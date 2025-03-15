@@ -36,12 +36,15 @@ export abstract class BaseMemoryBank {
         // Parse and validate tags
         const tags = await this.validateTags(this.extractTags(content));
 
+        // Ensure lastModified is a Date object
+        const lastModified = stats.mtime instanceof Date ? stats.mtime : new Date(stats.mtime);
+
         // Validate the complete document
         const document = {
           path: documentPath,
           content,
           tags,
-          lastModified: stats.mtime
+          lastModified
         };
 
         return MemoryDocumentSchema.parse(document);

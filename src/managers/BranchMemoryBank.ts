@@ -21,6 +21,7 @@ import {
 export class BranchMemoryBank extends BaseMemoryBank {
   private branchName: string;
   private language: Language;
+  private initialized: boolean = false;
 
   constructor(basePath: string, branchName: string, config: WorkspaceConfig) {
     super(basePath);
@@ -30,6 +31,19 @@ export class BranchMemoryBank extends BaseMemoryBank {
       throw MemoryBankError.invalidBranchName(branchName);
     }
     this.language = config.language;
+  }
+
+  /**
+   * Check if memory bank is initialized
+   */
+  private async ensureInitialized(): Promise<void> {
+    if (this.initialized) return;
+
+    const validation = await this.validateStructure();
+    if (!validation.isValid) {
+      await this.initialize();
+    }
+    this.initialized = true;
   }
 
   /**
@@ -117,17 +131,17 @@ export class BranchMemoryBank extends BaseMemoryBank {
     editOptions?: SectionEditOptions;
   }): Promise<void> {
     try {
+      await this.ensureInitialized();
       // Validate updates using zod schema
       const validatedUpdates = ActiveContextSchema.parse(updates);
       const editOptions = validatedUpdates.editOptions || { mode: 'replace' };
 
       const sections: DocumentSections = {};
 
-      if (validatedUpdates.currentWork) {
-        sections['currentWork'] = {
-          header: this.language === 'ja' ? '## 現在の作業内容' : '## Current Work',
-          content: validatedUpdates.currentWork
-        };
+      // Always include sections even if empty
+      sections['currentWork'] = {
+        header: this.language === 'ja' ? '## 現在の作業内容' : '## Current Work',
+        content: validatedUpdates.currentWork || ''
       }
 
       if (validatedUpdates.recentChanges) {
@@ -178,18 +192,18 @@ export class BranchMemoryBank extends BaseMemoryBank {
     editOptions?: SectionEditOptions;
   }): Promise<void> {
     try {
+      await this.ensureInitialized();
       // Validate updates using zod schema
       const validatedUpdates = ProgressSchema.parse(updates);
       const editOptions = validatedUpdates.editOptions || { mode: 'replace' };
 
       const sections: DocumentSections = {};
 
-      if (validatedUpdates.workingFeatures) {
-        sections['workingFeatures'] = {
-          header: this.language === 'ja' ? '## 動作している機能' : '## Working Features',
-          content: validatedUpdates.workingFeatures
-        };
-      }
+      // Always include sections even if empty
+      sections['workingFeatures'] = {
+        header: this.language === 'ja' ? '## 動作している機能' : '## Working Features',
+        content: validatedUpdates.workingFeatures || []
+      };
 
       if (validatedUpdates.pendingImplementation) {
         sections['pendingImplementation'] = {
@@ -232,6 +246,7 @@ export class BranchMemoryBank extends BaseMemoryBank {
     editOptions?: SectionEditOptions;
   }): Promise<void> {
     try {
+      await this.ensureInitialized();
       // Validate decision using zod schema
       const validatedDecision = SystemPatternsSchema.shape.technicalDecisions.unwrap().element.parse(decision);
       const editOptions = decision.editOptions || { mode: 'append' };
@@ -271,12 +286,7 @@ ${validatedDecision.consequences.map((c: string) => `- ${c}`).join('\n')}
   async writeCoreFiles(args: WriteBranchCoreFilesArgs): Promise<void> {
     try {
       const validatedArgs = WriteBranchCoreFilesArgsSchema.parse(args);
-
-      // Validate structure and initialize only if needed
-      const validation = await this.validateStructure();
-      if (!validation.isValid) {
-        await this.initialize();
-      }
+      await this.ensureInitialized();
 
       // Update branchContext.md
       if (validatedArgs.files.branchContext?.content) {
@@ -418,86 +428,130 @@ ${validatedDecision.consequences.map((c: string) => `- ${c}`).join('\n')}
   ): Promise<void> {
     try {
       const doc = await this.readDocument(documentPath);
-      let content = doc.content;
-      const lines = content.split('\n');
+      const lines = doc.content.split('\n');
+      const result: string[] = [];
+      let i = 0;
 
-      for (const [sectionName, section] of Object.entries(sections)) {
-        // Find all occurrences of the section header
-        const sectionIndices = lines
-          .map((line, index) => line.trim() === section.header ? index : -1)
-          .filter(index => index !== -1);
+      // First pass: collect all sections and their content
+      const allSections = new Map<string, { start: number; end: number }>();
+      let currentStart = -1;
 
-        // Remove duplicate sections if in replace mode
-        if (options.mode === 'replace' && sectionIndices.length > 1) {
-          for (let i = 1; i < sectionIndices.length; i++) {
-            const start = sectionIndices[i];
-            const end = i < sectionIndices.length - 1 ? sectionIndices[i + 1] : lines.length;
-            lines.splice(start, end - start);
+      for (i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (line.startsWith('##')) {
+          if (currentStart !== -1) {
+            allSections.set(lines[currentStart].trim(), { start: currentStart, end: i });
           }
-          content = lines.join('\n');
+          currentStart = i;
+        }
+      }
+      if (currentStart !== -1) {
+        allSections.set(lines[currentStart].trim(), { start: currentStart, end: lines.length });
+      }
+
+      // Second pass: build the new content
+      i = 0;
+      while (i < lines.length) {
+        const line = lines[i].trim();
+        if (!line.startsWith('##')) {
+          result.push(lines[i]);
+          i++;
+          continue;
         }
 
-        const sectionIndex = lines.findIndex(line => line.trim() === section.header);
+        // Found a section header
+        const section = Object.values(sections).find(s => s.header === line);
+        if (!section) {
+          // No update for this section, copy until next section
+          const sectionInfo = allSections.get(line);
+          if (sectionInfo) {
+            result.push(...lines.slice(i, sectionInfo.end));
+            i = sectionInfo.end;
+          } else {
+            result.push(lines[i]);
+            i++;
+          }
+          continue;
+        }
+
+        // Section to update
+        result.push(lines[i]); // Add header
+        i++;
+
+        // Format new content
         const formattedContent = Array.isArray(section.content)
           ? section.content.map(item => `- ${item}`).join('\n')
           : section.content;
 
-        if (sectionIndex === -1) {
-          // Section not found, append it at the end with proper spacing
-          content = content.trim() + '\n\n' + section.header + '\n\n' + formattedContent;
-          continue;
-        }
+        // Get existing content
+        const sectionInfo = allSections.get(line);
+        const existingContent = sectionInfo
+          ? lines.slice(i, sectionInfo.end).filter(l => l.trim())
+          : [];
 
-        // Find the next section or end of file
-        let nextSectionIndex = lines.findIndex((line, index) =>
-          index > sectionIndex && line.startsWith('##')
-        );
-        if (nextSectionIndex === -1) {
-          nextSectionIndex = lines.length;
-        }
+        // Apply the update based on mode
+        result.push(''); // Empty line after header
 
-        // Apply edit options
-        const startLine = options.startLine ?? sectionIndex + 2; // Skip header and empty line
-        const endLine = options.endLine ?? nextSectionIndex;
-
+        const content = [];
         switch (options.mode) {
           case 'append':
-            // Add new content at the end of the section with proper spacing
-            const beforeSection = lines.slice(0, endLine).join('\n').trim();
-            const afterSection = lines.slice(endLine).join('\n');
-            // Add double newlines to ensure proper spacing
-            content = `${beforeSection}\n\n${formattedContent}\n\n${afterSection.trim()}`;
+            if (existingContent.length > 0) {
+              content.push(...existingContent);
+            }
+            if (formattedContent) {
+              if (content.length > 0) content.push('');
+              content.push(formattedContent);
+            }
             break;
 
           case 'prepend':
-            // Add new content at the start of the section with proper spacing
-            const beforeContent = lines.slice(0, startLine).join('\n').trim();
-            const afterContent = lines.slice(startLine).join('\n');
-            // Add double newlines to ensure proper spacing
-            content = `${beforeContent}\n\n${formattedContent}\n\n${afterContent.trim()}`;
+            if (formattedContent) {
+              content.push(formattedContent);
+            }
+            if (existingContent.length > 0) {
+              if (content.length > 0) content.push('');
+              content.push(...existingContent);
+            }
             break;
 
           default: // replace
-            // Replace section content between startLine and endLine with proper spacing
-            const before = lines.slice(0, startLine).join('\n').trim();
-            const after = lines.slice(endLine).join('\n');
-            // Add double newlines to ensure proper spacing
-            content = `${before}\n\n${formattedContent}\n\n${after.trim()}`;
+            if (formattedContent) {
+              content.push(formattedContent);
+            }
             break;
+        }
+
+        if (content.length > 0) {
+          result.push(...content);
+        }
+
+        // Skip to next section
+        i = sectionInfo ? sectionInfo.end : i;
+      }
+
+      // Add missing sections
+      for (const section of Object.values(sections)) {
+        if (!allSections.has(section.header)) {
+          const formattedContent = Array.isArray(section.content)
+            ? section.content.map(item => `- ${item}`).join('\n')
+            : section.content;
+
+          if (formattedContent) {
+            result.push('');
+            result.push(section.header);
+            result.push('');
+            result.push(formattedContent);
+          }
         }
       }
 
-      // Normalize line endings and remove multiple consecutive empty lines
-      content = content
-        .replace(/\n{3,}/g, '\n\n') // Replace 3+ newlines with 2
-        .trim() + '\n'; // Ensure single newline at end of file
-
-      // Final check to ensure we don't have empty list items (-) with nothing after them
-      content = content.replace(/^-\s*$/gm, '');
-      // Remove any remaining empty list markers
-      content = content.replace(/^-\s*$/gm, '');
-      // Remove multiple consecutive newlines again after cleaning
-      content = content.replace(/\n{3,}/g, '\n\n').trim() + '\n';
+      // Clean up and normalize content
+      let content = result.join('\n')
+        .replace(/\r\n/g, '\n')
+        .replace(/\r/g, '\n')
+        .replace(/\n{3,}/g, '\n\n')
+        .replace(/^-\s*$/gm, '')
+        .trim() + '\n';
 
       await this.writeDocument(documentPath, content, doc.tags);
     } catch (error) {

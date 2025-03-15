@@ -428,7 +428,8 @@ describe('BranchMemoryBank Integration Test', () => {
       }, { mode: 'replace' });
 
       // ファイルを読み取り
-      const content = await fs.readFile(path.join(testDir, 'line-endings.md'), 'utf-8');
+      const doc = await branchMemoryBank.readDocument('line-endings.md');
+      const content = doc.content;
 
       // 行末の正規化を検証
       const hasInconsistentLineEndings = /\r\n/.test(content) && /[^\r]\n/.test(content);
@@ -506,7 +507,7 @@ describe('BranchMemoryBank Integration Test', () => {
 
       // 非常に大きなドキュメントを作成
       let largeContent = '# Large Document\n\n## Section\n';
-      for (let i = 0; i < 1000; i++) {
+      for (let i = 0; i < 2000; i++) {
         largeContent += `Item ${i}\n`;
       }
 
@@ -612,7 +613,8 @@ describe('BranchMemoryBank Integration Test', () => {
       }, { mode: 'replace' });
 
       // 更新後のドキュメントを読み取り
-      const content = await fs.readFile(path.join(testDir, 'multi-section.md'), 'utf-8');
+      const doc = await branchMemoryBank.readDocument('multi-section.md');
+      const content = doc.content;
 
       // 検証
       expect(content).toContain('更新セクション1');
