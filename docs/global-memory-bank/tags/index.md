@@ -2,23 +2,6 @@
 
 tags: #meta #index
 
-| タグ | 件数 | ドキュメント |
-|-----|------|-------------|
-| #architecture | 2 | [System Architecture](/architecture.md), [ドメインモデル](/domain-models.md) |
-| #best-practices | 1 | [Coding Standards](/coding-standards.md) |
-| #clean-architecture | 1 | [System Architecture](/architecture.md) |
-| #clean-code | 1 | [Coding Standards](/coding-standards.md) |
-| #definitions | 1 | [Glossary](/glossary.md) |
-| #dependencies | 1 | [Technology Stack](/tech-stack.md) |
-| #documentation | 1 | [ユーザーガイド](/user-guide.md) |
-| #domain | 1 | [ドメインモデル](/domain-models.md) |
-| #glossary | 1 | [Glossary](/glossary.md) |
-| #guide | 1 | [ユーザーガイド](/user-guide.md) |
-| #infrastructure | 1 | [Technology Stack](/tech-stack.md) |
-| #models | 1 | [ドメインモデル](/domain-models.md) |
-| #onion-architecture | 1 | [System Architecture](/architecture.md) |
-| #standards | 1 | [Coding Standards](/coding-standards.md) |
-| #system-design | 1 | [System Architecture](/architecture.md) |
-| #tech-stack | 1 | [Technology Stack](/tech-stack.md) |
-| #terminology | 1 | [Glossary](/glossary.md) |
-| #typescript | 1 | [Coding Standards](/coding-standards.md) |
+## 利用可能なタグ
+
+[このファイルは利用可能なタグで自動的に更新されます]
