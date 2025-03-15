@@ -8,7 +8,10 @@ import {
   PathSchema,
   TagSchema,
   DocumentSections,
-  DocumentSectionsSchema
+  DocumentSectionsSchema,
+  RecentBranch,
+  RecentBranchSchema,
+  GetRecentBranchesArgsSchema
 } from '../schemas/index.js';
 
 /**
@@ -139,6 +142,62 @@ export abstract class BaseMemoryBank {
         throw error;
       }
       throw MemoryBankError.documentValidationFailed(documentPath, (error as Error).message);
+    }
+  }
+
+  /**
+   * Get recent branch memory banks
+   */
+  async getRecentBranches(args: { limit?: number } = {}): Promise<RecentBranch[]> {
+    try {
+      // Validate arguments
+      const validatedArgs = GetRecentBranchesArgsSchema.parse(args);
+
+      // Get all branch directories
+      const branchesDir = path.join(this.basePath, 'branch-memory-bank');
+      const entries = await fs.readdir(branchesDir, { withFileTypes: true });
+      const branches: RecentBranch[] = [];
+
+      for (const entry of entries) {
+        if (!entry.isDirectory()) continue;
+
+        try {
+          const branchName = entry.name.replace(/-/g, '/');
+          const activeContextPath = path.join(branchesDir, entry.name, 'activeContext.md');
+          const stats = await fs.stat(activeContextPath);
+
+          // Read active context
+          const content = await fs.readFile(activeContextPath, 'utf-8');
+          const currentWork = this.extractSectionContent(content, '## Current Work') ||
+                            this.extractSectionContent(content, '## 現在の作業内容');
+          const recentChanges = this.extractListItems(content, '## Recent Changes') ||
+                               this.extractListItems(content, '## 最近の変更点');
+
+          const branch: RecentBranch = {
+            name: branchName,
+            lastModified: stats.mtime,
+            summary: {
+              currentWork,
+              recentChanges
+            }
+          };
+
+          branches.push(RecentBranchSchema.parse(branch));
+        } catch (error) {
+          console.error(`Error reading branch ${entry.name}:`, error);
+          continue;
+        }
+      }
+
+      // Sort by last modified date and limit
+      return branches
+        .sort((a, b) => b.lastModified.getTime() - a.lastModified.getTime())
+        .slice(0, validatedArgs.limit);
+    } catch (error) {
+      if (error instanceof MemoryBankError) {
+        throw error;
+      }
+      throw MemoryBankError.fileSystemError('list-branches', this.basePath, error as Error);
     }
   }
 
@@ -338,5 +397,38 @@ export abstract class BaseMemoryBank {
       const afterSection = lines.slice(nextSectionIndex).join('\n');
       return `${beforeSection}\n\n${newContent}\n${afterSection}`;
     }
+  }
+
+  protected extractSectionContent(content: string, sectionHeader: string): string | undefined {
+    const lines = content.split('\n');
+    const sectionIndex = lines.findIndex(line => line.trim() === sectionHeader);
+
+    if (sectionIndex === -1) return undefined;
+
+    // Find the next section or end of file
+    let nextSectionIndex = lines.findIndex((line, index) =>
+      index > sectionIndex && line.startsWith('##')
+    );
+    if (nextSectionIndex === -1) {
+      nextSectionIndex = lines.length;
+    }
+
+    // Extract and clean section content
+    return lines
+      .slice(sectionIndex + 1, nextSectionIndex)
+      .filter(line => line.trim())
+      .join('\n')
+      .trim();
+  }
+
+  protected extractListItems(content: string, sectionHeader: string): string[] | undefined {
+    const sectionContent = this.extractSectionContent(content, sectionHeader);
+    if (!sectionContent) return undefined;
+
+    return sectionContent
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.startsWith('-'))
+      .map(line => line.substring(1).trim());
   }
 }

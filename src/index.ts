@@ -39,6 +39,124 @@ const workspaceManager = new WorkspaceManager();
 let globalMemoryBank: GlobalMemoryBank | null = null;
 let branchMemoryBank: BranchMemoryBank | null = null;
 
+// Available tools definition
+const AVAILABLE_TOOLS = [
+  {
+    name: "list_tools",
+    description: "List all available tools",
+    inputSchema: {
+      type: "object",
+      properties: {}
+    }
+  },
+  {
+    name: "write_branch_memory_bank",
+    description: "Write a document to the current branch's memory bank",
+    inputSchema: {
+      type: "object",
+      properties: {
+        path: { type: "string" },
+        content: { type: "string" },
+        branch: {
+          type: "string",
+          description: "Branch name"
+        }
+      },
+      required: ["path"]
+    }
+  },
+  {
+    name: "read_branch_memory_bank",
+    description: "Read a document from the current branch's memory bank",
+    inputSchema: {
+      type: "object",
+      properties: {
+        path: { type: "string" },
+        branch: {
+          type: "string",
+          description: "Branch name"
+        }
+      },
+      required: ["path"]
+    }
+  },
+  {
+    name: "write_global_memory_bank",
+    description: "Write a document to the global memory bank",
+    inputSchema: {
+      type: "object",
+      properties: {
+        path: { type: "string" },
+        content: { type: "string" }
+      },
+      required: ["path"]
+    }
+  },
+  {
+    name: "read_global_memory_bank",
+    description: "Read a document from the global memory bank",
+    inputSchema: {
+      type: "object",
+      properties: {
+        path: { type: "string" }
+      },
+      required: ["path"]
+    }
+  },
+  {
+    name: "read_branch_core_files",
+    description: "Read all core files from the branch memory bank",
+    inputSchema: {
+      type: "object",
+      properties: {
+        branch: {
+          type: "string",
+          description: "Branch name"
+        }
+      },
+      required: ["branch"]
+    }
+  },
+  {
+    name: "read_global_core_files",
+    description: "Read all core files from the global memory bank",
+    inputSchema: {
+      type: "object",
+      properties: {}
+    }
+  },
+  {
+    name: "read_rules",
+    description: "Read the memory bank rules in specified language",
+    inputSchema: {
+      type: "object",
+      properties: {
+        language: {
+          type: "string",
+          enum: ["en", "ja"],
+          description: "Language code (en or ja)"
+        }
+      },
+      required: ["language"]
+    }
+  },
+  {
+    name: "get_recent_branches",
+    description: "Get recently updated branch memory banks",
+    inputSchema: {
+      type: "object",
+      properties: {
+        limit: {
+          type: "number",
+          description: "Maximum number of branches to return (default: 10, max: 100)",
+          minimum: 1,
+          maximum: 100
+        }
+      }
+    }
+  }
+];
+
 // Create a server
 const server = new Server(
   {
@@ -55,99 +173,7 @@ const server = new Server(
 // Set up tool handlers
 server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
-    tools: [
-      {
-        name: "write_branch_memory_bank",
-        description: "Write a document to the current branch's memory bank",
-        inputSchema: {
-          type: "object",
-          properties: {
-            path: { type: "string" },
-            content: { type: "string" },
-            branch: {
-              type: "string",
-              description: "Branch name"
-            }
-          },
-          required: ["path"]
-        }
-      },
-      {
-        name: "read_branch_memory_bank",
-        description: "Read a document from the current branch's memory bank",
-        inputSchema: {
-          type: "object",
-          properties: {
-            path: { type: "string" },
-            branch: {
-              type: "string",
-              description: "Branch name"
-            }
-          },
-          required: ["path"]
-        }
-      },
-      {
-        name: "write_global_memory_bank",
-        description: "Write a document to the global memory bank",
-        inputSchema: {
-          type: "object",
-          properties: {
-            path: { type: "string" },
-            content: { type: "string" }
-          },
-          required: ["path"]
-        }
-      },
-      {
-        name: "read_global_memory_bank",
-        description: "Read a document from the global memory bank",
-        inputSchema: {
-          type: "object",
-          properties: {
-            path: { type: "string" }
-          },
-          required: ["path"]
-        }
-      },
-      {
-        name: "read_branch_core_files",
-        description: "Read all core files from the branch memory bank",
-        inputSchema: {
-          type: "object",
-          properties: {
-            branch: {
-              type: "string",
-              description: "Branch name"
-            }
-          },
-          required: ["branch"]
-        }
-      },
-      {
-        name: "read_global_core_files",
-        description: "Read all core files from the global memory bank",
-        inputSchema: {
-          type: "object",
-          properties: {}
-        }
-      },
-      {
-        name: "read_rules",
-        description: "Read the memory bank rules in specified language",
-        inputSchema: {
-          type: "object",
-          properties: {
-            language: {
-              type: "string",
-              enum: ["en", "ja"],
-              description: "Language code (en or ja)"
-            }
-          },
-          required: ["language"]
-        }
-      }
-    ]
+    tools: AVAILABLE_TOOLS
   };
 });
 
@@ -165,6 +191,17 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   logger.debug('Parsed params:', params);
 
   switch (name) {
+    case "list_tools": {
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(AVAILABLE_TOOLS, null, 2)
+          }
+        ]
+      };
+    }
+
     case "write_branch_memory_bank": {
       const path = params.path as string;
       const content = params.content as string | undefined;
@@ -341,6 +378,26 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           {
             type: "text",
             text: JSON.stringify(results, null, 2)
+          }
+        ]
+      };
+    }
+
+    case "get_recent_branches": {
+      const limit = params.limit as number | undefined;
+      const config = await workspaceManager.initialize();
+      branchMemoryBank = new BranchMemoryBank(
+        workspaceManager.getBranchMemoryPath('main'),
+        'main',
+        config
+      );
+
+      const branches = await branchMemoryBank.getRecentBranches({ limit });
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(branches, null, 2)
           }
         ]
       };

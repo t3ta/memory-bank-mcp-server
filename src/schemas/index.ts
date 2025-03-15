@@ -36,6 +36,20 @@ export const SectionEditSchema = z.object({
 
 export const DocumentSectionsSchema = z.record(SectionEditSchema);
 
+// Recent branches schema
+export const RecentBranchSchema = z.object({
+  name: z.string(),
+  lastModified: z.date(),
+  summary: z.object({
+    currentWork: z.string().optional(),
+    recentChanges: z.array(z.string()).optional()
+  })
+});
+
+export const GetRecentBranchesArgsSchema = z.object({
+  limit: z.number().min(1).max(100).default(10)
+});
+
 // Workspace configuration schemas
 export const WorkspaceConfigSchema = z.object({
   workspaceRoot: PathSchema,
@@ -142,3 +156,5 @@ export type WorkspaceConfig = z.infer<typeof WorkspaceConfigSchema>;
 export type CliOptions = z.infer<typeof CliOptionsSchema>;
 export type SectionEdit = z.infer<typeof SectionEditSchema>;
 export type DocumentSections = z.infer<typeof DocumentSectionsSchema>;
+export type RecentBranch = z.infer<typeof RecentBranchSchema>;
+export type GetRecentBranchesArgs = z.infer<typeof GetRecentBranchesArgsSchema>;
