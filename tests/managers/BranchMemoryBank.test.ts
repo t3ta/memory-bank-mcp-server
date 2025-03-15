@@ -21,7 +21,7 @@ describe('BranchMemoryBank', () => {
   
   beforeEach(() => {
     mockFs.__resetMockFiles();
-    branchMemoryBank = new BranchMemoryBank(workspacePath, branchName);
+    branchMemoryBank = new BranchMemoryBank(workspacePath, branchName, { language: 'ja' });
   });
   
   describe('constructor', () => {
@@ -33,11 +33,11 @@ describe('BranchMemoryBank', () => {
     
     test('should throw error if branch name does not start with feature/ or fix/', () => {
       expect(() => {
-        new BranchMemoryBank(workspacePath, 'invalid-branch');
+        new BranchMemoryBank(workspacePath, 'invalid-branch', { language: 'ja' });
       }).toThrow(MemoryBankError);
       
       expect(() => {
-        new BranchMemoryBank(workspacePath, 'main');
+        new BranchMemoryBank(workspacePath, 'main', { language: 'ja' });
       }).toThrow(MemoryBankError);
     });
   });
@@ -150,8 +150,157 @@ describe('BranchMemoryBank', () => {
       expect(coreFiles.find(f => f.path === 'progress.md')?.content).toBe(sampleBranchMemoryBank.progress);
     });
   });
+
+  describe('updateActiveContext', () => {
+    beforeEach(async () => {
+      await branchMemoryBank.initialize();
+      jest.clearAllMocks();
+    });
+
+    test('should update current work', async () => {
+      await branchMemoryBank.updateActiveContext({
+        currentWork: 'テスト中のタスク'
+      });
+
+      // Check if writeFile was called with content containing the update
+      expect(mockFs.writeFile).toHaveBeenCalledWith(
+        expect.stringContaining('activeContext.md'),
+        expect.stringContaining('テスト中のタスク')
+      );
+
+      // Read the document back to verify
+      const doc = await branchMemoryBank.readDocument('activeContext.md');
+      expect(doc.content).toContain('テスト中のタスク');
+    });
+
+    test('should update multiple sections', async () => {
+      await branchMemoryBank.updateActiveContext({
+        currentWork: '複数セクションの更新テスト',
+        recentChanges: ['変更1', '変更2'],
+        activeDecisions: ['決定1'],
+        considerations: ['考慮点1', '考慮点2'],
+        nextSteps: ['次のステップ1']
+      });
+
+      // Read the document back to verify
+      const doc = await branchMemoryBank.readDocument('activeContext.md');
+      expect(doc.content).toContain('複数セクションの更新テスト');
+      expect(doc.content).toContain('- 変更1');
+      expect(doc.content).toContain('- 変更2');
+      expect(doc.content).toContain('- 決定1');
+      expect(doc.content).toContain('- 考慮点1');
+      expect(doc.content).toContain('- 考慮点2');
+      expect(doc.content).toContain('- 次のステップ1');
+    });
+
+    test('should handle append mode', async () => {
+      // First update
+      await branchMemoryBank.updateActiveContext({
+        currentWork: '初期状態',
+        nextSteps: ['ステップA']
+      });
+
+      // Second update with append mode
+      await branchMemoryBank.updateActiveContext({
+        nextSteps: ['ステップB'],
+        editOptions: { mode: 'append' }
+      });
+
+      // Read the document back to verify
+      const doc = await branchMemoryBank.readDocument('activeContext.md');
+      expect(doc.content).toContain('初期状態'); // Should preserve current work
+      expect(doc.content).toContain('- ステップA'); // Should keep original step
+      expect(doc.content).toContain('- ステップB'); // Should append new step
+    });
+  });
+
+  describe('updateProgress', () => {
+    beforeEach(async () => {
+      await branchMemoryBank.initialize();
+      jest.clearAllMocks();
+    });
+
+    test('should update status', async () => {
+      await branchMemoryBank.updateProgress({
+        status: '開発中'
+      });
+
+      // Read the document back to verify
+      const doc = await branchMemoryBank.readDocument('progress.md');
+      expect(doc.content).toContain('開発中');
+    });
+
+    test('should update features lists', async () => {
+      await branchMemoryBank.updateProgress({
+        workingFeatures: ['機能1', '機能2'],
+        pendingImplementation: ['未実装1'],
+        knownIssues: ['問題1', '問題2']
+      });
+
+      // Read the document back to verify
+      const doc = await branchMemoryBank.readDocument('progress.md');
+      expect(doc.content).toContain('- 機能1');
+      expect(doc.content).toContain('- 機能2');
+      expect(doc.content).toContain('- 未実装1');
+      expect(doc.content).toContain('- 問題1');
+      expect(doc.content).toContain('- 問題2');
+    });
+  });
+
+  describe('addTechnicalDecision', () => {
+    beforeEach(async () => {
+      await branchMemoryBank.initialize();
+      jest.clearAllMocks();
+    });
+
+    test('should add a technical decision', async () => {
+      await branchMemoryBank.addTechnicalDecision({
+        title: 'テスト決定',
+        context: 'テストのコンテキスト',
+        decision: 'テストの決定内容',
+        consequences: ['影響1', '影響2']
+      });
+
+      // Read the document back to verify
+      const doc = await branchMemoryBank.readDocument('systemPatterns.md');
+      expect(doc.content).toContain('### テスト決定');
+      expect(doc.content).toContain('テストのコンテキスト');
+      expect(doc.content).toContain('テストの決定内容');
+      expect(doc.content).toContain('- 影響1');
+      expect(doc.content).toContain('- 影響2');
+    });
+
+    test('should append multiple technical decisions', async () => {
+      // Add first decision
+      await branchMemoryBank.addTechnicalDecision({
+        title: '決定1',
+        context: 'コンテキスト1',
+        decision: '決定内容1',
+        consequences: ['決定1の影響']
+      });
+
+      // Add second decision
+      await branchMemoryBank.addTechnicalDecision({
+        title: '決定2',
+        context: 'コンテキスト2',
+        decision: '決定内容2',
+        consequences: ['決定2の影響']
+      });
+
+      // Read the document back to verify
+      const doc = await branchMemoryBank.readDocument('systemPatterns.md');
+      expect(doc.content).toContain('### 決定1');
+      expect(doc.content).toContain('コンテキスト1');
+      expect(doc.content).toContain('決定内容1');
+      expect(doc.content).toContain('決定1の影響');
+      expect(doc.content).toContain('### 決定2');
+      expect(doc.content).toContain('コンテキスト2');
+      expect(doc.content).toContain('決定内容2');
+      expect(doc.content).toContain('決定2の影響');
+    });
+  });
   
-  describe('writeBranchCoreFiles', () => {
+  describe('writeCoreFiles', () => {
     beforeEach(async () => {
       await branchMemoryBank.initialize();
       
@@ -168,7 +317,7 @@ describe('BranchMemoryBank', () => {
         nextSteps: ['Implement more tests', 'Add integration tests']
       };
       
-      await branchMemoryBank.writeBranchCoreFiles({
+      await branchMemoryBank.writeCoreFiles({
         branch: branchName,
         files: { activeContext }
       });
@@ -185,12 +334,12 @@ describe('BranchMemoryBank', () => {
       
       const content = writeFileCall ? writeFileCall[1] : '';
       expect(content).toContain('## 現在の作業内容\nTesting BranchMemoryBank');
-      expect(content).toContain('Added new tests');
-      expect(content).toContain('Fixed bugs');
-      expect(content).toContain('Use Jest for testing');
-      expect(content).toContain('How to improve test coverage');
-      expect(content).toContain('Implement more tests');
-      expect(content).toContain('Add integration tests');
+      expect(content).toContain('- Added new tests');
+      expect(content).toContain('- Fixed bugs');
+      expect(content).toContain('- Use Jest for testing');
+      expect(content).toContain('- How to improve test coverage');
+      expect(content).toContain('- Implement more tests');
+      expect(content).toContain('- Add integration tests');
     });
     
     test('should update progress', async () => {
@@ -201,7 +350,7 @@ describe('BranchMemoryBank', () => {
         knownIssues: ['Issue 1', 'Issue 2']
       };
       
-      await branchMemoryBank.writeBranchCoreFiles({
+      await branchMemoryBank.writeCoreFiles({
         branch: branchName,
         files: { progress }
       });
@@ -236,7 +385,7 @@ describe('BranchMemoryBank', () => {
         }
       ];
       
-      await branchMemoryBank.writeBranchCoreFiles({
+      await branchMemoryBank.writeCoreFiles({
         branch: branchName,
         files: { 
           systemPatterns: { 
@@ -266,7 +415,7 @@ describe('BranchMemoryBank', () => {
     test('should update branchContext', async () => {
       const branchContextContent = '# テスト用ブランチコンテキスト\n\nこれはテスト用のコンテンツです。';
       
-      await branchMemoryBank.writeBranchCoreFiles({
+      await branchMemoryBank.writeCoreFiles({
         branch: branchName,
         files: { 
           branchContext: { 
@@ -303,7 +452,7 @@ describe('BranchMemoryBank', () => {
         }
       };
       
-      await branchMemoryBank.writeBranchCoreFiles(updates);
+      await branchMemoryBank.writeCoreFiles(updates);
       
       // Should call writeFile for each updated file
       expect(mockFs.writeFile).toHaveBeenCalledTimes(3);
@@ -325,207 +474,6 @@ describe('BranchMemoryBank', () => {
         expect.stringContaining('progress.md'),
         expect.stringContaining('テスト中')
       );
-    });
-  });
-  
-  describe('updateDocumentSections', () => {
-    beforeEach(async () => {
-      // Setup a test document
-      const testDoc = `# テストドキュメント
-
-## セクション1
-
-これはセクション1の内容です。
-
-## セクション2
-
-これはセクション2の内容です。
-
-## セクション3
-
-これはセクション3の内容です。
-`;
-      
-      await branchMemoryBank.initialize();
-      await branchMemoryBank.writeDocument('test-sections.md', testDoc);
-      
-      // Clear mock calls after setup
-      jest.clearAllMocks();
-    });
-    
-    test('should replace section content', async () => {
-      await branchMemoryBank.updateDocumentSections('test-sections.md', {
-        'セクション2': {
-          header: '## セクション2',
-          content: '新しいセクション2の内容です。',
-          mode: 'replace'
-        }
-      });
-      
-      // Check if writeFile was called
-      expect(mockFs.writeFile).toHaveBeenCalled();
-      
-      // Read the updated document
-      const updatedDoc = await branchMemoryBank.readDocument('test-sections.md');
-      expect(updatedDoc.content).toContain('## セクション1');
-      expect(updatedDoc.content).toContain('これはセクション1の内容です。');
-      expect(updatedDoc.content).toContain('## セクション2');
-      expect(updatedDoc.content).toContain('新しいセクション2の内容です。');
-      expect(updatedDoc.content).toContain('## セクション3');
-      expect(updatedDoc.content).toContain('これはセクション3の内容です。');
-      expect(updatedDoc.content).not.toContain('これはセクション2の内容です。');
-    });
-    
-    test('should append to section content', async () => {
-      await branchMemoryBank.updateDocumentSections('test-sections.md', {
-        'セクション1': {
-          header: '## セクション1',
-          content: '追加された内容です。',
-          mode: 'append'
-        }
-      });
-      
-      // Read the updated document
-      const updatedDoc = await branchMemoryBank.readDocument('test-sections.md');
-      expect(updatedDoc.content).toContain('## セクション1');
-      expect(updatedDoc.content).toContain('これはセクション1の内容です。');
-      expect(updatedDoc.content).toContain('追加された内容です。');
-    });
-    
-    test('should prepend to section content', async () => {
-      await branchMemoryBank.updateDocumentSections('test-sections.md', {
-        'セクション3': {
-          header: '## セクション3',
-          content: '先頭に追加された内容です。',
-          mode: 'prepend'
-        }
-      });
-      
-      // Read the updated document
-      const updatedDoc = await branchMemoryBank.readDocument('test-sections.md');
-      expect(updatedDoc.content).toContain('## セクション3');
-      expect(updatedDoc.content).toContain('先頭に追加された内容です。');
-      expect(updatedDoc.content).toContain('これはセクション3の内容です。');
-    });
-    
-    test('should handle array content for sections', async () => {
-      await branchMemoryBank.updateDocumentSections('test-sections.md', {
-        'セクション2': {
-          header: '## セクション2',
-          content: ['項目1', '項目2', '項目3'],
-          mode: 'replace'
-        }
-      });
-      
-      // Read the updated document
-      const updatedDoc = await branchMemoryBank.readDocument('test-sections.md');
-      expect(updatedDoc.content).toContain('## セクション2');
-      expect(updatedDoc.content).toContain('- 項目1');
-      expect(updatedDoc.content).toContain('- 項目2');
-      expect(updatedDoc.content).toContain('- 項目3');
-    });
-    
-    test('should add new section if not found', async () => {
-      await branchMemoryBank.updateDocumentSections('test-sections.md', {
-        '新しいセクション': {
-          header: '## 新しいセクション',
-          content: 'これは新しいセクションの内容です。',
-          mode: 'replace'
-        }
-      });
-      
-      // Read the updated document
-      const updatedDoc = await branchMemoryBank.readDocument('test-sections.md');
-      expect(updatedDoc.content).toContain('## 新しいセクション');
-      expect(updatedDoc.content).toContain('これは新しいセクションの内容です。');
-    });
-    
-    test('should normalize multiple consecutive empty lines', async () => {
-      // Create a document with excessive newlines
-      const docWithExcessiveNewlines = `# ドキュメント
-
-
-## セクション1
-
-
-
-内容1
-
-
-
-
-## セクション2
-
-
-内容2
-
-`;
-      
-      await branchMemoryBank.writeDocument('newlines-test.md', docWithExcessiveNewlines);
-      jest.clearAllMocks();
-      
-      // Update a section
-      await branchMemoryBank.updateDocumentSections('newlines-test.md', {
-        'セクション1': {
-          header: '## セクション1',
-          content: '新しい内容1',
-          mode: 'replace'
-        }
-      });
-      
-      // Read the updated document
-      const updatedDoc = await branchMemoryBank.readDocument('newlines-test.md');
-      
-      // No more than 2 consecutive newlines should exist
-      expect(updatedDoc.content).not.toMatch(/\n{3,}/);
-      
-      // Correct content should be preserved
-      expect(updatedDoc.content).toContain('# ドキュメント');
-      expect(updatedDoc.content).toContain('## セクション1');
-      expect(updatedDoc.content).toContain('新しい内容1');
-      expect(updatedDoc.content).toContain('## セクション2');
-      expect(updatedDoc.content).toContain('内容2');
-    });
-    
-    test('should handle multiple sections with the same header', async () => {
-      // Create a document with duplicate section headers
-      const docWithDuplicateSections = `# ドキュメント
-
-## 重複セクション
-内容1
-
-## 別のセクション
-別の内容
-
-## 重複セクション
-内容2
-`;
-      
-      await branchMemoryBank.writeDocument('duplicate-sections.md', docWithDuplicateSections);
-      jest.clearAllMocks();
-      
-      // Update the duplicate section
-      await branchMemoryBank.updateDocumentSections('duplicate-sections.md', {
-        '重複セクション': {
-          header: '## 重複セクション',
-          content: '更新された内容',
-          mode: 'replace'
-        }
-      });
-      
-      // Read the updated document
-      const updatedDoc = await branchMemoryBank.readDocument('duplicate-sections.md');
-      
-      // Should remove duplicate sections and keep only one
-      const matches = updatedDoc.content.match(/## 重複セクション/g);
-      expect(matches?.length).toBe(1);
-      
-      // Updated content should be present
-      expect(updatedDoc.content).toContain('更新された内容');
-      
-      // Other section should be preserved
-      expect(updatedDoc.content).toContain('## 別のセクション');
-      expect(updatedDoc.content).toContain('別の内容');
     });
   });
 });
