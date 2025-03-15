@@ -1,7 +1,14 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { BaseMemoryBank } from './BaseMemoryBank.js';
-import { ValidationResult, BRANCH_CORE_FILES, TEMPLATES, Language, WorkspaceConfig } from '../models/types.js';
+import { ValidationResult, BRANCH_CORE_FILES, TEMPLATES, Language, WorkspaceConfig, ValidationErrorType } from '../models/types.js';
+import { MemoryBankError } from '../errors/MemoryBankError.js';
+import {
+  BranchNameSchema,
+  UpdateActiveContextArgsSchema,
+  UpdateProgressArgsSchema,
+  AddTechnicalDecisionArgsSchema
+} from '../schemas/index.js';
 
 /**
  * Branch memory bank implementation
@@ -12,7 +19,11 @@ export class BranchMemoryBank extends BaseMemoryBank {
 
   constructor(basePath: string, branchName: string, config: WorkspaceConfig) {
     super(basePath);
-    this.branchName = branchName;
+    try {
+      this.branchName = BranchNameSchema.parse(branchName);
+    } catch (error) {
+      throw MemoryBankError.invalidBranchName(branchName);
+    }
     this.language = config.language;
   }
 
@@ -20,41 +31,50 @@ export class BranchMemoryBank extends BaseMemoryBank {
    * Initialize the branch memory bank with required structure
    */
   async initialize(): Promise<void> {
-    // Ensure directory exists
-    await fs.mkdir(this.basePath, { recursive: true });
+    try {
+      // Ensure directory exists
+      await fs.mkdir(this.basePath, { recursive: true });
 
-    const timestamp = new Date().toISOString();
-    const templates = TEMPLATES[this.language];
+      const timestamp = new Date().toISOString();
+      const templates = TEMPLATES[this.language];
 
-    const templateMap = {
-      'branchContext.md': templates.branchContext,
-      'activeContext.md': templates.activeContext,
-      'systemPatterns.md': templates.systemPatterns,
-      'progress.md': templates.progress
-    };
+      const templateMap = {
+        'branchContext.md': templates.branchContext,
+        'activeContext.md': templates.activeContext,
+        'systemPatterns.md': templates.systemPatterns,
+        'progress.md': templates.progress
+      };
 
-    for (const file of BRANCH_CORE_FILES) {
-      try {
-        // Check if file exists
-        const filePath = path.join(this.basePath, file);
+      for (const file of BRANCH_CORE_FILES) {
         try {
-          await fs.access(filePath);
-          continue; // Skip if file exists
-        } catch {
-          // File doesn't exist, create it
-          let template: string = templateMap[file];
+          // Check if file exists
+          const filePath = path.join(this.basePath, file);
+          try {
+            await fs.access(filePath);
+            continue; // Skip if file exists
+          } catch {
+            // File doesn't exist, create it
+            let template: string = templateMap[file];
 
-          // Replace placeholders
-          template = template
-            .replace('{branchName}', this.branchName.replace(/\//g, '-'))
-            .replace('{timestamp}', timestamp);
+            // Replace placeholders
+            template = template
+              .replace('{branchName}', this.branchName.replace(/\//g, '-'))
+              .replace('{timestamp}', timestamp);
 
-          await fs.writeFile(filePath, template, 'utf-8');
+            await this.writeDocument(file, template);
+          }
+        } catch (error) {
+          if (error instanceof MemoryBankError) {
+            throw error;
+          }
+          throw MemoryBankError.fileSystemError('initialize', file, error as Error);
         }
-      } catch (error) {
-        console.error(`Error initializing file ${file}:`, error);
+      }
+    } catch (error) {
+      if (error instanceof MemoryBankError) {
         throw error;
       }
+      throw MemoryBankError.fileSystemError('initialize', this.basePath, error as Error);
     }
   }
 
@@ -75,6 +95,11 @@ export class BranchMemoryBank extends BaseMemoryBank {
       } catch {
         result.isValid = false;
         result.missingFiles.push(file);
+        result.errors.push({
+          type: ValidationErrorType.MISSING_FILE,
+          message: `Required file ${file} is missing`,
+          path: file
+        });
       }
     }
 
@@ -91,34 +116,44 @@ export class BranchMemoryBank extends BaseMemoryBank {
     considerations?: string[];
     nextSteps?: string[];
   }): Promise<void> {
-    const doc = await this.readDocument('activeContext.md');
-    let content = doc.content;
+    try {
+      // Validate updates using zod schema
+      const validatedUpdates = UpdateActiveContextArgsSchema.parse(updates);
 
-    if (updates.currentWork) {
-      content = this.updateSection(content, this.language === 'ja' ? '## 現在の作業内容' : '## Current Work', updates.currentWork);
+      const doc = await this.readDocument('activeContext.md');
+      let content = doc.content;
+
+      if (validatedUpdates.currentWork) {
+        content = this.updateSection(content, this.language === 'ja' ? '## 現在の作業内容' : '## Current Work', validatedUpdates.currentWork);
+      }
+
+      if (validatedUpdates.recentChanges) {
+        const changes = validatedUpdates.recentChanges.map(change => `- ${change}`).join('\n');
+        content = this.updateSection(content, this.language === 'ja' ? '## 最近の変更点' : '## Recent Changes', changes);
+      }
+
+      if (validatedUpdates.activeDecisions) {
+        const decisions = validatedUpdates.activeDecisions.map(decision => `- ${decision}`).join('\n');
+        content = this.updateSection(content, this.language === 'ja' ? '## アクティブな決定事項' : '## Active Decisions', decisions);
+      }
+
+      if (validatedUpdates.considerations) {
+        const considerations = validatedUpdates.considerations.map(item => `- ${item}`).join('\n');
+        content = this.updateSection(content, this.language === 'ja' ? '## 検討事項' : '## Active Considerations', considerations);
+      }
+
+      if (validatedUpdates.nextSteps) {
+        const steps = validatedUpdates.nextSteps.map(step => `- [ ] ${step}`).join('\n');
+        content = this.updateSection(content, this.language === 'ja' ? '## 次のステップ' : '## Next Steps', steps);
+      }
+
+      await this.writeDocument('activeContext.md', content);
+    } catch (error) {
+      if (error instanceof MemoryBankError) {
+        throw error;
+      }
+      throw MemoryBankError.documentValidationFailed('activeContext.md', (error as Error).message);
     }
-
-    if (updates.recentChanges) {
-      const changes = updates.recentChanges.map(change => `- ${change}`).join('\n');
-      content = this.updateSection(content, this.language === 'ja' ? '## 最近の変更点' : '## Recent Changes', changes);
-    }
-
-    if (updates.activeDecisions) {
-      const decisions = updates.activeDecisions.map(decision => `- ${decision}`).join('\n');
-      content = this.updateSection(content, this.language === 'ja' ? '## アクティブな決定事項' : '## Active Decisions', decisions);
-    }
-
-    if (updates.considerations) {
-      const considerations = updates.considerations.map(item => `- ${item}`).join('\n');
-      content = this.updateSection(content, this.language === 'ja' ? '## 検討事項' : '## Active Considerations', considerations);
-    }
-
-    if (updates.nextSteps) {
-      const steps = updates.nextSteps.map(step => `- [ ] ${step}`).join('\n');
-      content = this.updateSection(content, this.language === 'ja' ? '## 次のステップ' : '## Next Steps', steps);
-    }
-
-    await this.writeDocument('activeContext.md', content);
   }
 
   /**
@@ -130,29 +165,39 @@ export class BranchMemoryBank extends BaseMemoryBank {
     status?: string;
     knownIssues?: string[];
   }): Promise<void> {
-    const doc = await this.readDocument('progress.md');
-    let content = doc.content;
+    try {
+      // Validate updates using zod schema
+      const validatedUpdates = UpdateProgressArgsSchema.parse(updates);
 
-    if (updates.workingFeatures) {
-      const features = updates.workingFeatures.map(feature => `- ${feature}`).join('\n');
-      content = this.updateSection(content, this.language === 'ja' ? '## 動作している機能' : '## Working Features', features);
+      const doc = await this.readDocument('progress.md');
+      let content = doc.content;
+
+      if (validatedUpdates.workingFeatures) {
+        const features = validatedUpdates.workingFeatures.map(feature => `- ${feature}`).join('\n');
+        content = this.updateSection(content, this.language === 'ja' ? '## 動作している機能' : '## Working Features', features);
+      }
+
+      if (validatedUpdates.pendingImplementation) {
+        const pending = validatedUpdates.pendingImplementation.map(item => `- [ ] ${item}`).join('\n');
+        content = this.updateSection(content, this.language === 'ja' ? '## 未実装の機能' : '## Pending Implementation', pending);
+      }
+
+      if (validatedUpdates.status) {
+        content = this.updateSection(content, this.language === 'ja' ? '## 現在の状態' : '## Current Status', validatedUpdates.status);
+      }
+
+      if (validatedUpdates.knownIssues) {
+        const issues = validatedUpdates.knownIssues.map(issue => `- ${issue}`).join('\n');
+        content = this.updateSection(content, this.language === 'ja' ? '## 既知の問題' : '## Known Issues', issues);
+      }
+
+      await this.writeDocument('progress.md', content);
+    } catch (error) {
+      if (error instanceof MemoryBankError) {
+        throw error;
+      }
+      throw MemoryBankError.documentValidationFailed('progress.md', (error as Error).message);
     }
-
-    if (updates.pendingImplementation) {
-      const pending = updates.pendingImplementation.map(item => `- [ ] ${item}`).join('\n');
-      content = this.updateSection(content, this.language === 'ja' ? '## 未実装の機能' : '## Pending Implementation', pending);
-    }
-
-    if (updates.status) {
-      content = this.updateSection(content, this.language === 'ja' ? '## 現在の状態' : '## Current Status', updates.status);
-    }
-
-    if (updates.knownIssues) {
-      const issues = updates.knownIssues.map(issue => `- ${issue}`).join('\n');
-      content = this.updateSection(content, this.language === 'ja' ? '## 既知の問題' : '## Known Issues', issues);
-    }
-
-    await this.writeDocument('progress.md', content);
   }
 
   /**
@@ -164,22 +209,32 @@ export class BranchMemoryBank extends BaseMemoryBank {
     decision: string;
     consequences: string[];
   }): Promise<void> {
-    const doc = await this.readDocument('systemPatterns.md');
-    const decisionText = `
-### ${decision.title}
+    try {
+      // Validate decision using zod schema
+      const validatedDecision = AddTechnicalDecisionArgsSchema.parse(decision);
+
+      const doc = await this.readDocument('systemPatterns.md');
+      const decisionText = `
+### ${validatedDecision.title}
 
 ${this.language === 'ja' ? '#### コンテキスト' : '#### Context'}
-${decision.context}
+${validatedDecision.context}
 
 ${this.language === 'ja' ? '#### 決定事項' : '#### Decision'}
-${decision.decision}
+${validatedDecision.decision}
 
 ${this.language === 'ja' ? '#### 影響' : '#### Consequences'}
-${decision.consequences.map(c => `- ${c}`).join('\n')}
+${validatedDecision.consequences.map(c => `- ${c}`).join('\n')}
 `;
 
-    const content = this.updateSection(doc.content, this.language === 'ja' ? '## 技術的決定事項' : '## Technical Decisions', decisionText, true);
-    await this.writeDocument('systemPatterns.md', content);
+      const content = this.updateSection(doc.content, this.language === 'ja' ? '## 技術的決定事項' : '## Technical Decisions', decisionText, true);
+      await this.writeDocument('systemPatterns.md', content);
+    } catch (error) {
+      if (error instanceof MemoryBankError) {
+        throw error;
+      }
+      throw MemoryBankError.documentValidationFailed('systemPatterns.md', (error as Error).message);
+    }
   }
 
   private updateSection(content: string, sectionHeader: string, newContent: string, append = false): string {

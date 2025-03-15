@@ -341,7 +341,28 @@ tags: #guide #documentation
 export interface ValidationResult {
   isValid: boolean;
   missingFiles: string[];
-  errors: string[];
+  errors: ValidationError[];
+}
+
+/**
+ * Validation error details
+ */
+export interface ValidationError {
+  type: ValidationErrorType;
+  message: string;
+  path?: string;
+  details?: Record<string, unknown>;
+}
+
+/**
+ * Types of validation errors
+ */
+export enum ValidationErrorType {
+  MISSING_FILE = 'MISSING_FILE',
+  INVALID_CONTENT = 'INVALID_CONTENT',
+  INVALID_TAGS = 'INVALID_TAGS',
+  INVALID_PATH = 'INVALID_PATH',
+  INVALID_STRUCTURE = 'INVALID_STRUCTURE'
 }
 
 /**

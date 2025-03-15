@@ -1,6 +1,13 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-import { MemoryDocument, ValidationResult } from '../models/types.js';
+import { MemoryBankError } from '../errors/MemoryBankError.js';
+import { ValidationResult } from '../models/types.js';
+import {
+  MemoryDocument,
+  MemoryDocumentSchema,
+  PathSchema,
+  TagSchema
+} from '../schemas/index.js';
 
 /**
  * Base class for memory bank operations
@@ -12,23 +19,44 @@ export abstract class BaseMemoryBank {
    * Read a document from the memory bank
    */
   async readDocument(documentPath: string): Promise<MemoryDocument> {
-    const fullPath = this.resolvePath(documentPath);
-
     try {
-      const content = await fs.readFile(fullPath, 'utf-8');
-      const stats = await fs.stat(fullPath);
+      // Validate path
+      const validatedPath = await this.validatePath(documentPath);
+      const fullPath = this.resolvePath(validatedPath);
 
-      // Parse tags from content
-      const tags = this.extractTags(content);
+      try {
+        const content = await fs.readFile(fullPath, 'utf-8');
+        const stats = await fs.stat(fullPath);
 
-      return {
-        path: documentPath,
-        content,
-        tags,
-        lastModified: stats.mtime
-      };
+        // Parse and validate tags
+        const tags = await this.validateTags(this.extractTags(content));
+
+        // Validate the complete document
+        const document = {
+          path: documentPath,
+          content,
+          tags,
+          lastModified: stats.mtime
+        };
+
+        return MemoryDocumentSchema.parse(document);
+      } catch (error) {
+        if (error instanceof Error) {
+          if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+            throw MemoryBankError.documentNotFound(documentPath);
+          }
+          if ((error as NodeJS.ErrnoException).code === 'EACCES') {
+            throw MemoryBankError.filePermissionError(documentPath);
+          }
+          throw MemoryBankError.fileReadError(documentPath, error);
+        }
+        throw error;
+      }
     } catch (error) {
-      throw new Error(`Failed to read document ${documentPath}: ${error instanceof Error ? error.message : String(error)}`);
+      if (error instanceof MemoryBankError) {
+        throw error;
+      }
+      throw MemoryBankError.fileSystemError('read', documentPath, error as Error);
     }
   }
 
@@ -36,18 +64,43 @@ export abstract class BaseMemoryBank {
    * Write a document to the memory bank
    */
   async writeDocument(documentPath: string, content: string, tags: string[] = []): Promise<void> {
-    const fullPath = this.resolvePath(documentPath);
-
     try {
-      // Ensure directory exists
-      await fs.mkdir(path.dirname(fullPath), { recursive: true });
+      // Validate path and tags
+      const validatedPath = await this.validatePath(documentPath);
+      const validatedTags = await this.validateTags(tags);
+      const fullPath = this.resolvePath(validatedPath);
 
-      // Add tags to content if provided
-      const contentWithTags = this.addTagsToContent(content, tags);
+      try {
+        // Ensure directory exists
+        await fs.mkdir(path.dirname(fullPath), { recursive: true });
 
-      await fs.writeFile(fullPath, contentWithTags, 'utf-8');
+        // Add tags to content if provided
+        const contentWithTags = this.addTagsToContent(content, validatedTags);
+
+        // Validate the complete document before writing
+        const document = {
+          path: documentPath,
+          content: contentWithTags,
+          tags: validatedTags,
+          lastModified: new Date()
+        };
+        MemoryDocumentSchema.parse(document);
+
+        await fs.writeFile(fullPath, contentWithTags, 'utf-8');
+      } catch (error) {
+        if (error instanceof Error) {
+          if ((error as NodeJS.ErrnoException).code === 'EACCES') {
+            throw MemoryBankError.filePermissionError(documentPath);
+          }
+          throw MemoryBankError.fileWriteError(documentPath, error);
+        }
+        throw error;
+      }
     } catch (error) {
-      throw new Error(`Failed to write document ${documentPath}: ${error instanceof Error ? error.message : String(error)}`);
+      if (error instanceof MemoryBankError) {
+        throw error;
+      }
+      throw MemoryBankError.fileSystemError('write', documentPath, error as Error);
     }
   }
 
@@ -58,16 +111,26 @@ export abstract class BaseMemoryBank {
     const files: string[] = [];
 
     async function walkDir(dir: string): Promise<void> {
-      const entries = await fs.readdir(dir, { withFileTypes: true });
+      try {
+        const entries = await fs.readdir(dir, { withFileTypes: true });
 
-      for (const entry of entries) {
-        const fullPath = path.join(dir, entry.name);
+        for (const entry of entries) {
+          const fullPath = path.join(dir, entry.name);
 
-        if (entry.isDirectory()) {
-          await walkDir(fullPath);
-        } else if (entry.isFile()) {
-          files.push(fullPath);
+          if (entry.isDirectory()) {
+            await walkDir(fullPath);
+          } else if (entry.isFile()) {
+            files.push(fullPath);
+          }
         }
+      } catch (error) {
+        if (error instanceof Error) {
+          if ((error as NodeJS.ErrnoException).code === 'EACCES') {
+            throw MemoryBankError.filePermissionError(dir);
+          }
+          throw MemoryBankError.fileSystemError('list', dir, error);
+        }
+        throw error;
       }
     }
 
@@ -75,7 +138,10 @@ export abstract class BaseMemoryBank {
       await walkDir(this.basePath);
       return files.map(f => path.relative(this.basePath, f));
     } catch (error) {
-      throw new Error(`Failed to list documents: ${error instanceof Error ? error.message : String(error)}`);
+      if (error instanceof MemoryBankError) {
+        throw error;
+      }
+      throw MemoryBankError.fileSystemError('list', this.basePath, error as Error);
     }
   }
 
@@ -83,33 +149,59 @@ export abstract class BaseMemoryBank {
    * Search documents by tags
    */
   async searchByTags(searchTags: string[]): Promise<MemoryDocument[]> {
-    const documents: MemoryDocument[] = [];
-    const files = await this.listDocuments();
+    try {
+      // Validate search tags
+      const validatedTags = await this.validateTags(searchTags);
+      const documents: MemoryDocument[] = [];
+      const files = await this.listDocuments();
 
-    for (const file of files) {
-      try {
-        const doc = await this.readDocument(file);
-        if (searchTags.every(tag => doc.tags.includes(tag))) {
-          documents.push(doc);
+      for (const file of files) {
+        try {
+          const doc = await this.readDocument(file);
+          if (validatedTags.every(tag => doc.tags.includes(tag))) {
+            documents.push(doc);
+          }
+        } catch (error) {
+          console.error(`Error reading document ${file}:`, error);
         }
-      } catch (error) {
-        console.error(`Error reading document ${file}:`, error);
       }
-    }
 
-    return documents;
+      return documents;
+    } catch (error) {
+      if (error instanceof MemoryBankError) {
+        throw error;
+      }
+      throw MemoryBankError.fileSystemError('search', 'tags', error as Error);
+    }
   }
 
   /**
    * Delete a document from the memory bank
    */
   async deleteDocument(documentPath: string): Promise<void> {
-    const fullPath = this.resolvePath(documentPath);
-
     try {
-      await fs.unlink(fullPath);
+      const validatedPath = await this.validatePath(documentPath);
+      const fullPath = this.resolvePath(validatedPath);
+
+      try {
+        await fs.unlink(fullPath);
+      } catch (error) {
+        if (error instanceof Error) {
+          if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+            throw MemoryBankError.documentNotFound(documentPath);
+          }
+          if ((error as NodeJS.ErrnoException).code === 'EACCES') {
+            throw MemoryBankError.filePermissionError(documentPath);
+          }
+          throw MemoryBankError.fileSystemError('delete', documentPath, error);
+        }
+        throw error;
+      }
     } catch (error) {
-      throw new Error(`Failed to delete document ${documentPath}: ${error instanceof Error ? error.message : String(error)}`);
+      if (error instanceof MemoryBankError) {
+        throw error;
+      }
+      throw MemoryBankError.fileSystemError('delete', documentPath, error as Error);
     }
   }
 
@@ -118,10 +210,32 @@ export abstract class BaseMemoryBank {
    */
   abstract validateStructure(): Promise<ValidationResult>;
 
+  /**
+   * Validate a path using zod schema
+   */
+  protected async validatePath(documentPath: string): Promise<string> {
+    try {
+      return PathSchema.parse(documentPath);
+    } catch (error) {
+      throw MemoryBankError.invalidPath(documentPath, 'Invalid path format');
+    }
+  }
+
+  /**
+   * Validate tags using zod schema
+   */
+  protected async validateTags(tags: string[]): Promise<string[]> {
+    try {
+      return Promise.all(tags.map(tag => TagSchema.parse(tag)));
+    } catch (error) {
+      throw MemoryBankError.invalidTagFormat(tags.join(', '));
+    }
+  }
+
   protected resolvePath(documentPath: string): string {
     const normalizedPath = path.normalize(documentPath);
     if (normalizedPath.startsWith('..')) {
-      throw new Error('Invalid path: Accessing files outside memory bank directory is not allowed');
+      throw MemoryBankError.invalidPath(documentPath, 'Accessing files outside memory bank directory is not allowed');
     }
     return path.join(this.basePath, normalizedPath);
   }
