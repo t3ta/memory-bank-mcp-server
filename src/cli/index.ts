@@ -302,6 +302,11 @@ const argv = yargs(hideBin(process.argv))
         choices: ['en', 'ja'],
         description: 'Language for PR content',
         default: 'ja'
+      })
+      .option('skip-patterns', {
+        type: 'boolean',
+        description: 'Skip including systemPatterns in PR (use for memory-intensive repos)',
+        default: false
       });
   }, async (argv) => {
     try {
@@ -317,7 +322,8 @@ const argv = yargs(hideBin(process.argv))
         argv.branch as string,
         argv.title as string | undefined,
         argv.base as string | undefined,
-        argv.language as string
+        argv.language as string,
+        argv.skipPatterns as boolean
       );
 
       // Set up response message based on language

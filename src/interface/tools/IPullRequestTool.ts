@@ -17,6 +17,7 @@ export interface IPullRequestTool {
     branch: string,
     title?: string,
     baseBranch?: string,
-    language?: string
+    language?: string,
+    skipPatterns?: boolean
   ): Promise<PullRequestDTO>;
 }

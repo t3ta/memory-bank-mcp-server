@@ -36,7 +36,7 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
    */
   async execute(input: CreatePullRequestInput): Promise<CreatePullRequestOutput> {
     try {
-      const { branch, title, baseBranch, language = 'ja' } = input;
+      const { branch, title, baseBranch, language = 'ja', skipPatterns = false } = input;
 
       // Validate branch name
       if (!branch) {
@@ -71,7 +71,8 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
         branchInfo,
         title,
         baseBranch,
-        language
+        language,
+        skipPatterns
       );
 
       // Create PR file path
@@ -116,7 +117,8 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
     branchInfo: BranchInfo,
     customTitle?: string,
     customBaseBranch?: string,
-    language: string = 'ja'
+    language: string = 'ja',
+    skipPatterns: boolean = false
   ): Promise<PullRequestDTO> {
     // Get template file path
     const templateFileName = language === 'en' ? this.TEMPLATES.en : this.TEMPLATES.ja;
@@ -202,26 +204,31 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
     // Get technical decisions from systemPatterns efficiently (without loading entire file)
     let technicalDecisions = '';
     try {
-      // Check if systemPatterns file exists using listDocuments()
-      const allDocuments = await this.branchRepository.listDocuments(branchInfo);
-      const systemPatternsExists = allDocuments.some(
-        docPath => docPath.value === systemPatternsPath.value
-      );
-
-      if (systemPatternsExists) {
-        // Get only the most recent technical decisions to avoid memory issues
-        // Instead of loading the entire file, we'll extract just the decisions we need
-        const recentDecisions = await this.extractRecentTechnicalDecisions(
-          branchInfo,
-          systemPatternsPath,
-          language === 'en' ? '### ' : '### ',
-          5 // Limit to 5 recent decisions
+      // If skipPatterns is true, don't even try to extract system patterns
+      if (!skipPatterns) {
+        // Check if systemPatterns file exists using listDocuments()
+        const allDocuments = await this.branchRepository.listDocuments(branchInfo);
+        const systemPatternsExists = allDocuments.some(
+          docPath => docPath.value === systemPatternsPath.value
         );
 
-        if (recentDecisions.length > 0) {
-          const sectionHeader = language === 'en' ? '## Technical Decisions' : '## 技術的決定事項';
-          technicalDecisions = `${sectionHeader}\n\n${this.formatDecisions(recentDecisions)}`;
+        if (systemPatternsExists) {
+          // Get only the most recent technical decisions to avoid memory issues
+          // Instead of loading the entire file, we'll extract just the decisions we need
+          const recentDecisions = await this.extractRecentTechnicalDecisions(
+            branchInfo,
+            systemPatternsPath,
+            language === 'en' ? '### ' : '### ',
+            5 // Limit to 5 recent decisions
+          );
+
+          if (recentDecisions.length > 0) {
+            const sectionHeader = language === 'en' ? '## Technical Decisions' : '## 技術的決定事項';
+            technicalDecisions = `${sectionHeader}\n\n${this.formatDecisions(recentDecisions)}`;
+          }
         }
+      } else {
+        console.log('Skipping system patterns extraction as requested');
       }
     } catch (error) {
       // If we encounter an error, log it but continue without the technical decisions

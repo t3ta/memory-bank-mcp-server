@@ -24,6 +24,11 @@ export interface CreatePullRequestInput {
    * Language for PR content (en or ja)
    */
   language?: string;
+
+  /**
+   * Skip including systemPatterns in PR
+   */
+  skipPatterns?: boolean;
 }
 
 /**

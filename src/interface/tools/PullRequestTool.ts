@@ -17,14 +17,16 @@ export class PullRequestTool implements IPullRequestTool {
     branch: string,
     title?: string,
     baseBranch?: string,
-    language: string = 'ja'
+    language: string = 'ja',
+    skipPatterns: boolean = false
   ): Promise<PullRequestDTO> {
     // Execute use case
     const result = await this.createPullRequestUseCase.execute({
       branch,
       title,
       baseBranch,
-      language
+      language,
+      skipPatterns
     });
 
     return result.pullRequest;
