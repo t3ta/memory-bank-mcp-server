@@ -404,6 +404,6 @@ const argv = yargs(hideBin(process.argv))
   .alias('help', 'h')
   .wrap(null)
   .epilog('For more information visit https://github.com/yourusername/memory-bank-mcp-server')
-  .parseSync();
+  .parse();
 
 // Main function not needed as all logic is in command handlers
