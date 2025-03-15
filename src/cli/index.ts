@@ -282,7 +282,7 @@ const argv = yargs(hideBin(process.argv))
     }
   })
   // Utility commands
-  .command('create-pull-request <branch> <title>', 'Create a pull request from branch memory bank', (yargs) => {
+  .command('create-pull-request <branch> [title]', 'Create a pull request from branch memory bank', (yargs) => {
     return yargs
       .positional('branch', {
         describe: 'Branch name',
@@ -291,8 +291,7 @@ const argv = yargs(hideBin(process.argv))
       })
       .positional('title', {
         describe: 'PR title',
-        type: 'string',
-        demandOption: true
+        type: 'string'
       })
       .option('base', {
         type: 'string',
