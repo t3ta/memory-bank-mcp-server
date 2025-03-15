@@ -1,0 +1,55 @@
+{
+  "name": "memory-bank-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for managing project documentation and context across sessions",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "memory-bank-mcp-server": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc && chmod +x dist/index.js",
+    "clean": "rm -rf dist",
+    "prepare": "npm run clean && npm run build",
+    "start": "node dist/index.js",
+    "dev": "ts-node --esm src/index.ts",
+    "test": "node --test",
+    "prepublishOnly": "npm test && npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "memory-bank",
+    "documentation",
+    "project-management",
+    "claude",
+    "anthropic"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.1.0",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/yargs": "^17.0.32",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/memory-bank-mcp-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/memory-bank-mcp-server/issues"
+  },
+  "homepage": "https://github.com/yourusername/memory-bank-mcp-server#readme"
+}

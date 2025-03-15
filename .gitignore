@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Build files
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+
+# Logs
+logs/
+*.log
+
+# Editor directories and files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
