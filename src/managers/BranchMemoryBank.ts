@@ -40,23 +40,30 @@ export class BranchMemoryBank extends BaseMemoryBank {
     if (this.initialized) return;
 
     try {
-      // ディレクトリの存在確認
-      await fs.access(this.basePath);
-      // 既存のディレクトリが存在する場合は初期化をスキップ
-      this.initialized = true;
-      return;
-    } catch {
-      // ディレクトリが存在しない場合のみ初期化を試みる
-      try {
-        await fs.mkdir(this.basePath, { recursive: true });
-        const validation = await this.validateStructure();
-        if (!validation.isValid) {
-          await this.initialize();
+      // ディレクトリ作成（存在する場合は何もしない）
+      await fs.mkdir(this.basePath, { recursive: true });
+
+      // 必要なファイルの作成
+      const timestamp = new Date().toISOString();
+      const templates = TEMPLATES[this.language];
+
+      for (const file of BRANCH_CORE_FILES) {
+        try {
+          const filePath = path.join(this.basePath, file);
+          await fs.access(filePath);
+        } catch {
+          // ファイルが存在しない場合のみ作成
+          const templateKey = file.replace(/\.md$/, '') as keyof typeof TEMPLATES[typeof this.language];
+          const template = templates[templateKey]
+            .replace('{branchName}', this.branchName.replace(/\//g, '-'))
+            .replace('{timestamp}', timestamp);
+          await this.writeDocument(file, template);
         }
-      } catch {
-        // ディレクトリ作成に失敗した場合は初期化をスキップ
       }
+    } catch {
+      // エラーが発生した場合は無視（次回の呼び出しで再試行）
     }
+
     this.initialized = true;
   }
 
@@ -64,45 +71,7 @@ export class BranchMemoryBank extends BaseMemoryBank {
    * Initialize the branch memory bank with required structure
    */
   async initialize(): Promise<void> {
-    try {
-      // Ensure directory exists
-      await fs.mkdir(this.basePath, { recursive: true });
-
-      const timestamp = new Date().toISOString();
-      const templates = TEMPLATES[this.language];
-
-      const templateMap = {
-        'branchContext.md': templates.branchContext,
-        'activeContext.md': templates.activeContext,
-        'systemPatterns.md': templates.systemPatterns,
-        'progress.md': templates.progress
-      };
-
-      // Initialize all core files with templates
-      for (const file of BRANCH_CORE_FILES) {
-        try {
-          const filePath = path.join(this.basePath, file);
-          let template: string = templateMap[file];
-
-          // Replace placeholders
-          template = template
-            .replace('{branchName}', this.branchName.replace(/\//g, '-'))
-            .replace('{timestamp}', timestamp);
-
-          await this.writeDocument(file, template);
-        } catch (error) {
-          if (error instanceof MemoryBankError) {
-            throw error;
-          }
-          throw MemoryBankError.fileSystemError('initialize', file, error as Error);
-        }
-      }
-    } catch (error) {
-      if (error instanceof MemoryBankError) {
-        throw error;
-      }
-      throw MemoryBankError.fileSystemError('initialize', this.basePath, error as Error);
-    }
+    await this.ensureInitialized();
   }
 
   /**
@@ -302,127 +271,23 @@ ${validatedDecision.consequences.map((c: string) => `- ${c}`).join('\n')}
       const validatedArgs = WriteBranchCoreFilesArgsSchema.parse(args);
       await this.ensureInitialized();
 
-      // Update branchContext.md
+      // 各ファイルの更新
       if (validatedArgs.files.branchContext?.content) {
         await this.writeDocument('branchContext.md', validatedArgs.files.branchContext.content);
       }
 
-      // Update activeContext.md with complete content
       if (validatedArgs.files.activeContext) {
-        const contentSections = [
-          '# アクティブコンテキスト',
-          '',
-          '## 現在の作業内容'
-        ];
-
-        // Add current work if available, ensure proper spacing
-        if (validatedArgs.files.activeContext.currentWork) {
-          contentSections.push('', validatedArgs.files.activeContext.currentWork);
-        }
-
-        // Add recent changes
-        contentSections.push('', '## 最近の変更点');
-        if (validatedArgs.files.activeContext.recentChanges?.length) {
-          contentSections.push('');
-          contentSections.push(...validatedArgs.files.activeContext.recentChanges.map(c => `- ${c}`));
-        }
-
-        // Add active decisions
-        contentSections.push('', '## アクティブな決定事項');
-        if (validatedArgs.files.activeContext.activeDecisions?.length) {
-          contentSections.push('');
-          contentSections.push(...validatedArgs.files.activeContext.activeDecisions.map(d => `- ${d}`));
-        }
-
-        // Add considerations
-        contentSections.push('', '## 検討事項');
-        if (validatedArgs.files.activeContext.considerations?.length) {
-          contentSections.push('');
-          contentSections.push(...validatedArgs.files.activeContext.considerations.map(c => `- ${c}`));
-        }
-
-        // Add next steps
-        contentSections.push('', '## 次のステップ');
-        if (validatedArgs.files.activeContext.nextSteps?.length) {
-          contentSections.push('');
-          contentSections.push(...validatedArgs.files.activeContext.nextSteps.map(s => `- ${s}`));
-        }
-
-        const content = contentSections.join('\n');
-        await this.writeDocument('activeContext.md', content);
+        await this.updateActiveContext(validatedArgs.files.activeContext);
       }
 
-      // Update progress.md with complete content
       if (validatedArgs.files.progress) {
-        const contentSections = [
-          '# 進捗状況',
-          '',
-          '## 動作している機能'
-        ];
-
-        // Add working features
-        if (validatedArgs.files.progress.workingFeatures?.length) {
-          contentSections.push('');
-          contentSections.push(...validatedArgs.files.progress.workingFeatures.map(f => `- ${f}`));
-        }
-
-        // Add pending implementation
-        contentSections.push('', '## 未実装の機能');
-        if (validatedArgs.files.progress.pendingImplementation?.length) {
-          contentSections.push('');
-          contentSections.push(...validatedArgs.files.progress.pendingImplementation.map(f => `- ${f}`));
-        }
-
-        // Add current status
-        contentSections.push('', '## 現在の状態');
-        if (validatedArgs.files.progress.status) {
-          contentSections.push('', validatedArgs.files.progress.status);
-        }
-
-        // Add known issues
-        contentSections.push('', '## 既知の問題');
-        if (validatedArgs.files.progress.knownIssues?.length) {
-          contentSections.push('');
-          contentSections.push(...validatedArgs.files.progress.knownIssues.map(i => `- ${i}`));
-        }
-
-        const content = contentSections.join('\n');
-        await this.writeDocument('progress.md', content);
+        await this.updateProgress(validatedArgs.files.progress);
       }
 
-      // Update systemPatterns.md with complete content
       if (validatedArgs.files.systemPatterns?.technicalDecisions) {
-        const contentSections = [
-          '# システムパターン',
-          '',
-          '## 技術的決定事項'
-        ];
-
-        if (validatedArgs.files.systemPatterns.technicalDecisions.length > 0) {
-          // Add each technical decision with proper spacing
-          for (const decision of validatedArgs.files.systemPatterns.technicalDecisions) {
-            contentSections.push(
-              '',
-              `### ${decision.title}`,
-              '',
-              '#### コンテキスト',
-              decision.context,
-              '',
-              '#### 決定事項',
-              decision.decision,
-              '',
-              '#### 影響'
-            );
-
-            // Add consequences if available
-            if (decision.consequences?.length) {
-              contentSections.push(...decision.consequences.map(c => `- ${c}`));
-            }
-          }
+        for (const decision of validatedArgs.files.systemPatterns.technicalDecisions) {
+          await this.addTechnicalDecision(decision);
         }
-
-        contentSections.push('', '## 関連ファイルとディレクトリ構造');
-        await this.writeDocument('systemPatterns.md', contentSections.join('\n'));
       }
     } catch (error) {
       if (error instanceof MemoryBankError) {
