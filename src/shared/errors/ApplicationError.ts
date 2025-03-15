@@ -25,6 +25,7 @@ export const ApplicationErrorCodes = {
   NOT_FOUND: 'NOT_FOUND',
   CONFLICT: 'CONFLICT',
   UNKNOWN_ERROR: 'UNKNOWN_ERROR',
+  INVALID_STATE: 'INVALID_STATE',
 } as const;
 
 export type ApplicationErrorCode = keyof typeof ApplicationErrorCodes;
