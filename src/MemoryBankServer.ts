@@ -1,37 +1,8 @@
-import { McpError, ErrorCode } from '@modelcontextprotocol/sdk/types.js';
+import { McpError, ErrorCode, JsonRpcRequest, JsonRpcResponse, ToolResponse } from './types.js';
 import { WorkspaceManager } from './managers/WorkspaceManager.js';
 import { GlobalMemoryBank } from './managers/GlobalMemoryBank.js';
 import { BranchMemoryBank } from './managers/BranchMemoryBank.js';
-import {
-  CliOptions,
-  ToolResponse,
-  ReadMemoryBankArgs,
-  WriteMemoryBankArgs,
-  UpdateActiveContextArgs,
-  UpdateProgressArgs,
-  AddTechnicalDecisionArgs,
-  SearchByTagsArgs,
-  WorkspaceConfig
-} from './models/types.js';
-
-interface JsonRpcError {
-  code: number;
-  message: string;
-}
-
-interface JsonRpcRequest {
-  jsonrpc: "2.0";
-  id: number;
-  method: string;
-  params?: any;
-}
-
-interface JsonRpcResponse {
-  jsonrpc: "2.0";
-  id: number;
-  result?: any;
-  error?: JsonRpcError;
-}
+import { CliOptions, WorkspaceConfig } from './types.js';
 
 export class MemoryBankServer {
   private workspaceManager: WorkspaceManager;
@@ -66,6 +37,18 @@ export class MemoryBankServer {
   async handleRequest(request: JsonRpcRequest): Promise<JsonRpcResponse> {
     try {
       switch (request.method) {
+        case "initialize":
+          return {
+            jsonrpc: "2.0",
+            id: request.id,
+            result: {
+              capabilities: {
+                tools: true,
+                resources: false
+              }
+            }
+          };
+
         case "tools/list":
           return {
             jsonrpc: "2.0",
@@ -97,14 +80,14 @@ export class MemoryBankServer {
                 },
                 {
                   name: "read_rules",
-                  description: "Read the memory bank rules in the specified language",
+                  description: "Read the memory bank rules in specified language",
                   inputSchema: {
                     type: "object",
                     properties: {
                       language: {
                         type: "string",
                         enum: ["en", "ja"],
-                        description: "Language of the rules (en or ja)"
+                        description: "Language code (en or ja)"
                       }
                     },
                     required: ["language"]
@@ -131,13 +114,13 @@ export class MemoryBankServer {
             let result;
             switch (name) {
               case "write_branch_memory_bank":
-                result = await this.handleWriteBranchMemoryBank(args as WriteMemoryBankArgs);
+                result = await this.handleWriteBranchMemoryBank(args);
                 break;
               case "read_branch_memory_bank":
-                result = await this.handleReadBranchMemoryBank(args as ReadMemoryBankArgs);
+                result = await this.handleReadBranchMemoryBank(args);
                 break;
               case "read_rules":
-                result = await this.handleReadRules(args as { language: "en" | "ja" });
+                result = await this.handleReadRules(args);
                 break;
               default:
                 return this.createErrorResponse(
@@ -210,7 +193,7 @@ export class MemoryBankServer {
     return this.branchMemoryBank;
   }
 
-  private async handleReadBranchMemoryBank(args: ReadMemoryBankArgs): Promise<ToolResponse> {
+  private async handleReadBranchMemoryBank(args: { path: string }): Promise<ToolResponse> {
     try {
       this.log(`Reading from branch memory bank: ${args.path}`);
       const bank = await this.ensureBranchMemoryBank();
@@ -226,7 +209,7 @@ export class MemoryBankServer {
     }
   }
 
-  private async handleWriteBranchMemoryBank(args: WriteMemoryBankArgs): Promise<ToolResponse> {
+  private async handleWriteBranchMemoryBank(args: { path: string; content?: string }): Promise<ToolResponse> {
     try {
       this.log(`Initializing branch memory bank...`);
       const bank = await this.ensureBranchMemoryBank();
