@@ -375,7 +375,9 @@ export abstract class BaseMemoryBank {
 
     if (sectionIndex === -1) {
       // Section not found, append it at the end
-      return `${content}\n\n${sectionHeader}\n\n${newContent}`;
+      // Ensure we have proper spacing
+      const trimmedContent = content.trim();
+      return `${trimmedContent}\n\n${sectionHeader}\n\n${newContent}`;
     }
 
     // Find the next section or end of file
@@ -388,14 +390,16 @@ export abstract class BaseMemoryBank {
 
     if (append) {
       // Add new content at the end of the section
-      const beforeSection = lines.slice(0, nextSectionIndex).join('\n');
+      const beforeSection = lines.slice(0, nextSectionIndex).join('\n').trim();
       const afterSection = lines.slice(nextSectionIndex).join('\n');
-      return `${beforeSection}\n${newContent}\n${afterSection}`;
+      // Ensure proper spacing between existing content and new content
+      return `${beforeSection}\n\n${newContent}\n\n${afterSection}`;
     } else {
       // Replace section content
       const beforeSection = lines.slice(0, sectionIndex + 1).join('\n');
       const afterSection = lines.slice(nextSectionIndex).join('\n');
-      return `${beforeSection}\n\n${newContent}\n${afterSection}`;
+      // Ensure proper spacing around the new content
+      return `${beforeSection}\n\n${newContent}\n\n${afterSection}`;
     }
   }
 

@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/192</span>
+                <span class='fraction'>0/193</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/181</span>
+                <span class='fraction'>0/182</span>
             </div>
         
             
@@ -497,7 +497,11 @@
 <a name='L432'></a><a href='#L432'>432</a>
 <a name='L433'></a><a href='#L433'>433</a>
 <a name='L434'></a><a href='#L434'>434</a>
-<a name='L435'></a><a href='#L435'>435</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L435'></a><a href='#L435'>435</a>
+<a name='L436'></a><a href='#L436'>436</a>
+<a name='L437'></a><a href='#L437'>437</a>
+<a name='L438'></a><a href='#L438'>438</a>
+<a name='L439'></a><a href='#L439'>439</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -874,6 +878,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -889,11 +895,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1308,7 +1316,9 @@ import { ValidationResult } from '../models/types.js';
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (sectionIndex === -1) {</span>
       // Section not found, append it at the end
-<span class="cstat-no" title="statement not covered" >      return `${content}\n\n${sectionHeader}\n\n${newContent}`;</span>
+      // Ensure we have proper spacing
+      const trimmedContent = <span class="cstat-no" title="statement not covered" >content.trim();</span>
+<span class="cstat-no" title="statement not covered" >      return `${trimmedContent}\n\n${sectionHeader}\n\n${newContent}`;</span>
     }
 &nbsp;
     // Find the next section or end of file
@@ -1321,14 +1331,16 @@ import { ValidationResult } from '../models/types.js';
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (append) {</span>
       // Add new content at the end of the section
-      const beforeSection = <span class="cstat-no" title="statement not covered" >lines.slice(0, nextSectionIndex).join('\n');</span>
+      const beforeSection = <span class="cstat-no" title="statement not covered" >lines.slice(0, nextSectionIndex).join('\n').trim();</span>
       const afterSection = <span class="cstat-no" title="statement not covered" >lines.slice(nextSectionIndex).join('\n');</span>
-<span class="cstat-no" title="statement not covered" >      return `${beforeSection}\n${newContent}\n${afterSection}`;</span>
+      // Ensure proper spacing between existing content and new content
+<span class="cstat-no" title="statement not covered" >      return `${beforeSection}\n\n${newContent}\n\n${afterSection}`;</span>
     } else {
       // Replace section content
       const beforeSection = <span class="cstat-no" title="statement not covered" >lines.slice(0, sectionIndex + 1).join('\n');</span>
       const afterSection = <span class="cstat-no" title="statement not covered" >lines.slice(nextSectionIndex).join('\n');</span>
-<span class="cstat-no" title="statement not covered" >      return `${beforeSection}\n\n${newContent}\n${afterSection}`;</span>
+      // Ensure proper spacing around the new content
+<span class="cstat-no" title="statement not covered" >      return `${beforeSection}\n\n${newContent}\n\n${afterSection}`;</span>
     }
   }
 &nbsp;
@@ -1372,7 +1384,7 @@ import { ValidationResult } from '../models/types.js';
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-03-15T08:36:50.324Z
+                at 2025-03-15T09:22:58.081Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

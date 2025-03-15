@@ -282,73 +282,120 @@ ${validatedDecision.consequences.map((c: string) => `- ${c}`).join('\n')}
 
       // Update activeContext.md with complete content
       if (validatedArgs.files.activeContext) {
-        const content = [
+        const contentSections = [
           '# アクティブコンテキスト',
           '',
-          '## 現在の作業内容',
-          validatedArgs.files.activeContext.currentWork || '',
-          '',
-          '## 最近の変更点',
-          ...(validatedArgs.files.activeContext.recentChanges?.map(c => `- ${c}`) || []),
-          '',
-          '## アクティブな決定事項',
-          ...(validatedArgs.files.activeContext.activeDecisions?.map(d => `- ${d}`) || []),
-          '',
-          '## 検討事項',
-          ...(validatedArgs.files.activeContext.considerations?.map(c => `- ${c}`) || []),
-          '',
-          '## 次のステップ',
-          ...(validatedArgs.files.activeContext.nextSteps?.map(s => `- ${s}`) || [])
-        ].join('\n');
+          '## 現在の作業内容'
+        ];
+        
+        // Add current work if available, ensure proper spacing
+        if (validatedArgs.files.activeContext.currentWork) {
+          contentSections.push('', validatedArgs.files.activeContext.currentWork);
+        }
+        
+        // Add recent changes
+        contentSections.push('', '## 最近の変更点');
+        if (validatedArgs.files.activeContext.recentChanges?.length) {
+          contentSections.push('');
+          contentSections.push(...validatedArgs.files.activeContext.recentChanges.map(c => `- ${c}`));
+        }
+        
+        // Add active decisions
+        contentSections.push('', '## アクティブな決定事項');
+        if (validatedArgs.files.activeContext.activeDecisions?.length) {
+          contentSections.push('');
+          contentSections.push(...validatedArgs.files.activeContext.activeDecisions.map(d => `- ${d}`));
+        }
+        
+        // Add considerations
+        contentSections.push('', '## 検討事項');
+        if (validatedArgs.files.activeContext.considerations?.length) {
+          contentSections.push('');
+          contentSections.push(...validatedArgs.files.activeContext.considerations.map(c => `- ${c}`));
+        }
+        
+        // Add next steps
+        contentSections.push('', '## 次のステップ');
+        if (validatedArgs.files.activeContext.nextSteps?.length) {
+          contentSections.push('');
+          contentSections.push(...validatedArgs.files.activeContext.nextSteps.map(s => `- ${s}`));
+        }
+        
+        const content = contentSections.join('\n');
         await this.writeDocument('activeContext.md', content);
       }
 
       // Update progress.md with complete content
       if (validatedArgs.files.progress) {
-        const content = [
+        const contentSections = [
           '# 進捗状況',
           '',
-          '## 動作している機能',
-          ...(validatedArgs.files.progress.workingFeatures?.map(f => `- ${f}`) || []),
-          '',
-          '## 未実装の機能',
-          ...(validatedArgs.files.progress.pendingImplementation?.map(f => `- ${f}`) || []),
-          '',
-          '## 現在の状態',
-          validatedArgs.files.progress.status || '',
-          '',
-          '## 既知の問題',
-          ...(validatedArgs.files.progress.knownIssues?.map(i => `- ${i}`) || [])
-        ].join('\n');
+          '## 動作している機能'
+        ];
+        
+        // Add working features
+        if (validatedArgs.files.progress.workingFeatures?.length) {
+          contentSections.push('');
+          contentSections.push(...validatedArgs.files.progress.workingFeatures.map(f => `- ${f}`));
+        }
+        
+        // Add pending implementation
+        contentSections.push('', '## 未実装の機能');
+        if (validatedArgs.files.progress.pendingImplementation?.length) {
+          contentSections.push('');
+          contentSections.push(...validatedArgs.files.progress.pendingImplementation.map(f => `- ${f}`));
+        }
+        
+        // Add current status
+        contentSections.push('', '## 現在の状態');
+        if (validatedArgs.files.progress.status) {
+          contentSections.push('', validatedArgs.files.progress.status);
+        }
+        
+        // Add known issues
+        contentSections.push('', '## 既知の問題');
+        if (validatedArgs.files.progress.knownIssues?.length) {
+          contentSections.push('');
+          contentSections.push(...validatedArgs.files.progress.knownIssues.map(i => `- ${i}`));
+        }
+        
+        const content = contentSections.join('\n');
         await this.writeDocument('progress.md', content);
       }
 
       // Update systemPatterns.md with complete content
       if (validatedArgs.files.systemPatterns?.technicalDecisions) {
-        const content = [
+        const contentSections = [
           '# システムパターン',
           '',
           '## 技術的決定事項'
         ];
 
-        for (const decision of validatedArgs.files.systemPatterns.technicalDecisions) {
-          content.push(
-            '',
-            `### ${decision.title}`,
-            '',
-            '#### コンテキスト',
-            decision.context,
-            '',
-            '#### 決定事項',
-            decision.decision,
-            '',
-            '#### 影響',
-            ...decision.consequences.map(c => `- ${c}`)
-          );
+        if (validatedArgs.files.systemPatterns.technicalDecisions.length > 0) {
+          // Add each technical decision with proper spacing
+          for (const decision of validatedArgs.files.systemPatterns.technicalDecisions) {
+            contentSections.push(
+              '',
+              `### ${decision.title}`,
+              '',
+              '#### コンテキスト',
+              decision.context,
+              '',
+              '#### 決定事項',
+              decision.decision,
+              '',
+              '#### 影響'
+            );
+            
+            // Add consequences if available
+            if (decision.consequences?.length) {
+              contentSections.push(...decision.consequences.map(c => `- ${c}`));
+            }
+          }
         }
 
-        content.push('', '## 関連ファイルとディレクトリ構造');
-        await this.writeDocument('systemPatterns.md', content.join('\n'));
+        contentSections.push('', '## 関連ファイルとディレクトリ構造');
+        await this.writeDocument('systemPatterns.md', contentSections.join('\n'));
       }
     } catch (error) {
       if (error instanceof MemoryBankError) {
@@ -415,21 +462,24 @@ ${validatedDecision.consequences.map((c: string) => `- ${c}`).join('\n')}
             // Add new content at the end of the section with proper spacing
             const beforeSection = lines.slice(0, endLine).join('\n').trim();
             const afterSection = lines.slice(endLine).join('\n');
-            content = `${beforeSection}\n\n${formattedContent}\n\n${afterSection}`;
+            // Add double newlines to ensure proper spacing
+            content = `${beforeSection}\n\n${formattedContent}\n\n${afterSection.trim()}`;
             break;
 
           case 'prepend':
             // Add new content at the start of the section with proper spacing
             const beforeContent = lines.slice(0, startLine).join('\n').trim();
             const afterContent = lines.slice(startLine).join('\n');
-            content = `${beforeContent}\n\n${formattedContent}\n\n${afterContent}`;
+            // Add double newlines to ensure proper spacing
+            content = `${beforeContent}\n\n${formattedContent}\n\n${afterContent.trim()}`;
             break;
 
           default: // replace
             // Replace section content between startLine and endLine with proper spacing
             const before = lines.slice(0, startLine).join('\n').trim();
             const after = lines.slice(endLine).join('\n');
-            content = `${before}\n\n${formattedContent}\n\n${after}`;
+            // Add double newlines to ensure proper spacing
+            content = `${before}\n\n${formattedContent}\n\n${after.trim()}`;
             break;
         }
       }
@@ -438,6 +488,13 @@ ${validatedDecision.consequences.map((c: string) => `- ${c}`).join('\n')}
       content = content
         .replace(/\n{3,}/g, '\n\n') // Replace 3+ newlines with 2
         .trim() + '\n'; // Ensure single newline at end of file
+      
+      // Final check to ensure we don't have empty list items (-) with nothing after them
+      content = content.replace(/^-\s*$/gm, '');
+      // Remove any remaining empty list markers
+      content = content.replace(/^-\s*$/gm, '');
+      // Remove multiple consecutive newlines again after cleaning
+      content = content.replace(/\n{3,}/g, '\n\n').trim() + '\n';
 
       await this.writeDocument(documentPath, content, doc.tags);
     } catch (error) {
