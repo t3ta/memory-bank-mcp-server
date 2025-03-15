@@ -13,6 +13,7 @@ import { WorkspaceManager } from './managers/WorkspaceManager.js';
 import { GlobalMemoryBank } from './managers/GlobalMemoryBank.js';
 import { BranchMemoryBank } from './managers/BranchMemoryBank.js';
 import { Language, BRANCH_CORE_FILES, GLOBAL_CORE_FILES } from './models/types.js';
+import { MemoryBankError } from './errors/MemoryBankError.js';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
@@ -41,6 +42,37 @@ let branchMemoryBank: BranchMemoryBank | null = null;
 
 // Available tools definition
 const AVAILABLE_TOOLS = [
+  {
+    name: "create_pull_request",
+    description: "Creates a pull request based on branch memory bank information",
+    inputSchema: {
+      type: "object",
+      properties: {
+        branch: {
+          type: "string",
+          description: "Branch name"
+        },
+        title: {
+          type: "string",
+          description: "Custom PR title (optional)"
+        },
+        base: {
+          type: "string",
+          description: "Target branch for the PR (default: develop for feature branches, master for fix branches)"
+        },
+        language: {
+          type: "string",
+          enum: ["en", "ja"],
+          description: "Language for PR (en or ja)"
+        },
+        push: {
+          type: "boolean",
+          description: "Whether to automatically push the changes"
+        }
+      },
+      required: ["branch"]
+    }
+  },
   {
     name: "list_tools",
     description: "List all available tools",
@@ -479,10 +511,212 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       };
     }
 
+    case "create_pull_request": {
+      const branch = params.branch as string;
+      const title = params.title as string | undefined;
+      const base = params.base as string | undefined;
+      const language = params.language as string || 'ja';
+      const push = params.push as boolean | undefined;
+
+      if (!branch) {
+        throw new Error('Invalid arguments for create_pull_request');
+      }
+
+      // Initialize workspace and branch memory bank
+      const config = await workspaceManager.initialize(undefined, branch);
+      branchMemoryBank = new BranchMemoryBank(
+        workspaceManager.getBranchMemoryPath(branch),
+        branch,
+        config
+      );
+      await branchMemoryBank.initialize();
+
+      // Generate pull request content
+      const prContent = await generatePullRequestContent(branchMemoryBank, branch, title, base, language);
+
+      // Create the pullRequest.md file
+      await branchMemoryBank.writeDocument('pullRequest.md', prContent.content);
+
+      // Set up response message
+      let responseMessage = `pullRequest.md ファイルを作成しました。\n\n`;
+      responseMessage += `このファイルをコミットしてプッシュすると、GitHub Actionsによって自動的にPull Requestが作成されます。\n\n`;
+      responseMessage += `以下のコマンドを実行してください:\n`;
+      responseMessage += `git add ${workspaceManager.getBranchMemoryPath(branch)}/pullRequest.md\n`;
+      responseMessage += `git commit -m "chore: PR作成準備"\n`;
+      responseMessage += `git push\n\n`;
+      responseMessage += `PR情報:\n`;
+      responseMessage += `タイトル: ${prContent.title}\n`;
+      responseMessage += `ターゲットブランチ: ${prContent.baseBranch}\n`;
+      responseMessage += `ラベル: ${prContent.labels.join(', ')}\n`;
+
+      return { content: [{ type: "text", text: responseMessage }] };
+    }
+
     default:
       throw new Error(`Unknown tool: ${name}`);
   }
 });
+
+/**
+ * メモリバンクの情報からPRコンテンツを生成する
+ */
+async function generatePullRequestContent(
+  memoryBank: BranchMemoryBank,
+  branch: string,
+  customTitle?: string,
+  customBase?: string,
+  language: string = 'ja'
+): Promise<{
+  title: string;
+  baseBranch: string;
+  labels: string[];
+  content: string;
+}> {
+  try {
+    // テンプレートファイルの読み込み
+    // 言語に応じたテンプレートを選択（ただし生成されるファイル名は常に同一）
+    const templatePath = path.join(path.dirname(fileURLToPath(import.meta.url)), 'templates', `pull-request-template${language === 'en' ? '-en' : ''}.md`);
+    let templateContent = await fs.readFile(templatePath, 'utf-8');
+
+    // メモリバンクから必要なファイルを読み込み
+    const [activeContext, progress, systemPatterns] = await Promise.all([
+      memoryBank.readDocument('activeContext.md').catch(() => ({ content: '', lastModified: new Date() })),
+      memoryBank.readDocument('progress.md').catch(() => ({ content: '', lastModified: new Date() })),
+      memoryBank.readDocument('systemPatterns.md').catch(() => ({ content: '', lastModified: new Date() }))
+    ]);
+
+    // 英語の場合はセクション見出しも英語で検索
+    const sectionHeaders = language === 'en' ? {
+      currentWork: '## Current Work',
+      recentChanges: '## Recent Changes',
+      activeDecisions: '## Active Decisions',
+      considerations: '## Considerations',
+      workingFeatures: '## Working Features',
+      knownIssues: '## Known Issues'
+    } : {
+      currentWork: '## 現在の作業内容',
+      recentChanges: '## 最近の変更点',
+      activeDecisions: '## アクティブな決定事項',
+      considerations: '## 検討事項',
+      workingFeatures: '## 動作している機能',
+      knownIssues: '## 既知の問題'
+    };
+
+    // 現在の作業内容からタイトルを取得
+    let title = customTitle || '';
+    let currentWork = '';
+
+    if (!title && typeof activeContext.content === 'string') {
+      const currentWorkMatch = activeContext.content.match(new RegExp(`${sectionHeaders.currentWork}\s*\n([^\n#]+)`));
+      if (currentWorkMatch && currentWorkMatch[1].trim()) {
+        currentWork = currentWorkMatch[1].trim();
+        title = currentWork;
+      }
+    }
+
+    // タイトルが取得できなかった場合はブランチ名から生成
+    if (!title) {
+      const type = branch.startsWith('feature/') ? 'feat' : 'fix';
+      const featureName = branch.replace(/^(feature|fix)\//, '').replace(/-/g, ' ');
+      title = `${type}: ${featureName}`;
+    }
+
+    // テンプレートの各セクションを置換
+    const replacements: Record<string, string> = {
+      '{{CURRENT_WORK}}': currentWork,
+      '{{RECENT_CHANGES}}': extractSection(activeContext.content, sectionHeaders.recentChanges),
+      '{{ACTIVE_DECISIONS}}': extractSection(activeContext.content, sectionHeaders.activeDecisions),
+      '{{CONSIDERATIONS}}': extractSection(activeContext.content, sectionHeaders.considerations),
+      '{{WORKING_FEATURES}}': extractSection(progress.content, sectionHeaders.workingFeatures),
+      '{{KNOWN_ISSUES}}': extractSection(progress.content, sectionHeaders.knownIssues)
+    };
+
+    // テンプレートにデータを挿入
+    Object.entries(replacements).forEach(([placeholder, value]) => {
+      if (value) {
+        templateContent = templateContent.replace(placeholder, value);
+      } else {
+        // 該当するコンテンツがない場合はプレースホルダごと削除
+        const regex = new RegExp(`\n+<!-- [^>]+ -->\n+${placeholder}\n+`, 'g');
+        templateContent = templateContent.replace(regex, '');
+        templateContent = templateContent.replace(placeholder, '');
+      }
+    });
+
+    // 空のセクションをクリーンアップ
+    templateContent = templateContent.replace(/##\s+[^\n]+\n\s*\n+##/g, '##');
+    templateContent = templateContent.replace(/\n{3,}/g, '\n\n');
+
+    // PRのタイプに基づいてラベルを設定
+    const labels = ['memory-bank', 'auto-pr'];
+    if (title.toLowerCase().includes('fix:') || title.toLowerCase().includes('修正')) {
+      labels.push('bug');
+    } else if (title.toLowerCase().includes('feat:') || title.toLowerCase().includes('機能')) {
+      labels.push('enhancement');
+    } else if (title.toLowerCase().includes('doc:') || title.toLowerCase().includes('ドキュメント')) {
+      labels.push('documentation');
+    }
+
+    // ベースブランチの決定
+    const baseBranch = customBase || (branch.startsWith('feature/') ? 'develop' : 'master');
+
+    // PR作成メッセージを言語に合わせる
+    const prReadyMsg = language === 'en' ?
+      '# PR Ready\n\n' :
+      '# PRの準備完了\n\n';
+
+    const prFooter = language === 'en' ?
+      '\n\n_This PR was automatically generated based on information from the memory bank_' :
+      '\n\n_このPRはメモリバンクの情報を基に自動生成されました_';
+
+    // pullRequest.mdファイルのコンテンツを生成
+    const prContent = `${prReadyMsg}#title: ${title}\n#targetBranch: ${baseBranch}\n#labels: ${labels.join(',')}\n\n${templateContent}${prFooter}`;
+
+    return {
+      title,
+      baseBranch,
+      labels,
+      content: prContent
+    };
+  } catch (error) {
+    console.error('PR生成エラー:', error);
+    throw new MemoryBankError(
+      -33500,
+      `PR内容の生成に失敗しました: ${(error as Error).message || String(error)}`
+    );
+  }
+}
+
+/**
+ * マークダウンからセクションを抽出する
+ */
+function extractSection(content: string, sectionHeader: string): string {
+  if (!content) return '';
+
+  const lines = content.split('\n');
+  let capturing = false;
+  let result: string[] = [];
+
+  for (const line of lines) {
+    if (line.includes(sectionHeader)) {
+      capturing = true;
+      continue;
+    }
+
+    if (capturing) {
+      if (line.startsWith('##')) {
+        break;
+      }
+
+      // 空行でなければ追加
+      if (line.trim()) {
+        result.push(line);
+      }
+    }
+  }
+
+  return result.join('\n');
+}
 
 // Start the server
 async function main() {
