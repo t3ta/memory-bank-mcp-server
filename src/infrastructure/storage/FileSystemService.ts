@@ -282,7 +282,12 @@ export class FileSystemService implements IFileSystemService {
         
         // Handle stream events
         stream.on('data', (chunk) => {
-          chunks.push(Buffer.from(chunk));
+          // Handle different chunk types appropriately
+          if (typeof chunk === 'string') {
+            chunks.push(Buffer.from(chunk, 'utf8'));
+          } else {
+            chunks.push(chunk);
+          }
         });
         
         stream.on('end', () => {
