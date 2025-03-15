@@ -42,9 +42,22 @@ export class MemoryBankServer {
             jsonrpc: "2.0",
             id: request.id,
             result: {
+              protocolVersion: "1.0",
+              serverInfo: {
+                name: "memory-bank-mcp-server",
+                version: "1.0.0"
+              },
               capabilities: {
-                tools: true,
-                resources: false
+                tools: {
+                  supported: true,
+                  toolList: true,
+                  toolCall: true
+                },
+                resources: {
+                  supported: false,
+                  resourceList: false,
+                  resourceRead: false
+                }
               }
             }
           };
