@@ -362,7 +362,8 @@ async function main() {
   logger.debug('Initializing workspace...');
   const config = await workspaceManager.initialize({
     memoryRoot: argv.docs as string,
-    language: 'ja'
+    language: 'ja',
+    verbose: false
   });
 
   logger.debug('Initializing global memory bank...');

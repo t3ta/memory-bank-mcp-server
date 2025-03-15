@@ -74,20 +74,54 @@ docs/branch-memory-bank/feature-login/
 ### Tools
 
 - **write_branch_memory_bank**
-
   - Write a document to the current branch's memory bank
   - Input:
     - `path` (string): Document path
     - `content` (string): Document content
+    - `branch` (string): Branch name
   - Creates directories as needed
   - Initializes with templates if content is empty
 
 - **read_branch_memory_bank**
-
   - Read a document from the current branch's memory bank
   - Input:
     - `path` (string): Document path
+    - `branch` (string): Branch name
   - Returns document content and metadata
+
+- **write_global_memory_bank**
+  - Write a document to the global memory bank
+  - Input:
+    - `path` (string): Document path
+    - `content` (string): Document content
+  - Creates directories as needed
+  - Updates tags index automatically
+
+- **read_global_memory_bank**
+  - Read a document from the global memory bank
+  - Input:
+    - `path` (string): Document path
+  - Returns document content and metadata
+
+- **read_branch_core_files**
+  - Read all core files from the branch memory bank
+  - Input:
+    - `branch` (string): Branch name
+  - Returns content and metadata for:
+    - branchContext.md
+    - activeContext.md
+    - systemPatterns.md
+    - progress.md
+
+- **read_global_core_files**
+  - Read all core files from the global memory bank
+  - Returns content and metadata for:
+    - architecture.md
+    - coding-standards.md
+    - domain-models.md
+    - glossary.md
+    - tech-stack.md
+    - user-guide.md
 
 - **read_rules**
   - Read the memory bank rules in specified language
