@@ -78,24 +78,28 @@ export async function registerInfrastructureServices(
 export function registerApplicationServices(container: DIContainer): void {
   // Register use cases
   container.registerFactory('readGlobalDocumentUseCase', () => {
+    // Use explicit type assertion for proper type safety
     const globalRepository = container.get('globalMemoryBankRepository') as FileSystemGlobalMemoryBankRepository;
     
     return new ReadGlobalDocumentUseCase(globalRepository);
   });
   
   container.registerFactory('writeGlobalDocumentUseCase', () => {
+    // Use explicit type assertion for proper type safety
     const globalRepository = container.get('globalMemoryBankRepository') as FileSystemGlobalMemoryBankRepository;
     
     return new WriteGlobalDocumentUseCase(globalRepository);
   });
   
   container.registerFactory('readBranchDocumentUseCase', () => {
+    // Use explicit type assertion for proper type safety
     const branchRepository = container.get('branchMemoryBankRepository') as FileSystemBranchMemoryBankRepository;
     
     return new ReadBranchDocumentUseCase(branchRepository);
   });
   
   container.registerFactory('writeBranchDocumentUseCase', () => {
+    // Use explicit type assertion for proper type safety
     const branchRepository = container.get('branchMemoryBankRepository') as FileSystemBranchMemoryBankRepository;
     
     return new WriteBranchDocumentUseCase(branchRepository);
@@ -103,6 +107,7 @@ export function registerApplicationServices(container: DIContainer): void {
   
   // Register common use cases
   container.registerFactory('searchDocumentsByTagsUseCase', () => {
+    // Use explicit type assertion for proper type safety
     const globalRepository = container.get('globalMemoryBankRepository') as FileSystemGlobalMemoryBankRepository;
     const branchRepository = container.get('branchMemoryBankRepository') as FileSystemBranchMemoryBankRepository;
     
@@ -110,6 +115,7 @@ export function registerApplicationServices(container: DIContainer): void {
   });
   
   container.registerFactory('updateTagIndexUseCase', () => {
+    // Use explicit type assertion for proper type safety
     const globalRepository = container.get('globalMemoryBankRepository') as FileSystemGlobalMemoryBankRepository;
     const branchRepository = container.get('branchMemoryBankRepository') as FileSystemBranchMemoryBankRepository;
     
@@ -117,6 +123,7 @@ export function registerApplicationServices(container: DIContainer): void {
   });
   
   container.registerFactory('getRecentBranchesUseCase', () => {
+    // Use explicit type assertion for proper type safety
     const branchRepository = container.get('branchMemoryBankRepository') as FileSystemBranchMemoryBankRepository;
     
     return new GetRecentBranchesUseCase(branchRepository);
@@ -124,12 +131,14 @@ export function registerApplicationServices(container: DIContainer): void {
   
   // Register core files use cases
   container.registerFactory('readBranchCoreFilesUseCase', () => {
+    // Use explicit type assertion for proper type safety
     const branchRepository = container.get('branchMemoryBankRepository') as FileSystemBranchMemoryBankRepository;
     
     return new ReadBranchCoreFilesUseCase(branchRepository);
   });
   
   container.registerFactory('createBranchCoreFilesUseCase', () => {
+    // Use explicit type assertion for proper type safety
     const branchRepository = container.get('branchMemoryBankRepository') as FileSystemBranchMemoryBankRepository;
     
     return new CreateBranchCoreFilesUseCase(branchRepository);
@@ -137,6 +146,7 @@ export function registerApplicationServices(container: DIContainer): void {
   
   // Pull Request use cases
   container.registerFactory('createPullRequestUseCase', () => {
+    // Use explicit type assertion for proper type safety
     const branchRepository = container.get('branchMemoryBankRepository') as FileSystemBranchMemoryBankRepository;
     const fileSystemService = container.get('fileSystemService') as IFileSystemService;
     
@@ -154,6 +164,7 @@ export function registerInterfaceServices(container: DIContainer): void {
   
   // Register tools
   container.registerFactory('pullRequestTool', () => {
+    // Use explicit type assertion for proper type safety
     const createPullRequestUseCase = container.get('createPullRequestUseCase') as CreatePullRequestUseCase;
     
     return new PullRequestTool(createPullRequestUseCase);
@@ -161,6 +172,7 @@ export function registerInterfaceServices(container: DIContainer): void {
   
   // Register controllers
   container.registerFactory('globalController', () => {
+    // Use explicit type assertion for proper type safety
     const readGlobalDocumentUseCase = container.get('readGlobalDocumentUseCase') as ReadGlobalDocumentUseCase;
     const writeGlobalDocumentUseCase = container.get('writeGlobalDocumentUseCase') as WriteGlobalDocumentUseCase;
     const searchDocumentsByTagsUseCase = container.get('searchDocumentsByTagsUseCase') as SearchDocumentsByTagsUseCase;
@@ -177,6 +189,7 @@ export function registerInterfaceServices(container: DIContainer): void {
   });
   
   container.registerFactory('branchController', () => {
+    // Use explicit type assertion for proper type safety
     const readBranchDocumentUseCase = container.get('readBranchDocumentUseCase') as ReadBranchDocumentUseCase;
     const writeBranchDocumentUseCase = container.get('writeBranchDocumentUseCase') as WriteBranchDocumentUseCase;
     const searchDocumentsByTagsUseCase = container.get('searchDocumentsByTagsUseCase') as SearchDocumentsByTagsUseCase;

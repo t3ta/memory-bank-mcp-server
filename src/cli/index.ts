@@ -9,6 +9,7 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import createApplication from '../main/index.js';
 import { logger } from '../shared/utils/logger.js';
+import { MCPResponse } from '../interface/presenters/types/index.js';
 
 // Define CLI commands
 const argv = yargs(hideBin(process.argv))
@@ -49,6 +50,7 @@ const argv = yargs(hideBin(process.argv))
       });
 
       const result = await app.getGlobalController().readDocument(argv.path as string);
+      // Type guard to safely access success/error properties
       if (!result.success) {
         logger.error(`Error reading document: ${result.error.message}`);
         process.exit(1);
@@ -110,6 +112,7 @@ const argv = yargs(hideBin(process.argv))
 
       // Write document
       const result = await app.getGlobalController().writeDocument(argv.path as string, content);
+      // Type guard to safely access success/error properties
       if (!result.success) {
         logger.error(`Error writing document: ${result.error.message}`);
         process.exit(1);
@@ -147,6 +150,7 @@ const argv = yargs(hideBin(process.argv))
         argv.path as string
       );
       
+      // Type guard to safely access success/error properties
       if (!result.success) {
         logger.error(`Error reading document: ${result.error.message}`);
         process.exit(1);
@@ -218,6 +222,7 @@ const argv = yargs(hideBin(process.argv))
         content
       );
       
+      // Type guard to safely access success/error properties
       if (!result.success) {
         logger.error(`Error writing document: ${result.error.message}`);
         process.exit(1);
@@ -253,6 +258,7 @@ const argv = yargs(hideBin(process.argv))
 
       const result = await app.getBranchController().readCoreFiles(argv.branch as string);
       
+      // Type guard to safely access success/error properties
       if (!result.success) {
         logger.error(`Error reading core files: ${result.error.message}`);
         process.exit(1);
@@ -276,6 +282,78 @@ const argv = yargs(hideBin(process.argv))
     }
   })
   // Utility commands
+  .command('create-pull-request <branch>', 'Create a pull request from branch memory bank', (yargs) => {
+    return yargs
+      .positional('branch', {
+        describe: 'Branch name',
+        type: 'string',
+        demandOption: true
+      })
+      .option('title', {
+        type: 'string',
+        description: 'Custom PR title (optional)'
+      })
+      .option('base', {
+        type: 'string',
+        description: 'Target branch for the PR (default: develop for feature branches, master for fix branches)'
+      })
+      .option('language', {
+        type: 'string',
+        choices: ['en', 'ja'],
+        description: 'Language for PR content',
+        default: 'ja'
+      });
+  }, async (argv) => {
+    try {
+      const app = await createApplication({
+        memoryRoot: argv.docs as string,
+        language: argv.language as 'en' | 'ja',
+        verbose: argv.verbose
+      });
+
+      // Use the pull request tool
+      const pullRequestTool = app.getPullRequestTool();
+      const pullRequest = await pullRequestTool.createPullRequest(
+        argv.branch as string,
+        argv.title as string | undefined,
+        argv.base as string | undefined,
+        argv.language as string
+      );
+
+      // Set up response message based on language
+      const isJapanese = argv.language !== 'en';
+      let responseMessage = isJapanese 
+        ? `pullRequest.md ファイルを作成しました。\n\n` 
+        : `pullRequest.md file has been created.\n\n`;
+
+      if (isJapanese) {
+        responseMessage += `このファイルをコミットしてプッシュすると、GitHub Actionsによって自動的にPull Requestが作成されます。\n\n`;
+        responseMessage += `以下のコマンドを実行してください:\n`;
+        responseMessage += `git add ${pullRequest.filePath}\n`;
+        responseMessage += `git commit -m "chore: PR作成準備"\n`;
+        responseMessage += `git push\n\n`;
+        responseMessage += `PR情報:\n`;
+        responseMessage += `タイトル: ${pullRequest.title}\n`;
+        responseMessage += `ターゲットブランチ: ${pullRequest.baseBranch}\n`;
+        responseMessage += `ラベル: ${pullRequest.labels.join(', ')}\n`;
+      } else {
+        responseMessage += `Commit and push this file to automatically create a Pull Request via GitHub Actions.\n\n`;
+        responseMessage += `Run the following commands:\n`;
+        responseMessage += `git add ${pullRequest.filePath}\n`;
+        responseMessage += `git commit -m "chore: prepare PR"\n`;
+        responseMessage += `git push\n\n`;
+        responseMessage += `PR Information:\n`;
+        responseMessage += `Title: ${pullRequest.title}\n`;
+        responseMessage += `Target branch: ${pullRequest.baseBranch}\n`;
+        responseMessage += `Labels: ${pullRequest.labels.join(', ')}\n`;
+      }
+
+      console.log(responseMessage);
+    } catch (error) {
+      logger.error('Failed to create pull request:', error);
+      process.exit(1);
+    }
+  })
   .command('recent-branches [limit]', 'Get recent branches', (yargs) => {
     return yargs
       .positional('limit', {
@@ -293,6 +371,7 @@ const argv = yargs(hideBin(process.argv))
 
       const result = await app.getBranchController().getRecentBranches(argv.limit as number);
       
+      // Type guard to safely access success/error properties
       if (!result.success) {
         logger.error(`Error getting recent branches: ${result.error.message}`);
         process.exit(1);
@@ -317,6 +396,8 @@ const argv = yargs(hideBin(process.argv))
   .example('$0 read-global architecture.md', 'Read architecture document from global memory bank')
   .example('$0 write-global tech-stack.md -f ./tech-stack.md', 'Write tech stack document from file')
   .example('$0 read-branch feature/login activeContext.md', 'Read active context from branch')
+  .example('$0 create-pull-request feature/my-feature', 'Create a pull request from branch')
+  .example('$0 create-pull-request feature/my-feature --title "My awesome feature" --base main', 'Create PR with custom title and base')
   .example('$0 recent-branches', 'Show recent branches')
   .demandCommand(1, 'You need to specify a command')
   .help()
