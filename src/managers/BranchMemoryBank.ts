@@ -272,8 +272,11 @@ ${validatedDecision.consequences.map((c: string) => `- ${c}`).join('\n')}
     try {
       const validatedArgs = WriteBranchCoreFilesArgsSchema.parse(args);
 
-      // Initialize memory bank if needed
-      await this.initialize();
+      // Validate structure and initialize only if needed
+      const validation = await this.validateStructure();
+      if (!validation.isValid) {
+        await this.initialize();
+      }
 
       // Update branchContext.md
       if (validatedArgs.files.branchContext?.content) {
@@ -287,40 +290,40 @@ ${validatedDecision.consequences.map((c: string) => `- ${c}`).join('\n')}
           '',
           '## 現在の作業内容'
         ];
-        
+
         // Add current work if available, ensure proper spacing
         if (validatedArgs.files.activeContext.currentWork) {
           contentSections.push('', validatedArgs.files.activeContext.currentWork);
         }
-        
+
         // Add recent changes
         contentSections.push('', '## 最近の変更点');
         if (validatedArgs.files.activeContext.recentChanges?.length) {
           contentSections.push('');
           contentSections.push(...validatedArgs.files.activeContext.recentChanges.map(c => `- ${c}`));
         }
-        
+
         // Add active decisions
         contentSections.push('', '## アクティブな決定事項');
         if (validatedArgs.files.activeContext.activeDecisions?.length) {
           contentSections.push('');
           contentSections.push(...validatedArgs.files.activeContext.activeDecisions.map(d => `- ${d}`));
         }
-        
+
         // Add considerations
         contentSections.push('', '## 検討事項');
         if (validatedArgs.files.activeContext.considerations?.length) {
           contentSections.push('');
           contentSections.push(...validatedArgs.files.activeContext.considerations.map(c => `- ${c}`));
         }
-        
+
         // Add next steps
         contentSections.push('', '## 次のステップ');
         if (validatedArgs.files.activeContext.nextSteps?.length) {
           contentSections.push('');
           contentSections.push(...validatedArgs.files.activeContext.nextSteps.map(s => `- ${s}`));
         }
-        
+
         const content = contentSections.join('\n');
         await this.writeDocument('activeContext.md', content);
       }
@@ -332,33 +335,33 @@ ${validatedDecision.consequences.map((c: string) => `- ${c}`).join('\n')}
           '',
           '## 動作している機能'
         ];
-        
+
         // Add working features
         if (validatedArgs.files.progress.workingFeatures?.length) {
           contentSections.push('');
           contentSections.push(...validatedArgs.files.progress.workingFeatures.map(f => `- ${f}`));
         }
-        
+
         // Add pending implementation
         contentSections.push('', '## 未実装の機能');
         if (validatedArgs.files.progress.pendingImplementation?.length) {
           contentSections.push('');
           contentSections.push(...validatedArgs.files.progress.pendingImplementation.map(f => `- ${f}`));
         }
-        
+
         // Add current status
         contentSections.push('', '## 現在の状態');
         if (validatedArgs.files.progress.status) {
           contentSections.push('', validatedArgs.files.progress.status);
         }
-        
+
         // Add known issues
         contentSections.push('', '## 既知の問題');
         if (validatedArgs.files.progress.knownIssues?.length) {
           contentSections.push('');
           contentSections.push(...validatedArgs.files.progress.knownIssues.map(i => `- ${i}`));
         }
-        
+
         const content = contentSections.join('\n');
         await this.writeDocument('progress.md', content);
       }
@@ -386,7 +389,7 @@ ${validatedDecision.consequences.map((c: string) => `- ${c}`).join('\n')}
               '',
               '#### 影響'
             );
-            
+
             // Add consequences if available
             if (decision.consequences?.length) {
               contentSections.push(...decision.consequences.map(c => `- ${c}`));
@@ -488,7 +491,7 @@ ${validatedDecision.consequences.map((c: string) => `- ${c}`).join('\n')}
       content = content
         .replace(/\n{3,}/g, '\n\n') // Replace 3+ newlines with 2
         .trim() + '\n'; // Ensure single newline at end of file
-      
+
       // Final check to ensure we don't have empty list items (-) with nothing after them
       content = content.replace(/^-\s*$/gm, '');
       // Remove any remaining empty list markers
