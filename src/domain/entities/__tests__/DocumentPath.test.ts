@@ -6,7 +6,7 @@ describe('DocumentPath', () => {
     it('should create a valid document path', () => {
       // Arrange & Act
       const path = DocumentPath.create('test/file.md');
-      
+
       // Assert
       expect(path).toBeDefined();
       expect(path.value).toBe('test/file.md');
@@ -15,7 +15,7 @@ describe('DocumentPath', () => {
     it('should normalize backslashes to forward slashes', () => {
       // Arrange & Act
       const path = DocumentPath.create('test\\file.md');
-      
+
       // Assert
       expect(path.value).toBe('test/file.md');
     });
@@ -52,7 +52,7 @@ describe('DocumentPath', () => {
         expect("No error was thrown").toBe("Error should have been thrown");
       } catch (error) {
         expect(error).toBeInstanceOf(DomainError);
-        expect((error as DomainError).code).toBe(DomainErrorCodes.INVALID_DOCUMENT_PATH);
+        expect((error as DomainError).code).toBe(`DOMAIN_ERROR.${DomainErrorCodes.INVALID_DOCUMENT_PATH}`);
       }
     });
   });
@@ -61,10 +61,10 @@ describe('DocumentPath', () => {
     it('should return directory part of the path', () => {
       // Arrange
       const path = DocumentPath.create('test/nested/file.md');
-      
+
       // Act
       const directory = path.directory;
-      
+
       // Assert
       expect(directory).toBe('test/nested');
     });
@@ -72,10 +72,10 @@ describe('DocumentPath', () => {
     it('should return empty string for path without directory', () => {
       // Arrange
       const path = DocumentPath.create('file.md');
-      
+
       // Act
       const directory = path.directory;
-      
+
       // Assert
       expect(directory).toBe('');
     });
@@ -85,10 +85,10 @@ describe('DocumentPath', () => {
     it('should return filename part of the path', () => {
       // Arrange
       const path = DocumentPath.create('test/nested/file.md');
-      
+
       // Act
       const filename = path.filename;
-      
+
       // Assert
       expect(filename).toBe('file.md');
     });
@@ -96,10 +96,10 @@ describe('DocumentPath', () => {
     it('should return the whole path for path without directory', () => {
       // Arrange
       const path = DocumentPath.create('file.md');
-      
+
       // Act
       const filename = path.filename;
-      
+
       // Assert
       expect(filename).toBe('file.md');
     });
@@ -109,10 +109,10 @@ describe('DocumentPath', () => {
     it('should return extension part of the path', () => {
       // Arrange
       const path = DocumentPath.create('test/file.md');
-      
+
       // Act
       const extension = path.extension;
-      
+
       // Assert
       expect(extension).toBe('md');
     });
@@ -120,10 +120,10 @@ describe('DocumentPath', () => {
     it('should return empty string for path without extension', () => {
       // Arrange
       const path = DocumentPath.create('test/file');
-      
+
       // Act
       const extension = path.extension;
-      
+
       // Assert
       expect(extension).toBe('');
     });
@@ -131,10 +131,10 @@ describe('DocumentPath', () => {
     it('should return extension for filename with multiple dots', () => {
       // Arrange
       const path = DocumentPath.create('test/file.config.json');
-      
+
       // Act
       const extension = path.extension;
-      
+
       // Assert
       expect(extension).toBe('json');
     });
@@ -145,10 +145,10 @@ describe('DocumentPath', () => {
       // Arrange
       const path1 = DocumentPath.create('test/file.md');
       const path2 = DocumentPath.create('test/file.md');
-      
+
       // Act
       const result = path1.equals(path2);
-      
+
       // Assert
       expect(result).toBe(true);
     });
@@ -157,10 +157,10 @@ describe('DocumentPath', () => {
       // Arrange
       const path1 = DocumentPath.create('test/file1.md');
       const path2 = DocumentPath.create('test/file2.md');
-      
+
       // Act
       const result = path1.equals(path2);
-      
+
       // Assert
       expect(result).toBe(false);
     });
@@ -170,10 +170,10 @@ describe('DocumentPath', () => {
     it('should return path value as string', () => {
       // Arrange
       const path = DocumentPath.create('test/file.md');
-      
+
       // Act
       const result = path.toString();
-      
+
       // Assert
       expect(result).toBe('test/file.md');
     });

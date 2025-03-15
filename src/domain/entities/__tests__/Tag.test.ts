@@ -6,7 +6,7 @@ describe('Tag', () => {
     it('should create a valid tag', () => {
       // Arrange & Act
       const tag = Tag.create('test');
-      
+
       // Assert
       expect(tag).toBeDefined();
       expect(tag.value).toBe('test');
@@ -15,7 +15,7 @@ describe('Tag', () => {
     it('should create a valid tag with numbers and hyphens', () => {
       // Arrange & Act
       const tag = Tag.create('test-123');
-      
+
       // Assert
       expect(tag).toBeDefined();
       expect(tag.value).toBe('test-123');
@@ -53,7 +53,7 @@ describe('Tag', () => {
         expect("No error was thrown").toBe("Error should have been thrown");
       } catch (error) {
         expect(error).toBeInstanceOf(DomainError);
-        expect((error as DomainError).code).toBe(DomainErrorCodes.INVALID_TAG_FORMAT);
+        expect((error as DomainError).code).toBe(`DOMAIN_ERROR.${DomainErrorCodes.INVALID_TAG_FORMAT}`);
       }
     });
   });
@@ -63,10 +63,10 @@ describe('Tag', () => {
       // Arrange
       const tag1 = Tag.create('test');
       const tag2 = Tag.create('test');
-      
+
       // Act
       const result = tag1.equals(tag2);
-      
+
       // Assert
       expect(result).toBe(true);
     });
@@ -75,10 +75,10 @@ describe('Tag', () => {
       // Arrange
       const tag1 = Tag.create('test');
       const tag2 = Tag.create('other');
-      
+
       // Act
       const result = tag1.equals(tag2);
-      
+
       // Assert
       expect(result).toBe(false);
     });
@@ -88,10 +88,10 @@ describe('Tag', () => {
     it('should return tag value as string', () => {
       // Arrange
       const tag = Tag.create('test');
-      
+
       // Act
       const result = tag.toString();
-      
+
       // Assert
       expect(result).toBe('test');
     });
@@ -101,10 +101,10 @@ describe('Tag', () => {
     it('should return tag value with # prefix', () => {
       // Arrange
       const tag = Tag.create('test');
-      
+
       // Act
       const result = tag.toHashtag();
-      
+
       // Assert
       expect(result).toBe('#test');
     });
