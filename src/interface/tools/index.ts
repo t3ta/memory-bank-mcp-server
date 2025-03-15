@@ -1,2 +1,2 @@
-export * from './IPullRequestTool';
-export * from './PullRequestTool';
+export * from './IPullRequestTool.js';
+export * from './PullRequestTool.js';

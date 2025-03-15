@@ -1,2 +1,2 @@
-export * from './ICreatePullRequestUseCase';
-export * from './CreatePullRequestUseCase';
+export * from './ICreatePullRequestUseCase.js';
+export * from './CreatePullRequestUseCase.js';

@@ -1,5 +1,5 @@
-import { IUseCase } from '../../interfaces/IUseCase';
-import { PullRequestDTO } from '../../dtos/PullRequestDTO';
+import { IUseCase } from '../../interfaces/IUseCase.js';
+import { PullRequestDTO } from '../../dtos/PullRequestDTO.js';
 
 /**
  * Input for the CreatePullRequest use case

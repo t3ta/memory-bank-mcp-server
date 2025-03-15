@@ -1,6 +1,6 @@
-import { IPullRequestTool } from './IPullRequestTool';
-import { ICreatePullRequestUseCase } from '../../application/usecases/pr/ICreatePullRequestUseCase';
-import { PullRequestDTO } from '../../application/dtos/PullRequestDTO';
+import { IPullRequestTool } from './IPullRequestTool.js';
+import { ICreatePullRequestUseCase } from '../../application/usecases/pr/ICreatePullRequestUseCase.js';
+import { PullRequestDTO } from '../../application/dtos/PullRequestDTO.js';
 
 /**
  * Implementation of the pull request tool

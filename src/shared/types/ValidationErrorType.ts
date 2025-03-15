@@ -1,0 +1,12 @@
+/**
+ * Types of validation errors that can occur
+ */
+export enum ValidationErrorType {
+  INVALID_FORMAT = 'INVALID_FORMAT',
+  MISSING_FIELD = 'MISSING_FIELD',
+  INVALID_VALUE = 'INVALID_VALUE',
+  MISSING_FILE = 'MISSING_FILE',
+  DUPLICATE = 'DUPLICATE',
+  CONSTRAINT_VIOLATION = 'CONSTRAINT_VIOLATION',
+  UNKNOWN = 'UNKNOWN'
+}

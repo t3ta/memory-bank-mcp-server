@@ -1,15 +1,15 @@
-import { IFileSystemService } from '../../../infrastructure/storage/interfaces/IFileSystemService';
-import { IBranchMemoryBankRepository } from '../../../domain/repositories/IBranchMemoryBankRepository';
-import { PullRequestDTO } from '../../dtos/PullRequestDTO';
+import { IFileSystemService } from '../../../infrastructure/storage/interfaces/IFileSystemService.js';
+import { IBranchMemoryBankRepository } from '../../../domain/repositories/IBranchMemoryBankRepository.js';
+import { PullRequestDTO } from '../../dtos/PullRequestDTO.js';
 import { 
   ICreatePullRequestUseCase, 
   CreatePullRequestInput, 
   CreatePullRequestOutput 
-} from './ICreatePullRequestUseCase';
-import { ApplicationError } from '../../../shared/errors/ApplicationError';
-import { BranchInfo } from '../../../domain/entities/BranchInfo';
-import { DocumentPath } from '../../../domain/entities/DocumentPath';
-import { Tag } from '../../../domain/entities/Tag';
+} from './ICreatePullRequestUseCase.js';
+import { ApplicationError } from '../../../shared/errors/ApplicationError.js';
+import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
+import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
+import { Tag } from '../../../domain/entities/Tag.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ValidationErrorType } from '../models/types.js';
+import { ValidationErrorType } from '../shared/types/index.js';
 
 // Utility for flexible date parsing
 const dateStringToDate = (val: string, ctx: z.RefinementCtx) => {

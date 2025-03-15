@@ -1,4 +1,4 @@
-import { PullRequestDTO } from '../../application/dtos/PullRequestDTO';
+import { PullRequestDTO } from '../../application/dtos/PullRequestDTO.js';
 
 /**
  * Pull request tool interface
