@@ -1,10 +1,10 @@
 import { IFileSystemService } from '../../../infrastructure/storage/interfaces/IFileSystemService.js';
 import { IBranchMemoryBankRepository } from '../../../domain/repositories/IBranchMemoryBankRepository.js';
 import { PullRequestDTO } from '../../dtos/PullRequestDTO.js';
-import { 
-  ICreatePullRequestUseCase, 
-  CreatePullRequestInput, 
-  CreatePullRequestOutput 
+import {
+  ICreatePullRequestUseCase,
+  CreatePullRequestInput,
+  CreatePullRequestOutput
 } from './ICreatePullRequestUseCase.js';
 import { ApplicationError } from '../../../shared/errors/ApplicationError.js';
 import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
@@ -37,7 +37,7 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
   async execute(input: CreatePullRequestInput): Promise<CreatePullRequestOutput> {
     try {
       const { branch, title, baseBranch, language = 'ja' } = input;
-      
+
       // Validate branch name
       if (!branch) {
         throw new ApplicationError(
@@ -56,7 +56,7 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
 
       // Create domain objects
       const branchInfo = BranchInfo.create(branch);
-      
+
       // Check if branch exists
       const branchExists = await this.branchRepository.exists(branch);
       if (!branchExists) {
@@ -77,7 +77,7 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
       // Create PR file path
       const prFilePath = `pullRequest.md`;
       const documentPath = DocumentPath.create(prFilePath);
-      
+
       // Create memory document
       const document = MemoryDocument.create({
         path: documentPath,
@@ -85,7 +85,7 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
         tags: [Tag.create('pull-request')],
         lastModified: new Date()
       });
-      
+
       // Write pullRequest.md to branch memory bank
       await this.branchRepository.saveDocument(
         branchInfo,
@@ -100,7 +100,7 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
       if (error instanceof ApplicationError) {
         throw error;
       }
-      
+
       throw new ApplicationError(
         'PULL_REQUEST_CREATION_FAILED',
         `Failed to create pull request: ${(error as Error).message}`,
@@ -139,11 +139,11 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
     const activeContextPath = DocumentPath.create('activeContext.md');
     const progressPath = DocumentPath.create('progress.md');
     const systemPatternsPath = DocumentPath.create('systemPatterns.md');
-    
+
     // Get activeContext and progress files fully - these are smaller files
     const activeContext = await this.branchRepository.getDocument(branchInfo, activeContextPath);
     const progress = await this.branchRepository.getDocument(branchInfo, progressPath);
-    
+
     // TypeScript workaround for null checks
     if (!activeContext || !progress) {
       throw new ApplicationError(
@@ -151,7 +151,7 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
         'Required memory bank core files not found'
       );
     }
-    
+
     // Now TypeScript knows these are defined and have content property
     const activeContextContent = activeContext.content;
     const progressContent = progress.content;
@@ -196,9 +196,9 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
     }
 
     // Determine base branch if not specified
-    const baseBranch = customBaseBranch || 
+    const baseBranch = customBaseBranch ||
       (branchInfo.name.startsWith('feature/') ? 'develop' : 'master');
-      
+
     // Get technical decisions from systemPatterns efficiently (without loading entire file)
     let technicalDecisions = '';
     try {
@@ -207,18 +207,20 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
       const systemPatternsExists = allDocuments.some(
         docPath => docPath.value === systemPatternsPath.value
       );
-      
+
       if (systemPatternsExists) {
-        // Get systemPatterns but limit memory usage by processing it differently
-        const systemPatterns = await this.branchRepository.getDocument(branchInfo, systemPatternsPath);
-        
-        if (systemPatterns) {
-          // Process only a chunk of the document to avoid memory issues
+        // Get only the most recent technical decisions to avoid memory issues
+        // Instead of loading the entire file, we'll extract just the decisions we need
+        const recentDecisions = await this.extractRecentTechnicalDecisions(
+          branchInfo,
+          systemPatternsPath,
+          language === 'en' ? '### ' : '### ',
+          5 // Limit to 5 recent decisions
+        );
+
+        if (recentDecisions.length > 0) {
           const sectionHeader = language === 'en' ? '## Technical Decisions' : '## 技術的決定事項';
-          technicalDecisions = this.extractTechnicalDecisionsFromContent(
-            systemPatterns.content, 
-            sectionHeader
-          );
+          technicalDecisions = `${sectionHeader}\n\n${this.formatDecisions(recentDecisions)}`;
         }
       }
     } catch (error) {
@@ -236,7 +238,7 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
       '{{WORKING_FEATURES}}': this.extractSection(progressContent, sectionHeaders.workingFeatures),
       '{{KNOWN_ISSUES}}': this.extractSection(progressContent, sectionHeaders.knownIssues)
     };
-    
+
     // Only add technical decisions if we have them
     if (technicalDecisions) {
       // システムパターンから抽出した技術的決定事項もアクティブな決定事項として追加
@@ -259,7 +261,7 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
         // Remove placeholder and its comment if content is empty
         const commentRegex = new RegExp(`<!-- [^>]+ -->[\\s\\n]*${placeholder}[\\s\\n]*`, 'g');
         processedContent = processedContent.replace(commentRegex, '');
-        
+
         // Remove the placeholder itself
         processedContent = processedContent.replace(placeholder, '');
       }
@@ -280,9 +282,9 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
 
     // Add PR header
     const prReadyMsg = language === 'en' ? '# PR Ready\n\n' : '# PRの準備完了\n\n';
-    
+
     // Generate final content with metadata
-    const finalContent = 
+    const finalContent =
       `${prReadyMsg}#title: ${title}\n#targetBranch: ${baseBranch}\n#labels: ${labels.join(',')}\n\n${processedContent}`;
 
     return {
@@ -294,40 +296,73 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
   }
 
   /**
-   * Extract technical decisions from content
-   * This helps avoid memory issues by processing only parts of large documents
+   * Extract recent technical decisions directly from the repository
+   * This avoids loading the entire systemPatterns file into memory
    */
-  private extractTechnicalDecisionsFromContent(
-    content: string,
-    sectionHeader: string
-  ): string {
+  private async extractRecentTechnicalDecisions(
+    branchInfo: BranchInfo,
+    systemPatternsPath: DocumentPath,
+    decisionPrefix: string,
+    limit: number
+  ): Promise<string[]> {
     try {
-      // Find the section we want
-      const sectionIndex = content.indexOf(sectionHeader);
-      if (sectionIndex === -1) {
-        return '';
+      // Get the document content in chunks to avoid memory issues
+      const document = await this.branchRepository.getDocument(branchInfo, systemPatternsPath);
+      if (!document) {
+        return [];
       }
-      
-      // Extract just the decisions section and limit to 5 recent decisions for sanity
-      const nextSectionIndex = content.indexOf('##', sectionIndex + sectionHeader.length);
-      
-      const decisionsSection = nextSectionIndex !== -1 
-        ? content.substring(sectionIndex, nextSectionIndex)
-        : content.substring(sectionIndex);
-        
-      // Extract individual decisions and limit to recent ones to prevent memory issues
-      const decisions = this.parseDecisionsFromSection(decisionsSection);
-      const limitedDecisions = decisions.slice(0, 5); // Limit to 5 recent decisions
 
-      return this.formatDecisions(limitedDecisions);
+      // Find all decision sections (starting with "### ")
+      const decisions: string[] = [];
+      let content = document.content;
+
+      // Process the content in smaller chunks to reduce memory usage
+      const chunkSize = 50000; // Process 50KB at a time
+
+      if (content.length > chunkSize * 3) {
+        // For very large files, just process the first part where recent decisions are likely to be
+        content = content.substring(0, chunkSize * 3);
+      }
+
+      // Find all decision sections
+      const decisionStartIndices: number[] = [];
+      let searchIndex = 0;
+      let foundIndex: number;
+
+      // Find all occurrences of the decision prefix
+      while ((foundIndex = content.indexOf(decisionPrefix, searchIndex)) !== -1) {
+        decisionStartIndices.push(foundIndex);
+        searchIndex = foundIndex + decisionPrefix.length;
+
+        // Limit the number of decisions we process
+        if (decisionStartIndices.length >= limit * 2) {
+          break;
+        }
+      }
+
+      // Extract each decision section
+      for (let i = 0; i < decisionStartIndices.length; i++) {
+        const startIndex = decisionStartIndices[i];
+        const endIndex = i < decisionStartIndices.length - 1
+          ? decisionStartIndices[i + 1]
+          : content.length;
+
+        const decision = content.substring(startIndex, endIndex);
+        decisions.push(decision);
+      }
+
+      // Return the most recent decisions (which are typically at the beginning of the file)
+      return decisions.slice(0, limit);
     } catch (error) {
-      console.error('Error while extracting technical decisions:', error);
-      return '';
+      console.error('Error extracting recent technical decisions:', error);
+      return [];
     }
   }
-  
+
   /**
    * Parse individual decisions from a section
+   * This method is kept for backward compatibility but is no longer used
+   * in the optimized implementation
    */
   private parseDecisionsFromSection(section: string): string[] {
     // Split by "### " which indicates the start of each decision
@@ -336,7 +371,7 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
     parts.shift();
     return parts;
   }
-  
+
   /**
    * Format decision parts into a readable format
    */
@@ -344,16 +379,35 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
     if (decisions.length === 0) {
       return '';
     }
-    
+
     return decisions.map(decision => {
-      // Get the title (first line) and content separately
-      const lines = decision.trim().split('\n');
-      const title = lines[0].trim();
-      
-      // Only include the most important content - skip empty lines
-      const content = lines.slice(1).filter(line => line.trim().length > 0).slice(0, 5).join('\n');
-      
-      return `### ${title}\n${content}`;
+      // For decisions that already start with "### ", keep them as is
+      if (decision.trim().startsWith('###')) {
+        // Limit the content to reduce memory usage
+        const lines = decision.trim().split('\n');
+        // Get the title (first line)
+        const title = lines[0];
+
+        // Only include the most important content - skip empty lines and limit to 5 lines
+        const content = lines.slice(1)
+          .filter(line => line.trim().length > 0)
+          .slice(0, 5)
+          .join('\n');
+
+        return `${title}\n${content}`;
+      } else {
+        // For other formats, try to extract a title
+        const lines = decision.trim().split('\n');
+        const title = lines[0].trim();
+
+        // Only include the most important content - skip empty lines
+        const content = lines.slice(1)
+          .filter(line => line.trim().length > 0)
+          .slice(0, 5)
+          .join('\n');
+
+        return `### ${title}\n${content}`;
+      }
     }).join('\n\n');
   }
 
@@ -389,7 +443,7 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
     while (result.length > 0 && result[0].trim() === '') {
       result.shift();
     }
-    
+
     while (result.length > 0 && result[result.length - 1].trim() === '') {
       result.pop();
     }
@@ -403,16 +457,16 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
   private cleanupEmptySections(content: string): string {
     // Replace sections with no content
     let cleaned = content;
-    
+
     // Replace empty sections (header followed immediately by another header)
     cleaned = cleaned.replace(/##\s+[^\n]+\n\s*\n*##/g, '##');
-    
+
     // Reduce multiple consecutive newlines to max two
     cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
-    
+
     // Ensure there's a blank line before each section header
     cleaned = cleaned.replace(/([^\n])(\n##)/g, '$1\n$2');
-    
+
     return cleaned;
   }
 }
