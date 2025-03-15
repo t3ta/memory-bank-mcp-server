@@ -138,11 +138,12 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
     // Get core files
     const activeContextPath = DocumentPath.create('activeContext.md');
     const progressPath = DocumentPath.create('progress.md');
-    const systemPatternsPath = DocumentPath.create('systemPatterns.md');
+    // NOTE: systemPatternsは大きすぎてメモリリークするため現状では使用しない
+    //const systemPatternsPath = DocumentPath.create('systemPatterns.md');
     
     const activeContext = await this.branchRepository.getDocument(branchInfo, activeContextPath);
     const progress = await this.branchRepository.getDocument(branchInfo, progressPath);
-    const systemPatterns = await this.branchRepository.getDocument(branchInfo, systemPatternsPath);
+    //const systemPatterns = await this.branchRepository.getDocument(branchInfo, systemPatternsPath);
     
     // TypeScript workaround for null checks
     // This ensures TypeScript recognizes properly typed non-null values after the null check
@@ -157,10 +158,8 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
     // Now TypeScript knows these are defined and have content property
     const activeContextContent = activeContext.content;
     const progressContent = progress.content;
-    // Safely handle systemPatterns that might be null 
-    // and check if content is too large (more than 5000 chars)
-    const systemPatternsContent = systemPatterns && systemPatterns.content.length < 5000 ? 
-      systemPatterns.content : '';
+    // systemPatternsは使用しない (メモリリーク対策)
+    const systemPatternsContent = '';
 
     // Extract sections based on language
     const sectionHeaders = language === 'en' ? {
