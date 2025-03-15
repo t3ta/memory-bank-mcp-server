@@ -12,7 +12,7 @@ import {
 import { WorkspaceManager } from './managers/WorkspaceManager.js';
 import { GlobalMemoryBank } from './managers/GlobalMemoryBank.js';
 import { BranchMemoryBank } from './managers/BranchMemoryBank.js';
-import { Language } from './models/types.js';
+import { Language, BRANCH_CORE_FILES } from './models/types.js';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
@@ -108,6 +108,20 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             path: { type: "string" }
           },
           required: ["path"]
+        }
+      },
+      {
+        name: "read_branch_core_files",
+        description: "Read all core files from the branch memory bank",
+        inputSchema: {
+          type: "object",
+          properties: {
+            branch: {
+              type: "string",
+              description: "Branch name"
+            }
+          },
+          required: ["branch"]
         }
       },
       {
@@ -241,6 +255,53 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       return {
         content: [{ type: "text", text: doc.content }],
         _meta: { lastModified: doc.lastModified.toISOString() }
+      };
+    }
+
+    case "read_branch_core_files": {
+      const branch = params.branch as string;
+
+      if (!branch) {
+        throw new Error('Invalid arguments for read_branch_core_files');
+      }
+
+      const config = await workspaceManager.initialize(undefined, branch);
+      branchMemoryBank = new BranchMemoryBank(
+        workspaceManager.getBranchMemoryPath(branch),
+        branch,
+        config
+      );
+      await branchMemoryBank.initialize();
+
+      if (!branchMemoryBank) {
+        throw new Error('Branch memory bank not initialized');
+      }
+
+      const results = await Promise.all(
+        BRANCH_CORE_FILES.map(async (file) => {
+          try {
+            const doc = await branchMemoryBank!.readDocument(file);
+            return {
+              path: file,
+              content: doc.content,
+              lastModified: doc.lastModified.toISOString()
+            };
+          } catch (error: any) {
+            return {
+              path: file,
+              error: `Failed to read ${file}: ${error?.message || 'Unknown error'}`
+            };
+          }
+        })
+      );
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(results, null, 2)
+          }
+        ]
       };
     }
 
