@@ -129,35 +129,6 @@ docs/branch-memory-bank/feature-login/
     - `language` (string): Language code ("en" or "ja")
   - Returns rules documentation
 
-## Docker
-
-### Build
-```bash
-docker build -t memory-bank-mcp-server .
-```
-
-### Run
-```bash
-docker run -v $(pwd)/docs:/app/docs memory-bank-mcp-server
-```
-
-### Docker Compose
-Create a `docker-compose.yml`:
-```yaml
-version: '3'
-services:
-  memory-bank:
-    build: .
-    volumes:
-      - ./docs:/app/docs
-    environment:
-      - MEMORY_BANK_LANGUAGE=ja
-```
-
-Run with:
-```bash
-docker-compose up
-```
 
 ## Usage with Claude Desktop
 
@@ -196,35 +167,6 @@ Add one of these configurations to your claude_desktop_config.json:
 }
 ```
 
-### Docker
-```json
-{
-  "mcpServers": {
-    "memory-bank": {
-      "command": "docker",
-      "args": ["run", "-i", "-v", "${PWD}/docs:/app/docs", "memory-bank-mcp-server"],
-      "env": {
-        "MEMORY_BANK_LANGUAGE": "ja"
-      }
-    }
-  }
-}
-```
-
-### Docker Compose
-```json
-{
-  "mcpServers": {
-    "memory-bank": {
-      "command": "docker-compose",
-      "args": ["run", "-T", "memory-bank"],
-      "env": {
-        "MEMORY_BANK_LANGUAGE": "ja"
-      }
-    }
-  }
-}
-```
 
 Configuration options:
 
