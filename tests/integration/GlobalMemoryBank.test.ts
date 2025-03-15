@@ -58,7 +58,7 @@ describe('GlobalMemoryBank Integration Test', () => {
       for (const file of coreFiles) {
         try {
           const filePath = path.join(globalDir, file);
-          
+
           // ファイルの内容を確認
           const content = await fs.readFile(filePath, 'utf-8');
           expect(content).not.toBe('');
@@ -68,7 +68,7 @@ describe('GlobalMemoryBank Integration Test', () => {
             // 日本語のテンプレートが使用されていることを確認
             expect(content).toContain('アーキテクチャ');
           }
-          
+
           // ファイルが読み込め、内容があれば成功
           expect(true).toBe(true);
         } catch (error) {
@@ -285,7 +285,7 @@ describe('GlobalMemoryBank Integration Test', () => {
 
         // ドキュメントを削除
         await globalMemoryBank.deleteDocument('to-delete.md');
-        
+
         // ドキュメントが削除されたことを確認
         const existsAfter = await fs.access(docPath)
           .then(() => true)
@@ -333,11 +333,11 @@ describe('GlobalMemoryBank Integration Test', () => {
 
       // ドキュメントを作成
       await globalMemoryBank.writeDocument('api.md', '# API仕様', ['api', 'documentation']);
-      
+
       // ディレクトリの存在を確認（テストディレクトリを使用）
       const globalDir = path.join(testDir, 'global-memory-bank');
       const tagsDir = path.join(globalDir, 'tags');
-      
+
       try {
         // ディレクトリの存在を確認（アクセスできるかチェック）
         await fs.access(tagsDir);
@@ -479,19 +479,19 @@ describe('GlobalMemoryBank Integration Test', () => {
         // ディレクトリ構造を確認
         console.log('Branch dir created:', branchDir);
         console.log('Branch dir exists:', await fs.access(branchDir).then(() => true).catch(() => false));
-        
+
         // getRecentBranches関数が処理できる基本的な状態を検証
         const recentBranches = await globalMemoryBank.getRecentBranches({ limit: 1 });
-        
+
         // 基本的なテスト - 関数が実行でき、配列を返せるか
         expect(Array.isArray(recentBranches)).toBe(true);
-        
+
         // ブランチが見つかった場合のみ追加検証
         if (recentBranches.length > 0) {
           const branch = recentBranches[0];
           expect(typeof branch.name).toBe('string');
           expect(branch.lastModified instanceof Date).toBe(true);
-          
+
           if (branch.summary) {
             expect(typeof branch.summary).toBe('object');
           }
@@ -511,13 +511,13 @@ describe('GlobalMemoryBank Integration Test', () => {
         // 空のブランチディレクトリを作成
         const branchesDir = path.join(testDir, 'branch-memory-bank');
         await fs.mkdir(branchesDir, { recursive: true });
-        
+
         // 空ディレクトリでの動作確認
         const recentBranches = await globalMemoryBank.getRecentBranches();
-        
+
         // 期待される動作：空の配列が返る
         expect(Array.isArray(recentBranches)).toBe(true);
-        
+
         // 警告のために追加の検証
         console.log('Empty branches test result:', recentBranches);
       } catch (error) {
@@ -536,7 +536,7 @@ describe('GlobalMemoryBank Integration Test', () => {
       try {
         // 大きなドキュメントを作成（より小さいサイズに調整）
         let largeContent = '# 大きなドキュメント\n\n';
-        
+
         // テスト用に非常に小さいドキュメントを生成
         for (let i = 0; i < 10; i++) {
           largeContent += `## セクション ${i}\nこれはセクション ${i} の内容です。\n\n`;
