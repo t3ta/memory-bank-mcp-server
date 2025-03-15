@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs/promises';
-import { BranchMemoryBank } from '../../src/managers/BranchMemoryBank';
-import { MemoryBankError } from '../../src/errors/MemoryBankError';
+import { BranchMemoryBank } from '../../src/managers/BranchMemoryBank.js';
+import { MemoryBankError } from '../../src/errors/MemoryBankError.js';
 import { setupTestFiles } from '../utils/fsUtils';
 import { sampleBranchMemoryBank } from '../utils/testTemplates';
 
