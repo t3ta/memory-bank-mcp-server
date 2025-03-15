@@ -42,23 +42,38 @@ describe('BranchMemoryBank', () => {
   
   beforeEach(() => {
     mockFs.__resetMockFiles();
-    branchMemoryBank = new BranchMemoryBank(workspacePath, branchName, { language: 'ja' });
+    branchMemoryBank = new BranchMemoryBank(workspacePath, branchName, { 
+      workspaceRoot: workspacePath,
+      memoryBankRoot: path.join(workspacePath, 'docs'),
+      verbose: false,
+      language: 'ja'
+    });
   });
   
   describe('constructor', () => {
     test('should create instance with correct properties', () => {
-      expect(branchMemoryBank['workspacePath']).toBe(workspacePath);
+      expect(branchMemoryBank['basePath']).toBe(basePath);
       expect(branchMemoryBank['branchName']).toBe(branchName);
       expect(branchMemoryBank['basePath']).toBe(basePath);
     });
     
     test('should throw error if branch name does not start with feature/ or fix/', () => {
       expect(() => {
-        new BranchMemoryBank(workspacePath, 'invalid-branch', { language: 'ja' });
+        new BranchMemoryBank(workspacePath, 'invalid-branch', {
+          workspaceRoot: workspacePath,
+          memoryBankRoot: path.join(workspacePath, 'docs'),
+          verbose: false,
+          language: 'ja'
+        });
       }).toThrow(MemoryBankError);
       
       expect(() => {
-        new BranchMemoryBank(workspacePath, 'main', { language: 'ja' });
+        new BranchMemoryBank(workspacePath, 'main', {
+          workspaceRoot: workspacePath,
+          memoryBankRoot: path.join(workspacePath, 'docs'),
+          verbose: false,
+          language: 'ja'
+        });
       }).toThrow(MemoryBankError);
     });
   });
