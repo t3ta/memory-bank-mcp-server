@@ -227,6 +227,37 @@ Build:
 npm run build
 ```
 
+## CI/CD Pipeline
+
+This project uses GitHub Actions for continuous integration and deployment:
+
+### Automated Testing
+
+Tests are automatically run on:
+- Pull requests to `develop` and `master` branches
+- Direct pushes to `develop` and `master` branches
+
+The test workflow runs against multiple Node.js versions (16.x, 18.x, 20.x) to ensure compatibility.
+
+### Automated Release
+
+When code is merged to the `master` branch:
+1. Tests are run to verify the build
+2. A git tag is created based on the version in package.json
+3. A GitHub Release is created with release notes
+4. The package is published to npm
+
+### Manual Version Bumping
+
+To bump the version before a release:
+1. Go to the Actions tab in GitHub
+2. Select the "Version Bump" workflow
+3. Click "Run workflow"
+4. Choose the version bump type (patch, minor, or major)
+5. Select the branch to bump the version on (typically `develop`)
+
+This will create a commit with the updated version number in package.json.
+
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
