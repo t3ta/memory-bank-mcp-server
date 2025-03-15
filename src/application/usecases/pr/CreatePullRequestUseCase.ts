@@ -157,7 +157,10 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
     // Now TypeScript knows these are defined and have content property
     const activeContextContent = activeContext.content;
     const progressContent = progress.content;
-    const systemPatternsContent = systemPatterns ? systemPatterns.content : '';
+    // Safely handle systemPatterns that might be null 
+    // and check if content is too large (more than 5000 chars)
+    const systemPatternsContent = systemPatterns && systemPatterns.content.length < 5000 ? 
+      systemPatterns.content : '';
 
     // Extract sections based on language
     const sectionHeaders = language === 'en' ? {
