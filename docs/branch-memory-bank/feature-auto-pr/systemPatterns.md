@@ -14,4 +14,39 @@
 - PRの作成プロセスが効率化される
 - PRの品質と一貫性が向上する
 
+### PR生成プロセスのワークフロー
+
+#### コンテキスト
+PR情報の生成と実際のPR作成を効率的に連携させる必要がある
+
+#### 決定事項
+- `create_pull_request` MCPツールを使用してpullRequest.mdファイルを生成
+- GitHub ActionsワークフローがpullRequest.mdファイルの存在を検知して自動的にPRを作成
+- PR作成後、トリガーファイル（pullRequest.md）を自動的に削除して再トリガーを防止
+
+#### 影響
+- 宣言的なアプローチによりプロセスが明確に分離される
+- 手動でのPR作成作業が不要になり効率化される
+- 一貫性のあるPR内容が保証される
+
+### ブランチメモリバンクからの情報抽出
+
+#### コンテキスト
+メモリバンクから関連情報を効果的に抽出し、適切なPRコンテンツを生成する必要がある
+
+#### 決定事項
+- 各メモリバンクファイル（activeContext.md, progress.md, systemPatterns.md等）から適切なセクションを抽出
+- 多言語対応（日本語・英語）のテンプレートを用意
+- メタデータ（タイトル、ターゲットブランチ、レビュワー、ラベル）のカスタマイズをサポート
+
+#### 影響
+- 柔軟なPR生成プロセスが実現される
+- 開発者は最小限の労力でカスタマイズが可能になる
+- 情報抽出の精度によりPR品質が大きく左右される
+
 ## 関連ファイルとディレクトリ構造
+
+- `.github/workflows/auto-pr.yml` - PR自動作成用のGitHub Actionsワークフロー
+- `src/templates/pull-request-template.md` - 日本語PRテンプレート
+- `src/templates/pull-request-template-en.md` - 英語PRテンプレート
+- `docs/branch-memory-bank/{branch-name}/pullRequest.md` - 生成されるPR情報ファイル
