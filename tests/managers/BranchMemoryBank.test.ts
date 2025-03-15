@@ -1,11 +1,17 @@
 // @ts-nocheck
 import * as path from 'path';
-import * as fs from 'fs/promises';
-import { MemoryBankError } from '../../src/errors/MemoryBankError';
-import { setupTestFiles } from '../utils/fsUtils';
 import { sampleBranchMemoryBank } from '../utils/testTemplates';
 
-// Mock the BranchMemoryBank class to avoid ES module issues
+// Mock the fs/promises module
+jest.mock('fs/promises', () => ({
+  mkdir: jest.fn().mockResolvedValue(undefined),
+  writeFile: jest.fn().mockResolvedValue(undefined),
+  readFile: jest.fn().mockResolvedValue('mocked content'),
+  stat: jest.fn().mockResolvedValue({ mtime: new Date() }),
+  access: jest.fn().mockResolvedValue(undefined)
+}));
+
+// Mock the BranchMemoryBank class
 jest.mock('../../src/managers/BranchMemoryBank', () => {
   return {
     BranchMemoryBank: class MockBranchMemoryBank {
@@ -21,7 +27,8 @@ jest.mock('../../src/managers/BranchMemoryBank', () => {
         return {
           content: sampleBranchMemoryBank[file.replace(/\.md$/, '')],
           tags: [],
-          lastModified: new Date()
+          lastModified: new Date(),
+          path: file
         };
       }
       
@@ -41,44 +48,15 @@ jest.mock('../../src/managers/BranchMemoryBank', () => {
 // Now we can import it
 const { BranchMemoryBank } = require('../../src/managers/BranchMemoryBank');
 
-// Mock fs implementation
-const mockFs = fs as jest.Mocked<typeof fs> & {
-  __setMockFiles: (files: any) => void;
-  __getMockFiles: () => any;
-  __resetMockFiles: () => void;
-};
-
-// Helper function to read branch core files
-async function readBranchCoreFiles(bank: any): Promise<Array<{ path: string; content: string; lastModified?: Date }>> {
-  const coreFiles = ['branchContext.md', 'activeContext.md', 'systemPatterns.md', 'progress.md'];
-  const result = [];
-  
-  for (const file of coreFiles) {
-    try {
-      const doc = await bank.readDocument(file);
-      result.push({
-        path: file,
-        content: doc.content,
-        lastModified: doc.lastModified
-      });
-    } catch (error) {
-      // Skip if file doesn't exist
-    }
-  }
-  
-  return result;
-}
-
 describe('BranchMemoryBank', () => {
   const workspacePath = '/test-workspace';
   const branchName = 'feature/test';
   const basePath = path.join(workspacePath, 'docs', 'branch-memory-bank', 'feature-test');
   
-  let branchMemoryBank: any;
+  let branchMemoryBank;
   
   beforeEach(() => {
     jest.clearAllMocks();
-    mockFs.__resetMockFiles();
     branchMemoryBank = new BranchMemoryBank(workspacePath, branchName, { 
       workspaceRoot: workspacePath,
       memoryBankRoot: path.join(workspacePath, 'docs'),
@@ -95,24 +73,21 @@ describe('BranchMemoryBank', () => {
   });
   
   describe('initialize', () => {
-    test('should create directory structure and initialize files', async () => {
-      await branchMemoryBank.initialize();
-      
-      // Since we're using a mock, we just make sure the method was called
-      expect(true).toBeTruthy();
+    test('should not throw errors', async () => {
+      await expect(branchMemoryBank.initialize()).resolves.not.toThrow();
     });
   });
   
   describe('readDocument', () => {
-    test('should read document content', async () => {
+    test('should return document content', async () => {
       const doc = await branchMemoryBank.readDocument('branchContext.md');
-      
+      expect(doc).toBeDefined();
       expect(doc.content).toBe(sampleBranchMemoryBank.branchContext);
     });
   });
   
   describe('writeCoreFiles', () => {
-    test('should update activeContext', async () => {
+    test('should not throw errors', async () => {
       const activeContext = {
         currentWork: 'Testing BranchMemoryBank',
         recentChanges: ['Added new tests', 'Fixed bugs'],
@@ -121,13 +96,10 @@ describe('BranchMemoryBank', () => {
         nextSteps: ['Implement more tests', 'Add integration tests']
       };
       
-      await branchMemoryBank.writeCoreFiles({
+      await expect(branchMemoryBank.writeCoreFiles({
         branch: branchName,
         files: { activeContext }
-      });
-      
-      // Since we're using a mock, we just make sure it doesn't throw
-      expect(true).toBeTruthy();
+      })).resolves.not.toThrow();
     });
   });
 });
