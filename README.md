@@ -4,16 +4,24 @@ This project is inspired by [Cline Memory Bank](https://github.com/nickbaumann98
 
 A Memory Bank implementation for managing project documentation and context across sessions. This server helps Claude maintain consistent project knowledge through global and branch-specific memory banks.
 
-## Installation
+## Usage
 
+### NPX (Recommended)
 ```bash
-npm install memory-bank-mcp-server
+npx memory-bank-mcp-server
 ```
 
-Or install globally:
+With options:
+```bash
+npx memory-bank-mcp-server --language ja --verbose
+```
 
+### Installation (Optional)
+
+If you prefer to install globally:
 ```bash
 npm install -g memory-bank-mcp-server
+memory-bank-mcp-server --help
 ```
 
 ## Core Concepts
@@ -123,8 +131,23 @@ docker-compose up
 
 Add one of these configurations to your claude_desktop_config.json:
 
-### NPM Global Installation
+### NPX (Recommended)
+```json
+{
+  "mcpServers": {
+    "memory-bank": {
+      "command": "npx",
+      "args": ["-y", "memory-bank-mcp-server"],
+      "env": {
+        "MEMORY_BANK_ROOT": "/path/to/docs",
+        "MEMORY_BANK_LANGUAGE": "ja"
+      }
+    }
+  }
+}
+```
 
+### Global Installation
 ```json
 {
   "mcpServers": {

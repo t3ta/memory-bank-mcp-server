@@ -1,6 +1,6 @@
 {
   "name": "memory-bank-mcp-server",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "MCP server for managing project documentation and context across sessions",
   "type": "module",
   "main": "dist/index.js",
@@ -32,7 +32,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^0.1.0",
     "yargs": "^17.7.2"
   },
   "devDependencies": {
