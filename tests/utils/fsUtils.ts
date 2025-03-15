@@ -7,8 +7,13 @@
 
 import path from 'path';
 
+// Mock file system type definitions
+interface MockFileContent {
+  [key: string]: string | MockFileContent;
+}
+
 interface MockFileSystem {
-  [path: string]: string | { [dir: string]: string };
+  [path: string]: string | MockFileContent;
 }
 
 // Mocked file system storage
