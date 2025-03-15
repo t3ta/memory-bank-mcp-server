@@ -36,6 +36,53 @@ export const SectionEditSchema = z.object({
 
 export const DocumentSectionsSchema = z.record(SectionEditSchema);
 
+// Memory bank update schemas
+export const EditModeSchema = z.enum(['replace', 'append', 'prepend']);
+
+export const SectionEditOptionsSchema = z.object({
+  mode: EditModeSchema.optional().default('replace'),
+  startLine: z.number().optional(),
+  endLine: z.number().optional()
+});
+
+export const ActiveContextSchema = z.object({
+  currentWork: z.string().optional(),
+  recentChanges: z.array(z.string()).optional(),
+  activeDecisions: z.array(z.string()).optional(),
+  considerations: z.array(z.string()).optional(),
+  nextSteps: z.array(z.string()).optional(),
+  editOptions: SectionEditOptionsSchema.optional()
+});
+
+export const ProgressSchema = z.object({
+  workingFeatures: z.array(z.string()).optional(),
+  pendingImplementation: z.array(z.string()).optional(),
+  status: z.string().optional(),
+  knownIssues: z.array(z.string()).optional(),
+  editOptions: SectionEditOptionsSchema.optional()
+});
+
+export const TechnicalDecisionSchema = z.object({
+  title: z.string(),
+  context: z.string(),
+  decision: z.string(),
+  consequences: z.array(z.string())
+});
+
+export const SystemPatternsSchema = z.object({
+  technicalDecisions: z.array(TechnicalDecisionSchema).optional(),
+  editOptions: SectionEditOptionsSchema.optional()
+});
+
+export const CoreFilesUpdateSchema = z.object({
+  branch: z.string(),
+  files: z.object({
+    activeContext: ActiveContextSchema.optional(),
+    progress: ProgressSchema.optional(),
+    systemPatterns: SystemPatternsSchema.optional()
+  })
+});
+
 // Recent branches schema
 export const RecentBranchSchema = z.object({
   name: z.string(),
@@ -113,31 +160,13 @@ export const WriteMemoryBankArgsSchema = z.object({
   tags: z.array(TagSchema).optional()
 }).merge(BaseToolArgsSchema);
 
-// Branch memory bank specific schemas
-export const UpdateActiveContextArgsSchema = z.object({
-  currentWork: z.string().optional(),
-  recentChanges: z.array(z.string()).optional(),
-  activeDecisions: z.array(z.string()).optional(),
-  considerations: z.array(z.string()).optional(),
-  nextSteps: z.array(z.string()).optional()
-}).merge(BaseToolArgsSchema);
-
-export const UpdateProgressArgsSchema = z.object({
-  workingFeatures: z.array(z.string()).optional(),
-  pendingImplementation: z.array(z.string()).optional(),
-  status: z.string().optional(),
-  knownIssues: z.array(z.string()).optional()
-}).merge(BaseToolArgsSchema);
-
-export const AddTechnicalDecisionArgsSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
-  context: z.string().min(1, 'Context is required'),
-  decision: z.string().min(1, 'Decision is required'),
-  consequences: z.array(z.string()).min(1, 'At least one consequence is required')
-}).merge(BaseToolArgsSchema);
-
-export const SearchByTagsArgsSchema = z.object({
-  tags: z.array(TagSchema).min(1, 'At least one tag is required')
+export const WriteBranchCoreFilesArgsSchema = z.object({
+  branch: z.string(),
+  files: z.object({
+    activeContext: ActiveContextSchema.optional(),
+    progress: ProgressSchema.optional(),
+    systemPatterns: SystemPatternsSchema.optional()
+  })
 }).merge(BaseToolArgsSchema);
 
 // Type inference helpers
@@ -148,13 +177,17 @@ export type ToolContent = z.infer<typeof ToolContentSchema>;
 export type ToolResponse = z.infer<typeof ToolResponseSchema>;
 export type ReadMemoryBankArgs = z.infer<typeof ReadMemoryBankArgsSchema>;
 export type WriteMemoryBankArgs = z.infer<typeof WriteMemoryBankArgsSchema>;
-export type UpdateActiveContextArgs = z.infer<typeof UpdateActiveContextArgsSchema>;
-export type UpdateProgressArgs = z.infer<typeof UpdateProgressArgsSchema>;
-export type AddTechnicalDecisionArgs = z.infer<typeof AddTechnicalDecisionArgsSchema>;
-export type SearchByTagsArgs = z.infer<typeof SearchByTagsArgsSchema>;
+export type WriteBranchCoreFilesArgs = z.infer<typeof WriteBranchCoreFilesArgsSchema>;
 export type WorkspaceConfig = z.infer<typeof WorkspaceConfigSchema>;
 export type CliOptions = z.infer<typeof CliOptionsSchema>;
 export type SectionEdit = z.infer<typeof SectionEditSchema>;
 export type DocumentSections = z.infer<typeof DocumentSectionsSchema>;
 export type RecentBranch = z.infer<typeof RecentBranchSchema>;
 export type GetRecentBranchesArgs = z.infer<typeof GetRecentBranchesArgsSchema>;
+export type ActiveContext = z.infer<typeof ActiveContextSchema>;
+export type Progress = z.infer<typeof ProgressSchema>;
+export type SystemPatterns = z.infer<typeof SystemPatternsSchema>;
+export type CoreFilesUpdate = z.infer<typeof CoreFilesUpdateSchema>;
+export type EditMode = z.infer<typeof EditModeSchema>;
+export type SectionEditOptions = z.infer<typeof SectionEditOptionsSchema>;
+export type TechnicalDecision = z.infer<typeof TechnicalDecisionSchema>;

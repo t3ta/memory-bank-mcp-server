@@ -5,10 +5,14 @@ import { ValidationResult, BRANCH_CORE_FILES, TEMPLATES, Language, WorkspaceConf
 import { MemoryBankError } from '../errors/MemoryBankError.js';
 import {
   BranchNameSchema,
-  UpdateActiveContextArgsSchema,
-  UpdateProgressArgsSchema,
-  AddTechnicalDecisionArgsSchema,
-  DocumentSections
+  ActiveContextSchema,
+  ProgressSchema,
+  SystemPatternsSchema,
+  DocumentSections,
+  WriteBranchCoreFilesArgs,
+  WriteBranchCoreFilesArgsSchema,
+  EditMode,
+  SectionEditOptions
 } from '../schemas/index.js';
 
 /**
@@ -116,10 +120,12 @@ export class BranchMemoryBank extends BaseMemoryBank {
     activeDecisions?: string[];
     considerations?: string[];
     nextSteps?: string[];
+    editOptions?: SectionEditOptions;
   }): Promise<void> {
     try {
       // Validate updates using zod schema
-      const validatedUpdates = UpdateActiveContextArgsSchema.parse(updates);
+      const validatedUpdates = ActiveContextSchema.parse(updates);
+      const editOptions = validatedUpdates.editOptions || { mode: 'replace' };
 
       const sections: DocumentSections = {};
 
@@ -158,7 +164,7 @@ export class BranchMemoryBank extends BaseMemoryBank {
         };
       }
 
-      await this.updateSections('activeContext.md', sections);
+      await this.updateSectionsWithOptions('activeContext.md', sections, editOptions);
     } catch (error) {
       if (error instanceof MemoryBankError) {
         throw error;
@@ -175,10 +181,12 @@ export class BranchMemoryBank extends BaseMemoryBank {
     pendingImplementation?: string[];
     status?: string;
     knownIssues?: string[];
+    editOptions?: SectionEditOptions;
   }): Promise<void> {
     try {
       // Validate updates using zod schema
-      const validatedUpdates = UpdateProgressArgsSchema.parse(updates);
+      const validatedUpdates = ProgressSchema.parse(updates);
+      const editOptions = validatedUpdates.editOptions || { mode: 'replace' };
 
       const sections: DocumentSections = {};
 
@@ -210,7 +218,7 @@ export class BranchMemoryBank extends BaseMemoryBank {
         };
       }
 
-      await this.updateSections('progress.md', sections);
+      await this.updateSectionsWithOptions('progress.md', sections, editOptions);
     } catch (error) {
       if (error instanceof MemoryBankError) {
         throw error;
@@ -227,10 +235,12 @@ export class BranchMemoryBank extends BaseMemoryBank {
     context: string;
     decision: string;
     consequences: string[];
+    editOptions?: SectionEditOptions;
   }): Promise<void> {
     try {
       // Validate decision using zod schema
-      const validatedDecision = AddTechnicalDecisionArgsSchema.parse(decision);
+      const validatedDecision = SystemPatternsSchema.shape.technicalDecisions.unwrap().element.parse(decision);
+      const editOptions = decision.editOptions || { mode: 'append' };
 
       const decisionText = `
 ### ${validatedDecision.title}
@@ -242,23 +252,123 @@ ${this.language === 'ja' ? '#### 決定事項' : '#### Decision'}
 ${validatedDecision.decision}
 
 ${this.language === 'ja' ? '#### 影響' : '#### Consequences'}
-${validatedDecision.consequences.map(c => `- ${c}`).join('\n')}
+${validatedDecision.consequences.map((c: string) => `- ${c}`).join('\n')}
 `;
 
       const sections: DocumentSections = {
         'technicalDecisions': {
           header: this.language === 'ja' ? '## 技術的決定事項' : '## Technical Decisions',
-          content: decisionText,
-          append: true
+          content: decisionText
         }
       };
 
-      await this.updateSections('systemPatterns.md', sections);
+      await this.updateSectionsWithOptions('systemPatterns.md', sections, editOptions);
     } catch (error) {
       if (error instanceof MemoryBankError) {
         throw error;
       }
       throw MemoryBankError.documentValidationFailed('systemPatterns.md', (error as Error).message);
+    }
+  }
+
+  /**
+   * Write multiple core files at once
+   */
+  async writeCoreFiles(args: WriteBranchCoreFilesArgs): Promise<void> {
+    try {
+      const validatedArgs = WriteBranchCoreFilesArgsSchema.parse(args);
+
+      if (validatedArgs.files.activeContext) {
+        await this.updateActiveContext(validatedArgs.files.activeContext);
+      }
+
+      if (validatedArgs.files.progress) {
+        await this.updateProgress(validatedArgs.files.progress);
+      }
+
+      if (validatedArgs.files.systemPatterns?.technicalDecisions) {
+        for (const decision of validatedArgs.files.systemPatterns.technicalDecisions) {
+          await this.addTechnicalDecision({
+            ...decision,
+            editOptions: validatedArgs.files.systemPatterns.editOptions
+          });
+        }
+      }
+    } catch (error) {
+      if (error instanceof MemoryBankError) {
+        throw error;
+      }
+      throw MemoryBankError.documentValidationFailed('core-files', (error as Error).message);
+    }
+  }
+
+  /**
+   * Update sections with edit options
+   */
+  private async updateSectionsWithOptions(
+    documentPath: string,
+    sections: DocumentSections,
+    options: SectionEditOptions
+  ): Promise<void> {
+    try {
+      const doc = await this.readDocument(documentPath);
+      let content = doc.content;
+      const lines = content.split('\n');
+
+      for (const [sectionName, section] of Object.entries(sections)) {
+        const sectionIndex = lines.findIndex(line => line.trim() === section.header);
+        const formattedContent = Array.isArray(section.content)
+          ? section.content.map(item => `- ${item}`).join('\n')
+          : section.content;
+
+        if (sectionIndex === -1) {
+          // Section not found, append it at the end
+          content = `${content}\n\n${section.header}\n\n${formattedContent}`;
+          continue;
+        }
+
+        // Find the next section or end of file
+        let nextSectionIndex = lines.findIndex((line, index) =>
+          index > sectionIndex && line.startsWith('##')
+        );
+        if (nextSectionIndex === -1) {
+          nextSectionIndex = lines.length;
+        }
+
+        // Apply edit options
+        const startLine = options.startLine ?? sectionIndex + 1;
+        const endLine = options.endLine ?? nextSectionIndex;
+
+        switch (options.mode) {
+          case 'append':
+            // Add new content at the end of the section
+            const beforeSection = lines.slice(0, endLine).join('\n');
+            const afterSection = lines.slice(endLine).join('\n');
+            content = `${beforeSection}\n${formattedContent}\n${afterSection}`;
+            break;
+
+          case 'prepend':
+            // Add new content at the start of the section
+            const beforeContent = lines.slice(0, startLine).join('\n');
+            const afterContent = lines.slice(startLine).join('\n');
+            content = `${beforeContent}\n${formattedContent}\n${afterContent}`;
+            break;
+
+          default: // replace
+            // Replace section content between startLine and endLine
+            const before = lines.slice(0, startLine).join('\n');
+            const after = lines.slice(endLine).join('\n');
+            content = `${before}\n\n${formattedContent}\n${after}`;
+            break;
+        }
+      }
+
+      await this.writeDocument(documentPath, content, doc.tags);
+    } catch (error) {
+      if (error instanceof MemoryBankError) {
+        throw error;
+      }
+      throw MemoryBankError.documentValidationFailed(documentPath, (error as Error).message);
     }
   }
 }
