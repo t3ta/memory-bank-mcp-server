@@ -1,4 +1,11 @@
 # Rules
 
-- Execute `read_rule` and `read_branch_core_files` of memory-bank-mcp-server.
+- Execute `read_rules` and `read_branch_core_files` of memory-bank-mcp-server.
 - If `read_branch_core_files` does not provide enough information, execute `read_global_core_files` and ask the user the purpose of the branch.
+
+# Tools
+
+You can use
+
+- git
+- memory-bank

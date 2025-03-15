@@ -50,24 +50,18 @@ export class BranchMemoryBank extends BaseMemoryBank {
         'progress.md': templates.progress
       };
 
+      // Initialize all core files with templates
       for (const file of BRANCH_CORE_FILES) {
         try {
-          // Check if file exists
           const filePath = path.join(this.basePath, file);
-          try {
-            await fs.access(filePath);
-            continue; // Skip if file exists
-          } catch {
-            // File doesn't exist, create it
-            let template: string = templateMap[file];
+          let template: string = templateMap[file];
 
-            // Replace placeholders
-            template = template
-              .replace('{branchName}', this.branchName.replace(/\//g, '-'))
-              .replace('{timestamp}', timestamp);
+          // Replace placeholders
+          template = template
+            .replace('{branchName}', this.branchName.replace(/\//g, '-'))
+            .replace('{timestamp}', timestamp);
 
-            await this.writeDocument(file, template);
-          }
+          await this.writeDocument(file, template);
         } catch (error) {
           if (error instanceof MemoryBankError) {
             throw error;
@@ -278,21 +272,83 @@ ${validatedDecision.consequences.map((c: string) => `- ${c}`).join('\n')}
     try {
       const validatedArgs = WriteBranchCoreFilesArgsSchema.parse(args);
 
+      // Initialize memory bank if needed
+      await this.initialize();
+
+      // Update branchContext.md
+      if (validatedArgs.files.branchContext?.content) {
+        await this.writeDocument('branchContext.md', validatedArgs.files.branchContext.content);
+      }
+
+      // Update activeContext.md with complete content
       if (validatedArgs.files.activeContext) {
-        await this.updateActiveContext(validatedArgs.files.activeContext);
+        const content = [
+          '# アクティブコンテキスト',
+          '',
+          '## 現在の作業内容',
+          validatedArgs.files.activeContext.currentWork || '',
+          '',
+          '## 最近の変更点',
+          ...(validatedArgs.files.activeContext.recentChanges?.map(c => `- ${c}`) || []),
+          '',
+          '## アクティブな決定事項',
+          ...(validatedArgs.files.activeContext.activeDecisions?.map(d => `- ${d}`) || []),
+          '',
+          '## 検討事項',
+          ...(validatedArgs.files.activeContext.considerations?.map(c => `- ${c}`) || []),
+          '',
+          '## 次のステップ',
+          ...(validatedArgs.files.activeContext.nextSteps?.map(s => `- ${s}`) || [])
+        ].join('\n');
+        await this.writeDocument('activeContext.md', content);
       }
 
+      // Update progress.md with complete content
       if (validatedArgs.files.progress) {
-        await this.updateProgress(validatedArgs.files.progress);
+        const content = [
+          '# 進捗状況',
+          '',
+          '## 動作している機能',
+          ...(validatedArgs.files.progress.workingFeatures?.map(f => `- ${f}`) || []),
+          '',
+          '## 未実装の機能',
+          ...(validatedArgs.files.progress.pendingImplementation?.map(f => `- ${f}`) || []),
+          '',
+          '## 現在の状態',
+          validatedArgs.files.progress.status || '',
+          '',
+          '## 既知の問題',
+          ...(validatedArgs.files.progress.knownIssues?.map(i => `- ${i}`) || [])
+        ].join('\n');
+        await this.writeDocument('progress.md', content);
       }
 
+      // Update systemPatterns.md with complete content
       if (validatedArgs.files.systemPatterns?.technicalDecisions) {
+        const content = [
+          '# システムパターン',
+          '',
+          '## 技術的決定事項'
+        ];
+
         for (const decision of validatedArgs.files.systemPatterns.technicalDecisions) {
-          await this.addTechnicalDecision({
-            ...decision,
-            editOptions: validatedArgs.files.systemPatterns.editOptions
-          });
+          content.push(
+            '',
+            `### ${decision.title}`,
+            '',
+            '#### コンテキスト',
+            decision.context,
+            '',
+            '#### 決定事項',
+            decision.decision,
+            '',
+            '#### 影響',
+            ...decision.consequences.map(c => `- ${c}`)
+          );
         }
+
+        content.push('', '## 関連ファイルとディレクトリ構造');
+        await this.writeDocument('systemPatterns.md', content.join('\n'));
       }
     } catch (error) {
       if (error instanceof MemoryBankError) {
@@ -316,14 +372,29 @@ ${validatedDecision.consequences.map((c: string) => `- ${c}`).join('\n')}
       const lines = content.split('\n');
 
       for (const [sectionName, section] of Object.entries(sections)) {
+        // Find all occurrences of the section header
+        const sectionIndices = lines
+          .map((line, index) => line.trim() === section.header ? index : -1)
+          .filter(index => index !== -1);
+
+        // Remove duplicate sections if in replace mode
+        if (options.mode === 'replace' && sectionIndices.length > 1) {
+          for (let i = 1; i < sectionIndices.length; i++) {
+            const start = sectionIndices[i];
+            const end = i < sectionIndices.length - 1 ? sectionIndices[i + 1] : lines.length;
+            lines.splice(start, end - start);
+          }
+          content = lines.join('\n');
+        }
+
         const sectionIndex = lines.findIndex(line => line.trim() === section.header);
         const formattedContent = Array.isArray(section.content)
           ? section.content.map(item => `- ${item}`).join('\n')
           : section.content;
 
         if (sectionIndex === -1) {
-          // Section not found, append it at the end
-          content = `${content}\n\n${section.header}\n\n${formattedContent}`;
+          // Section not found, append it at the end with proper spacing
+          content = content.trim() + '\n\n' + section.header + '\n\n' + formattedContent;
           continue;
         }
 
@@ -336,32 +407,37 @@ ${validatedDecision.consequences.map((c: string) => `- ${c}`).join('\n')}
         }
 
         // Apply edit options
-        const startLine = options.startLine ?? sectionIndex + 1;
+        const startLine = options.startLine ?? sectionIndex + 2; // Skip header and empty line
         const endLine = options.endLine ?? nextSectionIndex;
 
         switch (options.mode) {
           case 'append':
-            // Add new content at the end of the section
-            const beforeSection = lines.slice(0, endLine).join('\n');
+            // Add new content at the end of the section with proper spacing
+            const beforeSection = lines.slice(0, endLine).join('\n').trim();
             const afterSection = lines.slice(endLine).join('\n');
-            content = `${beforeSection}\n${formattedContent}\n${afterSection}`;
+            content = `${beforeSection}\n\n${formattedContent}\n\n${afterSection}`;
             break;
 
           case 'prepend':
-            // Add new content at the start of the section
-            const beforeContent = lines.slice(0, startLine).join('\n');
+            // Add new content at the start of the section with proper spacing
+            const beforeContent = lines.slice(0, startLine).join('\n').trim();
             const afterContent = lines.slice(startLine).join('\n');
-            content = `${beforeContent}\n${formattedContent}\n${afterContent}`;
+            content = `${beforeContent}\n\n${formattedContent}\n\n${afterContent}`;
             break;
 
           default: // replace
-            // Replace section content between startLine and endLine
-            const before = lines.slice(0, startLine).join('\n');
+            // Replace section content between startLine and endLine with proper spacing
+            const before = lines.slice(0, startLine).join('\n').trim();
             const after = lines.slice(endLine).join('\n');
-            content = `${before}\n\n${formattedContent}\n${after}`;
+            content = `${before}\n\n${formattedContent}\n\n${after}`;
             break;
         }
       }
+
+      // Normalize line endings and remove multiple consecutive empty lines
+      content = content
+        .replace(/\n{3,}/g, '\n\n') // Replace 3+ newlines with 2
+        .trim() + '\n'; // Ensure single newline at end of file
 
       await this.writeDocument(documentPath, content, doc.tags);
     } catch (error) {

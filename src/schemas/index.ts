@@ -160,9 +160,14 @@ export const WriteMemoryBankArgsSchema = z.object({
   tags: z.array(TagSchema).optional()
 }).merge(BaseToolArgsSchema);
 
+export const BranchContextSchema = z.object({
+  content: z.string()
+});
+
 export const WriteBranchCoreFilesArgsSchema = z.object({
   branch: z.string(),
   files: z.object({
+    branchContext: BranchContextSchema.optional(),
     activeContext: ActiveContextSchema.optional(),
     progress: ProgressSchema.optional(),
     systemPatterns: SystemPatternsSchema.optional()
@@ -191,3 +196,4 @@ export type CoreFilesUpdate = z.infer<typeof CoreFilesUpdateSchema>;
 export type EditMode = z.infer<typeof EditModeSchema>;
 export type SectionEditOptions = z.infer<typeof SectionEditOptionsSchema>;
 export type TechnicalDecision = z.infer<typeof TechnicalDecisionSchema>;
+export type BranchContext = z.infer<typeof BranchContextSchema>;
