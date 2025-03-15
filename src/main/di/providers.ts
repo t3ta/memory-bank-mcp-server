@@ -11,6 +11,9 @@ import { ReadGlobalDocumentUseCase } from '../../application/usecases/global/Rea
 import { WriteGlobalDocumentUseCase } from '../../application/usecases/global/WriteGlobalDocumentUseCase.js';
 import { ReadBranchDocumentUseCase } from '../../application/usecases/branch/ReadBranchDocumentUseCase.js';
 import { WriteBranchDocumentUseCase } from '../../application/usecases/branch/WriteBranchDocumentUseCase.js';
+import { SearchDocumentsByTagsUseCase } from '../../application/usecases/common/SearchDocumentsByTagsUseCase.js';
+import { UpdateTagIndexUseCase } from '../../application/usecases/common/UpdateTagIndexUseCase.js';
+import { GetRecentBranchesUseCase } from '../../application/usecases/common/GetRecentBranchesUseCase.js';
 
 // Infrastructure layer
 import { IFileSystemService } from '../../infrastructure/storage/interfaces/IFileSystemService.js';
@@ -93,6 +96,27 @@ export function registerApplicationServices(container: DIContainer): void {
     
     return new WriteBranchDocumentUseCase(branchRepository);
   });
+  
+  // Register common use cases
+  container.registerFactory('searchDocumentsByTagsUseCase', () => {
+    const globalRepository = container.get('globalMemoryBankRepository');
+    const branchRepository = container.get('branchMemoryBankRepository');
+    
+    return new SearchDocumentsByTagsUseCase(globalRepository, branchRepository);
+  });
+  
+  container.registerFactory('updateTagIndexUseCase', () => {
+    const globalRepository = container.get('globalMemoryBankRepository');
+    const branchRepository = container.get('branchMemoryBankRepository');
+    
+    return new UpdateTagIndexUseCase(globalRepository, branchRepository);
+  });
+  
+  container.registerFactory('getRecentBranchesUseCase', () => {
+    const branchRepository = container.get('branchMemoryBankRepository');
+    
+    return new GetRecentBranchesUseCase(branchRepository);
+  });
 }
 
 /**
@@ -107,11 +131,15 @@ export function registerInterfaceServices(container: DIContainer): void {
   container.registerFactory('globalController', () => {
     const readGlobalDocumentUseCase = container.get('readGlobalDocumentUseCase');
     const writeGlobalDocumentUseCase = container.get('writeGlobalDocumentUseCase');
+    const searchDocumentsByTagsUseCase = container.get('searchDocumentsByTagsUseCase');
+    const updateTagIndexUseCase = container.get('updateTagIndexUseCase');
     const presenter = container.get('mcpResponsePresenter');
     
     return new GlobalController(
       readGlobalDocumentUseCase,
       writeGlobalDocumentUseCase,
+      searchDocumentsByTagsUseCase,
+      updateTagIndexUseCase,
       presenter
     );
   });
@@ -119,11 +147,17 @@ export function registerInterfaceServices(container: DIContainer): void {
   container.registerFactory('branchController', () => {
     const readBranchDocumentUseCase = container.get('readBranchDocumentUseCase');
     const writeBranchDocumentUseCase = container.get('writeBranchDocumentUseCase');
+    const searchDocumentsByTagsUseCase = container.get('searchDocumentsByTagsUseCase');
+    const updateTagIndexUseCase = container.get('updateTagIndexUseCase');
+    const getRecentBranchesUseCase = container.get('getRecentBranchesUseCase');
     const presenter = container.get('mcpResponsePresenter');
     
     return new BranchController(
       readBranchDocumentUseCase,
       writeBranchDocumentUseCase,
+      searchDocumentsByTagsUseCase,
+      updateTagIndexUseCase,
+      getRecentBranchesUseCase,
       presenter
     );
   });

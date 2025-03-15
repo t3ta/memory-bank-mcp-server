@@ -1,25 +1,23 @@
-import { BranchInfoDTO } from './BranchInfoDTO.js';
-
 /**
- * Data Transfer Object for recent branch information
+ * Data transfer object for recent branch information
  */
 export interface RecentBranchDTO {
   /**
-   * Branch information
+   * Branch name
    */
-  branch: BranchInfoDTO;
+  name: string;
   
   /**
-   * Last modified date (ISO string)
+   * Last modified timestamp (ISO string)
    */
   lastModified: string;
   
   /**
-   * Branch summary
+   * Branch summary information
    */
   summary: {
     /**
-     * Current work description
+     * Current work in progress
      */
     currentWork?: string;
     

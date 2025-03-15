@@ -45,4 +45,21 @@ export interface IBranchController extends IController {
    * @returns Promise resolving to MCP response with recent branches
    */
   getRecentBranches(limit?: number): Promise<MCPResponse>;
+  
+  /**
+   * Find documents by tags in branch memory bank
+   * @param branchName Branch name
+   * @param tags Tags to search for
+   * @param matchAllTags Whether to require all tags to match
+   * @returns Promise resolving to MCP response with matching documents
+   */
+  findDocumentsByTags(branchName: string, tags: string[], matchAllTags?: boolean): Promise<MCPResponse<DocumentDTO[]>>;
+  
+  /**
+   * Update tags index in branch memory bank
+   * @param branchName Branch name
+   * @param fullRebuild Whether to perform full rebuild of the index
+   * @returns Promise resolving to MCP response with the result
+   */
+  updateTagsIndex(branchName: string, fullRebuild?: boolean): Promise<MCPResponse>;
 }

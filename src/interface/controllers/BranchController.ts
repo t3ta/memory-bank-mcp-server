@@ -1,6 +1,9 @@
 import { IBranchController } from './interfaces/IBranchController.js';
 import { ReadBranchDocumentUseCase } from '../../application/usecases/branch/ReadBranchDocumentUseCase.js';
 import { WriteBranchDocumentUseCase } from '../../application/usecases/branch/WriteBranchDocumentUseCase.js';
+import { SearchDocumentsByTagsUseCase } from '../../application/usecases/common/SearchDocumentsByTagsUseCase.js';
+import { UpdateTagIndexUseCase } from '../../application/usecases/common/UpdateTagIndexUseCase.js';
+import { GetRecentBranchesUseCase } from '../../application/usecases/common/GetRecentBranchesUseCase.js';
 import { MCPResponsePresenter } from '../presenters/MCPResponsePresenter.js';
 import { MCPResponse } from '../presenters/types/index.js';
 import { DocumentDTO } from '../../application/dtos/index.js';
@@ -30,6 +33,9 @@ export class BranchController implements IBranchController {
   constructor(
     private readonly readBranchDocumentUseCase: ReadBranchDocumentUseCase,
     private readonly writeBranchDocumentUseCase: WriteBranchDocumentUseCase,
+    private readonly searchDocumentsByTagsUseCase: SearchDocumentsByTagsUseCase,
+    private readonly updateTagIndexUseCase: UpdateTagIndexUseCase,
+    private readonly getRecentBranchesUseCase: GetRecentBranchesUseCase,
     private readonly presenter: MCPResponsePresenter
   ) {}
 
@@ -183,11 +189,53 @@ export class BranchController implements IBranchController {
     try {
       logger.info(`Getting recent branches (limit: ${limit || 'default'})`);
       
-      // Not implemented yet - should be a separate use case
-      throw new ApplicationError(
-        'NOT_IMPLEMENTED',
-        'getRecentBranches is not implemented yet'
-      );
+      const result = await this.getRecentBranchesUseCase.execute({ limit });
+      
+      return this.presenter.present(result);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  /**
+   * Find documents by tags in branch memory bank
+   * @param branchName Branch name
+   * @param tags Tags to search for
+   * @param matchAllTags Whether to require all tags to match
+   * @returns Promise resolving to MCP response with matching documents
+   */
+  async findDocumentsByTags(branchName: string, tags: string[], matchAllTags?: boolean): Promise<MCPResponse<DocumentDTO[]>> {
+    try {
+      logger.info(`Finding documents by tags in branch ${branchName}: ${tags.join(', ')}`);
+      
+      const result = await this.searchDocumentsByTagsUseCase.execute({
+        branchName,
+        tags,
+        matchAllTags
+      });
+      
+      return this.presenter.present(result.documents);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  /**
+   * Update tags index in branch memory bank
+   * @param branchName Branch name
+   * @param fullRebuild Whether to perform full rebuild of the index
+   * @returns Promise resolving to MCP response with the result
+   */
+  async updateTagsIndex(branchName: string, fullRebuild?: boolean): Promise<MCPResponse> {
+    try {
+      logger.info(`Updating tags index for branch ${branchName} (fullRebuild: ${fullRebuild ? 'yes' : 'no'})`);
+      
+      const result = await this.updateTagIndexUseCase.execute({
+        branchName,
+        fullRebuild
+      });
+      
+      return this.presenter.present(result);
     } catch (error) {
       return this.handleError(error);
     }

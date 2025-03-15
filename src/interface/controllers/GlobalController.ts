@@ -1,6 +1,8 @@
 import { IGlobalController } from './interfaces/IGlobalController.js';
 import { ReadGlobalDocumentUseCase } from '../../application/usecases/global/ReadGlobalDocumentUseCase.js';
 import { WriteGlobalDocumentUseCase } from '../../application/usecases/global/WriteGlobalDocumentUseCase.js';
+import { SearchDocumentsByTagsUseCase } from '../../application/usecases/common/SearchDocumentsByTagsUseCase.js';
+import { UpdateTagIndexUseCase } from '../../application/usecases/common/UpdateTagIndexUseCase.js';
 import { MCPResponsePresenter } from '../presenters/MCPResponsePresenter.js';
 import { MCPResponse } from '../presenters/types/index.js';
 import { DocumentDTO } from '../../application/dtos/index.js';
@@ -24,6 +26,8 @@ export class GlobalController implements IGlobalController {
   constructor(
     private readonly readGlobalDocumentUseCase: ReadGlobalDocumentUseCase,
     private readonly writeGlobalDocumentUseCase: WriteGlobalDocumentUseCase,
+    private readonly searchDocumentsByTagsUseCase: SearchDocumentsByTagsUseCase,
+    private readonly updateTagIndexUseCase: UpdateTagIndexUseCase,
     private readonly presenter: MCPResponsePresenter
   ) {}
 
@@ -120,11 +124,12 @@ export class GlobalController implements IGlobalController {
     try {
       logger.info('Updating global tags index');
       
-      // Not implemented yet - should be a separate use case
-      throw new ApplicationError(
-        'NOT_IMPLEMENTED',
-        'updateTagsIndex is not implemented yet'
-      );
+      const result = await this.updateTagIndexUseCase.execute({
+        branchName: undefined, // Global memory bank
+        fullRebuild: true
+      });
+      
+      return this.presenter.present(result);
     } catch (error) {
       return this.handleError(error);
     }
@@ -133,17 +138,20 @@ export class GlobalController implements IGlobalController {
   /**
    * Find documents by tags in global memory bank
    * @param tags Tags to search for
+   * @param matchAllTags Whether to require all tags to match
    * @returns Promise resolving to MCP response with matching documents
    */
-  async findDocumentsByTags(tags: string[]): Promise<MCPResponse<DocumentDTO[]>> {
+  async findDocumentsByTags(tags: string[], matchAllTags?: boolean): Promise<MCPResponse<DocumentDTO[]>> {
     try {
       logger.info(`Finding global documents by tags: ${tags.join(', ')}`);
       
-      // Not implemented yet - should be a separate use case
-      throw new ApplicationError(
-        'NOT_IMPLEMENTED',
-        'findDocumentsByTags is not implemented yet'
-      );
+      const result = await this.searchDocumentsByTagsUseCase.execute({
+        tags,
+        matchAllTags,
+        branchName: undefined // Search in global memory bank
+      });
+      
+      return this.presenter.present(result.documents);
     } catch (error) {
       return this.handleError(error);
     }
