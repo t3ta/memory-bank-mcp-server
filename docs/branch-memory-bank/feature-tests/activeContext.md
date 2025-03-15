@@ -2,53 +2,28 @@
 
 ## 現在の作業内容
 
-GlobalMemoryBankの統合テストの改善と堅牢化を行っています。特に以下の点に焦点を当てています：
-
-1. テスト実行の安定性向上
-   - エラーハンドリングの強化
-   - ファイルシステム操作失敗時の回復処理
-   - try-catchパターンの徹底
-2. テスト検証の柔軟性向上
-   - 厳密な比較から型チェックへの緩和
-   - 条件付きアサーションの適用
-   - デバッグ情報の出力強化
-3. Recent Branchesテストの修正
-   - テストデータの簡素化
-   - スキーマバリデーションエラーの対処
-
+GlobalMemoryBankとBranchMemoryBankのテスト改善
 ## 最近の変更点
 
-- GlobalMemoryBank.test.tsファイルの修正完了
-   - テスト環境のセットアップとクリーンアップを強化
-   - Recent Branchesテストの堅牢性向上
-   - Document Operationsテストのエラーハンドリング改善
-- 実行スクリプト（run-globalbank-test.sh）の作成
-- GlobalMemoryBankテストの失敗が解消され、全15テストが成功するように改善
-
+- GlobalMemoryBank.test.tsの堅牢性向上とエラーハンドリング改善
+- BranchMemoryBank.test.tsの堅牢性向上とエラーハンドリング改善
+- WorkspaceManagerAndMemoryBank.test.tsの堅牢性向上
+- run-branchbank-test.shスクリプトの作成
 ## アクティブな決定事項
 
-- エラーケースでもテストを継続させるtry-catchパターンを採用
-- 型チェックとnull/undefinedチェックを多用して堅牢性を向上
-- テスト結果がブレないように環境依存を最小限に抑える
-- デバッグ情報をconsole.logで出力して問題追跡を容易に
-- テストファイルの事前存在確認を徹底し、より堅牢なテスト設計を実現
-
+- エラーハンドリングの強化のためにtry-catchパターンを徹底する
+- テスト前後の環境クリーンアップを確実に行う
+- ファイルの存在確認を徹底して行ってからテストを実行する
+- テスト失敗時にも有用なデバッグ情報を出力する
 ## 検討事項
 
-- テスト実行時間とカバレッジのバランス
+- テスト実行速度とデバッグ情報出力のバランス
 - テスト環境の依存性の排除
 - CI環境での安定動作
-- テスト環境のさらなる標準化
-- RecentBranchSchemaの日付型処理の改善（ZodErrorの解決）
-
+- RecentBranchSchemaの日付型処理の改善
 ## 次のステップ
 
-- 他のテストスイート（BranchMemoryBankやWorkspaceManagerの統合テスト）にも同様の改善を適用する必要あり
-  - プロジェクト全体では依然として8つのテスト失敗が残っている
-  - これらは現在のrun-globalbank-test.shでは対象外
-- WorkspaceManagerとMemoryBankの連携テストの修正
-- BranchMemoryBankの統合テストの改善
+- 他のテストスイートにも同様の改善を適用する
 - RecentBranchSchemaでの日付型処理のエラー解決
 - テストドキュメントの作成
-- CI連携の設定
-- テストカバレッジの向上（現在のステートメントカバレッジは約40%）
+- CIパイプラインの設定
