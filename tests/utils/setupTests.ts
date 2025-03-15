@@ -1,8 +1,16 @@
-/**
- * Jest setup file
- * 
- * This file runs before each test file and sets up the global test environment.
- */
+// グローバルなテスト設定やセットアップを行うファイル
 
-// Global test timeout
-jest.setTimeout(10000);
+// エラーを詳細に出力するための設定
+jest.setTimeout(10000); // タイムアウト時間を10秒に設定
+
+// エラーのスタックトレースを最大限に表示
+Error.stackTraceLimit = 100;
+
+// テスト前後のグローバルな処理が必要な場合はここに追加可能
+beforeAll(() => {
+  // グローバルな初期化処理
+});
+
+afterAll(() => {
+  // グローバルなクリーンアップ処理
+});

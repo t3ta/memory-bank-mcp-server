@@ -1,175 +1,153 @@
-// @ts-nocheck
-import * as path from 'path';
+import { WorkspaceManager } from '../../src/managers/WorkspaceManager';
+import * as fs from 'fs/promises';
+import path from 'path';
+import os from 'os';
 
-// Mock the fs/promises module
+// モジュールの完全なモック化
 jest.mock('fs/promises', () => ({
-  mkdir: jest.fn().mockResolvedValue(undefined),
-  readFile: jest.fn().mockResolvedValue('{"config": {"language": "en"}}'),
-  access: jest.fn().mockImplementation((path) => {
-    // Simulate access error for certain paths to test directory creation
-    if (path.includes('non-existent')) {
-      return Promise.reject(new Error('Directory does not exist'));
-    }
-    return Promise.resolve();
-  })
+  mkdir: jest.fn(),
+  writeFile: jest.fn(),
+  readFile: jest.fn(),
+  access: jest.fn(),
+  stat: jest.fn(),
+  rm: jest.fn(),
+  readdir: jest.fn(),
 }));
 
-// Mock the WorkspaceManager
-jest.mock('../../src/managers/WorkspaceManager', () => {
-  const originalModule = jest.requireActual('../../src/managers/WorkspaceManager');
-  
-  return {
-    ...originalModule,
-    WorkspaceManager: class MockWorkspaceManager {
-      private config = null;
-      
-      async initialize(options = {}, branchName = 'main') {
-        if (this.config) return this.config;
-        
-        // Simple validation for testing
-        if (options.workspace && typeof options.workspace !== 'string') {
-          throw new Error('Invalid workspace path');
-        }
-        
-        if (branchName && branchName !== 'main' && !branchName.match(/^(feature|fix)\/.+$/)) {
-          throw new Error(`Invalid branch name: ${branchName}`);
-        }
-        
-        this.config = {
-          workspaceRoot: options.workspace || process.cwd(),
-          memoryBankRoot: options.memoryRoot || path.join(options.workspace || process.cwd(), 'docs'),
-          verbose: options.verbose || false,
-          language: options.language || 'en'
-        };
-        
-        return this.config;
-      }
-      
-      getConfig() {
-        if (!this.config) {
-          throw new Error('WorkspaceManager not initialized');
-        }
-        return this.config;
-      }
-      
-      getGlobalMemoryPath() {
-        return path.join(this.getConfig().memoryBankRoot, 'global-memory-bank');
-      }
-      
-      getBranchMemoryPath(branchName) {
-        if (!branchName || (branchName !== 'main' && !branchName.match(/^(feature|fix)\/.+$/))) {
-          throw new Error(`Invalid branch name: ${branchName}`);
-        }
-        
-        const safeBranchName = branchName.replace(/\//g, '-');
-        return path.join(this.getConfig().memoryBankRoot, 'branch-memory-bank', safeBranchName);
-      }
-    }
-  };
-});
+describe('WorkspaceManager - Robust Test Suite', () => {
+  let workspaceManager: WorkspaceManager;
+  let testTempDir: string;
 
-// Import the WorkspaceManager for testing
-const { WorkspaceManager } = require('../../src/managers/WorkspaceManager');
+  beforeEach(async () => {
+    // テスト用の一時ディレクトリを作成
+    testTempDir = path.join(os.tmpdir(), `test-workspace-manager-${Date.now()}`);
+    await fs.mkdir(testTempDir, { recursive: true });
 
-describe('WorkspaceManager', () => {
-  let workspaceManager;
-  const testWorkspacePath = '/test/workspace';
-  
-  beforeEach(() => {
+    // WorkspaceManagerの初期化
+    workspaceManager = new WorkspaceManager({
+      basePath: testTempDir,
+      language: 'ja'
+    });
+
+    // モックのリセット
     jest.clearAllMocks();
-    workspaceManager = new WorkspaceManager();
   });
-  
-  describe('initialize', () => {
-    test('should initialize with default values', async () => {
-      const config = await workspaceManager.initialize();
-      
-      expect(config).toBeDefined();
-      expect(config.workspaceRoot).toBe(process.cwd());
-      expect(config.memoryBankRoot).toContain('docs');
-      expect(config.verbose).toBe(false);
-      expect(config.language).toBe('en');
+
+  afterEach(async () => {
+    // テスト後のクリーンアップ
+    try {
+      await fs.rm(testTempDir, { recursive: true, force: true });
+    } catch (error) {
+      console.error('Cleanup failed:', error);
+    }
+  });
+
+  // ブランチ管理機能のテスト
+  describe('Branch Management', () => {
+    test('ブランチ名のバリデーション', async () => {
+      // 有効なブランチ名のテスト
+      const validBranchNames = [
+        'feature/test-branch',
+        'fix/critical-bug',
+        'hotfix/security-patch'
+      ];
+
+      for (const branchName of validBranchNames) {
+        try {
+          await workspaceManager.switchBranch(branchName);
+        } catch (error) {
+          fail(`有効なブランチ名「${branchName}」でエラーが発生: ${error}`);
+        }
+      }
+
+      // 無効なブランチ名のテスト
+      const invalidBranchNames = [
+        'invalid/branch/name',
+        '../security-risk',
+        'space in branch',
+        ''
+      ];
+
+      for (const branchName of invalidBranchNames) {
+        await expect(workspaceManager.switchBranch(branchName)).rejects.toThrow();
+      }
     });
-    
-    test('should initialize with custom options', async () => {
-      const options = {
-        workspace: testWorkspacePath,
-        memoryRoot: '/custom/memory/path',
-        verbose: true,
-        language: 'ja'
-      };
-      
-      const config = await workspaceManager.initialize(options);
-      
-      expect(config.workspaceRoot).toBe(testWorkspacePath);
-      expect(config.memoryBankRoot).toBe('/custom/memory/path');
-      expect(config.verbose).toBe(true);
-      expect(config.language).toBe('ja');
+
+    test('ブランチメモリーバンク作成の堅牢性', async () => {
+      const branchName = 'feature/robust-test';
+
+      // モックの設定
+      (fs.mkdir as jest.Mock).mockResolvedValue(undefined);
+      (fs.writeFile as jest.Mock).mockResolvedValue(undefined);
+      (fs.readdir as jest.Mock).mockResolvedValue([]);
+
+      try {
+        await workspaceManager.createBranchMemoryBank(branchName);
+        
+        // 正しいパスで呼び出されたことを確認
+        expect(fs.mkdir).toHaveBeenCalledWith(
+          expect.stringContaining(path.join('docs', 'branch-memory-bank', 'feature-robust-test')), 
+          { recursive: true }
+        );
+      } catch (error) {
+        fail(`ブランチメモリーバンク作成中に予期せぬエラー: ${error}`);
+      }
     });
-    
-    test('should handle invalid branch names', async () => {
+  });
+
+  // ファイルシステム操作のテスト
+  describe('File System Operations', () => {
+    test('ファイルシステム権限エラーの処理', async () => {
+      // 権限エラーをシミュレート
+      (fs.mkdir as jest.Mock).mockRejectedValue(new Error('Permission denied'));
+
       await expect(
-        workspaceManager.initialize({}, 'invalid-branch-format')
-      ).rejects.toThrow('Invalid branch name');
+        workspaceManager.createBranchMemoryBank('test-branch')
+      ).rejects.toThrow('Permission denied');
     });
-    
-    test('should initialize only once', async () => {
-      const config1 = await workspaceManager.initialize();
-      const config2 = await workspaceManager.initialize({ verbose: true }); // Different options
+
+    test('一時的なファイルシステムエラーの回復', async () => {
+      const branchName = 'feature/temp-error-test';
       
-      // Should return the same config object
-      expect(config1).toBe(config2);
-      expect(config2.verbose).toBe(false); // Original value preserved
+      // 最初は失敗し、2回目で成功するシナリオをシミュレート
+      let callCount = 0;
+      (fs.mkdir as jest.Mock).mockImplementation(() => {
+        callCount++;
+        if (callCount === 1) {
+          return Promise.reject(new Error('Temporary file system error'));
+        }
+        return Promise.resolve();
+      });
+
+      try {
+        await workspaceManager.createBranchMemoryBank(branchName);
+        
+        // 2回目の呼び出しで成功することを確認
+        expect(callCount).toBe(2);
+      } catch (error) {
+        fail(`リトライ機構に失敗: ${error}`);
+      }
     });
   });
-  
-  describe('getConfig', () => {
-    test('should throw error if not initialized', () => {
-      expect(() => workspaceManager.getConfig()).toThrow('not initialized');
+
+  // エラーハンドリングとロバストネスのテスト
+  describe('Error Handling and Robustness', () => {
+    test('不明なエラーに対する適切な例外処理', async () => {
+      // 予期しない型のエラーをシミュレート
+      (fs.mkdir as jest.Mock).mockRejectedValue({ code: 'UNKNOWN_ERROR' });
+
+      await expect(
+        workspaceManager.createBranchMemoryBank('error-test-branch')
+      ).rejects.toThrow();
     });
-    
-    test('should return config after initialization', async () => {
-      await workspaceManager.initialize();
-      const config = workspaceManager.getConfig();
-      
-      expect(config).toBeDefined();
-      expect(config.workspaceRoot).toBe(process.cwd());
-    });
-  });
-  
-  describe('getGlobalMemoryPath', () => {
-    test('should return correct global memory path', async () => {
-      await workspaceManager.initialize({ workspace: testWorkspacePath });
-      const globalPath = workspaceManager.getGlobalMemoryPath();
-      
-      expect(globalPath).toContain('global-memory-bank');
-      expect(path.dirname(globalPath)).toContain('docs');
-    });
-  });
-  
-  describe('getBranchMemoryPath', () => {
-    test('should return correct branch memory path for feature branch', async () => {
-      await workspaceManager.initialize({ workspace: testWorkspacePath });
-      const branchPath = workspaceManager.getBranchMemoryPath('feature/test');
-      
-      expect(branchPath).toContain('branch-memory-bank');
-      expect(path.basename(branchPath)).toBe('feature-test');
-    });
-    
-    test('should return correct branch memory path for fix branch', async () => {
-      await workspaceManager.initialize({ workspace: testWorkspacePath });
-      const branchPath = workspaceManager.getBranchMemoryPath('fix/bug-123');
-      
-      expect(branchPath).toContain('branch-memory-bank');
-      expect(path.basename(branchPath)).toBe('fix-bug-123');
-    });
-    
-    test('should throw for invalid branch names', async () => {
-      await workspaceManager.initialize({ workspace: testWorkspacePath });
-      
-      expect(() => {
-        workspaceManager.getBranchMemoryPath('invalid/branch');
-      }).toThrow('Invalid branch name');
+
+    test('メモリーバンク初期化時の堅牢性', async () => {
+      // 初期化時のエラーケース
+      (fs.access as jest.Mock).mockRejectedValue(new Error('Base path not accessible'));
+
+      await expect(
+        workspaceManager.initialize()
+      ).rejects.toThrow('Base path not accessible');
     });
   });
 });
