@@ -13,9 +13,10 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc && chmod +x dist/index.js",
+    "build": "tsc && chmod +x dist/index.js && npm run copy-templates",
     "clean": "rm -rf dist",
     "prepare": "npm run clean && npm run build",
+    "copy-templates": "mkdir -p dist/templates && cp -r src/templates/* dist/templates/",
     "start": "node dist/index.js",
     "dev": "ts-node --esm src/index.ts",
     "test": "jest --config=jest.config.cjs",
