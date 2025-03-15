@@ -32,6 +32,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.7.0",
     "yargs": "^17.7.2"
   },
   "devDependencies": {
