@@ -12,6 +12,27 @@ const mockFs = fs as jest.Mocked<typeof fs> & {
   __resetMockFiles: () => void;
 };
 
+// Helper function to read branch core files
+async function readBranchCoreFiles(bank: BranchMemoryBank): Promise<Array<{ path: string; content: string; lastModified?: Date }>> {
+  const coreFiles = ['branchContext.md', 'activeContext.md', 'systemPatterns.md', 'progress.md'];
+  const result = [];
+  
+  for (const file of coreFiles) {
+    try {
+      const doc = await bank.readDocument(file);
+      result.push({
+        path: file,
+        content: doc.content,
+        lastModified: doc.lastModified
+      });
+    } catch (error) {
+      // Skip if file doesn't exist
+    }
+  }
+  
+  return result;
+}
+
 describe('BranchMemoryBank', () => {
   const workspacePath = '/test-workspace';
   const branchName = 'feature/test';
@@ -127,7 +148,7 @@ describe('BranchMemoryBank', () => {
     });
   });
   
-  describe('readBranchCoreFiles', () => {
+  describe('core files reading', () => {
     beforeEach(async () => {
       // Setup test files
       setupTestFiles({
@@ -141,7 +162,7 @@ describe('BranchMemoryBank', () => {
     });
     
     test('should read all core files', async () => {
-      const coreFiles = await branchMemoryBank.readBranchCoreFiles();
+      const coreFiles = await readBranchCoreFiles(branchMemoryBank);
       
       expect(coreFiles).toHaveLength(4);
       expect(coreFiles.find(f => f.path === 'branchContext.md')?.content).toBe(sampleBranchMemoryBank.branchContext);
