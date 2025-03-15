@@ -10,3 +10,5 @@ export * from './branch/WriteBranchDocumentUseCase.js';
 export * from './common/SearchDocumentsByTagsUseCase.js';
 export * from './common/UpdateTagIndexUseCase.js';
 export * from './common/GetRecentBranchesUseCase.js';
+export * from './common/ReadBranchCoreFilesUseCase.js';
+export * from './common/CreateBranchCoreFilesUseCase.js';

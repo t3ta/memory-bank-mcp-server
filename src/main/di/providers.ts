@@ -14,6 +14,8 @@ import { WriteBranchDocumentUseCase } from '../../application/usecases/branch/Wr
 import { SearchDocumentsByTagsUseCase } from '../../application/usecases/common/SearchDocumentsByTagsUseCase.js';
 import { UpdateTagIndexUseCase } from '../../application/usecases/common/UpdateTagIndexUseCase.js';
 import { GetRecentBranchesUseCase } from '../../application/usecases/common/GetRecentBranchesUseCase.js';
+import { ReadBranchCoreFilesUseCase } from '../../application/usecases/common/ReadBranchCoreFilesUseCase.js';
+import { CreateBranchCoreFilesUseCase } from '../../application/usecases/common/CreateBranchCoreFilesUseCase.js';
 
 // Infrastructure layer
 import { IFileSystemService } from '../../infrastructure/storage/interfaces/IFileSystemService.js';
@@ -117,6 +119,19 @@ export function registerApplicationServices(container: DIContainer): void {
     
     return new GetRecentBranchesUseCase(branchRepository);
   });
+  
+  // Register core files use cases
+  container.registerFactory('readBranchCoreFilesUseCase', () => {
+    const branchRepository = container.get('branchMemoryBankRepository');
+    
+    return new ReadBranchCoreFilesUseCase(branchRepository);
+  });
+  
+  container.registerFactory('createBranchCoreFilesUseCase', () => {
+    const branchRepository = container.get('branchMemoryBankRepository');
+    
+    return new CreateBranchCoreFilesUseCase(branchRepository);
+  });
 }
 
 /**
@@ -150,6 +165,8 @@ export function registerInterfaceServices(container: DIContainer): void {
     const searchDocumentsByTagsUseCase = container.get('searchDocumentsByTagsUseCase');
     const updateTagIndexUseCase = container.get('updateTagIndexUseCase');
     const getRecentBranchesUseCase = container.get('getRecentBranchesUseCase');
+    const readBranchCoreFilesUseCase = container.get('readBranchCoreFilesUseCase');
+    const createBranchCoreFilesUseCase = container.get('createBranchCoreFilesUseCase');
     const presenter = container.get('mcpResponsePresenter');
     
     return new BranchController(
@@ -158,6 +175,8 @@ export function registerInterfaceServices(container: DIContainer): void {
       searchDocumentsByTagsUseCase,
       updateTagIndexUseCase,
       getRecentBranchesUseCase,
+      readBranchCoreFilesUseCase,
+      createBranchCoreFilesUseCase,
       presenter
     );
   });
