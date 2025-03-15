@@ -1,4 +1,6 @@
 import { promises as fs } from 'fs';
+import { createReadStream } from 'fs';
+import { Readable } from 'stream';
 import path from 'path';
 import { IFileSystemService } from './interfaces/IFileSystemService.js';
 import { InfrastructureError, InfrastructureErrorCodes } from '../../shared/errors/InfrastructureError.js';
@@ -219,10 +221,95 @@ export class FileSystemService implements IFileSystemService {
   }
 
   /**
-   * Get file stats
+   * Read a chunk of a file
    * @param filePath File path
-   * @returns Promise resolving to file stats
+   * @param start Starting position in bytes
+   * @param length Number of bytes to read
+   * @returns Promise resolving to the chunk content as string
    */
+  /**
+   * Get the path to the branch memory bank directory
+   * @param branchName Branch name
+   * @returns Path to branch memory bank directory
+   */
+  getBranchMemoryPath(branchName: string): string {
+    const memoryBankRoot = 'docs/branch-memory-bank';
+    const branchDir = branchName.replace('/', '-');
+    return path.join(memoryBankRoot, branchDir);
+  }
+  
+  /**
+   * Get configuration
+   * @returns Configuration object
+   */
+  getConfig(): { memoryBankRoot: string; [key: string]: any } {
+    return { memoryBankRoot: 'docs' };
+  }
+  
+  async readFileChunk(filePath: string, start: number, length: number): Promise<string> {
+    try {
+      // Check if file exists first
+      if (!(await this.fileExists(filePath))) {
+        throw new InfrastructureError(
+          InfrastructureErrorCodes.FILE_NOT_FOUND,
+          `File not found: ${filePath}`
+        );
+      }
+      
+      // Get file stats to check the size
+      const stats = await fs.stat(filePath);
+      
+      // Adjust length if it exceeds file size
+      if (start + length > stats.size) {
+        length = Math.max(0, stats.size - start);
+      }
+      
+      // If length is 0, return empty string
+      if (length === 0) {
+        return '';
+      }
+      
+      // Create a promise to handle the stream
+      return new Promise<string>((resolve, reject) => {
+        const chunks: Buffer[] = [];
+        
+        // Create a readable stream with start and end positions
+        const stream = createReadStream(filePath, {
+          start,
+          end: start + length - 1,
+          encoding: 'utf8'
+        });
+        
+        // Handle stream events
+        stream.on('data', (chunk) => {
+          chunks.push(Buffer.from(chunk));
+        });
+        
+        stream.on('end', () => {
+          resolve(Buffer.concat(chunks).toString('utf8'));
+        });
+        
+        stream.on('error', (error) => {
+          reject(new InfrastructureError(
+            InfrastructureErrorCodes.FILE_READ_ERROR,
+            `Failed to read file chunk: ${filePath}`,
+            { originalError: error }
+          ));
+        });
+      });
+    } catch (error) {
+      if (error instanceof InfrastructureError) {
+        throw error;
+      }
+      
+      throw new InfrastructureError(
+        InfrastructureErrorCodes.FILE_READ_ERROR,
+        `Failed to read file chunk: ${filePath}`,
+        { originalError: error }
+      );
+    }
+  }
+  
   async getFileStats(filePath: string): Promise<{
     size: number;
     isDirectory: boolean;

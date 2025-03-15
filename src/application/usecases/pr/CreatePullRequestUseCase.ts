@@ -306,56 +306,95 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
     limit: number
   ): Promise<string[]> {
     try {
-      // Get the document content in chunks to avoid memory issues
-      const document = await this.branchRepository.getDocument(branchInfo, systemPatternsPath);
-      if (!document) {
+      // Instead of getting the whole document, check if it exists first
+      const allDocuments = await this.branchRepository.listDocuments(branchInfo);
+      const systemPatternsExists = allDocuments.some(docPath => docPath.value === systemPatternsPath.value);
+      
+      if (!systemPatternsExists) {
         return [];
       }
-
+      
+      // Use raw file system service to read the file in chunks
+      // This avoids loading the entire file into memory through the domain entity
+      const branchPath = this.fileSystemService.getBranchMemoryPath 
+        ? this.fileSystemService.getBranchMemoryPath(branchInfo.name)
+        : path.join(
+            this.fileSystemService.getConfig?.().memoryBankRoot || 'docs/branch-memory-bank', 
+            branchInfo.name.replace('/', '-')
+          );
+        
+      const systemPatternsFilePath = path.join(branchPath, systemPatternsPath.value);
+      
+      // Check if file exists
+      const fileExists = await this.fileSystemService.fileExists?.(systemPatternsFilePath);
+      if (!fileExists) {
+        return [];
+      }
+      
+      // Read only the beginning of the file (first 150KB) where recent technical decisions 
+      // are most likely to be found
+      const chunkSize = 150 * 1024; // 150KB
+      const firstChunk = await this.readFileChunk(systemPatternsFilePath, 0, chunkSize);
+      
       // Find all decision sections (starting with "### ")
       const decisions: string[] = [];
-      let content = document.content;
-
-      // Process the content in smaller chunks to reduce memory usage
-      const chunkSize = 50000; // Process 50KB at a time
-
-      if (content.length > chunkSize * 3) {
-        // For very large files, just process the first part where recent decisions are likely to be
-        content = content.substring(0, chunkSize * 3);
-      }
-
-      // Find all decision sections
+      
+      // Find decision sections indexes
       const decisionStartIndices: number[] = [];
       let searchIndex = 0;
       let foundIndex: number;
-
-      // Find all occurrences of the decision prefix
-      while ((foundIndex = content.indexOf(decisionPrefix, searchIndex)) !== -1) {
+      
+      // Find all occurrences of the decision prefix in the first chunk
+      while ((foundIndex = firstChunk.indexOf(decisionPrefix, searchIndex)) !== -1) {
         decisionStartIndices.push(foundIndex);
         searchIndex = foundIndex + decisionPrefix.length;
-
-        // Limit the number of decisions we process
-        if (decisionStartIndices.length >= limit * 2) {
+        
+        // Limit the number of decisions we find to avoid memory issues
+        if (decisionStartIndices.length >= limit) {
           break;
         }
       }
-
+      
       // Extract each decision section
       for (let i = 0; i < decisionStartIndices.length; i++) {
         const startIndex = decisionStartIndices[i];
         const endIndex = i < decisionStartIndices.length - 1
           ? decisionStartIndices[i + 1]
-          : content.length;
-
-        const decision = content.substring(startIndex, endIndex);
+          : Math.min(startIndex + 2000, firstChunk.length); // Limit each decision to max 2KB
+        
+        const decision = firstChunk.substring(startIndex, endIndex);
         decisions.push(decision);
       }
-
-      // Return the most recent decisions (which are typically at the beginning of the file)
-      return decisions.slice(0, limit);
+      
+      // Process each decision to extract just the essential parts
+      return decisions.slice(0, limit).map(decision => {
+        // Extract just the first few lines of each decision (title + context + main points)
+        const lines = decision.split('\n').slice(0, 10); // Take only first 10 lines max
+        return lines.join('\n');
+      });
     } catch (error) {
       console.error('Error extracting recent technical decisions:', error);
       return [];
+    }
+  }
+  
+  /**
+   * Read a chunk of a file rather than the entire file
+   * This helps prevent memory issues with large files
+   */
+  private async readFileChunk(filePath: string, start: number, length: number): Promise<string> {
+    try {
+      // Check if the fileSystemService has a readFileChunk method
+      if (this.fileSystemService.readFileChunk) {
+        return await this.fileSystemService.readFileChunk(filePath, start, length);
+      }
+      
+      // Fallback: read the whole file but only return the requested chunk
+      const content = await this.fileSystemService.readFile(filePath);
+      return content.substring(start, Math.min(start + length, content.length));
+    } catch (error) {
+      console.error(`Error reading file chunk from ${filePath}:`, error);
+      return '';
     }
   }
 

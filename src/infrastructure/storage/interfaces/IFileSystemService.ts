@@ -8,6 +8,15 @@ export interface IFileSystemService {
    * @returns Promise resolving to file content as string
    */
   readFile(filePath: string): Promise<string>;
+  
+  /**
+   * Read a chunk of a file
+   * @param filePath File path
+   * @param start Starting position in bytes
+   * @param length Number of bytes to read
+   * @returns Promise resolving to the chunk content as string
+   */
+  readFileChunk?(filePath: string, start: number, length: number): Promise<string>;
 
   /**
    * Write content to file
@@ -64,4 +73,17 @@ export interface IFileSystemService {
     lastModified: Date;
     createdAt: Date;
   }>;
+  
+  /**
+   * Get the path to the branch memory bank directory
+   * @param branchName Branch name
+   * @returns Path to branch memory bank directory
+   */
+  getBranchMemoryPath?(branchName: string): string;
+  
+  /**
+   * Get configuration
+   * @returns Configuration object
+   */
+  getConfig?(): { memoryBankRoot: string; [key: string]: any; };
 }
