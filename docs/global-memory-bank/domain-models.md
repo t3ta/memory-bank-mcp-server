@@ -1,11 +1,11 @@
-# Domain Models
+# ドメインモデル
 
 tags: #domain #models #architecture
 
-## Core Models
+## コアモデル
 
-[Define core domain models]
+[コアドメインモデルの定義]
 
-## Relationships
+## 関連性
 
-[Document relationships between models]
+[モデル間の関連性について]

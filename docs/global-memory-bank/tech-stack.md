@@ -1,15 +1,15 @@
-# Technology Stack
+# 技術スタック
 
 tags: #tech-stack #infrastructure
 
-## Backend Technologies
+## バックエンド技術
 
-[List backend technologies]
+[バックエンド技術の一覧]
 
-## Frontend Technologies
+## フロントエンド技術
 
-[List frontend technologies]
+[フロントエンド技術の一覧]
 
-## Infrastructure
+## インフラストラクチャ
 
-[Describe infrastructure components]
+[インフラストラクチャコンポーネントの説明]

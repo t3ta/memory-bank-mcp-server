@@ -1,11 +1,11 @@
-# User Guide
+# ユーザーガイド
 
 tags: #guide #documentation
 
-## Overview
+## 概要
 
-[Provide an overview of the system]
+[システムの概要]
 
-## Usage Instructions
+## 使用方法
 
-[Document how to use the system]
+[システムの使用方法について]

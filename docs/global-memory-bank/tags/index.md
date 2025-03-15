@@ -1,7 +1,7 @@
-# Tag Index
+# タグインデックス
 
 tags: #meta #index
 
-## Available Tags
+## 利用可能なタグ
 
-[This file is automatically updated with available tags]
+[このファイルは利用可能なタグで自動的に更新されます]

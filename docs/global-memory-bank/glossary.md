@@ -1,11 +1,11 @@
-# Project Glossary
+# 用語集
 
 tags: #glossary #terminology
 
-## Terms
+## 用語
 
-[List and define project-specific terms]
+[プロジェクト固有の用語の一覧と定義]
 
-## Acronyms
+## 略語
 
-[List and define commonly used acronyms]
+[よく使用される略語の一覧と定義]

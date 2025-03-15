@@ -1,10 +1,6 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-import { exec } from 'child_process';
-import { promisify } from 'util';
 import { WorkspaceConfig, CliOptions, Language } from '../models/types.js';
-
-const execAsync = promisify(exec);
 
 /**
  * Manages workspace configuration and initialization
@@ -15,7 +11,7 @@ export class WorkspaceManager {
   /**
    * Initialize the workspace configuration
    */
-  async initialize(options?: CliOptions): Promise<WorkspaceConfig> {
+  async initialize(options?: CliOptions, branchName: string = 'main'): Promise<WorkspaceConfig> {
     if (this.config) return this.config;
 
     // Resolve workspace root path
@@ -31,7 +27,7 @@ export class WorkspaceManager {
     };
 
     // Ensure required directories exist
-    await this.ensureDirectories();
+    await this.ensureDirectories(branchName);
 
     return this.config;
   }
@@ -63,26 +59,8 @@ export class WorkspaceManager {
     return path.join(config.memoryBankRoot, 'branch-memory-bank', safeBranchName);
   }
 
-  /**
-   * Get current git branch name
-   */
-  async getCurrentBranch(): Promise<string> {
-    try {
-      const { stdout } = await execAsync('git branch --show-current');
-      const branchName = stdout.trim();
-
-      if (!branchName.match(/^(feature|fix)\//)) {
-        throw new Error('Current branch name must start with "feature/" or "fix/"');
-      }
-
-      return branchName;
-    } catch (error) {
-      throw new Error(`Failed to get current branch: ${error instanceof Error ? error.message : String(error)}`);
-    }
-  }
-
   private async resolveWorkspaceRoot(options?: CliOptions): Promise<string> {
-    // Priority: CLI arg > env var > git root > current dir
+    // Priority: CLI arg > env var > current dir
     if (options?.workspace) {
       return this.validatePath(options.workspace);
     }
@@ -91,12 +69,7 @@ export class WorkspaceManager {
       return this.validatePath(process.env.WORKSPACE_ROOT);
     }
 
-    try {
-      const { stdout } = await execAsync('git rev-parse --show-toplevel');
-      return stdout.trim();
-    } catch {
-      return process.cwd();
-    }
+    return process.cwd();
   }
 
   private async resolveMemoryBankRoot(options?: CliOptions, workspaceRoot?: string): Promise<string> {
@@ -109,7 +82,8 @@ export class WorkspaceManager {
       return this.validatePath(process.env.MEMORY_BANK_ROOT);
     }
 
-    return path.join(workspaceRoot || process.cwd(), 'docs');
+    const root = workspaceRoot || process.cwd();
+    return path.resolve(root, 'docs');
   }
 
   private async resolveLanguage(options?: CliOptions): Promise<Language> {
@@ -155,7 +129,7 @@ export class WorkspaceManager {
     return absolutePath;
   }
 
-  private async ensureDirectories(): Promise<void> {
+  private async ensureDirectories(branchName: string): Promise<void> {
     const config = this.getConfig();
     const dirs = [
       this.getGlobalMemoryPath(),

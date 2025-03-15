@@ -46,7 +46,7 @@ export class BranchMemoryBank extends BaseMemoryBank {
 
           // Replace placeholders
           template = template
-            .replace('{branchName}', this.branchName)
+            .replace('{branchName}', this.branchName.replace(/\//g, '-'))
             .replace('{timestamp}', timestamp);
 
           await fs.writeFile(filePath, template, 'utf-8');
