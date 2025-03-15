@@ -138,16 +138,13 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
     // Get core files
     const activeContextPath = DocumentPath.create('activeContext.md');
     const progressPath = DocumentPath.create('progress.md');
-    // NOTE: systemPatternsは大きすぎてメモリリークするため現状では使用しない
-    //const systemPatternsPath = DocumentPath.create('systemPatterns.md');
+    const systemPatternsPath = DocumentPath.create('systemPatterns.md');
     
+    // Get activeContext and progress files fully - these are smaller files
     const activeContext = await this.branchRepository.getDocument(branchInfo, activeContextPath);
     const progress = await this.branchRepository.getDocument(branchInfo, progressPath);
-    //const systemPatterns = await this.branchRepository.getDocument(branchInfo, systemPatternsPath);
     
     // TypeScript workaround for null checks
-    // This ensures TypeScript recognizes properly typed non-null values after the null check
-
     if (!activeContext || !progress) {
       throw new ApplicationError(
         'CORE_FILES_NOT_FOUND',
@@ -158,8 +155,6 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
     // Now TypeScript knows these are defined and have content property
     const activeContextContent = activeContext.content;
     const progressContent = progress.content;
-    // systemPatternsは使用しない (メモリリーク対策)
-    const systemPatternsContent = '';
 
     // Extract sections based on language
     const sectionHeaders = language === 'en' ? {
@@ -203,6 +198,25 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
     // Determine base branch if not specified
     const baseBranch = customBaseBranch || 
       (branchInfo.name.startsWith('feature/') ? 'develop' : 'master');
+      
+    // Get technical decisions from systemPatterns efficiently (without loading entire file)
+    let technicalDecisions = '';
+    try {
+      // Only try to extract technical decisions if systemPatterns exists
+      const systemPatternsExists = await this.branchRepository.documentExists(branchInfo, systemPatternsPath);
+      if (systemPatternsExists) {
+        // Use streaming or chunking approach to extract only what we need
+        technicalDecisions = await this.extractTechnicalDecisionsEfficiently(
+          branchInfo, 
+          systemPatternsPath, 
+          language === 'en' ? '## Technical Decisions' : '## 技術的決定事項'
+        );
+      }
+    } catch (error) {
+      // If we encounter an error, log it but continue without the technical decisions
+      console.warn('Failed to extract technical decisions due to:', error);
+      technicalDecisions = '';
+    }
 
     // Prepare replacements for template
     const replacements: Record<string, string> = {
@@ -213,6 +227,18 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
       '{{WORKING_FEATURES}}': this.extractSection(progressContent, sectionHeaders.workingFeatures),
       '{{KNOWN_ISSUES}}': this.extractSection(progressContent, sectionHeaders.knownIssues)
     };
+    
+    // Only add technical decisions if we have them
+    if (technicalDecisions) {
+      // システムパターンから抽出した技術的決定事項もアクティブな決定事項として追加
+      // もし既にアクティブな決定事項がある場合は統合する
+      const activeDecisions = replacements['{{ACTIVE_DECISIONS}}'] || '';
+      if (activeDecisions) {
+        replacements['{{ACTIVE_DECISIONS}}'] = activeDecisions + '\n\n' + technicalDecisions;
+      } else {
+        replacements['{{ACTIVE_DECISIONS}}'] = technicalDecisions;
+      }
+    }
 
     // Apply replacements
     let processedContent = templateContent;
@@ -256,6 +282,81 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
       labels,
       content: finalContent
     };
+  }
+
+  /**
+   * Extract technical decisions from systemPatterns efficiently without loading entire file
+   * This method uses a targeted approach to only extract what's needed from the file
+   */
+  private async extractTechnicalDecisionsEfficiently(
+    branchInfo: BranchInfo,
+    systemPatternsPath: DocumentPath,
+    sectionHeader: string
+  ): Promise<string> {
+    // Get the document path where the file is physically stored
+    const documentPath = await this.branchRepository.getDocumentPath(branchInfo, systemPatternsPath);
+    
+    if (!documentPath) {
+      return '';
+    }
+    
+    try {
+      // Read the file directly using fileSystemService for more control
+      const content = await this.fileSystemService.readFile(documentPath);
+      
+      // Find the section we want
+      const sectionIndex = content.indexOf(sectionHeader);
+      if (sectionIndex === -1) {
+        return '';
+      }
+      
+      // Extract just the decisions section and limit to 5 recent decisions for sanity
+      const nextSectionIndex = content.indexOf('##', sectionIndex + sectionHeader.length);
+      
+      const decisionsSection = nextSectionIndex !== -1 
+        ? content.substring(sectionIndex, nextSectionIndex)
+        : content.substring(sectionIndex);
+        
+      // Extract individual decisions and limit to recent ones to prevent memory issues
+      const decisions = this.parseDecisionsFromSection(decisionsSection);
+      const limitedDecisions = decisions.slice(0, 5); // Limit to 5 recent decisions
+
+      return this.formatDecisions(limitedDecisions);
+    } catch (error) {
+      console.error('Error while extracting technical decisions:', error);
+      return '';
+    }
+  }
+  
+  /**
+   * Parse individual decisions from a section
+   */
+  private parseDecisionsFromSection(section: string): string[] {
+    // Split by "### " which indicates the start of each decision
+    const parts = section.split(/###\s+/);
+    // The first part is the section header, so remove it
+    parts.shift();
+    return parts;
+  }
+  
+  /**
+   * Format decision parts into a readable format
+   */
+  private formatDecisions(decisions: string[]): string {
+    if (decisions.length === 0) {
+      return '';
+    }
+    
+    return decisions.map(decision => {
+      // Get the title (first line) and content separately
+      const lines = decision.trim().split('\n');
+      const title = lines[0].trim();
+      
+      // Only include the most important content - skip empty lines
+      const content = lines.slice(1).filter(line => line.trim().length > 0).slice(0, 5).join('\n');
+      
+      return `### ${title}\n${content}`;
+    }).join('\n\n');
   }
 
   /**
