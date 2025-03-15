@@ -1,6 +1,6 @@
 {
   "name": "memory-bank-mcp-server",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "MCP server for managing project documentation and context across sessions",
   "type": "module",
   "main": "dist/index.js",
@@ -45,10 +45,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourusername/memory-bank-mcp-server.git"
+    "url": "git+https://github.com/t3ta/memory-bank-mcp-server.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/memory-bank-mcp-server/issues"
+    "url": "https://github.com/t3ta/memory-bank-mcp-server/issues"
   },
-  "homepage": "https://github.com/yourusername/memory-bank-mcp-server#readme"
+  "homepage": "https://github.com/t3ta/memory-bank-mcp-server#readme"
 }
