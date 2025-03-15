@@ -2,28 +2,28 @@
 
 ## 現在の作業内容
 
-GlobalMemoryBankとBranchMemoryBankのテスト改善
+RecentBranchSchemaの日付型処理改善とエラーハンドリング強化
 ## 最近の変更点
 
-- GlobalMemoryBank.test.tsの堅牢性向上とエラーハンドリング改善
-- BranchMemoryBank.test.tsの堅牢性向上とエラーハンドリング改善
-- WorkspaceManagerAndMemoryBank.test.tsの堅牢性向上
-- run-branchbank-test.shスクリプトの作成
+- FlexibleDateSchemaの導入で日付型と文字列の両方に対応
+- dateStringToDateユーティリティ関数の実装
+- parseDateSafely関数の追加によるエラーハンドリングの強化
+- MemoryDocumentSchemaでもFlexibleDateSchemaを活用
 ## アクティブな決定事項
 
-- エラーハンドリングの強化のためにtry-catchパターンを徹底する
-- テスト前後の環境クリーンアップを確実に行う
-- ファイルの存在確認を徹底して行ってからテストを実行する
-- テスト失敗時にも有用なデバッグ情報を出力する
+- 日付型のバリデーションをユニオン型（z.union）で拡張する
+- 日付変換処理を共通ユーティリティとして切り出す
+- エラー発生時のフォールバックとして現在日時を返す設計
+- エラーメッセージを詳細化して原因特定を容易にする
 ## 検討事項
 
-- テスト実行速度とデバッグ情報出力のバランス
-- テスト環境の依存性の排除
-- CI環境での安定動作
-- RecentBranchSchemaの日付型処理の改善
+- 他のスキーマ定義での日付型処理の標準化
+- テスト環境での日付型バリデーションパターンの確立
+- 後方互換性の確保
+- 型変換処理のエラー情報の拡充
 ## 次のステップ
 
-- 他のテストスイートにも同様の改善を適用する
-- RecentBranchSchemaでの日付型処理のエラー解決
-- テストドキュメントの作成
-- CIパイプラインの設定
+- RecentBranchSchema専用のテストケースを実装
+- 日付型変換のエッジケースのテスト追加
+- テスト実行時の詳細なロギング機能の実装
+- システムパターンにエラーハンドリングパターンを記録
