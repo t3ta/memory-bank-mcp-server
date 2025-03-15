@@ -316,7 +316,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       const response = await app.getBranchController().readDocument(branch, path);
-      if (response.error) {
+      if (!response.success) {
         throw new Error(response.error.message);
       }
 
@@ -368,7 +368,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       const response = await app.getGlobalController().readDocument(path);
-      if (response.error) {
+      if (!response.success) {
         throw new Error(response.error.message);
       }
 
@@ -386,7 +386,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       const response = await app.getBranchController().readCoreFiles(branch);
-      if (response.error) {
+      if (!response.success) {
         throw new Error(response.error.message);
       }
 
@@ -394,7 +394,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         content: [
           {
             type: "text",
-            text: JSON.stringify(response.data || {}, null, 2)
+            text: JSON.stringify(response.success ? response.data : {}, null, 2)
           }
         ]
       };
@@ -414,7 +414,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
     case "read_global_core_files": {
       const response = await app.getGlobalController().readCoreFiles();
-      if (response.error) {
+      if (!response.success) {
         throw new Error(response.error.message);
       }
 
@@ -422,7 +422,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         content: [
           {
             type: "text",
-            text: JSON.stringify(Object.values(response.data || {}), null, 2)
+            text: JSON.stringify(response.success ? response.data : {}, null, 2)
           }
         ]
       };
@@ -432,7 +432,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const limit = params.limit as number | undefined;
       
       const response = await app.getBranchController().getRecentBranches(limit);
-      if (response.error) {
+      if (!response.success) {
         throw new Error(response.error.message);
       }
 
@@ -440,7 +440,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         content: [
           {
             type: "text",
-            text: JSON.stringify(response.data, null, 2)
+            text: JSON.stringify(response.success ? response.data : {}, null, 2)
           }
         ]
       };

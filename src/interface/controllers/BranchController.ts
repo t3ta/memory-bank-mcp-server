@@ -83,9 +83,11 @@ export class BranchController implements IBranchController {
       
       await this.writeBranchDocumentUseCase.execute({
         branchName,
-        path,
-        content,
-        tags: tags || []
+        document: {
+          path,
+          content,
+          tags: tags || []
+        }
       });
       
       return this.presenter.present({ success: true });
@@ -192,9 +194,11 @@ export class BranchController implements IBranchController {
         
         await this.writeBranchDocumentUseCase.execute({
           branchName,
-          path: 'branchContext.md',
-          content,
-          tags: ['core', 'branch-context']
+          document: {
+            path: 'branchContext.md',
+            content,
+            tags: ['core', 'branch-context']
+          }
         });
         
         // Remove from files to avoid processing it again

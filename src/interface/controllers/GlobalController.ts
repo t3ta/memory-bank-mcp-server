@@ -60,9 +60,11 @@ export class GlobalController implements IGlobalController {
       logger.info(`Writing global document: ${path}`);
       
       await this.writeGlobalDocumentUseCase.execute({
-        path,
-        content,
-        tags: tags || []
+        document: {
+          path,
+          content,
+          tags: tags || []
+        }
       });
       
       return this.presenter.present({ success: true });

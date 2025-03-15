@@ -321,7 +321,7 @@ const argv = yargs(hideBin(process.argv))
   .demandCommand(1, 'You need to specify a command')
   .help()
   .alias('help', 'h')
-  .wrap(yargs.terminalWidth())
+  .wrap(null)
   .epilog('For more information visit https://github.com/yourusername/memory-bank-mcp-server')
   .parseSync();
 

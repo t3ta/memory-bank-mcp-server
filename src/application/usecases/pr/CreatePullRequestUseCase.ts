@@ -10,6 +10,7 @@ import { ApplicationError } from '../../../shared/errors/ApplicationError.js';
 import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
 import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
 import { Tag } from '../../../domain/entities/Tag.js';
+import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -77,11 +78,18 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
       const prFilePath = `pullRequest.md`;
       const documentPath = DocumentPath.create(prFilePath);
       
+      // Create memory document
+      const document = MemoryDocument.create({
+        path: documentPath,
+        content: pullRequest.content,
+        tags: [Tag.create('pull-request')],
+        lastModified: new Date()
+      });
+      
       // Write pullRequest.md to branch memory bank
       await this.branchRepository.saveDocument(
         branchInfo,
-        documentPath,
-        pullRequest.content
+        document
       );
 
       // Update return value with file path
@@ -135,6 +143,9 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
     const activeContext = await this.branchRepository.getDocument(branchInfo, activeContextPath);
     const progress = await this.branchRepository.getDocument(branchInfo, progressPath);
     const systemPatterns = await this.branchRepository.getDocument(branchInfo, systemPatternsPath);
+    
+    // TypeScript workaround for null checks
+    // This ensures TypeScript recognizes properly typed non-null values after the null check
 
     if (!activeContext || !progress) {
       throw new ApplicationError(
@@ -142,6 +153,11 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
         'Required memory bank core files not found'
       );
     }
+    
+    // Now TypeScript knows these are defined and have content property
+    const activeContextContent = activeContext.content;
+    const progressContent = progress.content;
+    const systemPatternsContent = systemPatterns ? systemPatterns.content : '';
 
     // Extract sections based on language
     const sectionHeaders = language === 'en' ? {
@@ -166,7 +182,7 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
 
     // Extract current work for title if custom title not provided
     let title = customTitle || '';
-    let currentWork = this.extractSection(activeContext.content, sectionHeaders.currentWork);
+    let currentWork = this.extractSection(activeContextContent, sectionHeaders.currentWork);
 
     if (!title && currentWork) {
       const firstLine = currentWork.split('\n')[0];
@@ -189,11 +205,11 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
     // Prepare replacements for template
     const replacements: Record<string, string> = {
       '{{CURRENT_WORK}}': currentWork,
-      '{{RECENT_CHANGES}}': this.extractSection(activeContext.content, sectionHeaders.recentChanges),
-      '{{ACTIVE_DECISIONS}}': this.extractSection(activeContext.content, sectionHeaders.activeDecisions),
-      '{{CONSIDERATIONS}}': this.extractSection(activeContext.content, sectionHeaders.considerations),
-      '{{WORKING_FEATURES}}': this.extractSection(progress.content, sectionHeaders.workingFeatures),
-      '{{KNOWN_ISSUES}}': this.extractSection(progress.content, sectionHeaders.knownIssues)
+      '{{RECENT_CHANGES}}': this.extractSection(activeContextContent, sectionHeaders.recentChanges),
+      '{{ACTIVE_DECISIONS}}': this.extractSection(activeContextContent, sectionHeaders.activeDecisions),
+      '{{CONSIDERATIONS}}': this.extractSection(activeContextContent, sectionHeaders.considerations),
+      '{{WORKING_FEATURES}}': this.extractSection(progressContent, sectionHeaders.workingFeatures),
+      '{{KNOWN_ISSUES}}': this.extractSection(progressContent, sectionHeaders.knownIssues)
     };
 
     // Apply replacements
