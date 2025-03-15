@@ -1,6 +1,33 @@
 import { z } from 'zod';
 import { ValidationErrorType } from '../models/types.js';
 
+// Utility for flexible date parsing
+const dateStringToDate = (val: string, ctx: z.RefinementCtx) => {
+  try {
+    const date = new Date(val);
+    if (isNaN(date.getTime())) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Invalid date format: ${val}`,
+      });
+      return z.NEVER;
+    }
+    return date;
+  } catch (error) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Failed to parse date: ${val}`,
+    });
+    return z.NEVER;
+  }
+};
+
+// Flexible date schema that accepts both Date objects and strings
+const FlexibleDateSchema = z.union([
+  z.date(),
+  z.string().transform(dateStringToDate)
+]);
+
 // Basic schemas
 export const TagSchema = z
   .string()
@@ -86,7 +113,7 @@ export const CoreFilesUpdateSchema = z.object({
 // Recent branches schema
 export const RecentBranchSchema = z.object({
   name: z.string(),
-  lastModified: z.date(),
+  lastModified: FlexibleDateSchema,
   summary: z.object({
     currentWork: z.string().optional(),
     recentChanges: z.array(z.string()).optional()
@@ -117,7 +144,7 @@ export const MemoryDocumentSchema = z.object({
   path: PathSchema,
   content: z.string(),
   tags: z.array(TagSchema),
-  lastModified: z.date()
+  lastModified: FlexibleDateSchema
 });
 
 // Validation schemas
@@ -173,6 +200,28 @@ export const WriteBranchCoreFilesArgsSchema = z.object({
     systemPatterns: SystemPatternsSchema.optional()
   })
 }).merge(BaseToolArgsSchema);
+
+// Export utility schemas
+export { FlexibleDateSchema };
+export const parseDateSafely = (dateInput: string | Date): Date => {
+  try {
+    if (dateInput instanceof Date) {
+      return dateInput;
+    }
+    
+    const date = new Date(dateInput);
+    
+    if (isNaN(date.getTime())) {
+      throw new Error(`Invalid date: ${dateInput}`);
+    }
+    
+    return date;
+  } catch (error) {
+    console.error(`日付パース中にエラーが発生しました: ${error instanceof Error ? error.message : String(error)}`);
+    // デフォルト値として現在時刻を返す
+    return new Date();
+  }
+};
 
 // Type inference helpers
 export type MemoryDocument = z.infer<typeof MemoryDocumentSchema>;
