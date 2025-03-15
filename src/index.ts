@@ -12,7 +12,7 @@ import {
 import { WorkspaceManager } from './managers/WorkspaceManager.js';
 import { GlobalMemoryBank } from './managers/GlobalMemoryBank.js';
 import { BranchMemoryBank } from './managers/BranchMemoryBank.js';
-import { Language, BRANCH_CORE_FILES } from './models/types.js';
+import { Language, BRANCH_CORE_FILES, GLOBAL_CORE_FILES } from './models/types.js';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
@@ -122,6 +122,14 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             }
           },
           required: ["branch"]
+        }
+      },
+      {
+        name: "read_global_core_files",
+        description: "Read all core files from the global memory bank",
+        inputSchema: {
+          type: "object",
+          properties: {}
         }
       },
       {
@@ -281,6 +289,39 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         BRANCH_CORE_FILES.map(async (file) => {
           try {
             const doc = await branchMemoryBank!.readDocument(file);
+            return {
+              path: file,
+              content: doc.content,
+              lastModified: doc.lastModified.toISOString()
+            };
+          } catch (error: any) {
+            return {
+              path: file,
+              error: `Failed to read ${file}: ${error?.message || 'Unknown error'}`
+            };
+          }
+        })
+      );
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(results, null, 2)
+          }
+        ]
+      };
+    }
+
+    case "read_global_core_files": {
+      if (!globalMemoryBank) {
+        throw new Error('Global memory bank not initialized');
+      }
+
+      const results = await Promise.all(
+        GLOBAL_CORE_FILES.map(async (file: string) => {
+          try {
+            const doc = await globalMemoryBank!.readDocument(file);
             return {
               path: file,
               content: doc.content,

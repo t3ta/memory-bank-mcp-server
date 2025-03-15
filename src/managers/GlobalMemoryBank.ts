@@ -1,21 +1,12 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { BaseMemoryBank } from './BaseMemoryBank.js';
-import { ValidationResult, TEMPLATES, Language, WorkspaceConfig } from '../models/types.js';
+import { ValidationResult, TEMPLATES, Language, WorkspaceConfig, GLOBAL_CORE_FILES } from '../models/types.js';
 
 /**
  * Global memory bank implementation
  */
 export class GlobalMemoryBank extends BaseMemoryBank {
-  private static readonly REQUIRED_FILES = [
-    'architecture.md',
-    'coding-standards.md',
-    'domain-models.md',
-    'glossary.md',
-    'tech-stack.md',
-    'user-guide.md'
-  ];
-
   private language: Language;
 
   constructor(basePath: string, config: WorkspaceConfig) {
@@ -72,7 +63,7 @@ tags: #meta #index
     };
 
     // Check for required files
-    for (const file of GlobalMemoryBank.REQUIRED_FILES) {
+    for (const file of GLOBAL_CORE_FILES) {
       try {
         await fs.access(path.join(this.basePath, file));
       } catch {

@@ -52,6 +52,18 @@ export const BRANCH_CORE_FILES = [
 ] as const;
 
 /**
+ * Core files required for global memory bank
+ */
+export const GLOBAL_CORE_FILES = [
+  'architecture.md',
+  'coding-standards.md',
+  'domain-models.md',
+  'glossary.md',
+  'tech-stack.md',
+  'user-guide.md'
+] as const;
+
+/**
  * Localized template content
  */
 export const TEMPLATES = {
