@@ -9,7 +9,7 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import { Language, BRANCH_CORE_FILES, GLOBAL_CORE_FILES } from './models/types.js';
+import { Language, BRANCH_CORE_FILES, GLOBAL_CORE_FILES } from './shared/types/index.js';
 import { MemoryBankError } from './errors/MemoryBankError.js';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
