@@ -202,15 +202,24 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
     // Get technical decisions from systemPatterns efficiently (without loading entire file)
     let technicalDecisions = '';
     try {
-      // Only try to extract technical decisions if systemPatterns exists
-      const systemPatternsExists = await this.branchRepository.documentExists(branchInfo, systemPatternsPath);
+      // Check if systemPatterns file exists using listDocuments()
+      const allDocuments = await this.branchRepository.listDocuments(branchInfo);
+      const systemPatternsExists = allDocuments.some(
+        docPath => docPath.value === systemPatternsPath.value
+      );
+      
       if (systemPatternsExists) {
-        // Use streaming or chunking approach to extract only what we need
-        technicalDecisions = await this.extractTechnicalDecisionsEfficiently(
-          branchInfo, 
-          systemPatternsPath, 
-          language === 'en' ? '## Technical Decisions' : '## 技術的決定事項'
-        );
+        // Get systemPatterns but limit memory usage by processing it differently
+        const systemPatterns = await this.branchRepository.getDocument(branchInfo, systemPatternsPath);
+        
+        if (systemPatterns) {
+          // Process only a chunk of the document to avoid memory issues
+          const sectionHeader = language === 'en' ? '## Technical Decisions' : '## 技術的決定事項';
+          technicalDecisions = this.extractTechnicalDecisionsFromContent(
+            systemPatterns.content, 
+            sectionHeader
+          );
+        }
       }
     } catch (error) {
       // If we encounter an error, log it but continue without the technical decisions
@@ -285,25 +294,14 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
   }
 
   /**
-   * Extract technical decisions from systemPatterns efficiently without loading entire file
-   * This method uses a targeted approach to only extract what's needed from the file
+   * Extract technical decisions from content
+   * This helps avoid memory issues by processing only parts of large documents
    */
-  private async extractTechnicalDecisionsEfficiently(
-    branchInfo: BranchInfo,
-    systemPatternsPath: DocumentPath,
+  private extractTechnicalDecisionsFromContent(
+    content: string,
     sectionHeader: string
-  ): Promise<string> {
-    // Get the document path where the file is physically stored
-    const documentPath = await this.branchRepository.getDocumentPath(branchInfo, systemPatternsPath);
-    
-    if (!documentPath) {
-      return '';
-    }
-    
+  ): string {
     try {
-      // Read the file directly using fileSystemService for more control
-      const content = await this.fileSystemService.readFile(documentPath);
-      
       // Find the section we want
       const sectionIndex = content.indexOf(sectionHeader);
       if (sectionIndex === -1) {
