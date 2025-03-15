@@ -6,7 +6,9 @@ import {
   MemoryDocument,
   MemoryDocumentSchema,
   PathSchema,
-  TagSchema
+  TagSchema,
+  DocumentSections,
+  DocumentSectionsSchema
 } from '../schemas/index.js';
 
 /**
@@ -101,6 +103,42 @@ export abstract class BaseMemoryBank {
         throw error;
       }
       throw MemoryBankError.fileSystemError('write', documentPath, error as Error);
+    }
+  }
+
+  /**
+   * Update document sections using JSON
+   */
+  async updateSections(documentPath: string, sections: DocumentSections): Promise<void> {
+    try {
+      // Validate sections
+      const validatedSections = DocumentSectionsSchema.parse(sections);
+
+      // Read current document
+      const doc = await this.readDocument(documentPath);
+      let content = doc.content;
+
+      // Update each section
+      for (const [sectionName, section] of Object.entries(validatedSections)) {
+        const formattedContent = Array.isArray(section.content)
+          ? section.content.map(item => `- ${item}`).join('\n')
+          : section.content;
+
+        content = this.updateSection(
+          content,
+          section.header,
+          formattedContent,
+          section.append ?? false
+        );
+      }
+
+      // Write updated document
+      await this.writeDocument(documentPath, content, doc.tags);
+    } catch (error) {
+      if (error instanceof MemoryBankError) {
+        throw error;
+      }
+      throw MemoryBankError.documentValidationFailed(documentPath, (error as Error).message);
     }
   }
 
@@ -270,5 +308,35 @@ export abstract class BaseMemoryBank {
     const rest = lines.slice(1).join('\n');
 
     return `${firstLine}\n\n${tagLine}${rest}`;
+  }
+
+  protected updateSection(content: string, sectionHeader: string, newContent: string, append = false): string {
+    const lines = content.split('\n');
+    const sectionIndex = lines.findIndex(line => line.trim() === sectionHeader);
+
+    if (sectionIndex === -1) {
+      // Section not found, append it at the end
+      return `${content}\n\n${sectionHeader}\n\n${newContent}`;
+    }
+
+    // Find the next section or end of file
+    let nextSectionIndex = lines.findIndex((line, index) =>
+      index > sectionIndex && line.startsWith('##')
+    );
+    if (nextSectionIndex === -1) {
+      nextSectionIndex = lines.length;
+    }
+
+    if (append) {
+      // Add new content at the end of the section
+      const beforeSection = lines.slice(0, nextSectionIndex).join('\n');
+      const afterSection = lines.slice(nextSectionIndex).join('\n');
+      return `${beforeSection}\n${newContent}\n${afterSection}`;
+    } else {
+      // Replace section content
+      const beforeSection = lines.slice(0, sectionIndex + 1).join('\n');
+      const afterSection = lines.slice(nextSectionIndex).join('\n');
+      return `${beforeSection}\n\n${newContent}\n${afterSection}`;
+    }
   }
 }

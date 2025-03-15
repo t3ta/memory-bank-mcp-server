@@ -22,6 +22,20 @@ export const BranchNameSchema = z
 
 export const LanguageSchema = z.enum(['en', 'ja']);
 
+// Section editing schemas
+export const SectionContentSchema = z.union([
+  z.string(),
+  z.array(z.string())
+]);
+
+export const SectionEditSchema = z.object({
+  header: z.string(),
+  content: SectionContentSchema,
+  append: z.boolean().optional()
+});
+
+export const DocumentSectionsSchema = z.record(SectionEditSchema);
+
 // Workspace configuration schemas
 export const WorkspaceConfigSchema = z.object({
   workspaceRoot: PathSchema,
@@ -126,3 +140,5 @@ export type AddTechnicalDecisionArgs = z.infer<typeof AddTechnicalDecisionArgsSc
 export type SearchByTagsArgs = z.infer<typeof SearchByTagsArgsSchema>;
 export type WorkspaceConfig = z.infer<typeof WorkspaceConfigSchema>;
 export type CliOptions = z.infer<typeof CliOptionsSchema>;
+export type SectionEdit = z.infer<typeof SectionEditSchema>;
+export type DocumentSections = z.infer<typeof DocumentSectionsSchema>;

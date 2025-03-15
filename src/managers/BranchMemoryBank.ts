@@ -7,7 +7,8 @@ import {
   BranchNameSchema,
   UpdateActiveContextArgsSchema,
   UpdateProgressArgsSchema,
-  AddTechnicalDecisionArgsSchema
+  AddTechnicalDecisionArgsSchema,
+  DocumentSections
 } from '../schemas/index.js';
 
 /**
@@ -120,34 +121,44 @@ export class BranchMemoryBank extends BaseMemoryBank {
       // Validate updates using zod schema
       const validatedUpdates = UpdateActiveContextArgsSchema.parse(updates);
 
-      const doc = await this.readDocument('activeContext.md');
-      let content = doc.content;
+      const sections: DocumentSections = {};
 
       if (validatedUpdates.currentWork) {
-        content = this.updateSection(content, this.language === 'ja' ? '## 現在の作業内容' : '## Current Work', validatedUpdates.currentWork);
+        sections['currentWork'] = {
+          header: this.language === 'ja' ? '## 現在の作業内容' : '## Current Work',
+          content: validatedUpdates.currentWork
+        };
       }
 
       if (validatedUpdates.recentChanges) {
-        const changes = validatedUpdates.recentChanges.map(change => `- ${change}`).join('\n');
-        content = this.updateSection(content, this.language === 'ja' ? '## 最近の変更点' : '## Recent Changes', changes);
+        sections['recentChanges'] = {
+          header: this.language === 'ja' ? '## 最近の変更点' : '## Recent Changes',
+          content: validatedUpdates.recentChanges
+        };
       }
 
       if (validatedUpdates.activeDecisions) {
-        const decisions = validatedUpdates.activeDecisions.map(decision => `- ${decision}`).join('\n');
-        content = this.updateSection(content, this.language === 'ja' ? '## アクティブな決定事項' : '## Active Decisions', decisions);
+        sections['activeDecisions'] = {
+          header: this.language === 'ja' ? '## アクティブな決定事項' : '## Active Decisions',
+          content: validatedUpdates.activeDecisions
+        };
       }
 
       if (validatedUpdates.considerations) {
-        const considerations = validatedUpdates.considerations.map(item => `- ${item}`).join('\n');
-        content = this.updateSection(content, this.language === 'ja' ? '## 検討事項' : '## Active Considerations', considerations);
+        sections['considerations'] = {
+          header: this.language === 'ja' ? '## 検討事項' : '## Active Considerations',
+          content: validatedUpdates.considerations
+        };
       }
 
       if (validatedUpdates.nextSteps) {
-        const steps = validatedUpdates.nextSteps.map(step => `- [ ] ${step}`).join('\n');
-        content = this.updateSection(content, this.language === 'ja' ? '## 次のステップ' : '## Next Steps', steps);
+        sections['nextSteps'] = {
+          header: this.language === 'ja' ? '## 次のステップ' : '## Next Steps',
+          content: validatedUpdates.nextSteps
+        };
       }
 
-      await this.writeDocument('activeContext.md', content);
+      await this.updateSections('activeContext.md', sections);
     } catch (error) {
       if (error instanceof MemoryBankError) {
         throw error;
@@ -169,29 +180,37 @@ export class BranchMemoryBank extends BaseMemoryBank {
       // Validate updates using zod schema
       const validatedUpdates = UpdateProgressArgsSchema.parse(updates);
 
-      const doc = await this.readDocument('progress.md');
-      let content = doc.content;
+      const sections: DocumentSections = {};
 
       if (validatedUpdates.workingFeatures) {
-        const features = validatedUpdates.workingFeatures.map(feature => `- ${feature}`).join('\n');
-        content = this.updateSection(content, this.language === 'ja' ? '## 動作している機能' : '## Working Features', features);
+        sections['workingFeatures'] = {
+          header: this.language === 'ja' ? '## 動作している機能' : '## Working Features',
+          content: validatedUpdates.workingFeatures
+        };
       }
 
       if (validatedUpdates.pendingImplementation) {
-        const pending = validatedUpdates.pendingImplementation.map(item => `- [ ] ${item}`).join('\n');
-        content = this.updateSection(content, this.language === 'ja' ? '## 未実装の機能' : '## Pending Implementation', pending);
+        sections['pendingImplementation'] = {
+          header: this.language === 'ja' ? '## 未実装の機能' : '## Pending Implementation',
+          content: validatedUpdates.pendingImplementation
+        };
       }
 
       if (validatedUpdates.status) {
-        content = this.updateSection(content, this.language === 'ja' ? '## 現在の状態' : '## Current Status', validatedUpdates.status);
+        sections['status'] = {
+          header: this.language === 'ja' ? '## 現在の状態' : '## Current Status',
+          content: validatedUpdates.status
+        };
       }
 
       if (validatedUpdates.knownIssues) {
-        const issues = validatedUpdates.knownIssues.map(issue => `- ${issue}`).join('\n');
-        content = this.updateSection(content, this.language === 'ja' ? '## 既知の問題' : '## Known Issues', issues);
+        sections['knownIssues'] = {
+          header: this.language === 'ja' ? '## 既知の問題' : '## Known Issues',
+          content: validatedUpdates.knownIssues
+        };
       }
 
-      await this.writeDocument('progress.md', content);
+      await this.updateSections('progress.md', sections);
     } catch (error) {
       if (error instanceof MemoryBankError) {
         throw error;
@@ -213,7 +232,6 @@ export class BranchMemoryBank extends BaseMemoryBank {
       // Validate decision using zod schema
       const validatedDecision = AddTechnicalDecisionArgsSchema.parse(decision);
 
-      const doc = await this.readDocument('systemPatterns.md');
       const decisionText = `
 ### ${validatedDecision.title}
 
@@ -227,43 +245,20 @@ ${this.language === 'ja' ? '#### 影響' : '#### Consequences'}
 ${validatedDecision.consequences.map(c => `- ${c}`).join('\n')}
 `;
 
-      const content = this.updateSection(doc.content, this.language === 'ja' ? '## 技術的決定事項' : '## Technical Decisions', decisionText, true);
-      await this.writeDocument('systemPatterns.md', content);
+      const sections: DocumentSections = {
+        'technicalDecisions': {
+          header: this.language === 'ja' ? '## 技術的決定事項' : '## Technical Decisions',
+          content: decisionText,
+          append: true
+        }
+      };
+
+      await this.updateSections('systemPatterns.md', sections);
     } catch (error) {
       if (error instanceof MemoryBankError) {
         throw error;
       }
       throw MemoryBankError.documentValidationFailed('systemPatterns.md', (error as Error).message);
-    }
-  }
-
-  private updateSection(content: string, sectionHeader: string, newContent: string, append = false): string {
-    const lines = content.split('\n');
-    const sectionIndex = lines.findIndex(line => line.trim() === sectionHeader);
-
-    if (sectionIndex === -1) {
-      // Section not found, append it at the end
-      return `${content}\n\n${sectionHeader}\n\n${newContent}`;
-    }
-
-    // Find the next section or end of file
-    let nextSectionIndex = lines.findIndex((line, index) =>
-      index > sectionIndex && line.startsWith('##')
-    );
-    if (nextSectionIndex === -1) {
-      nextSectionIndex = lines.length;
-    }
-
-    if (append) {
-      // Add new content at the end of the section
-      const beforeSection = lines.slice(0, nextSectionIndex).join('\n');
-      const afterSection = lines.slice(nextSectionIndex).join('\n');
-      return `${beforeSection}\n${newContent}\n${afterSection}`;
-    } else {
-      // Replace section content
-      const beforeSection = lines.slice(0, sectionIndex + 1).join('\n');
-      const afterSection = lines.slice(nextSectionIndex).join('\n');
-      return `${beforeSection}\n\n${newContent}\n${afterSection}`;
     }
   }
 }
