@@ -18,9 +18,9 @@
     "prepare": "npm run clean && npm run build",
     "start": "node dist/index.js",
     "dev": "ts-node --esm src/index.ts",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest --config=jest.config.cjs",
-    "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --config=jest.config.cjs --watch",
-    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --config=jest.config.cjs --coverage",
+    "test": "jest --config=jest.config.cjs",
+    "test:watch": "jest --config=jest.config.cjs --watch",
+    "test:coverage": "jest --config=jest.config.cjs --coverage",
     "prepublishOnly": "npm test && npm run build"
   },
   "keywords": [
