@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1742037498297" clover="3.2.0">
-  <project timestamp="1742037498297" name="All files">
-    <metrics statements="598" coveredstatements="477" conditionals="178" coveredconditionals="128" methods="88" coveredmethods="76" elements="864" coveredelements="681" complexity="0" loc="598" ncloc="598" packages="5" files="8" classes="8"/>
+<coverage generated="1742038338194" clover="3.2.0">
+  <project timestamp="1742038338194" name="All files">
+    <metrics statements="598" coveredstatements="473" conditionals="178" coveredconditionals="128" methods="88" coveredmethods="73" elements="864" coveredelements="674" complexity="0" loc="598" ncloc="598" packages="5" files="8" classes="8"/>
     <package name="src">
       <metrics statements="6" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="1" coveredmethods="0"/>
       <file name="types.ts" path="/Users/t3ta/workspace/memory-bank-mcp-server/src/types.ts">
@@ -55,25 +55,25 @@
       </file>
     </package>
     <package name="src.managers">
-      <metrics statements="513" coveredstatements="407" conditionals="166" coveredconditionals="118" methods="66" coveredmethods="64"/>
+      <metrics statements="513" coveredstatements="403" conditionals="166" coveredconditionals="118" methods="66" coveredmethods="61"/>
       <file name="BaseMemoryBank.ts" path="/Users/t3ta/workspace/memory-bank-mcp-server/src/managers/BaseMemoryBank.ts">
-        <metrics statements="183" coveredstatements="141" conditionals="50" coveredconditionals="32" methods="34" coveredmethods="33"/>
+        <metrics statements="183" coveredstatements="137" conditionals="50" coveredconditionals="32" methods="34" coveredmethods="30"/>
         <line num="1" count="4" type="stmt"/>
         <line num="2" count="4" type="stmt"/>
         <line num="3" count="4" type="stmt"/>
         <line num="5" count="4" type="stmt"/>
         <line num="20" count="4" type="stmt"/>
         <line num="21" count="58" type="stmt"/>
-        <line num="27" count="109" type="stmt"/>
-        <line num="29" count="109" type="stmt"/>
-        <line num="30" count="108" type="stmt"/>
-        <line num="32" count="108" type="stmt"/>
-        <line num="33" count="108" type="stmt"/>
-        <line num="34" count="106" type="stmt"/>
-        <line num="37" count="106" type="stmt"/>
-        <line num="40" count="106" type="cond" truecount="1" falsecount="1"/>
-        <line num="43" count="106" type="stmt"/>
-        <line num="50" count="106" type="stmt"/>
+        <line num="27" count="108" type="stmt"/>
+        <line num="29" count="108" type="stmt"/>
+        <line num="30" count="107" type="stmt"/>
+        <line num="32" count="107" type="stmt"/>
+        <line num="33" count="107" type="stmt"/>
+        <line num="34" count="105" type="stmt"/>
+        <line num="37" count="105" type="stmt"/>
+        <line num="40" count="105" type="cond" truecount="1" falsecount="1"/>
+        <line num="43" count="105" type="stmt"/>
+        <line num="50" count="105" type="stmt"/>
         <line num="52" count="2" type="cond" truecount="0" falsecount="1"/>
         <line num="53" count="0" type="cond" truecount="0" falsecount="1"/>
         <line num="54" count="0" type="stmt"/>
@@ -186,22 +186,22 @@
         <line num="301" count="0" type="cond" truecount="0" falsecount="1"/>
         <line num="302" count="0" type="stmt"/>
         <line num="304" count="0" type="stmt"/>
-        <line num="317" count="403" type="stmt"/>
-        <line num="318" count="403" type="stmt"/>
+        <line num="317" count="402" type="stmt"/>
+        <line num="318" count="402" type="stmt"/>
         <line num="320" count="2" type="stmt"/>
         <line num="328" count="182" type="stmt"/>
         <line num="329" count="182" type="stmt"/>
         <line num="331" count="0" type="stmt"/>
-        <line num="336" count="400" type="stmt"/>
-        <line num="337" count="400" type="cond" truecount="0" falsecount="1"/>
+        <line num="336" count="399" type="stmt"/>
+        <line num="337" count="399" type="cond" truecount="0" falsecount="1"/>
         <line num="338" count="0" type="stmt"/>
-        <line num="340" count="400" type="stmt"/>
-        <line num="344" count="107" type="stmt"/>
-        <line num="345" count="6701" type="stmt"/>
-        <line num="347" count="107" type="cond" truecount="1" falsecount="0"/>
-        <line num="349" count="64" type="stmt"/>
-        <line num="353" count="127" type="stmt"/>
-        <line num="354" count="127" type="stmt"/>
+        <line num="340" count="399" type="stmt"/>
+        <line num="344" count="106" type="stmt"/>
+        <line num="345" count="6698" type="stmt"/>
+        <line num="347" count="106" type="cond" truecount="1" falsecount="0"/>
+        <line num="349" count="63" type="stmt"/>
+        <line num="353" count="126" type="stmt"/>
+        <line num="354" count="126" type="stmt"/>
         <line num="358" count="293" type="cond" truecount="1" falsecount="0"/>
         <line num="360" count="37" type="stmt"/>
         <line num="363" count="22" type="cond" truecount="1" falsecount="0"/>
@@ -227,20 +227,20 @@
         <line num="403" count="2" type="stmt"/>
         <line num="405" count="2" type="stmt"/>
         <line num="410" count="4" type="stmt"/>
-        <line num="411" count="27" type="stmt"/>
+        <line num="411" count="18" type="stmt"/>
         <line num="413" count="4" type="cond" truecount="1" falsecount="0"/>
-        <line num="416" count="2" type="stmt"/>
-        <line num="417" count="15" type="cond" truecount="2" falsecount="0"/>
-        <line num="419" count="2" type="cond" truecount="1" falsecount="0"/>
+        <line num="416" count="1" type="stmt"/>
+        <line num="417" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="419" count="1" type="cond" truecount="1" falsecount="0"/>
         <line num="420" count="1" type="stmt"/>
-        <line num="424" count="2" type="stmt"/>
-        <line num="426" count="5" type="stmt"/>
+        <line num="424" count="1" type="stmt"/>
+        <line num="426" count="2" type="stmt"/>
         <line num="432" count="2" type="stmt"/>
         <line num="433" count="2" type="cond" truecount="1" falsecount="0"/>
-        <line num="435" count="1" type="stmt"/>
-        <line num="437" count="2" type="stmt"/>
-        <line num="438" count="2" type="stmt"/>
-        <line num="439" count="2" type="stmt"/>
+        <line num="435" count="0" type="stmt"/>
+        <line num="437" count="0" type="stmt"/>
+        <line num="438" count="0" type="stmt"/>
+        <line num="439" count="0" type="stmt"/>
       </file>
       <file name="BranchMemoryBank.ts" path="/Users/t3ta/workspace/memory-bank-mcp-server/src/managers/BranchMemoryBank.ts">
         <metrics statements="168" coveredstatements="155" conditionals="81" coveredconditionals="63" methods="14" coveredmethods="14"/>
@@ -487,10 +487,10 @@
         <line num="176" count="0" type="cond" truecount="0" falsecount="1"/>
         <line num="177" count="0" type="stmt"/>
         <line num="179" count="0" type="stmt"/>
-        <line num="187" count="245" type="stmt"/>
-        <line num="188" count="245" type="stmt"/>
-        <line num="189" count="159" type="stmt"/>
-        <line num="190" count="159" type="stmt"/>
+        <line num="187" count="244" type="stmt"/>
+        <line num="188" count="244" type="stmt"/>
+        <line num="189" count="158" type="stmt"/>
+        <line num="190" count="158" type="stmt"/>
         <line num="192" count="1" type="stmt"/>
         <line num="196" count="1" type="cond" truecount="1" falsecount="0"/>
         <line num="197" count="1" type="stmt"/>
@@ -608,8 +608,8 @@
         <line num="2" count="7" type="stmt"/>
         <line num="5" count="7" type="stmt"/>
         <line num="9" count="7" type="stmt"/>
-        <line num="12" count="887" type="stmt"/>
-        <line num="13" count="887" type="cond" truecount="2" falsecount="0"/>
+        <line num="12" count="885" type="stmt"/>
+        <line num="13" count="885" type="cond" truecount="2" falsecount="0"/>
         <line num="15" count="7" type="stmt"/>
         <line num="19" count="40" type="cond" truecount="2" falsecount="0"/>
         <line num="23" count="7" type="stmt"/>
