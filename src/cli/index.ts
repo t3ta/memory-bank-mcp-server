@@ -282,16 +282,17 @@ const argv = yargs(hideBin(process.argv))
     }
   })
   // Utility commands
-  .command('create-pull-request <branch>', 'Create a pull request from branch memory bank', (yargs) => {
+  .command('create-pull-request <branch> <title>', 'Create a pull request from branch memory bank', (yargs) => {
     return yargs
       .positional('branch', {
         describe: 'Branch name',
         type: 'string',
         demandOption: true
       })
-      .option('title', {
+      .positional('title', {
+        describe: 'PR title',
         type: 'string',
-        description: 'Custom PR title (optional)'
+        demandOption: true
       })
       .option('base', {
         type: 'string',
@@ -396,8 +397,8 @@ const argv = yargs(hideBin(process.argv))
   .example('$0 read-global architecture.md', 'Read architecture document from global memory bank')
   .example('$0 write-global tech-stack.md -f ./tech-stack.md', 'Write tech stack document from file')
   .example('$0 read-branch feature/login activeContext.md', 'Read active context from branch')
-  .example('$0 create-pull-request feature/my-feature', 'Create a pull request from branch')
-  .example('$0 create-pull-request feature/my-feature --title "My awesome feature" --base main', 'Create PR with custom title and base')
+  .example('$0 create-pull-request feature/my-feature "My feature title"', 'Create a pull request from branch')
+  .example('$0 create-pull-request feature/my-feature "My feature title" --base main', 'Create PR with custom base')
   .example('$0 recent-branches', 'Show recent branches')
   .demandCommand(1, 'You need to specify a command')
   .help()
