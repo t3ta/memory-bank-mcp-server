@@ -49,13 +49,13 @@ const argv = yargs(hideBin(process.argv))
       });
 
       const result = await app.getGlobalController().readDocument(argv.path as string);
-      if (result.error) {
+      if (!result.success) {
         logger.error(`Error reading document: ${result.error.message}`);
         process.exit(1);
       }
 
       // Output document content
-      console.log(result.data?.content || '');
+      console.log(result.data.content || '');
     } catch (error) {
       logger.error('Failed to read document:', error);
       process.exit(1);
@@ -110,7 +110,7 @@ const argv = yargs(hideBin(process.argv))
 
       // Write document
       const result = await app.getGlobalController().writeDocument(argv.path as string, content);
-      if (result.error) {
+      if (!result.success) {
         logger.error(`Error writing document: ${result.error.message}`);
         process.exit(1);
       }
@@ -147,13 +147,13 @@ const argv = yargs(hideBin(process.argv))
         argv.path as string
       );
       
-      if (result.error) {
+      if (!result.success) {
         logger.error(`Error reading document: ${result.error.message}`);
         process.exit(1);
       }
 
       // Output document content
-      console.log(result.data?.content || '');
+      console.log(result.data.content || '');
     } catch (error) {
       logger.error('Failed to read document:', error);
       process.exit(1);
@@ -218,7 +218,7 @@ const argv = yargs(hideBin(process.argv))
         content
       );
       
-      if (result.error) {
+      if (!result.success) {
         logger.error(`Error writing document: ${result.error.message}`);
         process.exit(1);
       }
@@ -253,7 +253,7 @@ const argv = yargs(hideBin(process.argv))
 
       const result = await app.getBranchController().readCoreFiles(argv.branch as string);
       
-      if (result.error) {
+      if (!result.success) {
         logger.error(`Error reading core files: ${result.error.message}`);
         process.exit(1);
       }
@@ -264,7 +264,7 @@ const argv = yargs(hideBin(process.argv))
       } else {
         // Pretty print each file
         console.log('\n=== BRANCH CORE FILES ===\n');
-        for (const [path, file] of Object.entries(result.data || {})) {
+        for (const [path, file] of Object.entries(result.data)) {
           console.log(`\n===== ${path} =====\n`);
           console.log(file.content);
           console.log('\n');
@@ -293,14 +293,14 @@ const argv = yargs(hideBin(process.argv))
 
       const result = await app.getBranchController().getRecentBranches(argv.limit as number);
       
-      if (result.error) {
+      if (!result.success) {
         logger.error(`Error getting recent branches: ${result.error.message}`);
         process.exit(1);
       }
 
       // Output in a pretty format
       console.log('\n=== RECENT BRANCHES ===\n');
-      result.data?.forEach((branch, index) => {
+      result.data.forEach((branch: { name: string; lastModified: string | number | Date; summary?: { currentWork?: string } }, index: number) => {
         console.log(`${index + 1}. ${branch.name}`);
         console.log(`   Last modified: ${new Date(branch.lastModified).toLocaleString()}`);
         if (branch.summary?.currentWork) {
