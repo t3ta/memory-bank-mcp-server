@@ -1,0 +1,88 @@
+import { MemoryDocument } from '../entities/MemoryDocument.js';
+import { DocumentPath } from '../entities/DocumentPath.js';
+import { BranchInfo } from '../entities/BranchInfo.js';
+import { Tag } from '../entities/Tag.js';
+
+/**
+ * Interface for recent branch information
+ */
+export interface RecentBranch {
+  branchInfo: BranchInfo;
+  lastModified: Date;
+  summary: {
+    currentWork?: string;
+    recentChanges?: string[];
+  };
+}
+
+/**
+ * Repository interface for branch memory bank
+ */
+export interface IBranchMemoryBankRepository {
+  /**
+   * Find branch by name
+   * @param branchName Branch name
+   * @returns Promise resolving to boolean indicating if branch exists
+   */
+  exists(branchName: string): Promise<boolean>;
+
+  /**
+   * Initialize branch memory bank
+   * @param branchInfo Branch information
+   * @returns Promise resolving when initialization is complete
+   */
+  initialize(branchInfo: BranchInfo): Promise<void>;
+
+  /**
+   * Get document from branch
+   * @param branchInfo Branch information
+   * @param path Document path
+   * @returns Promise resolving to document if found, null otherwise
+   */
+  getDocument(branchInfo: BranchInfo, path: DocumentPath): Promise<MemoryDocument | null>;
+
+  /**
+   * Save document to branch
+   * @param branchInfo Branch information
+   * @param document Document to save
+   * @returns Promise resolving when done
+   */
+  saveDocument(branchInfo: BranchInfo, document: MemoryDocument): Promise<void>;
+
+  /**
+   * Delete document from branch
+   * @param branchInfo Branch information
+   * @param path Document path
+   * @returns Promise resolving to boolean indicating success
+   */
+  deleteDocument(branchInfo: BranchInfo, path: DocumentPath): Promise<boolean>;
+
+  /**
+   * List all documents in branch
+   * @param branchInfo Branch information
+   * @returns Promise resolving to array of document paths
+   */
+  listDocuments(branchInfo: BranchInfo): Promise<DocumentPath[]>;
+
+  /**
+   * Find documents by tags in branch
+   * @param branchInfo Branch information
+   * @param tags Tags to search for
+   * @returns Promise resolving to array of matching documents
+   */
+  findDocumentsByTags(branchInfo: BranchInfo, tags: Tag[]): Promise<MemoryDocument[]>;
+
+  /**
+   * Get recent branches
+   * @param limit Maximum number of branches to return
+   * @returns Promise resolving to array of recent branches
+   */
+  getRecentBranches(limit?: number): Promise<RecentBranch[]>;
+
+  /**
+   * Validate branch structure
+   * @param branchInfo Branch information
+   * @returns Promise resolving to boolean indicating if structure is valid
+   */
+  validateStructure(branchInfo: BranchInfo): Promise<boolean>;
+}
