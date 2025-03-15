@@ -16,6 +16,7 @@ import { UpdateTagIndexUseCase } from '../../application/usecases/common/UpdateT
 import { GetRecentBranchesUseCase } from '../../application/usecases/common/GetRecentBranchesUseCase.js';
 import { ReadBranchCoreFilesUseCase } from '../../application/usecases/common/ReadBranchCoreFilesUseCase.js';
 import { CreateBranchCoreFilesUseCase } from '../../application/usecases/common/CreateBranchCoreFilesUseCase.js';
+import { CreatePullRequestUseCase } from '../../application/usecases/pr/CreatePullRequestUseCase.js';
 
 // Infrastructure layer
 import { IFileSystemService } from '../../infrastructure/storage/interfaces/IFileSystemService.js';
@@ -30,6 +31,7 @@ import { FileSystemBranchMemoryBankRepository } from '../../infrastructure/repos
 import { MCPResponsePresenter } from '../../interface/presenters/MCPResponsePresenter.js';
 import { GlobalController } from '../../interface/controllers/GlobalController.js';
 import { BranchController } from '../../interface/controllers/BranchController.js';
+import { PullRequestTool } from '../../interface/tools/PullRequestTool.js';
 
 // CLI options type
 import { CliOptions } from '../../infrastructure/config/WorkspaceConfig.js';
@@ -132,6 +134,14 @@ export function registerApplicationServices(container: DIContainer): void {
     
     return new CreateBranchCoreFilesUseCase(branchRepository);
   });
+  
+  // Pull Request use cases
+  container.registerFactory('createPullRequestUseCase', () => {
+    const branchRepository = container.get('branchMemoryBankRepository');
+    const fileSystemService = container.get('fileSystemService');
+    
+    return new CreatePullRequestUseCase(branchRepository, fileSystemService);
+  });
 }
 
 /**
@@ -141,6 +151,13 @@ export function registerApplicationServices(container: DIContainer): void {
 export function registerInterfaceServices(container: DIContainer): void {
   // Register presenter
   container.register('mcpResponsePresenter', new MCPResponsePresenter());
+  
+  // Register tools
+  container.registerFactory('pullRequestTool', () => {
+    const createPullRequestUseCase = container.get('createPullRequestUseCase');
+    
+    return new PullRequestTool(createPullRequestUseCase);
+  });
   
   // Register controllers
   container.registerFactory('globalController', () => {

@@ -12,3 +12,6 @@ export * from './common/UpdateTagIndexUseCase.js';
 export * from './common/GetRecentBranchesUseCase.js';
 export * from './common/ReadBranchCoreFilesUseCase.js';
 export * from './common/CreateBranchCoreFilesUseCase.js';
+
+// Pull Request use cases
+export * from './pr/index.js';

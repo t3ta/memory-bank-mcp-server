@@ -3,6 +3,7 @@ import { Constants } from './config/constants.js';
 import { logger } from '../shared/utils/logger.js';
 import { IGlobalController } from '../interface/controllers/interfaces/IGlobalController.js';
 import { IBranchController } from '../interface/controllers/interfaces/IBranchController.js';
+import { IPullRequestTool } from '../interface/tools/IPullRequestTool.js';
 import { CliOptions } from '../infrastructure/config/WorkspaceConfig.js';
 
 /**
@@ -13,6 +14,7 @@ export class Application {
   private readonly options: CliOptions;
   private globalController?: IGlobalController;
   private branchController?: IBranchController;
+  private pullRequestTool?: IPullRequestTool;
 
   /**
    * Constructor
@@ -33,9 +35,10 @@ export class Application {
       // Setup DI container
       const container = await setupContainer(this.options);
       
-      // Get controllers
+      // Get controllers and tools
       this.globalController = container.get<IGlobalController>('globalController');
       this.branchController = container.get<IBranchController>('branchController');
+      this.pullRequestTool = container.get<IPullRequestTool>('pullRequestTool');
       
       logger.info('Application initialized successfully');
     } catch (error) {
@@ -66,6 +69,18 @@ export class Application {
     }
     
     return this.branchController;
+  }
+
+  /**
+   * Get pull request tool
+   * @returns Pull request tool
+   */
+  getPullRequestTool(): IPullRequestTool {
+    if (!this.pullRequestTool) {
+      throw new Error('Application not initialized. Call initialize() first.');
+    }
+    
+    return this.pullRequestTool;
   }
 }
 
