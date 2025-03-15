@@ -9,13 +9,15 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import { WorkspaceManager } from './managers/WorkspaceManager.js';
-import { GlobalMemoryBank } from './managers/GlobalMemoryBank.js';
-import { BranchMemoryBank } from './managers/BranchMemoryBank.js';
 import { Language, BRANCH_CORE_FILES, GLOBAL_CORE_FILES } from './models/types.js';
 import { MemoryBankError } from './errors/MemoryBankError.js';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
+
+// 新しいインポート
+import createApplication from './main/index.js';
+import { Application } from './main/index.js';
+import { CoreFilesDTO } from './application/dtos/CoreFilesDTO.js';
 
 // Parse command line arguments
 const argv = yargs(hideBin(process.argv))
@@ -35,10 +37,8 @@ const logger = {
   error: (...args: any[]) => console.error('[ERROR]', ...args)
 };
 
-// Initialize managers
-const workspaceManager = new WorkspaceManager();
-let globalMemoryBank: GlobalMemoryBank | null = null;
-let branchMemoryBank: BranchMemoryBank | null = null;
+// 新しいアプリケーションインスタンス
+let app: Application;
 
 // Available tools definition
 const AVAILABLE_TOOLS = [
@@ -299,19 +299,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         throw new Error('Invalid arguments for write_branch_memory_bank');
       }
 
-      const config = await workspaceManager.initialize(undefined, branch);
-      branchMemoryBank = new BranchMemoryBank(
-        workspaceManager.getBranchMemoryPath(branch),
-        branch,
-        config
-      );
-      await branchMemoryBank.initialize();
-
       if (!content) {
         return { content: [{ type: "text", text: "Branch memory bank initialized successfully" }] };
       }
 
-      await branchMemoryBank.writeDocument(path, content);
+      await app.getBranchController().writeDocument(branch, path, content);
       return { content: [{ type: "text", text: "Document written successfully" }] };
     }
 
@@ -323,18 +315,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         throw new Error('Invalid arguments for read_branch_memory_bank');
       }
 
-      const config = await workspaceManager.initialize(undefined, branch);
-      branchMemoryBank = new BranchMemoryBank(
-        workspaceManager.getBranchMemoryPath(branch),
-        branch,
-        config
-      );
-      await branchMemoryBank.initialize();
+      const response = await app.getBranchController().readDocument(branch, path);
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
 
-      const doc = await branchMemoryBank.readDocument(path);
       return {
-        content: [{ type: "text", text: doc.content }],
-        _meta: { lastModified: doc.lastModified.toISOString() }
+        content: [{ type: "text", text: response.data?.content || '' }],
+        _meta: { lastModified: response.data?.lastModified || new Date().toISOString() }
       };
     }
 
@@ -368,8 +356,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return { content: [{ type: "text", text: "Global memory bank initialized successfully" }] };
       }
 
-      await globalMemoryBank?.writeDocument(path, content);
-      await globalMemoryBank?.updateTagsIndex();
+      await app.getGlobalController().writeDocument(path, content);
       return { content: [{ type: "text", text: "Document written successfully" }] };
     }
 
@@ -380,14 +367,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         throw new Error('Invalid arguments for read_global_memory_bank');
       }
 
-      const doc = await globalMemoryBank?.readDocument(path);
-      if (!doc) {
-        throw new Error(`Document not found: ${path}`);
+      const response = await app.getGlobalController().readDocument(path);
+      if (response.error) {
+        throw new Error(response.error.message);
       }
 
       return {
-        content: [{ type: "text", text: doc.content }],
-        _meta: { lastModified: doc.lastModified.toISOString() }
+        content: [{ type: "text", text: response.data?.content || '' }],
+        _meta: { lastModified: response.data?.lastModified || new Date().toISOString() }
       };
     }
 
@@ -398,41 +385,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         throw new Error('Invalid arguments for read_branch_core_files');
       }
 
-      const config = await workspaceManager.initialize(undefined, branch);
-      branchMemoryBank = new BranchMemoryBank(
-        workspaceManager.getBranchMemoryPath(branch),
-        branch,
-        config
-      );
-      await branchMemoryBank.initialize();
-
-      if (!branchMemoryBank) {
-        throw new Error('Branch memory bank not initialized');
+      const response = await app.getBranchController().readCoreFiles(branch);
+      if (response.error) {
+        throw new Error(response.error.message);
       }
-
-      const results = await Promise.all(
-        BRANCH_CORE_FILES.map(async (file) => {
-          try {
-            const doc = await branchMemoryBank!.readDocument(file);
-            return {
-              path: file,
-              content: doc.content,
-              lastModified: doc.lastModified.toISOString()
-            };
-          } catch (error: any) {
-            return {
-              path: file,
-              error: `Failed to read ${file}: ${error?.message || 'Unknown error'}`
-            };
-          }
-        })
-      );
 
       return {
         content: [
           {
             type: "text",
-            text: JSON.stringify(results, null, 2)
+            text: JSON.stringify(response.data || {}, null, 2)
           }
         ]
       };
@@ -446,46 +408,21 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         throw new Error('Invalid arguments for write_branch_core_files');
       }
 
-      const config = await workspaceManager.initialize(undefined, branch);
-      branchMemoryBank = new BranchMemoryBank(
-        workspaceManager.getBranchMemoryPath(branch),
-        branch,
-        config
-      );
-      await branchMemoryBank.initialize();
-
-      await branchMemoryBank.writeCoreFiles({ branch, files });
+      await app.getBranchController().writeCoreFiles(branch, files);
       return { content: [{ type: "text", text: "Core files updated successfully" }] };
     }
 
     case "read_global_core_files": {
-      if (!globalMemoryBank) {
-        throw new Error('Global memory bank not initialized');
+      const response = await app.getGlobalController().readCoreFiles();
+      if (response.error) {
+        throw new Error(response.error.message);
       }
-
-      const results = await Promise.all(
-        GLOBAL_CORE_FILES.map(async (file: string) => {
-          try {
-            const doc = await globalMemoryBank!.readDocument(file);
-            return {
-              path: file,
-              content: doc.content,
-              lastModified: doc.lastModified.toISOString()
-            };
-          } catch (error: any) {
-            return {
-              path: file,
-              error: `Failed to read ${file}: ${error?.message || 'Unknown error'}`
-            };
-          }
-        })
-      );
 
       return {
         content: [
           {
             type: "text",
-            text: JSON.stringify(results, null, 2)
+            text: JSON.stringify(Object.values(response.data || {}), null, 2)
           }
         ]
       };
@@ -493,19 +430,17 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
     case "get_recent_branches": {
       const limit = params.limit as number | undefined;
-      const config = await workspaceManager.initialize();
-      branchMemoryBank = new BranchMemoryBank(
-        workspaceManager.getBranchMemoryPath('main'),
-        'main',
-        config
-      );
+      
+      const response = await app.getBranchController().getRecentBranches(limit);
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
 
-      const branches = await branchMemoryBank.getRecentBranches({ limit });
       return {
         content: [
           {
             type: "text",
-            text: JSON.stringify(branches, null, 2)
+            text: JSON.stringify(response.data, null, 2)
           }
         ]
       };
@@ -522,26 +457,17 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         throw new Error('Invalid arguments for create_pull_request');
       }
 
-      // Initialize workspace and branch memory bank
-      const config = await workspaceManager.initialize(undefined, branch);
-      branchMemoryBank = new BranchMemoryBank(
-        workspaceManager.getBranchMemoryPath(branch),
-        branch,
-        config
-      );
-      await branchMemoryBank.initialize();
-
       // Generate pull request content
-      const prContent = await generatePullRequestContent(branchMemoryBank, branch, title, base, language);
+      const prContent = await generatePullRequestContent(app, branch, title, base, language);
 
       // Create the pullRequest.md file
-      await branchMemoryBank.writeDocument('pullRequest.md', prContent.content);
+      await app.getBranchController().writeDocument(branch, 'pullRequest.md', prContent.content);
 
       // Set up response message
       let responseMessage = `pullRequest.md ファイルを作成しました。\n\n`;
       responseMessage += `このファイルをコミットしてプッシュすると、GitHub Actionsによって自動的にPull Requestが作成されます。\n\n`;
       responseMessage += `以下のコマンドを実行してください:\n`;
-      responseMessage += `git add ${workspaceManager.getBranchMemoryPath(branch)}/pullRequest.md\n`;
+      responseMessage += `git add docs/branch-memory-bank/${branch.replace(/\//g, '-')}/pullRequest.md\n`;
       responseMessage += `git commit -m "chore: PR作成準備"\n`;
       responseMessage += `git push\n\n`;
       responseMessage += `PR情報:\n`;
@@ -561,7 +487,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
  * メモリバンクの情報からPRコンテンツを生成する
  */
 async function generatePullRequestContent(
-  memoryBank: BranchMemoryBank,
+  app: Application,
   branch: string,
   customTitle?: string,
   customBase?: string,
@@ -578,12 +504,18 @@ async function generatePullRequestContent(
     const templatePath = path.join(path.dirname(fileURLToPath(import.meta.url)), 'templates', `pull-request-template${language === 'en' ? '-en' : ''}.md`);
     let templateContent = await fs.readFile(templatePath, 'utf-8');
 
-    // メモリバンクから必要なファイルを読み込み
-    const [activeContext, progress, systemPatterns] = await Promise.all([
-      memoryBank.readDocument('activeContext.md').catch(() => ({ content: '', lastModified: new Date() })),
-      memoryBank.readDocument('progress.md').catch(() => ({ content: '', lastModified: new Date() })),
-      memoryBank.readDocument('systemPatterns.md').catch(() => ({ content: '', lastModified: new Date() }))
-    ]);
+    // 新しいアーキテクチャを使用してコアファイルを読み込み
+    const coreFilesResponse = await app.getBranchController().readCoreFiles(branch);
+    if (coreFilesResponse.error) {
+      throw new Error(coreFilesResponse.error.message);
+    }
+
+    const coreFiles = coreFilesResponse.data || {};
+    
+    // 必要なファイルの内容を取得
+    const activeContext = coreFiles['activeContext.md'] ? { content: coreFiles['activeContext.md'].content } : { content: '' };
+    const progress = coreFiles['progress.md'] ? { content: coreFiles['progress.md'].content } : { content: '' };
+    const systemPatterns = coreFiles['systemPatterns.md'] ? { content: coreFiles['systemPatterns.md'].content } : { content: '' };
 
     // 英語の場合はセクション見出しも英語で検索
     const sectionHeaders = language === 'en' ? {
@@ -726,22 +658,16 @@ async function main() {
   logger.debug('Connecting transport...');
   await server.connect(transport);
 
-  logger.debug('Initializing workspace...');
-  const config = await workspaceManager.initialize({
+  logger.debug('Initializing application...');
+  // 新しいアプリケーションの初期化
+  app = await createApplication({
     memoryRoot: argv.docs as string,
-    language: 'ja',
+    language: 'ja', 
     verbose: false
   });
 
-  logger.debug('Initializing global memory bank...');
-  globalMemoryBank = new GlobalMemoryBank(
-    workspaceManager.getGlobalMemoryPath(),
-    config
-  );
-  await globalMemoryBank.initialize();
-
-  logger.info(`Memory Bank MCP Server running on stdio (language: ${config.language})`);
-  logger.info(`Using docs directory: ${config.memoryBankRoot}`);
+  logger.info(`Memory Bank MCP Server running on stdio`);
+  logger.info(`Using new clean architecture implementation`);
 }
 
 main().catch((error) => {
