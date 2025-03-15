@@ -88,6 +88,29 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         }
       },
       {
+        name: "write_global_memory_bank",
+        description: "Write a document to the global memory bank",
+        inputSchema: {
+          type: "object",
+          properties: {
+            path: { type: "string" },
+            content: { type: "string" }
+          },
+          required: ["path"]
+        }
+      },
+      {
+        name: "read_global_memory_bank",
+        description: "Read a document from the global memory bank",
+        inputSchema: {
+          type: "object",
+          properties: {
+            path: { type: "string" }
+          },
+          required: ["path"]
+        }
+      },
+      {
         name: "read_rules",
         description: "Read the memory bank rules in specified language",
         inputSchema: {
@@ -183,6 +206,41 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       return {
         content: [{ type: "text", text: content }],
         _meta: { lastModified: new Date().toISOString() }
+      };
+    }
+
+    case "write_global_memory_bank": {
+      const path = params.path as string;
+      const content = params.content as string | undefined;
+
+      if (!path) {
+        throw new Error('Invalid arguments for write_global_memory_bank');
+      }
+
+      if (!content) {
+        return { content: [{ type: "text", text: "Global memory bank initialized successfully" }] };
+      }
+
+      await globalMemoryBank?.writeDocument(path, content);
+      await globalMemoryBank?.updateTagsIndex();
+      return { content: [{ type: "text", text: "Document written successfully" }] };
+    }
+
+    case "read_global_memory_bank": {
+      const path = params.path as string;
+
+      if (!path) {
+        throw new Error('Invalid arguments for read_global_memory_bank');
+      }
+
+      const doc = await globalMemoryBank?.readDocument(path);
+      if (!doc) {
+        throw new Error(`Document not found: ${path}`);
+      }
+
+      return {
+        content: [{ type: "text", text: doc.content }],
+        _meta: { lastModified: doc.lastModified.toISOString() }
       };
     }
 
