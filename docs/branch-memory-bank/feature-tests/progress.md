@@ -6,19 +6,19 @@
 - BranchMemoryBankのユニットテスト
 - GlobalMemoryBankのユニットテスト
 - WorkspaceManagerのユニットテスト
-- コードカバレッジの向上（80%以上達成）
+- GlobalMemoryBankの統合テストの一部（Document Operations, Tag Operationsなど）
 ## 未実装の機能
 
-- GlobalMemoryBankの統合テストの修正
+- GlobalMemoryBankの統合テストの修正（特にRecentBranches関連）
 - WorkspaceManagerとMemoryBankの連携テストの修正
 - テストドキュメントの作成
 - CIパイプラインの設定
 ## 現在の状態
 
-開発中。基本的なユニットテストはすべて完了し、統合テストも追加しました。テストカバレッジは80%以上に改善されましたが、いくつかのテストがまだ失敗しています。次のステップはテストの安定性を向上させることです。
+開発中。テストの安定性は向上しましたが、まだ8件のテスト失敗があります。
 ## 既知の問題
 
-- GlobalMemoryBankの統合テストで一部失敗が発生しています
-- WorkspaceManagerとMemoryBankの連携テストで一部失敗が発生しています
-- 大きなドキュメントのテストに関する問題があります
-- テスト間の依存性に関する問題が残っています
+- RecentBranchSchemaのパースエラー（日付型の処理に問題）
+- テスト環境での一時的なファイルアクセスエラー
+- 大きなドキュメント処理時のパフォーマンス問題
+- テスト間の依存性による不安定性
