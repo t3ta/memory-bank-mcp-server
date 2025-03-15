@@ -7,7 +7,11 @@
 import { mockFsImplementation } from './fsUtils';
 
 // Mock the Node.js file system module
-jest.mock('fs/promises', () => mockFsImplementation());
+jest.mock('fs/promises');
+
+// Apply mock implementation
+const mockFs = jest.requireMock('fs/promises');
+Object.assign(mockFs, mockFsImplementation());
 
 // Reset mocks between tests
 beforeEach(() => {
