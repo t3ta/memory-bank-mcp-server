@@ -39,9 +39,23 @@ export class BranchMemoryBank extends BaseMemoryBank {
   private async ensureInitialized(): Promise<void> {
     if (this.initialized) return;
 
-    const validation = await this.validateStructure();
-    if (!validation.isValid) {
-      await this.initialize();
+    try {
+      // ディレクトリの存在確認
+      await fs.access(this.basePath);
+      // 既存のディレクトリが存在する場合は初期化をスキップ
+      this.initialized = true;
+      return;
+    } catch {
+      // ディレクトリが存在しない場合のみ初期化を試みる
+      try {
+        await fs.mkdir(this.basePath, { recursive: true });
+        const validation = await this.validateStructure();
+        if (!validation.isValid) {
+          await this.initialize();
+        }
+      } catch {
+        // ディレクトリ作成に失敗した場合は初期化をスキップ
+      }
     }
     this.initialized = true;
   }
