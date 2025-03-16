@@ -85,7 +85,7 @@ export class JsonToMarkdownConverter {
     if (!converter) {
       throw new SharedUtilsError(
         SharedUtilsErrorCodes.CONVERSION_ERROR,
-        `No converter found for document type: ${document.metadata.documentType}`
+        `No converter found for document type: ${document.documentType}`
       );
     }
     
@@ -143,9 +143,9 @@ export class JsonToMarkdownConverter {
    */
   private getCacheKey(document: JsonDocument): string {
     // Use document ID, path, and last modified date as key
-    const lastModified = document.metadata.lastModified instanceof Date
-      ? document.metadata.lastModified.toISOString()
-      : document.metadata.lastModified;
+    const lastModified = document.lastModified instanceof Date
+      ? document.lastModified.toISOString()
+      : document.lastModified;
       
     return `${document.id.value}|${document.path.value}|${lastModified}`;
   }

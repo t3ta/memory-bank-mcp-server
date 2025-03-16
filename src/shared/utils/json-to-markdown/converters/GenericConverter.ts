@@ -125,20 +125,37 @@ export class GenericConverter extends BaseDocumentTypeConverter {
   }
   
   /**
-   * Format a section title from a camelCase or snake_case key
+   * Format a section title from a camelCase, snake_case, or UPPER_CASE key
    * @param key Object property key
    * @returns Formatted section title
    */
   private formatSectionTitle(key: string): string {
-    // Replace underscores and camelCase with spaces
-    const spacedKey = key
-      .replace(/_/g, ' ')
-      .replace(/([a-z])([A-Z])/g, '$1 $2');
-      
-    // Capitalize first letter of each word
+    // Check if the key is kebab-case
+    if (key.includes('-')) {
+      // Just capitalize the first letter for kebab-case
+      return key.charAt(0).toUpperCase() + key.slice(1);
+    }
+    
+    // Handle different case patterns
+    let spacedKey = key;
+    
+    // Replace underscores with spaces (for snake_case and UPPER_CASE)
+    spacedKey = spacedKey.replace(/_/g, ' ');
+    
+    // Add space before capital letters for camelCase
+    spacedKey = spacedKey.replace(/([a-z])([A-Z])/g, '$1 $2');
+    
+    // Split by spaces and capitalize each word
     return spacedKey
       .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .map(word => {
+        // For UPPER_CASE converted to spaces, convert to Title Case
+        if (word === word.toUpperCase() && word.length > 1) {
+          return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        }
+        // Otherwise just capitalize first letter
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      })
       .join(' ');
   }
 }

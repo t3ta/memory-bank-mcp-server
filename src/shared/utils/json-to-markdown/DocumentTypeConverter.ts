@@ -39,7 +39,7 @@ export abstract class BaseDocumentTypeConverter implements IDocumentTypeConverte
    * @returns true if document type matches this converter
    */
   canConvert(document: JsonDocument): boolean {
-    return document.metadata.documentType === this.documentType;
+    return document.documentType === this.documentType;
   }
   
   /**
@@ -52,11 +52,11 @@ export abstract class BaseDocumentTypeConverter implements IDocumentTypeConverte
     const md = builder || new MarkdownBuilder();
     
     // Add document title
-    md.heading(document.metadata.title);
+    md.heading(document.title);
     
     // Add tags if present
-    if (document.metadata.tags && document.metadata.tags.length > 0) {
-      md.tags(document.metadata.tags);
+    if (document.tags && document.tags.length > 0) {
+      md.tags(document.tags.map(tag => tag.value));
     }
     
     // Call implementation specific conversion
