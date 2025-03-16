@@ -1,0 +1,106 @@
+{
+  "id": "rules",
+  "type": "rules",
+  "version": "2.0.0",
+  "titleKey": "template.title.rules",
+  "descriptionKey": "template.description.rules",
+  "sections": [
+    {
+      "id": "global_memory_bank",
+      "titleKey": "template.section.global_memory_bank",
+      "isOptional": false
+    },
+    {
+      "id": "purpose_of_global_memory_bank",
+      "titleKey": "template.section.purpose_of_global_memory_bank",
+      "isOptional": false
+    },
+    {
+      "id": "global_memory_bank_structure",
+      "titleKey": "template.section.global_memory_bank_structure",
+      "isOptional": false
+    },
+    {
+      "id": "tag_system",
+      "titleKey": "template.section.tag_system",
+      "isOptional": false
+    },
+    {
+      "id": "using_global_memory_bank",
+      "titleKey": "template.section.using_global_memory_bank",
+      "isOptional": false
+    },
+    {
+      "id": "referencing_information",
+      "titleKey": "template.section.referencing_information",
+      "isOptional": false
+    },
+    {
+      "id": "adding_and_updating_information",
+      "titleKey": "template.section.adding_and_updating_information",
+      "isOptional": false
+    },
+    {
+      "id": "differences_from_branch_memory_bank",
+      "titleKey": "template.section.differences_from_branch_memory_bank",
+      "isOptional": false
+    },
+    {
+      "id": "information_priority",
+      "titleKey": "template.section.information_priority",
+      "isOptional": false
+    },
+    {
+      "id": "branch_memory_bank",
+      "titleKey": "template.section.branch_memory_bank",
+      "isOptional": false
+    },
+    {
+      "id": "memory_bank_structure",
+      "titleKey": "template.section.memory_bank_structure",
+      "isOptional": false
+    },
+    {
+      "id": "required_files",
+      "titleKey": "template.section.required_files",
+      "isOptional": false
+    },
+    {
+      "id": "additional_context",
+      "titleKey": "template.section.additional_context",
+      "isOptional": false
+    },
+    {
+      "id": "branch_name_retrieval",
+      "titleKey": "template.section.branch_name_retrieval",
+      "isOptional": false
+    },
+    {
+      "id": "core_workflow",
+      "titleKey": "template.section.core_workflow",
+      "isOptional": false
+    },
+    {
+      "id": "session_start_workflow",
+      "titleKey": "template.section.session_start_workflow",
+      "isOptional": false
+    },
+    {
+      "id": "task_progress_workflow",
+      "titleKey": "template.section.task_progress_workflow",
+      "isOptional": false
+    },
+    {
+      "id": "document_updates",
+      "titleKey": "template.section.document_updates",
+      "isOptional": false
+    },
+    {
+      "id": "finally",
+      "titleKey": "template.section.finally",
+      "isOptional": false
+    }
+  ],
+  "createdAt": "2025-03-17T00:00:00Z",
+  "updatedAt": "2025-03-17T00:00:00Z"
+}
