@@ -1,5 +1,8 @@
 import { Argv } from 'yargs';
 import { registerJsonCommands } from './json/index.js';
+import { registerGlobalCommands } from './global/index.js';
+import { registerBranchCommands } from './branch/index.js';
+import { registerUtilCommands } from './utils/index.js';
 
 /**
  * Register all CLI commands with yargs
@@ -7,11 +10,20 @@ import { registerJsonCommands } from './json/index.js';
  * @returns Configured yargs instance with all commands registered
  */
 export function registerAllCommands(yargs: Argv): Argv {
+  // Register each command group
+  let yargsInstance = yargs;
+  
   // Register JSON commands
-  let yargsInstance = registerJsonCommands(yargs);
-
-  // Register other command groups here as they are implemented
-  // Example: yargsInstance = registerMarkdownCommands(yargsInstance);
+  yargsInstance = registerJsonCommands(yargsInstance);
+  
+  // Register Global commands
+  yargsInstance = registerGlobalCommands(yargsInstance);
+  
+  // Register Branch commands
+  yargsInstance = registerBranchCommands(yargsInstance);
+  
+  // Register Utility commands
+  yargsInstance = registerUtilCommands(yargsInstance);
 
   return yargsInstance;
 }
