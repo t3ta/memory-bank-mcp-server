@@ -1,4 +1,5 @@
 import { IBranchController } from './interfaces/IBranchController.js';
+import { DocumentType } from '../../domain/entities/JsonDocument.js';
 import { ReadBranchDocumentUseCase } from '../../application/usecases/branch/ReadBranchDocumentUseCase.js';
 import { WriteBranchDocumentUseCase } from '../../application/usecases/branch/WriteBranchDocumentUseCase.js';
 import { SearchDocumentsByTagsUseCase } from '../../application/usecases/common/SearchDocumentsByTagsUseCase.js';
@@ -730,7 +731,7 @@ export class BranchController implements IBranchController {
 
       const result = await this.writeJsonDocumentUseCase.execute({
         branchName,
-        document,
+        document: {path: document.path || '', title: document.title, documentType: document.documentType, content: document.content, tags: document.tags},
       });
 
       return this.presenter.present(result);
@@ -787,7 +788,7 @@ export class BranchController implements IBranchController {
 
       const result = await this.searchJsonDocumentsUseCase.execute({
         branchName,
-        documentType: options?.type,
+        documentType: options?.type as DocumentType,
         tags: options?.tags,
       });
 
@@ -814,12 +815,12 @@ export class BranchController implements IBranchController {
         );
       }
 
-      const result = await this.searchJsonDocumentsUseCase.execute({
-        branchName,
-        query,
+      // Use the existing list function with tags
+      const result = await this.listJsonDocuments(branchName, {
+        tags: query ? [query] : undefined
       });
 
-      return this.presenter.present(result.documents);
+      return result;
     } catch (error) {
       return this.handleError(error);
     }

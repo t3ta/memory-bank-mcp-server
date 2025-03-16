@@ -1,3 +1,5 @@
+import { DocumentType } from '../../domain/entities/JsonDocument.js';
+
 /**
  * DTO for a JSON document
  * Contains all the fields necessary to represent a document in JSON format
@@ -21,7 +23,7 @@ export interface JsonDocumentDTO {
   /**
    * Document type
    */
-  documentType: string;
+  documentType: DocumentType;
 
   /**
    * Document tags

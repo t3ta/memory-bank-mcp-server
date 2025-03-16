@@ -61,7 +61,7 @@ export interface SearchJsonDocumentsOutput {
     /**
      * Document type
      */
-    documentType: string;
+    documentType: DocumentType;
 
     /**
      * Document tags
@@ -182,7 +182,7 @@ export class SearchJsonDocumentsUseCase
 
       // Set up search parameters
       const matchAllTags = input.matchAllTags ?? false;
-      let documents = [];
+      let documents: any[] = [];
 
       // Tag-based search
       if (input.tags && input.tags.length > 0) {
@@ -204,7 +204,7 @@ export class SearchJsonDocumentsUseCase
         path: doc.path.value,
         title: doc.title,
         documentType: doc.documentType,
-        tags: doc.tags.map((tag) => tag.value),
+        tags: doc.tags.map((tag: { value: string }) => tag.value),
         content: doc.content,
         lastModified: doc.lastModified.toISOString(),
         createdAt: doc.createdAt.toISOString(),

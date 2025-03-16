@@ -56,7 +56,7 @@ export interface ReadJsonDocumentOutput {
     /**
      * Document type
      */
-    documentType: string;
+    documentType: import('../../../domain/entities/JsonDocument.js').DocumentType;
 
     /**
      * Document tags
@@ -94,8 +94,7 @@ export interface ReadJsonDocumentOutput {
  * Use case for reading a JSON document
  */
 export class ReadJsonDocumentUseCase
-  implements IUseCase<ReadJsonDocumentInput, ReadJsonDocumentOutput>
-{
+  implements IUseCase<ReadJsonDocumentInput, ReadJsonDocumentOutput> {
   /**
    * Constructor
    * @param jsonRepository JSON document repository
@@ -104,7 +103,7 @@ export class ReadJsonDocumentUseCase
   constructor(
     private readonly jsonRepository: IJsonDocumentRepository,
     private readonly globalRepository?: IJsonDocumentRepository
-  ) {}
+  ) { }
 
   /**
    * Execute the use case
@@ -124,14 +123,14 @@ export class ReadJsonDocumentUseCase
       // Determine if searching in branch or global memory bank
       const isGlobal = !input.branchName;
       // letに変更: constからletに変えて再代入可能にする
-      let location = isGlobal ? 'global' : input.branchName;
+      let location = isGlobal ? 'global' : input.branchName || 'unknown';
 
       let document: JsonDocument | null = null;
 
       // If searching by ID
       if (input.id) {
         const documentId = DocumentId.create(input.id);
-        
+
         // 修正: グローバル検索の場合はグローバルリポジトリから直接探す
         if (isGlobal) {
           if (!this.globalRepository) {
@@ -144,7 +143,7 @@ export class ReadJsonDocumentUseCase
         } else {
           // ブランチ検索の場合は元の実装通り
           document = await this.jsonRepository.findById(documentId);
-          
+
           if (!document && this.globalRepository) {
             // If not found in branch, try global repository if available
             document = await this.globalRepository.findById(documentId);

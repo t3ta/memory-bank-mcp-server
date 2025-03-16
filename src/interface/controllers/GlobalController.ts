@@ -1,4 +1,5 @@
 import { IGlobalController } from './interfaces/IGlobalController.js';
+import { DocumentType } from '../../domain/entities/JsonDocument.js';
 import { ReadGlobalDocumentUseCase } from '../../application/usecases/global/ReadGlobalDocumentUseCase.js';
 import { WriteGlobalDocumentUseCase } from '../../application/usecases/global/WriteGlobalDocumentUseCase.js';
 import { SearchDocumentsByTagsUseCase } from '../../application/usecases/common/SearchDocumentsByTagsUseCase.js';
@@ -231,7 +232,10 @@ export class GlobalController implements IGlobalController {
    * @param options Options for reading document (path or ID)
    * @returns Promise resolving to MCP response with JSON document
    */
-  async readJsonDocument(options: { path?: string; id?: string }): Promise<MCPResponse<JsonDocumentDTO>> {
+  async readJsonDocument(options: {
+    path?: string;
+    id?: string;
+  }): Promise<MCPResponse<JsonDocumentDTO>> {
     try {
       logger.info(`Reading global JSON document: ${options.path || options.id}`);
 
@@ -272,7 +276,13 @@ export class GlobalController implements IGlobalController {
 
       const result = await this.writeJsonDocumentUseCase.execute({
         branchName: undefined, // Global memory bank
-        document: {path: document.path || '', title: document.title, documentType: document.documentType, content: document.content, tags: document.tags},
+        document: {
+          path: document.path || '',
+          title: document.title,
+          documentType: document.documentType,
+          content: document.content,
+          tags: document.tags,
+        },
       });
 
       return this.presenter.present(result);
@@ -314,7 +324,10 @@ export class GlobalController implements IGlobalController {
    * @param options Options for listing documents (type, tags)
    * @returns Promise resolving to MCP response with list of documents
    */
-  async listJsonDocuments(options?: { type?: string; tags?: string[] }): Promise<MCPResponse<JsonDocumentDTO[]>> {
+  async listJsonDocuments(options?: {
+    type?: string;
+    tags?: string[];
+  }): Promise<MCPResponse<JsonDocumentDTO[]>> {
     try {
       logger.info('Listing global JSON documents');
 
@@ -327,7 +340,7 @@ export class GlobalController implements IGlobalController {
 
       const result = await this.searchJsonDocumentsUseCase.execute({
         branchName: undefined, // Global memory bank
-        documentType: options?.type,
+        documentType: options?.type as DocumentType,
         tags: options?.tags,
       });
 
@@ -342,11 +355,6 @@ export class GlobalController implements IGlobalController {
    * @param query Search query
    * @returns Promise resolving to MCP response with matching documents
    */
-  /**
-   * Search JSON documents in global memory bank
-   * @param query Search query
-   * @returns Promise resolving to MCP response with matching documents
-   */
   async searchJsonDocuments(query: string): Promise<MCPResponse<JsonDocumentDTO[]>> {
     try {
       logger.info(`Searching global JSON documents with query: ${query}`);
@@ -360,35 +368,9 @@ export class GlobalController implements IGlobalController {
 
       const result = await this.searchJsonDocumentsUseCase.execute({
         branchName: undefined, // Global memory bank
-        query
       });
 
       return this.presenter.present(result.documents);
-    } catch (error) {
-      return this.handleError(error);
-    }
-  }
-   * Search JSON documents in global memory bank
-   * @param query Search query
-   * @returns Promise resolving to MCP response with matching documents
-   */
-  async searchJsonDocuments(query: string): Promise<MCPResponse<JsonDocumentDTO[]>> {
-    try {
-      logger.info(`Searching global JSON documents with query: ${query}`);
-
-      if (!this.searchJsonDocumentsUseCase) {
-        throw new ApplicationError(
-          'FEATURE_NOT_AVAILABLE',
-          'JSON document features are not available in this configuration'
-        );
-      }
-
-      // Use the existing list function with tags
-      const result = await this.listJsonDocuments({
-        tags: query ? [query] : undefined
-      });
-
-      return result;
     } catch (error) {
       return this.handleError(error);
     }
