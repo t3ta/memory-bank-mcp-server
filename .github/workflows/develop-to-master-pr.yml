@@ -1,0 +1,76 @@
+name: Create PR from develop to master
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check existing PR
+        id: check-pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          existing_pr=$(gh pr list --base master --head develop --state open --json number -q '.[0].number')
+          if [ ! -z "$existing_pr" ]; then
+            echo "Existing PR found: #$existing_pr"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "No existing PR found"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Pull Request
+        if: steps.check-pr.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # コミットメッセージから変更の種類を判断
+          commit_message="${{ github.event.head_commit.message }}"
+          if [[ "$commit_message" =~ ^feat:|^feature: ]]; then
+            pr_title="✨ feat: Merge develop into master"
+            label="enhancement"
+          elif [[ "$commit_message" =~ ^fix: ]]; then
+            pr_title="🐛 fix: Merge develop into master"
+            label="bug"
+          else
+            pr_title="🔄 chore: Merge develop into master"
+            label="chore"
+          fi
+
+          # 変更ログを生成
+          changes=$(git log master..develop --pretty=format:'- %s' --reverse)
+
+          # 言語を判断（デフォルトは日本語）
+          if [[ "$GITHUB_REPOSITORY" =~ .*-en$ ]]; then
+            template_file="src/templates/develop-to-master-pr-template-en.md"
+          else
+            template_file="src/templates/develop-to-master-pr-template.md"
+          fi
+
+          # テンプレートを読み込んで変更履歴を挿入
+          body=$(cat "$template_file" | sed "s|{{CHANGES}}|$changes|g")
+
+          # PRを作成
+          gh pr create \
+            --base master \
+            --head develop \
+            --title "$pr_title" \
+            --body "$body" \
+            --label "auto-generated" \
+            --label "$label"
+
+          echo "Pull Request created successfully!"
