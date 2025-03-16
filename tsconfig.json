@@ -10,7 +10,9 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "declaration": true,
-    "preserveConstEnums": false
+    "preserveConstEnums": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "include": [
     "src/**/*"

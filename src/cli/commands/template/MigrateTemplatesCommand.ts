@@ -6,7 +6,7 @@ import { Command } from 'commander';
 import { inject, injectable } from 'tsyringe';
 import path from 'path';
 import chalk from 'chalk';
-import { ICommand } from '../../interfaces/ICommand.js';
+import { Argv } from 'yargs';
 import { MarkdownToJsonConverter } from '../../../infrastructure/templates/MarkdownToJsonConverter.js';
 import { IFileSystemService } from '../../../infrastructure/storage/interfaces/IFileSystemService.js';
 import { IConfigProvider } from '../../../infrastructure/config/interfaces/IConfigProvider.js';
@@ -24,7 +24,7 @@ interface TemplateMapping {
  * Command to migrate Markdown templates to JSON format
  */
 @injectable()
-export class MigrateTemplatesCommand implements ICommand {
+export class MigrateTemplatesCommand {
   // Template mappings for known templates
   private readonly templateMappings: TemplateMapping[] = [
     {
@@ -171,7 +171,7 @@ export class MigrateTemplatesCommand implements ICommand {
   constructor(
     @inject('MarkdownToJsonConverter') private readonly converter: MarkdownToJsonConverter,
     @inject('FileSystemService') private readonly fileSystemService: IFileSystemService,
-    @inject('ConfigProvider') private readonly configProvider: IConfigProvider
+    @inject('ConfigProvider') private readonly configProvider: IConfigProvider // This is no longer used but kept for DI
   ) {}
 
   /**
@@ -184,12 +184,19 @@ export class MigrateTemplatesCommand implements ICommand {
   /**
    * Configure command
    */
-  configure(command: Command): Command {
-    return command
-      .description('Migrate Markdown templates to JSON format')
-      .option('-t, --template <template-id>', 'ID of specific template to migrate')
-      .option('-f, --force', 'Overwrite existing JSON templates', false)
-      .option('-d, --dry-run', 'Show what would be migrated without making changes', false);
+  configure(command: Command | Argv): Command | Argv {
+    if (command instanceof Command) {
+      return command
+        .description('Migrate Markdown templates to JSON format')
+        .option('-t, --template <template-id>', 'ID of specific template to migrate')
+        .option('-f, --force', 'Overwrite existing JSON templates', false)
+        .option('-d, --dry-run', 'Show what would be migrated without making changes', false);
+    } else {
+      return command
+        .option('template', { alias: 't', describe: 'ID of specific template to migrate', type: 'string' })
+        .option('force', { alias: 'f', describe: 'Overwrite existing JSON templates', type: 'boolean', default: false })
+        .option('dry-run', { alias: 'd', describe: 'Show what would be migrated without making changes', type: 'boolean', default: false });
+    }
   }
 
   /**
@@ -210,7 +217,7 @@ export class MigrateTemplatesCommand implements ICommand {
     }
 
     // Create output directory if it doesn't exist
-    const jsonDir = path.join(this.configProvider.getRootPath(), this.jsonTemplateDir);
+    const jsonDir = path.join(process.cwd(), this.jsonTemplateDir);
     if (!dryRun) {
       await this.ensureDirectoryExists(jsonDir);
     }
@@ -231,7 +238,7 @@ export class MigrateTemplatesCommand implements ICommand {
 
     // Check if output file already exists
     const outputPath = path.join(
-      this.configProvider.getRootPath(),
+      process.cwd(),
       this.jsonTemplateDir,
       `${mapping.id}.json`
     );
@@ -248,7 +255,7 @@ export class MigrateTemplatesCommand implements ICommand {
 
     for (const [language, legacyPath] of Object.entries(mapping.legacyPaths)) {
       try {
-        const fullPath = path.join(this.configProvider.getRootPath(), this.legacyTemplateDir, legacyPath);
+        const fullPath = path.join(process.cwd(), this.legacyTemplateDir, legacyPath);
         const content = await this.fileSystemService.readFile(fullPath);
         console.log(chalk.green(`  Loaded ${language} template from ${fullPath}`));
         languageContents[language] = content;

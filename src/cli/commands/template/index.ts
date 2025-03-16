@@ -3,8 +3,8 @@
  */
 import { Argv } from 'yargs';
 import { container } from 'tsyringe';
+// CommandBase is not needed here
 import { MigrateTemplatesCommand } from './MigrateTemplatesCommand.js';
-import { ICommand } from '../../interfaces/ICommand.js';
 
 export const templateCommands = [
   MigrateTemplatesCommand
@@ -20,12 +20,12 @@ export function registerTemplateCommands(yargs: Argv): Argv {
 
   // Register each template command
   for (const CommandClass of templateCommands) {
-    const command = container.resolve<ICommand>(CommandClass);
-    yargsInstance = yargsInstance.command(
-      command.name,
-      command.configure(yargs.command(command.name)).description,
-      (args) => command.configure(args),
-      async (argv) => {
+    const command = container.resolve<MigrateTemplatesCommand>(CommandClass);
+    yargsInstance = yargsInstance.command({
+      command: command.name,
+      describe: 'Migrate Markdown templates to JSON format',
+      builder: (args: Argv) => command.configure(args) as Argv,
+      handler: async (argv: any) => {
         try {
           await command.execute(argv);
         } catch (error) {
@@ -33,7 +33,7 @@ export function registerTemplateCommands(yargs: Argv): Argv {
           process.exit(1);
         }
       }
-    );
+    });
   }
 
   return yargsInstance;
