@@ -9,6 +9,7 @@ import { ReadBranchDocumentUseCase } from '../../application/usecases/branch/Rea
 import { WriteBranchDocumentUseCase } from '../../application/usecases/branch/WriteBranchDocumentUseCase.js';
 import { SearchDocumentsByTagsUseCase } from '../../application/usecases/common/SearchDocumentsByTagsUseCase.js';
 import { UpdateTagIndexUseCase } from '../../application/usecases/common/UpdateTagIndexUseCase.js';
+import { UpdateTagIndexUseCaseV2 } from '../../application/usecases/common/UpdateTagIndexUseCaseV2.js';
 import { GetRecentBranchesUseCase } from '../../application/usecases/common/GetRecentBranchesUseCase.js';
 import { ReadBranchCoreFilesUseCase } from '../../application/usecases/common/ReadBranchCoreFilesUseCase.js';
 import { CreateBranchCoreFilesUseCase } from '../../application/usecases/common/CreateBranchCoreFilesUseCase.js';
@@ -21,6 +22,7 @@ import { IConfigProvider } from '../../infrastructure/config/interfaces/IConfigP
 import { ConfigProvider } from '../../infrastructure/config/ConfigProvider.js';
 import { FileSystemGlobalMemoryBankRepository } from '../../infrastructure/repositories/file-system/FileSystemGlobalMemoryBankRepository.js';
 import { FileSystemBranchMemoryBankRepository } from '../../infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.js';
+import { FileSystemTagIndexRepository } from '../../infrastructure/repositories/file-system/FileSystemTagIndexRepository.js';
 
 // Interface layer
 import { MCPResponsePresenter } from '../../interface/presenters/MCPResponsePresenter.js';
@@ -63,6 +65,25 @@ export async function registerInfrastructureServices(
     const configProvider = container.get<IConfigProvider>('configProvider');
 
     return new FileSystemBranchMemoryBankRepository(fileSystemService, configProvider);
+  });
+
+  // Register tag index repository
+  container.registerFactory('tagIndexRepository', () => {
+    const fileSystemService = container.get<IFileSystemService>('fileSystemService');
+    const configProvider = container.get<IConfigProvider>('configProvider');
+    const globalRepository = container.get('globalMemoryBankRepository') as FileSystemGlobalMemoryBankRepository;
+    const branchRepository = container.get('branchMemoryBankRepository') as FileSystemBranchMemoryBankRepository;
+    
+    const branchMemoryBankRoot = configProvider.getBranchMemoryBankPath();
+    const globalMemoryBankPath = configProvider.getGlobalMemoryBankPath();
+    
+    return new FileSystemTagIndexRepository(
+      fileSystemService,
+      branchMemoryBankRoot,
+      globalMemoryBankPath,
+      branchRepository,
+      globalRepository
+    );
   });
 }
 
@@ -131,6 +152,20 @@ export function registerApplicationServices(container: DIContainer): void {
     ) as FileSystemBranchMemoryBankRepository;
 
     return new UpdateTagIndexUseCase(globalRepository, branchRepository);
+  });
+  
+  // Register the V2 version of the UpdateTagIndexUseCase
+  container.registerFactory('updateTagIndexUseCaseV2', () => {
+    // Use explicit type assertion for proper type safety
+    const globalRepository = container.get(
+      'globalMemoryBankRepository'
+    ) as FileSystemGlobalMemoryBankRepository;
+    const branchRepository = container.get(
+      'branchMemoryBankRepository'
+    ) as FileSystemBranchMemoryBankRepository;
+    const tagIndexRepository = container.get('tagIndexRepository') as FileSystemTagIndexRepository;
+
+    return new UpdateTagIndexUseCaseV2(globalRepository, branchRepository, tagIndexRepository);
   });
 
   container.registerFactory('getRecentBranchesUseCase', () => {
@@ -206,12 +241,16 @@ export function registerInterfaceServices(container: DIContainer): void {
     const updateTagIndexUseCase = container.get('updateTagIndexUseCase') as UpdateTagIndexUseCase;
     const presenter = container.get('mcpResponsePresenter') as MCPResponsePresenter;
 
+    // Get update tag index use case V2
+    const updateTagIndexUseCaseV2 = container.get('updateTagIndexUseCaseV2') as UpdateTagIndexUseCaseV2;
+    
     return new GlobalController(
       readGlobalDocumentUseCase,
       writeGlobalDocumentUseCase,
       searchDocumentsByTagsUseCase,
-      updateTagIndexUseCase,
-      presenter
+      updateTagIndexUseCase, // Keep V1 for backwards compatibility
+      presenter,
+      { updateTagIndexUseCaseV2 } // Pass V2 as an optional dependency
     );
   });
 
@@ -238,15 +277,19 @@ export function registerInterfaceServices(container: DIContainer): void {
     ) as CreateBranchCoreFilesUseCase;
     const presenter = container.get('mcpResponsePresenter') as MCPResponsePresenter;
 
+    // Get update tag index use case V2
+    const updateTagIndexUseCaseV2 = container.get('updateTagIndexUseCaseV2') as UpdateTagIndexUseCaseV2;
+    
     return new BranchController(
       readBranchDocumentUseCase,
       writeBranchDocumentUseCase,
       searchDocumentsByTagsUseCase,
-      updateTagIndexUseCase,
+      updateTagIndexUseCase, // Keep V1 for backwards compatibility
       getRecentBranchesUseCase,
       readBranchCoreFilesUseCase,
       createBranchCoreFilesUseCase,
-      presenter
+      presenter,
+      { updateTagIndexUseCaseV2 } // Pass V2 as an optional dependency
     );
   });
 }

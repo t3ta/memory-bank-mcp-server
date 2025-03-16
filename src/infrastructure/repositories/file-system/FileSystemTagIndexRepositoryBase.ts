@@ -43,7 +43,9 @@ export class FileSystemTagIndexRepository implements ITagIndexRepository {
   constructor(
     protected readonly fileSystem: FileSystemService,
     protected readonly branchMemoryBankRoot: string,
-    protected readonly globalMemoryBankPath: string
+    protected readonly globalMemoryBankPath: string,
+    protected readonly branchRepository: IBranchMemoryBankRepository,
+    protected readonly globalRepository: IGlobalMemoryBankRepository
   ) {}
 
   /**

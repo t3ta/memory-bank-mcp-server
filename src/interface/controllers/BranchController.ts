@@ -3,6 +3,7 @@ import { ReadBranchDocumentUseCase } from '../../application/usecases/branch/Rea
 import { WriteBranchDocumentUseCase } from '../../application/usecases/branch/WriteBranchDocumentUseCase.js';
 import { SearchDocumentsByTagsUseCase } from '../../application/usecases/common/SearchDocumentsByTagsUseCase.js';
 import { UpdateTagIndexUseCase } from '../../application/usecases/common/UpdateTagIndexUseCase.js';
+import { UpdateTagIndexUseCaseV2 } from '../../application/usecases/common/UpdateTagIndexUseCaseV2.js';
 import { GetRecentBranchesUseCase } from '../../application/usecases/common/GetRecentBranchesUseCase.js';
 import { ReadBranchCoreFilesUseCase } from '../../application/usecases/common/ReadBranchCoreFilesUseCase.js';
 import { CreateBranchCoreFilesUseCase } from '../../application/usecases/common/CreateBranchCoreFilesUseCase.js';
@@ -39,6 +40,9 @@ export class BranchController implements IBranchController {
    * @param createBranchCoreFilesUseCase Use case for creating branch core files
    * @param presenter Response presenter
    */
+  // Optional dependencies
+  private readonly updateTagIndexUseCaseV2?: UpdateTagIndexUseCaseV2;
+  
   constructor(
     private readonly readBranchDocumentUseCase: ReadBranchDocumentUseCase,
     private readonly writeBranchDocumentUseCase: WriteBranchDocumentUseCase,
@@ -47,8 +51,14 @@ export class BranchController implements IBranchController {
     private readonly getRecentBranchesUseCase: GetRecentBranchesUseCase,
     private readonly readBranchCoreFilesUseCase: ReadBranchCoreFilesUseCase,
     private readonly createBranchCoreFilesUseCase: CreateBranchCoreFilesUseCase,
-    private readonly presenter: MCPResponsePresenter
-  ) {}
+    private readonly presenter: MCPResponsePresenter,
+    options?: {
+      updateTagIndexUseCaseV2?: UpdateTagIndexUseCaseV2;
+    }
+  ) {
+    // Set optional dependencies
+    this.updateTagIndexUseCaseV2 = options?.updateTagIndexUseCaseV2;
+  }
 
   /**
    * Read document from branch memory bank
@@ -301,12 +311,22 @@ export class BranchController implements IBranchController {
         `Updating tags index for branch ${branchName} (fullRebuild: ${fullRebuild ? 'yes' : 'no'})`
       );
 
-      const result = await this.updateTagIndexUseCase.execute({
-        branchName,
-        fullRebuild,
-      });
-
-      return this.presenter.present(result);
+      // Use V2 if available, otherwise fall back to V1
+      if (this.updateTagIndexUseCaseV2) {
+        logger.info('Using UpdateTagIndexUseCaseV2 for branch tag index update');
+        const result = await this.updateTagIndexUseCaseV2.execute({
+          branchName,
+          fullRebuild,
+        });
+        return this.presenter.present(result);
+      } else {
+        logger.info('Using UpdateTagIndexUseCase (V1) for branch tag index update');
+        const result = await this.updateTagIndexUseCase.execute({
+          branchName,
+          fullRebuild,
+        });
+        return this.presenter.present(result);
+      }
     } catch (error) {
       return this.handleError(error);
     }

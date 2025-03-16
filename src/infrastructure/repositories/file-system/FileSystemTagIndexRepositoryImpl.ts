@@ -38,20 +38,22 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
       ? this.createEmptyBranchIndex(branchInfo)
       : await this.readBranchIndex(branchInfo) || this.createEmptyBranchIndex(branchInfo);
     
-    // Get all documents in branch
-    const documentsMap = new Map<string, MemoryDocument | JsonDocument>();
-    const documents: (MemoryDocument | JsonDocument)[] = [];
-    
     try {
-      // This is just a placeholder - in a real implementation,
-      // we would need to get all documents from the branch repository
-      // This would be injected as a dependency
-      // For now, we'll leave this empty and focus on the interface design
+      // Get all documents in branch
+      const documentsMap = new Map<string, MemoryDocument | JsonDocument>();
+      const documentPaths = await this.branchRepository.listDocuments(branchInfo);
+      const documents: (MemoryDocument | JsonDocument)[] = [];
       
-      // Process all documents
-      for (const document of documents) {
-        documentsMap.set(document.path.value, document);
+      // Load all documents from the repository
+      for (const path of documentPaths) {
+        const document = await this.branchRepository.getDocument(branchInfo, path);
+        if (document) {
+          documents.push(document);
+          documentsMap.set(document.path.value, document);
+        }
       }
+      
+      logger.info(`Loaded ${documents.length} documents from branch: ${branchInfo.name}`);
       
       // Build the index
       const tagEntries = [];
@@ -122,20 +124,22 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
       ? this.createEmptyGlobalIndex()
       : await this.readGlobalIndex() || this.createEmptyGlobalIndex();
     
-    // Get all documents in global memory bank
-    const documentsMap = new Map<string, MemoryDocument | JsonDocument>();
-    const documents: (MemoryDocument | JsonDocument)[] = [];
-    
     try {
-      // This is just a placeholder - in a real implementation,
-      // we would need to get all documents from the global repository
-      // This would be injected as a dependency
-      // For now, we'll leave this empty and focus on the interface design
+      // Get all documents in global memory bank
+      const documentsMap = new Map<string, MemoryDocument | JsonDocument>();
+      const documentPaths = await this.globalRepository.listDocuments();
+      const documents: (MemoryDocument | JsonDocument)[] = [];
       
-      // Process all documents
-      for (const document of documents) {
-        documentsMap.set(document.path.value, document);
+      // Load all documents from the repository
+      for (const path of documentPaths) {
+        const document = await this.globalRepository.getDocument(path);
+        if (document) {
+          documents.push(document);
+          documentsMap.set(document.path.value, document);
+        }
       }
+      
+      logger.info(`Loaded ${documents.length} documents from global memory bank`);
       
       // Build the index
       const tagEntries = [];

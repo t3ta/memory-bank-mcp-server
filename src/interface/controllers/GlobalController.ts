@@ -3,6 +3,7 @@ import { ReadGlobalDocumentUseCase } from '../../application/usecases/global/Rea
 import { WriteGlobalDocumentUseCase } from '../../application/usecases/global/WriteGlobalDocumentUseCase.js';
 import { SearchDocumentsByTagsUseCase } from '../../application/usecases/common/SearchDocumentsByTagsUseCase.js';
 import { UpdateTagIndexUseCase } from '../../application/usecases/common/UpdateTagIndexUseCase.js';
+import { UpdateTagIndexUseCaseV2 } from '../../application/usecases/common/UpdateTagIndexUseCaseV2.js';
 import { MCPResponsePresenter } from '../presenters/MCPResponsePresenter.js';
 import { MCPResponse } from '../presenters/types/index.js';
 import { DocumentDTO } from '../../application/dtos/index.js';
@@ -23,13 +24,22 @@ export class GlobalController implements IGlobalController {
    * @param writeGlobalDocumentUseCase Use case for writing global documents
    * @param presenter Response presenter
    */
+  // Optional dependencies
+  private readonly updateTagIndexUseCaseV2?: UpdateTagIndexUseCaseV2;
+  
   constructor(
     private readonly readGlobalDocumentUseCase: ReadGlobalDocumentUseCase,
     private readonly writeGlobalDocumentUseCase: WriteGlobalDocumentUseCase,
     private readonly searchDocumentsByTagsUseCase: SearchDocumentsByTagsUseCase,
     private readonly updateTagIndexUseCase: UpdateTagIndexUseCase,
-    private readonly presenter: MCPResponsePresenter
-  ) {}
+    private readonly presenter: MCPResponsePresenter,
+    options?: {
+      updateTagIndexUseCaseV2?: UpdateTagIndexUseCaseV2;
+    }
+  ) {
+    // Set optional dependencies
+    this.updateTagIndexUseCaseV2 = options?.updateTagIndexUseCaseV2;
+  }
 
   /**
    * Read document from global memory bank
@@ -126,12 +136,22 @@ export class GlobalController implements IGlobalController {
     try {
       logger.info('Updating global tags index');
 
-      const result = await this.updateTagIndexUseCase.execute({
-        branchName: undefined, // Global memory bank
-        fullRebuild: true,
-      });
-
-      return this.presenter.present(result);
+      // Use V2 if available, otherwise fall back to V1
+      if (this.updateTagIndexUseCaseV2) {
+        logger.info('Using UpdateTagIndexUseCaseV2 for global tag index update');
+        const result = await this.updateTagIndexUseCaseV2.execute({
+          branchName: undefined, // Global memory bank
+          fullRebuild: true,
+        });
+        return this.presenter.present(result);
+      } else {
+        logger.info('Using UpdateTagIndexUseCase (V1) for global tag index update');
+        const result = await this.updateTagIndexUseCase.execute({
+          branchName: undefined, // Global memory bank
+          fullRebuild: true,
+        });
+        return this.presenter.present(result);
+      }
     } catch (error) {
       return this.handleError(error);
     }
