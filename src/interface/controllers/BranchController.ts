@@ -81,7 +81,7 @@ export class BranchController implements IBranchController {
     try {
       logger.info(`Writing document to branch ${branchName}: ${path}`);
       
-      await this.writeBranchDocumentUseCase.execute({
+      const result = await this.writeBranchDocumentUseCase.execute({
         branchName,
         document: {
           path,
@@ -90,7 +90,7 @@ export class BranchController implements IBranchController {
         }
       });
       
-      return this.presenter.present({ success: true });
+      return this.presenter.present(result);
     } catch (error) {
       return this.handleError(error);
     }
@@ -227,14 +227,15 @@ export class BranchController implements IBranchController {
       }
       
       // Use the new CreateBranchCoreFilesUseCase
+      let result;
       if (Object.keys(coreFiles).length > 0) {
-        await this.createBranchCoreFilesUseCase.execute({
+        result = await this.createBranchCoreFilesUseCase.execute({
           branchName,
           files: coreFiles
         });
       }
       
-      return this.presenter.present({ success: true });
+      return this.presenter.present(result);
     } catch (error) {
       return this.handleError(error);
     }

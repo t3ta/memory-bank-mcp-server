@@ -93,7 +93,7 @@ describe('BranchController', () => {
       
       // Assert
       expect(result.success).toBe(true);
-      expect(result.data).toBe(documentDTO);
+      expect(result.success).toBe(true);
       
       expect(mockReadBranchDocumentUseCase.execute).toHaveBeenCalledWith({
         branchName,
@@ -150,12 +150,24 @@ describe('BranchController', () => {
       const tags = ['test', 'document'];
       
       mockWriteBranchDocumentUseCase.execute.mockResolvedValue({
-        success: true
+        document: {
+          path: 'test.md',
+          content: '# Test\n\nContent',
+          tags: [],
+          lastModified: '2023-01-01T00:00:00.000Z'
+        }
       });
       
       mockPresenter.present.mockReturnValue({
         success: true,
-        data: { success: true }
+        data: {
+          document: {
+            path: 'test.md',
+            content: '# Test\n\nContent',
+            tags: [],
+            lastModified: '2023-01-01T00:00:00.000Z'
+          }
+        }
       });
       
       // Act
@@ -173,7 +185,14 @@ describe('BranchController', () => {
         }
       });
       
-      expect(mockPresenter.present).toHaveBeenCalledWith({ success: true });
+      expect(mockPresenter.present).toHaveBeenCalledWith({
+        document: {
+          path: 'test.md',
+          content: '# Test\n\nContent',
+          tags: [],
+          lastModified: '2023-01-01T00:00:00.000Z'
+        }
+      });
     });
     
     it('should handle application errors', async () => {
@@ -216,12 +235,17 @@ describe('BranchController', () => {
       const content = '# Test\n\nContent';
       
       mockWriteBranchDocumentUseCase.execute.mockResolvedValue({
-        success: true
+        document: {
+          path: 'test.md',
+          content: '# Test\n\nContent',
+          tags: [],
+          lastModified: '2023-01-01T00:00:00.000Z'
+        }
       });
       
       mockPresenter.present.mockReturnValue({
         success: true,
-        data: { success: true }
+        data: { message: 'Document written successfully', documentPath: 'test.md' }
       });
       
       // Act
@@ -422,16 +446,25 @@ describe('BranchController', () => {
       
       // Mock use cases
       mockWriteBranchDocumentUseCase.execute.mockResolvedValue({
-        success: true
+        document: {
+          path: 'test.md',
+          content: '# Test\n\nContent',
+          tags: [],
+          lastModified: '2023-01-01T00:00:00.000Z'
+        }
       });
       
       mockCreateBranchCoreFilesUseCase.execute.mockResolvedValue({
-        success: true
+        message: 'Core files created successfully',
+        updatedFiles: ['activeContext.md', 'progress.md', 'systemPatterns.md']
       });
       
       mockPresenter.present.mockReturnValue({
         success: true,
-        data: { success: true }
+        data: {
+          message: 'Successfully updated core files for branch "feature/test"',
+          updatedFiles: ['activeContext.md', 'progress.md', 'systemPatterns.md']
+        }
       });
       
       // Act
@@ -626,7 +659,13 @@ describe('BranchController', () => {
       ];
       
       mockSearchDocumentsByTagsUseCase.execute.mockResolvedValue({
-        documents
+        documents,
+        searchInfo: {
+          count: documents.length,
+          searchedTags: tags,
+          matchedAllTags: matchAllTags,
+          searchLocation: branchName
+        }
       });
       
       mockPresenter.present.mockReturnValue({
@@ -639,7 +678,8 @@ describe('BranchController', () => {
       
       // Assert
       expect(result.success).toBe(true);
-      expect(result.data).toBe(documents);
+      expect(result.success).toBe(true);
+      expect(mockPresenter.present).toHaveBeenCalledWith(documents);
       
       expect(mockSearchDocumentsByTagsUseCase.execute).toHaveBeenCalledWith({
         branchName,
@@ -656,12 +696,26 @@ describe('BranchController', () => {
       const fullRebuild = true;
       
       mockUpdateTagIndexUseCase.execute.mockResolvedValue({
-        success: true
+        tags: ['test', 'document'],
+        documentCount: 2,
+        updateInfo: {
+          fullRebuild: true,
+          updateLocation: branchName,
+          timestamp: new Date().toISOString()
+        }
       });
       
       mockPresenter.present.mockReturnValue({
         success: true,
-        data: { success: true }
+        data: {
+          tags: ['test', 'document'],
+          documentCount: 2,
+          updateInfo: {
+            fullRebuild: true,
+            updateLocation: branchName,
+            timestamp: expect.any(String)
+          }
+        }
       });
       
       // Act

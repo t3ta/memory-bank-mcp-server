@@ -1,10 +1,10 @@
-import { WriteGlobalDocumentUseCase } from '../WriteGlobalDocumentUseCase';
-import { IGlobalMemoryBankRepository } from '../../../../domain/repositories/IGlobalMemoryBankRepository';
-import { MemoryDocument } from '../../../../domain/entities/MemoryDocument';
-import { DocumentPath } from '../../../../domain/entities/DocumentPath';
-import { Tag } from '../../../../domain/entities/Tag';
-import { DomainError } from '../../../../shared/errors/DomainError';
-import { ApplicationError, ApplicationErrorCodes } from '../../../../shared/errors/ApplicationError';
+import { WriteGlobalDocumentUseCase } from '../WriteGlobalDocumentUseCase.js';
+import { IGlobalMemoryBankRepository } from '../../../../domain/repositories/IGlobalMemoryBankRepository.js';
+import { MemoryDocument } from '../../../../domain/entities/MemoryDocument.js';
+import { DocumentPath } from '../../../../domain/entities/DocumentPath.js';
+import { Tag } from '../../../../domain/entities/Tag.js';
+import { DomainError } from '../../../../shared/errors/DomainError.js';
+import { ApplicationError, ApplicationErrorCodes } from '../../../../shared/errors/ApplicationError.js';
 
 // Mock repository
 const mockGlobalRepository: jest.Mocked<IGlobalMemoryBankRepository> = {

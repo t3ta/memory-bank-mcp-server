@@ -135,8 +135,7 @@ export class SearchDocumentsByTagsUseCase implements IUseCase<SearchDocumentsByT
         path: doc.path.value,
         content: doc.content,
         tags: doc.tags.map(tag => tag.value),
-        lastModified: doc.lastModified.toISOString(),
-        title: doc.title
+        lastModified: doc.lastModified.toISOString()
       }));
       
       return {
