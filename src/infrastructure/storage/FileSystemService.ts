@@ -92,7 +92,9 @@ export class FileSystemService implements IFileSystemService {
     try {
       const stats = await fs.stat(filePath);
       return stats.isFile();
-    } catch (_) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_error) {
+      // エラーをキャッチしたが使わない場合は戻り値のみを返す
       return false;
     }
   }
@@ -167,7 +169,9 @@ export class FileSystemService implements IFileSystemService {
     try {
       const stats = await fs.stat(dirPath);
       return stats.isDirectory();
-    } catch (_) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_error) {
+      // エラーをキャッチしたが使わない場合は戻り値のみを返す
       return false;
     }
   }

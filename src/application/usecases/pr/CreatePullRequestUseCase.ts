@@ -4,7 +4,7 @@ import { PullRequestDTO } from '../../dtos/PullRequestDTO.js';
 import {
   ICreatePullRequestUseCase,
   CreatePullRequestInput,
-  CreatePullRequestOutput
+  CreatePullRequestOutput,
 } from './ICreatePullRequestUseCase.js';
 import { ApplicationError } from '../../../shared/errors/ApplicationError.js';
 import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
@@ -23,7 +23,7 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
    */
   private readonly TEMPLATES = {
     ja: 'pull-request-template.md',
-    en: 'pull-request-template-en.md'
+    en: 'pull-request-template-en.md',
   };
 
   constructor(
@@ -40,18 +40,12 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
 
       // Validate branch name
       if (!branch) {
-        throw new ApplicationError(
-          'INVALID_INPUT',
-          'Branch name is required'
-        );
+        throw new ApplicationError('INVALID_INPUT', 'Branch name is required');
       }
 
       // Validate language
       if (language !== 'ja' && language !== 'en') {
-        throw new ApplicationError(
-          'INVALID_INPUT',
-          'Language must be either "ja" or "en"'
-        );
+        throw new ApplicationError('INVALID_INPUT', 'Language must be either "ja" or "en"');
       }
 
       // Create domain objects
@@ -60,10 +54,7 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
       // Check if branch exists
       const branchExists = await this.branchRepository.exists(branch);
       if (!branchExists) {
-        throw new ApplicationError(
-          'BRANCH_NOT_FOUND',
-          `Branch "${branch}" not found`
-        );
+        throw new ApplicationError('BRANCH_NOT_FOUND', `Branch "${branch}" not found`);
       }
 
       // Generate PR content
@@ -84,14 +75,11 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
         path: documentPath,
         content: pullRequest.content,
         tags: [Tag.create('pull-request')],
-        lastModified: new Date()
+        lastModified: new Date(),
       });
 
       // Write pullRequest.md to branch memory bank
-      await this.branchRepository.saveDocument(
-        branchInfo,
-        document
-      );
+      await this.branchRepository.saveDocument(branchInfo, document);
 
       // Update return value with file path
       pullRequest.filePath = `docs/branch-memory-bank/${branch.replace('/', '-')}/${prFilePath}`;
@@ -159,29 +147,32 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
     const progressContent = progress.content;
 
     // Extract sections based on language
-    const sectionHeaders = language === 'en' ? {
-      currentWork: '## Current Work',
-      recentChanges: '## Recent Changes',
-      activeDecisions: '## Active Decisions',
-      considerations: '## Considerations',
-      workingFeatures: '## Working Features',
-      knownIssues: '## Known Issues',
-      nextSteps: '## Next Steps',
-      techDecisions: '## Technical Decisions'
-    } : {
-      currentWork: '## 現在の作業内容',
-      recentChanges: '## 最近の変更点',
-      activeDecisions: '## アクティブな決定事項',
-      considerations: '## 検討事項',
-      workingFeatures: '## 動作している機能',
-      knownIssues: '## 既知の問題',
-      nextSteps: '## 次のステップ',
-      techDecisions: '## 技術的決定事項'
-    };
+    const sectionHeaders =
+      language === 'en'
+        ? {
+            currentWork: '## Current Work',
+            recentChanges: '## Recent Changes',
+            activeDecisions: '## Active Decisions',
+            considerations: '## Considerations',
+            workingFeatures: '## Working Features',
+            knownIssues: '## Known Issues',
+            nextSteps: '## Next Steps',
+            techDecisions: '## Technical Decisions',
+          }
+        : {
+            currentWork: '## 現在の作業内容',
+            recentChanges: '## 最近の変更点',
+            activeDecisions: '## アクティブな決定事項',
+            considerations: '## 検討事項',
+            workingFeatures: '## 動作している機能',
+            knownIssues: '## 既知の問題',
+            nextSteps: '## 次のステップ',
+            techDecisions: '## 技術的決定事項',
+          };
 
     // Extract current work for title if custom title not provided
     let title = customTitle || '';
-    let currentWork = this.extractSection(activeContextContent, sectionHeaders.currentWork);
+    const currentWork = this.extractSection(activeContextContent, sectionHeaders.currentWork);
 
     if (!title && currentWork) {
       const firstLine = currentWork.split('\n')[0];
@@ -198,8 +189,8 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
     }
 
     // Determine base branch if not specified
-    const baseBranch = customBaseBranch ||
-      (branchInfo.name.startsWith('feature/') ? 'develop' : 'master');
+    const baseBranch =
+      customBaseBranch || (branchInfo.name.startsWith('feature/') ? 'develop' : 'master');
 
     // Get technical decisions from systemPatterns efficiently (without loading entire file)
     let technicalDecisions = '';
@@ -209,7 +200,7 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
         // Check if systemPatterns file exists using listDocuments()
         const allDocuments = await this.branchRepository.listDocuments(branchInfo);
         const systemPatternsExists = allDocuments.some(
-          docPath => docPath.value === systemPatternsPath.value
+          (docPath) => docPath.value === systemPatternsPath.value
         );
 
         if (systemPatternsExists) {
@@ -223,12 +214,13 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
           );
 
           if (recentDecisions.length > 0) {
-            const sectionHeader = language === 'en' ? '## Technical Decisions' : '## 技術的決定事項';
+            const sectionHeader =
+              language === 'en' ? '## Technical Decisions' : '## 技術的決定事項';
             technicalDecisions = `${sectionHeader}\n\n${this.formatDecisions(recentDecisions)}`;
           }
         }
       } else {
-        console.log('Skipping system patterns extraction as requested');
+        console.info('Skipping system patterns extraction as requested');
       }
     } catch (error) {
       // If we encounter an error, log it but continue without the technical decisions
@@ -240,10 +232,16 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
     const replacements: Record<string, string> = {
       '{{CURRENT_WORK}}': currentWork,
       '{{RECENT_CHANGES}}': this.extractSection(activeContextContent, sectionHeaders.recentChanges),
-      '{{ACTIVE_DECISIONS}}': this.extractSection(activeContextContent, sectionHeaders.activeDecisions),
-      '{{CONSIDERATIONS}}': this.extractSection(activeContextContent, sectionHeaders.considerations),
+      '{{ACTIVE_DECISIONS}}': this.extractSection(
+        activeContextContent,
+        sectionHeaders.activeDecisions
+      ),
+      '{{CONSIDERATIONS}}': this.extractSection(
+        activeContextContent,
+        sectionHeaders.considerations
+      ),
       '{{WORKING_FEATURES}}': this.extractSection(progressContent, sectionHeaders.workingFeatures),
-      '{{KNOWN_ISSUES}}': this.extractSection(progressContent, sectionHeaders.knownIssues)
+      '{{KNOWN_ISSUES}}': this.extractSection(progressContent, sectionHeaders.knownIssues),
     };
 
     // Only add technical decisions if we have them
@@ -283,7 +281,10 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
       labels.push('bug');
     } else if (title.toLowerCase().includes('feat:') || title.toLowerCase().includes('機能')) {
       labels.push('enhancement');
-    } else if (title.toLowerCase().includes('doc:') || title.toLowerCase().includes('ドキュメント')) {
+    } else if (
+      title.toLowerCase().includes('doc:') ||
+      title.toLowerCase().includes('ドキュメント')
+    ) {
       labels.push('documentation');
     }
 
@@ -291,14 +292,13 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
     const prReadyMsg = language === 'en' ? '# PR Ready\n\n' : '# PRの準備完了\n\n';
 
     // Generate final content with metadata
-    const finalContent =
-      `${prReadyMsg}#title: ${title}\n#targetBranch: ${baseBranch}\n#labels: ${labels.join(',')}\n\n${processedContent}`;
+    const finalContent = `${prReadyMsg}#title: ${title}\n#targetBranch: ${baseBranch}\n#labels: ${labels.join(',')}\n\n${processedContent}`;
 
     return {
       title,
       baseBranch,
       labels,
-      content: finalContent
+      content: finalContent,
     };
   }
 
@@ -315,66 +315,69 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
     try {
       // Instead of getting the whole document, check if it exists first
       const allDocuments = await this.branchRepository.listDocuments(branchInfo);
-      const systemPatternsExists = allDocuments.some(docPath => docPath.value === systemPatternsPath.value);
-      
+      const systemPatternsExists = allDocuments.some(
+        (docPath) => docPath.value === systemPatternsPath.value
+      );
+
       if (!systemPatternsExists) {
         return [];
       }
-      
+
       // Use raw file system service to read the file in chunks
       // This avoids loading the entire file into memory through the domain entity
-      const branchPath = this.fileSystemService.getBranchMemoryPath 
+      const branchPath = this.fileSystemService.getBranchMemoryPath
         ? this.fileSystemService.getBranchMemoryPath(branchInfo.name)
         : path.join(
-            this.fileSystemService.getConfig?.().memoryBankRoot || 'docs/branch-memory-bank', 
+            this.fileSystemService.getConfig?.().memoryBankRoot || 'docs/branch-memory-bank',
             branchInfo.name.replace('/', '-')
           );
-        
+
       const systemPatternsFilePath = path.join(branchPath, systemPatternsPath.value);
-      
+
       // Check if file exists
       const fileExists = await this.fileSystemService.fileExists?.(systemPatternsFilePath);
       if (!fileExists) {
         return [];
       }
-      
-      // Read only the beginning of the file (first 150KB) where recent technical decisions 
+
+      // Read only the beginning of the file (first 150KB) where recent technical decisions
       // are most likely to be found
       const chunkSize = 150 * 1024; // 150KB
       const firstChunk = await this.readFileChunk(systemPatternsFilePath, 0, chunkSize);
-      
+
       // Find all decision sections (starting with "### ")
       const decisions: string[] = [];
-      
+
       // Find decision sections indexes
       const decisionStartIndices: number[] = [];
       let searchIndex = 0;
       let foundIndex: number;
-      
+
       // Find all occurrences of the decision prefix in the first chunk
       while ((foundIndex = firstChunk.indexOf(decisionPrefix, searchIndex)) !== -1) {
         decisionStartIndices.push(foundIndex);
         searchIndex = foundIndex + decisionPrefix.length;
-        
+
         // Limit the number of decisions we find to avoid memory issues
         if (decisionStartIndices.length >= limit) {
           break;
         }
       }
-      
+
       // Extract each decision section
       for (let i = 0; i < decisionStartIndices.length; i++) {
         const startIndex = decisionStartIndices[i];
-        const endIndex = i < decisionStartIndices.length - 1
-          ? decisionStartIndices[i + 1]
-          : Math.min(startIndex + 2000, firstChunk.length); // Limit each decision to max 2KB
-        
+        const endIndex =
+          i < decisionStartIndices.length - 1
+            ? decisionStartIndices[i + 1]
+            : Math.min(startIndex + 2000, firstChunk.length); // Limit each decision to max 2KB
+
         const decision = firstChunk.substring(startIndex, endIndex);
         decisions.push(decision);
       }
-      
+
       // Process each decision to extract just the essential parts
-      return decisions.slice(0, limit).map(decision => {
+      return decisions.slice(0, limit).map((decision) => {
         // Extract just the first few lines of each decision (title + context + main points)
         const lines = decision.split('\n').slice(0, 10); // Take only first 10 lines max
         return lines.join('\n');
@@ -384,7 +387,7 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
       return [];
     }
   }
-  
+
   /**
    * Read a chunk of a file rather than the entire file
    * This helps prevent memory issues with large files
@@ -395,7 +398,7 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
       if (this.fileSystemService.readFileChunk) {
         return await this.fileSystemService.readFileChunk(filePath, start, length);
       }
-      
+
       // Fallback: read the whole file but only return the requested chunk
       const content = await this.fileSystemService.readFile(filePath);
       return content.substring(start, Math.min(start + length, content.length));
@@ -426,35 +429,39 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
       return '';
     }
 
-    return decisions.map(decision => {
-      // For decisions that already start with "### ", keep them as is
-      if (decision.trim().startsWith('###')) {
-        // Limit the content to reduce memory usage
-        const lines = decision.trim().split('\n');
-        // Get the title (first line)
-        const title = lines[0];
+    return decisions
+      .map((decision) => {
+        // For decisions that already start with "### ", keep them as is
+        if (decision.trim().startsWith('###')) {
+          // Limit the content to reduce memory usage
+          const lines = decision.trim().split('\n');
+          // Get the title (first line)
+          const title = lines[0];
 
-        // Only include the most important content - skip empty lines and limit to 5 lines
-        const content = lines.slice(1)
-          .filter(line => line.trim().length > 0)
-          .slice(0, 5)
-          .join('\n');
+          // Only include the most important content - skip empty lines and limit to 5 lines
+          const content = lines
+            .slice(1)
+            .filter((line) => line.trim().length > 0)
+            .slice(0, 5)
+            .join('\n');
 
-        return `${title}\n${content}`;
-      } else {
-        // For other formats, try to extract a title
-        const lines = decision.trim().split('\n');
-        const title = lines[0].trim();
+          return `${title}\n${content}`;
+        } else {
+          // For other formats, try to extract a title
+          const lines = decision.trim().split('\n');
+          const title = lines[0].trim();
 
-        // Only include the most important content - skip empty lines
-        const content = lines.slice(1)
-          .filter(line => line.trim().length > 0)
-          .slice(0, 5)
-          .join('\n');
+          // Only include the most important content - skip empty lines
+          const content = lines
+            .slice(1)
+            .filter((line) => line.trim().length > 0)
+            .slice(0, 5)
+            .join('\n');
 
-        return `### ${title}\n${content}`;
-      }
-    }).join('\n\n');
+          return `### ${title}\n${content}`;
+        }
+      })
+      .join('\n\n');
   }
 
   /**
@@ -465,7 +472,7 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
 
     const lines = content.split('\n');
     let capturing = false;
-    let result: string[] = [];
+    const result: string[] = [];
 
     for (const line of lines) {
       // Start capturing when section header is found
