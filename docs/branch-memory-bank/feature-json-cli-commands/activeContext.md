@@ -2,7 +2,7 @@
 
 ## 現在の作業内容
 
-現在はテストが落ちている状態の修正が必要です。特に`FileSystemJsonDocumentRepository.ts`の追加と`markdown-parser.ts`の変更に伴い、各種テストファイルが更新されていない問題があります。
+FileSystemTagIndexRepositoryImpl.test.tsの修正が完了しました。JSONドキュメント形式のサポートに対応するようにテストを調整し、すべてのテストが正常に通過するようになりました。
 
 ## 最近の変更点
 
@@ -13,6 +13,7 @@
 - エラーメッセージの定義
 - FileSystemJsonDocumentRepository.tsの実装（JSONドキュメント用のリポジトリ）
 - markdown-parser.tsの更新（Markdownからの変換サポート追加）
+- FileSystemTagIndexRepositoryImpl.test.tsの修正（JSONドキュメント対応）
 
 ## アクティブな決定事項
 
@@ -21,25 +22,19 @@
 - ヘルプテキストを充実させる
 - インタラクティブモードをサポート
 - JSONドキュメントをサポートする（新機能）
+- テストではTAG_INDEX_VERSION定数を使用して一貫性を保つ
+- テストでは実装詳細に依存しすぎず基本構造を検証する
 
 ## 検討事項
 
 - テスト修正アプローチ（モックの更新 vs. ファイル構造の変更）
 - MarkdownとJSONの共存戦略
+- タグインデックスの更新戦略（インクリメンタル vs. フルリビルド）
 
 ## 次のステップ
 
-1. テストを修正する：
-   - WriteBranchDocumentUseCase.test.ts
-   - CreateBranchCoreFilesUseCase.test.ts
-   - SearchDocumentsByTagsUseCase.test.ts
-   - UpdateTagIndexUseCaseV2.test.ts
-   - ReadGlobalDocumentUseCase.test.ts
-
-2. モックとテストヘルパーファイルを確認・更新する
-
-3. テスト実行で確認する
-
-4. CRUD操作コマンドの実装完了
-5. 検索コマンドの実装開始
-6. インデックス管理コマンドの設計
+- 他の失敗しているテストの確認と修正
+- モックとテストヘルパーファイルの確認・更新
+- CRUD操作コマンドの実装完了
+- 検索コマンドの実装
+- インデックス管理コマンドの実装

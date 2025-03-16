@@ -5,7 +5,7 @@ export class Logger {
   private static instance: Logger;
   private verbose: boolean = false;
 
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): Logger {
     if (!Logger.instance) {
@@ -20,16 +20,16 @@ export class Logger {
 
   public debug(...args: any[]): void {
     if (this.verbose) {
-      console.error('[DEBUG]', ...args);
+      console.debug('[DEBUG]', ...args);
     }
   }
 
   public info(...args: any[]): void {
-    console.error('[INFO]', ...args);
+    console.info('[INFO]', ...args);
   }
 
   public warn(...args: any[]): void {
-    console.error('[WARN]', ...args);
+    console.warn('[WARN]', ...args);
   }
 
   public error(...args: any[]): void {

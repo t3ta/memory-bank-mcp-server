@@ -9,6 +9,7 @@ import { FileSystemService } from '../../../storage/FileSystemService';
 import { FileSystemTagIndexRepositoryImpl } from '../FileSystemTagIndexRepositoryImpl';
 import { IBranchMemoryBankRepository } from '../../../../domain/repositories/IBranchMemoryBankRepository';
 import { IGlobalMemoryBankRepository } from '../../../../domain/repositories/IGlobalMemoryBankRepository';
+import { TAG_INDEX_VERSION } from '../../../../schemas/v2/tag-index';
 
 // Mock FileSystemService
 const mockFileSystem = {
@@ -88,7 +89,7 @@ describe('FileSystemTagIndexRepositoryImpl', () => {
       const tags = [Tag.create('tag1'), Tag.create('tag3')];
       
       const mockIndex = {
-        schema: 'tag_index_v2',
+        schema: TAG_INDEX_VERSION,
         metadata: {
           indexType: 'branch',
           branchName: branchInfo.name,
@@ -140,7 +141,7 @@ describe('FileSystemTagIndexRepositoryImpl', () => {
       const tags = [Tag.create('tag1'), Tag.create('tag2')];
       
       const mockIndex = {
-        schema: 'tag_index_v2',
+        schema: TAG_INDEX_VERSION,
         metadata: {
           indexType: 'branch',
           branchName: branchInfo.name,
@@ -203,7 +204,7 @@ describe('FileSystemTagIndexRepositoryImpl', () => {
       const tags = [Tag.create('tag1'), Tag.create('tag3')];
       
       const mockIndex = {
-        schema: 'tag_index_v2',
+        schema: TAG_INDEX_VERSION,
         metadata: {
           indexType: 'global',
           lastUpdated: new Date().toISOString(),
@@ -274,11 +275,18 @@ describe('FileSystemTagIndexRepositoryImpl', () => {
       expect(mockBranchRepo.getDocument).toHaveBeenCalledTimes(2);
       expect(mockFileSystem.createDirectory).toHaveBeenCalled();
       
-      // この部分を修正する
-      // 単にwriteFileが呼ばれたことを確認するだけで、引数の値のチェックはしない
+      // writeFileの呼び出しを確認するが、内容の詳細な検証は行わない
       expect(mockFileSystem.writeFile).toHaveBeenCalled();
       
-      // Check the result
+      // writeFileの第2引数（JSON文字列）が正しいスキーマと基本構造を持っていることだけを検証
+      const writeFileArg = mockFileSystem.writeFile.mock.calls[0][1];
+      const parsedIndex = JSON.parse(writeFileArg);
+      expect(parsedIndex.schema).toBe(TAG_INDEX_VERSION);
+      expect(parsedIndex.metadata.indexType).toBe('branch');
+      expect(parsedIndex.metadata.branchName).toBe(branchInfo.name);
+      expect(parsedIndex.index).toBeInstanceOf(Array);
+      
+      // 結果オブジェクトのチェック
       expect(result.tags).toContain('tag1');
       expect(result.tags).toContain('tag2');
       expect(result.tags).toContain('tag3');
@@ -298,7 +306,7 @@ describe('FileSystemTagIndexRepositoryImpl', () => {
       // Even if an index exists, it should be ignored for full rebuild
       mockFileSystem.fileExists.mockResolvedValue(true);
       mockFileSystem.readFile.mockResolvedValue(JSON.stringify({
-        schema: 'tag_index_v2',
+        schema: TAG_INDEX_VERSION,
         metadata: {
           indexType: 'branch',
           branchName: branchInfo.name,
@@ -320,10 +328,19 @@ describe('FileSystemTagIndexRepositoryImpl', () => {
       // Assert
       expect(mockBranchRepo.listDocuments).toHaveBeenCalledWith(branchInfo);
       expect(mockBranchRepo.getDocument).toHaveBeenCalledTimes(2);
+      
+      // writeFileの呼び出しを確認
       expect(mockFileSystem.writeFile).toHaveBeenCalled();
       
-      // Check the result reflects new data, not existing index
-      expect(result.documentCount).toBe(2); // Should be the new count
+      // writeFileの第2引数（JSON文字列）の基本構造を検証
+      const writeFileArg = mockFileSystem.writeFile.mock.calls[0][1];
+      const parsedIndex = JSON.parse(writeFileArg);
+      expect(parsedIndex.schema).toBe(TAG_INDEX_VERSION);
+      expect(parsedIndex.metadata.indexType).toBe('branch');
+      expect(parsedIndex.metadata.documentCount).toBe(2); // 新しいドキュメント数
+      
+      // 結果オブジェクトのチェック
+      expect(result.documentCount).toBe(2); // 新しいカウントになるはず
       expect(result.updateInfo.fullRebuild).toBe(true);
     });
   });
@@ -352,10 +369,17 @@ describe('FileSystemTagIndexRepositoryImpl', () => {
       expect(mockGlobalRepo.getDocument).toHaveBeenCalledTimes(2);
       expect(mockFileSystem.createDirectory).toHaveBeenCalled();
       
-      // この部分を修正
+      // writeFileの呼び出しを確認
       expect(mockFileSystem.writeFile).toHaveBeenCalled();
       
-      // Check the result
+      // writeFileの第2引数（JSON文字列）の基本構造を検証
+      const writeFileArg = mockFileSystem.writeFile.mock.calls[0][1];
+      const parsedIndex = JSON.parse(writeFileArg);
+      expect(parsedIndex.schema).toBe(TAG_INDEX_VERSION);
+      expect(parsedIndex.metadata.indexType).toBe('global');
+      expect(parsedIndex.index).toBeInstanceOf(Array);
+      
+      // 結果オブジェクトのチェック
       expect(result.tags).toContain('global');
       expect(result.tags).toContain('tag1');
       expect(result.tags).toContain('tag2');
@@ -374,7 +398,7 @@ describe('FileSystemTagIndexRepositoryImpl', () => {
       // Existing index
       mockFileSystem.fileExists.mockResolvedValue(true);
       mockFileSystem.readFile.mockResolvedValue(JSON.stringify({
-        schema: 'tag_index_v2',
+        schema: TAG_INDEX_VERSION,
         metadata: {
           indexType: 'global',
           lastUpdated: new Date().toISOString(),
@@ -407,9 +431,18 @@ describe('FileSystemTagIndexRepositoryImpl', () => {
       // Assert
       expect(mockGlobalRepo.listDocuments).toHaveBeenCalled();
       expect(mockGlobalRepo.getDocument).toHaveBeenCalledTimes(2);
+      
+      // writeFileの呼び出しを確認
       expect(mockFileSystem.writeFile).toHaveBeenCalled();
       
-      // Check the result reflects new data
+      // writeFileの第2引数（JSON文字列）の基本構造を検証
+      const writeFileArg = mockFileSystem.writeFile.mock.calls[0][1];
+      const parsedIndex = JSON.parse(writeFileArg);
+      expect(parsedIndex.schema).toBe(TAG_INDEX_VERSION);
+      expect(parsedIndex.metadata.indexType).toBe('global');
+      expect(parsedIndex.metadata.documentCount).toBe(2); // 新しいドキュメント数
+      
+      // 結果オブジェクトのチェック
       expect(result.documentCount).toBe(2);
       expect(result.updateInfo.fullRebuild).toBe(false);
     });
