@@ -1,16 +1,22 @@
-// グローバルなテスト設定やセットアップを行うファイル
+/**
+ * Jest setup file
+ * This file is executed before each test file
+ */
+// Extend Jest matchers if needed
+// import 'jest-extended';
 
-// エラーを詳細に出力するための設定
-jest.setTimeout(10000); // タイムアウト時間を10秒に設定
+// Silence console logs during tests
+global.console = {
+  ...console,
+  // Uncomment to silence specific console methods during tests
+  // log: jest.fn(),
+  // info: jest.fn(),
+  // debug: jest.fn(),
+  // warn: jest.fn(),
+  // error: jest.fn(),
+};
 
-// エラーのスタックトレースを最大限に表示
-Error.stackTraceLimit = 100;
+// Set timezone for consistent Date handling in tests
+process.env.TZ = 'UTC';
 
-// テスト前後のグローバルな処理が必要な場合はここに追加可能
-beforeAll(() => {
-  // グローバルな初期化処理
-});
-
-afterAll(() => {
-  // グローバルなクリーンアップ処理
-});
+// Add any global test setup here
