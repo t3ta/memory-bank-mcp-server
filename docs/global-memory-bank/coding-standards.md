@@ -47,6 +47,7 @@ tags: #standards #best-practices #typescript #clean-code
 ### Commenting
 
 1. **Documentation**:
+   - All comments in source code need to be in English
    - Use JSDoc for classes, interfaces, methods, and non-obvious properties
    - Include parameter and return type descriptions
    - Document exceptions/errors that can be thrown
@@ -60,7 +61,7 @@ tags: #standards #best-practices #typescript #clean-code
    ```typescript
    /**
     * Finds documents that match the given tags
-    * 
+    *
     * @param branchInfo Branch information
     * @param tags Tags to search for
     * @param matchAll If true, documents must have all tags; if false, any tag is sufficient
@@ -245,7 +246,7 @@ export class MemoryDocument {
         'Memory document must have a path and content'
       );
     }
-    
+
     return new MemoryDocument(props);
   }
 
@@ -274,7 +275,7 @@ export class MemoryDocument {
     if (this.hasTag(tag)) {
       return this;
     }
-    
+
     return new MemoryDocument({
       ...this.props,
       tags: [...this.props.tags, tag],
@@ -286,7 +287,7 @@ export class MemoryDocument {
     if (content === this.props.content) {
       return this;
     }
-    
+
     return new MemoryDocument({
       ...this.props,
       content,
@@ -324,20 +325,20 @@ export class ReadBranchDocumentUseCase implements IUseCase<ReadBranchDocumentInp
       // Create domain objects
       const branchInfo = BranchInfo.create(input.branchName);
       const documentPath = DocumentPath.create(input.path);
-      
+
       // Check if branch exists
       const branchExists = await this.branchRepository.exists(input.branchName);
-      
+
       if (!branchExists) {
         throw new DomainError(
           DomainErrorCodes.BRANCH_NOT_FOUND,
           `Branch "${input.branchName}" not found`
         );
       }
-      
+
       // Get document from repository
       const document = await this.branchRepository.getDocument(branchInfo, documentPath);
-      
+
       // Check if document exists
       if (!document) {
         throw new DomainError(
@@ -345,7 +346,7 @@ export class ReadBranchDocumentUseCase implements IUseCase<ReadBranchDocumentInp
           `Document "${input.path}" not found in branch "${input.branchName}"`
         );
       }
-      
+
       // Transform to DTO
       return {
         document: {
@@ -360,7 +361,7 @@ export class ReadBranchDocumentUseCase implements IUseCase<ReadBranchDocumentInp
       if (error instanceof DomainError || error instanceof ApplicationError) {
         throw error;
       }
-      
+
       // Wrap other errors
       throw new ApplicationError(
         ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
@@ -385,12 +386,12 @@ export class BranchController implements IBranchController {
   async readDocument(branchName: string, path: string): Promise<MCPResponse<DocumentDTO>> {
     try {
       logger.info(`Reading document from branch ${branchName}: ${path}`);
-      
-      const result = await this.readBranchDocumentUseCase.execute({ 
-        branchName, 
-        path 
+
+      const result = await this.readBranchDocumentUseCase.execute({
+        branchName,
+        path
       });
-      
+
       return this.presenter.present(result.document);
     } catch (error) {
       return this.handleError(error);
@@ -398,12 +399,12 @@ export class BranchController implements IBranchController {
   }
 
   private handleError(error: any): MCPResponse {
-    if (error instanceof DomainError || 
-        error instanceof ApplicationError || 
+    if (error instanceof DomainError ||
+        error instanceof ApplicationError ||
         error instanceof InfrastructureError) {
       return this.presenter.presentError(error);
     }
-    
+
     // Unknown error
     return this.presenter.presentError(
       new ApplicationError(

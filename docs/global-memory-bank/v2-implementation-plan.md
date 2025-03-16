@@ -171,6 +171,39 @@ Memory Bank 2.0への移行を段階的に行うための実装計画です。�
 
 ---
 
+### フェーズ7.5: テンプレートシステムのJSON化（ブランチ名: `feature/json-templates`）
+
+**目的**: テンプレートシステムをJSON形式に移行し、多言語対応を強化する
+
+**作業項目**:
+1. JSONテンプレートスキーマの定義
+   - 基本テンプレート構造
+   - 多言語テキスト対応
+   - セクション構造
+2. テンプレートローダーの実装
+   - JSONからMarkdownへの変換機能
+   - 言語切り替え機能
+   - 後方互換性の確保
+3. 既存テンプレートのマイグレーション
+   - MarkdownからJSONへの変換ツール
+   - 多言語テンプレートの統合
+4. CLIコマンドとの統合
+   - テンプレート管理コマンド
+   - マイグレーションコマンド
+5. テストとドキュメント
+
+**成果物**:
+- `src/schemas/v2/template-schema.ts`
+- `src/infrastructure/templates/JsonTemplateLoader.ts`
+- `src/infrastructure/templates/MarkdownToJsonConverter.ts`
+- `src/cli/commands/template/MigrateTemplatesCommand.ts`
+- `src/templates/json/` ディレクトリ内のJSONテンプレート
+- テンプレートシステムのテスト
+
+**推定工数**: 2-3日
+
+---
+
 ### フェーズ8: マイグレーションツール（ブランチ名: `feature/markdown-to-json-migration`）
 
 **目的**: 既存のMarkdownファイルをJSONに変換するツールを実装する
@@ -291,7 +324,7 @@ Memory Bank 2.0への移行を段階的に行うための実装計画です。�
 
 - フェーズ1→2→3→4は順次進める必要があります（基盤となるため）
 - フェーズ5とフェーズ6は並行して進めることが可能です
-- フェーズ7と8は並行して進めることが可能です
+- フェーズ7→7.5→8は順次進める必要があります（CLIコマンドとテンプレートの依存関係）
 - フェーズ9→10→11→12は順次進める必要があります（依存関係があるため）
 
 ## リスク管理
