@@ -6,7 +6,7 @@ import { DocumentId } from '../../domain/entities/DocumentId.js';
 import { DocumentPath } from '../../domain/entities/DocumentPath.js';
 import { JsonDocument, DocumentType } from '../../domain/entities/JsonDocument.js';
 import { Tag } from '../../domain/entities/Tag.js';
-import { IFileSystemService } from '../services/file-system/IFileSystemService.js';
+import { IFileSystemService } from '../../infrastructure/storage/interfaces/IFileSystemService.js';
 import { InfrastructureError, InfrastructureErrorCodes } from '../../shared/errors/InfrastructureError.js';
 import { IIndexService } from './interfaces/IIndexService.js';
 import { DocumentReference, DocumentIndex, INDEX_SCHEMA_VERSION } from '../../schemas/v2/index-schema.js';
@@ -298,7 +298,7 @@ export class IndexService implements IIndexService {
     
     // Ensure directory exists
     const indexDir = path.dirname(indexFilePath);
-    await this.fileSystemService.ensureDirectoryExists(indexDir);
+    await this.fileSystemService.createDirectory(indexDir);
     
     // Write index to file
     try {
@@ -324,6 +324,15 @@ export class IndexService implements IIndexService {
     const indexFilePath = this.getIndexFilePath(branchInfo);
     
     try {
+      // Check if index file exists
+      const exists = await this.fileSystemService.fileExists(indexFilePath);
+      if (!exists) {
+        throw new InfrastructureError(
+          InfrastructureErrorCodes.INDEX_PERSISTENCE_ERROR,
+          `Index file not found: ${indexFilePath}`
+        );
+      }
+      
       // Read and parse the index file
       const indexJson = await this.fileSystemService.readFile(indexFilePath);
       const index = JSON.parse(indexJson) as DocumentIndex;

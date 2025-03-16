@@ -7,7 +7,7 @@ import { DocumentId } from '../../../domain/entities/DocumentId.js';
 import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
 import { JsonDocument, DocumentType } from '../../../domain/entities/JsonDocument.js';
 import { Tag } from '../../../domain/entities/Tag.js';
-import { IFileSystemService } from '../../services/file-system/IFileSystemService.js';
+import { IFileSystemService } from '../../../infrastructure/storage/interfaces/IFileSystemService.js';
 import { InfrastructureError, InfrastructureErrorCodes } from '../../../shared/errors/InfrastructureError.js';
 import { IIndexService } from '../../index/interfaces/IIndexService.js';
 
@@ -63,12 +63,24 @@ export class FileSystemJsonDocumentRepository implements IJsonDocumentRepository
   public async findById(id: DocumentId): Promise<JsonDocument | null> {
     try {
       // Find all branch directories
-      const branchDirs = await this.fileSystemService.readDirectory(this.rootPath);
+      const files = await this.fileSystemService.listFiles(this.rootPath);
+      const branchDirs = new Set<string>();
+      
+      // Extract unique directories
+      for (const file of files) {
+        const relativePath = path.relative(this.rootPath, file);
+        const parts = relativePath.split(path.sep);
+        if (parts.length > 0) {
+          branchDirs.add(parts[0]);
+        }
+      }
       
       // Look through each branch to find the document
       for (const branchDir of branchDirs) {
-        const stats = await this.fileSystemService.stat(path.join(this.rootPath, branchDir));
-        if (!stats.isDirectory()) {
+        const branchPath = path.join(this.rootPath, branchDir);
+        const isDir = await this.fileSystemService.directoryExists(branchPath);
+        
+        if (!isDir) {
           continue;
         }
         
@@ -129,7 +141,11 @@ export class FileSystemJsonDocumentRepository implements IJsonDocumentRepository
         
         try {
           // Check if file exists
-          await this.fileSystemService.stat(fullPath);
+          const fileExists = await this.fileSystemService.fileExists(fullPath);
+          
+          if (!fileExists) {
+            return null;
+          }
           
           // File exists, read and parse it
           const content = await this.fileSystemService.readFile(fullPath);
@@ -281,7 +297,7 @@ export class FileSystemJsonDocumentRepository implements IJsonDocumentRepository
       
       // Ensure directory exists
       const directory = path.dirname(fullPath);
-      await this.fileSystemService.ensureDirectoryExists(directory);
+      await this.fileSystemService.createDirectory(directory);
       
       // Serialize document to JSON
       const content = document.toString(true); // Pretty print
@@ -343,13 +359,7 @@ export class FileSystemJsonDocumentRepository implements IJsonDocumentRepository
       await this.indexService.removeFromIndex(branchInfo, document);
       
       // Delete file
-      try {
-        await this.fileSystemService.deleteFile(filePath);
-        return true;
-      } catch (error) {
-        // File doesn't exist or other error
-        return false;
-      }
+      return await this.fileSystemService.deleteFile(filePath);
     } catch (error) {
       if (error instanceof InfrastructureError) {
         throw error;
@@ -427,15 +437,16 @@ export class FileSystemJsonDocumentRepository implements IJsonDocumentRepository
     const branchDir = this.getBranchDirectoryPath(branchInfo);
     
     // Ensure branch directory exists
-    try {
-      await this.fileSystemService.stat(branchDir);
-    } catch (error) {
-      // Branch directory doesn't exist, return empty array
+    const dirExists = await this.fileSystemService.directoryExists(branchDir);
+    if (!dirExists) {
       return [];
     }
     
-    // Recursively find all JSON files
-    const jsonFiles = await this.findAllJsonFiles(branchDir);
+    // Get all files in branch directory
+    const files = await this.fileSystemService.listFiles(branchDir);
+    
+    // Filter JSON files
+    const jsonFiles = files.filter(file => file.endsWith('.json'));
     
     // Parse documents
     const documents: JsonDocument[] = [];
@@ -466,35 +477,6 @@ export class FileSystemJsonDocumentRepository implements IJsonDocumentRepository
   }
   
   /**
-   * Recursively find all JSON files in a directory
-   * @param directory Directory to search
-   * @returns Promise resolving to array of file paths
-   */
-  private async findAllJsonFiles(directory: string): Promise<string[]> {
-    const result: string[] = [];
-    
-    // Read directory contents
-    const entries = await this.fileSystemService.readDirectory(directory);
-    
-    // Process each entry
-    for (const entry of entries) {
-      const entryPath = path.join(directory, entry);
-      const stats = await this.fileSystemService.stat(entryPath);
-      
-      if (stats.isDirectory()) {
-        // Recursively scan subdirectory
-        const subDirFiles = await this.findAllJsonFiles(entryPath);
-        result.push(...subDirFiles);
-      } else if (stats.isFile() && entryPath.endsWith('.json')) {
-        // Add JSON file to result
-        result.push(entryPath);
-      }
-    }
-    
-    return result;
-  }
-  
-  /**
    * Check if a document exists by path
    * @param branchInfo Branch information
    * @param path Document path
@@ -509,25 +491,19 @@ export class FileSystemJsonDocumentRepository implements IJsonDocumentRepository
         // Verify file actually exists
         const fullPath = this.getAbsoluteFilePath(branchInfo, path);
         
-        try {
-          await this.fileSystemService.stat(fullPath);
-          return true;
-        } catch (error) {
+        const fileExists = await this.fileSystemService.fileExists(fullPath);
+        if (!fileExists) {
           // File doesn't exist, remove from index
           await this.indexService.removeFromIndex(branchInfo, path);
           return false;
         }
+        
+        return true;
       }
       
       // Not in index, check file system directly
       const fullPath = this.getAbsoluteFilePath(branchInfo, path);
-      
-      try {
-        await this.fileSystemService.stat(fullPath);
-        return true;
-      } catch (error) {
-        return false;
-      }
+      return await this.fileSystemService.fileExists(fullPath);
     } catch (error) {
       if (error instanceof InfrastructureError) {
         throw error;

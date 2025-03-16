@@ -4,7 +4,7 @@ import { DocumentPath } from '../../../../domain/entities/DocumentPath.js';
 import { JsonDocument } from '../../../../domain/entities/JsonDocument.js';
 import { Tag } from '../../../../domain/entities/Tag.js';
 import { FileSystemJsonDocumentRepository } from '../FileSystemJsonDocumentRepository.js';
-import { IFileSystemService } from '../../../services/file-system/IFileSystemService.js';
+import { IFileSystemService } from '../../../../infrastructure/storage/interfaces/IFileSystemService.js';
 import { IIndexService } from '../../../index/interfaces/IIndexService.js';
 import { DocumentReference } from '../../../../schemas/v2/index-schema.js';
 
@@ -13,10 +13,14 @@ const mockFileSystemService: jest.Mocked<IFileSystemService> = {
   readFile: jest.fn(),
   writeFile: jest.fn(),
   deleteFile: jest.fn(),
-  ensureDirectoryExists: jest.fn(),
-  readDirectory: jest.fn(),
-  stat: jest.fn(),
-  exists: jest.fn()
+  createDirectory: jest.fn(),
+  fileExists: jest.fn(),
+  directoryExists: jest.fn(),
+  listFiles: jest.fn(),
+  getFileStats: jest.fn(),
+  getBranchMemoryPath: jest.fn(),
+  getConfig: jest.fn(),
+  readFileChunk: jest.fn()
 };
 
 // Mock index service
@@ -81,8 +85,8 @@ describe('FileSystemJsonDocumentRepository', () => {
   describe('findById', () => {
     it('should find document by ID', async () => {
       // Setup mocks
-      mockFileSystemService.readDirectory.mockResolvedValue(['feature-test']);
-      mockFileSystemService.stat.mockResolvedValue({ isDirectory: () => true } as any);
+      mockFileSystemService.listFiles.mockResolvedValue([`${rootPath}/feature-test/some-file.json`]);
+      mockFileSystemService.directoryExists.mockResolvedValue(true);
       mockIndexService.findById.mockResolvedValue(sampleDocRef);
       mockFileSystemService.readFile.mockResolvedValue(sampleJsonDocument.toString());
       
@@ -98,8 +102,8 @@ describe('FileSystemJsonDocumentRepository', () => {
     
     it('should return null when document not found', async () => {
       // Setup mocks
-      mockFileSystemService.readDirectory.mockResolvedValue(['feature-test']);
-      mockFileSystemService.stat.mockResolvedValue({ isDirectory: () => true } as any);
+      mockFileSystemService.listFiles.mockResolvedValue([`${rootPath}/feature-test/some-file.json`]);
+      mockFileSystemService.directoryExists.mockResolvedValue(true);
       mockIndexService.findById.mockResolvedValue(null);
       
       // Call method
@@ -129,7 +133,7 @@ describe('FileSystemJsonDocumentRepository', () => {
     it('should check file system if not in index', async () => {
       // Setup mocks
       mockIndexService.findByPath.mockResolvedValue(null);
-      mockFileSystemService.stat.mockResolvedValue({ isFile: () => true } as any);
+      mockFileSystemService.fileExists.mockResolvedValue(true);
       mockFileSystemService.readFile.mockResolvedValue(sampleJsonDocument.toString());
       
       // Call method
@@ -143,7 +147,7 @@ describe('FileSystemJsonDocumentRepository', () => {
     it('should return null when document not found', async () => {
       // Setup mocks
       mockIndexService.findByPath.mockResolvedValue(null);
-      mockFileSystemService.stat.mockRejectedValue(new Error('File not found'));
+      mockFileSystemService.fileExists.mockResolvedValue(false);
       
       // Call method
       const result = await repository.findByPath(branchInfo, documentPath);
@@ -203,7 +207,7 @@ describe('FileSystemJsonDocumentRepository', () => {
   describe('save', () => {
     it('should save document', async () => {
       // Setup mocks
-      mockFileSystemService.ensureDirectoryExists.mockResolvedValue();
+      mockFileSystemService.createDirectory.mockResolvedValue();
       mockFileSystemService.writeFile.mockResolvedValue();
       mockIndexService.addToIndex.mockResolvedValue();
       
@@ -212,7 +216,7 @@ describe('FileSystemJsonDocumentRepository', () => {
       
       // Assertions
       expect(result).toBe(sampleJsonDocument);
-      expect(mockFileSystemService.ensureDirectoryExists).toHaveBeenCalled();
+      expect(mockFileSystemService.createDirectory).toHaveBeenCalled();
       expect(mockFileSystemService.writeFile).toHaveBeenCalled();
       expect(mockIndexService.addToIndex).toHaveBeenCalledWith(branchInfo, sampleJsonDocument);
     });
@@ -222,7 +226,7 @@ describe('FileSystemJsonDocumentRepository', () => {
     it('should delete document by JsonDocument', async () => {
       // Setup mocks
       mockIndexService.removeFromIndex.mockResolvedValue();
-      mockFileSystemService.deleteFile.mockResolvedValue();
+      mockFileSystemService.deleteFile.mockResolvedValue(true);
       
       // Call method
       const result = await repository.delete(branchInfo, sampleJsonDocument);
@@ -236,7 +240,7 @@ describe('FileSystemJsonDocumentRepository', () => {
     it('should delete document by DocumentPath', async () => {
       // Setup mocks
       mockIndexService.removeFromIndex.mockResolvedValue();
-      mockFileSystemService.deleteFile.mockResolvedValue();
+      mockFileSystemService.deleteFile.mockResolvedValue(true);
       
       // Call method
       const result = await repository.delete(branchInfo, documentPath);
@@ -249,7 +253,7 @@ describe('FileSystemJsonDocumentRepository', () => {
       // Setup mocks
       mockIndexService.findById.mockResolvedValue(sampleDocRef);
       mockIndexService.removeFromIndex.mockResolvedValue();
-      mockFileSystemService.deleteFile.mockResolvedValue();
+      mockFileSystemService.deleteFile.mockResolvedValue(true);
       
       // Call method
       const result = await repository.delete(branchInfo, documentId);
@@ -287,8 +291,8 @@ describe('FileSystemJsonDocumentRepository', () => {
     it('should fallback to file system scanning if index fails', async () => {
       // Setup mocks
       mockIndexService.listAll.mockRejectedValue(new Error('Index error'));
-      mockFileSystemService.stat.mockResolvedValue({ isDirectory: () => true } as any);
-      mockFileSystemService.readDirectory.mockResolvedValue(['test.json']);
+      mockFileSystemService.directoryExists.mockResolvedValue(true);
+      mockFileSystemService.listFiles.mockResolvedValue([`${rootPath}/feature-test/test.json`]);
       mockFileSystemService.readFile.mockResolvedValue(sampleJsonDocument.toString());
       mockIndexService.buildIndex.mockResolvedValue();
       
@@ -301,7 +305,7 @@ describe('FileSystemJsonDocumentRepository', () => {
     it('should return true when document exists in index', async () => {
       // Setup mocks
       mockIndexService.findByPath.mockResolvedValue(sampleDocRef);
-      mockFileSystemService.stat.mockResolvedValue({ isFile: () => true } as any);
+      mockFileSystemService.fileExists.mockResolvedValue(true);
       
       // Call method
       const result = await repository.exists(branchInfo, documentPath);
@@ -313,7 +317,7 @@ describe('FileSystemJsonDocumentRepository', () => {
     it('should check file system if not in index', async () => {
       // Setup mocks
       mockIndexService.findByPath.mockResolvedValue(null);
-      mockFileSystemService.stat.mockResolvedValue({ isFile: () => true } as any);
+      mockFileSystemService.fileExists.mockResolvedValue(true);
       
       // Call method
       const result = await repository.exists(branchInfo, documentPath);
@@ -325,7 +329,7 @@ describe('FileSystemJsonDocumentRepository', () => {
     it('should return false when document does not exist', async () => {
       // Setup mocks
       mockIndexService.findByPath.mockResolvedValue(null);
-      mockFileSystemService.stat.mockRejectedValue(new Error('File not found'));
+      mockFileSystemService.fileExists.mockResolvedValue(false);
       
       // Call method
       const result = await repository.exists(branchInfo, documentPath);
