@@ -20,3 +20,16 @@ global.console = {
 process.env.TZ = 'UTC';
 
 // Add any global test setup here
+
+// Import ts-mockito for mocking
+import { reset } from 'ts-mockito';
+
+// Reset all mocks before each test
+beforeEach(() => {
+  // Jest's built-in reset
+  jest.clearAllMocks();
+
+  // You can add specific ts-mockito reset logic here if needed
+  // Note: ts-mockito's reset() function is for resetting specific mocks,
+  // not for global reset like Jest's clearAllMocks()
+});

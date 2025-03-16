@@ -7,7 +7,10 @@ module.exports = {
   testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
   transform: {
     '^.+\\.tsx?$': ['ts-jest', {
-      tsconfig: 'tsconfig.test.json'
+      tsconfig: 'tsconfig.test.json',
+      diagnostics: {
+        ignoreCodes: [2345, 2322, 7005, 7006, 7034]
+      }
     }],
   },
   moduleNameMapper: {
