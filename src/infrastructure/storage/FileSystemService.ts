@@ -1,9 +1,11 @@
 import { promises as fs } from 'fs';
 import { createReadStream } from 'fs';
-import { Readable } from 'stream';
 import path from 'path';
 import { IFileSystemService } from './interfaces/IFileSystemService.js';
-import { InfrastructureError, InfrastructureErrorCodes } from '../../shared/errors/InfrastructureError.js';
+import {
+  InfrastructureError,
+  InfrastructureErrorCodes,
+} from '../../shared/errors/InfrastructureError.js';
 
 /**
  * Implementation of file system service
@@ -20,14 +22,14 @@ export class FileSystemService implements IFileSystemService {
     } catch (error) {
       if (error instanceof Error) {
         const nodeError = error as NodeJS.ErrnoException;
-        
+
         if (nodeError.code === 'ENOENT') {
           throw new InfrastructureError(
             InfrastructureErrorCodes.FILE_NOT_FOUND,
             `File not found: ${filePath}`
           );
         }
-        
+
         if (nodeError.code === 'EACCES') {
           throw new InfrastructureError(
             InfrastructureErrorCodes.FILE_PERMISSION_ERROR,
@@ -35,7 +37,7 @@ export class FileSystemService implements IFileSystemService {
           );
         }
       }
-      
+
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_READ_ERROR,
         `Failed to read file: ${filePath}`,
@@ -54,17 +56,17 @@ export class FileSystemService implements IFileSystemService {
     try {
       // Ensure directory exists
       await this.createDirectory(path.dirname(filePath));
-      
+
       // Write file
       await fs.writeFile(filePath, content, 'utf-8');
     } catch (error) {
       if (error instanceof InfrastructureError) {
         throw error;
       }
-      
+
       if (error instanceof Error) {
         const nodeError = error as NodeJS.ErrnoException;
-        
+
         if (nodeError.code === 'EACCES') {
           throw new InfrastructureError(
             InfrastructureErrorCodes.FILE_PERMISSION_ERROR,
@@ -72,7 +74,7 @@ export class FileSystemService implements IFileSystemService {
           );
         }
       }
-      
+
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_WRITE_ERROR,
         `Failed to write file: ${filePath}`,
@@ -90,7 +92,7 @@ export class FileSystemService implements IFileSystemService {
     try {
       const stats = await fs.stat(filePath);
       return stats.isFile();
-    } catch (error) {
+    } catch (_) {
       return false;
     }
   }
@@ -107,11 +109,11 @@ export class FileSystemService implements IFileSystemService {
     } catch (error) {
       if (error instanceof Error) {
         const nodeError = error as NodeJS.ErrnoException;
-        
+
         if (nodeError.code === 'ENOENT') {
           return false;
         }
-        
+
         if (nodeError.code === 'EACCES') {
           throw new InfrastructureError(
             InfrastructureErrorCodes.FILE_PERMISSION_ERROR,
@@ -119,7 +121,7 @@ export class FileSystemService implements IFileSystemService {
           );
         }
       }
-      
+
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
         `Failed to delete file: ${filePath}`,
@@ -139,7 +141,7 @@ export class FileSystemService implements IFileSystemService {
     } catch (error) {
       if (error instanceof Error) {
         const nodeError = error as NodeJS.ErrnoException;
-        
+
         if (nodeError.code === 'EACCES') {
           throw new InfrastructureError(
             InfrastructureErrorCodes.FILE_PERMISSION_ERROR,
@@ -147,7 +149,7 @@ export class FileSystemService implements IFileSystemService {
           );
         }
       }
-      
+
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
         `Failed to create directory: ${dirPath}`,
@@ -165,7 +167,7 @@ export class FileSystemService implements IFileSystemService {
     try {
       const stats = await fs.stat(dirPath);
       return stats.isDirectory();
-    } catch (error) {
+    } catch (_) {
       return false;
     }
   }
@@ -178,12 +180,12 @@ export class FileSystemService implements IFileSystemService {
   async listFiles(dirPath: string): Promise<string[]> {
     try {
       const entries = await fs.readdir(dirPath, { withFileTypes: true });
-      
+
       const files: string[] = [];
-      
+
       for (const entry of entries) {
         const fullPath = path.join(dirPath, entry.name);
-        
+
         if (entry.isFile()) {
           files.push(fullPath);
         } else if (entry.isDirectory()) {
@@ -191,19 +193,19 @@ export class FileSystemService implements IFileSystemService {
           files.push(...subFiles);
         }
       }
-      
+
       return files;
     } catch (error) {
       if (error instanceof Error) {
         const nodeError = error as NodeJS.ErrnoException;
-        
+
         if (nodeError.code === 'ENOENT') {
           throw new InfrastructureError(
             InfrastructureErrorCodes.FILE_NOT_FOUND,
             `Directory not found: ${dirPath}`
           );
         }
-        
+
         if (nodeError.code === 'EACCES') {
           throw new InfrastructureError(
             InfrastructureErrorCodes.FILE_PERMISSION_ERROR,
@@ -211,7 +213,7 @@ export class FileSystemService implements IFileSystemService {
           );
         }
       }
-      
+
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
         `Failed to list files: ${dirPath}`,
@@ -237,7 +239,7 @@ export class FileSystemService implements IFileSystemService {
     const branchDir = branchName.replace('/', '-');
     return path.join(memoryBankRoot, branchDir);
   }
-  
+
   /**
    * Get configuration
    * @returns Configuration object
@@ -245,7 +247,7 @@ export class FileSystemService implements IFileSystemService {
   getConfig(): { memoryBankRoot: string; [key: string]: any } {
     return { memoryBankRoot: 'docs' };
   }
-  
+
   async readFileChunk(filePath: string, start: number, length: number): Promise<string> {
     try {
       // Check if file exists first
@@ -255,31 +257,31 @@ export class FileSystemService implements IFileSystemService {
           `File not found: ${filePath}`
         );
       }
-      
+
       // Get file stats to check the size
       const stats = await fs.stat(filePath);
-      
+
       // Adjust length if it exceeds file size
       if (start + length > stats.size) {
         length = Math.max(0, stats.size - start);
       }
-      
+
       // If length is 0, return empty string
       if (length === 0) {
         return '';
       }
-      
+
       // Create a promise to handle the stream
       return new Promise<string>((resolve, reject) => {
         const chunks: Buffer[] = [];
-        
+
         // Create a readable stream with start and end positions
         const stream = createReadStream(filePath, {
           start,
           end: start + length - 1,
-          encoding: 'utf8'
+          encoding: 'utf8',
         });
-        
+
         // Handle stream events
         stream.on('data', (chunk) => {
           // Handle different chunk types appropriately
@@ -289,24 +291,26 @@ export class FileSystemService implements IFileSystemService {
             chunks.push(chunk);
           }
         });
-        
+
         stream.on('end', () => {
           resolve(Buffer.concat(chunks).toString('utf8'));
         });
-        
+
         stream.on('error', (error) => {
-          reject(new InfrastructureError(
-            InfrastructureErrorCodes.FILE_READ_ERROR,
-            `Failed to read file chunk: ${filePath}`,
-            { originalError: error }
-          ));
+          reject(
+            new InfrastructureError(
+              InfrastructureErrorCodes.FILE_READ_ERROR,
+              `Failed to read file chunk: ${filePath}`,
+              { originalError: error }
+            )
+          );
         });
       });
     } catch (error) {
       if (error instanceof InfrastructureError) {
         throw error;
       }
-      
+
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_READ_ERROR,
         `Failed to read file chunk: ${filePath}`,
@@ -314,7 +318,7 @@ export class FileSystemService implements IFileSystemService {
       );
     }
   }
-  
+
   async getFileStats(filePath: string): Promise<{
     size: number;
     isDirectory: boolean;
@@ -324,25 +328,25 @@ export class FileSystemService implements IFileSystemService {
   }> {
     try {
       const stats = await fs.stat(filePath);
-      
+
       return {
         size: stats.size,
         isDirectory: stats.isDirectory(),
         isFile: stats.isFile(),
         lastModified: stats.mtime,
-        createdAt: stats.birthtime
+        createdAt: stats.birthtime,
       };
     } catch (error) {
       if (error instanceof Error) {
         const nodeError = error as NodeJS.ErrnoException;
-        
+
         if (nodeError.code === 'ENOENT') {
           throw new InfrastructureError(
             InfrastructureErrorCodes.FILE_NOT_FOUND,
             `File not found: ${filePath}`
           );
         }
-        
+
         if (nodeError.code === 'EACCES') {
           throw new InfrastructureError(
             InfrastructureErrorCodes.FILE_PERMISSION_ERROR,
@@ -350,7 +354,7 @@ export class FileSystemService implements IFileSystemService {
           );
         }
       }
-      
+
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
         `Failed to get file stats: ${filePath}`,

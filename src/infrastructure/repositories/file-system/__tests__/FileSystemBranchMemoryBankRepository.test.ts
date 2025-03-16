@@ -5,7 +5,10 @@ import { DocumentPath } from '../../../../domain/entities/DocumentPath.js';
 import { MemoryDocument } from '../../../../domain/entities/MemoryDocument.js';
 import { BranchInfo } from '../../../../domain/entities/BranchInfo.js';
 import { Tag } from '../../../../domain/entities/Tag.js';
-import { InfrastructureError, InfrastructureErrorCodes } from '../../../../shared/errors/InfrastructureError.js';
+import {
+  InfrastructureError,
+  InfrastructureErrorCodes,
+} from '../../../../shared/errors/InfrastructureError.js';
 import { DomainError, DomainErrorCodes } from '../../../../shared/errors/DomainError.js';
 import { FileSystemMemoryDocumentRepository } from '../FileSystemMemoryDocumentRepository.js';
 import path from 'path';
@@ -22,7 +25,7 @@ const mockFileSystemService = {
   createDirectory: jest.fn(),
   directoryExists: jest.fn(),
   listFiles: jest.fn(),
-  getFileStats: jest.fn()
+  getFileStats: jest.fn(),
 } as jest.Mocked<IFileSystemService>;
 
 // Mock for IConfigProvider
@@ -31,7 +34,7 @@ const mockConfigProvider = {
   getConfig: jest.fn(),
   getGlobalMemoryPath: jest.fn(),
   getBranchMemoryPath: jest.fn(),
-  getLanguage: jest.fn()
+  getLanguage: jest.fn(),
 } as jest.Mocked<IConfigProvider>;
 
 // Mock for FileSystemMemoryDocumentRepository
@@ -40,12 +43,12 @@ const mockDocumentRepository = {
   save: jest.fn(),
   delete: jest.fn(),
   list: jest.fn(),
-  findByTags: jest.fn()
+  findByTags: jest.fn(),
 };
 
 describe('FileSystemBranchMemoryBankRepository', () => {
   let repository: FileSystemBranchMemoryBankRepository;
-  const branchMemoryBankPath = '/test/memory-bank/docs/branch-memory-bank';
+  const _branchMemoryBankPath = '/test/memory-bank/docs/branch-memory-bank';
   const featureBranchPath = '/test/memory-bank/docs/branch-memory-bank/feature-test';
   const branchName = 'feature/test';
   let branchInfo: BranchInfo;
@@ -94,7 +97,7 @@ describe('FileSystemBranchMemoryBankRepository', () => {
         type: branchName.startsWith('feature/') ? 'feature' : 'fix',
         safeName: branchName.replace(/\//g, '-'),
         equals: jest.fn().mockImplementation((other) => other.name === branchName),
-        toString: jest.fn().mockReturnValue(branchName)
+        toString: jest.fn().mockReturnValue(branchName),
       } as unknown as BranchInfo;
     });
 
@@ -106,7 +109,7 @@ describe('FileSystemBranchMemoryBankRepository', () => {
       workspaceRoot: '/test/workspace',
       memoryBankRoot: '/test/memory-bank/docs',
       verbose: false,
-      language: 'en'
+      language: 'en',
     });
     mockConfigProvider.getBranchMemoryPath.mockImplementation((branchName) => {
       if (branchName === 'feature/test') {
@@ -120,7 +123,9 @@ describe('FileSystemBranchMemoryBankRepository', () => {
     });
 
     // Mock FileSystemMemoryDocumentRepository constructor
-    (FileSystemMemoryDocumentRepository as jest.Mock).mockImplementation(() => mockDocumentRepository);
+    (FileSystemMemoryDocumentRepository as jest.Mock).mockImplementation(
+      () => mockDocumentRepository
+    );
 
     // Create repository with mocks
     repository = new FileSystemBranchMemoryBankRepository(
@@ -160,10 +165,7 @@ describe('FileSystemBranchMemoryBankRepository', () => {
       // Arrange
       const invalidBranchName = 'invalid-branch-name';
       jest.spyOn(BranchInfo, 'create').mockImplementationOnce(() => {
-        throw new DomainError(
-          DomainErrorCodes.INVALID_BRANCH_NAME,
-          'Invalid branch name'
-        );
+        throw new DomainError(DomainErrorCodes.INVALID_BRANCH_NAME, 'Invalid branch name');
       });
 
       // Act
@@ -180,7 +182,9 @@ describe('FileSystemBranchMemoryBankRepository', () => {
 
       // Act & Assert
       await expect(repository.exists(branchName)).rejects.toThrow(InfrastructureError);
-      await expect(repository.exists(branchName)).rejects.toThrow('Failed to check if branch memory bank exists');
+      await expect(repository.exists(branchName)).rejects.toThrow(
+        'Failed to check if branch memory bank exists'
+      );
     });
   });
 
@@ -236,7 +240,9 @@ describe('FileSystemBranchMemoryBankRepository', () => {
 
       // Act & Assert
       await expect(repository.initialize(branchInfo)).rejects.toThrow(InfrastructureError);
-      await expect(repository.initialize(branchInfo)).rejects.toThrow('Failed to initialize branch memory bank');
+      await expect(repository.initialize(branchInfo)).rejects.toThrow(
+        'Failed to initialize branch memory bank'
+      );
     });
   });
 
@@ -248,7 +254,7 @@ describe('FileSystemBranchMemoryBankRepository', () => {
         path: docPath,
         content: '# Test\n\ntags: #test\n\nContent',
         tags: [Tag.create('test')],
-        lastModified: new Date('2023-01-01')
+        lastModified: new Date('2023-01-01'),
       });
 
       mockDocumentRepository.findByPath.mockResolvedValue(expectedDocument);
@@ -289,7 +295,9 @@ describe('FileSystemBranchMemoryBankRepository', () => {
 
       // Act & Assert
       await expect(repository.getDocument(branchInfo, docPath)).rejects.toThrow(DomainError);
-      await expect(repository.getDocument(branchInfo, docPath)).rejects.toThrow('Invalid document path');
+      await expect(repository.getDocument(branchInfo, docPath)).rejects.toThrow(
+        'Invalid document path'
+      );
     });
 
     it('should handle infrastructure errors', async () => {
@@ -302,7 +310,9 @@ describe('FileSystemBranchMemoryBankRepository', () => {
       mockDocumentRepository.findByPath.mockRejectedValue(infraError);
 
       // Act & Assert
-      await expect(repository.getDocument(branchInfo, docPath)).rejects.toThrow(InfrastructureError);
+      await expect(repository.getDocument(branchInfo, docPath)).rejects.toThrow(
+        InfrastructureError
+      );
       await expect(repository.getDocument(branchInfo, docPath)).rejects.toThrow('File read error');
     });
 
@@ -313,8 +323,12 @@ describe('FileSystemBranchMemoryBankRepository', () => {
       mockDocumentRepository.findByPath.mockRejectedValue(error);
 
       // Act & Assert
-      await expect(repository.getDocument(branchInfo, docPath)).rejects.toThrow(InfrastructureError);
-      await expect(repository.getDocument(branchInfo, docPath)).rejects.toThrow('Failed to get document from branch memory bank');
+      await expect(repository.getDocument(branchInfo, docPath)).rejects.toThrow(
+        InfrastructureError
+      );
+      await expect(repository.getDocument(branchInfo, docPath)).rejects.toThrow(
+        'Failed to get document from branch memory bank'
+      );
     });
   });
 
@@ -326,10 +340,9 @@ describe('FileSystemBranchMemoryBankRepository', () => {
         path: docPath,
         content: '# Test\n\ntags: #test\n\nContent',
         tags: [Tag.create('test')],
-        lastModified: new Date('2023-01-01')
+        lastModified: new Date('2023-01-01'),
       });
-mockDocumentRepository.save.mockResolvedValue(undefined);
-
+      mockDocumentRepository.save.mockResolvedValue(undefined);
 
       // Act
       await repository.saveDocument(branchInfo, document);
@@ -349,7 +362,7 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
         path: docPath,
         content: '# Test\n\ntags: #test\n\nContent',
         tags: [Tag.create('test')],
-        lastModified: new Date('2023-01-01')
+        lastModified: new Date('2023-01-01'),
       });
 
       const domainError = new DomainError(
@@ -360,7 +373,9 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
 
       // Act & Assert
       await expect(repository.saveDocument(branchInfo, document)).rejects.toThrow(DomainError);
-      await expect(repository.saveDocument(branchInfo, document)).rejects.toThrow('Invalid document path');
+      await expect(repository.saveDocument(branchInfo, document)).rejects.toThrow(
+        'Invalid document path'
+      );
     });
 
     it('should handle infrastructure errors', async () => {
@@ -370,7 +385,7 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
         path: docPath,
         content: '# Test\n\ntags: #test\n\nContent',
         tags: [Tag.create('test')],
-        lastModified: new Date('2023-01-01')
+        lastModified: new Date('2023-01-01'),
       });
 
       const infraError = new InfrastructureError(
@@ -380,8 +395,12 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
       mockDocumentRepository.save.mockRejectedValue(infraError);
 
       // Act & Assert
-      await expect(repository.saveDocument(branchInfo, document)).rejects.toThrow(InfrastructureError);
-      await expect(repository.saveDocument(branchInfo, document)).rejects.toThrow('File write error');
+      await expect(repository.saveDocument(branchInfo, document)).rejects.toThrow(
+        InfrastructureError
+      );
+      await expect(repository.saveDocument(branchInfo, document)).rejects.toThrow(
+        'File write error'
+      );
     });
 
     it('should handle and wrap other errors', async () => {
@@ -391,15 +410,19 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
         path: docPath,
         content: '# Test\n\ntags: #test\n\nContent',
         tags: [Tag.create('test')],
-        lastModified: new Date('2023-01-01')
+        lastModified: new Date('2023-01-01'),
       });
 
       const error = new Error('Unknown error');
       mockDocumentRepository.save.mockRejectedValue(error);
 
       // Act & Assert
-      await expect(repository.saveDocument(branchInfo, document)).rejects.toThrow(InfrastructureError);
-      await expect(repository.saveDocument(branchInfo, document)).rejects.toThrow('Failed to save document to branch memory bank');
+      await expect(repository.saveDocument(branchInfo, document)).rejects.toThrow(
+        InfrastructureError
+      );
+      await expect(repository.saveDocument(branchInfo, document)).rejects.toThrow(
+        'Failed to save document to branch memory bank'
+      );
     });
   });
 
@@ -445,7 +468,9 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
 
       // Act & Assert
       await expect(repository.deleteDocument(branchInfo, docPath)).rejects.toThrow(DomainError);
-      await expect(repository.deleteDocument(branchInfo, docPath)).rejects.toThrow('Invalid document path');
+      await expect(repository.deleteDocument(branchInfo, docPath)).rejects.toThrow(
+        'Invalid document path'
+      );
     });
 
     it('should handle infrastructure errors', async () => {
@@ -458,8 +483,12 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
       mockDocumentRepository.delete.mockRejectedValue(infraError);
 
       // Act & Assert
-      await expect(repository.deleteDocument(branchInfo, docPath)).rejects.toThrow(InfrastructureError);
-      await expect(repository.deleteDocument(branchInfo, docPath)).rejects.toThrow('File system error');
+      await expect(repository.deleteDocument(branchInfo, docPath)).rejects.toThrow(
+        InfrastructureError
+      );
+      await expect(repository.deleteDocument(branchInfo, docPath)).rejects.toThrow(
+        'File system error'
+      );
     });
 
     it('should handle and wrap other errors', async () => {
@@ -469,8 +498,12 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
       mockDocumentRepository.delete.mockRejectedValue(error);
 
       // Act & Assert
-      await expect(repository.deleteDocument(branchInfo, docPath)).rejects.toThrow(InfrastructureError);
-      await expect(repository.deleteDocument(branchInfo, docPath)).rejects.toThrow('Failed to delete document from branch memory bank');
+      await expect(repository.deleteDocument(branchInfo, docPath)).rejects.toThrow(
+        InfrastructureError
+      );
+      await expect(repository.deleteDocument(branchInfo, docPath)).rejects.toThrow(
+        'Failed to delete document from branch memory bank'
+      );
     });
   });
 
@@ -480,7 +513,7 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
       const docPaths = [
         DocumentPath.create('file1.md'),
         DocumentPath.create('file2.md'),
-        DocumentPath.create('subdir/file3.md')
+        DocumentPath.create('subdir/file3.md'),
       ];
       mockDocumentRepository.list.mockResolvedValue(docPaths);
 
@@ -529,7 +562,9 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
 
       // Act & Assert
       await expect(repository.listDocuments(branchInfo)).rejects.toThrow(InfrastructureError);
-      await expect(repository.listDocuments(branchInfo)).rejects.toThrow('Failed to list documents in branch memory bank');
+      await expect(repository.listDocuments(branchInfo)).rejects.toThrow(
+        'Failed to list documents in branch memory bank'
+      );
     });
   });
 
@@ -542,8 +577,8 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
           path: DocumentPath.create('file1.md'),
           content: '# File 1\n\ntags: #test #document\n\nContent',
           tags: [Tag.create('test'), Tag.create('document')],
-          lastModified: new Date('2023-01-01')
-        })
+          lastModified: new Date('2023-01-01'),
+        }),
       ];
       mockDocumentRepository.findByTags.mockResolvedValue(documents);
 
@@ -570,7 +605,9 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
 
       // Act & Assert
       await expect(repository.findDocumentsByTags(branchInfo, tags)).rejects.toThrow(DomainError);
-      await expect(repository.findDocumentsByTags(branchInfo, tags)).rejects.toThrow('Invalid tag format');
+      await expect(repository.findDocumentsByTags(branchInfo, tags)).rejects.toThrow(
+        'Invalid tag format'
+      );
     });
 
     it('should handle infrastructure errors', async () => {
@@ -583,8 +620,12 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
       mockDocumentRepository.findByTags.mockRejectedValue(infraError);
 
       // Act & Assert
-      await expect(repository.findDocumentsByTags(branchInfo, tags)).rejects.toThrow(InfrastructureError);
-      await expect(repository.findDocumentsByTags(branchInfo, tags)).rejects.toThrow('File system error');
+      await expect(repository.findDocumentsByTags(branchInfo, tags)).rejects.toThrow(
+        InfrastructureError
+      );
+      await expect(repository.findDocumentsByTags(branchInfo, tags)).rejects.toThrow(
+        'File system error'
+      );
     });
 
     it('should handle and wrap other errors', async () => {
@@ -594,8 +635,12 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
       mockDocumentRepository.findByTags.mockRejectedValue(error);
 
       // Act & Assert
-      await expect(repository.findDocumentsByTags(branchInfo, tags)).rejects.toThrow(InfrastructureError);
-      await expect(repository.findDocumentsByTags(branchInfo, tags)).rejects.toThrow('Failed to find documents by tags in branch memory bank');
+      await expect(repository.findDocumentsByTags(branchInfo, tags)).rejects.toThrow(
+        InfrastructureError
+      );
+      await expect(repository.findDocumentsByTags(branchInfo, tags)).rejects.toThrow(
+        'Failed to find documents by tags in branch memory bank'
+      );
     });
   });
 
@@ -604,7 +649,7 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
       // Arrange
       const branchDirs = [
         '/test/memory-bank/docs/branch-memory-bank/feature-test',
-        '/test/memory-bank/docs/branch-memory-bank/fix-bug'
+        '/test/memory-bank/docs/branch-memory-bank/fix-bug',
       ];
 
       mockFileSystemService.createDirectory.mockResolvedValue();
@@ -613,7 +658,7 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
       mockFileSystemService.fileExists.mockResolvedValue(true);
 
       // Reset BranchInfo.create mock for this test
-      const originalCreateMock = BranchInfo.create;
+      const _originalCreateMock = BranchInfo.create;
       jest.spyOn(BranchInfo, 'create').mockImplementation((name) => {
         // For this test, we need to handle the specific case where the implementation
         // extracts the basename and then converts it to a branch name
@@ -624,7 +669,7 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
             type: 'feature',
             safeName: 'feature-test',
             equals: jest.fn().mockImplementation((other) => other.name === 'feature/test'),
-            toString: jest.fn().mockReturnValue('feature/test')
+            toString: jest.fn().mockReturnValue('feature/test'),
           } as unknown as BranchInfo;
         } else if (name === 'fix-bug') {
           return {
@@ -633,7 +678,7 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
             type: 'fix',
             safeName: 'fix-bug',
             equals: jest.fn().mockImplementation((other) => other.name === 'fix/bug'),
-            toString: jest.fn().mockReturnValue('fix/bug')
+            toString: jest.fn().mockReturnValue('fix/bug'),
           } as unknown as BranchInfo;
         }
 
@@ -644,7 +689,7 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
           type: name.startsWith('feature/') ? 'feature' : 'fix',
           safeName: name.replace(/\//g, '-'),
           equals: jest.fn().mockImplementation((other) => other.name === name),
-          toString: jest.fn().mockReturnValue(name)
+          toString: jest.fn().mockReturnValue(name),
         } as unknown as BranchInfo;
       });
 
@@ -667,7 +712,7 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
             isDirectory: false,
             isFile: true,
             lastModified: new Date('2023-01-02'),
-            createdAt: new Date('2023-01-01')
+            createdAt: new Date('2023-01-01'),
           };
         } else {
           return {
@@ -675,7 +720,7 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
             isDirectory: false,
             isFile: true,
             lastModified: new Date('2023-01-01'),
-            createdAt: new Date('2023-01-01')
+            createdAt: new Date('2023-01-01'),
           };
         }
       });
@@ -691,13 +736,15 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
 
       // Mock DocumentPath.create and MemoryDocument
       const mockActiveContext = {
-        content: '# アクティブコンテキスト\n\n## 現在の作業内容\n\nテスト中\n\n## 最近の変更点\n\n- 変更1\n- 変更2\n',
-        path: { value: 'activeContext.md' }
+        content:
+          '# アクティブコンテキスト\n\n## 現在の作業内容\n\nテスト中\n\n## 最近の変更点\n\n- 変更1\n- 変更2\n',
+        path: { value: 'activeContext.md' },
       };
 
       const mockBugActiveContext = {
-        content: '# アクティブコンテキスト\n\n## 現在の作業内容\n\nバグ修正中\n\n## 最近の変更点\n\n- 修正1\n',
-        path: { value: 'activeContext.md' }
+        content:
+          '# アクティブコンテキスト\n\n## 現在の作業内容\n\nバグ修正中\n\n## 最近の変更点\n\n- 修正1\n',
+        path: { value: 'activeContext.md' },
       };
 
       // Mock getDocument to return the active context
@@ -736,9 +783,7 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
 
     it('should handle branches without active context', async () => {
       // Arrange
-      const branchDirs = [
-        '/test/memory-bank/docs/branch-memory-bank/feature-test'
-      ];
+      const branchDirs = ['/test/memory-bank/docs/branch-memory-bank/feature-test'];
 
       mockFileSystemService.createDirectory.mockResolvedValue();
       mockFileSystemService.listFiles.mockResolvedValue(branchDirs);
@@ -754,7 +799,7 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
             type: 'feature',
             safeName: 'feature-test',
             equals: jest.fn().mockImplementation((other) => other.name === 'feature/test'),
-            toString: jest.fn().mockReturnValue('feature/test')
+            toString: jest.fn().mockReturnValue('feature/test'),
           } as unknown as BranchInfo;
         }
         return originalCreateMock(name);
@@ -789,7 +834,7 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
       // Arrange
       const branchDirs = [
         '/test/memory-bank/docs/branch-memory-bank/invalid-branch',
-        '/test/memory-bank/docs/branch-memory-bank/feature-test'
+        '/test/memory-bank/docs/branch-memory-bank/feature-test',
       ];
 
       mockFileSystemService.createDirectory.mockResolvedValue();
@@ -799,10 +844,7 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
       const originalCreateMock = BranchInfo.create;
       jest.spyOn(BranchInfo, 'create').mockImplementation((name) => {
         if (name === 'invalid-branch') {
-          throw new DomainError(
-            DomainErrorCodes.INVALID_BRANCH_NAME,
-            'Invalid branch name'
-          );
+          throw new DomainError(DomainErrorCodes.INVALID_BRANCH_NAME, 'Invalid branch name');
         } else if (name === 'feature-test') {
           return {
             name: 'feature/test',
@@ -810,7 +852,7 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
             type: 'feature',
             safeName: 'feature-test',
             equals: jest.fn().mockImplementation((other) => other.name === 'feature/test'),
-            toString: jest.fn().mockReturnValue('feature/test')
+            toString: jest.fn().mockReturnValue('feature/test'),
           } as unknown as BranchInfo;
         }
         return originalCreateMock(name);
@@ -829,7 +871,9 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
 
       // Mock directoryExists to return true only for valid branch
       mockFileSystemService.directoryExists.mockImplementation(async (dirPath) => {
-        return dirPath.includes('feature-test') || dirPath.includes('branch-memory-bank/feature-test');
+        return (
+          dirPath.includes('feature-test') || dirPath.includes('branch-memory-bank/feature-test')
+        );
       });
 
       mockFileSystemService.fileExists.mockResolvedValue(true);
@@ -838,13 +882,13 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
         isDirectory: false,
         isFile: true,
         lastModified: new Date('2023-01-01'),
-        createdAt: new Date('2023-01-01')
+        createdAt: new Date('2023-01-01'),
       });
 
       // Mock DocumentPath.create and MemoryDocument
       const mockActiveContext = {
         content: '# アクティブコンテキスト\n\n## 現在の作業内容\n\nテスト中\n',
-        path: { value: 'activeContext.md' }
+        path: { value: 'activeContext.md' },
       };
 
       // Mock getDocument to return the active context
@@ -855,7 +899,9 @@ mockDocumentRepository.save.mockResolvedValue(undefined);
         return null;
       });
 
-      mockFileSystemService.readFile.mockResolvedValue('# アクティブコンテキスト\n\n## 現在の作業内容\n\nテスト中\n');
+      mockFileSystemService.readFile.mockResolvedValue(
+        '# アクティブコンテキスト\n\n## 現在の作業内容\n\nテスト中\n'
+      );
 
       // Act
       const result = await repository.getRecentBranches();
