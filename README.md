@@ -6,7 +6,9 @@ A Memory Bank implementation for managing project documentation and context acro
 
 ## Usage
 
-### NPX (Recommended)
+### MCP Server
+
+#### NPX (Recommended)
 ```bash
 npx memory-bank-mcp-server
 ```
@@ -16,13 +18,48 @@ With options:
 npx memory-bank-mcp-server --language ja --verbose
 ```
 
-### Installation (Optional)
+#### Installation (Optional)
 
 If you prefer to install globally:
 ```bash
 npm install -g memory-bank-mcp-server
 memory-bank-mcp-server --help
 ```
+
+### CLI Tool
+
+The package also includes a CLI tool for direct memory bank operations from your terminal.
+
+#### NPX Usage
+```bash
+npx memory-bank read-global architecture.md
+npx memory-bank write-global tech-stack.md -f ./tech-stack.md
+npx memory-bank read-branch feature/login activeContext.md
+npx memory-bank recent-branches
+```
+
+#### Installation
+```bash
+npm install -g memory-bank-mcp-server
+memory-bank --help
+```
+
+#### Available Commands
+
+- **read-global** `<path>`: Read a document from the global memory bank
+- **write-global** `<path> [content]`: Write a document to the global memory bank
+- **read-branch** `<branch> <path>`: Read a document from a branch memory bank
+- **write-branch** `<branch> <path> [content]`: Write a document to a branch memory bank
+- **read-core-files** `<branch>`: Read all core files from a branch memory bank
+- **recent-branches** `[limit]`: Get recent branches
+
+#### Options
+
+- **--docs, -d**: Path to docs directory (default: './docs')
+- **--verbose, -v**: Run with verbose logging (default: false)
+- **--language, -l**: Language for templates ('en' or 'ja', default: 'en')
+- **--file, -f**: Read content from file (for write commands)
+- **--format**: Output format for read-core-files ('json' or 'pretty', default: 'pretty')
 
 ## Core Concepts
 
@@ -226,6 +263,37 @@ Build:
 ```bash
 npm run build
 ```
+
+## CI/CD Pipeline
+
+This project uses GitHub Actions for continuous integration and deployment:
+
+### Automated Testing
+
+Tests are automatically run on:
+- Pull requests to `develop` and `master` branches
+- Direct pushes to `develop` and `master` branches
+
+The test workflow runs against multiple Node.js versions (16.x, 18.x, 20.x) to ensure compatibility.
+
+### Automated Release
+
+When code is merged to the `master` branch:
+1. Tests are run to verify the build
+2. A git tag is created based on the version in package.json
+3. A GitHub Release is created with release notes
+4. The package is published to npm
+
+### Manual Version Bumping
+
+To bump the version before a release:
+1. Go to the Actions tab in GitHub
+2. Select the "Version Bump" workflow
+3. Click "Run workflow"
+4. Choose the version bump type (patch, minor, or major)
+5. Select the branch to bump the version on (typically `develop`)
+
+This will create a commit with the updated version number in package.json.
 
 ## License
 
