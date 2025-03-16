@@ -148,6 +148,98 @@ describe('DocumentPath', () => {
     });
   });
 
+  describe('isMarkdown', () => {
+    it('should return true for md files', () => {
+      // Arrange
+      const path = DocumentPath.create('test/file.md');
+
+      // Act
+      const isMarkdown = path.isMarkdown;
+
+      // Assert
+      expect(isMarkdown).toBe(true);
+    });
+
+    it('should return false for non-md files', () => {
+      // Arrange
+      const path = DocumentPath.create('test/file.txt');
+
+      // Act
+      const isMarkdown = path.isMarkdown;
+
+      // Assert
+      expect(isMarkdown).toBe(false);
+    });
+
+    it('should return false for files without extension', () => {
+      // Arrange
+      const path = DocumentPath.create('test/file');
+
+      // Act
+      const isMarkdown = path.isMarkdown;
+
+      // Assert
+      expect(isMarkdown).toBe(false);
+    });
+
+    it('should be case insensitive', () => {
+      // Arrange
+      const path = DocumentPath.create('test/file.MD');
+
+      // Act
+      const isMarkdown = path.isMarkdown;
+
+      // Assert
+      expect(isMarkdown).toBe(true);
+    });
+  });
+
+  describe('isJSON', () => {
+    it('should return true for json files', () => {
+      // Arrange
+      const path = DocumentPath.create('test/file.json');
+
+      // Act
+      const isJSON = path.isJSON;
+
+      // Assert
+      expect(isJSON).toBe(true);
+    });
+
+    it('should return false for non-json files', () => {
+      // Arrange
+      const path = DocumentPath.create('test/file.md');
+
+      // Act
+      const isJSON = path.isJSON;
+
+      // Assert
+      expect(isJSON).toBe(false);
+    });
+
+    it('should return false for files without extension', () => {
+      // Arrange
+      const path = DocumentPath.create('test/file');
+
+      // Act
+      const isJSON = path.isJSON;
+
+      // Assert
+      expect(isJSON).toBe(false);
+    });
+
+    it('should be case insensitive', () => {
+      // Arrange
+      const path = DocumentPath.create('test/file.JSON');
+
+      // Act
+      const isJSON = path.isJSON;
+
+      // Assert
+      expect(isJSON).toBe(true);
+    });
+  });
+
   describe('equals', () => {
     it('should return true for paths with same value', () => {
       // Arrange

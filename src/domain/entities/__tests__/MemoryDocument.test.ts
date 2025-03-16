@@ -1,6 +1,7 @@
 import { MemoryDocument } from '../MemoryDocument.js';
 import { DocumentPath } from '../DocumentPath.js';
 import { Tag } from '../Tag.js';
+import { BaseJsonDocument } from '../../../schemas/json-document.js';
 
 describe('MemoryDocument', () => {
   // Test fixtures
@@ -316,6 +317,33 @@ describe('MemoryDocument', () => {
     });
   });
 
+  describe('isJSON', () => {
+    it('should return true for json files', () => {
+      // Arrange
+      const props = createValidDocumentProps();
+      props.path = DocumentPath.create('test/document.json');
+      const document = MemoryDocument.create(props);
+
+      // Act
+      const isJSON = document.isJSON;
+
+      // Assert
+      expect(isJSON).toBe(true);
+    });
+
+    it('should return false for non-json files', () => {
+      // Arrange
+      const props = createValidDocumentProps();
+      const document = MemoryDocument.create(props);
+
+      // Act
+      const isJSON = document.isJSON;
+
+      // Assert
+      expect(isJSON).toBe(false);
+    });
+  });
+
   describe('toObject', () => {
     it('should convert document to plain object', () => {
       // Arrange
@@ -332,6 +360,158 @@ describe('MemoryDocument', () => {
         tags: props.tags.map((tag) => tag.value),
         lastModified: props.lastModified.toISOString(),
       });
+    });
+  });
+
+  describe('toJSON', () => {
+    it('should convert markdown document to JSON format', () => {
+      // Arrange
+      const props = createValidDocumentProps();
+      const document = MemoryDocument.create(props);
+
+      // Act
+      const jsonDoc = document.toJSON();
+
+      // Assert
+      expect(jsonDoc).toBeDefined();
+      expect(jsonDoc.schema).toBe('memory_document_v1');
+      expect(jsonDoc.metadata).toBeDefined();
+      expect(jsonDoc.metadata.title).toBe('Test Document');
+      expect(jsonDoc.metadata.path).toBe(props.path.value);
+      expect(jsonDoc.metadata.tags).toEqual(props.tags.map(tag => tag.value));
+      expect(jsonDoc.content).toBeDefined();
+    });
+
+    it('should detect document type based on path filename', () => {
+      // Arrange
+      const props = createValidDocumentProps();
+      props.path = DocumentPath.create('test/branchContext.md');
+      const document = MemoryDocument.create(props);
+
+      // Act
+      const jsonDoc = document.toJSON();
+
+      // Assert
+      expect(jsonDoc.metadata.documentType).toBe('branch_context');
+    });
+
+    it('should use generic document type for unknown document types', () => {
+      // Arrange
+      const props = createValidDocumentProps();
+      props.path = DocumentPath.create('test/unknown-document.md');
+      const document = MemoryDocument.create(props);
+
+      // Act
+      const jsonDoc = document.toJSON();
+
+      // Assert
+      expect(jsonDoc.metadata.documentType).toBe('generic');
+    });
+
+    it('should parse existing JSON document', () => {
+      // Arrange
+      const props = createValidDocumentProps();
+      props.path = DocumentPath.create('test/document.json');
+      props.content = JSON.stringify({
+        schema: 'memory_document_v1',
+        metadata: {
+          title: 'JSON Document',
+          documentType: 'active_context',
+          path: 'test/document.json',
+          tags: ['json', 'test'],
+          lastModified: '2023-01-01T00:00:00.000Z'
+        },
+        content: {
+          currentWork: 'Working on tests',
+          recentChanges: ['Added JSON support'],
+          activeDecisions: ['Use JSON as primary format'],
+          considerations: ['Performance implications'],
+          nextSteps: ['Implement more tests']
+        }
+      });
+      const document = MemoryDocument.create(props);
+
+      // Act
+      const jsonDoc = document.toJSON();
+
+      // Assert
+      expect(jsonDoc).toBeDefined();
+      expect(jsonDoc.schema).toBe('memory_document_v1');
+      expect(jsonDoc.metadata.title).toBe('JSON Document');
+      expect(jsonDoc.metadata.documentType).toBe('active_context');
+      expect(jsonDoc.content.currentWork).toBe('Working on tests');
+    });
+  });
+
+  describe('fromJSON', () => {
+    it('should convert JSON document to MemoryDocument', () => {
+      // Arrange
+      const jsonDoc: BaseJsonDocument = {
+        schema: 'memory_document_v1',
+        metadata: {
+          title: 'JSON Document',
+          documentType: 'active_context',
+          path: 'test/document.json',
+          tags: ['json', 'test'],
+          lastModified: new Date('2023-01-01T00:00:00.000Z')
+        },
+        content: {
+          currentWork: 'Working on tests',
+          recentChanges: ['Added JSON support'],
+          activeDecisions: ['Use JSON as primary format'],
+          considerations: ['Performance implications'],
+          nextSteps: ['Implement more tests']
+        }
+      };
+      const path = DocumentPath.create('test/document.json');
+
+      // Act
+      const document = MemoryDocument.fromJSON(jsonDoc, path);
+
+      // Assert
+      expect(document).toBeDefined();
+      expect(document.path).toBe(path);
+      expect(document.tags).toHaveLength(2);
+      expect(document.tags[0].value).toBe('json');
+      expect(document.tags[1].value).toBe('test');
+      expect(document.lastModified.toISOString()).toBe('2023-01-01T00:00:00.000Z');
+      expect(document.content).toContain('# JSON Document');
+      expect(document.content).toContain('## 現在の作業内容');
+      expect(document.content).toContain('Working on tests');
+    });
+
+    it('should handle branch context document correctly', () => {
+      // Arrange
+      const jsonDoc: BaseJsonDocument = {
+        schema: 'memory_document_v1',
+        metadata: {
+          title: 'Branch Context',
+          documentType: 'branch_context',
+          path: 'test/branchContext.json',
+          tags: ['branch', 'context'],
+          lastModified: new Date('2023-01-01T00:00:00.000Z')
+        },
+        content: {
+          purpose: 'Test purpose',
+          createdAt: new Date('2023-01-01T00:00:00.000Z'),
+          userStories: [
+            { description: 'Story 1', completed: false },
+            { description: 'Story 2', completed: true }
+          ]
+        }
+      };
+      const path = DocumentPath.create('test/branchContext.json');
+
+      // Act
+      const document = MemoryDocument.fromJSON(jsonDoc, path);
+
+      // Assert
+      expect(document).toBeDefined();
+      expect(document.content).toContain('# Branch Context');
+      expect(document.content).toContain('## 目的');
+      expect(document.content).toContain('Test purpose');
+      expect(document.content).toContain('- [ ] Story 1');
+      expect(document.content).toContain('- [x] Story 2');
     });
   });
 });
