@@ -4,8 +4,12 @@
 export class Logger {
   private static instance: Logger;
   private verbose: boolean = false;
+  private silent: boolean = false;
 
-  private constructor() {}
+  private constructor() {
+    // Detect test environment
+    this.silent = process.env.NODE_ENV === 'test';
+  }
 
   public static getInstance(): Logger {
     if (!Logger.instance) {
@@ -14,26 +18,33 @@ export class Logger {
     return Logger.instance;
   }
 
-  public configure(options: { verbose?: boolean }): void {
+  public configure(options: { verbose?: boolean, silent?: boolean }): void {
     this.verbose = options.verbose ?? false;
+    this.silent = options.silent ?? this.silent;
   }
 
   public debug(...args: any[]): void {
-    if (this.verbose) {
+    if (this.verbose && !this.silent) {
       console.error('[DEBUG]', ...args);
     }
   }
 
   public info(...args: any[]): void {
-    console.error('[INFO]', ...args);
+    if (!this.silent) {
+      console.error('[INFO]', ...args);
+    }
   }
 
   public warn(...args: any[]): void {
-    console.error('[WARN]', ...args);
+    if (!this.silent) {
+      console.error('[WARN]', ...args);
+    }
   }
 
   public error(...args: any[]): void {
-    console.error('[ERROR]', ...args);
+    if (!this.silent) {
+      console.error('[ERROR]', ...args);
+    }
   }
 }
 

@@ -69,7 +69,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
 
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_READ_ERROR,
-        `Failed to get document from global memory bank: ${path.value}`,
+        `Failed to find document by path: ${path.value}`,
         { originalError: error }
       );
     }
@@ -206,7 +206,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
 
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
-        `Failed to delete document from global memory bank: ${path.value}`,
+        `Failed to delete document: ${path.value}`,
         { originalError: error }
       );
     }

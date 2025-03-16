@@ -97,17 +97,23 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
       // Check if systemPatterns exists
       const systemPatternsPath = DocumentPath.create(this.SYSTEM_PATTERNS_PATH);
 
+      // Initialize systemPatterns with empty technicalDecisions array
+      coreFiles.systemPatterns = {
+        technicalDecisions: []
+      };
+
       try {
         // Try to get the document to check if it exists
         const systemPatternsDoc = await this.branchRepository.getDocument(branchInfo, systemPatternsPath);
 
         // If document exists, process it efficiently
         if (systemPatternsDoc) {
-          // Process it in a memory-efficient way
-          coreFiles.systemPatterns = await this.parseSystemPatternsEfficiently(branchInfo, systemPatternsPath);
+          // Process it in a memory-efficient way - use the document we already fetched
+          const parsedSystemPatterns = this.parseSystemPatterns(systemPatternsDoc.content);
+          coreFiles.systemPatterns = parsedSystemPatterns;
         }
       } catch (error) {
-        // If document doesn't exist or there's an error, just continue without system patterns
+        // If document doesn't exist or there's an error, just continue with empty systemPatterns
         console.warn('System patterns document not found or error occurred:', error);
       }
 
@@ -136,13 +142,13 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
     const activeContext: ActiveContextDTO = {};
 
     // Current Work
-    const currentWorkMatch = content.match(/## 現在の作業内容\n\n(.*?)(?:\n##|$)/s);
+    const currentWorkMatch = content.match(/## 現在の作業内容\n\n([^#]*)(?:\n##|$)/s);
     if (currentWorkMatch && currentWorkMatch[1].trim()) {
       activeContext.currentWork = currentWorkMatch[1].trim();
     }
 
     // Recent Changes
-    const recentChangesMatch = content.match(/## 最近の変更点\n\n(.*?)(?:\n##|$)/s);
+    const recentChangesMatch = content.match(/## 最近の変更点\n\n([^#]*)(?:\n##|$)/s);
     if (recentChangesMatch && recentChangesMatch[1].trim()) {
       activeContext.recentChanges = recentChangesMatch[1]
         .trim()
@@ -152,7 +158,7 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
     }
 
     // Active Decisions
-    const activeDecisionsMatch = content.match(/## アクティブな決定事項\n\n(.*?)(?:\n##|$)/s);
+    const activeDecisionsMatch = content.match(/## アクティブな決定事項\n\n([^#]*)(?:\n##|$)/s);
     if (activeDecisionsMatch && activeDecisionsMatch[1].trim()) {
       activeContext.activeDecisions = activeDecisionsMatch[1]
         .trim()
@@ -162,7 +168,7 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
     }
 
     // Considerations
-    const considerationsMatch = content.match(/## 検討事項\n\n(.*?)(?:\n##|$)/s);
+    const considerationsMatch = content.match(/## 検討事項\n\n([^#]*)(?:\n##|$)/s);
     if (considerationsMatch && considerationsMatch[1].trim()) {
       activeContext.considerations = considerationsMatch[1]
         .trim()
@@ -172,7 +178,7 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
     }
 
     // Next Steps
-    const nextStepsMatch = content.match(/## 次のステップ\n\n(.*?)(?:\n##|$)/s);
+    const nextStepsMatch = content.match(/## 次のステップ\n\n([^#]*)(?:\n##|$)/s);
     if (nextStepsMatch && nextStepsMatch[1].trim()) {
       activeContext.nextSteps = nextStepsMatch[1]
         .trim()
@@ -193,13 +199,13 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
     const progress: ProgressDTO = {};
 
     // Status
-    const statusMatch = content.match(/## 現在の状態\n\n(.*?)(?:\n##|$)/s);
+    const statusMatch = content.match(/## 現在の状態\n\n([^#]*)(?:\n##|$)/s);
     if (statusMatch && statusMatch[1].trim()) {
       progress.status = statusMatch[1].trim();
     }
 
     // Working Features
-    const workingFeaturesMatch = content.match(/## 動作している機能\n\n(.*?)(?:\n##|$)/s);
+    const workingFeaturesMatch = content.match(/## 動作している機能\n\n([^#]*)(?:\n##|$)/s);
     if (workingFeaturesMatch && workingFeaturesMatch[1].trim()) {
       progress.workingFeatures = workingFeaturesMatch[1]
         .trim()
@@ -209,7 +215,7 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
     }
 
     // Pending Implementation
-    const pendingImplementationMatch = content.match(/## 未実装の機能\n\n(.*?)(?:\n##|$)/s);
+    const pendingImplementationMatch = content.match(/## 未実装の機能\n\n([^#]*)(?:\n##|$)/s);
     if (pendingImplementationMatch && pendingImplementationMatch[1].trim()) {
       progress.pendingImplementation = pendingImplementationMatch[1]
         .trim()
@@ -219,7 +225,7 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
     }
 
     // Known Issues
-    const knownIssuesMatch = content.match(/## 既知の問題\n\n(.*?)(?:\n##|$)/s);
+    const knownIssuesMatch = content.match(/## 既知の問題\n\n([^#]*)(?:\n##|$)/s);
     if (knownIssuesMatch && knownIssuesMatch[1].trim()) {
       progress.knownIssues = knownIssuesMatch[1]
         .trim()
@@ -253,78 +259,45 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
         return systemPatterns;
       }
 
-      // Process the content in smaller chunks to reduce memory usage
+      // Process the content
       const content = document.content;
-      const chunkSize = 50000; // Process 50KB at a time
 
-      // For very large files, limit how much we process
-      const maxProcessSize = 150000; // Max 150KB to process
-      const contentToProcess = content.length > maxProcessSize
-        ? content.substring(0, maxProcessSize)
-        : content;
+      // Find all technical decisions sections with a more direct approach
+      // Use the regex to match full decision sections in one go
+      const decisionRegex = /### ([^\n]+)\n+(?:#### コンテキスト\n+([^#]*?)\n+)?(?:#### 決定事項\n+([^#]*?)\n+)?(?:#### 影響\n+([^#]*?)(?=\n+###|\n+##|$))?/gs;
 
-      // Find decision sections more efficiently
-      // Instead of using a complex regex on the entire content, we'll find decision markers
-      // and process each decision individually
-      const decisionMarkers: number[] = [];
-      let searchIndex = 0;
-      let foundIndex: number;
+      let match;
+      // Ensure technicalDecisions is initialized as an array
+      if (!systemPatterns.technicalDecisions) {
+        systemPatterns.technicalDecisions = [];
+      }
+      
+      while ((match = decisionRegex.exec(content)) !== null) {
+        const title = match[1]?.trim() || '';
+        const context = match[2]?.trim() || '';
+        const decision = match[3]?.trim() || '';
+        const consequencesText = match[4]?.trim() || '';
 
-      // Find all occurrences of "### " which mark the start of a decision
-      while ((foundIndex = contentToProcess.indexOf('### ', searchIndex)) !== -1) {
-        decisionMarkers.push(foundIndex);
-        searchIndex = foundIndex + 4; // Length of "### "
+        // Parse consequences list
+        const consequences = consequencesText
+          .split('\n')
+          .filter(line => line.trim().startsWith('- '))
+          .map(line => line.trim().substring(2).trim());
 
-        // Limit the number of decisions we process to avoid memory issues
-        if (decisionMarkers.length >= 10) {
+        systemPatterns.technicalDecisions!.push({
+          title,
+          context,
+          decision,
+          consequences
+        });
+
+        // Limit to 10 decisions to avoid memory issues
+        if (systemPatterns.technicalDecisions!.length >= 10) {
           break;
         }
       }
 
-      // Process each decision section individually
-      for (let i = 0; i < decisionMarkers.length; i++) {
-        const startIndex = decisionMarkers[i];
-        const endIndex = i < decisionMarkers.length - 1
-          ? decisionMarkers[i + 1]
-          : contentToProcess.length;
-
-        const decisionContent = contentToProcess.substring(startIndex, endIndex);
-
-        // Extract decision components
-        const titleMatch = decisionContent.match(/### (.+?)\n/);
-        const contextMatch = decisionContent.match(/#### コンテキスト\n\n(.*?)\n\n/s);
-        const decisionMatch = decisionContent.match(/#### 決定事項\n\n(.*?)\n\n/s);
-        const consequencesMatch = decisionContent.match(/#### 影響\n\n(.*?)(?=\n###|\n##|$)/s);
-
-        if (titleMatch) {
-          // Parse consequences list
-          const consequences = consequencesMatch ?
-            consequencesMatch[1]
-              .trim()
-              .split('\n')
-              .filter(line => line.startsWith('- '))
-              .map(line => line.substring(2).trim())
-            : [];
-
-          // Ensure technicalDecisions is an array before pushing
-          if (Array.isArray(systemPatterns.technicalDecisions)) {
-            systemPatterns.technicalDecisions.push({
-              title: titleMatch[1].trim(),
-              context: contextMatch ? contextMatch[1].trim() : '',
-              decision: decisionMatch ? decisionMatch[1].trim() : '',
-              consequences
-            });
-          } else {
-            // If for some reason it's not an array, initialize it
-            systemPatterns.technicalDecisions = [{
-              title: titleMatch[1].trim(),
-              context: contextMatch ? contextMatch[1].trim() : '',
-              decision: decisionMatch ? decisionMatch[1].trim() : '',
-              consequences
-            }];
-          }
-        }
-      }
+      // Match has already been handled by the regex loop above
 
       return systemPatterns;
     } catch (error) {
@@ -340,69 +313,44 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
    */
   private parseSystemPatterns(content: string): SystemPatternsDTO {
     console.warn('Using deprecated parseSystemPatterns method - consider using parseSystemPatternsEfficiently instead');
+    
     // Initialize with empty array to avoid undefined errors
     const systemPatterns: SystemPatternsDTO = {
       technicalDecisions: [] // Ensure this is always initialized as an array
     };
 
     try {
-      // Limit content size to avoid memory issues
-      const maxSize = 100000; // 100KB max
-      const limitedContent = content.length > maxSize ? content.substring(0, maxSize) : content;
+      // Use the same approach as parseSystemPatternsEfficiently for consistency
+      const decisionRegex = /### ([^\n]+)\n+(?:#### コンテキスト\n+([^#]*?)\n+)?(?:#### 決定事項\n+([^#]*?)\n+)?(?:#### 影響\n+([^#]*?)(?=\n+###|\n+##|$))?/gs;
 
-      // Find all technical decisions sections with a more efficient approach
-      const decisionSections: string[] = [];
-      let currentPos = 0;
+      let match;
+      // Ensure technicalDecisions is initialized as an array
+      if (!systemPatterns.technicalDecisions) {
+        systemPatterns.technicalDecisions = [];
+      }
+      
+      while ((match = decisionRegex.exec(content)) !== null) {
+        const title = match[1]?.trim() || '';
+        const context = match[2]?.trim() || '';
+        const decision = match[3]?.trim() || '';
+        const consequencesText = match[4]?.trim() || '';
 
-      // Find decision sections by looking for "### " markers
-      while (currentPos < limitedContent.length) {
-        const sectionStart = limitedContent.indexOf('### ', currentPos);
-        if (sectionStart === -1) break;
+        // Parse consequences list
+        const consequences = consequencesText
+          .split('\n')
+          .filter(line => line.trim().startsWith('- '))
+          .map(line => line.trim().substring(2).trim());
 
-        const nextSectionStart = limitedContent.indexOf('### ', sectionStart + 4);
-        const sectionEnd = nextSectionStart !== -1 ? nextSectionStart : limitedContent.length;
-
-        decisionSections.push(limitedContent.substring(sectionStart, sectionEnd));
-        currentPos = sectionEnd;
+        systemPatterns.technicalDecisions!.push({
+          title,
+          context,
+          decision,
+          consequences
+        });
 
         // Limit to 10 decisions to avoid memory issues
-        if (decisionSections.length >= 10) break;
-      }
-
-      // Process each decision section
-      for (const section of decisionSections) {
-        const titleMatch = section.match(/### (.+?)\n/);
-        const contextMatch = section.match(/#### コンテキスト\n\n(.*?)\n\n/s);
-        const decisionMatch = section.match(/#### 決定事項\n\n(.*?)\n\n/s);
-        const consequencesMatch = section.match(/#### 影響\n\n(.*?)(?=\n###|\n##|$)/s);
-
-        if (titleMatch) {
-          // Parse consequences list
-          const consequences = consequencesMatch ?
-            consequencesMatch[1]
-              .trim()
-              .split('\n')
-              .filter(line => line.startsWith('- '))
-              .map(line => line.substring(2).trim())
-            : [];
-
-          // Ensure technicalDecisions is an array before pushing
-          if (Array.isArray(systemPatterns.technicalDecisions)) {
-            systemPatterns.technicalDecisions.push({
-              title: titleMatch[1].trim(),
-              context: contextMatch ? contextMatch[1].trim() : '',
-              decision: decisionMatch ? decisionMatch[1].trim() : '',
-              consequences
-            });
-          } else {
-            // If for some reason it's not an array, initialize it
-            systemPatterns.technicalDecisions = [{
-              title: titleMatch[1].trim(),
-              context: contextMatch ? contextMatch[1].trim() : '',
-              decision: decisionMatch ? decisionMatch[1].trim() : '',
-              consequences
-            }];
-          }
+        if (systemPatterns.technicalDecisions!.length >= 10) {
+          break;
         }
       }
     } catch (error) {
