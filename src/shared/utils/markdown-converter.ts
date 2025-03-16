@@ -4,7 +4,7 @@ import {
   ActiveContextJson,
   ProgressJson,
   SystemPatternsJson,
-  TechnicalDecisionContent
+  TechnicalDecisionContent,
 } from '../../schemas/json-document.js';
 
 /**
@@ -14,13 +14,13 @@ import {
  */
 export function jsonToMarkdown(document: JsonDocument): string {
   const { metadata } = document;
-  
+
   // Basic metadata sections
   let markdown = `# ${metadata.title}\n\n`;
-  
+
   // Add tags if present
   if (metadata.tags && metadata.tags.length > 0) {
-    markdown += `tags: ${metadata.tags.map(tag => `#${tag}`).join(' ')}\n\n`;
+    markdown += `tags: ${metadata.tags.map((tag: string) => `#${tag}`).join(' ')}\n\n`;
   }
 
   // Select converter based on document type
@@ -54,16 +54,15 @@ function branchContextToMarkdown(document: BranchContextJson): string {
 
   markdown += `## 目的\n\n`;
   markdown += `ブランチ: ${document.metadata.path.split('/').pop()?.replace('.json', '')}\n`;
-  markdown += `作成日時: ${content.createdAt instanceof Date 
-    ? content.createdAt.toISOString() 
-    : content.createdAt}\n\n`;
-  
+  markdown += `作成日時: ${content.createdAt instanceof Date ? content.createdAt.toISOString() : content.createdAt
+    }\n\n`;
+
   markdown += content.purpose ? `${content.purpose}\n\n` : '';
 
   markdown += `## ユーザーストーリー\n\n`;
-  
+
   if (content.userStories && content.userStories.length > 0) {
-    content.userStories.forEach(story => {
+    content.userStories.forEach((story) => {
       markdown += `- [${story.completed ? 'x' : ' '}] ${story.description}\n`;
     });
   } else {
@@ -81,12 +80,14 @@ function activeContextToMarkdown(document: ActiveContextJson): string {
   let markdown = '';
 
   markdown += `## 現在の作業内容\n\n`;
-  markdown += content.currentWork ? `${content.currentWork}\n` : '_作業内容はまだ定義されていません_\n';
+  markdown += content.currentWork
+    ? `${content.currentWork}\n`
+    : '_作業内容はまだ定義されていません_\n';
   markdown += '\n';
 
   markdown += `## 最近の変更点\n\n`;
   if (content.recentChanges && content.recentChanges.length > 0) {
-    content.recentChanges.forEach(change => {
+    content.recentChanges.forEach((change) => {
       markdown += `- ${change}\n`;
     });
   } else {
@@ -96,7 +97,7 @@ function activeContextToMarkdown(document: ActiveContextJson): string {
 
   markdown += `## アクティブな決定事項\n\n`;
   if (content.activeDecisions && content.activeDecisions.length > 0) {
-    content.activeDecisions.forEach(decision => {
+    content.activeDecisions.forEach((decision) => {
       markdown += `- ${decision}\n`;
     });
   } else {
@@ -106,7 +107,7 @@ function activeContextToMarkdown(document: ActiveContextJson): string {
 
   markdown += `## 検討事項\n\n`;
   if (content.considerations && content.considerations.length > 0) {
-    content.considerations.forEach(consideration => {
+    content.considerations.forEach((consideration) => {
       markdown += `- ${consideration}\n`;
     });
   } else {
@@ -116,7 +117,7 @@ function activeContextToMarkdown(document: ActiveContextJson): string {
 
   markdown += `## 次のステップ\n\n`;
   if (content.nextSteps && content.nextSteps.length > 0) {
-    content.nextSteps.forEach(step => {
+    content.nextSteps.forEach((step) => {
       markdown += `- ${step}\n`;
     });
   } else {
@@ -135,7 +136,7 @@ function progressToMarkdown(document: ProgressJson): string {
 
   markdown += `## 動作している機能\n\n`;
   if (content.workingFeatures && content.workingFeatures.length > 0) {
-    content.workingFeatures.forEach(feature => {
+    content.workingFeatures.forEach((feature) => {
       markdown += `- ${feature}\n`;
     });
   } else {
@@ -145,7 +146,7 @@ function progressToMarkdown(document: ProgressJson): string {
 
   markdown += `## 未実装の機能\n\n`;
   if (content.pendingImplementation && content.pendingImplementation.length > 0) {
-    content.pendingImplementation.forEach(feature => {
+    content.pendingImplementation.forEach((feature) => {
       markdown += `- ${feature}\n`;
     });
   } else {
@@ -159,7 +160,7 @@ function progressToMarkdown(document: ProgressJson): string {
 
   markdown += `## 既知の問題\n\n`;
   if (content.knownIssues && content.knownIssues.length > 0) {
-    content.knownIssues.forEach(issue => {
+    content.knownIssues.forEach((issue) => {
       markdown += `- ${issue}\n`;
     });
   } else {
@@ -179,7 +180,7 @@ function systemPatternsToMarkdown(document: SystemPatternsJson): string {
   markdown += `## 技術的決定事項\n\n`;
 
   if (content.technicalDecisions && content.technicalDecisions.length > 0) {
-    content.technicalDecisions.forEach(decision => {
+    content.technicalDecisions.forEach((decision) => {
       markdown += technicalDecisionToMarkdown(decision);
     });
   } else {
@@ -196,15 +197,15 @@ function technicalDecisionToMarkdown(decision: TechnicalDecisionContent): string
   let markdown = '';
 
   markdown += `### ${decision.title}\n\n`;
-  
+
   markdown += `#### コンテキスト\n`;
   markdown += `${decision.context}\n\n`;
-  
+
   markdown += `#### 決定事項\n`;
   markdown += `${decision.decision}\n\n`;
-  
+
   markdown += `#### 影響\n`;
-  decision.consequences.forEach(consequence => {
+  decision.consequences.forEach((consequence) => {
     markdown += `- ${consequence}\n`;
   });
   markdown += '\n';
@@ -217,18 +218,16 @@ function technicalDecisionToMarkdown(decision: TechnicalDecisionContent): string
  */
 function genericContentToMarkdown(document: JsonDocument): string {
   let markdown = '';
-  
+
   // Try to handle generic content as a simple key-value structure
   const content = document.content as Record<string, unknown>;
-  
+
   Object.entries(content).forEach(([key, value]) => {
     // Convert key from camelCase to Title Case for headers
-    const headerText = key
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/^./, str => str.toUpperCase());
-    
+    const headerText = key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase());
+
     markdown += `## ${headerText}\n\n`;
-    
+
     if (Array.isArray(value)) {
       value.forEach((item: unknown) => {
         if (typeof item === 'string') {
@@ -242,9 +241,9 @@ function genericContentToMarkdown(document: JsonDocument): string {
     } else {
       markdown += `${value}\n`;
     }
-    
+
     markdown += '\n';
   });
-  
+
   return markdown;
 }

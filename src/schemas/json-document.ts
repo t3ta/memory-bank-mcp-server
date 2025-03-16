@@ -39,7 +39,7 @@ export const ActiveContextContentSchema = z.object({
   currentWork: z.string().optional(),
   recentChanges: z.array(z.string()).default([]),
   activeDecisions: z.array(z.string()).default([]),
-  considerations: z.array(z.string()).default([]), 
+  considerations: z.array(z.string()).default([]),
   nextSteps: z.array(z.string()).default([])
 });
 
@@ -86,11 +86,23 @@ export const SystemPatternsJsonSchema = BaseJsonDocumentSchema.extend({
 });
 
 // Union type for all document types
-export const JsonDocumentSchema = z.discriminatedUnion('metadata.documentType', [
-  BranchContextJsonSchema,
-  ActiveContextJsonSchema,
-  ProgressJsonSchema,
-  SystemPatternsJsonSchema
+export const JsonDocumentSchema = z.discriminatedUnion('documentType', [
+  BaseJsonDocumentSchema.extend({
+    documentType: z.literal('branch_context'),
+    content: BranchContextContentSchema
+  }),
+  BaseJsonDocumentSchema.extend({
+    documentType: z.literal('active_context'),
+    content: ActiveContextContentSchema
+  }),
+  BaseJsonDocumentSchema.extend({
+    documentType: z.literal('progress'),
+    content: ProgressContentSchema
+  }),
+  BaseJsonDocumentSchema.extend({
+    documentType: z.literal('system_patterns'),
+    content: SystemPatternsContentSchema
+  })
 ]);
 
 // Type exports
