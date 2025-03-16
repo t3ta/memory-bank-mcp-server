@@ -8,15 +8,15 @@ import { TagSchema } from '../common.js';
 export const TagIndexEntrySchema = z.object({
   // The tag value (without #)
   tag: TagSchema,
-  
+
   // Array of document paths that have this tag
   documentPaths: z.array(z.string()),
-  
+
   // Optional count of documents with this tag (for optimization)
   documentCount: z.number().int().nonnegative().optional(),
-  
+
   // Optional last updated timestamp
-  updatedAt: z.string().datetime().optional()
+  updatedAt: z.string().datetime().optional(),
 });
 
 /**
@@ -26,28 +26,28 @@ export const TagIndexEntrySchema = z.object({
 export const TagIndexSchema = z.object({
   // Schema version for future compatibility
   schema: z.literal('tag_index_v1'),
-  
+
   // Metadata about the index
   metadata: z.object({
     // When the index was created/updated
     updatedAt: z.string().datetime(),
-    
+
     // Total number of documents indexed
     documentCount: z.number().int().nonnegative(),
-    
+
     // Whether this was a full rebuild
     fullRebuild: z.boolean().default(false),
-    
+
     // The context of the index (branch name or 'global')
     context: z.string(),
-    
+
     // Optional description
-    description: z.string().optional()
+    description: z.string().optional(),
   }),
-  
+
   // The actual tag index entries
   // We use a Record for O(1) lookups with tag as key
-  index: z.record(z.string(), z.array(z.string()))
+  index: z.record(z.string(), z.array(z.string())),
 });
 
 // Type exports

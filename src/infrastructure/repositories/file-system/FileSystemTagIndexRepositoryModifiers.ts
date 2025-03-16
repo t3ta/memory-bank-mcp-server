@@ -4,7 +4,10 @@ import { JsonDocument } from '../../../domain/entities/JsonDocument.js';
 import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
 import { Tag } from '../../../domain/entities/Tag.js';
 import { getLogger } from '../../../shared/utils/logger.js';
-import { InfrastructureError, InfrastructureErrorCodes } from '../../../shared/errors/InfrastructureError.js';
+import {
+  InfrastructureError,
+  InfrastructureErrorCodes,
+} from '../../../shared/errors/InfrastructureError.js';
 import { FileSystemTagIndexRepositoryImpl } from './FileSystemTagIndexRepositoryImpl.js';
 import { DocumentReference } from '../../../schemas/v2/tag-index.js';
 
@@ -29,28 +32,29 @@ export class FileSystemTagIndexRepositoryModifiers extends FileSystemTagIndexRep
 
     try {
       // Read existing index or create new one
-      const tagIndex = await this.readBranchIndex(branchInfo) || this.createEmptyBranchIndex(branchInfo);
+      const tagIndex =
+        (await this.readBranchIndex(branchInfo)) || this.createEmptyBranchIndex(branchInfo);
 
       // Create document reference
       const docRef = this.createDocumentReference(document);
 
       // Update tag entries
-      const documentTags = document.tags.map(tag => tag.value);
+      const documentTags = document.tags.map((tag) => tag.value);
 
       // Remove document from existing tags (if it exists)
       for (const entry of tagIndex.index) {
-        entry.documents = entry.documents.filter(doc => doc.path !== docRef.path);
+        entry.documents = entry.documents.filter((doc) => doc.path !== docRef.path);
       }
 
       // Add document to relevant tags
       for (const tagValue of documentTags) {
         // Find or create tag entry
-        let tagEntry = tagIndex.index.find(entry => entry.tag === tagValue);
+        let tagEntry = tagIndex.index.find((entry) => entry.tag === tagValue);
 
         if (!tagEntry) {
           tagEntry = {
             tag: tagValue,
-            documents: []
+            documents: [],
           };
           tagIndex.index.push(tagEntry);
         }
@@ -60,7 +64,7 @@ export class FileSystemTagIndexRepositoryModifiers extends FileSystemTagIndexRep
       }
 
       // Remove empty tag entries
-      tagIndex.index = tagIndex.index.filter(entry => entry.documents.length > 0);
+      tagIndex.index = tagIndex.index.filter((entry) => entry.documents.length > 0);
 
       // Update metadata
       tagIndex.metadata.lastUpdated = new Date();
@@ -92,35 +96,33 @@ export class FileSystemTagIndexRepositoryModifiers extends FileSystemTagIndexRep
    * @param document Document to add/update
    * @returns Promise resolving when done
    */
-  async addDocumentToGlobalIndex(
-    document: MemoryDocument | JsonDocument
-  ): Promise<void> {
+  async addDocumentToGlobalIndex(document: MemoryDocument | JsonDocument): Promise<void> {
     logger.info(`Adding document to global tag index: ${document.path.value}`);
 
     try {
       // Read existing index or create new one
-      const tagIndex = await this.readGlobalIndex() || this.createEmptyGlobalIndex();
+      const tagIndex = (await this.readGlobalIndex()) || this.createEmptyGlobalIndex();
 
       // Create document reference
       const docRef = this.createDocumentReference(document);
 
       // Update tag entries
-      const documentTags = document.tags.map(tag => tag.value);
+      const documentTags = document.tags.map((tag) => tag.value);
 
       // Remove document from existing tags (if it exists)
       for (const entry of tagIndex.index) {
-        entry.documents = entry.documents.filter(doc => doc.path !== docRef.path);
+        entry.documents = entry.documents.filter((doc) => doc.path !== docRef.path);
       }
 
       // Add document to relevant tags
       for (const tagValue of documentTags) {
         // Find or create tag entry
-        let tagEntry = tagIndex.index.find(entry => entry.tag === tagValue);
+        let tagEntry = tagIndex.index.find((entry) => entry.tag === tagValue);
 
         if (!tagEntry) {
           tagEntry = {
             tag: tagValue,
-            documents: []
+            documents: [],
           };
           tagIndex.index.push(tagEntry);
         }
@@ -130,7 +132,7 @@ export class FileSystemTagIndexRepositoryModifiers extends FileSystemTagIndexRep
       }
 
       // Remove empty tag entries
-      tagIndex.index = tagIndex.index.filter(entry => entry.documents.length > 0);
+      tagIndex.index = tagIndex.index.filter((entry) => entry.documents.length > 0);
 
       // Update metadata
       tagIndex.metadata.lastUpdated = new Date();
@@ -163,10 +165,7 @@ export class FileSystemTagIndexRepositoryModifiers extends FileSystemTagIndexRep
    * @param path Document path
    * @returns Promise resolving when done
    */
-  async removeDocumentFromBranchIndex(
-    branchInfo: BranchInfo,
-    path: DocumentPath
-  ): Promise<void> {
+  async removeDocumentFromBranchIndex(branchInfo: BranchInfo, path: DocumentPath): Promise<void> {
     logger.info(`Removing document from branch tag index: ${path.value}`);
 
     try {
@@ -181,7 +180,7 @@ export class FileSystemTagIndexRepositoryModifiers extends FileSystemTagIndexRep
       let modified = false;
       for (const entry of tagIndex.index) {
         const initialLength = entry.documents.length;
-        entry.documents = entry.documents.filter(doc => doc.path !== path.value);
+        entry.documents = entry.documents.filter((doc) => doc.path !== path.value);
         if (entry.documents.length < initialLength) {
           modified = true;
         }
@@ -193,7 +192,7 @@ export class FileSystemTagIndexRepositoryModifiers extends FileSystemTagIndexRep
       }
 
       // Remove empty tag entries
-      tagIndex.index = tagIndex.index.filter(entry => entry.documents.length > 0);
+      tagIndex.index = tagIndex.index.filter((entry) => entry.documents.length > 0);
 
       // Update metadata
       tagIndex.metadata.lastUpdated = new Date();
@@ -225,9 +224,7 @@ export class FileSystemTagIndexRepositoryModifiers extends FileSystemTagIndexRep
    * @param path Document path
    * @returns Promise resolving when done
    */
-  async removeDocumentFromGlobalIndex(
-    path: DocumentPath
-  ): Promise<void> {
+  async removeDocumentFromGlobalIndex(path: DocumentPath): Promise<void> {
     logger.info(`Removing document from global tag index: ${path.value}`);
 
     try {
@@ -242,7 +239,7 @@ export class FileSystemTagIndexRepositoryModifiers extends FileSystemTagIndexRep
       let modified = false;
       for (const entry of tagIndex.index) {
         const initialLength = entry.documents.length;
-        entry.documents = entry.documents.filter(doc => doc.path !== path.value);
+        entry.documents = entry.documents.filter((doc) => doc.path !== path.value);
         if (entry.documents.length < initialLength) {
           modified = true;
         }
@@ -254,7 +251,7 @@ export class FileSystemTagIndexRepositoryModifiers extends FileSystemTagIndexRep
       }
 
       // Remove empty tag entries
-      tagIndex.index = tagIndex.index.filter(entry => entry.documents.length > 0);
+      tagIndex.index = tagIndex.index.filter((entry) => entry.documents.length > 0);
 
       // Update metadata
       tagIndex.metadata.lastUpdated = new Date();

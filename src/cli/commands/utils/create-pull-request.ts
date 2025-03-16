@@ -52,8 +52,14 @@ export class CreatePullRequestCommand extends CommandBase {
         description: 'Run with verbose logging',
         default: false,
       })
-      .example('$0 create-pull-request feature/my-feature "My feature title"', 'Create a pull request')
-      .example('$0 create-pull-request feature/my-feature "My feature title" --base main', 'Create PR with custom base');
+      .example(
+        '$0 create-pull-request feature/my-feature "My feature title"',
+        'Create a pull request'
+      )
+      .example(
+        '$0 create-pull-request feature/my-feature "My feature title" --base main',
+        'Create PR with custom base'
+      );
   }
 
   /**

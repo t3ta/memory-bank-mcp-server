@@ -26,7 +26,7 @@ export class GlobalController implements IGlobalController {
    */
   // Optional dependencies
   private readonly updateTagIndexUseCaseV2?: UpdateTagIndexUseCaseV2;
-  
+
   constructor(
     private readonly readGlobalDocumentUseCase: ReadGlobalDocumentUseCase,
     private readonly writeGlobalDocumentUseCase: WriteGlobalDocumentUseCase,

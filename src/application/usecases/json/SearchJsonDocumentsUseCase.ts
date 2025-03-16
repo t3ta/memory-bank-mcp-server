@@ -1,6 +1,7 @@
 import { IUseCase } from '../../interfaces/IUseCase.js';
 import { IJsonDocumentRepository } from '../../../domain/repositories/IJsonDocumentRepository.js';
 import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
+import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
 import { Tag } from '../../../domain/entities/Tag.js';
 import { DocumentType } from '../../../domain/entities/JsonDocument.js';
 import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
@@ -152,25 +153,25 @@ export class SearchJsonDocumentsUseCase
 
       // Determine if searching in branch or global memory bank
       const isGlobal = !input.branchName;
-      const repository = isGlobal ? this.globalRepository || this.jsonRepository : this.jsonRepository;
+      const repository = isGlobal
+        ? this.globalRepository || this.jsonRepository
+        : this.jsonRepository;
       const location = isGlobal ? 'global' : input.branchName!;
 
       // Create branch info
-      const branchInfo = isGlobal 
-        ? BranchInfo.create('global') 
+      const branchInfo = isGlobal
+        ? BranchInfo.create('feature/global')  // 変更: 'global' -> 'feature/global'
         : BranchInfo.create(input.branchName!);
 
       // Check if branch exists for branch searches
       if (!isGlobal) {
+        // 変更: dummy pathを使用
+        const dummyPath = DocumentPath.create('index.json');
         const branchExists = await this.jsonRepository.exists(
-          branchInfo, 
-          // Using a dummy path just to check if branch directory exists
-          // This is a bit of a hack, but it works with the current implementation
-          // Better solution would be to have a separate method to check branch existence
-          // TODO: Add exists method to repository interface
-          branchInfo.path
+          branchInfo,
+          dummyPath
         );
-        
+
         if (!branchExists) {
           throw new DomainError(
             DomainErrorCodes.BRANCH_NOT_FOUND,
@@ -186,8 +187,8 @@ export class SearchJsonDocumentsUseCase
       // Tag-based search
       if (input.tags && input.tags.length > 0) {
         // Create Tag domain objects
-        const tags = input.tags.map(tag => Tag.create(tag));
-        
+        const tags = input.tags.map((tag) => Tag.create(tag));
+
         // Find documents by tags
         documents = await repository.findByTags(branchInfo, tags, matchAllTags);
       }
@@ -198,16 +199,16 @@ export class SearchJsonDocumentsUseCase
       }
 
       // Transform to DTOs
-      const documentDTOs = documents.map(doc => ({
+      const documentDTOs = documents.map((doc) => ({
         id: doc.id.value,
         path: doc.path.value,
         title: doc.title,
         documentType: doc.documentType,
-        tags: doc.tags.map(tag => tag.value),
+        tags: doc.tags.map((tag) => tag.value),
         content: doc.content,
         lastModified: doc.lastModified.toISOString(),
         createdAt: doc.createdAt.toISOString(),
-        version: doc.version
+        version: doc.version,
       }));
 
       // Return result
@@ -218,8 +219,8 @@ export class SearchJsonDocumentsUseCase
           searchLocation: location,
           searchedTags: input.tags,
           searchedDocumentType: input.documentType,
-          matchedAllTags: input.tags ? matchAllTags : undefined
-        }
+          matchedAllTags: input.tags ? matchAllTags : undefined,
+        },
       };
     } catch (error) {
       // Re-throw domain and application errors

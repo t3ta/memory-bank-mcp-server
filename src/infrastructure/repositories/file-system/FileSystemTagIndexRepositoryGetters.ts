@@ -2,14 +2,20 @@ import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
 import { Tag } from '../../../domain/entities/Tag.js';
 import { ITagIndexRepository } from '../../../domain/repositories/ITagIndexRepository.js';
 import { logger } from '../../../shared/utils/logger.js';
-import { InfrastructureError, InfrastructureErrorCodes } from '../../../shared/errors/InfrastructureError.js';
+import {
+  InfrastructureError,
+  InfrastructureErrorCodes,
+} from '../../../shared/errors/InfrastructureError.js';
 import { FileSystemTagIndexRepositoryModifiers } from './FileSystemTagIndexRepositoryModifiers.js';
 
 /**
  * Implementation of getter methods for ITagIndexRepository
  * Final implementation class with all methods
  */
-export class FileSystemTagIndexRepository extends FileSystemTagIndexRepositoryModifiers implements ITagIndexRepository {
+export class FileSystemTagIndexRepository
+  extends FileSystemTagIndexRepositoryModifiers
+  implements ITagIndexRepository
+{
   /**
    * Get all tags in branch tag index
    * @param branchInfo Branch information
@@ -26,7 +32,7 @@ export class FileSystemTagIndexRepository extends FileSystemTagIndexRepositoryMo
       }
 
       // Extract unique tags
-      return tagIndex.index.map(entry => Tag.create(entry.tag));
+      return tagIndex.index.map((entry) => Tag.create(entry.tag));
     } catch (error) {
       logger.error(`Error getting branch tags for branch: ${branchInfo.name}`, error);
       throw new InfrastructureError(
@@ -52,7 +58,7 @@ export class FileSystemTagIndexRepository extends FileSystemTagIndexRepositoryMo
       }
 
       // Extract unique tags
-      return tagIndex.index.map(entry => Tag.create(entry.tag));
+      return tagIndex.index.map((entry) => Tag.create(entry.tag));
     } catch (error) {
       logger.error('Error getting global tags', error);
       throw new InfrastructureError(

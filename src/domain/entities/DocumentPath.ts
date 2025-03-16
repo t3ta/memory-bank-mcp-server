@@ -1,7 +1,12 @@
 import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
 
 // DocumentType without importing JsonDocument to avoid circular dependency
-type DocumentType = 'branch_context' | 'active_context' | 'progress' | 'system_patterns' | 'generic';
+type DocumentType =
+  | 'branch_context'
+  | 'active_context'
+  | 'progress'
+  | 'system_patterns'
+  | 'generic';
 
 /**
  * Value object representing a document path
@@ -124,7 +129,7 @@ export class DocumentPath {
   public inferDocumentType(): DocumentType {
     const lcFilename = this.filename.toLowerCase();
     const lcBasename = this.basename.toLowerCase();
-    
+
     if (lcBasename.includes('branchcontext') || lcBasename.includes('branch-context')) {
       return 'branch_context';
     } else if (lcBasename.includes('activecontext') || lcBasename.includes('active-context')) {
@@ -145,18 +150,15 @@ export class DocumentPath {
    */
   public withExtension(newExtension: string): DocumentPath {
     if (!newExtension) {
-      throw new DomainError(
-        DomainErrorCodes.INVALID_DOCUMENT_PATH,
-        'Extension cannot be empty'
-      );
+      throw new DomainError(DomainErrorCodes.INVALID_DOCUMENT_PATH, 'Extension cannot be empty');
     }
 
     const directory = this.directory;
     const basename = this.basename;
-    const newPath = directory ? 
-      `${directory}/${basename}.${newExtension}` : 
-      `${basename}.${newExtension}`;
-    
+    const newPath = directory
+      ? `${directory}/${basename}.${newExtension}`
+      : `${basename}.${newExtension}`;
+
     return DocumentPath.create(newPath);
   }
 

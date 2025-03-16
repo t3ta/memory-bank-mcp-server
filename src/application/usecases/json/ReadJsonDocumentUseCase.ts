@@ -123,28 +123,42 @@ export class ReadJsonDocumentUseCase
 
       // Determine if searching in branch or global memory bank
       const isGlobal = !input.branchName;
-      const location = isGlobal ? 'global' : input.branchName;
+      // letに変更: constからletに変えて再代入可能にする
+      let location = isGlobal ? 'global' : input.branchName;
 
       let document: JsonDocument | null = null;
 
       // If searching by ID
       if (input.id) {
         const documentId = DocumentId.create(input.id);
-        document = await this.jsonRepository.findById(documentId);
-
-        if (!document && !isGlobal && this.globalRepository) {
-          // If not found in branch, try global repository if available
+        
+        // 修正: グローバル検索の場合はグローバルリポジトリから直接探す
+        if (isGlobal) {
+          if (!this.globalRepository) {
+            throw new ApplicationError(
+              ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
+              'Global repository not provided for global document lookup'
+            );
+          }
           document = await this.globalRepository.findById(documentId);
-          if (document) {
-            // Update location if found in global
-            location = 'global';
+        } else {
+          // ブランチ検索の場合は元の実装通り
+          document = await this.jsonRepository.findById(documentId);
+          
+          if (!document && this.globalRepository) {
+            // If not found in branch, try global repository if available
+            document = await this.globalRepository.findById(documentId);
+            if (document) {
+              // Update location if found in global
+              location = 'global';
+            }
           }
         }
       }
       // If searching by path
       else if (input.path) {
         const documentPath = DocumentPath.create(input.path);
-        
+
         if (isGlobal) {
           // Global memory bank
           if (!this.globalRepository) {
@@ -154,8 +168,8 @@ export class ReadJsonDocumentUseCase
             );
           }
 
-          // Create a default branch info for global repository
-          const globalBranchInfo = BranchInfo.create('global');
+          // BranchInfo.createの引数を変更
+          const globalBranchInfo = BranchInfo.create('feature/global');
           document = await this.globalRepository.findByPath(globalBranchInfo, documentPath);
         } else {
           // Branch memory bank
@@ -185,9 +199,9 @@ export class ReadJsonDocumentUseCase
           content: document.content,
           lastModified: document.lastModified.toISOString(),
           createdAt: document.createdAt.toISOString(),
-          version: document.version
+          version: document.version,
         },
-        location
+        location,
       };
     } catch (error) {
       // Re-throw domain and application errors

@@ -1,6 +1,6 @@
 /**
  * Schema v2 - Index
- * 
+ *
  * This file re-exports all types and schemas from the v2 schemas,
  * providing a single import point for consumers.
  */

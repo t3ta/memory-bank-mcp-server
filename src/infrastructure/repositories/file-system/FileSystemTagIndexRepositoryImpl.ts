@@ -5,11 +5,14 @@ import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
 import { Tag } from '../../../domain/entities/Tag.js';
 import {
   TagIndexOptions,
-  TagIndexUpdateResult
+  TagIndexUpdateResult,
 } from '../../../domain/repositories/ITagIndexRepository.js';
 import { DocumentReference } from '../../../schemas/v2/tag-index.js';
 import { getLogger } from '../../../shared/utils/logger.js';
-import { InfrastructureError, InfrastructureErrorCodes } from '../../../shared/errors/InfrastructureError.js';
+import {
+  InfrastructureError,
+  InfrastructureErrorCodes,
+} from '../../../shared/errors/InfrastructureError.js';
 import { FileSystemTagIndexRepository } from './FileSystemTagIndexRepositoryBase.js';
 
 const logger = getLogger('FileSystemTagIndexRepositoryImpl');
@@ -35,9 +38,9 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
     const fullRebuild = options?.fullRebuild ?? false;
 
     // Read existing index or create new one
-    let tagIndex = fullRebuild
+    const tagIndex = fullRebuild
       ? this.createEmptyBranchIndex(branchInfo)
-      : await this.readBranchIndex(branchInfo) || this.createEmptyBranchIndex(branchInfo);
+      : (await this.readBranchIndex(branchInfo)) || this.createEmptyBranchIndex(branchInfo);
 
     try {
       // Get all documents in branch
@@ -77,7 +80,7 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
       for (const [tagValue, documents] of tagMap.entries()) {
         tagEntries.push({
           tag: tagValue,
-          documents
+          documents,
         });
       }
 
@@ -92,12 +95,12 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
 
       // Return result
       return {
-        tags: tagEntries.map(entry => entry.tag),
+        tags: tagEntries.map((entry) => entry.tag),
         documentCount: documents.length,
         updateInfo: {
           fullRebuild,
-          timestamp: tagIndex.metadata.lastUpdated.toISOString()
-        }
+          timestamp: tagIndex.metadata.lastUpdated.toISOString(),
+        },
       };
     } catch (error) {
       logger.error(`Error updating branch tag index for branch: ${branchInfo.name}`, error);
@@ -121,9 +124,9 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
     const fullRebuild = options?.fullRebuild ?? false;
 
     // Read existing index or create new one
-    let tagIndex = fullRebuild
+    const tagIndex = fullRebuild
       ? this.createEmptyGlobalIndex()
-      : await this.readGlobalIndex() || this.createEmptyGlobalIndex();
+      : (await this.readGlobalIndex()) || this.createEmptyGlobalIndex();
 
     try {
       // Get all documents in global memory bank
@@ -163,7 +166,7 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
       for (const [tagValue, documents] of tagMap.entries()) {
         tagEntries.push({
           tag: tagValue,
-          documents
+          documents,
         });
       }
 
@@ -178,12 +181,12 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
 
       // Return result
       return {
-        tags: tagEntries.map(entry => entry.tag),
+        tags: tagEntries.map((entry) => entry.tag),
         documentCount: documents.length,
         updateInfo: {
           fullRebuild,
-          timestamp: tagIndex.metadata.lastUpdated.toISOString()
-        }
+          timestamp: tagIndex.metadata.lastUpdated.toISOString(),
+        },
       };
     } catch (error) {
       logger.error('Error updating global tag index', error);
@@ -207,7 +210,7 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
     tags: Tag[],
     matchAll: boolean = false
   ): Promise<DocumentPath[]> {
-    logger.info(`Finding branch documents by tags: ${tags.map(t => t.value).join(', ')}`);
+    logger.info(`Finding branch documents by tags: ${tags.map((t) => t.value).join(', ')}`);
 
     try {
       // Read the index
@@ -218,12 +221,10 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
       }
 
       // Get tag values
-      const tagValues = tags.map(tag => tag.value);
+      const tagValues = tags.map((tag) => tag.value);
 
       // Find matching tag entries
-      const matchingEntries = tagIndex.index.filter(entry =>
-        tagValues.includes(entry.tag)
-      );
+      const matchingEntries = tagIndex.index.filter((entry) => tagValues.includes(entry.tag));
 
       if (matchingEntries.length === 0) {
         return [];
@@ -235,13 +236,13 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
       if (matchAll) {
         // Documents must have ALL specified tags
         // First, get all document paths from the first tag
-        const firstTagDocs = matchingEntries[0].documents.map(doc => doc.path);
+        const firstTagDocs = matchingEntries[0].documents.map((doc) => doc.path);
 
         // Then filter to only include documents that have ALL other tags
-        matchingDocPaths = firstTagDocs.filter(path => {
+        matchingDocPaths = firstTagDocs.filter((path) => {
           // Check if this document has all other tags
-          return matchingEntries.slice(1).every(entry => {
-            return entry.documents.some(doc => doc.path === path);
+          return matchingEntries.slice(1).every((entry) => {
+            return entry.documents.some((doc) => doc.path === path);
           });
         });
       } else {
@@ -259,7 +260,7 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
       }
 
       // Convert to DocumentPath objects
-      return matchingDocPaths.map(path => DocumentPath.create(path));
+      return matchingDocPaths.map((path) => DocumentPath.create(path));
     } catch (error) {
       logger.error(`Error finding branch documents by tags for branch: ${branchInfo.name}`, error);
       throw new InfrastructureError(
@@ -276,11 +277,8 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
    * @param matchAll Whether documents must have all tags (AND) or any tag (OR)
    * @returns Promise resolving to array of document paths matching the tags
    */
-  async findGlobalDocumentsByTags(
-    tags: Tag[],
-    matchAll: boolean = false
-  ): Promise<DocumentPath[]> {
-    logger.info(`Finding global documents by tags: ${tags.map(t => t.value).join(', ')}`);
+  async findGlobalDocumentsByTags(tags: Tag[], matchAll: boolean = false): Promise<DocumentPath[]> {
+    logger.info(`Finding global documents by tags: ${tags.map((t) => t.value).join(', ')}`);
 
     try {
       // Read the index
@@ -291,12 +289,10 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
       }
 
       // Get tag values
-      const tagValues = tags.map(tag => tag.value);
+      const tagValues = tags.map((tag) => tag.value);
 
       // Find matching tag entries
-      const matchingEntries = tagIndex.index.filter(entry =>
-        tagValues.includes(entry.tag)
-      );
+      const matchingEntries = tagIndex.index.filter((entry) => tagValues.includes(entry.tag));
 
       if (matchingEntries.length === 0) {
         return [];
@@ -308,13 +304,13 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
       if (matchAll) {
         // Documents must have ALL specified tags
         // First, get all document paths from the first tag
-        const firstTagDocs = matchingEntries[0].documents.map(doc => doc.path);
+        const firstTagDocs = matchingEntries[0].documents.map((doc) => doc.path);
 
         // Then filter to only include documents that have ALL other tags
-        matchingDocPaths = firstTagDocs.filter(path => {
+        matchingDocPaths = firstTagDocs.filter((path) => {
           // Check if this document has all other tags
-          return matchingEntries.slice(1).every(entry => {
-            return entry.documents.some(doc => doc.path === path);
+          return matchingEntries.slice(1).every((entry) => {
+            return entry.documents.some((doc) => doc.path === path);
           });
         });
       } else {
@@ -332,7 +328,7 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
       }
 
       // Convert to DocumentPath objects
-      return matchingDocPaths.map(path => DocumentPath.create(path));
+      return matchingDocPaths.map((path) => DocumentPath.create(path));
     } catch (error) {
       logger.error('Error finding global documents by tags', error);
       throw new InfrastructureError(

@@ -27,7 +27,7 @@ export const DocumentReferenceSchema = z.object({
   title: z.string().min(1, 'Title cannot be empty'),
 
   // Last modified timestamp
-  lastModified: FlexibleDateSchema
+  lastModified: FlexibleDateSchema,
 });
 
 // Tag entry mapping a tag to document references
@@ -36,7 +36,7 @@ export const TagEntrySchema = z.object({
   tag: TagSchema,
 
   // List of documents containing this tag
-  documents: z.array(DocumentReferenceSchema)
+  documents: z.array(DocumentReferenceSchema),
 });
 
 // Base schema for a tag index
@@ -59,11 +59,11 @@ export const BaseTagIndexSchema = z.object({
     documentCount: z.number().int().nonnegative(),
 
     // Number of unique tags
-    tagCount: z.number().int().nonnegative()
+    tagCount: z.number().int().nonnegative(),
   }),
 
   // Index data - mapping of tags to documents
-  index: z.array(TagEntrySchema)
+  index: z.array(TagEntrySchema),
 });
 
 // Branch-specific tag index schema
@@ -73,8 +73,8 @@ export const BranchTagIndexSchema = BaseTagIndexSchema.extend({
     branchName: z.string().min(1, 'Branch name cannot be empty'),
     lastUpdated: FlexibleDateSchema,
     documentCount: z.number().int().nonnegative(),
-    tagCount: z.number().int().nonnegative()
-  })
+    tagCount: z.number().int().nonnegative(),
+  }),
 });
 
 // Global tag index schema
@@ -83,8 +83,8 @@ export const GlobalTagIndexSchema = BaseTagIndexSchema.extend({
     indexType: z.literal('global'),
     lastUpdated: FlexibleDateSchema,
     documentCount: z.number().int().nonnegative(),
-    tagCount: z.number().int().nonnegative()
-  })
+    tagCount: z.number().int().nonnegative(),
+  }),
 });
 
 // Type exports for TypeScript usage

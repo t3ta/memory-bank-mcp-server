@@ -40,7 +40,10 @@ export class BuildIndexCommand extends CommandBase {
       })
       .example('$0 json build-index -b feature/my-feature', 'Build index for a branch')
       .example('$0 json build-index', 'Build index for global memory bank')
-      .example('$0 json build-index -b feature/my-feature -f', 'Force complete rebuild of branch index');
+      .example(
+        '$0 json build-index -b feature/my-feature -f',
+        'Force complete rebuild of branch index'
+      );
   }
 
   /**
@@ -58,15 +61,12 @@ export class BuildIndexCommand extends CommandBase {
       let result;
       if (argv.branch) {
         // Use JSON branch use case through MCP
-        result = await app.getBranchController().updateJsonIndex(
-          argv.branch, 
-          { force: argv.force }
-        );
+        result = await app
+          .getBranchController()
+          .updateJsonIndex(argv.branch, { force: argv.force });
       } else {
         // Use JSON global use case through MCP
-        result = await app.getGlobalController().updateJsonIndex(
-          { force: argv.force }
-        );
+        result = await app.getGlobalController().updateJsonIndex({ force: argv.force });
       }
 
       // Handle response
@@ -79,7 +79,7 @@ export class BuildIndexCommand extends CommandBase {
       const location = argv.branch ? `branch ${argv.branch}` : 'global memory bank';
       const rebuildType = argv.force ? 'Forced complete rebuild' : 'Incremental update';
       logger.info(`${rebuildType} of JSON document index for ${location} completed successfully.`);
-      
+
       // Show stats if available
       if (result.data.stats) {
         const stats = result.data.stats;
@@ -88,7 +88,6 @@ export class BuildIndexCommand extends CommandBase {
         console.log(`  Tags indexed: ${stats.tagsIndexed || 0}`);
         console.log(`  Execution time: ${stats.executionTimeMs || 0}ms`);
       }
-      
     } catch (error) {
       this.handleError(error, 'Failed to build index');
     }

@@ -19,6 +19,9 @@ const mockBranchRepository: jest.Mocked<IBranchMemoryBankRepository> = {
   findDocumentsByTags: jest.fn(),
   getRecentBranches: jest.fn(),
   validateStructure: jest.fn(),
+  saveTagIndex: jest.fn(),
+  getTagIndex: jest.fn(),
+  findDocumentPathsByTagsUsingIndex: jest.fn(),
 };
 
 describe('CreateBranchCoreFilesUseCase', () => {

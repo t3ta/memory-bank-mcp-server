@@ -72,8 +72,12 @@ export async function registerInfrastructureServices(
   container.registerFactory('tagIndexRepository', () => {
     const fileSystemService = container.get<IFileSystemService>('fileSystemService');
     const configProvider = container.get<IConfigProvider>('configProvider');
-    const globalRepository = container.get('globalMemoryBankRepository') as FileSystemGlobalMemoryBankRepository;
-    const branchRepository = container.get('branchMemoryBankRepository') as FileSystemBranchMemoryBankRepository;
+    const globalRepository = container.get(
+      'globalMemoryBankRepository'
+    ) as FileSystemGlobalMemoryBankRepository;
+    const branchRepository = container.get(
+      'branchMemoryBankRepository'
+    ) as FileSystemBranchMemoryBankRepository;
     // Get the branch memory bank root directory without using getBranchMemoryPath
     const config = configProvider.getConfig();
     const branchMemoryBankRoot = path.join(config.memoryBankRoot, 'branch-memory-bank');
@@ -165,7 +169,9 @@ export function registerApplicationServices(container: DIContainer): void {
     const branchRepository = container.get(
       'branchMemoryBankRepository'
     ) as FileSystemBranchMemoryBankRepository;
-    const tagIndexRepository = container.get('tagIndexRepository') as FileSystemTagIndexRepositoryV1Bridge;
+    const tagIndexRepository = container.get(
+      'tagIndexRepository'
+    ) as FileSystemTagIndexRepositoryV1Bridge;
 
     return new UpdateTagIndexUseCaseV2(globalRepository, branchRepository, tagIndexRepository);
   });
@@ -244,7 +250,9 @@ export function registerInterfaceServices(container: DIContainer): void {
     const presenter = container.get('mcpResponsePresenter') as MCPResponsePresenter;
 
     // Get update tag index use case V2
-    const updateTagIndexUseCaseV2 = container.get('updateTagIndexUseCaseV2') as UpdateTagIndexUseCaseV2;
+    const updateTagIndexUseCaseV2 = container.get(
+      'updateTagIndexUseCaseV2'
+    ) as UpdateTagIndexUseCaseV2;
 
     return new GlobalController(
       readGlobalDocumentUseCase,
@@ -280,7 +288,9 @@ export function registerInterfaceServices(container: DIContainer): void {
     const presenter = container.get('mcpResponsePresenter') as MCPResponsePresenter;
 
     // Get update tag index use case V2
-    const updateTagIndexUseCaseV2 = container.get('updateTagIndexUseCaseV2') as UpdateTagIndexUseCaseV2;
+    const updateTagIndexUseCaseV2 = container.get(
+      'updateTagIndexUseCaseV2'
+    ) as UpdateTagIndexUseCaseV2;
 
     return new BranchController(
       readBranchDocumentUseCase,

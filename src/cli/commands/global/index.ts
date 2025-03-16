@@ -9,10 +9,7 @@ import { WriteGlobalCommand } from './write-global.js';
  */
 export function registerGlobalCommands(yargs: Argv): Argv {
   // Create command instances
-  const commands = [
-    new ReadGlobalCommand(),
-    new WriteGlobalCommand(),
-  ];
+  const commands = [new ReadGlobalCommand(), new WriteGlobalCommand()];
 
   // Register each command
   let yargsInstance = yargs;

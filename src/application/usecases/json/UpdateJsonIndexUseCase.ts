@@ -1,6 +1,7 @@
 import { IUseCase } from '../../interfaces/IUseCase.js';
 import { IJsonDocumentRepository } from '../../../domain/repositories/IJsonDocumentRepository.js';
 import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
+import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
 import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
 import {
   ApplicationError,
@@ -85,23 +86,23 @@ export class UpdateJsonIndexUseCase
     try {
       // Determine if updating branch or global index
       const isGlobal = !input.branchName;
-      const repository = isGlobal ? this.globalRepository || this.jsonRepository : this.jsonRepository;
+      const repository = isGlobal
+        ? this.globalRepository || this.jsonRepository
+        : this.jsonRepository;
       const location = isGlobal ? 'global' : input.branchName!;
       const fullRebuild = input.fullRebuild ?? false;
 
-      // Create branch info
-      const branchInfo = isGlobal 
-        ? BranchInfo.create('global') 
+      // Create branch info - use feature/global for global operations to pass BranchInfo validation
+      const branchInfo = isGlobal
+        ? BranchInfo.create('feature/global')
         : BranchInfo.create(input.branchName!);
 
       // Check if branch exists for branch index updates
       if (!isGlobal) {
-        const branchExists = await this.jsonRepository.exists(
-          branchInfo, 
-          // Using branch info's path as a placeholder
-          branchInfo.path
-        );
-        
+        // Create a dummy path to check if branch exists
+        const dummyPath = DocumentPath.create('index.json');
+        const branchExists = await this.jsonRepository.exists(branchInfo, dummyPath);
+
         if (!branchExists) {
           throw new DomainError(
             DomainErrorCodes.BRANCH_NOT_FOUND,
@@ -125,8 +126,13 @@ export class UpdateJsonIndexUseCase
       }
 
       // Get index stats
-      const index = await this.indexService.getIndex(branchInfo);
-      const tags = index ? Object.keys(index.tagIndex) : [];
+      // We need to extract tags from the documents since getIndex method isn't available
+      const uniqueTags = new Set<string>();
+      documents.forEach(doc => {
+        doc.tags.forEach(tag => uniqueTags.add(tag.value));
+      });
+      
+      const tags = Array.from(uniqueTags);
 
       // Return result
       return {
@@ -135,8 +141,8 @@ export class UpdateJsonIndexUseCase
         updateInfo: {
           updateLocation: location,
           fullRebuild,
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       };
     } catch (error) {
       // Re-throw domain and application errors

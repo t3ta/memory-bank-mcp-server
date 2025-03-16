@@ -42,7 +42,7 @@ export class BranchController implements IBranchController {
    */
   // Optional dependencies
   private readonly updateTagIndexUseCaseV2?: UpdateTagIndexUseCaseV2;
-  
+
   constructor(
     private readonly readBranchDocumentUseCase: ReadBranchDocumentUseCase,
     private readonly writeBranchDocumentUseCase: WriteBranchDocumentUseCase,

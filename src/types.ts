@@ -2,7 +2,7 @@ export interface McpError {
   code: number;
   message: string;
 }
-/* 使用されていないが、MCPプロトコルの標準エラーコードとして定義 */
+/* Defined as standard error codes for the MCP, although not used */
 
 export enum _ErrorCode {
   _ParseError = -32700,

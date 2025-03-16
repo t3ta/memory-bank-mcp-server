@@ -24,11 +24,11 @@ export async function readInput(options: ReadInputOptions = {}): Promise<string>
   // Otherwise, read from stdin
   return new Promise((resolve) => {
     let data = '';
-    
+
     const dataListener = (chunk: Buffer) => {
       data += chunk;
     };
-    
+
     const endListener = () => {
       resolve(data);
     };

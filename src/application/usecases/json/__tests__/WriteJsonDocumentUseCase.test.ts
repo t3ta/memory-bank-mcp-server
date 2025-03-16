@@ -148,8 +148,8 @@ describe('WriteJsonDocumentUseCase', () => {
 
   describe('Writing to global repository', () => {
     it('should create a new document in global repository', async () => {
-      // Arrange
-      const branchInfo = BranchInfo.create('global');
+      // Arrange - globalのところをfeature/globalに変更
+      const branchInfo = BranchInfo.create('feature/global');
       const documentPath = DocumentPath.create(testDocumentPath);
 
       // Mock repository behavior

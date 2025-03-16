@@ -1,6 +1,6 @@
 /**
  * Schema definitions for the document index system
- * 
+ *
  * The index system provides efficient lookup for documents by:
  * - Document ID
  * - Tags
@@ -17,7 +17,7 @@ export const DocumentReferenceSchema = z.object({
   id: z.string().uuid('Document ID must be a valid UUID'),
   path: z.string().min(1, 'Path cannot be empty'),
   documentType: z.string().min(1, 'Document type cannot be empty'),
-  title: z.string().min(1, 'Title cannot be empty')
+  title: z.string().min(1, 'Title cannot be empty'),
 });
 
 // Schema for the primary index
@@ -26,18 +26,18 @@ export const DocumentIndexSchema = z.object({
   schema: z.literal(INDEX_SCHEMA_VERSION),
   lastUpdated: FlexibleDateSchema,
   branchName: z.string().min(1, 'Branch name cannot be empty'),
-  
+
   // ID-based index (maps document IDs to document references)
   idIndex: z.record(z.string().uuid(), DocumentReferenceSchema),
-  
+
   // Path-based index (maps document paths to document IDs)
   pathIndex: z.record(z.string(), z.string().uuid()),
-  
+
   // Document type index (maps document types to arrays of document IDs)
   typeIndex: z.record(z.string(), z.array(z.string().uuid())),
-  
+
   // Tag index (maps tag values to arrays of document IDs)
-  tagIndex: z.record(z.string(), z.array(z.string().uuid()))
+  tagIndex: z.record(z.string(), z.array(z.string().uuid())),
 });
 
 // Type exports for TypeScript usage

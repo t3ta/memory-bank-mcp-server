@@ -16,10 +16,7 @@ export class DocumentId {
    */
   public static create(value: string): DocumentId {
     if (!value) {
-      throw new DomainError(
-        DomainErrorCodes.INVALID_DOCUMENT_ID,
-        'Document ID cannot be empty'
-      );
+      throw new DomainError(DomainErrorCodes.INVALID_DOCUMENT_ID, 'Document ID cannot be empty');
     }
 
     if (!uuidValidate(value)) {

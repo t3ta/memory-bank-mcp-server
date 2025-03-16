@@ -50,7 +50,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
         try {
           // Parse JSON content
           const jsonDoc = JSON.parse(content);
-          
+
           // Convert JSON to MemoryDocument
           return MemoryDocument.fromJSON(jsonDoc, path);
         } catch (error) {
@@ -172,7 +172,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
         // Convert to JSON format
         const jsonDoc = document.toJSON();
         const jsonContent = JSON.stringify(jsonDoc, null, 2);
-        
+
         // Write JSON file
         await this.fileSystemService.writeFile(filePath, jsonContent);
         return;

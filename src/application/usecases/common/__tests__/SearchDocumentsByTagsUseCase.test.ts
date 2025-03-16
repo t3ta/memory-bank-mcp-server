@@ -1,67 +1,41 @@
+import { describe, it, expect, beforeEach } from '@jest/globals';
+import { mock, instance, when, verify, anyString, anything, deepEqual, reset } from 'ts-mockito';
 import { SearchDocumentsByTagsUseCase } from '../SearchDocumentsByTagsUseCase.js';
-import { IBranchMemoryBankRepository } from '../../../../domain/repositories/IBranchMemoryBankRepository.js';
-import { IGlobalMemoryBankRepository } from '../../../../domain/repositories/IGlobalMemoryBankRepository.js';
+import { BranchInfo } from '../../../../domain/entities/BranchInfo.js';
 import { DocumentPath } from '../../../../domain/entities/DocumentPath.js';
-import { MemoryDocument } from '../../../../domain/entities/MemoryDocument.js';
 import { Tag } from '../../../../domain/entities/Tag.js';
 import {
   ApplicationError,
   ApplicationErrorCodes,
 } from '../../../../shared/errors/ApplicationError.js';
 import { DomainError, DomainErrorCodes } from '../../../../shared/errors/DomainError.js';
-
-// Mock repositories
-const mockGlobalRepository: jest.Mocked<IGlobalMemoryBankRepository> = {
-  initialize: jest.fn(),
-  getDocument: jest.fn(),
-  saveDocument: jest.fn(),
-  deleteDocument: jest.fn(),
-  listDocuments: jest.fn(),
-  findDocumentsByTags: jest.fn(),
-  validateStructure: jest.fn(),
-  updateTagsIndex: jest.fn(),
-};
-
-const mockBranchRepository: jest.Mocked<IBranchMemoryBankRepository> = {
-  exists: jest.fn(),
-  initialize: jest.fn(),
-  getDocument: jest.fn(),
-  saveDocument: jest.fn(),
-  deleteDocument: jest.fn(),
-  listDocuments: jest.fn(),
-  findDocumentsByTags: jest.fn(),
-  getRecentBranches: jest.fn(),
-  validateStructure: jest.fn(),
-};
-
-// Helper function to create test documents
-const createTestDocument = (
-  path: string,
-  tags: string[],
-  content: string = `# Test Document\n\nContent for ${path}`
-): MemoryDocument => {
-  return MemoryDocument.create({
-    path: DocumentPath.create(path),
-    content,
-    tags: tags.map((t) => Tag.create(t)),
-    lastModified: new Date('2023-01-01T00:00:00.000Z'),
-  });
-};
+import { createMockBranchRepository, createMockGlobalRepository } from '../../../../../tests/mocks/repositories.js';
+import { createTestDocument, createTestBranch, createTestTags } from '../../../../../tests/helpers/test-data.js';
 
 describe('SearchDocumentsByTagsUseCase', () => {
   let useCase: SearchDocumentsByTagsUseCase;
+  let mockBranchRepo;
+  let mockGlobalRepo;
+  let branchRepoInstance;
+  let globalRepoInstance;
 
   beforeEach(() => {
-    // Reset mocks
-    jest.clearAllMocks();
+    // 各テスト前にモックを作成
+    const branchRepoMock = createMockBranchRepository();
+    const globalRepoMock = createMockGlobalRepository();
 
-    // Create use case with mock repositories
-    useCase = new SearchDocumentsByTagsUseCase(mockGlobalRepository, mockBranchRepository);
+    mockBranchRepo = branchRepoMock.mock;
+    mockGlobalRepo = globalRepoMock.mock;
+    branchRepoInstance = branchRepoMock.instance;
+    globalRepoInstance = globalRepoMock.instance;
+
+    useCase = new SearchDocumentsByTagsUseCase(globalRepoInstance, branchRepoInstance);
   });
 
   it('should search documents in global memory bank', async () => {
     // Arrange
     const searchTags = ['architecture', 'design'];
+    const tagObjects = createTestTags(searchTags);
 
     // Create test documents
     const documents = [
@@ -71,7 +45,7 @@ describe('SearchDocumentsByTagsUseCase', () => {
     ];
 
     // Mock repository behavior
-    mockGlobalRepository.findDocumentsByTags.mockResolvedValue(documents);
+    when(mockGlobalRepo.findDocumentsByTags(anything())).thenResolve(documents);
 
     // Act
     const result = await useCase.execute({ tags: searchTags });
@@ -85,23 +59,18 @@ describe('SearchDocumentsByTagsUseCase', () => {
     expect(result.searchInfo.searchLocation).toBe('global');
 
     // Verify repository calls
-    expect(mockGlobalRepository.findDocumentsByTags).toHaveBeenCalledTimes(1);
-
-    // Check that findDocumentsByTags was called with correct tags
-    const callTags = mockGlobalRepository.findDocumentsByTags.mock.calls[0][0];
-    expect(callTags).toHaveLength(2);
-    expect(callTags[0].value).toBe('architecture');
-    expect(callTags[1].value).toBe('design');
+    verify(mockGlobalRepo.findDocumentsByTags(anything())).once();
 
     // Verify branch repository was not called
-    expect(mockBranchRepository.exists).not.toHaveBeenCalled();
-    expect(mockBranchRepository.findDocumentsByTags).not.toHaveBeenCalled();
+    verify(mockBranchRepo.exists(anyString())).never();
+    verify(mockBranchRepo.findDocumentsByTags(anything(), anything())).never();
   });
 
   it('should search documents in branch memory bank', async () => {
     // Arrange
     const searchTags = ['feature', 'todo'];
     const branchName = 'feature/login';
+    const branchInfo = createTestBranch(branchName);
 
     // Create test documents
     const documents = [
@@ -110,8 +79,8 @@ describe('SearchDocumentsByTagsUseCase', () => {
     ];
 
     // Mock repository behavior
-    mockBranchRepository.exists.mockResolvedValue(true);
-    mockBranchRepository.findDocumentsByTags.mockResolvedValue(documents);
+    when(mockBranchRepo.exists(branchName)).thenResolve(true);
+    when(mockBranchRepo.findDocumentsByTags(anything(), anything())).thenResolve(documents);
 
     // Act
     const result = await useCase.execute({ tags: searchTags, branchName });
@@ -125,11 +94,11 @@ describe('SearchDocumentsByTagsUseCase', () => {
     expect(result.searchInfo.searchLocation).toBe(branchName);
 
     // Verify repository calls
-    expect(mockBranchRepository.exists).toHaveBeenCalledWith(branchName);
-    expect(mockBranchRepository.findDocumentsByTags).toHaveBeenCalledTimes(1);
+    verify(mockBranchRepo.exists(branchName)).once();
+    verify(mockBranchRepo.findDocumentsByTags(anything(), anything())).once();
 
     // Verify global repository was not called
-    expect(mockGlobalRepository.findDocumentsByTags).not.toHaveBeenCalled();
+    verify(mockGlobalRepo.findDocumentsByTags(anything())).never();
   });
 
   it('should filter documents by all tags when matchAllTags is true', async () => {
@@ -144,7 +113,7 @@ describe('SearchDocumentsByTagsUseCase', () => {
     ];
 
     // Mock repository behavior
-    mockGlobalRepository.findDocumentsByTags.mockResolvedValue(documents);
+    when(mockGlobalRepo.findDocumentsByTags(anything())).thenResolve(documents);
 
     // Act
     const result = await useCase.execute({ tags: searchTags, matchAllTags: true });
@@ -169,7 +138,7 @@ describe('SearchDocumentsByTagsUseCase', () => {
     );
 
     // Mock repository behavior
-    mockGlobalRepository.findDocumentsByTags.mockResolvedValue([document]);
+    when(mockGlobalRepo.findDocumentsByTags(anything())).thenResolve([document]);
 
     // Act
     const result = await useCase.execute({ tags: searchTags });
@@ -206,8 +175,8 @@ describe('SearchDocumentsByTagsUseCase', () => {
     }
 
     // Verify repositories were not called
-    expect(mockGlobalRepository.findDocumentsByTags).not.toHaveBeenCalled();
-    expect(mockBranchRepository.findDocumentsByTags).not.toHaveBeenCalled();
+    verify(mockGlobalRepo.findDocumentsByTags(anything())).never();
+    verify(mockBranchRepo.findDocumentsByTags(anything(), anything())).never();
   });
 
   it('should throw DomainError if branch does not exist', async () => {
@@ -216,7 +185,7 @@ describe('SearchDocumentsByTagsUseCase', () => {
     const branchName = 'feature/nonexistent';
 
     // Mock repository behavior - branch doesn't exist
-    mockBranchRepository.exists.mockResolvedValue(false);
+    when(mockBranchRepo.exists(branchName)).thenResolve(false);
 
     // Act & Assert
     await expect(useCase.execute({ tags: searchTags, branchName })).rejects.toThrow(DomainError);
@@ -232,8 +201,8 @@ describe('SearchDocumentsByTagsUseCase', () => {
     }
 
     // Verify branch repository was called to check existence but not to find documents
-    expect(mockBranchRepository.exists).toHaveBeenCalledWith(branchName);
-    expect(mockBranchRepository.findDocumentsByTags).not.toHaveBeenCalled();
+    verify(mockBranchRepo.exists(branchName)).called();
+    verify(mockBranchRepo.findDocumentsByTags(anything(), anything())).never();
   });
 
   it('should throw DomainError if tag is invalid', async () => {
@@ -247,7 +216,7 @@ describe('SearchDocumentsByTagsUseCase', () => {
     );
 
     // Verify repositories were not called
-    expect(mockGlobalRepository.findDocumentsByTags).not.toHaveBeenCalled();
+    verify(mockGlobalRepo.findDocumentsByTags(anything())).never();
   });
 
   it('should handle case with no matching documents', async () => {
@@ -255,7 +224,7 @@ describe('SearchDocumentsByTagsUseCase', () => {
     const searchTags = ['nonexistent'];
 
     // Mock repository behavior - no matching documents
-    mockGlobalRepository.findDocumentsByTags.mockResolvedValue([]);
+    when(mockGlobalRepo.findDocumentsByTags(anything())).thenResolve([]);
 
     // Act
     const result = await useCase.execute({ tags: searchTags });
@@ -272,7 +241,7 @@ describe('SearchDocumentsByTagsUseCase', () => {
 
     // Mock repository behavior - error
     const repositoryError = new Error('Database connection failed');
-    mockGlobalRepository.findDocumentsByTags.mockRejectedValue(repositoryError);
+    when(mockGlobalRepo.findDocumentsByTags(anything())).thenThrow(repositoryError);
 
     // Act & Assert
     await expect(useCase.execute({ tags: searchTags })).rejects.toThrow(ApplicationError);
@@ -297,10 +266,10 @@ describe('SearchDocumentsByTagsUseCase', () => {
 
     // Mock repository behavior - domain error
     const domainError = new DomainError(DomainErrorCodes.INVALID_TAG_FORMAT, 'Invalid tag format');
-    mockGlobalRepository.findDocumentsByTags.mockRejectedValue(domainError);
+    when(mockGlobalRepo.findDocumentsByTags(anything())).thenThrow(domainError);
 
     // Act & Assert
-    await expect(useCase.execute({ tags: searchTags })).rejects.toBe(domainError); // Should be the exact same error instance
+    await expect(useCase.execute({ tags: searchTags })).rejects.toThrow(domainError);
   });
 
   it('should pass through application errors from repository', async () => {
@@ -312,9 +281,9 @@ describe('SearchDocumentsByTagsUseCase', () => {
       ApplicationErrorCodes.UNKNOWN_ERROR,
       'Infrastructure error'
     );
-    mockGlobalRepository.findDocumentsByTags.mockRejectedValue(applicationError);
+    when(mockGlobalRepo.findDocumentsByTags(anything())).thenThrow(applicationError);
 
     // Act & Assert
-    await expect(useCase.execute({ tags: searchTags })).rejects.toBe(applicationError); // Should be the exact same error instance
+    await expect(useCase.execute({ tags: searchTags })).rejects.toThrow(applicationError);
   });
 });

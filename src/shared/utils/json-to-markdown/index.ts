@@ -23,18 +23,18 @@ export function createDefaultConverter(): JsonToMarkdownConverter {
   const { ProgressConverter } = require('./converters/ProgressConverter.js');
   const { SystemPatternsConverter } = require('./converters/SystemPatternsConverter.js');
   const { GenericConverter } = require('./converters/GenericConverter.js');
-  
+
   // Create converter instance
   const converter = new JsonToMarkdownConverter();
-  
+
   // Register all converters
   converter.registerConverter(new BranchContextConverter());
   converter.registerConverter(new ActiveContextConverter());
   converter.registerConverter(new ProgressConverter());
   converter.registerConverter(new SystemPatternsConverter());
-  
+
   // Register generic converter last (as fallback)
   converter.registerConverter(new GenericConverter());
-  
+
   return converter;
 }

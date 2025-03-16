@@ -2,11 +2,7 @@ import { DocumentPath } from './DocumentPath.js';
 import { Tag } from './Tag.js';
 import { jsonToMarkdown } from '../../shared/utils/markdown-converter.js';
 import { parseMarkdown } from '../../shared/utils/markdown-parser.js';
-import { 
-  JsonDocument, 
-  DocumentMetadata,
-  BaseJsonDocument
-} from '../../schemas/json-document.js';
+import { JsonDocument, DocumentMetadata, BaseJsonDocument } from '../../schemas/json-document.js';
 
 /**
  * Props for MemoryDocument entity
@@ -205,20 +201,20 @@ export class MemoryDocument {
     // If markdown or other format, parse and convert
     const documentType = this.determineDocumentType();
     const parsed = parseMarkdown(this.props.content, this.props.path.value);
-    
+
     // Ensure we have a title
     const title = this.title || parsed.metadata.title || this.props.path.filename;
-    
+
     return {
       schema: 'memory_document_v1',
       metadata: {
         title,
         documentType,
         path: this.props.path.value,
-        tags: this.props.tags.map(tag => tag.value),
-        lastModified: this.props.lastModified
+        tags: this.props.tags.map((tag) => tag.value),
+        lastModified: this.props.lastModified,
       },
-      content: parsed.content
+      content: parsed.content,
     };
   }
 
@@ -230,13 +226,13 @@ export class MemoryDocument {
   public static fromJSON(jsonDoc: BaseJsonDocument, path: DocumentPath): MemoryDocument {
     // Convert JSON to markdown
     const markdown = jsonToMarkdown(jsonDoc as JsonDocument);
-    
+
     // Create document
     return MemoryDocument.create({
       path,
       content: markdown,
-      tags: (jsonDoc.metadata.tags || []).map(tag => Tag.create(tag)),
-      lastModified: new Date(jsonDoc.metadata.lastModified)
+      tags: (jsonDoc.metadata.tags || []).map((tag) => Tag.create(tag)),
+      lastModified: new Date(jsonDoc.metadata.lastModified),
     });
   }
 
@@ -246,7 +242,7 @@ export class MemoryDocument {
    */
   private determineDocumentType(): string {
     const filename = this.props.path.filename.toLowerCase();
-    
+
     if (filename.includes('branchcontext') || filename.includes('branch-context')) {
       return 'branch_context';
     } else if (filename.includes('activecontext') || filename.includes('active-context')) {

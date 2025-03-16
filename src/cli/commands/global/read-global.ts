@@ -39,7 +39,10 @@ export class ReadGlobalCommand extends CommandBase {
         choices: ['en', 'ja'],
         default: 'en',
       })
-      .example('$0 read-global architecture.md', 'Read architecture document from global memory bank');
+      .example(
+        '$0 read-global architecture.md',
+        'Read architecture document from global memory bank'
+      );
   }
 
   /**
@@ -54,7 +57,7 @@ export class ReadGlobalCommand extends CommandBase {
       });
 
       const result = await app.getGlobalController().readDocument(argv.path as string);
-      
+
       // Handle response
       if (!result.success) {
         logger.error(`Error reading document: ${result.error.message}`);

@@ -19,6 +19,9 @@ const mockGlobalRepository: jest.Mocked<IGlobalMemoryBankRepository> = {
   findDocumentsByTags: jest.fn(),
   updateTagsIndex: jest.fn(),
   validateStructure: jest.fn(),
+  saveTagIndex: jest.fn(),
+  getTagIndex: jest.fn(),
+  findDocumentPathsByTagsUsingIndex: jest.fn(),
 };
 
 describe('ReadGlobalDocumentUseCase', () => {

@@ -16,13 +16,18 @@ import {
   ProgressJsonV2,
   SystemPatternsJsonV2Schema,
   SystemPatternsJsonV2,
-  DocumentMetadataV2
+  DocumentMetadataV2,
 } from '../../schemas/v2/json-document.js';
 
 /**
  * Type discriminator for document types
  */
-export type DocumentType = 'branch_context' | 'active_context' | 'progress' | 'system_patterns' | 'generic';
+export type DocumentType =
+  | 'branch_context'
+  | 'active_context'
+  | 'progress'
+  | 'system_patterns'
+  | 'generic';
 
 /**
  * JsonDocument entity represents a structured document stored in JSON format
@@ -116,7 +121,7 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
 
     // Create domain objects
     const id = DocumentId.create(metadata.id);
-    const tags = metadata.tags.map(tag => Tag.create(tag));
+    const tags = metadata.tags.map((tag) => Tag.create(tag));
     const lastModified = new Date(metadata.lastModified);
     const createdAt = new Date(metadata.createdAt);
 
@@ -147,7 +152,7 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
     content,
     lastModified = new Date(),
     createdAt = new Date(),
-    version = 1
+    version = 1,
   }: {
     id?: DocumentId;
     path: DocumentPath;
@@ -444,12 +449,12 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
         title: this._title,
         documentType: this._documentType,
         path: this._path.value,
-        tags: this._tags.map(tag => tag.value),
+        tags: this._tags.map((tag) => tag.value),
         lastModified: this._lastModified,
         createdAt: this._createdAt,
-        version: this._version
+        version: this._version,
       },
-      content: this._content
+      content: this._content,
     };
   }
 

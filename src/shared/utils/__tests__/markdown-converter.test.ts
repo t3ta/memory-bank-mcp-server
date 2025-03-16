@@ -4,7 +4,8 @@ import {
   ActiveContextJson,
   ProgressJson,
   SystemPatternsJson,
-  JsonDocument
+  JsonDocument,
+  BaseJsonDocument
 } from '../../../schemas/json-document.js';
 
 describe('markdown-converter', () => {
@@ -233,7 +234,8 @@ describe('markdown-converter', () => {
       };
 
       // Act
-      const markdown = jsonToMarkdown(jsonDoc as JsonDocument);
+      // 型互換性の問題を解決するため、まずunknownにキャストしてからJsonDocumentにキャスト
+      const markdown = jsonToMarkdown(jsonDoc as unknown as BaseJsonDocument);
 
       // Assert
       expect(markdown).toContain('# Unknown Document');

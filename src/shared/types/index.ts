@@ -75,7 +75,7 @@ export interface ValidationError {
 /**
  * Types of validation errors
  *
- * 注意: このenumはValidationErrorインターフェースで使用されています
+ * Note: This enum is used in the ValidationError interface
  */
 export enum ValidationErrorType {
   _MISSING_FILE = 'MISSING_FILE',

@@ -56,8 +56,14 @@ export class SearchJsonCommand extends CommandBase {
         description: 'Run with verbose logging',
         default: false,
       })
-      .example('$0 json search architecture design -b feature/my-feature', 'Search for documents with tags "architecture" or "design"')
-      .example('$0 json search architecture design --all', 'Search for documents with both "architecture" and "design" tags')
+      .example(
+        '$0 json search architecture design -b feature/my-feature',
+        'Search for documents with tags "architecture" or "design"'
+      )
+      .example(
+        '$0 json search architecture design --all',
+        'Search for documents with both "architecture" and "design" tags'
+      )
       .example('$0 json search --type branchContext', 'Search for all branchContext documents');
   }
 
@@ -68,7 +74,7 @@ export class SearchJsonCommand extends CommandBase {
     try {
       // Normalize tags
       const tags = argv.tags || [];
-      
+
       // Initialize application
       const app = await createApplication({
         memoryRoot: argv.docs as string,
@@ -79,23 +85,18 @@ export class SearchJsonCommand extends CommandBase {
       let result;
       if (argv.branch) {
         // Use JSON branch use case through MCP
-        result = await app.getBranchController().searchJsonDocuments(
-          argv.branch, 
-          {
-            tags,
-            matchAll: argv.all, 
-            documentType: argv.type
-          }
-        );
+        result = await app.getBranchController().searchJsonDocuments(argv.branch, {
+          tags,
+          matchAll: argv.all,
+          documentType: argv.type,
+        });
       } else {
         // Use JSON global use case through MCP
-        result = await app.getGlobalController().searchJsonDocuments(
-          {
-            tags,
-            matchAll: argv.all,
-            documentType: argv.type
-          }
-        );
+        result = await app.getGlobalController().searchJsonDocuments({
+          tags,
+          matchAll: argv.all,
+          documentType: argv.type,
+        });
       }
 
       // Handle response
@@ -105,16 +106,17 @@ export class SearchJsonCommand extends CommandBase {
       }
 
       const documents = result.data.documents;
-      
+
       // Output message if no documents found
       if (documents.length === 0) {
         const location = argv.branch ? `branch ${argv.branch}` : 'global memory bank';
-        const tagsMsg = tags.length > 0 
-          ? `with tags ${tags.map((t: string) => `"${t}"`).join(argv.all ? ' AND ' : ' OR ')}` 
-          : '';
+        const tagsMsg =
+          tags.length > 0
+            ? `with tags ${tags.map((t: string) => `"${t}"`).join(argv.all ? ' AND ' : ' OR ')}`
+            : '';
         const typeMsg = argv.type ? `of type "${argv.type}"` : '';
         const conjunction = tagsMsg && typeMsg ? ' and ' : '';
-        
+
         logger.info(`No documents found in ${location} ${tagsMsg}${conjunction}${typeMsg}`);
         return;
       }
@@ -134,7 +136,6 @@ export class SearchJsonCommand extends CommandBase {
           console.log();
         });
       }
-      
     } catch (error) {
       this.handleError(error, 'Failed to search JSON documents');
     }

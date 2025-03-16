@@ -1,19 +1,19 @@
 /**
  * Utility class for building Markdown strings
- * 
+ *
  * Provides a fluent interface for creating markdown content
  * with proper formatting and structure.
  */
 export class MarkdownBuilder {
   private content: string[];
-  
+
   /**
    * Create a new MarkdownBuilder
    */
   constructor() {
     this.content = [];
   }
-  
+
   /**
    * Add a heading to the markdown
    * @param text Heading text
@@ -23,14 +23,14 @@ export class MarkdownBuilder {
   heading(text: string, level: number = 1): MarkdownBuilder {
     if (level < 1) level = 1;
     if (level > 6) level = 6;
-    
+
     const hashes = '#'.repeat(level);
     this.content.push(`${hashes} ${text}`);
     this.content.push('');
-    
+
     return this;
   }
-  
+
   /**
    * Add a paragraph of text
    * @param text Paragraph text
@@ -39,13 +39,13 @@ export class MarkdownBuilder {
   paragraph(text: string): MarkdownBuilder {
     // Skip if empty
     if (!text.trim()) return this;
-    
+
     this.content.push(text);
     this.content.push('');
-    
+
     return this;
   }
-  
+
   /**
    * Add a list of items
    * @param items List items
@@ -55,36 +55,36 @@ export class MarkdownBuilder {
   list(items: string[], ordered: boolean = false): MarkdownBuilder {
     // Skip if empty
     if (items.length === 0) return this;
-    
+
     items.forEach((item, index) => {
       const prefix = ordered ? `${index + 1}.` : '-';
       this.content.push(`${prefix} ${item}`);
     });
-    
+
     this.content.push('');
-    
+
     return this;
   }
-  
+
   /**
    * Add a task list (checkboxes)
    * @param items List of {text, checked} objects
    * @returns this builder for chaining
    */
-  taskList(items: Array<{ text: string, checked: boolean }>): MarkdownBuilder {
+  taskList(items: Array<{ text: string; checked: boolean }>): MarkdownBuilder {
     // Skip if empty
     if (items.length === 0) return this;
-    
-    items.forEach(item => {
+
+    items.forEach((item) => {
       const checkbox = item.checked ? '[x]' : '[ ]';
       this.content.push(`- ${checkbox} ${item.text}`);
     });
-    
+
     this.content.push('');
-    
+
     return this;
   }
-  
+
   /**
    * Add a code block
    * @param code Code content
@@ -94,15 +94,15 @@ export class MarkdownBuilder {
   codeBlock(code: string, language?: string): MarkdownBuilder {
     const fence = '```';
     const lang = language || '';
-    
+
     this.content.push(`${fence}${lang}`);
     this.content.push(code);
     this.content.push(fence);
     this.content.push('');
-    
+
     return this;
   }
-  
+
   /**
    * Add a blockquote
    * @param text Quote text
@@ -111,16 +111,16 @@ export class MarkdownBuilder {
   blockquote(text: string): MarkdownBuilder {
     // Split by newlines and prefix each line with >
     const lines = text.split('\n');
-    
-    lines.forEach(line => {
+
+    lines.forEach((line) => {
       this.content.push(`> ${line}`);
     });
-    
+
     this.content.push('');
-    
+
     return this;
   }
-  
+
   /**
    * Add a horizontal rule
    * @returns this builder for chaining
@@ -128,10 +128,10 @@ export class MarkdownBuilder {
   horizontalRule(): MarkdownBuilder {
     this.content.push('---');
     this.content.push('');
-    
+
     return this;
   }
-  
+
   /**
    * Add a link
    * @param text Link text
@@ -141,10 +141,10 @@ export class MarkdownBuilder {
   link(text: string, url: string): MarkdownBuilder {
     this.content.push(`[${text}](${url})`);
     this.content.push('');
-    
+
     return this;
   }
-  
+
   /**
    * Add an image
    * @param altText Image alt text
@@ -154,10 +154,10 @@ export class MarkdownBuilder {
   image(altText: string, url: string): MarkdownBuilder {
     this.content.push(`![${altText}](${url})`);
     this.content.push('');
-    
+
     return this;
   }
-  
+
   /**
    * Add a table
    * @param headers Table headers
@@ -166,16 +166,16 @@ export class MarkdownBuilder {
    */
   table(headers: string[], rows: string[][]): MarkdownBuilder {
     if (headers.length === 0) return this;
-    
+
     // Add header row
     this.content.push(`| ${headers.join(' | ')} |`);
-    
+
     // Add separator row
     const separator = headers.map(() => '---');
     this.content.push(`| ${separator.join(' | ')} |`);
-    
+
     // Add data rows
-    rows.forEach(row => {
+    rows.forEach((row) => {
       // Ensure row has same length as headers
       const paddedRow = [...row];
       while (paddedRow.length < headers.length) {
@@ -183,12 +183,12 @@ export class MarkdownBuilder {
       }
       this.content.push(`| ${paddedRow.join(' | ')} |`);
     });
-    
+
     this.content.push('');
-    
+
     return this;
   }
-  
+
   /**
    * Add bold text
    * @param text Text to make bold
@@ -197,10 +197,10 @@ export class MarkdownBuilder {
   bold(text: string): MarkdownBuilder {
     this.content.push(`**${text}**`);
     this.content.push('');
-    
+
     return this;
   }
-  
+
   /**
    * Add italic text
    * @param text Text to italicize
@@ -209,10 +209,10 @@ export class MarkdownBuilder {
   italic(text: string): MarkdownBuilder {
     this.content.push(`*${text}*`);
     this.content.push('');
-    
+
     return this;
   }
-  
+
   /**
    * Add raw markdown text
    * @param markdown Raw markdown content
@@ -221,12 +221,12 @@ export class MarkdownBuilder {
   raw(markdown: string): MarkdownBuilder {
     // Skip if empty
     if (!markdown.trim()) return this;
-    
+
     this.content.push(markdown);
-    
+
     return this;
   }
-  
+
   /**
    * Add tags section in frontmatter format
    * @param tags Array of tags
@@ -234,15 +234,15 @@ export class MarkdownBuilder {
    */
   tags(tags: string[]): MarkdownBuilder {
     if (tags.length === 0) return this;
-    
+
     // Format tags with # prefix
-    const formattedTags = tags.map(tag => `#${tag}`).join(' ');
+    const formattedTags = tags.map((tag) => `#${tag}`).join(' ');
     this.content.push(`tags: ${formattedTags}`);
     this.content.push('');
-    
+
     return this;
   }
-  
+
   /**
    * Build the final markdown string
    * @returns Complete markdown content
@@ -250,7 +250,7 @@ export class MarkdownBuilder {
   build(): string {
     return this.content.join('\n');
   }
-  
+
   /**
    * Clear the builder content
    * @returns this builder for chaining

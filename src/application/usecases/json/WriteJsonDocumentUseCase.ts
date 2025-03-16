@@ -153,11 +153,13 @@ export class WriteJsonDocumentUseCase
       // Determine if saving in branch or global memory bank
       const isGlobal = !input.branchName;
       const location = isGlobal ? 'global' : input.branchName;
-      const repository = isGlobal ? this.globalRepository || this.jsonRepository : this.jsonRepository;
+      const repository = isGlobal
+        ? this.globalRepository || this.jsonRepository
+        : this.jsonRepository;
 
-      // Create branch info
-      const branchInfo = isGlobal 
-        ? BranchInfo.create('global') 
+      // Create branch info - BranchInfo validation requires feature/ or fix/ prefix
+      const branchInfo = isGlobal
+        ? BranchInfo.create('feature/global')  // 変更: 'global' -> 'feature/global'
         : BranchInfo.create(input.branchName!);
 
       // Create document path
@@ -171,11 +173,11 @@ export class WriteJsonDocumentUseCase
       const documentId = existingDocument
         ? existingDocument.id
         : input.document.id
-        ? DocumentId.create(input.document.id)
-        : DocumentId.generate();
+          ? DocumentId.create(input.document.id)
+          : DocumentId.generate();
 
       // Create tags
-      const tags = (input.document.tags || []).map(tag => Tag.create(tag));
+      const tags = (input.document.tags || []).map((tag) => Tag.create(tag));
 
       // Handle document creation or update
       let document: JsonDocument;
@@ -220,14 +222,14 @@ export class WriteJsonDocumentUseCase
           path: savedDocument.path.value,
           title: savedDocument.title,
           documentType: savedDocument.documentType,
-          tags: savedDocument.tags.map(tag => tag.value),
+          tags: savedDocument.tags.map((tag) => tag.value),
           content: savedDocument.content,
           lastModified: savedDocument.lastModified.toISOString(),
           createdAt: savedDocument.createdAt.toISOString(),
-          version: savedDocument.version
+          version: savedDocument.version,
         },
         isNew,
-        location
+        location,
       };
     } catch (error) {
       // Re-throw domain and application errors
@@ -252,34 +254,22 @@ export class WriteJsonDocumentUseCase
   private validateInput(input: WriteJsonDocumentInput): void {
     // Check if document data is provided
     if (!input.document) {
-      throw new ApplicationError(
-        ApplicationErrorCodes.INVALID_INPUT,
-        'Document data is required'
-      );
+      throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Document data is required');
     }
 
     // Check if document path is provided
     if (!input.document.path) {
-      throw new ApplicationError(
-        ApplicationErrorCodes.INVALID_INPUT,
-        'Document path is required'
-      );
+      throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Document path is required');
     }
 
     // Check if document title is provided
     if (!input.document.title) {
-      throw new ApplicationError(
-        ApplicationErrorCodes.INVALID_INPUT,
-        'Document title is required'
-      );
+      throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Document title is required');
     }
 
     // Check if document type is provided
     if (!input.document.documentType) {
-      throw new ApplicationError(
-        ApplicationErrorCodes.INVALID_INPUT,
-        'Document type is required'
-      );
+      throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Document type is required');
     }
 
     // Check if document content is provided

@@ -66,8 +66,14 @@ export class CreateJsonCommand extends CommandBase {
         description: 'Run with verbose logging',
         default: false,
       })
-      .example('$0 json create myfile.json -b feature/my-feature -t "My Document" -y generic', 'Create a generic JSON document in a branch')
-      .example('$0 json create architecture.json -t "Architecture" -f ./architecture.json', 'Create a JSON document in global memory bank from file');
+      .example(
+        '$0 json create myfile.json -b feature/my-feature -t "My Document" -y generic',
+        'Create a generic JSON document in a branch'
+      )
+      .example(
+        '$0 json create architecture.json -t "Architecture" -f ./architecture.json',
+        'Create a JSON document in global memory bank from file'
+      );
   }
 
   /**
@@ -77,7 +83,7 @@ export class CreateJsonCommand extends CommandBase {
     try {
       // Read content from appropriate source
       let contentObj: Record<string, unknown>;
-      
+
       if (argv.content) {
         // Content provided as string
         try {
@@ -118,22 +124,17 @@ export class CreateJsonCommand extends CommandBase {
         title: argv.title,
         documentType: argv.type,
         tags: Array.isArray(argv.tags) ? argv.tags : [argv.tags].filter(Boolean),
-        content: contentObj
+        content: contentObj,
       };
 
       // Get the right repository based on branch/global
       let result;
       if (argv.branch) {
         // Use JSON branch use case through MCP
-        result = await app.getBranchController().writeJsonDocument(
-          argv.branch, 
-          documentData
-        );
+        result = await app.getBranchController().writeJsonDocument(argv.branch, documentData);
       } else {
         // Use JSON global use case through MCP
-        result = await app.getGlobalController().writeJsonDocument(
-          documentData
-        );
+        result = await app.getGlobalController().writeJsonDocument(documentData);
       }
 
       // Handle response
@@ -145,7 +146,6 @@ export class CreateJsonCommand extends CommandBase {
       // Success message
       const location = argv.branch ? `branch ${argv.branch}` : 'global memory bank';
       logger.info(`JSON document ${argv.path} created successfully in ${location}`);
-      
     } catch (error) {
       this.handleError(error, 'Failed to create JSON document');
     }

@@ -49,7 +49,10 @@ export class ReadJsonCommand extends CommandBase {
         description: 'Run with verbose logging',
         default: false,
       })
-      .example('$0 json read myfile.json -b feature/my-feature', 'Read a JSON document from a branch')
+      .example(
+        '$0 json read myfile.json -b feature/my-feature',
+        'Read a JSON document from a branch'
+      )
       .example('$0 json read architecture.json', 'Read a JSON document from global memory bank')
       .example('$0 json read --id abc123', 'Read a JSON document by ID');
   }
@@ -69,15 +72,12 @@ export class ReadJsonCommand extends CommandBase {
       let result;
       if (argv.branch) {
         // Use JSON branch use case through MCP
-        result = await app.getBranchController().readJsonDocument(
-          argv.branch, 
-          { path: argv.path, id: argv.id }
-        );
+        result = await app
+          .getBranchController()
+          .readJsonDocument(argv.branch, { path: argv.path, id: argv.id });
       } else {
         // Use JSON global use case through MCP
-        result = await app.getGlobalController().readJsonDocument(
-          { path: argv.path, id: argv.id }
-        );
+        result = await app.getGlobalController().readJsonDocument({ path: argv.path, id: argv.id });
       }
 
       // Handle response
@@ -92,7 +92,6 @@ export class ReadJsonCommand extends CommandBase {
       } else {
         console.log(JSON.stringify(result.data));
       }
-      
     } catch (error) {
       this.handleError(error, 'Failed to read JSON document');
     }

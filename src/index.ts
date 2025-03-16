@@ -9,7 +9,7 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprot
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
-// アプリケーションのインポート
+// Import the application
 import createApplication from './main/index.js';
 import { Application } from './main/index.js';
 
@@ -31,7 +31,7 @@ const logger = {
   error: (...args: any[]) => console.error('[ERROR]', ...args),
 };
 
-// 新しいアプリケーションインスタンス
+// New application instance
 let app: Application | null;
 
 // Available tools definition
@@ -478,18 +478,18 @@ async function cleanup() {
 
     // Release application resources if available
     if (app) {
-      // アプリケーションが保持するリソースを解放
-      // 例: データベース接続、ファイルハンドルなど
+      // Release resources held by the application
+      // e.g. database connections, file handles, etc.
       logger.info('Releasing application resources');
 
-      // appをnullに設定してGCの対象にする
+      // Set app to null to make it eligible for garbage collection
       app = null;
     }
   } catch (error) {
     logger.error('Error during server cleanup:', error);
   }
 
-  // 明示的にGCを促す（Node.jsの場合）
+  // Explicitly trigger garbage collection (for Node.js)
   if (global.gc) {
     logger.info('Forcing garbage collection');
     global.gc();
@@ -505,7 +505,7 @@ async function main() {
   await server.connect(transport);
 
   logger.debug('Initializing application...');
-  // 新しいアプリケーションの初期化
+  // Initialize a new application
   app = await createApplication({
     memoryRoot: argv.docs as string,
     language: 'ja',

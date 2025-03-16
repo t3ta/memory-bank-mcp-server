@@ -65,7 +65,9 @@ export interface UpdateTagIndexOutput {
 /**
  * Use case for updating tag index with JSON persistence
  */
-export class UpdateTagIndexUseCaseV2 implements IUseCase<UpdateTagIndexInput, UpdateTagIndexOutput> {
+export class UpdateTagIndexUseCaseV2
+  implements IUseCase<UpdateTagIndexInput, UpdateTagIndexOutput>
+{
   /**
    * Constructor
    * @param globalRepository Global memory bank repository
@@ -153,10 +155,7 @@ export class UpdateTagIndexUseCaseV2 implements IUseCase<UpdateTagIndexInput, Up
     const branchExists = await this.branchRepository.exists(branchName);
 
     if (!branchExists) {
-      throw new DomainError(
-        DomainErrorCodes.BRANCH_NOT_FOUND,
-        `Branch "${branchName}" not found`
-      );
+      throw new DomainError(DomainErrorCodes.BRANCH_NOT_FOUND, `Branch "${branchName}" not found`);
     }
 
     // Create branch info
@@ -211,9 +210,7 @@ export class UpdateTagIndexUseCaseV2 implements IUseCase<UpdateTagIndexInput, Up
    * @param fullRebuild Whether to perform a full rebuild
    * @returns Promise resolving to update result
    */
-  private async updateGlobalTagIndex(
-    fullRebuild: boolean
-  ): Promise<{
+  private async updateGlobalTagIndex(fullRebuild: boolean): Promise<{
     documentCount: number;
     tags: Tag[];
     tagMap: Record<string, string[]>;
@@ -278,28 +275,26 @@ export class UpdateTagIndexUseCaseV2 implements IUseCase<UpdateTagIndexInput, Up
     allTags: Tag[];
   }> {
     // Initialize tag map from existing index or create new one
-    const tagMap: Record<string, string[]> = existingTagIndex
-      ? { ...existingTagIndex.index }
-      : {};
-    
+    const tagMap: Record<string, string[]> = existingTagIndex ? { ...existingTagIndex.index } : {};
+
     // Use Set to track unique tags
     const tagSet = new Set<string>();
-    
+
     // Process each document
     for (const path of documentPaths) {
       try {
         const document = await documentGetter(path);
-        
+
         if (document) {
           // For each tag in the document, add the document path to the tag's list
           for (const tag of document.tags) {
             const tagValue = tag.value;
             tagSet.add(tagValue);
-            
+
             if (!tagMap[tagValue]) {
               tagMap[tagValue] = [];
             }
-            
+
             // Only add the path if it's not already in the list
             if (!tagMap[tagValue].includes(path.value)) {
               tagMap[tagValue].push(path.value);
@@ -311,10 +306,10 @@ export class UpdateTagIndexUseCaseV2 implements IUseCase<UpdateTagIndexInput, Up
         logger.error(`Error processing document ${path.value} for tag index:`, error);
       }
     }
-    
+
     // Convert Set to an array of Tag objects
-    const allTags = Array.from(tagSet).map(tagValue => Tag.create(tagValue));
-    
+    const allTags = Array.from(tagSet).map((tagValue) => Tag.create(tagValue));
+
     return { tagMap, allTags };
   }
 }

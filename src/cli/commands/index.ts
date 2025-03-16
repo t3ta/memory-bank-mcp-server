@@ -12,16 +12,16 @@ import { registerUtilCommands } from './utils/index.js';
 export function registerAllCommands(yargs: Argv): Argv {
   // Register each command group
   let yargsInstance = yargs;
-  
+
   // Register JSON commands
   yargsInstance = registerJsonCommands(yargsInstance);
-  
+
   // Register Global commands
   yargsInstance = registerGlobalCommands(yargsInstance);
-  
+
   // Register Branch commands
   yargsInstance = registerBranchCommands(yargsInstance);
-  
+
   // Register Utility commands
   yargsInstance = registerUtilCommands(yargsInstance);
 

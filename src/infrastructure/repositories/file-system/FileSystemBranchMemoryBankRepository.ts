@@ -591,8 +591,10 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
       logger.debug(`Tag index loaded for branch ${branchInfo.name}`);
       return tagIndex;
     } catch (error) {
-      if (error instanceof InfrastructureError && 
-          error.code === `INFRA_ERROR.${InfrastructureErrorCodes.FILE_NOT_FOUND}`) {
+      if (
+        error instanceof InfrastructureError &&
+        error.code === `INFRA_ERROR.${InfrastructureErrorCodes.FILE_NOT_FOUND}`
+      ) {
         return null;
       }
 
@@ -626,7 +628,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
         // Fall back to regular method if no index exists
         logger.debug(`No tag index found, falling back to regular method`);
         const docs = await this.findDocumentsByTags(branchInfo, tags);
-        return docs.map(doc => doc.path);
+        return docs.map((doc) => doc.path);
       }
 
       let resultPaths: string[] = [];
@@ -643,35 +645,35 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
         for (let i = 1; i < tags.length; i++) {
           const tagValue = tags[i].value;
           const tagPaths = tagIndex.index[tagValue] || [];
-          
+
           // Keep only paths that are in both sets
-          matchedPaths = matchedPaths.filter(path => tagPaths.includes(path));
-          
+          matchedPaths = matchedPaths.filter((path) => tagPaths.includes(path));
+
           // Early exit if no matches
           if (matchedPaths.length === 0) break;
         }
-        
+
         resultPaths = matchedPaths;
       } else {
         // OR logic - document can have any of the tags
         const pathSet = new Set<string>();
-        
+
         // Collect all paths for all tags
         for (const tag of tags) {
           const tagValue = tag.value;
           const tagPaths = tagIndex.index[tagValue] || [];
-          
+
           // Add to result set
           for (const docPath of tagPaths) {
             pathSet.add(docPath);
           }
         }
-        
+
         resultPaths = Array.from(pathSet);
       }
-      
+
       // Convert string paths to DocumentPath objects
-      return resultPaths.map(p => DocumentPath.create(p));
+      return resultPaths.map((p) => DocumentPath.create(p));
     } catch (error) {
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_READ_ERROR,

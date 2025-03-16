@@ -49,7 +49,10 @@ export class WriteGlobalCommand extends CommandBase {
         choices: ['en', 'ja'],
         default: 'en',
       })
-      .example('$0 write-global tech-stack.md -f ./tech-stack.md', 'Write tech stack document from file')
+      .example(
+        '$0 write-global tech-stack.md -f ./tech-stack.md',
+        'Write tech stack document from file'
+      )
       .example('$0 write-global notes.md "My notes content"', 'Write document with inline content');
   }
 
@@ -59,7 +62,7 @@ export class WriteGlobalCommand extends CommandBase {
   async handler(argv: any): Promise<void> {
     try {
       // Read content from appropriate source
-      const content = argv.content || await readInput({ file: argv.file as string });
+      const content = argv.content || (await readInput({ file: argv.file as string }));
 
       // Initialize application
       const app = await createApplication({
@@ -70,7 +73,7 @@ export class WriteGlobalCommand extends CommandBase {
 
       // Write document
       const result = await app.getGlobalController().writeDocument(argv.path as string, content);
-      
+
       // Handle response
       if (!result.success) {
         logger.error(`Error writing document: ${result.error.message}`);

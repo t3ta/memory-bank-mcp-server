@@ -1,20 +1,25 @@
 import { mock, instance, when, anyString, anything, deepEqual } from 'ts-mockito';
-import { IBranchMemoryBankRepository, RecentBranch } from '../../src/domain/repositories/IBranchMemoryBankRepository.js';
+import {
+  IBranchMemoryBankRepository,
+  RecentBranch,
+} from '../../src/domain/repositories/IBranchMemoryBankRepository.js';
 import { IGlobalMemoryBankRepository } from '../../src/domain/repositories/IGlobalMemoryBankRepository.js';
+import { IJsonDocumentRepository } from '../../src/domain/repositories/IJsonDocumentRepository.js';
 import { BranchInfo } from '../../src/domain/entities/BranchInfo.js';
 import { DocumentPath } from '../../src/domain/entities/DocumentPath.js';
 import { MemoryDocument } from '../../src/domain/entities/MemoryDocument.js';
+import { JsonDocument, DocumentType } from '../../src/domain/entities/JsonDocument.js';
+import { DocumentId } from '../../src/domain/entities/DocumentId.js';
 import { Tag } from '../../src/domain/entities/Tag.js';
 import { TagIndex } from '../../src/schemas/tag-index/tag-index-schema.js';
 
 /**
- * リポジトリのモッククラス
- * ts-mockitoはインターフェースを直接モックできないため、
- * インターフェースを実装する具体的なクラスを作成します
- */
-/**
- * ts-mockitoでモックするためのクラス
- * 実際の実装は必要ないため、メソッドの宣言のみを行う
+ * Mock classes for repositories
+ * Since ts-mockito cannot directly mock interfaces,
+ * we create concrete classes that implement the interfaces
+ *
+ * Class for mocking with ts-mockito
+ * Only method declarations are needed as actual implementation is not required
  */
 export class MockBranchRepository implements IBranchMemoryBankRepository {
   exists(branchName: string): Promise<boolean> {
@@ -61,7 +66,11 @@ export class MockBranchRepository implements IBranchMemoryBankRepository {
     return Promise.resolve(null);
   }
 
-  findDocumentPathsByTagsUsingIndex(branchInfo: BranchInfo, tags: Tag[], matchAll?: boolean): Promise<DocumentPath[]> {
+  findDocumentPathsByTagsUsingIndex(
+    branchInfo: BranchInfo,
+    tags: Tag[],
+    matchAll?: boolean
+  ): Promise<DocumentPath[]> {
     return Promise.resolve([]);
   }
 }
@@ -112,33 +121,86 @@ export class MockGlobalRepository implements IGlobalMemoryBankRepository {
   }
 }
 
+export class MockJsonDocumentRepository implements IJsonDocumentRepository {
+  findById(id: DocumentId): Promise<JsonDocument | null> {
+    return Promise.resolve(null);
+  }
+
+  findByPath(branchInfo: BranchInfo, path: DocumentPath): Promise<JsonDocument | null> {
+    return Promise.resolve(null);
+  }
+
+  findByTags(branchInfo: BranchInfo, tags: Tag[], matchAll?: boolean): Promise<JsonDocument[]> {
+    return Promise.resolve([]);
+  }
+
+  findByType(branchInfo: BranchInfo, documentType: DocumentType): Promise<JsonDocument[]> {
+    return Promise.resolve([]);
+  }
+
+  save(branchInfo: BranchInfo, document: JsonDocument): Promise<JsonDocument> {
+    return Promise.resolve(document);
+  }
+
+  delete(
+    branchInfo: BranchInfo,
+    document: JsonDocument | DocumentId | DocumentPath
+  ): Promise<boolean> {
+    return Promise.resolve(true);
+  }
+
+  listAll(branchInfo: BranchInfo): Promise<JsonDocument[]> {
+    return Promise.resolve([]);
+  }
+
+  exists(branchInfo: BranchInfo, path: DocumentPath): Promise<boolean> {
+    return Promise.resolve(false);
+  }
+}
+
 /**
- * ブランチリポジトリのモックを作成するファクトリ関数
- * @returns モックとそのインスタンス
+ * Factory function to create a mock branch repository
+ * @returns The mock and its instance
  */
 export const createMockBranchRepository = () => {
   const mockRepo = mock(MockBranchRepository);
 
-  // デフォルトの振る舞いを設定（必要に応じて）
+  // Set default behavior (as needed)
   when(mockRepo.exists(anyString())).thenResolve(true);
 
   return {
     mock: mockRepo,
-    instance: instance(mockRepo)
+    instance: instance(mockRepo),
   };
 };
 
 /**
- * グローバルリポジトリのモックを作成するファクトリ関数
- * @returns モックとそのインスタンス
+ * Factory function to create a mock global repository
+ * @returns The mock and its instance
  */
 export const createMockGlobalRepository = () => {
   const mockRepo = mock(MockGlobalRepository);
 
-  // デフォルトの振る舞いを設定（必要に応じて）
+  // Set default behavior (as needed)
 
   return {
     mock: mockRepo,
-    instance: instance(mockRepo)
+    instance: instance(mockRepo),
+  };
+};
+
+/**
+ * Factory function to create a mock JSON document repository
+ * @returns The mock and its instance
+ */
+export const createMockJsonDocumentRepository = () => {
+  const mockRepo = mock(MockJsonDocumentRepository);
+
+  // Set default behavior (as needed)
+  when(mockRepo.exists(anything(), anything())).thenResolve(true);
+
+  return {
+    mock: mockRepo,
+    instance: instance(mockRepo),
   };
 };

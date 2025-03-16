@@ -61,7 +61,7 @@ export class ReadBranchCommand extends CommandBase {
       const result = await app
         .getBranchController()
         .readDocument(argv.branch as string, argv.path as string);
-      
+
       // Handle response
       if (!result.success) {
         logger.error(`Error reading document: ${result.error.message}`);

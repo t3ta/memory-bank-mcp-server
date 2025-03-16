@@ -10,11 +10,7 @@ import { ReadCoreFilesCommand } from './read-core-files.js';
  */
 export function registerBranchCommands(yargs: Argv): Argv {
   // Create command instances
-  const commands = [
-    new ReadBranchCommand(),
-    new WriteBranchCommand(),
-    new ReadCoreFilesCommand(),
-  ];
+  const commands = [new ReadBranchCommand(), new WriteBranchCommand(), new ReadCoreFilesCommand()];
 
   // Register each command
   let yargsInstance = yargs;

@@ -62,7 +62,7 @@ export class RecentBranchesCommand extends CommandBase {
       });
 
       const result = await app.getBranchController().getRecentBranches(argv.limit as number);
-      
+
       // Handle response
       if (!result.success) {
         logger.error(`Error getting recent branches: ${result.error.message}`);

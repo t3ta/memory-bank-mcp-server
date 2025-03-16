@@ -47,7 +47,10 @@ export class ListJsonCommand extends CommandBase {
       })
       .example('$0 json list -b feature/my-feature', 'List all JSON documents in a branch')
       .example('$0 json list', 'List all JSON documents in global memory bank')
-      .example('$0 json list -t activeContext --format json', 'List activeContext documents in JSON format');
+      .example(
+        '$0 json list -t activeContext --format json',
+        'List activeContext documents in JSON format'
+      );
   }
 
   /**
@@ -65,15 +68,12 @@ export class ListJsonCommand extends CommandBase {
       let result;
       if (argv.branch) {
         // Use JSON branch use case through MCP
-        result = await app.getBranchController().listJsonDocuments(
-          argv.branch, 
-          { documentType: argv.type }
-        );
+        result = await app
+          .getBranchController()
+          .listJsonDocuments(argv.branch, { documentType: argv.type });
       } else {
         // Use JSON global use case through MCP
-        result = await app.getGlobalController().listJsonDocuments(
-          { documentType: argv.type }
-        );
+        result = await app.getGlobalController().listJsonDocuments({ documentType: argv.type });
       }
 
       // Handle response
@@ -83,12 +83,12 @@ export class ListJsonCommand extends CommandBase {
       }
 
       const documents = result.data.documents;
-      
+
       // Output message if no documents found
       if (documents.length === 0) {
         const location = argv.branch ? `branch ${argv.branch}` : 'global memory bank';
         const typeMsg = argv.type ? `of type "${argv.type}"` : '';
-        
+
         logger.info(`No JSON documents found in ${location} ${typeMsg}`);
         return;
       }
@@ -100,7 +100,7 @@ export class ListJsonCommand extends CommandBase {
         // Pretty print document list
         const location = argv.branch ? `branch ${argv.branch}` : 'global memory bank';
         console.log(`\nJSON Documents in ${location}:\n`);
-        
+
         documents.forEach((doc: any, index: number) => {
           console.log(`${index + 1}. ${doc.title || doc.path}`);
           console.log(`   Path: ${doc.path}`);
@@ -110,7 +110,6 @@ export class ListJsonCommand extends CommandBase {
           console.log();
         });
       }
-      
     } catch (error) {
       this.handleError(error, 'Failed to list JSON documents');
     }

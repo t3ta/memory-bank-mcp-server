@@ -56,7 +56,7 @@ export abstract class CommandBase {
    */
   protected handleError(error: unknown, message?: string): never {
     const errorMsg = message || 'Command execution failed';
-    
+
     if (error instanceof Error) {
       logger.error(`${errorMsg}: ${error.message}`);
       if (error.stack && process.env.DEBUG) {
@@ -65,7 +65,7 @@ export abstract class CommandBase {
     } else {
       logger.error(`${errorMsg}: Unknown error`);
     }
-    
+
     process.exit(1);
   }
 }

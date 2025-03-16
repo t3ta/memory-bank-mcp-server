@@ -46,7 +46,10 @@ export class ReadCoreFilesCommand extends CommandBase {
         default: 'en',
       })
       .example('$0 read-core-files feature/login', 'Read core files from branch')
-      .example('$0 read-core-files feature/login --format json', 'Output core files in JSON format');
+      .example(
+        '$0 read-core-files feature/login --format json',
+        'Output core files in JSON format'
+      );
   }
 
   /**
@@ -61,7 +64,7 @@ export class ReadCoreFilesCommand extends CommandBase {
       });
 
       const result = await app.getBranchController().readCoreFiles(argv.branch as string);
-      
+
       // Handle response
       if (!result.success) {
         logger.error(`Error reading core files: ${result.error.message}`);

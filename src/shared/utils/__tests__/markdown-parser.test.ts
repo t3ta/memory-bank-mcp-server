@@ -42,11 +42,16 @@ describe('markdown-parser', () => {
       // Assert
       expect(result.metadata.documentType).toBe('branch_context');
       expect(result.content.purpose).toBe('This is a test branch.');
-      expect(result.content.userStories).toHaveLength(2);
-      expect(result.content.userStories[0].completed).toBe(false);
-      expect(result.content.userStories[0].description).toBe('Test story 1');
-      expect(result.content.userStories[1].completed).toBe(true);
-      expect(result.content.userStories[1].description).toBe('Test story 2');
+      expect(result.content.userStories).toBeDefined();
+      expect(Array.isArray(result.content.userStories)).toBe(true);
+      
+      if (result.content.userStories) {
+        expect(result.content.userStories).toHaveLength(2);
+        expect(result.content.userStories[0].completed).toBe(false);
+        expect(result.content.userStories[0].description).toBe('Test story 1');
+        expect(result.content.userStories[1].completed).toBe(true);
+        expect(result.content.userStories[1].description).toBe('Test story 2');
+      }
     });
 
     it('should determine document type based on filename for active context', () => {
@@ -161,12 +166,17 @@ The actual decision 2.
 
       // Assert
       expect(result.metadata.documentType).toBe('system_patterns');
-      expect(result.content.technicalDecisions).toHaveLength(2);
-      expect(result.content.technicalDecisions[0].title).toBe('Decision 1');
-      expect(result.content.technicalDecisions[0].context).toBe('Context for decision 1.');
-      expect(result.content.technicalDecisions[0].decision).toBe('The actual decision 1.');
-      expect(result.content.technicalDecisions[0].consequences).toEqual(['Consequence 1', 'Consequence 2']);
-      expect(result.content.technicalDecisions[1].title).toBe('Decision 2');
+      expect(result.content.technicalDecisions).toBeDefined();
+      expect(Array.isArray(result.content.technicalDecisions)).toBe(true);
+      
+      if (result.content.technicalDecisions) {
+        expect(result.content.technicalDecisions).toHaveLength(2);
+        expect(result.content.technicalDecisions[0].title).toBe('Decision 1');
+        expect(result.content.technicalDecisions[0].context).toBe('Context for decision 1.');
+        expect(result.content.technicalDecisions[0].decision).toBe('The actual decision 1.');
+        expect(result.content.technicalDecisions[0].consequences).toEqual(['Consequence 1', 'Consequence 2']);
+        expect(result.content.technicalDecisions[1].title).toBe('Decision 2');
+      }
     });
 
     it('should parse generic document with different sections', () => {

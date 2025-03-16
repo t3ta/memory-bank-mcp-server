@@ -48,7 +48,10 @@ export class DeleteJsonCommand extends CommandBase {
         description: 'Run with verbose logging',
         default: false,
       })
-      .example('$0 json delete myfile.json -b feature/my-feature', 'Delete a JSON document from a branch')
+      .example(
+        '$0 json delete myfile.json -b feature/my-feature',
+        'Delete a JSON document from a branch'
+      )
       .example('$0 json delete architecture.json', 'Delete a JSON document from global memory bank')
       .example('$0 json delete --id abc123 -f', 'Force delete a JSON document by ID');
   }
@@ -68,20 +71,20 @@ export class DeleteJsonCommand extends CommandBase {
       if (!argv.force) {
         const location = argv.branch ? `branch ${argv.branch}` : 'global memory bank';
         const confirmMessage = `Are you sure you want to delete the document ${argv.path} from ${location}? (y/N): `;
-        
+
         // Use readline for simple confirmation
         const readline = (await import('readline')).default.createInterface({
           input: process.stdin,
-          output: process.stdout
+          output: process.stdout,
         });
-        
+
         const confirmation = await new Promise<string>((resolve) => {
           readline.question(confirmMessage, (answer) => {
             readline.close();
             resolve(answer.toLowerCase());
           });
         });
-        
+
         if (confirmation !== 'y' && confirmation !== 'yes') {
           logger.info('Deletion cancelled');
           return;
@@ -92,15 +95,14 @@ export class DeleteJsonCommand extends CommandBase {
       let result;
       if (argv.branch) {
         // Use JSON branch use case through MCP
-        result = await app.getBranchController().deleteJsonDocument(
-          argv.branch, 
-          { path: argv.path, id: argv.id }
-        );
+        result = await app
+          .getBranchController()
+          .deleteJsonDocument(argv.branch, { path: argv.path, id: argv.id });
       } else {
         // Use JSON global use case through MCP
-        result = await app.getGlobalController().deleteJsonDocument(
-          { path: argv.path, id: argv.id }
-        );
+        result = await app
+          .getGlobalController()
+          .deleteJsonDocument({ path: argv.path, id: argv.id });
       }
 
       // Handle response
@@ -112,7 +114,6 @@ export class DeleteJsonCommand extends CommandBase {
       // Success message
       const location = argv.branch ? `branch ${argv.branch}` : 'global memory bank';
       logger.info(`JSON document ${argv.path || argv.id} deleted successfully from ${location}`);
-      
     } catch (error) {
       this.handleError(error, 'Failed to delete JSON document');
     }

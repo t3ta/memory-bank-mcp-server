@@ -68,8 +68,14 @@ export class UpdateJsonCommand extends CommandBase {
         description: 'Run with verbose logging',
         default: false,
       })
-      .example('$0 json update myfile.json -b feature/my-feature -t "Updated Title"', 'Update document title')
-      .example('$0 json update myfile.json -b feature/my-feature -f ./updated.json', 'Update document content from file');
+      .example(
+        '$0 json update myfile.json -b feature/my-feature -t "Updated Title"',
+        'Update document title'
+      )
+      .example(
+        '$0 json update myfile.json -b feature/my-feature -f ./updated.json',
+        'Update document content from file'
+      );
   }
 
   /**
@@ -87,15 +93,14 @@ export class UpdateJsonCommand extends CommandBase {
       let readResult;
       if (argv.branch) {
         // Use JSON branch use case through MCP
-        readResult = await app.getBranchController().readJsonDocument(
-          argv.branch, 
-          { path: argv.path, id: argv.id }
-        );
+        readResult = await app
+          .getBranchController()
+          .readJsonDocument(argv.branch, { path: argv.path, id: argv.id });
       } else {
         // Use JSON global use case through MCP
-        readResult = await app.getGlobalController().readJsonDocument(
-          { path: argv.path, id: argv.id }
-        );
+        readResult = await app
+          .getGlobalController()
+          .readJsonDocument({ path: argv.path, id: argv.id });
       }
 
       // Handle read response
@@ -109,14 +114,12 @@ export class UpdateJsonCommand extends CommandBase {
 
       // Prepare update with existing values as defaults
       let contentObj: Record<string, unknown> = existingDoc.content;
-      
+
       // Update content if provided
       if (argv.content || argv.file) {
         // Read updated content
-        const contentStr = argv.content 
-          ? argv.content 
-          : await readInput({ file: argv.file });
-        
+        const contentStr = argv.content ? argv.content : await readInput({ file: argv.file });
+
         try {
           contentObj = JSON.parse(contentStr);
         } catch (err) {
@@ -131,23 +134,22 @@ export class UpdateJsonCommand extends CommandBase {
         path: argv.path,
         title: argv.title || existingDoc.title,
         documentType: argv.type || existingDoc.documentType,
-        tags: argv.tags ? (Array.isArray(argv.tags) ? argv.tags : [argv.tags].filter(Boolean)) : existingDoc.tags,
-        content: contentObj
+        tags: argv.tags
+          ? Array.isArray(argv.tags)
+            ? argv.tags
+            : [argv.tags].filter(Boolean)
+          : existingDoc.tags,
+        content: contentObj,
       };
 
       // Update document
       let updateResult;
       if (argv.branch) {
         // Use JSON branch use case through MCP
-        updateResult = await app.getBranchController().writeJsonDocument(
-          argv.branch, 
-          documentData
-        );
+        updateResult = await app.getBranchController().writeJsonDocument(argv.branch, documentData);
       } else {
         // Use JSON global use case through MCP
-        updateResult = await app.getGlobalController().writeJsonDocument(
-          documentData
-        );
+        updateResult = await app.getGlobalController().writeJsonDocument(documentData);
       }
 
       // Handle update response
@@ -159,7 +161,6 @@ export class UpdateJsonCommand extends CommandBase {
       // Success message
       const location = argv.branch ? `branch ${argv.branch}` : 'global memory bank';
       logger.info(`JSON document ${argv.path} updated successfully in ${location}`);
-      
     } catch (error) {
       this.handleError(error, 'Failed to update JSON document');
     }

@@ -51,7 +51,7 @@ export interface IJsonDocumentRepository {
 
   /**
    * Delete a document
-   * @param branchInfo Branch information (for branch-specific repositories) 
+   * @param branchInfo Branch information (for branch-specific repositories)
    * @param document Document to delete (or document ID or path)
    * @returns Promise resolving to boolean indicating success
    */

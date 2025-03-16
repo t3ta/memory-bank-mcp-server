@@ -96,11 +96,13 @@ export class DeleteJsonDocumentUseCase
       // Determine if deleting from branch or global memory bank
       const isGlobal = !input.branchName;
       const location = isGlobal ? 'global' : input.branchName;
-      const repository = isGlobal ? this.globalRepository || this.jsonRepository : this.jsonRepository;
+      const repository = isGlobal
+        ? this.globalRepository || this.jsonRepository
+        : this.jsonRepository;
 
       // Create branch info
-      const branchInfo = isGlobal 
-        ? BranchInfo.create('global') 
+      const branchInfo = isGlobal
+        ? BranchInfo.create('global')
         : BranchInfo.create(input.branchName!);
 
       let success = false;
@@ -110,7 +112,7 @@ export class DeleteJsonDocumentUseCase
       if (input.id) {
         // Delete by ID
         const documentId = DocumentId.create(input.id);
-        
+
         // Check if document exists
         const document = await repository.findById(documentId);
         if (!document) {
@@ -119,16 +121,16 @@ export class DeleteJsonDocumentUseCase
             `Document with ID "${input.id}" not found in ${isGlobal ? 'global memory bank' : `branch "${input.branchName}"`}`
           );
         }
-        
+
         // Delete document
         success = await repository.delete(branchInfo, documentId);
-        
+
         // Update index
         await this.indexService.removeFromIndex(branchInfo, documentId);
       } else if (input.path) {
         // Delete by path
         const documentPath = DocumentPath.create(input.path);
-        
+
         // Check if document exists
         const documentExists = await repository.exists(branchInfo, documentPath);
         if (!documentExists) {
@@ -137,10 +139,10 @@ export class DeleteJsonDocumentUseCase
             `Document "${input.path}" not found in ${isGlobal ? 'global memory bank' : `branch "${input.branchName}"`}`
           );
         }
-        
+
         // Delete document
         success = await repository.delete(branchInfo, documentPath);
-        
+
         // Update index
         await this.indexService.removeFromIndex(branchInfo, documentPath);
       }
@@ -151,8 +153,8 @@ export class DeleteJsonDocumentUseCase
         location,
         details: {
           identifier,
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       };
     } catch (error) {
       // Re-throw domain and application errors

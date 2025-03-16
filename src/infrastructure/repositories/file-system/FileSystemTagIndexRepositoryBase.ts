@@ -9,7 +9,7 @@ import { Tag } from '../../../domain/entities/Tag.js';
 import {
   ITagIndexRepository,
   TagIndexOptions,
-  TagIndexUpdateResult
+  TagIndexUpdateResult,
 } from '../../../domain/repositories/ITagIndexRepository.js';
 import { FileSystemService } from '../../storage/FileSystemService.js';
 import path from 'path';
@@ -22,10 +22,13 @@ import {
   TagEntry,
   TAG_INDEX_VERSION,
   BranchTagIndexSchema,
-  GlobalTagIndexSchema
+  GlobalTagIndexSchema,
 } from '../../../schemas/v2/tag-index.js';
 import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
-import { InfrastructureError, InfrastructureErrorCodes } from '../../../shared/errors/InfrastructureError.js';
+import {
+  InfrastructureError,
+  InfrastructureErrorCodes,
+} from '../../../shared/errors/InfrastructureError.js';
 
 const logger = getLogger('FileSystemTagIndexRepository');
 
@@ -69,10 +72,7 @@ export abstract class FileSystemTagIndexRepository {
    * @returns Path to global index file
    */
   protected getGlobalIndexPath(): string {
-    return path.join(
-      this.globalMemoryBankPath,
-      FileSystemTagIndexRepository.GLOBAL_INDEX_FILENAME
-    );
+    return path.join(this.globalMemoryBankPath, FileSystemTagIndexRepository.GLOBAL_INDEX_FILENAME);
   }
 
   /**
@@ -106,8 +106,10 @@ export abstract class FileSystemTagIndexRepository {
         return null;
       }
 
-      if (error instanceof InfrastructureError &&
-          error.code === InfrastructureErrorCodes.FILE_NOT_FOUND) {
+      if (
+        error instanceof InfrastructureError &&
+        error.code === InfrastructureErrorCodes.FILE_NOT_FOUND
+      ) {
         return null;
       }
 
@@ -150,8 +152,10 @@ export abstract class FileSystemTagIndexRepository {
         return null;
       }
 
-      if (error instanceof InfrastructureError &&
-          error.code === InfrastructureErrorCodes.FILE_NOT_FOUND) {
+      if (
+        error instanceof InfrastructureError &&
+        error.code === InfrastructureErrorCodes.FILE_NOT_FOUND
+      ) {
         return null;
       }
 
@@ -229,21 +233,19 @@ export abstract class FileSystemTagIndexRepository {
         id: document.id.value,
         path: document.path.value,
         title: document.title,
-        lastModified: document.lastModified
+        lastModified: document.lastModified,
       };
     } else {
       // Legacy MemoryDocument doesn't have id or title
       // Generate a deterministic ID based on path
       const pathHash = document.path.value;
-      const id = DocumentId.create(
-        pathHash.padEnd(36, '0').substring(0, 36)
-      );
+      const id = DocumentId.create(pathHash.padEnd(36, '0').substring(0, 36));
 
       return {
         id: id.value,
         path: document.path.value,
         title: document.path.basename || document.path.value,
-        lastModified: document.lastModified
+        lastModified: document.lastModified,
       };
     }
   }
@@ -261,9 +263,9 @@ export abstract class FileSystemTagIndexRepository {
         branchName: branchInfo.name,
         lastUpdated: new Date(),
         documentCount: 0,
-        tagCount: 0
+        tagCount: 0,
       },
-      index: []
+      index: [],
     };
   }
 
@@ -278,9 +280,9 @@ export abstract class FileSystemTagIndexRepository {
         indexType: 'global',
         lastUpdated: new Date(),
         documentCount: 0,
-        tagCount: 0
+        tagCount: 0,
       },
-      index: []
+      index: [],
     };
   }
 

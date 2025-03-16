@@ -85,10 +85,7 @@ export interface ITagIndexRepository {
    * @param matchAll Whether documents must have all tags (AND) or any tag (OR)
    * @returns Promise resolving to array of document paths matching the tags
    */
-  findGlobalDocumentsByTags(
-    tags: Tag[],
-    matchAll?: boolean
-  ): Promise<DocumentPath[]>;
+  findGlobalDocumentsByTags(tags: Tag[], matchAll?: boolean): Promise<DocumentPath[]>;
 
   /**
    * Add or update document in branch tag index
@@ -106,9 +103,7 @@ export interface ITagIndexRepository {
    * @param document Document to add/update
    * @returns Promise resolving when done
    */
-  addDocumentToGlobalIndex(
-    document: MemoryDocument | JsonDocument
-  ): Promise<void>;
+  addDocumentToGlobalIndex(document: MemoryDocument | JsonDocument): Promise<void>;
 
   /**
    * Remove document from branch tag index
@@ -116,19 +111,14 @@ export interface ITagIndexRepository {
    * @param path Document path
    * @returns Promise resolving when done
    */
-  removeDocumentFromBranchIndex(
-    branchInfo: BranchInfo,
-    path: DocumentPath
-  ): Promise<void>;
+  removeDocumentFromBranchIndex(branchInfo: BranchInfo, path: DocumentPath): Promise<void>;
 
   /**
    * Remove document from global tag index
    * @param path Document path
    * @returns Promise resolving when done
    */
-  removeDocumentFromGlobalIndex(
-    path: DocumentPath
-  ): Promise<void>;
+  removeDocumentFromGlobalIndex(path: DocumentPath): Promise<void>;
 
   /**
    * Get all tags in branch tag index

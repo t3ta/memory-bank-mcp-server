@@ -1,5 +1,6 @@
 import {
   JsonDocument,
+  BaseJsonDocument,
   BranchContextJson,
   ActiveContextJson,
   ProgressJson,
@@ -12,7 +13,7 @@ import {
  * @param document JSON document to convert
  * @returns Markdown formatted string
  */
-export function jsonToMarkdown(document: JsonDocument): string {
+export function jsonToMarkdown(document: JsonDocument | BaseJsonDocument): string {
   const { metadata } = document;
 
   // Basic metadata sections
@@ -54,8 +55,9 @@ function branchContextToMarkdown(document: BranchContextJson): string {
 
   markdown += `## 目的\n\n`;
   markdown += `ブランチ: ${document.metadata.path.split('/').pop()?.replace('.json', '')}\n`;
-  markdown += `作成日時: ${content.createdAt instanceof Date ? content.createdAt.toISOString() : content.createdAt
-    }\n\n`;
+  markdown += `作成日時: ${
+    content.createdAt instanceof Date ? content.createdAt.toISOString() : content.createdAt
+  }\n\n`;
 
   markdown += content.purpose ? `${content.purpose}\n\n` : '';
 
@@ -216,7 +218,7 @@ function technicalDecisionToMarkdown(decision: TechnicalDecisionContent): string
 /**
  * Generic content converter for unknown document types
  */
-function genericContentToMarkdown(document: JsonDocument): string {
+function genericContentToMarkdown(document: BaseJsonDocument): string {
   let markdown = '';
 
   // Try to handle generic content as a simple key-value structure

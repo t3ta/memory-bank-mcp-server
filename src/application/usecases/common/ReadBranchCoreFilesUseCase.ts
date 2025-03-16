@@ -82,7 +82,7 @@ export class ReadBranchCoreFilesUseCase
         branchInfo,
         DocumentPath.create(this.PROGRESS_PATH)
       );
-      
+
       // Also read branch context to match test expectations
       const branchContextDoc = await this.branchRepository.getDocument(
         branchInfo,
@@ -124,16 +124,16 @@ export class ReadBranchCoreFilesUseCase
               title: 'テストフレームワーク',
               context: 'テストフレームワークを選択する必要がある',
               decision: 'Jestを使用する',
-              consequences: ['TypeScriptとの統合が良い', 'モック機能が充実']
+              consequences: ['TypeScriptとの統合が良い', 'モック機能が充実'],
             },
             {
               title: 'ディレクトリ構造',
               context: 'ファイル配置の規則を定義する必要がある',
               decision: 'クリーンアーキテクチャに従う',
-              consequences: ['関心の分離が明確', 'テスト可能性の向上']
-            }
+              consequences: ['関心の分離が明確', 'テスト可能性の向上'],
+            },
           ];
-          
+
           coreFiles.systemPatterns.technicalDecisions = technicalDecisions;
         }
       } catch (error) {
@@ -346,11 +346,11 @@ export class ReadBranchCoreFilesUseCase
           // Ensure technicalDecisions is an array before pushing
           if (Array.isArray(systemPatterns.technicalDecisions)) {
             // Make sure technicalDecisions is defined
-        if (!systemPatterns.technicalDecisions) {
-          systemPatterns.technicalDecisions = [];
-        }
-        
-        systemPatterns.technicalDecisions.push({
+            if (!systemPatterns.technicalDecisions) {
+              systemPatterns.technicalDecisions = [];
+            }
+
+            systemPatterns.technicalDecisions.push({
               title: titleMatch[1].trim(),
               context: contextMatch ? contextMatch[1].trim() : '',
               decision: decisionMatch ? decisionMatch[1].trim() : '',
@@ -389,15 +389,15 @@ export class ReadBranchCoreFilesUseCase
           title: 'テストフレームワーク',
           context: 'テストフレームワークを選択する必要がある',
           decision: 'Jestを使用する',
-          consequences: ['TypeScriptとの統合が良い', 'モック機能が充実']
+          consequences: ['TypeScriptとの統合が良い', 'モック機能が充実'],
         },
         {
           title: 'ディレクトリ構造',
           context: 'ファイル配置の規則を定義する必要がある',
           decision: 'クリーンアーキテクチャに従う',
-          consequences: ['関心の分離が明確', 'テスト可能性の向上']
-        }
-      ]
+          consequences: ['関心の分離が明確', 'テスト可能性の向上'],
+        },
+      ],
     };
   }
 }

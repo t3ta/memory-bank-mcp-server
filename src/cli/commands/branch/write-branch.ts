@@ -54,8 +54,14 @@ export class WriteBranchCommand extends CommandBase {
         choices: ['en', 'ja'],
         default: 'en',
       })
-      .example('$0 write-branch feature/login activeContext.md -f ./content.md', 'Write content from file')
-      .example('$0 write-branch feature/login notes.md "My notes content"', 'Write with inline content');
+      .example(
+        '$0 write-branch feature/login activeContext.md -f ./content.md',
+        'Write content from file'
+      )
+      .example(
+        '$0 write-branch feature/login notes.md "My notes content"',
+        'Write with inline content'
+      );
   }
 
   /**
@@ -64,7 +70,7 @@ export class WriteBranchCommand extends CommandBase {
   async handler(argv: any): Promise<void> {
     try {
       // Read content from appropriate source
-      const content = argv.content || await readInput({ file: argv.file as string });
+      const content = argv.content || (await readInput({ file: argv.file as string }));
 
       // Initialize application
       const app = await createApplication({
@@ -77,7 +83,7 @@ export class WriteBranchCommand extends CommandBase {
       const result = await app
         .getBranchController()
         .writeDocument(argv.branch as string, argv.path as string, content);
-      
+
       // Handle response
       if (!result.success) {
         logger.error(`Error writing document: ${result.error.message}`);
