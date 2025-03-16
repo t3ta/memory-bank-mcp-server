@@ -37,6 +37,13 @@ import { MigrateTemplatesCommand } from '../../cli/commands/template/MigrateTemp
 
 // CLI options type
 import { CliOptions } from '../../infrastructure/config/WorkspaceConfig.js';
+import type {
+  DeleteJsonDocumentUseCase,
+  ReadJsonDocumentUseCase,
+  SearchJsonDocumentsUseCase,
+  UpdateJsonIndexUseCase,
+  WriteJsonDocumentUseCase
+} from '../../application/usecases/index.js';
 
 /**
  * Register infrastructure services
@@ -98,11 +105,14 @@ export async function registerInfrastructureServices(
 
   // Register template tools
   container.register('markdownToJsonConverter', new MarkdownToJsonConverter());
-  container.register('migrateTemplatesCommand', new MigrateTemplatesCommand(
-    container.get('markdownToJsonConverter') as MarkdownToJsonConverter,
-    container.get('fileSystemService') as IFileSystemService,
-    container.get('configProvider') as IConfigProvider
-  ));
+  container.register(
+    'migrateTemplatesCommand',
+    new MigrateTemplatesCommand(
+      container.get('markdownToJsonConverter') as MarkdownToJsonConverter,
+      container.get('fileSystemService') as IFileSystemService,
+      container.get('configProvider') as IConfigProvider
+    )
+  );
 }
 
 /**
@@ -188,6 +198,13 @@ export function registerApplicationServices(container: DIContainer): void {
     return new UpdateTagIndexUseCaseV2(globalRepository, branchRepository, tagIndexRepository);
   });
 
+  // Register JSON document use cases
+  container.register('readJsonDocumentUseCase', null);
+  container.register('writeJsonDocumentUseCase', null);
+  container.register('deleteJsonDocumentUseCase', null);
+  container.register('searchJsonDocumentsUseCase', null);
+  container.register('updateJsonIndexUseCase', null);
+
   container.registerFactory('getRecentBranchesUseCase', () => {
     // Use explicit type assertion for proper type safety
     const branchRepository = container.get(
@@ -265,21 +282,11 @@ export function registerInterfaceServices(container: DIContainer): void {
     const updateTagIndexUseCaseV2 = container.get(
       'updateTagIndexUseCaseV2'
     ) as UpdateTagIndexUseCaseV2;
-    const readJsonDocumentUseCase = container.get(
-      'readJsonDocumentUseCase'
-    ) as ReadJsonDocumentUseCase;
-    const writeJsonDocumentUseCase = container.get(
-      'writeJsonDocumentUseCase'
-    ) as WriteJsonDocumentUseCase;
-    const deleteJsonDocumentUseCase = container.get(
-      'deleteJsonDocumentUseCase'
-    ) as DeleteJsonDocumentUseCase;
-    const searchJsonDocumentsUseCase = container.get(
-      'searchJsonDocumentsUseCase'
-    ) as SearchJsonDocumentsUseCase;
-    const updateJsonIndexUseCase = container.get(
-      'updateJsonIndexUseCase'
-    ) as UpdateJsonIndexUseCase;
+    const readJsonDocumentUseCase = container.get('readJsonDocumentUseCase') as ReadJsonDocumentUseCase | undefined;
+    const writeJsonDocumentUseCase = container.get('writeJsonDocumentUseCase') as WriteJsonDocumentUseCase | undefined;
+    const deleteJsonDocumentUseCase = container.get('deleteJsonDocumentUseCase') as DeleteJsonDocumentUseCase | undefined;
+    const searchJsonDocumentsUseCase = container.get('searchJsonDocumentsUseCase') as SearchJsonDocumentsUseCase | undefined;
+    const updateJsonIndexUseCase = container.get('updateJsonIndexUseCase') as UpdateJsonIndexUseCase | undefined;
 
     return new GlobalController(
       readGlobalDocumentUseCase,
@@ -287,13 +294,13 @@ export function registerInterfaceServices(container: DIContainer): void {
       searchDocumentsByTagsUseCase,
       updateTagIndexUseCase, // Keep V1 for backwards compatibility
       presenter,
-      { 
+      {
         updateTagIndexUseCaseV2,
         readJsonDocumentUseCase,
         writeJsonDocumentUseCase,
         deleteJsonDocumentUseCase,
         searchJsonDocumentsUseCase,
-        updateJsonIndexUseCase
+        updateJsonIndexUseCase,
       } // Pass optional dependencies
     );
   });
@@ -321,10 +328,15 @@ export function registerInterfaceServices(container: DIContainer): void {
     ) as CreateBranchCoreFilesUseCase;
     const presenter = container.get('mcpResponsePresenter') as MCPResponsePresenter;
 
-    // Get update tag index use case V2
+    // Get optional use cases
     const updateTagIndexUseCaseV2 = container.get(
       'updateTagIndexUseCaseV2'
     ) as UpdateTagIndexUseCaseV2;
+    const readJsonDocumentUseCase = container.get('readJsonDocumentUseCase') as ReadJsonDocumentUseCase | undefined;
+    const writeJsonDocumentUseCase = container.get('writeJsonDocumentUseCase') as WriteJsonDocumentUseCase | undefined;
+    const deleteJsonDocumentUseCase = container.get('deleteJsonDocumentUseCase') as DeleteJsonDocumentUseCase | undefined;
+    const searchJsonDocumentsUseCase = container.get('searchJsonDocumentsUseCase') as SearchJsonDocumentsUseCase | undefined;
+    const updateJsonIndexUseCase = container.get('updateJsonIndexUseCase') as UpdateJsonIndexUseCase | undefined;
 
     return new BranchController(
       readBranchDocumentUseCase,
@@ -335,13 +347,13 @@ export function registerInterfaceServices(container: DIContainer): void {
       readBranchCoreFilesUseCase,
       createBranchCoreFilesUseCase,
       presenter,
-      { 
+      {
         updateTagIndexUseCaseV2,
         readJsonDocumentUseCase,
         writeJsonDocumentUseCase,
         deleteJsonDocumentUseCase,
         searchJsonDocumentsUseCase,
-        updateJsonIndexUseCase
+        updateJsonIndexUseCase,
       } // Pass optional dependencies
     );
   });
