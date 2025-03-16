@@ -3,7 +3,7 @@
  * Utility for converting Markdown templates to JSON format
  */
 
-import { JsonTemplate, JsonTemplateSection, createJsonTemplate, createTemplateSection } from '../../schemas/v2/template-schema.js';
+import { JsonTemplate, JsonTemplateSection, createJsonTemplate, createJsonTemplateSection } from '../../schemas/v2/template-schema.js';
 
 /**
  * Interface for language files mapping
@@ -77,7 +77,7 @@ export class MarkdownToJsonConverter {
       }
 
       // Create the template section
-      templateSections[sectionId] = createTemplateSection(
+      templateSections[sectionId] = createJsonTemplateSection(
         titleMap,
         contentMap,
         isOptional

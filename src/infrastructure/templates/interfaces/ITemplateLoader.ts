@@ -3,7 +3,7 @@
  * Defines the contract for loading and processing templates
  */
 import { Language } from '../../../schemas/v2/i18n-schema.js';
-import { BaseTemplate } from '../../../schemas/v2/template-schema.js';
+import { BaseTemplate, JsonTemplate } from '../../../schemas/v2/template-schema.js';
 
 /**
  * Interface for template loading and rendering functionality
@@ -13,10 +13,10 @@ export interface ITemplateLoader {
    * Loads a JSON template by ID
    * 
    * @param templateId The ID of the template to load
-   * @returns Promise resolving to a BaseTemplate object
+   * @returns Promise resolving to a JsonTemplate object
    * @throws Error if template not found or invalid
    */
-  loadJsonTemplate(templateId: string): Promise<BaseTemplate>;
+  loadJsonTemplate(templateId: string): Promise<JsonTemplate>;
   
   /**
    * Gets a template in Markdown format for the specified language

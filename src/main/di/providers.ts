@@ -24,12 +24,16 @@ import { ConfigProvider } from '../../infrastructure/config/ConfigProvider.js';
 import { FileSystemGlobalMemoryBankRepository } from '../../infrastructure/repositories/file-system/FileSystemGlobalMemoryBankRepository.js';
 import { FileSystemBranchMemoryBankRepository } from '../../infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.js';
 import { FileSystemTagIndexRepositoryV1Bridge } from '../../infrastructure/repositories/file-system/FileSystemTagIndexRepositoryV1Bridge.js';
+import { MarkdownToJsonConverter } from '../../infrastructure/templates/MarkdownToJsonConverter.js';
 
 // Interface layer
 import { MCPResponsePresenter } from '../../interface/presenters/MCPResponsePresenter.js';
 import { GlobalController } from '../../interface/controllers/GlobalController.js';
 import { BranchController } from '../../interface/controllers/BranchController.js';
 import { PullRequestTool } from '../../interface/tools/PullRequestTool.js';
+
+// CLI 関連
+import { MigrateTemplatesCommand } from '../../cli/commands/template/MigrateTemplatesCommand.js';
 
 // CLI options type
 import { CliOptions } from '../../infrastructure/config/WorkspaceConfig.js';
@@ -91,6 +95,14 @@ export async function registerInfrastructureServices(
       globalRepository
     );
   });
+
+  // Register template tools
+  container.register('markdownToJsonConverter', new MarkdownToJsonConverter());
+  container.register('migrateTemplatesCommand', new MigrateTemplatesCommand(
+    container.get('markdownToJsonConverter') as MarkdownToJsonConverter,
+    container.get('fileSystemService') as IFileSystemService,
+    container.get('configProvider') as IConfigProvider
+  ));
 }
 
 /**

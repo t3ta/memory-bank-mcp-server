@@ -6,7 +6,12 @@ import { z } from 'zod';
 import { TranslationKey, Language } from './i18n-schema.js';
 
 /**
- * Template section schema
+ * LanguageMap type for multilingual text
+ */
+export type LanguageMap = Record<Language, string>;
+
+/**
+ * Template section schema for array-based templates
  */
 export const templateSectionSchema = z.object({
   id: z.string(),
@@ -19,7 +24,18 @@ export const templateSectionSchema = z.object({
 export type TemplateSection = z.infer<typeof templateSectionSchema>;
 
 /**
- * Base template schema
+ * JSON Template section schema with internationalized content
+ */
+export const jsonTemplateSectionSchema = z.object({
+  title: z.record(z.string(), z.string()),  // Map of language codes to titles
+  content: z.record(z.string(), z.string()).optional(),  // Map of language codes to content
+  optional: z.boolean().default(false)  // Whether the section is optional
+});
+
+export type JsonTemplateSection = z.infer<typeof jsonTemplateSectionSchema>;
+
+/**
+ * Base template schema for array-based templates
  */
 export const baseTemplateSchema = z.object({
   id: z.string(),
@@ -33,6 +49,26 @@ export const baseTemplateSchema = z.object({
 });
 
 export type BaseTemplate = z.infer<typeof baseTemplateSchema>;
+
+/**
+ * JSON Template schema with metadata and content
+ */
+export const jsonTemplateSchema = z.object({
+  schema: z.literal('template_v1'),
+  metadata: z.object({
+    id: z.string(),
+    name: z.record(z.string(), z.string()),  // Map of language codes to names
+    description: z.record(z.string(), z.string()).optional(),  // Map of language codes to descriptions
+    type: z.string(),
+    lastModified: z.string()  // ISO 8601 format
+  }),
+  content: z.object({
+    sections: z.record(z.string(), jsonTemplateSectionSchema),  // Map of section IDs to sections
+    placeholders: z.record(z.string(), z.string()).optional()  // Map of placeholder names to descriptions
+  })
+});
+
+export type JsonTemplate = z.infer<typeof jsonTemplateSchema>;
 
 /**
  * Pull request template schema
@@ -70,6 +106,30 @@ export function validateTemplate(template: unknown): BaseTemplate {
       ).join('\n');
       
       throw new Error(`Invalid template format:\n${formattedErrors}`);
+    }
+    
+    throw error;
+  }
+}
+
+/**
+ * Validates that a template object conforms to the JsonTemplate schema
+ * 
+ * @param template The JSON template object to validate
+ * @returns The validated JSON template object
+ * @throws Error if validation fails
+ */
+export function validateJsonTemplate(template: unknown): JsonTemplate {
+  try {
+    return jsonTemplateSchema.parse(template);
+  } catch (error) {
+    // Enhanced error reporting
+    if (error instanceof z.ZodError) {
+      const formattedErrors = error.errors.map(err => 
+        `${err.path.join('.')}: ${err.message}`
+      ).join('\n');
+      
+      throw new Error(`Invalid JSON template format:\n${formattedErrors}`);
     }
     
     throw error;
@@ -132,5 +192,62 @@ export function createTemplateSection(
     contentKey,
     placeholder,
     isOptional,
+  };
+}
+
+/**
+ * Creates a new JSON template section
+ * 
+ * @param titleMap Map of language codes to titles
+ * @param contentMap Optional map of language codes to content
+ * @param isOptional Whether this section is optional
+ * @returns A new JsonTemplateSection object
+ */
+export function createJsonTemplateSection(
+  titleMap: Record<Language, string>,
+  contentMap?: Record<Language, string>,
+  isOptional: boolean = false,
+): JsonTemplateSection {
+  return {
+    title: titleMap,
+    content: contentMap,
+    optional: isOptional,
+  };
+}
+
+/**
+ * Creates a new JsonTemplate with the specified properties
+ * 
+ * @param id Template ID
+ * @param type Template type
+ * @param nameMap Map of language codes to template names
+ * @param sections Map of section IDs to template sections
+ * @param descriptionMap Optional map of language codes to template descriptions
+ * @param placeholders Optional map of placeholder names to descriptions
+ * @returns A new JsonTemplate object
+ */
+export function createJsonTemplate(
+  id: string,
+  type: string,
+  nameMap: Record<Language, string>,
+  sections: Record<string, JsonTemplateSection>,
+  descriptionMap?: Record<Language, string>,
+  placeholders?: Record<string, string>,
+): JsonTemplate {
+  const now = new Date().toISOString();
+  
+  return {
+    schema: 'template_v1',
+    metadata: {
+      id,
+      name: nameMap,
+      description: descriptionMap,
+      type,
+      lastModified: now
+    },
+    content: {
+      sections,
+      placeholders
+    }
   };
 }

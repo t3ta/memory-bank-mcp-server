@@ -4,7 +4,7 @@
  */
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { BaseTemplate, validateTemplate } from '../../schemas/v2/template-schema.js';
+import { BaseTemplate, validateTemplate, JsonTemplate, validateJsonTemplate } from '../../schemas/v2/template-schema.js';
 import { Language, isValidLanguage } from '../../schemas/v2/i18n-schema.js';
 import { IFileSystemService } from '../storage/interfaces/IFileSystemService.js';
 import { II18nProvider } from '../i18n/interfaces/II18nProvider.js';
@@ -56,7 +56,7 @@ export class JsonTemplateLoader implements ITemplateLoader {
   /**
    * Implements ITemplateLoader.loadJsonTemplate
    */
-  async loadJsonTemplate(templateId: string): Promise<BaseTemplate> {
+  async loadJsonTemplate(templateId: string): Promise<JsonTemplate> {
     const templatePath = path.join(this.getJsonTemplatesDirectory(), `${templateId}.json`);
     
     try {
@@ -71,7 +71,7 @@ export class JsonTemplateLoader implements ITemplateLoader {
       
       // Parse and validate template
       const template = JSON.parse(content);
-      return validateTemplate(template);
+      return validateJsonTemplate(template);
     } catch (error) {
       if (error instanceof SyntaxError) {
         throw new Error(`Invalid JSON format in template ${templateId}: ${error.message}`);
