@@ -4,6 +4,11 @@ on:
   push:
     branches: [master]
 
+# コンカレンシー制御 - 同じブランチで同時に実行されないようにする
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   release:
     runs-on: ubuntu-latest

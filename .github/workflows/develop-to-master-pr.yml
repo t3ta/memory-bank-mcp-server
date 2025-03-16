@@ -5,6 +5,11 @@ on:
     branches:
       - develop
 
+# コンカレンシー制御 - 同じブランチで同時に実行されないようにする
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   create-pr:
     runs-on: ubuntu-latest
@@ -35,6 +40,7 @@ jobs:
 
       - name: Create Pull Request
         if: steps.check-pr.outputs.skip != 'true'
+        id: create-pr
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -53,6 +59,10 @@ jobs:
 
           # 変更ログを生成
           changes=$(git log master..develop --pretty=format:'- %s' --reverse)
+          if [ -z "$changes" ]; then
+            echo "警告: developとmasterの間に変更が見つかりませんでした"
+            changes="*変更履歴が見つかりませんでした*"
+          fi
 
           # 言語を判断（デフォルトは日本語）
           if [[ "$GITHUB_REPOSITORY" =~ .*-en$ ]]; then
@@ -61,16 +71,40 @@ jobs:
             template_file="src/templates/develop-to-master-pr-template.md"
           fi
 
-          # テンプレートを読み込んで変更履歴を挿入
-          body=$(cat "$template_file" | sed "s|{{CHANGES}}|$changes|g")
+          # テンプレートファイルの存在確認
+          if [ ! -f "$template_file" ]; then
+            echo "エラー: テンプレートファイル '$template_file' が見つかりませんでした"
+            echo "デフォルトテンプレートを使用します"
+            
+            if [[ "$GITHUB_REPOSITORY" =~ .*-en$ ]]; then
+              body="## Changes\n\n${changes}\n\n---\n\n_This PR was automatically generated_"
+            else
+              body="## 変更内容\n\n${changes}\n\n---\n\n_このPRは自動的に作成されました_"
+            fi
+          else
+            # テンプレートを読み込んで変更履歴を挿入
+            body=$(cat "$template_file" | sed "s|{{CHANGES}}|$changes|g")
+          fi
 
           # PRを作成
-          gh pr create \
+          set +e  # エラーが発生してもスクリプトを継続
+          pr_result=$(gh pr create \
             --base master \
             --head develop \
             --title "$pr_title" \
             --body "$body" \
             --label "auto-generated" \
-            --label "$label"
-
-          echo "Pull Request created successfully!"
+            --label "$label" 2>&1)
+          pr_status=$?
+          set -e  # エラーハンドリングを再度有効化
+          
+          if [ $pr_status -eq 0 ]; then
+            echo "Pull Request created successfully!"
+            echo "pr_url=$pr_result" >> $GITHUB_OUTPUT
+            echo "pr_status=success" >> $GITHUB_OUTPUT
+          else
+            echo "Pull Request creation failed: $pr_result"
+            echo "pr_status=failed" >> $GITHUB_OUTPUT
+            echo "pr_error=$pr_result" >> $GITHUB_OUTPUT
+            exit 1
+          fi

@@ -5,13 +5,16 @@ tags: #index #meta
 | タグ | 件数 | ドキュメント |
 |-----|------|-------------|
 | #architecture | 2 | [System Architecture](/architecture.md), [ドメインモデル](/domain-models.md) |
+| #automation | 1 | [CI/CD Workflows](/ci-cd/workflows.md) |
 | #best-practices | 1 | [Coding Standards](/coding-standards.md) |
+| #ci-cd | 1 | [CI/CD Workflows](/ci-cd/workflows.md) |
 | #clean-architecture | 1 | [System Architecture](/architecture.md) |
 | #clean-code | 1 | [Coding Standards](/coding-standards.md) |
 | #definitions | 1 | [Glossary](/glossary.md) |
 | #dependencies | 1 | [Technology Stack](/tech-stack.md) |
 | #documentation | 1 | [ユーザーガイド](/user-guide.md) |
 | #domain | 1 | [ドメインモデル](/domain-models.md) |
+| #github-actions | 1 | [CI/CD Workflows](/ci-cd/workflows.md) |
 | #glossary | 1 | [Glossary](/glossary.md) |
 | #guide | 1 | [ユーザーガイド](/user-guide.md) |
 | #infrastructure | 1 | [Technology Stack](/tech-stack.md) |
@@ -22,3 +25,4 @@ tags: #index #meta
 | #tech-stack | 1 | [Technology Stack](/tech-stack.md) |
 | #terminology | 1 | [Glossary](/glossary.md) |
 | #typescript | 1 | [Coding Standards](/coding-standards.md) |
+| #workflows | 1 | [CI/CD Workflows](/ci-cd/workflows.md) |
