@@ -2,6 +2,20 @@
 
 ## 技術的決定事項
 
+### リソース解放パターン
+
+#### コンテキスト
+長期実行型のNode.jsアプリケーションではメモリリークが発生しやすい
+
+#### 決定事項
+明示的なリソース解放処理とクリーンアップ機能を実装する
+
+#### 影響
+- アプリケーションインスタンスは使用後にnullに設定する
+- イベントリスナーは不要になったら明示的に削除する
+- プロセス終了時に適切なクリーンアップを行う
+- 未処理の例外やRejectionも適切に処理する
+
 ### テンプレートの言語分岐
 
 #### コンテキスト
@@ -44,6 +58,8 @@ PRのタイトルとラベルはコミットの種類を反映すべき
 
 ## 関連ファイルとディレクトリ構造
 
+- src/index.ts - メインサーバープロセス、リソース解放処理を追加
+- src/cli/index.ts - CLIツール、イベントリスナー管理を改善
 - .github/workflows/develop-to-master-pr.yml - 新規作成するワークフロー
 - .github/workflow-templates/develop-to-master-pr-template.md - 日本語テンプレート
 - .github/workflow-templates/develop-to-master-pr-template-en.md - 英語テンプレート
@@ -52,4 +68,5 @@ PRのタイトルとラベルはコミットの種類を反映すべき
 - .github/workflows/test.yml - テストワークフロー
 - .github/workflows/version-bump.yml - バージョンアップワークフロー
 - docs/global-memory-bank/ci-cd/workflows.md - CI/CDワークフローのドキュメント
+- docs/global-memory-bank/ci-cd/memory-bank-errors.md - メモリバンクエラーのトラブルシューティング
 - src/templates/ - ソフトウェア機能として提供するテンプレート

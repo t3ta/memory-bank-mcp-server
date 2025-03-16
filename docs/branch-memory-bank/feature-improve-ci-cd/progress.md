@@ -2,21 +2,24 @@
 
 ## 動作している機能
 
+- メモリリーク対応（リソース解放処理の実装）
+- プロセス終了時のクリーンアップ機能
+- イベントリスナー適切な解放処理
 - develop-to-master-pr.yml の基本的な動作
 - PR作成時のテンプレート（日本語・英語）
 - CI/CDワークフローのドキュメント
 
 ## 未実装の機能
 
+- メモリ使用量モニタリング機能
 - develop-to-master-pr.yml のコンカレンシー設定追加
 - 既存ワークフローのコンカレンシー設定統一
-- エラーハンドリングの改善
 
 ## 現在の状態
 
-開発中 - workflows.mdは作成済み、develop-to-master-pr.ymlの改善が必要
+実装完了 - メモリリーク修正対応済み、PRを作成準備中
 
 ## 既知の問題
 
-- メモリバンク関連の機能（read_branch_core_files, write_branch_core_files）でエラーが発生している
-- グローバルメモリバンクに問題解決方法を記録済み（docs/global-memory-bank/ci-cd/memory-bank-errors.md）
+- メモリバンク関連の機能（read_branch_core_files, write_branch_core_files）でエラーが発生している問題は修正済み
+- 長時間実行時のメモリ使用状況は引き続き監視が必要
