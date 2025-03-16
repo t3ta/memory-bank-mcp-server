@@ -94,7 +94,7 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
       
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_READ_ERROR,
-        `Failed to get document from global memory bank: ${path.value}`,
+        `Failed to find document by path: ${path.value}`,
         { originalError: error }
       );
     }
@@ -124,7 +124,7 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
       
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_WRITE_ERROR,
-        `Failed to save document to global memory bank: ${document.path.value}`,
+        `Failed to save document: ${document.path.value}`,
         { originalError: error }
       );
     }
@@ -156,7 +156,7 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
       
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
-        `Failed to delete document from global memory bank: ${path.value}`,
+        `Failed to delete document: ${path.value}`,
         { originalError: error }
       );
     }
