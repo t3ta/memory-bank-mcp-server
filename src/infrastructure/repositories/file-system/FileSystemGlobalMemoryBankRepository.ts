@@ -12,7 +12,7 @@ import {
 import { DomainError } from '../../../shared/errors/DomainError.js';
 import { FileSystemMemoryDocumentRepository } from './FileSystemMemoryDocumentRepository.js';
 import { logger } from '../../../shared/utils/logger.js';
-import { TagIndex } from '../../../schemas/tag-index/tag-index-schema';
+import { TagIndex } from '../../../schemas/tag-index/tag-index-schema.js';
 
 /**
  * File system implementation of global memory bank repository
@@ -68,7 +68,7 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
       // Check if files exist, create default structure if needed
       await this.ensureDefaultStructure();
 
-      // Update tags index
+      // Create tag index if needed
       await this.updateTagsIndex();
 
       logger.debug('Global memory bank initialized');
@@ -121,8 +121,8 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
 
       // Update tags index if document is markdown
       if (document.isMarkdown && document.path.value !== 'tags/index.md') {
-        // Pass true to skip saveDocument call to avoid circular reference
-        await this.updateTagsIndex(true);
+        // Generate and save the tag index
+        await this.generateAndSaveTagIndex();
       }
     } catch (error) {
       if (error instanceof DomainError) {
@@ -148,12 +148,18 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
    */
   async deleteDocument(path: DocumentPath): Promise<boolean> {
     try {
+      // 事前にファイルの存在を確認
+      const document = await this.getDocument(path);
+      if (!document) {
+        return false;
+      }
+      
       const result = await this.documentRepository.delete(path);
 
       // Update tags index if document was deleted
       if (result && path.value !== 'tags/index.md') {
-        // Pass true to skip saveDocument call to avoid circular reference
-        await this.updateTagsIndex(true);
+        // Generate and save the tag index
+        await this.generateAndSaveTagIndex();
       }
 
       return result;
@@ -224,10 +230,154 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
   }
 
   /**
+   * Generate and save tag index from all documents
+   * @returns Promise resolving when done
+   */
+  private async generateAndSaveTagIndex(): Promise<void> {
+    try {
+      logger.debug('Generating global tag index');
+      
+      // Get all documents
+      const allPaths = await this.listDocuments();
+      const documents: MemoryDocument[] = [];
+
+      for (const docPath of allPaths) {
+        // Skip the tags index itself
+        if (docPath.value === 'tags/index.md') {
+          continue;
+        }
+
+        const doc = await this.getDocument(docPath);
+        if (doc) {
+          documents.push(doc);
+        }
+      }
+
+      // Create tag index
+      const tagIndex: TagIndex = {
+        version: 1,
+        lastUpdated: new Date().toISOString(),
+        index: {}
+      };
+
+      // Collect documents by tag
+      for (const doc of documents) {
+        for (const tag of doc.tags) {
+          if (!tagIndex.index[tag.value]) {
+            tagIndex.index[tag.value] = [];
+          }
+          tagIndex.index[tag.value].push(doc.path.value);
+        }
+      }
+
+      // Save the tag index
+      await this.saveTagIndex(tagIndex);
+      
+      // Also update the legacy tags index file
+      await this.updateLegacyTagsIndex();
+      
+      logger.debug('Global tag index generated and saved');
+    } catch (error) {
+      throw new InfrastructureError(
+        InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
+        `Failed to generate and save tag index: ${(error as Error).message}`,
+        { originalError: error }
+      );
+    }
+  }
+
+  /**
+   * Updates the legacy tags/index.md file for backward compatibility
+   * @returns Promise resolving when done
+   * @private
+   */
+  private async updateLegacyTagsIndex(): Promise<void> {
+    try {
+      logger.debug('Updating legacy tags index file');
+
+      // Get all documents
+      const allPaths = await this.listDocuments();
+      const documents: MemoryDocument[] = [];
+
+      for (const docPath of allPaths) {
+        // Skip the tags index itself
+        if (docPath.value === 'tags/index.md') {
+          continue;
+        }
+
+        const doc = await this.getDocument(docPath);
+        if (doc) {
+          documents.push(doc);
+        }
+      }
+
+      // Collect all tags with their documents
+      const tagMap: Map<string, { count: number; documents: string[] }> = new Map();
+
+      for (const doc of documents) {
+        for (const tag of doc.tags) {
+          const existing = tagMap.get(tag.value);
+
+          if (existing) {
+            existing.count += 1;
+            existing.documents.push(doc.path.value);
+          } else {
+            tagMap.set(tag.value, {
+              count: 1,
+              documents: [doc.path.value],
+            });
+          }
+        }
+      }
+
+      // Create tags index content
+      let indexContent = '# タグインデックス\n\ntags: #index #meta\n\n';
+
+      // Add table header
+      indexContent += '| タグ | 件数 | ドキュメント |\n';
+      indexContent += '|-----|------|-------------|\n';
+
+      // Sort tags by name
+      const sortedTags = Array.from(tagMap.keys()).sort();
+
+      for (const tag of sortedTags) {
+        const info = tagMap.get(tag)!;
+
+        // Format document links
+        const docLinks = info.documents
+          .map((d) => {
+            // Get doc title if possible
+            const doc = documents.find((doc) => doc.path.value === d);
+            const title = doc?.title || d;
+
+            return `[${title}](/${d})`;
+          })
+          .join(', ');
+
+        indexContent += `| #${tag} | ${info.count} | ${docLinks} |\n`;
+      }
+
+      // Direct path - used to avoid circular reference
+      const indexPath = DocumentPath.create('tags/index.md');
+      const fullPath = path.join(this.globalMemoryPath, indexPath.value);
+      await this.fileSystemService.createDirectory(path.dirname(fullPath));
+      await this.fileSystemService.writeFile(fullPath, indexContent);
+
+      logger.debug('Legacy tags index file updated');
+    } catch (error) {
+      throw new InfrastructureError(
+        InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
+        `Failed to update legacy tags index file: ${(error as Error).message}`,
+        { originalError: error }
+      );
+    }
+  }
+
+  /**
    * Update tags index in global memory bank (legacy method)
    * @param skipSaveDocument Optional flag to skip saveDocument to prevent circular references
    * @returns Promise resolving when done
-   * @deprecated Use saveTagIndex instead
+   * @deprecated Use generateAndSaveTagIndex instead
    */
   async updateTagsIndex(skipSaveDocument: boolean = false): Promise<void> {
     try {

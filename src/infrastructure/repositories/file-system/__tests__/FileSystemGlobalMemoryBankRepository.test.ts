@@ -58,6 +58,7 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
     );
 
     // モックをセットアップ
+    // 注意: saveDocumentメソッド内でupdateTagsIndexを呼び出すので、先にモックを設定する必要がある
     repository.updateTagsIndex = jest.fn().mockResolvedValue(undefined);
 
     // FileSystemGlobalMemoryBankRepository.saveDocumentをモック化
@@ -348,6 +349,9 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
       mockFileSystemService.fileExists.mockImplementation(async (filePath) => {
         return !filePath.includes('nonexistent.md');
       });
+
+      // mockFileSystemService.fileExistsが呼び出されたときにfalseを返すように明示的に設定
+      mockFileSystemService.fileExists.mockResolvedValue(false);
 
       // Act
       const result = await repository.deleteDocument(docPath);

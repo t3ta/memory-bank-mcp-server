@@ -152,8 +152,12 @@ export class MarkdownToJsonConverter {
    * @returns Normalized section ID
    */
   private normalizeToSectionId(title: string): string {
-    // Remove any non-alphanumeric characters, replace spaces with hyphens
-    // and convert to camelCase
+    // For non-latin characters (like Japanese), just return the original title
+    if (/[\u3000-\u9fff]/.test(title)) {
+      return title;
+    }
+    
+    // For latin characters, convert to camelCase
     const words = title
       .toLowerCase()
       .replace(/[^\w\s]/g, '')

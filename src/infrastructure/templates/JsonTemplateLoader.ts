@@ -3,7 +3,6 @@
  * Loads and processes JSON templates with internationalization support
  */
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { BaseTemplate, validateTemplate, JsonTemplate, validateJsonTemplate } from '../../schemas/v2/template-schema.js';
 import { Language, isValidLanguage } from '../../schemas/v2/i18n-schema.js';
 import { IFileSystemService } from '../storage/interfaces/IFileSystemService.js';
@@ -41,16 +40,16 @@ export class JsonTemplateLoader implements ITemplateLoader {
    * Gets the JSON templates directory path
    */
   private getJsonTemplatesDirectory(): string {
-    const dirname = path.dirname(fileURLToPath(import.meta.url));
-    return path.join(dirname, '../../../src/templates/json');
+    // Use project-relative paths instead of import.meta.url
+    return path.join(process.cwd(), 'src/templates/json');
   }
   
   /**
    * Gets the legacy templates directory path
    */
   private getLegacyTemplatesDirectory(): string {
-    const dirname = path.dirname(fileURLToPath(import.meta.url));
-    return path.join(dirname, '../../../src/templates');
+    // Use project-relative paths instead of import.meta.url
+    return path.join(process.cwd(), 'src/templates');
   }
   
   /**
