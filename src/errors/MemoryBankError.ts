@@ -1,8 +1,8 @@
 import { McpError } from '../types.js';
 
+/* eslint-disable no-unused-vars */
 export enum MemoryBankErrorCode {
   // Document related errors (range: -33000 to -33099)
-  /* eslint-disable no-unused-vars */
   DocumentNotFound = -33000,
   DocumentValidationFailed = -33001,
   RequiredFieldMissing = -33002,
@@ -12,7 +12,6 @@ export enum MemoryBankErrorCode {
   InvalidPath = -33100,
   PathNotFound = -33101,
   InvalidBranchName = -33102,
-  /* eslint-enable no-unused-vars */
 
   // Tag related errors (range: -33200 to -33299)
   InvalidTagFormat = -33200,
@@ -24,6 +23,7 @@ export enum MemoryBankErrorCode {
   FileWriteError = -33302,
   FilePermissionError = -33303,
 }
+/* eslint-enable no-unused-vars */
 
 export class MemoryBankError extends Error implements McpError {
   constructor(

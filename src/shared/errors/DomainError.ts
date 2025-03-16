@@ -5,11 +5,7 @@ import { BaseError } from './BaseError.js';
  * Used for business rule violations and domain validation errors
  */
 export class DomainError extends BaseError {
-  constructor(
-    code: string,
-    message: string,
-    details?: Record<string, unknown>
-  ) {
+  constructor(code: string, message: string, details?: Record<string, unknown>) {
     super(`DOMAIN_ERROR.${code}`, message, details);
   }
 }

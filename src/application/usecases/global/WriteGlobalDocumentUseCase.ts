@@ -6,7 +6,10 @@ import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
 import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
 import { Tag } from '../../../domain/entities/Tag.js';
 import { DomainError } from '../../../shared/errors/DomainError.js';
-import { ApplicationError, ApplicationErrorCodes } from '../../../shared/errors/ApplicationError.js';
+import {
+  ApplicationError,
+  ApplicationErrorCodes,
+} from '../../../shared/errors/ApplicationError.js';
 
 /**
  * Input data for write global document use case
@@ -31,14 +34,14 @@ export interface WriteGlobalDocumentOutput {
 /**
  * Use case for writing a document to global memory bank
  */
-export class WriteGlobalDocumentUseCase implements IUseCase<WriteGlobalDocumentInput, WriteGlobalDocumentOutput> {
+export class WriteGlobalDocumentUseCase
+  implements IUseCase<WriteGlobalDocumentInput, WriteGlobalDocumentOutput>
+{
   /**
    * Constructor
    * @param globalRepository Global memory bank repository
    */
-  constructor(
-    private readonly globalRepository: IGlobalMemoryBankRepository
-  ) {}
+  constructor(private readonly globalRepository: IGlobalMemoryBankRepository) {}
 
   /**
    * Execute the use case
@@ -49,10 +52,7 @@ export class WriteGlobalDocumentUseCase implements IUseCase<WriteGlobalDocumentI
     try {
       // Validate input
       if (!input.document) {
-        throw new ApplicationError(
-          ApplicationErrorCodes.INVALID_INPUT,
-          'Document is required'
-        );
+        throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Document is required');
       }
 
       if (!input.document.path) {
@@ -71,20 +71,20 @@ export class WriteGlobalDocumentUseCase implements IUseCase<WriteGlobalDocumentI
 
       // Create domain objects
       const documentPath = DocumentPath.create(input.document.path);
-      const tags = (input.document.tags ?? []).map(tag => Tag.create(tag));
-      
+      const tags = (input.document.tags ?? []).map((tag) => Tag.create(tag));
+
       // Initialize global memory bank if needed
       await this.globalRepository.initialize();
 
       // Create or update document
       const existingDocument = await this.globalRepository.getDocument(documentPath);
-      
+
       let document: MemoryDocument;
-      
+
       if (existingDocument) {
         // Update existing document
         document = existingDocument.updateContent(input.document.content);
-        
+
         // Update tags if provided
         if (input.document.tags) {
           document = document.updateTags(tags);
@@ -95,31 +95,31 @@ export class WriteGlobalDocumentUseCase implements IUseCase<WriteGlobalDocumentI
           path: documentPath,
           content: input.document.content,
           tags,
-          lastModified: new Date()
+          lastModified: new Date(),
         });
       }
-      
+
       // Save document
       await this.globalRepository.saveDocument(document);
-      
+
       // Update tags index
       await this.globalRepository.updateTagsIndex();
-      
+
       // Transform to DTO
       return {
         document: {
           path: document.path.value,
           content: document.content,
-          tags: document.tags.map(tag => tag.value),
-          lastModified: document.lastModified.toISOString()
-        }
+          tags: document.tags.map((tag) => tag.value),
+          lastModified: document.lastModified.toISOString(),
+        },
       };
     } catch (error) {
       // Re-throw domain and application errors
       if (error instanceof DomainError || error instanceof ApplicationError) {
         throw error;
       }
-      
+
       // Wrap other errors
       throw new ApplicationError(
         ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,

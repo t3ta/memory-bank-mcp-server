@@ -242,7 +242,7 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
     it('should handle and wrap errors', async () => {
       // Arrange
       const docPath = DocumentPath.create('test.md');
-      const error = new Error('File read error');
+      const _error = new Error('File read error');
       mockFileSystemService.fileExists.mockRejectedValue(
         new InfrastructureError(
           InfrastructureErrorCodes.FILE_READ_ERROR,
@@ -365,7 +365,7 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
     it('should handle errors when deleting document', async () => {
       // Arrange
       const docPath = DocumentPath.create('test.md');
-      const error = new Error('File delete error');
+      const _error = new Error('File delete error');
 
       mockFileSystemService.fileExists.mockResolvedValue(true);
       mockFileSystemService.deleteFile.mockRejectedValue(

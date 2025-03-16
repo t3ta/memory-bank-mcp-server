@@ -32,9 +32,9 @@ export class MemoryDocument {
       path: props.path,
       content: props.content,
       tags: [...props.tags],
-      lastModified: new Date(props.lastModified) 
+      lastModified: new Date(props.lastModified),
     };
-    
+
     return new MemoryDocument(documentProps);
   }
 
@@ -72,7 +72,7 @@ export class MemoryDocument {
    * @returns boolean indicating if document has tag
    */
   public hasTag(tag: Tag): boolean {
-    return this.props.tags.some(t => t.equals(tag));
+    return this.props.tags.some((t) => t.equals(tag));
   }
 
   /**
@@ -84,11 +84,11 @@ export class MemoryDocument {
     if (content === this.props.content) {
       return this;
     }
-    
+
     return MemoryDocument.create({
       ...this.props,
       content,
-      lastModified: new Date()
+      lastModified: new Date(),
     });
   }
 
@@ -101,11 +101,11 @@ export class MemoryDocument {
     if (this.hasTag(tag)) {
       return this;
     }
-    
+
     return MemoryDocument.create({
       ...this.props,
       tags: [...this.props.tags, tag],
-      lastModified: new Date()
+      lastModified: new Date(),
     });
   }
 
@@ -118,11 +118,11 @@ export class MemoryDocument {
     if (!this.hasTag(tag)) {
       return this;
     }
-    
+
     return MemoryDocument.create({
       ...this.props,
-      tags: this.props.tags.filter(t => !t.equals(tag)),
-      lastModified: new Date()
+      tags: this.props.tags.filter((t) => !t.equals(tag)),
+      lastModified: new Date(),
     });
   }
 
@@ -135,7 +135,7 @@ export class MemoryDocument {
     return MemoryDocument.create({
       ...this.props,
       tags,
-      lastModified: new Date()
+      lastModified: new Date(),
     });
   }
 
@@ -168,8 +168,8 @@ export class MemoryDocument {
     return {
       path: this.props.path.value,
       content: this.props.content,
-      tags: this.props.tags.map(tag => tag.value),
-      lastModified: this.props.lastModified.toISOString()
+      tags: this.props.tags.map((tag) => tag.value),
+      lastModified: this.props.lastModified.toISOString(),
     };
   }
 }

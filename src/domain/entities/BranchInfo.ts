@@ -18,10 +18,7 @@ export class BranchInfo {
    */
   public static create(branchName: string): BranchInfo {
     if (!branchName) {
-      throw new DomainError(
-        DomainErrorCodes.INVALID_BRANCH_NAME,
-        'Branch name cannot be empty'
-      );
+      throw new DomainError(DomainErrorCodes.INVALID_BRANCH_NAME, 'Branch name cannot be empty');
     }
 
     // Branch name should start with feature/ or fix/
@@ -34,10 +31,10 @@ export class BranchInfo {
 
     // Get branch type
     const type = branchName.startsWith('feature/') ? 'feature' : 'fix';
-    
+
     // Get display name by removing the prefix
     const displayName = branchName.substring(branchName.indexOf('/') + 1);
-    
+
     if (!displayName) {
       throw new DomainError(
         DomainErrorCodes.INVALID_BRANCH_NAME,

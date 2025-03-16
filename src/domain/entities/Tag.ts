@@ -14,10 +14,7 @@ export class Tag {
    */
   public static create(value: string): Tag {
     if (!value) {
-      throw new DomainError(
-        DomainErrorCodes.INVALID_TAG_FORMAT,
-        'Tag cannot be empty'
-      );
+      throw new DomainError(DomainErrorCodes.INVALID_TAG_FORMAT, 'Tag cannot be empty');
     }
 
     // Tags should only contain lowercase letters, numbers, and hyphens

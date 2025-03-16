@@ -12,8 +12,7 @@ import createApplication from '../main/index.js';
 import { logger } from '../shared/utils/logger.js';
 
 // Define CLI commands
-// eslint-disable-next-line no-unused-vars
-const argv = yargs(hideBin(process.argv))
+const _argv = yargs(hideBin(process.argv))
   .scriptName('memory-bank')
   .usage('Usage: $0 <command> [options]')
   .option('docs', {

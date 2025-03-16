@@ -4,7 +4,10 @@ import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
 import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
 import { Tag } from '../../../domain/entities/Tag.js';
 import { IFileSystemService } from '../../storage/interfaces/IFileSystemService.js';
-import { InfrastructureError, InfrastructureErrorCodes } from '../../../shared/errors/InfrastructureError.js';
+import {
+  InfrastructureError,
+  InfrastructureErrorCodes,
+} from '../../../shared/errors/InfrastructureError.js';
 import { DomainError } from '../../../shared/errors/DomainError.js';
 import { extractTags } from '../../../shared/utils/index.js';
 
@@ -42,7 +45,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
       const content = await this.fileSystemService.readFile(filePath);
 
       // Extract tags
-      const tags = extractTags(content).map(tag => Tag.create(tag));
+      const tags = extractTags(content).map((tag) => Tag.create(tag));
 
       // Get file stats
       const stats = await this.fileSystemService.getFileStats(filePath);
@@ -52,7 +55,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
         path,
         content,
         tags,
-        lastModified: stats.lastModified
+        lastModified: stats.lastModified,
       });
     } catch (error) {
       if (error instanceof DomainError) {
@@ -69,7 +72,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
 
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_READ_ERROR,
-        `Failed to get document from global memory bank: ${path.value}`,
+        `Failed to find document by path: ${path.value}`,
         { originalError: error }
       );
     }
@@ -106,7 +109,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
 
           if (document) {
             // Check if document has all tags
-            const hasAllTags = tags.every(tag => document.hasTag(tag));
+            const hasAllTags = tags.every((tag) => document.hasTag(tag));
 
             if (hasAllTags) {
               documents.push(document);
@@ -150,7 +153,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
 
       // Add or update tags if document has any
       if (document.tags.length > 0) {
-        const tagLine = `tags: ${document.tags.map(tag => tag.toHashtag()).join(' ')}\n\n`;
+        const tagLine = `tags: ${document.tags.map((tag) => tag.toHashtag()).join(' ')}\n\n`;
 
         // If content already has tags, replace them
         if (content.includes('tags:')) {
@@ -206,7 +209,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
 
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
-        `Failed to delete document from global memory bank: ${path.value}`,
+        `Failed to delete document: ${path.value}`,
         { originalError: error }
       );
     }
@@ -221,7 +224,8 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
       // List all files
       const files = await this.fileSystemService.listFiles(this.basePath);
 
-      // Convert to document paths
+      // Convert to document paths and remove duplicates
+      const uniquePaths = new Set<string>();
       const paths: DocumentPath[] = [];
 
       for (const file of files) {
@@ -234,13 +238,34 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
             continue;
           }
 
-          // Create document path
-          const documentPath = DocumentPath.create(relativePath);
+          // Validate the path first
+          const parts = relativePath.split(path.sep);
+          if (parts.includes('..') || parts.some((part) => part.startsWith('..'))) {
+            console.error('Invalid document path:', {
+              path: relativePath,
+              reason: 'Path traversal attempt detected',
+            });
+            continue;
+          }
 
-          paths.push(documentPath);
+          // Only process paths we haven't seen before
+          if (!uniquePaths.has(relativePath)) {
+            try {
+              uniquePaths.add(relativePath);
+              const documentPath = DocumentPath.create(relativePath);
+              paths.push(documentPath);
+            } catch (error) {
+              console.error('Error creating document path:', {
+                path: relativePath,
+                error: error instanceof Error ? error.message : String(error),
+              });
+            }
+          }
         } catch (error) {
-          // Skip files that don't match path format
-          console.error(`Error processing file path ${file}:`, error);
+          console.error('Error processing file path:', {
+            path: file,
+            error: error instanceof Error ? error.message : String(error),
+          });
         }
       }
 
@@ -256,7 +281,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
 
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
-        `Failed to list documents in global memory bank`,
+        'Failed to list documents',
         { originalError: error }
       );
     }

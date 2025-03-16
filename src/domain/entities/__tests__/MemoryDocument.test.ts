@@ -9,7 +9,7 @@ describe('MemoryDocument', () => {
       path: DocumentPath.create('test/document.md'),
       content: '# Test Document\n\nThis is a test document.',
       tags: [Tag.create('test'), Tag.create('document')],
-      lastModified: new Date('2023-01-01T00:00:00.000Z')
+      lastModified: new Date('2023-01-01T00:00:00.000Z'),
     };
   };
 
@@ -17,10 +17,10 @@ describe('MemoryDocument', () => {
     it('should create a valid document', () => {
       // Arrange
       const props = createValidDocumentProps();
-      
+
       // Act
       const document = MemoryDocument.create(props);
-      
+
       // Assert
       expect(document).toBeDefined();
       expect(document.path).toBe(props.path);
@@ -33,12 +33,12 @@ describe('MemoryDocument', () => {
       // Arrange
       const props = createValidDocumentProps();
       const originalTags = [...props.tags];
-      
+
       // Act
       const document = MemoryDocument.create(props);
       props.tags.push(Tag.create('modified'));
       props.lastModified = new Date('2025-01-01');
-      
+
       // Assert
       expect(document.tags).toHaveLength(originalTags.length);
       expect(document.lastModified.getTime()).toBe(new Date('2023-01-01T00:00:00.000Z').getTime());
@@ -50,10 +50,10 @@ describe('MemoryDocument', () => {
       // Arrange
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const path = document.path;
-      
+
       // Assert
       expect(path).toBe(props.path);
     });
@@ -62,10 +62,10 @@ describe('MemoryDocument', () => {
       // Arrange
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const content = document.content;
-      
+
       // Assert
       expect(content).toBe(props.content);
     });
@@ -74,10 +74,10 @@ describe('MemoryDocument', () => {
       // Arrange
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const tags = document.tags;
-      
+
       // Assert
       expect(tags).toEqual(props.tags);
       expect(tags).not.toBe(props.tags); // Should be a different array instance
@@ -87,10 +87,10 @@ describe('MemoryDocument', () => {
       // Arrange
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const lastModified = document.lastModified;
-      
+
       // Assert
       expect(lastModified.getTime()).toBe(props.lastModified.getTime());
       expect(lastModified).not.toBe(props.lastModified); // Should be a different Date instance
@@ -102,10 +102,10 @@ describe('MemoryDocument', () => {
       // Arrange
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const result = document.hasTag(Tag.create('test'));
-      
+
       // Assert
       expect(result).toBe(true);
     });
@@ -114,10 +114,10 @@ describe('MemoryDocument', () => {
       // Arrange
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const result = document.hasTag(Tag.create('missing'));
-      
+
       // Assert
       expect(result).toBe(false);
     });
@@ -129,26 +129,28 @@ describe('MemoryDocument', () => {
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
       const newContent = '# Updated Document\n\nThis is an updated document.';
-      
+
       // Act
       const updatedDocument = document.updateContent(newContent);
-      
+
       // Assert
       expect(updatedDocument).not.toBe(document); // Should be a new instance
       expect(updatedDocument.content).toBe(newContent);
       expect(updatedDocument.path).toBe(document.path);
       expect(updatedDocument.tags).toEqual(document.tags);
-      expect(updatedDocument.lastModified.getTime()).toBeGreaterThan(document.lastModified.getTime());
+      expect(updatedDocument.lastModified.getTime()).toBeGreaterThan(
+        document.lastModified.getTime()
+      );
     });
 
     it('should return the same document if content is unchanged', () => {
       // Arrange
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const updatedDocument = document.updateContent(props.content);
-      
+
       // Assert
       expect(updatedDocument).toBe(document); // Should be the same instance
     });
@@ -160,17 +162,19 @@ describe('MemoryDocument', () => {
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
       const newTag = Tag.create('newtag');
-      
+
       // Act
       const updatedDocument = document.addTag(newTag);
-      
+
       // Assert
       expect(updatedDocument).not.toBe(document); // Should be a new instance
       expect(updatedDocument.tags).toHaveLength(document.tags.length + 1);
       expect(updatedDocument.hasTag(newTag)).toBe(true);
       expect(updatedDocument.path).toBe(document.path);
       expect(updatedDocument.content).toBe(document.content);
-      expect(updatedDocument.lastModified.getTime()).toBeGreaterThan(document.lastModified.getTime());
+      expect(updatedDocument.lastModified.getTime()).toBeGreaterThan(
+        document.lastModified.getTime()
+      );
     });
 
     it('should return the same document if tag already exists', () => {
@@ -178,10 +182,10 @@ describe('MemoryDocument', () => {
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
       const existingTag = Tag.create('test');
-      
+
       // Act
       const updatedDocument = document.addTag(existingTag);
-      
+
       // Assert
       expect(updatedDocument).toBe(document); // Should be the same instance
     });
@@ -193,17 +197,19 @@ describe('MemoryDocument', () => {
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
       const tagToRemove = Tag.create('test');
-      
+
       // Act
       const updatedDocument = document.removeTag(tagToRemove);
-      
+
       // Assert
       expect(updatedDocument).not.toBe(document); // Should be a new instance
       expect(updatedDocument.tags).toHaveLength(document.tags.length - 1);
       expect(updatedDocument.hasTag(tagToRemove)).toBe(false);
       expect(updatedDocument.path).toBe(document.path);
       expect(updatedDocument.content).toBe(document.content);
-      expect(updatedDocument.lastModified.getTime()).toBeGreaterThan(document.lastModified.getTime());
+      expect(updatedDocument.lastModified.getTime()).toBeGreaterThan(
+        document.lastModified.getTime()
+      );
     });
 
     it('should return the same document if tag does not exist', () => {
@@ -211,10 +217,10 @@ describe('MemoryDocument', () => {
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
       const nonExistingTag = Tag.create('nonexistent');
-      
+
       // Act
       const updatedDocument = document.removeTag(nonExistingTag);
-      
+
       // Assert
       expect(updatedDocument).toBe(document); // Should be the same instance
     });
@@ -226,10 +232,10 @@ describe('MemoryDocument', () => {
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
       const newTags = [Tag.create('new'), Tag.create('tags')];
-      
+
       // Act
       const updatedDocument = document.updateTags(newTags);
-      
+
       // Assert
       expect(updatedDocument).not.toBe(document); // Should be a new instance
       expect(updatedDocument.tags).toHaveLength(newTags.length);
@@ -237,7 +243,9 @@ describe('MemoryDocument', () => {
       expect(updatedDocument.hasTag(newTags[1])).toBe(true);
       expect(updatedDocument.path).toBe(document.path);
       expect(updatedDocument.content).toBe(document.content);
-      expect(updatedDocument.lastModified.getTime()).toBeGreaterThan(document.lastModified.getTime());
+      expect(updatedDocument.lastModified.getTime()).toBeGreaterThan(
+        document.lastModified.getTime()
+      );
     });
   });
 
@@ -246,10 +254,10 @@ describe('MemoryDocument', () => {
       // Arrange
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const title = document.title;
-      
+
       // Assert
       expect(title).toBe('Test Document');
     });
@@ -259,10 +267,10 @@ describe('MemoryDocument', () => {
       const props = createValidDocumentProps();
       props.content = 'This is a document without a title.';
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const title = document.title;
-      
+
       // Assert
       expect(title).toBeUndefined();
     });
@@ -272,10 +280,10 @@ describe('MemoryDocument', () => {
       const props = createValidDocumentProps();
       props.content = '#   Extra Spaced Title  \n\nContent';
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const title = document.title;
-      
+
       // Assert
       expect(title).toBe('Extra Spaced Title');
     });
@@ -286,10 +294,10 @@ describe('MemoryDocument', () => {
       // Arrange
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const isMarkdown = document.isMarkdown;
-      
+
       // Assert
       expect(isMarkdown).toBe(true);
     });
@@ -299,10 +307,10 @@ describe('MemoryDocument', () => {
       const props = createValidDocumentProps();
       props.path = DocumentPath.create('test/document.txt');
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const isMarkdown = document.isMarkdown;
-      
+
       // Assert
       expect(isMarkdown).toBe(false);
     });
@@ -313,16 +321,16 @@ describe('MemoryDocument', () => {
       // Arrange
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const obj = document.toObject();
-      
+
       // Assert
       expect(obj).toEqual({
         path: props.path.value,
         content: props.content,
-        tags: props.tags.map(tag => tag.value),
-        lastModified: props.lastModified.toISOString()
+        tags: props.tags.map((tag) => tag.value),
+        lastModified: props.lastModified.toISOString(),
       });
     });
   });

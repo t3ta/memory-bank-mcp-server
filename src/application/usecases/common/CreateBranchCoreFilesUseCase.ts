@@ -286,6 +286,5 @@ import {
   ActiveContextDTO,
   ProgressDTO,
   SystemPatternsDTO,
-  /* eslint-disable-next-line no-unused-vars */
-  TechnicalDecisionDTO,
+  // TechnicalDecisionDTOはここでは直接使用されていないため削除
 } from '../../dtos/CoreFilesDTO.js';

@@ -3,7 +3,10 @@ import { DocumentDTO } from '../../dtos/DocumentDTO.js';
 import { IGlobalMemoryBankRepository } from '../../../domain/repositories/IGlobalMemoryBankRepository.js';
 import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
 import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
-import { ApplicationError, ApplicationErrorCodes } from '../../../shared/errors/ApplicationError.js';
+import {
+  ApplicationError,
+  ApplicationErrorCodes,
+} from '../../../shared/errors/ApplicationError.js';
 
 /**
  * Input data for read global document use case
@@ -28,14 +31,14 @@ export interface ReadGlobalDocumentOutput {
 /**
  * Use case for reading a document from global memory bank
  */
-export class ReadGlobalDocumentUseCase implements IUseCase<ReadGlobalDocumentInput, ReadGlobalDocumentOutput> {
+export class ReadGlobalDocumentUseCase
+  implements IUseCase<ReadGlobalDocumentInput, ReadGlobalDocumentOutput>
+{
   /**
    * Constructor
    * @param globalRepository Global memory bank repository
    */
-  constructor(
-    private readonly globalRepository: IGlobalMemoryBankRepository
-  ) {}
+  constructor(private readonly globalRepository: IGlobalMemoryBankRepository) {}
 
   /**
    * Execute the use case
@@ -54,10 +57,10 @@ export class ReadGlobalDocumentUseCase implements IUseCase<ReadGlobalDocumentInp
 
       // Create domain objects
       const documentPath = DocumentPath.create(input.path);
-      
+
       // Get document from repository
       const document = await this.globalRepository.getDocument(documentPath);
-      
+
       // Check if document exists
       if (!document) {
         throw new DomainError(
@@ -65,22 +68,22 @@ export class ReadGlobalDocumentUseCase implements IUseCase<ReadGlobalDocumentInp
           `Document "${input.path}" not found in global memory bank`
         );
       }
-      
+
       // Transform to DTO
       return {
         document: {
           path: document.path.value,
           content: document.content,
-          tags: document.tags.map(tag => tag.value),
-          lastModified: document.lastModified.toISOString()
-        }
+          tags: document.tags.map((tag) => tag.value),
+          lastModified: document.lastModified.toISOString(),
+        },
       };
     } catch (error) {
       // Re-throw domain and application errors
       if (error instanceof DomainError || error instanceof ApplicationError) {
         throw error;
       }
-      
+
       // Wrap other errors
       throw new ApplicationError(
         ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,

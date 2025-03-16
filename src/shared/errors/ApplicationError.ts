@@ -5,11 +5,7 @@ import { BaseError } from './BaseError.js';
  * Used for use case execution errors and application flow errors
  */
 export class ApplicationError extends BaseError {
-  constructor(
-    code: string,
-    message: string,
-    details?: Record<string, unknown>
-  ) {
+  constructor(code: string, message: string, details?: Record<string, unknown>) {
     super(`APP_ERROR.${code}`, message, details);
   }
 }

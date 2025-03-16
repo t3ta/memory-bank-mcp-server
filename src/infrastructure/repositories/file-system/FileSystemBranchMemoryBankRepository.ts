@@ -1,13 +1,19 @@
 import path from 'path';
-import { IBranchMemoryBankRepository, RecentBranch } from '../../../domain/repositories/IBranchMemoryBankRepository.js';
+import {
+  IBranchMemoryBankRepository,
+  RecentBranch,
+} from '../../../domain/repositories/IBranchMemoryBankRepository.js';
 import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
 import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
 import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
 import { Tag } from '../../../domain/entities/Tag.js';
 import { IFileSystemService } from '../../storage/interfaces/IFileSystemService.js';
 import { IConfigProvider } from '../../config/interfaces/IConfigProvider.js';
-import { InfrastructureError, InfrastructureErrorCodes } from '../../../shared/errors/InfrastructureError.js';
-import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
+import {
+  InfrastructureError,
+  InfrastructureErrorCodes,
+} from '../../../shared/errors/InfrastructureError.js';
+import { DomainError } from '../../../shared/errors/DomainError.js';
 import { FileSystemMemoryDocumentRepository } from './FileSystemMemoryDocumentRepository.js';
 import { extractListItems, extractSectionContent } from '../../../shared/utils/index.js';
 import { logger } from '../../../shared/utils/logger.js';
@@ -21,7 +27,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
     'branchContext.md',
     'activeContext.md',
     'systemPatterns.md',
-    'progress.md'
+    'progress.md',
   ];
   private readonly defaultTemplates: Record<string, string | ((branchName: string) => string)> = {
     'branchContext.md': (branchName: string) => `# ブランチコンテキスト
@@ -133,7 +139,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
 - [問題1]
 - [問題2]
 - [問題3]
-`
+`,
   };
 
   /**
@@ -158,16 +164,15 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
    */
   async exists(branchName: string): Promise<boolean> {
     try {
-      const branchInfo = BranchInfo.create(branchName);
       const branchPath = this.configProvider.getBranchMemoryPath(branchName);
-      
+
       return await this.fileSystemService.directoryExists(branchPath);
     } catch (error) {
       if (error instanceof DomainError) {
         // If the branch name is invalid, it doesn't exist
         return false;
       }
-      
+
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
         `Failed to check if branch memory bank exists: ${(error as Error).message}`,
@@ -184,38 +189,38 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
   async initialize(branchInfo: BranchInfo): Promise<void> {
     try {
       logger.debug(`Initializing branch memory bank for ${branchInfo.name}`);
-      
+
       const branchPath = this.configProvider.getBranchMemoryPath(branchInfo.name);
-      
+
       // Create directory if it doesn't exist
       await this.fileSystemService.createDirectory(branchPath);
-      
+
       // Create core documents if they don't exist
       for (const document of this.coreDocuments) {
         const filePath = path.join(branchPath, document);
         const exists = await this.fileSystemService.fileExists(filePath);
-        
+
         if (!exists) {
           const templateFn = this.defaultTemplates[document];
           let content: string;
-          
+
           if (typeof templateFn === 'function') {
             content = templateFn(branchInfo.name);
           } else {
             content = templateFn;
           }
-          
+
           await this.fileSystemService.writeFile(filePath, content);
           logger.debug(`Created core document: ${document} for branch ${branchInfo.name}`);
         }
       }
-      
+
       logger.debug(`Branch memory bank initialized for ${branchInfo.name}`);
     } catch (error) {
       if (error instanceof DomainError) {
         throw error;
       }
-      
+
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
         `Failed to initialize branch memory bank: ${(error as Error).message}`,
@@ -238,11 +243,11 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
       if (error instanceof DomainError) {
         throw error;
       }
-      
+
       if (error instanceof InfrastructureError) {
         throw error;
       }
-      
+
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_READ_ERROR,
         `Failed to get document from branch memory bank: ${path.value}`,
@@ -265,11 +270,11 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
       if (error instanceof DomainError) {
         throw error;
       }
-      
+
       if (error instanceof InfrastructureError) {
         throw error;
       }
-      
+
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_WRITE_ERROR,
         `Failed to save document to branch memory bank: ${document.path.value}`,
@@ -292,11 +297,11 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
       if (error instanceof DomainError) {
         throw error;
       }
-      
+
       if (error instanceof InfrastructureError) {
         throw error;
       }
-      
+
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
         `Failed to delete document from branch memory bank: ${path.value}`,
@@ -318,11 +323,11 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
       if (error instanceof DomainError) {
         throw error;
       }
-      
+
       if (error instanceof InfrastructureError) {
         throw error;
       }
-      
+
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
         `Failed to list documents in branch memory bank`,
@@ -345,11 +350,11 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
       if (error instanceof DomainError) {
         throw error;
       }
-      
+
       if (error instanceof InfrastructureError) {
         throw error;
       }
-      
+
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
         `Failed to find documents by tags in branch memory bank`,
@@ -366,46 +371,46 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
   async getRecentBranches(limit: number = 10): Promise<RecentBranch[]> {
     try {
       logger.debug(`Getting recent branches (limit: ${limit})`);
-      
+
       // Ensure the branch memory bank directory exists
       await this.fileSystemService.createDirectory(this.branchMemoryBankPath);
-      
+
       // List all directories in the branch memory bank directory
       const entries = await this.fileSystemService.listFiles(this.branchMemoryBankPath);
-      
+
       const branchInfos: {
         branchInfo: BranchInfo;
         path: string;
         lastModified: Date;
       }[] = [];
-      
+
       // Get last modified times for each branch directory
       for (const entry of entries) {
         try {
           // Get the directory name (without path)
           const dirName = path.basename(entry);
-          
+
           // Convert directory name to branch name (replace dash with slash)
           const branchName = dirName.replace(/^(feature|fix)-/, '$1/');
-          
+
           // Create BranchInfo
           const branchInfo = BranchInfo.create(branchName);
-          
+
           // Check if it's a directory and has active context document
           const branchPath = this.configProvider.getBranchMemoryPath(branchInfo.name);
           const activeContextPath = path.join(branchPath, 'activeContext.md');
-          
+
           const isDirectory = await this.fileSystemService.directoryExists(branchPath);
           const hasActiveContext = await this.fileSystemService.fileExists(activeContextPath);
-          
+
           if (isDirectory && hasActiveContext) {
             // Get last modified date of active context
             const stats = await this.fileSystemService.getFileStats(activeContextPath);
-            
+
             branchInfos.push({
               branchInfo,
               path: branchPath,
-              lastModified: stats.lastModified
+              lastModified: stats.lastModified,
             });
           }
         } catch (error) {
@@ -413,43 +418,45 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
           logger.debug(`Skipping invalid branch directory: ${entry}`, error);
         }
       }
-      
+
       // Sort by last modified date (descending)
       branchInfos.sort((a, b) => b.lastModified.getTime() - a.lastModified.getTime());
-      
+
       // Limit the results
       const limited = branchInfos.slice(0, limit);
-      
+
       // Build full branch info
       const recentBranches: RecentBranch[] = [];
-      
+
       for (const { branchInfo, lastModified } of limited) {
         try {
           // Get active context document to extract summary
           const activeContextPath = DocumentPath.create('activeContext.md');
           const activeContext = await this.getDocument(branchInfo, activeContextPath);
-          
+
           if (activeContext) {
             const content = activeContext.content;
-            
+
             // Extract current work and recent changes
             const currentWork = extractSectionContent(content, '## 現在の作業内容');
-            const recentChanges = extractListItems(content, '## 最近の変更点')?.map(item => item.trim());
-            
+            const recentChanges = extractListItems(content, '## 最近の変更点')?.map((item) =>
+              item.trim()
+            );
+
             recentBranches.push({
               branchInfo,
               lastModified,
               summary: {
                 currentWork,
-                recentChanges
-              }
+                recentChanges,
+              },
             });
           } else {
             // Include branch even without active context details
             recentBranches.push({
               branchInfo,
               lastModified,
-              summary: {}
+              summary: {},
             });
           }
         } catch (error) {
@@ -457,18 +464,18 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
           logger.debug(`Error processing branch ${branchInfo.name}:`, error);
         }
       }
-      
+
       logger.debug(`Found ${recentBranches.length} recent branches`);
       return recentBranches;
     } catch (error) {
       if (error instanceof DomainError) {
         throw error;
       }
-      
+
       if (error instanceof InfrastructureError) {
         throw error;
       }
-      
+
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
         `Failed to get recent branches: ${(error as Error).message}`,
@@ -485,28 +492,28 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
   async validateStructure(branchInfo: BranchInfo): Promise<boolean> {
     try {
       logger.debug(`Validating branch structure for ${branchInfo.name}`);
-      
+
       const branchPath = this.configProvider.getBranchMemoryPath(branchInfo.name);
-      
+
       // Check if directory exists
       const dirExists = await this.fileSystemService.directoryExists(branchPath);
-      
+
       if (!dirExists) {
         logger.debug(`Branch directory does not exist: ${branchPath}`);
         return false;
       }
-      
+
       // Check if all core documents exist
       for (const document of this.coreDocuments) {
         const filePath = path.join(branchPath, document);
         const fileExists = await this.fileSystemService.fileExists(filePath);
-        
+
         if (!fileExists) {
           logger.debug(`Core document missing: ${document}`);
           return false;
         }
       }
-      
+
       logger.debug(`Branch structure is valid for ${branchInfo.name}`);
       return true;
     } catch (error) {

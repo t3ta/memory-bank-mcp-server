@@ -13,7 +13,7 @@ export interface IBranchController extends IController {
    * @returns Promise resolving to MCP response with document
    */
   readDocument(branchName: string, path: string): Promise<MCPResponse<DocumentDTO>>;
-  
+
   /**
    * Write document to branch memory bank
    * @param branchName Branch name
@@ -22,15 +22,20 @@ export interface IBranchController extends IController {
    * @param tags Optional tags for the document
    * @returns Promise resolving to MCP response with the result
    */
-  writeDocument(branchName: string, path: string, content: string, tags?: string[]): Promise<MCPResponse>;
-  
+  writeDocument(
+    branchName: string,
+    path: string,
+    content: string,
+    tags?: string[]
+  ): Promise<MCPResponse>;
+
   /**
    * Read core files from branch memory bank
    * @param branchName Branch name
    * @returns Promise resolving to MCP response with core files content
    */
   readCoreFiles(branchName: string): Promise<MCPResponse<Record<string, DocumentDTO>>>;
-  
+
   /**
    * Write core files to branch memory bank
    * @param branchName Branch name
@@ -38,14 +43,14 @@ export interface IBranchController extends IController {
    * @returns Promise resolving to MCP response with the result
    */
   writeCoreFiles(branchName: string, files: Record<string, any>): Promise<MCPResponse>;
-  
+
   /**
    * Get recent branches
    * @param limit Maximum number of branches to return
    * @returns Promise resolving to MCP response with recent branches
    */
   getRecentBranches(limit?: number): Promise<MCPResponse>;
-  
+
   /**
    * Find documents by tags in branch memory bank
    * @param branchName Branch name
@@ -53,8 +58,12 @@ export interface IBranchController extends IController {
    * @param matchAllTags Whether to require all tags to match
    * @returns Promise resolving to MCP response with matching documents
    */
-  findDocumentsByTags(branchName: string, tags: string[], matchAllTags?: boolean): Promise<MCPResponse<DocumentDTO[]>>;
-  
+  findDocumentsByTags(
+    branchName: string,
+    tags: string[],
+    matchAllTags?: boolean
+  ): Promise<MCPResponse<DocumentDTO[]>>;
+
   /**
    * Update tags index in branch memory bank
    * @param branchName Branch name

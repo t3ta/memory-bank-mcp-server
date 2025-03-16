@@ -6,12 +6,12 @@ export interface RecentBranchDTO {
    * Branch name
    */
   name: string;
-  
+
   /**
    * Last modified timestamp (ISO string)
    */
   lastModified: string;
-  
+
   /**
    * Branch summary information
    */
@@ -20,7 +20,7 @@ export interface RecentBranchDTO {
      * Current work in progress
      */
     currentWork?: string;
-    
+
     /**
      * Recent changes
      */

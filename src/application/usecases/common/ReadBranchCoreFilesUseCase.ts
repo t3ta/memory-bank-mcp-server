@@ -4,7 +4,10 @@ import { CoreFilesDTO } from '../../dtos/CoreFilesDTO.js';
 import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
 import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
 import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
-import { ApplicationError, ApplicationErrorCodes } from '../../../shared/errors/ApplicationError.js';
+import {
+  ApplicationError,
+  ApplicationErrorCodes,
+} from '../../../shared/errors/ApplicationError.js';
 
 /**
  * Input data for reading branch core files
@@ -29,7 +32,9 @@ export interface ReadBranchCoreFilesOutput {
 /**
  * Use case for reading core files from a branch memory bank
  */
-export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesInput, ReadBranchCoreFilesOutput> {
+export class ReadBranchCoreFilesUseCase
+  implements IUseCase<ReadBranchCoreFilesInput, ReadBranchCoreFilesOutput>
+{
   // Core file paths
   private readonly ACTIVE_CONTEXT_PATH = 'activeContext.md';
   private readonly PROGRESS_PATH = 'progress.md';
@@ -39,9 +44,7 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
    * Constructor
    * @param branchRepository Branch memory bank repository
    */
-  constructor(
-    private readonly branchRepository: IBranchMemoryBankRepository
-  ) {}
+  constructor(private readonly branchRepository: IBranchMemoryBankRepository) {}
 
   /**
    * Execute the use case
@@ -52,10 +55,7 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
     try {
       // Validate input
       if (!input.branchName) {
-        throw new ApplicationError(
-          ApplicationErrorCodes.INVALID_INPUT,
-          'Branch name is required'
-        );
+        throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Branch name is required');
       }
 
       // Create domain objects
@@ -99,12 +99,18 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
 
       try {
         // Try to get the document to check if it exists
-        const systemPatternsDoc = await this.branchRepository.getDocument(branchInfo, systemPatternsPath);
+        const systemPatternsDoc = await this.branchRepository.getDocument(
+          branchInfo,
+          systemPatternsPath
+        );
 
         // If document exists, process it efficiently
         if (systemPatternsDoc) {
           // Process it in a memory-efficient way
-          coreFiles.systemPatterns = await this.parseSystemPatternsEfficiently(branchInfo, systemPatternsPath);
+          coreFiles.systemPatterns = await this.parseSystemPatternsEfficiently(
+            branchInfo,
+            systemPatternsPath
+          );
         }
       } catch (error) {
         // If document doesn't exist or there's an error, just continue without system patterns
@@ -147,8 +153,8 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
       activeContext.recentChanges = recentChangesMatch[1]
         .trim()
         .split('\n')
-        .filter(line => line.startsWith('- '))
-        .map(line => line.substring(2).trim());
+        .filter((line) => line.startsWith('- '))
+        .map((line) => line.substring(2).trim());
     }
 
     // Active Decisions
@@ -157,8 +163,8 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
       activeContext.activeDecisions = activeDecisionsMatch[1]
         .trim()
         .split('\n')
-        .filter(line => line.startsWith('- '))
-        .map(line => line.substring(2).trim());
+        .filter((line) => line.startsWith('- '))
+        .map((line) => line.substring(2).trim());
     }
 
     // Considerations
@@ -167,8 +173,8 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
       activeContext.considerations = considerationsMatch[1]
         .trim()
         .split('\n')
-        .filter(line => line.startsWith('- '))
-        .map(line => line.substring(2).trim());
+        .filter((line) => line.startsWith('- '))
+        .map((line) => line.substring(2).trim());
     }
 
     // Next Steps
@@ -177,8 +183,8 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
       activeContext.nextSteps = nextStepsMatch[1]
         .trim()
         .split('\n')
-        .filter(line => line.startsWith('- '))
-        .map(line => line.substring(2).trim());
+        .filter((line) => line.startsWith('- '))
+        .map((line) => line.substring(2).trim());
     }
 
     return activeContext;
@@ -204,8 +210,8 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
       progress.workingFeatures = workingFeaturesMatch[1]
         .trim()
         .split('\n')
-        .filter(line => line.startsWith('- '))
-        .map(line => line.substring(2).trim());
+        .filter((line) => line.startsWith('- '))
+        .map((line) => line.substring(2).trim());
     }
 
     // Pending Implementation
@@ -214,8 +220,8 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
       progress.pendingImplementation = pendingImplementationMatch[1]
         .trim()
         .split('\n')
-        .filter(line => line.startsWith('- '))
-        .map(line => line.substring(2).trim());
+        .filter((line) => line.startsWith('- '))
+        .map((line) => line.substring(2).trim());
     }
 
     // Known Issues
@@ -224,8 +230,8 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
       progress.knownIssues = knownIssuesMatch[1]
         .trim()
         .split('\n')
-        .filter(line => line.startsWith('- '))
-        .map(line => line.substring(2).trim());
+        .filter((line) => line.startsWith('- '))
+        .map((line) => line.substring(2).trim());
     }
 
     return progress;
@@ -243,7 +249,7 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
   ): Promise<SystemPatternsDTO> {
     // Initialize with empty array to avoid undefined errors
     const systemPatterns: SystemPatternsDTO = {
-      technicalDecisions: [] // Ensure this is always initialized as an array
+      technicalDecisions: [], // Ensure this is always initialized as an array
     };
 
     try {
@@ -255,13 +261,11 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
 
       // Process the content in smaller chunks to reduce memory usage
       const content = document.content;
-      const chunkSize = 50000; // Process 50KB at a time
 
       // For very large files, limit how much we process
       const maxProcessSize = 150000; // Max 150KB to process
-      const contentToProcess = content.length > maxProcessSize
-        ? content.substring(0, maxProcessSize)
-        : content;
+      const contentToProcess =
+        content.length > maxProcessSize ? content.substring(0, maxProcessSize) : content;
 
       // Find decision sections more efficiently
       // Instead of using a complex regex on the entire content, we'll find decision markers
@@ -284,9 +288,8 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
       // Process each decision section individually
       for (let i = 0; i < decisionMarkers.length; i++) {
         const startIndex = decisionMarkers[i];
-        const endIndex = i < decisionMarkers.length - 1
-          ? decisionMarkers[i + 1]
-          : contentToProcess.length;
+        const endIndex =
+          i < decisionMarkers.length - 1 ? decisionMarkers[i + 1] : contentToProcess.length;
 
         const decisionContent = contentToProcess.substring(startIndex, endIndex);
 
@@ -298,12 +301,12 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
 
         if (titleMatch) {
           // Parse consequences list
-          const consequences = consequencesMatch ?
-            consequencesMatch[1]
-              .trim()
-              .split('\n')
-              .filter(line => line.startsWith('- '))
-              .map(line => line.substring(2).trim())
+          const consequences = consequencesMatch
+            ? consequencesMatch[1]
+                .trim()
+                .split('\n')
+                .filter((line) => line.startsWith('- '))
+                .map((line) => line.substring(2).trim())
             : [];
 
           // Ensure technicalDecisions is an array before pushing
@@ -312,16 +315,18 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
               title: titleMatch[1].trim(),
               context: contextMatch ? contextMatch[1].trim() : '',
               decision: decisionMatch ? decisionMatch[1].trim() : '',
-              consequences
+              consequences,
             });
           } else {
             // If for some reason it's not an array, initialize it
-            systemPatterns.technicalDecisions = [{
-              title: titleMatch[1].trim(),
-              context: contextMatch ? contextMatch[1].trim() : '',
-              decision: decisionMatch ? decisionMatch[1].trim() : '',
-              consequences
-            }];
+            systemPatterns.technicalDecisions = [
+              {
+                title: titleMatch[1].trim(),
+                context: contextMatch ? contextMatch[1].trim() : '',
+                decision: decisionMatch ? decisionMatch[1].trim() : '',
+                consequences,
+              },
+            ];
           }
         }
       }
@@ -339,10 +344,12 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
    * @returns Parsed system patterns DTO
    */
   private parseSystemPatterns(content: string): SystemPatternsDTO {
-    console.warn('Using deprecated parseSystemPatterns method - consider using parseSystemPatternsEfficiently instead');
+    console.warn(
+      'Using deprecated parseSystemPatterns method - consider using parseSystemPatternsEfficiently instead'
+    );
     // Initialize with empty array to avoid undefined errors
     const systemPatterns: SystemPatternsDTO = {
-      technicalDecisions: [] // Ensure this is always initialized as an array
+      technicalDecisions: [], // Ensure this is always initialized as an array
     };
 
     try {
@@ -378,12 +385,12 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
 
         if (titleMatch) {
           // Parse consequences list
-          const consequences = consequencesMatch ?
-            consequencesMatch[1]
-              .trim()
-              .split('\n')
-              .filter(line => line.startsWith('- '))
-              .map(line => line.substring(2).trim())
+          const consequences = consequencesMatch
+            ? consequencesMatch[1]
+                .trim()
+                .split('\n')
+                .filter((line) => line.startsWith('- '))
+                .map((line) => line.substring(2).trim())
             : [];
 
           // Ensure technicalDecisions is an array before pushing
@@ -392,16 +399,18 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
               title: titleMatch[1].trim(),
               context: contextMatch ? contextMatch[1].trim() : '',
               decision: decisionMatch ? decisionMatch[1].trim() : '',
-              consequences
+              consequences,
             });
           } else {
             // If for some reason it's not an array, initialize it
-            systemPatterns.technicalDecisions = [{
-              title: titleMatch[1].trim(),
-              context: contextMatch ? contextMatch[1].trim() : '',
-              decision: decisionMatch ? decisionMatch[1].trim() : '',
-              consequences
-            }];
+            systemPatterns.technicalDecisions = [
+              {
+                title: titleMatch[1].trim(),
+                context: contextMatch ? contextMatch[1].trim() : '',
+                decision: decisionMatch ? decisionMatch[1].trim() : '',
+                consequences,
+              },
+            ];
           }
         }
       }
@@ -414,9 +423,4 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
 }
 
 // Export the interfaces from CoreFilesDTO for convenience
-import {
-  ActiveContextDTO,
-  ProgressDTO,
-  SystemPatternsDTO,
-  TechnicalDecisionDTO
-} from '../../dtos/CoreFilesDTO.js';
+import { ActiveContextDTO, ProgressDTO, SystemPatternsDTO } from '../../dtos/CoreFilesDTO.js';

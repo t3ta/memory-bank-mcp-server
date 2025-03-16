@@ -30,19 +30,25 @@ describe('Tag', () => {
     it('should throw an error for tag with uppercase letters', () => {
       // Arrange & Act & Assert
       expect(() => Tag.create('Test')).toThrow(DomainError);
-      expect(() => Tag.create('Test')).toThrow('Tag must contain only lowercase letters, numbers, and hyphens');
+      expect(() => Tag.create('Test')).toThrow(
+        'Tag must contain only lowercase letters, numbers, and hyphens'
+      );
     });
 
     it('should throw an error for tag with special characters', () => {
       // Arrange & Act & Assert
       expect(() => Tag.create('test_tag')).toThrow(DomainError);
-      expect(() => Tag.create('test_tag')).toThrow('Tag must contain only lowercase letters, numbers, and hyphens');
+      expect(() => Tag.create('test_tag')).toThrow(
+        'Tag must contain only lowercase letters, numbers, and hyphens'
+      );
     });
 
     it('should throw an error for tag with spaces', () => {
       // Arrange & Act & Assert
       expect(() => Tag.create('test tag')).toThrow(DomainError);
-      expect(() => Tag.create('test tag')).toThrow('Tag must contain only lowercase letters, numbers, and hyphens');
+      expect(() => Tag.create('test tag')).toThrow(
+        'Tag must contain only lowercase letters, numbers, and hyphens'
+      );
     });
 
     it('should throw DomainError with correct error code', () => {
@@ -50,10 +56,12 @@ describe('Tag', () => {
       try {
         Tag.create('');
         // If we get here, it means the expected error wasn't thrown
-        expect("No error was thrown").toBe("Error should have been thrown");
+        expect('No error was thrown').toBe('Error should have been thrown');
       } catch (error) {
         expect(error).toBeInstanceOf(DomainError);
-        expect((error as DomainError).code).toBe(`DOMAIN_ERROR.${DomainErrorCodes.INVALID_TAG_FORMAT}`);
+        expect((error as DomainError).code).toBe(
+          `DOMAIN_ERROR.${DomainErrorCodes.INVALID_TAG_FORMAT}`
+        );
       }
     });
   });

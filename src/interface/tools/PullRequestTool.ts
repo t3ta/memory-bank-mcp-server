@@ -6,9 +6,7 @@ import { PullRequestDTO } from '../../application/dtos/PullRequestDTO.js';
  * Implementation of the pull request tool
  */
 export class PullRequestTool implements IPullRequestTool {
-  constructor(
-    private readonly createPullRequestUseCase: ICreatePullRequestUseCase
-  ) {}
+  constructor(private readonly createPullRequestUseCase: ICreatePullRequestUseCase) {}
 
   /**
    * Creates a pull request based on branch memory bank information
@@ -26,7 +24,7 @@ export class PullRequestTool implements IPullRequestTool {
       title,
       baseBranch,
       language,
-      skipPatterns
+      skipPatterns,
     });
 
     return result.pullRequest;

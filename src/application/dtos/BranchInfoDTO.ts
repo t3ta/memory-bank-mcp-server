@@ -6,12 +6,12 @@ export interface BranchInfoDTO {
    * Branch name
    */
   name: string;
-  
+
   /**
    * Display name (without prefix)
    */
   displayName: string;
-  
+
   /**
    * Branch type
    */

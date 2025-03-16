@@ -1,11 +1,13 @@
 import { ReadBranchDocumentUseCase } from '../ReadBranchDocumentUseCase.js';
 import { IBranchMemoryBankRepository } from '../../../../domain/repositories/IBranchMemoryBankRepository.js';
 import { MemoryDocument } from '../../../../domain/entities/MemoryDocument.js';
-import { BranchInfo } from '../../../../domain/entities/BranchInfo.js';
 import { DocumentPath } from '../../../../domain/entities/DocumentPath.js';
 import { Tag } from '../../../../domain/entities/Tag.js';
 import { DomainError, DomainErrorCodes } from '../../../../shared/errors/DomainError.js';
-import { ApplicationError, ApplicationErrorCodes } from '../../../../shared/errors/ApplicationError.js';
+import {
+  ApplicationError,
+  ApplicationErrorCodes,
+} from '../../../../shared/errors/ApplicationError.js';
 
 // Mock repository
 const mockBranchRepository: jest.Mocked<IBranchMemoryBankRepository> = {
@@ -17,7 +19,7 @@ const mockBranchRepository: jest.Mocked<IBranchMemoryBankRepository> = {
   listDocuments: jest.fn(),
   findDocumentsByTags: jest.fn(),
   getRecentBranches: jest.fn(),
-  validateStructure: jest.fn()
+  validateStructure: jest.fn(),
 };
 
 describe('ReadBranchDocumentUseCase', () => {
@@ -40,15 +42,14 @@ describe('ReadBranchDocumentUseCase', () => {
 
   it('should successfully read a document', async () => {
     // Arrange
-    const branchInfo = BranchInfo.create(testBranchName);
     const documentPath = DocumentPath.create(testDocumentPath);
-    const tags = testDocumentTags.map(tag => Tag.create(tag));
+    const tags = testDocumentTags.map((tag) => Tag.create(tag));
 
     const testDocument = MemoryDocument.create({
       path: documentPath,
       content: testDocumentContent,
       tags,
-      lastModified: testLastModified
+      lastModified: testLastModified,
     });
 
     // Mock repository responses
@@ -58,7 +59,7 @@ describe('ReadBranchDocumentUseCase', () => {
     // Act
     const result = await useCase.execute({
       branchName: testBranchName,
-      path: testDocumentPath
+      path: testDocumentPath,
     });
 
     // Assert
@@ -79,15 +80,19 @@ describe('ReadBranchDocumentUseCase', () => {
 
   it('should throw ApplicationError when branch name is empty', async () => {
     // Act & Assert
-    await expect(useCase.execute({
-      branchName: '',
-      path: testDocumentPath
-    })).rejects.toThrow(ApplicationError);
+    await expect(
+      useCase.execute({
+        branchName: '',
+        path: testDocumentPath,
+      })
+    ).rejects.toThrow(ApplicationError);
 
-    await expect(useCase.execute({
-      branchName: '',
-      path: testDocumentPath
-    })).rejects.toThrow('Branch name is required');
+    await expect(
+      useCase.execute({
+        branchName: '',
+        path: testDocumentPath,
+      })
+    ).rejects.toThrow('Branch name is required');
 
     // Verify repository was not called
     expect(mockBranchRepository.exists).not.toHaveBeenCalled();
@@ -96,15 +101,19 @@ describe('ReadBranchDocumentUseCase', () => {
 
   it('should throw ApplicationError when document path is empty', async () => {
     // Act & Assert
-    await expect(useCase.execute({
-      branchName: testBranchName,
-      path: ''
-    })).rejects.toThrow(ApplicationError);
+    await expect(
+      useCase.execute({
+        branchName: testBranchName,
+        path: '',
+      })
+    ).rejects.toThrow(ApplicationError);
 
-    await expect(useCase.execute({
-      branchName: testBranchName,
-      path: ''
-    })).rejects.toThrow('Document path is required');
+    await expect(
+      useCase.execute({
+        branchName: testBranchName,
+        path: '',
+      })
+    ).rejects.toThrow('Document path is required');
 
     // Verify repository was not called
     expect(mockBranchRepository.exists).not.toHaveBeenCalled();
@@ -116,15 +125,19 @@ describe('ReadBranchDocumentUseCase', () => {
     mockBranchRepository.exists.mockResolvedValue(false);
 
     // Act & Assert
-    await expect(useCase.execute({
-      branchName: testBranchName,
-      path: testDocumentPath
-    })).rejects.toThrow(DomainError);
+    await expect(
+      useCase.execute({
+        branchName: testBranchName,
+        path: testDocumentPath,
+      })
+    ).rejects.toThrow(DomainError);
 
-    await expect(useCase.execute({
-      branchName: testBranchName,
-      path: testDocumentPath
-    })).rejects.toThrow(`Branch "${testBranchName}" not found`);
+    await expect(
+      useCase.execute({
+        branchName: testBranchName,
+        path: testDocumentPath,
+      })
+    ).rejects.toThrow(`Branch "${testBranchName}" not found`);
 
     // Verify repository was called correctly
     expect(mockBranchRepository.exists).toHaveBeenCalledWith(testBranchName);
@@ -137,15 +150,19 @@ describe('ReadBranchDocumentUseCase', () => {
     mockBranchRepository.getDocument.mockResolvedValue(null);
 
     // Act & Assert
-    await expect(useCase.execute({
-      branchName: testBranchName,
-      path: testDocumentPath
-    })).rejects.toThrow(DomainError);
+    await expect(
+      useCase.execute({
+        branchName: testBranchName,
+        path: testDocumentPath,
+      })
+    ).rejects.toThrow(DomainError);
 
-    await expect(useCase.execute({
-      branchName: testBranchName,
-      path: testDocumentPath
-    })).rejects.toThrow(`Document "${testDocumentPath}" not found in branch "${testBranchName}"`);
+    await expect(
+      useCase.execute({
+        branchName: testBranchName,
+        path: testDocumentPath,
+      })
+    ).rejects.toThrow(`Document "${testDocumentPath}" not found in branch "${testBranchName}"`);
 
     // Verify repository was called correctly
     expect(mockBranchRepository.exists).toHaveBeenCalledWith(testBranchName);
@@ -160,27 +177,33 @@ describe('ReadBranchDocumentUseCase', () => {
     });
 
     // Act & Assert
-    await expect(useCase.execute({
-      branchName: testBranchName,
-      path: testDocumentPath
-    })).rejects.toThrow(ApplicationError);
+    await expect(
+      useCase.execute({
+        branchName: testBranchName,
+        path: testDocumentPath,
+      })
+    ).rejects.toThrow(ApplicationError);
 
-    await expect(useCase.execute({
-      branchName: testBranchName,
-      path: testDocumentPath
-    })).rejects.toThrow(`Failed to read document: Something went wrong`);
+    await expect(
+      useCase.execute({
+        branchName: testBranchName,
+        path: testDocumentPath,
+      })
+    ).rejects.toThrow(`Failed to read document: Something went wrong`);
 
     // Verify error is properly wrapped
     try {
       await useCase.execute({
         branchName: testBranchName,
-        path: testDocumentPath
+        path: testDocumentPath,
       });
       // If we get here, it means the expected error wasn't thrown
-      expect("No error was thrown").toBe("Error should have been thrown");
+      expect('No error was thrown').toBe('Error should have been thrown');
     } catch (error) {
       expect(error).toBeInstanceOf(ApplicationError);
-      expect((error as ApplicationError).code).toBe(`APP_ERROR.${ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED}`);
+      expect((error as ApplicationError).code).toBe(
+        `APP_ERROR.${ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED}`
+      );
       expect((error as ApplicationError).details).toEqual({ originalError: unknownError });
     }
   });
@@ -197,14 +220,18 @@ describe('ReadBranchDocumentUseCase', () => {
     });
 
     // Act & Assert
-    await expect(useCase.execute({
-      branchName: testBranchName,
-      path: testDocumentPath
-    })).rejects.toBe(domainError); // Should be the exact same error instance
+    await expect(
+      useCase.execute({
+        branchName: testBranchName,
+        path: testDocumentPath,
+      })
+    ).rejects.toBe(domainError); // Should be the exact same error instance
 
-    await expect(useCase.execute({
-      branchName: testBranchName,
-      path: testDocumentPath
-    })).rejects.toThrow('Invalid branch name format');
+    await expect(
+      useCase.execute({
+        branchName: testBranchName,
+        path: testDocumentPath,
+      })
+    ).rejects.toThrow('Invalid branch name format');
   });
 });
