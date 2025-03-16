@@ -75,6 +75,20 @@ export class DocumentPath {
   }
 
   /**
+   * Check if this document is a markdown file
+   */
+  public get isMarkdown(): boolean {
+    return this.extension.toLowerCase() === 'md';
+  }
+
+  /**
+   * Check if this document is a JSON file
+   */
+  public get isJSON(): boolean {
+    return this.extension.toLowerCase() === 'json';
+  }
+
+  /**
    * Checks if two DocumentPath instances are equal
    * @param other Another DocumentPath instance
    * @returns boolean indicating equality

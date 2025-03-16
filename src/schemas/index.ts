@@ -207,6 +207,9 @@ export const WriteBranchCoreFilesArgsSchema = z
   })
   .merge(BaseToolArgsSchema);
 
+// Export json document schemas
+export * from './json-document.js';
+
 // Export utility schemas
 export { FlexibleDateSchema };
 export const parseDateSafely = (dateInput: string | Date): Date => {

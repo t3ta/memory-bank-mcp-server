@@ -45,6 +45,24 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
       // Read file content
       const content = await this.fileSystemService.readFile(filePath);
 
+      // Handle JSON files differently
+      if (path.isJSON) {
+        try {
+          // Parse JSON content
+          const jsonDoc = JSON.parse(content);
+          
+          // Convert JSON to MemoryDocument
+          return MemoryDocument.fromJSON(jsonDoc, path);
+        } catch (error) {
+          throw new InfrastructureError(
+            InfrastructureErrorCodes.FILE_READ_ERROR,
+            `Failed to parse JSON document: ${path.value}`,
+            { originalError: error }
+          );
+        }
+      }
+
+      // For markdown and other files, continue with normal processing
       // Extract tags
       const tags = extractTags(content).map((tag) => Tag.create(tag));
 
@@ -97,8 +115,8 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
           // Get relative path
           const relativePath = path.relative(this.basePath, file);
 
-          // Skip non-markdown files
-          if (!relativePath.endsWith('.md')) {
+          // Skip non-markdown and non-json files
+          if (!relativePath.endsWith('.md') && !relativePath.endsWith('.json')) {
             continue;
           }
 
@@ -149,6 +167,18 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
     try {
       const filePath = this.resolvePath(document.path.value);
 
+      // Handle JSON files differently
+      if (document.isJSON) {
+        // Convert to JSON format
+        const jsonDoc = document.toJSON();
+        const jsonContent = JSON.stringify(jsonDoc, null, 2);
+        
+        // Write JSON file
+        await this.fileSystemService.writeFile(filePath, jsonContent);
+        return;
+      }
+
+      // For markdown files, continue with normal processing
       // Prepare content with tags
       let content = document.content;
 
@@ -234,8 +264,8 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
           // Get relative path
           const relativePath = path.relative(this.basePath, file);
 
-          // Skip non-markdown files
-          if (!relativePath.endsWith('.md')) {
+          // Skip non-markdown and non-json files
+          if (!relativePath.endsWith('.md') && !relativePath.endsWith('.json')) {
             continue;
           }
 
