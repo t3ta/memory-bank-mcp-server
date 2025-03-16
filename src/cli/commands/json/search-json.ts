@@ -85,18 +85,10 @@ export class SearchJsonCommand extends CommandBase {
       let result;
       if (argv.branch) {
         // Use JSON branch use case through MCP
-        result = await app.getBranchController().searchJsonDocuments(argv.branch, {
-          tags,
-          matchAll: argv.all,
-          documentType: argv.type,
-        });
+        result = await app.getBranchController().searchJsonDocuments(argv.branch, argv.tags ? argv.tags.join(' ') : '');
       } else {
         // Use JSON global use case through MCP
-        result = await app.getGlobalController().searchJsonDocuments({
-          tags,
-          matchAll: argv.all,
-          documentType: argv.type,
-        });
+        result = await app.getGlobalController().searchJsonDocuments(argv.tags ? argv.tags.join(' ') : '');
       }
 
       // Handle response
@@ -105,7 +97,7 @@ export class SearchJsonCommand extends CommandBase {
         process.exit(1);
       }
 
-      const documents = result.data.documents;
+      const documents = result.data;
 
       // Output message if no documents found
       if (documents.length === 0) {

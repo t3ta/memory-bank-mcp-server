@@ -110,7 +110,7 @@ export class UpdateJsonCommand extends CommandBase {
       }
 
       // Get existing document data
-      const existingDoc = readResult.data.document;
+      const existingDoc = readResult.data;
 
       // Prepare update with existing values as defaults
       let contentObj: Record<string, unknown> = existingDoc.content;

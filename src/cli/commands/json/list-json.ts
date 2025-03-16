@@ -70,10 +70,10 @@ export class ListJsonCommand extends CommandBase {
         // Use JSON branch use case through MCP
         result = await app
           .getBranchController()
-          .listJsonDocuments(argv.branch, { documentType: argv.type });
+          .listJsonDocuments(argv.branch, { type: argv.type });
       } else {
         // Use JSON global use case through MCP
-        result = await app.getGlobalController().listJsonDocuments({ documentType: argv.type });
+        result = await app.getGlobalController().listJsonDocuments({ type: argv.type });
       }
 
       // Handle response
@@ -82,7 +82,7 @@ export class ListJsonCommand extends CommandBase {
         process.exit(1);
       }
 
-      const documents = result.data.documents;
+      const documents = result.data;
 
       // Output message if no documents found
       if (documents.length === 0) {
