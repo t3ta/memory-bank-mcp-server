@@ -145,62 +145,6 @@ const AVAILABLE_TOOLS = [
     },
   },
   {
-    name: 'write_branch_core_files',
-    description: 'Write multiple core files at once',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        branch: {
-          type: 'string',
-          description: 'Branch name',
-        },
-        files: {
-          type: 'object',
-          properties: {
-            activeContext: {
-              type: 'object',
-              properties: {
-                currentWork: { type: 'string' },
-                recentChanges: { type: 'array', items: { type: 'string' } },
-                activeDecisions: { type: 'array', items: { type: 'string' } },
-                considerations: { type: 'array', items: { type: 'string' } },
-                nextSteps: { type: 'array', items: { type: 'string' } },
-              },
-            },
-            progress: {
-              type: 'object',
-              properties: {
-                workingFeatures: { type: 'array', items: { type: 'string' } },
-                pendingImplementation: { type: 'array', items: { type: 'string' } },
-                status: { type: 'string' },
-                knownIssues: { type: 'array', items: { type: 'string' } },
-              },
-            },
-            systemPatterns: {
-              type: 'object',
-              properties: {
-                technicalDecisions: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    properties: {
-                      title: { type: 'string' },
-                      context: { type: 'string' },
-                      decision: { type: 'string' },
-                      consequences: { type: 'array', items: { type: 'string' } },
-                    },
-                    required: ['title', 'context', 'decision', 'consequences'],
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-      required: ['branch', 'files'],
-    },
-  },
-  {
     name: 'read_global_core_files',
     description: 'Read all core files from the global memory bank',
     inputSchema: {
@@ -406,21 +350,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           },
         ],
       };
-    }
-
-    case 'write_branch_core_files': {
-      const branch = params.branch as string;
-      const files = params.files as Record<string, unknown>;
-
-      if (!branch || !files) {
-        throw new Error('Invalid arguments for write_branch_core_files');
-      }
-
-      if (!app) {
-        throw new Error('Application not initialized');
-      }
-      await app.getBranchController().writeCoreFiles(branch, files);
-      return { content: [{ type: 'text', text: 'Core files updated successfully' }] };
     }
 
     case 'read_global_core_files': {
