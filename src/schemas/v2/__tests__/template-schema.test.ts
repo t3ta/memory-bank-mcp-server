@@ -5,7 +5,7 @@ import {
   jsonTemplateSchema,
   validateJsonTemplate,
   createJsonTemplate,
-  createTemplateSection
+  createJsonTemplateSection
 } from '../template-schema.js';
 import { ZodError } from 'zod';
 
@@ -106,7 +106,7 @@ describe('JSON Template Schema', () => {
         content: {}
       };
       
-      expect(() => validateJsonTemplate(invalidTemplate)).toThrow('Invalid template format:');
+      expect(() => validateJsonTemplate(invalidTemplate)).toThrow('Invalid JSON template format:');
     });
   });
   
@@ -116,7 +116,7 @@ describe('JSON Template Schema', () => {
       const type = 'test';
       const nameMap = { en: 'Test Template', ja: 'テストテンプレート' };
       const sections = {
-        testSection: createTemplateSection(
+        testSection: createJsonTemplateSection(
           { en: 'Test Section', ja: 'テストセクション' },
           { en: 'Test content', ja: 'テストコンテンツ' }
         )
@@ -139,7 +139,7 @@ describe('JSON Template Schema', () => {
       const descriptionMap = { en: 'Test Description', ja: 'テスト説明' };
       const placeholders = { 'TITLE': 'The title placeholder' };
       const sections = {
-        testSection: createTemplateSection(
+        testSection: createJsonTemplateSection(
           { en: 'Test Section', ja: 'テストセクション' },
           { en: 'Test content', ja: 'テストコンテンツ' }
         )
@@ -152,12 +152,12 @@ describe('JSON Template Schema', () => {
     });
   });
   
-  describe('createTemplateSection', () => {
+  describe('createJsonTemplateSection', () => {
     it('should create a non-optional section by default', () => {
       const titleMap = { en: 'Test Section', ja: 'テストセクション' };
       const contentMap = { en: 'Test content', ja: 'テストコンテンツ' };
       
-      const section = createTemplateSection(titleMap, contentMap);
+      const section = createJsonTemplateSection(titleMap, contentMap);
       
       expect(section.title).toEqual(titleMap);
       expect(section.content).toEqual(contentMap);
@@ -168,7 +168,7 @@ describe('JSON Template Schema', () => {
       const titleMap = { en: 'Test Section', ja: 'テストセクション' };
       const contentMap = { en: 'Test content', ja: 'テストコンテンツ' };
       
-      const section = createTemplateSection(titleMap, contentMap, true);
+      const section = createJsonTemplateSection(titleMap, contentMap, true);
       
       expect(section.optional).toBe(true);
     });
