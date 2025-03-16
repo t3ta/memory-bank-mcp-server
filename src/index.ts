@@ -38,7 +38,7 @@ const logger = {
 };
 
 // 新しいアプリケーションインスタンス
-let app: Application;
+let app: Application | null;
 
 // Available tools definition
 const AVAILABLE_TOOLS = [
@@ -303,6 +303,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return { content: [{ type: "text", text: "Branch memory bank initialized successfully" }] };
       }
 
+      if (!app) {
+        throw new Error('Application not initialized');
+      }
       await app.getBranchController().writeDocument(branch, path, content);
       return { content: [{ type: "text", text: "Document written successfully" }] };
     }
@@ -315,6 +318,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         throw new Error('Invalid arguments for read_branch_memory_bank');
       }
 
+      if (!app) {
+        throw new Error('Application not initialized');
+      }
       const response = await app.getBranchController().readDocument(branch, path);
       if (!response.success) {
         throw new Error(response.error.message);
@@ -356,6 +362,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return { content: [{ type: "text", text: "Global memory bank initialized successfully" }] };
       }
 
+      if (!app) {
+        throw new Error('Application not initialized');
+      }
       await app.getGlobalController().writeDocument(path, content);
       return { content: [{ type: "text", text: "Document written successfully" }] };
     }
@@ -367,6 +376,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         throw new Error('Invalid arguments for read_global_memory_bank');
       }
 
+      if (!app) {
+        throw new Error('Application not initialized');
+      }
       const response = await app.getGlobalController().readDocument(path);
       if (!response.success) {
         throw new Error(response.error.message);
@@ -385,6 +397,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         throw new Error('Invalid arguments for read_branch_core_files');
       }
 
+      if (!app) {
+        throw new Error('Application not initialized');
+      }
       const response = await app.getBranchController().readCoreFiles(branch);
       if (!response.success) {
         throw new Error(response.error.message);
@@ -408,11 +423,17 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         throw new Error('Invalid arguments for write_branch_core_files');
       }
 
+      if (!app) {
+        throw new Error('Application not initialized');
+      }
       await app.getBranchController().writeCoreFiles(branch, files);
       return { content: [{ type: "text", text: "Core files updated successfully" }] };
     }
 
     case "read_global_core_files": {
+      if (!app) {
+        throw new Error('Application not initialized');
+      }
       const response = await app.getGlobalController().readCoreFiles();
       if (!response.success) {
         throw new Error(response.error.message);
@@ -430,7 +451,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
     case "get_recent_branches": {
       const limit = params.limit as number | undefined;
-      
+
+      if (!app) {
+        throw new Error('Application not initialized');
+      }
       const response = await app.getBranchController().getRecentBranches(limit);
       if (!response.success) {
         throw new Error(response.error.message);
@@ -457,6 +481,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       // Use the new pull request tool
+      if (!app) {
+        throw new Error('Application not initialized');
+      }
       const pullRequestTool = app.getPullRequestTool();
       const pullRequest = await pullRequestTool.createPullRequest(
         branch,
@@ -467,8 +494,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       // Set up response message based on language
       const isJapanese = language !== 'en';
-      let responseMessage = isJapanese 
-        ? `pullRequest.md ファイルを作成しました。\n\n` 
+      let responseMessage = isJapanese
+        ? `pullRequest.md ファイルを作成しました。\n\n`
         : `pullRequest.md file has been created.\n\n`;
 
       if (isJapanese) {
@@ -501,7 +528,51 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   }
 });
 
-// (古い関数は削除)
+// Error handling
+server.onerror = (error) => {
+  logger.error('[MCP Server Error]', error);
+};
+
+// Process termination handling
+process.on('SIGINT', async () => {
+  logger.info('Received SIGINT signal, shutting down...');
+  await cleanup();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  logger.info('Received SIGTERM signal, shutting down...');
+  await cleanup();
+  process.exit(0);
+});
+
+// Cleanup function to properly release resources
+async function cleanup() {
+  logger.info('Cleaning up resources...');
+  try {
+    // Close the server connection if it's open
+    await server.close();
+    logger.info('Server connection closed');
+
+    // Release application resources if available
+    if (app) {
+      // アプリケーションが保持するリソースを解放
+      // 例: データベース接続、ファイルハンドルなど
+      logger.info('Releasing application resources');
+
+      // appをnullに設定してGCの対象にする
+      app = null;
+    }
+  } catch (error) {
+    logger.error('Error during server cleanup:', error);
+  }
+
+  // 明示的にGCを促す（Node.jsの場合）
+  if (global.gc) {
+    logger.info('Forcing garbage collection');
+    global.gc();
+  }
+}
 
 // Start the server
 async function main() {
@@ -515,7 +586,7 @@ async function main() {
   // 新しいアプリケーションの初期化
   app = await createApplication({
     memoryRoot: argv.docs as string,
-    language: 'ja', 
+    language: 'ja',
     verbose: false
   });
 
@@ -523,8 +594,22 @@ async function main() {
   logger.info(`Using new clean architecture implementation`);
 }
 
-main().catch((error) => {
+// Handle uncaught exceptions and unhandled rejections
+process.on('uncaughtException', async (error) => {
+  logger.error('Uncaught exception:', error);
+  await cleanup();
+  process.exit(1);
+});
+
+process.on('unhandledRejection', async (reason, promise) => {
+  logger.error('Unhandled rejection at:', promise, 'reason:', reason);
+  await cleanup();
+  process.exit(1);
+});
+
+main().catch(async (error) => {
   logger.error('Fatal error:', error);
   console.error("Fatal error in main():", error);
+  await cleanup();
   process.exit(1);
 });

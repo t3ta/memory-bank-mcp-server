@@ -93,11 +93,20 @@ const argv = yargs(hideBin(process.argv))
           // Read from stdin
           content = await new Promise((resolve) => {
             let data = '';
-            process.stdin.on('data', (chunk) => {
+            const dataListener = (chunk: Buffer) => {
               data += chunk;
-            });
-            process.stdin.on('end', () => {
+            };
+            const endListener = () => {
               resolve(data);
+            };
+
+            process.stdin.on('data', dataListener);
+            process.stdin.on('end', endListener);
+
+            // Cleanup listeners when promise resolves
+            process.stdin.once('end', () => {
+              process.stdin.removeListener('data', dataListener);
+              process.stdin.removeListener('end', endListener);
             });
           });
         }
@@ -149,7 +158,7 @@ const argv = yargs(hideBin(process.argv))
         argv.branch as string,
         argv.path as string
       );
-      
+
       // Type guard to safely access success/error properties
       if (!result.success) {
         logger.error(`Error reading document: ${result.error.message}`);
@@ -198,11 +207,20 @@ const argv = yargs(hideBin(process.argv))
           // Read from stdin
           content = await new Promise((resolve) => {
             let data = '';
-            process.stdin.on('data', (chunk) => {
+            const dataListener = (chunk: Buffer) => {
               data += chunk;
-            });
-            process.stdin.on('end', () => {
+            };
+            const endListener = () => {
               resolve(data);
+            };
+
+            process.stdin.on('data', dataListener);
+            process.stdin.on('end', endListener);
+
+            // Cleanup listeners when promise resolves
+            process.stdin.once('end', () => {
+              process.stdin.removeListener('data', dataListener);
+              process.stdin.removeListener('end', endListener);
             });
           });
         }
@@ -218,10 +236,10 @@ const argv = yargs(hideBin(process.argv))
       // Write document
       const result = await app.getBranchController().writeDocument(
         argv.branch as string,
-        argv.path as string, 
+        argv.path as string,
         content
       );
-      
+
       // Type guard to safely access success/error properties
       if (!result.success) {
         logger.error(`Error writing document: ${result.error.message}`);
@@ -257,7 +275,7 @@ const argv = yargs(hideBin(process.argv))
       });
 
       const result = await app.getBranchController().readCoreFiles(argv.branch as string);
-      
+
       // Type guard to safely access success/error properties
       if (!result.success) {
         logger.error(`Error reading core files: ${result.error.message}`);
@@ -328,8 +346,8 @@ const argv = yargs(hideBin(process.argv))
 
       // Set up response message based on language
       const isJapanese = argv.language !== 'en';
-      let responseMessage = isJapanese 
-        ? `pullRequest.md ファイルを作成しました。\n\n` 
+      let responseMessage = isJapanese
+        ? `pullRequest.md ファイルを作成しました。\n\n`
         : `pullRequest.md file has been created.\n\n`;
 
       if (isJapanese) {
@@ -376,7 +394,7 @@ const argv = yargs(hideBin(process.argv))
       });
 
       const result = await app.getBranchController().getRecentBranches(argv.limit as number);
-      
+
       // Type guard to safely access success/error properties
       if (!result.success) {
         logger.error(`Error getting recent branches: ${result.error.message}`);
