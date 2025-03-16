@@ -363,4 +363,31 @@ export class GlobalController implements IGlobalController {
       return this.handleError(error);
     }
   }
+
+  /**
+   * Update JSON index in global memory bank
+   * @param options Options for updating index (force rebuild)
+   * @returns Promise resolving to MCP response with the result
+   */
+  async updateJsonIndex(options?: { force?: boolean }): Promise<MCPResponse> {
+    try {
+      logger.info(`Updating global JSON index (force: ${options?.force ? 'yes' : 'no'})`);
+
+      if (!this.updateJsonIndexUseCase) {
+        throw new ApplicationError(
+          'FEATURE_NOT_AVAILABLE',
+          'JSON document features are not available in this configuration'
+        );
+      }
+
+      const result = await this.updateJsonIndexUseCase.execute({
+        branchName: undefined, // Global memory bank
+        fullRebuild: options?.force,
+      });
+
+      return this.presenter.present(result);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
 }

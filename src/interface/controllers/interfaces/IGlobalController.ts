@@ -75,4 +75,11 @@ export interface IGlobalController extends IController {
    * @returns Promise resolving to MCP response with matching documents
    */
   searchJsonDocuments(query: string): Promise<MCPResponse<JsonDocumentDTO[]>>;
+
+  /**
+   * Update JSON index in global memory bank
+   * @param options Options for updating index (force rebuild)
+   * @returns Promise resolving to MCP response with the result
+   */
+  updateJsonIndex(options?: { force?: boolean }): Promise<MCPResponse>;
 }

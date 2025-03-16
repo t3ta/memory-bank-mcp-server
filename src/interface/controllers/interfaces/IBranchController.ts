@@ -111,4 +111,12 @@ export interface IBranchController extends IController {
    * @returns Promise resolving to MCP response with matching documents
    */
   searchJsonDocuments(branchName: string, query: string): Promise<MCPResponse<JsonDocumentDTO[]>>;
+
+  /**
+   * Update JSON index in branch memory bank
+   * @param branchName Branch name
+   * @param options Options for updating index (force rebuild)
+   * @returns Promise resolving to MCP response with the result
+   */
+  updateJsonIndex(branchName: string, options?: { force?: boolean }): Promise<MCPResponse>;
 }
