@@ -278,4 +278,184 @@ describe('DocumentPath', () => {
       expect(result).toBe('test/file.md');
     });
   });
+
+  describe('basename', () => {
+    it('should return filename without extension', () => {
+      // Arrange
+      const path = DocumentPath.create('test/file.md');
+
+      // Act
+      const basename = path.basename;
+
+      // Assert
+      expect(basename).toBe('file');
+    });
+
+    it('should return filename for files without extension', () => {
+      // Arrange
+      const path = DocumentPath.create('test/file');
+
+      // Act
+      const basename = path.basename;
+
+      // Assert
+      expect(basename).toBe('file');
+    });
+
+    it('should return correct basename for filenames with multiple dots', () => {
+      // Arrange
+      const path = DocumentPath.create('test/file.config.json');
+
+      // Act
+      const basename = path.basename;
+
+      // Assert
+      expect(basename).toBe('file.config');
+    });
+  });
+
+  describe('inferDocumentType', () => {
+    it('should infer branch_context type', () => {
+      // Arrange
+      const paths = [
+        DocumentPath.create('branchContext.md'),
+        DocumentPath.create('branch-context.json'),
+        DocumentPath.create('test/branchcontext.md')
+      ];
+
+      // Act & Assert
+      paths.forEach(path => {
+        expect(path.inferDocumentType()).toBe('branch_context');
+      });
+    });
+
+    it('should infer active_context type', () => {
+      // Arrange
+      const paths = [
+        DocumentPath.create('activeContext.md'),
+        DocumentPath.create('active-context.json'),
+        DocumentPath.create('test/activecontext.md')
+      ];
+
+      // Act & Assert
+      paths.forEach(path => {
+        expect(path.inferDocumentType()).toBe('active_context');
+      });
+    });
+
+    it('should infer progress type', () => {
+      // Arrange
+      const paths = [
+        DocumentPath.create('progress.md'),
+        DocumentPath.create('test/progress.json')
+      ];
+
+      // Act & Assert
+      paths.forEach(path => {
+        expect(path.inferDocumentType()).toBe('progress');
+      });
+    });
+
+    it('should infer system_patterns type', () => {
+      // Arrange
+      const paths = [
+        DocumentPath.create('systemPatterns.md'),
+        DocumentPath.create('system-patterns.json'),
+        DocumentPath.create('test/systempatterns.md')
+      ];
+
+      // Act & Assert
+      paths.forEach(path => {
+        expect(path.inferDocumentType()).toBe('system_patterns');
+      });
+    });
+
+    it('should default to generic type', () => {
+      // Arrange
+      const paths = [
+        DocumentPath.create('unknown.md'),
+        DocumentPath.create('test/random.json'),
+        DocumentPath.create('notes.txt')
+      ];
+
+      // Act & Assert
+      paths.forEach(path => {
+        expect(path.inferDocumentType()).toBe('generic');
+      });
+    });
+  });
+
+  describe('withExtension', () => {
+    it('should create a new path with different extension', () => {
+      // Arrange
+      const path = DocumentPath.create('test/file.md');
+
+      // Act
+      const newPath = path.withExtension('json');
+
+      // Assert
+      expect(newPath.value).toBe('test/file.json');
+      expect(newPath.extension).toBe('json');
+      // Original should be unchanged
+      expect(path.extension).toBe('md');
+    });
+
+    it('should work with paths without extension', () => {
+      // Arrange
+      const path = DocumentPath.create('test/file');
+
+      // Act
+      const newPath = path.withExtension('md');
+
+      // Assert
+      expect(newPath.value).toBe('test/file.md');
+    });
+
+    it('should throw error for empty extension', () => {
+      // Arrange
+      const path = DocumentPath.create('test/file.md');
+
+      // Act & Assert
+      expect(() => path.withExtension('')).toThrow(DomainError);
+      expect(() => path.withExtension('')).toThrow('Extension cannot be empty');
+    });
+  });
+
+  describe('toAlternateFormat', () => {
+    it('should convert markdown to JSON', () => {
+      // Arrange
+      const path = DocumentPath.create('test/file.md');
+
+      // Act
+      const jsonPath = path.toAlternateFormat();
+
+      // Assert
+      expect(jsonPath.value).toBe('test/file.json');
+      expect(jsonPath.isJSON).toBe(true);
+    });
+
+    it('should convert JSON to markdown', () => {
+      // Arrange
+      const path = DocumentPath.create('test/file.json');
+
+      // Act
+      const mdPath = path.toAlternateFormat();
+
+      // Assert
+      expect(mdPath.value).toBe('test/file.md');
+      expect(mdPath.isMarkdown).toBe(true);
+    });
+
+    it('should return the same path for other formats', () => {
+      // Arrange
+      const path = DocumentPath.create('test/file.txt');
+
+      // Act
+      const result = path.toAlternateFormat();
+
+      // Assert
+      expect(result).toBe(path);
+      expect(result.value).toBe('test/file.txt');
+    });
+  });
 });
