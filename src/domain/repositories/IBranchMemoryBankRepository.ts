@@ -2,6 +2,7 @@ import { MemoryDocument } from '../entities/MemoryDocument.js';
 import { DocumentPath } from '../entities/DocumentPath.js';
 import { BranchInfo } from '../entities/BranchInfo.js';
 import { Tag } from '../entities/Tag.js';
+import { TagIndex } from '../../schemas/tag-index/tag-index-schema';
 
 /**
  * Interface for recent branch information
@@ -85,4 +86,28 @@ export interface IBranchMemoryBankRepository {
    * @returns Promise resolving to boolean indicating if structure is valid
    */
   validateStructure(branchInfo: BranchInfo): Promise<boolean>;
+
+  /**
+   * Save tag index for branch
+   * @param branchInfo Branch information
+   * @param tagIndex Tag index to save
+   * @returns Promise resolving when done
+   */
+  saveTagIndex(branchInfo: BranchInfo, tagIndex: TagIndex): Promise<void>;
+
+  /**
+   * Get tag index for branch
+   * @param branchInfo Branch information
+   * @returns Promise resolving to tag index if found, null otherwise
+   */
+  getTagIndex(branchInfo: BranchInfo): Promise<TagIndex | null>;
+
+  /**
+   * Find documents by tags in branch using index
+   * @param branchInfo Branch information
+   * @param tags Tags to search for
+   * @param matchAll If true, documents must have all tags (AND), otherwise any tag (OR)
+   * @returns Promise resolving to array of document paths
+   */
+  findDocumentPathsByTagsUsingIndex(branchInfo: BranchInfo, tags: Tag[], matchAll?: boolean): Promise<DocumentPath[]>;
 }

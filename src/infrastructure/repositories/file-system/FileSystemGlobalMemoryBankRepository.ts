@@ -12,6 +12,7 @@ import {
 import { DomainError } from '../../../shared/errors/DomainError.js';
 import { FileSystemMemoryDocumentRepository } from './FileSystemMemoryDocumentRepository.js';
 import { logger } from '../../../shared/utils/logger.js';
+import { TagIndex } from '../../../schemas/tag-index/tag-index-schema';
 
 /**
  * File system implementation of global memory bank repository
@@ -223,9 +224,10 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
   }
 
   /**
-   * Update tags index in global memory bank
+   * Update tags index in global memory bank (legacy method)
    * @param skipSaveDocument Optional flag to skip saveDocument to prevent circular references
    * @returns Promise resolving when done
+   * @deprecated Use saveTagIndex instead
    */
   async updateTagsIndex(skipSaveDocument: boolean = false): Promise<void> {
     try {
@@ -380,9 +382,147 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
   }
 
   /**
-   * Ensure default structure exists
+   * Save tag index for global memory bank
+   * @param tagIndex Tag index to save
    * @returns Promise resolving when done
    */
+  async saveTagIndex(tagIndex: TagIndex): Promise<void> {
+    try {
+      logger.debug('Saving global tag index');
+
+      const indexPath = path.join(this.globalMemoryPath, '_global_index.json');
+
+      // Convert to JSON string with pretty formatting
+      const jsonContent = JSON.stringify(tagIndex, null, 2);
+
+      // Write to file
+      await this.fileSystemService.writeFile(indexPath, jsonContent);
+
+      logger.debug('Global tag index saved');
+    } catch (error) {
+      throw new InfrastructureError(
+        InfrastructureErrorCodes.FILE_WRITE_ERROR,
+        `Failed to save global tag index: ${(error as Error).message}`,
+        { originalError: error }
+      );
+    }
+  }
+
+  /**
+   * Get tag index for global memory bank
+   * @returns Promise resolving to tag index if found, null otherwise
+   */
+  async getTagIndex(): Promise<TagIndex | null> {
+    try {
+      logger.debug('Getting global tag index');
+
+      const indexPath = path.join(this.globalMemoryPath, '_global_index.json');
+
+      // Check if file exists
+      const exists = await this.fileSystemService.fileExists(indexPath);
+
+      if (!exists) {
+        logger.debug('No global tag index found');
+        return null;
+      }
+
+      // Read file content
+      const content = await this.fileSystemService.readFile(indexPath);
+
+      // Parse JSON
+      const tagIndex = JSON.parse(content) as TagIndex;
+
+      logger.debug('Global tag index loaded');
+      return tagIndex;
+    } catch (error) {
+      if (error instanceof InfrastructureError && 
+          error.code === `INFRA_ERROR.${InfrastructureErrorCodes.FILE_NOT_FOUND}`) {
+        return null;
+      }
+
+      throw new InfrastructureError(
+        InfrastructureErrorCodes.FILE_READ_ERROR,
+        `Failed to get global tag index: ${(error as Error).message}`,
+        { originalError: error }
+      );
+    }
+  }
+
+  /**
+   * Find documents by tags in global memory bank using index
+   * @param tags Tags to search for
+   * @param matchAll If true, documents must have all tags (AND); if false, any tag (OR)
+   * @returns Promise resolving to array of document paths
+   */
+  async findDocumentPathsByTagsUsingIndex(
+    tags: Tag[],
+    matchAll: boolean = false
+  ): Promise<DocumentPath[]> {
+    try {
+      logger.debug('Finding documents by tags using index in global memory bank');
+
+      // Get tag index
+      const tagIndex = await this.getTagIndex();
+
+      if (!tagIndex) {
+        // Fall back to regular method if no index exists
+        logger.debug('No tag index found, falling back to regular method');
+        const docs = await this.findDocumentsByTags(tags);
+        return docs.map(doc => doc.path);
+      }
+
+      let resultPaths: string[] = [];
+
+      if (matchAll) {
+        // AND logic - document must have all tags
+        if (tags.length === 0) return [];
+
+        // Start with all documents for the first tag
+        const firstTag = tags[0].value;
+        let matchedPaths = tagIndex.index[firstTag] || [];
+
+        // Filter for each additional tag
+        for (let i = 1; i < tags.length; i++) {
+          const tagValue = tags[i].value;
+          const tagPaths = tagIndex.index[tagValue] || [];
+          
+          // Keep only paths that are in both sets
+          matchedPaths = matchedPaths.filter(path => tagPaths.includes(path));
+          
+          // Early exit if no matches
+          if (matchedPaths.length === 0) break;
+        }
+        
+        resultPaths = matchedPaths;
+      } else {
+        // OR logic - document can have any of the tags
+        const pathSet = new Set<string>();
+        
+        // Collect all paths for all tags
+        for (const tag of tags) {
+          const tagValue = tag.value;
+          const tagPaths = tagIndex.index[tagValue] || [];
+          
+          // Add to result set
+          for (const docPath of tagPaths) {
+            pathSet.add(docPath);
+          }
+        }
+        
+        resultPaths = Array.from(pathSet);
+      }
+      
+      // Convert string paths to DocumentPath objects
+      return resultPaths.map(p => DocumentPath.create(p));
+    } catch (error) {
+      throw new InfrastructureError(
+        InfrastructureErrorCodes.FILE_READ_ERROR,
+        `Failed to find documents by tags using index: ${(error as Error).message}`,
+        { originalError: error }
+      );
+    }
+  }
+
   private async ensureDefaultStructure(): Promise<void> {
     try {
       logger.debug('Ensuring global memory bank default structure');
