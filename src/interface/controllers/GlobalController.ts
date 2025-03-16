@@ -6,7 +6,6 @@ import { UpdateTagIndexUseCase } from '../../application/usecases/common/UpdateT
 import { MCPResponsePresenter } from '../presenters/MCPResponsePresenter.js';
 import { MCPResponse } from '../presenters/types/index.js';
 import { DocumentDTO } from '../../application/dtos/index.js';
-import { Tag } from '../../domain/entities/Tag.js';
 import { DomainError } from '../../shared/errors/DomainError.js';
 import { ApplicationError } from '../../shared/errors/ApplicationError.js';
 import { InfrastructureError } from '../../shared/errors/InfrastructureError.js';
@@ -17,6 +16,7 @@ import { logger } from '../../shared/utils/logger.js';
  * Handles incoming requests related to global memory bank
  */
 export class GlobalController implements IGlobalController {
+  readonly _type = 'controller' as const;
   /**
    * Constructor
    * @param readGlobalDocumentUseCase Use case for reading global documents
@@ -39,9 +39,9 @@ export class GlobalController implements IGlobalController {
   async readDocument(path: string): Promise<MCPResponse<DocumentDTO>> {
     try {
       logger.info(`Reading global document: ${path}`);
-      
+
       const result = await this.readGlobalDocumentUseCase.execute({ path });
-      
+
       return this.presenter.present(result.document);
     } catch (error) {
       return this.handleError(error);
@@ -58,15 +58,15 @@ export class GlobalController implements IGlobalController {
   async writeDocument(path: string, content: string, tags?: string[]): Promise<MCPResponse> {
     try {
       logger.info(`Writing global document: ${path}`);
-      
+
       await this.writeGlobalDocumentUseCase.execute({
         document: {
           path,
           content,
-          tags: tags || []
-        }
+          tags: tags || [],
+        },
       });
-      
+
       return this.presenter.present({ success: true });
     } catch (error) {
       return this.handleError(error);
@@ -80,7 +80,7 @@ export class GlobalController implements IGlobalController {
   async readCoreFiles(): Promise<MCPResponse<Record<string, DocumentDTO>>> {
     try {
       logger.info('Reading global core files');
-      
+
       // Define core files to read
       const coreFiles = [
         'architecture.md',
@@ -88,12 +88,12 @@ export class GlobalController implements IGlobalController {
         'domain-models.md',
         'glossary.md',
         'tech-stack.md',
-        'user-guide.md'
+        'user-guide.md',
       ];
-      
+
       // Read each core file
       const result: Record<string, DocumentDTO> = {};
-      
+
       for (const filePath of coreFiles) {
         try {
           const response = await this.readGlobalDocumentUseCase.execute({ path: filePath });
@@ -101,17 +101,17 @@ export class GlobalController implements IGlobalController {
         } catch (error) {
           // Log error but continue with other files
           logger.error(`Error reading global core file ${filePath}:`, error);
-          
+
           // Add empty placeholder for missing file
           result[filePath] = {
             path: filePath,
             content: '',
             tags: [],
-            lastModified: new Date().toISOString()
+            lastModified: new Date().toISOString(),
           };
         }
       }
-      
+
       return this.presenter.present(result);
     } catch (error) {
       return this.handleError(error);
@@ -125,12 +125,12 @@ export class GlobalController implements IGlobalController {
   async updateTagsIndex(): Promise<MCPResponse> {
     try {
       logger.info('Updating global tags index');
-      
+
       const result = await this.updateTagIndexUseCase.execute({
         branchName: undefined, // Global memory bank
-        fullRebuild: true
+        fullRebuild: true,
       });
-      
+
       return this.presenter.present(result);
     } catch (error) {
       return this.handleError(error);
@@ -143,16 +143,19 @@ export class GlobalController implements IGlobalController {
    * @param matchAllTags Whether to require all tags to match
    * @returns Promise resolving to MCP response with matching documents
    */
-  async findDocumentsByTags(tags: string[], matchAllTags?: boolean): Promise<MCPResponse<DocumentDTO[]>> {
+  async findDocumentsByTags(
+    tags: string[],
+    matchAllTags?: boolean
+  ): Promise<MCPResponse<DocumentDTO[]>> {
     try {
       logger.info(`Finding global documents by tags: ${tags.join(', ')}`);
-      
+
       const result = await this.searchDocumentsByTagsUseCase.execute({
         tags,
         matchAllTags,
-        branchName: undefined // Search in global memory bank
+        branchName: undefined, // Search in global memory bank
       });
-      
+
       return this.presenter.present(result.documents);
     } catch (error) {
       return this.handleError(error);
@@ -165,12 +168,14 @@ export class GlobalController implements IGlobalController {
    * @returns Formatted error response
    */
   private handleError(error: any): MCPResponse {
-    if (error instanceof DomainError || 
-        error instanceof ApplicationError || 
-        error instanceof InfrastructureError) {
+    if (
+      error instanceof DomainError ||
+      error instanceof ApplicationError ||
+      error instanceof InfrastructureError
+    ) {
       return this.presenter.presentError(error);
     }
-    
+
     // Unknown error
     return this.presenter.presentError(
       new ApplicationError(

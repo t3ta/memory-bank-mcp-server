@@ -38,10 +38,10 @@ export class DIContainer {
     if (this.factories.has(name)) {
       const factory = this.factories.get(name)!;
       const instance = factory();
-      
+
       // Cache the instance
       this.services.set(name, instance);
-      
+
       return instance as T;
     }
 

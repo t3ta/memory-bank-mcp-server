@@ -29,19 +29,25 @@ describe('DocumentPath', () => {
     it('should throw an error for path containing ..', () => {
       // Arrange & Act & Assert
       expect(() => DocumentPath.create('test/../file.md')).toThrow(DomainError);
-      expect(() => DocumentPath.create('test/../file.md')).toThrow('Document path cannot contain ".."');
+      expect(() => DocumentPath.create('test/../file.md')).toThrow(
+        'Document path cannot contain ".."'
+      );
     });
 
     it('should throw an error for absolute path starting with /', () => {
       // Arrange & Act & Assert
       expect(() => DocumentPath.create('/test/file.md')).toThrow(DomainError);
-      expect(() => DocumentPath.create('/test/file.md')).toThrow('Document path cannot be absolute');
+      expect(() => DocumentPath.create('/test/file.md')).toThrow(
+        'Document path cannot be absolute'
+      );
     });
 
     it('should throw an error for absolute path with drive letter', () => {
       // Arrange & Act & Assert
       expect(() => DocumentPath.create('C:/test/file.md')).toThrow(DomainError);
-      expect(() => DocumentPath.create('C:/test/file.md')).toThrow('Document path cannot be absolute');
+      expect(() => DocumentPath.create('C:/test/file.md')).toThrow(
+        'Document path cannot be absolute'
+      );
     });
 
     it('should throw DomainError with correct error code', () => {
@@ -49,10 +55,12 @@ describe('DocumentPath', () => {
       try {
         DocumentPath.create('');
         // If we get here, it means the expected error wasn't thrown
-        expect("No error was thrown").toBe("Error should have been thrown");
+        expect('No error was thrown').toBe('Error should have been thrown');
       } catch (error) {
         expect(error).toBeInstanceOf(DomainError);
-        expect((error as DomainError).code).toBe(`DOMAIN_ERROR.${DomainErrorCodes.INVALID_DOCUMENT_PATH}`);
+        expect((error as DomainError).code).toBe(
+          `DOMAIN_ERROR.${DomainErrorCodes.INVALID_DOCUMENT_PATH}`
+        );
       }
     });
   });
@@ -137,6 +145,98 @@ describe('DocumentPath', () => {
 
       // Assert
       expect(extension).toBe('json');
+    });
+  });
+
+  describe('isMarkdown', () => {
+    it('should return true for md files', () => {
+      // Arrange
+      const path = DocumentPath.create('test/file.md');
+
+      // Act
+      const isMarkdown = path.isMarkdown;
+
+      // Assert
+      expect(isMarkdown).toBe(true);
+    });
+
+    it('should return false for non-md files', () => {
+      // Arrange
+      const path = DocumentPath.create('test/file.txt');
+
+      // Act
+      const isMarkdown = path.isMarkdown;
+
+      // Assert
+      expect(isMarkdown).toBe(false);
+    });
+
+    it('should return false for files without extension', () => {
+      // Arrange
+      const path = DocumentPath.create('test/file');
+
+      // Act
+      const isMarkdown = path.isMarkdown;
+
+      // Assert
+      expect(isMarkdown).toBe(false);
+    });
+
+    it('should be case insensitive', () => {
+      // Arrange
+      const path = DocumentPath.create('test/file.MD');
+
+      // Act
+      const isMarkdown = path.isMarkdown;
+
+      // Assert
+      expect(isMarkdown).toBe(true);
+    });
+  });
+
+  describe('isJSON', () => {
+    it('should return true for json files', () => {
+      // Arrange
+      const path = DocumentPath.create('test/file.json');
+
+      // Act
+      const isJSON = path.isJSON;
+
+      // Assert
+      expect(isJSON).toBe(true);
+    });
+
+    it('should return false for non-json files', () => {
+      // Arrange
+      const path = DocumentPath.create('test/file.md');
+
+      // Act
+      const isJSON = path.isJSON;
+
+      // Assert
+      expect(isJSON).toBe(false);
+    });
+
+    it('should return false for files without extension', () => {
+      // Arrange
+      const path = DocumentPath.create('test/file');
+
+      // Act
+      const isJSON = path.isJSON;
+
+      // Assert
+      expect(isJSON).toBe(false);
+    });
+
+    it('should be case insensitive', () => {
+      // Arrange
+      const path = DocumentPath.create('test/file.JSON');
+
+      // Act
+      const isJSON = path.isJSON;
+
+      // Assert
+      expect(isJSON).toBe(true);
     });
   });
 

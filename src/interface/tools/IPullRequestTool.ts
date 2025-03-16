@@ -6,7 +6,7 @@ import { PullRequestDTO } from '../../application/dtos/PullRequestDTO.js';
 export interface IPullRequestTool {
   /**
    * Creates a pull request based on branch memory bank information
-   * 
+   *
    * @param branch Branch name
    * @param title Custom PR title (optional)
    * @param baseBranch Target branch for the PR (optional)

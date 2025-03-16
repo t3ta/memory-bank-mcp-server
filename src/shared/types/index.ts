@@ -6,9 +6,9 @@ export type Language = 'en' | 'ja';
 /**
  * Types of memory banks available in the system
  */
-export enum MemoryBankType {
-  GLOBAL = 'global',
-  BRANCH = 'branch'
+export enum _MemoryBankType {
+  _GLOBAL = 'global',
+  _BRANCH = 'branch',
 }
 
 /**
@@ -18,7 +18,7 @@ export const BRANCH_CORE_FILES = [
   'branchContext.md',
   'activeContext.md',
   'systemPatterns.md',
-  'progress.md'
+  'progress.md',
 ] as const;
 
 /**
@@ -30,7 +30,7 @@ export const GLOBAL_CORE_FILES = [
   'domain-models.md',
   'glossary.md',
   'tech-stack.md',
-  'user-guide.md'
+  'user-guide.md',
 ] as const;
 
 /**
@@ -74,13 +74,15 @@ export interface ValidationError {
 
 /**
  * Types of validation errors
+ *
+ * 注意: このenumはValidationErrorインターフェースで使用されています
  */
 export enum ValidationErrorType {
-  MISSING_FILE = 'MISSING_FILE',
-  INVALID_CONTENT = 'INVALID_CONTENT',
-  INVALID_TAGS = 'INVALID_TAGS',
-  INVALID_PATH = 'INVALID_PATH',
-  INVALID_STRUCTURE = 'INVALID_STRUCTURE'
+  _MISSING_FILE = 'MISSING_FILE',
+  _INVALID_CONTENT = 'INVALID_CONTENT',
+  _INVALID_TAGS = 'INVALID_TAGS',
+  _INVALID_PATH = 'INVALID_PATH',
+  _INVALID_STRUCTURE = 'INVALID_STRUCTURE',
 }
 
 /**

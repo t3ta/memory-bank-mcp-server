@@ -1,0 +1,10 @@
+# ビルド生成物
+dist/
+coverage/
+node_modules/
+
+# ドキュメント (除外するドキュメントディレクトリ)
+docs/
+
+# その他
+*.log

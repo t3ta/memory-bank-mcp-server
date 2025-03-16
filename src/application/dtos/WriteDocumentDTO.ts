@@ -6,12 +6,12 @@ export interface WriteDocumentDTO {
    * Document path
    */
   path: string;
-  
+
   /**
    * Document content
    */
   content: string;
-  
+
   /**
    * Document tags (optional)
    */

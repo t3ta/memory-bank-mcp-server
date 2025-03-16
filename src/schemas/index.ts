@@ -13,7 +13,8 @@ const dateStringToDate = (val: string, ctx: z.RefinementCtx) => {
       return z.NEVER;
     }
     return date;
-  } catch (error) {
+  } catch (err) {
+    console.error(`Failed to parse date: ${err}`);
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: `Failed to parse date: ${val}`,
@@ -23,10 +24,7 @@ const dateStringToDate = (val: string, ctx: z.RefinementCtx) => {
 };
 
 // Flexible date schema that accepts both Date objects and strings
-const FlexibleDateSchema = z.union([
-  z.date(),
-  z.string().transform(dateStringToDate)
-]);
+const FlexibleDateSchema = z.union([z.date(), z.string().transform(dateStringToDate)]);
 
 // Basic schemas
 export const TagSchema = z
@@ -36,29 +34,29 @@ export const TagSchema = z
 export const PathSchema = z
   .string()
   .min(1, 'Path cannot be empty')
-  .refine(path => !path.includes('..'), 'Path cannot contain ".."')
-  .refine(path => path.startsWith('/') || !path.startsWith('.'), 'Path must be absolute or relative without leading "."');
+  .refine((path) => !path.includes('..'), 'Path cannot contain ".."')
+  .refine(
+    (path) => path.startsWith('/') || !path.startsWith('.'),
+    'Path must be absolute or relative without leading "."'
+  );
 
 export const BranchNameSchema = z
   .string()
   .min(1, 'Branch name cannot be empty')
   .refine(
-    name => name.startsWith('feature/') || name.startsWith('fix/'),
+    (name) => name.startsWith('feature/') || name.startsWith('fix/'),
     'Branch name must start with "feature/" or "fix/"'
   );
 
 export const LanguageSchema = z.enum(['en', 'ja']);
 
 // Section editing schemas
-export const SectionContentSchema = z.union([
-  z.string(),
-  z.array(z.string())
-]);
+export const SectionContentSchema = z.union([z.string(), z.array(z.string())]);
 
 export const SectionEditSchema = z.object({
   header: z.string(),
   content: SectionContentSchema,
-  append: z.boolean().optional()
+  append: z.boolean().optional(),
 });
 
 export const DocumentSectionsSchema = z.record(SectionEditSchema);
@@ -69,7 +67,7 @@ export const EditModeSchema = z.enum(['replace', 'append', 'prepend']);
 export const SectionEditOptionsSchema = z.object({
   mode: EditModeSchema.optional().default('replace'),
   startLine: z.number().optional(),
-  endLine: z.number().optional()
+  endLine: z.number().optional(),
 });
 
 export const ActiveContextSchema = z.object({
@@ -78,7 +76,7 @@ export const ActiveContextSchema = z.object({
   activeDecisions: z.array(z.string()).optional(),
   considerations: z.array(z.string()).optional(),
   nextSteps: z.array(z.string()).optional(),
-  editOptions: SectionEditOptionsSchema.optional()
+  editOptions: SectionEditOptionsSchema.optional(),
 });
 
 export const ProgressSchema = z.object({
@@ -86,19 +84,19 @@ export const ProgressSchema = z.object({
   pendingImplementation: z.array(z.string()).optional(),
   status: z.string().optional(),
   knownIssues: z.array(z.string()).optional(),
-  editOptions: SectionEditOptionsSchema.optional()
+  editOptions: SectionEditOptionsSchema.optional(),
 });
 
 export const TechnicalDecisionSchema = z.object({
   title: z.string(),
   context: z.string(),
   decision: z.string(),
-  consequences: z.array(z.string())
+  consequences: z.array(z.string()),
 });
 
 export const SystemPatternsSchema = z.object({
   technicalDecisions: z.array(TechnicalDecisionSchema).optional(),
-  editOptions: SectionEditOptionsSchema.optional()
+  editOptions: SectionEditOptionsSchema.optional(),
 });
 
 export const CoreFilesUpdateSchema = z.object({
@@ -106,8 +104,8 @@ export const CoreFilesUpdateSchema = z.object({
   files: z.object({
     activeContext: ActiveContextSchema.optional(),
     progress: ProgressSchema.optional(),
-    systemPatterns: SystemPatternsSchema.optional()
-  })
+    systemPatterns: SystemPatternsSchema.optional(),
+  }),
 });
 
 // Recent branches schema
@@ -116,12 +114,12 @@ export const RecentBranchSchema = z.object({
   lastModified: FlexibleDateSchema,
   summary: z.object({
     currentWork: z.string().optional(),
-    recentChanges: z.array(z.string()).optional()
-  })
+    recentChanges: z.array(z.string()).optional(),
+  }),
 });
 
 export const GetRecentBranchesArgsSchema = z.object({
-  limit: z.number().min(1).max(100).default(10)
+  limit: z.number().min(1).max(100).default(10),
 });
 
 // Workspace configuration schemas
@@ -129,14 +127,14 @@ export const WorkspaceConfigSchema = z.object({
   workspaceRoot: PathSchema,
   memoryBankRoot: PathSchema,
   verbose: z.boolean(),
-  language: LanguageSchema
+  language: LanguageSchema,
 });
 
 export const CliOptionsSchema = z.object({
   workspace: PathSchema.optional(),
   memoryRoot: PathSchema.optional(),
   verbose: z.boolean().optional(),
-  language: LanguageSchema.optional()
+  language: LanguageSchema.optional(),
 });
 
 // Memory Document schema
@@ -144,7 +142,7 @@ export const MemoryDocumentSchema = z.object({
   path: PathSchema,
   content: z.string(),
   tags: z.array(TagSchema),
-  lastModified: FlexibleDateSchema
+  lastModified: FlexibleDateSchema,
 });
 
 // Validation schemas
@@ -152,54 +150,65 @@ export const ValidationErrorSchema = z.object({
   type: z.nativeEnum(ValidationErrorType),
   message: z.string(),
   path: z.string().optional(),
-  details: z.record(z.unknown()).optional()
+  details: z.record(z.unknown()).optional(),
 });
 
 export const ValidationResultSchema = z.object({
   isValid: z.boolean(),
   missingFiles: z.array(z.string()),
-  errors: z.array(ValidationErrorSchema)
+  errors: z.array(ValidationErrorSchema),
 });
 
 // Tool content and response schemas
 export const ToolContentSchema = z.object({
   type: z.string(),
   text: z.string(),
-  mimeType: z.string().optional()
+  mimeType: z.string().optional(),
 });
 
-export const ToolResponseSchema = z.object({
-  content: z.array(ToolContentSchema),
-  isError: z.boolean().optional(),
-  _meta: z.record(z.unknown()).optional()
-}).passthrough();
+export const ToolResponseSchema = z
+  .object({
+    content: z.array(ToolContentSchema),
+    isError: z.boolean().optional(),
+    _meta: z.record(z.unknown()).optional(),
+  })
+  .passthrough();
 
 // Tool arguments schemas
 export const BaseToolArgsSchema = z.object({}).passthrough();
 
-export const ReadMemoryBankArgsSchema = z.object({
-  path: PathSchema
-}).merge(BaseToolArgsSchema);
+export const ReadMemoryBankArgsSchema = z
+  .object({
+    path: PathSchema,
+  })
+  .merge(BaseToolArgsSchema);
 
-export const WriteMemoryBankArgsSchema = z.object({
-  path: PathSchema,
-  content: z.string(),
-  tags: z.array(TagSchema).optional()
-}).merge(BaseToolArgsSchema);
+export const WriteMemoryBankArgsSchema = z
+  .object({
+    path: PathSchema,
+    content: z.string(),
+    tags: z.array(TagSchema).optional(),
+  })
+  .merge(BaseToolArgsSchema);
 
 export const BranchContextSchema = z.object({
-  content: z.string()
+  content: z.string(),
 });
 
-export const WriteBranchCoreFilesArgsSchema = z.object({
-  branch: z.string(),
-  files: z.object({
-    branchContext: BranchContextSchema.optional(),
-    activeContext: ActiveContextSchema.optional(),
-    progress: ProgressSchema.optional(),
-    systemPatterns: SystemPatternsSchema.optional()
+export const WriteBranchCoreFilesArgsSchema = z
+  .object({
+    branch: z.string(),
+    files: z.object({
+      branchContext: BranchContextSchema.optional(),
+      activeContext: ActiveContextSchema.optional(),
+      progress: ProgressSchema.optional(),
+      systemPatterns: SystemPatternsSchema.optional(),
+    }),
   })
-}).merge(BaseToolArgsSchema);
+  .merge(BaseToolArgsSchema);
+
+// Export json document schemas
+export * from './json-document.js';
 
 // Export utility schemas
 export { FlexibleDateSchema };
@@ -208,16 +217,19 @@ export const parseDateSafely = (dateInput: string | Date): Date => {
     if (dateInput instanceof Date) {
       return dateInput;
     }
-    
+
     const date = new Date(dateInput);
-    
+
     if (isNaN(date.getTime())) {
       throw new Error(`Invalid date: ${dateInput}`);
     }
-    
+
     return date;
-  } catch (error) {
-    console.error(`日付パース中にエラーが発生しました: ${error instanceof Error ? error.message : String(error)}`);
+  } catch (err) {
+    // 明示的にエラーを使用
+    console.error(
+      `日付パース中にエラーが発生しました: ${err instanceof Error ? err.message : String(err)}`
+    );
     // デフォルト値として現在時刻を返す
     return new Date();
   }

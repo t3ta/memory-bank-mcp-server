@@ -1,5 +1,6 @@
-import { McpError, ErrorCode } from '../types.js';
+import { McpError } from '../types.js';
 
+/* eslint-disable no-unused-vars */
 export enum MemoryBankErrorCode {
   // Document related errors (range: -33000 to -33099)
   DocumentNotFound = -33000,
@@ -22,6 +23,7 @@ export enum MemoryBankErrorCode {
   FileWriteError = -33302,
   FilePermissionError = -33303,
 }
+/* eslint-enable no-unused-vars */
 
 export class MemoryBankError extends Error implements McpError {
   constructor(
@@ -41,10 +43,7 @@ export class MemoryBankError extends Error implements McpError {
     );
   }
 
-  static documentValidationFailed(
-    path: string,
-    reason: string
-  ): MemoryBankError {
+  static documentValidationFailed(path: string, reason: string): MemoryBankError {
     return new MemoryBankError(
       MemoryBankErrorCode.DocumentValidationFailed,
       `Document validation failed for ${path}: ${reason}`,
@@ -52,10 +51,7 @@ export class MemoryBankError extends Error implements McpError {
     );
   }
 
-  static requiredFieldMissing(
-    field: string,
-    context: string
-  ): MemoryBankError {
+  static requiredFieldMissing(field: string, context: string): MemoryBankError {
     return new MemoryBankError(
       MemoryBankErrorCode.RequiredFieldMissing,
       `Required field '${field}' is missing in ${context}`,
@@ -63,10 +59,7 @@ export class MemoryBankError extends Error implements McpError {
     );
   }
 
-  static invalidDocumentFormat(
-    path: string,
-    reason: string
-  ): MemoryBankError {
+  static invalidDocumentFormat(path: string, reason: string): MemoryBankError {
     return new MemoryBankError(
       MemoryBankErrorCode.InvalidDocumentFormat,
       `Invalid document format at ${path}: ${reason}`,
@@ -83,11 +76,9 @@ export class MemoryBankError extends Error implements McpError {
   }
 
   static pathNotFound(path: string): MemoryBankError {
-    return new MemoryBankError(
-      MemoryBankErrorCode.PathNotFound,
-      `Path not found: ${path}`,
-      { path }
-    );
+    return new MemoryBankError(MemoryBankErrorCode.PathNotFound, `Path not found: ${path}`, {
+      path,
+    });
   }
 
   static invalidBranchName(branch: string): MemoryBankError {
@@ -107,18 +98,10 @@ export class MemoryBankError extends Error implements McpError {
   }
 
   static tagNotFound(tag: string): MemoryBankError {
-    return new MemoryBankError(
-      MemoryBankErrorCode.TagNotFound,
-      `Tag not found: ${tag}`,
-      { tag }
-    );
+    return new MemoryBankError(MemoryBankErrorCode.TagNotFound, `Tag not found: ${tag}`, { tag });
   }
 
-  static fileSystemError(
-    operation: string,
-    path: string,
-    error: Error
-  ): MemoryBankError {
+  static fileSystemError(operation: string, path: string, error: Error): MemoryBankError {
     return new MemoryBankError(
       MemoryBankErrorCode.FileSystemError,
       `File system error during ${operation} at ${path}: ${error.message}`,

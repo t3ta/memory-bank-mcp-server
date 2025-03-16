@@ -9,7 +9,7 @@ export interface IPresenter<Response, ErrorResponse> {
    * @returns Formatted response
    */
   present<T>(data: T): Response;
-  
+
   /**
    * Present error response
    * @param error Error to present

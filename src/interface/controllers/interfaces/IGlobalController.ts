@@ -12,7 +12,7 @@ export interface IGlobalController extends IController {
    * @returns Promise resolving to MCP response with document
    */
   readDocument(path: string): Promise<MCPResponse<DocumentDTO>>;
-  
+
   /**
    * Write document to global memory bank
    * @param path Document path
@@ -21,19 +21,19 @@ export interface IGlobalController extends IController {
    * @returns Promise resolving to MCP response with the result
    */
   writeDocument(path: string, content: string, tags?: string[]): Promise<MCPResponse>;
-  
+
   /**
    * Read core files from global memory bank
    * @returns Promise resolving to MCP response with core files content
    */
   readCoreFiles(): Promise<MCPResponse<Record<string, DocumentDTO>>>;
-  
+
   /**
    * Update tags index in global memory bank
    * @returns Promise resolving to MCP response with the result
    */
   updateTagsIndex(): Promise<MCPResponse>;
-  
+
   /**
    * Find documents by tags in global memory bank
    * @param tags Tags to search for

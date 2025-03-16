@@ -5,7 +5,10 @@ import { BranchInfo } from '../../../../domain/entities/BranchInfo.js';
 import { DocumentPath } from '../../../../domain/entities/DocumentPath.js';
 import { Tag } from '../../../../domain/entities/Tag.js';
 import { DomainError } from '../../../../shared/errors/DomainError.js';
-import { ApplicationError, ApplicationErrorCodes } from '../../../../shared/errors/ApplicationError.js';
+import {
+  ApplicationError,
+  ApplicationErrorCodes,
+} from '../../../../shared/errors/ApplicationError.js';
 
 // Mock repository
 const mockBranchRepository: jest.Mocked<IBranchMemoryBankRepository> = {
@@ -17,7 +20,7 @@ const mockBranchRepository: jest.Mocked<IBranchMemoryBankRepository> = {
   listDocuments: jest.fn(),
   findDocumentsByTags: jest.fn(),
   getRecentBranches: jest.fn(),
-  validateStructure: jest.fn()
+  validateStructure: jest.fn(),
 };
 
 describe('WriteBranchDocumentUseCase', () => {
@@ -58,8 +61,8 @@ describe('WriteBranchDocumentUseCase', () => {
       document: {
         path: testDocumentPath,
         content: testDocumentContent,
-        tags: testDocumentTags
-      }
+        tags: testDocumentTags,
+      },
     });
 
     // Assert
@@ -84,8 +87,8 @@ describe('WriteBranchDocumentUseCase', () => {
         content: testDocumentContent,
         tags: expect.arrayContaining([
           expect.objectContaining({ value: testDocumentTags[0] }),
-          expect.objectContaining({ value: testDocumentTags[1] })
-        ])
+          expect.objectContaining({ value: testDocumentTags[1] }),
+        ]),
       })
     );
   });
@@ -103,8 +106,8 @@ describe('WriteBranchDocumentUseCase', () => {
       document: {
         path: testDocumentPath,
         content: testDocumentContent,
-        tags: testDocumentTags
-      }
+        tags: testDocumentTags,
+      },
     });
 
     // Assert
@@ -115,15 +118,14 @@ describe('WriteBranchDocumentUseCase', () => {
 
   it('should update an existing document', async () => {
     // Arrange
-    const branchInfo = BranchInfo.create(testBranchName);
     const documentPath = DocumentPath.create(testDocumentPath);
-    const tags = testDocumentTags.map(tag => Tag.create(tag));
+    // If we're never going to use branchInfo, we don't need to declare it
 
     const existingDocument = MemoryDocument.create({
       path: documentPath,
       content: 'Old content',
       tags: [Tag.create('old')],
-      lastModified: new Date('2022-01-01T00:00:00.000Z')
+      lastModified: new Date('2022-01-01T00:00:00.000Z'),
     });
 
     mockBranchRepository.exists.mockResolvedValue(true);
@@ -136,8 +138,8 @@ describe('WriteBranchDocumentUseCase', () => {
       document: {
         path: testDocumentPath,
         content: testDocumentContent,
-        tags: testDocumentTags
-      }
+        tags: testDocumentTags,
+      },
     });
 
     // Assert
@@ -153,15 +155,15 @@ describe('WriteBranchDocumentUseCase', () => {
         content: testDocumentContent,
         tags: expect.arrayContaining([
           expect.objectContaining({ value: testDocumentTags[0] }),
-          expect.objectContaining({ value: testDocumentTags[1] })
-        ])
+          expect.objectContaining({ value: testDocumentTags[1] }),
+        ]),
       })
     );
   });
 
   it('should update content while preserving tags if tags are not provided', async () => {
     // Arrange
-    const branchInfo = BranchInfo.create(testBranchName);
+    const _branchInfo = BranchInfo.create(testBranchName); // Add underscore prefix to indicate its unused
     const documentPath = DocumentPath.create(testDocumentPath);
     const existingTags = [Tag.create('existing'), Tag.create('tags')];
 
@@ -169,7 +171,7 @@ describe('WriteBranchDocumentUseCase', () => {
       path: documentPath,
       content: 'Old content',
       tags: existingTags,
-      lastModified: new Date('2022-01-01T00:00:00.000Z')
+      lastModified: new Date('2022-01-01T00:00:00.000Z'),
     });
 
     mockBranchRepository.exists.mockResolvedValue(true);
@@ -181,16 +183,16 @@ describe('WriteBranchDocumentUseCase', () => {
       branchName: testBranchName,
       document: {
         path: testDocumentPath,
-        content: testDocumentContent
+        content: testDocumentContent,
         // No tags provided
-      }
+      },
     });
 
     // Assert
     expect(result).toBeDefined();
     expect(result.document).toBeDefined();
     expect(result.document.content).toBe(testDocumentContent);
-    expect(result.document.tags).toEqual(existingTags.map(tag => tag.value));
+    expect(result.document.tags).toEqual(existingTags.map((tag) => tag.value));
 
     // Verify saveDocument was called with a document that has updated content but preserved tags
     expect(mockBranchRepository.saveDocument).toHaveBeenCalledWith(
@@ -199,29 +201,33 @@ describe('WriteBranchDocumentUseCase', () => {
         content: testDocumentContent,
         tags: expect.arrayContaining([
           expect.objectContaining({ value: 'existing' }),
-          expect.objectContaining({ value: 'tags' })
-        ])
+          expect.objectContaining({ value: 'tags' }),
+        ]),
       })
     );
   });
 
   it('should throw ApplicationError when branch name is empty', async () => {
     // Act & Assert
-    await expect(useCase.execute({
-      branchName: '',
-      document: {
-        path: testDocumentPath,
-        content: testDocumentContent
-      }
-    })).rejects.toThrow(ApplicationError);
+    await expect(
+      useCase.execute({
+        branchName: '',
+        document: {
+          path: testDocumentPath,
+          content: testDocumentContent,
+        },
+      })
+    ).rejects.toThrow(ApplicationError);
 
-    await expect(useCase.execute({
-      branchName: '',
-      document: {
-        path: testDocumentPath,
-        content: testDocumentContent
-      }
-    })).rejects.toThrow('Branch name is required');
+    await expect(
+      useCase.execute({
+        branchName: '',
+        document: {
+          path: testDocumentPath,
+          content: testDocumentContent,
+        },
+      })
+    ).rejects.toThrow('Branch name is required');
 
     // Verify repository was not called
     expect(mockBranchRepository.exists).not.toHaveBeenCalled();
@@ -229,53 +235,65 @@ describe('WriteBranchDocumentUseCase', () => {
 
   it('should throw ApplicationError when document is missing', async () => {
     // Act & Assert
-    await expect(useCase.execute({
-      branchName: testBranchName,
-      document: null as any
-    })).rejects.toThrow(ApplicationError);
+    await expect(
+      useCase.execute({
+        branchName: testBranchName,
+        document: null as any,
+      })
+    ).rejects.toThrow(ApplicationError);
 
-    await expect(useCase.execute({
-      branchName: testBranchName,
-      document: null as any
-    })).rejects.toThrow('Document is required');
+    await expect(
+      useCase.execute({
+        branchName: testBranchName,
+        document: null as any,
+      })
+    ).rejects.toThrow('Document is required');
   });
 
   it('should throw ApplicationError when document path is empty', async () => {
     // Act & Assert
-    await expect(useCase.execute({
-      branchName: testBranchName,
-      document: {
-        path: '',
-        content: testDocumentContent
-      }
-    })).rejects.toThrow(ApplicationError);
+    await expect(
+      useCase.execute({
+        branchName: testBranchName,
+        document: {
+          path: '',
+          content: testDocumentContent,
+        },
+      })
+    ).rejects.toThrow(ApplicationError);
 
-    await expect(useCase.execute({
-      branchName: testBranchName,
-      document: {
-        path: '',
-        content: testDocumentContent
-      }
-    })).rejects.toThrow('Document path is required');
+    await expect(
+      useCase.execute({
+        branchName: testBranchName,
+        document: {
+          path: '',
+          content: testDocumentContent,
+        },
+      })
+    ).rejects.toThrow('Document path is required');
   });
 
   it('should throw ApplicationError when document content is missing', async () => {
     // Act & Assert
-    await expect(useCase.execute({
-      branchName: testBranchName,
-      document: {
-        path: testDocumentPath,
-        content: null as any
-      }
-    })).rejects.toThrow(ApplicationError);
+    await expect(
+      useCase.execute({
+        branchName: testBranchName,
+        document: {
+          path: testDocumentPath,
+          content: null as any,
+        },
+      })
+    ).rejects.toThrow(ApplicationError);
 
-    await expect(useCase.execute({
-      branchName: testBranchName,
-      document: {
-        path: testDocumentPath,
-        content: null as any
-      }
-    })).rejects.toThrow('Document content is required');
+    await expect(
+      useCase.execute({
+        branchName: testBranchName,
+        document: {
+          path: testDocumentPath,
+          content: null as any,
+        },
+      })
+    ).rejects.toThrow('Document content is required');
   });
 
   it('should wrap unknown errors as ApplicationError', async () => {
@@ -286,21 +304,25 @@ describe('WriteBranchDocumentUseCase', () => {
     });
 
     // Act & Assert
-    await expect(useCase.execute({
-      branchName: testBranchName,
-      document: {
-        path: testDocumentPath,
-        content: testDocumentContent
-      }
-    })).rejects.toThrow(ApplicationError);
+    await expect(
+      useCase.execute({
+        branchName: testBranchName,
+        document: {
+          path: testDocumentPath,
+          content: testDocumentContent,
+        },
+      })
+    ).rejects.toThrow(ApplicationError);
 
-    await expect(useCase.execute({
-      branchName: testBranchName,
-      document: {
-        path: testDocumentPath,
-        content: testDocumentContent
-      }
-    })).rejects.toThrow(`Failed to write document: Something went wrong`);
+    await expect(
+      useCase.execute({
+        branchName: testBranchName,
+        document: {
+          path: testDocumentPath,
+          content: testDocumentContent,
+        },
+      })
+    ).rejects.toThrow(`Failed to write document: Something went wrong`);
 
     // Verify error is properly wrapped
     try {
@@ -308,45 +330,48 @@ describe('WriteBranchDocumentUseCase', () => {
         branchName: testBranchName,
         document: {
           path: testDocumentPath,
-          content: testDocumentContent
-        }
+          content: testDocumentContent,
+        },
       });
 
       // If we get here, it means the expected error wasn't thrown
-      expect("No error was thrown").toBe("Error should have been thrown");
+      expect('No error was thrown').toBe('Error should have been thrown');
     } catch (error) {
       expect(error).toBeInstanceOf(ApplicationError);
-      expect((error as ApplicationError).code).toBe(`APP_ERROR.${ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED}`);
+      expect((error as ApplicationError).code).toBe(
+        `APP_ERROR.${ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED}`
+      );
       expect((error as ApplicationError).details).toEqual({ originalError: unknownError });
     }
   });
 
   it('should pass through domain errors without wrapping', async () => {
     // Arrange
-    const domainError = new DomainError(
-      'INVALID_BRANCH_NAME',
-      'Invalid branch name format'
-    );
+    const domainError = new DomainError('INVALID_BRANCH_NAME', 'Invalid branch name format');
 
     mockBranchRepository.exists.mockImplementation(() => {
       throw domainError;
     });
 
     // Act & Assert
-    await expect(useCase.execute({
-      branchName: testBranchName,
-      document: {
-        path: testDocumentPath,
-        content: testDocumentContent
-      }
-    })).rejects.toBe(domainError); // Should be the exact same error instance
+    await expect(
+      useCase.execute({
+        branchName: testBranchName,
+        document: {
+          path: testDocumentPath,
+          content: testDocumentContent,
+        },
+      })
+    ).rejects.toBe(domainError); // Should be the exact same error instance
 
-    await expect(useCase.execute({
-      branchName: testBranchName,
-      document: {
-        path: testDocumentPath,
-        content: testDocumentContent
-      }
-    })).rejects.toThrow('Invalid branch name format');
+    await expect(
+      useCase.execute({
+        branchName: testBranchName,
+        document: {
+          path: testDocumentPath,
+          content: testDocumentContent,
+        },
+      })
+    ).rejects.toThrow('Invalid branch name format');
   });
 });

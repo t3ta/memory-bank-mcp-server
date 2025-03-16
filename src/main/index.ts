@@ -31,15 +31,15 @@ export class Application {
   async initialize(): Promise<void> {
     try {
       logger.info('Initializing application...');
-      
+
       // Setup DI container
       const container = await setupContainer(this.options);
-      
+
       // Get controllers and tools
       this.globalController = container.get<IGlobalController>('globalController');
       this.branchController = container.get<IBranchController>('branchController');
       this.pullRequestTool = container.get<IPullRequestTool>('pullRequestTool');
-      
+
       logger.info('Application initialized successfully');
     } catch (error) {
       logger.error('Failed to initialize application:', error);
@@ -55,7 +55,7 @@ export class Application {
     if (!this.globalController) {
       throw new Error('Application not initialized. Call initialize() first.');
     }
-    
+
     return this.globalController;
   }
 
@@ -67,7 +67,7 @@ export class Application {
     if (!this.branchController) {
       throw new Error('Application not initialized. Call initialize() first.');
     }
-    
+
     return this.branchController;
   }
 
@@ -79,7 +79,7 @@ export class Application {
     if (!this.pullRequestTool) {
       throw new Error('Application not initialized. Call initialize() first.');
     }
-    
+
     return this.pullRequestTool;
   }
 }

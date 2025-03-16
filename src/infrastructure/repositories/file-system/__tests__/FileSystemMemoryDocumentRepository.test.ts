@@ -4,7 +4,10 @@ import { IFileSystemService } from '../../../storage/interfaces/IFileSystemServi
 import { DocumentPath } from '../../../../domain/entities/DocumentPath.js';
 import { MemoryDocument } from '../../../../domain/entities/MemoryDocument.js';
 import { Tag } from '../../../../domain/entities/Tag.js';
-import { InfrastructureError, InfrastructureErrorCodes } from '../../../../shared/errors/InfrastructureError.js';
+import {
+  InfrastructureError,
+  InfrastructureErrorCodes,
+} from '../../../../shared/errors/InfrastructureError.js';
 import { DomainError, DomainErrorCodes } from '../../../../shared/errors/DomainError.js';
 
 // Mock FileSystemService
@@ -17,7 +20,7 @@ const mockFileSystemService: jest.Mocked<IFileSystemService> = {
   createDirectory: jest.fn(),
   directoryExists: jest.fn(),
   listFiles: jest.fn(),
-  getFileStats: jest.fn()
+  getFileStats: jest.fn(),
 };
 
 // Mock utils functions
@@ -25,25 +28,42 @@ jest.mock('../../../../shared/utils/index.js', () => ({
   extractTags: jest.fn((content) => {
     const tagMatch = content.match(/tags:\s+((?:#[a-z0-9-]+\s*)+)/);
     if (tagMatch && tagMatch[1]) {
-      return tagMatch[1].trim().split(/\s+/).map((tag: string) => tag.substring(1));
+      return tagMatch[1]
+        .trim()
+        .split(/\s+/)
+        .map((tag: string) => tag.substring(1));
     }
     return [];
-  })
+  }),
 }));
+
+// Mock logger
+jest.mock('../../../../shared/utils/logger.js', () => ({
+  logger: {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+}));
+
+// Import logger after mocking
+import { logger } from '../../../../shared/utils/logger.js';
 
 describe('FileSystemMemoryDocumentRepository', () => {
   let repository: FileSystemMemoryDocumentRepository;
   const basePath = '/test/docs';
-  
+
   beforeEach(() => {
     // Reset all mocks
     jest.clearAllMocks();
-    
+
     // Create repository
     repository = new FileSystemMemoryDocumentRepository(basePath, mockFileSystemService);
-    
+
     // Suppress console output in tests
     jest.spyOn(console, 'error').mockImplementation(() => {});
+    jest.clearAllMocks(); // Clear all mocks including logger
   });
 
   afterEach(() => {
@@ -56,7 +76,7 @@ describe('FileSystemMemoryDocumentRepository', () => {
       const docPath = DocumentPath.create('test.md');
       const fullPath = path.join(basePath, 'test.md');
       const content = '# Test Document\n\ntags: #test #document\n\nTest content';
-      
+
       mockFileSystemService.fileExists.mockResolvedValue(true);
       mockFileSystemService.readFile.mockResolvedValue(content);
       mockFileSystemService.getFileStats.mockResolvedValue({
@@ -64,12 +84,12 @@ describe('FileSystemMemoryDocumentRepository', () => {
         isDirectory: false,
         isFile: true,
         lastModified: new Date('2023-01-01T00:00:00.000Z'),
-        createdAt: new Date('2023-01-01T00:00:00.000Z')
+        createdAt: new Date('2023-01-01T00:00:00.000Z'),
       });
-      
+
       // Act
       const result = await repository.findByPath(docPath);
-      
+
       // Assert
       expect(result).toBeDefined();
       expect(result?.path.value).toBe('test.md');
@@ -78,7 +98,7 @@ describe('FileSystemMemoryDocumentRepository', () => {
       expect(result?.tags[0].value).toBe('test');
       expect(result?.tags[1].value).toBe('document');
       expect(result?.lastModified.toISOString()).toBe('2023-01-01T00:00:00.000Z');
-      
+
       // Verify fileSystemService calls
       expect(mockFileSystemService.fileExists).toHaveBeenCalledWith(fullPath);
       expect(mockFileSystemService.readFile).toHaveBeenCalledWith(fullPath);
@@ -89,12 +109,12 @@ describe('FileSystemMemoryDocumentRepository', () => {
       // Arrange
       const docPath = DocumentPath.create('nonexistent.md');
       const fullPath = path.join(basePath, 'nonexistent.md');
-      
+
       mockFileSystemService.fileExists.mockResolvedValue(false);
-      
+
       // Act
       const result = await repository.findByPath(docPath);
-      
+
       // Assert
       expect(result).toBeNull();
       expect(mockFileSystemService.fileExists).toHaveBeenCalledWith(fullPath);
@@ -109,13 +129,13 @@ describe('FileSystemMemoryDocumentRepository', () => {
         InfrastructureErrorCodes.FILE_NOT_FOUND,
         'File not found'
       );
-      
+
       mockFileSystemService.fileExists.mockResolvedValue(true);
       mockFileSystemService.readFile.mockRejectedValue(notFoundError);
-      
+
       // Act
       const result = await repository.findByPath(docPath);
-      
+
       // Assert
       expect(result).toBeNull();
     });
@@ -127,14 +147,16 @@ describe('FileSystemMemoryDocumentRepository', () => {
         DomainErrorCodes.INVALID_TAG_FORMAT,
         'Invalid tag format'
       );
-      
+
       mockFileSystemService.fileExists.mockResolvedValue(true);
       mockFileSystemService.readFile.mockResolvedValue('content');
       // Simulate error during tag extraction
-      require('../../../../shared/utils/index.js').extractTags.mockImplementation(() => {
-        throw domainError;
-      });
-      
+      jest
+        .mocked(jest.requireMock('../../../../shared/utils/index.js'))
+        .extractTags.mockImplementation(() => {
+          throw domainError;
+        });
+
       // Act & Assert
       await expect(repository.findByPath(docPath)).rejects.toThrow(DomainError);
       await expect(repository.findByPath(docPath)).rejects.toThrow('Invalid tag format');
@@ -147,10 +169,10 @@ describe('FileSystemMemoryDocumentRepository', () => {
         InfrastructureErrorCodes.FILE_READ_ERROR,
         'Failed to read file'
       );
-      
+
       mockFileSystemService.fileExists.mockResolvedValue(true);
       mockFileSystemService.readFile.mockRejectedValue(infraError);
-      
+
       // Act & Assert
       await expect(repository.findByPath(docPath)).rejects.toThrow(InfrastructureError);
       await expect(repository.findByPath(docPath)).rejects.toThrow('Failed to read file');
@@ -160,18 +182,22 @@ describe('FileSystemMemoryDocumentRepository', () => {
       // Arrange
       const docPath = DocumentPath.create('test.md');
       const error = new Error('Unknown error');
-      
+
       mockFileSystemService.fileExists.mockResolvedValue(true);
       mockFileSystemService.readFile.mockRejectedValue(error);
-      
+
       // Act & Assert
       await expect(repository.findByPath(docPath)).rejects.toThrow(InfrastructureError);
-      await expect(repository.findByPath(docPath)).rejects.toThrow(`Failed to find document by path: ${docPath.value}`);
-      
+      await expect(repository.findByPath(docPath)).rejects.toThrow(
+        `Failed to find document by path: ${docPath.value}`
+      );
+
       try {
         await repository.findByPath(docPath);
       } catch (e) {
-        expect((e as InfrastructureError).code).toBe(`INFRA_ERROR.${InfrastructureErrorCodes.FILE_READ_ERROR}`);
+        expect((e as InfrastructureError).code).toBe(
+          `INFRA_ERROR.${InfrastructureErrorCodes.FILE_READ_ERROR}`
+        );
         expect((e as InfrastructureError).details).toEqual({ originalError: error });
       }
     });
@@ -185,47 +211,49 @@ describe('FileSystemMemoryDocumentRepository', () => {
         path.join(basePath, 'doc1.md'),
         path.join(basePath, 'doc2.md'),
         path.join(basePath, 'doc3.md'),
-        path.join(basePath, 'not-markdown.txt')
+        path.join(basePath, 'not-markdown.txt'),
       ];
-      
+
       // Mock listFiles to return file paths
       mockFileSystemService.listFiles.mockResolvedValue(files);
-      
+
       // Mock findByPath for different documents
-      const findByPathSpy = jest.spyOn(repository, 'findByPath').mockImplementation(async (docPath: DocumentPath) => {
-        if (docPath.value === 'doc1.md') {
-          return MemoryDocument.create({
-            path: docPath,
-            content: '# Doc 1\n\ntags: #architecture #design\n\nContent',
-            tags: [Tag.create('architecture'), Tag.create('design')],
-            lastModified: new Date('2023-01-01T00:00:00.000Z')
-          });
-        } else if (docPath.value === 'doc2.md') {
-          return MemoryDocument.create({
-            path: docPath,
-            content: '# Doc 2\n\ntags: #ui #design\n\nContent',
-            tags: [Tag.create('ui'), Tag.create('design')],
-            lastModified: new Date('2023-01-01T00:00:00.000Z')
-          });
-        } else if (docPath.value === 'doc3.md') {
-          return MemoryDocument.create({
-            path: docPath,
-            content: '# Doc 3\n\ntags: #architecture #api\n\nContent',
-            tags: [Tag.create('architecture'), Tag.create('api')],
-            lastModified: new Date('2023-01-01T00:00:00.000Z')
-          });
-        }
-        return null;
-      });
-      
+      const findByPathSpy = jest
+        .spyOn(repository, 'findByPath')
+        .mockImplementation(async (docPath: DocumentPath) => {
+          if (docPath.value === 'doc1.md') {
+            return MemoryDocument.create({
+              path: docPath,
+              content: '# Doc 1\n\ntags: #architecture #design\n\nContent',
+              tags: [Tag.create('architecture'), Tag.create('design')],
+              lastModified: new Date('2023-01-01T00:00:00.000Z'),
+            });
+          } else if (docPath.value === 'doc2.md') {
+            return MemoryDocument.create({
+              path: docPath,
+              content: '# Doc 2\n\ntags: #ui #design\n\nContent',
+              tags: [Tag.create('ui'), Tag.create('design')],
+              lastModified: new Date('2023-01-01T00:00:00.000Z'),
+            });
+          } else if (docPath.value === 'doc3.md') {
+            return MemoryDocument.create({
+              path: docPath,
+              content: '# Doc 3\n\ntags: #architecture #api\n\nContent',
+              tags: [Tag.create('architecture'), Tag.create('api')],
+              lastModified: new Date('2023-01-01T00:00:00.000Z'),
+            });
+          }
+          return null;
+        });
+
       // Act
       const result = await repository.findByTags(tagsToFind);
-      
+
       // Assert
       expect(result).toHaveLength(2); // Should find 2 documents with 'architecture' tag
       expect(result[0].path.value).toBe('doc1.md');
       expect(result[1].path.value).toBe('doc3.md');
-      
+
       // Restore all spies
       findByPathSpy.mockRestore();
       jest.restoreAllMocks();
@@ -234,30 +262,29 @@ describe('FileSystemMemoryDocumentRepository', () => {
     it('should return empty array when no documents match tags', async () => {
       // Arrange
       const tagsToFind = [Tag.create('nonexistent')];
-      const files = [
-        path.join(basePath, 'doc1.md'),
-        path.join(basePath, 'doc2.md')
-      ];
-      
+      const files = [path.join(basePath, 'doc1.md'), path.join(basePath, 'doc2.md')];
+
       // Mock listFiles to return file paths
       mockFileSystemService.listFiles.mockResolvedValue(files);
-      
+
       // Mock findByPath to return documents without the searched tag
-      const findByPathSpy = jest.spyOn(repository, 'findByPath').mockImplementation(async (docPath: DocumentPath) => {
-        return MemoryDocument.create({
-          path: docPath,
-          content: '# Doc\n\ntags: #other #tag\n\nContent',
-          tags: [Tag.create('other'), Tag.create('tag')],
-          lastModified: new Date('2023-01-01T00:00:00.000Z')
+      const findByPathSpy = jest
+        .spyOn(repository, 'findByPath')
+        .mockImplementation(async (docPath: DocumentPath) => {
+          return MemoryDocument.create({
+            path: docPath,
+            content: '# Doc\n\ntags: #other #tag\n\nContent',
+            tags: [Tag.create('other'), Tag.create('tag')],
+            lastModified: new Date('2023-01-01T00:00:00.000Z'),
+          });
         });
-      });
-      
+
       // Act
       const result = await repository.findByTags(tagsToFind);
-      
+
       // Assert
       expect(result).toHaveLength(0);
-      
+
       // Restore all spies
       findByPathSpy.mockRestore();
       jest.restoreAllMocks();
@@ -266,39 +293,38 @@ describe('FileSystemMemoryDocumentRepository', () => {
     it('should handle errors when reading files and continue with valid ones', async () => {
       // Arrange
       const tagsToFind = [Tag.create('architecture')];
-      const files = [
-        path.join(basePath, 'valid.md'),
-        path.join(basePath, 'error.md')
-      ];
-      
+      const files = [path.join(basePath, 'valid.md'), path.join(basePath, 'error.md')];
+
       // Mock listFiles to return file paths
       mockFileSystemService.listFiles.mockResolvedValue(files);
-      
+
       // Mock findByPath to succeed for one file and fail for another
-      const findByPathSpy = jest.spyOn(repository, 'findByPath').mockImplementation(async (docPath: DocumentPath) => {
-        if (docPath.value === 'valid.md') {
-          return MemoryDocument.create({
-            path: docPath,
-            content: '# Doc\n\ntags: #architecture\n\nContent',
-            tags: [Tag.create('architecture')],
-            lastModified: new Date('2023-01-01T00:00:00.000Z')
-          });
-        } else if (docPath.value === 'error.md') {
-          throw new Error('Error reading file');
-        }
-        return null;
-      });
-      
+      const findByPathSpy = jest
+        .spyOn(repository, 'findByPath')
+        .mockImplementation(async (docPath: DocumentPath) => {
+          if (docPath.value === 'valid.md') {
+            return MemoryDocument.create({
+              path: docPath,
+              content: '# Doc\n\ntags: #architecture\n\nContent',
+              tags: [Tag.create('architecture')],
+              lastModified: new Date('2023-01-01T00:00:00.000Z'),
+            });
+          } else if (docPath.value === 'error.md') {
+            throw new Error('Error reading file');
+          }
+          return null;
+        });
+
       // Act
       const result = await repository.findByTags(tagsToFind);
-      
+
       // Assert
       expect(result).toHaveLength(1); // Should still find the valid document
       expect(result[0].path.value).toBe('valid.md');
-      
+
       // Verify error was logged
-      expect(console.error).toHaveBeenCalled();
-      
+      expect(logger.error).toHaveBeenCalled();
+
       // Restore all spies
       findByPathSpy.mockRestore();
       jest.restoreAllMocks();
@@ -311,9 +337,9 @@ describe('FileSystemMemoryDocumentRepository', () => {
         DomainErrorCodes.INVALID_DOCUMENT_PATH,
         'Invalid document path'
       );
-      
+
       mockFileSystemService.listFiles.mockRejectedValue(domainError);
-      
+
       // Act & Assert
       await expect(repository.findByTags(tagsToFind)).rejects.toThrow(DomainError);
       await expect(repository.findByTags(tagsToFind)).rejects.toThrow('Invalid document path');
@@ -326,9 +352,9 @@ describe('FileSystemMemoryDocumentRepository', () => {
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
         'File system error'
       );
-      
+
       mockFileSystemService.listFiles.mockRejectedValue(infraError);
-      
+
       // Act & Assert
       await expect(repository.findByTags(tagsToFind)).rejects.toThrow(InfrastructureError);
       await expect(repository.findByTags(tagsToFind)).rejects.toThrow('File system error');
@@ -338,17 +364,21 @@ describe('FileSystemMemoryDocumentRepository', () => {
       // Arrange
       const tagsToFind = [Tag.create('architecture')];
       const error = new Error('Unknown error');
-      
+
       mockFileSystemService.listFiles.mockRejectedValue(error);
-      
+
       // Act & Assert
       await expect(repository.findByTags(tagsToFind)).rejects.toThrow(InfrastructureError);
-      await expect(repository.findByTags(tagsToFind)).rejects.toThrow('Failed to find documents by tags');
-      
+      await expect(repository.findByTags(tagsToFind)).rejects.toThrow(
+        'Failed to find documents by tags'
+      );
+
       try {
         await repository.findByTags(tagsToFind);
       } catch (e) {
-        expect((e as InfrastructureError).code).toBe(`INFRA_ERROR.${InfrastructureErrorCodes.FILE_SYSTEM_ERROR}`);
+        expect((e as InfrastructureError).code).toBe(
+          `INFRA_ERROR.${InfrastructureErrorCodes.FILE_SYSTEM_ERROR}`
+        );
         expect((e as InfrastructureError).details).toEqual({ originalError: error });
       }
     });
@@ -364,14 +394,14 @@ describe('FileSystemMemoryDocumentRepository', () => {
         path: docPath,
         content,
         tags: [Tag.create('test'), Tag.create('document')],
-        lastModified: new Date('2023-01-01T00:00:00.000Z')
+        lastModified: new Date('2023-01-01T00:00:00.000Z'),
       });
-      
+
       mockFileSystemService.writeFile.mockResolvedValue();
-      
+
       // Act
       await repository.save(document);
-      
+
       // Assert
       expect(mockFileSystemService.writeFile).toHaveBeenCalledWith(
         fullPath,
@@ -392,14 +422,14 @@ describe('FileSystemMemoryDocumentRepository', () => {
         path: docPath,
         content,
         tags: [Tag.create('new'), Tag.create('updated')],
-        lastModified: new Date('2023-01-01T00:00:00.000Z')
+        lastModified: new Date('2023-01-01T00:00:00.000Z'),
       });
-      
+
       mockFileSystemService.writeFile.mockResolvedValue();
-      
+
       // Act
       await repository.save(document);
-      
+
       // Assert
       expect(mockFileSystemService.writeFile).toHaveBeenCalledWith(
         fullPath,
@@ -420,14 +450,14 @@ describe('FileSystemMemoryDocumentRepository', () => {
         path: docPath,
         content,
         tags: [],
-        lastModified: new Date('2023-01-01T00:00:00.000Z')
+        lastModified: new Date('2023-01-01T00:00:00.000Z'),
       });
-      
+
       mockFileSystemService.writeFile.mockResolvedValue();
-      
+
       // Act
       await repository.save(document);
-      
+
       // Assert
       expect(mockFileSystemService.writeFile).toHaveBeenCalledWith(
         fullPath,
@@ -443,16 +473,16 @@ describe('FileSystemMemoryDocumentRepository', () => {
         path: docPath,
         content,
         tags: [Tag.create('test')],
-        lastModified: new Date('2023-01-01T00:00:00.000Z')
+        lastModified: new Date('2023-01-01T00:00:00.000Z'),
       });
-      
+
       const domainError = new DomainError(
         DomainErrorCodes.INVALID_DOCUMENT_PATH,
         'Invalid document path'
       );
-      
+
       mockFileSystemService.writeFile.mockRejectedValue(domainError);
-      
+
       // Act & Assert
       await expect(repository.save(document)).rejects.toThrow(DomainError);
       await expect(repository.save(document)).rejects.toThrow('Invalid document path');
@@ -466,16 +496,16 @@ describe('FileSystemMemoryDocumentRepository', () => {
         path: docPath,
         content,
         tags: [Tag.create('test')],
-        lastModified: new Date('2023-01-01T00:00:00.000Z')
+        lastModified: new Date('2023-01-01T00:00:00.000Z'),
       });
-      
+
       const infraError = new InfrastructureError(
         InfrastructureErrorCodes.FILE_WRITE_ERROR,
         'Failed to write file'
       );
-      
+
       mockFileSystemService.writeFile.mockRejectedValue(infraError);
-      
+
       // Act & Assert
       await expect(repository.save(document)).rejects.toThrow(InfrastructureError);
       await expect(repository.save(document)).rejects.toThrow('Failed to write file');
@@ -489,21 +519,25 @@ describe('FileSystemMemoryDocumentRepository', () => {
         path: docPath,
         content,
         tags: [Tag.create('test')],
-        lastModified: new Date('2023-01-01T00:00:00.000Z')
+        lastModified: new Date('2023-01-01T00:00:00.000Z'),
       });
-      
+
       const error = new Error('Unknown error');
-      
+
       mockFileSystemService.writeFile.mockRejectedValue(error);
-      
+
       // Act & Assert
       await expect(repository.save(document)).rejects.toThrow(InfrastructureError);
-      await expect(repository.save(document)).rejects.toThrow(`Failed to save document: ${docPath.value}`);
-      
+      await expect(repository.save(document)).rejects.toThrow(
+        `Failed to save document: ${docPath.value}`
+      );
+
       try {
         await repository.save(document);
       } catch (e) {
-        expect((e as InfrastructureError).code).toBe(`INFRA_ERROR.${InfrastructureErrorCodes.FILE_WRITE_ERROR}`);
+        expect((e as InfrastructureError).code).toBe(
+          `INFRA_ERROR.${InfrastructureErrorCodes.FILE_WRITE_ERROR}`
+        );
         expect((e as InfrastructureError).details).toEqual({ originalError: error });
       }
     });
@@ -514,12 +548,12 @@ describe('FileSystemMemoryDocumentRepository', () => {
       // Arrange
       const docPath = DocumentPath.create('test.md');
       const fullPath = path.join(basePath, 'test.md');
-      
+
       mockFileSystemService.deleteFile.mockResolvedValue(true);
-      
+
       // Act
       const result = await repository.delete(docPath);
-      
+
       // Assert
       expect(result).toBe(true);
       expect(mockFileSystemService.deleteFile).toHaveBeenCalledWith(fullPath);
@@ -528,12 +562,12 @@ describe('FileSystemMemoryDocumentRepository', () => {
     it('should return false when deletion fails', async () => {
       // Arrange
       const docPath = DocumentPath.create('test.md');
-      
+
       mockFileSystemService.deleteFile.mockResolvedValue(false);
-      
+
       // Act
       const result = await repository.delete(docPath);
-      
+
       // Assert
       expect(result).toBe(false);
     });
@@ -545,9 +579,9 @@ describe('FileSystemMemoryDocumentRepository', () => {
         DomainErrorCodes.INVALID_DOCUMENT_PATH,
         'Invalid document path'
       );
-      
+
       mockFileSystemService.deleteFile.mockRejectedValue(domainError);
-      
+
       // Act & Assert
       await expect(repository.delete(docPath)).rejects.toThrow(DomainError);
       await expect(repository.delete(docPath)).rejects.toThrow('Invalid document path');
@@ -560,9 +594,9 @@ describe('FileSystemMemoryDocumentRepository', () => {
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
         'File system error'
       );
-      
+
       mockFileSystemService.deleteFile.mockRejectedValue(infraError);
-      
+
       // Act & Assert
       await expect(repository.delete(docPath)).rejects.toThrow(InfrastructureError);
       await expect(repository.delete(docPath)).rejects.toThrow('File system error');
@@ -572,17 +606,21 @@ describe('FileSystemMemoryDocumentRepository', () => {
       // Arrange
       const docPath = DocumentPath.create('test.md');
       const error = new Error('Unknown error');
-      
+
       mockFileSystemService.deleteFile.mockRejectedValue(error);
-      
+
       // Act & Assert
       await expect(repository.delete(docPath)).rejects.toThrow(InfrastructureError);
-      await expect(repository.delete(docPath)).rejects.toThrow(`Failed to delete document: ${docPath.value}`);
-      
+      await expect(repository.delete(docPath)).rejects.toThrow(
+        `Failed to delete document: ${docPath.value}`
+      );
+
       try {
         await repository.delete(docPath);
       } catch (e) {
-        expect((e as InfrastructureError).code).toBe(`INFRA_ERROR.${InfrastructureErrorCodes.FILE_SYSTEM_ERROR}`);
+        expect((e as InfrastructureError).code).toBe(
+          `INFRA_ERROR.${InfrastructureErrorCodes.FILE_SYSTEM_ERROR}`
+        );
         expect((e as InfrastructureError).details).toEqual({ originalError: error });
       }
     });
@@ -595,14 +633,14 @@ describe('FileSystemMemoryDocumentRepository', () => {
         path.join(basePath, 'doc1.md'),
         path.join(basePath, 'doc2.md'),
         path.join(basePath, 'subdir/doc3.md'),
-        path.join(basePath, 'not-markdown.txt')
+        path.join(basePath, 'not-markdown.txt'),
       ];
-      
+
       mockFileSystemService.listFiles.mockResolvedValue(files);
-      
+
       // Act
       const results = await repository.list();
-      
+
       // Assert
       expect(results).toHaveLength(3); // Should only include .md files
       expect(results[0].value).toBe('doc1.md');
@@ -611,51 +649,53 @@ describe('FileSystemMemoryDocumentRepository', () => {
     });
 
     it('should handle invalid document paths and continue with valid ones', async () => {
-      // Arrange
+      // Set up the files to list
       const files = [
         path.join(basePath, 'valid.md'),
-        path.join(basePath, '../invalid.md') // This path contains '..' which should be filtered out
+        path.join(basePath, '..', 'invalid.md') // This path is outside the base directory
       ];
-      
+
       mockFileSystemService.listFiles.mockResolvedValue(files);
-      
+
       // Mock DocumentPath.create to throw error for invalid path
       jest.spyOn(DocumentPath, 'create').mockImplementation((pathStr) => {
         if (pathStr === 'valid.md') {
           return { value: 'valid.md' } as unknown as DocumentPath;
         }
         if (pathStr === '../invalid.md') {
-          throw new DomainError(
-            DomainErrorCodes.INVALID_DOCUMENT_PATH,
-            'Invalid document path'
-          );
+          throw new DomainError(DomainErrorCodes.INVALID_DOCUMENT_PATH, 'Invalid document path');
         }
         return { value: pathStr } as unknown as DocumentPath;
       });
-      
+
       // Mock path.relative to return the path strings
       jest.spyOn(path, 'relative').mockImplementation((from, to) => {
-        if (to.includes('valid.md')) return 'valid.md';
-        if (to.includes('invalid.md')) return '../invalid.md';
+        console.log('DEBUG path.relative:', { from, to });
+        if (to === path.join(basePath, 'valid.md')) {
+          return 'valid.md';
+        }
+        if (to === path.join(basePath, '..', 'invalid.md')) {
+          return '../invalid.md';
+        }
         return '';
       });
-      
+
       // Act
       const results = await repository.list();
-      
+
       // Assert
       expect(results).toHaveLength(1); // Only the valid path should be included
       expect(results[0].value).toBe('valid.md');
-      expect(console.error).toHaveBeenCalled(); // Error should be logged for invalid path
+      expect(logger.error).toHaveBeenCalled(); // Error should be logged for invalid path
     });
 
     it('should return empty array when no documents found', async () => {
       // Arrange
       mockFileSystemService.listFiles.mockResolvedValue([]);
-      
+
       // Act
       const results = await repository.list();
-      
+
       // Assert
       expect(results).toHaveLength(0);
     });
@@ -666,9 +706,9 @@ describe('FileSystemMemoryDocumentRepository', () => {
         DomainErrorCodes.INVALID_DOCUMENT_PATH,
         'Invalid document path'
       );
-      
+
       mockFileSystemService.listFiles.mockRejectedValue(domainError);
-      
+
       // Act & Assert
       await expect(repository.list()).rejects.toThrow(DomainError);
       await expect(repository.list()).rejects.toThrow('Invalid document path');
@@ -680,9 +720,9 @@ describe('FileSystemMemoryDocumentRepository', () => {
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
         'File system error'
       );
-      
+
       mockFileSystemService.listFiles.mockRejectedValue(infraError);
-      
+
       // Act & Assert
       await expect(repository.list()).rejects.toThrow(InfrastructureError);
       await expect(repository.list()).rejects.toThrow('File system error');
@@ -691,17 +731,19 @@ describe('FileSystemMemoryDocumentRepository', () => {
     it('should handle and wrap other errors', async () => {
       // Arrange
       const error = new Error('Unknown error');
-      
+
       mockFileSystemService.listFiles.mockRejectedValue(error);
-      
+
       // Act & Assert
       await expect(repository.list()).rejects.toThrow(InfrastructureError);
       await expect(repository.list()).rejects.toThrow('Failed to list documents');
-      
+
       try {
         await repository.list();
       } catch (e) {
-        expect((e as InfrastructureError).code).toBe(`INFRA_ERROR.${InfrastructureErrorCodes.FILE_SYSTEM_ERROR}`);
+        expect((e as InfrastructureError).code).toBe(
+          `INFRA_ERROR.${InfrastructureErrorCodes.FILE_SYSTEM_ERROR}`
+        );
         expect((e as InfrastructureError).details).toEqual({ originalError: error });
       }
     });
@@ -711,10 +753,10 @@ describe('FileSystemMemoryDocumentRepository', () => {
     it('should resolve paths correctly', () => {
       // Arrange
       const documentPath = 'test.md';
-      
+
       // Act
       const result = (repository as any).resolvePath(documentPath);
-      
+
       // Assert
       expect(result).toBe(path.join(basePath, documentPath));
     });
@@ -722,10 +764,10 @@ describe('FileSystemMemoryDocumentRepository', () => {
     it('should normalize paths', () => {
       // Arrange
       const documentPath = 'subdir/../test.md';
-      
+
       // Act
       const result = (repository as any).resolvePath(documentPath);
-      
+
       // Assert
       expect(result).toBe(path.join(basePath, 'test.md'));
     });
@@ -733,15 +775,17 @@ describe('FileSystemMemoryDocumentRepository', () => {
     it('should throw InfrastructureError for path traversal attempts', () => {
       // Arrange
       const documentPath = '../outside.md';
-      
+
       // Act & Assert
       expect(() => (repository as any).resolvePath(documentPath)).toThrow(InfrastructureError);
       expect(() => (repository as any).resolvePath(documentPath)).toThrow('Invalid document path');
-      
+
       try {
         (repository as any).resolvePath(documentPath);
       } catch (e) {
-        expect((e as InfrastructureError).code).toBe(`INFRA_ERROR.${InfrastructureErrorCodes.FILE_SYSTEM_ERROR}`);
+        expect((e as InfrastructureError).code).toBe(
+          `INFRA_ERROR.${InfrastructureErrorCodes.FILE_SYSTEM_ERROR}`
+        );
       }
     });
   });

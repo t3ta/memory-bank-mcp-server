@@ -3,7 +3,10 @@ import { IBranchMemoryBankRepository } from '../../../domain/repositories/IBranc
 import { IGlobalMemoryBankRepository } from '../../../domain/repositories/IGlobalMemoryBankRepository.js';
 import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
 import { Tag } from '../../../domain/entities/Tag.js';
-import { ApplicationError, ApplicationErrorCodes } from '../../../shared/errors/ApplicationError.js';
+import {
+  ApplicationError,
+  ApplicationErrorCodes,
+} from '../../../shared/errors/ApplicationError.js';
 import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
 
 /**
@@ -14,7 +17,7 @@ export interface UpdateTagIndexInput {
    * Branch name (optional - if not provided, updates global tag index)
    */
   branchName?: string;
-  
+
   /**
    * Whether to perform a full rebuild of the index (default: false)
    */
@@ -29,12 +32,12 @@ export interface UpdateTagIndexOutput {
    * List of all unique tags found
    */
   tags: string[];
-  
+
   /**
    * Number of documents indexed
    */
   documentCount: number;
-  
+
   /**
    * Information about the update
    */
@@ -43,12 +46,12 @@ export interface UpdateTagIndexOutput {
      * Whether a full rebuild was performed
      */
     fullRebuild: boolean;
-    
+
     /**
      * Where the update was performed (branch name or 'global')
      */
     updateLocation: string;
-    
+
     /**
      * When the update was performed
      */
@@ -80,79 +83,79 @@ export class UpdateTagIndexUseCase implements IUseCase<UpdateTagIndexInput, Upda
       // Set default values
       const fullRebuild = input.fullRebuild ?? false;
       const updateLocation = input.branchName ? input.branchName : 'global';
-      
+
       let documentCount = 0;
       let allTags: Tag[] = [];
-      
+
       // Update tag index in either branch or global memory bank
       if (input.branchName) {
         // Check if branch exists
         const branchExists = await this.branchRepository.exists(input.branchName);
-        
+
         if (!branchExists) {
           throw new DomainError(
             DomainErrorCodes.BRANCH_NOT_FOUND,
             `Branch "${input.branchName}" not found`
           );
         }
-        
+
         // Create branch info
         const branchInfo = BranchInfo.create(input.branchName);
-        
+
         // Get all documents in branch
         const documentPaths = await this.branchRepository.listDocuments(branchInfo);
         documentCount = documentPaths.length;
-        
+
         // Collect all tags
         const tagSet = new Set<string>();
-        
+
         for (const path of documentPaths) {
           const document = await this.branchRepository.getDocument(branchInfo, path);
           if (document) {
-            document.tags.forEach(tag => tagSet.add(tag.value));
+            document.tags.forEach((tag) => tagSet.add(tag.value));
           }
         }
-        
-        allTags = Array.from(tagSet).map(tag => Tag.create(tag));
-        
+
+        allTags = Array.from(tagSet).map((tag) => Tag.create(tag));
+
         // In a real implementation, we would update a tag index persistently here
         // For now, we're just collecting the tags for the response
       } else {
         // Update global tag index
         const documentPaths = await this.globalRepository.listDocuments();
         documentCount = documentPaths.length;
-        
+
         // Collect all tags
         const tagSet = new Set<string>();
-        
+
         for (const path of documentPaths) {
           const document = await this.globalRepository.getDocument(path);
           if (document) {
-            document.tags.forEach(tag => tagSet.add(tag.value));
+            document.tags.forEach((tag) => tagSet.add(tag.value));
           }
         }
-        
-        allTags = Array.from(tagSet).map(tag => Tag.create(tag));
-        
+
+        allTags = Array.from(tagSet).map((tag) => Tag.create(tag));
+
         // In a real implementation, we would update a tag index persistently here
         // For now, we're just collecting the tags for the response
       }
-      
+
       return {
-        tags: allTags.map(tag => tag.value),
+        tags: allTags.map((tag) => tag.value),
         documentCount,
         updateInfo: {
           fullRebuild,
           updateLocation,
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       };
     } catch (error) {
       // Re-throw domain and application errors
       if (error instanceof DomainError || error instanceof ApplicationError) {
         throw error;
       }
-      
+
       // Wrap other errors
       throw new ApplicationError(
         ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,

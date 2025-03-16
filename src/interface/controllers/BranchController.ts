@@ -19,11 +19,13 @@ import { logger } from '../../shared/utils/logger.js';
  * Handles incoming requests related to branch memory banks
  */
 export class BranchController implements IBranchController {
+  readonly _type = 'controller' as const;
+
   private readonly coreFiles = [
     'branchContext.md',
     'activeContext.md',
     'systemPatterns.md',
-    'progress.md'
+    'progress.md',
   ];
 
   /**
@@ -57,12 +59,12 @@ export class BranchController implements IBranchController {
   async readDocument(branchName: string, path: string): Promise<MCPResponse<DocumentDTO>> {
     try {
       logger.info(`Reading document from branch ${branchName}: ${path}`);
-      
-      const result = await this.readBranchDocumentUseCase.execute({ 
-        branchName, 
-        path 
+
+      const result = await this.readBranchDocumentUseCase.execute({
+        branchName,
+        path,
       });
-      
+
       return this.presenter.present(result.document);
     } catch (error) {
       return this.handleError(error);
@@ -77,19 +79,24 @@ export class BranchController implements IBranchController {
    * @param tags Optional tags for the document
    * @returns Promise resolving to MCP response with the result
    */
-  async writeDocument(branchName: string, path: string, content: string, tags?: string[]): Promise<MCPResponse> {
+  async writeDocument(
+    branchName: string,
+    path: string,
+    content: string,
+    tags?: string[]
+  ): Promise<MCPResponse> {
     try {
       logger.info(`Writing document to branch ${branchName}: ${path}`);
-      
+
       const result = await this.writeBranchDocumentUseCase.execute({
         branchName,
         document: {
           path,
           content,
-          tags: tags || []
-        }
+          tags: tags || [],
+        },
       });
-      
+
       return this.presenter.present(result);
     } catch (error) {
       return this.handleError(error);
@@ -104,66 +111,66 @@ export class BranchController implements IBranchController {
   async readCoreFiles(branchName: string): Promise<MCPResponse<Record<string, DocumentDTO>>> {
     try {
       logger.info(`Reading core files from branch ${branchName}`);
-      
+
       // Use the new ReadBranchCoreFilesUseCase
       const result = await this.readBranchCoreFilesUseCase.execute({
-        branchName
+        branchName,
       });
-      
+
       // Format response to maintain backward compatibility
       const formattedResult: Record<string, DocumentDTO> = {};
-      
+
       // If activeContext exists in the result
       if (result.files.activeContext) {
         formattedResult['activeContext.md'] = {
           path: 'activeContext.md',
           content: this.generateActiveContextContent(result.files.activeContext),
           tags: ['core', 'active-context'],
-          lastModified: new Date().toISOString()
+          lastModified: new Date().toISOString(),
         };
       }
-      
+
       // If progress exists in the result
       if (result.files.progress) {
         formattedResult['progress.md'] = {
           path: 'progress.md',
           content: this.generateProgressContent(result.files.progress),
           tags: ['core', 'progress'],
-          lastModified: new Date().toISOString()
+          lastModified: new Date().toISOString(),
         };
       }
-      
+
       // If systemPatterns exists in the result
       if (result.files.systemPatterns) {
         formattedResult['systemPatterns.md'] = {
           path: 'systemPatterns.md',
           content: this.generateSystemPatternsContent(result.files.systemPatterns),
           tags: ['core', 'system-patterns'],
-          lastModified: new Date().toISOString()
+          lastModified: new Date().toISOString(),
         };
       }
-      
+
       // For branchContext.md, we still use the old approach
       // since it's not included in the core files DTO
       try {
         const branchContextResult = await this.readBranchDocumentUseCase.execute({
           branchName,
-          path: 'branchContext.md'
+          path: 'branchContext.md',
         });
-        
+
         formattedResult['branchContext.md'] = branchContextResult.document;
       } catch (error) {
         logger.error(`Error reading branchContext.md from branch ${branchName}:`, error);
-        
+
         // Add empty placeholder for missing file
         formattedResult['branchContext.md'] = {
           path: 'branchContext.md',
           content: '',
           tags: ['core', 'branch-context'],
-          lastModified: new Date().toISOString()
+          lastModified: new Date().toISOString(),
         };
       }
-      
+
       return this.presenter.present(formattedResult);
     } catch (error) {
       return this.handleError(error);
@@ -179,62 +186,59 @@ export class BranchController implements IBranchController {
   async writeCoreFiles(branchName: string, files: Record<string, any>): Promise<MCPResponse> {
     try {
       logger.info(`Writing core files to branch ${branchName}`);
-      
+
       // Validate input
       if (!files || typeof files !== 'object') {
-        throw new DomainError(
-          'INVALID_INPUT',
-          'Files must be provided as an object'
-        );
+        throw new DomainError('INVALID_INPUT', 'Files must be provided as an object');
       }
-      
+
       // Handle branchContext.md separately since it's not part of the CoreFilesDTO
       if (files['branchContext.md']) {
         const content = this.extractContent(files['branchContext.md']);
-        
+
         await this.writeBranchDocumentUseCase.execute({
           branchName,
           document: {
             path: 'branchContext.md',
             content,
-            tags: ['core', 'branch-context']
-          }
+            tags: ['core', 'branch-context'],
+          },
         });
-        
+
         // Remove from files to avoid processing it again
         delete files['branchContext.md'];
       }
-      
+
       // Prepare CoreFilesDTO from the remaining files
       const coreFiles: CoreFilesDTO = {};
-      
+
       // Process activeContext.md
       if (files['activeContext.md']) {
         const content = this.extractContent(files['activeContext.md']);
         coreFiles.activeContext = this.parseActiveContextContent(content);
       }
-      
+
       // Process progress.md
       if (files['progress.md']) {
         const content = this.extractContent(files['progress.md']);
         coreFiles.progress = this.parseProgressContent(content);
       }
-      
+
       // Process systemPatterns.md
       if (files['systemPatterns.md']) {
         const content = this.extractContent(files['systemPatterns.md']);
         coreFiles.systemPatterns = this.parseSystemPatternsContent(content);
       }
-      
+
       // Use the new CreateBranchCoreFilesUseCase
       let result;
       if (Object.keys(coreFiles).length > 0) {
         result = await this.createBranchCoreFilesUseCase.execute({
           branchName,
-          files: coreFiles
+          files: coreFiles,
         });
       }
-      
+
       return this.presenter.present(result);
     } catch (error) {
       return this.handleError(error);
@@ -249,9 +253,9 @@ export class BranchController implements IBranchController {
   async getRecentBranches(limit?: number): Promise<MCPResponse> {
     try {
       logger.info(`Getting recent branches (limit: ${limit || 'default'})`);
-      
+
       const result = await this.getRecentBranchesUseCase.execute({ limit });
-      
+
       return this.presenter.present(result);
     } catch (error) {
       return this.handleError(error);
@@ -265,16 +269,20 @@ export class BranchController implements IBranchController {
    * @param matchAllTags Whether to require all tags to match
    * @returns Promise resolving to MCP response with matching documents
    */
-  async findDocumentsByTags(branchName: string, tags: string[], matchAllTags?: boolean): Promise<MCPResponse<DocumentDTO[]>> {
+  async findDocumentsByTags(
+    branchName: string,
+    tags: string[],
+    matchAllTags?: boolean
+  ): Promise<MCPResponse<DocumentDTO[]>> {
     try {
       logger.info(`Finding documents by tags in branch ${branchName}: ${tags.join(', ')}`);
-      
+
       const result = await this.searchDocumentsByTagsUseCase.execute({
         branchName,
         tags,
-        matchAllTags
+        matchAllTags,
       });
-      
+
       return this.presenter.present(result.documents);
     } catch (error) {
       return this.handleError(error);
@@ -289,13 +297,15 @@ export class BranchController implements IBranchController {
    */
   async updateTagsIndex(branchName: string, fullRebuild?: boolean): Promise<MCPResponse> {
     try {
-      logger.info(`Updating tags index for branch ${branchName} (fullRebuild: ${fullRebuild ? 'yes' : 'no'})`);
-      
+      logger.info(
+        `Updating tags index for branch ${branchName} (fullRebuild: ${fullRebuild ? 'yes' : 'no'})`
+      );
+
       const result = await this.updateTagIndexUseCase.execute({
         branchName,
-        fullRebuild
+        fullRebuild,
       });
-      
+
       return this.presenter.present(result);
     } catch (error) {
       return this.handleError(error);
@@ -313,11 +323,8 @@ export class BranchController implements IBranchController {
     } else if (input && typeof input === 'object' && 'content' in input) {
       return input.content as string;
     }
-    
-    throw new ApplicationError(
-      'INVALID_INPUT',
-      'Invalid content format'
-    );
+
+    throw new ApplicationError('INVALID_INPUT', 'Invalid content format');
   }
 
   /**
@@ -332,55 +339,55 @@ export class BranchController implements IBranchController {
       recentChanges: [],
       activeDecisions: [],
       considerations: [],
-      nextSteps: []
+      nextSteps: [],
     };
-    
+
     // Extract current work
     const currentWorkMatch = content.match(/## 現在の作業内容\n\n(.*?)(?:\n##|$)/s);
     if (currentWorkMatch && currentWorkMatch[1].trim()) {
       result.currentWork = currentWorkMatch[1].trim();
     }
-    
+
     // Extract recent changes
     const recentChangesMatch = content.match(/## 最近の変更点\n\n(.*?)(?:\n##|$)/s);
     if (recentChangesMatch && recentChangesMatch[1].trim()) {
       result.recentChanges = recentChangesMatch[1]
         .trim()
         .split('\n')
-        .filter(line => line.startsWith('- '))
-        .map(line => line.substring(2).trim());
+        .filter((line) => line.startsWith('- '))
+        .map((line) => line.substring(2).trim());
     }
-    
+
     // Extract active decisions
     const activeDecisionsMatch = content.match(/## アクティブな決定事項\n\n(.*?)(?:\n##|$)/s);
     if (activeDecisionsMatch && activeDecisionsMatch[1].trim()) {
       result.activeDecisions = activeDecisionsMatch[1]
         .trim()
         .split('\n')
-        .filter(line => line.startsWith('- '))
-        .map(line => line.substring(2).trim());
+        .filter((line) => line.startsWith('- '))
+        .map((line) => line.substring(2).trim());
     }
-    
+
     // Extract considerations
     const considerationsMatch = content.match(/## 検討事項\n\n(.*?)(?:\n##|$)/s);
     if (considerationsMatch && considerationsMatch[1].trim()) {
       result.considerations = considerationsMatch[1]
         .trim()
         .split('\n')
-        .filter(line => line.startsWith('- '))
-        .map(line => line.substring(2).trim());
+        .filter((line) => line.startsWith('- '))
+        .map((line) => line.substring(2).trim());
     }
-    
+
     // Extract next steps
     const nextStepsMatch = content.match(/## 次のステップ\n\n(.*?)(?:\n##|$)/s);
     if (nextStepsMatch && nextStepsMatch[1].trim()) {
       result.nextSteps = nextStepsMatch[1]
         .trim()
         .split('\n')
-        .filter(line => line.startsWith('- '))
-        .map(line => line.substring(2).trim());
+        .filter((line) => line.startsWith('- '))
+        .map((line) => line.substring(2).trim());
     }
-    
+
     return result;
   }
 
@@ -395,45 +402,45 @@ export class BranchController implements IBranchController {
       workingFeatures: [],
       pendingImplementation: [],
       status: '',
-      knownIssues: []
+      knownIssues: [],
     };
-    
+
     // Extract working features
     const workingFeaturesMatch = content.match(/## 動作している機能\n\n(.*?)(?:\n##|$)/s);
     if (workingFeaturesMatch && workingFeaturesMatch[1].trim()) {
       result.workingFeatures = workingFeaturesMatch[1]
         .trim()
         .split('\n')
-        .filter(line => line.startsWith('- '))
-        .map(line => line.substring(2).trim());
+        .filter((line) => line.startsWith('- '))
+        .map((line) => line.substring(2).trim());
     }
-    
+
     // Extract pending implementation
     const pendingImplementationMatch = content.match(/## 未実装の機能\n\n(.*?)(?:\n##|$)/s);
     if (pendingImplementationMatch && pendingImplementationMatch[1].trim()) {
       result.pendingImplementation = pendingImplementationMatch[1]
         .trim()
         .split('\n')
-        .filter(line => line.startsWith('- '))
-        .map(line => line.substring(2).trim());
+        .filter((line) => line.startsWith('- '))
+        .map((line) => line.substring(2).trim());
     }
-    
+
     // Extract status
     const statusMatch = content.match(/## 現在の状態\n\n(.*?)(?:\n##|$)/s);
     if (statusMatch && statusMatch[1].trim()) {
       result.status = statusMatch[1].trim();
     }
-    
+
     // Extract known issues
     const knownIssuesMatch = content.match(/## 既知の問題\n\n(.*?)(?:\n##|$)/s);
     if (knownIssuesMatch && knownIssuesMatch[1].trim()) {
       result.knownIssues = knownIssuesMatch[1]
         .trim()
         .split('\n')
-        .filter(line => line.startsWith('- '))
-        .map(line => line.substring(2).trim());
+        .filter((line) => line.startsWith('- '))
+        .map((line) => line.substring(2).trim());
     }
-    
+
     return result;
   }
 
@@ -445,38 +452,40 @@ export class BranchController implements IBranchController {
   private parseSystemPatternsContent(content: string): any {
     // Simple parsing, in real implementation this would use the same parser as in ReadBranchCoreFilesUseCase
     const result: any = {
-      technicalDecisions: []
+      technicalDecisions: [],
     };
-    
+
     // Find all technical decisions sections
-    const decisions = content.match(/### (.+?)\n\n#### コンテキスト\n\n(.*?)\n\n#### 決定事項\n\n(.*?)\n\n#### 影響\n\n(.*?)(?=\n###|\n##|$)/gs);
-    
+    const decisions = content.match(
+      /### (.+?)\n\n#### コンテキスト\n\n(.*?)\n\n#### 決定事項\n\n(.*?)\n\n#### 影響\n\n(.*?)(?=\n###|\n##|$)/gs
+    );
+
     if (decisions) {
-      result.technicalDecisions = decisions.map(decision => {
+      result.technicalDecisions = decisions.map((decision) => {
         // Extract parts of each decision
         const titleMatch = decision.match(/### (.+?)\n/);
         const contextMatch = decision.match(/#### コンテキスト\n\n(.*?)\n\n/s);
         const decisionMatch = decision.match(/#### 決定事項\n\n(.*?)\n\n/s);
         const consequencesMatch = decision.match(/#### 影響\n\n(.*?)(?=\n###|\n##|$)/s);
-        
+
         // Parse consequences list
-        const consequences = consequencesMatch ? 
-          consequencesMatch[1]
-            .trim()
-            .split('\n')
-            .filter(line => line.startsWith('- '))
-            .map(line => line.substring(2).trim())
+        const consequences = consequencesMatch
+          ? consequencesMatch[1]
+              .trim()
+              .split('\n')
+              .filter((line) => line.startsWith('- '))
+              .map((line) => line.substring(2).trim())
           : [];
-        
+
         return {
           title: titleMatch ? titleMatch[1].trim() : '',
           context: contextMatch ? contextMatch[1].trim() : '',
           decision: decisionMatch ? decisionMatch[1].trim() : '',
-          consequences
+          consequences,
         };
       });
     }
-    
+
     return result;
   }
 
@@ -487,13 +496,13 @@ export class BranchController implements IBranchController {
    */
   private generateActiveContextContent(activeContext: any): string {
     let markdown = '# アクティブコンテキスト\n\n';
-    
+
     // Current Work
     markdown += '## 現在の作業内容\n\n';
     if (activeContext.currentWork) {
       markdown += `${activeContext.currentWork}\n`;
     }
-    
+
     // Recent Changes
     markdown += '## 最近の変更点\n\n';
     if (activeContext.recentChanges && activeContext.recentChanges.length > 0) {
@@ -501,7 +510,7 @@ export class BranchController implements IBranchController {
         markdown += `- ${change}\n`;
       });
     }
-    
+
     // Active Decisions
     markdown += '## アクティブな決定事項\n\n';
     if (activeContext.activeDecisions && activeContext.activeDecisions.length > 0) {
@@ -509,7 +518,7 @@ export class BranchController implements IBranchController {
         markdown += `- ${decision}\n`;
       });
     }
-    
+
     // Considerations
     markdown += '## 検討事項\n\n';
     if (activeContext.considerations && activeContext.considerations.length > 0) {
@@ -517,7 +526,7 @@ export class BranchController implements IBranchController {
         markdown += `- ${consideration}\n`;
       });
     }
-    
+
     // Next Steps
     markdown += '## 次のステップ\n\n';
     if (activeContext.nextSteps && activeContext.nextSteps.length > 0) {
@@ -525,7 +534,7 @@ export class BranchController implements IBranchController {
         markdown += `- ${step}\n`;
       });
     }
-    
+
     return markdown;
   }
 
@@ -536,7 +545,7 @@ export class BranchController implements IBranchController {
    */
   private generateProgressContent(progress: any): string {
     let markdown = '# 進捗状況\n\n';
-    
+
     // Working Features
     markdown += '## 動作している機能\n\n';
     if (progress.workingFeatures && progress.workingFeatures.length > 0) {
@@ -544,7 +553,7 @@ export class BranchController implements IBranchController {
         markdown += `- ${feature}\n`;
       });
     }
-    
+
     // Pending Implementation
     markdown += '## 未実装の機能\n\n';
     if (progress.pendingImplementation && progress.pendingImplementation.length > 0) {
@@ -552,13 +561,13 @@ export class BranchController implements IBranchController {
         markdown += `- ${item}\n`;
       });
     }
-    
+
     // Current Status
     markdown += '## 現在の状態\n\n';
     if (progress.status) {
       markdown += `${progress.status}\n`;
     }
-    
+
     // Known Issues
     markdown += '## 既知の問題\n\n';
     if (progress.knownIssues && progress.knownIssues.length > 0) {
@@ -566,7 +575,7 @@ export class BranchController implements IBranchController {
         markdown += `- ${issue}\n`;
       });
     }
-    
+
     return markdown;
   }
 
@@ -577,23 +586,23 @@ export class BranchController implements IBranchController {
    */
   private generateSystemPatternsContent(systemPatterns: any): string {
     let markdown = '# システムパターン\n\n';
-    
+
     // Technical Decisions
     markdown += '## 技術的決定事項\n\n';
-    
+
     if (systemPatterns.technicalDecisions && systemPatterns.technicalDecisions.length > 0) {
       systemPatterns.technicalDecisions.forEach((decision: any) => {
         // Decision title
         markdown += `### ${decision.title}\n\n`;
-        
+
         // Context
         markdown += '#### コンテキスト\n\n';
         markdown += `${decision.context}\n\n`;
-        
+
         // Decision
         markdown += '#### 決定事項\n\n';
         markdown += `${decision.decision}\n\n`;
-        
+
         // Consequences
         markdown += '#### 影響\n\n';
         if (decision.consequences && decision.consequences.length > 0) {
@@ -601,11 +610,11 @@ export class BranchController implements IBranchController {
             markdown += `- ${consequence}\n`;
           });
         }
-        
+
         markdown += '\n';
       });
     }
-    
+
     return markdown;
   }
 
@@ -615,12 +624,14 @@ export class BranchController implements IBranchController {
    * @returns Formatted error response
    */
   private handleError(error: any): MCPResponse {
-    if (error instanceof DomainError || 
-        error instanceof ApplicationError || 
-        error instanceof InfrastructureError) {
+    if (
+      error instanceof DomainError ||
+      error instanceof ApplicationError ||
+      error instanceof InfrastructureError
+    ) {
       return this.presenter.presentError(error);
     }
-    
+
     // Unknown error
     return this.presenter.presentError(
       new ApplicationError(

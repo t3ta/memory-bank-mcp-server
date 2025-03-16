@@ -1,6 +1,7 @@
 import { MemoryDocument } from '../MemoryDocument.js';
 import { DocumentPath } from '../DocumentPath.js';
 import { Tag } from '../Tag.js';
+import { BaseJsonDocument } from '../../../schemas/json-document.js';
 
 describe('MemoryDocument', () => {
   // Test fixtures
@@ -9,7 +10,7 @@ describe('MemoryDocument', () => {
       path: DocumentPath.create('test/document.md'),
       content: '# Test Document\n\nThis is a test document.',
       tags: [Tag.create('test'), Tag.create('document')],
-      lastModified: new Date('2023-01-01T00:00:00.000Z')
+      lastModified: new Date('2023-01-01T00:00:00.000Z'),
     };
   };
 
@@ -17,10 +18,10 @@ describe('MemoryDocument', () => {
     it('should create a valid document', () => {
       // Arrange
       const props = createValidDocumentProps();
-      
+
       // Act
       const document = MemoryDocument.create(props);
-      
+
       // Assert
       expect(document).toBeDefined();
       expect(document.path).toBe(props.path);
@@ -33,12 +34,12 @@ describe('MemoryDocument', () => {
       // Arrange
       const props = createValidDocumentProps();
       const originalTags = [...props.tags];
-      
+
       // Act
       const document = MemoryDocument.create(props);
       props.tags.push(Tag.create('modified'));
       props.lastModified = new Date('2025-01-01');
-      
+
       // Assert
       expect(document.tags).toHaveLength(originalTags.length);
       expect(document.lastModified.getTime()).toBe(new Date('2023-01-01T00:00:00.000Z').getTime());
@@ -50,10 +51,10 @@ describe('MemoryDocument', () => {
       // Arrange
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const path = document.path;
-      
+
       // Assert
       expect(path).toBe(props.path);
     });
@@ -62,10 +63,10 @@ describe('MemoryDocument', () => {
       // Arrange
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const content = document.content;
-      
+
       // Assert
       expect(content).toBe(props.content);
     });
@@ -74,10 +75,10 @@ describe('MemoryDocument', () => {
       // Arrange
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const tags = document.tags;
-      
+
       // Assert
       expect(tags).toEqual(props.tags);
       expect(tags).not.toBe(props.tags); // Should be a different array instance
@@ -87,10 +88,10 @@ describe('MemoryDocument', () => {
       // Arrange
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const lastModified = document.lastModified;
-      
+
       // Assert
       expect(lastModified.getTime()).toBe(props.lastModified.getTime());
       expect(lastModified).not.toBe(props.lastModified); // Should be a different Date instance
@@ -102,10 +103,10 @@ describe('MemoryDocument', () => {
       // Arrange
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const result = document.hasTag(Tag.create('test'));
-      
+
       // Assert
       expect(result).toBe(true);
     });
@@ -114,10 +115,10 @@ describe('MemoryDocument', () => {
       // Arrange
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const result = document.hasTag(Tag.create('missing'));
-      
+
       // Assert
       expect(result).toBe(false);
     });
@@ -129,26 +130,28 @@ describe('MemoryDocument', () => {
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
       const newContent = '# Updated Document\n\nThis is an updated document.';
-      
+
       // Act
       const updatedDocument = document.updateContent(newContent);
-      
+
       // Assert
       expect(updatedDocument).not.toBe(document); // Should be a new instance
       expect(updatedDocument.content).toBe(newContent);
       expect(updatedDocument.path).toBe(document.path);
       expect(updatedDocument.tags).toEqual(document.tags);
-      expect(updatedDocument.lastModified.getTime()).toBeGreaterThan(document.lastModified.getTime());
+      expect(updatedDocument.lastModified.getTime()).toBeGreaterThan(
+        document.lastModified.getTime()
+      );
     });
 
     it('should return the same document if content is unchanged', () => {
       // Arrange
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const updatedDocument = document.updateContent(props.content);
-      
+
       // Assert
       expect(updatedDocument).toBe(document); // Should be the same instance
     });
@@ -160,17 +163,19 @@ describe('MemoryDocument', () => {
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
       const newTag = Tag.create('newtag');
-      
+
       // Act
       const updatedDocument = document.addTag(newTag);
-      
+
       // Assert
       expect(updatedDocument).not.toBe(document); // Should be a new instance
       expect(updatedDocument.tags).toHaveLength(document.tags.length + 1);
       expect(updatedDocument.hasTag(newTag)).toBe(true);
       expect(updatedDocument.path).toBe(document.path);
       expect(updatedDocument.content).toBe(document.content);
-      expect(updatedDocument.lastModified.getTime()).toBeGreaterThan(document.lastModified.getTime());
+      expect(updatedDocument.lastModified.getTime()).toBeGreaterThan(
+        document.lastModified.getTime()
+      );
     });
 
     it('should return the same document if tag already exists', () => {
@@ -178,10 +183,10 @@ describe('MemoryDocument', () => {
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
       const existingTag = Tag.create('test');
-      
+
       // Act
       const updatedDocument = document.addTag(existingTag);
-      
+
       // Assert
       expect(updatedDocument).toBe(document); // Should be the same instance
     });
@@ -193,17 +198,19 @@ describe('MemoryDocument', () => {
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
       const tagToRemove = Tag.create('test');
-      
+
       // Act
       const updatedDocument = document.removeTag(tagToRemove);
-      
+
       // Assert
       expect(updatedDocument).not.toBe(document); // Should be a new instance
       expect(updatedDocument.tags).toHaveLength(document.tags.length - 1);
       expect(updatedDocument.hasTag(tagToRemove)).toBe(false);
       expect(updatedDocument.path).toBe(document.path);
       expect(updatedDocument.content).toBe(document.content);
-      expect(updatedDocument.lastModified.getTime()).toBeGreaterThan(document.lastModified.getTime());
+      expect(updatedDocument.lastModified.getTime()).toBeGreaterThan(
+        document.lastModified.getTime()
+      );
     });
 
     it('should return the same document if tag does not exist', () => {
@@ -211,10 +218,10 @@ describe('MemoryDocument', () => {
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
       const nonExistingTag = Tag.create('nonexistent');
-      
+
       // Act
       const updatedDocument = document.removeTag(nonExistingTag);
-      
+
       // Assert
       expect(updatedDocument).toBe(document); // Should be the same instance
     });
@@ -226,10 +233,10 @@ describe('MemoryDocument', () => {
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
       const newTags = [Tag.create('new'), Tag.create('tags')];
-      
+
       // Act
       const updatedDocument = document.updateTags(newTags);
-      
+
       // Assert
       expect(updatedDocument).not.toBe(document); // Should be a new instance
       expect(updatedDocument.tags).toHaveLength(newTags.length);
@@ -237,7 +244,9 @@ describe('MemoryDocument', () => {
       expect(updatedDocument.hasTag(newTags[1])).toBe(true);
       expect(updatedDocument.path).toBe(document.path);
       expect(updatedDocument.content).toBe(document.content);
-      expect(updatedDocument.lastModified.getTime()).toBeGreaterThan(document.lastModified.getTime());
+      expect(updatedDocument.lastModified.getTime()).toBeGreaterThan(
+        document.lastModified.getTime()
+      );
     });
   });
 
@@ -246,10 +255,10 @@ describe('MemoryDocument', () => {
       // Arrange
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const title = document.title;
-      
+
       // Assert
       expect(title).toBe('Test Document');
     });
@@ -259,10 +268,10 @@ describe('MemoryDocument', () => {
       const props = createValidDocumentProps();
       props.content = 'This is a document without a title.';
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const title = document.title;
-      
+
       // Assert
       expect(title).toBeUndefined();
     });
@@ -272,10 +281,10 @@ describe('MemoryDocument', () => {
       const props = createValidDocumentProps();
       props.content = '#   Extra Spaced Title  \n\nContent';
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const title = document.title;
-      
+
       // Assert
       expect(title).toBe('Extra Spaced Title');
     });
@@ -286,10 +295,10 @@ describe('MemoryDocument', () => {
       // Arrange
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const isMarkdown = document.isMarkdown;
-      
+
       // Assert
       expect(isMarkdown).toBe(true);
     });
@@ -299,12 +308,39 @@ describe('MemoryDocument', () => {
       const props = createValidDocumentProps();
       props.path = DocumentPath.create('test/document.txt');
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const isMarkdown = document.isMarkdown;
-      
+
       // Assert
       expect(isMarkdown).toBe(false);
+    });
+  });
+
+  describe('isJSON', () => {
+    it('should return true for json files', () => {
+      // Arrange
+      const props = createValidDocumentProps();
+      props.path = DocumentPath.create('test/document.json');
+      const document = MemoryDocument.create(props);
+
+      // Act
+      const isJSON = document.isJSON;
+
+      // Assert
+      expect(isJSON).toBe(true);
+    });
+
+    it('should return false for non-json files', () => {
+      // Arrange
+      const props = createValidDocumentProps();
+      const document = MemoryDocument.create(props);
+
+      // Act
+      const isJSON = document.isJSON;
+
+      // Assert
+      expect(isJSON).toBe(false);
     });
   });
 
@@ -313,17 +349,169 @@ describe('MemoryDocument', () => {
       // Arrange
       const props = createValidDocumentProps();
       const document = MemoryDocument.create(props);
-      
+
       // Act
       const obj = document.toObject();
-      
+
       // Assert
       expect(obj).toEqual({
         path: props.path.value,
         content: props.content,
-        tags: props.tags.map(tag => tag.value),
-        lastModified: props.lastModified.toISOString()
+        tags: props.tags.map((tag) => tag.value),
+        lastModified: props.lastModified.toISOString(),
       });
+    });
+  });
+
+  describe('toJSON', () => {
+    it('should convert markdown document to JSON format', () => {
+      // Arrange
+      const props = createValidDocumentProps();
+      const document = MemoryDocument.create(props);
+
+      // Act
+      const jsonDoc = document.toJSON();
+
+      // Assert
+      expect(jsonDoc).toBeDefined();
+      expect(jsonDoc.schema).toBe('memory_document_v1');
+      expect(jsonDoc.metadata).toBeDefined();
+      expect(jsonDoc.metadata.title).toBe('Test Document');
+      expect(jsonDoc.metadata.path).toBe(props.path.value);
+      expect(jsonDoc.metadata.tags).toEqual(props.tags.map(tag => tag.value));
+      expect(jsonDoc.content).toBeDefined();
+    });
+
+    it('should detect document type based on path filename', () => {
+      // Arrange
+      const props = createValidDocumentProps();
+      props.path = DocumentPath.create('test/branchContext.md');
+      const document = MemoryDocument.create(props);
+
+      // Act
+      const jsonDoc = document.toJSON();
+
+      // Assert
+      expect(jsonDoc.metadata.documentType).toBe('branch_context');
+    });
+
+    it('should use generic document type for unknown document types', () => {
+      // Arrange
+      const props = createValidDocumentProps();
+      props.path = DocumentPath.create('test/unknown-document.md');
+      const document = MemoryDocument.create(props);
+
+      // Act
+      const jsonDoc = document.toJSON();
+
+      // Assert
+      expect(jsonDoc.metadata.documentType).toBe('generic');
+    });
+
+    it('should parse existing JSON document', () => {
+      // Arrange
+      const props = createValidDocumentProps();
+      props.path = DocumentPath.create('test/document.json');
+      props.content = JSON.stringify({
+        schema: 'memory_document_v1',
+        metadata: {
+          title: 'JSON Document',
+          documentType: 'active_context',
+          path: 'test/document.json',
+          tags: ['json', 'test'],
+          lastModified: '2023-01-01T00:00:00.000Z'
+        },
+        content: {
+          currentWork: 'Working on tests',
+          recentChanges: ['Added JSON support'],
+          activeDecisions: ['Use JSON as primary format'],
+          considerations: ['Performance implications'],
+          nextSteps: ['Implement more tests']
+        }
+      });
+      const document = MemoryDocument.create(props);
+
+      // Act
+      const jsonDoc = document.toJSON();
+
+      // Assert
+      expect(jsonDoc).toBeDefined();
+      expect(jsonDoc.schema).toBe('memory_document_v1');
+      expect(jsonDoc.metadata.title).toBe('JSON Document');
+      expect(jsonDoc.metadata.documentType).toBe('active_context');
+      expect(jsonDoc.content.currentWork).toBe('Working on tests');
+    });
+  });
+
+  describe('fromJSON', () => {
+    it('should convert JSON document to MemoryDocument', () => {
+      // Arrange
+      const jsonDoc: BaseJsonDocument = {
+        schema: 'memory_document_v1',
+        metadata: {
+          title: 'JSON Document',
+          documentType: 'active_context',
+          path: 'test/document.json',
+          tags: ['json', 'test'],
+          lastModified: new Date('2023-01-01T00:00:00.000Z')
+        },
+        content: {
+          currentWork: 'Working on tests',
+          recentChanges: ['Added JSON support'],
+          activeDecisions: ['Use JSON as primary format'],
+          considerations: ['Performance implications'],
+          nextSteps: ['Implement more tests']
+        }
+      };
+      const path = DocumentPath.create('test/document.json');
+
+      // Act
+      const document = MemoryDocument.fromJSON(jsonDoc, path);
+
+      // Assert
+      expect(document).toBeDefined();
+      expect(document.path).toBe(path);
+      expect(document.tags).toHaveLength(2);
+      expect(document.tags[0].value).toBe('json');
+      expect(document.tags[1].value).toBe('test');
+      expect(document.lastModified.toISOString()).toBe('2023-01-01T00:00:00.000Z');
+      expect(document.content).toContain('# JSON Document');
+      expect(document.content).toContain('## 現在の作業内容');
+      expect(document.content).toContain('Working on tests');
+    });
+
+    it('should handle branch context document correctly', () => {
+      // Arrange
+      const jsonDoc: BaseJsonDocument = {
+        schema: 'memory_document_v1',
+        metadata: {
+          title: 'Branch Context',
+          documentType: 'branch_context',
+          path: 'test/branchContext.json',
+          tags: ['branch', 'context'],
+          lastModified: new Date('2023-01-01T00:00:00.000Z')
+        },
+        content: {
+          purpose: 'Test purpose',
+          createdAt: new Date('2023-01-01T00:00:00.000Z'),
+          userStories: [
+            { description: 'Story 1', completed: false },
+            { description: 'Story 2', completed: true }
+          ]
+        }
+      };
+      const path = DocumentPath.create('test/branchContext.json');
+
+      // Act
+      const document = MemoryDocument.fromJSON(jsonDoc, path);
+
+      // Assert
+      expect(document).toBeDefined();
+      expect(document.content).toContain('# Branch Context');
+      expect(document.content).toContain('## 目的');
+      expect(document.content).toContain('Test purpose');
+      expect(document.content).toContain('- [ ] Story 1');
+      expect(document.content).toContain('- [x] Story 2');
     });
   });
 });

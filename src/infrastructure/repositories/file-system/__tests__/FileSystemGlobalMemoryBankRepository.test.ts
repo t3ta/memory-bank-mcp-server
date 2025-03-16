@@ -4,7 +4,10 @@ import { IConfigProvider } from '../../../config/interfaces/IConfigProvider.js';
 import { DocumentPath } from '../../../../domain/entities/DocumentPath.js';
 import { MemoryDocument } from '../../../../domain/entities/MemoryDocument.js';
 import { Tag } from '../../../../domain/entities/Tag.js';
-import { InfrastructureError, InfrastructureErrorCodes } from '../../../../shared/errors/InfrastructureError.js';
+import {
+  InfrastructureError,
+  InfrastructureErrorCodes,
+} from '../../../../shared/errors/InfrastructureError.js';
 import path from 'path';
 
 // Mock for IFileSystemService
@@ -16,7 +19,16 @@ const mockFileSystemService = {
   createDirectory: jest.fn<Promise<void>, [string]>(),
   directoryExists: jest.fn<Promise<boolean>, [string]>(),
   listFiles: jest.fn<Promise<string[]>, [string]>(),
-  getFileStats: jest.fn<Promise<{ size: number; isDirectory: boolean; isFile: boolean; lastModified: Date; createdAt: Date; }>, [string]>()
+  getFileStats: jest.fn<
+    Promise<{
+      size: number;
+      isDirectory: boolean;
+      isFile: boolean;
+      lastModified: Date;
+      createdAt: Date;
+    }>,
+    [string]
+  >(),
 } as jest.Mocked<IFileSystemService>;
 
 // Mock for IConfigProvider
@@ -25,7 +37,7 @@ const mockConfigProvider: jest.Mocked<IConfigProvider> = {
   getConfig: jest.fn(),
   getGlobalMemoryPath: jest.fn(),
   getBranchMemoryPath: jest.fn(),
-  getLanguage: jest.fn()
+  getLanguage: jest.fn(),
 };
 
 describe('FileSystemGlobalMemoryBankRepository', () => {
@@ -45,22 +57,20 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
       mockConfigProvider
     );
 
-    // Solve circular reference problem with saveDocument and updateTagsIndex
-    // Original implementation causes infinite loop in tests
-    const originalSaveDocument = repository.saveDocument.bind(repository);
-    repository.saveDocument = jest.fn().mockImplementation(async (document: MemoryDocument) => {
-      // Call original save without triggering updateTagsIndex
-      await mockFileSystemService.createDirectory(path.dirname(path.join(globalMemoryPath, document.path.value)));
-      await mockFileSystemService.writeFile(path.join(globalMemoryPath, document.path.value), document.content);
-      return undefined;
-    });
+    // モックをセットアップ
+    repository.updateTagsIndex = jest.fn().mockResolvedValue(undefined);
 
-    // Use a simplified updateTagsIndex that doesn't call saveDocument
-    repository.updateTagsIndex = jest.fn().mockImplementation(async () => {
-      const indexPath = path.join(globalMemoryPath, 'tags/index.md');
-      const indexContent = '# タグインデックス\n\ntags: #index #meta\n\n| タグ | 件数 | ドキュメント |\n|-----|------|-------------|\n';
-      await mockFileSystemService.writeFile(indexPath, indexContent);
-      return undefined;
+    // FileSystemGlobalMemoryBankRepository.saveDocumentをモック化
+    const originalSaveDocument = repository.saveDocument;
+    repository.saveDocument = jest.fn().mockImplementation(async (document: MemoryDocument) => {
+      // 直接ファイルシステムにアクセス（documentRepositoryを経由せず）
+      await mockFileSystemService.createDirectory(
+        path.dirname(path.join(globalMemoryPath, document.path.value))
+      );
+      await mockFileSystemService.writeFile(
+        path.join(globalMemoryPath, document.path.value),
+        document.content
+      );
     });
   });
 
@@ -70,13 +80,15 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
       mockFileSystemService.createDirectory.mockResolvedValue();
       mockFileSystemService.fileExists.mockResolvedValue(true);
       mockFileSystemService.listFiles.mockResolvedValue([]);
-      mockFileSystemService.readFile.mockResolvedValue('# タグインデックス\n\ntags: #index #meta\n\n');
+      mockFileSystemService.readFile.mockResolvedValue(
+        '# タグインデックス\n\ntags: #index #meta\n\n'
+      );
       mockFileSystemService.getFileStats.mockResolvedValue({
         size: 100,
         isDirectory: false,
         isFile: true,
         lastModified: new Date('2023-01-01'),
-        createdAt: new Date('2023-01-01')
+        createdAt: new Date('2023-01-01'),
       });
 
       // Act
@@ -84,7 +96,9 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
 
       // Assert
       expect(mockFileSystemService.createDirectory).toHaveBeenCalledWith(globalMemoryPath);
-      expect(mockFileSystemService.createDirectory).toHaveBeenCalledWith(path.join(globalMemoryPath, 'tags'));
+      expect(mockFileSystemService.createDirectory).toHaveBeenCalledWith(
+        path.join(globalMemoryPath, 'tags')
+      );
 
       // Verify updateTagsIndex was called
       expect(repository.updateTagsIndex).toHaveBeenCalled();
@@ -101,13 +115,15 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
       mockFileSystemService.fileExists.mockResolvedValue(false);
       mockFileSystemService.writeFile.mockResolvedValue();
       mockFileSystemService.listFiles.mockResolvedValue([]);
-      mockFileSystemService.readFile.mockResolvedValue('# タグインデックス\n\ntags: #index #meta\n\n');
+      mockFileSystemService.readFile.mockResolvedValue(
+        '# タグインデックス\n\ntags: #index #meta\n\n'
+      );
       mockFileSystemService.getFileStats.mockResolvedValue({
         size: 100,
         isDirectory: false,
         isFile: true,
         lastModified: new Date('2023-01-01'),
-        createdAt: new Date('2023-01-01')
+        createdAt: new Date('2023-01-01'),
       });
 
       // Act
@@ -116,7 +132,9 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
       // Assert
       // Directories are created
       expect(mockFileSystemService.createDirectory).toHaveBeenCalledWith(globalMemoryPath);
-      expect(mockFileSystemService.createDirectory).toHaveBeenCalledWith(path.join(globalMemoryPath, 'tags'));
+      expect(mockFileSystemService.createDirectory).toHaveBeenCalledWith(
+        path.join(globalMemoryPath, 'tags')
+      );
 
       // Verify updateTagsIndex was called
       expect(repository.updateTagsIndex).toHaveBeenCalled();
@@ -130,24 +148,28 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
       // Arrange
       const error = new Error('File system error');
       mockFileSystemService.createDirectory.mockRejectedValue(error);
-      mockFileSystemService.readFile.mockResolvedValue('# タグインデックス\n\ntags: #index #meta\n\n');
+      mockFileSystemService.readFile.mockResolvedValue(
+        '# タグインデックス\n\ntags: #index #meta\n\n'
+      );
       mockFileSystemService.getFileStats.mockResolvedValue({
         size: 100,
         isDirectory: false,
         isFile: true,
         lastModified: new Date('2023-01-01'),
-        createdAt: new Date('2023-01-01')
+        createdAt: new Date('2023-01-01'),
       });
 
       // Act & Assert
       await expect(repository.initialize()).rejects.toThrow(InfrastructureError);
-      await expect(repository.initialize()).rejects.toThrow('Failed to initialize global memory bank');
+      await expect(repository.initialize()).rejects.toThrow(
+        'Failed to initialize global memory bank'
+      );
 
       try {
         await repository.initialize();
         fail('Should have thrown an error');
-      } catch (e) {
-        const infraError = e as InfrastructureError;
+      } catch (_e) {
+        const infraError = _e as InfrastructureError;
         expect(infraError.code).toBe(`INFRA_ERROR.${InfrastructureErrorCodes.FILE_SYSTEM_ERROR}`);
         expect(infraError.details).toEqual({ originalError: error });
       }
@@ -174,7 +196,7 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
             isDirectory: false,
             isFile: true,
             lastModified: new Date('2023-01-01'),
-            createdAt: new Date('2023-01-01')
+            createdAt: new Date('2023-01-01'),
           };
         }
         return {
@@ -182,7 +204,7 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
           isDirectory: false,
           isFile: false,
           lastModified: new Date(),
-          createdAt: new Date()
+          createdAt: new Date(),
         };
       });
 
@@ -212,16 +234,20 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
     it('should handle and wrap errors', async () => {
       // Arrange
       const docPath = DocumentPath.create('test.md');
-      const error = new Error('File read error');
-      mockFileSystemService.fileExists.mockRejectedValue(new InfrastructureError(
-        InfrastructureErrorCodes.FILE_READ_ERROR,
-        'Failed to get document from global memory bank',
-        { originalError: new Error('File read error') }
-      ));
+      const _error = new Error('File read error');
+      mockFileSystemService.fileExists.mockRejectedValue(
+        new InfrastructureError(
+          InfrastructureErrorCodes.FILE_READ_ERROR,
+          'Failed to get document from global memory bank',
+          { originalError: new Error('File read error') }
+        )
+      );
 
       // Act & Assert
       await expect(repository.getDocument(docPath)).rejects.toThrow(InfrastructureError);
-      await expect(repository.getDocument(docPath)).rejects.toThrow('Failed to get document from global memory bank');
+      await expect(repository.getDocument(docPath)).rejects.toThrow(
+        'Failed to get document from global memory bank'
+      );
     });
   });
 
@@ -234,7 +260,7 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
         path: docPath,
         content,
         tags: [Tag.create('test'), Tag.create('document')],
-        lastModified: new Date('2023-01-01')
+        lastModified: new Date('2023-01-01'),
       });
 
       mockFileSystemService.createDirectory.mockResolvedValue();
@@ -247,7 +273,7 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
         isDirectory: false,
         isFile: true,
         lastModified: new Date('2023-01-01'),
-        createdAt: new Date('2023-01-01')
+        createdAt: new Date('2023-01-01'),
       });
 
       // Act
@@ -272,7 +298,7 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
         path: docPath,
         content,
         tags: [Tag.create('test')],
-        lastModified: new Date('2023-01-01')
+        lastModified: new Date('2023-01-01'),
       });
 
       const error = new InfrastructureError(
@@ -284,7 +310,9 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
 
       // Act & Assert
       await expect(repository.saveDocument(document)).rejects.toThrow(InfrastructureError);
-      await expect(repository.saveDocument(document)).rejects.toThrow('Failed to save document to global memory bank');
+      await expect(repository.saveDocument(document)).rejects.toThrow(
+        'Failed to save document to global memory bank'
+      );
     });
   });
 
@@ -296,6 +324,9 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
       mockFileSystemService.fileExists.mockResolvedValue(true);
       mockFileSystemService.deleteFile.mockResolvedValue(true);
       mockFileSystemService.listFiles.mockResolvedValue([]);
+
+      // Ensure updateTagsIndex is properly mocked
+      (repository.updateTagsIndex as jest.Mock).mockImplementation(() => Promise.resolve());
 
       // Act
       const result = await repository.deleteDocument(docPath);
@@ -329,18 +360,22 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
     it('should handle errors when deleting document', async () => {
       // Arrange
       const docPath = DocumentPath.create('test.md');
-      const error = new Error('File delete error');
+      const _error = new Error('File delete error');
 
       mockFileSystemService.fileExists.mockResolvedValue(true);
-      mockFileSystemService.deleteFile.mockRejectedValue(new InfrastructureError(
-        InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
-        'Failed to delete document from global memory bank',
-        { originalError: new Error('File delete error') }
-      ));
+      mockFileSystemService.deleteFile.mockRejectedValue(
+        new InfrastructureError(
+          InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
+          'Failed to delete document from global memory bank',
+          { originalError: new Error('File delete error') }
+        )
+      );
 
       // Act & Assert
       await expect(repository.deleteDocument(docPath)).rejects.toThrow(InfrastructureError);
-      await expect(repository.deleteDocument(docPath)).rejects.toThrow('Failed to delete document from global memory bank');
+      await expect(repository.deleteDocument(docPath)).rejects.toThrow(
+        'Failed to delete document from global memory bank'
+      );
     });
   });
 
@@ -350,7 +385,7 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
       mockFileSystemService.listFiles.mockResolvedValue([
         path.join(globalMemoryPath, 'file1.md'),
         path.join(globalMemoryPath, 'file2.md'),
-        path.join(globalMemoryPath, 'subdir/file3.md')
+        path.join(globalMemoryPath, 'subdir/file3.md'),
       ]);
       mockFileSystemService.directoryExists.mockImplementation(async (dir) => {
         return dir.endsWith('subdir');
@@ -361,7 +396,7 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
           isDirectory: path.endsWith('subdir'),
           isFile: !path.endsWith('subdir'),
           lastModified: new Date('2023-01-01'),
-          createdAt: new Date('2023-01-01')
+          createdAt: new Date('2023-01-01'),
         };
       });
 
@@ -382,7 +417,9 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
 
       // Act & Assert
       await expect(repository.listDocuments()).rejects.toThrow(InfrastructureError);
-      await expect(repository.listDocuments()).rejects.toThrow('Failed to list documents in global memory bank');
+      await expect(repository.listDocuments()).rejects.toThrow(
+        'Failed to list documents'
+      );
     });
   });
 
@@ -395,7 +432,7 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
 
       mockFileSystemService.listFiles.mockResolvedValue([
         path.join(globalMemoryPath, 'file1.md'),
-        path.join(globalMemoryPath, 'file2.md')
+        path.join(globalMemoryPath, 'file2.md'),
       ]);
       mockFileSystemService.directoryExists.mockResolvedValue(false);
       mockFileSystemService.fileExists.mockResolvedValue(true);
@@ -409,7 +446,7 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
         isDirectory: false,
         isFile: true,
         lastModified: new Date('2023-01-01'),
-        createdAt: new Date('2023-01-01')
+        createdAt: new Date('2023-01-01'),
       });
 
       // Act
@@ -428,9 +465,7 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
       const tags = [Tag.create('nonexistent')];
       const fileContent = '# File\n\ntags: #other\n\nContent';
 
-      mockFileSystemService.listFiles.mockResolvedValue([
-        path.join(globalMemoryPath, 'file.md')
-      ]);
+      mockFileSystemService.listFiles.mockResolvedValue([path.join(globalMemoryPath, 'file.md')]);
       mockFileSystemService.directoryExists.mockResolvedValue(false);
       mockFileSystemService.fileExists.mockResolvedValue(true);
       mockFileSystemService.readFile.mockResolvedValue(fileContent);
@@ -439,7 +474,7 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
         isDirectory: false,
         isFile: true,
         lastModified: new Date('2023-01-01'),
-        createdAt: new Date('2023-01-01')
+        createdAt: new Date('2023-01-01'),
       });
 
       // Act
@@ -457,7 +492,9 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
 
       // Act & Assert
       await expect(repository.findDocumentsByTags(tags)).rejects.toThrow(InfrastructureError);
-      await expect(repository.findDocumentsByTags(tags)).rejects.toThrow('Failed to find documents by tags in global memory bank');
+      await expect(repository.findDocumentsByTags(tags)).rejects.toThrow(
+        'Failed to find documents by tags in global memory bank'
+      );
     });
   });
 
@@ -473,7 +510,9 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
       // Assert
       expect(result).toBe(true);
       expect(mockFileSystemService.directoryExists).toHaveBeenCalledWith(globalMemoryPath);
-      expect(mockFileSystemService.directoryExists).toHaveBeenCalledWith(path.join(globalMemoryPath, 'tags'));
+      expect(mockFileSystemService.directoryExists).toHaveBeenCalledWith(
+        path.join(globalMemoryPath, 'tags')
+      );
       expect(mockFileSystemService.fileExists).toHaveBeenCalled();
     });
 

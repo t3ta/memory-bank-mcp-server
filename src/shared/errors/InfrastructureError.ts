@@ -5,11 +5,7 @@ import { BaseError } from './BaseError.js';
  * Used for external system integration errors, file system errors, etc.
  */
 export class InfrastructureError extends BaseError {
-  constructor(
-    code: string,
-    message: string,
-    details?: Record<string, unknown>
-  ) {
+  constructor(code: string, message: string, details?: Record<string, unknown>) {
     super(`INFRA_ERROR.${code}`, message, details);
   }
 }

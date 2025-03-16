@@ -3,21 +3,15 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} from "@modelcontextprotocol/sdk/types.js";
-import { Language, BRANCH_CORE_FILES, GLOBAL_CORE_FILES } from './shared/types/index.js';
-import { MemoryBankError } from './errors/MemoryBankError.js';
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
-// 新しいインポート
+// アプリケーションのインポート
 import createApplication from './main/index.js';
 import { Application } from './main/index.js';
-import { CoreFilesDTO } from './application/dtos/CoreFilesDTO.js';
 
 // Parse command line arguments
 const argv = yargs(hideBin(process.argv))
@@ -25,7 +19,7 @@ const argv = yargs(hideBin(process.argv))
     alias: 'd',
     type: 'string',
     description: 'Path to docs directory',
-    default: './docs'
+    default: './docs',
   })
   .help()
   .parseSync();
@@ -34,7 +28,7 @@ const argv = yargs(hideBin(process.argv))
 const logger = {
   debug: (...args: any[]) => console.error('[DEBUG]', ...args),
   info: (...args: any[]) => console.error('[INFO]', ...args),
-  error: (...args: any[]) => console.error('[ERROR]', ...args)
+  error: (...args: any[]) => console.error('[ERROR]', ...args),
 };
 
 // 新しいアプリケーションインスタンス
@@ -43,213 +37,214 @@ let app: Application | null;
 // Available tools definition
 const AVAILABLE_TOOLS = [
   {
-    name: "create_pull_request",
-    description: "Creates a pull request based on branch memory bank information",
+    name: 'create_pull_request',
+    description: 'Creates a pull request based on branch memory bank information',
     inputSchema: {
-      type: "object",
+      type: 'object',
       properties: {
         branch: {
-          type: "string",
-          description: "Branch name"
+          type: 'string',
+          description: 'Branch name',
         },
         title: {
-          type: "string",
-          description: "Custom PR title (optional)"
+          type: 'string',
+          description: 'Custom PR title (optional)',
         },
         base: {
-          type: "string",
-          description: "Target branch for the PR (default: develop for feature branches, master for fix branches)"
+          type: 'string',
+          description:
+            'Target branch for the PR (default: develop for feature branches, master for fix branches)',
         },
         language: {
-          type: "string",
-          enum: ["en", "ja"],
-          description: "Language for PR (en or ja)"
+          type: 'string',
+          enum: ['en', 'ja'],
+          description: 'Language for PR (en or ja)',
         },
         push: {
-          type: "boolean",
-          description: "Whether to automatically push the changes"
-        }
+          type: 'boolean',
+          description: 'Whether to automatically push the changes',
+        },
       },
-      required: ["branch"]
-    }
+      required: ['branch'],
+    },
   },
   {
-    name: "list_tools",
-    description: "List all available tools",
+    name: 'list_tools',
+    description: 'List all available tools',
     inputSchema: {
-      type: "object",
-      properties: {}
-    }
+      type: 'object',
+      properties: {},
+    },
   },
   {
-    name: "write_branch_memory_bank",
+    name: 'write_branch_memory_bank',
     description: "Write a document to the current branch's memory bank",
     inputSchema: {
-      type: "object",
+      type: 'object',
       properties: {
-        path: { type: "string" },
-        content: { type: "string" },
+        path: { type: 'string' },
+        content: { type: 'string' },
         branch: {
-          type: "string",
-          description: "Branch name"
-        }
+          type: 'string',
+          description: 'Branch name',
+        },
       },
-      required: ["path"]
-    }
+      required: ['path'],
+    },
   },
   {
-    name: "read_branch_memory_bank",
+    name: 'read_branch_memory_bank',
     description: "Read a document from the current branch's memory bank",
     inputSchema: {
-      type: "object",
+      type: 'object',
       properties: {
-        path: { type: "string" },
+        path: { type: 'string' },
         branch: {
-          type: "string",
-          description: "Branch name"
-        }
+          type: 'string',
+          description: 'Branch name',
+        },
       },
-      required: ["path"]
-    }
+      required: ['path'],
+    },
   },
   {
-    name: "write_global_memory_bank",
-    description: "Write a document to the global memory bank",
+    name: 'write_global_memory_bank',
+    description: 'Write a document to the global memory bank',
     inputSchema: {
-      type: "object",
+      type: 'object',
       properties: {
-        path: { type: "string" },
-        content: { type: "string" }
+        path: { type: 'string' },
+        content: { type: 'string' },
       },
-      required: ["path"]
-    }
+      required: ['path'],
+    },
   },
   {
-    name: "read_global_memory_bank",
-    description: "Read a document from the global memory bank",
+    name: 'read_global_memory_bank',
+    description: 'Read a document from the global memory bank',
     inputSchema: {
-      type: "object",
+      type: 'object',
       properties: {
-        path: { type: "string" }
+        path: { type: 'string' },
       },
-      required: ["path"]
-    }
+      required: ['path'],
+    },
   },
   {
-    name: "read_branch_core_files",
-    description: "Read all core files from the branch memory bank",
+    name: 'read_branch_core_files',
+    description: 'Read all core files from the branch memory bank',
     inputSchema: {
-      type: "object",
-      properties: {
-        branch: {
-          type: "string",
-          description: "Branch name"
-        }
-      },
-      required: ["branch"]
-    }
-  },
-  {
-    name: "write_branch_core_files",
-    description: "Write multiple core files at once",
-    inputSchema: {
-      type: "object",
+      type: 'object',
       properties: {
         branch: {
-          type: "string",
-          description: "Branch name"
+          type: 'string',
+          description: 'Branch name',
+        },
+      },
+      required: ['branch'],
+    },
+  },
+  {
+    name: 'write_branch_core_files',
+    description: 'Write multiple core files at once',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        branch: {
+          type: 'string',
+          description: 'Branch name',
         },
         files: {
-          type: "object",
+          type: 'object',
           properties: {
             activeContext: {
-              type: "object",
+              type: 'object',
               properties: {
-                currentWork: { type: "string" },
-                recentChanges: { type: "array", items: { type: "string" } },
-                activeDecisions: { type: "array", items: { type: "string" } },
-                considerations: { type: "array", items: { type: "string" } },
-                nextSteps: { type: "array", items: { type: "string" } }
-              }
+                currentWork: { type: 'string' },
+                recentChanges: { type: 'array', items: { type: 'string' } },
+                activeDecisions: { type: 'array', items: { type: 'string' } },
+                considerations: { type: 'array', items: { type: 'string' } },
+                nextSteps: { type: 'array', items: { type: 'string' } },
+              },
             },
             progress: {
-              type: "object",
+              type: 'object',
               properties: {
-                workingFeatures: { type: "array", items: { type: "string" } },
-                pendingImplementation: { type: "array", items: { type: "string" } },
-                status: { type: "string" },
-                knownIssues: { type: "array", items: { type: "string" } }
-              }
+                workingFeatures: { type: 'array', items: { type: 'string' } },
+                pendingImplementation: { type: 'array', items: { type: 'string' } },
+                status: { type: 'string' },
+                knownIssues: { type: 'array', items: { type: 'string' } },
+              },
             },
             systemPatterns: {
-              type: "object",
+              type: 'object',
               properties: {
                 technicalDecisions: {
-                  type: "array",
+                  type: 'array',
                   items: {
-                    type: "object",
+                    type: 'object',
                     properties: {
-                      title: { type: "string" },
-                      context: { type: "string" },
-                      decision: { type: "string" },
-                      consequences: { type: "array", items: { type: "string" } }
+                      title: { type: 'string' },
+                      context: { type: 'string' },
+                      decision: { type: 'string' },
+                      consequences: { type: 'array', items: { type: 'string' } },
                     },
-                    required: ["title", "context", "decision", "consequences"]
-                  }
-                }
-              }
-            }
-          }
-        }
+                    required: ['title', 'context', 'decision', 'consequences'],
+                  },
+                },
+              },
+            },
+          },
+        },
       },
-      required: ["branch", "files"]
-    }
+      required: ['branch', 'files'],
+    },
   },
   {
-    name: "read_global_core_files",
-    description: "Read all core files from the global memory bank",
+    name: 'read_global_core_files',
+    description: 'Read all core files from the global memory bank',
     inputSchema: {
-      type: "object",
-      properties: {}
-    }
+      type: 'object',
+      properties: {},
+    },
   },
   {
-    name: "read_rules",
-    description: "Read the memory bank rules in specified language",
+    name: 'read_rules',
+    description: 'Read the memory bank rules in specified language',
     inputSchema: {
-      type: "object",
+      type: 'object',
       properties: {
         language: {
-          type: "string",
-          enum: ["en", "ja"],
-          description: "Language code (en or ja)"
-        }
+          type: 'string',
+          enum: ['en', 'ja'],
+          description: 'Language code (en or ja)',
+        },
       },
-      required: ["language"]
-    }
+      required: ['language'],
+    },
   },
   {
-    name: "get_recent_branches",
-    description: "Get recently updated branch memory banks",
+    name: 'get_recent_branches',
+    description: 'Get recently updated branch memory banks',
     inputSchema: {
-      type: "object",
+      type: 'object',
       properties: {
         limit: {
-          type: "number",
-          description: "Maximum number of branches to return (default: 10, max: 100)",
+          type: 'number',
+          description: 'Maximum number of branches to return (default: 10, max: 100)',
           minimum: 1,
-          maximum: 100
-        }
-      }
-    }
-  }
+          maximum: 100,
+        },
+      },
+    },
+  },
 ];
 
 // Create a server
 const server = new Server(
   {
-    name: "memory-bank-mcp-server",
-    version: "1.0.0",
+    name: 'memory-bank-mcp-server',
+    version: '1.0.0',
   },
   {
     capabilities: {
@@ -261,7 +256,7 @@ const server = new Server(
 // Set up tool handlers
 server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
-    tools: AVAILABLE_TOOLS
+    tools: AVAILABLE_TOOLS,
   };
 });
 
@@ -279,40 +274,40 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   logger.debug('Parsed params:', params);
 
   switch (name) {
-    case "list_tools": {
+    case 'list_tools': {
       return {
         content: [
           {
-            type: "text",
-            text: JSON.stringify(AVAILABLE_TOOLS, null, 2)
-          }
-        ]
+            type: 'text',
+            text: JSON.stringify(AVAILABLE_TOOLS, null, 2),
+          },
+        ],
       };
     }
 
-    case "write_branch_memory_bank": {
+    case 'write_branch_memory_bank': {
       const path = params.path as string;
       const content = params.content as string | undefined;
-      const branch = (params.branch as string);
+      const branch = params.branch as string;
 
       if (!path) {
         throw new Error('Invalid arguments for write_branch_memory_bank');
       }
 
       if (!content) {
-        return { content: [{ type: "text", text: "Branch memory bank initialized successfully" }] };
+        return { content: [{ type: 'text', text: 'Branch memory bank initialized successfully' }] };
       }
 
       if (!app) {
         throw new Error('Application not initialized');
       }
       await app.getBranchController().writeDocument(branch, path, content);
-      return { content: [{ type: "text", text: "Document written successfully" }] };
+      return { content: [{ type: 'text', text: 'Document written successfully' }] };
     }
 
-    case "read_branch_memory_bank": {
+    case 'read_branch_memory_bank': {
       const path = params.path as string;
-      const branch = (params.branch as string);
+      const branch = params.branch as string;
 
       if (!path) {
         throw new Error('Invalid arguments for read_branch_memory_bank');
@@ -327,30 +322,28 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       return {
-        content: [{ type: "text", text: response.data?.content || '' }],
-        _meta: { lastModified: response.data?.lastModified || new Date().toISOString() }
+        content: [{ type: 'text', text: response.data?.content || '' }],
+        _meta: { lastModified: response.data?.lastModified || new Date().toISOString() },
       };
     }
 
-    case "read_rules": {
+    case 'read_rules': {
       const language = params.language as string;
 
-      if (!language || !["en", "ja"].includes(language)) {
+      if (!language || !['en', 'ja'].includes(language)) {
         throw new Error('Invalid arguments for read_rules');
       }
-
-      const validLanguage = language as Language;
 
       const dirname = path.dirname(fileURLToPath(import.meta.url));
       const filePath = path.join(dirname, 'templates', `rules-${language}.md`);
       const content = await fs.readFile(filePath, 'utf-8');
       return {
-        content: [{ type: "text", text: content }],
-        _meta: { lastModified: new Date().toISOString() }
+        content: [{ type: 'text', text: content }],
+        _meta: { lastModified: new Date().toISOString() },
       };
     }
 
-    case "write_global_memory_bank": {
+    case 'write_global_memory_bank': {
       const path = params.path as string;
       const content = params.content as string | undefined;
 
@@ -359,17 +352,17 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       if (!content) {
-        return { content: [{ type: "text", text: "Global memory bank initialized successfully" }] };
+        return { content: [{ type: 'text', text: 'Global memory bank initialized successfully' }] };
       }
 
       if (!app) {
         throw new Error('Application not initialized');
       }
       await app.getGlobalController().writeDocument(path, content);
-      return { content: [{ type: "text", text: "Document written successfully" }] };
+      return { content: [{ type: 'text', text: 'Document written successfully' }] };
     }
 
-    case "read_global_memory_bank": {
+    case 'read_global_memory_bank': {
       const path = params.path as string;
 
       if (!path) {
@@ -385,12 +378,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       return {
-        content: [{ type: "text", text: response.data?.content || '' }],
-        _meta: { lastModified: response.data?.lastModified || new Date().toISOString() }
+        content: [{ type: 'text', text: response.data?.content || '' }],
+        _meta: { lastModified: response.data?.lastModified || new Date().toISOString() },
       };
     }
 
-    case "read_branch_core_files": {
+    case 'read_branch_core_files': {
       const branch = params.branch as string;
 
       if (!branch) {
@@ -408,14 +401,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       return {
         content: [
           {
-            type: "text",
-            text: JSON.stringify(response.success ? response.data : {}, null, 2)
-          }
-        ]
+            type: 'text',
+            text: JSON.stringify(response.success ? response.data : {}, null, 2),
+          },
+        ],
       };
     }
 
-    case "write_branch_core_files": {
+    case 'write_branch_core_files': {
       const branch = params.branch as string;
       const files = params.files as Record<string, unknown>;
 
@@ -427,10 +420,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         throw new Error('Application not initialized');
       }
       await app.getBranchController().writeCoreFiles(branch, files);
-      return { content: [{ type: "text", text: "Core files updated successfully" }] };
+      return { content: [{ type: 'text', text: 'Core files updated successfully' }] };
     }
 
-    case "read_global_core_files": {
+    case 'read_global_core_files': {
       if (!app) {
         throw new Error('Application not initialized');
       }
@@ -442,14 +435,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       return {
         content: [
           {
-            type: "text",
-            text: JSON.stringify(response.success ? response.data : {}, null, 2)
-          }
-        ]
+            type: 'text',
+            text: JSON.stringify(response.success ? response.data : {}, null, 2),
+          },
+        ],
       };
     }
 
-    case "get_recent_branches": {
+    case 'get_recent_branches': {
       const limit = params.limit as number | undefined;
 
       if (!app) {
@@ -463,18 +456,18 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       return {
         content: [
           {
-            type: "text",
-            text: JSON.stringify(response.success ? response.data : {}, null, 2)
-          }
-        ]
+            type: 'text',
+            text: JSON.stringify(response.success ? response.data : {}, null, 2),
+          },
+        ],
       };
     }
 
-    case "create_pull_request": {
+    case 'create_pull_request': {
       const branch = params.branch as string;
       const title = params.title as string | undefined;
       const baseBranch = params.base as string | undefined;
-      const language = params.language as string || 'ja';
+      const language = (params.language as string) || 'ja';
 
       if (!branch) {
         throw new Error('Invalid arguments for create_pull_request');
@@ -520,7 +513,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         responseMessage += `Labels: ${pullRequest.labels.join(', ')}\n`;
       }
 
-      return { content: [{ type: "text", text: responseMessage }] };
+      return { content: [{ type: 'text', text: responseMessage }] };
     }
 
     default:
@@ -587,7 +580,7 @@ async function main() {
   app = await createApplication({
     memoryRoot: argv.docs as string,
     language: 'ja',
-    verbose: false
+    verbose: false,
   });
 
   logger.info(`Memory Bank MCP Server running on stdio`);
@@ -609,7 +602,7 @@ process.on('unhandledRejection', async (reason, promise) => {
 
 main().catch(async (error) => {
   logger.error('Fatal error:', error);
-  console.error("Fatal error in main():", error);
+  console.error('Fatal error in main():', error);
   await cleanup();
   process.exit(1);
 });

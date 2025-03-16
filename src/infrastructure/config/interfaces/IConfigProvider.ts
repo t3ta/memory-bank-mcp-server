@@ -30,7 +30,7 @@ export interface IConfigProvider {
    * @returns Branch memory bank path
    */
   getBranchMemoryPath(branchName: string): string;
-  
+
   /**
    * Get language setting
    * @returns Language setting
