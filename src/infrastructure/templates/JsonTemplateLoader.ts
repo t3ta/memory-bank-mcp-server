@@ -48,10 +48,10 @@ export class JsonTemplateLoader implements ITemplateLoader {
    * Gets the legacy templates directory path
    */
   private getLegacyTemplatesDirectory(): string {
-    // Use project-relative paths instead of import.meta.url
-    return path.join(process.cwd(), 'src/templates');
-  }
-  
+  /**
+   * Implements ITemplateLoader.loadJsonTemplate
+   */
+  async loadJsonTemplate(templateId: string): Promise<JsonTemplate> {
   /**
    * Implements ITemplateLoader.loadJsonTemplate
    */
@@ -72,9 +72,19 @@ export class JsonTemplateLoader implements ITemplateLoader {
       const template = JSON.parse(content);
       return validateJsonTemplate(template);
     } catch (error) {
-      if (error instanceof SyntaxError) {
-        throw new Error(`Invalid JSON format in template ${templateId}: ${error.message}`);
-      }
+  /**
+   * Implements ITemplateLoader.getMarkdownTemplate
+   */
+  async getMarkdownTemplate(templateId: string, language: Language, variables?: Record<string, string>): Promise<string> {
+    // Check if language is supported
+    if (!this.i18nProvider.isLanguageSupported(language)) {
+      throw new Error(`Unsupported language: ${language}`);
+    }
+    
+    try {
+    }
+    
+    try {
       throw error;
     }
   }
@@ -111,8 +121,10 @@ export class JsonTemplateLoader implements ITemplateLoader {
    * Implements ITemplateLoader.loadLegacyTemplate
    */
   async loadLegacyTemplate(templatePath: string, language: Language): Promise<string> {
-    try {
-      // If templatePath is just a template name without extension, resolve it
+  /**
+   * Implements ITemplateLoader.loadLegacyTemplate
+   */
+  async loadLegacyTemplate(templatePath: string, language: Language): Promise<string> {
       if (!templatePath.includes('.')) {
         templatePath = this.getLegacyTemplatePath(templatePath, language);
       }
@@ -139,8 +151,10 @@ export class JsonTemplateLoader implements ITemplateLoader {
   
   /**
    * Gets the legacy template file path based on template name and language
-   * 
-   * @param templateName Template name (without extension)
+  /**
+   * Implements ITemplateLoader.templateExists
+   */
+  async templateExists(templateId: string): Promise<boolean> {
    * @param language Target language
    * @returns Full path to the legacy template file
    */

@@ -53,26 +53,57 @@ export class MarkdownToJsonConverter {
       // Collect all section IDs
       Object.keys(sections).forEach(id => allSectionIds.add(id));
     }
+  convertMarkdownsToJsonTemplate(
+    templateId: string,
+    templateType: string,
+    languageContents: Record<string, string>,
+    nameMap: Record<string, string>,
+    descriptionMap?: Record<string, string>
+  ): JsonTemplate {
+    // Extract sections from each language version
+    const sectionsByLanguage: Record<string, Record<string, ExtractedSection>> = {};
+    const allSectionTitles = new Map<string, string>();
+    const sectionIdMapping: Record<string, Record<string, string>> = {};
 
+    // Process each language version
+    for (const [language, content] of Object.entries(languageContents)) {
+      const sections = this.extractSections(content);
+      sectionsByLanguage[language] = sections;
+      
+      // Collect all section IDs and their titles
+      for (const [id, section] of Object.entries(sections)) {
+        if (!sectionIdMapping[id]) {
+          sectionIdMapping[id] = {};
+        }
+        sectionIdMapping[id][language] = section.title;
+        allSectionTitles.set(id, section.title);
+      }
+    }
+
+    // Determine common section IDs across languages
+    const mappedSectionIds = Object.keys(sectionIdMapping);
+          isOptional = true;
     // Construct template sections
     const templateSections: Record<string, JsonTemplateSection> = {};
     
-    for (const sectionId of allSectionIds) {
+    for (const sectionId of mappedSectionIds) {
       const titleMap: Record<string, string> = {};
       const contentMap: Record<string, string> = {};
-      let isOptional = true;
-
+      // When a section only appears in one language, it's considered optional
+      let isOptional = false;
+      
       // For each language, get the section title and content
       for (const [language, sections] of Object.entries(sectionsByLanguage)) {
-        const section = sections[sectionId];
+        const section = Object.entries(sections).find(
+          ([id, _]) => id === sectionId
+        )?.[1];
+        
         if (section) {
           titleMap[language] = section.title;
           contentMap[language] = section.content;
-          
-          // If at least one language has non-empty content, consider the section required
-          if (section.content.trim() !== '') {
-            isOptional = false;
-          }
+        } else {
+          // If section is missing in any language, it's optional
+          isOptional = true;
         }
       }
 
@@ -83,28 +114,6 @@ export class MarkdownToJsonConverter {
         isOptional
       );
     }
-
-    // Create the template with all sections
-    return createJsonTemplate(
-      templateId,
-      templateType,
-      nameMap,
-      templateSections,
-      descriptionMap
-    );
-  }
-
-  /**
-   * Extract sections from Markdown content
-   * Sections are identified by heading level 2 (## )
-   * 
-   * @param markdown Markdown content
-   * @returns Map of normalized section IDs to section objects
-   */
-  private extractSections(markdown: string): Record<string, ExtractedSection> {
-    const sections: Record<string, ExtractedSection> = {};
-    const lines = markdown.split('\n');
-    
     let currentSectionId: string | null = null;
     let currentSectionTitle: string | null = null;
     let currentSectionContent: string[] = [];
@@ -163,6 +172,53 @@ export class MarkdownToJsonConverter {
       .replace(/[^\w\s]/g, '')
       .split(/\s+/);
     
+    return words[0] + words.slice(1).map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join('');
+  }
+
+  /**
+   * Find placeholders in Markdown content
+   * Placeholders are in the format {{PLACEHOLDER_NAME}}
+   * 
+   * @param markdown Markdown content
+   * @returns Map of placeholder names to empty strings (to be filled with descriptions)
+   */
+  findPlaceholders(markdown: string): Record<string, string> {
+    // For non-latin characters (like Japanese), create a mapping to common IDs
+    if (/[\u3000-\u9fff]/.test(title)) {
+      if (title === 'はじめに') return 'introduction';
+      if (title === '主要な内容') return 'mainContent';
+      if (title === 'まとめ') return 'summary';
+      // If no mapping exists, just return the original title
+      placeholders[match[1]] = '';
+    }
+    
+  /**
+   * Normalize a section title to a valid section ID
+   * 
+   * @param title Section title
+   * @returns Normalized section ID
+   */
+    // For non-latin characters (like Japanese), create a mapping to common IDs
+    if (/[　-鿿]/.test(title)) {
+      if (title === 'はじめに') return 'introduction';
+      if (title === '主要な内容') return 'mainContent';
+      if (title === 'まとめ') return 'summary';
+      // If no mapping exists, just return the original title
+      return title;
+    }
+    
+    // For latin characters, convert to camelCase
+    const words = title
+      .toLowerCase()
+      .replace(/[^\w\s]/g, '')
+      .split(/\s+/);
+    
+    return words[0] + words.slice(1).map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join('');
+  }
     return words[0] + words.slice(1).map(word => 
       word.charAt(0).toUpperCase() + word.slice(1)
     ).join('');

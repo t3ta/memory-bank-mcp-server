@@ -12,7 +12,6 @@ import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
 import { Tag } from '../../../domain/entities/Tag.js';
 import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
 import path from 'path';
-import { fileURLToPath } from 'url';
 
 /**
  * Implementation of the CreatePullRequest use case
@@ -110,8 +109,8 @@ export class CreatePullRequestUseCase implements ICreatePullRequestUseCase {
   ): Promise<PullRequestDTO> {
     // Get template file path
     const templateFileName = language === 'en' ? this.TEMPLATES.en : this.TEMPLATES.ja;
-    const templateDirname = path.dirname(fileURLToPath(import.meta.url));
-    const templatePath = path.join(templateDirname, '../../../../src/templates', templateFileName);
+    // Use process.cwd() instead of import.meta.url
+    const templatePath = path.join(process.cwd(), 'src/templates', templateFileName);
 
     // Read template content
     let templateContent: string;
