@@ -4,3 +4,4 @@ export * from './BranchInfoDTO.js';
 export * from './RecentBranchDTO.js';
 export * from './CoreFilesDTO.js';
 export * from './PullRequestDTO.js';
+export * from './JsonDocumentDTO.js';

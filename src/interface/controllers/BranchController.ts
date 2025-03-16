@@ -7,9 +7,14 @@ import { UpdateTagIndexUseCaseV2 } from '../../application/usecases/common/Updat
 import { GetRecentBranchesUseCase } from '../../application/usecases/common/GetRecentBranchesUseCase.js';
 import { ReadBranchCoreFilesUseCase } from '../../application/usecases/common/ReadBranchCoreFilesUseCase.js';
 import { CreateBranchCoreFilesUseCase } from '../../application/usecases/common/CreateBranchCoreFilesUseCase.js';
+import { ReadJsonDocumentUseCase } from '../../application/usecases/json/ReadJsonDocumentUseCase.js';
+import { WriteJsonDocumentUseCase } from '../../application/usecases/json/WriteJsonDocumentUseCase.js';
+import { DeleteJsonDocumentUseCase } from '../../application/usecases/json/DeleteJsonDocumentUseCase.js';
+import { SearchJsonDocumentsUseCase } from '../../application/usecases/json/SearchJsonDocumentsUseCase.js';
+import { UpdateJsonIndexUseCase } from '../../application/usecases/json/UpdateJsonIndexUseCase.js';
 import { MCPResponsePresenter } from '../presenters/MCPResponsePresenter.js';
 import { MCPResponse } from '../presenters/types/index.js';
-import { DocumentDTO, CoreFilesDTO } from '../../application/dtos/index.js';
+import { DocumentDTO, CoreFilesDTO, JsonDocumentDTO } from '../../application/dtos/index.js';
 import { DomainError } from '../../shared/errors/DomainError.js';
 import { ApplicationError } from '../../shared/errors/ApplicationError.js';
 import { InfrastructureError } from '../../shared/errors/InfrastructureError.js';
@@ -42,6 +47,11 @@ export class BranchController implements IBranchController {
    */
   // Optional dependencies
   private readonly updateTagIndexUseCaseV2?: UpdateTagIndexUseCaseV2;
+  private readonly readJsonDocumentUseCase?: ReadJsonDocumentUseCase;
+  private readonly writeJsonDocumentUseCase?: WriteJsonDocumentUseCase;
+  private readonly deleteJsonDocumentUseCase?: DeleteJsonDocumentUseCase;
+  private readonly searchJsonDocumentsUseCase?: SearchJsonDocumentsUseCase;
+  private readonly updateJsonIndexUseCase?: UpdateJsonIndexUseCase;
 
   constructor(
     private readonly readBranchDocumentUseCase: ReadBranchDocumentUseCase,
@@ -54,10 +64,20 @@ export class BranchController implements IBranchController {
     private readonly presenter: MCPResponsePresenter,
     options?: {
       updateTagIndexUseCaseV2?: UpdateTagIndexUseCaseV2;
+      readJsonDocumentUseCase?: ReadJsonDocumentUseCase;
+      writeJsonDocumentUseCase?: WriteJsonDocumentUseCase;
+      deleteJsonDocumentUseCase?: DeleteJsonDocumentUseCase;
+      searchJsonDocumentsUseCase?: SearchJsonDocumentsUseCase;
+      updateJsonIndexUseCase?: UpdateJsonIndexUseCase;
     }
   ) {
     // Set optional dependencies
     this.updateTagIndexUseCaseV2 = options?.updateTagIndexUseCaseV2;
+    this.readJsonDocumentUseCase = options?.readJsonDocumentUseCase;
+    this.writeJsonDocumentUseCase = options?.writeJsonDocumentUseCase;
+    this.deleteJsonDocumentUseCase = options?.deleteJsonDocumentUseCase;
+    this.searchJsonDocumentsUseCase = options?.searchJsonDocumentsUseCase;
+    this.updateJsonIndexUseCase = options?.updateJsonIndexUseCase;
   }
 
   /**
@@ -660,5 +680,148 @@ export class BranchController implements IBranchController {
         { originalError: error }
       )
     );
+  }
+
+  /**
+   * Read JSON document from branch memory bank
+   * @param branchName Branch name
+   * @param options Options for reading document (path or ID)
+   * @returns Promise resolving to MCP response with JSON document
+   */
+  async readJsonDocument(branchName: string, options: { path?: string; id?: string }): Promise<MCPResponse<JsonDocumentDTO>> {
+    try {
+      logger.info(`Reading JSON document from branch ${branchName}: ${options.path || options.id}`);
+
+      if (!this.readJsonDocumentUseCase) {
+        throw new ApplicationError(
+          'FEATURE_NOT_AVAILABLE',
+          'JSON document features are not available in this configuration'
+        );
+      }
+
+      const result = await this.readJsonDocumentUseCase.execute({
+        branchName,
+        path: options.path,
+        id: options.id,
+      });
+
+      return this.presenter.present(result.document);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  /**
+   * Write JSON document to branch memory bank
+   * @param branchName Branch name
+   * @param document Document data to write
+   * @returns Promise resolving to MCP response with the result
+   */
+  async writeJsonDocument(branchName: string, document: JsonDocumentDTO): Promise<MCPResponse> {
+    try {
+      logger.info(`Writing JSON document to branch ${branchName}: ${document.path}`);
+
+      if (!this.writeJsonDocumentUseCase) {
+        throw new ApplicationError(
+          'FEATURE_NOT_AVAILABLE',
+          'JSON document features are not available in this configuration'
+        );
+      }
+
+      const result = await this.writeJsonDocumentUseCase.execute({
+        branchName,
+        document,
+      });
+
+      return this.presenter.present(result);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  /**
+   * Delete JSON document from branch memory bank
+   * @param branchName Branch name
+   * @param options Options for deleting document (path or ID)
+   * @returns Promise resolving to MCP response with the result
+   */
+  async deleteJsonDocument(branchName: string, options: { path?: string; id?: string }): Promise<MCPResponse> {
+    try {
+      logger.info(`Deleting JSON document from branch ${branchName}: ${options.path || options.id}`);
+
+      if (!this.deleteJsonDocumentUseCase) {
+        throw new ApplicationError(
+          'FEATURE_NOT_AVAILABLE',
+          'JSON document features are not available in this configuration'
+        );
+      }
+
+      const result = await this.deleteJsonDocumentUseCase.execute({
+        branchName,
+        path: options.path,
+        id: options.id,
+      });
+
+      return this.presenter.present(result);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  /**
+   * List JSON documents in branch memory bank
+   * @param branchName Branch name
+   * @param options Options for listing documents (type, tags)
+   * @returns Promise resolving to MCP response with list of documents
+   */
+  async listJsonDocuments(branchName: string, options?: { type?: string; tags?: string[] }): Promise<MCPResponse<JsonDocumentDTO[]>> {
+    try {
+      logger.info(`Listing JSON documents in branch ${branchName}`);
+
+      if (!this.searchJsonDocumentsUseCase) {
+        throw new ApplicationError(
+          'FEATURE_NOT_AVAILABLE',
+          'JSON document features are not available in this configuration'
+        );
+      }
+
+      const result = await this.searchJsonDocumentsUseCase.execute({
+        branchName,
+        documentType: options?.type,
+        tags: options?.tags,
+      });
+
+      return this.presenter.present(result.documents);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  /**
+   * Search JSON documents in branch memory bank
+   * @param branchName Branch name
+   * @param query Search query
+   * @returns Promise resolving to MCP response with matching documents
+   */
+  async searchJsonDocuments(branchName: string, query: string): Promise<MCPResponse<JsonDocumentDTO[]>> {
+    try {
+      logger.info(`Searching JSON documents in branch ${branchName} with query: ${query}`);
+
+      if (!this.searchJsonDocumentsUseCase) {
+        throw new ApplicationError(
+          'FEATURE_NOT_AVAILABLE',
+          'JSON document features are not available in this configuration'
+        );
+      }
+
+      const result = await this.searchJsonDocumentsUseCase.execute({
+        branchName,
+        query,
+      });
+
+      return this.presenter.present(result.documents);
+    } catch (error) {
+      return this.handleError(error);
+    }
   }
 }

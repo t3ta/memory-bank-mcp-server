@@ -249,10 +249,25 @@ export function registerInterfaceServices(container: DIContainer): void {
     const updateTagIndexUseCase = container.get('updateTagIndexUseCase') as UpdateTagIndexUseCase;
     const presenter = container.get('mcpResponsePresenter') as MCPResponsePresenter;
 
-    // Get update tag index use case V2
+    // Get optional use cases
     const updateTagIndexUseCaseV2 = container.get(
       'updateTagIndexUseCaseV2'
     ) as UpdateTagIndexUseCaseV2;
+    const readJsonDocumentUseCase = container.get(
+      'readJsonDocumentUseCase'
+    ) as ReadJsonDocumentUseCase;
+    const writeJsonDocumentUseCase = container.get(
+      'writeJsonDocumentUseCase'
+    ) as WriteJsonDocumentUseCase;
+    const deleteJsonDocumentUseCase = container.get(
+      'deleteJsonDocumentUseCase'
+    ) as DeleteJsonDocumentUseCase;
+    const searchJsonDocumentsUseCase = container.get(
+      'searchJsonDocumentsUseCase'
+    ) as SearchJsonDocumentsUseCase;
+    const updateJsonIndexUseCase = container.get(
+      'updateJsonIndexUseCase'
+    ) as UpdateJsonIndexUseCase;
 
     return new GlobalController(
       readGlobalDocumentUseCase,
@@ -260,7 +275,14 @@ export function registerInterfaceServices(container: DIContainer): void {
       searchDocumentsByTagsUseCase,
       updateTagIndexUseCase, // Keep V1 for backwards compatibility
       presenter,
-      { updateTagIndexUseCaseV2 } // Pass V2 as an optional dependency
+      { 
+        updateTagIndexUseCaseV2,
+        readJsonDocumentUseCase,
+        writeJsonDocumentUseCase,
+        deleteJsonDocumentUseCase,
+        searchJsonDocumentsUseCase,
+        updateJsonIndexUseCase
+      } // Pass optional dependencies
     );
   });
 
@@ -301,7 +323,14 @@ export function registerInterfaceServices(container: DIContainer): void {
       readBranchCoreFilesUseCase,
       createBranchCoreFilesUseCase,
       presenter,
-      { updateTagIndexUseCaseV2 } // Pass V2 as an optional dependency
+      { 
+        updateTagIndexUseCaseV2,
+        readJsonDocumentUseCase,
+        writeJsonDocumentUseCase,
+        deleteJsonDocumentUseCase,
+        searchJsonDocumentsUseCase,
+        updateJsonIndexUseCase
+      } // Pass optional dependencies
     );
   });
 }

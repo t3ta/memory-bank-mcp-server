@@ -4,9 +4,14 @@ import { WriteGlobalDocumentUseCase } from '../../application/usecases/global/Wr
 import { SearchDocumentsByTagsUseCase } from '../../application/usecases/common/SearchDocumentsByTagsUseCase.js';
 import { UpdateTagIndexUseCase } from '../../application/usecases/common/UpdateTagIndexUseCase.js';
 import { UpdateTagIndexUseCaseV2 } from '../../application/usecases/common/UpdateTagIndexUseCaseV2.js';
+import { ReadJsonDocumentUseCase } from '../../application/usecases/json/ReadJsonDocumentUseCase.js';
+import { WriteJsonDocumentUseCase } from '../../application/usecases/json/WriteJsonDocumentUseCase.js';
+import { DeleteJsonDocumentUseCase } from '../../application/usecases/json/DeleteJsonDocumentUseCase.js';
+import { SearchJsonDocumentsUseCase } from '../../application/usecases/json/SearchJsonDocumentsUseCase.js';
+import { UpdateJsonIndexUseCase } from '../../application/usecases/json/UpdateJsonIndexUseCase.js';
 import { MCPResponsePresenter } from '../presenters/MCPResponsePresenter.js';
 import { MCPResponse } from '../presenters/types/index.js';
-import { DocumentDTO } from '../../application/dtos/index.js';
+import { DocumentDTO, JsonDocumentDTO } from '../../application/dtos/index.js';
 import { DomainError } from '../../shared/errors/DomainError.js';
 import { ApplicationError } from '../../shared/errors/ApplicationError.js';
 import { InfrastructureError } from '../../shared/errors/InfrastructureError.js';
@@ -26,6 +31,11 @@ export class GlobalController implements IGlobalController {
    */
   // Optional dependencies
   private readonly updateTagIndexUseCaseV2?: UpdateTagIndexUseCaseV2;
+  private readonly readJsonDocumentUseCase?: ReadJsonDocumentUseCase;
+  private readonly writeJsonDocumentUseCase?: WriteJsonDocumentUseCase;
+  private readonly deleteJsonDocumentUseCase?: DeleteJsonDocumentUseCase;
+  private readonly searchJsonDocumentsUseCase?: SearchJsonDocumentsUseCase;
+  private readonly updateJsonIndexUseCase?: UpdateJsonIndexUseCase;
 
   constructor(
     private readonly readGlobalDocumentUseCase: ReadGlobalDocumentUseCase,
@@ -35,10 +45,20 @@ export class GlobalController implements IGlobalController {
     private readonly presenter: MCPResponsePresenter,
     options?: {
       updateTagIndexUseCaseV2?: UpdateTagIndexUseCaseV2;
+      readJsonDocumentUseCase?: ReadJsonDocumentUseCase;
+      writeJsonDocumentUseCase?: WriteJsonDocumentUseCase;
+      deleteJsonDocumentUseCase?: DeleteJsonDocumentUseCase;
+      searchJsonDocumentsUseCase?: SearchJsonDocumentsUseCase;
+      updateJsonIndexUseCase?: UpdateJsonIndexUseCase;
     }
   ) {
     // Set optional dependencies
     this.updateTagIndexUseCaseV2 = options?.updateTagIndexUseCaseV2;
+    this.readJsonDocumentUseCase = options?.readJsonDocumentUseCase;
+    this.writeJsonDocumentUseCase = options?.writeJsonDocumentUseCase;
+    this.deleteJsonDocumentUseCase = options?.deleteJsonDocumentUseCase;
+    this.searchJsonDocumentsUseCase = options?.searchJsonDocumentsUseCase;
+    this.updateJsonIndexUseCase = options?.updateJsonIndexUseCase;
   }
 
   /**
@@ -204,5 +224,143 @@ export class GlobalController implements IGlobalController {
         { originalError: error }
       )
     );
+  }
+
+  /**
+   * Read JSON document from global memory bank
+   * @param options Options for reading document (path or ID)
+   * @returns Promise resolving to MCP response with JSON document
+   */
+  async readJsonDocument(options: { path?: string; id?: string }): Promise<MCPResponse<JsonDocumentDTO>> {
+    try {
+      logger.info(`Reading global JSON document: ${options.path || options.id}`);
+
+      if (!this.readJsonDocumentUseCase) {
+        throw new ApplicationError(
+          'FEATURE_NOT_AVAILABLE',
+          'JSON document features are not available in this configuration'
+        );
+      }
+
+      const result = await this.readJsonDocumentUseCase.execute({
+        branchName: undefined, // Global memory bank
+        path: options.path,
+        id: options.id,
+      });
+
+      return this.presenter.present(result.document);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  /**
+   * Write JSON document to global memory bank
+   * @param document Document data to write
+   * @returns Promise resolving to MCP response with the result
+   */
+  async writeJsonDocument(document: JsonDocumentDTO): Promise<MCPResponse> {
+    try {
+      logger.info(`Writing global JSON document: ${document.path}`);
+
+      if (!this.writeJsonDocumentUseCase) {
+        throw new ApplicationError(
+          'FEATURE_NOT_AVAILABLE',
+          'JSON document features are not available in this configuration'
+        );
+      }
+
+      const result = await this.writeJsonDocumentUseCase.execute({
+        branchName: undefined, // Global memory bank
+        document,
+      });
+
+      return this.presenter.present(result);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  /**
+   * Delete JSON document from global memory bank
+   * @param options Options for deleting document (path or ID)
+   * @returns Promise resolving to MCP response with the result
+   */
+  async deleteJsonDocument(options: { path?: string; id?: string }): Promise<MCPResponse> {
+    try {
+      logger.info(`Deleting global JSON document: ${options.path || options.id}`);
+
+      if (!this.deleteJsonDocumentUseCase) {
+        throw new ApplicationError(
+          'FEATURE_NOT_AVAILABLE',
+          'JSON document features are not available in this configuration'
+        );
+      }
+
+      const result = await this.deleteJsonDocumentUseCase.execute({
+        branchName: undefined, // Global memory bank
+        path: options.path,
+        id: options.id,
+      });
+
+      return this.presenter.present(result);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  /**
+   * List JSON documents in global memory bank
+   * @param options Options for listing documents (type, tags)
+   * @returns Promise resolving to MCP response with list of documents
+   */
+  async listJsonDocuments(options?: { type?: string; tags?: string[] }): Promise<MCPResponse<JsonDocumentDTO[]>> {
+    try {
+      logger.info('Listing global JSON documents');
+
+      if (!this.searchJsonDocumentsUseCase) {
+        throw new ApplicationError(
+          'FEATURE_NOT_AVAILABLE',
+          'JSON document features are not available in this configuration'
+        );
+      }
+
+      const result = await this.searchJsonDocumentsUseCase.execute({
+        branchName: undefined, // Global memory bank
+        documentType: options?.type,
+        tags: options?.tags,
+      });
+
+      return this.presenter.present(result.documents);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  /**
+   * Search JSON documents in global memory bank
+   * @param query Search query
+   * @returns Promise resolving to MCP response with matching documents
+   */
+  async searchJsonDocuments(query: string): Promise<MCPResponse<JsonDocumentDTO[]>> {
+    try {
+      logger.info(`Searching global JSON documents with query: ${query}`);
+
+      if (!this.searchJsonDocumentsUseCase) {
+        throw new ApplicationError(
+          'FEATURE_NOT_AVAILABLE',
+          'JSON document features are not available in this configuration'
+        );
+      }
+
+      const result = await this.searchJsonDocumentsUseCase.execute({
+        branchName: undefined, // Global memory bank
+        query,
+      });
+
+      return this.presenter.present(result.documents);
+    } catch (error) {
+      return this.handleError(error);
+    }
   }
 }
