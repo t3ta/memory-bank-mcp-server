@@ -2,12 +2,16 @@
 
 ## 現在の作業内容
 
-JSONをベースファイルとしてMarkdownをプレゼンテーション用として位置づける実装を進めている。将来的にはSurrealDBのembeddedへ置き換えることも視野に入れている。
+JSONをベースファイルとしてMarkdownをプレゼンテーション用として位置づける実装。将来的にはSurrealDBのembeddedへの移行を見据えたデータ構造設計。
 
 ## 最近の変更点
 
 - DocumentPathクラスに`isJSON()`と`isMarkdown()`ヘルパーメソッドを追加
-- JSON直読みから始めて、必要に応じてインデックスや検索機能を強化していく方針に決定
+- JSON形式のスキーマ定義（json-document.ts）を実装
+- Markdown⇔JSON変換ユーティリティを実装
+- MemoryDocumentエンティティにJSON変換メソッドを追加
+- FileSystemMemoryDocumentRepositoryをJSON対応に拡張
+- 初期実装をコミット (0a2df55)
 
 ## アクティブな決定事項
 
@@ -21,8 +25,8 @@ JSONをベースファイルとしてMarkdownをプレゼンテーション用�
     "schema": "memory_document_v1",
     "metadata": {
       "title": "タイトル",
-      "path": "パス",
       "documentType": "ドキュメントタイプ",
+      "path": "パス",
       "tags": ["タグ1", "タグ2"],
       "lastModified": "日時"
     },
@@ -34,14 +38,16 @@ JSONをベースファイルとしてMarkdownをプレゼンテーション用�
 
 ## 検討事項
 
-- コンフリクト対応（当初はgit管理による解決に依存）
-- 検索性の確保（最初はシンプルに全ファイル検索、将来的にインデックス導入？）
-- 各ドキュメントタイプに応じたJSONスキーマの詳細設計
-- Markdownからの初期マイグレーション戦略
+- テスト戦略（単体テストだけでなく統合テストも必要）
+- Markdownパーサーの複雑なドキュメント対応
+- MarkdownとJSONの二重管理問題（同期方法など）
+- パフォーマンス最適化（特に大量のJSONファイル検索時）
+- バリデーションの厳密さのバランス
 
 ## 次のステップ
 
-- MemoryDocument JSONスキーマの詳細定義
-- JSONからMarkdownへの変換ユーティリティ実装
-- FileSystemMemoryDocumentRepositoryのJSON対応
-- コアファイルのJSONバージョン作成
+- Markdown/JSONパーサーと変換ユーティリティのテスト実装
+- リポジトリの統合テスト実装
+- サンプルJSONファイルの作成
+- CLIコマンドでのJSON対応明示化
+- ドキュメント同期機能の検討
