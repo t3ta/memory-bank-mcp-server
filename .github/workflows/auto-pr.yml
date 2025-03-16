@@ -45,8 +45,8 @@ jobs:
         run: |
           # Node.jsスクリプトを作成して、より堅牢な抽出処理を実現
           cat > extract-pr-info.js << 'EOF'
-          const fs = require('fs');
-          const path = require('path');
+          import fs from 'fs';
+          import path from 'path';
 
           // ブランチ名からディレクトリ名を生成
           const branchName = process.env.BRANCH_NAME;
@@ -233,10 +233,10 @@ jobs:
           console.log(result.body.substring(0, 300) + '...');
 
           // GitHub Actions用の環境変数をセット
-          const fs_env = require('fs');
-          fs_env.appendFileSync(process.env.GITHUB_ENV, `PR_TITLE=${result.title}\n`);
-          fs_env.appendFileSync(process.env.GITHUB_ENV, `PR_LABELS=${result.labels.join(',')}\n`);
-          fs_env.appendFileSync(process.env.GITHUB_ENV, 'PR_BODY<<EOF\n' + result.body + '\nEOF\n');
+          // 環境変数用のファイル操作はfsを再利用
+          fs.appendFileSync(process.env.GITHUB_ENV, `PR_TITLE=${result.title}\n`);
+          fs.appendFileSync(process.env.GITHUB_ENV, `PR_LABELS=${result.labels.join(',')}\n`);
+          fs.appendFileSync(process.env.GITHUB_ENV, 'PR_BODY<<EOF\n' + result.body + '\nEOF\n');
 
           // ターゲットブランチが指定されていない場合はデフォルト設定
           if (!process.env.TARGET_BRANCH) {
@@ -246,8 +246,8 @@ jobs:
           }
           EOF
 
-          # Node.jsスクリプトを実行
-          node extract-pr-info.js
+          # Node.jsスクリプトをES Moduleとして実行
+          node --input-type=module extract-pr-info.js
 
       - name: Create Pull Request
         env:
