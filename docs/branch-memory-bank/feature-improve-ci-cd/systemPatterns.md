@@ -45,10 +45,11 @@ PRのタイトルとラベルはコミットの種類を反映すべき
 ## 関連ファイルとディレクトリ構造
 
 - .github/workflows/develop-to-master-pr.yml - 新規作成するワークフロー
-- src/templates/develop-to-master-pr-template.md - 日本語テンプレート
-- src/templates/develop-to-master-pr-template-en.md - 英語テンプレート
+- .github/workflow-templates/develop-to-master-pr-template.md - 日本語テンプレート
+- .github/workflow-templates/develop-to-master-pr-template-en.md - 英語テンプレート
 - .github/workflows/auto-pr.yml - 既存のPR自動作成ワークフロー
 - .github/workflows/release.yml - masterブランチでのリリースワークフロー
 - .github/workflows/test.yml - テストワークフロー
 - .github/workflows/version-bump.yml - バージョンアップワークフロー
 - docs/global-memory-bank/ci-cd/workflows.md - CI/CDワークフローのドキュメント
+- src/templates/ - ソフトウェア機能として提供するテンプレート

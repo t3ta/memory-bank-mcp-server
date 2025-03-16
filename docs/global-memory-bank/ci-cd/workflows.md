@@ -6,6 +6,32 @@ tags: #ci-cd #github-actions #automation #workflows
 
 This document provides an overview of the CI/CD workflows used in the Memory Bank MCP Server project. These workflows automate various aspects of the development process, from testing and building to deployment and release management.
 
+## Workflow Templates
+
+Workflow related templates are stored in a dedicated directory to maintain clear separation from application templates:
+
+- **Location**: `.github/workflow-templates/`
+- **Purpose**: Strictly for GitHub Actions workflow use
+- **Examples**: PR templates for automated workflows like develop-to-master PRs
+
+Application templates provided as part of the software functionality remain in the `src/templates/` directory.
+
+### Template Structure
+
+```
+.github/workflow-templates/
+  ├── develop-to-master-pr-template.md      # Japanese template
+  └── develop-to-master-pr-template-en.md   # English template
+
+src/templates/
+  ├── pull-request-template.md           # Application template (JP)
+  ├── pull-request-template-en.md        # Application template (EN)
+  ├── rules-ja.md                      # Memory bank rules (JP)
+  └── rules-en.md                      # Memory bank rules (EN)
+```
+
+This separation ensures clear responsibility boundaries and prevents confusion as the project grows.
+
 ## GitHub Actions Workflows
 
 Our CI/CD pipeline consists of the following GitHub Actions workflows:
@@ -126,7 +152,7 @@ When working with these workflows:
 
 1. **Use conventional commit messages** (e.g., `feat: add new feature` or `fix: resolve bug`) to help with automatic PR categorization and release notes.
 
-2. **Keep PR templates updated** - The templates in `src/templates/` directory are used for automatic PR creation.
+2. **Keep PR templates updated** - The templates in `.github/workflow-templates/` directory are used for GitHub Actions, while templates in `src/templates/` are used for application functionality.
 
 3. **Include proper test coverage** for new features to ensure the test workflow passes.
 

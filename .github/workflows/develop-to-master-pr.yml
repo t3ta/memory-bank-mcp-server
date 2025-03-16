@@ -66,9 +66,9 @@ jobs:
 
           # 言語を判断（デフォルトは日本語）
           if [[ "$GITHUB_REPOSITORY" =~ .*-en$ ]]; then
-            template_file="src/templates/develop-to-master-pr-template-en.md"
+            template_file=".github/workflow-templates/develop-to-master-pr-template-en.md"
           else
-            template_file="src/templates/develop-to-master-pr-template.md"
+            template_file=".github/workflow-templates/develop-to-master-pr-template.md"
           fi
 
           # テンプレートファイルの存在確認
