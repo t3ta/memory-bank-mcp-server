@@ -23,7 +23,7 @@ import { IConfigProvider } from '../../infrastructure/config/interfaces/IConfigP
 import { ConfigProvider } from '../../infrastructure/config/ConfigProvider.js';
 import { FileSystemGlobalMemoryBankRepository } from '../../infrastructure/repositories/file-system/FileSystemGlobalMemoryBankRepository.js';
 import { FileSystemBranchMemoryBankRepository } from '../../infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.js';
-import { FileSystemTagIndexRepository } from '../../infrastructure/repositories/file-system/FileSystemTagIndexRepository.js';
+import { FileSystemTagIndexRepositoryV1Bridge } from '../../infrastructure/repositories/file-system/FileSystemTagIndexRepositoryV1Bridge.js';
 
 // Interface layer
 import { MCPResponsePresenter } from '../../interface/presenters/MCPResponsePresenter.js';
@@ -79,7 +79,7 @@ export async function registerInfrastructureServices(
     const branchMemoryBankRoot = path.join(config.memoryBankRoot, 'branch-memory-bank');
     const globalMemoryBankPath = configProvider.getGlobalMemoryPath();
 
-    return new FileSystemTagIndexRepository(
+    return new FileSystemTagIndexRepositoryV1Bridge(
       fileSystemService as FileSystemService,
       branchMemoryBankRoot,
       globalMemoryBankPath,
@@ -165,7 +165,7 @@ export function registerApplicationServices(container: DIContainer): void {
     const branchRepository = container.get(
       'branchMemoryBankRepository'
     ) as FileSystemBranchMemoryBankRepository;
-    const tagIndexRepository = container.get('tagIndexRepository') as FileSystemTagIndexRepository;
+    const tagIndexRepository = container.get('tagIndexRepository') as FileSystemTagIndexRepositoryV1Bridge;
 
     return new UpdateTagIndexUseCaseV2(globalRepository, branchRepository, tagIndexRepository);
   });

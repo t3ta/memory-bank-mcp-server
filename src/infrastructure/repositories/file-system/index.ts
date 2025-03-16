@@ -1,1 +1,1 @@
-export * from './FileSystemTagIndexRepository.js';
+export * from './FileSystemTagIndexRepositoryV1Bridge.js';
