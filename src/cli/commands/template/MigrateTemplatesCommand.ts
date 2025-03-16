@@ -4,8 +4,8 @@
  */
 import { Command } from 'commander';
 import { inject, injectable } from 'tsyringe';
-import chalk from 'chalk';
 import path from 'path';
+import chalk from 'chalk';
 import { ICommand } from '../../interfaces/ICommand.js';
 import { MarkdownToJsonConverter } from '../../../infrastructure/templates/MarkdownToJsonConverter.js';
 import { IFileSystemService } from '../../../infrastructure/storage/interfaces/IFileSystemService.js';
@@ -33,15 +33,18 @@ export class MigrateTemplatesCommand implements ICommand {
       names: {
         ja: 'プルリクエストテンプレート',
         en: 'Pull Request Template',
+        zh: 'Pull Request Template'
       },
       descriptions: {
         ja: 'ブランチのメモリバンク情報に基づいてプルリクエストを生成するためのテンプレート',
         en: 'Template for generating pull requests based on branch memory bank information',
+        zh: 'Template for generating pull requests based on branch memory bank information'
       },
       legacyPaths: {
         ja: 'pull-request-template.md',
         en: 'pull-request-template-en.md',
-      },
+        zh: 'pull-request-template-en.md'
+      }
     },
     {
       id: 'develop-to-master-pr-template',
@@ -49,15 +52,18 @@ export class MigrateTemplatesCommand implements ICommand {
       names: {
         ja: '開発から本番へのプルリクエストテンプレート',
         en: 'Develop to Master Pull Request Template',
+        zh: 'Develop to Master Pull Request Template'
       },
       descriptions: {
         ja: '開発ブランチから本番ブランチへのプルリクエストを生成するためのテンプレート',
         en: 'Template for generating pull requests from develop to master branch',
+        zh: 'Template for generating pull requests from develop to master branch'
       },
       legacyPaths: {
         ja: 'develop-to-master-pr-template.md',
         en: 'develop-to-master-pr-template-en.md',
-      },
+        zh: 'develop-to-master-pr-template-en.md'
+      }
     },
     {
       id: 'branch-context-template',
@@ -65,15 +71,18 @@ export class MigrateTemplatesCommand implements ICommand {
       names: {
         ja: 'ブランチコンテキストテンプレート',
         en: 'Branch Context Template',
+        zh: 'Branch Context Template'
       },
       descriptions: {
         ja: 'ブランチの目的や背景情報を記録するためのテンプレート',
         en: 'Template for documenting the purpose and background of a branch',
+        zh: 'Template for documenting the purpose and background of a branch'
       },
       legacyPaths: {
         ja: 'branch-context-template.md',
         en: 'branch-context-template-en.md',
-      },
+        zh: 'branch-context-template-en.md'
+      }
     },
     {
       id: 'active-context-template',
@@ -81,31 +90,37 @@ export class MigrateTemplatesCommand implements ICommand {
       names: {
         ja: 'アクティブコンテキストテンプレート',
         en: 'Active Context Template',
+        zh: 'Active Context Template'
       },
       descriptions: {
         ja: '現在の作業状況や最近の変更点を記録するためのテンプレート',
         en: 'Template for documenting current work status and recent changes',
+        zh: 'Template for documenting current work status and recent changes'
       },
       legacyPaths: {
         ja: 'active-context-template.md',
         en: 'active-context-template-en.md',
-      },
+        zh: 'active-context-template-en.md'
+      }
     },
     {
       id: 'system-patterns-template',
-      type: 'branch-memory',
+      type: 'system',
       names: {
         ja: 'システムパターンテンプレート',
         en: 'System Patterns Template',
+        zh: 'System Patterns Template'
       },
       descriptions: {
         ja: '技術的決定事項やアーキテクチャパターンを記録するためのテンプレート',
         en: 'Template for documenting technical decisions and architectural patterns',
+        zh: 'Template for documenting technical decisions and architectural patterns'
       },
       legacyPaths: {
         ja: 'system-patterns-template.md',
         en: 'system-patterns-template-en.md',
-      },
+        zh: 'system-patterns-template-en.md'
+      }
     },
     {
       id: 'progress-template',
@@ -113,15 +128,18 @@ export class MigrateTemplatesCommand implements ICommand {
       names: {
         ja: '進捗状況テンプレート',
         en: 'Progress Template',
+        zh: 'Progress Template'
       },
       descriptions: {
         ja: '機能の実装状況や残作業を記録するためのテンプレート',
         en: 'Template for documenting feature implementation status and remaining work',
+        zh: 'Template for documenting feature implementation status and remaining work'
       },
       legacyPaths: {
         ja: 'progress-template.md',
         en: 'progress-template-en.md',
-      },
+        zh: 'progress-template-en.md'
+      }
     },
     {
       id: 'rules-template',
@@ -129,16 +147,19 @@ export class MigrateTemplatesCommand implements ICommand {
       names: {
         ja: 'メモリーバンクのルール',
         en: 'Memory Bank Rules',
+        zh: 'Memory Bank Rules'
       },
       descriptions: {
         ja: 'メモリーバンクの使用ルールと構造に関する説明',
         en: 'Explanation of memory bank usage rules and structure',
+        zh: 'Explanation of memory bank usage rules and structure'
       },
       legacyPaths: {
         ja: 'rules.md',
         en: 'rules-en.md',
-      },
-    },
+        zh: 'rules-en.md'
+      }
+    }
   ];
 
   private readonly jsonTemplateDir = 'templates/json';

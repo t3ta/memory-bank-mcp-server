@@ -272,7 +272,7 @@ export class GlobalController implements IGlobalController {
 
       const result = await this.writeJsonDocumentUseCase.execute({
         branchName: undefined, // Global memory bank
-        document,
+        document: {path: document.path || '', title: document.title, documentType: document.documentType, content: document.content, tags: document.tags},
       });
 
       return this.presenter.present(result);
@@ -342,6 +342,11 @@ export class GlobalController implements IGlobalController {
    * @param query Search query
    * @returns Promise resolving to MCP response with matching documents
    */
+  /**
+   * Search JSON documents in global memory bank
+   * @param query Search query
+   * @returns Promise resolving to MCP response with matching documents
+   */
   async searchJsonDocuments(query: string): Promise<MCPResponse<JsonDocumentDTO[]>> {
     try {
       logger.info(`Searching global JSON documents with query: ${query}`);
@@ -355,10 +360,35 @@ export class GlobalController implements IGlobalController {
 
       const result = await this.searchJsonDocumentsUseCase.execute({
         branchName: undefined, // Global memory bank
-        query,
+        query
       });
 
       return this.presenter.present(result.documents);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+   * Search JSON documents in global memory bank
+   * @param query Search query
+   * @returns Promise resolving to MCP response with matching documents
+   */
+  async searchJsonDocuments(query: string): Promise<MCPResponse<JsonDocumentDTO[]>> {
+    try {
+      logger.info(`Searching global JSON documents with query: ${query}`);
+
+      if (!this.searchJsonDocumentsUseCase) {
+        throw new ApplicationError(
+          'FEATURE_NOT_AVAILABLE',
+          'JSON document features are not available in this configuration'
+        );
+      }
+
+      // Use the existing list function with tags
+      const result = await this.listJsonDocuments({
+        tags: query ? [query] : undefined
+      });
+
+      return result;
     } catch (error) {
       return this.handleError(error);
     }
