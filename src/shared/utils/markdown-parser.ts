@@ -1,4 +1,5 @@
-import { DocumentMetadata } from '../../schemas/json-document.js';
+import { DocumentMetadataV2 as DocumentMetadata } from '../../schemas/v2/json-document.js';
+import crypto from 'crypto';
 
 /**
  * Parse markdown document to extract metadata and content sections
@@ -54,6 +55,9 @@ export function parseMarkdown(
       path,
       tags: [],
       lastModified: new Date(),
+      id: crypto.randomUUID(), // Add ID for v2 schema
+      createdAt: new Date(), // Add createdAt for v2 schema
+      version: 1, // Add version for v2 schema
     },
     content: {},
   };
