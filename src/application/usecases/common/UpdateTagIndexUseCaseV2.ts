@@ -8,7 +8,7 @@ import {
   ApplicationErrorCodes,
 } from '../../../shared/errors/ApplicationError.js';
 import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
-import { getLogger } from '../../../shared/utils/Logger.js';
+import { getLogger } from '../../../shared/utils/logger.js';
 
 const logger = getLogger('UpdateTagIndexUseCaseV2');
 
@@ -88,7 +88,7 @@ export class UpdateTagIndexUseCaseV2 implements IUseCase<UpdateTagIndexInput, Up
       logger.info(
         `Updating tag index: ${input.branchName || 'global'}, fullRebuild: ${input.fullRebuild || false}`
       );
-      
+
       // Set default values
       const fullRebuild = input.fullRebuild ?? false;
       const updateLocation = input.branchName ? input.branchName : 'global';
@@ -120,7 +120,7 @@ export class UpdateTagIndexUseCaseV2 implements IUseCase<UpdateTagIndexInput, Up
           fullRebuild
         });
       }
-      
+
       // Return combined result
       return {
         tags: result.tags,

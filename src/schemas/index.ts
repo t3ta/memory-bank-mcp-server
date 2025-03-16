@@ -1,36 +1,11 @@
 import { z } from 'zod';
 import { ValidationErrorType } from '../shared/types/index.js';
 
-// Utility for flexible date parsing
-const dateStringToDate = (val: string, ctx: z.RefinementCtx) => {
-  try {
-    const date = new Date(val);
-    if (isNaN(date.getTime())) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Invalid date format: ${val}`,
-      });
-      return z.NEVER;
-    }
-    return date;
-  } catch (err) {
-    console.error(`Failed to parse date: ${err}`);
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Failed to parse date: ${val}`,
-    });
-    return z.NEVER;
-  }
-};
+// Import and re-export common schemas
+import { FlexibleDateSchema, TagSchema } from './common.js';
+export { FlexibleDateSchema, TagSchema } from './common.js';
 
-// Flexible date schema that accepts both Date objects and strings
-const FlexibleDateSchema = z.union([z.date(), z.string().transform(dateStringToDate)]);
-
-// Basic schemas
-export const TagSchema = z
-  .string()
-  .regex(/^[a-z0-9-]+$/, 'Tag must contain only lowercase letters, numbers, and hyphens');
-
+// Path schema
 export const PathSchema = z
   .string()
   .min(1, 'Path cannot be empty')
@@ -213,8 +188,7 @@ export * from './json-document.js';
 // Export v2 json document schemas
 export * as V2 from './v2/index.js';
 
-// Export utility schemas
-export { FlexibleDateSchema };
+// Date utility function
 export const parseDateSafely = (dateInput: string | Date): Date => {
   try {
     if (dateInput instanceof Date) {

@@ -7,7 +7,8 @@ import {
   TagIndexOptions,
   TagIndexUpdateResult
 } from '../../../domain/repositories/ITagIndexRepository.js';
-import { getLogger } from '../../../shared/utils/Logger.js';
+import { DocumentReference } from '../../../schemas/v2/tag-index.js';
+import { getLogger } from '../../../shared/utils/logger.js';
 import { InfrastructureError, InfrastructureErrorCodes } from '../../../shared/errors/InfrastructureError.js';
 import { FileSystemTagIndexRepository } from './FileSystemTagIndexRepositoryBase.js';
 
@@ -29,21 +30,21 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
     options?: TagIndexOptions
   ): Promise<TagIndexUpdateResult> {
     logger.info(`Updating branch tag index for branch: ${branchInfo.name}`);
-    
+
     // Determine if we need a full rebuild
     const fullRebuild = options?.fullRebuild ?? false;
-    
+
     // Read existing index or create new one
     let tagIndex = fullRebuild
       ? this.createEmptyBranchIndex(branchInfo)
       : await this.readBranchIndex(branchInfo) || this.createEmptyBranchIndex(branchInfo);
-    
+
     try {
       // Get all documents in branch
       const documentsMap = new Map<string, MemoryDocument | JsonDocument>();
       const documentPaths = await this.branchRepository.listDocuments(branchInfo);
       const documents: (MemoryDocument | JsonDocument)[] = [];
-      
+
       // Load all documents from the repository
       for (const path of documentPaths) {
         const document = await this.branchRepository.getDocument(branchInfo, path);
@@ -52,17 +53,17 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
           documentsMap.set(document.path.value, document);
         }
       }
-      
+
       logger.info(`Loaded ${documents.length} documents from branch: ${branchInfo.name}`);
-      
+
       // Build the index
       const tagEntries = [];
       const tagMap = new Map<string, DocumentReference[]>();
-      
+
       // Group documents by tag
       for (const document of documents) {
         const docRef = this.createDocumentReference(document);
-        
+
         for (const tag of document.tags) {
           const tagValue = tag.value;
           if (!tagMap.has(tagValue)) {
@@ -71,7 +72,7 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
           tagMap.get(tagValue)!.push(docRef);
         }
       }
-      
+
       // Convert to tag entries
       for (const [tagValue, documents] of tagMap.entries()) {
         tagEntries.push({
@@ -79,16 +80,16 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
           documents
         });
       }
-      
+
       // Update the index
       tagIndex.index = tagEntries;
       tagIndex.metadata.lastUpdated = new Date();
       tagIndex.metadata.documentCount = documents.length;
       tagIndex.metadata.tagCount = tagEntries.length;
-      
+
       // Write index to file
       await this.writeBranchIndex(branchInfo, tagIndex);
-      
+
       // Return result
       return {
         tags: tagEntries.map(entry => entry.tag),
@@ -115,21 +116,21 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
    */
   async updateGlobalTagIndex(options?: TagIndexOptions): Promise<TagIndexUpdateResult> {
     logger.info('Updating global tag index');
-    
+
     // Determine if we need a full rebuild
     const fullRebuild = options?.fullRebuild ?? false;
-    
+
     // Read existing index or create new one
     let tagIndex = fullRebuild
       ? this.createEmptyGlobalIndex()
       : await this.readGlobalIndex() || this.createEmptyGlobalIndex();
-    
+
     try {
       // Get all documents in global memory bank
       const documentsMap = new Map<string, MemoryDocument | JsonDocument>();
       const documentPaths = await this.globalRepository.listDocuments();
       const documents: (MemoryDocument | JsonDocument)[] = [];
-      
+
       // Load all documents from the repository
       for (const path of documentPaths) {
         const document = await this.globalRepository.getDocument(path);
@@ -138,17 +139,17 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
           documentsMap.set(document.path.value, document);
         }
       }
-      
+
       logger.info(`Loaded ${documents.length} documents from global memory bank`);
-      
+
       // Build the index
       const tagEntries = [];
       const tagMap = new Map<string, DocumentReference[]>();
-      
+
       // Group documents by tag
       for (const document of documents) {
         const docRef = this.createDocumentReference(document);
-        
+
         for (const tag of document.tags) {
           const tagValue = tag.value;
           if (!tagMap.has(tagValue)) {
@@ -157,7 +158,7 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
           tagMap.get(tagValue)!.push(docRef);
         }
       }
-      
+
       // Convert to tag entries
       for (const [tagValue, documents] of tagMap.entries()) {
         tagEntries.push({
@@ -165,16 +166,16 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
           documents
         });
       }
-      
+
       // Update the index
       tagIndex.index = tagEntries;
       tagIndex.metadata.lastUpdated = new Date();
       tagIndex.metadata.documentCount = documents.length;
       tagIndex.metadata.tagCount = tagEntries.length;
-      
+
       // Write index to file
       await this.writeGlobalIndex(tagIndex);
-      
+
       // Return result
       return {
         tags: tagEntries.map(entry => entry.tag),
@@ -207,7 +208,7 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
     matchAll: boolean = false
   ): Promise<DocumentPath[]> {
     logger.info(`Finding branch documents by tags: ${tags.map(t => t.value).join(', ')}`);
-    
+
     try {
       // Read the index
       const tagIndex = await this.readBranchIndex(branchInfo);
@@ -215,27 +216,27 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
         logger.info(`No tag index found for branch: ${branchInfo.name}`);
         return [];
       }
-      
+
       // Get tag values
       const tagValues = tags.map(tag => tag.value);
-      
+
       // Find matching tag entries
-      const matchingEntries = tagIndex.index.filter(entry => 
+      const matchingEntries = tagIndex.index.filter(entry =>
         tagValues.includes(entry.tag)
       );
-      
+
       if (matchingEntries.length === 0) {
         return [];
       }
-      
+
       // Extract matching document paths
       let matchingDocPaths: string[] = [];
-      
+
       if (matchAll) {
         // Documents must have ALL specified tags
         // First, get all document paths from the first tag
         const firstTagDocs = matchingEntries[0].documents.map(doc => doc.path);
-        
+
         // Then filter to only include documents that have ALL other tags
         matchingDocPaths = firstTagDocs.filter(path => {
           // Check if this document has all other tags
@@ -247,16 +248,16 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
         // Documents can have ANY of the specified tags (union)
         // Get unique document paths from all matching tag entries
         const docPathSet = new Set<string>();
-        
+
         for (const entry of matchingEntries) {
           for (const doc of entry.documents) {
             docPathSet.add(doc.path);
           }
         }
-        
+
         matchingDocPaths = Array.from(docPathSet);
       }
-      
+
       // Convert to DocumentPath objects
       return matchingDocPaths.map(path => DocumentPath.create(path));
     } catch (error) {
@@ -280,7 +281,7 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
     matchAll: boolean = false
   ): Promise<DocumentPath[]> {
     logger.info(`Finding global documents by tags: ${tags.map(t => t.value).join(', ')}`);
-    
+
     try {
       // Read the index
       const tagIndex = await this.readGlobalIndex();
@@ -288,27 +289,27 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
         logger.info('No global tag index found');
         return [];
       }
-      
+
       // Get tag values
       const tagValues = tags.map(tag => tag.value);
-      
+
       // Find matching tag entries
-      const matchingEntries = tagIndex.index.filter(entry => 
+      const matchingEntries = tagIndex.index.filter(entry =>
         tagValues.includes(entry.tag)
       );
-      
+
       if (matchingEntries.length === 0) {
         return [];
       }
-      
+
       // Extract matching document paths
       let matchingDocPaths: string[] = [];
-      
+
       if (matchAll) {
         // Documents must have ALL specified tags
         // First, get all document paths from the first tag
         const firstTagDocs = matchingEntries[0].documents.map(doc => doc.path);
-        
+
         // Then filter to only include documents that have ALL other tags
         matchingDocPaths = firstTagDocs.filter(path => {
           // Check if this document has all other tags
@@ -320,16 +321,16 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
         // Documents can have ANY of the specified tags (union)
         // Get unique document paths from all matching tag entries
         const docPathSet = new Set<string>();
-        
+
         for (const entry of matchingEntries) {
           for (const doc of entry.documents) {
             docPathSet.add(doc.path);
           }
         }
-        
+
         matchingDocPaths = Array.from(docPathSet);
       }
-      
+
       // Convert to DocumentPath objects
       return matchingDocPaths.map(path => DocumentPath.create(path));
     } catch (error) {

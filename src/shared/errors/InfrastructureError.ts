@@ -23,6 +23,7 @@ export const InfrastructureErrorCodes = {
   CONFIGURATION_ERROR: 'CONFIGURATION_ERROR',
   MCP_SERVER_ERROR: 'MCP_SERVER_ERROR',
   GIT_ERROR: 'GIT_ERROR',
+  PERSISTENCE_ERROR: 'PERSISTENCE_ERROR',
 } as const;
 
 export type InfrastructureErrorCode = keyof typeof InfrastructureErrorCodes;

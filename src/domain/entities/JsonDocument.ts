@@ -28,7 +28,7 @@ export type DocumentType = 'branch_context' | 'active_context' | 'progress' | 's
  * JsonDocument entity represents a structured document stored in JSON format
  * It uses the v2 schema with typed content based on document type
  */
-export class JsonDocument<T = unknown> {
+export class JsonDocument<T extends Record<string, unknown> = Record<string, unknown>> {
   private constructor(
     private readonly _id: DocumentId,
     private readonly _path: DocumentPath,
@@ -56,7 +56,7 @@ export class JsonDocument<T = unknown> {
       if (error instanceof DomainError) {
         throw error;
       }
-      
+
       throw new DomainError(
         DomainErrorCodes.VALIDATION_ERROR,
         `Failed to parse JSON document: ${(error as Error).message}`
@@ -85,10 +85,10 @@ export class JsonDocument<T = unknown> {
     const baseDocument = jsonData as BaseJsonDocumentV2;
     const metadata = baseDocument.metadata;
     const documentType = metadata.documentType as DocumentType;
-    
+
     // Then validate against specific document type schema
     let validatedDocument: BaseJsonDocumentV2;
-    
+
     try {
       switch (documentType) {
         case 'branch_context':

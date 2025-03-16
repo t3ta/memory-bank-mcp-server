@@ -1,4 +1,6 @@
 import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
+import { IBranchMemoryBankRepository } from '../../../domain/repositories/IBranchMemoryBankRepository.js';
+import { IGlobalMemoryBankRepository } from '../../../domain/repositories/IGlobalMemoryBankRepository.js';
 import { DocumentId } from '../../../domain/entities/DocumentId.js';
 import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
 import { JsonDocument } from '../../../domain/entities/JsonDocument.js';
@@ -10,8 +12,8 @@ import {
   TagIndexUpdateResult
 } from '../../../domain/repositories/ITagIndexRepository.js';
 import { FileSystemService } from '../../storage/FileSystemService.js';
-import { PathUtils } from '../../../shared/utils/PathUtils.js';
-import { getLogger } from '../../../shared/utils/Logger.js';
+import path from 'path';
+import { getLogger } from '../../../shared/utils/logger.js';
 import {
   BaseTagIndex,
   BranchTagIndex,
@@ -30,7 +32,7 @@ const logger = getLogger('FileSystemTagIndexRepository');
 /**
  * Implementation of ITagIndexRepository for file system storage
  */
-export class FileSystemTagIndexRepository implements ITagIndexRepository {
+export abstract class FileSystemTagIndexRepository {
   protected static readonly GLOBAL_INDEX_FILENAME = 'tag-index.json';
   protected static readonly BRANCH_INDEX_FILENAME = 'tag-index.json';
 
@@ -54,8 +56,8 @@ export class FileSystemTagIndexRepository implements ITagIndexRepository {
    * @returns Path to branch index file
    */
   protected getBranchIndexPath(branchInfo: BranchInfo): string {
-    const normalizedBranchName = branchInfo.getNormalizedName();
-    return PathUtils.join(
+    const normalizedBranchName = branchInfo.safeName;
+    return path.join(
       this.branchMemoryBankRoot,
       normalizedBranchName,
       FileSystemTagIndexRepository.BRANCH_INDEX_FILENAME
@@ -67,7 +69,7 @@ export class FileSystemTagIndexRepository implements ITagIndexRepository {
    * @returns Path to global index file
    */
   protected getGlobalIndexPath(): string {
-    return PathUtils.join(
+    return path.join(
       this.globalMemoryBankPath,
       FileSystemTagIndexRepository.GLOBAL_INDEX_FILENAME
     );
@@ -82,7 +84,7 @@ export class FileSystemTagIndexRepository implements ITagIndexRepository {
     const indexPath = this.getBranchIndexPath(branchInfo);
 
     try {
-      const exists = await this.fileSystem.exists(indexPath);
+      const exists = await this.fileSystem.fileExists(indexPath);
       if (!exists) {
         return null;
       }
@@ -104,7 +106,7 @@ export class FileSystemTagIndexRepository implements ITagIndexRepository {
         return null;
       }
 
-      if (error instanceof InfrastructureError && 
+      if (error instanceof InfrastructureError &&
           error.code === InfrastructureErrorCodes.FILE_NOT_FOUND) {
         return null;
       }
@@ -126,7 +128,7 @@ export class FileSystemTagIndexRepository implements ITagIndexRepository {
     const indexPath = this.getGlobalIndexPath();
 
     try {
-      const exists = await this.fileSystem.exists(indexPath);
+      const exists = await this.fileSystem.fileExists(indexPath);
       if (!exists) {
         return null;
       }
@@ -148,7 +150,7 @@ export class FileSystemTagIndexRepository implements ITagIndexRepository {
         return null;
       }
 
-      if (error instanceof InfrastructureError && 
+      if (error instanceof InfrastructureError &&
           error.code === InfrastructureErrorCodes.FILE_NOT_FOUND) {
         return null;
       }
@@ -170,12 +172,12 @@ export class FileSystemTagIndexRepository implements ITagIndexRepository {
    */
   protected async writeBranchIndex(branchInfo: BranchInfo, index: BranchTagIndex): Promise<void> {
     const indexPath = this.getBranchIndexPath(branchInfo);
-    
+
     try {
       // Ensure directory exists
-      const dirPath = PathUtils.dirname(indexPath);
-      await this.fileSystem.ensureDir(dirPath);
-      
+      const dirPath = path.dirname(indexPath);
+      await this.fileSystem.createDirectory(dirPath);
+
       // Write the file
       const content = JSON.stringify(index, null, 2);
       await this.fileSystem.writeFile(indexPath, content);
@@ -196,12 +198,12 @@ export class FileSystemTagIndexRepository implements ITagIndexRepository {
    */
   protected async writeGlobalIndex(index: GlobalTagIndex): Promise<void> {
     const indexPath = this.getGlobalIndexPath();
-    
+
     try {
       // Ensure directory exists
-      const dirPath = PathUtils.dirname(indexPath);
-      await this.fileSystem.ensureDir(dirPath);
-      
+      const dirPath = path.dirname(indexPath);
+      await this.fileSystem.createDirectory(dirPath);
+
       // Write the file
       const content = JSON.stringify(index, null, 2);
       await this.fileSystem.writeFile(indexPath, content);
@@ -236,7 +238,7 @@ export class FileSystemTagIndexRepository implements ITagIndexRepository {
       const id = DocumentId.create(
         pathHash.padEnd(36, '0').substring(0, 36)
       );
-      
+
       return {
         id: id.value,
         path: document.path.value,

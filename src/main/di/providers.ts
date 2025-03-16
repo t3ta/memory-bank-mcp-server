@@ -1,4 +1,5 @@
 import { DIContainer } from './DIContainer.js';
+import path from 'path';
 
 // Domain layer
 
@@ -73,12 +74,13 @@ export async function registerInfrastructureServices(
     const configProvider = container.get<IConfigProvider>('configProvider');
     const globalRepository = container.get('globalMemoryBankRepository') as FileSystemGlobalMemoryBankRepository;
     const branchRepository = container.get('branchMemoryBankRepository') as FileSystemBranchMemoryBankRepository;
-    
-    const branchMemoryBankRoot = configProvider.getBranchMemoryBankPath();
-    const globalMemoryBankPath = configProvider.getGlobalMemoryBankPath();
-    
+    // Get the branch memory bank root directory without using getBranchMemoryPath
+    const config = configProvider.getConfig();
+    const branchMemoryBankRoot = path.join(config.memoryBankRoot, 'branch-memory-bank');
+    const globalMemoryBankPath = configProvider.getGlobalMemoryPath();
+
     return new FileSystemTagIndexRepository(
-      fileSystemService,
+      fileSystemService as FileSystemService,
       branchMemoryBankRoot,
       globalMemoryBankPath,
       branchRepository,
@@ -153,7 +155,7 @@ export function registerApplicationServices(container: DIContainer): void {
 
     return new UpdateTagIndexUseCase(globalRepository, branchRepository);
   });
-  
+
   // Register the V2 version of the UpdateTagIndexUseCase
   container.registerFactory('updateTagIndexUseCaseV2', () => {
     // Use explicit type assertion for proper type safety
@@ -243,7 +245,7 @@ export function registerInterfaceServices(container: DIContainer): void {
 
     // Get update tag index use case V2
     const updateTagIndexUseCaseV2 = container.get('updateTagIndexUseCaseV2') as UpdateTagIndexUseCaseV2;
-    
+
     return new GlobalController(
       readGlobalDocumentUseCase,
       writeGlobalDocumentUseCase,
@@ -279,7 +281,7 @@ export function registerInterfaceServices(container: DIContainer): void {
 
     // Get update tag index use case V2
     const updateTagIndexUseCaseV2 = container.get('updateTagIndexUseCaseV2') as UpdateTagIndexUseCaseV2;
-    
+
     return new BranchController(
       readBranchDocumentUseCase,
       writeBranchDocumentUseCase,

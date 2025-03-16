@@ -1,6 +1,6 @@
 /**
  * JSON Document Schema Definitions v2
- * 
+ *
  * This file defines the schema for the v2 JSON documents used in Memory Bank.
  * The schema is structured to provide:
  * - Clear separation between metadata and content
@@ -8,9 +8,8 @@
  * - Extensibility for future document types
  * - Explicit versioning
  */
-
 import { z } from 'zod';
-import { FlexibleDateSchema, TagSchema } from '../index.js';
+import { FlexibleDateSchema, TagSchema } from '../common.js';
 
 // Schema version identifier - used for migration and compatibility
 export const SCHEMA_VERSION = 'memory_document_v2';
@@ -22,10 +21,10 @@ export const DocumentMetadataV2Schema = z.object({
   documentType: z.string().min(1, 'Document type cannot be empty'),
   id: z.string().uuid('Document ID must be a valid UUID'),
   path: z.string().min(1, 'Path cannot be empty'),
-  
+
   // Classification and organization
   tags: z.array(TagSchema).default([]),
-  
+
   // Tracking and versioning
   lastModified: FlexibleDateSchema,
   createdAt: FlexibleDateSchema,

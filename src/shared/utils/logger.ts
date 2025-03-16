@@ -39,3 +39,12 @@ export class Logger {
 
 // Export singleton instance
 export const logger = Logger.getInstance();
+
+/**
+ * Get a logger with a specific context name
+ * @param context Context name for the logger
+ * @returns Logger instance
+ */
+export function getLogger(context: string): Logger {
+  return logger;
+}
