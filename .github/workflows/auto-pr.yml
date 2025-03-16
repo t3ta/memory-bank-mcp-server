@@ -20,26 +20,26 @@ jobs:
       # 適切な権限を明示的に設定
       contents: write
       pull-requests: write
-      
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-      
+          cache: 'yarn'
+
       - name: Install dependencies
-        run: npm ci
-      
+        run: yarn install --frozen-lockfile
+
       - name: Get branch name
         id: branch-name
         run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
-      
+
       - name: Extract PR information from memory bank
         id: extract-pr-info
         run: |
@@ -51,16 +51,16 @@ jobs:
           // ブランチ名からディレクトリ名を生成
           const branchName = process.env.BRANCH_NAME;
           const memoryBankDir = path.join('docs/branch-memory-bank', branchName.replace('/', '-'));
-          
+
           console.log(`Extracting PR info from ${memoryBankDir}`);
-          
+
           // 結果オブジェクト
           const result = {
             title: '',
             body: '# Overview\n\n',
             labels: ['auto-generated'],
           };
-          
+
           // ファイルが存在するかチェックする関数
           function fileExists(filePath) {
             try {
@@ -70,58 +70,58 @@ jobs:
               return false;
             }
           }
-          
+
           // ファイルから指定されたセクションを抽出する関数
           function extractSection(filePath, sectionHeader, stopPattern = /^##/) {
             if (!fileExists(filePath)) return '';
-            
+
             try {
               const content = fs.readFileSync(filePath, 'utf8');
               const lines = content.split('\n');
-              
+
               let capturing = false;
               let result = [];
-              
+
               for (const line of lines) {
                 if (line.match(sectionHeader)) {
                   capturing = true;
                   continue;
                 }
-                
+
                 if (capturing) {
                   if (line.match(stopPattern) && !line.match(sectionHeader)) {
                     break;
                   }
-                  
+
                   // 空行でなければ追加
                   if (line.trim()) {
                     result.push(line);
                   }
                 }
               }
-              
+
               return result.join('\n');
             } catch (err) {
               console.error(`Error extracting section from ${filePath}:`, err);
               return '';
             }
           }
-          
+
           // pullRequest.mdからカスタム情報と言語を取得
           const prFilePath = path.join(memoryBankDir, 'pullRequest.md');
           let isEnglish = false;
-          
+
           if (fileExists(prFilePath)) {
             try {
               const prContent = fs.readFileSync(prFilePath, 'utf8');
-              
+
               // 言語の検出 (英語か日本語か)
-              isEnglish = prContent.includes('# PR Ready') || 
+              isEnglish = prContent.includes('# PR Ready') ||
                          prContent.includes('This PR was automatically generated');
-              
+
               // 言語をログに出力 (デバッグ用)
               console.log(`Detected language: ${isEnglish ? 'English' : 'Japanese'}`);
-              
+
               // セクションヘッダー - 英語と日本語の両方に対応
               const sectionHeaders = {
                 en: {
@@ -141,37 +141,37 @@ jobs:
                   knownIssues: '## 既知の問題'
                 }
               };
-              
+
               // 言語に基づいてセクションヘッダーを選択
               const headers = isEnglish ? sectionHeaders.en : sectionHeaders.ja;
-              
+
               // branchContext.mdからプロジェクト目的を取得
               const branchContextPath = path.join(memoryBankDir, 'branchContext.md');
-              
+
               // activeContext.mdから情報を取得
               const activeContextPath = path.join(memoryBankDir, 'activeContext.md');
-              
+
               // #title:タグがあればタイトルを設定
               const titleMatch = prContent.match(/#title:\s*(.+)$/m);
               if (titleMatch) {
                 result.title = titleMatch[1].trim();
                 console.log(`Custom title specified: ${result.title}`);
               }
-              
+
               // #targetBranch:タグがあれば抽出
               const targetBranchMatch = prContent.match(/#targetBranch:\s*([a-zA-Z0-9\/_-]+)/);
               if (targetBranchMatch) {
                 process.env.TARGET_BRANCH = targetBranchMatch[1];
                 console.log(`Custom target branch specified: ${process.env.TARGET_BRANCH}`);
               }
-              
+
               // #reviewers:タグがあれば抽出
               const reviewersMatch = prContent.match(/#reviewers:\s*([a-zA-Z0-9\/_,\s-]+)/);
               if (reviewersMatch) {
                 process.env.REVIEWERS = reviewersMatch[1].replace(/\s+/g, '');
                 console.log(`Reviewers specified: ${process.env.REVIEWERS}`);
               }
-              
+
               // #labels:タグがあれば抽出して既存のラベルに追加
               const labelsMatch = prContent.match(/#labels:\s*([a-zA-Z0-9\/_,\s-]+)/);
               if (labelsMatch) {
@@ -179,11 +179,11 @@ jobs:
                 result.labels.push(...additionalLabels);
                 console.log(`Additional labels specified: ${additionalLabels.join(', ')}`);
               }
-              
+
               // PR本文を抽出 - 最初のヘッダー（Overview/概要）の後から始める
               const bodyStartRegex = isEnglish ? /# Overview/ : /# 概要/;
               const bodyStartMatch = prContent.match(bodyStartRegex);
-              
+
               if (bodyStartMatch) {
                 // "#title:", "#targetBranch:", "#labels:", "#reviewers:"などのメタタグを除いた部分を抽出
                 const metaEndPos = prContent.lastIndexOf('#', prContent.indexOf(bodyStartMatch[0]));
@@ -201,10 +201,10 @@ jobs:
                   .replace(/#labels:\s*([a-zA-Z0-9\/_,\s-]+)/g, '')
                   .replace(/#title:\s*(.+)$/mg, '')
                   .trim();
-                  
+
                 if (additionalInfo) {
-                  result.body += isEnglish 
-                    ? `## Additional Information\n${additionalInfo}\n\n` 
+                  result.body += isEnglish
+                    ? `## Additional Information\n${additionalInfo}\n\n`
                     : `## 追加情報\n${additionalInfo}\n\n`;
                 }
               }
@@ -212,7 +212,7 @@ jobs:
               console.error(`Error processing pullRequest.md:`, err);
             }
           }
-          
+
           // タイトルが設定されていなければフォールバックを使用
           if (!result.title) {
             // ブランチ名からタイトルを生成
@@ -220,24 +220,24 @@ jobs:
             const featureName = branchName.replace(/^(feature|fix)\//, '').replace(/-/g, ' ');
             result.title = `${type}: ${featureName}`;
           }
-          
+
           // フッターを追加
-          result.body += isEnglish 
+          result.body += isEnglish
             ? '\n---\n\n_This PR was automatically generated based on information from the memory bank_\n'
             : '\n---\n\n_このPRはメモリバンクの情報を基に自動生成されました_\n';
-          
+
           // 環境変数にセット
           console.log(`PR Title: ${result.title}`);
           console.log(`Labels: ${result.labels.join(', ')}`);
           console.log('PR Body preview (first 300 chars):');
           console.log(result.body.substring(0, 300) + '...');
-          
+
           // GitHub Actions用の環境変数をセット
           const fs_env = require('fs');
           fs_env.appendFileSync(process.env.GITHUB_ENV, `PR_TITLE=${result.title}\n`);
           fs_env.appendFileSync(process.env.GITHUB_ENV, `PR_LABELS=${result.labels.join(',')}\n`);
           fs_env.appendFileSync(process.env.GITHUB_ENV, 'PR_BODY<<EOF\n' + result.body + '\nEOF\n');
-          
+
           // ターゲットブランチが指定されていない場合はデフォルト設定
           if (!process.env.TARGET_BRANCH) {
             // デフォルトでfeatureブランチはdevelopに、fixブランチはmasterにマージ
@@ -245,10 +245,10 @@ jobs:
             fs_env.appendFileSync(process.env.GITHUB_ENV, `TARGET_BRANCH=${defaultTarget}\n`);
           }
           EOF
-          
+
           # Node.jsスクリプトを実行
           node extract-pr-info.js
-      
+
       - name: Create Pull Request
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -259,7 +259,7 @@ jobs:
           for LABEL in "${LABELS[@]}"; do
             LABEL_ARGS="${LABEL_ARGS} --label \"${LABEL}\""
           done
-          
+
           # レビュワーを準備（もし指定されていれば）
           REVIEWER_ARGS=""
           if [ ! -z "${{ env.REVIEWERS }}" ]; then
@@ -268,7 +268,7 @@ jobs:
               REVIEWER_ARGS="${REVIEWER_ARGS} --reviewer \"${REVIEWER}\""
             done
           fi
-          
+
           # PRを作成するコマンドを構築
           PR_CMD="gh pr create \
             --base \"${{ env.TARGET_BRANCH }}\" \
@@ -277,10 +277,10 @@ jobs:
             --body \"${{ env.PR_BODY }}\" \
             ${LABEL_ARGS} \
             ${REVIEWER_ARGS}"
-          
+
           # コマンドを実行
           eval ${PR_CMD}
-          
+
           # 成功したら、pullRequest.mdを削除して再トリガーを防止
           if [ $? -eq 0 ]; then
             echo "Pull Request created successfully. Removing pullRequest.md trigger file..."
@@ -293,7 +293,7 @@ jobs:
             echo "Failed to create Pull Request. Please check the logs and try again."
             exit 1
           fi
-      
+
       - name: PR Creation Result
         if: success()
         run: |

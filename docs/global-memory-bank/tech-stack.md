@@ -22,6 +22,13 @@ The application purposely avoids heavy frameworks to maintain architectural puri
 
 - **Custom Clean Architecture Implementation** - Handcrafted architecture inspired by Uncle Bob's Clean Architecture
 
+## Package Manager
+
+- **Yarn** - Fast, reliable, and secure dependency management
+  - Used for: Managing project dependencies and running scripts
+  - Version: Latest
+  - Features used: Workspaces, frozen lockfile, caching
+
 ## Libraries and Dependencies
 
 ### Core Dependencies
