@@ -9,7 +9,7 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprot
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
-// 新しいインポート
+// アプリケーションのインポート
 import createApplication from './main/index.js';
 import { Application } from './main/index.js';
 

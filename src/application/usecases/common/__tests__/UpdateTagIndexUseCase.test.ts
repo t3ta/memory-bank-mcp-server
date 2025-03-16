@@ -93,7 +93,7 @@ describe('UpdateTagIndexUseCase', () => {
 
     // Assert
     expect(result).toBeDefined();
-    expect(result.tags).toHaveLength(3); // 'architecture', 'design', 'ui', 'pattern' with duplicates removed
+    expect(result.tags).toHaveLength(4); // 'architecture', 'design', 'ui', 'pattern'
     expect(result.tags).toContain('architecture');
     expect(result.tags).toContain('design');
     expect(result.tags).toContain('ui');

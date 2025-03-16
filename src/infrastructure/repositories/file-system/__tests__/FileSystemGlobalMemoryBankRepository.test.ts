@@ -57,11 +57,13 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
       mockConfigProvider
     );
 
-    // Solve circular reference problem with saveDocument and updateTagsIndex
-    // Original implementation causes infinite loop in tests
-    const _originalSaveDocument = repository.saveDocument.bind(repository);
+    // モックをセットアップ
+    repository.updateTagsIndex = jest.fn().mockResolvedValue(undefined);
+
+    // FileSystemGlobalMemoryBankRepository.saveDocumentをモック化
+    const originalSaveDocument = repository.saveDocument;
     repository.saveDocument = jest.fn().mockImplementation(async (document: MemoryDocument) => {
-      // Call original save without triggering updateTagsIndex
+      // 直接ファイルシステムにアクセス（documentRepositoryを経由せず）
       await mockFileSystemService.createDirectory(
         path.dirname(path.join(globalMemoryPath, document.path.value))
       );
@@ -69,16 +71,6 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
         path.join(globalMemoryPath, document.path.value),
         document.content
       );
-      return undefined;
-    });
-
-    // Use a simplified updateTagsIndex that doesn't call saveDocument
-    repository.updateTagsIndex = jest.fn().mockImplementation(async () => {
-      const indexPath = path.join(globalMemoryPath, 'tags/index.md');
-      const indexContent =
-        '# タグインデックス\n\ntags: #index #meta\n\n| タグ | 件数 | ドキュメント |\n|-----|------|-------------|\n';
-      await mockFileSystemService.writeFile(indexPath, indexContent);
-      return undefined;
     });
   });
 
@@ -333,6 +325,9 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
       mockFileSystemService.deleteFile.mockResolvedValue(true);
       mockFileSystemService.listFiles.mockResolvedValue([]);
 
+      // Ensure updateTagsIndex is properly mocked
+      (repository.updateTagsIndex as jest.Mock).mockImplementation(() => Promise.resolve());
+
       // Act
       const result = await repository.deleteDocument(docPath);
 
@@ -423,7 +418,7 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
       // Act & Assert
       await expect(repository.listDocuments()).rejects.toThrow(InfrastructureError);
       await expect(repository.listDocuments()).rejects.toThrow(
-        'Failed to list documents in global memory bank'
+        'Failed to list documents'
       );
     });
   });

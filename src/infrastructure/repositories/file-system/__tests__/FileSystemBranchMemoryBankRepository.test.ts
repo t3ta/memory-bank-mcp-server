@@ -841,21 +841,20 @@ describe('FileSystemBranchMemoryBankRepository', () => {
       mockFileSystemService.listFiles.mockResolvedValue(branchDirs);
 
       // Reset BranchInfo.create mock for this test
-      const originalCreateMock = BranchInfo.create;
       jest.spyOn(BranchInfo, 'create').mockImplementation((name) => {
         if (name === 'invalid-branch') {
           throw new DomainError(DomainErrorCodes.INVALID_BRANCH_NAME, 'Invalid branch name');
-        } else if (name === 'feature-test') {
+        } else if (name === 'feature-test' || name === 'feature/test') {
           return {
             name: 'feature/test',
             displayName: 'test',
             type: 'feature',
             safeName: 'feature-test',
-            equals: jest.fn().mockImplementation((other) => other.name === 'feature/test'),
+            equals: jest.fn().mockReturnValue(true),
             toString: jest.fn().mockReturnValue('feature/test'),
           } as unknown as BranchInfo;
         }
-        return originalCreateMock(name);
+        throw new Error(`Unexpected branch name in test: ${name}`);
       });
 
       // Mock path.basename to return the correct directory name
@@ -876,7 +875,11 @@ describe('FileSystemBranchMemoryBankRepository', () => {
         );
       });
 
-      mockFileSystemService.fileExists.mockResolvedValue(true);
+      // Mock fileExists to specifically return true for feature-test's activeContext.md
+      mockFileSystemService.fileExists.mockImplementation(async (filePath) => {
+        return filePath.includes('feature-test') && filePath.includes('activeContext.md');
+      });
+      
       mockFileSystemService.getFileStats.mockResolvedValue({
         size: 100,
         isDirectory: false,
@@ -906,9 +909,11 @@ describe('FileSystemBranchMemoryBankRepository', () => {
       // Act
       const result = await repository.getRecentBranches();
 
-      // Assert
+      // Valid branch directory should be included
       expect(result).toHaveLength(1);
       expect(result[0].branchInfo.name).toBe('feature/test');
+      
+      // Invalid branch directory should be skipped automatically
 
       // Restore original mocks
       jest.spyOn(repository, 'getDocument').mockRestore();

@@ -10,6 +10,7 @@ import {
 } from '../../../shared/errors/InfrastructureError.js';
 import { DomainError } from '../../../shared/errors/DomainError.js';
 import { extractTags } from '../../../shared/utils/index.js';
+import { logger } from '../../../shared/utils/logger.js';
 
 /**
  * File system based implementation of memory document repository
@@ -117,7 +118,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
           }
         } catch (error) {
           // Skip files that can't be read or don't match path format
-          console.error(`Error reading file ${file}:`, error);
+          logger.error(`Error reading file ${file}:`, error);
         }
       }
 
@@ -241,7 +242,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
           // Validate the path first
           const parts = relativePath.split(path.sep);
           if (parts.includes('..') || parts.some((part) => part.startsWith('..'))) {
-            console.error('Invalid document path:', {
+            logger.error('Invalid document path:', {
               path: relativePath,
               reason: 'Path traversal attempt detected',
             });
@@ -255,14 +256,14 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
               const documentPath = DocumentPath.create(relativePath);
               paths.push(documentPath);
             } catch (error) {
-              console.error('Error creating document path:', {
+              logger.error('Error creating document path:', {
                 path: relativePath,
                 error: error instanceof Error ? error.message : String(error),
               });
             }
           }
         } catch (error) {
-          console.error('Error processing file path:', {
+          logger.error('Error processing file path:', {
             path: file,
             error: error instanceof Error ? error.message : String(error),
           });

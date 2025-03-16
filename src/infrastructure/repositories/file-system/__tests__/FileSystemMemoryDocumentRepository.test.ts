@@ -37,6 +37,19 @@ jest.mock('../../../../shared/utils/index.js', () => ({
   }),
 }));
 
+// Mock logger
+jest.mock('../../../../shared/utils/logger.js', () => ({
+  logger: {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+}));
+
+// Import logger after mocking
+import { logger } from '../../../../shared/utils/logger.js';
+
 describe('FileSystemMemoryDocumentRepository', () => {
   let repository: FileSystemMemoryDocumentRepository;
   const basePath = '/test/docs';
@@ -50,6 +63,7 @@ describe('FileSystemMemoryDocumentRepository', () => {
 
     // Suppress console output in tests
     jest.spyOn(console, 'error').mockImplementation(() => {});
+    jest.clearAllMocks(); // Clear all mocks including logger
   });
 
   afterEach(() => {
@@ -309,7 +323,7 @@ describe('FileSystemMemoryDocumentRepository', () => {
       expect(result[0].path.value).toBe('valid.md');
 
       // Verify error was logged
-      expect(console.error).toHaveBeenCalled();
+      expect(logger.error).toHaveBeenCalled();
 
       // Restore all spies
       findByPathSpy.mockRestore();
@@ -635,10 +649,10 @@ describe('FileSystemMemoryDocumentRepository', () => {
     });
 
     it('should handle invalid document paths and continue with valid ones', async () => {
-      // Arrange
+      // Set up the files to list
       const files = [
         path.join(basePath, 'valid.md'),
-        path.join(basePath, '../invalid.md'), // This path contains '..' which should be filtered out
+        path.join(basePath, '..', 'invalid.md') // This path is outside the base directory
       ];
 
       mockFileSystemService.listFiles.mockResolvedValue(files);
@@ -656,8 +670,13 @@ describe('FileSystemMemoryDocumentRepository', () => {
 
       // Mock path.relative to return the path strings
       jest.spyOn(path, 'relative').mockImplementation((from, to) => {
-        if (to.includes('valid.md')) return 'valid.md';
-        if (to.includes('invalid.md')) return '../invalid.md';
+        console.log('DEBUG path.relative:', { from, to });
+        if (to === path.join(basePath, 'valid.md')) {
+          return 'valid.md';
+        }
+        if (to === path.join(basePath, '..', 'invalid.md')) {
+          return '../invalid.md';
+        }
         return '';
       });
 
@@ -667,7 +686,7 @@ describe('FileSystemMemoryDocumentRepository', () => {
       // Assert
       expect(results).toHaveLength(1); // Only the valid path should be included
       expect(results[0].value).toBe('valid.md');
-      expect(console.error).toHaveBeenCalled(); // Error should be logged for invalid path
+      expect(logger.error).toHaveBeenCalled(); // Error should be logged for invalid path
     });
 
     it('should return empty array when no documents found', async () => {

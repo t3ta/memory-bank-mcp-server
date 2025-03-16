@@ -119,8 +119,9 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
       await this.documentRepository.save(document);
 
       // Update tags index if document is markdown
-      if (document.isMarkdown) {
-        await this.updateTagsIndex();
+      if (document.isMarkdown && document.path.value !== 'tags/index.md') {
+        // Pass true to skip saveDocument call to avoid circular reference
+        await this.updateTagsIndex(true);
       }
     } catch (error) {
       if (error instanceof DomainError) {
@@ -149,8 +150,9 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
       const result = await this.documentRepository.delete(path);
 
       // Update tags index if document was deleted
-      if (result) {
-        await this.updateTagsIndex();
+      if (result && path.value !== 'tags/index.md') {
+        // Pass true to skip saveDocument call to avoid circular reference
+        await this.updateTagsIndex(true);
       }
 
       return result;
@@ -222,9 +224,10 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
 
   /**
    * Update tags index in global memory bank
+   * @param skipSaveDocument Optional flag to skip saveDocument to prevent circular references
    * @returns Promise resolving when done
    */
-  async updateTagsIndex(): Promise<void> {
+  async updateTagsIndex(skipSaveDocument: boolean = false): Promise<void> {
     try {
       logger.debug('Updating global memory bank tags index');
 
@@ -293,20 +296,28 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
       // Create or update tags index
       const indexPath = DocumentPath.create('tags/index.md');
 
-      // Get current document if exists
-      const currentIndex = await this.getDocument(indexPath);
+      if (!skipSaveDocument) {
+        // Normal path - might cause circular reference if called from saveDocument
+        // Get current document if exists
+        const currentIndex = await this.getDocument(indexPath);
 
-      if (currentIndex) {
-        await this.saveDocument(currentIndex.updateContent(indexContent));
+        if (currentIndex) {
+          await this.saveDocument(currentIndex.updateContent(indexContent));
+        } else {
+          const newIndex = MemoryDocument.create({
+            path: indexPath,
+            content: indexContent,
+            tags: [Tag.create('index'), Tag.create('meta')],
+            lastModified: new Date(),
+          });
+
+          await this.saveDocument(newIndex);
+        }
       } else {
-        const newIndex = MemoryDocument.create({
-          path: indexPath,
-          content: indexContent,
-          tags: [Tag.create('index'), Tag.create('meta')],
-          lastModified: new Date(),
-        });
-
-        await this.saveDocument(newIndex);
+        // Direct path - used when called from saveDocument to avoid circular reference
+        const fullPath = path.join(this.globalMemoryPath, indexPath.value);
+        await this.fileSystemService.createDirectory(path.dirname(fullPath));
+        await this.fileSystemService.writeFile(fullPath, indexContent);
       }
 
       logger.debug('Global memory bank tags index updated');
