@@ -24,8 +24,28 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Check branch existence
+        id: check-branches
+        run: |
+          # developブランチの存在を確認
+          if ! git rev-parse --verify origin/develop &>/dev/null; then
+            echo "Warning: develop branch doesn't exist. Skipping PR creation."
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # masterブランチの存在を確認
+          if ! git rev-parse --verify origin/master &>/dev/null; then
+            echo "Warning: master branch doesn't exist. Skipping PR creation."
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          echo "skip=false" >> $GITHUB_OUTPUT
+
       - name: Check existing PR
         id: check-pr
+        if: steps.check-branches.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -39,7 +59,7 @@ jobs:
           fi
 
       - name: Create Pull Request
-        if: steps.check-pr.outputs.skip != 'true'
+        if: steps.check-pr.outputs.skip != 'true' && steps.check-branches.outputs.skip != 'true'
         id: create-pr
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -58,9 +78,13 @@ jobs:
           fi
 
           # 変更ログを生成
-          changes=$(git log master..develop --pretty=format:'- %s' --reverse)
-          if [ -z "$changes" ]; then
-            echo "警告: developとmasterの間に変更が見つかりませんでした"
+          set +e  # エラーが発生してもスクリプトを継続
+          changes=$(git log master..develop --pretty=format:'- %s' --reverse 2>/dev/null)
+          exit_code=$?
+          set -e  # エラーハンドリングを再度有効化
+          
+          if [ $exit_code -ne 0 ] || [ -z "$changes" ]; then
+            echo "警告: developとmasterの間に変更が見つかりませんでした、またはコマンドが失敗しました"
             changes="*変更履歴が見つかりませんでした*"
           fi
 
