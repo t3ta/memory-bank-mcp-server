@@ -25,7 +25,10 @@ function renderTemplate(template: any, translations: any): string {
       result.metadata.title = translations.translations[result.metadata.titleKey];
     }
 
-    if (result.metadata?.descriptionKey && translations.translations[result.metadata.descriptionKey]) {
+    if (
+      result.metadata?.descriptionKey &&
+      translations.translations[result.metadata.descriptionKey]
+    ) {
       result.metadata.description = translations.translations[result.metadata.descriptionKey];
     }
 
@@ -131,28 +134,6 @@ const AVAILABLE_TOOLS = [
     },
   },
   {
-    name: 'read_branch_core_files',
-    description: 'Read all core files from the branch memory bank',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        branch: {
-          type: 'string',
-          description: 'Branch name',
-        },
-      },
-      required: ['branch'],
-    },
-  },
-  {
-    name: 'read_global_core_files',
-    description: 'Read all core files from the global memory bank',
-    inputSchema: {
-      type: 'object',
-      properties: {},
-    },
-  },
-  {
     name: 'read_rules',
     description: 'Read the memory bank rules in specified language',
     inputSchema: {
@@ -178,6 +159,37 @@ const AVAILABLE_TOOLS = [
           description: 'Maximum number of branches to return (default: 10, max: 100)',
           minimum: 1,
           maximum: 100,
+        },
+      },
+    },
+  },
+  {
+    name: 'read_context',
+    description:
+      'Read all context information (rules, branch memory bank, global memory bank) at once',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        branch: {
+          type: 'string',
+          description: 'Branch name (required if includeBranchMemory is true)',
+        },
+        language: {
+          type: 'string',
+          enum: ['en', 'ja'],
+          description: 'Language code (en or ja)',
+        },
+        includeRules: {
+          type: 'boolean',
+          description: 'Whether to include rules (default: true)',
+        },
+        includeBranchMemory: {
+          type: 'boolean',
+          description: 'Whether to include branch memory bank (default: true)',
+        },
+        includeGlobalMemory: {
+          type: 'boolean',
+          description: 'Whether to include global memory bank (default: true)',
         },
       },
     },
@@ -287,7 +299,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const template = JSON.parse(templateContent);
 
         // Load language translations
-        const translationsPath = path.join(dirname, 'infrastructure', 'i18n', 'translations', `${language}.json`);
+        const translationsPath = path.join(
+          dirname,
+          'infrastructure',
+          'i18n',
+          'translations',
+          `${language}.json`
+        );
         const translationsContent = await fs.readFile(translationsPath, 'utf-8');
         const translations = JSON.parse(translationsContent);
 
@@ -366,50 +384,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       };
     }
 
-    case 'read_branch_core_files': {
-      const branch = params.branch as string;
-
-      if (!branch) {
-        throw new Error('Invalid arguments for read_branch_core_files');
-      }
-
-      if (!app) {
-        throw new Error('Application not initialized');
-      }
-      const response = await app.getBranchController().readCoreFiles(branch);
-      if (!response.success) {
-        throw new Error(response.error.message);
-      }
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(response.success ? response.data : {}, null, 2),
-          },
-        ],
-      };
-    }
-
-    case 'read_global_core_files': {
-      if (!app) {
-        throw new Error('Application not initialized');
-      }
-      const response = await app.getGlobalController().readCoreFiles();
-      if (!response.success) {
-        throw new Error(response.error.message);
-      }
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(response.success ? response.data : {}, null, 2),
-          },
-        ],
-      };
-    }
-
     case 'get_recent_branches': {
       const limit = params.limit as number | undefined;
 
@@ -426,6 +400,111 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           {
             type: 'text',
             text: JSON.stringify(response.success ? response.data : {}, null, 2),
+          },
+        ],
+      };
+    }
+
+    case 'read_context': {
+      const branch = params.branch as string | undefined;
+      const language = (params.language as string) || 'ja';
+      const includeRules = params.includeRules !== false; // デフォルトはtrue
+      const includeBranchMemory = params.includeBranchMemory !== false; // デフォルトはtrue
+      const includeGlobalMemory = params.includeGlobalMemory !== false; // デフォルトはtrue
+
+      logger.info(`Reading context (branch: ${branch || 'none'}, language: ${language})`);
+
+      // ブランチメモリバンクを含める場合は、ブランチ名が必須
+      if (includeBranchMemory && !branch) {
+        throw new Error('Branch name is required when includeBranchMemory is true');
+      }
+
+      if (!app) {
+        throw new Error('Application not initialized');
+      }
+
+      // 結果を格納するオブジェクト
+      const result: Record<string, any> = {};
+
+      // ルールを取得
+      if (includeRules) {
+        logger.debug('Including rules in context');
+        if (!['en', 'ja'].includes(language)) {
+          throw new Error('Invalid language for rules');
+        }
+
+        try {
+          const dirname = path.dirname(fileURLToPath(import.meta.url));
+
+          // Load template structure
+          const templatePath = path.join(dirname, 'templates', 'json', 'rules.json');
+          const templateContent = await fs.readFile(templatePath, 'utf-8');
+          const template = JSON.parse(templateContent);
+
+          // Load language translations
+          const translationsPath = path.join(
+            dirname,
+            'infrastructure',
+            'i18n',
+            'translations',
+            `${language}.json`
+          );
+          const translationsContent = await fs.readFile(translationsPath, 'utf-8');
+          const translations = JSON.parse(translationsContent);
+
+          // Render template with translations
+          const renderedContent = renderTemplate(template, translations);
+
+          result.rules = { content: renderedContent };
+        } catch (error) {
+          logger.error('Error reading rules:', error);
+
+          // Fall back to legacy files if available
+          try {
+            // Try JSON format first
+            const dirname = path.dirname(fileURLToPath(import.meta.url));
+            const jsonFilePath = path.join(dirname, 'templates', 'json', `rules-${language}.json`);
+            const content = await fs.readFile(jsonFilePath, 'utf-8');
+            result.rules = { content };
+          } catch (jsonError) {
+            // Fall back to markdown file
+            try {
+              const dirname = path.dirname(fileURLToPath(import.meta.url));
+              const mdFilePath = path.join(dirname, 'templates', `rules-${language}.md`);
+              const content = await fs.readFile(mdFilePath, 'utf-8');
+              result.rules = { content };
+            } catch (mdError) {
+              throw new Error(`Failed to read rules in ${language}: ${(error as Error).message}`);
+            }
+          }
+        }
+      }
+
+      // ブランチメモリバンクを取得
+      if (includeBranchMemory && branch) {
+        logger.debug(`Including branch memory bank for branch: ${branch}`);
+        const branchResponse = await app.getBranchController().readCoreFiles(branch);
+        if (!branchResponse.success) {
+          throw new Error(branchResponse.error.message);
+        }
+        result.branchMemory = branchResponse.data;
+      }
+
+      // グローバルメモリバンクを取得
+      if (includeGlobalMemory) {
+        logger.debug('Including global memory bank in context');
+        const globalResponse = await app.getGlobalController().readCoreFiles();
+        if (!globalResponse.success) {
+          throw new Error(globalResponse.error.message);
+        }
+        result.globalMemory = globalResponse.data;
+      }
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2),
           },
         ],
       };
@@ -514,12 +593,7 @@ async function main() {
     const backupService = new MigrationBackup(logger);
     const validator = new MigrationValidator(logger);
     const converterFactory = new ConverterFactory();
-    const migrator = new MarkdownToJsonMigrator(
-      backupService,
-      validator,
-      converterFactory,
-      logger
-    );
+    const migrator = new MarkdownToJsonMigrator(backupService, validator, converterFactory, logger);
 
     // Configure migration options
     const migrationOptions = {
@@ -534,11 +608,15 @@ async function main() {
 
     // Log migration results
     if (result.success) {
-      logger.info(`Auto-migration completed successfully. Migrated: ${result.stats.successCount}, Skipped: ${result.stats.skippedCount}`);
+      logger.info(
+        `Auto-migration completed successfully. Migrated: ${result.stats.successCount}, Skipped: ${result.stats.skippedCount}`
+      );
     } else {
-      logger.warn(`Auto-migration completed with issues. Migrated: ${result.stats.successCount}, Failed: ${result.stats.failureCount}, Skipped: ${result.stats.skippedCount}`);
+      logger.warn(
+        `Auto-migration completed with issues. Migrated: ${result.stats.successCount}, Failed: ${result.stats.failureCount}, Skipped: ${result.stats.skippedCount}`
+      );
       if (result.stats.failures.length > 0) {
-        logger.warn(`Failed migrations: ${result.stats.failures.map(f => f.path).join(', ')}`);
+        logger.warn(`Failed migrations: ${result.stats.failures.map((f) => f.path).join(', ')}`);
       }
     }
   } catch (error) {
