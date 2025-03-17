@@ -1,6 +1,6 @@
 export * from './markdown-converter.js';
 export * from './markdown-parser.js';
-
+export * from './logger.js';
 /**
  * Logger utility
  */
@@ -182,16 +182,9 @@ export const extractSectionContent = (
 /**
  * Extract list items from a section in markdown content
  * @param content Markdown content
- * @param sectionHeader Section header
- * @returns Array of list items or undefined if section not found
- */
-export const extractListItems = (content: string, sectionHeader: string): string[] | undefined => {
-  const sectionContent = extractSectionContent(content, sectionHeader);
-  if (!sectionContent) return undefined;
+// Re-export logger from logger.ts
+export * from './logger.js';
 
-  return sectionContent
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => line.startsWith('-'))
+// Date utilities
     .map((line) => line.substring(1).trim());
 };
