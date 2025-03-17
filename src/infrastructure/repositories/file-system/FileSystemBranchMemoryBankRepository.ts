@@ -458,57 +458,6 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
 
   /**
    * List all documents in branch
-   * @param branchInfo Branch information
-   * @returns Promise resolving to array of document paths
-   */
-  async listDocuments(branchInfo: BranchInfo): Promise<DocumentPath[]> {
-    try {
-      const documentRepository = this.getRepositoryForBranch(branchInfo);
-      return await documentRepository.list();
-    } catch (error) {
-      if (error instanceof DomainError) {
-        throw error;
-      }
-
-      if (error instanceof InfrastructureError) {
-        throw error;
-      }
-
-      throw new InfrastructureError(
-        InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
-        `Failed to list documents in branch memory bank`,
-        { originalError: error }
-      );
-    }
-  }
-
-  /**
-   * Find documents by tags in branch
-   * @param branchInfo Branch information
-   * @param tags Tags to search for
-   * @returns Promise resolving to array of matching documents
-   */
-  async findDocumentsByTags(branchInfo: BranchInfo, tags: Tag[]): Promise<MemoryDocument[]> {
-    try {
-      const documentRepository = this.getRepositoryForBranch(branchInfo);
-      return await documentRepository.findByTags(tags);
-    } catch (error) {
-      if (error instanceof DomainError) {
-        throw error;
-      }
-
-      if (error instanceof InfrastructureError) {
-        throw error;
-      }
-
-      throw new InfrastructureError(
-        InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
-        `Failed to find documents by tags in branch memory bank`,
-        { originalError: error }
-      );
-    }
-  }
-
   /**
    * Get recent branches
    * @param limit Maximum number of branches to return (default: 10)
@@ -544,15 +493,122 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
 
           // Check if it's a directory and has active context document
           const branchPath = this.configProvider.getBranchMemoryPath(branchInfo.name);
-          const activeContextPath = path.join(branchPath, 'activeContext.json');
+          // Check for both .json and .md versions for backwards compatibility
+          const activeContextJsonPath = path.join(branchPath, 'activeContext.json');
+          const activeContextMdPath = path.join(branchPath, 'activeContext.md');
 
           const isDirectory = await this.fileSystemService.directoryExists(branchPath);
-          const hasActiveContext = await this.fileSystemService.fileExists(activeContextPath);
+          const hasActiveContextJson = await this.fileSystemService.fileExists(activeContextJsonPath);
+          const hasActiveContextMd = await this.fileSystemService.fileExists(activeContextMdPath);
 
-          if (isDirectory && hasActiveContext) {
-            // Get last modified date of active context
+          if (isDirectory && (hasActiveContextJson || hasActiveContextMd)) {
+            // Get last modified date of active context (prefer json version)
+            const activeContextPath = hasActiveContextJson ? activeContextJsonPath : activeContextMdPath;
             const stats = await this.fileSystemService.getFileStats(activeContextPath);
 
+            branchInfos.push({
+              branchInfo,
+              path: branchPath,
+              lastModified: stats.lastModified,
+            });
+          }
+        } catch (error) {
+          // Skip invalid branch directories
+          logger.debug(`Skipping invalid branch directory: ${entry}`, error);
+        }
+      }
+
+      // Sort by last modified date (descending)
+      branchInfos.sort((a, b) => b.lastModified.getTime() - a.lastModified.getTime());
+
+      // Limit the results
+      const limited = branchInfos.slice(0, limit);
+
+      // Build full branch info
+      const recentBranches: RecentBranch[] = [];
+
+      for (const { branchInfo, lastModified } of limited) {
+        try {
+          // Try both JSON and MD paths for backwards compatibility
+          const activeContextJsonPath = DocumentPath.create('activeContext.json');
+          const activeContextMdPath = DocumentPath.create('activeContext.md');
+          
+          // Try to get the document, first JSON then MD
+          let activeContext = await this.getDocument(branchInfo, activeContextJsonPath);
+          if (!activeContext) {
+            activeContext = await this.getDocument(branchInfo, activeContextMdPath);
+          }
+
+          if (activeContext) {
+            const content = activeContext.content;
+
+            // Extract current work and recent changes
+            if (activeContext.isJSON) {
+              try {
+                const jsonContent = JSON.parse(content);
+                const currentWork = jsonContent.content?.currentWork;
+                const recentChanges = jsonContent.content?.recentChanges?.map((change: any) => change.description);
+
+                recentBranches.push({
+                  branchInfo,
+                  lastModified,
+                  summary: {
+                    currentWork,
+                    recentChanges,
+                  },
+                });
+                continue;
+              } catch (jsonError) {
+                logger.debug(`Error parsing JSON content for ${branchInfo.name}:`, jsonError);
+              }
+            }
+
+            // Fallback to Markdown parsing for backward compatibility
+            const currentWork = extractSectionContent(content, '## 現在の作業内容');
+            const recentChanges = extractListItems(content, '## 最近の変更点')?.map((item) =>
+              item.trim()
+            );
+
+            recentBranches.push({
+              branchInfo,
+              lastModified,
+              summary: {
+                currentWork,
+                recentChanges,
+              },
+            });
+          } else {
+            // Include branch even without active context details
+            recentBranches.push({
+              branchInfo,
+              lastModified,
+              summary: {},
+            });
+          }
+        } catch (error) {
+          // Skip branches with errors
+          logger.debug(`Error processing branch ${branchInfo.name}:`, error);
+        }
+      }
+
+      logger.debug(`Found ${recentBranches.length} recent branches`);
+      return recentBranches;
+    } catch (error) {
+      if (error instanceof DomainError) {
+        throw error;
+      }
+
+      if (error instanceof InfrastructureError) {
+        throw error;
+      }
+
+      throw new InfrastructureError(
+        InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
+        `Failed to get recent branches: ${(error as Error).message}`,
+        { originalError: error }
+      );
+    }
+  }
             branchInfos.push({
               branchInfo,
               path: branchPath,
@@ -669,6 +725,19 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
         logger.debug(`Branch directory does not exist: ${branchPath}`);
         return false;
       }
+  async validateStructure(branchInfo: BranchInfo): Promise<boolean> {
+    try {
+      logger.debug(`Validating branch structure for ${branchInfo.name}`);
+
+      const branchPath = this.configProvider.getBranchMemoryPath(branchInfo.name);
+
+      // Check if directory exists
+      const dirExists = await this.fileSystemService.directoryExists(branchPath);
+
+      if (!dirExists) {
+        logger.debug(`Branch directory does not exist: ${branchPath}`);
+        return false;
+      }
 
       // Check if all core documents exist
       for (const document of this.coreDocuments) {
@@ -687,16 +756,6 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
       logger.error(`Error validating branch structure for ${branchInfo.name}:`, error);
       return false;
     }
-  }
-
-  /**
-   * Get memory document repository for branch
-   * @param branchInfo Branch information
-   * @returns FileSystemMemoryDocumentRepository
-   */
-  private getRepositoryForBranch(branchInfo: BranchInfo): FileSystemMemoryDocumentRepository {
-    const branchPath = this.configProvider.getBranchMemoryPath(branchInfo.name);
-    return new FileSystemMemoryDocumentRepository(branchPath, this.fileSystemService);
   }
 
   /**
