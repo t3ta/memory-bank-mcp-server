@@ -1,0 +1,19 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "8a69ae8a-27f7-4fce-8e74-f4fa847c50f9",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.705Z",
+    "createdAt": "2025-03-17T02:13:31.705Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [],
+    "pendingImplementation": [],
+    "status": "基本機能の実装が完了し、zodスキーマによるバリデーションとエラーハンドリングが強化されました。\nさらに、JSONベースのセクション編集機能とブランチ情報取得機能を追加し、ドキュメント管理の柔軟性が向上しました。\nlist_toolsコマンドとwrite_branch_core_filesコマンドの追加により、利用可能なコマンドの一覧取得とコアファイルの一括更新が可能になりました。\nwrite_branch_core_filesコマンドの改善により、セクション単位での編集モード指定や行番号指定による部分更新が可能になり、より柔軟なドキュメント管理が実現しました。\nテストは別ブランチで実装する予定です。",
+    "knownIssues": []
+  }
+}

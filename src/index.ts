@@ -12,7 +12,7 @@ import { hideBin } from 'yargs/helpers';
 // Import the application
 import createApplication from './main/index.js';
 import { Application } from './main/index.js';
-import { logger } from './shared/utils/logger.js';
+import { logger } from './shared/utils/index.js';
 
 // Parse command line arguments
 const argv = yargs(hideBin(process.argv))
@@ -423,6 +423,52 @@ async function main() {
     language: 'ja',
     verbose: false,
   });
+
+  // Auto-migration: Convert Markdown files to JSON on startup
+  try {
+    logger.info('Starting auto-migration of Markdown files to JSON...');
+
+    // Import required classes for migration
+    const { MarkdownToJsonMigrator } = await import('./migration/MarkdownToJsonMigrator.js');
+    const { MigrationBackup } = await import('./migration/MigrationBackup.js');
+    const { MigrationValidator } = await import('./migration/MigrationValidator.js');
+    const { ConverterFactory } = await import('./migration/converters/ConverterFactory.js');
+
+    // Create migrator with required dependencies
+    const backupService = new MigrationBackup(logger);
+    const validator = new MigrationValidator(logger);
+    const converterFactory = new ConverterFactory();
+    const migrator = new MarkdownToJsonMigrator(
+      backupService,
+      validator,
+      converterFactory,
+      logger
+    );
+
+    // Configure migration options
+    const migrationOptions = {
+      createBackup: true,
+      overwriteExisting: false,
+      validateJson: true,
+      deleteOriginals: false,
+    };
+
+    // Run migration on the docs directory
+    const result = await migrator.migrateDirectory(argv.docs as string, migrationOptions);
+
+    // Log migration results
+    if (result.success) {
+      logger.info(`Auto-migration completed successfully. Migrated: ${result.stats.successCount}, Skipped: ${result.stats.skippedCount}`);
+    } else {
+      logger.warn(`Auto-migration completed with issues. Migrated: ${result.stats.successCount}, Failed: ${result.stats.failureCount}, Skipped: ${result.stats.skippedCount}`);
+      if (result.stats.failures.length > 0) {
+        logger.warn(`Failed migrations: ${result.stats.failures.map(f => f.path).join(', ')}`);
+      }
+    }
+  } catch (error) {
+    logger.error('Error during auto-migration:', error);
+    // Continue server startup even if migration fails
+  }
 
   logger.info(`Memory Bank MCP Server running on stdio`);
   logger.info(`Using new clean architecture implementation`);

@@ -1,0 +1,24 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "ad7bb9ac-739e-4d33-9d59-862c4771edc7",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.701Z",
+    "createdAt": "2025-03-17T02:13:31.701Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [],
+    "pendingImplementation": [],
+    "status": "基本的なCRUD操作のユースケース設計が完了し、読み取りと書き込みの実装を進めています。\nエラーハンドリングの共通フレームワークも整備中です。テスト環境の準備も並行して進めています。",
+    "knownIssues": [
+      "トランザクション管理の詳細が未定義",
+      "大量データ処理時のパフォーマンス検証が必要",
+      "インデックス更新の整合性確保方法の検討",
+      "キャッシュ無効化戦略の決定が必要"
+    ]
+  }
+}

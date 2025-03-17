@@ -116,7 +116,10 @@ function detectDocumentType(path: string, title: string): DocumentType {
     return 'active_context';
   } else if (pathLower.includes('progress')) {
     return 'progress';
-  } else if (pathLower.includes('systempatterns') || pathLower.includes('system-patterns')) {
+  } else if (
+    (pathLower.includes('systempatterns') || pathLower.includes('system-patterns')) &&
+    titleLower.includes('技術的')
+  ) {
     return 'system_patterns';
   }
 
@@ -130,7 +133,10 @@ function detectDocumentType(path: string, title: string): DocumentType {
     return 'active_context';
   } else if (titleLower.includes('progress') || titleLower.includes('進捗')) {
     return 'progress';
-  } else if (titleLower.includes('system patterns') || titleLower.includes('システムパターン')) {
+  } else if (
+    (titleLower.includes('system patterns') || titleLower.includes('システムパターン')) &&
+    titleLower.includes('技術的')
+  ) {
     return 'system_patterns';
   }
 
@@ -376,7 +382,7 @@ function parseSystemPatterns(lines: string[], content: Record<string, unknown>):
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
 
-    // Check for technical decision header (H3)
+    // Check for technical decision header (H3 or bold with colon)
     if (line.startsWith('### ')) {
       // Save previous decision if exists
       if (currentDecision) {
@@ -395,16 +401,31 @@ function parseSystemPatterns(lines: string[], content: Record<string, unknown>):
     }
 
     // Check for section headers (H4)
-    if (line.startsWith('#### コンテキスト')) {
+    // Support both H4 headers and bold with colon format
+    if (
+      line.startsWith('#### コンテキスト') ||
+      line.startsWith('#### 背景') ||
+      line.startsWith('**コンテキスト**:')
+    ) {
       currentSection = 'context';
       continue;
-    } else if (line.startsWith('#### 決定事項') || line.startsWith('#### 判断')) {
+    } else if (
+      line.startsWith('#### 決定事項') ||
+      line.startsWith('#### 判断') ||
+      line.startsWith('#### 決定内容') ||
+      line.startsWith('**決定事項**:')
+    ) {
       currentSection = 'decision';
       continue;
-    } else if (line.startsWith('#### 影響') || line.startsWith('#### 理由')) {
+    } else if (
+      line.startsWith('#### 影響') ||
+      line.startsWith('#### 理由') ||
+      line.startsWith('#### 結果') ||
+      line.startsWith('**結果**:')
+    ) {
       currentSection = 'consequences';
       continue;
-    } else if (line.startsWith('####')) {
+    } else if (line.startsWith('####') || line.match(/^\*\*.*\*\*:$/)) {
       currentSection = '';
       continue;
     }

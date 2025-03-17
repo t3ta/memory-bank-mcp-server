@@ -1,0 +1,17 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "ed4f413c-c016-4ed5-bee8-182395056a44",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.707Z",
+    "createdAt": "2025-03-17T02:13:31.707Z",
+    "version": 1
+  },
+  "content": {
+    "purpose": "Markdown関連の不要なコードを安全に削除し、JSON専用のアーキテクチャへの移行を完了する",
+    "userStories": []
+  }
+}

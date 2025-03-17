@@ -1,0 +1,26 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "68bdb7f9-c33f-4b4f-b50c-acf89dae0f83",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.706Z",
+    "createdAt": "2025-03-17T02:13:31.706Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "Markdownサポート関連コードの削除作業を進めています。特にパーサーと\n関連する依存関係の特定と削除に焦点を当てています。",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": [
+      "Markdownパーサーの削除",
+      "関連テストの更新",
+      "依存パッケージの整理",
+      "ドキュメントの更新",
+      "最終テストの実行"
+    ]
+  }
+}

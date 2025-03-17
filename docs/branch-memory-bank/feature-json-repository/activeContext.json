@@ -1,0 +1,24 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "36e37a8c-9149-4609-8e74-79075612a348",
+    "title": "Active Context: JSONリポジトリ実装",
+    "documentType": "active_context",
+    "path": "activeContext.md",
+    "tags": [
+      "active",
+      "repository",
+      "json"
+    ],
+    "lastModified": "2025-03-17T02:13:31.694Z",
+    "createdAt": "2025-03-17T02:13:31.694Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": []
+  }
+}

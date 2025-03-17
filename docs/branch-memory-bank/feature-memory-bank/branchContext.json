@@ -1,0 +1,17 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "e378bf6b-d6b9-4471-91c2-c5152f579643",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.704Z",
+    "createdAt": "2025-03-17T02:13:31.704Z",
+    "version": 1
+  },
+  "content": {
+    "purpose": "このブランチでは、memory-bank-mcp-serverにおけるコマンドの追加実装を行います。\nMCPサーバーとして、メモリーバンク機能を提供し、ブランチごとの作業コンテキストを管理します。",
+    "userStories": []
+  }
+}

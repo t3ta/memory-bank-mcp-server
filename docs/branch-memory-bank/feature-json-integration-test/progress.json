@@ -1,0 +1,24 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "dd9f451f-e40d-4f29-aaa1-a935576eb56e",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.693Z",
+    "createdAt": "2025-03-17T02:13:31.693Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [],
+    "pendingImplementation": [],
+    "status": "基本的な統合テストシナリオの作成を進めています。\nテスト環境の準備も並行して行い、パフォーマンステストの\n設計も開始しました。いくつかのバグも特定され、\n修正の優先順位付けを行っています。",
+    "knownIssues": [
+      "一部のエッジケースが未カバー",
+      "パフォーマンス要件の具体化が必要",
+      "CI/CDパイプラインの調整が必要",
+      "大規模データでのテストが未実施"
+    ]
+  }
+}

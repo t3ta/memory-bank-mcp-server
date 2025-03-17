@@ -1,0 +1,20 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "07512688-fd97-47c0-bef3-cd123feedab4",
+    "title": "ESLint導入ブランチ",
+    "documentType": "generic",
+    "path": "readme.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.669Z",
+    "createdAt": "2025-03-17T02:13:31.669Z",
+    "version": 1
+  },
+  "content": {
+    "rawContent": "# ESLint導入ブランチ\n\nこのブランチはESLintを導入し、警告を修正するためのブランチです。\n\n## 概要\n\n- ESLintの設定ファイルの追加\n- 未使用変数の警告修正\n- フォーマットの問題修正\n\n## 変更内容\n\n- 未使用の変数に `_` プレフィックスを追加\n- catchブロックの未使用エラー変数を `_` に変更\n- スペース関連のフォーマット問題を修正\n\n## 今後の課題\n\n- 残りのESLint警告の修正\n- コードスタイルの統一\n- より厳格なルールの導入と段階的な適用\n",
+    "sections": {
+      "main": "このブランチはESLintを導入し、警告を修正するためのブランチです。",
+      "": "- 残りのESLint警告の修正\n- コードスタイルの統一\n- より厳格なルールの導入と段階的な適用"
+    }
+  }
+}

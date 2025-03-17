@@ -1,0 +1,22 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "0813e1c2-864e-4207-b899-2f879cecc3a7",
+    "title": "Feature: JSONリポジトリ実装",
+    "documentType": "branch_context",
+    "path": "branchContext.md",
+    "tags": [
+      "repository",
+      "json",
+      "file-system",
+      "implementation"
+    ],
+    "lastModified": "2025-03-17T02:13:31.694Z",
+    "createdAt": "2025-03-17T02:13:31.694Z",
+    "version": 1
+  },
+  "content": {
+    "purpose": "- JSON専用のリポジトリインターフェースを定義する\n- ファイルシステムベースの実装を提供する\n- 効率的な検索とインデックス機能を統合する\n- テスト用のモックリポジトリを実装する",
+    "userStories": []
+  }
+}

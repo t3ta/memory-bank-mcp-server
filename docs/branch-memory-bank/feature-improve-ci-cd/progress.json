@@ -1,0 +1,33 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "396e99d7-8548-4b54-9bb6-f7dc90e1a388",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.688Z",
+    "createdAt": "2025-03-17T02:13:31.688Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [
+      "メモリリーク対応（リソース解放処理の実装）",
+      "プロセス終了時のクリーンアップ機能",
+      "イベントリスナー適切な解放処理",
+      "develop-to-master-pr.yml の基本的な動作",
+      "PR作成時のテンプレート（日本語・英語）",
+      "CI/CDワークフローのドキュメント"
+    ],
+    "pendingImplementation": [
+      "メモリ使用量モニタリング機能",
+      "develop-to-master-pr.yml のコンカレンシー設定追加",
+      "既存ワークフローのコンカレンシー設定統一"
+    ],
+    "status": "実装完了 - メモリリーク修正対応済み、PRを作成準備中",
+    "knownIssues": [
+      "メモリバンク関連の機能（read_branch_core_files, write_branch_core_files）でエラーが発生している問題は修正済み",
+      "長時間実行時のメモリ使用状況は引き続き監視が必要"
+    ]
+  }
+}

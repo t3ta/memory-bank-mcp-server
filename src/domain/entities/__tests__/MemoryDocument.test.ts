@@ -444,8 +444,15 @@ describe('MemoryDocument', () => {
   });
 
   describe('fromJSON', () => {
-    it('should convert JSON document to MemoryDocument', () => {
+    it('should create MemoryDocument from JSON', () => {
       // Arrange
+      const documentContent = {
+        currentWork: 'Working on tests',
+        recentChanges: ['Added JSON support'],
+        activeDecisions: ['Use JSON as primary format'],
+        considerations: ['Performance implications'],
+        nextSteps: ['Implement more tests'],
+      };
       const jsonDoc: BaseJsonDocument = {
         schema: 'memory_document_v1',
         metadata: {
@@ -455,13 +462,7 @@ describe('MemoryDocument', () => {
           tags: ['json', 'test'],
           lastModified: new Date('2023-01-01T00:00:00.000Z'),
         },
-        content: {
-          currentWork: 'Working on tests',
-          recentChanges: ['Added JSON support'],
-          activeDecisions: ['Use JSON as primary format'],
-          considerations: ['Performance implications'],
-          nextSteps: ['Implement more tests'],
-        },
+        content: documentContent,
       };
       const path = DocumentPath.create('test/document.json');
 
@@ -475,13 +476,22 @@ describe('MemoryDocument', () => {
       expect(document.tags[0].value).toBe('json');
       expect(document.tags[1].value).toBe('test');
       expect(document.lastModified.toISOString()).toBe('2023-01-01T00:00:00.000Z');
-      expect(document.content).toContain('# JSON Document');
-      expect(document.content).toContain('## 現在の作業内容');
-      expect(document.content).toContain('Working on tests');
+      const parsedContent = JSON.parse(document.content);
+      expect(parsedContent.content).toEqual(documentContent);
+      expect(parsedContent.schema).toBe('memory_document_v1');
+      expect(parsedContent.metadata.title).toBe('JSON Document');
     });
 
-    it('should handle branch context document correctly', () => {
+    it('should create MemoryDocument from branch context JSON', () => {
       // Arrange
+      const documentContent = {
+        purpose: 'Test purpose',
+        createdAt: new Date('2023-01-01T00:00:00.000Z'),
+        userStories: [
+          { description: 'Story 1', completed: false },
+          { description: 'Story 2', completed: true },
+        ],
+      };
       const jsonDoc: BaseJsonDocument = {
         schema: 'memory_document_v1',
         metadata: {
@@ -491,14 +501,7 @@ describe('MemoryDocument', () => {
           tags: ['branch', 'context'],
           lastModified: new Date('2023-01-01T00:00:00.000Z'),
         },
-        content: {
-          purpose: 'Test purpose',
-          createdAt: new Date('2023-01-01T00:00:00.000Z'),
-          userStories: [
-            { description: 'Story 1', completed: false },
-            { description: 'Story 2', completed: true },
-          ],
-        },
+        content: documentContent,
       };
       const path = DocumentPath.create('test/branchContext.json');
 
@@ -507,11 +510,14 @@ describe('MemoryDocument', () => {
 
       // Assert
       expect(document).toBeDefined();
-      expect(document.content).toContain('# Branch Context');
-      expect(document.content).toContain('## 目的');
-      expect(document.content).toContain('Test purpose');
-      expect(document.content).toContain('- [ ] Story 1');
-      expect(document.content).toContain('- [x] Story 2');
+      const content = JSON.parse(document.content);
+      const parsedContent = JSON.parse(document.content);
+      expect(parsedContent.schema).toBe('memory_document_v1');
+      expect(parsedContent.metadata.title).toBe('Branch Context');
+      expect(parsedContent.content).toEqual({
+        ...documentContent,
+        createdAt: documentContent.createdAt.toISOString(),
+      });
     });
   });
 });

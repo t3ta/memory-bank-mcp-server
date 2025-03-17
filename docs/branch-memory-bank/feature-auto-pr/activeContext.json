@@ -1,0 +1,25 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "5acc1e75-6332-4195-b801-b00a26382297",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.670Z",
+    "createdAt": "2025-03-17T02:13:31.670Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "メモリリーク対策のための実装改善",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": [
+      "メモリ使用量最適化の実装をテスト",
+      "実装した機能の動作確認",
+      "テストケースの追加",
+      "ドキュメントの更新"
+    ]
+  }
+}

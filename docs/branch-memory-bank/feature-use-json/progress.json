@@ -1,0 +1,38 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "74eca5ba-c156-4d78-a16a-5ad5f2b5cb0e",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.711Z",
+    "createdAt": "2025-03-17T02:13:31.711Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [
+      "DocumentPathクラスのJSON拡張子チェック機能",
+      "JSON形式のスキーマ定義",
+      "Markdown→JSON、JSON→Markdownの変換ユーティリティ",
+      "MemoryDocumentエンティティのJSON対応拡張",
+      "FileSystemMemoryDocumentRepositoryでのJSON形式の読み書き対応",
+      "JSONファイルの検索・リスト取得機能"
+    ],
+    "pendingImplementation": [
+      "単体テスト（Markdownパーサーやコンバーター用テストなど）",
+      "統合テスト（実際のJSON保存・読み込みのE2Eテスト）",
+      "CLIコマンドでのJSON形式サポート明示化",
+      "サンプルJSONファイルの作成",
+      "ドキュメント同期機能（MarkdownとJSONの二重管理問題の解決）",
+      "検索最適化（将来的な拡張）"
+    ],
+    "status": "基本実装完了 - コードレビューとテスト実装が必要",
+    "knownIssues": [
+      "現段階ではテストが未実装のため、エッジケースで問題が発生する可能性がある",
+      "Markdownパーサーの複雑なドキュメント構造対応はまだ不完全",
+      "JSONスキーマの詳細なバリデーションや型安全性の確保が必要",
+      "性能面での最適化はまだ行われていない"
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "12251802-999a-4a8e-93a1-a40da25aaf84",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.713Z",
+    "createdAt": "2025-03-17T02:13:31.713Z",
+    "version": 1
+  },
+  "content": {
+    "purpose": "失敗しているテストを修正し、プロジェクトの安定性を高める",
+    "userStories": []
+  }
+}

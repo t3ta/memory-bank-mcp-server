@@ -1,0 +1,21 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "7f73665f-16e1-4e14-9a10-7a82f2e81e68",
+    "title": "システムパターン: feature/json-templates",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.md",
+    "tags": [
+      "patterns",
+      "json",
+      "templates",
+      "architecture"
+    ],
+    "lastModified": "2025-03-17T02:13:31.698Z",
+    "createdAt": "2025-03-17T02:13:31.698Z",
+    "version": 1
+  },
+  "content": {
+    "technicalDecisions": []
+  }
+}

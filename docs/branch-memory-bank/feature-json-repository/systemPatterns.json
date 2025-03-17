@@ -1,0 +1,21 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "4990b8c9-e718-4f8b-9347-2161d7dbb91d",
+    "title": "System Patterns: JSONリポジトリ実装",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.md",
+    "tags": [
+      "patterns",
+      "repository",
+      "json",
+      "design"
+    ],
+    "lastModified": "2025-03-17T02:13:31.695Z",
+    "createdAt": "2025-03-17T02:13:31.695Z",
+    "version": 1
+  },
+  "content": {
+    "technicalDecisions": []
+  }
+}

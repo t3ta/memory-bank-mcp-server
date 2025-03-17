@@ -1,0 +1,47 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "091714da-0ab2-4f29-9003-9612292a8550",
+    "title": "`read_context`コマンド設計書",
+    "documentType": "generic",
+    "path": "read-context-command-design.md",
+    "tags": [
+      "design",
+      "mcp",
+      "command",
+      "context",
+      "v2"
+    ],
+    "lastModified": "2025-03-17T02:13:31.721Z",
+    "createdAt": "2025-03-17T02:13:31.721Z",
+    "version": 1
+  },
+  "content": {
+    "1_": "本ドキュメントは、Memory Bank MCPサーバーに新たに追加する`read_context`コマンドの設計を定義します。このコマンドは、現在別々のコマンドで取得している「ルール」、「ブランチメモリバンク」、「グローバルメモリバンク」の情報を一度に取得できるようにするものです。\n",
+    "2_": "現在のMemory Bank MCPサーバーでは、以下のコマンドを使って各種情報を取得しています：\n`read_rules`: メモリバンクのルールを取得\n`read_branch_core_files`: ブランチメモリバンクのコアファイルを取得\n`read_global_core_files`: グローバルメモリバンクのコアファイルを取得\nこれらのコマンドを個別に実行する必要があり、コンテキスト全体を把握するためには複数のコマンドを実行する必要があります。`read_context`コマンドは、これらの情報を一度に取得できるようにすることで、より効率的なコンテキスト取得を可能にします。",
+    "3_": "```\nread_context\n```\n| パラメータ名 | 型 | 必須 | デフォルト値 | 説明 |\n|------------|----|----|------------|------|\n| branch | string | △ | なし | ブランチ名（`includeBranchMemory`がtrueの場合は必須） |\n| language | string | × | 'ja' | 言語コード（'en'または'ja'） |\n| includeRules | boolean | × | true | ルールを含めるかどうか |\n| includeBranchMemory | boolean | × | true | ブランチメモリバンクを含めるかどうか |\n| includeGlobalMemory | boolean | × | true | グローバルメモリバンクを含めるかどうか |\n```json\n{\n\"rules\": {\n\"content\": \"ルールの内容（Markdown形式）\"\n},\n\"branchMemory\": {\n\"branchContext.md\": {\n\"path\": \"branchContext.md\",\n\"content\": \"ブランチコンテキストの内容\",\n\"tags\": [\"core\", \"branch-context\"],\n\"lastModified\": \"2025-03-17T00:00:00Z\"\n},\n\"activeContext.md\": {\n\"path\": \"activeContext.md\",\n\"content\": \"アクティブコンテキストの内容\",\n\"tags\": [\"core\", \"active-context\"],\n\"lastModified\": \"2025-03-17T00:00:00Z\"\n},\n\"systemPatterns.md\": {\n\"path\": \"systemPatterns.md\",\n\"content\": \"システムパターンの内容\",\n\"tags\": [\"core\", \"system-patterns\"],\n\"lastModified\": \"2025-03-17T00:00:00Z\"\n},\n\"progress.md\": {\n\"path\": \"progress.md\",\n\"content\": \"進捗状況の内容\",\n\"tags\": [\"core\", \"progress\"],\n\"lastModified\": \"2025-03-17T00:00:00Z\"\n}\n},\n\"globalMemory\": {\n\"architecture.md\": {\n\"path\": \"architecture.md\",\n\"content\": \"アーキテクチャの内容\",\n\"tags\": [\"core\", \"architecture\"],\n\"lastModified\": \"2025-03-17T00:00:00Z\"\n},\n\"coding-standards.md\": {\n\"path\": \"coding-standards.md\",\n\"content\": \"コーディング規約の内容\",\n\"tags\": [\"core\", \"coding-standards\"],\n\"lastModified\": \"2025-03-17T00:00:00Z\"\n},\n\"domain-models.md\": {\n\"path\": \"domain-models.md\",\n\"content\": \"ドメインモデルの内容\",\n\"tags\": [\"core\", \"domain-models\"],\n\"lastModified\": \"2025-03-17T00:00:00Z\"\n},\n\"glossary.md\": {\n\"path\": \"glossary.md\",\n\"content\": \"用語集の内容\",\n\"tags\": [\"core\", \"glossary\"],\n\"lastModified\": \"2025-03-17T00:00:00Z\"\n},\n\"tech-stack.md\": {\n\"path\": \"tech-stack.md\",\n\"content\": \"技術スタックの内容\",\n\"tags\": [\"core\", \"tech-stack\"],\n\"lastModified\": \"2025-03-17T00:00:00Z\"\n},\n\"user-guide.md\": {\n\"path\": \"user-guide.md\",\n\"content\": \"ユーザーガイドの内容\",\n\"tags\": [\"core\", \"user-guide\"],\n\"lastModified\": \"2025-03-17T00:00:00Z\"\n}\n}\n}\n```\n各セクション（`rules`、`branchMemory`、`globalMemory`）は、対応するパラメータ（`includeRules`、`includeBranchMemory`、`includeGlobalMemory`）がfalseの場合は出力に含まれません。\n",
+    "4_": [
+      "安全性を優先し、ブランチの自動検出は行いません。`includeBranchMemory`がtrueの場合は、`branch`パラメータを必須とします。`branch`パラメータが指定されていない場合は、明確なエラーメッセージを返します。\nこれは、MCPサーバーが起動しているディレクトリと実際のプロジェクトディレクトリが異なる可能性があり、自動検出を行うと誤ったブランチ情報を取得してしまう可能性があるためです。\n`src/index.ts`ファイルの`AVAILABLE_TOOLS`配列に新しいコマンド定義を追加します：\n```typescript\n{\nname: 'read_context',\ndescription: 'Read all context information (rules, branch memory bank, global memory bank) at once',\ninputSchema: {\ntype: 'object',\nproperties: {\nbranch: {\ntype: 'string',\ndescription: 'Branch name (required if includeBranchMemory is true)',\n},\nlanguage: {\ntype: 'string',\nenum: ['en', 'ja'],\ndescription: 'Language code (en or ja)',\n},\nincludeRules: {\ntype: 'boolean',\ndescription: 'Whether to include rules (default: true)',\n},\nincludeBranchMemory: {\ntype: 'boolean',\ndescription: 'Whether to include branch memory bank (default: true)',\n},\nincludeGlobalMemory: {\ntype: 'boolean',\ndescription: 'Whether to include global memory bank (default: true)',\n},\n},\n},\n},\n```\nまた、`CallToolRequestSchema`ハンドラーのswitch文に新しいケースを追加します。詳細な実装は実装ガイドを参照してください。",
+      "`includeBranchMemory`がtrueで`branch`パラメータが指定されていない場合は、エラーを返します。",
+      "言語が'en'または'ja'以外の場合は、エラーを返します。",
+      "アプリケーションが初期化されていない場合は、エラーを返します。",
+      "各コンポーネント（ルール、ブランチメモリバンク、グローバルメモリバンク）の取得に失敗した場合は、エラーを返します。",
+      "複数のコンポーネントを一度に取得するため、処理時間が長くなる可能性があります。",
+      "必要なコンポーネントのみを取得するために、`includeRules`、`includeBranchMemory`、`includeGlobalMemory`パラメータを提供しています。"
+    ],
+    "5_": [
+      "各パラメータの組み合わせでコマンドが正しく動作することを確認します。",
+      "エラーケースが適切に処理されることを確認します。",
+      "`includeBranchMemory`がtrueで`branch`パラメータが指定されていない場合のエラーハンドリングを確認します。",
+      "実際のメモリバンク環境でコマンドを実行し、正しい結果が返されることを確認します。",
+      "大量のデータがある場合のパフォーマンスを確認します。",
+      "様々なパラメータの組み合わせでのテストを行います。"
+    ],
+    "6_": [
+      "JSON形式のドキュメントサポートが追加された場合は、それらも含めるようにコマンドを拡張できます。",
+      "将来的に新しいタイプのメモリバンクが追加された場合は、それらも含めるようにコマンドを拡張できます。",
+      "将来的に安全なブランチ自動検出の仕組みが実装された場合は、それを利用するようにコマンドを拡張できます。"
+    ],
+    "7_": "`read_context`コマンドは、Memory Bank MCPサーバーのユーザビリティを向上させ、より効率的なコンテキスト取得を可能にします。このコマンドにより、ユーザーは一度のコマンド実行で必要なすべてのコンテキスト情報を取得できるようになります。安全性を優先し、ブランチの自動検出は行わず、明示的にブランチ名を指定する必要がありますが、これにより誤ったブランチ情報を取得するリスクを回避できます。"
+  }
+}

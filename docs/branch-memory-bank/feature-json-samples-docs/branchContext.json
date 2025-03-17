@@ -1,0 +1,17 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "04516b3a-a8ee-4a84-8653-8c8b93c96177",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.696Z",
+    "createdAt": "2025-03-17T02:13:31.696Z",
+    "version": 1
+  },
+  "content": {
+    "purpose": "サンプルJSONファイルとドキュメントを提供し、新しいJSONベースのアーキテクチャの\n使用方法を明確に示す",
+    "userStories": []
+  }
+}

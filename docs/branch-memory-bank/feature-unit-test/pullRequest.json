@@ -1,0 +1,20 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "dbf68729-8dcd-4942-bd9a-eac3a9fdd260",
+    "title": "PRの準備完了",
+    "documentType": "generic",
+    "path": "pullRequest.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.710Z",
+    "createdAt": "2025-03-17T02:13:31.710Z",
+    "version": 1
+  },
+  "content": {
+    "rawContent": "# PRの準備完了\n\n#title: ユニットテストのコンパイルエラーを修正\n#targetBranch: develop\n#labels: memory-bank,auto-pr,bug\n\n# 概要## 変更内容\n\n<!-- メモリバンクの最近の変更点から自動生成されます -->\n- ドメインレイヤー：BranchInfoエンティティのテストを実装\n- アプリケーションレイヤー：GetRecentBranchesUseCaseのテストを実装\n- インフラストラクチャレイヤー：FileSystemGlobalMemoryBankRepositoryのテストを実装\n- インターフェースレイヤー：BranchControllerのテストを実装\n- 実装したテストをコミット完了\n\n## 技術的決定事項\n\n<!-- メモリバンクのアクティブな決定事項から自動生成されます -->\n- 各レイヤーでは基本的なクラスに対するテストを先に実装し、それをテンプレートとして他のクラスのテストも展開していく\n- モックを効果的に活用して依存関係を分離し、ユニットテストの分離性を保つ\n- 正常系だけでなく異常系（エラーケース）のテストも重視する\n\n## 実装済み機能\n\n<!-- メモリバンクの動作している機能から自動生成されます -->\n- ドメインレイヤーの一部エンティティ（BranchInfo, MemoryDocument, DocumentPath, Tag）のテストが実装済み\n- アプリケーションレイヤーの一部ユースケース（GetRecentBranchesUseCase, ReadBranchDocumentUseCase, WriteBranchDocumentUseCase, ReadGlobalDocumentUseCase, WriteGlobalDocumentUseCase）のテストが実装済み\n- インフラストラクチャレイヤーのFileSystemGlobalMemoryBankRepositoryのテスト実装済み\n- インターフェースレイヤーのBranchControllerのテスト実装済み\n\n## 既知の問題\n\n<!-- メモリバンクの既知の問題から自動生成されます -->\n- testsディレクトリ内の古いテストファイルが存在し、現在のアーキテクチャと一致していない可能性がある\n- テストカバレッジのCI/CD連携がまだ設定されていない\n\n## 検討事項\n\n<!-- メモリバンクの検討事項から自動生成されます -->\n- テストカバレッジの目標設定（どの程度のカバレッジを目指すか）\n- E2Eテストとインテグレーションテストの追加要否\n- テスト自動化のCI/CD整備\n\n---\n\n_このPRはメモリバンクの情報を基に自動生成されました_\n\n\n_このPRはメモリバンクの情報を基に自動生成されました_",
+    "sections": {
+      "main": "#title: ユニットテストのコンパイルエラーを修正\n#targetBranch: develop\n#labels: memory-bank,auto-pr,bug\n\n\n<!-- メモリバンクの最近の変更点から自動生成されます -->\n- ドメインレイヤー：BranchInfoエンティティのテストを実装\n- アプリケーションレイヤー：GetRecentBranchesUseCaseのテストを実装\n- インフラストラクチャレイヤー：FileSystemGlobalMemoryBankRepositoryのテストを実装\n- インターフェースレイヤー：BranchControllerのテストを実装\n- 実装したテストをコミット完了",
+      "": "<!-- メモリバンクの検討事項から自動生成されます -->\n- テストカバレッジの目標設定（どの程度のカバレッジを目指すか）\n- E2Eテストとインテグレーションテストの追加要否\n- テスト自動化のCI/CD整備\n\n---\n\n_このPRはメモリバンクの情報を基に自動生成されました_\n\n\n_このPRはメモリバンクの情報を基に自動生成されました_"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "25df0575-67ed-46cf-89ff-8011aa12ad78",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.673Z",
+    "createdAt": "2025-03-17T02:13:31.673Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "GitHub Actionsを使ったCI/CDの実装",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": [
+      "CIパイプラインのテストを実施",
+      "NPM_TOKENの設定方法をドキュメント化",
+      "developブランチへマージするPRを作成"
+    ]
+  }
+}

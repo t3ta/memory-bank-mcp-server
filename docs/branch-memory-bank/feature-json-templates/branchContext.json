@@ -1,0 +1,22 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "eda86d2f-21bc-47e8-87ed-e875af00a613",
+    "title": "Branch Context: feature/json-templates",
+    "documentType": "branch_context",
+    "path": "branchContext.md",
+    "tags": [
+      "json",
+      "templates",
+      "feature",
+      "multilingual"
+    ],
+    "lastModified": "2025-03-17T02:13:31.697Z",
+    "createdAt": "2025-03-17T02:13:31.697Z",
+    "version": 1
+  },
+  "content": {
+    "purpose": "このブランチは、テンプレートシステムをJSON形式に移行し、多言語対応を強化することを目的としています。",
+    "userStories": []
+  }
+}

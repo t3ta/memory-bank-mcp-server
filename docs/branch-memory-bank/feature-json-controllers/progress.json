@@ -1,0 +1,38 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "c2f4a47d-a34c-402d-9374-3caf51a1386f",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.690Z",
+    "createdAt": "2025-03-17T02:13:31.690Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [
+      "JsonBranchControllerの実装完了",
+      "JsonGlobalControllerの実装完了",
+      "プレゼンターの拡張（IResponsePresenter, JsonResponsePresenter）",
+      "MCPレスポンス型のメタデータ対応",
+      "DIコンテナの設定更新",
+      "型エラーの修正完了（ビルド成功）"
+    ],
+    "pendingImplementation": [
+      "JsonBranchControllerのテスト",
+      "JsonGlobalControllerのテスト",
+      "JsonResponsePresenterのテスト",
+      "統合テスト",
+      "APIドキュメント"
+    ],
+    "status": "JSONコントローラーの基本実装が完了し、DIコンテナの設定も更新しました。\n型エラーを修正し、ビルドが正常に通るようになりました。\n特にWriteJsonDocumentUseCaseの引数構造に合わせて、コントローラーの\n実装を調整しました。メタデータ対応のレスポンス形式を定義し、\nJSONに特化したコントローラーとプレゼンターを分離したことで\n今後の拡張性が向上しました。",
+    "knownIssues": [
+      "DIコンテナでのJsonDocumentUseCaseの直接参照がリファクタリング必要",
+      "コントローラー間での重複コードが一部存在（ロギングやエラーハンドリング）",
+      "テスト未実装のため動作検証が不十分",
+      "メタデータフィールドの標準化が必要",
+      "branchNameとoptionsの組み合わせによる型安全性の確保が必要"
+    ]
+  }
+}

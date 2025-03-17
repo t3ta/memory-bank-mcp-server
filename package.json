@@ -61,6 +61,7 @@
     "ts-jest": "^29.1.0",
     "ts-mockito": "^2.6.1",
     "ts-node": "^10.9.1",
+    "ts-prune": "^0.10.3",
     "typescript": "^5.0.0",
     "typescript-eslint": "^8.26.1"
   },

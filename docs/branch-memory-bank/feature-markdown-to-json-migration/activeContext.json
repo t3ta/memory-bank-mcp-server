@@ -1,0 +1,37 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "4a9310f7-11e2-45ef-840d-98ceb233ef81",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.702Z",
+    "createdAt": "2025-03-17T02:13:31.702Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "現在、Markdownから新しいJSON形式へのマイグレーションツールを実装しています。基本的なクラス構造、コンバーター、バックアップ機能、およびCLIコマンドの実装が完了しました。",
+    "recentChanges": [
+      "MarkdownToJsonMigratorクラスの実装",
+      "各ドキュメントタイプのコンバーターの実装",
+      "MigrationBackupクラスの実装",
+      "MigrationValidatorクラスの実装",
+      "MigrateCommandの実装",
+      "必要なユーティリティの追加"
+    ],
+    "activeDecisions": [
+      "ストラテジーパターンを使用して、各ドキュメントタイプごとに専用のコンバーターを実装する",
+      "マイグレーション前に自動バックアップを作成し、問題発生時にロールバックできるようにする",
+      "Zodを使用して生成されたJSONの検証を行う",
+      "CLIコマンドは、ディレクトリ単位またはファイル単位でのマイグレーションをサポートする"
+    ],
+    "considerations": [
+      "どのようにドキュメントタイプを検出するか（ファイルパス、内容分析、またはその両方）",
+      "同時に大量のファイルを処理する場合のパフォーマンス最適化",
+      "マイグレーション失敗時のエラーハンドリングと報告方法",
+      "以前のフェーズで作成されたJSONスキーマとの互換性確保"
+    ],
+    "nextSteps": []
+  }
+}

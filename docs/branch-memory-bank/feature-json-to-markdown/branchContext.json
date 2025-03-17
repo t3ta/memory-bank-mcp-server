@@ -1,0 +1,17 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "10887563-e2fb-4ff4-94a5-a9a99b1aee79",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.699Z",
+    "createdAt": "2025-03-17T02:13:31.699Z",
+    "version": 1
+  },
+  "content": {
+    "purpose": "このブランチは、JSONドキュメントをMarkdown形式に変換する機能を実装するためのものです。新しいJSON形式のドキュメントモデルが導入されたことに伴い、既存のMarkdown表示機能を維持するために必要となりました。",
+    "userStories": []
+  }
+}

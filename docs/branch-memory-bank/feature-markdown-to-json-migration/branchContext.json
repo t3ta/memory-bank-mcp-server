@@ -1,0 +1,17 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "10e4481a-3bd6-4c24-b6f3-6c115c55db0e",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.703Z",
+    "createdAt": "2025-03-17T02:13:31.703Z",
+    "version": 1
+  },
+  "content": {
+    "purpose": "このブランチは、既存のMarkdownファイルをJSON形式に変換するためのマイグレーションツールを実装するためのものです。Memory Bank 2.0への移行計画の一部として、既存のMarkdownドキュメントを新しいJSON形式に変換する必要があります。",
+    "userStories": []
+  }
+}

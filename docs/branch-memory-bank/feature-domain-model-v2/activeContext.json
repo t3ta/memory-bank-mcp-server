@@ -1,0 +1,37 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "d0adc677-fc8f-4dfa-9cac-2a71b10252fc",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.md",
+    "tags": [
+      "domain-model",
+      "v2",
+      "json",
+      "implementation"
+    ],
+    "lastModified": "2025-03-17T02:13:31.680Z",
+    "createdAt": "2025-03-17T02:13:31.680Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "フェーズ2のドメインモデル拡張を実装中です。具体的に以下の作業を行なっています：\n1. DocumentId値オブジェクトの設計・実装\n2. JsonDocumentエンティティの設計・実装\n3. DocumentPathクラスの機能拡張",
+    "recentChanges": [
+      "フェーズ1で実装されたJSONスキーマの調査完了",
+      "ブランチメモリバンクの初期設定",
+      "実装戦略の決定"
+    ],
+    "activeDecisions": [
+      "JsonDocumentはフェーズ1で定義されたスキーマに準拠する",
+      "既存のMemoryDocumentとは別のエンティティとして実装する",
+      "Zodスキーマを活用して型安全なドキュメント操作を実現する"
+    ],
+    "considerations": [
+      "既存のMemoryDocumentを使う古いコードとの互換性維持",
+      "JsonDocument対応のリポジトリ実装は次のフェーズで行うため、現状のリポジトリインターフェイスは変更しない",
+      "テストカバレッジの確保"
+    ],
+    "nextSteps": []
+  }
+}

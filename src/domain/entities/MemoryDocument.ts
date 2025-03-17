@@ -1,8 +1,6 @@
 import { DocumentPath } from './DocumentPath.js';
 import { Tag } from './Tag.js';
-import { jsonToMarkdown } from '../../shared/utils/markdown-converter.js';
-import { parseMarkdown } from '../../shared/utils/markdown-parser.js';
-import { JsonDocument, DocumentMetadata, BaseJsonDocument } from '../../schemas/json-document.js';
+import { BaseJsonDocument } from '../../schemas/json-document.js';
 
 /**
  * Props for MemoryDocument entity
@@ -188,22 +186,54 @@ export class MemoryDocument {
    * @returns JSON document object
    */
   public toJSON(): BaseJsonDocument {
-    // If already JSON format, parse and return
     if (this.isJSON) {
       try {
         return JSON.parse(this.props.content) as BaseJsonDocument;
       } catch (error) {
         console.error('Failed to parse JSON document:', error);
-        // Continue with conversion as fallback
       }
     }
 
-    // If markdown or other format, parse and convert
     const documentType = this.determineDocumentType();
-    const parsed = parseMarkdown(this.props.content, this.props.path.value);
+    const title = this.title || this.props.path.filename;
 
-    // Ensure we have a title
-    const title = this.title || parsed.metadata.title || this.props.path.filename;
+    // Create a default content structure based on document type
+    let content: Record<string, unknown>;
+    switch (documentType) {
+      case 'branch_context':
+        content = {
+          purpose: this.props.content,
+          createdAt: new Date(),
+          userStories: [],
+        };
+        break;
+      case 'active_context':
+        content = {
+          currentWork: this.props.content,
+          recentChanges: [],
+          activeDecisions: [],
+          considerations: [],
+          nextSteps: [],
+        };
+        break;
+      case 'progress':
+        content = {
+          status: this.props.content,
+          workingFeatures: [],
+          pendingImplementation: [],
+          knownIssues: [],
+        };
+        break;
+      case 'system_patterns':
+        content = {
+          technicalDecisions: [],
+        };
+        break;
+      default:
+        content = {
+          text: this.props.content,
+        };
+    }
 
     return {
       schema: 'memory_document_v1',
@@ -214,7 +244,7 @@ export class MemoryDocument {
         tags: this.props.tags.map((tag) => tag.value),
         lastModified: this.props.lastModified,
       },
-      content: parsed.content,
+      content,
     };
   }
 
@@ -224,13 +254,9 @@ export class MemoryDocument {
    * @returns Markdown formatted string
    */
   public static fromJSON(jsonDoc: BaseJsonDocument, path: DocumentPath): MemoryDocument {
-    // Convert JSON to markdown
-    const markdown = jsonToMarkdown(jsonDoc as JsonDocument);
-
-    // Create document
     return MemoryDocument.create({
       path,
-      content: markdown,
+      content: JSON.stringify(jsonDoc, null, 2),
       tags: (jsonDoc.metadata.tags || []).map((tag) => Tag.create(tag)),
       lastModified: new Date(jsonDoc.metadata.lastModified),
     });

@@ -1,0 +1,17 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "8afe570f-7791-426e-b9a4-c381d2122103",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.638Z",
+    "createdAt": "2025-03-17T02:13:31.638Z",
+    "version": 1
+  },
+  "content": {
+    "purpose": "プロジェクトにESLintとPrettierを導入してコード品質を向上させる",
+    "userStories": []
+  }
+}

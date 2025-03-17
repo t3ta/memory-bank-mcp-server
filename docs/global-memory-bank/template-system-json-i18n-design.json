@@ -1,0 +1,62 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "4aed7afe-57d2-40d6-833f-e1ee850d114c",
+    "title": "テンプレートシステムのJSON化と多言語対応 - 設計仕様書",
+    "documentType": "generic",
+    "path": "template-system-json-i18n-design.md",
+    "tags": [
+      "design",
+      "template",
+      "json",
+      "i18n",
+      "l10n",
+      "v2"
+    ],
+    "lastModified": "2025-03-17T02:13:31.723Z",
+    "createdAt": "2025-03-17T02:13:31.723Z",
+    "version": 1
+  },
+  "content": {
+    "1_": "本ドキュメントは、Memory Bank 2.0におけるテンプレートシステムのJSON化と多言語対応の設計仕様を定義します。この設計は、v2実装計画のフェーズ7.5として位置づけられ、既存のMarkdownベースのテンプレートシステムをJSONベースに移行し、効率的な多言語対応を実現するものです。\n",
+    "2_": [
+      "テンプレート構造とコンテンツの分離による保守性の向上",
+      "国際化（i18n）と地域化（l10n）のベストプラクティスの適用",
+      "既存のテンプレートからの円滑な移行",
+      "将来的な言語追加の容易化",
+      "クリーンアーキテクチャに準拠した実装"
+    ],
+    "3_": "```\nsrc/\n├── schemas/v2/                      # スキーマ定義\n│   ├── template-schema.ts           # テンプレート基本スキーマ\n│   └── i18n-schema.ts               # 国際化スキーマ\n├── infrastructure/                  # インフラストラクチャレイヤー\n│   ├── i18n/                        # 国際化関連\n│   │   ├── translations/            # 翻訳ファイル\n│   │   │   ├── en.json              # 英語翻訳\n│   │   │   ├── ja.json              # 日本語翻訳\n│   │   │   └── zh.json              # 中国語翻訳（オプション）\n│   │   ├── I18nProvider.ts          # 国際化プロバイダー\n│   │   └── interfaces/\n│   │       └── II18nProvider.ts     # 国際化プロバイダーインターフェース\n│   └── templates/                   # テンプレート関連\n│       ├── JsonTemplateLoader.ts    # テンプレートローダー\n│       ├── TemplateRenderer.ts      # テンプレートレンダラー\n│       └── interfaces/\n│           └── ITemplateLoader.ts   # テンプレートローダーインターフェース\n├── templates/json/                  # JSONテンプレート\n│   ├── pull-request.json            # PRテンプレート\n│   ├── develop-to-master.json       # develop→masterテンプレート\n│   ├── branch-context.json          # ブランチコンテキストテンプレート\n│   ├── active-context.json          # アクティブコンテキストテンプレート\n│   ├── system-patterns.json         # システムパターンテンプレート\n│   └── progress.json                # 進捗テンプレート\n└── cli/commands/template/           # テンプレート関連コマンド\n├── MigrateTemplatesCommand.ts   # テンプレート移行コマンド\n└── GenerateTemplateCommand.ts   # テンプレート生成コマンド\n```\n",
+    "4_": "```typescript\n// src/schemas/v2/i18n-schema.ts\n// 翻訳キー型\nexport type TranslationKey = string;\n// 翻訳辞書型\nexport type TranslationDictionary = Record<TranslationKey, string>;\n// 翻訳ファイル型\nexport interface TranslationFile {\nlanguage: 'en' | 'ja' | 'zh';\ntranslations: TranslationDictionary;\nmetadata: {\nversion: string;\nupdatedAt: string; // ISO 8601形式\n};\n}\n```\n```typescript\n// src/schemas/v2/template-schema.ts\nimport { TranslationKey } from './i18n-schema.js';\n// テンプレートセクション型\nexport interface TemplateSection {\nid: string;\ntitleKey: TranslationKey;  // 翻訳キーを参照\ncontentKey?: TranslationKey;  // 翻訳キーを参照（オプション）\nplaceholder?: string;  // プレースホルダー（オプション）\nisOptional: boolean;  // オプションセクションかどうか\n}\n// テンプレート基本型\nexport interface BaseTemplate {\nid: string;\ntype: string;\nversion: string;\ntitleKey: TranslationKey;  // 翻訳キーを参照\ndescriptionKey?: TranslationKey;  // 翻訳キーを参照（オプション）\nsections: TemplateSection[];\ncreatedAt: string;  // ISO 8601形式\nupdatedAt: string;  // ISO 8601形式\n}\n// 特定のテンプレートタイプ\nexport interface PullRequestTemplate extends BaseTemplate {\ntype: 'pull-request';\n}\nexport interface BranchMemoryTemplate extends BaseTemplate {\ntype: 'branch-memory';\n}\n```\n",
+    "5_": [
+      "**責務**:\n翻訳ファイルの読み込みと管理\n翻訳キーに基づくテキスト取得\n言語フォールバック処理\nパラメータ置換\n**インターフェース**:```typescript\n// src/infrastructure/i18n/interfaces/II18nProvider.ts\nexport interface II18nProvider {\ntranslate(key: TranslationKey, language: Language, params?: Record<string, string>): string;\nloadTranslations(language: Language): Promise<boolean>;\nisLanguageSupported(language: Language): boolean;\n}\n```\n**主要メソッド**:\n`translate`: 指定された言語で翻訳を取得\n`loadTranslations`: 翻訳ファイルを読み込む\n`isLanguageSupported`: サポートされている言語かどうかを確認\n**責務**:\nJSONテンプレートをMarkdownに変換\n翻訳テキストの適用\n変数置換\nフォーマット処理\n**主要メソッド**:\n`renderToMarkdown`: テンプレートをMarkdownに変換\n**責務**:\nJSONテンプレートファイルの読み込み\nテンプレートのバリデーション\nテンプレートのレンダリング\n後方互換性の提供\n**インターフェース**:```typescript\n// src/infrastructure/templates/interfaces/ITemplateLoader.ts\nexport interface ITemplateLoader {\nloadJsonTemplate(templateId: string): Promise<BaseTemplate>;\ngetMarkdownTemplate(templateId: string, language: Language, variables?: Record<string, string>): Promise<string>;\nloadLegacyTemplate(templateName: string, language: Language): Promise<string>;\n}\n```\n**主要メソッド**:",
+      "`loadJsonTemplate`: JSONテンプレートを読み込む",
+      "`getMarkdownTemplate`: テンプレートをMarkdownとして取得",
+      "`loadLegacyTemplate`: 既存のMarkdownテンプレートを読み込む"
+    ],
+    "6_": "```json\n{\n\"language\": \"en\",\n\"translations\": {\n\"template.title.pull_request\": \"Pull Request\",\n\"template.description.pull_request\": \"Standard pull request template\",\n\"template.section.overview\": \"Overview\",\n\"template.section.changes\": \"Changes\",\n\"template.section.technical_decisions\": \"Technical Decisions\",\n\"template.section.implemented_features\": \"Implemented Features\",\n\"template.section.known_issues\": \"Known Issues\",\n\"template.section.considerations\": \"Considerations\",\n\"template.footer.pull_request\": \"_This PR was automatically generated based on information from the memory bank_\",\n\"template.title.branch_context\": \"Branch Context\",\n\"template.section.purpose\": \"Purpose of this Branch\",\n\"template.section.user_stories\": \"User Stories\",\n\"template.content.user_stories\": \"### Problem to Solve\\n\\n{{PROBLEM}}\\n\\n### Required Features\\n\\n{{FEATURES}}\\n\\n### Expected Behavior\\n\\n{{BEHAVIOR}}\",\n\"template.section.related_issues\": \"Related Issues\",\n\"template.title.active_context\": \"Active Context\",\n\"template.section.current_work\": \"Current Work\",\n\"template.section.recent_changes\": \"Recent Changes\",\n\"template.section.active_decisions\": \"Active Decisions\",\n\"template.section.active_considerations\": \"Active Considerations\",\n\"template.section.next_steps\": \"Next Steps\",\n\"template.title.system_patterns\": \"System Patterns\",\n\"template.section.major_technical_decisions\": \"Major Technical Decisions\",\n\"template.section.file_structure\": \"Related Files and Directory Structure\",\n\"template.section.design_patterns\": \"Design Patterns\",\n\"template.section.architecture\": \"Architecture\",\n\"template.title.progress\": \"Progress\",\n\"template.section.working_features\": \"Currently Working Parts\",\n\"template.section.unimplemented_features\": \"Unimplemented Features and Remaining Work\",\n\"template.section.current_status\": \"Current Status\",\n\"template.section.known_issues\": \"Known Issues\",\n\"template.section.completion_criteria\": \"Completion Criteria\",\n\"template.footer.branch_memory\": \"_This document is part of the branch memory bank_\"\n},\n\"metadata\": {\n\"version\": \"1.0.0\",\n\"updatedAt\": \"2025-03-17T00:00:00Z\"\n}\n}\n```\n```json\n{\n\"id\": \"pull-request\",\n\"type\": \"pull-request\",\n\"version\": \"2.0.0\",\n\"titleKey\": \"template.title.pull_request\",\n\"descriptionKey\": \"template.description.pull_request\",\n\"sections\": [\n{\n\"id\": \"overview\",\n\"titleKey\": \"template.section.overview\",\n\"placeholder\": \"{{CURRENT_WORK}}\"\n},\n{\n\"id\": \"changes\",\n\"titleKey\": \"template.section.changes\",\n\"placeholder\": \"{{RECENT_CHANGES}}\"\n},\n{\n\"id\": \"technical_decisions\",\n\"titleKey\": \"template.section.technical_decisions\",\n\"placeholder\": \"{{ACTIVE_DECISIONS}}\"\n},\n{\n\"id\": \"implemented_features\",\n\"titleKey\": \"template.section.implemented_features\",\n\"placeholder\": \"{{WORKING_FEATURES}}\"\n},\n{\n\"id\": \"known_issues\",\n\"titleKey\": \"template.section.known_issues\",\n\"placeholder\": \"{{KNOWN_ISSUES}}\"\n},\n{\n\"id\": \"considerations\",\n\"titleKey\": \"template.section.considerations\",\n\"placeholder\": \"{{CONSIDERATIONS}}\"\n}\n],\n\"createdAt\": \"2025-03-17T00:00:00Z\",\n\"updatedAt\": \"2025-03-17T00:00:00Z\"\n}\n```\n",
+    "7_": "1. `JsonTemplateLoader.getMarkdownTemplate()`が呼び出される\n2. 指定された言語の翻訳ファイルが読み込まれる\n3. JSONテンプレートファイルが読み込まれる\n4. テンプレートがバリデーションされる\n5. `TemplateRenderer.renderToMarkdown()`が呼び出される\n6. 各セクションのタイトルと内容が翻訳される\n7. 変数が置換される\n8. Markdown形式の文字列が返される\n1. `MigrateTemplatesCommand.execute()`が呼び出される\n2. 既存のMarkdownテンプレートファイルが読み込まれる\n3. Markdownがパースされ、セクションに分割される\n4. 各セクションから翻訳キーが生成される\n5. 翻訳テキストが翻訳ファイルに追加される\n6. JSONテンプレート構造が生成される\n7. JSONテンプレートファイルが保存される\n",
+    "8_": "既存のMarkdownテンプレートとの後方互換性を確保するため、以下の戦略を採用します：\n1. 既存のテンプレートパスをサポート\n2. `loadLegacyTemplate()`メソッドの提供\n3. 既存のテンプレート参照コードの段階的な移行\n4. 移行期間中の両方のフォーマットのサポート\n",
+    "9_": [
+      "この設計は以下の拡張に対応できます：\n1. **新しい言語の追加**:\n新しい翻訳ファイルの追加のみで対応可能\nテンプレート自体の変更は不要\n2. **新しいテンプレートタイプの追加**:\n新しいJSONテンプレートファイルの追加\n必要な翻訳キーの追加\n3. **テンプレート形式の拡張**:",
+      "新しいセクションタイプの追加",
+      "条件付きセクションの実装",
+      "ネストされたセクションの対応"
+    ],
+    "10_": [
+      "1. **基盤の整備** (1日目):\nスキーマ定義\nインターフェース設計\nディレクトリ構造の作成\n2. **コア機能の実装** (1日目):\nI18nProvider\nTemplateRenderer\nJsonTemplateLoader\n3. **テンプレートとリソースの作成** (2日目):\n翻訳ファイル\nJSONテンプレート\nマイグレーションツール\n4. **統合とテスト** (2日目):",
+      "CLIコマンド",
+      "DIコンテナ登録",
+      "テスト実装",
+      "フェーズ7（CLIコマンド）の後に実装",
+      "フェーズ8（マイグレーションツール）の前に実装",
+      "多言語対応計画と連携"
+    ],
+    "11_": [
+      "1. **単体テスト**:\nI18nProviderのテスト\nTemplateRendererのテスト\nJsonTemplateLoaderのテスト\n2. **統合テスト**:\nテンプレート読み込みからレンダリングまでの統合テスト\nCLIコマンドの統合テスト\n3. **マイグレーションテスト**:",
+      "既存テンプレートからの移行テスト",
+      "生成されたJSONの検証"
+    ],
+    "12_": "この設計により、Memory Bank 2.0のテンプレートシステムは以下の利点を得ることができます：\n1. **保守性の向上**:\nテンプレート構造とコンテンツの分離\n翻訳の一元管理\n2. **多言語対応の強化**:\n効率的な翻訳管理\n言語追加の容易化\n3. **拡張性の向上**:\n新しいテンプレートタイプの追加が容易\n将来的な機能拡張に対応\n4. **クリーンアーキテクチャとの整合性**:\n明確な責務分離\nインターフェースによる依存関係の逆転\nこの設計は、v2実装計画のフェーズ7.5として位置づけられ、JSONベースのアーキテクチャへの移行を促進するものです。"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "12cb1873-6f51-43f6-a012-5a38826cd3d8",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.714Z",
+    "createdAt": "2025-03-17T02:13:31.714Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "templatesディレクトリが正しくdistに含まれるようにビルドスクリプトを修正",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": [
+      "他の非TSファイルが正しくdistディレクトリに含まれているか確認",
+      "必要に応じてREADMEにビルドプロセスについての説明を追加"
+    ]
+  }
+}

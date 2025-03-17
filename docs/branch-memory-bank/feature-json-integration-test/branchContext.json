@@ -1,0 +1,17 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "933977fc-d734-4f98-a9ad-b356f3d9fc67",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.693Z",
+    "createdAt": "2025-03-17T02:13:31.693Z",
+    "version": 1
+  },
+  "content": {
+    "purpose": "JSON機能のエンドツーエンドテストを実施し、統合テストの整備と最終的なバグ修正を行う",
+    "userStories": []
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "31d0e4fd-b11c-43df-bc7a-2d1a6210228c",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.703Z",
+    "createdAt": "2025-03-17T02:13:31.703Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [
+      "マイグレーションの基本構造の実装（MarkdownToJsonMigrator）",
+      "各ドキュメントタイプのコンバーター実装",
+      "バックアップとロールバック機能の実装",
+      "バリデーション機能の実装",
+      "CLIコマンドの実装"
+    ],
+    "pendingImplementation": [
+      "[ ] テストの作成",
+      "[ ] ユニットテスト",
+      "[ ] 統合テスト",
+      "[ ] 実際のドキュメントでのテスト",
+      "[ ] エッジケースの考慮と対応",
+      "[ ] エラーメッセージの改善"
+    ],
+    "status": "基本的な機能実装は完了しました。テストと実際のドキュメントを使った検証が必要です。",
+    "knownIssues": [
+      "TypeDetectorの分離をしていないが、現在はMarkdownParserの中に統合している",
+      "特殊なマークダウン形式があった場合の対応が必要かもしれない",
+      "マイグレーションのロールバック時のエラーハンドリングが不十分かもしれない"
+    ]
+  }
+}

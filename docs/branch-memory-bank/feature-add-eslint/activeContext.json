@@ -1,0 +1,25 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "f155cab5-ad02-41c3-870f-9179ebe1dd95",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.620Z",
+    "createdAt": "2025-03-17T02:13:31.620Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "ESLintの警告修正作業を行っています。特に未使用変数の警告と、フォーマットの問題を中心に修正しています。",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": [
+      "残りのESLint警告の整理と優先度決定",
+      "リファクタリングによる改善可能な箇所の選定",
+      "ESLintルールの段階的な厳格化計画の立案",
+      "CI/CDパイプラインにESLintを組み込むことの検討"
+    ]
+  }
+}

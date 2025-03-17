@@ -1,0 +1,26 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "43084774-db72-4415-899e-3737596c7aab",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.690Z",
+    "createdAt": "2025-03-17T02:13:31.690Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "JSONコントローラーの基本実装を完了しました。MCPレスポンスの形式も\nメタデータをサポートするように拡張しています。次はコントローラーの\nテストケースを実装する予定です。型エラーの修正を行い、ビルドが\n正常に通るようになりました。",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": [
+      "JsonBranchControllerのテスト実装",
+      "JsonGlobalControllerのテスト実装",
+      "JsonResponsePresenterのテスト実装",
+      "統合テストの実装",
+      "ドキュメントの整備（APIリファレンス）"
+    ]
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "5a470962-19d2-4c8a-a6d7-ef482993fe42",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.715Z",
+    "createdAt": "2025-03-17T02:13:31.715Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [
+      "templatesディレクトリとMarkdownファイルがdistディレクトリに正しくコピーされるようになった"
+    ],
+    "pendingImplementation": [],
+    "status": "完了",
+    "knownIssues": []
+  }
+}

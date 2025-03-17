@@ -1,0 +1,24 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "18c2d0f7-ed30-4ef3-9c69-82615fa150f7",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.712Z",
+    "createdAt": "2025-03-17T02:13:31.712Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "失敗しているテストの修正",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": [
+      "正規表現パターンを修正して、空のセクションを正しく解析できるようにする",
+      "残りのテストを修正する",
+      "修正内容をコミットしてプッシュする"
+    ]
+  }
+}

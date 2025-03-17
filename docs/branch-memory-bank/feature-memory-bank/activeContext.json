@@ -1,0 +1,22 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "3f1dfe38-8192-4acf-9fc7-741173f62b2e",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.704Z",
+    "createdAt": "2025-03-17T02:13:31.704Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "write_branch_core_filesコマンドを改善",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": [
+      "テスト実装用の新しいブランチを作成する"
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "c48319aa-a705-48b4-babc-fddb3345b3e6",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.689Z",
+    "createdAt": "2025-03-17T02:13:31.689Z",
+    "version": 1
+  },
+  "content": {
+    "purpose": "JSON操作のためのCLIコマンドを実装し、ユーザーが効率的にJSONドキュメントを操作できるようにする",
+    "userStories": []
+  }
+}

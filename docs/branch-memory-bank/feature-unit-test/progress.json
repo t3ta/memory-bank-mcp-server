@@ -1,0 +1,34 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "de9a069b-455a-4016-9e8f-c7263875b60f",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.709Z",
+    "createdAt": "2025-03-17T02:13:31.709Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [
+      "ドメインレイヤーの一部エンティティ（BranchInfo, MemoryDocument, DocumentPath, Tag）のテスト実装",
+      "アプリケーションレイヤーの一部ユースケース（GetRecentBranchesUseCase, ReadBranchDocumentUseCase, WriteBranchDocumentUseCase, ReadGlobalDocumentUseCase, WriteGlobalDocumentUseCase）のテスト実装",
+      "インフラストラクチャレイヤーのFileSystemGlobalMemoryBankRepositoryのテスト実装",
+      "インターフェースレイヤーのBranchControllerのテスト実装",
+      "コンパイルエラーの修正"
+    ],
+    "pendingImplementation": [
+      "ドメインレイヤーの残りのエンティティとバリューオブジェクトのテスト実装",
+      "アプリケーションレイヤーの残りのユースケースのテスト実装",
+      "インフラストラクチャレイヤーの残りのリポジトリ実装のテスト実装",
+      "インターフェースレイヤーの残りのコントローラーのテスト実装",
+      "テストカバレッジレポートの生成と閾値設定",
+      "CI/CDパイプラインとの統合"
+    ],
+    "status": "実装中 - 各レイヤーに対するテストを追加し、コアロジックのカバレッジを向上",
+    "knownIssues": [
+      "テストカバレッジのCI/CD連携がまだ設定されていない"
+    ]
+  }
+}
