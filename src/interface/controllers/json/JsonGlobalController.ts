@@ -19,10 +19,17 @@ import { UpdateJsonIndexUseCase } from '../../../application/usecases/json/Updat
  * Controller for JSON global memory bank operations
  * Dedicated controller for JSON document operations with global memory bank
  */
-export class JsonGlobalController implements Pick<IGlobalController, 
-  'readJsonDocument' | 'writeJsonDocument' | 'deleteJsonDocument' | 
-  'listJsonDocuments' | 'searchJsonDocuments' | 'updateJsonIndex'> {
-  
+export class JsonGlobalController
+  implements
+  Pick<
+    IGlobalController,
+    | 'readJsonDocument'
+    | 'writeJsonDocument'
+    | 'deleteJsonDocument'
+    | 'listJsonDocuments'
+    | 'searchJsonDocuments'
+    | 'updateJsonIndex'
+  > {
   readonly _type = 'controller' as const;
 
   /**
@@ -41,16 +48,17 @@ export class JsonGlobalController implements Pick<IGlobalController,
     private readonly searchJsonDocumentsUseCase: SearchJsonDocumentsUseCase,
     private readonly updateJsonIndexUseCase: UpdateJsonIndexUseCase,
     private readonly presenter: IResponsePresenter
-  ) {}
+  ) { }
 
   /**
    * Read JSON document from global memory bank
    * @param options Options for reading document (path or ID)
    * @returns Promise resolving to MCP response with JSON document
    */
-  async readJsonDocument(
-    options: { path?: string; id?: string }
-  ): Promise<MCPResponse<JsonDocumentDTO>> {
+  async readJsonDocument(options: {
+    path?: string;
+    id?: string;
+  }): Promise<MCPResponse<JsonDocumentDTO>> {
     try {
       logger.info(`Reading JSON document from global memory bank: ${options.path || options.id}`);
 
@@ -70,25 +78,17 @@ export class JsonGlobalController implements Pick<IGlobalController,
    * @param document Document data to write
    * @returns Promise resolving to MCP response with the result
    */
-  async writeJsonDocument(
-    document: JsonDocumentDTO
-  ): Promise<MCPResponse> {
+  async writeJsonDocument(document: JsonDocumentDTO): Promise<MCPResponse> {
     try {
       logger.info(`Writing JSON document to global memory bank: ${document.path || document.id}`);
 
       // Validate required fields
       if (!document.title) {
-        throw new ApplicationError(
-          'VALIDATION_ERROR',
-          'Document title is required'
-        );
+        throw new ApplicationError('VALIDATION_ERROR', 'Document title is required');
       }
 
       if (!document.documentType) {
-        throw new ApplicationError(
-          'VALIDATION_ERROR',
-          'Document type is required'
-        );
+        throw new ApplicationError('VALIDATION_ERROR', 'Document type is required');
       }
 
       if (!document.content || Object.keys(document.content).length === 0) {
@@ -105,7 +105,7 @@ export class JsonGlobalController implements Pick<IGlobalController,
           documentType: document.documentType as DocumentType,
           content: document.content,
           tags: document.tags || [],
-        }
+        },
       });
 
       return this.presenter.present(result);
@@ -119,9 +119,7 @@ export class JsonGlobalController implements Pick<IGlobalController,
    * @param options Options for deleting document (path or ID)
    * @returns Promise resolving to MCP response with the result
    */
-  async deleteJsonDocument(
-    options: { path?: string; id?: string }
-  ): Promise<MCPResponse> {
+  async deleteJsonDocument(options: { path?: string; id?: string }): Promise<MCPResponse> {
     try {
       logger.info(`Deleting JSON document from global memory bank: ${options.path || options.id}`);
 
@@ -149,13 +147,15 @@ export class JsonGlobalController implements Pick<IGlobalController,
    * @param options Options for listing documents (type, tags)
    * @returns Promise resolving to MCP response with list of documents
    */
-  async listJsonDocuments(
-    options?: { type?: string; tags?: string[] }
-  ): Promise<MCPResponse<JsonDocumentDTO[]>> {
+  async listJsonDocuments(options?: {
+    type?: string;
+    tags?: string[];
+  }): Promise<MCPResponse<JsonDocumentDTO[]>> {
     try {
-      logger.info(`Listing JSON documents in global memory bank${
-        options?.type ? ` of type ${options.type}` : ''
-      }${options?.tags ? ` with tags ${options.tags.join(', ')}` : ''}`);
+      logger.info(
+        `Listing JSON documents in global memory bank${options?.type ? ` of type ${options.type}` : ''
+        }${options?.tags ? ` with tags ${options.tags.join(', ')}` : ''}`
+      );
 
       const result = await this.searchJsonDocumentsUseCase.execute({
         documentType: options?.type as DocumentType,
@@ -173,16 +173,14 @@ export class JsonGlobalController implements Pick<IGlobalController,
    * @param query Search query
    * @returns Promise resolving to MCP response with matching documents
    */
-  async searchJsonDocuments(
-    query: string
-  ): Promise<MCPResponse<JsonDocumentDTO[]>> {
+  async searchJsonDocuments(query: string): Promise<MCPResponse<JsonDocumentDTO[]>> {
     try {
       logger.info(`Searching JSON documents in global memory bank with query: ${query}`);
 
       // For now, we just use tag-based search
       // In the future, this could be extended to support more complex queries
-      const tags = query.split(/\s+/).filter(tag => tag.trim() !== '');
-      
+      const tags = query.split(/\s+/).filter((tag) => tag.trim() !== '');
+
       const result = await this.searchJsonDocumentsUseCase.execute({
         tags: tags.length > 0 ? tags : undefined,
       });
@@ -198,9 +196,7 @@ export class JsonGlobalController implements Pick<IGlobalController,
    * @param options Options for updating index (force rebuild)
    * @returns Promise resolving to MCP response with the result
    */
-  async updateJsonIndex(
-    options?: { force?: boolean }
-  ): Promise<MCPResponse> {
+  async updateJsonIndex(options?: { force?: boolean }): Promise<MCPResponse> {
     try {
       logger.info(
         `Updating JSON index for global memory bank (force: ${options?.force ? 'yes' : 'no'})`

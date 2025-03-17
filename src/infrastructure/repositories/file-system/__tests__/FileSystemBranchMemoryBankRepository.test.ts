@@ -879,7 +879,7 @@ describe('FileSystemBranchMemoryBankRepository', () => {
       mockFileSystemService.fileExists.mockImplementation(async (filePath) => {
         return filePath.includes('feature-test') && filePath.includes('activeContext.md');
       });
-      
+
       mockFileSystemService.getFileStats.mockResolvedValue({
         size: 100,
         isDirectory: false,
@@ -912,7 +912,7 @@ describe('FileSystemBranchMemoryBankRepository', () => {
       // Valid branch directory should be included
       expect(result).toHaveLength(1);
       expect(result[0].branchInfo.name).toBe('feature/test');
-      
+
       // Invalid branch directory should be skipped automatically
 
       // Restore original mocks

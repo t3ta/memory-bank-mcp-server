@@ -62,7 +62,7 @@ describe('FileSystemMemoryDocumentRepository', () => {
     repository = new FileSystemMemoryDocumentRepository(basePath, mockFileSystemService);
 
     // Suppress console output in tests
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    jest.spyOn(console, 'error').mockImplementation(() => { });
     jest.clearAllMocks(); // Clear all mocks including logger
   });
 
@@ -652,7 +652,7 @@ describe('FileSystemMemoryDocumentRepository', () => {
       // Set up the files to list
       const files = [
         path.join(basePath, 'valid.md'),
-        path.join(basePath, '..', 'invalid.md') // This path is outside the base directory
+        path.join(basePath, '..', 'invalid.md'), // This path is outside the base directory
       ];
 
       mockFileSystemService.listFiles.mockResolvedValue(files);

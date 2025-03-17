@@ -4,7 +4,7 @@ import { BaseError } from '../../shared/errors/BaseError.js';
 import { DomainError } from '../../shared/errors/DomainError.js';
 import { ApplicationError } from '../../shared/errors/ApplicationError.js';
 import { InfrastructureError } from '../../shared/errors/InfrastructureError.js';
-import { logger } from '../../shared/utils/Logger.js';
+import { logger } from '../../shared/utils/logger.js';
 
 /**
  * Presenter for JSON responses
@@ -79,11 +79,11 @@ export class JsonResponsePresenter implements IResponsePresenter {
     } else if (error instanceof ApplicationError) {
       // Application errors could be client or server errors
       errorResponse.error.code = `JSON_APP_ERROR.${error.code}`;
-      
+
       // Determine status code based on error type
       if (
-        error.code === 'VALIDATION_ERROR' || 
-        error.code === 'NOT_FOUND' || 
+        error.code === 'VALIDATION_ERROR' ||
+        error.code === 'NOT_FOUND' ||
         error.code === 'INVALID_INPUT'
       ) {
         errorResponse.error.status = 400;

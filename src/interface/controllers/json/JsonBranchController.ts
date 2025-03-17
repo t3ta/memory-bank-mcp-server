@@ -20,11 +20,18 @@ import { GetRecentBranchesUseCase } from '../../../application/usecases/common/G
  * Controller for JSON branch memory bank operations
  * Dedicated controller for JSON document operations with branch memory banks
  */
-export class JsonBranchController implements Pick<IBranchController, 
-  'readJsonDocument' | 'writeJsonDocument' | 'deleteJsonDocument' | 
-  'listJsonDocuments' | 'searchJsonDocuments' | 'updateJsonIndex' |
-  'getRecentBranches'> {
-  
+export class JsonBranchController
+  implements
+  Pick<
+    IBranchController,
+    | 'readJsonDocument'
+    | 'writeJsonDocument'
+    | 'deleteJsonDocument'
+    | 'listJsonDocuments'
+    | 'searchJsonDocuments'
+    | 'updateJsonIndex'
+    | 'getRecentBranches'
+  > {
   readonly _type = 'controller' as const;
 
   /**
@@ -45,7 +52,7 @@ export class JsonBranchController implements Pick<IBranchController,
     private readonly updateJsonIndexUseCase: UpdateJsonIndexUseCase,
     private readonly getRecentBranchesUseCase: GetRecentBranchesUseCase,
     private readonly presenter: IResponsePresenter
-  ) {}
+  ) { }
 
   /**
    * Read JSON document from branch memory bank
@@ -54,7 +61,7 @@ export class JsonBranchController implements Pick<IBranchController,
    * @returns Promise resolving to MCP response with JSON document
    */
   async readJsonDocument(
-    branchName: string, 
+    branchName: string,
     options: { path?: string; id?: string }
   ): Promise<MCPResponse<JsonDocumentDTO>> {
     try {
@@ -78,26 +85,17 @@ export class JsonBranchController implements Pick<IBranchController,
    * @param document Document data to write
    * @returns Promise resolving to MCP response with the result
    */
-  async writeJsonDocument(
-    branchName: string, 
-    document: JsonDocumentDTO
-  ): Promise<MCPResponse> {
+  async writeJsonDocument(branchName: string, document: JsonDocumentDTO): Promise<MCPResponse> {
     try {
       logger.info(`Writing JSON document to branch ${branchName}: ${document.path || document.id}`);
 
       // Validate required fields
       if (!document.title) {
-        throw new ApplicationError(
-          'VALIDATION_ERROR',
-          'Document title is required'
-        );
+        throw new ApplicationError('VALIDATION_ERROR', 'Document title is required');
       }
 
       if (!document.documentType) {
-        throw new ApplicationError(
-          'VALIDATION_ERROR',
-          'Document type is required'
-        );
+        throw new ApplicationError('VALIDATION_ERROR', 'Document type is required');
       }
 
       if (!document.content || Object.keys(document.content).length === 0) {
@@ -115,7 +113,7 @@ export class JsonBranchController implements Pick<IBranchController,
           documentType: document.documentType as DocumentType,
           content: document.content,
           tags: document.tags || [],
-        }
+        },
       });
 
       return this.presenter.present(result);
@@ -131,11 +129,13 @@ export class JsonBranchController implements Pick<IBranchController,
    * @returns Promise resolving to MCP response with the result
    */
   async deleteJsonDocument(
-    branchName: string, 
+    branchName: string,
     options: { path?: string; id?: string }
   ): Promise<MCPResponse> {
     try {
-      logger.info(`Deleting JSON document from branch ${branchName}: ${options.path || options.id}`);
+      logger.info(
+        `Deleting JSON document from branch ${branchName}: ${options.path || options.id}`
+      );
 
       // Validate that at least one option is provided
       if (!options.path && !options.id) {
@@ -164,13 +164,14 @@ export class JsonBranchController implements Pick<IBranchController,
    * @returns Promise resolving to MCP response with list of documents
    */
   async listJsonDocuments(
-    branchName: string, 
+    branchName: string,
     options?: { type?: string; tags?: string[] }
   ): Promise<MCPResponse<JsonDocumentDTO[]>> {
     try {
-      logger.info(`Listing JSON documents in branch ${branchName}${
-        options?.type ? ` of type ${options.type}` : ''
-      }${options?.tags ? ` with tags ${options.tags.join(', ')}` : ''}`);
+      logger.info(
+        `Listing JSON documents in branch ${branchName}${options?.type ? ` of type ${options.type}` : ''
+        }${options?.tags ? ` with tags ${options.tags.join(', ')}` : ''}`
+      );
 
       const result = await this.searchJsonDocumentsUseCase.execute({
         branchName,
@@ -191,7 +192,7 @@ export class JsonBranchController implements Pick<IBranchController,
    * @returns Promise resolving to MCP response with matching documents
    */
   async searchJsonDocuments(
-    branchName: string, 
+    branchName: string,
     query: string
   ): Promise<MCPResponse<JsonDocumentDTO[]>> {
     try {
@@ -199,8 +200,8 @@ export class JsonBranchController implements Pick<IBranchController,
 
       // For now, we just use tag-based search
       // In the future, this could be extended to support more complex queries
-      const tags = query.split(/\s+/).filter(tag => tag.trim() !== '');
-      
+      const tags = query.split(/\s+/).filter((tag) => tag.trim() !== '');
+
       const result = await this.searchJsonDocumentsUseCase.execute({
         branchName,
         tags: tags.length > 0 ? tags : undefined,
@@ -218,10 +219,7 @@ export class JsonBranchController implements Pick<IBranchController,
    * @param options Options for updating index (force rebuild)
    * @returns Promise resolving to MCP response with the result
    */
-  async updateJsonIndex(
-    branchName: string, 
-    options?: { force?: boolean }
-  ): Promise<MCPResponse> {
+  async updateJsonIndex(branchName: string, options?: { force?: boolean }): Promise<MCPResponse> {
     try {
       logger.info(
         `Updating JSON index for branch ${branchName} (force: ${options?.force ? 'yes' : 'no'})`

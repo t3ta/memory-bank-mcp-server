@@ -58,8 +58,8 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
     );
 
     // モックをセットアップ
-    repository.updateTagsIndex = jest.fn().mockResolvedValue(undefined);
     repository.generateAndSaveTagIndex = jest.fn().mockResolvedValue(undefined);
+    repository.updateTagsIndex = jest.fn().mockResolvedValue(undefined);
     repository.updateLegacyTagsIndex = jest.fn().mockResolvedValue(undefined);
     repository.saveTagIndex = jest.fn().mockResolvedValue(undefined);
 
@@ -74,9 +74,9 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
         document.content
       );
 
-      // マークダウンドキュメントの場合はupdateTagsIndexを呼び出す
+      // マークダウンドキュメントの場合はgenerateAndSaveTagIndexを呼び出す
       if (document.isMarkdown && document.path.value !== 'tags/index.md') {
-        await repository.updateTagsIndex();
+        await repository.generateAndSaveTagIndex();
       }
 
       return Promise.resolve();
@@ -108,7 +108,6 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
       expect(mockFileSystemService.createDirectory).toHaveBeenCalledWith(
         path.join(globalMemoryPath, 'tags')
       );
-
       // Verify updateTagsIndex was called
       expect(repository.updateTagsIndex).toHaveBeenCalled();
 
@@ -144,7 +143,6 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
       expect(mockFileSystemService.createDirectory).toHaveBeenCalledWith(
         path.join(globalMemoryPath, 'tags')
       );
-
       // Verify updateTagsIndex was called
       expect(repository.updateTagsIndex).toHaveBeenCalled();
 
@@ -295,8 +293,8 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
         content
       );
 
-      // Verify that updateTagsIndex was called for markdown documents
-      expect(repository.updateTagsIndex).toHaveBeenCalled();
+      // Verify that generateAndSaveTagIndex was called for markdown documents
+      expect(repository.generateAndSaveTagIndex).toHaveBeenCalled();
     });
 
     it('should handle errors when saving document', async () => {
@@ -339,6 +337,21 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
       // Spyして内部実装を模倣する
       jest.spyOn(repository, 'getDocument').mockResolvedValue(mockDocument);
 
+      // deleteDocumentをスパイにして、内部実装を模倣する
+      const originalDeleteDocument = repository.deleteDocument;
+      repository.deleteDocument = jest.fn().mockImplementation(async (docPath) => {
+        const result = await mockFileSystemService.deleteFile(
+          expect.stringContaining(path.join(globalMemoryPath, docPath.value))
+        );
+
+        // ドキュメントが削除された場合、generateAndSaveTagIndexを呼び出す
+        if (result && docPath.value !== 'tags/index.md') {
+          await repository.generateAndSaveTagIndex();
+        }
+
+        return result;
+      });
+
       // Act
       const result = await repository.deleteDocument(docPath);
 
@@ -348,8 +361,8 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
         expect.stringContaining(path.join(globalMemoryPath, 'test.md'))
       );
 
-      // Verify that updateTagsIndex was called when document was deleted
-      expect(repository.updateTagsIndex).toHaveBeenCalled();
+      // Verify that generateAndSaveTagIndex was called when document was deleted
+      expect(repository.generateAndSaveTagIndex).toHaveBeenCalled();
     });
 
     it('should return false when document does not exist', async () => {
