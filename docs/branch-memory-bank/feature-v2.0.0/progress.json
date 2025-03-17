@@ -1,0 +1,61 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "progress-001",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress",
+      "status",
+      "tracking"
+    ],
+    "lastModified": "2025-03-17T14:15:00.000Z",
+    "createdAt": "2025-03-17T12:45:00.000Z",
+    "version": 2
+  },
+  "content": {
+    "status": "実装完了、リリースPR準備完了",
+    "workingFeatures": [
+      {
+        "feature": "Clean Architecture実装",
+        "status": "完了",
+        "description": "ドメイン、アプリケーション、インフラストラクチャ、インターフェースの各層を備えたClean Architectureの実装が完了"
+      },
+      {
+        "feature": "JSONドキュメントモデル",
+        "status": "完了",
+        "description": "スキーマ検証を備えたJSONベースのドキュメントモデルの実装が完了"
+      },
+      {
+        "feature": "マイグレーションツール",
+        "status": "完了",
+        "description": "マークダウンからJSONへの変換ツールが実装され、テスト済み"
+      },
+      {
+        "feature": "マルチリンガルサポート",
+        "status": "完了",
+        "description": "英語、日本語、中国語のテンプレートと翻訳が実装済み"
+      },
+      {
+        "feature": "read_contextコマンド",
+        "status": "完了",
+        "description": "ブランチメモリバンク、グローバルメモリバンク、ルールを一発で取得できるコマンド実装完了"
+      },
+      {
+        "feature": "メモリバンクドキュメント",
+        "status": "完了",
+        "description": "プロジェクトに関する詳細な情報を含むグローバルメモリバンクの作成が完了"
+      }
+    ],
+    "pendingImplementation": [],
+    "completedTasks": [
+      {
+        "task": "リリースPR作成の準備",
+        "completedDate": "2025-03-17",
+        "description": "バージョン2.0のリリースPRを作成するための情報収集と準備が完了"
+      }
+    ],
+    "knownIssues": []
+  }
+}

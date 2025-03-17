@@ -1,0 +1,66 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "active-context-001",
+    "title": "現在の作業コンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active",
+      "context",
+      "current-work"
+    ],
+    "lastModified": "2025-03-17T14:10:00.000Z",
+    "createdAt": "2025-03-17T12:35:00.000Z",
+    "version": 2
+  },
+  "content": {
+    "currentWork": "Memory Bank MCP Server バージョン2.0のリリースPR作成",
+    "recentChanges": [
+      "グローバルメモリバンクに新しいドキュメントを追加：",
+      "- project-overview.json（プロジェクト概要）",
+      "- release-v2.0.0.json（リリース情報）",
+      "- v2.0-design-decisions.json（設計上の決定事項）",
+      "ブランチメモリバンクをJSON形式で作成完了",
+      "`read_context`コマンドで必要な情報を一発で取得できることを確認"
+    ],
+    "activeDecisions": [
+      {
+        "id": "decision-001",
+        "title": "JSONベースの構造採用",
+        "description": "より構造化されたデータモデルとスキーマ検証のためにJSONベースのドキュメント構造を採用する",
+        "status": "完了"
+      },
+      {
+        "id": "decision-002",
+        "title": "マイグレーションツール実装",
+        "description": "既存のマークダウンドキュメントを新しいJSON形式に簡単に変換できるようにするためのマイグレーションツールを実装する",
+        "status": "完了"
+      },
+      {
+        "id": "decision-003",
+        "title": "マルチリンガルサポート",
+        "description": "英語、日本語、中国語のサポートを追加する",
+        "status": "完了"
+      },
+      {
+        "id": "decision-004",
+        "title": "read_contextコマンドの活用",
+        "description": "ブランチメモリバンク、グローバルメモリバンク、ルールを一括取得するread_contextコマンドを積極的に活用する",
+        "status": "完了"
+      }
+    ],
+    "considerations": [
+      "リリースPRに必要な情報がすべて揃っているか",
+      "テスト結果の確認",
+      "バージョン番号の整合性",
+      "README.mdの更新状況"
+    ],
+    "nextSteps": [
+      "リリースPRの最終レビュー",
+      "英語版と日本語版のPR内容を作成",
+      "必要に応じてテストの修正",
+      "PRマージ後のリリース作業の準備"
+    ]
+  }
+}
