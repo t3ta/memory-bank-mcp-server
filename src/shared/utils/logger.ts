@@ -76,4 +76,4 @@ export function createConsoleLogger(level: LogLevel = 'info'): Logger {
   };
 }
 
-export const logger = createConsoleLogger();
+export const logger = createConsoleLogger('warn');
