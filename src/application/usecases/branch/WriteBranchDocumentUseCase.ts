@@ -7,7 +7,10 @@ import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
 import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
 import { Tag } from '../../../domain/entities/Tag.js';
 import { DomainError } from '../../../shared/errors/DomainError.js';
-import { ApplicationError, ApplicationErrorCodes } from '../../../shared/errors/ApplicationError.js';
+import {
+  ApplicationError,
+  ApplicationErrorCodes,
+} from '../../../shared/errors/ApplicationError.js';
 
 /**
  * Input data for write branch document use case
@@ -17,7 +20,7 @@ export interface WriteBranchDocumentInput {
    * Branch name
    */
   branchName: string;
-  
+
   /**
    * Document data
    */
@@ -37,14 +40,14 @@ export interface WriteBranchDocumentOutput {
 /**
  * Use case for writing a document to branch memory bank
  */
-export class WriteBranchDocumentUseCase implements IUseCase<WriteBranchDocumentInput, WriteBranchDocumentOutput> {
+export class WriteBranchDocumentUseCase
+  implements IUseCase<WriteBranchDocumentInput, WriteBranchDocumentOutput>
+{
   /**
    * Constructor
    * @param branchRepository Branch memory bank repository
    */
-  constructor(
-    private readonly branchRepository: IBranchMemoryBankRepository
-  ) {}
+  constructor(private readonly branchRepository: IBranchMemoryBankRepository) {}
 
   /**
    * Execute the use case
@@ -55,17 +58,11 @@ export class WriteBranchDocumentUseCase implements IUseCase<WriteBranchDocumentI
     try {
       // Validate input
       if (!input.branchName) {
-        throw new ApplicationError(
-          ApplicationErrorCodes.INVALID_INPUT,
-          'Branch name is required'
-        );
+        throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Branch name is required');
       }
 
       if (!input.document) {
-        throw new ApplicationError(
-          ApplicationErrorCodes.INVALID_INPUT,
-          'Document is required'
-        );
+        throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Document is required');
       }
 
       if (!input.document.path) {
@@ -85,24 +82,24 @@ export class WriteBranchDocumentUseCase implements IUseCase<WriteBranchDocumentI
       // Create domain objects
       const branchInfo = BranchInfo.create(input.branchName);
       const documentPath = DocumentPath.create(input.document.path);
-      const tags = (input.document.tags ?? []).map(tag => Tag.create(tag));
-      
+      const tags = (input.document.tags ?? []).map((tag) => Tag.create(tag));
+
       // Check if branch exists and initialize if needed
       const branchExists = await this.branchRepository.exists(input.branchName);
-      
+
       if (!branchExists) {
         await this.branchRepository.initialize(branchInfo);
       }
-      
+
       // Create or update document
       const existingDocument = await this.branchRepository.getDocument(branchInfo, documentPath);
-      
+
       let document: MemoryDocument;
-      
+
       if (existingDocument) {
         // Update existing document
         document = existingDocument.updateContent(input.document.content);
-        
+
         // Update tags if provided
         if (input.document.tags) {
           document = document.updateTags(tags);
@@ -113,28 +110,28 @@ export class WriteBranchDocumentUseCase implements IUseCase<WriteBranchDocumentI
           path: documentPath,
           content: input.document.content,
           tags,
-          lastModified: new Date()
+          lastModified: new Date(),
         });
       }
-      
+
       // Save document
       await this.branchRepository.saveDocument(branchInfo, document);
-      
+
       // Transform to DTO
       return {
         document: {
           path: document.path.value,
           content: document.content,
-          tags: document.tags.map(tag => tag.value),
-          lastModified: document.lastModified.toISOString()
-        }
+          tags: document.tags.map((tag) => tag.value),
+          lastModified: document.lastModified.toISOString(),
+        },
       };
     } catch (error) {
       // Re-throw domain and application errors
       if (error instanceof DomainError || error instanceof ApplicationError) {
         throw error;
       }
-      
+
       // Wrap other errors
       throw new ApplicationError(
         ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,

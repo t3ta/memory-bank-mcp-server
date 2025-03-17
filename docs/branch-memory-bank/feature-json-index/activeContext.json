@@ -1,0 +1,25 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "21185bcb-1204-4fe2-aad6-62b2476a50db",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.691Z",
+    "createdAt": "2025-03-17T02:13:31.691Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "JSON形式でタグインデックスを永続化する機能の実装が完了しました。インポートパスの問題を修正し、既存のリポジトリインターフェースへのタグインデックス操作メソッドの追加も無事に終わりました。ブリッジパターンを使って旧形式と新形式の互換性を保ちつつ実装しています。",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": [
+      "旧タグインデックス実装への依存をすべて新しいJSON形式に置き換える",
+      "テストケースの拡充とエッジケースのテスト追加",
+      "インデックスのパフォーマンス測定と改善",
+      "新形式を使った検索機能のパフォーマンス最適化"
+    ]
+  }
+}

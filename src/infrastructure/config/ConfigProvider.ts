@@ -4,7 +4,10 @@ import { IConfigProvider } from './interfaces/IConfigProvider.js';
 import { WorkspaceConfig, CliOptions } from './WorkspaceConfig.js';
 import { Language } from '../../shared/types/index.js';
 import { BranchInfo } from '../../domain/entities/BranchInfo.js';
-import { InfrastructureError, InfrastructureErrorCodes } from '../../shared/errors/InfrastructureError.js';
+import {
+  InfrastructureError,
+  InfrastructureErrorCodes,
+} from '../../shared/errors/InfrastructureError.js';
 import { DomainError } from '../../shared/errors/DomainError.js';
 
 /**
@@ -24,10 +27,10 @@ export class ConfigProvider implements IConfigProvider {
 
       // Resolve workspace root
       const workspaceRoot = await this.resolveWorkspaceRoot(options);
-      
+
       // Resolve memory bank root
       const memoryBankRoot = await this.resolveMemoryBankRoot(options, workspaceRoot);
-      
+
       // Resolve language
       const language = await this.resolveLanguage(options);
 
@@ -36,7 +39,7 @@ export class ConfigProvider implements IConfigProvider {
         workspaceRoot,
         memoryBankRoot,
         verbose: options?.verbose ?? false,
-        language
+        language,
       };
 
       // Ensure required directories exist
@@ -47,7 +50,7 @@ export class ConfigProvider implements IConfigProvider {
       if (error instanceof InfrastructureError || error instanceof DomainError) {
         throw error;
       }
-      
+
       throw new InfrastructureError(
         InfrastructureErrorCodes.CONFIGURATION_ERROR,
         `Failed to initialize configuration: ${(error as Error).message}`,
@@ -67,7 +70,7 @@ export class ConfigProvider implements IConfigProvider {
         'Configuration not initialized'
       );
     }
-    
+
     return this.config;
   }
 
@@ -88,16 +91,16 @@ export class ConfigProvider implements IConfigProvider {
   getBranchMemoryPath(branchName: string): string {
     try {
       const config = this.getConfig();
-      
+
       // Validate branch name
       const branchInfo = BranchInfo.create(branchName);
-      
+
       return path.join(config.memoryBankRoot, 'branch-memory-bank', branchInfo.safeName);
     } catch (error) {
       if (error instanceof DomainError) {
         throw error;
       }
-      
+
       throw new InfrastructureError(
         InfrastructureErrorCodes.CONFIGURATION_ERROR,
         `Invalid branch name: ${branchName}`,
@@ -146,7 +149,10 @@ export class ConfigProvider implements IConfigProvider {
    * @param workspaceRoot Workspace root directory
    * @returns Promise resolving to memory bank root path
    */
-  private async resolveMemoryBankRoot(options?: CliOptions, workspaceRoot?: string): Promise<string> {
+  private async resolveMemoryBankRoot(
+    options?: CliOptions,
+    workspaceRoot?: string
+  ): Promise<string> {
     try {
       // Priority: CLI arg > env var > default (workspace/docs)
       if (options?.memoryRoot) {
@@ -188,7 +194,7 @@ export class ConfigProvider implements IConfigProvider {
         // Try to read from package.json
         const packageJsonPath = path.join(process.cwd(), 'package.json');
         const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf-8'));
-        
+
         if (packageJson.config?.language) {
           return this.validateLanguage(packageJson.config.language);
         }
@@ -218,7 +224,7 @@ export class ConfigProvider implements IConfigProvider {
         `Invalid language: ${language}. Supported languages are 'en' and 'ja'.`
       );
     }
-    
+
     return language as Language;
   }
 
@@ -232,16 +238,16 @@ export class ConfigProvider implements IConfigProvider {
       if (!p) {
         throw new Error('Path cannot be empty');
       }
-      
+
       const absolutePath = path.resolve(p);
-      
+
       // Create directory if it doesn't exist
       try {
         await fs.access(absolutePath);
       } catch {
         await fs.mkdir(absolutePath, { recursive: true });
       }
-      
+
       return absolutePath;
     } catch (error) {
       throw new InfrastructureError(
@@ -259,12 +265,12 @@ export class ConfigProvider implements IConfigProvider {
   private async ensureDirectories(): Promise<void> {
     try {
       const config = this.getConfig();
-      
+
       const dirs = [
         this.getGlobalMemoryPath(),
-        path.join(config.memoryBankRoot, 'branch-memory-bank')
+        path.join(config.memoryBankRoot, 'branch-memory-bank'),
       ];
-      
+
       for (const dir of dirs) {
         await fs.mkdir(dir, { recursive: true });
       }

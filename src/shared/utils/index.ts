@@ -1,4 +1,8 @@
+export * from './markdown-converter.js';
+export * from './markdown-parser.js';
 export * from './logger.js';
+
+// Date utilities
 
 /**
  * Parse a date string safely, returning a valid Date object
@@ -10,13 +14,13 @@ export const parseDateSafely = (dateInput: string | Date): Date => {
     if (dateInput instanceof Date) {
       return dateInput;
     }
-    
+
     const date = new Date(dateInput);
-    
+
     if (isNaN(date.getTime())) {
       throw new Error(`Invalid date: ${dateInput}`);
     }
-    
+
     return date;
   } catch (error) {
     console.error(`Error parsing date: ${error instanceof Error ? error.message : String(error)}`);
@@ -31,8 +35,7 @@ export const parseDateSafely = (dateInput: string | Date): Date => {
  * @returns Array of tags
  */
 export const extractTags = (content: string): string[] => {
-  const tagLine = content.split('\n')
-    .find(line => line.trim().startsWith('tags:'));
+  const tagLine = content.split('\n').find((line) => line.trim().startsWith('tags:'));
 
   if (!tagLine) return [];
 
@@ -40,8 +43,8 @@ export const extractTags = (content: string): string[] => {
     .replace('tags:', '')
     .trim()
     .split(/\s+/)
-    .filter(tag => tag.startsWith('#'))
-    .map(tag => tag.substring(1));
+    .filter((tag) => tag.startsWith('#'))
+    .map((tag) => tag.substring(1));
 };
 
 /**
@@ -53,7 +56,7 @@ export const extractTags = (content: string): string[] => {
 export const addTagsToContent = (content: string, tags: string[]): string => {
   if (tags.length === 0) return content;
 
-  const tagLine = `tags: ${tags.map(t => `#${t}`).join(' ')}\n\n`;
+  const tagLine = `tags: ${tags.map((t) => `#${t}`).join(' ')}\n\n`;
 
   // If content already has tags, replace them
   if (content.includes('tags:')) {
@@ -74,15 +77,18 @@ export const addTagsToContent = (content: string, tags: string[]): string => {
  * @param sectionHeader Section header
  * @returns Section content or undefined if section not found
  */
-export const extractSectionContent = (content: string, sectionHeader: string): string | undefined => {
+export const extractSectionContent = (
+  content: string,
+  sectionHeader: string
+): string | undefined => {
   const lines = content.split('\n');
-  const sectionIndex = lines.findIndex(line => line.trim() === sectionHeader);
+  const sectionIndex = lines.findIndex((line) => line.trim() === sectionHeader);
 
   if (sectionIndex === -1) return undefined;
 
   // Find the next section or end of file
-  let nextSectionIndex = lines.findIndex((line, index) =>
-    index > sectionIndex && line.startsWith('##')
+  let nextSectionIndex = lines.findIndex(
+    (line, index) => index > sectionIndex && line.startsWith('##')
   );
   if (nextSectionIndex === -1) {
     nextSectionIndex = lines.length;
@@ -91,24 +97,7 @@ export const extractSectionContent = (content: string, sectionHeader: string): s
   // Extract and clean section content
   return lines
     .slice(sectionIndex + 1, nextSectionIndex)
-    .filter(line => line.trim())
+    .filter((line) => line.trim())
     .join('\n')
     .trim();
-};
-
-/**
- * Extract list items from a section in markdown content
- * @param content Markdown content
- * @param sectionHeader Section header
- * @returns Array of list items or undefined if section not found
- */
-export const extractListItems = (content: string, sectionHeader: string): string[] | undefined => {
-  const sectionContent = extractSectionContent(content, sectionHeader);
-  if (!sectionContent) return undefined;
-
-  return sectionContent
-    .split('\n')
-    .map(line => line.trim())
-    .filter(line => line.startsWith('-'))
-    .map(line => line.substring(1).trim());
 };

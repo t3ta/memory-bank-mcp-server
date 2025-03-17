@@ -1,0 +1,134 @@
+name: Create PR from develop to master
+
+on:
+  push:
+    branches:
+      - develop
+
+# コンカレンシー制御 - 同じブランチで同時に実行されないようにする
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check branch existence
+        id: check-branches
+        run: |
+          # developブランチの存在を確認
+          if ! git rev-parse --verify origin/develop &>/dev/null; then
+            echo "Warning: develop branch doesn't exist. Skipping PR creation."
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # masterブランチの存在を確認
+          if ! git rev-parse --verify origin/master &>/dev/null; then
+            echo "Warning: master branch doesn't exist. Skipping PR creation."
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          echo "skip=false" >> $GITHUB_OUTPUT
+
+      - name: Check existing PR
+        id: check-pr
+        if: steps.check-branches.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          existing_pr=$(gh pr list --base master --head develop --state open --json number -q '.[0].number')
+          if [ ! -z "$existing_pr" ]; then
+            echo "Existing PR found: #$existing_pr"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "No existing PR found"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Pull Request
+        if: steps.check-pr.outputs.skip != 'true' && steps.check-branches.outputs.skip != 'true'
+        id: create-pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # コミットメッセージから変更の種類を判断
+          commit_message="${{ github.event.head_commit.message }}"
+          if [[ "$commit_message" =~ ^feat:|^feature: ]]; then
+            pr_title="✨ feat: Merge develop into master"
+            label="enhancement"
+          elif [[ "$commit_message" =~ ^fix: ]]; then
+            pr_title="🐛 fix: Merge develop into master"
+            label="bug"
+          else
+            pr_title="🔄 chore: Merge develop into master"
+            label="chore"
+          fi
+
+          # 変更ログを生成
+          set +e  # エラーが発生してもスクリプトを継続
+          changes=$(git log master..develop --pretty=format:'- %s' --reverse 2>/dev/null)
+          exit_code=$?
+          set -e  # エラーハンドリングを再度有効化
+          
+          if [ $exit_code -ne 0 ] || [ -z "$changes" ]; then
+            echo "警告: developとmasterの間に変更が見つかりませんでした、またはコマンドが失敗しました"
+            changes="*変更履歴が見つかりませんでした*"
+          fi
+
+          # 言語を判断（デフォルトは日本語）
+          if [[ "$GITHUB_REPOSITORY" =~ .*-en$ ]]; then
+            template_file=".github/workflow-templates/develop-to-master-pr-template-en.md"
+          else
+            template_file=".github/workflow-templates/develop-to-master-pr-template.md"
+          fi
+
+          # テンプレートファイルの存在確認
+          if [ ! -f "$template_file" ]; then
+            echo "エラー: テンプレートファイル '$template_file' が見つかりませんでした"
+            echo "デフォルトテンプレートを使用します"
+            
+            if [[ "$GITHUB_REPOSITORY" =~ .*-en$ ]]; then
+              body="## Changes\n\n${changes}\n\n---\n\n_This PR was automatically generated_"
+            else
+              body="## 変更内容\n\n${changes}\n\n---\n\n_このPRは自動的に作成されました_"
+            fi
+          else
+            # テンプレートを読み込んで変更履歴を挿入
+            body=$(cat "$template_file" | sed "s|{{CHANGES}}|$changes|g")
+          fi
+
+          # PRを作成
+          set +e  # エラーが発生してもスクリプトを継続
+          pr_result=$(gh pr create \
+            --base master \
+            --head develop \
+            --title "$pr_title" \
+            --body "$body" \
+            --label "auto-generated" \
+            --label "$label" 2>&1)
+          pr_status=$?
+          set -e  # エラーハンドリングを再度有効化
+          
+          if [ $pr_status -eq 0 ]; then
+            echo "Pull Request created successfully!"
+            echo "pr_url=$pr_result" >> $GITHUB_OUTPUT
+            echo "pr_status=success" >> $GITHUB_OUTPUT
+          else
+            echo "Pull Request creation failed: $pr_result"
+            echo "pr_status=failed" >> $GITHUB_OUTPUT
+            echo "pr_error=$pr_result" >> $GITHUB_OUTPUT
+            exit 1
+          fi

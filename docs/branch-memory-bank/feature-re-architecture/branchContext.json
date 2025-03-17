@@ -1,0 +1,17 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "6a628b65-1fc4-4bc2-badf-5cb916b18be5",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.705Z",
+    "createdAt": "2025-03-17T02:13:31.705Z",
+    "version": 1
+  },
+  "content": {
+    "purpose": "このブランチは、memory-bank-mcp-serverのアーキテクチャを再設計し、より柔軟で拡張性のあるシステムに改善することを目的としています。具体的には以下の課題を解決します：",
+    "userStories": []
+  }
+}

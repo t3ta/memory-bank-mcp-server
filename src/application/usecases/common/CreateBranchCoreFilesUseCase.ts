@@ -5,7 +5,10 @@ import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
 import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
 import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
 import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
-import { ApplicationError, ApplicationErrorCodes } from '../../../shared/errors/ApplicationError.js';
+import {
+  ApplicationError,
+  ApplicationErrorCodes,
+} from '../../../shared/errors/ApplicationError.js';
 import { Tag } from '../../../domain/entities/Tag.js';
 
 /**
@@ -16,7 +19,7 @@ export interface CreateBranchCoreFilesInput {
    * Branch name
    */
   branchName: string;
-  
+
   /**
    * Core files data
    */
@@ -31,7 +34,7 @@ export interface CreateBranchCoreFilesOutput {
    * Success message
    */
   message: string;
-  
+
   /**
    * List of updated file paths
    */
@@ -41,19 +44,19 @@ export interface CreateBranchCoreFilesOutput {
 /**
  * Use case for creating or updating core files in a branch memory bank
  */
-export class CreateBranchCoreFilesUseCase implements IUseCase<CreateBranchCoreFilesInput, CreateBranchCoreFilesOutput> {
+export class CreateBranchCoreFilesUseCase
+  implements IUseCase<CreateBranchCoreFilesInput, CreateBranchCoreFilesOutput>
+{
   // Core file paths
-  private readonly ACTIVE_CONTEXT_PATH = 'activeContext.md';
-  private readonly PROGRESS_PATH = 'progress.md';
-  private readonly SYSTEM_PATTERNS_PATH = 'systemPatterns.md';
+  private readonly ACTIVE_CONTEXT_PATH = 'activeContext.json';
+  private readonly PROGRESS_PATH = 'progress.json';
+  private readonly SYSTEM_PATTERNS_PATH = 'systemPatterns.json';
 
   /**
    * Constructor
    * @param branchRepository Branch memory bank repository
    */
-  constructor(
-    private readonly branchRepository: IBranchMemoryBankRepository
-  ) {}
+  constructor(private readonly branchRepository: IBranchMemoryBankRepository) {}
 
   /**
    * Execute the use case
@@ -64,10 +67,7 @@ export class CreateBranchCoreFilesUseCase implements IUseCase<CreateBranchCoreFi
     try {
       // Validate input
       if (!input.branchName) {
-        throw new ApplicationError(
-          ApplicationErrorCodes.INVALID_INPUT,
-          'Branch name is required'
-        );
+        throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Branch name is required');
       }
 
       if (!input.files) {
@@ -79,69 +79,69 @@ export class CreateBranchCoreFilesUseCase implements IUseCase<CreateBranchCoreFi
 
       // Create domain objects
       const branchInfo = BranchInfo.create(input.branchName);
-      
+
       // Check if branch exists
       const branchExists = await this.branchRepository.exists(input.branchName);
-      
+
       if (!branchExists) {
         throw new DomainError(
           DomainErrorCodes.BRANCH_NOT_FOUND,
           `Branch "${input.branchName}" not found`
         );
       }
-      
+
       const updatedFiles: string[] = [];
-      
+
       // Update each core file if provided
       if (input.files.activeContext) {
-        const content = this.generateActiveContextMarkdown(input.files.activeContext);
+        const content = this.generateActiveContextJSON(input.files.activeContext);
         const document = MemoryDocument.create({
           path: DocumentPath.create(this.ACTIVE_CONTEXT_PATH),
           content,
           tags: [Tag.create('core'), Tag.create('active-context')],
-          lastModified: new Date()
+          lastModified: new Date(),
         });
-        
+
         await this.branchRepository.saveDocument(branchInfo, document);
         updatedFiles.push(this.ACTIVE_CONTEXT_PATH);
       }
-      
+
       if (input.files.progress) {
-        const content = this.generateProgressMarkdown(input.files.progress);
+        const content = this.generateProgressJSON(input.files.progress);
         const document = MemoryDocument.create({
           path: DocumentPath.create(this.PROGRESS_PATH),
           content,
           tags: [Tag.create('core'), Tag.create('progress')],
-          lastModified: new Date()
+          lastModified: new Date(),
         });
-        
+
         await this.branchRepository.saveDocument(branchInfo, document);
         updatedFiles.push(this.PROGRESS_PATH);
       }
-      
+
       if (input.files.systemPatterns && input.files.systemPatterns.technicalDecisions) {
-        const content = this.generateSystemPatternsMarkdown(input.files.systemPatterns);
+        const content = this.generateSystemPatternsJSON(input.files.systemPatterns);
         const document = MemoryDocument.create({
           path: DocumentPath.create(this.SYSTEM_PATTERNS_PATH),
           content,
           tags: [Tag.create('core'), Tag.create('system-patterns')],
-          lastModified: new Date()
+          lastModified: new Date(),
         });
-        
+
         await this.branchRepository.saveDocument(branchInfo, document);
         updatedFiles.push(this.SYSTEM_PATTERNS_PATH);
       }
-      
+
       return {
         message: `Successfully updated ${updatedFiles.length} core files for branch "${input.branchName}"`,
-        updatedFiles
+        updatedFiles,
       };
     } catch (error) {
       // Re-throw domain and application errors
       if (error instanceof DomainError || error instanceof ApplicationError) {
         throw error;
       }
-      
+
       // Wrap other errors
       throw new ApplicationError(
         ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
@@ -152,139 +152,243 @@ export class CreateBranchCoreFilesUseCase implements IUseCase<CreateBranchCoreFi
   }
 
   /**
-   * Generate markdown for active context
+   * Generate JSON for active context
    * @param activeContext Active context DTO
-   * @returns Markdown content
+   * @returns JSON content as string
    */
-  private generateActiveContextMarkdown(activeContext: ActiveContextDTO): string {
-    let markdown = '# アクティブコンテキスト\n\n';
-    
-    // Current Work
-    markdown += '## 現在の作業内容\n\n';
-    if (activeContext.currentWork) {
-      markdown += `${activeContext.currentWork}\n`;
-    }
-    
-    // Recent Changes
-    markdown += '## 最近の変更点\n\n';
-    if (activeContext.recentChanges && activeContext.recentChanges.length > 0) {
-      activeContext.recentChanges.forEach(change => {
-        markdown += `- ${change}\n`;
-      });
-    }
-    
-    // Active Decisions
-    markdown += '## アクティブな決定事項\n\n';
-    if (activeContext.activeDecisions && activeContext.activeDecisions.length > 0) {
-      activeContext.activeDecisions.forEach(decision => {
-        markdown += `- ${decision}\n`;
-      });
-    }
-    
-    // Considerations
-    markdown += '## 検討事項\n\n';
-    if (activeContext.considerations && activeContext.considerations.length > 0) {
-      activeContext.considerations.forEach(consideration => {
-        markdown += `- ${consideration}\n`;
-      });
-    }
-    
-    // Next Steps
-    markdown += '## 次のステップ\n\n';
-    if (activeContext.nextSteps && activeContext.nextSteps.length > 0) {
-      activeContext.nextSteps.forEach(step => {
-        markdown += `- ${step}\n`;
-      });
-    }
-    
-    return markdown;
+  private generateActiveContextJSON(activeContext: ActiveContextDTO): string {
+    const now = new Date();
+
+    // Create structured JSON document
+    const jsonDoc = {
+      schema: 'memory_document_v2',
+      metadata: {
+        id: this.generateUUID(),
+        title: 'アクティブコンテキスト',
+        documentType: 'active_context',
+        path: this.ACTIVE_CONTEXT_PATH,
+        tags: ['core', 'active-context'],
+        lastModified: now.toISOString(),
+        createdAt: now.toISOString(),
+        version: 1
+      },
+      content: {
+        currentWork: activeContext.currentWork || '',
+        recentChanges: this.formatRecentChanges(activeContext.recentChanges || []),
+        activeDecisions: this.formatActiveDecisions(activeContext.activeDecisions || []),
+        considerations: this.formatConsiderations(activeContext.considerations || []),
+        nextSteps: this.formatNextSteps(activeContext.nextSteps || [])
+      }
+    };
+
+    return JSON.stringify(jsonDoc, null, 2);
   }
 
   /**
-   * Generate markdown for progress
+   * Format recent changes to structured format
+   * @param changes Array of change strings
+   * @returns Structured changes
+   */
+  private formatRecentChanges(changes: string[]): Array<{date: string, description: string}> {
+    return changes.map(change => ({
+      date: new Date().toISOString(),
+      description: change
+    }));
+  }
+
+  /**
+   * Format active decisions to structured format
+   * @param decisions Array of decision strings
+   * @returns Structured decisions
+   */
+  private formatActiveDecisions(decisions: string[]): Array<{id: string, description: string, reason?: string}> {
+    return decisions.map(decision => ({
+      id: this.generateUUID(),
+      description: decision
+    }));
+  }
+
+  /**
+   * Format considerations to structured format
+   * @param considerations Array of consideration strings
+   * @returns Structured considerations
+   */
+  private formatConsiderations(considerations: string[]): Array<{id: string, description: string, status: string}> {
+    return considerations.map(consideration => ({
+      id: this.generateUUID(),
+      description: consideration,
+      status: 'open'
+    }));
+  }
+
+  /**
+   * Format next steps to structured format
+   * @param steps Array of step strings
+   * @returns Structured steps
+   */
+  private formatNextSteps(steps: string[]): Array<{id: string, description: string, priority: string}> {
+    return steps.map(step => ({
+      id: this.generateUUID(),
+      description: step,
+      priority: 'medium'
+    }));
+  }
+
+  /**
+   * Generate JSON for progress
    * @param progress Progress DTO
-   * @returns Markdown content
+   * @returns JSON content as string
    */
-  private generateProgressMarkdown(progress: ProgressDTO): string {
-    let markdown = '# 進捗状況\n\n';
-    
-    // Working Features
-    markdown += '## 動作している機能\n\n';
-    if (progress.workingFeatures && progress.workingFeatures.length > 0) {
-      progress.workingFeatures.forEach(feature => {
-        markdown += `- ${feature}\n`;
-      });
-    }
-    
-    // Pending Implementation
-    markdown += '## 未実装の機能\n\n';
-    if (progress.pendingImplementation && progress.pendingImplementation.length > 0) {
-      progress.pendingImplementation.forEach(item => {
-        markdown += `- ${item}\n`;
-      });
-    }
-    
-    // Current Status
-    markdown += '## 現在の状態\n\n';
-    if (progress.status) {
-      markdown += `${progress.status}\n`;
-    }
-    
-    // Known Issues
-    markdown += '## 既知の問題\n\n';
-    if (progress.knownIssues && progress.knownIssues.length > 0) {
-      progress.knownIssues.forEach(issue => {
-        markdown += `- ${issue}\n`;
-      });
-    }
-    
-    return markdown;
+  private generateProgressJSON(progress: ProgressDTO): string {
+    const now = new Date();
+
+    // Create structured JSON document
+    const jsonDoc = {
+      schema: 'memory_document_v2',
+      metadata: {
+        id: this.generateUUID(),
+        title: '進捗状況',
+        documentType: 'progress',
+        path: this.PROGRESS_PATH,
+        tags: ['core', 'progress'],
+        lastModified: now.toISOString(),
+        createdAt: now.toISOString(),
+        version: 1
+      },
+      content: {
+        workingFeatures: this.formatWorkingFeatures(progress.workingFeatures || []),
+        pendingImplementation: this.formatPendingImplementation(progress.pendingImplementation || []),
+        status: progress.status || '',
+        completionPercentage: 0,
+        knownIssues: this.formatKnownIssues(progress.knownIssues || [])
+      }
+    };
+
+    return JSON.stringify(jsonDoc, null, 2);
   }
 
   /**
-   * Generate markdown for system patterns
-   * @param systemPatterns System patterns DTO
-   * @returns Markdown content
+   * Format working features to structured format
+   * @param features Array of feature strings
+   * @returns Structured features
    */
-  private generateSystemPatternsMarkdown(systemPatterns: SystemPatternsDTO): string {
-    let markdown = '# システムパターン\n\n';
-    
-    // Technical Decisions
-    markdown += '## 技術的決定事項\n\n';
-    
-    if (systemPatterns.technicalDecisions && systemPatterns.technicalDecisions.length > 0) {
-      systemPatterns.technicalDecisions.forEach(decision => {
-        // Decision title
-        markdown += `### ${decision.title}\n\n`;
-        
-        // Context
-        markdown += '#### コンテキスト\n\n';
-        markdown += `${decision.context}\n\n`;
-        
-        // Decision
-        markdown += '#### 決定事項\n\n';
-        markdown += `${decision.decision}\n\n`;
-        
-        // Consequences
-        markdown += '#### 影響\n\n';
-        if (decision.consequences && decision.consequences.length > 0) {
-          decision.consequences.forEach(consequence => {
-            markdown += `- ${consequence}\n`;
-          });
-        }
-        
-        markdown += '\n';
-      });
-    }
-    
-    return markdown;
+  private formatWorkingFeatures(features: string[]): Array<{id: string, description: string, implementedAt: string}> {
+    return features.map(feature => ({
+      id: this.generateUUID(),
+      description: feature,
+      implementedAt: new Date().toISOString()
+    }));
+  }
+
+  /**
+   * Format pending implementation to structured format
+   * @param items Array of pending item strings
+   * @returns Structured pending items
+   */
+  private formatPendingImplementation(items: string[]): Array<{id: string, description: string, priority: string, estimatedCompletion?: string}> {
+    return items.map(item => ({
+      id: this.generateUUID(),
+      description: item,
+      priority: 'medium'
+    }));
+  }
+
+  /**
+   * Format known issues to structured format
+   * @param issues Array of issue strings
+   * @returns Structured issues
+   */
+  private formatKnownIssues(issues: string[]): Array<{id: string, description: string, severity: string, workaround?: string}> {
+    return issues.map(issue => ({
+      id: this.generateUUID(),
+      description: issue,
+      severity: 'medium'
+    }));
+  }
+
+  /**
+   * Generate JSON for system patterns
+   * @param systemPatterns System patterns DTO
+   * @returns JSON content as string
+   */
+  private generateSystemPatternsJSON(systemPatterns: SystemPatternsDTO): string {
+    const now = new Date();
+
+    // Create structured JSON document
+    const jsonDoc = {
+      schema: 'memory_document_v2',
+      metadata: {
+        id: this.generateUUID(),
+        title: 'システムパターン',
+        documentType: 'system_patterns',
+        path: this.SYSTEM_PATTERNS_PATH,
+        tags: ['core', 'system-patterns'],
+        lastModified: now.toISOString(),
+        createdAt: now.toISOString(),
+        version: 1
+      },
+      content: {
+        technicalDecisions: this.formatTechnicalDecisions(systemPatterns.technicalDecisions || []),
+        implementationPatterns: []
+      }
+    };
+
+    return JSON.stringify(jsonDoc, null, 2);
+  }
+
+  /**
+   * Format technical decisions to structured format
+   * @param decisions Array of technical decision DTOs
+   * @returns Structured technical decisions
+   */
+  private formatTechnicalDecisions(decisions: TechnicalDecisionDTO[]): Array<{
+    id: string,
+    title: string,
+    context: string,
+    decision: string,
+    consequences: {
+      positive: string[],
+      negative: string[]
+    },
+    status: string,
+    date: string,
+    alternatives?: Array<{
+      description: string,
+      reason?: string
+    }>
+  }> {
+    return decisions.map(decision => ({
+      id: this.generateUUID(),
+      title: decision.title,
+      context: decision.context,
+      decision: decision.decision,
+      consequences: {
+        positive: decision.consequences || [],
+        negative: []
+      },
+      status: 'accepted',
+      date: new Date().toISOString(),
+      alternatives: []
+    }));
+  }
+
+  /**
+   * Generate a UUID for document IDs
+   * @returns UUID string
+   */
+  private generateUUID(): string {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
   }
 }
 
 // Export the interfaces from CoreFilesDTO for convenience
-import { 
-  ActiveContextDTO, 
-  ProgressDTO, 
-  SystemPatternsDTO, 
-  TechnicalDecisionDTO 
+import {
+  ActiveContextDTO,
+  ProgressDTO,
+  SystemPatternsDTO,
+  TechnicalDecisionDTO
 } from '../../dtos/CoreFilesDTO.js';

@@ -1,0 +1,19 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "7488298c-52d4-421a-b9f3-7d5d014fec01",
+    "title": "templates ディレクトリが dist に含まれるようにするビルドプロセスの修正",
+    "documentType": "generic",
+    "path": "build-process-fix.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.715Z",
+    "createdAt": "2025-03-17T02:13:31.715Z",
+    "version": 1
+  },
+  "content": {
+    "rawContent": "# templates ディレクトリが dist に含まれるようにするビルドプロセスの修正\n\n## 問題概要\nテンプレートファイル（特に `rules-en.md` および `rules-ja.md`）が実行時に参照できず、以下のエラーが発生していた。\n\n```\nError executing code: MCP error -32603: ENOENT: no such file or directory, open '/Users/tmita/.npm/_npx/ab7f7c50e30c1e37/node_modules/memory-bank-mcp-server/dist/templates/rules-en.md'\n```\n\n## 根本原因\nTypeScript のコンパイルプロセスでは、`.ts` ファイルは JavaScript に変換されるが、非 TypeScript ファイル（.md などのテキストファイル）は自動的に出力ディレクトリにコピーされない。そのため、`src/templates` 内のファイルが `dist/templates` に複製されず、実行時にファイルが見つからないエラーが発生していた。\n\n## 実装した解決策\n\n### 1. package.json に修正を追加\n`copy-templates` スクリプトを追加し、ビルドプロセスの一部として実行されるようにした。\n\n```diff\n  \"scripts\": {\n-    \"build\": \"tsc && chmod +x dist/index.js\",\n+    \"build\": \"tsc && chmod +x dist/index.js && npm run copy-templates\",\n     \"clean\": \"rm -rf dist\",\n     \"prepare\": \"npm run clean && npm run build\",\n+    \"copy-templates\": \"mkdir -p dist/templates && cp -r src/templates/* dist/templates/\",\n```\n\n### 2. ビルドの実行\n修正後にビルドを実行し、`dist/templates` ディレクトリが正しく作成され、その中に必要なファイルがコピーされていることを確認した。\n\n## 技術的考察\n- TypeScript プロジェクトでは静的アセット（設定ファイル、テンプレート、静的ファイルなど）の処理に明示的な対応が必要\n- npm パッケージとして配布する際に、ランタイムに必要なすべてのファイルが含まれているかの確認が重要\n- 一般的な解決策としては:\n  1. npm スクリプトを使用して必要なファイルをコピー（今回の採用方法）\n  2. webpack などのバンドラーで静的ファイルをプロセスに組み込む\n  3. tsconfig.json の `copyFiles` プラグインを使用（ts-node の場合）\n\n## ベストプラクティス\n- ビルドプロセスでは常に非ソースコードファイルの扱いを考慮する\n- npm パッケージ公開前に、`npm pack` でパッケージ内容を確認する\n- CI/CD パイプラインに、このようなエラーを早期に検出するテストを組み込む\n\n## コミット情報\n- コミットメッセージ: `Fix: Add copy-templates script to ensure template files are included in dist directory`\n- コミットハッシュ: 6733c47619215e4e02c68b05463cfc388746864d",
+    "sections": {
+      "": "- コミットメッセージ: `Fix: Add copy-templates script to ensure template files are included in dist directory`\n- コミットハッシュ: 6733c47619215e4e02c68b05463cfc388746864d"
+    }
+  }
+}

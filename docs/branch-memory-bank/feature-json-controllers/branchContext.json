@@ -1,0 +1,17 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "28889618-724c-4c09-b1b0-85ed2ba1ccc5",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.690Z",
+    "createdAt": "2025-03-17T02:13:31.690Z",
+    "version": 1
+  },
+  "content": {
+    "purpose": "JSONインターフェースをMCPコントローラーと統合し、新しいJSONベースの機能を\nシステム全体で利用可能にする",
+    "userStories": []
+  }
+}

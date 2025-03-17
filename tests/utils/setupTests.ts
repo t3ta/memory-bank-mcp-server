@@ -5,16 +5,7 @@
 // Extend Jest matchers if needed
 // import 'jest-extended';
 
-// Ensure NODE_ENV is set to 'test'
-process.env.NODE_ENV = 'test';
-
-// Import logger and configure it for tests
-import { logger } from '../../src/shared/utils/logger.js';
-
-// Configure logger to be silent during tests
-logger.configure({ silent: true });
-
-// Optionally silence console logs during tests
+// Silence console logs during tests
 global.console = {
   ...console,
   // Uncomment to silence specific console methods during tests
@@ -22,10 +13,23 @@ global.console = {
   // info: jest.fn(),
   // debug: jest.fn(),
   // warn: jest.fn(),
-  error: console.error, // Keep error output for test failures
+  // error: jest.fn(),
 };
 
 // Set timezone for consistent Date handling in tests
 process.env.TZ = 'UTC';
 
 // Add any global test setup here
+
+// Import ts-mockito for mocking
+import { reset } from 'ts-mockito';
+
+// Reset all mocks before each test
+beforeEach(() => {
+  // Jest's built-in reset
+  jest.clearAllMocks();
+
+  // You can add specific ts-mockito reset logic here if needed
+  // Note: ts-mockito's reset() function is for resetting specific mocks,
+  // not for global reset like Jest's clearAllMocks()
+});

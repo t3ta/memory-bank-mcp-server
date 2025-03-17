@@ -1,0 +1,22 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "27c529b0-ea56-4cd5-9fdc-e91b48e5ac1b",
+    "title": "PRの準備完了",
+    "documentType": "generic",
+    "path": "pullRequest.md",
+    "tags": [
+      "pull-request"
+    ],
+    "lastModified": "2025-03-17T02:13:31.684Z",
+    "createdAt": "2025-03-17T02:13:31.684Z",
+    "version": 1
+  },
+  "content": {
+    "rawContent": "# PRの準備完了\n\ntags: #pull-request\n\n\n#title: ドメインモデルV2の実装\n#targetBranch: develop\n#labels: memory-bank,auto-pr\n\n# 概要\n\n<!-- メモリバンクの現在の作業内容から自動生成されます -->\nフェーズ2のドメインモデル拡張を実装中です。具体的に以下の作業を行なっています：\n\n1. DocumentId値オブジェクトの設計・実装\n2. JsonDocumentエンティティの設計・実装\n3. DocumentPathクラスの機能拡張\n\n## 技術的決定事項\n\n## 既知の問題\n\n<!-- メモリバンクの既知の問題から自動生成されます -->\n- 特になし\n\n## 検討事項\n\n---\n\n_このPRはメモリバンクの情報を基に自動生成されました_\n",
+    "sections": {
+      "main": "#title: ドメインモデルV2の実装\n#targetBranch: develop\n#labels: memory-bank,auto-pr\n\n\n<!-- メモリバンクの現在の作業内容から自動生成されます -->\nフェーズ2のドメインモデル拡張を実装中です。具体的に以下の作業を行なっています：\n\n1. DocumentId値オブジェクトの設計・実装\n2. JsonDocumentエンティティの設計・実装\n3. DocumentPathクラスの機能拡張",
+      "": "---\n\n_このPRはメモリバンクの情報を基に自動生成されました_"
+    }
+  }
+}

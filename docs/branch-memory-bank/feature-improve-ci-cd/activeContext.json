@@ -1,0 +1,25 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "e239b344-bc42-42f9-b6f7-3291ec39a45a",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.687Z",
+    "createdAt": "2025-03-17T02:13:31.687Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "CI/CDドキュメント整備、既存ワークフローの統一性確保、メモリリーク対応",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": [
+      "変更をmasterにマージ",
+      "さらなるメモリ最適化の検討",
+      "develop-to-master-pr.yml のコンカレンシー設定追加",
+      "既存ワークフローのコンカレンシー設定統一"
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "branch-context-uuid",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context",
+      "feature-json-initialization"
+    ],
+    "lastModified": "2025-03-17T11:59:00.000Z",
+    "createdAt": "2025-03-17T11:59:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "feature/json-initialization",
+    "purpose": "メモリバンクの初期化処理をJSON形式に切り替える",
+    "createdAt": "2025-03-17T11:59:00.000Z",
+    "userStories": [
+      {
+        "id": "story-uuid",
+        "description": "CreateBranchCoreFilesUseCaseクラスを更新して、ファイルパスの拡張子を.mdから.jsonに変更する",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "story-uuid-2",
+        "description": "コンテンツ生成をMarkdownからJSONに変更する",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "story-uuid-3",
+        "description": "リポジトリレイヤーを更新して、JSON形式のドキュメントを優先的に保存するようにする",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": "この作業により、メモリバンクの初期化処理がJSON形式に完全に移行されます。"
+  }
+}

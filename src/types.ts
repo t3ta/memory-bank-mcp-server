@@ -2,24 +2,25 @@ export interface McpError {
   code: number;
   message: string;
 }
+/* Defined as standard error codes for the MCP, although not used */
 
-export enum ErrorCode {
-  ParseError = -32700,
-  InvalidRequest = -32600,
-  MethodNotFound = -32601,
-  InvalidParams = -32602,
-  InternalError = -32603
+export enum _ErrorCode {
+  _ParseError = -32700,
+  _InvalidRequest = -32600,
+  _MethodNotFound = -32601,
+  _InvalidParams = -32602,
+  _InternalError = -32603,
 }
 
 export interface JsonRpcRequest {
-  jsonrpc: "2.0";
+  jsonrpc: '2.0';
   id: number;
   method: string;
   params?: any;
 }
 
 export interface JsonRpcResponse {
-  jsonrpc: "2.0";
+  jsonrpc: '2.0';
   id: number;
   result?: any;
   error?: McpError;
@@ -35,14 +36,14 @@ export interface CliOptions {
   workspace?: string;
   memoryRoot?: string;
   verbose?: boolean;
-  language?: "en" | "ja";
+  language?: 'en' | 'ja';
 }
 
 export interface WorkspaceConfig {
   workspaceRoot: string;
   memoryBankRoot: string;
   verbose: boolean;
-  language: "en" | "ja";
+  language: 'en' | 'ja';
 }
 
 export interface ReadMemoryBankArgs {

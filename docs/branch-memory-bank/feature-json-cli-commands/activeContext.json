@@ -1,0 +1,26 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "9850413e-415d-4cef-a039-5a1e29095814",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.689Z",
+    "createdAt": "2025-03-17T02:13:31.689Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "FileSystemTagIndexRepositoryImpl.test.tsの修正が完了しました。JSONドキュメント形式のサポートに対応するようにテストを調整し、すべてのテストが正常に通過するようになりました。",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": [
+      "他の失敗しているテストの確認と修正",
+      "モックとテストヘルパーファイルの確認・更新",
+      "CRUD操作コマンドの実装完了",
+      "検索コマンドの実装",
+      "インデックス管理コマンドの実装"
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "27cc4539-f187-4205-9dc7-62729131a43b",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.701Z",
+    "createdAt": "2025-03-17T02:13:31.701Z",
+    "version": 1
+  },
+  "content": {
+    "purpose": "JSON操作のためのユースケースレイヤーを実装し、アプリケーションの機能を整理された形で提供する",
+    "userStories": []
+  }
+}

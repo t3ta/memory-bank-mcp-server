@@ -1,0 +1,17 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "14aa5dbf-93a3-4688-90a9-95f978d14b12",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.688Z",
+    "createdAt": "2025-03-17T02:13:31.688Z",
+    "version": 1
+  },
+  "content": {
+    "purpose": "CI/CD パイプラインの改善と効率化",
+    "userStories": []
+  }
+}

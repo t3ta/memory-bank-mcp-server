@@ -4,9 +4,13 @@ import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
 import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
 import { Tag } from '../../../domain/entities/Tag.js';
 import { IFileSystemService } from '../../storage/interfaces/IFileSystemService.js';
-import { InfrastructureError, InfrastructureErrorCodes } from '../../../shared/errors/InfrastructureError.js';
+import {
+  InfrastructureError,
+  InfrastructureErrorCodes,
+} from '../../../shared/errors/InfrastructureError.js';
 import { DomainError } from '../../../shared/errors/DomainError.js';
 import { extractTags } from '../../../shared/utils/index.js';
+import { logger } from '../../../shared/utils/logger.js';
 
 /**
  * File system based implementation of memory document repository
@@ -41,8 +45,26 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
       // Read file content
       const content = await this.fileSystemService.readFile(filePath);
 
+      // Handle JSON files differently
+      if (path.isJSON) {
+        try {
+          // Parse JSON content
+          const jsonDoc = JSON.parse(content);
+
+          // Convert JSON to MemoryDocument
+          return MemoryDocument.fromJSON(jsonDoc, path);
+        } catch (error) {
+          throw new InfrastructureError(
+            InfrastructureErrorCodes.FILE_READ_ERROR,
+            `Failed to parse JSON document: ${path.value}`,
+            { originalError: error }
+          );
+        }
+      }
+
+      // For markdown and other files, continue with normal processing
       // Extract tags
-      const tags = extractTags(content).map(tag => Tag.create(tag));
+      const tags = extractTags(content).map((tag) => Tag.create(tag));
 
       // Get file stats
       const stats = await this.fileSystemService.getFileStats(filePath);
@@ -52,7 +74,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
         path,
         content,
         tags,
-        lastModified: stats.lastModified
+        lastModified: stats.lastModified,
       });
     } catch (error) {
       if (error instanceof DomainError) {
@@ -93,8 +115,8 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
           // Get relative path
           const relativePath = path.relative(this.basePath, file);
 
-          // Skip non-markdown files
-          if (!relativePath.endsWith('.md')) {
+          // Skip non-markdown and non-json files
+          if (!relativePath.endsWith('.md') && !relativePath.endsWith('.json')) {
             continue;
           }
 
@@ -106,7 +128,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
 
           if (document) {
             // Check if document has all tags
-            const hasAllTags = tags.every(tag => document.hasTag(tag));
+            const hasAllTags = tags.every((tag) => document.hasTag(tag));
 
             if (hasAllTags) {
               documents.push(document);
@@ -114,7 +136,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
           }
         } catch (error) {
           // Skip files that can't be read or don't match path format
-          console.error(`Error reading file ${file}:`, error);
+          logger.error(`Error reading file ${file}:`, error);
         }
       }
 
@@ -145,12 +167,24 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
     try {
       const filePath = this.resolvePath(document.path.value);
 
+      // Handle JSON files differently
+      if (document.isJSON) {
+        // Convert to JSON format
+        const jsonDoc = document.toJSON();
+        const jsonContent = JSON.stringify(jsonDoc, null, 2);
+
+        // Write JSON file
+        await this.fileSystemService.writeFile(filePath, jsonContent);
+        return;
+      }
+
+      // For markdown files, continue with normal processing
       // Prepare content with tags
       let content = document.content;
 
       // Add or update tags if document has any
       if (document.tags.length > 0) {
-        const tagLine = `tags: ${document.tags.map(tag => tag.toHashtag()).join(' ')}\n\n`;
+        const tagLine = `tags: ${document.tags.map((tag) => tag.toHashtag()).join(' ')}\n\n`;
 
         // If content already has tags, replace them
         if (content.includes('tags:')) {
@@ -221,7 +255,8 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
       // List all files
       const files = await this.fileSystemService.listFiles(this.basePath);
 
-      // Convert to document paths
+      // Convert to document paths and remove duplicates
+      const uniquePaths = new Set<string>();
       const paths: DocumentPath[] = [];
 
       for (const file of files) {
@@ -229,18 +264,39 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
           // Get relative path
           const relativePath = path.relative(this.basePath, file);
 
-          // Skip non-markdown files
-          if (!relativePath.endsWith('.md')) {
+          // Skip non-markdown and non-json files
+          if (!relativePath.endsWith('.md') && !relativePath.endsWith('.json')) {
             continue;
           }
 
-          // Create document path
-          const documentPath = DocumentPath.create(relativePath);
+          // Validate the path first
+          const parts = relativePath.split(path.sep);
+          if (parts.includes('..') || parts.some((part) => part.startsWith('..'))) {
+            logger.error('Invalid document path:', {
+              path: relativePath,
+              reason: 'Path traversal attempt detected',
+            });
+            continue;
+          }
 
-          paths.push(documentPath);
+          // Only process paths we haven't seen before
+          if (!uniquePaths.has(relativePath)) {
+            try {
+              uniquePaths.add(relativePath);
+              const documentPath = DocumentPath.create(relativePath);
+              paths.push(documentPath);
+            } catch (error) {
+              logger.error('Error creating document path:', {
+                path: relativePath,
+                error: error instanceof Error ? error.message : String(error),
+              });
+            }
+          }
         } catch (error) {
-          // Skip files that don't match path format
-          console.error(`Error processing file path ${file}:`, error);
+          logger.error('Error processing file path:', {
+            path: file,
+            error: error instanceof Error ? error.message : String(error),
+          });
         }
       }
 
@@ -256,7 +312,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
 
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
-        `Failed to list documents in global memory bank`,
+        'Failed to list documents',
         { originalError: error }
       );
     }

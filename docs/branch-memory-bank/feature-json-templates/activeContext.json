@@ -1,0 +1,20 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "4c3fae4a-1e11-4a50-adb7-1d9d16581ac3",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.697Z",
+    "createdAt": "2025-03-17T02:13:31.697Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "新しく考案された設計仕様に基づいて、JSONテンプレートシステムと多言語対応基盤を実装中。今日はコントローラとCLIコマンドの修正を実施しました。",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": []
+  }
+}

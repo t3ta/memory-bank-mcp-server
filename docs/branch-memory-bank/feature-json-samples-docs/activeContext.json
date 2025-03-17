@@ -1,0 +1,26 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "c2940ebe-1415-46e2-9806-b9d2fd31e749",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.696Z",
+    "createdAt": "2025-03-17T02:13:31.696Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "サンプルJSONファイルとドキュメントの作成を進めています。特に各ドキュメント\nタイプのサンプル作成とスキーマドキュメントの整備に焦点を当てています。",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": [
+      "残りのサンプルJSONの作成",
+      "スキーマドキュメントの完成",
+      "マイグレーションガイドの完成",
+      "テンプレートの最終化",
+      "使用方法ガイドの作成"
+    ]
+  }
+}

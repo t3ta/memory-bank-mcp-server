@@ -1,0 +1,21 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "c7522780-2f62-4366-a6eb-6f73f88ed442",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.712Z",
+    "createdAt": "2025-03-17T02:13:31.712Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [
+      "MCPResponseの型変更に対応したCLIコマンド実装"
+    ],
+    "pendingImplementation": [],
+    "status": "完了",
+    "knownIssues": []
+  }
+}

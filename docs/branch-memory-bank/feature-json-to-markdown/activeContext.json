@@ -1,0 +1,20 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "f0f37ca8-eba3-4cd4-8475-a6ff265ad749",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.699Z",
+    "createdAt": "2025-03-17T02:13:31.699Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "基本的な変換機能の実装が完了し、テスト作成まで進んでいます。現在は残りのテストケース作成と最適化の検討をしている段階です。",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": []
+  }
+}

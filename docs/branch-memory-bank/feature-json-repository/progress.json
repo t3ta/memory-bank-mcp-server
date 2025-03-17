@@ -1,0 +1,23 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "d6bb2e4d-22dc-4d84-924e-027f01ef4977",
+    "title": "Progress: JSONリポジトリ実装",
+    "documentType": "progress",
+    "path": "progress.md",
+    "tags": [
+      "progress",
+      "repository",
+      "json"
+    ],
+    "lastModified": "2025-03-17T02:13:31.695Z",
+    "createdAt": "2025-03-17T02:13:31.695Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [],
+    "pendingImplementation": [],
+    "status": "",
+    "knownIssues": []
+  }
+}

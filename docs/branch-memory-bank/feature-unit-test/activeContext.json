@@ -1,0 +1,25 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "1d419100-56dc-42d3-9f23-7ad612a8a1b1",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.709Z",
+    "createdAt": "2025-03-17T02:13:31.709Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "ユニットテストのコンパイルエラーを修正し、ビルドを成功させた",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": [
+      "残りの重要なドメインエンティティのテストを完成させる",
+      "残りのアプリケーションレイヤーユースケースのテストを実装する",
+      "CI/CDパイプラインでテスト実行を自動化する",
+      "カバレッジレポート生成を設定する"
+    ]
+  }
+}

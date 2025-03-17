@@ -1,0 +1,24 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "533e2d84-4e0d-49d8-99e7-6d2eca41db4d",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.707Z",
+    "createdAt": "2025-03-17T02:13:31.707Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [],
+    "pendingImplementation": [],
+    "status": "Markdown関連コードの依存関係分析を完了し、削除計画を立案中です。\n主要なMarkdownサポートコードを特定し、削除の優先順位を\n決定しています。テストケースの見直しも並行して進めています。",
+    "knownIssues": [
+      "複雑な依存関係の存在",
+      "テストカバレッジへの影響",
+      "リグレッションのリスク",
+      "ビルド設定の更新必要性"
+    ]
+  }
+}

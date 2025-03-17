@@ -1,0 +1,45 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "b4f3b6b2-1d28-44bb-b5f9-bd6bb8b06303",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.700Z",
+    "createdAt": "2025-03-17T02:13:31.700Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [
+      "MarkdownBuilder クラス - マークダウン構文を構築するためのユーティリティ",
+      "JsonToMarkdownConverter - 変換のメインクラス、キャッシング機能つき",
+      "ドキュメントタイプのコンバーター:",
+      "BranchContextConverter",
+      "ActiveContextConverter",
+      "ProgressConverter",
+      "SystemPatternsConverter",
+      "GenericConverter（フォールバック）",
+      "テストケース (MarkdownBuilder)"
+    ],
+    "pendingImplementation": [
+      "残りのコンバーターのテストケース:",
+      "JsonToMarkdownConverter",
+      "BranchContextConverter",
+      "ActiveContextConverter",
+      "ProgressConverter",
+      "SystemPatternsConverter",
+      "GenericConverter",
+      "統合テスト",
+      "プレビュー機能",
+      "パフォーマンス最適化（初期実装すみ、改善の余地あり）"
+    ],
+    "status": "基本的な変換機能の実装が完了しました。以下の点で特に注目すべきです：\n- ストラテジーとビルダーパターンを組み合わせた柔軟な設計\n- キャッシング機能が統合済み\n- エラーハンドリングが組み込み済み\n- 各ドキュメントタイプ別の変換ロジックが分離され拡張性良好\n追加のテスト作成とエッジケースへの対応が今後の課題です。",
+    "knownIssues": [
+      "現状ではJSONドキュメントの構造に依存しているため、スキーマ変更に弱い",
+      "キャッシュの無効化はclearCache()を手動で呼ぶ必要がある",
+      "GenericConverterの深いネストへの対応が不十分",
+      "大量ドキュメントのパフォーマンステストが未実施"
+    ]
+  }
+}

@@ -13,5 +13,5 @@ export * from './common/GetRecentBranchesUseCase.js';
 export * from './common/ReadBranchCoreFilesUseCase.js';
 export * from './common/CreateBranchCoreFilesUseCase.js';
 
-// Pull Request use cases
-export * from './pr/index.js';
+// JSON document use cases
+export * from './json/index.js';

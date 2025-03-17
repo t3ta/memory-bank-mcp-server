@@ -1,0 +1,47 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "progress-uuid",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress",
+      "feature-json-initialization"
+    ],
+    "lastModified": "2025-03-17T12:06:00.000Z",
+    "createdAt": "2025-03-17T11:59:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "feature-uuid-1",
+        "description": "CreateBranchCoreFilesUseCaseクラスの更新",
+        "implementedAt": "2025-03-17T12:02:00.000Z"
+      },
+      {
+        "id": "feature-uuid-2",
+        "description": "JSON生成メソッドの実装",
+        "implementedAt": "2025-03-17T12:02:00.000Z"
+      },
+      {
+        "id": "feature-uuid-3",
+        "description": "リポジトリレイヤーの更新",
+        "implementedAt": "2025-03-17T12:05:00.000Z"
+      }
+    ],
+    "pendingImplementation": [],
+    "status": "completed",
+    "completionPercentage": 100,
+    "knownIssues": [
+      {
+        "id": "issue-uuid",
+        "description": "既存のMarkdownファイルとの互換性を維持する必要がある",
+        "severity": "medium",
+        "workaround": "自動マイグレーション機能を使用して、Markdownファイルを自動的にJSONに変換する",
+        "status": "resolved"
+      }
+    ]
+  }
+}

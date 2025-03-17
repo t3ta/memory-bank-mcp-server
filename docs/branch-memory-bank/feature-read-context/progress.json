@@ -1,0 +1,139 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "progress-read-context",
+    "title": "read_context コマンドの進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "core",
+      "progress",
+      "read-context",
+      "status"
+    ],
+    "lastModified": "2025-03-17T12:32:00.000Z",
+    "createdAt": "2025-03-17T11:58:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "completed": [
+      {
+        "task": "設計ドキュメントの作成",
+        "description": "read_contextコマンドの設計を定義したdocs/global-memory-bank/read-context-command-design.jsonを作成しました。",
+        "date": "2025-03-17"
+      },
+      {
+        "task": "実装ガイドの作成",
+        "description": "read_contextコマンドの実装方法を説明したdocs/global-memory-bank/read-context-command-implementation.jsonを作成しました。",
+        "date": "2025-03-17"
+      },
+      {
+        "task": "コマンド実装",
+        "description": "src/index.tsにAVAILABLE_TOOLSの追加とコマンドハンドラーの実装を行いました。",
+        "date": "2025-03-17"
+      },
+      {
+        "task": "ブランチメモリバンクの作成",
+        "description": "必要なファイル（branchContext.json、systemPatterns.json、activeContext.json、progress.json）を作成しました。",
+        "date": "2025-03-17"
+      },
+      {
+        "task": "メモリバンクファイル編集ルールの追加",
+        "description": "メモリバンクファイルを直接編集することを禁止するルールを追加しました。日本語と英語の翻訳を更新しました。",
+        "date": "2025-03-17"
+      },
+      {
+        "task": "中国語サポートの追加",
+        "description": "`read_rules`と`read_context`コマンドに中国語サポートを追加しました。言語オプションとエラーチェックの部分を更新しました。",
+        "date": "2025-03-17"
+      }
+    ],
+    "inProgress": [
+      {
+        "task": "中国語サポートのテスト",
+        "description": "中国語でのルール表示が正しく動作することを確認します。コードの変更後にビルドと再起動が必要です。",
+        "status": "作業中"
+      }
+    ],
+    "pending": [
+      {
+        "task": "コードのビルド",
+        "description": "変更したコードをビルドしてサーバーを再起動する必要があります。",
+        "priority": "高"
+      },
+      {
+        "task": "中国語翻訳の補完",
+        "description": "中国語の翻訳ファイルに不足している可能性のあるキーを確認し、必要に応じて追加します。",
+        "priority": "中"
+      },
+      {
+        "task": "単体テスト",
+        "description": "様々なパラメータの組み合わせとエラーケースをカバーする単体テストを作成する必要があります。",
+        "priority": "中"
+      },
+      {
+        "task": "統合テスト",
+        "description": "実際の環境での動作確認を行う統合テストを作成する必要があります。",
+        "priority": "中"
+      },
+      {
+        "task": "ドキュメント更新",
+        "description": "ユーザーガイドを更新し、新しいコマンドの使用方法を説明する必要があります。",
+        "priority": "中"
+      },
+      {
+        "task": "プルリクエスト作成",
+        "description": "すべてのテストが通ったら、プルリクエストを作成して変更をmainブランチにマージします。",
+        "priority": "低"
+      }
+    ],
+    "issues": [
+      {
+        "issue": "サーバー再起動の問題",
+        "description": "コードの変更を反映させるには、ビルドとサーバーの再起動が必要ですが、現在のMCPサーバーの起動方法によっては、これが簡単ではない可能性があります。",
+        "severity": "中",
+        "status": "未解決"
+      },
+      {
+        "issue": "中国語翻訳の不完全性",
+        "description": "中国語の翻訳ファイルには、一部のコンテンツキーが不足している可能性があります。これが原因でエラーが発生している可能性があります。",
+        "severity": "中",
+        "status": "未解決"
+      }
+    ],
+    "milestones": [
+      {
+        "name": "コード実装",
+        "status": "完了",
+        "date": "2025-03-17"
+      },
+      {
+        "name": "ファイル編集ルール追加",
+        "status": "完了",
+        "date": "2025-03-17"
+      },
+      {
+        "name": "中国語サポート追加",
+        "status": "コード実装完了、テスト待ち",
+        "targetDate": "2025-03-18"
+      },
+      {
+        "name": "テスト",
+        "status": "未開始",
+        "targetDate": "2025-03-18"
+      },
+      {
+        "name": "ドキュメント更新",
+        "status": "未開始",
+        "targetDate": "2025-03-18"
+      },
+      {
+        "name": "プルリクエスト",
+        "status": "未開始",
+        "targetDate": "2025-03-19"
+      }
+    ],
+    "overallStatus": "予定通り進行中",
+    "completionPercentage": 75
+  }
+}

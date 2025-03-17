@@ -1,0 +1,29 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "eae08b1d-94c5-4d8c-afed-5a7564828254",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.676Z",
+    "createdAt": "2025-03-17T02:13:31.676Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [
+      "GitHubワークフローの設定",
+      "テスト実行の自動化",
+      "リリースの自動化",
+      "バージョンバンプの仕組み"
+    ],
+    "pendingImplementation": [
+      "実際の環境でのCI/CDテスト",
+      "必要に応じたワークフローの微調整"
+    ],
+    "status": "実装済み",
+    "knownIssues": [
+      "NPM_TOKENの設定が必要"
+    ]
+  }
+}

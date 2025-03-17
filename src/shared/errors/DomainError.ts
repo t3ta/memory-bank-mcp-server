@@ -5,11 +5,7 @@ import { BaseError } from './BaseError.js';
  * Used for business rule violations and domain validation errors
  */
 export class DomainError extends BaseError {
-  constructor(
-    code: string,
-    message: string,
-    details?: Record<string, unknown>
-  ) {
+  constructor(code: string, message: string, details?: Record<string, unknown>) {
     super(`DOMAIN_ERROR.${code}`, message, details);
   }
 }
@@ -19,6 +15,7 @@ export class DomainError extends BaseError {
  */
 export const DomainErrorCodes = {
   INVALID_DOCUMENT_PATH: 'INVALID_DOCUMENT_PATH',
+  INVALID_DOCUMENT_ID: 'INVALID_DOCUMENT_ID',
   INVALID_TAG_FORMAT: 'INVALID_TAG_FORMAT',
   DOCUMENT_NOT_FOUND: 'DOCUMENT_NOT_FOUND',
   DOCUMENT_ALREADY_EXISTS: 'DOCUMENT_ALREADY_EXISTS',
@@ -27,6 +24,8 @@ export const DomainErrorCodes = {
   BRANCH_ALREADY_EXISTS: 'BRANCH_ALREADY_EXISTS',
   VALIDATION_ERROR: 'VALIDATION_ERROR',
   UNAUTHORIZED_ACCESS: 'UNAUTHORIZED_ACCESS',
+  // 追加したエラーコード
+  INVALID_TAG: 'INVALID_TAG',
 } as const;
 
 export type DomainErrorCode = keyof typeof DomainErrorCodes;

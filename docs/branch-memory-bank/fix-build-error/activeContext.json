@@ -1,0 +1,22 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "29ea8a1d-dc06-498e-a9b6-06a1d4441b36",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.711Z",
+    "createdAt": "2025-03-17T02:13:31.711Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "ビルドエラーの修正 - MCPResponseの型定義変更に対する対応",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": [
+      "修正内容をgitコミットする"
+    ]
+  }
+}

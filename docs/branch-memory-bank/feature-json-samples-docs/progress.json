@@ -1,0 +1,24 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "de898455-790c-4f01-90bc-d333964eed25",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.696Z",
+    "createdAt": "2025-03-17T02:13:31.696Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [],
+    "pendingImplementation": [],
+    "status": "基本的なドキュメントタイプのサンプルJSONを作成中で、\nスキーマドキュメントの執筆も並行して進めています。\nマイグレーションガイドの基本構造も設計を開始しました。",
+    "knownIssues": [
+      "サンプルの網羅性の確保",
+      "ドキュメントの保守方法",
+      "更新頻度の管理",
+      "オンラインドキュメントのホスティング"
+    ]
+  }
+}

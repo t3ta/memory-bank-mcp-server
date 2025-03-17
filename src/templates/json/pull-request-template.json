@@ -1,0 +1,105 @@
+{
+  "schema": "template_v1",
+  "metadata": {
+    "id": "pull-request-template",
+    "name": {
+      "ja": "プルリクエストテンプレート",
+      "en": "Pull Request Template"
+    },
+    "description": {
+      "ja": "ブランチのメモリバンク情報に基づいてプルリクエストを生成するためのテンプレート",
+      "en": "Template for generating pull requests based on branch memory bank information"
+    },
+    "type": "pull-request",
+    "lastModified": "2025-03-17T00:00:00.000Z"
+  },
+  "content": {
+    "sections": {
+      "overview": {
+        "title": {
+          "ja": "概要",
+          "en": "Overview"
+        },
+        "content": {
+          "ja": "<!-- メモリバンクの現在の作業内容から自動生成されます -->\n{{CURRENT_WORK}}",
+          "en": "<!-- Auto-generated from the current work in memory bank -->\n{{CURRENT_WORK}}"
+        },
+        "optional": false
+      },
+      "changes": {
+        "title": {
+          "ja": "変更内容",
+          "en": "Changes"
+        },
+        "content": {
+          "ja": "<!-- メモリバンクの最近の変更点から自動生成されます -->\n{{RECENT_CHANGES}}",
+          "en": "<!-- Auto-generated from recent changes in memory bank -->\n{{RECENT_CHANGES}}"
+        },
+        "optional": true
+      },
+      "technicalDecisions": {
+        "title": {
+          "ja": "技術的決定事項",
+          "en": "Technical Decisions"
+        },
+        "content": {
+          "ja": "<!-- メモリバンクのアクティブな決定事項から自動生成されます -->\n{{ACTIVE_DECISIONS}}",
+          "en": "<!-- Auto-generated from active decisions in memory bank -->\n{{ACTIVE_DECISIONS}}"
+        },
+        "optional": true
+      },
+      "implementedFeatures": {
+        "title": {
+          "ja": "実装済み機能",
+          "en": "Implemented Features"
+        },
+        "content": {
+          "ja": "<!-- メモリバンクの動作している機能から自動生成されます -->\n{{WORKING_FEATURES}}",
+          "en": "<!-- Auto-generated from working features in memory bank -->\n{{WORKING_FEATURES}}"
+        },
+        "optional": true
+      },
+      "knownIssues": {
+        "title": {
+          "ja": "既知の問題",
+          "en": "Known Issues"
+        },
+        "content": {
+          "ja": "<!-- メモリバンクの既知の問題から自動生成されます -->\n{{KNOWN_ISSUES}}",
+          "en": "<!-- Auto-generated from known issues in memory bank -->\n{{KNOWN_ISSUES}}"
+        },
+        "optional": true
+      },
+      "considerations": {
+        "title": {
+          "ja": "検討事項",
+          "en": "Considerations"
+        },
+        "content": {
+          "ja": "<!-- メモリバンクの検討事項から自動生成されます -->\n{{CONSIDERATIONS}}",
+          "en": "<!-- Auto-generated from considerations in memory bank -->\n{{CONSIDERATIONS}}"
+        },
+        "optional": true
+      },
+      "footer": {
+        "title": {
+          "ja": "",
+          "en": ""
+        },
+        "content": {
+          "ja": "---\n\n_このPRはメモリバンクの情報を基に自動生成されました_",
+          "en": "---\n\n_This PR was automatically generated based on information from the memory bank_"
+        },
+        "optional": false
+      }
+    },
+    "placeholders": {
+      "CURRENT_WORK": "現在の作業内容のプレースホルダー",
+      "RECENT_CHANGES": "最近の変更点のプレースホルダー",
+      "ACTIVE_DECISIONS": "アクティブな決定事項のプレースホルダー",
+      "WORKING_FEATURES": "動作している機能のプレースホルダー",
+      "KNOWN_ISSUES": "既知の問題のプレースホルダー",
+      "CONSIDERATIONS": "検討事項のプレースホルダー"
+    }
+  }
+}

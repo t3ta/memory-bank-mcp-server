@@ -1,0 +1,32 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "0109e017-5ef3-41dc-9e7e-263f0850db4e",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.671Z",
+    "createdAt": "2025-03-17T02:13:31.671Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [
+      "GitHub Actionsによる自動PR作成ワークフロー",
+      "クリーンアーキテクチャに基づく`create_pull_request` MCPツール",
+      "ブランチメモリバンクからの情報抽出機能",
+      "テンプレート処理と空セクションのクリーンアップ",
+      "多言語対応（日本語・英語）",
+      "CLIインターフェースの実装",
+      "systemPatternsのメモリ最適化処理"
+    ],
+    "pendingImplementation": [
+      "ユーザー設定可能なカスタムテンプレート"
+    ],
+    "status": "主要機能の実装完了、メモリリーク対策中",
+    "knownIssues": [
+      "CLIコマンド実行時にメモリ不足が発生する（対策実装中）",
+      "テスト環境がないため、実際のGitHub Actionsとの連携テストが必要"
+    ]
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "fe14bea6-a8d0-4afd-9dc2-eb276b83ea56",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.715Z",
+    "createdAt": "2025-03-17T02:13:31.715Z",
+    "version": 1
+  },
+  "content": {
+    "purpose": " ブランチの目的",
+    "userStories": [
+      {
+        "description": "解決する課題を定義",
+        "completed": false
+      },
+      {
+        "description": "必要な機能を記述",
+        "completed": false
+      },
+      {
+        "description": "期待される動作を明記",
+        "completed": false
+      }
+    ]
+  }
+}

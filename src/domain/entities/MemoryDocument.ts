@@ -1,5 +1,6 @@
 import { DocumentPath } from './DocumentPath.js';
 import { Tag } from './Tag.js';
+import { BaseJsonDocument } from '../../schemas/json-document.js';
 
 /**
  * Props for MemoryDocument entity
@@ -32,9 +33,9 @@ export class MemoryDocument {
       path: props.path,
       content: props.content,
       tags: [...props.tags],
-      lastModified: new Date(props.lastModified) 
+      lastModified: new Date(props.lastModified),
     };
-    
+
     return new MemoryDocument(documentProps);
   }
 
@@ -72,7 +73,7 @@ export class MemoryDocument {
    * @returns boolean indicating if document has tag
    */
   public hasTag(tag: Tag): boolean {
-    return this.props.tags.some(t => t.equals(tag));
+    return this.props.tags.some((t) => t.equals(tag));
   }
 
   /**
@@ -84,11 +85,11 @@ export class MemoryDocument {
     if (content === this.props.content) {
       return this;
     }
-    
+
     return MemoryDocument.create({
       ...this.props,
       content,
-      lastModified: new Date()
+      lastModified: new Date(),
     });
   }
 
@@ -101,11 +102,11 @@ export class MemoryDocument {
     if (this.hasTag(tag)) {
       return this;
     }
-    
+
     return MemoryDocument.create({
       ...this.props,
       tags: [...this.props.tags, tag],
-      lastModified: new Date()
+      lastModified: new Date(),
     });
   }
 
@@ -118,11 +119,11 @@ export class MemoryDocument {
     if (!this.hasTag(tag)) {
       return this;
     }
-    
+
     return MemoryDocument.create({
       ...this.props,
-      tags: this.props.tags.filter(t => !t.equals(tag)),
-      lastModified: new Date()
+      tags: this.props.tags.filter((t) => !t.equals(tag)),
+      lastModified: new Date(),
     });
   }
 
@@ -135,7 +136,7 @@ export class MemoryDocument {
     return MemoryDocument.create({
       ...this.props,
       tags,
-      lastModified: new Date()
+      lastModified: new Date(),
     });
   }
 
@@ -158,7 +159,14 @@ export class MemoryDocument {
    * Check if the document is a markdown file
    */
   public get isMarkdown(): boolean {
-    return this.props.path.extension.toLowerCase() === 'md';
+    return this.props.path.isMarkdown;
+  }
+
+  /**
+   * Check if the document is a JSON file
+   */
+  public get isJSON(): boolean {
+    return this.props.path.isJSON;
   }
 
   /**
@@ -168,8 +176,109 @@ export class MemoryDocument {
     return {
       path: this.props.path.value,
       content: this.props.content,
-      tags: this.props.tags.map(tag => tag.value),
-      lastModified: this.props.lastModified.toISOString()
+      tags: this.props.tags.map((tag) => tag.value),
+      lastModified: this.props.lastModified.toISOString(),
     };
+  }
+
+  /**
+   * Convert document to JSON format
+   * @returns JSON document object
+   */
+  public toJSON(): BaseJsonDocument {
+    if (this.isJSON) {
+      try {
+        return JSON.parse(this.props.content) as BaseJsonDocument;
+      } catch (error) {
+        console.error('Failed to parse JSON document:', error);
+      }
+    }
+
+    const documentType = this.determineDocumentType();
+    const title = this.title || this.props.path.filename;
+
+    // Create a default content structure based on document type
+    let content: Record<string, unknown>;
+    switch (documentType) {
+      case 'branch_context':
+        content = {
+          purpose: this.props.content,
+          createdAt: new Date(),
+          userStories: [],
+        };
+        break;
+      case 'active_context':
+        content = {
+          currentWork: this.props.content,
+          recentChanges: [],
+          activeDecisions: [],
+          considerations: [],
+          nextSteps: [],
+        };
+        break;
+      case 'progress':
+        content = {
+          status: this.props.content,
+          workingFeatures: [],
+          pendingImplementation: [],
+          knownIssues: [],
+        };
+        break;
+      case 'system_patterns':
+        content = {
+          technicalDecisions: [],
+        };
+        break;
+      default:
+        content = {
+          text: this.props.content,
+        };
+    }
+
+    return {
+      schema: 'memory_document_v1',
+      metadata: {
+        title,
+        documentType,
+        path: this.props.path.value,
+        tags: this.props.tags.map((tag) => tag.value),
+        lastModified: this.props.lastModified,
+      },
+      content,
+    };
+  }
+
+  /**
+   * Convert JSON document to Markdown
+   * @param jsonDoc JSON document to convert
+   * @returns Markdown formatted string
+   */
+  public static fromJSON(jsonDoc: BaseJsonDocument, path: DocumentPath): MemoryDocument {
+    return MemoryDocument.create({
+      path,
+      content: JSON.stringify(jsonDoc, null, 2),
+      tags: (jsonDoc.metadata.tags || []).map((tag) => Tag.create(tag)),
+      lastModified: new Date(jsonDoc.metadata.lastModified),
+    });
+  }
+
+  /**
+   * Determine the document type based on the path or content
+   * @returns document type
+   */
+  private determineDocumentType(): string {
+    const filename = this.props.path.filename.toLowerCase();
+
+    if (filename.includes('branchcontext') || filename.includes('branch-context')) {
+      return 'branch_context';
+    } else if (filename.includes('activecontext') || filename.includes('active-context')) {
+      return 'active_context';
+    } else if (filename.includes('progress')) {
+      return 'progress';
+    } else if (filename.includes('systempatterns') || filename.includes('system-patterns')) {
+      return 'system_patterns';
+    } else {
+      return 'generic';
+    }
   }
 }

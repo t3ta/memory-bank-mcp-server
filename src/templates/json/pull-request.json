@@ -1,0 +1,53 @@
+{
+  "id": "pull-request",
+  "type": "pull-request",
+  "version": "2.0.0",
+  "titleKey": "template.title.pull_request",
+  "descriptionKey": "template.description.pull_request",
+  "sections": [
+    {
+      "id": "overview",
+      "titleKey": "template.section.overview",
+      "placeholder": "{{CURRENT_WORK}}",
+      "isOptional": false
+    },
+    {
+      "id": "changes",
+      "titleKey": "template.section.changes",
+      "placeholder": "{{RECENT_CHANGES}}",
+      "isOptional": true
+    },
+    {
+      "id": "technical_decisions",
+      "titleKey": "template.section.technical_decisions",
+      "placeholder": "{{ACTIVE_DECISIONS}}",
+      "isOptional": true
+    },
+    {
+      "id": "implemented_features",
+      "titleKey": "template.section.implemented_features",
+      "placeholder": "{{WORKING_FEATURES}}",
+      "isOptional": true
+    },
+    {
+      "id": "known_issues",
+      "titleKey": "template.section.known_issues",
+      "placeholder": "{{KNOWN_ISSUES}}",
+      "isOptional": true
+    },
+    {
+      "id": "considerations",
+      "titleKey": "template.section.considerations",
+      "placeholder": "{{CONSIDERATIONS}}",
+      "isOptional": true
+    },
+    {
+      "id": "footer",
+      "titleKey": "",
+      "contentKey": "template.footer.pull_request",
+      "isOptional": false
+    }
+  ],
+  "createdAt": "2025-03-17T00:00:00Z",
+  "updatedAt": "2025-03-17T00:00:00Z"
+}

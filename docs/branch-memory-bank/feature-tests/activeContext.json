@@ -1,0 +1,25 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "57fa280d-9147-4c3d-9bf0-8983f9bcf082",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.708Z",
+    "createdAt": "2025-03-17T02:13:31.708Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "RecentBranchSchemaの日付型処理改善とエラーハンドリング強化",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": [
+      "RecentBranchSchema専用のテストケースを実装",
+      "日付型変換のエッジケースのテスト追加",
+      "テスト実行時の詳細なロギング機能の実装",
+      "システムパターンにエラーハンドリングパターンを記録"
+    ]
+  }
+}

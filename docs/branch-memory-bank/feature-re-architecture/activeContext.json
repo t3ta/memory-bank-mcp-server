@@ -1,0 +1,23 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "45cd14f5-1006-4285-8f1e-5580f6d0292b",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.705Z",
+    "createdAt": "2025-03-17T02:13:31.705Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "旧マネージャークラスとmodelsディレクトリの削除が完了",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": [
+      "テストの実装",
+      "残りの必要なドキュメントの更新"
+    ]
+  }
+}

@@ -3,7 +3,6 @@ import { Constants } from './config/constants.js';
 import { logger } from '../shared/utils/logger.js';
 import { IGlobalController } from '../interface/controllers/interfaces/IGlobalController.js';
 import { IBranchController } from '../interface/controllers/interfaces/IBranchController.js';
-import { IPullRequestTool } from '../interface/tools/IPullRequestTool.js';
 import { CliOptions } from '../infrastructure/config/WorkspaceConfig.js';
 
 /**
@@ -14,7 +13,6 @@ export class Application {
   private readonly options: CliOptions;
   private globalController?: IGlobalController;
   private branchController?: IBranchController;
-  private pullRequestTool?: IPullRequestTool;
 
   /**
    * Constructor
@@ -31,15 +29,14 @@ export class Application {
   async initialize(): Promise<void> {
     try {
       logger.info('Initializing application...');
-      
+
       // Setup DI container
       const container = await setupContainer(this.options);
-      
-      // Get controllers and tools
+
+      // Get controllers
       this.globalController = container.get<IGlobalController>('globalController');
       this.branchController = container.get<IBranchController>('branchController');
-      this.pullRequestTool = container.get<IPullRequestTool>('pullRequestTool');
-      
+
       logger.info('Application initialized successfully');
     } catch (error) {
       logger.error('Failed to initialize application:', error);
@@ -55,7 +52,7 @@ export class Application {
     if (!this.globalController) {
       throw new Error('Application not initialized. Call initialize() first.');
     }
-    
+
     return this.globalController;
   }
 
@@ -67,21 +64,11 @@ export class Application {
     if (!this.branchController) {
       throw new Error('Application not initialized. Call initialize() first.');
     }
-    
+
     return this.branchController;
   }
 
-  /**
-   * Get pull request tool
-   * @returns Pull request tool
-   */
-  getPullRequestTool(): IPullRequestTool {
-    if (!this.pullRequestTool) {
-      throw new Error('Application not initialized. Call initialize() first.');
-    }
-    
-    return this.pullRequestTool;
-  }
+  // getPullRequestTool method removed
 }
 
 // Export default for use as a module

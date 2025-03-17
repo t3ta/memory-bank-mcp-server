@@ -4,7 +4,10 @@ import { IBranchMemoryBankRepository } from '../../../domain/repositories/IBranc
 import { IGlobalMemoryBankRepository } from '../../../domain/repositories/IGlobalMemoryBankRepository.js';
 import { Tag } from '../../../domain/entities/Tag.js';
 import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
-import { ApplicationError, ApplicationErrorCodes } from '../../../shared/errors/ApplicationError.js';
+import {
+  ApplicationError,
+  ApplicationErrorCodes,
+} from '../../../shared/errors/ApplicationError.js';
 import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
 
 /**
@@ -15,12 +18,12 @@ export interface SearchDocumentsByTagsInput {
    * Tags to search for (at least one required)
    */
   tags: string[];
-  
+
   /**
    * Branch name (optional - if not provided, searches in global memory bank)
    */
   branchName?: string;
-  
+
   /**
    * Whether to require all tags to match (default: false, meaning ANY tag matches)
    */
@@ -35,7 +38,7 @@ export interface SearchDocumentsByTagsOutput {
    * Matching documents
    */
   documents: DocumentDTO[];
-  
+
   /**
    * Information about the search
    */
@@ -44,17 +47,17 @@ export interface SearchDocumentsByTagsOutput {
      * Number of documents found
      */
     count: number;
-    
+
     /**
      * Tags used for search
      */
     searchedTags: string[];
-    
+
     /**
      * Whether all tags were required to match
      */
     matchedAllTags: boolean;
-    
+
     /**
      * Where the search was performed (branch name or 'global')
      */
@@ -65,7 +68,9 @@ export interface SearchDocumentsByTagsOutput {
 /**
  * Use case for searching documents by tags
  */
-export class SearchDocumentsByTagsUseCase implements IUseCase<SearchDocumentsByTagsInput, SearchDocumentsByTagsOutput> {
+export class SearchDocumentsByTagsUseCase
+  implements IUseCase<SearchDocumentsByTagsInput, SearchDocumentsByTagsOutput>
+{
   /**
    * Constructor
    * @param globalRepository Global memory bank repository
@@ -92,26 +97,26 @@ export class SearchDocumentsByTagsUseCase implements IUseCase<SearchDocumentsByT
       }
 
       // Convert tag strings to Tag domain objects
-      const tags = input.tags.map(tag => Tag.create(tag));
-      
+      const tags = input.tags.map((tag) => Tag.create(tag));
+
       // Set default values
       const matchAllTags = input.matchAllTags ?? false;
       const searchLocation = input.branchName ? input.branchName : 'global';
-      
+
       // Perform search in either branch or global memory bank
       let documents = [];
-      
+
       if (input.branchName) {
         // Check if branch exists
         const branchExists = await this.branchRepository.exists(input.branchName);
-        
+
         if (!branchExists) {
           throw new DomainError(
             DomainErrorCodes.BRANCH_NOT_FOUND,
             `Branch "${input.branchName}" not found`
           );
         }
-        
+
         // Create branch info and search in branch
         const branchInfo = BranchInfo.create(input.branchName);
         documents = await this.branchRepository.findDocumentsByTags(branchInfo, tags);
@@ -119,40 +124,38 @@ export class SearchDocumentsByTagsUseCase implements IUseCase<SearchDocumentsByT
         // Search in global memory bank
         documents = await this.globalRepository.findDocumentsByTags(tags);
       }
-      
+
       // Filter documents if matchAllTags is true
       if (matchAllTags && tags.length > 1) {
-        documents = documents.filter(doc => {
+        documents = documents.filter((doc) => {
           // Check if document contains all the search tags
-          return tags.every(searchTag => 
-            doc.tags.some(docTag => docTag.equals(searchTag))
-          );
+          return tags.every((searchTag) => doc.tags.some((docTag) => docTag.equals(searchTag)));
         });
       }
-      
+
       // Transform to DTOs
-      const documentDTOs = documents.map(doc => ({
+      const documentDTOs = documents.map((doc) => ({
         path: doc.path.value,
         content: doc.content,
-        tags: doc.tags.map(tag => tag.value),
-        lastModified: doc.lastModified.toISOString()
+        tags: doc.tags.map((tag) => tag.value),
+        lastModified: doc.lastModified.toISOString(),
       }));
-      
+
       return {
         documents: documentDTOs,
         searchInfo: {
           count: documentDTOs.length,
           searchedTags: input.tags,
           matchedAllTags: matchAllTags,
-          searchLocation
-        }
+          searchLocation,
+        },
       };
     } catch (error) {
       // Re-throw domain and application errors
       if (error instanceof DomainError || error instanceof ApplicationError) {
         throw error;
       }
-      
+
       // Wrap other errors
       throw new ApplicationError(
         ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,

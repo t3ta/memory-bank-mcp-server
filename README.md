@@ -1,8 +1,8 @@
-# Memory Bank MCP Server
+# Memory Bank MCP Server 2.0
 
 This project is inspired by [Cline Memory Bank](https://github.com/nickbaumann98/cline_docs/blob/main/prompting/custom%20instructions%20library/cline-memory-bank.md) from the [nickbaumann98/cline_docs](https://github.com/nickbaumann98/cline_docs) repository, which provides an excellent foundation for managing Claude's memory in software projects.
 
-A Memory Bank implementation for managing project documentation and context across sessions. This server helps Claude maintain consistent project knowledge through global and branch-specific memory banks.
+A Memory Bank implementation for managing project documentation and context across sessions. This server helps Claude maintain consistent project knowledge through global and branch-specific memory banks. Version 2.0 introduces JSON-based structured document storage, enhanced API, and multilingual support.
 
 ## Usage
 
@@ -57,9 +57,68 @@ memory-bank --help
 
 - **--docs, -d**: Path to docs directory (default: './docs')
 - **--verbose, -v**: Run with verbose logging (default: false)
-- **--language, -l**: Language for templates ('en' or 'ja', default: 'en')
+- **--language, -l**: Language for templates ('en', 'ja' or 'zh', default: 'en')
 - **--file, -f**: Read content from file (for write commands)
 - **--format**: Output format for read-core-files ('json' or 'pretty', default: 'pretty')
+
+## What's New in 2.0
+
+### JSON-based Document Structure
+
+Memory Bank 2.0 introduces a new JSON-based architecture for all documents, providing:
+
+- Better structure and validation through schema-based documents
+- Enhanced programmatic accessibility
+- Improved search and filtering capabilities
+- Future-proof design for database integration
+
+JSON documents follow this structure:
+
+```json
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "unique-id",
+    "title": "Document Title",
+    "documentType": "document_type",
+    "path": "relative/path.json",
+    "tags": ["tag1", "tag2"],
+    "lastModified": "2025-03-17T00:00:00Z",
+    "createdAt": "2025-03-17T00:00:00Z",
+    "version": 1
+  },
+  "content": {
+    // Document type-specific content
+  }
+}
+```
+
+### Markdown to JSON Migration
+
+Memory Bank 2.0 includes built-in migration tools:
+
+- Automatic migration on server startup
+- Original file backups before conversion
+- Schema validation for generated JSON files
+- Manual migration commands
+
+During the transition period, both formats are supported, but Markdown support will eventually be deprecated.
+
+### Enhanced API
+
+- New `read_context` command for fetching combined information
+- Multilingual support (English, Japanese, Chinese)
+- Template-based document initialization
+- Improved error handling and validation
+
+### Clean Architecture Implementation
+
+The codebase has been refactored to follow clean architecture principles:
+
+- Domain-centric design with explicit layers
+- Separation of concerns for better testability
+- Framework-agnostic core business logic
+- Improved maintainability and extensibility
 
 ## Core Concepts
 
@@ -78,14 +137,16 @@ Example structure:
 
 ```
 docs/global-memory-bank/
-  ├── architecture.md      # System architecture
-  ├── coding-standards.md  # Coding conventions
-  ├── domain-models.md     # Domain model definitions
-  ├── glossary.md          # Terminology
-  ├── tech-stack.md        # Technology stack
-  ├── user-guide.md        # User guide
-  └── tags/                # Information organization
+  ├── architecture.json      # System architecture
+  ├── coding-standards.json  # Coding conventions
+  ├── domain-models.json     # Domain model definitions
+  ├── glossary.json          # Terminology
+  ├── tech-stack.json        # Technology stack
+  ├── user-guide.json        # User guide
+  └── tags/                  # Information organization
 ```
+
+> Note: Both .md and .json formats are supported, but .json is recommended for new documents.
 
 ### Branch Memory Bank
 
@@ -100,11 +161,13 @@ Example structure:
 
 ```
 docs/branch-memory-bank/feature-login/
-  ├── branchContext.md   # Branch purpose and stories
-  ├── activeContext.md   # Current work state
-  ├── systemPatterns.md  # Technical decisions
-  └── progress.md        # Implementation status
+  ├── branchContext.json   # Branch purpose and stories
+  ├── activeContext.json   # Current work state
+  ├── systemPatterns.json  # Technical decisions
+  └── progress.json        # Implementation status
 ```
+
+> Note: Both .md and .json formats are supported, but .json is recommended for new documents.
 
 ## API
 
@@ -140,30 +203,40 @@ docs/branch-memory-bank/feature-login/
     - `path` (string): Document path
   - Returns document content and metadata
 
+- **read_context**
+  - Read all context information (rules, branch memory bank, global memory bank) at once
+  - Input:
+    - `branch` (string): Branch name (required if includeBranchMemory is true)
+    - `language` (string): Language code ('en', 'ja', or 'zh', default: 'ja')
+    - `includeRules` (boolean): Whether to include rules (default: true)
+    - `includeBranchMemory` (boolean): Whether to include branch memory bank (default: true)
+    - `includeGlobalMemory` (boolean): Whether to include global memory bank (default: true)
+  - Returns combined context information from requested sources
+
 - **read_branch_core_files**
   - Read all core files from the branch memory bank
   - Input:
     - `branch` (string): Branch name
   - Returns content and metadata for:
-    - branchContext.md
-    - activeContext.md
-    - systemPatterns.md
-    - progress.md
+    - branchContext.md/json
+    - activeContext.md/json
+    - systemPatterns.md/json
+    - progress.md/json
 
 - **read_global_core_files**
   - Read all core files from the global memory bank
   - Returns content and metadata for:
-    - architecture.md
-    - coding-standards.md
-    - domain-models.md
-    - glossary.md
-    - tech-stack.md
-    - user-guide.md
+    - architecture.md/json
+    - coding-standards.md/json
+    - domain-models.md/json
+    - glossary.md/json
+    - tech-stack.md/json
+    - user-guide.md/json
 
 - **read_rules**
   - Read the memory bank rules in specified language
   - Input:
-    - `language` (string): Language code ("en" or "ja")
+    - `language` (string): Language code ("en", "ja", or "zh")
   - Returns rules documentation
 
 
@@ -208,7 +281,7 @@ Add one of these configurations to your claude_desktop_config.json:
 Configuration options:
 
 - `MEMORY_BANK_ROOT`: Root directory for memory bank storage (default: `docs` in workspace)
-- `MEMORY_BANK_LANGUAGE`: Default language for templates ("en" or "ja", default: "en")
+- `MEMORY_BANK_LANGUAGE`: Default language for templates ("en", "ja", or "zh", default: "en")
 
 ### System Prompt
 

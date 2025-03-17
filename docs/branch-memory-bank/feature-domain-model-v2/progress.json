@@ -1,0 +1,32 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "48502646-0525-4760-b89c-fbe07d38a2d9",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.md",
+    "tags": [
+      "domain-model",
+      "v2",
+      "json",
+      "implementation"
+    ],
+    "lastModified": "2025-03-17T02:13:31.683Z",
+    "createdAt": "2025-03-17T02:13:31.683Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [
+      "フェーズ1のJSONスキーマ実装"
+    ],
+    "pendingImplementation": [
+      "DocumentId値オブジェクト",
+      "JsonDocumentエンティティ",
+      "DocumentPathクラスの拡張"
+    ],
+    "status": "フェーズ2の実装を開始したところです。まずはDocumentId値オブジェクトの実装から着手します。",
+    "knownIssues": [
+      "特になし"
+    ]
+  }
+}

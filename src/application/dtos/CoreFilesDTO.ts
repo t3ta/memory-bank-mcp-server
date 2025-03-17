@@ -6,22 +6,22 @@ export interface ActiveContextDTO {
    * Current work description
    */
   currentWork?: string;
-  
+
   /**
    * Recent changes list
    */
   recentChanges?: string[];
-  
+
   /**
    * Active decisions list
    */
   activeDecisions?: string[];
-  
+
   /**
    * Considerations list
    */
   considerations?: string[];
-  
+
   /**
    * Next steps list
    */
@@ -36,17 +36,17 @@ export interface ProgressDTO {
    * Current status
    */
   status?: string;
-  
+
   /**
    * Working features list
    */
   workingFeatures?: string[];
-  
+
   /**
    * Pending implementation list
    */
   pendingImplementation?: string[];
-  
+
   /**
    * Known issues list
    */
@@ -61,17 +61,17 @@ export interface TechnicalDecisionDTO {
    * Decision title
    */
   title: string;
-  
+
   /**
    * Decision context
    */
   context: string;
-  
+
   /**
    * Decision description
    */
   decision: string;
-  
+
   /**
    * Decision consequences
    */
@@ -96,12 +96,12 @@ export interface CoreFilesDTO {
    * Active context information
    */
   activeContext?: ActiveContextDTO;
-  
+
   /**
    * Progress information
    */
   progress?: ProgressDTO;
-  
+
   /**
    * System patterns information
    */

@@ -23,6 +23,9 @@ logs/
 *.sln
 *.sw?
 
+# Migration backups
+.backup_*/
+
 # OS generated files
 .DS_Store
 .DS_Store?

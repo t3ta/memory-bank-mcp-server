@@ -1,0 +1,17 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "ec6bf227-84a0-4ec2-a350-867cdc3605eb",
+    "title": "ブランチコンテキスト - feature/json-index",
+    "documentType": "branch_context",
+    "path": "branchContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.691Z",
+    "createdAt": "2025-03-17T02:13:31.691Z",
+    "version": 1
+  },
+  "content": {
+    "purpose": "このブランチでは、メモリードキュメントのタグインデックスをJSON形式で永続化する機能を実装します。これにより、タグを用いた高速な検索機能を提供し、アプリケーションの再起動後もインデックス情報を維持できるようにします。",
+    "userStories": []
+  }
+}

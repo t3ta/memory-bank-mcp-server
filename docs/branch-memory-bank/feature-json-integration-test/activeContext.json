@@ -1,0 +1,26 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "0d7b554c-6de2-4333-aa3b-ec61a34cd6ae",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.693Z",
+    "createdAt": "2025-03-17T02:13:31.693Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "統合テストシナリオの実装を進めています。特に基本的なCRUD操作の\nエンドツーエンドテストとパフォーマンステストの設計に焦点を当てています。",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": [
+      "残りのテストシナリオ実装",
+      "パフォーマンステストの実行",
+      "バグ修正の着手",
+      "CI/CD統合の完了",
+      "ドキュメントの更新"
+    ]
+  }
+}

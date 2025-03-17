@@ -1,0 +1,26 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "a52578a0-b64e-412b-8e74-98b0eb56ad8d",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.710Z",
+    "createdAt": "2025-03-17T02:13:31.710Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "JSONをベースファイルとしてMarkdownをプレゼンテーション用として位置づける実装。将来的にはSurrealDBのembeddedへの移行を見据えたデータ構造設計。",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": [
+      "Markdown/JSONパーサーと変換ユーティリティのテスト実装",
+      "リポジトリの統合テスト実装",
+      "サンプルJSONファイルの作成",
+      "CLIコマンドでのJSON対応明示化",
+      "ドキュメント同期機能の検討"
+    ]
+  }
+}

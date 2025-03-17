@@ -1,0 +1,137 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "system-patterns-001",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "patterns",
+      "architecture",
+      "design"
+    ],
+    "lastModified": "2025-03-17T12:40:00.000Z",
+    "createdAt": "2025-03-17T12:40:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "tech-001",
+        "title": "Clean Architecture採用",
+        "description": "コードベースを整理し、テスト容易性と保守性を向上させるためにClean Architectureを採用",
+        "context": "以前のコードベースは適切な構造を欠いており、機能追加や変更が困難だった",
+        "decision": "ドメイン層、アプリケーション層、インフラストラクチャ層、インターフェース層に分ける明確な責任分担を持つアーキテクチャを採用",
+        "consequences": [
+          "コードの責任範囲が明確になる",
+          "テストがより簡単になる",
+          "ドメインロジックとインフラストラクチャの関心事が分離される",
+          "初期の開発オーバーヘッドがあるが長期的なメリットがある"
+        ],
+        "status": "完了"
+      },
+      {
+        "id": "tech-002",
+        "title": "JSONベースのドキュメントモデル",
+        "description": "マークダウンからJSONベースのドキュメントモデルへの移行",
+        "context": "マークダウンベースのドキュメントは人間が読みやすいが、プログラムによる処理が難しい",
+        "decision": "ドキュメントをJSONベースのスキーマ検証可能な形式に移行し、Markdownサポートを段階的に廃止する",
+        "consequences": [
+          "プログラムによるアクセスと操作が容易になる",
+          "スキーマベースの検証が可能になる",
+          "構造化されたデータモデルが得られる",
+          "手動編集が若干難しくなる"
+        ],
+        "status": "完了"
+      },
+      {
+        "id": "tech-003",
+        "title": "マルチリンガルサポート",
+        "description": "英語、日本語、中国語のサポート追加",
+        "context": "国際的なユーザーベースに対応する必要がある",
+        "decision": "国際化（i18n）サポートを追加し、言語固有のテンプレートとメッセージを提供",
+        "consequences": [
+          "より広範なユーザーベースにアクセスできる",
+          "コード内の文字列を外部化する必要がある",
+          "各言語のテンプレートを維持する必要がある"
+        ],
+        "status": "完了"
+      },
+      {
+        "id": "tech-004",
+        "title": "ドメイン駆動設計（DDD）の要素",
+        "description": "DDDの原則を適用してドメインモデルを強化",
+        "context": "ドメインの概念が以前のコードで明確にモデル化されていなかった",
+        "decision": "エンティティ、値オブジェクト、集約、リポジトリなどのDDD概念を適用",
+        "consequences": [
+          "より豊かなドメインモデル",
+          "ビジネスルールのドメイン内でのカプセル化",
+          "より直感的なコード構成",
+          "ビジネス要件とのより良い整合性"
+        ],
+        "status": "完了"
+      }
+    ],
+    "codeStructure": [
+      {
+        "path": "src/domain",
+        "description": "ドメイン層：ビジネスロジックとエンティティ"
+      },
+      {
+        "path": "src/application",
+        "description": "アプリケーション層：ユースケースとDTO"
+      },
+      {
+        "path": "src/infrastructure",
+        "description": "インフラストラクチャ層：リポジトリ実装と外部サービス"
+      },
+      {
+        "path": "src/interface",
+        "description": "インターフェース層：コントローラーとプレゼンター"
+      },
+      {
+        "path": "src/main",
+        "description": "メイン層：アプリケーションのエントリーポイントと依存性注入"
+      },
+      {
+        "path": "src/migration",
+        "description": "マイグレーション：マークダウンからJSONへの変換ツール"
+      },
+      {
+        "path": "src/schemas",
+        "description": "スキーマ：JSON検証のためのスキーマ定義"
+      }
+    ],
+    "patterns": [
+      {
+        "name": "リポジトリパターン",
+        "description": "データアクセスを抽象化し、ドメインオブジェクトのコレクションのようなインターフェースを提供",
+        "usageLocations": [
+          "src/domain/repositories",
+          "src/infrastructure/repositories"
+        ]
+      },
+      {
+        "name": "ファクトリメソッド",
+        "description": "オブジェクト生成ロジックをカプセル化し、インスタンス生成を単一のメソッドに委譲",
+        "usageLocations": [
+          "src/domain/entities"
+        ]
+      },
+      {
+        "name": "依存性注入",
+        "description": "オブジェクトがその依存関係を直接作成するのではなく、外部から提供される",
+        "usageLocations": [
+          "src/main"
+        ]
+      },
+      {
+        "name": "ユースケース",
+        "description": "アプリケーションの振る舞いをカプセル化し、入力から出力への変換を処理",
+        "usageLocations": [
+          "src/application/usecases"
+        ]
+      }
+    ]
+  }
+}

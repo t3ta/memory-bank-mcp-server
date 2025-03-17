@@ -1,0 +1,46 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "branch-context-read-context",
+    "title": "read_context コマンド実装のブランチコンテキスト",
+    "documentType": "branchContext",
+    "path": "branchContext.json",
+    "tags": [
+      "core",
+      "branch-context",
+      "read-context",
+      "command"
+    ],
+    "lastModified": "2025-03-17T11:55:00.000Z",
+    "createdAt": "2025-03-17T11:55:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "purpose": "このブランチの目的は、3つの異なるコマンド（read_rules、read_branch_core_files、read_global_core_files）の機能を統合した新しい`read_context`コマンドをMemory Bank MCPサーバーに実装することです。",
+    "userStory": {
+      "problem": "現在、Memory Bank MCPサーバーのユーザーは、コンテキスト全体を把握するために複数のコマンドを個別に実行する必要があります。これは非効率的で、ユーザーエクスペリエンスを低下させています。",
+      "requirements": [
+        "ルール、ブランチメモリバンク、グローバルメモリバンクの情報を一度に取得できるようにすること",
+        "必要なコンポーネントのみを取得できるオプションパラメータを提供すること",
+        "言語選択のオプションを提供すること",
+        "安全性を考慮し、明示的なブランチ名の指定を要求すること"
+      ],
+      "expectedBehavior": [
+        "一度のコマンド実行で、ルール、ブランチメモリバンク、グローバルメモリバンクの情報を取得できる",
+        "取得するコンポーネントを選択できる（includeRules, includeBranchMemory, includeGlobalMemory）",
+        "言語を指定できる（en, ja）",
+        "ブランチメモリバンクを含める場合はブランチ名を指定する必要がある",
+        "エラーハンドリングが適切に行われる"
+      ]
+    },
+    "resources": {
+      "designDocument": "docs/global-memory-bank/read-context-command-design.json",
+      "implementationGuide": "docs/global-memory-bank/read-context-command-implementation.json"
+    },
+    "keyTechnologies": [
+      "TypeScript",
+      "Clean Architecture",
+      "Model Context Protocol"
+    ]
+  }
+}

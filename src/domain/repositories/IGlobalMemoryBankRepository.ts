@@ -1,6 +1,7 @@
 import { MemoryDocument } from '../entities/MemoryDocument.js';
 import { DocumentPath } from '../entities/DocumentPath.js';
 import { Tag } from '../entities/Tag.js';
+import { TagIndex } from '../../schemas/tag-index/tag-index-schema.js';
 
 /**
  * Repository interface for global memory bank
@@ -47,10 +48,32 @@ export interface IGlobalMemoryBankRepository {
   findDocumentsByTags(tags: Tag[]): Promise<MemoryDocument[]>;
 
   /**
-   * Update tags index in global memory bank
+   * Update tags index in global memory bank (legacy method)
    * @returns Promise resolving when done
+   * @deprecated Use saveTagIndex instead
    */
   updateTagsIndex(): Promise<void>;
+
+  /**
+   * Save tag index for global memory bank
+   * @param tagIndex Tag index to save
+   * @returns Promise resolving when done
+   */
+  saveTagIndex(tagIndex: TagIndex): Promise<void>;
+
+  /**
+   * Get tag index for global memory bank
+   * @returns Promise resolving to tag index if found, null otherwise
+   */
+  getTagIndex(): Promise<TagIndex | null>;
+
+  /**
+   * Find documents by tags in global memory bank using index
+   * @param tags Tags to search for
+   * @param matchAll If true, documents must have all tags (AND), otherwise any tag (OR)
+   * @returns Promise resolving to array of document paths
+   */
+  findDocumentPathsByTagsUsingIndex(tags: Tag[], matchAll?: boolean): Promise<DocumentPath[]>;
 
   /**
    * Validate global memory bank structure

@@ -5,11 +5,7 @@ import { BaseError } from './BaseError.js';
  * Used for external system integration errors, file system errors, etc.
  */
 export class InfrastructureError extends BaseError {
-  constructor(
-    code: string,
-    message: string,
-    details?: Record<string, unknown>
-  ) {
+  constructor(code: string, message: string, details?: Record<string, unknown>) {
     super(`INFRA_ERROR.${code}`, message, details);
   }
 }
@@ -27,6 +23,9 @@ export const InfrastructureErrorCodes = {
   CONFIGURATION_ERROR: 'CONFIGURATION_ERROR',
   MCP_SERVER_ERROR: 'MCP_SERVER_ERROR',
   GIT_ERROR: 'GIT_ERROR',
+  PERSISTENCE_ERROR: 'PERSISTENCE_ERROR',
+  // 追加したエラーコード
+  INVALID_ARGUMENT: 'INVALID_ARGUMENT',
 } as const;
 
 export type InfrastructureErrorCode = keyof typeof InfrastructureErrorCodes;

@@ -1,0 +1,79 @@
+{
+  "schema": "template_v1",
+  "metadata": {
+    "id": "system-patterns-template",
+    "name": {
+      "ja": "システムパターンテンプレート",
+      "en": "System Patterns Template"
+    },
+    "description": {
+      "ja": "技術的決定事項やアーキテクチャパターンを記録するためのテンプレート",
+      "en": "Template for documenting technical decisions and architectural patterns"
+    },
+    "type": "branch-memory",
+    "lastModified": "2025-03-17T10:00:00.000Z"
+  },
+  "content": {
+    "sections": {
+      "technicalDecisions": {
+        "title": {
+          "ja": "技術的決定事項",
+          "en": "Technical Decisions"
+        },
+        "content": {
+          "ja": "<!-- 主要な技術的判断を記述（ADR形式が望ましい） -->\n\n### テスト方針\n\n#### コンテキスト\n\n<!--意思決定の背景-->\n\n#### 決定事項\n\n<!--どのような決定をしたか-->\n\n#### 影響\n\n<!--その決定の影響-->\n\n### フォルダ構造\n\n#### コンテキスト\n\n<!--意思決定の背景-->\n\n#### 決定事項\n\n<!--どのような決定をしたか-->\n\n#### 影響\n\n<!--その決定の影響-->",
+          "en": "<!-- Describe major technical decisions (ADR format preferred) -->\n\n### Testing Strategy\n\n#### Context\n\n<!--Background for the decision-->\n\n#### Decision\n\n<!--What was decided-->\n\n#### Consequences\n\n<!--Impact of the decision-->\n\n### Folder Structure\n\n#### Context\n\n<!--Background for the decision-->\n\n#### Decision\n\n<!--What was decided-->\n\n#### Consequences\n\n<!--Impact of the decision-->"
+        },
+        "optional": false
+      },
+      "fileStructure": {
+        "title": {
+          "ja": "関連するファイルやディレクトリ構造",
+          "en": "Related Files and Directory Structure"
+        },
+        "content": {
+          "ja": "<!-- コードの主要なファイル構造やディレクトリ構造を記述 -->\n```\n# ディレクトリ構造例\nsrc/\n  ├── domain/\n  ├── application/\n  ├── infrastructure/\n  └── interface/\n```",
+          "en": "<!-- Describe the main file structure or directory layout of the code -->\n```\n# Example directory structure\nsrc/\n  ├── domain/\n  ├── application/\n  ├── infrastructure/\n  └── interface/\n```"
+        },
+        "optional": true
+      },
+      "designPatterns": {
+        "title": {
+          "ja": "デザインパターン",
+          "en": "Design Patterns"
+        },
+        "content": {
+          "ja": "<!-- 使用しているデザインパターンとその適用方法を記述 -->\n{{DESIGN_PATTERNS}}",
+          "en": "<!-- Describe design patterns being used and how they are applied -->\n{{DESIGN_PATTERNS}}"
+        },
+        "optional": true
+      },
+      "architecture": {
+        "title": {
+          "ja": "アーキテクチャ",
+          "en": "Architecture"
+        },
+        "content": {
+          "ja": "<!-- アーキテクチャの概要や特徴的な部分を記述 -->\n{{ARCHITECTURE}}",
+          "en": "<!-- Describe the architecture overview or notable aspects -->\n{{ARCHITECTURE}}"
+        },
+        "optional": true
+      },
+      "footer": {
+        "title": {
+          "ja": "",
+          "en": ""
+        },
+        "content": {
+          "ja": "---\n\n_このドキュメントはブランチメモリーバンクの一部です_",
+          "en": "---\n\n_This document is part of the branch memory bank_"
+        },
+        "optional": false
+      }
+    },
+    "placeholders": {
+      "DESIGN_PATTERNS": "デザインパターンのプレースホルダー",
+      "ARCHITECTURE": "アーキテクチャのプレースホルダー"
+    }
+  }
+}

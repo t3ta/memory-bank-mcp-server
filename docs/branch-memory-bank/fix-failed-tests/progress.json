@@ -1,0 +1,29 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "95e6d6f0-aa54-4877-8412-bf51cbcd6176",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.713Z",
+    "createdAt": "2025-03-17T02:13:31.713Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [
+      "ReadBranchCoreFilesUseCase.tsのbranchContext取得処理",
+      "空のセクションに対する初期化処理の一部",
+      "ts-nodeの拡張子解決の設定"
+    ],
+    "pendingImplementation": [
+      "ReadBranchCoreFilesUseCase.tsの空セクション解析の完全な修正",
+      "残りのテスト修正"
+    ],
+    "status": "進行中",
+    "knownIssues": [
+      "現在の実装では空のセクションが\"## 最近の変更点\"という文字列として取得されてしまう",
+      "ModuleNotFoundエラー: '/src/main/index.js'がインポートできない"
+    ]
+  }
+}

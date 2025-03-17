@@ -1,0 +1,26 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "0c03d3ee-932f-4a2c-88d7-1dac9f616c46",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.700Z",
+    "createdAt": "2025-03-17T02:13:31.700Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "ユースケースレイヤーの基本実装を進めています。特にCRUD操作の基本ユースケースと、\nエラーハンドリングの統一的な実装に焦点を当てています。",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": [
+      "CRUD操作のユースケース実装完了",
+      "検索機能の実装開始",
+      "インデックス管理機能の実装",
+      "テストケースの拡充",
+      "パフォーマンステストの準備"
+    ]
+  }
+}

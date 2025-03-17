@@ -1,0 +1,38 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "3dbd45a3-8f70-4ad5-bec4-d6c7e2c0c679",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.711Z",
+    "createdAt": "2025-03-17T02:13:31.711Z",
+    "version": 1
+  },
+  "content": {
+    "purpose": "現在のMarkdown形式のメモリバンクをJSON形式に変換する機能を追加し、より構造化されたデータ管理を可能にします。",
+    "userStories": [
+      {
+        "description": "メモリバンクのドキュメントをJSON形式で保存・読み込みできるようにする",
+        "completed": false
+      },
+      {
+        "description": "既存のMarkdownファイルとの互換性を維持する",
+        "completed": false
+      },
+      {
+        "description": "MarkdownとJSONの相互変換をサポートする",
+        "completed": false
+      },
+      {
+        "description": "JSON形式のデータに対する効率的な検索・フィルタリング機能を提供する",
+        "completed": false
+      },
+      {
+        "description": "CLIツールでJSON形式をサポートする",
+        "completed": false
+      }
+    ]
+  }
+}

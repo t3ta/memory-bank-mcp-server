@@ -1,0 +1,16 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "1789598f-83dc-464c-bf84-6f69f83183b8",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.md",
+    "tags": [],
+    "lastModified": "2025-03-17T02:13:31.710Z",
+    "createdAt": "2025-03-17T02:13:31.710Z",
+    "version": 1
+  },
+  "content": {
+    "technicalDecisions": []
+  }
+}
