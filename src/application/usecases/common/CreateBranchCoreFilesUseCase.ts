@@ -48,9 +48,9 @@ export class CreateBranchCoreFilesUseCase
   implements IUseCase<CreateBranchCoreFilesInput, CreateBranchCoreFilesOutput>
 {
   // Core file paths
-  private readonly ACTIVE_CONTEXT_PATH = 'activeContext.md';
-  private readonly PROGRESS_PATH = 'progress.md';
-  private readonly SYSTEM_PATTERNS_PATH = 'systemPatterns.md';
+  private readonly ACTIVE_CONTEXT_PATH = 'activeContext.json';
+  private readonly PROGRESS_PATH = 'progress.json';
+  private readonly SYSTEM_PATTERNS_PATH = 'systemPatterns.json';
 
   /**
    * Constructor
@@ -94,7 +94,7 @@ export class CreateBranchCoreFilesUseCase
 
       // Update each core file if provided
       if (input.files.activeContext) {
-        const content = this.generateActiveContextMarkdown(input.files.activeContext);
+        const content = this.generateActiveContextJSON(input.files.activeContext);
         const document = MemoryDocument.create({
           path: DocumentPath.create(this.ACTIVE_CONTEXT_PATH),
           content,
@@ -107,7 +107,7 @@ export class CreateBranchCoreFilesUseCase
       }
 
       if (input.files.progress) {
-        const content = this.generateProgressMarkdown(input.files.progress);
+        const content = this.generateProgressJSON(input.files.progress);
         const document = MemoryDocument.create({
           path: DocumentPath.create(this.PROGRESS_PATH),
           content,
@@ -120,7 +120,7 @@ export class CreateBranchCoreFilesUseCase
       }
 
       if (input.files.systemPatterns && input.files.systemPatterns.technicalDecisions) {
-        const content = this.generateSystemPatternsMarkdown(input.files.systemPatterns);
+        const content = this.generateSystemPatternsJSON(input.files.systemPatterns);
         const document = MemoryDocument.create({
           path: DocumentPath.create(this.SYSTEM_PATTERNS_PATH),
           content,
@@ -152,132 +152,236 @@ export class CreateBranchCoreFilesUseCase
   }
 
   /**
-   * Generate markdown for active context
+   * Generate JSON for active context
    * @param activeContext Active context DTO
-   * @returns Markdown content
+   * @returns JSON content as string
    */
-  private generateActiveContextMarkdown(activeContext: ActiveContextDTO): string {
-    let markdown = '# アクティブコンテキスト\n\n';
+  private generateActiveContextJSON(activeContext: ActiveContextDTO): string {
+    const now = new Date();
 
-    // Current Work
-    markdown += '## 現在の作業内容\n\n';
-    if (activeContext.currentWork) {
-      markdown += `${activeContext.currentWork}\n`;
-    }
+    // Create structured JSON document
+    const jsonDoc = {
+      schema: 'memory_document_v2',
+      metadata: {
+        id: this.generateUUID(),
+        title: 'アクティブコンテキスト',
+        documentType: 'active_context',
+        path: this.ACTIVE_CONTEXT_PATH,
+        tags: ['core', 'active-context'],
+        lastModified: now.toISOString(),
+        createdAt: now.toISOString(),
+        version: 1
+      },
+      content: {
+        currentWork: activeContext.currentWork || '',
+        recentChanges: this.formatRecentChanges(activeContext.recentChanges || []),
+        activeDecisions: this.formatActiveDecisions(activeContext.activeDecisions || []),
+        considerations: this.formatConsiderations(activeContext.considerations || []),
+        nextSteps: this.formatNextSteps(activeContext.nextSteps || [])
+      }
+    };
 
-    // Recent Changes
-    markdown += '## 最近の変更点\n\n';
-    if (activeContext.recentChanges && activeContext.recentChanges.length > 0) {
-      activeContext.recentChanges.forEach((change) => {
-        markdown += `- ${change}\n`;
-      });
-    }
-
-    // Active Decisions
-    markdown += '## アクティブな決定事項\n\n';
-    if (activeContext.activeDecisions && activeContext.activeDecisions.length > 0) {
-      activeContext.activeDecisions.forEach((decision) => {
-        markdown += `- ${decision}\n`;
-      });
-    }
-
-    // Considerations
-    markdown += '## 検討事項\n\n';
-    if (activeContext.considerations && activeContext.considerations.length > 0) {
-      activeContext.considerations.forEach((consideration) => {
-        markdown += `- ${consideration}\n`;
-      });
-    }
-
-    // Next Steps
-    markdown += '## 次のステップ\n\n';
-    if (activeContext.nextSteps && activeContext.nextSteps.length > 0) {
-      activeContext.nextSteps.forEach((step) => {
-        markdown += `- ${step}\n`;
-      });
-    }
-
-    return markdown;
+    return JSON.stringify(jsonDoc, null, 2);
   }
 
   /**
-   * Generate markdown for progress
+   * Format recent changes to structured format
+   * @param changes Array of change strings
+   * @returns Structured changes
+   */
+  private formatRecentChanges(changes: string[]): Array<{date: string, description: string}> {
+    return changes.map(change => ({
+      date: new Date().toISOString(),
+      description: change
+    }));
+  }
+
+  /**
+   * Format active decisions to structured format
+   * @param decisions Array of decision strings
+   * @returns Structured decisions
+   */
+  private formatActiveDecisions(decisions: string[]): Array<{id: string, description: string, reason?: string}> {
+    return decisions.map(decision => ({
+      id: this.generateUUID(),
+      description: decision
+    }));
+  }
+
+  /**
+   * Format considerations to structured format
+   * @param considerations Array of consideration strings
+   * @returns Structured considerations
+   */
+  private formatConsiderations(considerations: string[]): Array<{id: string, description: string, status: string}> {
+    return considerations.map(consideration => ({
+      id: this.generateUUID(),
+      description: consideration,
+      status: 'open'
+    }));
+  }
+
+  /**
+   * Format next steps to structured format
+   * @param steps Array of step strings
+   * @returns Structured steps
+   */
+  private formatNextSteps(steps: string[]): Array<{id: string, description: string, priority: string}> {
+    return steps.map(step => ({
+      id: this.generateUUID(),
+      description: step,
+      priority: 'medium'
+    }));
+  }
+
+  /**
+   * Generate JSON for progress
    * @param progress Progress DTO
-   * @returns Markdown content
+   * @returns JSON content as string
    */
-  private generateProgressMarkdown(progress: ProgressDTO): string {
-    let markdown = '# 進捗状況\n\n';
+  private generateProgressJSON(progress: ProgressDTO): string {
+    const now = new Date();
 
-    // Working Features
-    markdown += '## 動作している機能\n\n';
-    if (progress.workingFeatures && progress.workingFeatures.length > 0) {
-      progress.workingFeatures.forEach((feature) => {
-        markdown += `- ${feature}\n`;
-      });
-    }
+    // Create structured JSON document
+    const jsonDoc = {
+      schema: 'memory_document_v2',
+      metadata: {
+        id: this.generateUUID(),
+        title: '進捗状況',
+        documentType: 'progress',
+        path: this.PROGRESS_PATH,
+        tags: ['core', 'progress'],
+        lastModified: now.toISOString(),
+        createdAt: now.toISOString(),
+        version: 1
+      },
+      content: {
+        workingFeatures: this.formatWorkingFeatures(progress.workingFeatures || []),
+        pendingImplementation: this.formatPendingImplementation(progress.pendingImplementation || []),
+        status: progress.status || '',
+        completionPercentage: 0,
+        knownIssues: this.formatKnownIssues(progress.knownIssues || [])
+      }
+    };
 
-    // Pending Implementation
-    markdown += '## 未実装の機能\n\n';
-    if (progress.pendingImplementation && progress.pendingImplementation.length > 0) {
-      progress.pendingImplementation.forEach((item) => {
-        markdown += `- ${item}\n`;
-      });
-    }
-
-    // Current Status
-    markdown += '## 現在の状態\n\n';
-    if (progress.status) {
-      markdown += `${progress.status}\n`;
-    }
-
-    // Known Issues
-    markdown += '## 既知の問題\n\n';
-    if (progress.knownIssues && progress.knownIssues.length > 0) {
-      progress.knownIssues.forEach((issue) => {
-        markdown += `- ${issue}\n`;
-      });
-    }
-
-    return markdown;
+    return JSON.stringify(jsonDoc, null, 2);
   }
 
   /**
-   * Generate markdown for system patterns
-   * @param systemPatterns System patterns DTO
-   * @returns Markdown content
+   * Format working features to structured format
+   * @param features Array of feature strings
+   * @returns Structured features
    */
-  private generateSystemPatternsMarkdown(systemPatterns: SystemPatternsDTO): string {
-    let markdown = '# システムパターン\n\n';
+  private formatWorkingFeatures(features: string[]): Array<{id: string, description: string, implementedAt: string}> {
+    return features.map(feature => ({
+      id: this.generateUUID(),
+      description: feature,
+      implementedAt: new Date().toISOString()
+    }));
+  }
 
-    // Technical Decisions
-    markdown += '## 技術的決定事項\n\n';
+  /**
+   * Format pending implementation to structured format
+   * @param items Array of pending item strings
+   * @returns Structured pending items
+   */
+  private formatPendingImplementation(items: string[]): Array<{id: string, description: string, priority: string, estimatedCompletion?: string}> {
+    return items.map(item => ({
+      id: this.generateUUID(),
+      description: item,
+      priority: 'medium'
+    }));
+  }
 
-    if (systemPatterns.technicalDecisions && systemPatterns.technicalDecisions.length > 0) {
-      systemPatterns.technicalDecisions.forEach((decision) => {
-        // Decision title
-        markdown += `### ${decision.title}\n\n`;
+  /**
+   * Format known issues to structured format
+   * @param issues Array of issue strings
+   * @returns Structured issues
+   */
+  private formatKnownIssues(issues: string[]): Array<{id: string, description: string, severity: string, workaround?: string}> {
+    return issues.map(issue => ({
+      id: this.generateUUID(),
+      description: issue,
+      severity: 'medium'
+    }));
+  }
 
-        // Context
-        markdown += '#### コンテキスト\n\n';
-        markdown += `${decision.context}\n\n`;
+  /**
+   * Generate JSON for system patterns
+   * @param systemPatterns System patterns DTO
+   * @returns JSON content as string
+   */
+  private generateSystemPatternsJSON(systemPatterns: SystemPatternsDTO): string {
+    const now = new Date();
 
-        // Decision
-        markdown += '#### 決定事項\n\n';
-        markdown += `${decision.decision}\n\n`;
+    // Create structured JSON document
+    const jsonDoc = {
+      schema: 'memory_document_v2',
+      metadata: {
+        id: this.generateUUID(),
+        title: 'システムパターン',
+        documentType: 'system_patterns',
+        path: this.SYSTEM_PATTERNS_PATH,
+        tags: ['core', 'system-patterns'],
+        lastModified: now.toISOString(),
+        createdAt: now.toISOString(),
+        version: 1
+      },
+      content: {
+        technicalDecisions: this.formatTechnicalDecisions(systemPatterns.technicalDecisions || []),
+        implementationPatterns: []
+      }
+    };
 
-        // Consequences
-        markdown += '#### 影響\n\n';
-        if (decision.consequences && decision.consequences.length > 0) {
-          decision.consequences.forEach((consequence) => {
-            markdown += `- ${consequence}\n`;
-          });
-        }
+    return JSON.stringify(jsonDoc, null, 2);
+  }
 
-        markdown += '\n';
-      });
-    }
+  /**
+   * Format technical decisions to structured format
+   * @param decisions Array of technical decision DTOs
+   * @returns Structured technical decisions
+   */
+  private formatTechnicalDecisions(decisions: TechnicalDecisionDTO[]): Array<{
+    id: string,
+    title: string,
+    context: string,
+    decision: string,
+    consequences: {
+      positive: string[],
+      negative: string[]
+    },
+    status: string,
+    date: string,
+    alternatives?: Array<{
+      description: string,
+      reason?: string
+    }>
+  }> {
+    return decisions.map(decision => ({
+      id: this.generateUUID(),
+      title: decision.title,
+      context: decision.context,
+      decision: decision.decision,
+      consequences: {
+        positive: decision.consequences || [],
+        negative: []
+      },
+      status: 'accepted',
+      date: new Date().toISOString(),
+      alternatives: []
+    }));
+  }
 
-    return markdown;
+  /**
+   * Generate a UUID for document IDs
+   * @returns UUID string
+   */
+  private generateUUID(): string {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
   }
 }
 
@@ -286,5 +390,5 @@ import {
   ActiveContextDTO,
   ProgressDTO,
   SystemPatternsDTO,
-  // TechnicalDecisionDTOはここでは直接使用されていないため削除
+  TechnicalDecisionDTO
 } from '../../dtos/CoreFilesDTO.js';

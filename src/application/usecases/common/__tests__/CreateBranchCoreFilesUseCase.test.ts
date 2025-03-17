@@ -78,9 +78,9 @@ describe('CreateBranchCoreFilesUseCase', () => {
     expect(result).toBeDefined();
     expect(result.message).toContain('Successfully updated 3 core files');
     expect(result.updatedFiles).toHaveLength(3);
-    expect(result.updatedFiles).toContain('activeContext.md');
-    expect(result.updatedFiles).toContain('progress.md');
-    expect(result.updatedFiles).toContain('systemPatterns.md');
+    expect(result.updatedFiles).toContain('activeContext.json');
+    expect(result.updatedFiles).toContain('progress.json');
+    expect(result.updatedFiles).toContain('systemPatterns.json');
 
     // Verify repository calls
     expect(mockBranchRepository.exists).toHaveBeenCalledWith(branchName);
@@ -94,37 +94,75 @@ describe('CreateBranchCoreFilesUseCase', () => {
     expect(saveDocumentCalls[1][0]).toEqual(BranchInfo.create(branchName));
     expect(saveDocumentCalls[2][0]).toEqual(BranchInfo.create(branchName));
 
-    // Check documents - this is more complex as we just want to verify specific properties
+    // Check documents - verify JSON structure and content
     // First call - activeContext
     const activeContextDoc = saveDocumentCalls[0][1] as MemoryDocument;
-    expect(activeContextDoc.path.value).toBe('activeContext.md');
-    expect(activeContextDoc.content).toContain('# アクティブコンテキスト');
-    expect(activeContextDoc.content).toContain('Testing the feature');
-    expect(activeContextDoc.content).toContain('Added tests');
-    expect(activeContextDoc.content).toContain('Fixed bugs');
-    expect(activeContextDoc.content).toContain('Use Jest for testing');
-    expect(activeContextDoc.content).toContain('Test coverage thresholds');
-    expect(activeContextDoc.content).toContain('Implement more tests');
-    expect(activeContextDoc.content).toContain('Set up CI');
+    expect(activeContextDoc.path.value).toBe('activeContext.json');
+
+    // Parse JSON content
+    const activeContextJson = JSON.parse(activeContextDoc.content);
+    expect(activeContextJson.schema).toBe('memory_document_v2');
+    expect(activeContextJson.metadata.title).toBe('アクティブコンテキスト');
+    expect(activeContextJson.metadata.documentType).toBe('active_context');
+    expect(activeContextJson.metadata.path).toBe('activeContext.json');
+    expect(activeContextJson.metadata.tags).toContain('core');
+    expect(activeContextJson.metadata.tags).toContain('active-context');
+
+    // Check content
+    expect(activeContextJson.content.currentWork).toBe('Testing the feature');
+    expect(activeContextJson.content.recentChanges).toHaveLength(2);
+    expect(activeContextJson.content.recentChanges[0].description).toBe('Added tests');
+    expect(activeContextJson.content.recentChanges[1].description).toBe('Fixed bugs');
+    expect(activeContextJson.content.activeDecisions).toHaveLength(1);
+    expect(activeContextJson.content.activeDecisions[0].description).toBe('Use Jest for testing');
+    expect(activeContextJson.content.considerations).toHaveLength(1);
+    expect(activeContextJson.content.considerations[0].description).toBe('Test coverage thresholds');
+    expect(activeContextJson.content.nextSteps).toHaveLength(2);
+    expect(activeContextJson.content.nextSteps[0].description).toBe('Implement more tests');
+    expect(activeContextJson.content.nextSteps[1].description).toBe('Set up CI');
 
     // Second call - progress
     const progressDoc = saveDocumentCalls[1][1] as MemoryDocument;
-    expect(progressDoc.path.value).toBe('progress.md');
-    expect(progressDoc.content).toContain('# 進捗状況');
-    expect(progressDoc.content).toContain('In progress');
-    expect(progressDoc.content).toContain('Basic functionality');
-    expect(progressDoc.content).toContain('Advanced features');
-    expect(progressDoc.content).toContain('Performance issue');
+    expect(progressDoc.path.value).toBe('progress.json');
+
+    // Parse JSON content
+    const progressJson = JSON.parse(progressDoc.content);
+    expect(progressJson.schema).toBe('memory_document_v2');
+    expect(progressJson.metadata.title).toBe('進捗状況');
+    expect(progressJson.metadata.documentType).toBe('progress');
+    expect(progressJson.metadata.path).toBe('progress.json');
+    expect(progressJson.metadata.tags).toContain('core');
+    expect(progressJson.metadata.tags).toContain('progress');
+
+    // Check content
+    expect(progressJson.content.status).toBe('In progress');
+    expect(progressJson.content.workingFeatures).toHaveLength(1);
+    expect(progressJson.content.workingFeatures[0].description).toBe('Basic functionality');
+    expect(progressJson.content.pendingImplementation).toHaveLength(1);
+    expect(progressJson.content.pendingImplementation[0].description).toBe('Advanced features');
+    expect(progressJson.content.knownIssues).toHaveLength(1);
+    expect(progressJson.content.knownIssues[0].description).toBe('Performance issue');
 
     // Third call - systemPatterns
     const systemPatternsDoc = saveDocumentCalls[2][1] as MemoryDocument;
-    expect(systemPatternsDoc.path.value).toBe('systemPatterns.md');
-    expect(systemPatternsDoc.content).toContain('# システムパターン');
-    expect(systemPatternsDoc.content).toContain('Test Framework');
-    expect(systemPatternsDoc.content).toContain('We need to choose a test framework');
-    expect(systemPatternsDoc.content).toContain('We will use Jest');
-    expect(systemPatternsDoc.content).toContain('Better integration with TypeScript');
-    expect(systemPatternsDoc.content).toContain('Good mocking capabilities');
+    expect(systemPatternsDoc.path.value).toBe('systemPatterns.json');
+
+    // Parse JSON content
+    const systemPatternsJson = JSON.parse(systemPatternsDoc.content);
+    expect(systemPatternsJson.schema).toBe('memory_document_v2');
+    expect(systemPatternsJson.metadata.title).toBe('システムパターン');
+    expect(systemPatternsJson.metadata.documentType).toBe('system_patterns');
+    expect(systemPatternsJson.metadata.path).toBe('systemPatterns.json');
+    expect(systemPatternsJson.metadata.tags).toContain('core');
+    expect(systemPatternsJson.metadata.tags).toContain('system-patterns');
+
+    // Check content
+    expect(systemPatternsJson.content.technicalDecisions).toHaveLength(1);
+    expect(systemPatternsJson.content.technicalDecisions[0].title).toBe('Test Framework');
+    expect(systemPatternsJson.content.technicalDecisions[0].context).toBe('We need to choose a test framework');
+    expect(systemPatternsJson.content.technicalDecisions[0].decision).toBe('We will use Jest');
+    expect(systemPatternsJson.content.technicalDecisions[0].consequences.positive).toContain('Better integration with TypeScript');
+    expect(systemPatternsJson.content.technicalDecisions[0].consequences.positive).toContain('Good mocking capabilities');
   });
 
   it('should create only specified core files', async () => {
@@ -152,7 +190,7 @@ describe('CreateBranchCoreFilesUseCase', () => {
     expect(result).toBeDefined();
     expect(result.message).toContain('Successfully updated 1 core files');
     expect(result.updatedFiles).toHaveLength(1);
-    expect(result.updatedFiles).toContain('activeContext.md');
+    expect(result.updatedFiles).toContain('activeContext.json');
 
     // Verify repository calls
     expect(mockBranchRepository.exists).toHaveBeenCalledWith(branchName);
@@ -163,10 +201,15 @@ describe('CreateBranchCoreFilesUseCase', () => {
 
     // First call - activeContext
     const activeContextDoc = saveDocumentCalls[0][1] as MemoryDocument;
-    expect(activeContextDoc.path.value).toBe('activeContext.md');
-    expect(activeContextDoc.content).toContain('# アクティブコンテキスト');
-    expect(activeContextDoc.content).toContain('Testing the feature');
-    expect(activeContextDoc.content).toContain('Added tests');
+    expect(activeContextDoc.path.value).toBe('activeContext.json');
+
+    // Parse JSON content
+    const activeContextJson = JSON.parse(activeContextDoc.content);
+    expect(activeContextJson.schema).toBe('memory_document_v2');
+    expect(activeContextJson.metadata.title).toBe('アクティブコンテキスト');
+    expect(activeContextJson.content.currentWork).toBe('Testing the feature');
+    expect(activeContextJson.content.recentChanges).toHaveLength(1);
+    expect(activeContextJson.content.recentChanges[0].description).toBe('Added tests');
   });
 
   it('should handle empty lists in input data', async () => {
@@ -202,8 +245,8 @@ describe('CreateBranchCoreFilesUseCase', () => {
     expect(result).toBeDefined();
     expect(result.message).toContain('Successfully updated 2 core files');
     expect(result.updatedFiles).toHaveLength(2);
-    expect(result.updatedFiles).toContain('activeContext.md');
-    expect(result.updatedFiles).toContain('progress.md');
+    expect(result.updatedFiles).toContain('activeContext.json');
+    expect(result.updatedFiles).toContain('progress.json');
 
     // Verify repository calls
     expect(mockBranchRepository.saveDocument).toHaveBeenCalledTimes(2);

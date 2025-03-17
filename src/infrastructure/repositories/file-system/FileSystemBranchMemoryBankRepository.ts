@@ -15,8 +15,7 @@ import {
 } from '../../../shared/errors/InfrastructureError.js';
 import { DomainError } from '../../../shared/errors/DomainError.js';
 import { FileSystemMemoryDocumentRepository } from './FileSystemMemoryDocumentRepository.js';
-import { extractListItems, extractSectionContent } from '../../../shared/utils/index.js';
-import { logger } from '../../../shared/utils/logger.js';
+import { extractListItems, extractSectionContent, logger } from '../../../shared/utils/index.js';
 import { TagIndex } from '../../../schemas/tag-index/tag-index-schema.js';
 
 /**
@@ -25,123 +24,269 @@ import { TagIndex } from '../../../schemas/tag-index/tag-index-schema.js';
 export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRepository {
   private readonly branchMemoryBankPath: string;
   private readonly coreDocuments = [
-    'branchContext.md',
-    'activeContext.md',
-    'systemPatterns.md',
-    'progress.md',
+    'branchContext.json',
+    'activeContext.json',
+    'systemPatterns.json',
+    'progress.json',
   ];
   private readonly defaultTemplates: Record<string, string | ((branchName: string) => string)> = {
-    'branchContext.md': (branchName: string) => `# ブランチコンテキスト
-
-## 目的
-
-ブランチ: ${branchName}
-作成日時: ${new Date().toISOString().split('T')[0]}
-
-このブランチは、[ブランチの目的を記述]
-
-## ユーザーストーリー
-
-### 解決する課題
-
-- [解決する課題1]
-- [解決する課題2]
-- [解決する課題3]
-
-### 必要な機能
-
-- [必要な機能1]
-- [必要な機能2]
-- [必要な機能3]
-
-### 期待される動作
-
-- [期待される動作1]
-- [期待される動作2]
-- [期待される動作3]
-`,
-    'activeContext.md': `# アクティブコンテキスト
-
-## 現在の作業内容
-
-[現在取り組んでいる作業の説明]
-
-## 最近の変更点
-
-- [変更点1]
-- [変更点2]
-- [変更点3]
-
-## アクティブな決定事項
-
-- [決定事項1]
-- [決定事項2]
-- [決定事項3]
-
-## 検討事項
-
-- [検討事項1]
-- [検討事項2]
-- [検討事項3]
-
-## 次のステップ
-
-1. [次のステップ1]
-2. [次のステップ2]
-3. [次のステップ3]
-`,
-    'systemPatterns.md': `# システムパターン
-
-## 技術的決定事項
-
-### [決定事項のタイトル]
-
-#### コンテキスト
-[決定の背景や理由]
-
-#### 決定事項
-[具体的な決定内容]
-
-#### 影響
-- [影響1]
-- [影響2]
-- [影響3]
-
-## 関連ファイルとディレクトリ構造
-
-\`\`\`
-[関連するディレクトリ構造]
-\`\`\`
-`,
-    'progress.md': `# 進捗状況
-
-## 動作している機能
-
-- [機能1]
-- [機能2]
-- [機能3]
-
-## 未実装の機能
-
-- [未実装の機能1]
-- [未実装の機能2]
-- [未実装の機能3]
-
-## 現在の状態
-
-[現在の実装状態の説明]
-
-## 実装計画
-
-[今後の実装計画]
-
-## 既知の問題
-
-- [問題1]
-- [問題2]
-- [問題3]
-`,
+    'branchContext.json': (branchName: string) => {
+      const now = new Date();
+      return JSON.stringify(
+        {
+          schema: 'memory_document_v2',
+          metadata: {
+            id: this.generateUUID(),
+            title: 'ブランチコンテキスト',
+            documentType: 'branch_context',
+            path: 'branchContext.json',
+            tags: ['branch-context'],
+            lastModified: now.toISOString(),
+            createdAt: now.toISOString(),
+            version: 1,
+          },
+          content: {
+            branchName: branchName,
+            purpose: 'このブランチの目的を記述してください',
+            createdAt: now.toISOString(),
+            userStories: [
+              {
+                id: this.generateUUID(),
+                description: '解決する課題1',
+                completed: false,
+                priority: 1,
+              },
+              {
+                id: this.generateUUID(),
+                description: '解決する課題2',
+                completed: false,
+                priority: 2,
+              },
+              {
+                id: this.generateUUID(),
+                description: '解決する課題3',
+                completed: false,
+                priority: 3,
+              },
+            ],
+            additionalNotes: '',
+          },
+        },
+        null,
+        2
+      );
+    },
+    'activeContext.json': () => {
+      const now = new Date();
+      return JSON.stringify(
+        {
+          schema: 'memory_document_v2',
+          metadata: {
+            id: this.generateUUID(),
+            title: 'アクティブコンテキスト',
+            documentType: 'active_context',
+            path: 'activeContext.json',
+            tags: ['active-context'],
+            lastModified: now.toISOString(),
+            createdAt: now.toISOString(),
+            version: 1,
+          },
+          content: {
+            currentWork: '現在取り組んでいる作業の説明',
+            recentChanges: [
+              {
+                date: now.toISOString(),
+                description: '変更点1',
+              },
+              {
+                date: now.toISOString(),
+                description: '変更点2',
+              },
+              {
+                date: now.toISOString(),
+                description: '変更点3',
+              },
+            ],
+            activeDecisions: [
+              {
+                id: this.generateUUID(),
+                description: '決定事項1',
+              },
+              {
+                id: this.generateUUID(),
+                description: '決定事項2',
+              },
+              {
+                id: this.generateUUID(),
+                description: '決定事項3',
+              },
+            ],
+            considerations: [
+              {
+                id: this.generateUUID(),
+                description: '検討事項1',
+                status: 'open',
+              },
+              {
+                id: this.generateUUID(),
+                description: '検討事項2',
+                status: 'open',
+              },
+              {
+                id: this.generateUUID(),
+                description: '検討事項3',
+                status: 'open',
+              },
+            ],
+            nextSteps: [
+              {
+                id: this.generateUUID(),
+                description: '次のステップ1',
+                priority: 'high',
+              },
+              {
+                id: this.generateUUID(),
+                description: '次のステップ2',
+                priority: 'medium',
+              },
+              {
+                id: this.generateUUID(),
+                description: '次のステップ3',
+                priority: 'low',
+              },
+            ],
+          },
+        },
+        null,
+        2
+      );
+    },
+    'systemPatterns.json': () => {
+      const now = new Date();
+      return JSON.stringify(
+        {
+          schema: 'memory_document_v2',
+          metadata: {
+            id: this.generateUUID(),
+            title: 'システムパターン',
+            documentType: 'system_patterns',
+            path: 'systemPatterns.json',
+            tags: ['system-patterns'],
+            lastModified: now.toISOString(),
+            createdAt: now.toISOString(),
+            version: 1,
+          },
+          content: {
+            technicalDecisions: [
+              {
+                id: this.generateUUID(),
+                title: '決定事項のタイトル',
+                context: '決定の背景や理由',
+                decision: '具体的な決定内容',
+                consequences: {
+                  positive: ['影響1', '影響2', '影響3'],
+                  negative: [],
+                },
+                status: 'proposed',
+                date: now.toISOString(),
+                alternatives: [],
+              },
+            ],
+            implementationPatterns: [],
+          },
+        },
+        null,
+        2
+      );
+    },
+    'progress.json': () => {
+      const now = new Date();
+      return JSON.stringify(
+        {
+          schema: 'memory_document_v2',
+          metadata: {
+            id: this.generateUUID(),
+            title: '進捗状況',
+            documentType: 'progress',
+            path: 'progress.json',
+            tags: ['progress'],
+            lastModified: now.toISOString(),
+            createdAt: now.toISOString(),
+            version: 1,
+          },
+          content: {
+            workingFeatures: [
+              {
+                id: this.generateUUID(),
+                description: '機能1',
+                implementedAt: now.toISOString(),
+              },
+              {
+                id: this.generateUUID(),
+                description: '機能2',
+                implementedAt: now.toISOString(),
+              },
+              {
+                id: this.generateUUID(),
+                description: '機能3',
+                implementedAt: now.toISOString(),
+              },
+            ],
+            pendingImplementation: [
+              {
+                id: this.generateUUID(),
+                description: '未実装の機能1',
+                priority: 'high',
+              },
+              {
+                id: this.generateUUID(),
+                description: '未実装の機能2',
+                priority: 'medium',
+              },
+              {
+                id: this.generateUUID(),
+                description: '未実装の機能3',
+                priority: 'low',
+              },
+            ],
+            status: '現在の実装状態の説明',
+            completionPercentage: 0,
+            knownIssues: [
+              {
+                id: this.generateUUID(),
+                description: '問題1',
+                severity: 'high',
+              },
+              {
+                id: this.generateUUID(),
+                description: '問題2',
+                severity: 'medium',
+              },
+              {
+                id: this.generateUUID(),
+                description: '問題3',
+                severity: 'low',
+              },
+            ],
+          },
+        },
+        null,
+        2
+      );
+    },
   };
+
+  /**
+   * Generate a UUID for document IDs
+   * @returns UUID string
+   */
+  private generateUUID(): string {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
 
   /**
    * Constructor
@@ -399,7 +544,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
 
           // Check if it's a directory and has active context document
           const branchPath = this.configProvider.getBranchMemoryPath(branchInfo.name);
-          const activeContextPath = path.join(branchPath, 'activeContext.md');
+          const activeContextPath = path.join(branchPath, 'activeContext.json');
 
           const isDirectory = await this.fileSystemService.directoryExists(branchPath);
           const hasActiveContext = await this.fileSystemService.fileExists(activeContextPath);
@@ -432,13 +577,34 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
       for (const { branchInfo, lastModified } of limited) {
         try {
           // Get active context document to extract summary
-          const activeContextPath = DocumentPath.create('activeContext.md');
+          const activeContextPath = DocumentPath.create('activeContext.json');
           const activeContext = await this.getDocument(branchInfo, activeContextPath);
 
           if (activeContext) {
             const content = activeContext.content;
 
             // Extract current work and recent changes
+            if (activeContext.isJSON) {
+              try {
+                const jsonContent = JSON.parse(content);
+                const currentWork = jsonContent.content?.currentWork;
+                const recentChanges = jsonContent.content?.recentChanges?.map((change: any) => change.description);
+
+                recentBranches.push({
+                  branchInfo,
+                  lastModified,
+                  summary: {
+                    currentWork,
+                    recentChanges,
+                  },
+                });
+                continue;
+              } catch (jsonError) {
+                logger.debug(`Error parsing JSON content for ${branchInfo.name}:`, jsonError);
+              }
+            }
+
+            // Fallback to Markdown parsing for backward compatibility
             const currentWork = extractSectionContent(content, '## 現在の作業内容');
             const recentChanges = extractListItems(content, '## 最近の変更点')?.map((item) =>
               item.trim()

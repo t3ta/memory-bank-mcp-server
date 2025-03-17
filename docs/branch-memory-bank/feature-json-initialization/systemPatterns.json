@@ -1,0 +1,101 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "system-patterns-uuid",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "system-patterns",
+      "feature-json-initialization"
+    ],
+    "lastModified": "2025-03-17T12:04:00.000Z",
+    "createdAt": "2025-03-17T11:59:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "decision-uuid",
+        "title": "メモリバンク初期化のJSON化",
+        "context": "現在、メモリバンクの初期化処理はMarkdown形式を使用していますが、Memory Bank 2.0ではJSONをデータ保存形式として一本化する方針です。",
+        "decision": "CreateBranchCoreFilesUseCaseクラスを更新して、ファイルパスの拡張子を.mdから.jsonに変更し、コンテンツ生成をMarkdownからJSONに変更します。",
+        "consequences": {
+          "positive": [
+            "JSON形式に完全に移行できる",
+            "構造化されたデータとして扱いやすくなる",
+            "バリデーションが容易になる"
+          ],
+          "negative": [
+            "既存のMarkdownファイルとの互換性を維持する必要がある"
+          ]
+        },
+        "status": "implemented",
+        "date": "2025-03-17T12:03:00.000Z",
+        "alternatives": [
+          {
+            "description": "Markdown形式を維持する",
+            "reason": "既存のコードとの互換性を維持できるが、JSON化の方針に反する"
+          }
+        ]
+      },
+      {
+        "id": "decision-uuid-2",
+        "title": "JSON構造の設計",
+        "context": "JSONドキュメントの構造を設計する必要があります。",
+        "decision": "memory_document_v2スキーマを使用し、メタデータとコンテンツを分離した構造を採用します。",
+        "consequences": {
+          "positive": [
+            "一貫性のある構造でドキュメントを管理できる",
+            "メタデータとコンテンツの分離により、検索や分類が容易になる",
+            "スキーマバージョンを明示することで、将来の変更に対応しやすくなる"
+          ],
+          "negative": [
+            "構造が複雑になる可能性がある"
+          ]
+        },
+        "status": "implemented",
+        "date": "2025-03-17T12:03:00.000Z",
+        "alternatives": [
+          {
+            "description": "シンプルなJSONオブジェクトを使用する",
+            "reason": "シンプルだが、メタデータとコンテンツの分離ができない"
+          }
+        ]
+      }
+    ],
+    "implementationPatterns": [
+      {
+        "id": "pattern-uuid",
+        "name": "JSONドキュメント生成",
+        "description": "MemoryDocumentエンティティのtoJSON()メソッドを使用して、JSONドキュメントを生成する",
+        "useCases": [
+          "メモリバンクの初期化",
+          "ドキュメントの更新"
+        ],
+        "codeExample": "const document = MemoryDocument.fromJSON(jsonDoc, DocumentPath.create('example.json'));"
+      },
+      {
+        "id": "pattern-uuid-2",
+        "name": "構造化データの生成",
+        "description": "単純な文字列配列を構造化されたオブジェクト配列に変換する",
+        "useCases": [
+          "アクティブコンテキストの生成",
+          "進捗状況の生成",
+          "システムパターンの生成"
+        ],
+        "codeExample": "private formatRecentChanges(changes: string[]): Array<{date: string, description: string}> {\n  return changes.map(change => ({\n    date: new Date().toISOString(),\n    description: change\n  }));\n}"
+      },
+      {
+        "id": "pattern-uuid-3",
+        "name": "UUIDの生成",
+        "description": "一意のIDを生成して、JSONドキュメント内の各要素を識別する",
+        "useCases": [
+          "ドキュメントID",
+          "コンテンツ要素のID"
+        ],
+        "codeExample": "private generateUUID(): string {\n  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {\n    const r = Math.random() * 16 | 0;\n    const v = c === 'x' ? r : (r & 0x3 | 0x8);\n    return v.toString(16);\n  });\n}"
+      }
+    ]
+  }
+}

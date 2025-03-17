@@ -1,0 +1,58 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "active-context-uuid",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context",
+      "feature-json-initialization"
+    ],
+    "lastModified": "2025-03-17T12:06:00.000Z",
+    "createdAt": "2025-03-17T11:59:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "すべての実装が完了しました",
+    "recentChanges": [
+      {
+        "date": "2025-03-17T11:59:00.000Z",
+        "description": "ブランチを作成し、メモリバンクを初期化"
+      },
+      {
+        "date": "2025-03-17T12:02:00.000Z",
+        "description": "CreateBranchCoreFilesUseCaseクラスを更新して、ファイルパスの拡張子を.mdから.jsonに変更"
+      },
+      {
+        "date": "2025-03-17T12:02:30.000Z",
+        "description": "JSON生成メソッドを実装"
+      },
+      {
+        "date": "2025-03-17T12:03:00.000Z",
+        "description": "テストを更新して、JSON形式のドキュメントが正しく生成されることを確認"
+      },
+      {
+        "date": "2025-03-17T12:05:00.000Z",
+        "description": "FileSystemBranchMemoryBankRepositoryクラスを更新して、JSON形式のドキュメントを優先的に保存するように変更"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "decision-uuid",
+        "description": "ファイルパスの拡張子を.mdから.jsonに変更する",
+        "reason": "JSON形式に完全に移行するため",
+        "status": "implemented"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "consideration-uuid",
+        "description": "既存のMarkdownファイルとの互換性をどのように維持するか",
+        "status": "resolved",
+        "resolution": "自動マイグレーション機能を使用して、Markdownファイルを自動的にJSONに変換する"
+      }
+    ],
+    "nextSteps": []
+  }
+}
