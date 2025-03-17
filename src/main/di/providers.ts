@@ -23,15 +23,11 @@ import { ConfigProvider } from '../../infrastructure/config/ConfigProvider.js';
 import { FileSystemGlobalMemoryBankRepository } from '../../infrastructure/repositories/file-system/FileSystemGlobalMemoryBankRepository.js';
 import { FileSystemBranchMemoryBankRepository } from '../../infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.js';
 import { FileSystemTagIndexRepositoryV1Bridge } from '../../infrastructure/repositories/file-system/FileSystemTagIndexRepositoryV1Bridge.js';
-import { MarkdownToJsonConverter } from '../../infrastructure/templates/MarkdownToJsonConverter.js';
 
 // Interface layer
 import { MCPResponsePresenter } from '../../interface/presenters/MCPResponsePresenter.js';
 import { GlobalController } from '../../interface/controllers/GlobalController.js';
 import { BranchController } from '../../interface/controllers/BranchController.js';
-
-// CLI 関連
-import { MigrateTemplatesCommand } from '../../cli/commands/template/MigrateTemplatesCommand.js';
 
 // CLI options type
 import { CliOptions } from '../../infrastructure/config/WorkspaceConfig.js';
@@ -40,7 +36,7 @@ import type {
   ReadJsonDocumentUseCase,
   SearchJsonDocumentsUseCase,
   UpdateJsonIndexUseCase,
-  WriteJsonDocumentUseCase
+  WriteJsonDocumentUseCase,
 } from '../../application/usecases/index.js';
 
 /**
@@ -100,17 +96,6 @@ export async function registerInfrastructureServices(
       globalRepository
     );
   });
-
-  // Register template tools
-  container.register('markdownToJsonConverter', new MarkdownToJsonConverter());
-  container.register(
-    'migrateTemplatesCommand',
-    new MigrateTemplatesCommand(
-      container.get('markdownToJsonConverter') as MarkdownToJsonConverter,
-      container.get('fileSystemService') as IFileSystemService,
-      container.get('configProvider') as IConfigProvider
-    )
-  );
 }
 
 /**
@@ -263,11 +248,21 @@ export function registerInterfaceServices(container: DIContainer): void {
     const updateTagIndexUseCaseV2 = container.get(
       'updateTagIndexUseCaseV2'
     ) as UpdateTagIndexUseCaseV2;
-    const readJsonDocumentUseCase = container.get('readJsonDocumentUseCase') as ReadJsonDocumentUseCase | undefined;
-    const writeJsonDocumentUseCase = container.get('writeJsonDocumentUseCase') as WriteJsonDocumentUseCase | undefined;
-    const deleteJsonDocumentUseCase = container.get('deleteJsonDocumentUseCase') as DeleteJsonDocumentUseCase | undefined;
-    const searchJsonDocumentsUseCase = container.get('searchJsonDocumentsUseCase') as SearchJsonDocumentsUseCase | undefined;
-    const updateJsonIndexUseCase = container.get('updateJsonIndexUseCase') as UpdateJsonIndexUseCase | undefined;
+    const readJsonDocumentUseCase = container.get('readJsonDocumentUseCase') as
+      | ReadJsonDocumentUseCase
+      | undefined;
+    const writeJsonDocumentUseCase = container.get('writeJsonDocumentUseCase') as
+      | WriteJsonDocumentUseCase
+      | undefined;
+    const deleteJsonDocumentUseCase = container.get('deleteJsonDocumentUseCase') as
+      | DeleteJsonDocumentUseCase
+      | undefined;
+    const searchJsonDocumentsUseCase = container.get('searchJsonDocumentsUseCase') as
+      | SearchJsonDocumentsUseCase
+      | undefined;
+    const updateJsonIndexUseCase = container.get('updateJsonIndexUseCase') as
+      | UpdateJsonIndexUseCase
+      | undefined;
 
     return new GlobalController(
       readGlobalDocumentUseCase,
@@ -313,11 +308,21 @@ export function registerInterfaceServices(container: DIContainer): void {
     const updateTagIndexUseCaseV2 = container.get(
       'updateTagIndexUseCaseV2'
     ) as UpdateTagIndexUseCaseV2;
-    const readJsonDocumentUseCase = container.get('readJsonDocumentUseCase') as ReadJsonDocumentUseCase | undefined;
-    const writeJsonDocumentUseCase = container.get('writeJsonDocumentUseCase') as WriteJsonDocumentUseCase | undefined;
-    const deleteJsonDocumentUseCase = container.get('deleteJsonDocumentUseCase') as DeleteJsonDocumentUseCase | undefined;
-    const searchJsonDocumentsUseCase = container.get('searchJsonDocumentsUseCase') as SearchJsonDocumentsUseCase | undefined;
-    const updateJsonIndexUseCase = container.get('updateJsonIndexUseCase') as UpdateJsonIndexUseCase | undefined;
+    const readJsonDocumentUseCase = container.get('readJsonDocumentUseCase') as
+      | ReadJsonDocumentUseCase
+      | undefined;
+    const writeJsonDocumentUseCase = container.get('writeJsonDocumentUseCase') as
+      | WriteJsonDocumentUseCase
+      | undefined;
+    const deleteJsonDocumentUseCase = container.get('deleteJsonDocumentUseCase') as
+      | DeleteJsonDocumentUseCase
+      | undefined;
+    const searchJsonDocumentsUseCase = container.get('searchJsonDocumentsUseCase') as
+      | SearchJsonDocumentsUseCase
+      | undefined;
+    const updateJsonIndexUseCase = container.get('updateJsonIndexUseCase') as
+      | UpdateJsonIndexUseCase
+      | undefined;
 
     return new BranchController(
       readBranchDocumentUseCase,

@@ -3,7 +3,6 @@ import { registerJsonCommands } from './json/index.js';
 import { registerGlobalCommands } from './global/index.js';
 import { registerBranchCommands } from './branch/index.js';
 import { registerUtilCommands } from './utils/index.js';
-import { registerTemplateCommands } from './template/index.js';
 
 /**
  * Register all CLI commands with yargs
@@ -25,9 +24,6 @@ export function registerAllCommands(yargs: Argv): Argv {
 
   // Register Utility commands
   yargsInstance = registerUtilCommands(yargsInstance);
-
-  // Register Template commands
-  yargsInstance = registerTemplateCommands(yargsInstance);
 
   return yargsInstance;
 }
