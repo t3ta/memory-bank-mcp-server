@@ -42,7 +42,7 @@ jobs:
       
       - name: Bump version
         run: |
-          npm version ${{ github.event.inputs.bump-type }} -m "Bump version to %s [skip ci]"
+          yarn version --new-version ${{ github.event.inputs.bump-type }} --message "Bump version to %s [skip ci]"
       
       - name: Push changes
         run: |
