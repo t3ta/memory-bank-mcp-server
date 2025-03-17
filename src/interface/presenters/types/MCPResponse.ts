@@ -11,6 +11,12 @@ export interface MCPBaseResponse {
 export interface MCPSuccessResponse<T = any> extends MCPBaseResponse {
   success: true;
   data: T;
+  meta?: {
+    format?: string;
+    timestamp?: string;
+    version?: string;
+    [key: string]: any;
+  };
 }
 
 /**
@@ -22,6 +28,13 @@ export interface MCPErrorResponse extends MCPBaseResponse {
     code: string;
     message: string;
     details?: any;
+    status?: number;
+  };
+  meta?: {
+    format?: string;
+    timestamp?: string;
+    version?: string;
+    [key: string]: any;
   };
 }
 
