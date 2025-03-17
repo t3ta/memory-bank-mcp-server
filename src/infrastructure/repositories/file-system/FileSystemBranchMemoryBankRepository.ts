@@ -15,7 +15,7 @@ import {
 } from '../../../shared/errors/InfrastructureError.js';
 import { DomainError } from '../../../shared/errors/DomainError.js';
 import { FileSystemMemoryDocumentRepository } from './FileSystemMemoryDocumentRepository.js';
-import { extractListItems, extractSectionContent, logger } from '../../../shared/utils/index.js';
+import { extractSectionContent, logger } from '../../../shared/utils/index.js';
 import { TagIndex } from '../../../schemas/tag-index/tag-index-schema.js';
 
 /**
@@ -282,8 +282,8 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
    */
   private generateUUID(): string {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-      const r = Math.random() * 16 | 0;
-      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      const r = (Math.random() * 16) | 0;
+      const v = c === 'x' ? r : (r & 0x3) | 0x8;
       return v.toString(16);
     });
   }
@@ -457,8 +457,6 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
   }
 
   /**
-   * List all documents in branch
-  /**
    * Get recent branches
    * @param limit Maximum number of branches to return (default: 10)
    * @returns Promise resolving to array of recent branches
@@ -498,12 +496,15 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
           const activeContextMdPath = path.join(branchPath, 'activeContext.md');
 
           const isDirectory = await this.fileSystemService.directoryExists(branchPath);
-          const hasActiveContextJson = await this.fileSystemService.fileExists(activeContextJsonPath);
+          const hasActiveContextJson =
+            await this.fileSystemService.fileExists(activeContextJsonPath);
           const hasActiveContextMd = await this.fileSystemService.fileExists(activeContextMdPath);
 
           if (isDirectory && (hasActiveContextJson || hasActiveContextMd)) {
             // Get last modified date of active context (prefer json version)
-            const activeContextPath = hasActiveContextJson ? activeContextJsonPath : activeContextMdPath;
+            const activeContextPath = hasActiveContextJson
+              ? activeContextJsonPath
+              : activeContextMdPath;
             const stats = await this.fileSystemService.getFileStats(activeContextPath);
 
             branchInfos.push({
@@ -532,7 +533,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
           // Try both JSON and MD paths for backwards compatibility
           const activeContextJsonPath = DocumentPath.create('activeContext.json');
           const activeContextMdPath = DocumentPath.create('activeContext.md');
-          
+
           // Try to get the document, first JSON then MD
           let activeContext = await this.getDocument(branchInfo, activeContextJsonPath);
           if (!activeContext) {
@@ -547,7 +548,9 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
               try {
                 const jsonContent = JSON.parse(content);
                 const currentWork = jsonContent.content?.currentWork;
-                const recentChanges = jsonContent.content?.recentChanges?.map((change: any) => change.description);
+                const recentChanges = jsonContent.content?.recentChanges?.map(
+                  (change: any) => change.description
+                );
 
                 recentBranches.push({
                   branchInfo,
@@ -565,105 +568,10 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
 
             // Fallback to Markdown parsing for backward compatibility
             const currentWork = extractSectionContent(content, '## 現在の作業内容');
-            const recentChanges = extractListItems(content, '## 最近の変更点')?.map((item) =>
-              item.trim()
-            );
-
-            recentBranches.push({
-              branchInfo,
-              lastModified,
-              summary: {
-                currentWork,
-                recentChanges,
-              },
-            });
-          } else {
-            // Include branch even without active context details
-            recentBranches.push({
-              branchInfo,
-              lastModified,
-              summary: {},
-            });
-          }
-        } catch (error) {
-          // Skip branches with errors
-          logger.debug(`Error processing branch ${branchInfo.name}:`, error);
-        }
-      }
-
-      logger.debug(`Found ${recentBranches.length} recent branches`);
-      return recentBranches;
-    } catch (error) {
-      if (error instanceof DomainError) {
-        throw error;
-      }
-
-      if (error instanceof InfrastructureError) {
-        throw error;
-      }
-
-      throw new InfrastructureError(
-        InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
-        `Failed to get recent branches: ${(error as Error).message}`,
-        { originalError: error }
-      );
-    }
-  }
-            branchInfos.push({
-              branchInfo,
-              path: branchPath,
-              lastModified: stats.lastModified,
-            });
-          }
-        } catch (error) {
-          // Skip invalid branch directories
-          logger.debug(`Skipping invalid branch directory: ${entry}`, error);
-        }
-      }
-
-      // Sort by last modified date (descending)
-      branchInfos.sort((a, b) => b.lastModified.getTime() - a.lastModified.getTime());
-
-      // Limit the results
-      const limited = branchInfos.slice(0, limit);
-
-      // Build full branch info
-      const recentBranches: RecentBranch[] = [];
-
-      for (const { branchInfo, lastModified } of limited) {
-        try {
-          // Get active context document to extract summary
-          const activeContextPath = DocumentPath.create('activeContext.json');
-          const activeContext = await this.getDocument(branchInfo, activeContextPath);
-
-          if (activeContext) {
-            const content = activeContext.content;
-
-            // Extract current work and recent changes
-            if (activeContext.isJSON) {
-              try {
-                const jsonContent = JSON.parse(content);
-                const currentWork = jsonContent.content?.currentWork;
-                const recentChanges = jsonContent.content?.recentChanges?.map((change: any) => change.description);
-
-                recentBranches.push({
-                  branchInfo,
-                  lastModified,
-                  summary: {
-                    currentWork,
-                    recentChanges,
-                  },
-                });
-                continue;
-              } catch (jsonError) {
-                logger.debug(`Error parsing JSON content for ${branchInfo.name}:`, jsonError);
-              }
-            }
-
-            // Fallback to Markdown parsing for backward compatibility
-            const currentWork = extractSectionContent(content, '## 現在の作業内容');
-            const recentChanges = extractListItems(content, '## 最近の変更点')?.map((item) =>
-              item.trim()
+            const recentChanges = content
+              .split('\n')
+              .filter(line => line.trim().startsWith('- '))
+              .map((line: string) => line.replace(/^-\s*/, '').trim()
             );
 
             recentBranches.push({
@@ -725,19 +633,6 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
         logger.debug(`Branch directory does not exist: ${branchPath}`);
         return false;
       }
-  async validateStructure(branchInfo: BranchInfo): Promise<boolean> {
-    try {
-      logger.debug(`Validating branch structure for ${branchInfo.name}`);
-
-      const branchPath = this.configProvider.getBranchMemoryPath(branchInfo.name);
-
-      // Check if directory exists
-      const dirExists = await this.fileSystemService.directoryExists(branchPath);
-
-      if (!dirExists) {
-        logger.debug(`Branch directory does not exist: ${branchPath}`);
-        return false;
-      }
 
       // Check if all core documents exist
       for (const document of this.coreDocuments) {
@@ -756,6 +651,16 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
       logger.error(`Error validating branch structure for ${branchInfo.name}:`, error);
       return false;
     }
+  }
+
+  /**
+   * Gets a document repository for the specific branch
+   * @param branchInfo Branch information
+   * @returns Memory document repository for the branch
+   */
+  private getRepositoryForBranch(branchInfo: BranchInfo): FileSystemMemoryDocumentRepository {
+    const branchPath = this.configProvider.getBranchMemoryPath(branchInfo.name);
+    return new FileSystemMemoryDocumentRepository(branchPath, this.fileSystemService);
   }
 
   /**
@@ -832,6 +737,44 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
   }
 
   /**
+   * Find documents by tags in branch
+   * @param branchInfo Branch information
+   * @param tags Tags to search for
+   * @returns Promise resolving to array of memory documents
+   */
+  async findDocumentsByTags(branchInfo: BranchInfo, tags: Tag[]): Promise<MemoryDocument[]> {
+    try {
+      logger.debug(`Finding documents by tags in branch ${branchInfo.name}`);
+
+      const documentRepository = this.getRepositoryForBranch(branchInfo);
+      const paths = await documentRepository.list();
+      const documents: MemoryDocument[] = [];
+
+      for (const docPath of paths) {
+        const doc = await documentRepository.findByPath(docPath);
+        if (doc) {
+          documents.push(doc);
+        }
+      }
+
+      // Filter documents that have any of the specified tags
+      return documents.filter((doc: MemoryDocument) => {
+        // If no tags specified, return all documents
+        if (tags.length === 0) return true;
+
+        // Check if any of the search tags matches document's tags
+        return tags.some((searchTag: Tag) => doc.hasTag(searchTag));
+      });
+    } catch (error: unknown) {
+      throw new InfrastructureError(
+        InfrastructureErrorCodes.FILE_READ_ERROR,
+        `Failed to find documents by tags: ${(error as Error).message}`,
+        { originalError: error }
+      );
+    }
+  }
+
+  /**
    * Find documents by tags in branch using index
    * @param branchInfo Branch information
    * @param tags Tags to search for
@@ -899,10 +842,27 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
 
       // Convert string paths to DocumentPath objects
       return resultPaths.map((p) => DocumentPath.create(p));
-    } catch (error) {
+    } catch (error: unknown) {
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_READ_ERROR,
         `Failed to find documents by tags using index: ${(error as Error).message}`,
+        { originalError: error }
+      );
+    }
+  }
+  /**
+   * List all documents in branch
+   * @param branchInfo Branch information
+   * @returns Promise resolving to array of document paths
+   */
+  async listDocuments(branchInfo: BranchInfo): Promise<DocumentPath[]> {
+    try {
+      const documentRepository = this.getRepositoryForBranch(branchInfo);
+      return await documentRepository.list();
+    } catch (error: unknown) {
+      throw new InfrastructureError(
+        InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
+        `Failed to list documents: ${(error as Error).message}`,
         { originalError: error }
       );
     }

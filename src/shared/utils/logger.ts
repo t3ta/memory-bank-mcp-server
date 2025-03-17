@@ -72,7 +72,7 @@ export function createConsoleLogger(level: LogLevel = 'info'): Logger {
 
     setLevel(level: LogLevel): void {
       currentLevel = level;
-export const logger = createConsoleLogger('debug'); // For more verbose logging during development
+    },
   };
 }
 
