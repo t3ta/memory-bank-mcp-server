@@ -14,6 +14,43 @@ import createApplication from './main/index.js';
 import { Application } from './main/index.js';
 import { logger } from './shared/utils/index.js';
 
+// Helper function to render template with translations
+function renderTemplate(template: any, translations: any): string {
+  try {
+    // Create a copy of the template to avoid modifying the original
+    const result = JSON.parse(JSON.stringify(template));
+
+    // Replace title and description with translated versions
+    if (result.metadata?.titleKey && translations.translations[result.metadata.titleKey]) {
+      result.metadata.title = translations.translations[result.metadata.titleKey];
+    }
+
+    if (result.metadata?.descriptionKey && translations.translations[result.metadata.descriptionKey]) {
+      result.metadata.description = translations.translations[result.metadata.descriptionKey];
+    }
+
+    // Process sections
+    if (Array.isArray(result.content?.sections)) {
+      for (const section of result.content.sections) {
+        // Replace section title with translated version
+        if (section.titleKey && translations.translations[section.titleKey]) {
+          section.title = translations.translations[section.titleKey];
+        }
+
+        // Replace section content with translated version
+        if (section.contentKey && translations.translations[section.contentKey]) {
+          section.content = translations.translations[section.contentKey];
+        }
+      }
+    }
+
+    return JSON.stringify(result, null, 2);
+  } catch (error) {
+    logger.error('Error rendering template:', error);
+    return JSON.stringify(template, null, 2);
+  }
+}
+
 // Parse command line arguments
 const argv = yargs(hideBin(process.argv))
   .option('docs', {
@@ -242,12 +279,51 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       const dirname = path.dirname(fileURLToPath(import.meta.url));
-      const filePath = path.join(dirname, 'templates', `rules-${language}.md`);
-      const content = await fs.readFile(filePath, 'utf-8');
-      return {
-        content: [{ type: 'text', text: content }],
-        _meta: { lastModified: new Date().toISOString() },
-      };
+
+      try {
+        // Load template structure
+        const templatePath = path.join(dirname, 'templates', 'json', 'rules.json');
+        const templateContent = await fs.readFile(templatePath, 'utf-8');
+        const template = JSON.parse(templateContent);
+
+        // Load language translations
+        const translationsPath = path.join(dirname, 'infrastructure', 'i18n', 'translations', `${language}.json`);
+        const translationsContent = await fs.readFile(translationsPath, 'utf-8');
+        const translations = JSON.parse(translationsContent);
+
+        // Render template with translations
+        const renderedContent = renderTemplate(template, translations);
+
+        return {
+          content: [{ type: 'text', text: renderedContent }],
+          _meta: { lastModified: new Date().toISOString() },
+        };
+      } catch (error) {
+        logger.error('Error reading rules:', error);
+
+        // Fall back to legacy files if available
+        try {
+          // Try JSON format first
+          const jsonFilePath = path.join(dirname, 'templates', 'json', `rules-${language}.json`);
+          const content = await fs.readFile(jsonFilePath, 'utf-8');
+          return {
+            content: [{ type: 'text', text: content }],
+            _meta: { lastModified: new Date().toISOString() },
+          };
+        } catch (jsonError) {
+          // Fall back to markdown file
+          try {
+            const mdFilePath = path.join(dirname, 'templates', `rules-${language}.md`);
+            const content = await fs.readFile(mdFilePath, 'utf-8');
+            return {
+              content: [{ type: 'text', text: content }],
+              _meta: { lastModified: new Date().toISOString() },
+            };
+          } catch (mdError) {
+            throw new Error(`Failed to read rules in ${language}: ${(error as Error).message}`);
+          }
+        }
+      }
     }
 
     case 'write_global_memory_bank': {
