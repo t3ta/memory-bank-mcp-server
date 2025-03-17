@@ -597,7 +597,7 @@ async function main() {
 
     // Configure migration options
     const migrationOptions = {
-      createBackup: true,
+      createBackup: false,  // バックアップ作成を無効化
       overwriteExisting: false,
       validateJson: true,
       deleteOriginals: false,
