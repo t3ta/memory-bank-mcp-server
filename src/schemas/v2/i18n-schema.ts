@@ -33,7 +33,7 @@ export interface TranslationFile {
 
 /**
  * Validates a language code
- * 
+ *
  * @param lang Language code to validate
  * @returns True if supported language, false otherwise
  */
@@ -43,7 +43,7 @@ export function isValidLanguage(lang: string): lang is Language {
 
 /**
  * Gets a safe language code, defaulting to English if not supported
- * 
+ *
  * @param lang Language code to validate
  * @returns Valid language code
  */

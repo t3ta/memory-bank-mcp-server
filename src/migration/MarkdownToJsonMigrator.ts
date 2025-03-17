@@ -109,7 +109,7 @@ export class MarkdownToJsonMigrator {
     private readonly validator: MigrationValidator,
     private readonly converterFactory: ConverterFactory,
     private readonly logger: Logger
-  ) { }
+  ) {}
 
   /**
    * Migrate all Markdown files in a directory to JSON
@@ -125,7 +125,7 @@ export class MarkdownToJsonMigrator {
       createBackup = true,
       overwriteExisting = false,
       validateJson = true,
-      deleteOriginals = false
+      deleteOriginals = false,
     } = options;
 
     // Initialize result
@@ -135,8 +135,8 @@ export class MarkdownToJsonMigrator {
         successCount: 0,
         failureCount: 0,
         skippedCount: 0,
-        failures: []
-      }
+        failures: [],
+      },
     };
 
     try {
@@ -179,11 +179,7 @@ export class MarkdownToJsonMigrator {
           }
 
           // Migrate file
-          const migrationSuccess = await this.migrateFile(
-            file,
-            jsonPath,
-            { validateJson }
-          );
+          const migrationSuccess = await this.migrateFile(file, jsonPath, { validateJson });
 
           if (migrationSuccess) {
             result.stats.successCount++;
@@ -197,7 +193,7 @@ export class MarkdownToJsonMigrator {
             result.stats.failureCount++;
             result.stats.failures.push({
               path: file,
-              error: 'Migration failed without throwing an error'
+              error: 'Migration failed without throwing an error',
             });
           }
         } catch (error) {
@@ -205,13 +201,15 @@ export class MarkdownToJsonMigrator {
           result.stats.failureCount++;
           result.stats.failures.push({
             path: file,
-            error: (error as Error).message
+            error: (error as Error).message,
           });
         }
       }
 
       // Log summary
-      this.logger.info(`Migration complete. Success: ${result.stats.successCount}, Failed: ${result.stats.failureCount}, Skipped: ${result.stats.skippedCount}`);
+      this.logger.info(
+        `Migration complete. Success: ${result.stats.successCount}, Failed: ${result.stats.failureCount}, Skipped: ${result.stats.skippedCount}`
+      );
 
       // Set success flag based on failure count
       result.success = result.stats.failureCount === 0;
@@ -223,7 +221,7 @@ export class MarkdownToJsonMigrator {
       return {
         success: false,
         stats: result.stats,
-        error: `Migration failed: ${(error as Error).message}`
+        error: `Migration failed: ${(error as Error).message}`,
       };
     }
   }

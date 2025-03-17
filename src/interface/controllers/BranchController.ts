@@ -689,7 +689,10 @@ export class BranchController implements IBranchController {
    * @param options Options for reading document (path or ID)
    * @returns Promise resolving to MCP response with JSON document
    */
-  async readJsonDocument(branchName: string, options: { path?: string; id?: string }): Promise<MCPResponse<JsonDocumentDTO>> {
+  async readJsonDocument(
+    branchName: string,
+    options: { path?: string; id?: string }
+  ): Promise<MCPResponse<JsonDocumentDTO>> {
     try {
       logger.info(`Reading JSON document from branch ${branchName}: ${options.path || options.id}`);
 
@@ -731,7 +734,13 @@ export class BranchController implements IBranchController {
 
       const result = await this.writeJsonDocumentUseCase.execute({
         branchName,
-        document: {path: document.path || '', title: document.title, documentType: document.documentType, content: document.content, tags: document.tags},
+        document: {
+          path: document.path || '',
+          title: document.title,
+          documentType: document.documentType,
+          content: document.content,
+          tags: document.tags,
+        },
       });
 
       return this.presenter.present(result);
@@ -746,9 +755,14 @@ export class BranchController implements IBranchController {
    * @param options Options for deleting document (path or ID)
    * @returns Promise resolving to MCP response with the result
    */
-  async deleteJsonDocument(branchName: string, options: { path?: string; id?: string }): Promise<MCPResponse> {
+  async deleteJsonDocument(
+    branchName: string,
+    options: { path?: string; id?: string }
+  ): Promise<MCPResponse> {
     try {
-      logger.info(`Deleting JSON document from branch ${branchName}: ${options.path || options.id}`);
+      logger.info(
+        `Deleting JSON document from branch ${branchName}: ${options.path || options.id}`
+      );
 
       if (!this.deleteJsonDocumentUseCase) {
         throw new ApplicationError(
@@ -775,7 +789,10 @@ export class BranchController implements IBranchController {
    * @param options Options for listing documents (type, tags)
    * @returns Promise resolving to MCP response with list of documents
    */
-  async listJsonDocuments(branchName: string, options?: { type?: string; tags?: string[] }): Promise<MCPResponse<JsonDocumentDTO[]>> {
+  async listJsonDocuments(
+    branchName: string,
+    options?: { type?: string; tags?: string[] }
+  ): Promise<MCPResponse<JsonDocumentDTO[]>> {
     try {
       logger.info(`Listing JSON documents in branch ${branchName}`);
 
@@ -804,7 +821,10 @@ export class BranchController implements IBranchController {
    * @param query Search query
    * @returns Promise resolving to MCP response with matching documents
    */
-  async searchJsonDocuments(branchName: string, query: string): Promise<MCPResponse<JsonDocumentDTO[]>> {
+  async searchJsonDocuments(
+    branchName: string,
+    query: string
+  ): Promise<MCPResponse<JsonDocumentDTO[]>> {
     try {
       logger.info(`Searching JSON documents in branch ${branchName} with query: ${query}`);
 
@@ -817,7 +837,7 @@ export class BranchController implements IBranchController {
 
       // Use the existing list function with tags
       const result = await this.listJsonDocuments(branchName, {
-        tags: query ? [query] : undefined
+        tags: query ? [query] : undefined,
       });
 
       return result;

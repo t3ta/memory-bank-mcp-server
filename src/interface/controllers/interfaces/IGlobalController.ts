@@ -67,7 +67,10 @@ export interface IGlobalController extends IController {
    * @param options Options for listing documents (type, tags)
    * @returns Promise resolving to MCP response with list of documents
    */
-  listJsonDocuments(options?: { type?: string; tags?: string[] }): Promise<MCPResponse<JsonDocumentDTO[]>>;
+  listJsonDocuments(options?: {
+    type?: string;
+    tags?: string[];
+  }): Promise<MCPResponse<JsonDocumentDTO[]>>;
 
   /**
    * Search JSON documents in global memory bank

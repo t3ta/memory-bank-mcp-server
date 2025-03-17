@@ -78,7 +78,10 @@ export interface IBranchController extends IController {
    * @param options Options for reading document (path or ID)
    * @returns Promise resolving to MCP response with JSON document
    */
-  readJsonDocument(branchName: string, options: { path?: string; id?: string }): Promise<MCPResponse<JsonDocumentDTO>>;
+  readJsonDocument(
+    branchName: string,
+    options: { path?: string; id?: string }
+  ): Promise<MCPResponse<JsonDocumentDTO>>;
 
   /**
    * Write JSON document to branch memory bank
@@ -94,7 +97,10 @@ export interface IBranchController extends IController {
    * @param options Options for deleting document (path or ID)
    * @returns Promise resolving to MCP response with the result
    */
-  deleteJsonDocument(branchName: string, options: { path?: string; id?: string }): Promise<MCPResponse>;
+  deleteJsonDocument(
+    branchName: string,
+    options: { path?: string; id?: string }
+  ): Promise<MCPResponse>;
 
   /**
    * List JSON documents in branch memory bank
@@ -102,7 +108,10 @@ export interface IBranchController extends IController {
    * @param options Options for listing documents (type, tags)
    * @returns Promise resolving to MCP response with list of documents
    */
-  listJsonDocuments(branchName: string, options?: { type?: string; tags?: string[] }): Promise<MCPResponse<JsonDocumentDTO[]>>;
+  listJsonDocuments(
+    branchName: string,
+    options?: { type?: string; tags?: string[] }
+  ): Promise<MCPResponse<JsonDocumentDTO[]>>;
 
   /**
    * Search JSON documents in branch memory bank

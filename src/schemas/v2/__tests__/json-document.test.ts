@@ -1,6 +1,6 @@
 /**
  * JSON Document Schema v2 Tests
- * 
+ *
  * These tests validate the v2 JSON document schemas, ensuring they:
  * - Properly validate expected formats
  * - Reject invalid documents with appropriate errors
@@ -15,14 +15,14 @@ import {
   ActiveContextJsonV2Schema,
   ProgressJsonV2Schema,
   SystemPatternsJsonV2Schema,
-  JsonDocumentV2Schema
+  JsonDocumentV2Schema,
 } from '../json-document.js';
 
 describe('JSON Document Schema v2', () => {
   // Common test data
   const now = new Date();
   const validUuid = uuidv4();
-  
+
   const validBaseMetadata = {
     title: 'Test Document',
     documentType: 'test_type',
@@ -31,7 +31,7 @@ describe('JSON Document Schema v2', () => {
     tags: ['test', 'document'],
     lastModified: now,
     createdAt: now,
-    version: 1
+    version: 1,
   };
 
   describe('BaseJsonDocumentV2Schema', () => {
@@ -39,11 +39,11 @@ describe('JSON Document Schema v2', () => {
       const validBaseDocument = {
         schema: SCHEMA_VERSION,
         metadata: validBaseMetadata,
-        content: { 
-          test: 'value'
-        }
+        content: {
+          test: 'value',
+        },
       };
-      
+
       const result = BaseJsonDocumentV2Schema.safeParse(validBaseDocument);
       expect(result.success).toBe(true);
     });
@@ -52,9 +52,9 @@ describe('JSON Document Schema v2', () => {
       const invalidVersionDoc = {
         schema: 'wrong_version',
         metadata: validBaseMetadata,
-        content: { test: 'value' }
+        content: { test: 'value' },
       };
-      
+
       const result = BaseJsonDocumentV2Schema.safeParse(invalidVersionDoc);
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -66,9 +66,9 @@ describe('JSON Document Schema v2', () => {
       const emptyContentDoc = {
         schema: SCHEMA_VERSION,
         metadata: validBaseMetadata,
-        content: {}
+        content: {},
       };
-      
+
       const result = BaseJsonDocumentV2Schema.safeParse(emptyContentDoc);
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -81,11 +81,11 @@ describe('JSON Document Schema v2', () => {
         schema: SCHEMA_VERSION,
         metadata: {
           ...validBaseMetadata,
-          id: 'not-a-uuid'
+          id: 'not-a-uuid',
         },
-        content: { test: 'value' }
+        content: { test: 'value' },
       };
-      
+
       const result = BaseJsonDocumentV2Schema.safeParse(invalidUuidDoc);
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -100,19 +100,19 @@ describe('JSON Document Schema v2', () => {
         schema: SCHEMA_VERSION,
         metadata: {
           ...validBaseMetadata,
-          documentType: 'branch_context'
+          documentType: 'branch_context',
         },
         content: {
           purpose: 'This is a test branch',
           userStories: [
             {
               description: 'As a user, I want to test this schema',
-              completed: false
-            }
-          ]
-        }
+              completed: false,
+            },
+          ],
+        },
       };
-      
+
       const result = BranchContextJsonV2Schema.safeParse(validBranchContext);
       expect(result.success).toBe(true);
     });
@@ -122,14 +122,14 @@ describe('JSON Document Schema v2', () => {
         schema: SCHEMA_VERSION,
         metadata: {
           ...validBaseMetadata,
-          documentType: 'branch_context'
+          documentType: 'branch_context',
         },
         content: {
           purpose: '',
-          userStories: []
-        }
+          userStories: [],
+        },
       };
-      
+
       const result = BranchContextJsonV2Schema.safeParse(invalidBranchContext);
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -144,17 +144,17 @@ describe('JSON Document Schema v2', () => {
         schema: SCHEMA_VERSION,
         metadata: {
           ...validBaseMetadata,
-          documentType: 'active_context'
+          documentType: 'active_context',
         },
         content: {
           currentWork: 'Working on tests',
           recentChanges: ['Added new tests'],
           activeDecisions: ['Use Jest for testing'],
           considerations: ['Should add more test cases'],
-          nextSteps: ['Complete test suite']
-        }
+          nextSteps: ['Complete test suite'],
+        },
       };
-      
+
       const result = ActiveContextJsonV2Schema.safeParse(validActiveContext);
       expect(result.success).toBe(true);
     });
@@ -164,17 +164,17 @@ describe('JSON Document Schema v2', () => {
         schema: SCHEMA_VERSION,
         metadata: {
           ...validBaseMetadata,
-          documentType: 'active_context'
+          documentType: 'active_context',
         },
         content: {
           // currentWork is optional
           recentChanges: [],
           activeDecisions: [],
           considerations: [],
-          nextSteps: []
-        }
+          nextSteps: [],
+        },
       };
-      
+
       const result = ActiveContextJsonV2Schema.safeParse(minimalActiveContext);
       expect(result.success).toBe(true);
     });
@@ -186,16 +186,16 @@ describe('JSON Document Schema v2', () => {
         schema: SCHEMA_VERSION,
         metadata: {
           ...validBaseMetadata,
-          documentType: 'progress'
+          documentType: 'progress',
         },
         content: {
           workingFeatures: ['Feature A', 'Feature B'],
           pendingImplementation: ['Feature C'],
           status: 'In progress',
-          knownIssues: ['Issue X']
-        }
+          knownIssues: ['Issue X'],
+        },
       };
-      
+
       const result = ProgressJsonV2Schema.safeParse(validProgress);
       expect(result.success).toBe(true);
     });
@@ -205,16 +205,16 @@ describe('JSON Document Schema v2', () => {
         schema: SCHEMA_VERSION,
         metadata: {
           ...validBaseMetadata,
-          documentType: 'progress'
+          documentType: 'progress',
         },
         content: {
           workingFeatures: [],
           pendingImplementation: [],
           // status is optional
-          knownIssues: []
-        }
+          knownIssues: [],
+        },
       };
-      
+
       const result = ProgressJsonV2Schema.safeParse(minimalProgress);
       expect(result.success).toBe(true);
     });
@@ -226,7 +226,7 @@ describe('JSON Document Schema v2', () => {
         schema: SCHEMA_VERSION,
         metadata: {
           ...validBaseMetadata,
-          documentType: 'system_patterns'
+          documentType: 'system_patterns',
         },
         content: {
           technicalDecisions: [
@@ -234,12 +234,12 @@ describe('JSON Document Schema v2', () => {
               title: 'Use TypeScript',
               context: 'Need strong typing',
               decision: 'We will use TypeScript',
-              consequences: ['Better type safety', 'Enhanced IDE support']
-            }
-          ]
-        }
+              consequences: ['Better type safety', 'Enhanced IDE support'],
+            },
+          ],
+        },
       };
-      
+
       const result = SystemPatternsJsonV2Schema.safeParse(validSystemPatterns);
       expect(result.success).toBe(true);
     });
@@ -249,7 +249,7 @@ describe('JSON Document Schema v2', () => {
         schema: SCHEMA_VERSION,
         metadata: {
           ...validBaseMetadata,
-          documentType: 'system_patterns'
+          documentType: 'system_patterns',
         },
         content: {
           technicalDecisions: [
@@ -257,12 +257,12 @@ describe('JSON Document Schema v2', () => {
               title: 'Use TypeScript',
               context: 'Need strong typing',
               decision: 'We will use TypeScript',
-              consequences: [] // Empty consequences
-            }
-          ]
-        }
+              consequences: [], // Empty consequences
+            },
+          ],
+        },
       };
-      
+
       const result = SystemPatternsJsonV2Schema.safeParse(invalidSystemPatterns);
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -284,9 +284,9 @@ describe('JSON Document Schema v2', () => {
         createdAt: now.toISOString(),
         version: 1,
         purpose: 'Testing the union schema',
-        userStories: []
+        userStories: [],
       };
-      
+
       const result = JsonDocumentV2Schema.safeParse(branchContext);
       expect(result.success).toBe(true);
     });
@@ -306,9 +306,9 @@ describe('JSON Document Schema v2', () => {
         recentChanges: [],
         activeDecisions: [],
         considerations: [],
-        nextSteps: []
+        nextSteps: [],
       };
-      
+
       const result = JsonDocumentV2Schema.safeParse(activeContext);
       expect(result.success).toBe(true);
     });
@@ -327,9 +327,9 @@ describe('JSON Document Schema v2', () => {
         workingFeatures: ['Feature A'],
         pendingImplementation: ['Feature B'],
         status: 'In Progress',
-        knownIssues: []
+        knownIssues: [],
       };
-      
+
       const result = JsonDocumentV2Schema.safeParse(progress);
       expect(result.success).toBe(true);
     });
@@ -350,11 +350,11 @@ describe('JSON Document Schema v2', () => {
             title: 'Use TypeScript',
             context: 'Need strong typing',
             decision: 'We will use TypeScript',
-            consequences: ['Better type safety']
-          }
-        ]
+            consequences: ['Better type safety'],
+          },
+        ],
       };
-      
+
       const result = JsonDocumentV2Schema.safeParse(systemPatterns);
       expect(result.success).toBe(true);
     });
@@ -371,9 +371,9 @@ describe('JSON Document Schema v2', () => {
         createdAt: now.toISOString(),
         version: 1,
         // Some arbitrary content
-        someField: 'value'
+        someField: 'value',
       };
-      
+
       const result = JsonDocumentV2Schema.safeParse(unknownType);
       expect(result.success).toBe(false);
       if (!result.success) {

@@ -4,8 +4,15 @@ import { UpdateTagIndexUseCaseV2 } from '../UpdateTagIndexUseCaseV2.js';
 import { BranchInfo } from '../../../../domain/entities/BranchInfo.js';
 import { DocumentPath } from '../../../../domain/entities/DocumentPath.js';
 import { DomainError } from '../../../../shared/errors/DomainError.js';
-import { createMockBranchRepository, createMockGlobalRepository } from '../../../../../tests/mocks/repositories.js';
-import { createTestDocument, createTestBranch, createTestTagIndex } from '../../../../../tests/helpers/test-data.js';
+import {
+  createMockBranchRepository,
+  createMockGlobalRepository,
+} from '../../../../../tests/mocks/repositories.js';
+import {
+  createTestDocument,
+  createTestBranch,
+  createTestTagIndex,
+} from '../../../../../tests/helpers/test-data.js';
 
 describe('UpdateTagIndexUseCaseV2', () => {
   let useCase: UpdateTagIndexUseCaseV2;
@@ -36,11 +43,7 @@ describe('UpdateTagIndexUseCaseV2', () => {
 
       // Setup repository mocks
       // @ts-ignore - ignore ts-mockito type error
-      when(mockGlobalRepo.listDocuments()).thenResolve([
-        doc1.path,
-        doc2.path,
-        doc3.path,
-      ]);
+      when(mockGlobalRepo.listDocuments()).thenResolve([doc1.path, doc2.path, doc3.path]);
 
       when(mockGlobalRepo.getDocument(deepEqual(DocumentPath.create('doc1.md')))).thenResolve(doc1);
       when(mockGlobalRepo.getDocument(deepEqual(DocumentPath.create('doc2.md')))).thenResolve(doc2);
@@ -74,10 +77,14 @@ describe('UpdateTagIndexUseCaseV2', () => {
 
     test('should update existing global tag index when not doing full rebuild', async () => {
       // Setup existing tag index
-      const existingTagIndex = createTestTagIndex('global', {
-        tag1: ['doc1.md', 'old-doc.md'],
-        tag2: ['doc1.md'],
-      }, true);
+      const existingTagIndex = createTestTagIndex(
+        'global',
+        {
+          tag1: ['doc1.md', 'old-doc.md'],
+          tag2: ['doc1.md'],
+        },
+        true
+      );
 
       // Setup documents with tags (doc1 updated, old-doc removed, doc2 added)
       const doc1 = createTestDocument('doc1.md', ['tag1', 'tag3']); // tag2 removed, tag3 added
@@ -110,7 +117,9 @@ describe('UpdateTagIndexUseCaseV2', () => {
       when(mockBranchRepo.exists('feature/nonexistent')).thenResolve(false);
 
       // Call the use case and expect error
-      await expect(useCase.execute({ branchName: 'feature/nonexistent' })).rejects.toThrow(DomainError);
+      await expect(useCase.execute({ branchName: 'feature/nonexistent' })).rejects.toThrow(
+        DomainError
+      );
     });
 
     test('should create and save a branch tag index', async () => {
@@ -125,8 +134,12 @@ describe('UpdateTagIndexUseCaseV2', () => {
       // Setup repository mocks
       when(mockBranchRepo.exists(branchName)).thenResolve(true);
       when(mockBranchRepo.listDocuments(deepEqual(branchInfo))).thenResolve([doc1.path, doc2.path]);
-      when(mockBranchRepo.getDocument(deepEqual(branchInfo), deepEqual(DocumentPath.create('doc1.md')))).thenResolve(doc1);
-      when(mockBranchRepo.getDocument(deepEqual(branchInfo), deepEqual(DocumentPath.create('doc2.md')))).thenResolve(doc2);
+      when(
+        mockBranchRepo.getDocument(deepEqual(branchInfo), deepEqual(DocumentPath.create('doc1.md')))
+      ).thenResolve(doc1);
+      when(
+        mockBranchRepo.getDocument(deepEqual(branchInfo), deepEqual(DocumentPath.create('doc2.md')))
+      ).thenResolve(doc2);
       when(mockBranchRepo.getTagIndex(deepEqual(branchInfo))).thenResolve(null);
 
       // Call the use case
@@ -155,8 +168,12 @@ describe('UpdateTagIndexUseCaseV2', () => {
       // Setup repository mocks
       when(mockBranchRepo.exists(branchName)).thenResolve(true);
       when(mockBranchRepo.listDocuments(deepEqual(branchInfo))).thenResolve([doc1.path, errorPath]);
-      when(mockBranchRepo.getDocument(deepEqual(branchInfo), deepEqual(DocumentPath.create('doc1.md')))).thenResolve(doc1);
-      when(mockBranchRepo.getDocument(deepEqual(branchInfo), deepEqual(errorPath))).thenThrow(new Error('Test error'));
+      when(
+        mockBranchRepo.getDocument(deepEqual(branchInfo), deepEqual(DocumentPath.create('doc1.md')))
+      ).thenResolve(doc1);
+      when(mockBranchRepo.getDocument(deepEqual(branchInfo), deepEqual(errorPath))).thenThrow(
+        new Error('Test error')
+      );
       when(mockBranchRepo.getTagIndex(deepEqual(branchInfo))).thenResolve(null);
 
       // Call the use case - should not throw despite error in document processing

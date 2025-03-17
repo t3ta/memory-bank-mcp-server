@@ -1,6 +1,6 @@
 /**
  * Active context converter
- * 
+ *
  * Converts active context markdown documents to JSON
  */
 import { v4 as uuidv4 } from 'uuid';
@@ -25,27 +25,27 @@ export class ActiveContextConverter implements BaseConverter {
   convert(markdownContent: string, path: DocumentPath): JsonDocument {
     // Parse markdown
     const parsed = parseMarkdownForMigration(markdownContent, path.value);
-    
+
     // Prepare content
     const content: ActiveContextContentV2 = {
-      currentWork: parsed.content.currentWork as string || '',
-      recentChanges: Array.isArray(parsed.content.recentChanges) 
-        ? parsed.content.recentChanges as string[] 
+      currentWork: (parsed.content.currentWork as string) || '',
+      recentChanges: Array.isArray(parsed.content.recentChanges)
+        ? (parsed.content.recentChanges as string[])
         : [],
-      activeDecisions: Array.isArray(parsed.content.activeDecisions) 
-        ? parsed.content.activeDecisions as string[] 
+      activeDecisions: Array.isArray(parsed.content.activeDecisions)
+        ? (parsed.content.activeDecisions as string[])
         : [],
-      considerations: Array.isArray(parsed.content.considerations) 
-        ? parsed.content.considerations as string[] 
+      considerations: Array.isArray(parsed.content.considerations)
+        ? (parsed.content.considerations as string[])
         : [],
-      nextSteps: Array.isArray(parsed.content.nextSteps) 
-        ? parsed.content.nextSteps as string[] 
-        : []
+      nextSteps: Array.isArray(parsed.content.nextSteps)
+        ? (parsed.content.nextSteps as string[])
+        : [],
     };
-    
+
     // Create tags
-    const tags = parsed.tags.map(tag => Tag.create(tag));
-    
+    const tags = parsed.tags.map((tag) => Tag.create(tag));
+
     // Create JsonDocument
     return JsonDocument.create({
       id: DocumentId.create(uuidv4()),
@@ -55,7 +55,7 @@ export class ActiveContextConverter implements BaseConverter {
       tags,
       content,
       lastModified: new Date(),
-      createdAt: new Date()
+      createdAt: new Date(),
     });
   }
 }

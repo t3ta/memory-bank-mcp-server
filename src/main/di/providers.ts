@@ -230,7 +230,7 @@ export function registerApplicationServices(container: DIContainer): void {
 
     return container.get('readJsonDocumentUseCase');
   });
-  
+
   container.registerFactory('writeJsonDocumentUseCase', () => {
     const branchRepository = container.get(
       'branchMemoryBankRepository'
@@ -241,7 +241,7 @@ export function registerApplicationServices(container: DIContainer): void {
 
     return container.get('writeJsonDocumentUseCase');
   });
-  
+
   container.registerFactory('deleteJsonDocumentUseCase', () => {
     const branchRepository = container.get(
       'branchMemoryBankRepository'
@@ -252,7 +252,7 @@ export function registerApplicationServices(container: DIContainer): void {
 
     return container.get('deleteJsonDocumentUseCase');
   });
-  
+
   container.registerFactory('searchJsonDocumentsUseCase', () => {
     const branchRepository = container.get(
       'branchMemoryBankRepository'
@@ -263,7 +263,7 @@ export function registerApplicationServices(container: DIContainer): void {
 
     return container.get('searchJsonDocumentsUseCase');
   });
-  
+
   container.registerFactory('updateJsonIndexUseCase', () => {
     const branchRepository = container.get(
       'branchMemoryBankRepository'
@@ -274,7 +274,7 @@ export function registerApplicationServices(container: DIContainer): void {
 
     return container.get('updateJsonIndexUseCase');
   });
-  
+
   // Pull Request use cases section removed
 }
 
@@ -292,16 +292,28 @@ export function registerInterfaceServices(container: DIContainer): void {
   // Register JSON controllers
   container.registerFactory('jsonBranchController', () => {
     // Get required use cases
-    const readJsonDocumentUseCase = container.get('readJsonDocumentUseCase') as ReadJsonDocumentUseCase;
-    const writeJsonDocumentUseCase = container.get('writeJsonDocumentUseCase') as WriteJsonDocumentUseCase;
-    const deleteJsonDocumentUseCase = container.get('deleteJsonDocumentUseCase') as DeleteJsonDocumentUseCase;
-    const searchJsonDocumentsUseCase = container.get('searchJsonDocumentsUseCase') as SearchJsonDocumentsUseCase;
-    const updateJsonIndexUseCase = container.get('updateJsonIndexUseCase') as UpdateJsonIndexUseCase;
-    const getRecentBranchesUseCase = container.get('getRecentBranchesUseCase') as GetRecentBranchesUseCase;
-    
+    const readJsonDocumentUseCase = container.get(
+      'readJsonDocumentUseCase'
+    ) as ReadJsonDocumentUseCase;
+    const writeJsonDocumentUseCase = container.get(
+      'writeJsonDocumentUseCase'
+    ) as WriteJsonDocumentUseCase;
+    const deleteJsonDocumentUseCase = container.get(
+      'deleteJsonDocumentUseCase'
+    ) as DeleteJsonDocumentUseCase;
+    const searchJsonDocumentsUseCase = container.get(
+      'searchJsonDocumentsUseCase'
+    ) as SearchJsonDocumentsUseCase;
+    const updateJsonIndexUseCase = container.get(
+      'updateJsonIndexUseCase'
+    ) as UpdateJsonIndexUseCase;
+    const getRecentBranchesUseCase = container.get(
+      'getRecentBranchesUseCase'
+    ) as GetRecentBranchesUseCase;
+
     // Get presenter
     const presenter = container.get('jsonResponsePresenter') as JsonResponsePresenter;
-    
+
     return new JsonBranchController(
       readJsonDocumentUseCase,
       writeJsonDocumentUseCase,
@@ -312,18 +324,28 @@ export function registerInterfaceServices(container: DIContainer): void {
       presenter
     );
   });
-  
+
   container.registerFactory('jsonGlobalController', () => {
     // Get required use cases
-    const readJsonDocumentUseCase = container.get('readJsonDocumentUseCase') as ReadJsonDocumentUseCase;
-    const writeJsonDocumentUseCase = container.get('writeJsonDocumentUseCase') as WriteJsonDocumentUseCase;
-    const deleteJsonDocumentUseCase = container.get('deleteJsonDocumentUseCase') as DeleteJsonDocumentUseCase;
-    const searchJsonDocumentsUseCase = container.get('searchJsonDocumentsUseCase') as SearchJsonDocumentsUseCase;
-    const updateJsonIndexUseCase = container.get('updateJsonIndexUseCase') as UpdateJsonIndexUseCase;
-    
+    const readJsonDocumentUseCase = container.get(
+      'readJsonDocumentUseCase'
+    ) as ReadJsonDocumentUseCase;
+    const writeJsonDocumentUseCase = container.get(
+      'writeJsonDocumentUseCase'
+    ) as WriteJsonDocumentUseCase;
+    const deleteJsonDocumentUseCase = container.get(
+      'deleteJsonDocumentUseCase'
+    ) as DeleteJsonDocumentUseCase;
+    const searchJsonDocumentsUseCase = container.get(
+      'searchJsonDocumentsUseCase'
+    ) as SearchJsonDocumentsUseCase;
+    const updateJsonIndexUseCase = container.get(
+      'updateJsonIndexUseCase'
+    ) as UpdateJsonIndexUseCase;
+
     // Get presenter
     const presenter = container.get('jsonResponsePresenter') as JsonResponsePresenter;
-    
+
     return new JsonGlobalController(
       readJsonDocumentUseCase,
       writeJsonDocumentUseCase,

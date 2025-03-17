@@ -32,14 +32,14 @@ const createTestDocuments = () => {
     title: 'Document 2',
     documentType: 'branch_context',
     tags: [Tag.create('tag2'), Tag.create('tag3')],
-    content: { 
+    content: {
       purpose: 'Test branch purpose', // branch_contextタイプに必要なフィールド
       userStories: [
         {
           description: 'Test user story',
-          completed: false
-        }
-      ]
+          completed: false,
+        },
+      ],
     },
     lastModified: new Date('2023-01-02T00:00:00.000Z'),
     createdAt: new Date('2023-01-02T00:00:00.000Z'),
@@ -51,12 +51,12 @@ const createTestDocuments = () => {
     title: 'Document 3',
     documentType: 'active_context',
     tags: [Tag.create('tag1'), Tag.create('tag3'), Tag.create('tag4')],
-    content: { 
+    content: {
       currentWork: 'Test current work',
       recentChanges: ['change 1', 'change 2'],
       activeDecisions: [],
       considerations: [],
-      nextSteps: []
+      nextSteps: [],
     }, // active_contextに合わせたコンテンツ
     lastModified: new Date('2023-01-03T00:00:00.000Z'),
     createdAt: new Date('2023-01-03T00:00:00.000Z'),
@@ -69,7 +69,7 @@ describe('SearchJsonDocumentsUseCase', () => {
   // Mocks
   let jsonRepositoryMock: IJsonDocumentRepository;
   let globalRepositoryMock: IJsonDocumentRepository;
-  
+
   // Use case
   let useCase: SearchJsonDocumentsUseCase;
 
@@ -95,17 +95,19 @@ describe('SearchJsonDocumentsUseCase', () => {
       const branchInfo = BranchInfo.create(testBranchName);
       const dummyPath = DocumentPath.create('index.json');
       const searchTags = ['tag1', 'tag3'];
-      const tagObjects = searchTags.map(tag => Tag.create(tag));
-      
+      const tagObjects = searchTags.map((tag) => Tag.create(tag));
+
       // These documents have either tag1 or tag3
       const expectedDocuments = [testDocuments[0], testDocuments[2]];
 
       // Mock repository behavior
-      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(dummyPath)))
-        .thenResolve(true);
-      
-      when(jsonRepositoryMock.findByTags(deepEqual(branchInfo), anything(), false))
-        .thenResolve(expectedDocuments);
+      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(dummyPath))).thenResolve(
+        true
+      );
+
+      when(jsonRepositoryMock.findByTags(deepEqual(branchInfo), anything(), false)).thenResolve(
+        expectedDocuments
+      );
 
       // Act
       const result = await useCase.execute({
@@ -133,17 +135,19 @@ describe('SearchJsonDocumentsUseCase', () => {
       const branchInfo = BranchInfo.create(testBranchName);
       const dummyPath = DocumentPath.create('index.json');
       const searchTags = ['tag1', 'tag3'];
-      const tagObjects = searchTags.map(tag => Tag.create(tag));
-      
+      const tagObjects = searchTags.map((tag) => Tag.create(tag));
+
       // Only document 3 has both tag1 and tag3
       const expectedDocuments = [testDocuments[2]];
 
       // Mock repository behavior
-      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(dummyPath)))
-        .thenResolve(true);
-      
-      when(jsonRepositoryMock.findByTags(deepEqual(branchInfo), anything(), true))
-        .thenResolve(expectedDocuments);
+      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(dummyPath))).thenResolve(
+        true
+      );
+
+      when(jsonRepositoryMock.findByTags(deepEqual(branchInfo), anything(), true)).thenResolve(
+        expectedDocuments
+      );
 
       // Act
       const result = await useCase.execute({
@@ -168,16 +172,18 @@ describe('SearchJsonDocumentsUseCase', () => {
       const branchInfo = BranchInfo.create(testBranchName);
       const dummyPath = DocumentPath.create('index.json');
       const documentType = 'branch_context';
-      
+
       // Only document 2 is of type branch_context
       const expectedDocuments = [testDocuments[1]];
 
       // Mock repository behavior
-      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(dummyPath)))
-        .thenResolve(true);
-      
-      when(jsonRepositoryMock.findByType(deepEqual(branchInfo), documentType))
-        .thenResolve(expectedDocuments);
+      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(dummyPath))).thenResolve(
+        true
+      );
+
+      when(jsonRepositoryMock.findByType(deepEqual(branchInfo), documentType)).thenResolve(
+        expectedDocuments
+      );
 
       // Act
       const result = await useCase.execute({
@@ -204,8 +210,9 @@ describe('SearchJsonDocumentsUseCase', () => {
       const searchTags = ['tag1'];
 
       // Mock repository behavior
-      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(dummyPath)))
-        .thenResolve(false);
+      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(dummyPath))).thenResolve(
+        false
+      );
 
       // Act & Assert
       try {
@@ -230,14 +237,15 @@ describe('SearchJsonDocumentsUseCase', () => {
       // Arrange
       const branchInfo = BranchInfo.create('feature/global'); // 変更: 'global' -> 'feature/global'
       const searchTags = ['tag1'];
-      const tagObjects = searchTags.map(tag => Tag.create(tag));
-      
+      const tagObjects = searchTags.map((tag) => Tag.create(tag));
+
       // Documents with tag1
       const expectedDocuments = [testDocuments[0], testDocuments[2]];
 
       // Mock repository behavior
-      when(globalRepositoryMock.findByTags(deepEqual(branchInfo), anything(), false))
-        .thenResolve(expectedDocuments);
+      when(globalRepositoryMock.findByTags(deepEqual(branchInfo), anything(), false)).thenResolve(
+        expectedDocuments
+      );
 
       // Act
       const result = await useCase.execute({
@@ -282,16 +290,15 @@ describe('SearchJsonDocumentsUseCase', () => {
       const branchInfo = BranchInfo.create(testBranchName);
       const dummyPath = DocumentPath.create('index.json');
       const searchTags = ['tag1'];
-      const domainError = new DomainError(
-        DomainErrorCodes.INVALID_TAG,
-        'Invalid tag format'
+      const domainError = new DomainError(DomainErrorCodes.INVALID_TAG, 'Invalid tag format');
+
+      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(dummyPath))).thenResolve(
+        true
       );
 
-      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(dummyPath)))
-        .thenResolve(true);
-      
-      when(jsonRepositoryMock.findByTags(deepEqual(branchInfo), anything(), false))
-        .thenThrow(domainError);
+      when(jsonRepositoryMock.findByTags(deepEqual(branchInfo), anything(), false)).thenThrow(
+        domainError
+      );
 
       // Act & Assert
       await expect(
@@ -309,11 +316,13 @@ describe('SearchJsonDocumentsUseCase', () => {
       const searchTags = ['tag1'];
       const unknownError = new Error('Something went wrong');
 
-      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(dummyPath)))
-        .thenResolve(true);
-      
-      when(jsonRepositoryMock.findByTags(deepEqual(branchInfo), anything(), false))
-        .thenThrow(unknownError);
+      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(dummyPath))).thenResolve(
+        true
+      );
+
+      when(jsonRepositoryMock.findByTags(deepEqual(branchInfo), anything(), false)).thenThrow(
+        unknownError
+      );
 
       // Act & Assert
       await expect(

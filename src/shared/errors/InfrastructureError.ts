@@ -25,7 +25,7 @@ export const InfrastructureErrorCodes = {
   GIT_ERROR: 'GIT_ERROR',
   PERSISTENCE_ERROR: 'PERSISTENCE_ERROR',
   // 追加したエラーコード
-  INVALID_ARGUMENT: 'INVALID_ARGUMENT'
+  INVALID_ARGUMENT: 'INVALID_ARGUMENT',
 } as const;
 
 export type InfrastructureErrorCode = keyof typeof InfrastructureErrorCodes;

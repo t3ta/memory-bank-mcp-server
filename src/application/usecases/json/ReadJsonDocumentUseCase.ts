@@ -94,7 +94,8 @@ export interface ReadJsonDocumentOutput {
  * Use case for reading a JSON document
  */
 export class ReadJsonDocumentUseCase
-  implements IUseCase<ReadJsonDocumentInput, ReadJsonDocumentOutput> {
+  implements IUseCase<ReadJsonDocumentInput, ReadJsonDocumentOutput>
+{
   /**
    * Constructor
    * @param jsonRepository JSON document repository
@@ -103,7 +104,7 @@ export class ReadJsonDocumentUseCase
   constructor(
     private readonly jsonRepository: IJsonDocumentRepository,
     private readonly globalRepository?: IJsonDocumentRepository
-  ) { }
+  ) {}
 
   /**
    * Execute the use case

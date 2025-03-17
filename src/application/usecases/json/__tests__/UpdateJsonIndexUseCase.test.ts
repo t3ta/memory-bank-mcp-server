@@ -33,14 +33,14 @@ const createTestDocuments = () => {
     title: 'Document 2',
     documentType: 'branch_context',
     tags: [Tag.create('tag2'), Tag.create('tag3')],
-    content: { 
+    content: {
       purpose: 'Test branch purpose',
       userStories: [
         {
           description: 'Test user story',
-          completed: false
-        }
-      ] 
+          completed: false,
+        },
+      ],
     },
   });
 
@@ -52,7 +52,7 @@ describe('UpdateJsonIndexUseCase', () => {
   let jsonRepositoryMock: IJsonDocumentRepository;
   let globalRepositoryMock: IJsonDocumentRepository;
   let indexServiceMock: IIndexService;
-  
+
   // Use case
   let useCase: UpdateJsonIndexUseCase;
 
@@ -81,14 +81,15 @@ describe('UpdateJsonIndexUseCase', () => {
       const dummyPath = DocumentPath.create('index.json');
 
       // Mock repository behavior
-      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(dummyPath)))
-        .thenResolve(true);
-      
-      when(jsonRepositoryMock.listAll(deepEqual(branchInfo)))
-        .thenResolve(testDocuments);
-      
-      when(indexServiceMock.buildIndex(deepEqual(branchInfo), deepEqual(testDocuments)))
-        .thenResolve();
+      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(dummyPath))).thenResolve(
+        true
+      );
+
+      when(jsonRepositoryMock.listAll(deepEqual(branchInfo))).thenResolve(testDocuments);
+
+      when(
+        indexServiceMock.buildIndex(deepEqual(branchInfo), deepEqual(testDocuments))
+      ).thenResolve();
 
       // Act
       const result = await useCase.execute({
@@ -116,14 +117,13 @@ describe('UpdateJsonIndexUseCase', () => {
       const dummyPath = DocumentPath.create('index.json');
 
       // Mock repository behavior
-      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(dummyPath)))
-        .thenResolve(true);
-      
-      when(jsonRepositoryMock.listAll(deepEqual(branchInfo)))
-        .thenResolve(testDocuments);
-      
-      when(indexServiceMock.addToIndex(deepEqual(branchInfo), anything()))
-        .thenResolve();
+      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(dummyPath))).thenResolve(
+        true
+      );
+
+      when(jsonRepositoryMock.listAll(deepEqual(branchInfo))).thenResolve(testDocuments);
+
+      when(indexServiceMock.addToIndex(deepEqual(branchInfo), anything())).thenResolve();
 
       // Act
       const result = await useCase.execute({
@@ -152,8 +152,9 @@ describe('UpdateJsonIndexUseCase', () => {
       const dummyPath = DocumentPath.create('index.json');
 
       // Mock repository behavior
-      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(dummyPath)))
-        .thenResolve(false);
+      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(dummyPath))).thenResolve(
+        false
+      );
 
       // Act & Assert
       try {
@@ -178,13 +179,11 @@ describe('UpdateJsonIndexUseCase', () => {
       // Arrange: Mock the UpdateJsonIndexUseCase instead of using BranchInfo for global
       // Use feature/ prefix to avoid BranchInfo validation error
       const mockBranchInfo = BranchInfo.create('feature/global');
-      
+
       // Mock repository behavior
-      when(globalRepositoryMock.listAll(anything()))
-        .thenResolve(testDocuments);
-      
-      when(indexServiceMock.buildIndex(anything(), deepEqual(testDocuments)))
-        .thenResolve();
+      when(globalRepositoryMock.listAll(anything())).thenResolve(testDocuments);
+
+      when(indexServiceMock.buildIndex(anything(), deepEqual(testDocuments))).thenResolve();
 
       // Act
       const result = await useCase.execute({
@@ -215,8 +214,9 @@ describe('UpdateJsonIndexUseCase', () => {
         'Invalid branch name'
       );
 
-      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(dummyPath)))
-        .thenThrow(domainError);
+      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(dummyPath))).thenThrow(
+        domainError
+      );
 
       // Act & Assert
       await expect(
@@ -232,8 +232,9 @@ describe('UpdateJsonIndexUseCase', () => {
       const dummyPath = DocumentPath.create('index.json');
       const unknownError = new Error('Something went wrong');
 
-      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(dummyPath)))
-        .thenThrow(unknownError);
+      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(dummyPath))).thenThrow(
+        unknownError
+      );
 
       // Act & Assert
       await expect(

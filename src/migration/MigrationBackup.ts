@@ -14,7 +14,7 @@ export class MigrationBackup {
   /**
    * @param logger Logger instance
    */
-  constructor(private readonly logger: Logger) { }
+  constructor(private readonly logger: Logger) {}
 
   /**
    * Create a backup of a directory

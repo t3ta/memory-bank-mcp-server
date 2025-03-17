@@ -5,7 +5,10 @@
  */
 import { CommandModule } from 'yargs';
 import chalk from 'chalk';
-import { MarkdownToJsonMigrator, MigrationOptions } from '../../../migration/MarkdownToJsonMigrator.js';
+import {
+  MarkdownToJsonMigrator,
+  MigrationOptions,
+} from '../../../migration/MarkdownToJsonMigrator.js';
 import { MigrationBackup } from '../../../migration/MigrationBackup.js';
 import { MigrationValidator } from '../../../migration/MigrationValidator.js';
 import { ConverterFactory } from '../../../migration/converters/ConverterFactory.js';
@@ -34,41 +37,41 @@ export const MigrateCommand: CommandModule<{}, MigrateArgs> = {
         alias: 'd',
         describe: 'Directory containing Markdown files to migrate',
         type: 'string',
-        default: './docs'
+        default: './docs',
       })
       .option('file', {
         alias: 'f',
         describe: 'Specific Markdown file to migrate',
-        type: 'string'
+        type: 'string',
       })
       .option('backup', {
         alias: 'b',
         describe: 'Create backup before migration',
         type: 'boolean',
-        default: true
+        default: true,
       })
       .option('overwrite', {
         alias: 'o',
         describe: 'Overwrite existing JSON files',
         type: 'boolean',
-        default: false
+        default: false,
       })
       .option('validate', {
         alias: 'v',
         describe: 'Validate generated JSON against schema',
         type: 'boolean',
-        default: true
+        default: true,
       })
       .option('deleteOriginals', {
         alias: 'D',
         describe: 'Delete original Markdown files after successful migration',
         type: 'boolean',
-        default: false
+        default: false,
       })
       .option('verbose', {
         describe: 'Output verbose logs',
         type: 'boolean',
-        default: false
+        default: false,
       });
   },
 
@@ -102,7 +105,7 @@ export const MigrateCommand: CommandModule<{}, MigrateArgs> = {
         createBackup: args.backup,
         overwriteExisting: args.overwrite,
         validateJson: args.validate,
-        deleteOriginals: args.deleteOriginals
+        deleteOriginals: args.deleteOriginals,
       };
 
       // Summary of operation
@@ -114,13 +117,17 @@ export const MigrateCommand: CommandModule<{}, MigrateArgs> = {
       console.log(`Create backup: ${args.backup ? chalk.green('Yes') : chalk.red('No')}`);
       console.log(`Overwrite existing: ${args.overwrite ? chalk.green('Yes') : chalk.red('No')}`);
       console.log(`Validate JSON: ${args.validate ? chalk.green('Yes') : chalk.red('No')}`);
-      console.log(`Delete originals: ${args.deleteOriginals ? chalk.yellow('Yes') : chalk.green('No')}`);
+      console.log(
+        `Delete originals: ${args.deleteOriginals ? chalk.yellow('Yes') : chalk.green('No')}`
+      );
       console.log();
 
       // Confirm with user if deleting originals
       if (args.deleteOriginals) {
         // In a real CLI, we would add a confirmation prompt here
-        console.log(chalk.yellow.bold('⚠️  Warning: Original Markdown files will be deleted after migration!'));
+        console.log(
+          chalk.yellow.bold('⚠️  Warning: Original Markdown files will be deleted after migration!')
+        );
         console.log();
       }
 
@@ -129,15 +136,17 @@ export const MigrateCommand: CommandModule<{}, MigrateArgs> = {
 
       let result;
       if (args.file) {
-        const success = await migrator.migrateFile(args.file, undefined, { validateJson: args.validate });
+        const success = await migrator.migrateFile(args.file, undefined, {
+          validateJson: args.validate,
+        });
         result = {
           success,
           stats: {
             successCount: success ? 1 : 0,
             failureCount: success ? 0 : 1,
             skippedCount: 0,
-            failures: success ? [] : [{ path: args.file, error: 'Migration failed' }]
-          }
+            failures: success ? [] : [{ path: args.file, error: 'Migration failed' }],
+          },
         };
       } else {
         result = await migrator.migrateDirectory(args.directory, options);
@@ -182,5 +191,5 @@ export const MigrateCommand: CommandModule<{}, MigrateArgs> = {
 
       process.exit(1);
     }
-  }
+  },
 };

@@ -21,15 +21,16 @@ import { UpdateJsonIndexUseCase } from '../../../application/usecases/json/Updat
  */
 export class JsonGlobalController
   implements
-  Pick<
-    IGlobalController,
-    | 'readJsonDocument'
-    | 'writeJsonDocument'
-    | 'deleteJsonDocument'
-    | 'listJsonDocuments'
-    | 'searchJsonDocuments'
-    | 'updateJsonIndex'
-  > {
+    Pick<
+      IGlobalController,
+      | 'readJsonDocument'
+      | 'writeJsonDocument'
+      | 'deleteJsonDocument'
+      | 'listJsonDocuments'
+      | 'searchJsonDocuments'
+      | 'updateJsonIndex'
+    >
+{
   readonly _type = 'controller' as const;
 
   /**
@@ -48,7 +49,7 @@ export class JsonGlobalController
     private readonly searchJsonDocumentsUseCase: SearchJsonDocumentsUseCase,
     private readonly updateJsonIndexUseCase: UpdateJsonIndexUseCase,
     private readonly presenter: IResponsePresenter
-  ) { }
+  ) {}
 
   /**
    * Read JSON document from global memory bank
@@ -153,7 +154,8 @@ export class JsonGlobalController
   }): Promise<MCPResponse<JsonDocumentDTO[]>> {
     try {
       logger.info(
-        `Listing JSON documents in global memory bank${options?.type ? ` of type ${options.type}` : ''
+        `Listing JSON documents in global memory bank${
+          options?.type ? ` of type ${options.type}` : ''
         }${options?.tags ? ` with tags ${options.tags.join(', ')}` : ''}`
       );
 

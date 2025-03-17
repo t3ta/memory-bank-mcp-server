@@ -11,7 +11,7 @@ import {
   BranchContextJsonV2Schema,
   ActiveContextJsonV2Schema,
   ProgressJsonV2Schema,
-  SystemPatternsJsonV2Schema
+  SystemPatternsJsonV2Schema,
 } from '../schemas/v2/json-document.js';
 
 /**
@@ -36,7 +36,7 @@ export class MigrationValidator {
   /**
    * @param logger Logger instance
    */
-  constructor(private readonly logger: Logger) { }
+  constructor(private readonly logger: Logger) {}
 
   /**
    * Validate a JSON document against its schema
@@ -77,21 +77,21 @@ export class MigrationValidator {
       return { success: true };
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errors = error.errors.map(err => {
+        const errors = error.errors.map((err) => {
           return `${err.path.join('.')}: ${err.message}`;
         });
 
         this.logger.error(`Validation failed for ${documentType} document: ${errors.join(', ')}`);
         return {
           success: false,
-          errors
+          errors,
         };
       }
 
       this.logger.error(`Unexpected validation error: ${(error as Error).message}`);
       return {
         success: false,
-        errors: [(error as Error).message]
+        errors: [(error as Error).message],
       };
     }
   }

@@ -159,7 +159,7 @@ export class WriteJsonDocumentUseCase
 
       // Create branch info - BranchInfo validation requires feature/ or fix/ prefix
       const branchInfo = isGlobal
-        ? BranchInfo.create('feature/global')  // 変更: 'global' -> 'feature/global'
+        ? BranchInfo.create('feature/global') // 変更: 'global' -> 'feature/global'
         : BranchInfo.create(input.branchName!);
 
       // Create document path

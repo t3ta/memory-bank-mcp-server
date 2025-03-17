@@ -346,12 +346,13 @@ Jestを使用する
 - 関心の分離が明確
 - テスト可能性の向上
 `;
-    
+
     mockBranchRepository.exists.mockResolvedValue(true);
     mockBranchRepository.getDocument.mockImplementation(
       async (branchInfo: BranchInfo, path: DocumentPath) => {
         const pathStr = path.value;
-        if (pathStr === 'systemPatterns.md') return createMemoryDocument('systemPatterns.md', systemPatternsContent);
+        if (pathStr === 'systemPatterns.md')
+          return createMemoryDocument('systemPatterns.md', systemPatternsContent);
         return null;
       }
     );

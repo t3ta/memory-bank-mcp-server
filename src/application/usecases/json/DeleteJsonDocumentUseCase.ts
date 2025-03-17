@@ -64,7 +64,8 @@ export interface DeleteJsonDocumentOutput {
  * Use case for deleting a JSON document
  */
 export class DeleteJsonDocumentUseCase
-  implements IUseCase<DeleteJsonDocumentInput, DeleteJsonDocumentOutput> {
+  implements IUseCase<DeleteJsonDocumentInput, DeleteJsonDocumentOutput>
+{
   /**
    * Constructor
    * @param jsonRepository JSON document repository
@@ -75,7 +76,7 @@ export class DeleteJsonDocumentUseCase
     private readonly jsonRepository: IJsonDocumentRepository,
     private readonly indexService: IIndexService,
     private readonly globalRepository?: IJsonDocumentRepository
-  ) { }
+  ) {}
 
   /**
    * Execute the use case

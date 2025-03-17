@@ -1,6 +1,6 @@
 /**
  * Branch context converter
- * 
+ *
  * Converts branch context markdown documents to JSON
  */
 import { v4 as uuidv4 } from 'uuid';
@@ -25,56 +25,57 @@ export class BranchContextConverter implements BaseConverter {
   convert(markdownContent: string, path: DocumentPath): JsonDocument {
     // Parse markdown
     const parsed = parseMarkdownForMigration(markdownContent, path.value);
-    
+
     // Extract branch info from path or content
     const branchName = this.extractBranchName(parsed.content, path.value);
-    
+
     // Create user stories array
-    const userStories = (parsed.content.userStories as Array<{ description: string; completed: boolean }> || [])
-      .map(story => ({
-        description: story.description,
-        completed: story.completed
-      }));
-    
+    const userStories = (
+      (parsed.content.userStories as Array<{ description: string; completed: boolean }>) || []
+    ).map((story) => ({
+      description: story.description,
+      completed: story.completed,
+    }));
+
     // Add any challenges from "解決する課題" section
     if (Array.isArray(parsed.content.challenges)) {
-      parsed.content.challenges.forEach(challenge => {
+      parsed.content.challenges.forEach((challenge) => {
         userStories.push({
           description: `解決する課題: ${challenge}`,
-          completed: false
+          completed: false,
         });
       });
     }
-    
+
     // Add any features from "必要な機能" section
     if (Array.isArray(parsed.content.features)) {
-      parsed.content.features.forEach(feature => {
+      parsed.content.features.forEach((feature) => {
         userStories.push({
           description: `必要な機能: ${feature}`,
-          completed: false
+          completed: false,
         });
       });
     }
-    
+
     // Add any expectations from "期待される動作" section
     if (Array.isArray(parsed.content.expectations)) {
-      parsed.content.expectations.forEach(expectation => {
+      parsed.content.expectations.forEach((expectation) => {
         userStories.push({
           description: `期待される動作: ${expectation}`,
-          completed: false
+          completed: false,
         });
       });
     }
-    
+
     // Prepare content
     const content: BranchContextContentV2 = {
-      purpose: parsed.content.purpose as string || `${branchName} ブランチの目的`,
-      userStories
+      purpose: (parsed.content.purpose as string) || `${branchName} ブランチの目的`,
+      userStories,
     };
-    
+
     // Create tags
-    const tags = parsed.tags.map(tag => Tag.create(tag));
-    
+    const tags = parsed.tags.map((tag) => Tag.create(tag));
+
     // Create JsonDocument
     return JsonDocument.create({
       id: DocumentId.create(uuidv4()),
@@ -84,10 +85,10 @@ export class BranchContextConverter implements BaseConverter {
       tags,
       content,
       lastModified: new Date(),
-      createdAt: new Date()
+      createdAt: new Date(),
     });
   }
-  
+
   /**
    * Extract branch name from content or path
    * @param content Parsed content
@@ -99,18 +100,18 @@ export class BranchContextConverter implements BaseConverter {
     if (typeof content.branchName === 'string' && content.branchName) {
       return content.branchName;
     }
-    
+
     // Try to extract from path
     const pathParts = path.split('/');
     const branchDirName = pathParts[pathParts.length - 2] || '';
-    
+
     // Convert directory name to branch name
     if (branchDirName.startsWith('feature-')) {
       return `feature/${branchDirName.substring(8)}`;
     } else if (branchDirName.startsWith('fix-')) {
       return `fix/${branchDirName.substring(4)}`;
     }
-    
+
     // Fallback to just the directory name
     return branchDirName;
   }

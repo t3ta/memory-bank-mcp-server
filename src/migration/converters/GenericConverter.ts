@@ -1,6 +1,6 @@
 /**
  * Generic converter
- * 
+ *
  * Converts generic markdown documents to JSON
  * Used as a fallback when no specific converter is available
  */
@@ -25,21 +25,25 @@ export class GenericConverter implements BaseConverter {
   convert(markdownContent: string, path: DocumentPath): JsonDocument {
     // Parse markdown
     const parsed = parseMarkdownForMigration(markdownContent, path.value);
-    
+
     // For generic documents, use the content as-is
     // Remove any properties that shouldn't be in the content
     const contentObj = { ...parsed.content };
-    
+
     // Ensure content is an object and not empty
-    if (typeof contentObj !== 'object' || contentObj === null || Object.keys(contentObj).length === 0) {
+    if (
+      typeof contentObj !== 'object' ||
+      contentObj === null ||
+      Object.keys(contentObj).length === 0
+    ) {
       // If empty, create a basic content object with the raw content
       contentObj.rawContent = markdownContent;
       contentObj.sections = this.extractSections(markdownContent);
     }
-    
+
     // Create tags
-    const tags = parsed.tags.map(tag => Tag.create(tag));
-    
+    const tags = parsed.tags.map((tag) => Tag.create(tag));
+
     // Create JsonDocument
     return JsonDocument.create({
       id: DocumentId.create(uuidv4()),
@@ -49,10 +53,10 @@ export class GenericConverter implements BaseConverter {
       tags,
       content: contentObj,
       lastModified: new Date(),
-      createdAt: new Date()
+      createdAt: new Date(),
     });
   }
-  
+
   /**
    * Extract sections from markdown content
    * @param content Markdown content
@@ -61,20 +65,20 @@ export class GenericConverter implements BaseConverter {
   private extractSections(content: string): Record<string, string> {
     const sections: Record<string, string> = {};
     const lines = content.split('\n');
-    
+
     let currentSection = 'main';
     let currentContent = '';
-    
+
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
-      
+
       // New section header
       if (line.startsWith('## ')) {
         // Save previous section
         if (currentContent.trim()) {
           sections[currentSection] = currentContent.trim();
         }
-        
+
         // Start new section
         currentSection = line
           .substring(3)
@@ -85,21 +89,21 @@ export class GenericConverter implements BaseConverter {
         currentContent = '';
         continue;
       }
-      
+
       // Skip H1 title and tags line
       if (line.startsWith('# ') || line.startsWith('tags:')) {
         continue;
       }
-      
+
       // Add content to current section
       currentContent += line + '\n';
     }
-    
+
     // Save last section
     if (currentContent.trim()) {
       sections[currentSection] = currentContent.trim();
     }
-    
+
     return sections;
   }
 }

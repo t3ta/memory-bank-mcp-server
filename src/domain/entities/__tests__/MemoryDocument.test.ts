@@ -378,7 +378,7 @@ describe('MemoryDocument', () => {
       expect(jsonDoc.metadata).toBeDefined();
       expect(jsonDoc.metadata.title).toBe('Test Document');
       expect(jsonDoc.metadata.path).toBe(props.path.value);
-      expect(jsonDoc.metadata.tags).toEqual(props.tags.map(tag => tag.value));
+      expect(jsonDoc.metadata.tags).toEqual(props.tags.map((tag) => tag.value));
       expect(jsonDoc.content).toBeDefined();
     });
 
@@ -419,15 +419,15 @@ describe('MemoryDocument', () => {
           documentType: 'active_context',
           path: 'test/document.json',
           tags: ['json', 'test'],
-          lastModified: '2023-01-01T00:00:00.000Z'
+          lastModified: '2023-01-01T00:00:00.000Z',
         },
         content: {
           currentWork: 'Working on tests',
           recentChanges: ['Added JSON support'],
           activeDecisions: ['Use JSON as primary format'],
           considerations: ['Performance implications'],
-          nextSteps: ['Implement more tests']
-        }
+          nextSteps: ['Implement more tests'],
+        },
       });
       const document = MemoryDocument.create(props);
 
@@ -453,15 +453,15 @@ describe('MemoryDocument', () => {
           documentType: 'active_context',
           path: 'test/document.json',
           tags: ['json', 'test'],
-          lastModified: new Date('2023-01-01T00:00:00.000Z')
+          lastModified: new Date('2023-01-01T00:00:00.000Z'),
         },
         content: {
           currentWork: 'Working on tests',
           recentChanges: ['Added JSON support'],
           activeDecisions: ['Use JSON as primary format'],
           considerations: ['Performance implications'],
-          nextSteps: ['Implement more tests']
-        }
+          nextSteps: ['Implement more tests'],
+        },
       };
       const path = DocumentPath.create('test/document.json');
 
@@ -489,16 +489,16 @@ describe('MemoryDocument', () => {
           documentType: 'branch_context',
           path: 'test/branchContext.json',
           tags: ['branch', 'context'],
-          lastModified: new Date('2023-01-01T00:00:00.000Z')
+          lastModified: new Date('2023-01-01T00:00:00.000Z'),
         },
         content: {
           purpose: 'Test purpose',
           createdAt: new Date('2023-01-01T00:00:00.000Z'),
           userStories: [
             { description: 'Story 1', completed: false },
-            { description: 'Story 2', completed: true }
-          ]
-        }
+            { description: 'Story 2', completed: true },
+          ],
+        },
       };
       const path = DocumentPath.create('test/branchContext.json');
 

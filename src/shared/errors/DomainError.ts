@@ -25,7 +25,7 @@ export const DomainErrorCodes = {
   VALIDATION_ERROR: 'VALIDATION_ERROR',
   UNAUTHORIZED_ACCESS: 'UNAUTHORIZED_ACCESS',
   // 追加したエラーコード
-  INVALID_TAG: 'INVALID_TAG'
+  INVALID_TAG: 'INVALID_TAG',
 } as const;
 
 export type DomainErrorCode = keyof typeof DomainErrorCodes;

@@ -320,11 +320,11 @@ describe('DocumentPath', () => {
       const paths = [
         DocumentPath.create('branchContext.md'),
         DocumentPath.create('branch-context.json'),
-        DocumentPath.create('test/branchcontext.md')
+        DocumentPath.create('test/branchcontext.md'),
       ];
 
       // Act & Assert
-      paths.forEach(path => {
+      paths.forEach((path) => {
         expect(path.inferDocumentType()).toBe('branch_context');
       });
     });
@@ -334,24 +334,21 @@ describe('DocumentPath', () => {
       const paths = [
         DocumentPath.create('activeContext.md'),
         DocumentPath.create('active-context.json'),
-        DocumentPath.create('test/activecontext.md')
+        DocumentPath.create('test/activecontext.md'),
       ];
 
       // Act & Assert
-      paths.forEach(path => {
+      paths.forEach((path) => {
         expect(path.inferDocumentType()).toBe('active_context');
       });
     });
 
     it('should infer progress type', () => {
       // Arrange
-      const paths = [
-        DocumentPath.create('progress.md'),
-        DocumentPath.create('test/progress.json')
-      ];
+      const paths = [DocumentPath.create('progress.md'), DocumentPath.create('test/progress.json')];
 
       // Act & Assert
-      paths.forEach(path => {
+      paths.forEach((path) => {
         expect(path.inferDocumentType()).toBe('progress');
       });
     });
@@ -361,11 +358,11 @@ describe('DocumentPath', () => {
       const paths = [
         DocumentPath.create('systemPatterns.md'),
         DocumentPath.create('system-patterns.json'),
-        DocumentPath.create('test/systempatterns.md')
+        DocumentPath.create('test/systempatterns.md'),
       ];
 
       // Act & Assert
-      paths.forEach(path => {
+      paths.forEach((path) => {
         expect(path.inferDocumentType()).toBe('system_patterns');
       });
     });
@@ -375,11 +372,11 @@ describe('DocumentPath', () => {
       const paths = [
         DocumentPath.create('unknown.md'),
         DocumentPath.create('test/random.json'),
-        DocumentPath.create('notes.txt')
+        DocumentPath.create('notes.txt'),
       ];
 
       // Act & Assert
-      paths.forEach(path => {
+      paths.forEach((path) => {
         expect(path.inferDocumentType()).toBe('generic');
       });
     });

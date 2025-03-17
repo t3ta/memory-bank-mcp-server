@@ -32,7 +32,7 @@ describe('WriteJsonDocumentUseCase', () => {
   let jsonRepositoryMock: IJsonDocumentRepository;
   let globalRepositoryMock: IJsonDocumentRepository;
   let indexServiceMock: IIndexService;
-  
+
   // Use case
   let useCase: WriteJsonDocumentUseCase;
 
@@ -62,14 +62,15 @@ describe('WriteJsonDocumentUseCase', () => {
       const documentPath = DocumentPath.create(testDocumentPath);
 
       // Mock repository behavior
-      when(jsonRepositoryMock.findByPath(deepEqual(branchInfo), deepEqual(documentPath)))
-        .thenResolve(null);
-      
-      when(jsonRepositoryMock.save(deepEqual(branchInfo), anything()))
-        .thenCall((branchInfo, document) => Promise.resolve(document));
-      
-      when(indexServiceMock.addToIndex(deepEqual(branchInfo), anything()))
-        .thenResolve();
+      when(
+        jsonRepositoryMock.findByPath(deepEqual(branchInfo), deepEqual(documentPath))
+      ).thenResolve(null);
+
+      when(jsonRepositoryMock.save(deepEqual(branchInfo), anything())).thenCall(
+        (branchInfo, document) => Promise.resolve(document)
+      );
+
+      when(indexServiceMock.addToIndex(deepEqual(branchInfo), anything())).thenResolve();
 
       // Act
       const result = await useCase.execute({
@@ -108,14 +109,15 @@ describe('WriteJsonDocumentUseCase', () => {
       const newContent = { newTest: 'newContent' };
 
       // Mock repository behavior
-      when(jsonRepositoryMock.findByPath(deepEqual(branchInfo), deepEqual(documentPath)))
-        .thenResolve(existingDocument);
-      
-      when(jsonRepositoryMock.save(deepEqual(branchInfo), anything()))
-        .thenCall((branchInfo, document) => Promise.resolve(document));
-      
-      when(indexServiceMock.addToIndex(deepEqual(branchInfo), anything()))
-        .thenResolve();
+      when(
+        jsonRepositoryMock.findByPath(deepEqual(branchInfo), deepEqual(documentPath))
+      ).thenResolve(existingDocument);
+
+      when(jsonRepositoryMock.save(deepEqual(branchInfo), anything())).thenCall(
+        (branchInfo, document) => Promise.resolve(document)
+      );
+
+      when(indexServiceMock.addToIndex(deepEqual(branchInfo), anything())).thenResolve();
 
       // Act
       const result = await useCase.execute({
@@ -153,14 +155,15 @@ describe('WriteJsonDocumentUseCase', () => {
       const documentPath = DocumentPath.create(testDocumentPath);
 
       // Mock repository behavior
-      when(globalRepositoryMock.findByPath(deepEqual(branchInfo), deepEqual(documentPath)))
-        .thenResolve(null);
-      
-      when(globalRepositoryMock.save(deepEqual(branchInfo), anything()))
-        .thenCall((branchInfo, document) => Promise.resolve(document));
-      
-      when(indexServiceMock.addToIndex(deepEqual(branchInfo), anything()))
-        .thenResolve();
+      when(
+        globalRepositoryMock.findByPath(deepEqual(branchInfo), deepEqual(documentPath))
+      ).thenResolve(null);
+
+      when(globalRepositoryMock.save(deepEqual(branchInfo), anything())).thenCall(
+        (branchInfo, document) => Promise.resolve(document)
+      );
+
+      when(indexServiceMock.addToIndex(deepEqual(branchInfo), anything())).thenResolve();
 
       // Act
       const result = await useCase.execute({
@@ -184,7 +187,9 @@ describe('WriteJsonDocumentUseCase', () => {
       expect(result.location).toBe('global');
 
       // Verify repository methods were called
-      verify(globalRepositoryMock.findByPath(deepEqual(branchInfo), deepEqual(documentPath))).once();
+      verify(
+        globalRepositoryMock.findByPath(deepEqual(branchInfo), deepEqual(documentPath))
+      ).once();
       verify(globalRepositoryMock.save(deepEqual(branchInfo), anything())).once();
       verify(indexServiceMock.addToIndex(deepEqual(branchInfo), anything())).once();
       verify(jsonRepositoryMock.findByPath(anything(), anything())).never();
@@ -355,8 +360,9 @@ describe('WriteJsonDocumentUseCase', () => {
         'Invalid document path'
       );
 
-      when(jsonRepositoryMock.findByPath(deepEqual(branchInfo), deepEqual(documentPath)))
-        .thenThrow(domainError);
+      when(jsonRepositoryMock.findByPath(deepEqual(branchInfo), deepEqual(documentPath))).thenThrow(
+        domainError
+      );
 
       // Act & Assert
       await expect(
@@ -378,8 +384,9 @@ describe('WriteJsonDocumentUseCase', () => {
       const documentPath = DocumentPath.create(testDocumentPath);
       const unknownError = new Error('Something went wrong');
 
-      when(jsonRepositoryMock.findByPath(deepEqual(branchInfo), deepEqual(documentPath)))
-        .thenThrow(unknownError);
+      when(jsonRepositoryMock.findByPath(deepEqual(branchInfo), deepEqual(documentPath))).thenThrow(
+        unknownError
+      );
 
       // Act & Assert
       await expect(

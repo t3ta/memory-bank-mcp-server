@@ -112,7 +112,9 @@ describe('WriteBranchDocumentUseCase', () => {
     });
 
     when(mockBranchRepo.exists(testBranchName)).thenResolve(true);
-    when(mockBranchRepo.getDocument(deepEqual(branchInfo), deepEqual(docPath))).thenResolve(existingDocument);
+    when(mockBranchRepo.getDocument(deepEqual(branchInfo), deepEqual(docPath))).thenResolve(
+      existingDocument
+    );
     when(mockBranchRepo.saveDocument(anything(), anything())).thenResolve();
 
     // Act
@@ -149,7 +151,9 @@ describe('WriteBranchDocumentUseCase', () => {
     });
 
     when(mockBranchRepo.exists(testBranchName)).thenResolve(true);
-    when(mockBranchRepo.getDocument(deepEqual(branchInfo), deepEqual(docPath))).thenResolve(existingDocument);
+    when(mockBranchRepo.getDocument(deepEqual(branchInfo), deepEqual(docPath))).thenResolve(
+      existingDocument
+    );
     when(mockBranchRepo.saveDocument(anything(), anything())).thenResolve();
 
     // Act

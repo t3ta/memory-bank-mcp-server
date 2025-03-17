@@ -18,10 +18,8 @@ const createTestDocument = (id: string, path: string, content?: Record<string, u
   const documentId = DocumentId.create(id);
   const documentPath = DocumentPath.create(path);
   // 常に有効なコンテンツを持つように修正
-  const validContent = content && Object.keys(content).length > 0 
-    ? content 
-    : { test: 'content' };
-    
+  const validContent = content && Object.keys(content).length > 0 ? content : { test: 'content' };
+
   return JsonDocument.create({
     id: documentId,
     path: documentPath,
@@ -38,7 +36,7 @@ describe('ReadJsonDocumentUseCase', () => {
   // Mocks
   let jsonRepositoryMock: IJsonDocumentRepository;
   let globalRepositoryMock: IJsonDocumentRepository;
-  
+
   // Use case
   let useCase: ReadJsonDocumentUseCase;
 
@@ -66,8 +64,9 @@ describe('ReadJsonDocumentUseCase', () => {
       const documentPath = DocumentPath.create(testDocumentPath);
       const expectedDocument = createTestDocument(testDocumentId, testDocumentPath);
 
-      when(jsonRepositoryMock.findByPath(deepEqual(branchInfo), deepEqual(documentPath)))
-        .thenResolve(expectedDocument);
+      when(
+        jsonRepositoryMock.findByPath(deepEqual(branchInfo), deepEqual(documentPath))
+      ).thenResolve(expectedDocument);
 
       // Act
       const result = await useCase.execute({
@@ -88,7 +87,9 @@ describe('ReadJsonDocumentUseCase', () => {
       expect(result.location).toBe(testBranchName);
 
       // Verify repository method was called - .once()ではなく.atLeast(1)を使用
-      verify(jsonRepositoryMock.findByPath(deepEqual(branchInfo), deepEqual(documentPath))).atLeast(1);
+      verify(jsonRepositoryMock.findByPath(deepEqual(branchInfo), deepEqual(documentPath))).atLeast(
+        1
+      );
       verify(globalRepositoryMock.findByPath(anything(), anything())).never();
     });
 
@@ -97,8 +98,7 @@ describe('ReadJsonDocumentUseCase', () => {
       const documentId = DocumentId.create(testDocumentId);
       const expectedDocument = createTestDocument(testDocumentId, testDocumentPath);
 
-      when(jsonRepositoryMock.findById(deepEqual(documentId)))
-        .thenResolve(expectedDocument);
+      when(jsonRepositoryMock.findById(deepEqual(documentId))).thenResolve(expectedDocument);
 
       // Act
       const result = await useCase.execute({
@@ -123,8 +123,9 @@ describe('ReadJsonDocumentUseCase', () => {
       const branchInfo = BranchInfo.create(testBranchName);
       const documentPath = DocumentPath.create(testDocumentPath);
 
-      when(jsonRepositoryMock.findByPath(deepEqual(branchInfo), deepEqual(documentPath)))
-        .thenResolve(null);
+      when(
+        jsonRepositoryMock.findByPath(deepEqual(branchInfo), deepEqual(documentPath))
+      ).thenResolve(null);
 
       // Act & Assert
       try {
@@ -135,11 +136,15 @@ describe('ReadJsonDocumentUseCase', () => {
         fail('Expected DomainError to be thrown');
       } catch (error) {
         expect(error).toBeInstanceOf(DomainError);
-        expect((error as DomainError).message).toContain(`Document "${testDocumentPath}" not found in branch`);
+        expect((error as DomainError).message).toContain(
+          `Document "${testDocumentPath}" not found in branch`
+        );
       }
 
       // Verify repository method was called - .once()ではなく.atLeast(1)を使用
-      verify(jsonRepositoryMock.findByPath(deepEqual(branchInfo), deepEqual(documentPath))).atLeast(1);
+      verify(jsonRepositoryMock.findByPath(deepEqual(branchInfo), deepEqual(documentPath))).atLeast(
+        1
+      );
     });
   });
 
@@ -150,8 +155,9 @@ describe('ReadJsonDocumentUseCase', () => {
       const documentPath = DocumentPath.create(testDocumentPath);
       const expectedDocument = createTestDocument(testDocumentId, testDocumentPath);
 
-      when(globalRepositoryMock.findByPath(deepEqual(branchInfo), deepEqual(documentPath)))
-        .thenResolve(expectedDocument);
+      when(
+        globalRepositoryMock.findByPath(deepEqual(branchInfo), deepEqual(documentPath))
+      ).thenResolve(expectedDocument);
 
       // Act
       const result = await useCase.execute({
@@ -166,7 +172,9 @@ describe('ReadJsonDocumentUseCase', () => {
       expect(result.location).toBe('global');
 
       // Verify repository method was called - .once()ではなく.atLeast(1)を使用
-      verify(globalRepositoryMock.findByPath(deepEqual(branchInfo), deepEqual(documentPath))).atLeast(1);
+      verify(
+        globalRepositoryMock.findByPath(deepEqual(branchInfo), deepEqual(documentPath))
+      ).atLeast(1);
       verify(jsonRepositoryMock.findByPath(anything(), anything())).never();
     });
 
@@ -175,8 +183,7 @@ describe('ReadJsonDocumentUseCase', () => {
       const documentId = DocumentId.create(testDocumentId);
       const expectedDocument = createTestDocument(testDocumentId, testDocumentPath);
 
-      when(globalRepositoryMock.findById(deepEqual(documentId)))
-        .thenResolve(expectedDocument);
+      when(globalRepositoryMock.findById(deepEqual(documentId))).thenResolve(expectedDocument);
 
       // Act
       const result = await useCase.execute({
@@ -226,8 +233,7 @@ describe('ReadJsonDocumentUseCase', () => {
         'Invalid document path'
       );
 
-      when(jsonRepositoryMock.findById(deepEqual(documentId)))
-        .thenThrow(domainError);
+      when(jsonRepositoryMock.findById(deepEqual(documentId))).thenThrow(domainError);
 
       // Act & Assert
       await expect(
@@ -243,8 +249,7 @@ describe('ReadJsonDocumentUseCase', () => {
       const documentId = DocumentId.create(testDocumentId);
       const unknownError = new Error('Something went wrong');
 
-      when(jsonRepositoryMock.findById(deepEqual(documentId)))
-        .thenThrow(unknownError);
+      when(jsonRepositoryMock.findById(deepEqual(documentId))).thenThrow(unknownError);
 
       // Act & Assert
       await expect(

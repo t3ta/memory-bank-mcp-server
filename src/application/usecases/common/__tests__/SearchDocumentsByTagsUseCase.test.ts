@@ -9,8 +9,15 @@ import {
   ApplicationErrorCodes,
 } from '../../../../shared/errors/ApplicationError.js';
 import { DomainError, DomainErrorCodes } from '../../../../shared/errors/DomainError.js';
-import { createMockBranchRepository, createMockGlobalRepository } from '../../../../../tests/mocks/repositories.js';
-import { createTestDocument, createTestBranch, createTestTags } from '../../../../../tests/helpers/test-data.js';
+import {
+  createMockBranchRepository,
+  createMockGlobalRepository,
+} from '../../../../../tests/mocks/repositories.js';
+import {
+  createTestDocument,
+  createTestBranch,
+  createTestTags,
+} from '../../../../../tests/helpers/test-data.js';
 
 describe('SearchDocumentsByTagsUseCase', () => {
   let useCase: SearchDocumentsByTagsUseCase;

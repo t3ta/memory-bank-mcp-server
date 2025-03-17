@@ -11,7 +11,9 @@ import { logger } from '../../shared/utils/logger.js';
  * Presenter for MCP server responses
  * Transforms application output into standardized MCP response format
  */
-export class MCPResponsePresenter implements IPresenter<MCPResponse, MCPResponse>, IResponsePresenter {
+export class MCPResponsePresenter
+  implements IPresenter<MCPResponse, MCPResponse>, IResponsePresenter
+{
   /**
    * Present success response
    * @param data Data to present

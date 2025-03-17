@@ -22,16 +22,17 @@ import { GetRecentBranchesUseCase } from '../../../application/usecases/common/G
  */
 export class JsonBranchController
   implements
-  Pick<
-    IBranchController,
-    | 'readJsonDocument'
-    | 'writeJsonDocument'
-    | 'deleteJsonDocument'
-    | 'listJsonDocuments'
-    | 'searchJsonDocuments'
-    | 'updateJsonIndex'
-    | 'getRecentBranches'
-  > {
+    Pick<
+      IBranchController,
+      | 'readJsonDocument'
+      | 'writeJsonDocument'
+      | 'deleteJsonDocument'
+      | 'listJsonDocuments'
+      | 'searchJsonDocuments'
+      | 'updateJsonIndex'
+      | 'getRecentBranches'
+    >
+{
   readonly _type = 'controller' as const;
 
   /**
@@ -52,7 +53,7 @@ export class JsonBranchController
     private readonly updateJsonIndexUseCase: UpdateJsonIndexUseCase,
     private readonly getRecentBranchesUseCase: GetRecentBranchesUseCase,
     private readonly presenter: IResponsePresenter
-  ) { }
+  ) {}
 
   /**
    * Read JSON document from branch memory bank
@@ -169,7 +170,8 @@ export class JsonBranchController
   ): Promise<MCPResponse<JsonDocumentDTO[]>> {
     try {
       logger.info(
-        `Listing JSON documents in branch ${branchName}${options?.type ? ` of type ${options.type}` : ''
+        `Listing JSON documents in branch ${branchName}${
+          options?.type ? ` of type ${options.type}` : ''
         }${options?.tags ? ` with tags ${options.tags.join(', ')}` : ''}`
       );
 

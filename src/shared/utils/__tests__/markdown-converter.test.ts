@@ -5,7 +5,7 @@ import {
   ProgressJson,
   SystemPatternsJson,
   JsonDocument,
-  BaseJsonDocument
+  BaseJsonDocument,
 } from '../../../schemas/json-document.js';
 
 describe('markdown-converter', () => {
@@ -19,16 +19,16 @@ describe('markdown-converter', () => {
           documentType: 'branch_context',
           path: 'branchContext.json',
           tags: ['branch', 'context'],
-          lastModified: new Date('2023-01-01T00:00:00.000Z')
+          lastModified: new Date('2023-01-01T00:00:00.000Z'),
         },
         content: {
           purpose: 'This is a test branch for JSON support.',
           createdAt: new Date('2023-01-01T00:00:00.000Z'),
           userStories: [
             { description: 'Implement JSON support', completed: false },
-            { description: 'Write tests', completed: true }
-          ]
-        }
+            { description: 'Write tests', completed: true },
+          ],
+        },
       };
 
       // Act
@@ -55,15 +55,15 @@ describe('markdown-converter', () => {
           documentType: 'active_context',
           path: 'activeContext.json',
           tags: ['active', 'context'],
-          lastModified: new Date('2023-01-01T00:00:00.000Z')
+          lastModified: new Date('2023-01-01T00:00:00.000Z'),
         },
         content: {
           currentWork: 'Working on JSON conversion',
           recentChanges: ['Added JSON schema', 'Implemented converter'],
           activeDecisions: ['Use JSON as primary format', 'Generate Markdown views'],
           considerations: ['Performance for large documents', 'Synchronization issues'],
-          nextSteps: ['Implement more tests', 'Document the approach']
-        }
+          nextSteps: ['Implement more tests', 'Document the approach'],
+        },
       };
 
       // Act
@@ -97,14 +97,14 @@ describe('markdown-converter', () => {
           documentType: 'progress',
           path: 'progress.json',
           tags: ['progress', 'status'],
-          lastModified: new Date('2023-01-01T00:00:00.000Z')
+          lastModified: new Date('2023-01-01T00:00:00.000Z'),
         },
         content: {
           workingFeatures: ['JSON schema definition', 'Basic conversion'],
           pendingImplementation: ['Advanced validation', 'Search optimization'],
           status: 'In development',
-          knownIssues: ['Complex document structure handling', 'Performance with large files']
-        }
+          knownIssues: ['Complex document structure handling', 'Performance with large files'],
+        },
       };
 
       // Act
@@ -135,7 +135,7 @@ describe('markdown-converter', () => {
           documentType: 'system_patterns',
           path: 'systemPatterns.json',
           tags: ['system', 'patterns'],
-          lastModified: new Date('2023-01-01T00:00:00.000Z')
+          lastModified: new Date('2023-01-01T00:00:00.000Z'),
         },
         content: {
           technicalDecisions: [
@@ -146,8 +146,8 @@ describe('markdown-converter', () => {
               consequences: [
                 'Better structured data',
                 'Easier to validate',
-                'More complex implementation'
-              ]
+                'More complex implementation',
+              ],
             },
             {
               title: 'Bidirectional Conversion',
@@ -156,11 +156,11 @@ describe('markdown-converter', () => {
               consequences: [
                 'Maintains compatibility',
                 'Increases code complexity',
-                'Potential synchronization issues'
-              ]
-            }
-          ]
-        }
+                'Potential synchronization issues',
+              ],
+            },
+          ],
+        },
       };
 
       // Act
@@ -174,7 +174,9 @@ describe('markdown-converter', () => {
       expect(markdown).toContain('#### コンテキスト');
       expect(markdown).toContain('Need a more structured format than Markdown for data storage');
       expect(markdown).toContain('#### 決定事項');
-      expect(markdown).toContain('Use JSON as primary storage format with Markdown as presentation');
+      expect(markdown).toContain(
+        'Use JSON as primary storage format with Markdown as presentation'
+      );
       expect(markdown).toContain('#### 影響');
       expect(markdown).toContain('- Better structured data');
       expect(markdown).toContain('- Easier to validate');
@@ -191,15 +193,15 @@ describe('markdown-converter', () => {
           documentType: 'active_context',
           path: 'emptyActiveContext.json',
           tags: [],
-          lastModified: new Date('2023-01-01T00:00:00.000Z')
+          lastModified: new Date('2023-01-01T00:00:00.000Z'),
         },
         content: {
           currentWork: '',
           recentChanges: [],
           activeDecisions: [],
           considerations: [],
-          nextSteps: []
-        }
+          nextSteps: [],
+        },
       };
 
       // Act
@@ -222,15 +224,15 @@ describe('markdown-converter', () => {
           documentType: 'unknown_type',
           path: 'unknown.json',
           tags: ['unknown'],
-          lastModified: new Date('2023-01-01T00:00:00.000Z')
+          lastModified: new Date('2023-01-01T00:00:00.000Z'),
         },
         content: {
           someField: 'Some value',
           listField: ['Item 1', 'Item 2'],
           nestedField: {
-            subField: 'Nested value'
-          }
-        }
+            subField: 'Nested value',
+          },
+        },
       };
 
       // Act

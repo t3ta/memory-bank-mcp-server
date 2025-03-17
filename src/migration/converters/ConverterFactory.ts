@@ -14,7 +14,7 @@ import { GenericConverter } from './GenericConverter.js';
  */
 export class ConverterFactory {
   private readonly converters: Map<DocumentType, BaseConverter>;
-  
+
   /**
    * Create a new converter factory
    */
@@ -22,7 +22,7 @@ export class ConverterFactory {
     this.converters = new Map<DocumentType, BaseConverter>();
     this.registerDefaultConverters();
   }
-  
+
   /**
    * Register default converters for standard document types
    */
@@ -33,7 +33,7 @@ export class ConverterFactory {
     this.registerConverter('progress', new ProgressConverter());
     this.registerConverter('generic', new GenericConverter());
   }
-  
+
   /**
    * Register a custom converter for a document type
    * @param documentType Document type
@@ -42,7 +42,7 @@ export class ConverterFactory {
   public registerConverter(documentType: DocumentType, converter: BaseConverter): void {
     this.converters.set(documentType, converter);
   }
-  
+
   /**
    * Get converter for a document type
    * @param documentType Document type
@@ -51,18 +51,18 @@ export class ConverterFactory {
    */
   public getConverter(documentType: DocumentType): BaseConverter {
     const converter = this.converters.get(documentType);
-    
+
     if (!converter) {
       // Fall back to generic converter
       const genericConverter = this.converters.get('generic');
-      
+
       if (!genericConverter) {
         throw new Error(`No converter registered for document type '${documentType}'`);
       }
-      
+
       return genericConverter;
     }
-    
+
     return converter;
   }
 }

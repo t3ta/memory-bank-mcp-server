@@ -39,7 +39,7 @@ export abstract class FileSystemTagIndexRepository {
     protected readonly globalMemoryBankPath: string,
     protected readonly branchRepository: IBranchMemoryBankRepository,
     protected readonly globalRepository: IGlobalMemoryBankRepository
-  ) { }
+  ) {}
 
   /**
    * Get path to branch index file

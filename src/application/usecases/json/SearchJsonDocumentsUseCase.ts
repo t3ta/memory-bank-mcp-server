@@ -160,17 +160,14 @@ export class SearchJsonDocumentsUseCase
 
       // Create branch info
       const branchInfo = isGlobal
-        ? BranchInfo.create('feature/global')  // 変更: 'global' -> 'feature/global'
+        ? BranchInfo.create('feature/global') // 変更: 'global' -> 'feature/global'
         : BranchInfo.create(input.branchName!);
 
       // Check if branch exists for branch searches
       if (!isGlobal) {
         // 変更: dummy pathを使用
         const dummyPath = DocumentPath.create('index.json');
-        const branchExists = await this.jsonRepository.exists(
-          branchInfo,
-          dummyPath
-        );
+        const branchExists = await this.jsonRepository.exists(branchInfo, dummyPath);
 
         if (!branchExists) {
           throw new DomainError(

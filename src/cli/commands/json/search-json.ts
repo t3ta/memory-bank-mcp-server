@@ -85,10 +85,14 @@ export class SearchJsonCommand extends CommandBase {
       let result;
       if (argv.branch) {
         // Use JSON branch use case through MCP
-        result = await app.getBranchController().searchJsonDocuments(argv.branch, argv.tags ? argv.tags.join(' ') : '');
+        result = await app
+          .getBranchController()
+          .searchJsonDocuments(argv.branch, argv.tags ? argv.tags.join(' ') : '');
       } else {
         // Use JSON global use case through MCP
-        result = await app.getGlobalController().searchJsonDocuments(argv.tags ? argv.tags.join(' ') : '');
+        result = await app
+          .getGlobalController()
+          .searchJsonDocuments(argv.tags ? argv.tags.join(' ') : '');
       }
 
       // Handle response

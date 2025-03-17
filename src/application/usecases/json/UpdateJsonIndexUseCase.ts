@@ -128,10 +128,10 @@ export class UpdateJsonIndexUseCase
       // Get index stats
       // We need to extract tags from the documents since getIndex method isn't available
       const uniqueTags = new Set<string>();
-      documents.forEach(doc => {
-        doc.tags.forEach(tag => uniqueTags.add(tag.value));
+      documents.forEach((doc) => {
+        doc.tags.forEach((tag) => uniqueTags.add(tag.value));
       });
-      
+
       const tags = Array.from(uniqueTags);
 
       // Return result

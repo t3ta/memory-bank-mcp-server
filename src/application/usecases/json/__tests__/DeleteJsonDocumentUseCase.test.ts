@@ -30,23 +30,25 @@ const createTestJsonDocument = (id: string, path: string) => {
 // モック BranchInfo クラスのオーバーライド（テストために、'global'を許可）
 jest.mock('../../../../domain/entities/BranchInfo.js', () => {
   const originalModule = jest.requireActual('../../../../domain/entities/BranchInfo.js');
-  
+
   return {
     ...originalModule,
     BranchInfo: {
       ...originalModule.BranchInfo,
-      create: function(branchName: string) {
+      create: function (branchName: string) {
         // globalという名前のブランチを特別に許可する（テスト用）
         if (branchName === 'global') {
-          return { 
-            name: branchName, 
+          return {
+            name: branchName,
             safeName: 'global',
-            equals: function(other: any) { return other && other.name === this.name; }
+            equals: function (other: any) {
+              return other && other.name === this.name;
+            },
           };
         }
         return originalModule.BranchInfo.create(branchName);
-      }
-    }
+      },
+    },
   };
 });
 
@@ -55,7 +57,7 @@ describe('DeleteJsonDocumentUseCase', () => {
   let jsonRepositoryMock: IJsonDocumentRepository;
   let globalRepositoryMock: IJsonDocumentRepository;
   let indexServiceMock: IIndexService;
-  
+
   // Use case
   let useCase: DeleteJsonDocumentUseCase;
 
@@ -85,14 +87,17 @@ describe('DeleteJsonDocumentUseCase', () => {
       const documentPath = DocumentPath.create(testDocumentPath);
 
       // Mock repository behavior
-      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(documentPath)))
-        .thenResolve(true);
-      
-      when(jsonRepositoryMock.delete(deepEqual(branchInfo), deepEqual(documentPath)))
-        .thenResolve(true);
-      
-      when(indexServiceMock.removeFromIndex(deepEqual(branchInfo), deepEqual(documentPath)))
-        .thenResolve();
+      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(documentPath))).thenResolve(
+        true
+      );
+
+      when(jsonRepositoryMock.delete(deepEqual(branchInfo), deepEqual(documentPath))).thenResolve(
+        true
+      );
+
+      when(
+        indexServiceMock.removeFromIndex(deepEqual(branchInfo), deepEqual(documentPath))
+      ).thenResolve();
 
       // Act
       const result = await useCase.execute({
@@ -110,7 +115,9 @@ describe('DeleteJsonDocumentUseCase', () => {
       // Verify repository methods were called
       verify(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(documentPath))).once();
       verify(jsonRepositoryMock.delete(deepEqual(branchInfo), deepEqual(documentPath))).once();
-      verify(indexServiceMock.removeFromIndex(deepEqual(branchInfo), deepEqual(documentPath))).once();
+      verify(
+        indexServiceMock.removeFromIndex(deepEqual(branchInfo), deepEqual(documentPath))
+      ).once();
     });
 
     it('should delete a document by ID', async () => {
@@ -120,14 +127,15 @@ describe('DeleteJsonDocumentUseCase', () => {
       const testDocument = createTestJsonDocument(testDocumentId, testDocumentPath);
 
       // Mock repository behavior
-      when(jsonRepositoryMock.findById(deepEqual(documentId)))
-        .thenResolve(testDocument);
-      
-      when(jsonRepositoryMock.delete(deepEqual(branchInfo), deepEqual(documentId)))
-        .thenResolve(true);
-      
-      when(indexServiceMock.removeFromIndex(deepEqual(branchInfo), deepEqual(documentId)))
-        .thenResolve();
+      when(jsonRepositoryMock.findById(deepEqual(documentId))).thenResolve(testDocument);
+
+      when(jsonRepositoryMock.delete(deepEqual(branchInfo), deepEqual(documentId))).thenResolve(
+        true
+      );
+
+      when(
+        indexServiceMock.removeFromIndex(deepEqual(branchInfo), deepEqual(documentId))
+      ).thenResolve();
 
       // Act
       const result = await useCase.execute({
@@ -154,8 +162,9 @@ describe('DeleteJsonDocumentUseCase', () => {
       const documentPath = DocumentPath.create(testDocumentPath);
 
       // Mock repository behavior
-      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(documentPath)))
-        .thenResolve(false);
+      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(documentPath))).thenResolve(
+        false
+      );
 
       // Act & Assert
       await expect(
@@ -182,8 +191,7 @@ describe('DeleteJsonDocumentUseCase', () => {
       const documentId = DocumentId.create(testDocumentId);
 
       // Mock repository behavior
-      when(jsonRepositoryMock.findById(deepEqual(documentId)))
-        .thenResolve(null);
+      when(jsonRepositoryMock.findById(deepEqual(documentId))).thenResolve(null);
 
       // Act & Assert
       await expect(
@@ -198,7 +206,9 @@ describe('DeleteJsonDocumentUseCase', () => {
           branchName: testBranchName,
           id: testDocumentId,
         })
-      ).rejects.toThrow(`Document with ID "${testDocumentId}" not found in branch "${testBranchName}"`);
+      ).rejects.toThrow(
+        `Document with ID "${testDocumentId}" not found in branch "${testBranchName}"`
+      );
 
       // Verify repository methods were called - 実際の呼び出し回数に合わせて修正
       verify(jsonRepositoryMock.findById(deepEqual(documentId))).called();
@@ -213,14 +223,11 @@ describe('DeleteJsonDocumentUseCase', () => {
       const documentPath = DocumentPath.create(testDocumentPath);
 
       // Mock repository behavior - この部分が重要！グローバルリポジトリのexistsをモック化
-      when(globalRepositoryMock.exists(anything(), deepEqual(documentPath)))
-        .thenResolve(true);
-      
-      when(globalRepositoryMock.delete(anything(), deepEqual(documentPath)))
-        .thenResolve(true);
-      
-      when(indexServiceMock.removeFromIndex(anything(), deepEqual(documentPath)))
-        .thenResolve();
+      when(globalRepositoryMock.exists(anything(), deepEqual(documentPath))).thenResolve(true);
+
+      when(globalRepositoryMock.delete(anything(), deepEqual(documentPath))).thenResolve(true);
+
+      when(indexServiceMock.removeFromIndex(anything(), deepEqual(documentPath))).thenResolve();
 
       // Act
       const result = await useCase.execute({
@@ -272,8 +279,9 @@ describe('DeleteJsonDocumentUseCase', () => {
         'Invalid document path'
       );
 
-      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(documentPath)))
-        .thenThrow(domainError);
+      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(documentPath))).thenThrow(
+        domainError
+      );
 
       // Act & Assert
       await expect(
@@ -290,8 +298,9 @@ describe('DeleteJsonDocumentUseCase', () => {
       const documentPath = DocumentPath.create(testDocumentPath);
       const unknownError = new Error('Something went wrong');
 
-      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(documentPath)))
-        .thenThrow(unknownError);
+      when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(documentPath))).thenThrow(
+        unknownError
+      );
 
       // Act & Assert
       await expect(

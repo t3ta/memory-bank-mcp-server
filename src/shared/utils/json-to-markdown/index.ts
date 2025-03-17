@@ -14,7 +14,6 @@ export { ProgressConverter } from './converters/ProgressConverter.js';
 export { SystemPatternsConverter } from './converters/SystemPatternsConverter.js';
 export { GenericConverter } from './converters/GenericConverter.js';
 
-
 // Factory function to create a fully configured converter
 export function createDefaultConverter() {
   // Import here to avoid circular dependency

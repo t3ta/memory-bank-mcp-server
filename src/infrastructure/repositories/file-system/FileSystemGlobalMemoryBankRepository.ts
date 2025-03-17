@@ -153,7 +153,7 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
       if (!document) {
         return false;
       }
-      
+
       const result = await this.documentRepository.delete(path);
 
       // Update tags index if document was deleted
@@ -236,7 +236,7 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
   async generateAndSaveTagIndex(): Promise<void> {
     try {
       logger.debug('Generating global tag index');
-      
+
       // Get all documents
       const allPaths = await this.listDocuments();
       const documents: MemoryDocument[] = [];
@@ -260,9 +260,9 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
           updatedAt: new Date().toISOString(),
           documentCount: documents.length,
           fullRebuild: true,
-          context: 'global'
+          context: 'global',
         },
-        index: {}
+        index: {},
       };
 
       // Collect documents by tag
@@ -277,10 +277,10 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
 
       // Save the tag index
       await this.saveTagIndex(tagIndex);
-      
+
       // Also update the legacy tags index file
       await this.updateLegacyTagsIndex();
-      
+
       logger.debug('Global tag index generated and saved');
     } catch (error) {
       throw new InfrastructureError(
