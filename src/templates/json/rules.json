@@ -88,6 +88,12 @@
         "isOptional": false
       },
       {
+        "id": "fileEditingRules",
+        "titleKey": "template.section.file_editing_rules",
+        "contentKey": "template.content.file_editing_rules",
+        "isOptional": false
+      },
+      {
         "id": "finally",
         "titleKey": "template.section.finally",
         "contentKey": "template.content.finally",
