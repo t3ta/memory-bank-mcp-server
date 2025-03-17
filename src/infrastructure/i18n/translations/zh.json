@@ -51,6 +51,12 @@
     "template.section.session_start_workflow": "从会话开始到开始实质性编辑",
     "template.section.task_progress_workflow": "任务进行期间",
     "template.section.document_updates": "文档更新",
+    "template.section.migration_strategy": "迁移策略",
+    "template.content.migration_strategy": "Memory Bank 2.0包含从Markdown迁移到JSON格式的工具：\n\n1. **自动迁移**：MCP服务器启动时，自动检测Markdown文件并转换为JSON格式\n2. **备份创建**：转换前备份原始Markdown文件\n3. **验证**：根据架构验证生成的JSON文件\n4. **手动迁移**：可以使用`migrate`命令进行手动迁移\n\n迁移过程保留所有内容和元数据，同时将其转换为新的结构化JSON格式。在过渡期内，两种格式都受支持，但最终将删除Markdown支持。",
+
+    "template.section.file_editing_rules": "记忆库文件编辑规则",
+    "template.content.file_editing_rules": "**记忆库文件不得直接编辑。** 所有记忆库文件的创建和更新必须使用MCP服务器提供的专用命令进行：\n\n- 分支记忆库：`write_branch_memory_bank`命令\n- 全局记忆库：`write_global_memory_bank`命令\n\n此规则的原因：\n\n1. MCP服务器执行验证以确保记忆库文件的完整性和结构\n2. 直接编辑可能破坏JSON架构或文件格式\n3. 通过直接编辑所做的更改可能不会反映在MCP服务器的缓存中\n4. 使用MCP命令确保适当的事件记录和错误处理\n\n仅在紧急或特殊情况下，如果满足以下条件，可能允许直接编辑：\n\n1. 编辑前创建文件备份\n2. 严格维护JSON结构\n3. 编辑后重启MCP服务器\n4. 通知相关人员所做的编辑",
+
     "template.section.finally": "最后",
     "template.placeholder.current_work": "从记忆库中的当前工作自动生成",
     "template.placeholder.recent_changes": "从记忆库中的最近变更自动生成",

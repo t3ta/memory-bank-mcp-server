@@ -141,8 +141,8 @@ const AVAILABLE_TOOLS = [
       properties: {
         language: {
           type: 'string',
-          enum: ['en', 'ja'],
-          description: 'Language code (en or ja)',
+          enum: ['en', 'ja', 'zh'],
+          description: 'Language code (en, ja, or zh)',
         },
       },
       required: ['language'],
@@ -176,8 +176,8 @@ const AVAILABLE_TOOLS = [
         },
         language: {
           type: 'string',
-          enum: ['en', 'ja'],
-          description: 'Language code (en or ja)',
+          enum: ['en', 'ja', 'zh'],
+          description: 'Language code (en, ja, or zh)',
         },
         includeRules: {
           type: 'boolean',
@@ -286,7 +286,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     case 'read_rules': {
       const language = params.language as string;
 
-      if (!language || !['en', 'ja'].includes(language)) {
+      if (!language || !['en', 'ja', 'zh'].includes(language)) {
         throw new Error('Invalid arguments for read_rules');
       }
 
@@ -429,7 +429,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       // ルールを取得
       if (includeRules) {
         logger.debug('Including rules in context');
-        if (!['en', 'ja'].includes(language)) {
+        if (!['en', 'ja', 'zh'].includes(language)) {
           throw new Error('Invalid language for rules');
         }
 
