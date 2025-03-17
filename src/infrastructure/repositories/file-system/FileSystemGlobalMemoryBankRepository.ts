@@ -69,7 +69,13 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
       await this.ensureDefaultStructure();
 
       // Create tag index if needed
-      await this.updateTagsIndex();
+      try {
+        await this.updateTagsIndex();
+      } catch (tagIndexError) {
+        // Log error but don't fail initialization
+        logger.error('Failed to update tags index, but continuing initialization:', tagIndexError);
+        logger.warn('Some documents may have invalid tags. Consider running a repair script.');
+      }
 
       logger.debug('Global memory bank initialized');
     } catch (error) {

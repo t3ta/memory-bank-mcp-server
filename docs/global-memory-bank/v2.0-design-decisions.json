@@ -5,7 +5,12 @@
     "title": "v2.0 設計上の決定事項",
     "documentType": "generic",
     "path": "v2.0-design-decisions.json",
-    "tags": ["design", "decisions", "architecture", "v2.0"],
+    "tags": [
+      "design",
+      "decisions",
+      "architecture",
+      "v2-0"
+    ],
     "lastModified": "2025-03-17T13:40:00.000Z",
     "createdAt": "2025-03-17T13:40:00.000Z",
     "version": 1

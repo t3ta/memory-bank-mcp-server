@@ -1,6 +1,7 @@
 import { DocumentPath } from './DocumentPath.js';
 import { Tag } from './Tag.js';
 import { BaseJsonDocument } from '../../schemas/json-document.js';
+import { DomainError } from '../../shared/errors/DomainError.js';
 
 /**
  * Props for MemoryDocument entity
@@ -254,10 +255,28 @@ export class MemoryDocument {
    * @returns Markdown formatted string
    */
   public static fromJSON(jsonDoc: BaseJsonDocument, path: DocumentPath): MemoryDocument {
+    // Sanitize tags before creating Tag objects
+    const sanitizedTags = (jsonDoc.metadata.tags || []).map((tag: string) => {
+      // First try to create the tag as is
+      try {
+        return Tag.create(tag);
+      } catch (e: unknown) {
+        // If creation fails, sanitize the tag
+        if (e instanceof DomainError && e.code === 'DOMAIN_ERROR.INVALID_TAG_FORMAT') {
+          // Make lowercase and replace invalid characters with hyphens
+          const sanitizedTagStr = tag.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+          // Log the sanitization for debugging
+          console.warn(`Sanitized tag '${tag}' to '${sanitizedTagStr}'`);
+          return Tag.create(sanitizedTagStr);
+        }
+        throw e; // Re-throw if it's not a format error
+      }
+    });
+    
     return MemoryDocument.create({
       path,
       content: JSON.stringify(jsonDoc, null, 2),
-      tags: (jsonDoc.metadata.tags || []).map((tag) => Tag.create(tag)),
+      tags: sanitizedTags,
       lastModified: new Date(jsonDoc.metadata.lastModified),
     });
   }

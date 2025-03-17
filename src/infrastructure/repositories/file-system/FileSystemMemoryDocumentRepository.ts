@@ -54,6 +54,37 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
           // Convert JSON to MemoryDocument
           return MemoryDocument.fromJSON(jsonDoc, path);
         } catch (error) {
+          // Check if this is a tag validation error
+          if (error instanceof DomainError && error.code === 'DOMAIN_ERROR.INVALID_TAG_FORMAT') {
+            logger.error(`Invalid tag format in document ${path.value}:`, error);
+            
+            // Try to recover by using sanitized tags
+            try {
+              // Parse again and sanitize tags
+              const jsonDoc = JSON.parse(content);
+              
+              // Sanitize tags if they exist
+              if (jsonDoc.metadata && jsonDoc.metadata.tags) {
+                // Replace problematic characters with hyphens
+                jsonDoc.metadata.tags = jsonDoc.metadata.tags.map((tag: string) => {
+                  // Make lowercase and replace invalid characters with hyphens
+                  return tag.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+                });
+                
+                logger.warn(`Sanitized tags in ${path.value}: ${JSON.stringify(jsonDoc.metadata.tags)}`);
+                
+                // Try to create memory document with sanitized tags
+                return MemoryDocument.fromJSON(jsonDoc, path);
+              }
+            } catch (recoveryError) {
+              logger.error(`Failed to recover document ${path.value}:`, recoveryError);
+            }
+            
+            // If we reach here, recovery failed - log but don't throw
+            logger.warn(`Skipping document with invalid tags: ${path.value}`);
+            return null;
+          }
+          
           throw new InfrastructureError(
             InfrastructureErrorCodes.FILE_READ_ERROR,
             `Failed to parse JSON document: ${path.value}`,

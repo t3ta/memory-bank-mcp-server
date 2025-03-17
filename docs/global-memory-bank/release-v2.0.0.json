@@ -5,7 +5,12 @@
     "title": "リリース v2.0.0",
     "documentType": "generic",
     "path": "release-v2.0.0.json",
-    "tags": ["release", "v2.0", "pr", "changelog"],
+    "tags": [
+      "release",
+      "v2-0",
+      "pr",
+      "changelog"
+    ],
     "lastModified": "2025-03-17T13:35:00.000Z",
     "createdAt": "2025-03-17T13:35:00.000Z",
     "version": 1
@@ -23,7 +28,10 @@
           "構造化されたデータアクセスと操作",
           "ドキュメントメタデータとコンテンツの明確な分離"
         ],
-        "commits": ["6ecbc9104e5cba7e2f030d14827f93f801814954", "5191a9960f6267cb2782f831d289e6895b286ffc"]
+        "commits": [
+          "6ecbc9104e5cba7e2f030d14827f93f801814954",
+          "5191a9960f6267cb2782f831d289e6895b286ffc"
+        ]
       },
       {
         "title": "マイグレーションツール",
@@ -33,7 +41,9 @@
           "移行期間中の両形式のサポート",
           "自動マイグレーションの設定オプション"
         ],
-        "commits": ["dda49c2c5ae80e063878436ce6f8cfa616c68bfb"]
+        "commits": [
+          "dda49c2c5ae80e063878436ce6f8cfa616c68bfb"
+        ]
       },
       {
         "title": "マルチリンガルサポート",
@@ -43,7 +53,9 @@
           "国際化（i18n）インフラストラクチャの整備",
           "言語設定オプション"
         ],
-        "commits": ["a0133e55866a82e16987de44aa798044a9365489"]
+        "commits": [
+          "a0133e55866a82e16987de44aa798044a9365489"
+        ]
       },
       {
         "title": "APIの拡張",
@@ -53,7 +65,10 @@
           "`read_branch_core_files`と`read_global_core_files`コマンドを置き換え",
           "効率的なコンテキスト取得"
         ],
-        "commits": ["5b864caaf9e5f18ad6d661ad95d25a2dd7b258b1", "ab81db5f5bd06c90d09594a1c883913c6f014236"]
+        "commits": [
+          "5b864caaf9e5f18ad6d661ad95d25a2dd7b258b1",
+          "ab81db5f5bd06c90d09594a1c883913c6f014236"
+        ]
       },
       {
         "title": "クリーンアーキテクチャの完全実装",
@@ -63,7 +78,9 @@
           "ユースケース駆動設計",
           "依存性の明示的な注入"
         ],
-        "commits": ["2d93e392635ac81b05327a5d15cdb6632a8d9690"]
+        "commits": [
+          "2d93e392635ac81b05327a5d15cdb6632a8d9690"
+        ]
       }
     ],
     "migrationGuide": {
@@ -82,7 +99,10 @@
           "mcpServers": {
             "memory-bank": {
               "command": "npx",
-              "args": ["-y", "memory-bank-mcp-server"],
+              "args": [
+                "-y",
+                "memory-bank-mcp-server"
+              ],
               "env": {
                 "MEMORY_BANK_ROOT": "/path/to/docs",
                 "MEMORY_BANK_LANGUAGE": "ja"
