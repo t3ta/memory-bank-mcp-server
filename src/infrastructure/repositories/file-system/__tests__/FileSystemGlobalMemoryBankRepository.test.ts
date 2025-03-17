@@ -45,11 +45,8 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
   const globalMemoryPath = '/test/memory-bank/docs/global-memory-bank';
 
   beforeEach(() => {
-describe('FileSystemGlobalMemoryBankRepository', () => {
-  let repository: FileSystemGlobalMemoryBankRepository;
-  const globalMemoryPath = '/test/memory-bank/docs/global-memory-bank';
-
-  beforeEach(() => {
+    // Reset all mocks
+    jest.clearAllMocks();
 
     // Set up config provider mock
     mockConfigProvider.getGlobalMemoryPath.mockReturnValue(globalMemoryPath);
@@ -65,14 +62,7 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
     repository.generateAndSaveTagIndex = jest.fn().mockResolvedValue(undefined);
     repository.updateLegacyTagsIndex = jest.fn().mockResolvedValue(undefined);
     repository.saveTagIndex = jest.fn().mockResolvedValue(undefined);
-    
-    // オリジナルの実装を保存（スパイ）
-    const originalSaveDocument = repository.saveDocument;
-    
-    // saveDocumentをスパイにして、呼び出された後に updateTagsIndex を呼び出す
-    repository.saveDocument = jest.fn().mockImplementation(async (document: MemoryDocument) => {
-      // 元のメソッドを呼び出す代わりに、直接ファイルを書き込む
-      await mockFileSystemService.createDirectory(
+
     // saveDocumentをスパイにして、呼び出された後に updateTagsIndex を呼び出す
     repository.saveDocument = jest.fn().mockImplementation(async (document: MemoryDocument) => {
       // 元のメソッドを呼び出す代わりに、直接ファイルを書き込む
@@ -83,26 +73,13 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
         path.join(globalMemoryPath, document.path.value),
         document.content
       );
-      
+
       // マークダウンドキュメントの場合はupdateTagsIndexを呼び出す
       if (document.isMarkdown && document.path.value !== 'tags/index.md') {
         await repository.updateTagsIndex();
       }
-      
+
       return Promise.resolve();
-    });
-  });
-    // FileSystemGlobalMemoryBankRepository.saveDocumentをモック化
-    const originalSaveDocument = repository.saveDocument;
-    repository.saveDocument = jest.fn().mockImplementation(async (document: MemoryDocument) => {
-      // 直接ファイルシステムにアクセス（documentRepositoryを経由せず）
-      await mockFileSystemService.createDirectory(
-        path.dirname(path.join(globalMemoryPath, document.path.value))
-      );
-      await mockFileSystemService.writeFile(
-        path.join(globalMemoryPath, document.path.value),
-        document.content
-      );
     });
   });
 
@@ -293,6 +270,35 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
         content,
         tags: [Tag.create('test'), Tag.create('document')],
         lastModified: new Date('2023-01-01'),
+      });
+
+      mockFileSystemService.createDirectory.mockResolvedValue();
+      mockFileSystemService.writeFile.mockResolvedValue();
+      mockFileSystemService.listFiles.mockResolvedValue(['test.md']);
+      mockFileSystemService.readFile.mockResolvedValue(content);
+      mockFileSystemService.fileExists.mockResolvedValue(true);
+      mockFileSystemService.getFileStats.mockResolvedValue({
+        size: 100,
+        isDirectory: false,
+        isFile: true,
+        lastModified: new Date('2023-01-01'),
+        createdAt: new Date('2023-01-01'),
+      });
+
+      // Act
+      await repository.saveDocument(document);
+
+      // Assert
+      expect(mockFileSystemService.createDirectory).toHaveBeenCalled();
+      expect(mockFileSystemService.writeFile).toHaveBeenCalledWith(
+        expect.stringContaining(path.join(globalMemoryPath, 'test.md')),
+        content
+      );
+
+      // Verify that updateTagsIndex was called for markdown documents
+      expect(repository.updateTagsIndex).toHaveBeenCalled();
+    });
+
     it('should handle errors when saving document', async () => {
       // Arrange
       const docPath = DocumentPath.create('test.md');
@@ -314,6 +320,82 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
   });
 
   describe('deleteDocument', () => {
+    it('should delete document from file system', async () => {
+      // Arrange
+      const docPath = DocumentPath.create('test.md');
+
+      mockFileSystemService.fileExists.mockResolvedValue(true);
+      mockFileSystemService.deleteFile.mockResolvedValue(true);
+      mockFileSystemService.listFiles.mockResolvedValue([]);
+
+      // Create a mock getDocument response that contains content and is markdown type
+      const mockDocument = MemoryDocument.create({
+        path: docPath,
+        content: '# Test\n\ntags: #test\n\nTest content',
+        tags: [Tag.create('test')],
+        lastModified: new Date(),
+      });
+
+      // Spyして内部実装を模倣する
+      jest.spyOn(repository, 'getDocument').mockResolvedValue(mockDocument);
+
+      // Act
+      const result = await repository.deleteDocument(docPath);
+
+      // Assert
+      expect(result).toBe(true);
+      expect(mockFileSystemService.deleteFile).toHaveBeenCalledWith(
+        expect.stringContaining(path.join(globalMemoryPath, 'test.md'))
+      );
+
+      // Verify that updateTagsIndex was called when document was deleted
+      expect(repository.updateTagsIndex).toHaveBeenCalled();
+    });
+
+    it('should return false when document does not exist', async () => {
+      // Arrange
+      const docPath = DocumentPath.create('nonexistent.md');
+
+      mockFileSystemService.fileExists.mockImplementation(async (filePath) => {
+        return !filePath.includes('nonexistent.md');
+      });
+
+      // mockFileSystemService.fileExistsが呼び出されたときにfalseを返すように明示的に設定
+      mockFileSystemService.fileExists.mockResolvedValue(false);
+
+      // Act
+      const result = await repository.deleteDocument(docPath);
+
+      // Assert
+      expect(result).toBe(false);
+      expect(mockFileSystemService.deleteFile).not.toHaveBeenCalled();
+    });
+
+    it('should handle errors when deleting document', async () => {
+      // Arrange
+      const docPath = DocumentPath.create('test.md');
+      const _error = new Error('File delete error');
+
+      mockFileSystemService.fileExists.mockResolvedValue(true);
+      mockFileSystemService.deleteFile.mockRejectedValue(
+        new InfrastructureError(
+          InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
+          'Failed to delete document from global memory bank',
+          { originalError: new Error('File delete error') }
+        )
+      );
+
+      // Act & Assert
+      await expect(repository.deleteDocument(docPath)).rejects.toThrow(InfrastructureError);
+      await expect(repository.deleteDocument(docPath)).rejects.toThrow(
+        'Failed to delete document from global memory bank'
+      );
+    });
+  });
+
+  describe('listDocuments', () => {
+    it('should list all documents', async () => {
+      // Arrange
       mockFileSystemService.listFiles.mockResolvedValue([
         path.join(globalMemoryPath, 'file1.md'),
         path.join(globalMemoryPath, 'file2.md'),
@@ -331,29 +413,31 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
           createdAt: new Date('2023-01-01'),
         };
       });
-    it('should delete document from file system', async () => {
-      // Arrange
-      const docPath = DocumentPath.create('test.md');
-
-      mockFileSystemService.fileExists.mockResolvedValue(true);
-      mockFileSystemService.deleteFile.mockResolvedValue(true);
-      mockFileSystemService.listFiles.mockResolvedValue([]);
-
-      // Ensure updateTagsIndex is properly mocked
-      (repository.updateTagsIndex as jest.Mock).mockImplementation(() => Promise.resolve());
 
       // Act
-      const result = await repository.deleteDocument(docPath);
+      const result = await repository.listDocuments();
 
       // Assert
-      expect(result).toBe(true);
-      expect(mockFileSystemService.deleteFile).toHaveBeenCalledWith(
-        expect.stringContaining(path.join(globalMemoryPath, 'test.md'))
-      );
-
-      // Verify that updateTagsIndex was called when document was deleted
-      expect(repository.updateTagsIndex).toHaveBeenCalled();
+      expect(result).toHaveLength(3);
+      expect(result[0].value).toBe('file1.md');
+      expect(result[1].value).toBe('file2.md');
+      expect(result[2].value).toBe('subdir/file3.md');
     });
+
+    it('should handle errors when listing documents', async () => {
+      // Arrange
+      const error = new Error('File system error');
+      mockFileSystemService.listFiles.mockRejectedValue(error);
+
+      // Act & Assert
+      await expect(repository.listDocuments()).rejects.toThrow(InfrastructureError);
+      await expect(repository.listDocuments()).rejects.toThrow('Failed to list documents');
+    });
+  });
+
+  describe('findDocumentsByTags', () => {
+    it('should find documents with matching tags', async () => {
+      // Arrange
       const tags = [Tag.create('test')];
       const file1Content = '# File 1\n\ntags: #test #document\n\nContent';
       const file2Content = '# File 2\n\ntags: #other\n\nContent';
@@ -494,5 +578,4 @@ describe('FileSystemGlobalMemoryBankRepository', () => {
       expect(result).toBe(false);
     });
   });
-});  });
 });

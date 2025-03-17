@@ -233,7 +233,7 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
    * Generate and save tag index from all documents
    * @returns Promise resolving when done
    */
-  private async generateAndSaveTagIndex(): Promise<void> {
+  async generateAndSaveTagIndex(): Promise<void> {
     try {
       logger.debug('Generating global tag index');
       
@@ -255,8 +255,13 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
 
       // Create tag index
       const tagIndex: TagIndex = {
-        version: 1,
-        lastUpdated: new Date().toISOString(),
+        schema: 'tag_index_v1',
+        metadata: {
+          updatedAt: new Date().toISOString(),
+          documentCount: documents.length,
+          fullRebuild: true,
+          context: 'global'
+        },
         index: {}
       };
 
@@ -289,9 +294,8 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
   /**
    * Updates the legacy tags/index.md file for backward compatibility
    * @returns Promise resolving when done
-   * @private
    */
-  private async updateLegacyTagsIndex(): Promise<void> {
+  async updateLegacyTagsIndex(): Promise<void> {
     try {
       logger.debug('Updating legacy tags index file');
 

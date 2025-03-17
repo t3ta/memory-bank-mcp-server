@@ -2,7 +2,7 @@ import { MemoryDocument } from '../entities/MemoryDocument.js';
 import { DocumentPath } from '../entities/DocumentPath.js';
 import { BranchInfo } from '../entities/BranchInfo.js';
 import { Tag } from '../entities/Tag.js';
-import { TagIndex } from '../../schemas/tag-index/tag-index-schema';
+import { TagIndex } from '../../schemas/tag-index/tag-index-schema.js';
 
 /**
  * Interface for recent branch information

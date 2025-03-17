@@ -2,13 +2,10 @@
  * Tests for MarkdownToJsonConverter.ts
  */
 import { MarkdownToJsonConverter } from '../MarkdownToJsonConverter.js';
-// 別PRで対応するため、一時的にスキップ
-// 別PRで対応するため、一時的にスキップ
-describe.skip('MarkdownToJsonConverter', () => {
+
+describe('MarkdownToJsonConverter', () => {
   let converter: MarkdownToJsonConverter;
-  
-  let converter: MarkdownToJsonConverter;
-  
+
   // Sample markdown content
   const jaMarkdown = `## はじめに
 
@@ -41,7 +38,7 @@ In summary, this is the important point.`;
   beforeEach(() => {
     converter = new MarkdownToJsonConverter();
   });
-  
+
   describe('convertMarkdownsToJsonTemplate', () => {
     it('should convert multiple language markdowns to a single JSON template', () => {
       // Arrange
@@ -55,7 +52,7 @@ In summary, this is the important point.`;
         ja: 'テストテンプレート',
         en: 'Test Template'
       };
-      
+
       // Act
       const result = converter.convertMarkdownsToJsonTemplate(
         templateId,
@@ -63,18 +60,18 @@ In summary, this is the important point.`;
         languageContents,
         nameMap
       );
-      
+
       // Assert
       // Check basic structure
       expect(result.schema).toBe('template_v1');
       expect(result.metadata.id).toBe(templateId);
       expect(result.metadata.type).toBe(templateType);
       expect(result.metadata.name).toEqual(nameMap);
-      
+
       // Check sections - should be 6, 3 from each language
       // We now expect all sections to be included even if they have different names
       expect(Object.keys(result.content.sections).length).toBe(6);
-      
+
       // Check that sections have correct mapping
       const introSection = result.content.sections['はじめに'] || result.content.sections['introduction'];
       expect(introSection).toBeDefined();
@@ -82,7 +79,7 @@ In summary, this is the important point.`;
       expect(introSection.title.en).toBe('Introduction');
       expect(introSection.content?.ja).toContain('これははじめにのセクション');
       expect(introSection.content?.en).toContain('This is the introduction section');
-      
+
       const summarySection = result.content.sections['まとめ'] || result.content.sections['summary'];
       expect(summarySection).toBeDefined();
       expect(summarySection.title.ja).toBe('まとめ');
@@ -90,7 +87,7 @@ In summary, this is the important point.`;
       expect(summarySection.content?.ja).toContain('要約として');
       expect(summarySection.content?.en).toContain('In summary');
     });
-    
+
     it('should handle sections that exist in only one language', () => {
       // Arrange
       const jaMarkdownWithExtra = jaMarkdown + `\n\n## 追加セクション\n\nこれは日本語だけのセクションです。`;
@@ -98,7 +95,7 @@ In summary, this is the important point.`;
         ja: jaMarkdownWithExtra,
         en: enMarkdown
       };
-      
+
       // Act
       const result = converter.convertMarkdownsToJsonTemplate(
         'test',
@@ -106,7 +103,7 @@ In summary, this is the important point.`;
         languageContents,
         { ja: 'テスト', en: 'Test' }
       );
-      
+
       // Assert
       const extraSection = result.content.sections['追加セクション'] || result.content.sections['additionalSection'];
       expect(extraSection).toBeDefined();
@@ -118,7 +115,7 @@ In summary, this is the important point.`;
       expect(extraSection.optional).toBe(true); // Should be optional since it's not in all languages
     });
   });
-  
+
   describe('findPlaceholders', () => {
     it('should find all placeholders in markdown content', () => {
       // Arrange
@@ -131,17 +128,17 @@ Replace {{TITLE}} with actual title.
 ## Section Two
 
 Replace {{CONTENT}} with actual content and {{DATE}} with the current date.`;
-      
+
       // Act
       const placeholders = converter.findPlaceholders(markdownWithPlaceholders);
-      
+
       // Assert
       expect(Object.keys(placeholders).length).toBe(3);
       expect(placeholders['TITLE']).toBe('');
       expect(placeholders['CONTENT']).toBe('');
       expect(placeholders['DATE']).toBe('');
     });
-    
+
     it('should return empty object when no placeholders found', () => {
       // Arrange
       const markdownWithoutPlaceholders = `# Template without Placeholders
@@ -153,10 +150,10 @@ This has no placeholders.
 ## Section Two
 
 This also has no placeholders.`;
-      
+
       // Act
       const placeholders = converter.findPlaceholders(markdownWithoutPlaceholders);
-      
+
       // Assert
       expect(Object.keys(placeholders).length).toBe(0);
     });

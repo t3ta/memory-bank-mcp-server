@@ -3,8 +3,8 @@
  * Loads and processes JSON templates with internationalization support
  */
 import path from 'path';
-import { BaseTemplate, validateTemplate, JsonTemplate, validateJsonTemplate } from '../../schemas/v2/template-schema.js';
-import { Language, isValidLanguage } from '../../schemas/v2/i18n-schema.js';
+import { JsonTemplate, validateJsonTemplate } from '../../schemas/v2/template-schema.js';
+import { Language } from '../../schemas/v2/i18n-schema.js';
 import { IFileSystemService } from '../storage/interfaces/IFileSystemService.js';
 import { II18nProvider } from '../i18n/interfaces/II18nProvider.js';
 import { TemplateRenderer } from './TemplateRenderer.js';
@@ -48,10 +48,9 @@ export class JsonTemplateLoader implements ITemplateLoader {
    * Gets the legacy templates directory path
    */
   private getLegacyTemplatesDirectory(): string {
-  /**
-   * Implements ITemplateLoader.loadJsonTemplate
-   */
-  async loadJsonTemplate(templateId: string): Promise<JsonTemplate> {
+    return path.join(process.cwd(), 'src/templates/markdown');
+  }
+  
   /**
    * Implements ITemplateLoader.loadJsonTemplate
    */
@@ -72,6 +71,10 @@ export class JsonTemplateLoader implements ITemplateLoader {
       const template = JSON.parse(content);
       return validateJsonTemplate(template);
     } catch (error) {
+      throw new Error(`Failed to load JSON template ${templateId}: ${(error as Error).message}`);
+    }
+  }
+  
   /**
    * Implements ITemplateLoader.getMarkdownTemplate
    */
@@ -81,18 +84,6 @@ export class JsonTemplateLoader implements ITemplateLoader {
       throw new Error(`Unsupported language: ${language}`);
     }
     
-    try {
-    }
-    
-    try {
-      throw error;
-    }
-  }
-  
-  /**
-   * Implements ITemplateLoader.getMarkdownTemplate
-   */
-  async getMarkdownTemplate(templateId: string, language: Language, variables?: Record<string, string>): Promise<string> {
     try {
       // Load the JSON template
       const template = await this.loadJsonTemplate(templateId);
@@ -121,10 +112,7 @@ export class JsonTemplateLoader implements ITemplateLoader {
    * Implements ITemplateLoader.loadLegacyTemplate
    */
   async loadLegacyTemplate(templatePath: string, language: Language): Promise<string> {
-  /**
-   * Implements ITemplateLoader.loadLegacyTemplate
-   */
-  async loadLegacyTemplate(templatePath: string, language: Language): Promise<string> {
+    try {
       if (!templatePath.includes('.')) {
         templatePath = this.getLegacyTemplatePath(templatePath, language);
       }
@@ -151,10 +139,8 @@ export class JsonTemplateLoader implements ITemplateLoader {
   
   /**
    * Gets the legacy template file path based on template name and language
-  /**
-   * Implements ITemplateLoader.templateExists
-   */
-  async templateExists(templateId: string): Promise<boolean> {
+   * 
+   * @param templateName Template name without extension
    * @param language Target language
    * @returns Full path to the legacy template file
    */

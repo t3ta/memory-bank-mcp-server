@@ -1,5 +1,4 @@
 import { Argv } from 'yargs';
-import { CreatePullRequestCommand } from './create-pull-request.js';
 import { RecentBranchesCommand } from './recent-branches.js';
 
 /**
@@ -9,7 +8,7 @@ import { RecentBranchesCommand } from './recent-branches.js';
  */
 export function registerUtilCommands(yargs: Argv): Argv {
   // Create command instances
-  const commands = [new CreatePullRequestCommand(), new RecentBranchesCommand()];
+  const commands = [new RecentBranchesCommand()];
 
   // Register each command
   let yargsInstance = yargs;

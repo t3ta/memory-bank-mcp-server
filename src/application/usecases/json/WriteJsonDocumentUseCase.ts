@@ -229,7 +229,7 @@ export class WriteJsonDocumentUseCase
           version: savedDocument.version,
         },
         isNew,
-        location,
+        location: location || '',
       };
     } catch (error) {
       // Re-throw domain and application errors

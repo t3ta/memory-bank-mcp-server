@@ -14,7 +14,6 @@ import { UpdateTagIndexUseCaseV2 } from '../../application/usecases/common/Updat
 import { GetRecentBranchesUseCase } from '../../application/usecases/common/GetRecentBranchesUseCase.js';
 import { ReadBranchCoreFilesUseCase } from '../../application/usecases/common/ReadBranchCoreFilesUseCase.js';
 import { CreateBranchCoreFilesUseCase } from '../../application/usecases/common/CreateBranchCoreFilesUseCase.js';
-import { CreatePullRequestUseCase } from '../../application/usecases/pr/CreatePullRequestUseCase.js';
 
 // Infrastructure layer
 import { IFileSystemService } from '../../infrastructure/storage/interfaces/IFileSystemService.js';
@@ -30,7 +29,6 @@ import { MarkdownToJsonConverter } from '../../infrastructure/templates/Markdown
 import { MCPResponsePresenter } from '../../interface/presenters/MCPResponsePresenter.js';
 import { GlobalController } from '../../interface/controllers/GlobalController.js';
 import { BranchController } from '../../interface/controllers/BranchController.js';
-import { PullRequestTool } from '../../interface/tools/PullRequestTool.js';
 
 // CLI 関連
 import { MigrateTemplatesCommand } from '../../cli/commands/template/MigrateTemplatesCommand.js';
@@ -233,16 +231,7 @@ export function registerApplicationServices(container: DIContainer): void {
     return new CreateBranchCoreFilesUseCase(branchRepository);
   });
 
-  // Pull Request use cases
-  container.registerFactory('createPullRequestUseCase', () => {
-    // Use explicit type assertion for proper type safety
-    const branchRepository = container.get(
-      'branchMemoryBankRepository'
-    ) as FileSystemBranchMemoryBankRepository;
-    const fileSystemService = container.get('fileSystemService') as IFileSystemService;
-
-    return new CreatePullRequestUseCase(branchRepository, fileSystemService);
-  });
+  // Pull Request use cases section removed
 }
 
 /**
@@ -253,15 +242,7 @@ export function registerInterfaceServices(container: DIContainer): void {
   // Register presenter
   container.register('mcpResponsePresenter', new MCPResponsePresenter());
 
-  // Register tools
-  container.registerFactory('pullRequestTool', () => {
-    // Use explicit type assertion for proper type safety
-    const createPullRequestUseCase = container.get(
-      'createPullRequestUseCase'
-    ) as CreatePullRequestUseCase;
-
-    return new PullRequestTool(createPullRequestUseCase);
-  });
+  // Register tools section removed
 
   // Register controllers
   container.registerFactory('globalController', () => {

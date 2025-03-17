@@ -36,38 +36,7 @@ let app: Application | null;
 
 // Available tools definition
 const AVAILABLE_TOOLS = [
-  {
-    name: 'create_pull_request',
-    description: 'Creates a pull request based on branch memory bank information',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        branch: {
-          type: 'string',
-          description: 'Branch name',
-        },
-        title: {
-          type: 'string',
-          description: 'Custom PR title (optional)',
-        },
-        base: {
-          type: 'string',
-          description:
-            'Target branch for the PR (default: develop for feature branches, master for fix branches)',
-        },
-        language: {
-          type: 'string',
-          enum: ['en', 'ja'],
-          description: 'Language for PR (en or ja)',
-        },
-        push: {
-          type: 'boolean',
-          description: 'Whether to automatically push the changes',
-        },
-      },
-      required: ['branch'],
-    },
-  },
+  // create_pull_request tool definition removed
   {
     name: 'list_tools',
     description: 'List all available tools',
@@ -392,58 +361,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       };
     }
 
-    case 'create_pull_request': {
-      const branch = params.branch as string;
-      const title = params.title as string | undefined;
-      const baseBranch = params.base as string | undefined;
-      const language = (params.language as string) || 'ja';
-
-      if (!branch) {
-        throw new Error('Invalid arguments for create_pull_request');
-      }
-
-      // Use the new pull request tool
-      if (!app) {
-        throw new Error('Application not initialized');
-      }
-      const pullRequestTool = app.getPullRequestTool();
-      const pullRequest = await pullRequestTool.createPullRequest(
-        branch,
-        title,
-        baseBranch,
-        language
-      );
-
-      // Set up response message based on language
-      const isJapanese = language !== 'en';
-      let responseMessage = isJapanese
-        ? `pullRequest.md ファイルを作成しました。\n\n`
-        : `pullRequest.md file has been created.\n\n`;
-
-      if (isJapanese) {
-        responseMessage += `このファイルをコミットしてプッシュすると、GitHub Actionsによって自動的にPull Requestが作成されます。\n\n`;
-        responseMessage += `以下のコマンドを実行してください:\n`;
-        responseMessage += `git add ${pullRequest.filePath}\n`;
-        responseMessage += `git commit -m "chore: PR作成準備"\n`;
-        responseMessage += `git push\n\n`;
-        responseMessage += `PR情報:\n`;
-        responseMessage += `タイトル: ${pullRequest.title}\n`;
-        responseMessage += `ターゲットブランチ: ${pullRequest.baseBranch}\n`;
-        responseMessage += `ラベル: ${pullRequest.labels.join(', ')}\n`;
-      } else {
-        responseMessage += `Commit and push this file to automatically create a Pull Request via GitHub Actions.\n\n`;
-        responseMessage += `Run the following commands:\n`;
-        responseMessage += `git add ${pullRequest.filePath}\n`;
-        responseMessage += `git commit -m "chore: prepare PR"\n`;
-        responseMessage += `git push\n\n`;
-        responseMessage += `PR Information:\n`;
-        responseMessage += `Title: ${pullRequest.title}\n`;
-        responseMessage += `Target branch: ${pullRequest.baseBranch}\n`;
-        responseMessage += `Labels: ${pullRequest.labels.join(', ')}\n`;
-      }
-
-      return { content: [{ type: 'text', text: responseMessage }] };
-    }
+    // create_pull_request case removed
 
     default:
       throw new Error(`Unknown tool: ${name}`);

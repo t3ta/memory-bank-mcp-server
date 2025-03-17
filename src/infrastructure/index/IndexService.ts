@@ -298,7 +298,7 @@ export class IndexService implements IIndexService {
     const index = this.indices.get(branchInfo.name);
     if (!index) {
       throw new InfrastructureError(
-        InfrastructureErrorCodes.INDEX_NOT_FOUND,
+        InfrastructureErrorCodes.FILE_NOT_FOUND,
         `Index for branch ${branchInfo.name} not found`
       );
     }
@@ -318,7 +318,7 @@ export class IndexService implements IIndexService {
       );
     } catch (error) {
       throw new InfrastructureError(
-        InfrastructureErrorCodes.INDEX_PERSISTENCE_ERROR,
+        InfrastructureErrorCodes.PERSISTENCE_ERROR,
         `Failed to save index: ${(error as Error).message}`,
         { cause: error }
       );
@@ -338,7 +338,7 @@ export class IndexService implements IIndexService {
       const exists = await this.fileSystemService.fileExists(indexFilePath);
       if (!exists) {
         throw new InfrastructureError(
-          InfrastructureErrorCodes.INDEX_PERSISTENCE_ERROR,
+          InfrastructureErrorCodes.PERSISTENCE_ERROR,
           `Index file not found: ${indexFilePath}`
         );
       }
@@ -351,7 +351,7 @@ export class IndexService implements IIndexService {
       this.indices.set(branchInfo.name, index);
     } catch (error) {
       throw new InfrastructureError(
-        InfrastructureErrorCodes.INDEX_PERSISTENCE_ERROR,
+        InfrastructureErrorCodes.PERSISTENCE_ERROR,
         `Failed to load index: ${(error as Error).message}`,
         { cause: error }
       );
@@ -402,7 +402,7 @@ export class IndexService implements IIndexService {
     // This should never happen due to the above logic
     if (!index) {
       throw new InfrastructureError(
-        InfrastructureErrorCodes.INDEX_NOT_FOUND,
+        InfrastructureErrorCodes.FILE_NOT_FOUND,
         `Index for branch ${branchInfo.name} not found`
       );
     }

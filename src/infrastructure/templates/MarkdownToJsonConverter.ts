@@ -43,25 +43,6 @@ export class MarkdownToJsonConverter {
   ): JsonTemplate {
     // Extract sections from each language version
     const sectionsByLanguage: Record<string, Record<string, ExtractedSection>> = {};
-    const allSectionIds = new Set<string>();
-
-    // Process each language version
-    for (const [language, content] of Object.entries(languageContents)) {
-      const sections = this.extractSections(content);
-      sectionsByLanguage[language] = sections;
-      
-      // Collect all section IDs
-      Object.keys(sections).forEach(id => allSectionIds.add(id));
-    }
-  convertMarkdownsToJsonTemplate(
-    templateId: string,
-    templateType: string,
-    languageContents: Record<string, string>,
-    nameMap: Record<string, string>,
-    descriptionMap?: Record<string, string>
-  ): JsonTemplate {
-    // Extract sections from each language version
-    const sectionsByLanguage: Record<string, Record<string, ExtractedSection>> = {};
     const allSectionTitles = new Map<string, string>();
     const sectionIdMapping: Record<string, Record<string, string>> = {};
 
@@ -82,7 +63,7 @@ export class MarkdownToJsonConverter {
 
     // Determine common section IDs across languages
     const mappedSectionIds = Object.keys(sectionIdMapping);
-          isOptional = true;
+    
     // Construct template sections
     const templateSections: Record<string, JsonTemplateSection> = {};
     
@@ -114,6 +95,27 @@ export class MarkdownToJsonConverter {
         isOptional
       );
     }
+    
+    // Create the complete template
+    return createJsonTemplate(
+      templateId,
+      templateType,
+      nameMap,
+      templateSections,
+      descriptionMap
+    );
+  }
+  
+  /**
+   * Extract sections from a Markdown document
+   * 
+   * @param markdown Markdown content
+   * @returns Record of section IDs to their content
+   */
+  private extractSections(markdown: string): Record<string, ExtractedSection> {
+    const sections: Record<string, ExtractedSection> = {};
+    const lines = markdown.split('\n');
+    
     let currentSectionId: string | null = null;
     let currentSectionTitle: string | null = null;
     let currentSectionContent: string[] = [];
@@ -161,45 +163,6 @@ export class MarkdownToJsonConverter {
    * @returns Normalized section ID
    */
   private normalizeToSectionId(title: string): string {
-    // For non-latin characters (like Japanese), just return the original title
-    if (/[\u3000-\u9fff]/.test(title)) {
-      return title;
-    }
-    
-    // For latin characters, convert to camelCase
-    const words = title
-      .toLowerCase()
-      .replace(/[^\w\s]/g, '')
-      .split(/\s+/);
-    
-    return words[0] + words.slice(1).map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join('');
-  }
-
-  /**
-   * Find placeholders in Markdown content
-   * Placeholders are in the format {{PLACEHOLDER_NAME}}
-   * 
-   * @param markdown Markdown content
-   * @returns Map of placeholder names to empty strings (to be filled with descriptions)
-   */
-  findPlaceholders(markdown: string): Record<string, string> {
-    // For non-latin characters (like Japanese), create a mapping to common IDs
-    if (/[\u3000-\u9fff]/.test(title)) {
-      if (title === 'はじめに') return 'introduction';
-      if (title === '主要な内容') return 'mainContent';
-      if (title === 'まとめ') return 'summary';
-      // If no mapping exists, just return the original title
-      placeholders[match[1]] = '';
-    }
-    
-  /**
-   * Normalize a section title to a valid section ID
-   * 
-   * @param title Section title
-   * @returns Normalized section ID
-   */
     // For non-latin characters (like Japanese), create a mapping to common IDs
     if (/[　-鿿]/.test(title)) {
       if (title === 'はじめに') return 'introduction';
@@ -215,10 +178,6 @@ export class MarkdownToJsonConverter {
       .replace(/[^\w\s]/g, '')
       .split(/\s+/);
     
-    return words[0] + words.slice(1).map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join('');
-  }
     return words[0] + words.slice(1).map(word => 
       word.charAt(0).toUpperCase() + word.slice(1)
     ).join('');

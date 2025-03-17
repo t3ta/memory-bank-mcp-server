@@ -17,7 +17,7 @@ import { DomainError } from '../../../shared/errors/DomainError.js';
 import { FileSystemMemoryDocumentRepository } from './FileSystemMemoryDocumentRepository.js';
 import { extractListItems, extractSectionContent } from '../../../shared/utils/index.js';
 import { logger } from '../../../shared/utils/logger.js';
-import { TagIndex } from '../../../schemas/tag-index/tag-index-schema';
+import { TagIndex } from '../../../schemas/tag-index/tag-index-schema.js';
 
 /**
  * File system implementation of branch memory bank repository
