@@ -1,0 +1,71 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "active-context-read-context",
+    "title": "read_context コマンドの現在の作業コンテキスト",
+    "documentType": "activeContext",
+    "path": "activeContext.json",
+    "tags": [
+      "core",
+      "active-context",
+      "read-context",
+      "current-work"
+    ],
+    "lastModified": "2025-03-17T12:30:00.000Z",
+    "createdAt": "2025-03-17T11:57:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": {
+      "description": "現在、read_contextコマンドに中国語サポートを追加する作業を行っています。コードの変更は完了していますが、ビルドと再起動が必要です。",
+      "focus": "中国語サポートの追加と、それに伴うUI/UXの改善。"
+    },
+    "recentChanges": [
+      {
+        "date": "2025-03-17",
+        "description": "中国語サポートを追加するコード変更を実装しました。具体的には："
+      },
+      {
+        "date": "2025-03-17",
+        "description": "- `read_rules`と`read_context`コマンドの言語オプションに'zh'を追加"
+      },
+      {
+        "date": "2025-03-17",
+        "description": "- 言語チェックの部分を`['en', 'ja', 'zh']`に更新"
+      },
+      {
+        "date": "2025-03-17",
+        "description": "- 中国語翻訳ファイル（zh.json）に「ファイル編集ルール」のセクションを追加"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "decision": "中国語サポートの追加",
+        "status": "実装完了、テスト待ち",
+        "rationale": "多言語対応のためのステップとして、まず中国語サポートを追加します。"
+      },
+      {
+        "decision": "テスト戦略",
+        "status": "検討中",
+        "rationale": "変更をビルドして再起動した後、中国語のルールが正しく表示されることを確認する必要があります。"
+      }
+    ],
+    "activeConcerns": [
+      {
+        "concern": "中国語翻訳の完全性",
+        "description": "中国語の翻訳ファイルには、一部の`template.content.*`キーが不足している可能性があります。これが原因でエラーが発生している可能性があります。"
+      },
+      {
+        "concern": "サーバー再起動の必要性",
+        "description": "コードの変更を反映させるには、ビルドとサーバーの再起動が必要です。現在のMCPサーバーの起動方法によっては、これが簡単ではないかもしれません。"
+      }
+    ],
+    "nextSteps": [
+      "コードをビルドする（npm run build）",
+      "サーバーを再起動する",
+      "中国語ルールの表示をテストする",
+      "必要に応じて中国語翻訳を補完する",
+      "プルリクエストを作成する"
+    ]
+  }
+}
