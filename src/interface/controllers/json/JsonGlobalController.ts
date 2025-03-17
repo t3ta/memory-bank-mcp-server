@@ -100,16 +100,12 @@ export class JsonGlobalController implements Pick<IGlobalController,
 
       const result = await this.writeJsonDocumentUseCase.execute({
         document: {
-          id: document.id,
-          path: document.path,
+          path: document.path || '',
           title: document.title,
           documentType: document.documentType as DocumentType,
           content: document.content,
           tags: document.tags || [],
-          lastModified: document.lastModified ? new Date(document.lastModified).toISOString() : undefined,
-          createdAt: document.createdAt ? new Date(document.createdAt).toISOString() : undefined,
-          version: document.version
-        },
+        }
       });
 
       return this.presenter.present(result);

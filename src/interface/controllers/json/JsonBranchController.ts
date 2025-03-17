@@ -110,16 +110,12 @@ export class JsonBranchController implements Pick<IBranchController,
       const result = await this.writeJsonDocumentUseCase.execute({
         branchName,
         document: {
-          id: document.id,
-          path: document.path,
+          path: document.path || '',
           title: document.title,
           documentType: document.documentType as DocumentType,
           content: document.content,
           tags: document.tags || [],
-          lastModified: document.lastModified ? new Date(document.lastModified).toISOString() : undefined,
-          createdAt: document.createdAt ? new Date(document.createdAt).toISOString() : undefined,
-          version: document.version
-        },
+        }
       });
 
       return this.presenter.present(result);
@@ -285,7 +281,6 @@ export class JsonBranchController implements Pick<IBranchController,
 
   // These methods are not implemented in this controller, as they are specific to Markdown documents
   // They would be implemented in the original BranchController
-
   readDocument(): Promise<MCPResponse<DocumentDTO>> {
     throw new ApplicationError(
       'NOT_IMPLEMENTED',
