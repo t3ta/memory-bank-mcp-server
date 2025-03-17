@@ -8,14 +8,12 @@ import {
   TagIndexUpdateResult,
 } from '../../../domain/repositories/ITagIndexRepository.js';
 import { DocumentReference } from '../../../schemas/v2/tag-index.js';
-import { getLogger } from '../../../shared/utils/logger.js';
+import { logger } from '../../../shared/utils/logger.js';
 import {
   InfrastructureError,
   InfrastructureErrorCodes,
 } from '../../../shared/errors/InfrastructureError.js';
 import { FileSystemTagIndexRepository } from './FileSystemTagIndexRepositoryBase.js';
-
-const logger = getLogger('FileSystemTagIndexRepositoryImpl');
 
 /**
  * Implementation of ITagIndexRepository interface methods

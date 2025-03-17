@@ -2,35 +2,23 @@ import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
 import { IBranchMemoryBankRepository } from '../../../domain/repositories/IBranchMemoryBankRepository.js';
 import { IGlobalMemoryBankRepository } from '../../../domain/repositories/IGlobalMemoryBankRepository.js';
 import { DocumentId } from '../../../domain/entities/DocumentId.js';
-import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
 import { JsonDocument } from '../../../domain/entities/JsonDocument.js';
 import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
-import { Tag } from '../../../domain/entities/Tag.js';
-import {
-  ITagIndexRepository,
-  TagIndexOptions,
-  TagIndexUpdateResult,
-} from '../../../domain/repositories/ITagIndexRepository.js';
 import { FileSystemService } from '../../storage/FileSystemService.js';
 import path from 'path';
-import { getLogger } from '../../../shared/utils/logger.js';
+import { logger } from '../../../shared/utils/logger.js';
 import {
-  BaseTagIndex,
   BranchTagIndex,
   GlobalTagIndex,
   DocumentReference,
-  TagEntry,
   TAG_INDEX_VERSION,
   BranchTagIndexSchema,
   GlobalTagIndexSchema,
 } from '../../../schemas/v2/tag-index.js';
-import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
 import {
   InfrastructureError,
   InfrastructureErrorCodes,
 } from '../../../shared/errors/InfrastructureError.js';
-
-const logger = getLogger('FileSystemTagIndexRepository');
 
 /**
  * Implementation of ITagIndexRepository for file system storage
@@ -51,7 +39,7 @@ export abstract class FileSystemTagIndexRepository {
     protected readonly globalMemoryBankPath: string,
     protected readonly branchRepository: IBranchMemoryBankRepository,
     protected readonly globalRepository: IGlobalMemoryBankRepository
-  ) {}
+  ) { }
 
   /**
    * Get path to branch index file

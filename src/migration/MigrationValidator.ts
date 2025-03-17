@@ -1,11 +1,11 @@
 /**
  * Migration validator
- * 
+ *
  * Validates JSON documents against their respective schemas
  */
 import { z } from 'zod';
 import { DocumentType } from '../domain/entities/JsonDocument.js';
-import { Logger } from '../shared/utils/Logger.js';
+import { Logger } from '../shared/utils/logger.js';
 import {
   BaseJsonDocumentV2Schema,
   BranchContextJsonV2Schema,
@@ -22,7 +22,7 @@ export interface ValidationResult {
    * Whether validation passed
    */
   success: boolean;
-  
+
   /**
    * Error messages if validation failed
    */
@@ -36,8 +36,8 @@ export class MigrationValidator {
   /**
    * @param logger Logger instance
    */
-  constructor(private readonly logger: Logger) {}
-  
+  constructor(private readonly logger: Logger) { }
+
   /**
    * Validate a JSON document against its schema
    * @param jsonData JSON data to validate
@@ -48,10 +48,10 @@ export class MigrationValidator {
     try {
       // First validate against base schema
       BaseJsonDocumentV2Schema.parse(jsonData);
-      
+
       // Then validate against specific schema
       let schema: z.ZodType;
-      
+
       switch (documentType) {
         case 'branch_context':
           schema = BranchContextJsonV2Schema;
@@ -70,9 +70,9 @@ export class MigrationValidator {
           schema = BaseJsonDocumentV2Schema;
           break;
       }
-      
+
       schema.parse(jsonData);
-      
+
       this.logger.debug(`Validated ${documentType} document successfully`);
       return { success: true };
     } catch (error) {
@@ -80,14 +80,14 @@ export class MigrationValidator {
         const errors = error.errors.map(err => {
           return `${err.path.join('.')}: ${err.message}`;
         });
-        
+
         this.logger.error(`Validation failed for ${documentType} document: ${errors.join(', ')}`);
         return {
           success: false,
           errors
         };
       }
-      
+
       this.logger.error(`Unexpected validation error: ${(error as Error).message}`);
       return {
         success: false,

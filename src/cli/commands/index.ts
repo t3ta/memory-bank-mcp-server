@@ -3,7 +3,6 @@ import { registerJsonCommands } from './json/index.js';
 import { registerGlobalCommands } from './global/index.js';
 import { registerUtilCommands } from './utils/index.js';
 import { registerMigrationCommands } from './migration/index.js';
-import { registerUtilCommands } from './utils/index.js';
 
 /**
  * Register all CLI commands with yargs

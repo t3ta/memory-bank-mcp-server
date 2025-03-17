@@ -2,16 +2,12 @@ import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
 import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
 import { JsonDocument } from '../../../domain/entities/JsonDocument.js';
 import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
-import { Tag } from '../../../domain/entities/Tag.js';
-import { getLogger } from '../../../shared/utils/logger.js';
+import { logger } from '../../../shared/utils/logger.js';
 import {
   InfrastructureError,
   InfrastructureErrorCodes,
 } from '../../../shared/errors/InfrastructureError.js';
 import { FileSystemTagIndexRepositoryImpl } from './FileSystemTagIndexRepositoryImpl.js';
-import { DocumentReference } from '../../../schemas/v2/tag-index.js';
-
-const logger = getLogger('FileSystemTagIndexRepositoryModifiers');
 
 /**
  * Implementation of document modification operations for ITagIndexRepository

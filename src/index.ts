@@ -12,6 +12,7 @@ import { hideBin } from 'yargs/helpers';
 // Import the application
 import createApplication from './main/index.js';
 import { Application } from './main/index.js';
+import { logger } from './shared/utils/logger.js';
 
 // Parse command line arguments
 const argv = yargs(hideBin(process.argv))
@@ -23,13 +24,6 @@ const argv = yargs(hideBin(process.argv))
   })
   .help()
   .parseSync();
-
-// Logger setup
-const logger = {
-  debug: (...args: any[]) => console.error('[DEBUG]', ...args),
-  info: (...args: any[]) => console.error('[INFO]', ...args),
-  error: (...args: any[]) => console.error('[ERROR]', ...args),
-};
 
 // New application instance
 let app: Application | null;
