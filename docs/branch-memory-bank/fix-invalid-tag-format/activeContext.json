@@ -1,0 +1,17 @@
+{
+  "schema": "memory_document_v1",
+  "metadata": {
+    "title": "activeContext.json",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [],
+    "lastModified": "2025-03-17T05:31:10.128Z"
+  },
+  "content": {
+    "currentWork": "{\n  \"schema\": \"memory_document_v2\",\n  \"metadata\": {\n    \"id\": \"active-context-001\",\n    \"title\": \"無効なタグ形式修正の作業コンテキスト\",\n    \"documentType\": \"active_context\",\n    \"path\": \"activeContext.json\",\n    \"tags\": [\"hotfix\", \"active-work\", \"tag-validation\"],\n    \"lastModified\": \"2025-03-17T15:00:00.000Z\",\n    \"createdAt\": \"2025-03-17T14:30:00.000Z\",\n    \"version\": 1\n  },\n  \"content\": {\n    \"currentWork\": \"問題のJSONドキュメント内にある無効なタグを修正し、同時にシステムの堅牢性を向上させるために、エラーハンドリングと自動タグサニタイ",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": []
+  }
+}
