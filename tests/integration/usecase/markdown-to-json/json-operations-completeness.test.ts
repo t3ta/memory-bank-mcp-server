@@ -39,7 +39,7 @@ describe('JSON Operations Completeness Integration Tests', () => {
   // Instance of the test target
   let repository: FileSystemBranchMemoryBankRepository;
   let jsonRepository: FileSystemJsonDocumentRepository;
-  let tagRepository: FileSystemTagIndexRepositoryImpl;
+  // tagRepository is not used in this test but is initialized in configuration
   let fileSystemService: FileSystemService;
   let indexService: IndexService;
   let configProvider: ConfigProvider;

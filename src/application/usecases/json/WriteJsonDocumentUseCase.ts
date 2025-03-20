@@ -5,7 +5,7 @@ import { DocumentPath } from '../../../domain/entities/DocumentPath';
 import { DocumentId } from '../../../domain/entities/DocumentId';
 import { JsonDocument, DocumentType } from '../../../domain/entities/JsonDocument';
 import { Tag } from '../../../domain/entities/Tag';
-import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError';
+import { DomainError } from '../../../shared/errors/DomainError';
 import {
   ApplicationError,
   ApplicationErrorCodes,

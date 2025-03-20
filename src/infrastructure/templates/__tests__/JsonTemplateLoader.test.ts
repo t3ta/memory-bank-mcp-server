@@ -18,9 +18,9 @@ const mockFileSystemService: jest.Mocked<IFileSystemService> = {
   directoryExists: jest.fn(),
   listFiles: jest.fn(),
   getFileStats: jest.fn(),
-  readFileChunk: jest.fn().mockReturnValue(Promise.resolve('')) as jest.Mock<Promise<string>>,
-  getBranchMemoryPath: jest.fn().mockReturnValue('') as jest.Mock<string>,
-  getConfig: jest.fn().mockReturnValue({ memoryBankRoot: '' }) as jest.Mock<{ memoryBankRoot: string, [key: string]: any }>,
+  readFileChunk: jest.fn().mockReturnValue(Promise.resolve('')),
+  getBranchMemoryPath: jest.fn().mockReturnValue(''),
+  getConfig: jest.fn().mockReturnValue({ memoryBankRoot: '' }),
 };
 
 // Mock i18n provider
