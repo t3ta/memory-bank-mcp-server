@@ -1,3 +1,30 @@
+  it('Markdownファイルへの書き込みが禁止されていること', async () => {
+    // テストデータ - マークダウン形式
+    const docPath = 'test-markdown-disabled.md';
+    const content = `# マークダウン禁止テスト
+
+このドキュメントは書き込みが禁止されるはずです。
+`;
+
+    // ドキュメント書き込み
+    const writeResult = await controller.writeDocument(docPath, content);
+
+    // 書き込み結果の検証 - 失敗するはず
+    expect(writeResult.success).toBe(false);
+    if (!writeResult.success) {
+      // エラーメッセージを確認
+      expect(writeResult.error.message).toContain('Writing to Markdown files is disabled');
+      expect(writeResult.error.message).toContain('.json');
+    } else {
+      fail('マークダウンファイルへの書き込みが失敗するはずが成功してしまいました');
+    }
+
+    // ファイルが存在しないことを確認
+    const filePath = path.join(globalDir, docPath);
+    const fileExists = await fileExistsAsync(filePath);
+    expect(fileExists).toBe(false);
+  });
+
 import { promises as fs } from 'node:fs';
 import * as path from 'node:path';
 import { v4 as uuidv4 } from 'uuid';
@@ -179,13 +206,13 @@ describe('GlobalController Integration Tests', () => {
   });
 
   it('グローバルドキュメントの書き込みと読み込みができること', async () => {
-    // テストデータ - マークダウン形式
-    const docPath = 'test-global-doc.md';
-    const content = `# グローバルテストドキュメント
-
-このドキュメントは統合テストで作成されたグローバルドキュメントです。
-作成時刻: ${new Date().toISOString()}
-`;
+    // テストデータ - JSON形式
+    const docPath = 'test-global-doc.json';
+    const content = JSON.stringify({
+      title: "グローバルテストドキュメント",
+      description: "このドキュメントは統合テストで作成されたグローバルドキュメントです。",
+      createdAt: new Date().toISOString()
+    });
 
     // ドキュメント書き込み
     const writeResult = await controller.writeDocument(docPath, content);

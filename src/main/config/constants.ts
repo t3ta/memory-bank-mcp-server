@@ -46,6 +46,6 @@ export const Constants = {
    * Migration config
    */
   MIGRATION: {
-    disableMarkdownWrites: false,
+    disableMarkdownWrites: true,
   }
 };

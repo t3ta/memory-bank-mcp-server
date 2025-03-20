@@ -7,7 +7,9 @@
  */
 
 import { IBranchMemoryBankRepository } from '../domain/repositories/IBranchMemoryBankRepository.js';
+import { IGlobalMemoryBankRepository } from '../domain/repositories/IGlobalMemoryBankRepository.js';
 import { WriteBranchDocumentUseCase } from '../application/usecases/branch/WriteBranchDocumentUseCase.js';
+import { WriteGlobalDocumentUseCase } from '../application/usecases/global/WriteGlobalDocumentUseCase.js';
 import { Constants } from '../main/config/constants.js';
 
 /**
@@ -31,6 +33,18 @@ export class UseCaseFactory {
   }
 
   /**
-   * その他のユースケースファクトリーメソッド..
+   * WriteGlobalDocumentUseCaseを作成
+   *
+   * マイグレーション設定に基づいて、Markdown書き込み禁止オプションを設定
+   *
+   * @param globalRepository グローバルメモリーバンクリポジトリ
+   * @returns WriteGlobalDocumentUseCaseのインスタンス
    */
+  static createWriteGlobalDocumentUseCase(
+    globalRepository: IGlobalMemoryBankRepository
+  ): WriteGlobalDocumentUseCase {
+    return new WriteGlobalDocumentUseCase(globalRepository, {
+      disableMarkdownWrites: Constants.MIGRATION.disableMarkdownWrites
+    });
+  }
 }

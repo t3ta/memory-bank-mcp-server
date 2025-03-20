@@ -19,6 +19,7 @@ import {
  * - Preserving tags when only content is updated
  * - Input validation for document data
  * - Proper error handling and error wrapping
+ * - Markdown writes prevention when disableMarkdownWrites is enabled
  * 
  * The test suite uses a mocked IGlobalMemoryBankRepository and fake timers
  * to ensure consistent behavior across test runs.
@@ -41,6 +42,7 @@ const mockGlobalRepository: jest.Mocked<IGlobalMemoryBankRepository> = {
 
 describe('WriteGlobalDocumentUseCase', () => {
   let useCase: WriteGlobalDocumentUseCase;
+  let useCaseWithMarkdownDisabled: WriteGlobalDocumentUseCase;
 
   // Test document data
   const testDocumentPath = 'test/document.md';
@@ -58,6 +60,11 @@ describe('WriteGlobalDocumentUseCase', () => {
 
     // Create use case with mock repository
     useCase = new WriteGlobalDocumentUseCase(mockGlobalRepository);
+    
+    // Create a use case with Markdown writing disabled
+    useCaseWithMarkdownDisabled = new WriteGlobalDocumentUseCase(mockGlobalRepository, {
+      disableMarkdownWrites: true
+    });
   });
 
   afterEach(() => {
@@ -256,6 +263,66 @@ describe('WriteGlobalDocumentUseCase', () => {
 
     // Verify repository was not called
     expect(mockGlobalRepository.initialize).not.toHaveBeenCalled();
+  });
+
+  it('should throw ApplicationError when attempting to write to Markdown file with disableMarkdownWrites option', async () => {
+    // Arrange
+    mockGlobalRepository.initialize.mockResolvedValue();
+
+    // Act & Assert
+    await expect(
+      useCaseWithMarkdownDisabled.execute({
+        document: {
+          path: testDocumentPath,  // This is a .md file
+          content: testDocumentContent,
+        },
+      })
+    ).rejects.toThrow(ApplicationError);
+
+    await expect(
+      useCaseWithMarkdownDisabled.execute({
+        document: {
+          path: testDocumentPath,
+          content: testDocumentContent,
+        },
+      })
+    ).rejects.toThrow('Writing to Markdown files is disabled');
+
+    // Verify the error message contains the JSON alternative path
+    await expect(
+      useCaseWithMarkdownDisabled.execute({
+        document: {
+          path: testDocumentPath,
+          content: testDocumentContent,
+        },
+      })
+    ).rejects.toThrow('test/document.json');
+  });
+
+  it('should allow writing to JSON file with disableMarkdownWrites option', async () => {
+    // Arrange
+    const jsonPath = 'test/document.json';
+    mockGlobalRepository.initialize.mockResolvedValue();
+    mockGlobalRepository.getDocument.mockResolvedValue(null);
+    mockGlobalRepository.saveDocument.mockResolvedValue();
+    mockGlobalRepository.updateTagsIndex.mockResolvedValue();
+
+    // Act
+    const result = await useCaseWithMarkdownDisabled.execute({
+      document: {
+        path: jsonPath,
+        content: '{"test": true}',
+      },
+    });
+
+    // Assert
+    expect(result).toBeDefined();
+    expect(result.document).toBeDefined();
+    expect(result.document.path).toBe(jsonPath);
+
+    // Verify repository calls
+    expect(mockGlobalRepository.initialize).toHaveBeenCalled();
+    expect(mockGlobalRepository.saveDocument).toHaveBeenCalled();
   });
 
   it('should wrap unknown errors as ApplicationError', async () => {

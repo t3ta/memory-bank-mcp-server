@@ -1,6 +1,6 @@
 # タグインデックス
 
-tags: #meta #index
+tags: #index #meta
 
 | タグ | 件数 | ドキュメント |
 |-----|------|-------------|
@@ -11,7 +11,9 @@ tags: #meta #index
 | #ci-cd | 2 | [ci-cd/workflows.json](/ci-cd/workflows.json), [CI/CD Workflows](/ci-cd/workflows.md) |
 | #clean-architecture | 2 | [architecture.json](/architecture.json), [System Architecture](/architecture.md) |
 | #clean-code | 2 | [coding-standards.json](/coding-standards.json), [Coding Standards](/coding-standards.md) |
+| #cli | 1 | [CLI コマンド一覧](/cli-commands.md) |
 | #command | 4 | [read-context-command-design.json](/read-context-command-design.json), [`read_context`コマンド設計書](/read-context-command-design.md), [read-context-command-implementation.json](/read-context-command-implementation.json), [`read_context`コマンド実装ガイド](/read-context-command-implementation.md) |
+| #commands | 1 | [CLI コマンド一覧](/cli-commands.md) |
 | #context | 4 | [read-context-command-design.json](/read-context-command-design.json), [`read_context`コマンド設計書](/read-context-command-design.md), [read-context-command-implementation.json](/read-context-command-implementation.json), [`read_context`コマンド実装ガイド](/read-context-command-implementation.md) |
 | #controller | 1 | [integration-test-strategy.json](/integration-test-strategy.json) |
 | #decision | 2 | [architecture-decisions.json](/architecture-decisions.json), [アーキテクチャ決定記録](/architecture-decisions.md) |
@@ -32,19 +34,23 @@ tags: #meta #index
 | #infrastructure | 2 | [tech-stack.json](/tech-stack.json), [Technology Stack](/tech-stack.md) |
 | #integration-test | 2 | [integration-test-strategy.json](/integration-test-strategy.json), [json-global-design-issues.json](/json-global-design-issues.json) |
 | #integration-tests | 2 | [e2e-to-integration-test-approach.json](/e2e-to-integration-test-approach.json), [E2E から Integration テストへの移行アプローチ](/e2e-to-integration-test-approach.md) |
-| #json | 10 | [architecture-decisions.json](/architecture-decisions.json), [アーキテクチャ決定記録](/architecture-decisions.md), [domain-models.json](/domain-models.json), [ドメインモデル](/domain-models.md), [json-based-architecture.json](/json-based-architecture.json), [Memory Bank 2.0: JSON ベースアーキテクチャ詳細設計](/json-based-architecture.md), [template-system-json-i18n-design.json](/template-system-json-i18n-design.json), [テンプレートシステムのJSON化と多言語対応 - 設計仕様書](/template-system-json-i18n-design.md), [v2-implementation-plan.json](/v2-implementation-plan.json), [Memory Bank 2.0: 実装計画](/v2-implementation-plan.md) |
+| #json | 11 | [architecture-decisions.json](/architecture-decisions.json), [アーキテクチャ決定記録](/architecture-decisions.md), [domain-models.json](/domain-models.json), [ドメインモデル](/domain-models.md), [json-based-architecture.json](/json-based-architecture.json), [Memory Bank 2.0: JSON ベースアーキテクチャ詳細設計](/json-based-architecture.md), [Markdown から JSON 形式への移行ポリシー](/migration-policy.md), [template-system-json-i18n-design.json](/template-system-json-i18n-design.json), [テンプレートシステムのJSON化と多言語対応 - 設計仕様書](/template-system-json-i18n-design.md), [v2-implementation-plan.json](/v2-implementation-plan.json), [Memory Bank 2.0: 実装計画](/v2-implementation-plan.md) |
 | #l10n | 2 | [template-system-json-i18n-design.json](/template-system-json-i18n-design.json), [テンプレートシステムのJSON化と多言語対応 - 設計仕様書](/template-system-json-i18n-design.md) |
+| #markdown | 1 | [Markdown から JSON 形式への移行ポリシー](/migration-policy.md) |
 | #mcp | 4 | [read-context-command-design.json](/read-context-command-design.json), [`read_context`コマンド設計書](/read-context-command-design.md), [read-context-command-implementation.json](/read-context-command-implementation.json), [`read_context`コマンド実装ガイド](/read-context-command-implementation.md) |
 | #memory-bank | 3 | [ci-cd/memory-bank-errors.json](/ci-cd/memory-bank-errors.json), [Memory Bank Error Troubleshooting](/ci-cd/memory-bank-errors.md), [json-global-design-issues.json](/json-global-design-issues.json) |
 | #meta | 1 | [tags/index.json](/tags/index.json) |
+| #migration | 1 | [Markdown から JSON 形式への移行ポリシー](/migration-policy.md) |
 | #models | 2 | [domain-models.json](/domain-models.json), [ドメインモデル](/domain-models.md) |
 | #onion-architecture | 2 | [architecture.json](/architecture.json), [System Architecture](/architecture.md) |
 | #overview | 1 | [project-overview.json](/project-overview.json) |
 | #plan | 2 | [v2-implementation-plan.json](/v2-implementation-plan.json), [Memory Bank 2.0: 実装計画](/v2-implementation-plan.md) |
+| #policy | 1 | [Markdown から JSON 形式への移行ポリシー](/migration-policy.md) |
 | #pr | 1 | [release-v2.0.0.json](/release-v2.0.0.json) |
 | #project | 1 | [project-overview.json](/project-overview.json) |
 | #qa | 1 | [integration-test-strategy.json](/integration-test-strategy.json) |
 | #refactoring | 1 | [json-global-design-issues.json](/json-global-design-issues.json) |
+| #reference | 1 | [CLI コマンド一覧](/cli-commands.md) |
 | #release | 1 | [release-v2.0.0.json](/release-v2.0.0.json) |
 | #standards | 2 | [coding-standards.json](/coding-standards.json), [Coding Standards](/coding-standards.md) |
 | #summary | 1 | [project-overview.json](/project-overview.json) |

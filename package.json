@@ -29,7 +29,7 @@
     "test": "NODE_OPTIONS='--experimental-vm-modules' jest --no-coverage",
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' jest --watch",
     "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage",
-    "test:e2e": "NODE_OPTIONS='--experimental-vm-modules' jest --no-coverage --testMatch='**/tests/e2e/**/*.test.ts' --runInBand",
+    "test:e2e": "NODE_OPTIONS='--experimental-vm-modules' jest --no-coverage --config=tests/e2e/jest.config.ts --runInBand",
     "test:integration": "NODE_OPTIONS='--experimental-vm-modules' jest --no-coverage --testMatch='**/tests/integration/**/*.test.ts' --config=tests/integration/jest.config.ts",
     "prepublishOnly": "npm run lint && npm test && npm run build"
   },

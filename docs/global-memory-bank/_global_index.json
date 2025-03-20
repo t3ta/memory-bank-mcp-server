@@ -1,8 +1,8 @@
 {
   "schema": "tag_index_v1",
   "metadata": {
-    "updatedAt": "2025-03-19T12:40:16.492Z",
-    "documentCount": 53,
+    "updatedAt": "2025-03-20T17:33:25.751Z",
+    "documentCount": 57,
     "fullRebuild": true,
     "context": "global"
   },
@@ -31,6 +31,7 @@
       "domain-models.md",
       "json-based-architecture.json",
       "json-based-architecture.md",
+      "migration-policy.md",
       "template-system-json-i18n-design.json",
       "template-system-json-i18n-design.md",
       "v2-implementation-plan.json",
@@ -62,7 +63,8 @@
     ],
     "memory-bank": [
       "ci-cd/memory-bank-errors.json",
-      "ci-cd/memory-bank-errors.md"
+      "ci-cd/memory-bank-errors.md",
+      "json-global-design-issues.json"
     ],
     "errors": [
       "ci-cd/memory-bank-errors.json",
@@ -83,6 +85,15 @@
     "workflows": [
       "ci-cd/workflows.json",
       "ci-cd/workflows.md"
+    ],
+    "cli": [
+      "cli-commands.md"
+    ],
+    "commands": [
+      "cli-commands.md"
+    ],
+    "reference": [
+      "cli-commands.md"
     ],
     "standards": [
       "coding-standards.json",
@@ -132,40 +143,46 @@
       "glossary.json",
       "glossary.md"
     ],
-    "---": [
+    "test": [
       "integration-test-strategy.json"
     ],
     "tdd": [
       "integration-test-strategy.json"
     ],
-    "-----": [
+    "integration-test": [
       "integration-test-strategy.json",
-      "json-global-design-issues.json",
       "json-global-design-issues.json"
     ],
-    "----": [
+    "qa": [
       "integration-test-strategy.json"
     ],
-    "-------": [
+    "controller": [
       "integration-test-strategy.json"
     ],
     "design": [
       "json-based-architecture.json",
       "json-based-architecture.md",
+      "json-global-design-issues.json",
       "read-context-command-design.json",
       "read-context-command-design.md",
       "template-system-json-i18n-design.json",
       "template-system-json-i18n-design.md",
       "v2.0-design-decisions.json"
     ],
-    "--": [
+    "tech-debt": [
       "json-global-design-issues.json"
     ],
-    "--------": [
+    "refactoring": [
       "json-global-design-issues.json"
     ],
-    "------": [
-      "json-global-design-issues.json"
+    "migration": [
+      "migration-policy.md"
+    ],
+    "markdown": [
+      "migration-policy.md"
+    ],
+    "policy": [
+      "migration-policy.md"
     ],
     "overview": [
       "project-overview.json"

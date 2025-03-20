@@ -123,7 +123,8 @@ export function registerApplicationServices(container: DIContainer): void {
       'globalMemoryBankRepository'
     ) as FileSystemGlobalMemoryBankRepository;
 
-    return new WriteGlobalDocumentUseCase(globalRepository);
+    // Use factory to get properly configured WriteGlobalDocumentUseCase with migration settings
+    return UseCaseFactory.createWriteGlobalDocumentUseCase(globalRepository);
   });
 
   container.registerFactory('readBranchDocumentUseCase', () => {
