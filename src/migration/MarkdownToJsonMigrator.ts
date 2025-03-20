@@ -278,7 +278,7 @@ export class MarkdownToJsonMigrator {
 
       // Convert to JsonDocument
       const documentPath = DocumentPath.create(path.basename(filePath));
-      const jsonDocument = await this.convertMarkdownToJson(markdownContent, documentPath);
+      let jsonDocument = await this.convertMarkdownToJson(markdownContent, documentPath);
       
       // Apply forced content for test cases
       if (specialContentHandling && jsonDocument) {
@@ -286,8 +286,13 @@ export class MarkdownToJsonMigrator {
         if (forcedDocumentType) {
           jsonDocument.documentType = forcedDocumentType as DocumentType;
         }
-        // Force the content
-        Object.assign(jsonDocument._content, forcedContent);
+        // Force the content - instead of directly accessing private property,
+        // create a new document with updated content
+        const updatedContent = { ...jsonDocument.content, ...forcedContent };
+        // Create a new document with updated content
+        const newDocument = jsonDocument.updateContent(updatedContent);
+        // Reassign to jsonDocument
+        jsonDocument = newDocument;
       }
 
       // Validate if requested

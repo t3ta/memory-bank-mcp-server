@@ -1,6 +1,10 @@
-import path from "path";
 import fs from "fs/promises";
+import path from "path";
+import { JsonToMarkdownConverter } from "../../../shared/utils/json-to-markdown/index.js";
 import { DomainError, DomainErrorCodes } from "../../../shared/errors/DomainError.js";
+import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
+import { JsonDocument } from "../../../domain/entities/JsonDocument.js";
+
 
 
 export type RulesResult = {
@@ -18,8 +22,12 @@ export class ReadRulesUseCase {
   /**
    * コンストラクタ
    * @param rulesDir ルールディレクトリパス
+   * @param jsonToMarkdownConverter JSON to Markdown コンバーター
    */
-  constructor(rulesDir: string) {
+  constructor(
+    rulesDir: string,
+    private readonly jsonToMarkdownConverter?: JsonToMarkdownConverter
+  ) {
     this.rulesDir = rulesDir;
   }
 
@@ -39,12 +47,49 @@ export class ReadRulesUseCase {
     }
 
     try {
-      // ルールファイルのパス
-      const filePath = path.join(this.rulesDir, `rules-${language}.md`);
-      console.log('Rules file path:', filePath);
-
-      // ファイル読み込み
-      const content = await fs.readFile(filePath, 'utf-8');
+      // JSONファイルのパス - 複数のパスを試す
+      const possiblePaths = [
+        // 新しいパス (templates/json/rules-{lang}.json)
+        path.join(this.rulesDir, 'templates', 'json', `rules-${language}.json`),
+        // 第二候補 (templates/rules-{lang}.json)
+        path.join(this.rulesDir, 'templates', `rules-${language}.json`),
+        // フォールバック
+        path.join(this.rulesDir, `rules-${language}.json`)
+      ];
+      
+      let jsonContent = '';
+      let jsonFilePath = '';
+      
+      // 存在するパスを探す
+      for (const p of possiblePaths) {
+        try {
+          jsonContent = await fs.readFile(p, 'utf-8');
+          jsonFilePath = p;
+          console.log(`Rules JSON file found at: ${jsonFilePath}`);
+          break;
+        } catch (err) {
+          // このパスでは見つからなかった、次を試す
+          continue;
+        }
+      }
+      
+      if (!jsonContent) {
+        throw new Error(`Rules file not found for language: ${language}`);
+      }
+      
+      const jsonData = JSON.parse(jsonContent);
+      
+      // JSONからマークダウンに変換する場合
+      let content = '';
+      if (this.jsonToMarkdownConverter) {
+        // コンバーターが提供されていれば使用 - JsonDocumentを作成してから変換
+        const docPath = DocumentPath.create('rules.json');
+        const jsonDoc = JsonDocument.fromObject(jsonData, docPath);
+        content = this.jsonToMarkdownConverter.convert(jsonDoc);
+      } else {
+        // コンバーターがない場合は生のJSON文字列を使用
+        content = JSON.stringify(jsonData, null, 2);
+      }
 
       return {
         content,

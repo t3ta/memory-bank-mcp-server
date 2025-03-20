@@ -1,4 +1,6 @@
 import { DIContainer } from './DIContainer.js';
+import { MCPResponsePresenter } from '../../interface/presenters/MCPResponsePresenter.js';
+import { ReadGlobalDocumentUseCase } from '../../application/usecases/global/ReadGlobalDocumentUseCase.js';
 import path from 'node:path';
 import { IndexService } from '../../infrastructure/index/IndexService.js';
 import { IIndexService } from '../../infrastructure/index/interfaces/IIndexService.js';
@@ -7,8 +9,8 @@ import { IJsonDocumentRepository } from '../../domain/repositories/IJsonDocument
 
 // Domain layer
 
-// Application layer
-import { ReadGlobalDocumentUseCase } from '../../application/usecases/global/ReadGlobalDocumentUseCase.js';
+import { ReadRulesUseCase } from '../../application/usecases/common/ReadRulesUseCase.js';
+import { ReadContextUseCase } from '../../application/usecases/common/ReadContextUseCase.js';
 import { WriteGlobalDocumentUseCase } from '../../application/usecases/global/WriteGlobalDocumentUseCase.js';
 import { ReadBranchDocumentUseCase } from '../../application/usecases/branch/ReadBranchDocumentUseCase.js';
 import { WriteBranchDocumentUseCase } from '../../application/usecases/branch/WriteBranchDocumentUseCase.js';
@@ -33,8 +35,7 @@ import { FileSystemGlobalMemoryBankRepository } from '../../infrastructure/repos
 import { FileSystemBranchMemoryBankRepository } from '../../infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.js';
 import { FileSystemTagIndexRepositoryV1Bridge } from '../../infrastructure/repositories/file-system/FileSystemTagIndexRepositoryV1Bridge.js';
 
-// Interface layer
-import { MCPResponsePresenter } from '../../interface/presenters/MCPResponsePresenter.js';
+import { ContextController } from '../../interface/controllers/ContextController.js';
 import { JsonResponsePresenter } from '../../interface/presenters/JsonResponsePresenter.js';
 import { GlobalController } from '../../interface/controllers/GlobalController.js';
 import { BranchController } from '../../interface/controllers/BranchController.js';
@@ -193,6 +194,25 @@ export function registerApplicationServices(container: DIContainer): void {
   });
 
   // Register common use cases
+  container.registerFactory('readRulesUseCase', () => {
+    const configProvider = container.get<IConfigProvider>('configProvider');
+    const config = configProvider.getConfig();
+    const rulesDir = config.memoryBankRoot;
+    
+    // 同期的に新しいReadRulesUseCaseを作成 - コンバーターなしで
+    return new ReadRulesUseCase(rulesDir);
+  });
+  
+  container.registerFactory('readContextUseCase', () => {
+    const branchRepository = container.get(
+      'branchMemoryBankRepository'
+    ) as FileSystemBranchMemoryBankRepository;
+    const globalRepository = container.get(
+      'globalMemoryBankRepository'
+    ) as FileSystemGlobalMemoryBankRepository;
+    
+    return new ReadContextUseCase(branchRepository, globalRepository);
+  });
   container.registerFactory('searchDocumentsByTagsUseCase', () => {
     // Use explicit type assertion for proper type safety
     const globalRepository = container.get(
@@ -313,6 +333,13 @@ export function registerInterfaceServices(container: DIContainer): void {
   // Register presenters
   container.register('mcpResponsePresenter', new MCPResponsePresenter());
   container.register('jsonResponsePresenter', new JsonResponsePresenter());
+
+  container.registerFactory('contextController', () => {
+    const readContextUseCase = container.get('readContextUseCase') as ReadContextUseCase;
+    const readRulesUseCase = container.get('readRulesUseCase') as ReadRulesUseCase;
+    
+    return new ContextController(readContextUseCase, readRulesUseCase);
+  });
 
   // Register tools section removed
 
