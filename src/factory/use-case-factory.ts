@@ -8,7 +8,7 @@
 
 import { IBranchMemoryBankRepository } from '../domain/repositories/IBranchMemoryBankRepository.js';
 import { WriteBranchDocumentUseCase } from '../application/usecases/branch/WriteBranchDocumentUseCase.js';
-import { migrationConfig } from '../config/migration-config.js';
+import { Constants } from '../main/config/constants.js';
 
 /**
  * ユースケースファクトリー
@@ -26,7 +26,7 @@ export class UseCaseFactory {
     branchRepository: IBranchMemoryBankRepository
   ): WriteBranchDocumentUseCase {
     return new WriteBranchDocumentUseCase(branchRepository, {
-      disableMarkdownWrites: migrationConfig.disableMarkdownWrites
+      disableMarkdownWrites: Constants.MIGRATION.disableMarkdownWrites
     });
   }
 

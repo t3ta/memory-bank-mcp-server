@@ -41,4 +41,11 @@ export const Constants = {
    * Supported languages
    */
   SUPPORTED_LANGUAGES: ['en', 'ja'] as const,
+
+  /**
+   * Migration config
+   */
+  MIGRATION: {
+    disableMarkdownWrites: false,
+  }
 };

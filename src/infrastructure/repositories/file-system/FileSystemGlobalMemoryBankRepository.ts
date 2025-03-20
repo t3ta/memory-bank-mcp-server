@@ -3,7 +3,6 @@ import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
 import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
 import { Tag } from '../../../domain/entities/Tag.js';
 import type { IGlobalMemoryBankRepository } from '../../../domain/repositories/IGlobalMemoryBankRepository.js';
-import type { MemoryDocument } from '../../../schemas/index.js';
 import type { TagIndex } from '../../../schemas/tag-index/tag-index-schema.js';
 import { DomainError } from '../../../shared/errors/DomainError.js';
 import { InfrastructureError, InfrastructureErrorCodes } from '../../../shared/errors/InfrastructureError.js';

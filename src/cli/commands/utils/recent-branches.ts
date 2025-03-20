@@ -65,7 +65,7 @@ export class RecentBranchesCommand extends CommandBase {
 
       // Handle response
       if (!result.success) {
-        logger.error(`Error getting recent branches: ${result.error.message}`);
+        logger.error(`Error getting recent branches: ${(result as any).error.message}`);
         process.exit(1);
       }
 

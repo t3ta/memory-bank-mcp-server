@@ -4,8 +4,7 @@ import { BranchInfo } from "../../../domain/entities/BranchInfo.js";
 import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
 import { MemoryDocument } from "../../../domain/entities/MemoryDocument.js";
 import type { Tag } from "../../../domain/entities/Tag.js";
-import type { IBranchMemoryBankRepository } from "../../../domain/repositories/IBranchMemoryBankRepository.js";
-import type { MemoryDocument, RecentBranch } from "../../../schemas/index.js";
+import type { IBranchMemoryBankRepository, RecentBranch } from "../../../domain/repositories/IBranchMemoryBankRepository.js";
 import type { TagIndex } from "../../../schemas/tag-index/tag-index-schema.js";
 import { DomainError, DomainErrorCodes } from "../../../shared/errors/DomainError.js";
 

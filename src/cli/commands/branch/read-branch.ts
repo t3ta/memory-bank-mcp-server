@@ -65,7 +65,7 @@ export class ReadBranchCommand extends CommandBase {
 
       // Handle response
       if (!result.success) {
-        logger.error(`Error reading document: ${result.error.message}`);
+        logger.error(`Error reading document: ${(result as any).error.message}`);
         process.exit(1);
       }
 

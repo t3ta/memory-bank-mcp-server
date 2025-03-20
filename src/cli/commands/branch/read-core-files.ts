@@ -68,7 +68,7 @@ export class ReadCoreFilesCommand extends CommandBase {
 
       // Handle response
       if (!result.success) {
-        logger.error(`Error reading core files: ${result.error.message}`);
+        logger.error(`Error reading core files: ${(result as any).error.message}`);
         process.exit(1);
       }
 

@@ -8,6 +8,7 @@ import yargs from 'yargs/yargs';
 import { createApplication, Application } from './main/index.js';
 import { logger } from './shared/utils/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { Server as MCPServer } from '@modelcontextprotocol/sdk/server/index.js';
 import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { Server } from 'node:http';
 
@@ -196,7 +197,7 @@ const AVAILABLE_TOOLS = [
 ];
 
 // Create a server
-const server = new Server(
+const server = new MCPServer(
   {
     name: 'memory-bank-mcp-server',
     version: '2.0.0',
@@ -273,7 +274,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
       }
       const response = await app.getBranchController().readDocument(branch, path);
       if (!response.success) {
-        throw new Error(response.error.message);
+        throw new Error((response as any).error.message);
       }
 
       return {
@@ -374,7 +375,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
       }
       const response = await app.getGlobalController().readDocument(path);
       if (!response.success) {
-        throw new Error(response.error.message);
+        throw new Error((response as any).error.message);
       }
 
       return {
@@ -391,7 +392,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
       }
       const response = await app.getBranchController().getRecentBranches(limit);
       if (!response.success) {
-        throw new Error(response.error.message);
+        throw new Error((response as any).error.message);
       }
 
       return {
@@ -484,7 +485,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         logger.debug(`Including branch memory bank for branch: ${branch}`);
         const branchResponse = await app.getBranchController().readCoreFiles(branch);
         if (!branchResponse.success) {
-          throw new Error(branchResponse.error.message);
+          throw new Error((branchResponse as any).error.message);
         }
         result.branchMemory = branchResponse.data;
       }
@@ -494,7 +495,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         logger.debug('Including global memory bank in context');
         const globalResponse = await app.getGlobalController().readCoreFiles();
         if (!globalResponse.success) {
-          throw new Error(globalResponse.error.message);
+          throw new Error((globalResponse as any).error.message);
         }
         result.globalMemory = globalResponse.data;
       }
@@ -517,7 +518,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 });
 
 // Error handling
-server.onerror = (error: any) => {
+(server as any).onerror = (error: any) => {
   logger.error('[MCP Server Error]', error);
 };
 
@@ -539,7 +540,7 @@ async function cleanup() {
   logger.info('Cleaning up resources..');
   try {
     // Close the server connection if it's open
-    await server.close();
+    await (server as any).close();
     logger.info('Server connection closed');
 
     // Release application resources if available
@@ -568,7 +569,7 @@ async function main() {
   const transport = new StdioServerTransport();
 
   logger.debug('Connecting transport..');
-  await server.connect(transport);
+  await (server as any).connect(transport);
 
   logger.debug('Initializing application..');
   // Initialize a new application

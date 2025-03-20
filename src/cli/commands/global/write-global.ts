@@ -77,7 +77,7 @@ export class WriteGlobalCommand extends CommandBase {
 
       // Handle response
       if (!result.success) {
-        logger.error(`Error writing document: ${result.error.message}`);
+        logger.error(`Error writing document: ${(result as any).error.message}`);
         process.exit(1);
       }
 

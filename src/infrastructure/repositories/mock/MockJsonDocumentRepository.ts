@@ -1,10 +1,9 @@
 import type { BranchInfo } from "../../../domain/entities/BranchInfo.js";
 import { DocumentId } from "../../../domain/entities/DocumentId.js";
 import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
-import { JsonDocument } from "../../../domain/entities/JsonDocument.js";
+import { JsonDocument, DocumentType } from "../../../domain/entities/JsonDocument.js";
 import type { Tag } from "../../../domain/entities/Tag.js";
 import type { IJsonDocumentRepository } from "../../../domain/repositories/IJsonDocumentRepository.js";
-import type { JsonDocument } from "../../../schemas/json-document.js";
 
 
 /**
