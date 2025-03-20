@@ -1,15 +1,15 @@
 import path from "path";
 import type { BranchInfo } from "../../../domain/entities/BranchInfo.js";
 import { DocumentId } from "../../../domain/entities/DocumentId.js";
+import type { DocumentPath } from "../../../domain/entities/DocumentPath.js";
 import { JsonDocument } from "../../../domain/entities/JsonDocument.js";
+import { MemoryDocument } from "../../../domain/entities/MemoryDocument.js";
 import type { IBranchMemoryBankRepository } from "../../../domain/repositories/IBranchMemoryBankRepository.js";
 import type { IGlobalMemoryBankRepository } from "../../../domain/repositories/IGlobalMemoryBankRepository.js";
-import type { MemoryDocument } from "../../../schemas/index.js";
-import type { JsonDocument } from "../../../schemas/json-document.js";
 import { type BranchTagIndex, BranchTagIndexSchema, type GlobalTagIndex, GlobalTagIndexSchema, type DocumentReference, TAG_INDEX_VERSION } from "../../../schemas/v2/tag-index.js";
 import { InfrastructureError, InfrastructureErrorCodes } from "../../../shared/errors/InfrastructureError.js";
 import { logger } from "../../../shared/utils/logger.js";
-import type { FileSystemService } from "../../storage/FileSystemService.js";
+import type { IFileSystemService } from "../../storage/interfaces/IFileSystemService.js";
 
 
 /**
@@ -26,7 +26,7 @@ export abstract class FileSystemTagIndexRepository {
    * @param globalMemoryBankPath Path to global memory bank
    */
   constructor(
-    protected readonly fileSystem: FileSystemService,
+    protected readonly fileSystem: IFileSystemService,
     protected readonly branchMemoryBankRoot: string,
     protected readonly globalMemoryBankPath: string,
     protected readonly branchRepository: IBranchMemoryBankRepository,
@@ -216,15 +216,14 @@ export abstract class FileSystemTagIndexRepository {
         lastModified: document.lastModified,
       };
     } else {
-      // Legacy MemoryDocument doesn't have id or title
-      // Generate a deterministic ID based on path
-      const pathHash = document.path.value;
-      const id = DocumentId.create(pathHash.padEnd(36, '0').substring(0, 36));
+      // Legacy MemoryDocument's path is always a DocumentPath object
+      const pathValue = document.path.value;
+      const id = DocumentId.create(pathValue.padEnd(36, '0').substring(0, 36));
 
       return {
         id: id.value,
-        path: document.path.value,
-        title: document.path.basename || document.path.value,
+        path: pathValue,
+        title: path.basename(pathValue) || pathValue,
         lastModified: document.lastModified,
       };
     }

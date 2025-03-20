@@ -9,44 +9,43 @@ TypeScript 5.8.2バージョンアップデートに伴うビルドエラーと�
 3. 未使用変数/インポートの修正
 4. モックオブジェクトの型付け強化
 5. 重複する型インポートの解決（ドメイン層とスキーマ層）
-6. migration関連ファイルの型エラー修正
+6. リポジトリ実装の型互換性問題
 
 ## 最近の変更点
 
-- **TypeScriptバージョン更新**: package.jsonでTypeScriptを5.8.2に更新
-- **アプリケーションレイヤーの修正**:
-  - `WriteGlobalDocumentUseCase.ts`: 重複する`MemoryDocument`インポートを削除
-  - `WriteJsonDocumentUseCase.ts`: 重複する`JsonDocument`インポートを解決
-  - `ReadJsonDocumentUseCase.ts`: 適切な型インポートに修正
-  - `SearchJsonDocumentsUseCase.ts`: `DocumentType`を明示的にインポート
-  - `UpdateJsonIndexUseCase.ts`: 適切な型インポートを追加
-- **Migration関連ファイルの修正**:
-  - `SystemPatternsConverter.ts`: 重複する`JsonDocument`インポートを解決し、`uuid`を追加
-  - `ConverterFactory.ts`: `DocumentType`を明示的にインポート
-  - `markdown-parser.ts`: スキーマのv2フィールドに対応するよう型を拡張
-- **メインファイルの修正**:
-  - `main/index.ts`: `Constants`のインポートを`import type`から通常の`import`に変更
+- **コントローラー層の完全修正**:
+  - IContextControllerの戻り値型を具体的なオブジェクト型に修正
+  - GlobalControllerとBranchControllerにDocumentType型をインポート
+  - result型のimplicitAny問題を解決
+  - インターフェース層の相対パスを修正
+
+- **FileSystemTagIndexRepositoryBaseの改善**:
+  - DocumentPathのインポートを追加
+  - createDocumentReferenceメソッドでのpath処理を改善
+  - FileSystemServiceをIFileSystemServiceインターフェースに変更
 
 ## アクティブな決定事項
 
 - **ESモジュール使用の継続**: Node.jsでESモジュール形式を維持し、TypeScript 5.8.2の要件に合わせてインポートパスに拡張子を追加
 - **未使用コードの整理**: 使用されていない変数や関数を削除または修正する
-- **モック型付けの強化**: モックオブジェクトには具体的な型を提供し、型エラーを防止する
-- **テスト用環境の整備**: 必要なテスト用モジュールを作成して、テスト実行の安定性を向上させる
-- **型インポートの整理**: 同名の型が複数の場所からインポートされている場合は、重複を排除。クラスとしても使用する場合は`import type`ではなく通常の`import`を使用する
-- **拡張フィールドの型対応**: v2スキーマで追加されたフィールド（id, createdAt, version）を既存の型定義に追加する
+- **型安全性の強化**: 積極的な型チェックと条件分岐による型互換性の保証
+- **インスタンス型チェックを活用**: `instanceof`を利用した動的型チェックを導入し、型安全性と互換性を両立
+- **インターフェースへの依存**: 具体的な実装クラスよりもインターフェース型への依存を優先し、疎結合を促進
+- **型キャストの戦略的使用**: モジュール間の非互換性に対処するため、`as`演算子によるキャストを必要な箇所で導入
+- **複雑な型定義の簡素化**: 返り値の型をインラインで定義し、わかりやすくする
 
 ## 検討事項
 
-- **FileSystemリポジトリの型問題**: リポジトリの実装が正しいインターフェースを満たしていない問題をどう解決するか
-- **テスト間の依存問題**: テスト間で依存関係があり、順序に依存するテストが存在する可能性がある
-- **未使用コードの検出方法**: TypeScriptの型チェッカーで検出される未使用コードを体系的に特定する方法
-- **型定義の整理**: ドメイン層の実装クラスとスキーマ層の型定義が混在していることによる問題への対応
-- **ドメインエンティティとリポジトリの整合性**: リポジトリインターフェースが返す型とドメインエンティティの整合性を保証する方法
+- **インフラ層の次のターゲット**: FileSystemTagIndexRepositoryの関連ファイルとFileSystemJsonDocumentRepositoryのどちらを先に修正すべきか
+- **アプリケーション層のエラー取り組み方**: UseCaseのエラーにどのように効率的に対処するか
+- **テスト修正フェーズへの移行タイミング**: ビルドが部分的に通った段階でテスト修正に着手するか
+- **解決戦略の優先順位**: インポートパス問題と型互換性問題、どちらを先に対処するか
+- **汎用的な修正ツールの検討**: 拡張子追加などの繰り返し作業の自動化が可能か
 
 ## 次のステップ
 
-1. `FileSystemBranchMemoryBankRepository`などのリポジトリ実装の型問題を解決する
-2. インターフェース層のコントローラーの型エラー解決
-3. インフラストラクチャ層の他のファイルを修正
-4. 残りのエラーを一つずつ解決していく
+1. FileSystemTagIndexRepositoryの実装ファイル群（FileSystemTagIndexRepositoryImpl, FileSystemTagIndexRepositoryGetters, FileSystemTagIndexRepositoryModifiers）の修正
+2. FileSystemJsonDocumentRepositoryの残りのエラー修正
+3. アプリケーション層のWriteGlobalDocumentUseCaseとUpdateJsonIndexUseCaseのエラー対応
+4. インデックス関連のインフラコードの修正
+5. より多くのインポートパスに.js拡張子を追加

@@ -2,7 +2,9 @@ import type { BranchInfo } from "../../../domain/entities/BranchInfo.js";
 import type { DocumentId } from "../../../domain/entities/DocumentId.js";
 import type { DocumentPath } from "../../../domain/entities/DocumentPath.js";
 import type { Tag } from "../../../domain/entities/Tag.js";
-import type { JsonDocument } from "../../../schemas/json-document.js";
+import type { JsonDocument as SchemaJsonDocument } from "../../../schemas/json-document.js";
+import type { JsonDocument } from "../../../domain/entities/JsonDocument.js";
+import type { DocumentType } from "../../../domain/entities/JsonDocument.js";
 import type { DocumentReference } from "../../../schemas/v2/index-schema.js";
 
 

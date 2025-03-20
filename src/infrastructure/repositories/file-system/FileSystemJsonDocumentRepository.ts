@@ -1,13 +1,12 @@
 import path from "path";
 import { BranchInfo } from "../../../domain/entities/BranchInfo.js";
-import type { DocumentId } from "../../../domain/entities/DocumentId.js";
+import { DocumentId } from "../../../domain/entities/DocumentId.js";
 import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
-import type { JsonDocument } from "../../../domain/entities/JsonDocument.js";
+import { JsonDocument, DocumentType } from "../../../domain/entities/JsonDocument.js";
 import type { Tag } from "../../../domain/entities/Tag.js";
 import type { IJsonDocumentRepository } from "../../../domain/repositories/IJsonDocumentRepository.js";
-import type { JsonDocument } from "../../../schemas/json-document.js";
 import { InfrastructureError, InfrastructureErrorCodes } from "../../../shared/errors/InfrastructureError.js";
-import type { IIndexService } from "../../index/index.js";
+import type { IIndexService } from "../../index/interfaces/IIndexService.js";
 import type { IFileSystemService } from "../../storage/interfaces/IFileSystemService.js";
 
 
@@ -155,7 +154,7 @@ export class FileSystemJsonDocumentRepository implements IJsonDocumentRepository
           const document = JsonDocument.fromString(content, path);
 
           // Add to index for future lookups
-          await this.indexService.addToIndex(branchInfo, document);
+          await this.indexService.addToIndex(branchInfo, document as unknown as any);
 
           return document;
         } catch (error) {
@@ -251,7 +250,7 @@ export class FileSystemJsonDocumentRepository implements IJsonDocumentRepository
   ): Promise<JsonDocument[]> {
     try {
       // Use index service to find documents by type
-      const docRefs = await this.indexService.findByType(branchInfo, documentType);
+      const docRefs = await this.indexService.findByType(branchInfo, documentType as unknown as any);
 
       // Load all matching documents
       const documents: JsonDocument[] = [];
@@ -309,7 +308,7 @@ export class FileSystemJsonDocumentRepository implements IJsonDocumentRepository
       await this.fileSystemService.writeFile(fullPath, content);
 
       // Update index
-      await this.indexService.addToIndex(branchInfo, document);
+      await this.indexService.addToIndex(branchInfo, document as unknown as any);
 
       return document;
     } catch (error) {
@@ -359,7 +358,7 @@ export class FileSystemJsonDocumentRepository implements IJsonDocumentRepository
       }
 
       // Remove from index
-      await this.indexService.removeFromIndex(branchInfo, document);
+      await this.indexService.removeFromIndex(branchInfo, document as unknown as any);
 
       // Delete file
       return await this.fileSystemService.deleteFile(filePath);
@@ -474,7 +473,7 @@ export class FileSystemJsonDocumentRepository implements IJsonDocumentRepository
     }
 
     // Rebuild index with found documents
-    await this.indexService.buildIndex(branchInfo, jsonDocuments);
+    await this.indexService.buildIndex(branchInfo, jsonDocuments as unknown as any[]);
 
     return documents;
   }
