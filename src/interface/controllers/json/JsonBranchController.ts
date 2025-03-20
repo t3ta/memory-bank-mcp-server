@@ -1,6 +1,7 @@
 import type { DocumentDTO } from "../../../application/dtos/DocumentDTO.js";
 import type { JsonDocumentDTO } from "../../../application/dtos/JsonDocumentDTO.js";
 import type { ReadJsonDocumentUseCase, WriteJsonDocumentUseCase, DeleteJsonDocumentUseCase, SearchJsonDocumentsUseCase, UpdateJsonIndexUseCase, GetRecentBranchesUseCase } from "../../../application/usecases/index.js";
+import { DocumentType } from "../../../domain/entities/JsonDocument.js";
 import { ApplicationError } from "../../../shared/errors/ApplicationError.js";
 import { DomainError } from "../../../shared/errors/DomainError.js";
 import { InfrastructureError } from "../../../shared/errors/InfrastructureError.js";

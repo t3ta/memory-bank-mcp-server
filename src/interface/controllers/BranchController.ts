@@ -3,6 +3,7 @@ import type { DocumentDTO } from "../../application/dtos/DocumentDTO.js";
 import type { JsonDocumentDTO } from "../../application/dtos/JsonDocumentDTO.js";
 import type { UpdateTagIndexUseCaseV2 } from "../../application/usecases/common/UpdateTagIndexUseCaseV2.js";
 import type { ReadJsonDocumentUseCase, WriteJsonDocumentUseCase, DeleteJsonDocumentUseCase, SearchJsonDocumentsUseCase, UpdateJsonIndexUseCase, ReadBranchDocumentUseCase, WriteBranchDocumentUseCase, SearchDocumentsByTagsUseCase, UpdateTagIndexUseCase, GetRecentBranchesUseCase, ReadBranchCoreFilesUseCase, CreateBranchCoreFilesUseCase } from "../../application/usecases/index.js";
+import { DocumentType } from "../../domain/entities/JsonDocument.js";
 import { ApplicationError } from "../../shared/errors/ApplicationError.js";
 import { DomainError } from "../../shared/errors/DomainError.js";
 import { InfrastructureError } from "../../shared/errors/InfrastructureError.js";
@@ -254,7 +255,7 @@ export class BranchController implements IBranchController {
       }
 
       // Use the new CreateBranchCoreFilesUseCase
-      let result;
+      let result: any;
       if (Object.keys(coreFiles).length > 0) {
         result = await this.createBranchCoreFilesUseCase.execute({
           branchName,

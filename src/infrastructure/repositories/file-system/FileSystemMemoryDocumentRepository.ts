@@ -1,16 +1,16 @@
 import path from 'node:path';
-import { IMemoryDocumentRepository } from '../../domain/repositories/IMemoryDocumentRepository.js';
-import { MemoryDocument } from '../../domain/entities/MemoryDocument.js';
-import { DocumentPath } from '../../domain/entities/DocumentPath.js';
-import { Tag } from '../../domain/entities/Tag.js';
-import { IFileSystemService } from '../storage/interfaces/IFileSystemService.js';
+import { IMemoryDocumentRepository } from '../../../domain/repositories/IMemoryDocumentRepository.js';
+import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
+import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
+import { Tag } from '../../../domain/entities/Tag.js';
+import { IFileSystemService } from '../../storage/interfaces/IFileSystemService.js';
 import {
   InfrastructureError,
   InfrastructureErrorCodes,
-} from '../../shared/errors/InfrastructureError.js';
-import { DomainError } from '../../shared/errors/DomainError.js';
-import { extractTags } from '../../shared/utils/index.js';
-import { logger } from '../../shared/utils/logger.js';
+} from '../../../shared/errors/InfrastructureError.js';
+import { DomainError } from '../../../shared/errors/DomainError.js';
+import { extractTags } from '../../../shared/utils/index.js';
+import { logger } from '../../../shared/utils/logger.js';
 
 /**
  * File system based implementation of memory document repository
