@@ -1,1 +1,1 @@
-export * from './IUseCase';
+export * from '../.jsIUseCase.js';

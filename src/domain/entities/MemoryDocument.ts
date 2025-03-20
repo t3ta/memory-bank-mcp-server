@@ -1,7 +1,7 @@
-import { DocumentPath } from './DocumentPath';
-import { Tag } from './Tag';
-import { BaseJsonDocument } from '../../schemas/json-document';
-import { DomainError } from '../../shared/errors/DomainError';
+import { DocumentPath } from './DocumentPath.js';
+import { Tag } from './Tag.js';
+import { BaseJsonDocument } from '../../schemas/json-document.js';
+import { DomainError } from '../../shared/errors/DomainError.js';
 
 /**
  * Props for MemoryDocument entity
@@ -272,7 +272,7 @@ export class MemoryDocument {
         throw e; // Re-throw if it's not a format error
       }
     });
-    
+
     return MemoryDocument.create({
       path,
       content: JSON.stringify(jsonDoc, null, 2),

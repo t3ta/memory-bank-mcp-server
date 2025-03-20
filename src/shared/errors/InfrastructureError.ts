@@ -1,4 +1,4 @@
-import { BaseError } from './BaseError';
+import { BaseError } from '../.jsBaseError.js';
 
 /**
  * Error class for infrastructure layer

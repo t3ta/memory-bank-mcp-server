@@ -1,11 +1,11 @@
 import { promises as fs } from 'fs';
 import { createReadStream } from 'fs';
 import path from 'path';
-import { IFileSystemService } from './interfaces/IFileSystemService';
+import { IFileSystemService } from '../.jsinterfaces/IFileSystemService.js';
 import {
   InfrastructureError,
   InfrastructureErrorCodes,
-} from '../../shared/errors/InfrastructureError';
+} from '../shared/errors/InfrastructureError.js';
 
 /**
  * Implementation of file system service
@@ -192,7 +192,7 @@ export class FileSystemService implements IFileSystemService {
           files.push(fullPath);
         } else if (entry.isDirectory()) {
           const subFiles = await this.listFiles(fullPath);
-          files.push(...subFiles);
+          files.push(..subFiles);
         }
       }
 
@@ -246,7 +246,7 @@ export class FileSystemService implements IFileSystemService {
    * Get configuration
    * @returns Configuration object
    */
-  getConfig(): { memoryBankRoot: string; [key: string]: any } {
+  getConfig(): { memoryBankRoot: string;[key: string]: any } {
     return { memoryBankRoot: 'docs' };
   }
 

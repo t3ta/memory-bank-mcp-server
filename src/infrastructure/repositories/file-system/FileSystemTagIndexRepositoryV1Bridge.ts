@@ -1,14 +1,14 @@
 import path from 'path';
-import { FileSystemService } from '../../storage/FileSystemService';
-import { FileSystemBranchMemoryBankRepository } from './FileSystemBranchMemoryBankRepository';
-import { FileSystemGlobalMemoryBankRepository } from './FileSystemGlobalMemoryBankRepository';
-import { BranchInfo } from '../../../domain/entities/BranchInfo';
-import { TagIndex } from '../../../schemas/tag-index/tag-index-schema';
-import { logger } from '../../../shared/utils/logger';
+import { FileSystemService } from '../storage/FileSystemService.js';
+import { FileSystemBranchMemoryBankRepository } from '../.jsFileSystemBranchMemoryBankRepository.js';
+import { FileSystemGlobalMemoryBankRepository } from '../.jsFileSystemGlobalMemoryBankRepository.js';
+import { BranchInfo } from '../../domain/entities/BranchInfo.js';
+import { TagIndex } from '../../schemas/tag-index/tag-index-schema.js';
+import { logger } from '../../shared/utils/logger.js';
 import {
   InfrastructureError,
   InfrastructureErrorCodes,
-} from '../../../shared/errors/InfrastructureError';
+} from '../../shared/errors/InfrastructureError.js';
 
 /**
  * Bridge implementation for V1 tag index format
@@ -29,7 +29,7 @@ export class FileSystemTagIndexRepositoryV1Bridge {
     private readonly globalMemoryBankPath: string,
     private readonly branchRepository: FileSystemBranchMemoryBankRepository,
     private readonly globalRepository: FileSystemGlobalMemoryBankRepository
-  ) {}
+  ) { }
 
   /**
    * Save tag index for branch

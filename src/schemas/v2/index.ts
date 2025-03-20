@@ -6,7 +6,7 @@
  */
 
 // Re-export everything from the json-document file
-export * from './json-document';
-export * from './tag-index';
+export * from '../.jsjson-document.js';
+export * from '../.jstag-index.js';
 
 // We'll add additional schema exports here in future iterations

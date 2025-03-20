@@ -1,4 +1,4 @@
-import { DocumentMetadataV2 as DocumentMetadata } from '../../schemas/v2/json-document.js';
+import { DocumentMetadataV2 as DocumentMetadata } from '../schemas/v2/json-document.js';
 import crypto from 'crypto';
 
 /**

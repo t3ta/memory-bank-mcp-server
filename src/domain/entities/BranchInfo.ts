@@ -1,4 +1,4 @@
-import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError';
+import { DomainError, DomainErrorCodes } from '../shared/errors/DomainError.js';
 
 /**
  * Value object representing branch information

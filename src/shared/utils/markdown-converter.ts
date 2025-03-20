@@ -6,7 +6,7 @@ import {
   ProgressJson,
   SystemPatternsJson,
   TechnicalDecisionContent,
-} from '../../schemas/json-document.js';
+} from '../../../schemas/json-document.js';
 
 // 型ガード関数群
 function isValidStringArray(arr: unknown): arr is string[] {

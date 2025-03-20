@@ -1,5 +1,5 @@
-import { JsonDocument } from '../../../domain/entities/JsonDocument.js';
-import { MarkdownBuilder } from './MarkdownBuilder.js';
+import { JsonDocument } from '../../domain/entities/JsonDocument.js';
+import { MarkdownBuilder } from '../.jsMarkdownBuilder.js';
 
 /**
  * Interface for document type specific conversion strategies

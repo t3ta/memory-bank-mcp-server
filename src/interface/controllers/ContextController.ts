@@ -1,9 +1,9 @@
-import { IContextController } from './interfaces/IContextController';
-import { ReadContextUseCase, ContextRequest, ContextResult } from '../../application/usecases/common/ReadContextUseCase';
-import { ReadRulesUseCase, RulesResult } from '../../application/usecases/common/ReadRulesUseCase';
-import { DomainError } from '../../shared/errors/DomainError';
-import { ApplicationError } from '../../shared/errors/ApplicationError';
-import { InfrastructureError } from '../../shared/errors/InfrastructureError';
+import { IContextController } from '../.jsinterfaces/IContextController.js';
+import { ReadContextUseCase, ContextRequest, ContextResult } from '../application/usecases/common/ReadContextUseCase.js';
+import { ReadRulesUseCase, RulesResult } from '../application/usecases/common/ReadRulesUseCase.js';
+import { DomainError } from '../shared/errors/DomainError.js';
+import { ApplicationError } from '../shared/errors/ApplicationError.js';
+import { InfrastructureError } from '../shared/errors/InfrastructureError.js';
 
 /**
  * コンテキストコントローラー
@@ -20,7 +20,7 @@ export class ContextController implements IContextController {
   constructor(
     private readonly readContextUseCase: ReadContextUseCase,
     private readonly readRulesUseCase: ReadRulesUseCase
-  ) {}
+  ) { }
 
   /**
    * 指定された言語のルールを読み込む
@@ -55,11 +55,11 @@ export class ContextController implements IContextController {
   }> {
     // 結果オブジェクト
     const contextResult: ContextResult = {};
-    
+
     try {
       // サニタイズ
       const sanitizedRequest = {
-        ...request,
+        ..request,
         // デフォルト値の設定
         includeRules: request.includeRules !== undefined ? request.includeRules : false,
         includeBranchMemory: request.includeBranchMemory !== undefined ? request.includeBranchMemory : false,
@@ -112,7 +112,7 @@ export class ContextController implements IContextController {
           // 既にブランチの存在チェックをしているので、ここでエラーになるのは予期しない
         }
       }
-      
+
       // グローバルメモリーを読み込む場合
       if (sanitizedRequest.includeGlobalMemory) {
         try {
@@ -151,9 +151,9 @@ export class ContextController implements IContextController {
     error: string;
   } {
     console.error('ContextController error:', error);
-    
+
     let errorMessage: string;
-    
+
     if (
       error instanceof DomainError ||
       error instanceof ApplicationError ||
@@ -165,7 +165,7 @@ export class ContextController implements IContextController {
         ? error.message
         : 'An unexpected error occurred';
     }
-    
+
     return {
       success: false,
       error: errorMessage

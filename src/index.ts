@@ -3,15 +3,15 @@
 import { promises as fs } from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Server } from '@modelcontextprotocol/sdk/server/index';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio';
-import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types';
+import { Server } from '@modelcontextprotocol/sdk/dist/server/index.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/dist/server/stdio.js';
+import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/dist/types.js';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
 // Import the application
-import { createApplication, Application } from './main/index';
-import { logger } from './shared/utils/index';
+import { createApplication, Application } from './main/index.js';
+import { logger } from './shared/utils/index.js';
 
 // Helper function to render template with translations
 function renderTemplate(template: any, translations: any): string {
@@ -525,20 +525,20 @@ server.onerror = (error: any) => {
 
 // Process termination handling
 process.on('SIGINT', async () => {
-  logger.info('Received SIGINT signal, shutting down...');
+  logger.info('Received SIGINT signal, shutting down..');
   await cleanup();
   process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
-  logger.info('Received SIGTERM signal, shutting down...');
+  logger.info('Received SIGTERM signal, shutting down..');
   await cleanup();
   process.exit(0);
 });
 
 // Cleanup function to properly release resources
 async function cleanup() {
-  logger.info('Cleaning up resources...');
+  logger.info('Cleaning up resources..');
   try {
     // Close the server connection if it's open
     await server.close();
@@ -566,13 +566,13 @@ async function cleanup() {
 
 // Start the server
 async function main() {
-  logger.info('Starting Memory Bank MCP Server...');
+  logger.info('Starting Memory Bank MCP Server..');
   const transport = new StdioServerTransport();
 
-  logger.debug('Connecting transport...');
+  logger.debug('Connecting transport..');
   await server.connect(transport);
 
-  logger.debug('Initializing application...');
+  logger.debug('Initializing application..');
   // Initialize a new application
   app = await createApplication({
     memoryRoot: argv.docs as string,

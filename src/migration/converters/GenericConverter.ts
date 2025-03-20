@@ -5,12 +5,12 @@
  * Used as a fallback when no specific converter is available
  */
 import { v4 as uuidv4 } from 'uuid';
-import { BaseConverter } from './BaseConverter';
-import { parseMarkdownForMigration } from '../utils/MarkdownParser';
-import { JsonDocument } from '../../domain/entities/JsonDocument';
-import { DocumentPath } from '../../domain/entities/DocumentPath';
-import { DocumentId } from '../../domain/entities/DocumentId';
-import { Tag } from '../../domain/entities/Tag';
+import { BaseConverter } from '../.jsBaseConverter.js';
+import { parseMarkdownForMigration } from '..utils/MarkdownParser.js';
+import { JsonDocument } from '../domain/entities/JsonDocument.js';
+import { DocumentPath } from '../domain/entities/DocumentPath.js';
+import { DocumentId } from '../domain/entities/DocumentId.js';
+import { Tag } from '../domain/entities/Tag.js';
 
 /**
  * Converter for generic documents
@@ -28,7 +28,7 @@ export class GenericConverter implements BaseConverter {
 
     // For generic documents, use the content as-is
     // Remove any properties that shouldn't be in the content
-    const contentObj = { ...parsed.content };
+    const contentObj = { ..parsed.content };
 
     // Ensure content is an object and not empty
     if (

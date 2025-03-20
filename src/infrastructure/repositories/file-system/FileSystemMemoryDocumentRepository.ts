@@ -1,16 +1,16 @@
 import path from 'path';
-import { IMemoryDocumentRepository } from '../../../domain/repositories/IMemoryDocumentRepository';
-import { MemoryDocument } from '../../../domain/entities/MemoryDocument';
-import { DocumentPath } from '../../../domain/entities/DocumentPath';
-import { Tag } from '../../../domain/entities/Tag';
-import { IFileSystemService } from '../../storage/interfaces/IFileSystemService';
+import { IMemoryDocumentRepository } from '../../domain/repositories/IMemoryDocumentRepository.js';
+import { MemoryDocument } from '../../domain/entities/MemoryDocument.js';
+import { DocumentPath } from '../../domain/entities/DocumentPath.js';
+import { Tag } from '../../domain/entities/Tag.js';
+import { IFileSystemService } from '../storage/interfaces/IFileSystemService.js';
 import {
   InfrastructureError,
   InfrastructureErrorCodes,
-} from '../../../shared/errors/InfrastructureError';
-import { DomainError } from '../../../shared/errors/DomainError';
-import { extractTags } from '../../../shared/utils/index';
-import { logger } from '../../../shared/utils/logger';
+} from '../../shared/errors/InfrastructureError.js';
+import { DomainError } from '../../shared/errors/DomainError.js';
+import { extractTags } from '../../shared/utils/index.js';
+import { logger } from '../../shared/utils/logger.js';
 
 /**
  * File system based implementation of memory document repository
@@ -24,7 +24,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
   constructor(
     private readonly basePath: string,
     private readonly fileSystemService: IFileSystemService
-  ) {}
+  ) { }
 
   /**
    * Find document by path
@@ -58,7 +58,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
           } else {
             // It's a regular JSON - create a MemoryDocument with the raw content
             const stats = await this.fileSystemService.getFileStats(filePath);
-            
+
             // Extract tags if they exist in a metadata field
             let tags: Tag[] = [];
             if (jsonObj.metadata && Array.isArray(jsonObj.metadata.tags)) {
@@ -68,7 +68,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
                 logger.warn(`Ignoring invalid tags in ${path.value}:`, tagError);
               }
             }
-            
+
             return MemoryDocument.create({
               path,
               content,
@@ -80,12 +80,12 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
           // Check if this is a tag validation error
           if (error instanceof DomainError && error.code === 'DOMAIN_ERROR.INVALID_TAG_FORMAT') {
             logger.error(`Invalid tag format in document ${path.value}:`, error);
-            
+
             // Try to recover by using sanitized tags
             try {
               // Parse again and sanitize tags
               const jsonDoc = JSON.parse(content);
-              
+
               // Sanitize tags if they exist
               if (jsonDoc.metadata && jsonDoc.metadata.tags) {
                 // Replace problematic characters with hyphens
@@ -93,9 +93,9 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
                   // Make lowercase and replace invalid characters with hyphens
                   return tag.toLowerCase().replace(/[^a-z0-9-]/g, '-');
                 });
-                
+
                 logger.warn(`Sanitized tags in ${path.value}: ${JSON.stringify(jsonDoc.metadata.tags)}`);
-                
+
                 // Try to create memory document with sanitized tags
                 if (jsonDoc.schema === 'memory_document_v1' && jsonDoc.metadata && jsonDoc.content) {
                   return MemoryDocument.fromJSON(jsonDoc, path);
@@ -104,12 +104,12 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
             } catch (recoveryError) {
               logger.error(`Failed to recover document ${path.value}:`, recoveryError);
             }
-            
+
             // If we reach here, recovery failed - log but don't throw
             logger.warn(`Skipping document with invalid tags: ${path.value}`);
             return null;
           }
-          
+
           throw new InfrastructureError(
             InfrastructureErrorCodes.FILE_READ_ERROR,
             `Failed to parse JSON document: ${path.value}`,

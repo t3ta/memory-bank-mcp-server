@@ -1,6 +1,6 @@
-export * from './markdown-converter.js';
-export * from './markdown-parser.js';
-export * from './logger.js';
+export * from '../.jsmarkdown-converter.js';
+export * from '../.jsmarkdown-parser.js';
+export * from '../.jslogger.js';
 
 // Date utilities
 

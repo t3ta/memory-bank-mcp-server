@@ -43,8 +43,8 @@
           "en": "Global Memory Bank Structure"
         },
         "content": {
-          "ja": "グローバルメモリーバンクのルートディレクトリは `docs/global-memory-bank/` です。このディレクトリには以下のような主要ファイルが含まれます：\n\n```\ndocs/global-memory-bank/\n  ├── architecture.md      # システムアーキテクチャの説明\n  ├── coding-standards.md  # コーディング規約\n  ├── domain-models.md     # ドメインモデルの定義\n  ├── glossary.md          # 用語集\n  ├── tech-stack.md        # 技術スタックの説明\n  ├── user-guide.md        # ユーザーガイド\n  └── tags/                # タグによる情報整理\n      ├── index.md         # タグのインデックス\n      └── ...              # 各タグに関連するファイル\n```",
-          "en": "The root directory of the global memory bank is `docs/global-memory-bank/`. This directory contains the following main files:\n\n```\ndocs/global-memory-bank/\n  ├── architecture.md      # System architecture description\n  ├── coding-standards.md  # Coding standards\n  ├── domain-models.md     # Domain model definitions\n  ├── glossary.md          # Glossary\n  ├── tech-stack.md        # Technology stack description\n  ├── user-guide.md        # User guide\n  └── tags/                # Information organization by tags\n      ├── index.md         # Tag index\n      └── ...              # Files related to each tag\n```"
+          "ja": "グローバルメモリーバンクのルートディレクトリは `docs/global-memory-bank/` です。このディレクトリには以下のような主要ファイルが含まれます：\n\n```\ndocs/global-memory-bank/\n  ├── architecture.md      # システムアーキテクチャの説明\n  ├── coding-standards.md  # コーディング規約\n  ├── domain-models.md     # ドメインモデルの定義\n  ├── glossary.md          # 用語集\n  ├── tech-stack.md        # 技術スタックの説明\n  ├── user-guide.md        # ユーザーガイド\n  └── tags/                # タグによる情報整理\n      ├── index.md         # タグのインデックス\n      └── ..              # 各タグに関連するファイル\n```",
+          "en": "The root directory of the global memory bank is `docs/global-memory-bank/`. This directory contains the following main files:\n\n```\ndocs/global-memory-bank/\n  ├── architecture.md      # System architecture description\n  ├── coding-standards.md  # Coding standards\n  ├── domain-models.md     # Domain model definitions\n  ├── glossary.md          # Glossary\n  ├── tech-stack.md        # Technology stack description\n  ├── user-guide.md        # User guide\n  └── tags/                # Information organization by tags\n      ├── index.md         # Tag index\n      └── ..              # Files related to each tag\n```"
         },
         "optional": false
       },
@@ -54,8 +54,8 @@
           "en": "Tag System"
         },
         "content": {
-          "ja": "グローバルメモリーバンクではタグを使って情報を整理します。各ドキュメントの先頭には関連するタグが記載されています：\n\n```markdown\n# ドキュメントタイトル\n\ntags: #tag1 #tag2 #tag3\n\nドキュメントの内容...\n```\n\nタグを通じて関連する情報に素早くアクセスできます。例えば、アーキテクチャに関する情報を探す場合は `#architecture` タグが付いたドキュメントを参照します。",
-          "en": "The global memory bank uses tags to organize information. Each document has related tags at the top:\n\n```markdown\n# Document Title\n\ntags: #tag1 #tag2 #tag3\n\nDocument content...\n```\n\nTags allow quick access to related information. For example, to find information about architecture, refer to documents with the `#architecture` tag."
+          "ja": "グローバルメモリーバンクではタグを使って情報を整理します。各ドキュメントの先頭には関連するタグが記載されています：\n\n```markdown\n# ドキュメントタイトル\n\ntags: #tag1 #tag2 #tag3\n\nドキュメントの内容..\n```\n\nタグを通じて関連する情報に素早くアクセスできます。例えば、アーキテクチャに関する情報を探す場合は `#architecture` タグが付いたドキュメントを参照します。",
+          "en": "The global memory bank uses tags to organize information. Each document has related tags at the top:\n\n```markdown\n# Document Title\n\ntags: #tag1 #tag2 #tag3\n\nDocument content..\n```\n\nTags allow quick access to related information. For example, to find information about architecture, refer to documents with the `#architecture` tag."
         },
         "optional": false
       },

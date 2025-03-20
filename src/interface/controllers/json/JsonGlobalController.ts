@@ -1,19 +1,19 @@
-import { IGlobalController } from '../interfaces/IGlobalController';
-import { DocumentType } from '../../../domain/entities/JsonDocument';
-import { MCPResponse } from '../../presenters/types/index';
-import { DocumentDTO, JsonDocumentDTO } from '../../../application/dtos/index';
-import { DomainError } from '../../../shared/errors/DomainError';
-import { ApplicationError } from '../../../shared/errors/ApplicationError';
-import { InfrastructureError } from '../../../shared/errors/InfrastructureError';
-import { IResponsePresenter } from '../../presenters/interfaces/IResponsePresenter';
-import { logger } from '../../../shared/utils/logger';
+import { IGlobalController } from '..interfaces/IGlobalController.js';
+import { DocumentType } from '../../domain/entities/JsonDocument.js';
+import { MCPResponse } from '../presenters/types/index.js';
+import { DocumentDTO, JsonDocumentDTO } from '../../application/dtos/index.js';
+import { DomainError } from '../../shared/errors/DomainError.js';
+import { ApplicationError } from '../../shared/errors/ApplicationError.js';
+import { InfrastructureError } from '../../shared/errors/InfrastructureError.js';
+import { IResponsePresenter } from '../presenters/interfaces/IResponsePresenter.js';
+import { logger } from '../../shared/utils/logger.js';
 
 // Import use cases
-import { ReadJsonDocumentUseCase } from '../../../application/usecases/json/ReadJsonDocumentUseCase';
-import { WriteJsonDocumentUseCase } from '../../../application/usecases/json/WriteJsonDocumentUseCase';
-import { DeleteJsonDocumentUseCase } from '../../../application/usecases/json/DeleteJsonDocumentUseCase';
-import { SearchJsonDocumentsUseCase } from '../../../application/usecases/json/SearchJsonDocumentsUseCase';
-import { UpdateJsonIndexUseCase } from '../../../application/usecases/json/UpdateJsonIndexUseCase';
+import { ReadJsonDocumentUseCase } from '../../application/usecases/json/ReadJsonDocumentUseCase.js';
+import { WriteJsonDocumentUseCase } from '../../application/usecases/json/WriteJsonDocumentUseCase.js';
+import { DeleteJsonDocumentUseCase } from '../../application/usecases/json/DeleteJsonDocumentUseCase.js';
+import { SearchJsonDocumentsUseCase } from '../../application/usecases/json/SearchJsonDocumentsUseCase.js';
+import { UpdateJsonIndexUseCase } from '../../application/usecases/json/UpdateJsonIndexUseCase.js';
 
 /**
  * Controller for JSON global memory bank operations
@@ -21,16 +21,15 @@ import { UpdateJsonIndexUseCase } from '../../../application/usecases/json/Updat
  */
 export class JsonGlobalController
   implements
-    Pick<
-      IGlobalController,
-      | 'readJsonDocument'
-      | 'writeJsonDocument'
-      | 'deleteJsonDocument'
-      | 'listJsonDocuments'
-      | 'searchJsonDocuments'
-      | 'updateJsonIndex'
-    >
-{
+  Pick<
+    IGlobalController,
+    | 'readJsonDocument'
+    | 'writeJsonDocument'
+    | 'deleteJsonDocument'
+    | 'listJsonDocuments'
+    | 'searchJsonDocuments'
+    | 'updateJsonIndex'
+  > {
   readonly _type = 'controller' as const;
 
   /**
@@ -49,7 +48,7 @@ export class JsonGlobalController
     private readonly searchJsonDocumentsUseCase: SearchJsonDocumentsUseCase,
     private readonly updateJsonIndexUseCase: UpdateJsonIndexUseCase,
     private readonly presenter: IResponsePresenter
-  ) {}
+  ) { }
 
   /**
    * Read JSON document from global memory bank
@@ -154,8 +153,7 @@ export class JsonGlobalController
   }): Promise<MCPResponse<JsonDocumentDTO[]>> {
     try {
       logger.info(
-        `Listing JSON documents in global memory bank${
-          options?.type ? ` of type ${options.type}` : ''
+        `Listing JSON documents in global memory bank${options?.type ? ` of type ${options.type}` : ''
         }${options?.tags ? ` with tags ${options.tags.join(', ')}` : ''}`
       );
 

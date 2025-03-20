@@ -1,25 +1,25 @@
-import { IBranchController } from './interfaces/IBranchController';
-import { DocumentType } from '../../domain/entities/JsonDocument';
-import { ReadBranchDocumentUseCase } from '../../application/usecases/branch/ReadBranchDocumentUseCase';
-import { WriteBranchDocumentUseCase } from '../../application/usecases/branch/WriteBranchDocumentUseCase';
-import { SearchDocumentsByTagsUseCase } from '../../application/usecases/common/SearchDocumentsByTagsUseCase';
-import { UpdateTagIndexUseCase } from '../../application/usecases/common/UpdateTagIndexUseCase';
-import { UpdateTagIndexUseCaseV2 } from '../../application/usecases/common/UpdateTagIndexUseCaseV2';
-import { GetRecentBranchesUseCase } from '../../application/usecases/common/GetRecentBranchesUseCase';
-import { ReadBranchCoreFilesUseCase } from '../../application/usecases/common/ReadBranchCoreFilesUseCase';
-import { CreateBranchCoreFilesUseCase } from '../../application/usecases/common/CreateBranchCoreFilesUseCase';
-import { ReadJsonDocumentUseCase } from '../../application/usecases/json/ReadJsonDocumentUseCase';
-import { WriteJsonDocumentUseCase } from '../../application/usecases/json/WriteJsonDocumentUseCase';
-import { DeleteJsonDocumentUseCase } from '../../application/usecases/json/DeleteJsonDocumentUseCase';
-import { SearchJsonDocumentsUseCase } from '../../application/usecases/json/SearchJsonDocumentsUseCase';
-import { UpdateJsonIndexUseCase } from '../../application/usecases/json/UpdateJsonIndexUseCase';
-import { MCPResponsePresenter } from '../presenters/MCPResponsePresenter';
-import { MCPResponse } from '../presenters/types/index';
-import { DocumentDTO, CoreFilesDTO, JsonDocumentDTO } from '../../application/dtos/index';
-import { DomainError } from '../../shared/errors/DomainError';
-import { ApplicationError } from '../../shared/errors/ApplicationError';
-import { InfrastructureError } from '../../shared/errors/InfrastructureError';
-import { logger } from '../../shared/utils/logger';
+import { IBranchController } from '../.jsinterfaces/IBranchController.js';
+import { DocumentType } from '../domain/entities/JsonDocument.js';
+import { ReadBranchDocumentUseCase } from '../application/usecases/branch/ReadBranchDocumentUseCase.js';
+import { WriteBranchDocumentUseCase } from '../application/usecases/branch/WriteBranchDocumentUseCase.js';
+import { SearchDocumentsByTagsUseCase } from '../application/usecases/common/SearchDocumentsByTagsUseCase.js';
+import { UpdateTagIndexUseCase } from '../application/usecases/common/UpdateTagIndexUseCase.js';
+import { UpdateTagIndexUseCaseV2 } from '../application/usecases/common/UpdateTagIndexUseCaseV2.js';
+import { GetRecentBranchesUseCase } from '../application/usecases/common/GetRecentBranchesUseCase.js';
+import { ReadBranchCoreFilesUseCase } from '../application/usecases/common/ReadBranchCoreFilesUseCase.js';
+import { CreateBranchCoreFilesUseCase } from '../application/usecases/common/CreateBranchCoreFilesUseCase.js';
+import { ReadJsonDocumentUseCase } from '../application/usecases/json/ReadJsonDocumentUseCase.js';
+import { WriteJsonDocumentUseCase } from '../application/usecases/json/WriteJsonDocumentUseCase.js';
+import { DeleteJsonDocumentUseCase } from '../application/usecases/json/DeleteJsonDocumentUseCase.js';
+import { SearchJsonDocumentsUseCase } from '../application/usecases/json/SearchJsonDocumentsUseCase.js';
+import { UpdateJsonIndexUseCase } from '../application/usecases/json/UpdateJsonIndexUseCase.js';
+import { MCPResponsePresenter } from '..presenters/MCPResponsePresenter.js';
+import { MCPResponse } from '..presenters/types/index.js';
+import { DocumentDTO, CoreFilesDTO, JsonDocumentDTO } from '../application/dtos/index.js';
+import { DomainError } from '../shared/errors/DomainError.js';
+import { ApplicationError } from '../shared/errors/ApplicationError.js';
+import { InfrastructureError } from '../shared/errors/InfrastructureError.js';
+import { logger } from '../shared/utils/logger.js';
 
 /**
  * Controller for branch memory bank operations
@@ -513,10 +513,10 @@ export class BranchController implements IBranchController {
         // Parse consequences list
         const consequences = consequencesMatch
           ? consequencesMatch[1]
-              .trim()
-              .split('\n')
-              .filter((line) => line.startsWith('- '))
-              .map((line) => line.substring(2).trim())
+            .trim()
+            .split('\n')
+            .filter((line) => line.startsWith('- '))
+            .map((line) => line.substring(2).trim())
           : [];
 
         return {

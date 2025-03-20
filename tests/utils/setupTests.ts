@@ -9,7 +9,7 @@ import { reset } from 'ts-mockito';
 
 // Silence console logs during tests
 // global.console = {
-//   ...console,
+//   ..console,
 //   // コンソール出力を無効化
 //   log: jest.fn(),
 //   info: jest.fn(),
@@ -28,7 +28,7 @@ beforeEach(() => {
   // Clear mocks and reset ts-mockito
   jest.clearAllMocks();
   reset(); // ts-mockitoのモックをキレイにリセットするんだから！
-  
+
   // Add any other setup logic here
 });
 
@@ -41,7 +41,7 @@ afterEach(() => {
 afterAll(async () => {
   // Force cleanup of any remaining resources
   jest.useRealTimers(); // Make sure we're using real timers
-  
+
   // Delay a bit to allow any pending async operations to complete
   await new Promise(resolve => setTimeout(resolve, 100));
 });

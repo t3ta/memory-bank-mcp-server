@@ -1,16 +1,16 @@
-import { IUseCase } from '../../interfaces/IUseCase.js';
-import { IBranchMemoryBankRepository } from '../../../domain/repositories/IBranchMemoryBankRepository.js';
-import { IGlobalMemoryBankRepository } from '../../../domain/repositories/IGlobalMemoryBankRepository.js';
-import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
-import { Tag } from '../../../domain/entities/Tag.js';
+import { IUseCase } from '../interfaces/IUseCase.js';
+import { IBranchMemoryBankRepository } from '../../domain/repositories/IBranchMemoryBankRepository.js';
+import { IGlobalMemoryBankRepository } from '../../domain/repositories/IGlobalMemoryBankRepository.js';
+import { BranchInfo } from '../../domain/entities/BranchInfo.js';
+import { Tag } from '../../domain/entities/Tag.js';
 import {
   ApplicationError,
   ApplicationErrorCodes,
-} from '../../../shared/errors/ApplicationError.js';
-import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
-import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
-import { TagIndex } from '../../../schemas/tag-index/tag-index-schema.js';
-import { logger } from '../../../shared/utils/logger.js';
+} from '../../shared/errors/ApplicationError.js';
+import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
+import { DocumentPath } from '../../domain/entities/DocumentPath.js';
+import { TagIndex } from '../../schemas/tag-index/tag-index-schema.js';
+import { logger } from '../../shared/utils/logger.js';
 
 /**
  * Input data for updating tag index
@@ -66,8 +66,7 @@ export interface UpdateTagIndexOutput {
  * Use case for updating tag index with JSON persistence
  */
 export class UpdateTagIndexUseCaseV2
-  implements IUseCase<UpdateTagIndexInput, UpdateTagIndexOutput>
-{
+  implements IUseCase<UpdateTagIndexInput, UpdateTagIndexOutput> {
   /**
    * Constructor
    * @param globalRepository Global memory bank repository
@@ -78,7 +77,7 @@ export class UpdateTagIndexUseCaseV2
     private readonly globalRepository: IGlobalMemoryBankRepository,
     private readonly branchRepository: IBranchMemoryBankRepository,
     private readonly tagIndexRepository?: any
-  ) {}
+  ) { }
 
   /**
    * Execute the use case
@@ -275,7 +274,7 @@ export class UpdateTagIndexUseCaseV2
     allTags: Tag[];
   }> {
     // Initialize tag map from existing index or create new one
-    const tagMap: Record<string, string[]> = existingTagIndex ? { ...existingTagIndex.index } : {};
+    const tagMap: Record<string, string[]> = existingTagIndex ? { ..existingTagIndex.index } : {};
 
     // Use Set to track unique tags
     const tagSet = new Set<string>();

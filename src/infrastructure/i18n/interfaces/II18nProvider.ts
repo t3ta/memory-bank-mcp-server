@@ -2,7 +2,7 @@
  * Interface for internationalization provider
  * Defines the contract for translation and localization services
  */
-import { Language, TranslationKey } from '../../../schemas/v2/i18n-schema';
+import { Language, TranslationKey } from '../../schemas/v2/i18n-schema.js';
 
 /**
  * I18n Provider Interface

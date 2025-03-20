@@ -1,4 +1,4 @@
-import { McpError } from '../types';
+import { McpError } from '..types.js';
 
 /* eslint-disable no-unused-vars */
 export enum MemoryBankErrorCode {

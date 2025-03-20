@@ -1,7 +1,7 @@
-import { JsonDocument } from '../../../domain/entities/JsonDocument.js';
-import { IDocumentTypeConverter } from './DocumentTypeConverter.js';
-import { MarkdownBuilder } from './MarkdownBuilder.js';
-import { SharedUtilsError, SharedUtilsErrorCodes } from '../../errors/SharedUtilsError.js';
+import { JsonDocument } from '../../domain/entities/JsonDocument.js';
+import { IDocumentTypeConverter } from '../.jsDocumentTypeConverter.js';
+import { MarkdownBuilder } from '../.jsMarkdownBuilder.js';
+import { SharedUtilsError, SharedUtilsErrorCodes } from '..errors/SharedUtilsError.js';
 
 /**
  * Options for JSON to Markdown conversion
@@ -65,8 +65,8 @@ export class JsonToMarkdownConverter {
   convert(document: JsonDocument, options: JsonToMarkdownOptions = {}): string {
     // Merge options with defaults
     const mergedOptions: JsonToMarkdownOptions = {
-      ...DEFAULT_OPTIONS,
-      ...options,
+      ..DEFAULT_OPTIONS,
+      ..options,
     };
 
     // Check cache if enabled

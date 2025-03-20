@@ -1,15 +1,15 @@
-import { IUseCase } from '../../interfaces/IUseCase.js';
-import { DocumentDTO } from '../../dtos/DocumentDTO.js';
-import { WriteDocumentDTO } from '../../dtos/WriteDocumentDTO.js';
-import { IGlobalMemoryBankRepository } from '../../../domain/repositories/IGlobalMemoryBankRepository.js';
-import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
-import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
-import { Tag } from '../../../domain/entities/Tag.js';
-import { DomainError } from '../../../shared/errors/DomainError.js';
+import { IUseCase } from '../interfaces/IUseCase.js';
+import { DocumentDTO } from '../dtos/DocumentDTO.js';
+import { WriteDocumentDTO } from '../dtos/WriteDocumentDTO.js';
+import { IGlobalMemoryBankRepository } from '../../domain/repositories/IGlobalMemoryBankRepository.js';
+import { DocumentPath } from '../../domain/entities/DocumentPath.js';
+import { MemoryDocument } from '../../domain/entities/MemoryDocument.js';
+import { Tag } from '../../domain/entities/Tag.js';
+import { DomainError } from '../../shared/errors/DomainError.js';
 import {
   ApplicationError,
   ApplicationErrorCodes,
-} from '../../../shared/errors/ApplicationError.js';
+} from '../../shared/errors/ApplicationError.js';
 
 /**
  * Input data for write global document use case
@@ -35,13 +35,12 @@ export interface WriteGlobalDocumentOutput {
  * Use case for writing a document to global memory bank
  */
 export class WriteGlobalDocumentUseCase
-  implements IUseCase<WriteGlobalDocumentInput, WriteGlobalDocumentOutput>
-{
+  implements IUseCase<WriteGlobalDocumentInput, WriteGlobalDocumentOutput> {
   /**
    * Constructor
    * @param globalRepository Global memory bank repository
    */
-  constructor(private readonly globalRepository: IGlobalMemoryBankRepository) {}
+  constructor(private readonly globalRepository: IGlobalMemoryBankRepository) { }
 
   /**
    * Execute the use case

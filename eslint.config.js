@@ -17,8 +17,8 @@ const baseConfig = {
       sourceType: 'module'
   },
   globals: {
-      ...globals.node,
-      ...globals.jest,
+      ..globals.node,
+      ..globals.jest,
       NodeJS: 'readonly'
     }
   },
@@ -29,19 +29,19 @@ const baseConfig = {
     'import/no-unresolved': 'off', // Keep this off since it depends on config
     'no-unused-vars': 'off', // Turn off base rule
     'no-undef': 'off', // Turn off undefined variable check for NodeJS types
-    '@typescript-eslint/no-unused-vars': ['warn', { 
+    '@typescript-eslint/no-unused-vars': ['warn', {
       'argsIgnorePattern': '^_',
       'varsIgnorePattern': '^_',
-      'ignoreRestSiblings': true 
+      'ignoreRestSiblings': true
     }]
   }
 };
 
 // テスト用の設定（より緩い）
 const testConfig = {
-  ...baseConfig,
+  ..baseConfig,
   rules: {
-    ...baseConfig.rules,
+    ..baseConfig.rules,
     '@typescript-eslint/no-unused-vars': 'off', // テストでは未使用変数を許可
     'no-undef': 'off' // テストでは未定義変数の警告を無効化
   }
@@ -53,11 +53,11 @@ export default [
   },
   js.configs.recommended,
   {
-    ...baseConfig,
+    ..baseConfig,
     // src 配下のファイルに基本設定を適用
     files: ['src/**/*.ts'],
     rules: {
-      ...baseConfig.rules,
+      ..baseConfig.rules,
       // 警告をエラーにしない設定
       '@typescript-eslint/no-unused-vars': ['warn', {
         'argsIgnorePattern': '^_',
@@ -67,7 +67,7 @@ export default [
     }
   },
   {
-    ...testConfig,
+    ..testConfig,
     // tests 配下のファイルにテスト用設定を適用
     files: ['tests/**/*.ts', 'tests/**/*.js']
   }

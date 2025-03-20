@@ -1,6 +1,6 @@
 import { promises as fs } from 'node:fs';
 import * as path from 'node:path';
-import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
+import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
 
 export type RulesResult = {
   content: string;

@@ -1,7 +1,7 @@
 import { Argv } from 'yargs';
-import { CommandBase } from '../../command-base';
-import { createApplication } from '../../../main/index';
-import { logger } from '../../../shared/utils/logger';
+import { CommandBase } from '../command-base.js';
+import { createApplication } from '../main/index.js';
+import { logger } from '../shared/utils/logger.js';
 
 /**
  * Command to read all core files from a branch memory bank

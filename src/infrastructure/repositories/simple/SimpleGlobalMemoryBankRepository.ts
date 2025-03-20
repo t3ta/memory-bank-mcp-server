@@ -1,11 +1,11 @@
 import * as path from 'node:path';
 import { promises as fs } from 'node:fs';
-import { IGlobalMemoryBankRepository } from '../../../domain/repositories/IGlobalMemoryBankRepository';
-import { MemoryDocument } from '../../../domain/entities/MemoryDocument';
-import { DocumentPath } from '../../../domain/entities/DocumentPath';
-import { Tag } from '../../../domain/entities/Tag';
-import { InfrastructureError, InfrastructureErrorCodes } from '../../../shared/errors/InfrastructureError';
-import { TagIndex } from '../../../schemas/tag-index/tag-index-schema';
+import { IGlobalMemoryBankRepository } from '../../domain/repositories/IGlobalMemoryBankRepository.js';
+import { MemoryDocument } from '../domain/entities/MemoryDocument.js';
+import { DocumentPath } from '../domain/entities/DocumentPath.js';
+import { Tag } from '../domain/entities/Tag.js';
+import { InfrastructureError, InfrastructureErrorCodes } from '../shared/errors/InfrastructureError.js';
+import { TagIndex } from '../schemas/tag-index/tag-index-schema.js';
 
 /**
  * Simple file system implementation of global memory bank repository for testing
@@ -49,7 +49,7 @@ export class SimpleGlobalMemoryBankRepository implements IGlobalMemoryBankReposi
   async getDocument(documentPath: DocumentPath): Promise<MemoryDocument | null> {
     const filePath = path.join(this.globalMemoryPath, documentPath.value);
     console.log(`Getting global document: ${filePath}`);
-    
+
     try {
       const content = await fs.readFile(filePath, 'utf-8');
       console.log(`Global document found: ${filePath}`);
@@ -74,7 +74,7 @@ export class SimpleGlobalMemoryBankRepository implements IGlobalMemoryBankReposi
     const filePath = path.join(this.globalMemoryPath, document.path.value);
     const dirPath = path.dirname(filePath);
     console.log(`Saving global document: ${filePath}`);
-    
+
     try {
       await fs.mkdir(dirPath, { recursive: true });
       await fs.writeFile(filePath, document.content, 'utf-8');
@@ -97,7 +97,7 @@ export class SimpleGlobalMemoryBankRepository implements IGlobalMemoryBankReposi
   async deleteDocument(documentPath: DocumentPath): Promise<boolean> {
     const filePath = path.join(this.globalMemoryPath, documentPath.value);
     console.log(`Deleting global document: ${filePath}`);
-    
+
     try {
       await fs.unlink(filePath);
       console.log(`Global document deleted: ${filePath}`);
@@ -114,7 +114,7 @@ export class SimpleGlobalMemoryBankRepository implements IGlobalMemoryBankReposi
    */
   async listDocuments(): Promise<DocumentPath[]> {
     console.log(`Listing global documents in: ${this.globalMemoryPath}`);
-    
+
     try {
       const files = await fs.readdir(this.globalMemoryPath);
       console.log(`Global documents found: ${files.join(', ')}`);
@@ -137,14 +137,14 @@ export class SimpleGlobalMemoryBankRepository implements IGlobalMemoryBankReposi
     console.log(`Finding global documents by tags: ${tags.map(t => t.value).join(', ')}`);
     const documents: MemoryDocument[] = [];
     const paths = await this.listDocuments();
-    
+
     for (const path of paths) {
       const doc = await this.getDocument(path);
       if (doc) {
         documents.push(doc);
       }
     }
-    
+
     // For testing, we'll just return all documents regardless of tags
     console.log(`Found ${documents.length} global documents`);
     return documents;
@@ -158,7 +158,7 @@ export class SimpleGlobalMemoryBankRepository implements IGlobalMemoryBankReposi
   async saveTagIndex(tagIndex: TagIndex): Promise<void> {
     const indexPath = path.join(this.globalMemoryPath, '_index.json');
     console.log(`Saving global tag index: ${indexPath}`);
-    
+
     try {
       await fs.writeFile(indexPath, JSON.stringify(tagIndex, null, 2), 'utf-8');
       console.log(`Global tag index saved: ${indexPath}`);
@@ -179,7 +179,7 @@ export class SimpleGlobalMemoryBankRepository implements IGlobalMemoryBankReposi
   async getTagIndex(): Promise<TagIndex | null> {
     const indexPath = path.join(this.globalMemoryPath, '_index.json');
     console.log(`Getting global tag index: ${indexPath}`);
-    
+
     try {
       const content = await fs.readFile(indexPath, 'utf-8');
       console.log(`Global tag index found: ${indexPath}`);

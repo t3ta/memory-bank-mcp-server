@@ -1,4 +1,4 @@
-import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError';
+import { DomainError, DomainErrorCodes } from '../shared/errors/DomainError.js';
 
 // DocumentType without importing JsonDocument to avoid circular dependency
 type DocumentType =
@@ -12,7 +12,7 @@ type DocumentType =
  * Value object representing a document path
  */
 export class DocumentPath {
-  private constructor(private readonly _value: string) {}
+  private constructor(private readonly _value: string) { }
 
   /**
    * Factory method to create a new DocumentPath

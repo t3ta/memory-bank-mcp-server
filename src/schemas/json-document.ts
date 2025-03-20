@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { FlexibleDateSchema, TagSchema } from './common';
+import { FlexibleDateSchema, TagSchema } from '../.jscommon.js';
 
 // Base metadata for all document types
 export const DocumentMetadataSchema = z.object({

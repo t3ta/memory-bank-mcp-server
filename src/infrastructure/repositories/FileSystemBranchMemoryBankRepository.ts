@@ -1,15 +1,15 @@
 import path from 'path';
 import { promises as fs } from 'fs';
-import { 
+import {
   IBranchMemoryBankRepository,
   RecentBranch
-} from '../../domain/repositories/IBranchMemoryBankRepository';
-import { MemoryDocument } from '../../domain/entities/MemoryDocument';
-import { DocumentPath } from '../../domain/entities/DocumentPath';
-import { BranchInfo } from '../../domain/entities/BranchInfo';
-import { Tag } from '../../domain/entities/Tag';
-import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError';
-import { TagIndex } from '../../schemas/tag-index/tag-index-schema';
+} from '../domain/repositories/IBranchMemoryBankRepository.js';
+import { MemoryDocument } from '../domain/entities/MemoryDocument.js';
+import { DocumentPath } from '../domain/entities/DocumentPath.js';
+import { BranchInfo } from '../domain/entities/BranchInfo.js';
+import { Tag } from '../domain/entities/Tag.js';
+import { DomainError, DomainErrorCodes } from '../shared/errors/DomainError.js';
+import { TagIndex } from '../schemas/tag-index/tag-index-schema.js';
 
 /**
  * Simple file system implementation of branch memory bank repository for testing
@@ -47,7 +47,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
    */
   async initialize(branchInfo: BranchInfo): Promise<void> {
     const branchPath = path.join(this.branchMemoryBankPath, branchInfo.name);
-    
+
     try {
       await fs.mkdir(branchPath, { recursive: true });
     } catch (error) {
@@ -66,16 +66,16 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
    */
   async getDocument(branchInfo: BranchInfo, documentPath: DocumentPath): Promise<MemoryDocument | null> {
     const filePath = path.join(this.branchMemoryBankPath, branchInfo.name, documentPath.value);
-    
+
     console.log(`Trying to read file: ${filePath}`);
-    
+
     // .md ファイルを要求されている場合の特別処理 (.json が優先)
     if (documentPath.value.endsWith('.md')) {
       const jsonPath = documentPath.value.replace('.md', '.json');
       const jsonFilePath = path.join(this.branchMemoryBankPath, branchInfo.name, jsonPath);
-      
+
       console.log(`Also trying JSON variant: ${jsonFilePath}`);
-      
+
       try {
         // まず.jsonファイルを試す
         const content = await fs.readFile(jsonFilePath, 'utf-8');
@@ -104,7 +104,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
         }
       }
     }
-    
+
     // 通常の読み込み処理
     try {
       const content = await fs.readFile(filePath, 'utf-8');
@@ -128,14 +128,14 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
   async saveDocument(branchInfo: BranchInfo, document: MemoryDocument): Promise<void> {
     const branchPath = path.join(this.branchMemoryBankPath, branchInfo.name);
     const filePath = path.join(branchPath, document.path.value);
-    
+
     console.log(`Saving document to: ${filePath}`);
-    
+
     try {
       await fs.mkdir(branchPath, { recursive: true });
       await fs.writeFile(filePath, document.content, 'utf-8');
       console.log(`Successfully wrote to: ${filePath}`);
-      
+
       // テスト対応: .jsonファイルを作成したら、同じ内容で.mdファイルも作成
       if (document.path.value.endsWith('.json')) {
         const mdPath = document.path.value.replace('.json', '.md');
@@ -144,12 +144,12 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
         await fs.writeFile(mdFilePath, document.content, 'utf-8');
         console.log(`Successfully wrote MD version to: ${mdFilePath}`);
       }
-      
+
       // branchContextの場合の特別対応 (CreateUseCaseにはないので手動対応)
-      if (document.path.value === 'activeContext.json' || 
-          document.path.value === 'progress.json' || 
-          document.path.value === 'systemPatterns.json') {
-        
+      if (document.path.value === 'activeContext.json' ||
+        document.path.value === 'progress.json' ||
+        document.path.value === 'systemPatterns.json') {
+
         // テストのためにbranchContext.mdを作成
         if (!await this.fileExists(path.join(branchPath, 'branchContext.md'))) {
           const branchContext = `# テストブランチコンテキスト\n\n## 目的\n\nテスト用ブランチです。`;
@@ -159,7 +159,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
           console.log(`Successfully wrote default branchContext.md to: ${branchContextPath}`);
         }
       }
-      
+
     } catch (error) {
       console.error(`Error saving document: ${error instanceof Error ? error.message : 'Unknown error'}`);
       throw new DomainError(
@@ -168,7 +168,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
       );
     }
   }
-  
+
   /**
    * ファイルが存在するか確認
    * @param filePath ファイルパス
@@ -191,7 +191,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
    */
   async deleteDocument(branchInfo: BranchInfo, documentPath: DocumentPath): Promise<boolean> {
     const filePath = path.join(this.branchMemoryBankPath, branchInfo.name, documentPath.value);
-    
+
     try {
       await fs.unlink(filePath);
       return true;
@@ -207,7 +207,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
    */
   async listDocuments(branchInfo: BranchInfo): Promise<DocumentPath[]> {
     const branchPath = path.join(this.branchMemoryBankPath, branchInfo.name);
-    
+
     try {
       const files = await fs.readdir(branchPath);
       return files
@@ -228,14 +228,14 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
     // Simplified implementation for tests
     const documents: MemoryDocument[] = [];
     const paths = await this.listDocuments(branchInfo);
-    
+
     for (const path of paths) {
       const doc = await this.getDocument(branchInfo, path);
       if (doc) {
         documents.push(doc);
       }
     }
-    
+
     // For testing, we'll just return all documents regardless of tags
     return documents;
   }
@@ -249,12 +249,12 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
     try {
       const entries = await fs.readdir(this.branchMemoryBankPath);
       const branches: RecentBranch[] = [];
-      
+
       for (const entry of entries) {
         try {
           const branchInfo = BranchInfo.create(entry);
           const stats = await fs.stat(path.join(this.branchMemoryBankPath, entry));
-          
+
           branches.push({
             branchInfo,
             lastModified: stats.mtime,
@@ -264,10 +264,10 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
           // Skip invalid branches
         }
       }
-      
+
       // Sort by last modified date (descending)
       branches.sort((a, b) => b.lastModified.getTime() - a.lastModified.getTime());
-      
+
       // Limit the results
       return branches.slice(0, limit || 10);
     } catch {
@@ -292,7 +292,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
    */
   async saveTagIndex(branchInfo: BranchInfo, tagIndex: TagIndex): Promise<void> {
     const indexPath = path.join(this.branchMemoryBankPath, branchInfo.name, '_index.json');
-    
+
     try {
       await fs.writeFile(indexPath, JSON.stringify(tagIndex, null, 2), 'utf-8');
     } catch (error) {
@@ -310,7 +310,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
    */
   async getTagIndex(branchInfo: BranchInfo): Promise<TagIndex | null> {
     const indexPath = path.join(this.branchMemoryBankPath, branchInfo.name, '_index.json');
-    
+
     try {
       const content = await fs.readFile(indexPath, 'utf-8');
       return JSON.parse(content) as TagIndex;

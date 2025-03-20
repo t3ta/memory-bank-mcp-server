@@ -6,14 +6,14 @@
  */
 import path from 'path';
 import { promises as fs } from 'fs';
-import { DocumentPath } from '../domain/entities/DocumentPath';
-import { DocumentId } from '../domain/entities/DocumentId';
-import { JsonDocument, DocumentType } from '../domain/entities/JsonDocument';
-import { DomainError, DomainErrorCodes } from '../shared/errors/DomainError';
-import { MigrationBackup } from './MigrationBackup';
-import { MigrationValidator } from './MigrationValidator';
-import { ConverterFactory } from './converters/ConverterFactory';
-import { Logger } from '../shared/utils/logger';
+import { DocumentPath } from '..domain/entities/DocumentPath.js';
+import { DocumentId } from '..domain/entities/DocumentId.js';
+import { JsonDocument, DocumentType } from '..domain/entities/JsonDocument.js';
+import { DomainError, DomainErrorCodes } from '..shared/errors/DomainError.js';
+import { MigrationBackup } from '../.jsMigrationBackup.js';
+import { MigrationValidator } from '../.jsMigrationValidator.js';
+import { ConverterFactory } from '../.jsconverters/ConverterFactory.js';
+import { Logger } from '..shared/utils/logger.js';
 
 /**
  * Migration options
@@ -109,7 +109,7 @@ export class MarkdownToJsonMigrator {
     private readonly validator: MigrationValidator,
     private readonly converterFactory: ConverterFactory,
     private readonly logger: Logger
-  ) {}
+  ) { }
 
   /**
    * Migrate all Markdown files in a directory to JSON
@@ -360,7 +360,7 @@ export class MarkdownToJsonMigrator {
     const result: string[] = [];
 
     const entries = await fs.readdir(directory, { withFileTypes: true });
-      this.logger.info(`Directory entries in ${directory}: ${entries.map(e => e.name).join(', ')}`);
+    this.logger.info(`Directory entries in ${directory}: ${entries.map(e => e.name).join(', ')}`);
 
     for (const entry of entries) {
       const fullPath = path.join(directory, entry.name);
@@ -368,7 +368,7 @@ export class MarkdownToJsonMigrator {
       if (entry.isDirectory()) {
         // Recursively process subdirectories
         const subdirFiles = await this.findMarkdownFiles(fullPath);
-        result.push(...subdirFiles);
+        result.push(..subdirFiles);
       } else if (entry.isFile() && entry.name.endsWith('.md')) {
         // Add markdown files
         result.push(fullPath);

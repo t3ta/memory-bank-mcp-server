@@ -1,2 +1,2 @@
-export * from './interfaces/IFileSystemService';
-export * from './FileSystemService';
+export * from '../.jsinterfaces/IFileSystemService.js';
+export * from '../.jsFileSystemService.js';

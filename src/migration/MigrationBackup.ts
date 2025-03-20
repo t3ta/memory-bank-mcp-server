@@ -5,7 +5,7 @@
  */
 import path from 'path';
 import { promises as fs } from 'fs';
-import { Logger } from '../shared/utils/logger';
+import { Logger } from '..shared/utils/logger.js';
 
 /**
  * Service for creating backups before migration and rolling back if needed
@@ -14,7 +14,7 @@ export class MigrationBackup {
   /**
    * @param logger Logger instance
    */
-  constructor(private readonly logger: Logger) {}
+  constructor(private readonly logger: Logger) { }
 
   /**
    * Create a backup of a directory

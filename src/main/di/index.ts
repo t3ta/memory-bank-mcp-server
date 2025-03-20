@@ -1,2 +1,2 @@
-export * from './DIContainer';
-export * from './providers';
+export * from '../.jsDIContainer.js';
+export * from '../.jsproviders.js';

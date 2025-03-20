@@ -7,7 +7,7 @@
  * - Document Type
  */
 import { z } from 'zod';
-import { FlexibleDateSchema } from '../common';
+import { FlexibleDateSchema } from '..common.js';
 
 // Index version identifier
 export const INDEX_SCHEMA_VERSION = 'document_index_v1';

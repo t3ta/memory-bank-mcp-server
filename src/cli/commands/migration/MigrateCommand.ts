@@ -8,11 +8,11 @@ import chalk from 'chalk';
 import {
   MarkdownToJsonMigrator,
   MigrationOptions,
-} from '../../../migration/MarkdownToJsonMigrator';
-import { MigrationBackup } from '../../../migration/MigrationBackup';
-import { MigrationValidator } from '../../../migration/MigrationValidator';
-import { ConverterFactory } from '../../../migration/converters/ConverterFactory';
-import { createConsoleLogger } from '../../../shared/utils/logger';
+} from '../../migration/MarkdownToJsonMigrator';
+import { MigrationBackup } from '../migration/MigrationBackup';
+import { MigrationValidator } from '../migration/MigrationValidator';
+import { ConverterFactory } from '../migration/converters/ConverterFactory';
+import { createConsoleLogger } from '../shared/utils/logger';
 
 interface MigrateArgs {
   directory: string;
@@ -132,7 +132,7 @@ export const MigrateCommand: CommandModule<{}, MigrateArgs> = {
       }
 
       // Execute migration
-      console.log(chalk.blue('Starting migration...'));
+      console.log(chalk.blue('Starting migration..'));
 
       let result;
       if (args.file) {

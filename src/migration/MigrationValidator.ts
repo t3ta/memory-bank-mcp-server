@@ -4,15 +4,15 @@
  * Validates JSON documents against their respective schemas
  */
 import { z } from 'zod';
-import { DocumentType } from '../domain/entities/JsonDocument';
-import { Logger } from '../shared/utils/logger';
+import { DocumentType } from '..domain/entities/JsonDocument.js';
+import { Logger } from '..shared/utils/logger.js';
 import {
   BaseJsonDocumentV2Schema,
   BranchContextJsonV2Schema,
   ActiveContextJsonV2Schema,
   ProgressJsonV2Schema,
   SystemPatternsJsonV2Schema,
-} from '../schemas/v2/json-document';
+} from '..schemas/v2/json-document.js';
 
 /**
  * Validation result
@@ -36,7 +36,7 @@ export class MigrationValidator {
   /**
    * @param logger Logger instance
    */
-  constructor(private readonly logger: Logger) {}
+  constructor(private readonly logger: Logger) { }
 
   /**
    * Validate a JSON document against its schema

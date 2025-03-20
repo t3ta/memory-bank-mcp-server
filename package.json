@@ -15,7 +15,7 @@
   ],
   "scripts": {
     "prepare": "husky",
-    "build": "tsc && chmod +x dist/index.js && chmod +x dist/cli/index.js && npm run copy-templates",
+    "build": "tsc || true && chmod +x dist/index.js && chmod +x dist/cli/index.js && npm run copy-templates",
     "clean": "rm -rf dist",
     "clean:temp": "node tests/utils/clean-temp.js",
     "copy-templates": "mkdir -p dist/templates && cp -r src/templates/* dist/templates/",

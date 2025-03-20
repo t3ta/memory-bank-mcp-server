@@ -1,2 +1,2 @@
-export * from './IndexService';
-export * from './interfaces/IIndexService';
+export * from '../.jsIndexService.js';
+export * from '../.jsinterfaces/IIndexService.js';

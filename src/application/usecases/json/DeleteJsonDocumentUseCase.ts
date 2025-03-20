@@ -1,14 +1,14 @@
-import { IUseCase } from '../../interfaces/IUseCase';
-import { IJsonDocumentRepository } from '../../../domain/repositories/IJsonDocumentRepository';
-import { BranchInfo } from '../../../domain/entities/BranchInfo';
-import { DocumentPath } from '../../../domain/entities/DocumentPath';
-import { DocumentId } from '../../../domain/entities/DocumentId';
-import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError';
+import { IUseCase } from '../interfaces/IUseCase.js';
+import { IJsonDocumentRepository } from '../../domain/repositories/IJsonDocumentRepository.js';
+import { BranchInfo } from '../../domain/entities/BranchInfo.js';
+import { DocumentPath } from '../../domain/entities/DocumentPath.js';
+import { DocumentId } from '../../domain/entities/DocumentId.js';
+import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
 import {
   ApplicationError,
   ApplicationErrorCodes,
-} from '../../../shared/errors/ApplicationError';
-import { IIndexService } from '../../../infrastructure/index/interfaces/IIndexService';
+} from '../../shared/errors/ApplicationError.js';
+import { IIndexService } from '../../infrastructure/index/interfaces/IIndexService.js';
 
 /**
  * Input data for delete JSON document use case
@@ -64,8 +64,7 @@ export interface DeleteJsonDocumentOutput {
  * Use case for deleting a JSON document
  */
 export class DeleteJsonDocumentUseCase
-  implements IUseCase<DeleteJsonDocumentInput, DeleteJsonDocumentOutput>
-{
+  implements IUseCase<DeleteJsonDocumentInput, DeleteJsonDocumentOutput> {
   /**
    * Constructor
    * @param jsonRepository JSON document repository
@@ -76,7 +75,7 @@ export class DeleteJsonDocumentUseCase
     private readonly jsonRepository: IJsonDocumentRepository,
     private readonly indexService: IIndexService,
     private readonly globalRepository?: IJsonDocumentRepository
-  ) {}
+  ) { }
 
   /**
    * Execute the use case
@@ -105,7 +104,7 @@ export class DeleteJsonDocumentUseCase
       // TODO: 将来的には設計を見直し、グローバルメモリバンクではBranchInfoに依存しない設計にすべき
       // 現在はWriteJsonDocumentUseCaseとの整合性のために'feature/global'を使用
       const branchInfo = isGlobal
-        ? BranchInfo.create('feature/global') 
+        ? BranchInfo.create('feature/global')
         : BranchInfo.create(input.branchName!);
 
       let success = false;

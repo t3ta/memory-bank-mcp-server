@@ -1,15 +1,15 @@
 import * as path from 'node:path';
 import { promises as fs } from 'node:fs';
-import { 
+import {
   IBranchMemoryBankRepository,
   RecentBranch
-} from '../../../domain/repositories/IBranchMemoryBankRepository';
-import { MemoryDocument } from '../../../domain/entities/MemoryDocument';
-import { DocumentPath } from '../../../domain/entities/DocumentPath';
-import { BranchInfo } from '../../../domain/entities/BranchInfo';
-import { Tag } from '../../../domain/entities/Tag';
-import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError';
-import { TagIndex } from '../../../schemas/tag-index/tag-index-schema';
+} from '../../domain/repositories/IBranchMemoryBankRepository.js';
+import { MemoryDocument } from '../domain/entities/MemoryDocument.js';
+import { DocumentPath } from '../domain/entities/DocumentPath.js';
+import { BranchInfo } from '../domain/entities/BranchInfo.js';
+import { Tag } from '../domain/entities/Tag.js';
+import { DomainError, DomainErrorCodes } from '../shared/errors/DomainError.js';
+import { TagIndex } from '../schemas/tag-index/tag-index-schema.js';
 
 /**
  * Simple file system implementation of branch memory bank repository for testing
@@ -52,7 +52,7 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
   async initialize(branchInfo: BranchInfo): Promise<void> {
     const branchPath = path.join(this.branchMemoryBankPath, branchInfo.name);
     console.log(`Initializing branch: ${branchPath}`);
-    
+
     try {
       await fs.mkdir(branchPath, { recursive: true });
       console.log(`Branch initialized: ${branchPath}`);
@@ -74,7 +74,7 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
   async getDocument(branchInfo: BranchInfo, documentPath: DocumentPath): Promise<MemoryDocument | null> {
     const filePath = path.join(this.branchMemoryBankPath, branchInfo.name, documentPath.value);
     console.log(`Getting document: ${filePath}`);
-    
+
     try {
       const content = await fs.readFile(filePath, 'utf-8');
       console.log(`Document found: ${filePath}`);
@@ -100,7 +100,7 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
     const branchPath = path.join(this.branchMemoryBankPath, branchInfo.name);
     const filePath = path.join(branchPath, document.path.value);
     console.log(`Saving document: ${filePath}`);
-    
+
     try {
       await fs.mkdir(branchPath, { recursive: true });
       await fs.writeFile(filePath, document.content, 'utf-8');
@@ -123,7 +123,7 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
   async deleteDocument(branchInfo: BranchInfo, documentPath: DocumentPath): Promise<boolean> {
     const filePath = path.join(this.branchMemoryBankPath, branchInfo.name, documentPath.value);
     console.log(`Deleting document: ${filePath}`);
-    
+
     try {
       await fs.unlink(filePath);
       console.log(`Document deleted: ${filePath}`);
@@ -142,7 +142,7 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
   async listDocuments(branchInfo: BranchInfo): Promise<DocumentPath[]> {
     const branchPath = path.join(this.branchMemoryBankPath, branchInfo.name);
     console.log(`Listing documents in: ${branchPath}`);
-    
+
     try {
       const files = await fs.readdir(branchPath);
       console.log(`Documents found: ${files.join(', ')}`);
@@ -166,14 +166,14 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
     console.log(`Finding documents by tags: ${tags.map(t => t.value).join(', ')}`);
     const documents: MemoryDocument[] = [];
     const paths = await this.listDocuments(branchInfo);
-    
+
     for (const path of paths) {
       const doc = await this.getDocument(branchInfo, path);
       if (doc) {
         documents.push(doc);
       }
     }
-    
+
     // For testing, we'll just return all documents regardless of tags
     console.log(`Found ${documents.length} documents`);
     return documents;
@@ -190,12 +190,12 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
       const entries = await fs.readdir(this.branchMemoryBankPath);
       console.log(`Found branches: ${entries.join(', ')}`);
       const branches: RecentBranch[] = [];
-      
+
       for (const entry of entries) {
         try {
           const branchInfo = BranchInfo.create(entry);
           const stats = await fs.stat(path.join(this.branchMemoryBankPath, entry));
-          
+
           branches.push({
             branchInfo,
             lastModified: stats.mtime,
@@ -206,10 +206,10 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
           console.log(`Skipping invalid branch: ${entry}`);
         }
       }
-      
+
       // Sort by last modified date (descending)
       branches.sort((a, b) => b.lastModified.getTime() - a.lastModified.getTime());
-      
+
       // Limit the results
       const limited = branches.slice(0, limit || 10);
       console.log(`Returning ${limited.length} recent branches`);
@@ -241,7 +241,7 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
   async saveTagIndex(branchInfo: BranchInfo, tagIndex: TagIndex): Promise<void> {
     const indexPath = path.join(this.branchMemoryBankPath, branchInfo.name, '_index.json');
     console.log(`Saving tag index: ${indexPath}`);
-    
+
     try {
       await fs.writeFile(indexPath, JSON.stringify(tagIndex, null, 2), 'utf-8');
       console.log(`Tag index saved: ${indexPath}`);
@@ -262,7 +262,7 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
   async getTagIndex(branchInfo: BranchInfo): Promise<TagIndex | null> {
     const indexPath = path.join(this.branchMemoryBankPath, branchInfo.name, '_index.json');
     console.log(`Getting tag index: ${indexPath}`);
-    
+
     try {
       const content = await fs.readFile(indexPath, 'utf-8');
       console.log(`Tag index found: ${indexPath}`);

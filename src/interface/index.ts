@@ -1,4 +1,4 @@
-export * from './controllers/index';
-export * from './presenters/index';
+export * from '../.jscontrollers/index.js';
+export * from '../.jspresenters/index.js';
 // tools index is empty for now
-// export * from './tools/index';
+// export * from '../.jstools/index.js';

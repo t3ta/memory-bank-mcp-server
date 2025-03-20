@@ -1,8 +1,8 @@
-export * from './SearchDocumentsByTagsUseCase.js';
-export * from './UpdateTagIndexUseCase.js';
-export { UpdateTagIndexUseCaseV2 } from './UpdateTagIndexUseCaseV2.js';
-export * from './GetRecentBranchesUseCase.js';
-export * from './ReadBranchCoreFilesUseCase.js';
-export * from './CreateBranchCoreFilesUseCase.js';
-export * from './ReadContextUseCase.js';
-export * from './ReadRulesUseCase.js';
+export * from '../.jsSearchDocumentsByTagsUseCase.js';
+export * from '../.jsUpdateTagIndexUseCase.js';
+export { UpdateTagIndexUseCaseV2 } from '../.jsUpdateTagIndexUseCaseV2.js';
+export * from '../.jsGetRecentBranchesUseCase.js';
+export * from '../.jsReadBranchCoreFilesUseCase.js';
+export * from '../.jsCreateBranchCoreFilesUseCase.js';
+export * from '../.jsReadContextUseCase.js';
+export * from '../.jsReadRulesUseCase.js';

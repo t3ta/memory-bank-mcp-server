@@ -4,14 +4,14 @@
  */
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { IFileSystemService } from '../storage/interfaces/IFileSystemService';
+import { IFileSystemService } from '..storage/interfaces/IFileSystemService.js';
 import {
   Language,
   TranslationKey,
   isValidLanguage,
   TranslationFile,
-} from '../../schemas/v2/i18n-schema';
-import { II18nProvider } from './interfaces/II18nProvider';
+} from '../schemas/v2/i18n-schema.js';
+import { II18nProvider } from '../.jsinterfaces/II18nProvider.js';
 
 /**
  * Implementation of II18nProvider
@@ -119,7 +119,7 @@ export class I18nProvider implements II18nProvider {
    * Implements II18nProvider.getSupportedLanguages
    */
   getSupportedLanguages(): Language[] {
-    return [...this.supportedLanguages];
+    return [..this.supportedLanguages];
   }
 
   /**

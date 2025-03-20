@@ -1,12 +1,12 @@
-import { IUseCase } from '../../interfaces/IUseCase.js';
-import { DocumentDTO } from '../../dtos/DocumentDTO.js';
-import { IGlobalMemoryBankRepository } from '../../../domain/repositories/IGlobalMemoryBankRepository.js';
-import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
-import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
+import { IUseCase } from '../interfaces/IUseCase.js';
+import { DocumentDTO } from '../dtos/DocumentDTO.js';
+import { IGlobalMemoryBankRepository } from '../../domain/repositories/IGlobalMemoryBankRepository.js';
+import { DocumentPath } from '../../domain/entities/DocumentPath.js';
+import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
 import {
   ApplicationError,
   ApplicationErrorCodes,
-} from '../../../shared/errors/ApplicationError.js';
+} from '../../shared/errors/ApplicationError.js';
 
 /**
  * Input data for read global document use case
@@ -32,13 +32,12 @@ export interface ReadGlobalDocumentOutput {
  * Use case for reading a document from global memory bank
  */
 export class ReadGlobalDocumentUseCase
-  implements IUseCase<ReadGlobalDocumentInput, ReadGlobalDocumentOutput>
-{
+  implements IUseCase<ReadGlobalDocumentInput, ReadGlobalDocumentOutput> {
   /**
    * Constructor
    * @param globalRepository Global memory bank repository
    */
-  constructor(private readonly globalRepository: IGlobalMemoryBankRepository) {}
+  constructor(private readonly globalRepository: IGlobalMemoryBankRepository) { }
 
   /**
    * Execute the use case

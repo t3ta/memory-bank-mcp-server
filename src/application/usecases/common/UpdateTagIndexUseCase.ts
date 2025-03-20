@@ -1,13 +1,13 @@
-import { IUseCase } from '../../interfaces/IUseCase.js';
-import { IBranchMemoryBankRepository } from '../../../domain/repositories/IBranchMemoryBankRepository.js';
-import { IGlobalMemoryBankRepository } from '../../../domain/repositories/IGlobalMemoryBankRepository.js';
-import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
-import { Tag } from '../../../domain/entities/Tag.js';
+import { IUseCase } from '../interfaces/IUseCase.js';
+import { IBranchMemoryBankRepository } from '../../domain/repositories/IBranchMemoryBankRepository.js';
+import { IGlobalMemoryBankRepository } from '../../domain/repositories/IGlobalMemoryBankRepository.js';
+import { BranchInfo } from '../../domain/entities/BranchInfo.js';
+import { Tag } from '../../domain/entities/Tag.js';
 import {
   ApplicationError,
   ApplicationErrorCodes,
-} from '../../../shared/errors/ApplicationError.js';
-import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
+} from '../../shared/errors/ApplicationError.js';
+import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
 
 /**
  * Input data for updating tag index
@@ -71,7 +71,7 @@ export class UpdateTagIndexUseCase implements IUseCase<UpdateTagIndexInput, Upda
   constructor(
     private readonly globalRepository: IGlobalMemoryBankRepository,
     private readonly branchRepository: IBranchMemoryBankRepository
-  ) {}
+  ) { }
 
   /**
    * Execute the use case

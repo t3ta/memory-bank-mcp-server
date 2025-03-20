@@ -1,18 +1,18 @@
 import path from 'path';
-import { IGlobalMemoryBankRepository } from '../../../domain/repositories/IGlobalMemoryBankRepository';
-import { MemoryDocument } from '../../../domain/entities/MemoryDocument';
-import { DocumentPath } from '../../../domain/entities/DocumentPath';
-import { Tag } from '../../../domain/entities/Tag';
-import { IFileSystemService } from '../../storage/interfaces/IFileSystemService';
-import { IConfigProvider } from '../../config/interfaces/IConfigProvider';
+import { IGlobalMemoryBankRepository } from '../../domain/repositories/IGlobalMemoryBankRepository.js';
+import { MemoryDocument } from '../domain/entities/MemoryDocument.js';
+import { DocumentPath } from '../domain/entities/DocumentPath.js';
+import { Tag } from '../domain/entities/Tag.js';
+import { IFileSystemService } from '..storage/interfaces/IFileSystemService.js';
+import { IConfigProvider } from '..config/interfaces/IConfigProvider.js';
 import {
   InfrastructureError,
   InfrastructureErrorCodes,
-} from '../../../shared/errors/InfrastructureError';
-import { DomainError } from '../../../shared/errors/DomainError';
-import { FileSystemMemoryDocumentRepository } from './FileSystemMemoryDocumentRepository';
-import { logger } from '../../../shared/utils/logger';
-import { TagIndex } from '../../../schemas/tag-index/tag-index-schema';
+} from '../shared/errors/InfrastructureError.js';
+import { DomainError } from '../shared/errors/DomainError.js';
+import { FileSystemMemoryDocumentRepository } from '../.jsFileSystemMemoryDocumentRepository.js';
+import { logger } from '../shared/utils/logger.js';
+import { TagIndex } from '../schemas/tag-index/tag-index-schema.js';
 
 /**
  * File system implementation of global memory bank repository

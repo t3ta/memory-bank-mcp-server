@@ -1,12 +1,12 @@
 import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
-import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError';
+import { DomainError, DomainErrorCodes } from '../shared/errors/DomainError';
 
 /**
  * Value object representing a document ID
  * Used to uniquely identify documents regardless of their path
  */
 export class DocumentId {
-  private constructor(private readonly _value: string) {}
+  private constructor(private readonly _value: string) { }
 
   /**
    * Factory method to create a new DocumentId

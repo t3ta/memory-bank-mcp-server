@@ -613,35 +613,35 @@ src/
 │   │   ├── BranchMemoryBank.ts
 │   │   ├── Tag.ts
 │   │   ├── DocumentPath.ts
-│   │   └── ...
+│   │   └── ..
 │   ├── repositories/         # リポジトリインターフェース
 │   │   ├── IMemoryDocumentRepository.ts
 │   │   ├── IGlobalMemoryBankRepository.ts
 │   │   ├── IBranchMemoryBankRepository.ts
-│   │   └── ...
+│   │   └── ..
 │   └── services/             # ドメインサービス
 │       ├── DocumentValidationService.ts
 │       ├── TagManagementService.ts
-│       └── ...
+│       └── ..
 │
 ├── application/              # アプリケーション層
 │   ├── usecases/             # ユースケース実装
 │   │   ├── global/
 │   │   │   ├── ReadGlobalDocumentUseCase.ts
 │   │   │   ├── WriteGlobalDocumentUseCase.ts
-│   │   │   └── ...
+│   │   │   └── ..
 │   │   ├── branch/
 │   │   │   ├── ReadBranchDocumentUseCase.ts
 │   │   │   ├── WriteBranchDocumentUseCase.ts
-│   │   │   └── ...
+│   │   │   └── ..
 │   │   └── common/
 │   │       ├── ListDocumentsUseCase.ts
 │   │       ├── SearchDocumentsByTagsUseCase.ts
-│   │       └── ...
+│   │       └── ..
 │   ├── dtos/                 # 入出力データ転送オブジェクト
 │   │   ├── DocumentDTO.ts
 │   │   ├── WriteDocumentDTO.ts
-│   │   └── ...
+│   │   └── ..
 │   └── interfaces/           # ユースケースインターフェース
 │       └── IUseCase.ts
 │
@@ -650,30 +650,30 @@ src/
 │   │   ├── FileSystemMemoryDocumentRepository.ts
 │   │   ├── FileSystemGlobalMemoryBankRepository.ts
 │   │   ├── FileSystemBranchMemoryBankRepository.ts
-│   │   └── ...
+│   │   └── ..
 │   ├── storage/              # ストレージ実装
 │   │   └── FileSystemStorage.ts
 │   ├── config/               # 設定
 │   │   ├── ConfigProvider.ts
-│   │   └── ...
+│   │   └── ..
 │   └── external/             # 外部サービス連携
 │       └── mcpserver/
 │           ├── MCPServer.ts
-│           └── ...
+│           └── ..
 │
 ├── interface/                # インターフェース層
 │   ├── controllers/          # コントローラー
 │   │   ├── MemoryBankController.ts
 │   │   ├── BranchController.ts
 │   │   ├── GlobalController.ts
-│   │   └── ...
+│   │   └── ..
 │   ├── presenters/           # プレゼンター
 │   │   ├── MCPResponsePresenter.ts
-│   │   └── ...
+│   │   └── ..
 │   └── validators/           # 入力検証
 │       ├── DocumentPathValidator.ts
 │       ├── DocumentContentValidator.ts
-│       └── ...
+│       └── ..
 │
 ├── main/                     # アプリケーションのエントリーポイント
 │   ├── di/                   # 依存性注入設定
@@ -681,7 +681,7 @@ src/
 │   │   └── providers.ts
 │   ├── config/               # アプリケーション設定
 │   │   ├── config.ts
-│   │   └── ...
+│   │   └── ..
 │   └── index.ts              # メインエントリーポイント
 │
 └── shared/                   # 共有コンポーネント
@@ -689,12 +689,12 @@ src/
     │   ├── ApplicationError.ts
     │   ├── DomainError.ts
     │   ├── InfrastructureError.ts
-    │   └── ...
+    │   └── ..
     ├── types/                # 共通型定義
     │   └── index.ts
     └── utils/                # ユーティリティ
         ├── logger.ts
-        └── ...
+        └── ..
 ```
 
 ### コアドメインエンティティの設計例
@@ -737,7 +737,7 @@ export class MemoryDocument {
   }
 
   public get tags(): Tag[] {
-    return [...this.props.tags];
+    return [..this.props.tags];
   }
 
   public get lastModified(): Date {
@@ -753,17 +753,17 @@ export class MemoryDocument {
     if (this.hasTag(tag)) {
       return this;
     }
-    
+
     return new MemoryDocument({
-      ...this.props,
-      tags: [...this.props.tags, tag],
+      ..this.props,
+      tags: [..this.props.tags, tag],
       lastModified: new Date()
     });
   }
 
   public removeTag(tag: Tag): MemoryDocument {
     return new MemoryDocument({
-      ...this.props,
+      ..this.props,
       tags: this.props.tags.filter(t => !t.equals(tag)),
       lastModified: new Date()
     });
@@ -773,9 +773,9 @@ export class MemoryDocument {
     if (content === this.props.content) {
       return this;
     }
-    
+
     return new MemoryDocument({
-      ...this.props,
+      ..this.props,
       content,
       lastModified: new Date()
     });
@@ -831,27 +831,27 @@ export class ReadBranchDocumentUseCase implements IUseCase<ReadBranchDocumentInp
     if (!input.branchName) {
       throw new DomainError('INVALID_BRANCH_NAME', 'Branch name is required');
     }
-    
+
     if (!input.path) {
       throw new DomainError('INVALID_PATH', 'Document path is required');
     }
 
     // ドメインオブジェクトへの変換
     const documentPath = DocumentPath.create(input.path);
-    
+
     // リポジトリを使用してデータ取得
     const branch = await this.branchRepository.findByName(input.branchName);
-    
+
     if (!branch) {
       throw new DomainError('BRANCH_NOT_FOUND', `Branch "${input.branchName}" not found`);
     }
-    
+
     const document = await branch.getDocument(documentPath);
-    
+
     if (!document) {
       throw new DomainError('DOCUMENT_NOT_FOUND', `Document "${input.path}" not found in branch "${input.branchName}"`);
     }
-    
+
     // DTOへの変換
     return {
       document: {
@@ -891,7 +891,7 @@ export class BranchController {
       if (error instanceof DomainError || error instanceof ApplicationError) {
         return this.presenter.presentError(error);
       }
-      
+
       // 未知のエラー
       return this.presenter.presentError(
         new ApplicationError('UNKNOWN_ERROR', 'An unexpected error occurred', { originalError: error })
@@ -907,13 +907,13 @@ export class BranchController {
         content,
         tags: tags || []
       });
-      
+
       return this.presenter.present(result);
     } catch (error) {
       if (error instanceof DomainError || error instanceof ApplicationError) {
         return this.presenter.presentError(error);
       }
-      
+
       // 未知のエラー
       return this.presenter.presentError(
         new ApplicationError('UNKNOWN_ERROR', 'An unexpected error occurred', { originalError: error })

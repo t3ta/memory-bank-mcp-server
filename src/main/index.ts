@@ -1,11 +1,11 @@
 // Import dependencies
-import { setupContainer } from './di/providers';
-import { Constants } from './config/constants';
-import { logger } from '../shared/utils/logger';
+import { setupContainer } from '../.jsdi/providers.js';
+import { Constants } from '../.jsconfig/constants.js';
+import { logger } from '..shared/utils/logger.js';
 // Interfaces can be imported as types
-import { IGlobalController } from '../interface/controllers/interfaces/IGlobalController';
-import { IBranchController } from '../interface/controllers/interfaces/IBranchController';
-import { CliOptions } from '../infrastructure/config/WorkspaceConfig';
+import { IGlobalController } from '..interface/controllers/interfaces/IGlobalController.js';
+import { IBranchController } from '..interface/controllers/interfaces/IBranchController.js';
+import { CliOptions } from '..infrastructure/config/WorkspaceConfig.js';
 
 /**
  * Application main class
@@ -30,7 +30,7 @@ class Application {
    */
   async initialize(): Promise<void> {
     try {
-      logger.info('Initializing application...');
+      logger.info('Initializing application..');
 
       // Setup DI container
       const container = await setupContainer(this.options);

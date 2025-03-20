@@ -1,4 +1,4 @@
-import { BaseError } from './BaseError.js';
+import { BaseError } from '../.jsBaseError.js';
 
 /**
  * Error class for application layer

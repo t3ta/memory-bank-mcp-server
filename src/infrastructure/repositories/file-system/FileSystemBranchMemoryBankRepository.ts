@@ -2,21 +2,21 @@ import path from 'path';
 import {
   IBranchMemoryBankRepository,
   RecentBranch,
-} from '../../../domain/repositories/IBranchMemoryBankRepository';
-import { MemoryDocument } from '../../../domain/entities/MemoryDocument';
-import { DocumentPath } from '../../../domain/entities/DocumentPath';
-import { BranchInfo } from '../../../domain/entities/BranchInfo';
-import { Tag } from '../../../domain/entities/Tag';
-import { IFileSystemService } from '../../storage/interfaces/IFileSystemService';
-import { IConfigProvider } from '../../config/interfaces/IConfigProvider';
+} from '../../domain/repositories/IBranchMemoryBankRepository.js';
+import { MemoryDocument } from '../../domain/entities/MemoryDocument.js';
+import { DocumentPath } from '../../domain/entities/DocumentPath.js';
+import { BranchInfo } from '../../domain/entities/BranchInfo.js';
+import { Tag } from '../../domain/entities/Tag.js';
+import { IFileSystemService } from '../storage/interfaces/IFileSystemService.js';
+import { IConfigProvider } from '../config/interfaces/IConfigProvider.js';
 import {
   InfrastructureError,
   InfrastructureErrorCodes,
-} from '../../../shared/errors/InfrastructureError';
-import { DomainError } from '../../../shared/errors/DomainError';
-import { FileSystemMemoryDocumentRepository } from './FileSystemMemoryDocumentRepository';
-import { extractSectionContent, logger } from '../../../shared/utils/index';
-import { TagIndex } from '../../../schemas/tag-index/tag-index-schema';
+} from '../../shared/errors/InfrastructureError.js';
+import { DomainError } from '../../shared/errors/DomainError.js';
+import { FileSystemMemoryDocumentRepository } from '../.jsFileSystemMemoryDocumentRepository.js';
+import { extractSectionContent, logger } from '../../shared/utils/index.js';
+import { TagIndex } from '../../schemas/tag-index/tag-index-schema.js';
 
 /**
  * File system implementation of branch memory bank repository
@@ -572,7 +572,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
               .split('\n')
               .filter(line => line.trim().startsWith('- '))
               .map((line: string) => line.replace(/^-\s*/, '').trim()
-            );
+              );
 
             recentBranches.push({
               branchInfo,

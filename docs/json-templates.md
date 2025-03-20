@@ -37,7 +37,7 @@ JSON templates follow a standard structure with three main sections:
         },
         "optional": false
       }
-      // More sections...
+      // More sections..
     },
     "placeholders": {
       "PLACEHOLDER_NAME": "Description of what this placeholder is for"
@@ -76,8 +76,8 @@ const markdown = await templateLoader.getMarkdownTemplate('template-id', 'en');
 
 // Get rendered Markdown with variable substitution
 const markdownWithVars = await templateLoader.getMarkdownTemplate(
-  'template-id', 
-  'ja', 
+  'template-id',
+  'ja',
   { 'VARIABLE_NAME': 'Replacement Value' }
 );
 ```
@@ -85,9 +85,9 @@ const markdownWithVars = await templateLoader.getMarkdownTemplate(
 ### Creating Templates
 
 ```typescript
-import { 
-  createJsonTemplate, 
-  createJsonTemplateSection 
+import {
+  createJsonTemplate,
+  createJsonTemplateSection
 } from '../schemas/v2/template-schema.js';
 
 // Create template sections

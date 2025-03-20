@@ -8,7 +8,7 @@
 
 **判断**: ストラテジーパターンを採用し、各ドキュメントタイプに特化した変換ロジックを実装します。また、コマンドパターンを使用してマイグレーションプロセスをカプセル化します。
 
-**理由**: 
+**理由**:
 - ドキュメントタイプごとに異なる変換ロジックが必要
 - 将来的に新しいドキュメントタイプが追加される可能性がある
 - マイグレーションプロセスの一貫性と再利用性を確保するため
@@ -105,7 +105,7 @@ export class MarkdownToJsonMigrator {
   async migrateDirectory(directory: string, options: MigrationOptions): Promise<MigrationResult>;
   async migrateFile(filePath: string, options: MigrationOptions): Promise<MigrationResult>;
   private async detectDocumentType(content: string, path: string): Promise<DocumentType>;
-  // ...その他の内部メソッド
+  // ..その他の内部メソッド
 }
 ```
 

@@ -1,14 +1,14 @@
-import { IUseCase } from '../../interfaces/IUseCase.js';
-import { DocumentDTO } from '../../dtos/DocumentDTO.js';
-import { IBranchMemoryBankRepository } from '../../../domain/repositories/IBranchMemoryBankRepository.js';
-import { IGlobalMemoryBankRepository } from '../../../domain/repositories/IGlobalMemoryBankRepository.js';
-import { Tag } from '../../../domain/entities/Tag.js';
-import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
+import { IUseCase } from '../interfaces/IUseCase.js';
+import { DocumentDTO } from '../dtos/DocumentDTO.js';
+import { IBranchMemoryBankRepository } from '../../domain/repositories/IBranchMemoryBankRepository.js';
+import { IGlobalMemoryBankRepository } from '../../domain/repositories/IGlobalMemoryBankRepository.js';
+import { Tag } from '../../domain/entities/Tag.js';
+import { BranchInfo } from '../../domain/entities/BranchInfo.js';
 import {
   ApplicationError,
   ApplicationErrorCodes,
-} from '../../../shared/errors/ApplicationError.js';
-import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
+} from '../../shared/errors/ApplicationError.js';
+import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
 
 /**
  * Input data for searching documents by tags
@@ -69,8 +69,7 @@ export interface SearchDocumentsByTagsOutput {
  * Use case for searching documents by tags
  */
 export class SearchDocumentsByTagsUseCase
-  implements IUseCase<SearchDocumentsByTagsInput, SearchDocumentsByTagsOutput>
-{
+  implements IUseCase<SearchDocumentsByTagsInput, SearchDocumentsByTagsOutput> {
   /**
    * Constructor
    * @param globalRepository Global memory bank repository
@@ -79,7 +78,7 @@ export class SearchDocumentsByTagsUseCase
   constructor(
     private readonly globalRepository: IGlobalMemoryBankRepository,
     private readonly branchRepository: IBranchMemoryBankRepository
-  ) {}
+  ) { }
 
   /**
    * Execute the use case

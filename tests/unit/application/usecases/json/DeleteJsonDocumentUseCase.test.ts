@@ -15,14 +15,14 @@ import {
 
 /**
  * Unit tests for DeleteJsonDocumentUseCase
- * 
+ *
  * These tests verify that the DeleteJsonDocumentUseCase correctly implements:
  * - Deleting JSON documents from branch memory banks by path and ID
  * - Deleting JSON documents from global memory bank by path and ID
  * - Input validation for document paths and IDs
  * - Proper error handling for non-existent documents
  * - Integration with index service to maintain consistent indices
- * 
+ *
  * The test uses mocked repositories to isolate the use case behavior.
  */
 
@@ -45,9 +45,9 @@ jest.mock('/Users/t3ta/workspace/memory-bank-mcp-server/src/domain/entities/Bran
   const originalModule = jest.requireActual('/Users/t3ta/workspace/memory-bank-mcp-server/src/domain/entities/BranchInfo') as any;
 
   return {
-    ...originalModule,
+    ..originalModule,
     BranchInfo: {
-      ...originalModule.BranchInfo,
+      ..originalModule.BranchInfo,
       create: function (branchName: string) {
         // globalという名前のブランチを特別に許可する（テスト用）
         if (branchName === 'global') {

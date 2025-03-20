@@ -1,16 +1,16 @@
-import { IUseCase } from '../../interfaces/IUseCase';
-import { IJsonDocumentRepository } from '../../../domain/repositories/IJsonDocumentRepository';
-import { BranchInfo } from '../../../domain/entities/BranchInfo';
-import { DocumentPath } from '../../../domain/entities/DocumentPath';
-import { DocumentId } from '../../../domain/entities/DocumentId';
-import { JsonDocument, DocumentType } from '../../../domain/entities/JsonDocument';
-import { Tag } from '../../../domain/entities/Tag';
-import { DomainError } from '../../../shared/errors/DomainError';
+import { IUseCase } from '../interfaces/IUseCase.js';
+import { IJsonDocumentRepository } from '../../domain/repositories/IJsonDocumentRepository.js';
+import { BranchInfo } from '../../domain/entities/BranchInfo.js';
+import { DocumentPath } from '../../domain/entities/DocumentPath.js';
+import { DocumentId } from '../../domain/entities/DocumentId.js';
+import { JsonDocument, DocumentType } from '../../domain/entities/JsonDocument.js';
+import { Tag } from '../../domain/entities/Tag.js';
+import { DomainError } from '../../shared/errors/DomainError.js';
 import {
   ApplicationError,
   ApplicationErrorCodes,
-} from '../../../shared/errors/ApplicationError';
-import { IIndexService } from '../../../infrastructure/index/interfaces/IIndexService';
+} from '../../shared/errors/ApplicationError.js';
+import { IIndexService } from '../../infrastructure/index/interfaces/IIndexService.js';
 
 /**
  * Input data for write JSON document use case
@@ -126,8 +126,7 @@ export interface WriteJsonDocumentOutput {
  * Use case for writing (creating or updating) a JSON document
  */
 export class WriteJsonDocumentUseCase
-  implements IUseCase<WriteJsonDocumentInput, WriteJsonDocumentOutput>
-{
+  implements IUseCase<WriteJsonDocumentInput, WriteJsonDocumentOutput> {
   /**
    * Constructor
    * @param jsonRepository JSON document repository
@@ -138,7 +137,7 @@ export class WriteJsonDocumentUseCase
     private readonly jsonRepository: IJsonDocumentRepository,
     private readonly indexService: IIndexService,
     private readonly globalRepository?: IJsonDocumentRepository
-  ) {}
+  ) { }
 
   /**
    * Execute the use case

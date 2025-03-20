@@ -157,13 +157,13 @@ docs/
   │   │   ├── activeContext.json   # アクティブコンテキスト
   │   │   ├── progress.json        # 進捗状況
   │   │   ├── systemPatterns.json  # システムパターン
-  │   │   └── ...                  # その他ドキュメント
-  │   └── ...
+  │   │   └── ..                  # その他ドキュメント
+  │   └── ..
   ├── global-memory-bank/
   │   ├── index.json               # グローバルインデックス
   │   ├── architecture.json        # アーキテクチャ
   │   ├── coding-standards.json    # コーディング規約
-  │   └── ...                      # その他ドキュメント
+  │   └── ..                      # その他ドキュメント
   └── .index/                      # インデックスディレクトリ
       ├── tags.json                # タグインデックス
       ├── documents.json           # ドキュメントメタデータ
@@ -201,12 +201,12 @@ interface IMemoryDocumentRepository {
   findByPath(path: DocumentPath): Promise<JsonDocument | null>;
   save(document: JsonDocument): Promise<void>;
   delete(id: string): Promise<boolean>;
-  
+
   // 検索・クエリ操作
   list(): Promise<DocumentMetadata[]>;
   findByTags(tags: string[], matchAll?: boolean): Promise<JsonDocument[]>;
   search(query: string): Promise<DocumentMetadata[]>;
-  
+
   // インデックス操作
   updateIndex(): Promise<void>;
   getIndex(): Promise<MemoryBankIndex>;
@@ -222,9 +222,9 @@ class FileSystemJsonDocumentRepository implements IMemoryDocumentRepository {
     private readonly fileSystemService: IFileSystemService,
     private readonly indexService: IIndexService
   ) {}
-  
+
   // 実装詳細
-  // ...
+  // ..
 }
 ```
 
@@ -252,9 +252,9 @@ class JsonDocument {
 
   constructor(props: JsonDocumentProps) {
     this.props = {
-      ...props,
+      ..props,
       metadata: {
-        ...props.metadata,
+        ..props.metadata,
         lastModified: new Date().toISOString()
       }
     };
@@ -272,21 +272,21 @@ class JsonDocument {
   }
 
   // ゲッター、メソッド等
-  get id(): string { /* ... */ }
-  get type(): string { /* ... */ }
-  get content(): Record<string, unknown> { /* ... */ }
-  
-  hasTag(tag: string): boolean { /* ... */ }
-  addTag(tag: string): JsonDocument { /* ... */ }
-  removeTag(tag: string): JsonDocument { /* ... */ }
-  
-  updateContent(content: Record<string, unknown>): JsonDocument { /* ... */ }
-  
+  get id(): string { /* .. */ }
+  get type(): string { /* .. */ }
+  get content(): Record<string, unknown> { /* .. */ }
+
+  hasTag(tag: string): boolean { /* .. */ }
+  addTag(tag: string): JsonDocument { /* .. */ }
+  removeTag(tag: string): JsonDocument { /* .. */ }
+
+  updateContent(content: Record<string, unknown>): JsonDocument { /* .. */ }
+
   // シリアライズ
-  toJSON(): Record<string, unknown> { /* ... */ }
-  
+  toJSON(): Record<string, unknown> { /* .. */ }
+
   // プレゼンテーション用にMarkdown形式に変換（オプション）
-  toMarkdown(): string { /* ... */ }
+  toMarkdown(): string { /* .. */ }
 }
 ```
 
@@ -295,20 +295,20 @@ class JsonDocument {
 ```typescript
 class DocumentId {
   private readonly value: string;
-  
+
   private constructor(value: string) {
     this.value = value;
   }
-  
+
   static create(): DocumentId {
     return new DocumentId(uuid.v4());
   }
-  
+
   static fromString(value: string): DocumentId {
     // UUIDバリデーション
     return new DocumentId(value);
   }
-  
+
   toString(): string {
     return this.value;
   }
@@ -338,10 +338,10 @@ class ReadDocumentUseCase implements IUseCase<ReadDocumentInput, ReadDocumentOut
   constructor(
     private readonly documentRepository: IMemoryDocumentRepository
   ) {}
-  
+
   async execute(input: ReadDocumentInput): Promise<ReadDocumentOutput> {
     // IDまたはパスでの検索ロジック
-    // ...
+    // ..
   }
 }
 ```
@@ -354,13 +354,13 @@ JSONからMarkdownへの一方向変換機能は維持し、表示用途に限�
 class JsonToMarkdownConverter {
   static convert(document: JsonDocument): string {
     // ドキュメントタイプに基づく変換ロジック
-    // ...
+    // ..
   }
-  
-  private static convertBranchContext(document: JsonDocument): string { /* ... */ }
-  private static convertActiveContext(document: JsonDocument): string { /* ... */ }
-  private static convertProgress(document: JsonDocument): string { /* ... */ }
-  private static convertSystemPatterns(document: JsonDocument): string { /* ... */ }
+
+  private static convertBranchContext(document: JsonDocument): string { /* .. */ }
+  private static convertActiveContext(document: JsonDocument): string { /* .. */ }
+  private static convertProgress(document: JsonDocument): string { /* .. */ }
+  private static convertSystemPatterns(document: JsonDocument): string { /* .. */ }
 }
 ```
 
@@ -380,7 +380,7 @@ class CreateJsonDocumentCommand {
       .option('--tags <tags>', 'Comma-separated tags')
       .action(async (options) => {
         // コマンド実行ロジック
-        // ...
+        // ..
       });
   }
 }
@@ -410,7 +410,7 @@ class MarkdownToJsonMigrator {
     private readonly targetDir: string,
     private readonly logger: ILogger
   ) {}
-  
+
   async migrate(): Promise<MigrationResult> {
     // 1. すべてのMarkdownファイルをスキャン
     // 2. ファイルタイプに基づいて適切なコンバーターを選択
@@ -420,11 +420,11 @@ class MarkdownToJsonMigrator {
     // 6. インデックスを更新
     // 7. 結果を返す
   }
-  
+
   private async migrateFile(filePath: string): Promise<boolean> {
     // 個別ファイルマイグレーションロジック
   }
-  
+
   private determineDocumentType(filePath: string, content: string): string {
     // ファイル名とコンテンツに基づくドキュメントタイプの特定
   }
@@ -441,7 +441,7 @@ class MigrationValidator {
     // 3. コンテンツの整合性チェック
     // 4. タグの検証
   }
-  
+
   static compare(originalMarkdown: string, convertedJson: JsonDocument): ComparisonResult {
     // マークダウンとJSONの内容比較
     // 情報損失の特定
@@ -456,7 +456,7 @@ class MigrationBackup {
   static async backup(sourceDir: string, backupDir: string): Promise<void> {
     // ファイルシステムバックアップの作成
   }
-  
+
   static async restore(backupDir: string, targetDir: string): Promise<void> {
     // バックアップからの復元
   }

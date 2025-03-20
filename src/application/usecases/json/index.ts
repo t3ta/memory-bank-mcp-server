@@ -1,6 +1,6 @@
 // Export all JSON usecases
-export * from './ReadJsonDocumentUseCase.js';
-export * from './WriteJsonDocumentUseCase.js';
-export * from './DeleteJsonDocumentUseCase.js';
-export * from './SearchJsonDocumentsUseCase.js';
-export * from './UpdateJsonIndexUseCase.js';
+export * from '../.jsReadJsonDocumentUseCase.js';
+export * from '../.jsWriteJsonDocumentUseCase.js';
+export * from '../.jsDeleteJsonDocumentUseCase.js';
+export * from '../.jsSearchJsonDocumentsUseCase.js';
+export * from '../.jsUpdateJsonIndexUseCase.js';

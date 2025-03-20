@@ -1,13 +1,13 @@
-import { IUseCase } from '../../interfaces/IUseCase.js';
-import { IBranchMemoryBankRepository } from '../../../domain/repositories/IBranchMemoryBankRepository.js';
-import { CoreFilesDTO } from '../../dtos/CoreFilesDTO.js';
-import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
-import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
-import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
+import { IUseCase } from '../interfaces/IUseCase.js';
+import { IBranchMemoryBankRepository } from '../../domain/repositories/IBranchMemoryBankRepository.js';
+import { CoreFilesDTO } from '../dtos/CoreFilesDTO.js';
+import { BranchInfo } from '../../domain/entities/BranchInfo.js';
+import { DocumentPath } from '../../domain/entities/DocumentPath.js';
+import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
 import {
   ApplicationError,
   ApplicationErrorCodes,
-} from '../../../shared/errors/ApplicationError.js';
+} from '../../shared/errors/ApplicationError.js';
 
 /**
  * Input data for reading branch core files
@@ -33,8 +33,7 @@ export interface ReadBranchCoreFilesOutput {
  * Use case for reading core files from a branch memory bank
  */
 export class ReadBranchCoreFilesUseCase
-  implements IUseCase<ReadBranchCoreFilesInput, ReadBranchCoreFilesOutput>
-{
+  implements IUseCase<ReadBranchCoreFilesInput, ReadBranchCoreFilesOutput> {
   // Core file paths
   private readonly ACTIVE_CONTEXT_PATH = 'activeContext.md';
   private readonly PROGRESS_PATH = 'progress.md';
@@ -45,7 +44,7 @@ export class ReadBranchCoreFilesUseCase
    * Constructor
    * @param branchRepository Branch memory bank repository
    */
-  constructor(private readonly branchRepository: IBranchMemoryBankRepository) {}
+  constructor(private readonly branchRepository: IBranchMemoryBankRepository) { }
 
   /**
    * Execute the use case
@@ -90,7 +89,7 @@ export class ReadBranchCoreFilesUseCase
       );
       // Initialize the output DTO
       const coreFiles: CoreFilesDTO = {};
-      
+
       // Parse branch context if exists
       if (branchContextDoc) {
         coreFiles.branchContext = branchContextDoc.content;
@@ -303,6 +302,6 @@ export class ReadBranchCoreFilesUseCase
 }
 
 // Export the interfaces from CoreFilesDTO for convenience
-import { ActiveContextDTO, ProgressDTO } from '../../dtos/CoreFilesDTO.js';
+import { ActiveContextDTO, ProgressDTO } from '../dtos/CoreFilesDTO.js';
 // SystemPatternsDTO is used in the coreFiles assignment, but TypeScript doesn't detect it correctly
-import type { SystemPatternsDTO } from '../../dtos/CoreFilesDTO.js';
+import type { SystemPatternsDTO } from '../dtos/CoreFilesDTO.js';
