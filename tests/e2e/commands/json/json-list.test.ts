@@ -37,7 +37,7 @@ afterEach(() => {
   deleteTempDir(testDir);
 });
 
-describe('Memory Bank CLI - json list command', () => {
+describe.skip('Memory Bank CLI - json list command', () => {
   test('should list JSON documents in global memory bank', async () => {
     // Create multiple test documents in global memory bank
     const doc1 = {

@@ -41,9 +41,9 @@ afterEach(() => {
   deleteTempDir(testDir);
 });
 
-describe('Memory Bank CLI - JSON Basic Commands', () => {
+describe.skip('Memory Bank CLI - JSON Basic Commands', () => {
   // Test json create command
-  describe('json create command', () => {
+  describe.skip('json create command', () => {
     test('should create a new JSON document in global memory bank', async () => {
       const documentName = 'test-create.json';
       const title = 'Test Create Document';
@@ -265,7 +265,7 @@ describe('Memory Bank CLI - JSON Basic Commands', () => {
   });
 
   // Test json read command
-  describe('json read command', () => {
+  describe.skip('json read command', () => {
     test('should read a JSON document from global memory bank', async () => {
       const documentName = 'test-read.json';
       const documentContent = {

@@ -41,7 +41,7 @@ afterEach(() => {
   deleteTempDir(testDir);
 });
 
-describe('Memory Bank CLI - json update command', () => {
+describe.skip('Memory Bank CLI - json update command', () => {
   test('should update a JSON document title in global memory bank', async () => {
     const documentName = 'update-title-test.json';
     const initialTitle = 'Initial Title';

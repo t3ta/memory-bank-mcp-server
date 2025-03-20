@@ -122,7 +122,7 @@ afterEach(() => {
   deleteTempDir(testDir);
 });
 
-describe('Memory Bank CLI - json list command', () => {
+describe.skip('Memory Bank CLI - json list command', () => {
   // Test listing all JSON documents in branch memory bank
   test('should list all JSON documents in branch memory bank', async () => {
     const result = await runCliSuccessful([

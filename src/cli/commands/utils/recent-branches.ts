@@ -71,11 +71,12 @@ export class RecentBranchesCommand extends CommandBase {
 
       if (argv.format === 'json') {
         // Output as JSON
-        console.log(JSON.stringify(result.data, null, 2));
+        console.log(JSON.stringify(result.data.branches, null, 2));
       } else {
         // Output in a pretty format
         console.log('\n=== RECENT BRANCHES ===\n');
-        result.data.forEach(
+        if (result.data.branches && Array.isArray(result.data.branches)) {
+          result.data.branches.forEach(
           (
             branch: {
               name: string;
@@ -92,6 +93,9 @@ export class RecentBranchesCommand extends CommandBase {
             console.log();
           }
         );
+        } else {
+          console.log('No recent branches found.');
+        }
       }
     } catch (error) {
       this.handleError(error, 'Failed to get recent branches');

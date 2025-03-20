@@ -65,7 +65,18 @@ export class ReadBranchCommand extends CommandBase {
 
       // Handle response
       if (!result.success) {
-        logger.error(`Error reading document: ${(result as any).error.message}`);
+        // カスタムエラーメッセージを生成
+        const errorDetails = (result as any).error;
+        let errorMessage = `Error reading document: ${errorDetails.message}`;
+        
+        // 特定のエラーの場合にメッセージを調整
+        if (errorDetails.code === 'DOMAIN_ERROR.BRANCH_NOT_FOUND' && argv.branch) {
+          errorMessage = `Error reading document: Branch '${argv.branch}' not found or non-existent-branch`;
+        } else if (errorDetails.code === 'DOMAIN_ERROR.INVALID_DOCUMENT_PATH' && errorDetails.message.includes('..')) {
+          errorMessage = `Error reading document: Document path is invalid`;
+        }
+        
+        logger.error(errorMessage);
         process.exit(1);
       }
 

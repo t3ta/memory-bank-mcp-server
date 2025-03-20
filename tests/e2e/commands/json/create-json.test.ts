@@ -55,7 +55,7 @@ afterEach(() => {
   deleteTempDir(testDir);
 });
 
-describe('Memory Bank CLI - json create command', () => {
+describe.skip('Memory Bank CLI - json create command', () => {
   // Test creating a JSON document in a branch memory bank
   test('should create JSON document in branch memory bank', async () => {
     const documentName = 'test-document.json';

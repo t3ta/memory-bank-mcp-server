@@ -1,4 +1,5 @@
 import type { Argv } from "yargs";
+import { registerBranchCommands } from "./branch/index.js";
 import { registerGlobalCommands } from "./global/index.js";
 import { registerJsonCommands } from "./json/index.js";
 import { registerMigrationCommands } from "./migration/index.js";
@@ -20,6 +21,8 @@ export function registerAllCommands(yargs: Argv): Argv {
   yargsInstance = registerGlobalCommands(yargsInstance);
 
   // Register Branch commands
+  yargsInstance = registerBranchCommands(yargsInstance);
+  
   // Register Utility commands
   yargsInstance = registerUtilCommands(yargsInstance);
 

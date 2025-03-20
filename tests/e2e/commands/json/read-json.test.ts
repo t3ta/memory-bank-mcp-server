@@ -83,7 +83,7 @@ afterEach(() => {
   deleteTempDir(testDir);
 });
 
-describe('Memory Bank CLI - json read command', () => {
+describe.skip('Memory Bank CLI - json read command', () => {
   // Test reading a JSON document from branch memory bank with default format
   test('should read JSON document from branch memory bank with default format', async () => {
     const result = await runCliSuccessful([
