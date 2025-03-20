@@ -218,21 +218,21 @@ describe('ContextController Integration Tests', () => {
   });
 
   it.skip('Should support both JSON and MD file formats', async () => {
-    // JSONファイル
+    // JSON file
     await fs.writeFile(
       path.join(branchDir, testBranch, 'config.json'),
       '{"name": "test", "value": 123}',
       'utf-8'
     );
 
-    // コンテキスト読み込み
+    // Read context
     const contextResult = await controller.readContext({
       branch: testBranch,
       language: 'en',
       includeBranchMemory: true
     });
 
-    // 読み込み結果の検証
+    // Verify read result
     expect(contextResult.success).toBe(true);
     expect(contextResult.data?.branchMemory?.['config.json']).toBeDefined();
     expect(contextResult.data?.branchMemory?.['config.json']).toContain('"value": 123');

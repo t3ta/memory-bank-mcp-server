@@ -19,13 +19,13 @@ export type ContextResult = {
 };
 
 /**
- * コンテキスト読み込みユースケース
+ * Context Reading Use Case
  */
 export class ReadContextUseCase {
   /**
-   * コンストラクタ
-   * @param branchRepository ブランチメモリーバンクリポジトリ
-   * @param globalRepository グローバルメモリーバンクリポジトリ
+   * Constructor
+   * @param branchRepository Branch memory bank repository
+   * @param globalRepository Global memory bank repository
    */
   constructor(
     private readonly branchRepository: IBranchMemoryBankRepository,
@@ -33,10 +33,10 @@ export class ReadContextUseCase {
   ) { }
 
   /**
-   * 指定されたブランチとオプションに基づいてコンテキストを読み込む
-   * @param request コンテキストリクエスト
-   * @returns コンテキスト結果
-   * @throws ブランチが存在しない場合
+   * Read context based on specified branch and options
+   * @param request Context request
+   * @returns Context result
+   * @throws When branch does not exist
    */
   async execute(request: ContextRequest): Promise<ContextResult> {
     const { branch, includeBranchMemory, includeGlobalMemory } = request;
@@ -82,9 +82,9 @@ export class ReadContextUseCase {
   }
 
   /**
-   * ブランチメモリーを読み込む
-   * @param branchName ブランチ名
-   * @returns ドキュメントパスをキー、内容を値とするオブジェクト
+   * Read branch memory
+   * @param branchName Branch name
+   * @returns Object with document paths as keys and content as values
    */
   private async readBranchMemory(branchName: string): Promise<Record<string, string>> {
     const branchInfo = BranchInfo.create(branchName);
@@ -108,8 +108,8 @@ export class ReadContextUseCase {
   }
 
   /**
-   * グローバルメモリーを読み込む
-   * @returns ドキュメントパスをキー、内容を値とするオブジェクト
+   * Read global memory
+   * @returns Object with document paths as keys and content as values
    */
   private async readGlobalMemory(): Promise<Record<string, string>> {
     const paths = await this.globalRepository.listDocuments();

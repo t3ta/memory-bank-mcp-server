@@ -54,7 +54,7 @@ export class ContextController implements IContextController {
     data?: ContextResult;
     error?: string;
   }> {
-    // 結果オブジェクト
+    // Result object
     const contextResult: ContextResult = {};
 
     try {

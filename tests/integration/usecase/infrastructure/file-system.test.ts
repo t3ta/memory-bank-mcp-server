@@ -3,72 +3,72 @@ import * as path from 'node:path';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
- * 基本的なファイルシステム操作のテスト
- * 実際のシステムコンポーネントを使わない最小限の統合テスト
+ * Basic file system operation test
+ * Minimal integration test that doesn't use actual system components
  */
 describe('Basic File System Integration Test', () => {
-  // テスト用ディレクトリ
+  // Test directory
   let testDir: string;
 
   beforeAll(async () => {
-    // テスト環境のセットアップ
+    // Test environment setup
     const testId = uuidv4();
     testDir = path.join(process.cwd(), 'tests', '.temp', `integration-simple-${testId}`);
     
-    // ディレクトリ作成
+    // Create directory
     await fs.mkdir(testDir, { recursive: true });
     
-    console.log(`シンプルテスト環境セットアップ完了: ${testDir}`);
+    console.log(`Simple test environment setup complete: ${testDir}`);
   }, 10000);
 
   afterAll(async () => {
-    // テスト環境のクリーンアップ
+    // Test environment cleanup
     try {
       await fs.rm(testDir, { recursive: true, force: true });
-      console.log(`テスト環境削除: ${testDir}`);
+      console.log(`Test environment deleted: ${testDir}`);
     } catch (error) {
-      console.error('クリーンアップ失敗:', error);
+      console.error('Cleanup failed:', error);
     }
   });
 
-  it('ファイルの作成と読み込みができること', async () => {
-    // テストデータ
+  it('should be able to create and read files', async () => {
+    // Test data
     const filePath = path.join(testDir, 'test.txt');
-    const content = `テスト内容\n作成時刻: ${new Date().toISOString()}`;
+    const content = `Test content\nCreation time: ${new Date().toISOString()}`;
     
-    // ファイル書き込み
+    // Write file
     await fs.writeFile(filePath, content, 'utf-8');
     
-    // ファイルが存在するか確認
+    // Check if file exists
     const fileExists = await fileExistsAsync(filePath);
     expect(fileExists).toBe(true);
     
-    // ファイル内容の確認
+    // Check file content
     const readContent = await fs.readFile(filePath, 'utf-8');
     expect(readContent).toEqual(content);
   });
 
-  it('ディレクトリの作成と削除ができること', async () => {
-    // テストデータ
+  it('should be able to create and delete directories', async () => {
+    // Test data
     const dirPath = path.join(testDir, 'test-dir');
     
-    // ディレクトリ作成
+    // Create directory
     await fs.mkdir(dirPath, { recursive: true });
     
-    // ディレクトリが存在するか確認
+    // Check if directory exists
     const dirExists = await fileExistsAsync(dirPath);
     expect(dirExists).toBe(true);
     
-    // ディレクトリ削除
+    // Delete directory
     await fs.rm(dirPath, { recursive: true, force: true });
     
-    // ディレクトリが削除されたか確認
+    // Check if directory has been deleted
     const dirStillExists = await fileExistsAsync(dirPath);
     expect(dirStillExists).toBe(false);
   });
 });
 
-// ヘルパー関数
+// Helper function
 async function fileExistsAsync(filePath: string): Promise<boolean> {
   try {
     await fs.access(filePath);
