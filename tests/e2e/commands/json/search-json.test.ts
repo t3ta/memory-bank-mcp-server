@@ -124,7 +124,7 @@ afterEach(() => {
   deleteTempDir(testDir);
 });
 
-describe.skip('Memory Bank CLI - json search command', () => {
+describe('Memory Bank CLI - json search command', () => {
   // Test searching by a single tag in branch memory bank
   test('should search documents by single tag in branch memory bank', async () => {
     const result = await runCliSuccessful([
