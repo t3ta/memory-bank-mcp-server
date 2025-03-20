@@ -1,5 +1,5 @@
-import { Tag } from '../../../../src/domain/entities/Tag';
-import { DomainError } from '../../../../src/shared/errors/DomainError';
+import { Tag } from '../../../../src/domain/entities/Tag.js';
+import { DomainError } from '../../../../src/shared/errors/DomainError.js';
 
 /**
  * Unit tests for Tag entity

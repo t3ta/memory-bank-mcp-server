@@ -1,5 +1,5 @@
-import { DocumentId } from '../../../../src/domain/entities/DocumentId';
-import { DomainError, DomainErrorCodes } from '../../../../src/shared/errors/DomainError';
+import { DocumentId } from '../../../../src/domain/entities/DocumentId.js';
+import { DomainError, DomainErrorCodes } from '../../../../src/shared/errors/DomainError.js';
 
 describe('DocumentId', () => {
   describe('create', () => {

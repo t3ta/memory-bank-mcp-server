@@ -1,5 +1,5 @@
-import { BranchInfo } from '../../../../src/domain/entities/BranchInfo';
-import { DomainError } from '../../../../src/shared/errors/DomainError';
+import { BranchInfo } from '../../../../src/domain/entities/BranchInfo.js';
+import { DomainError } from '../../../../src/shared/errors/DomainError.js';
 
 /**
  * Unit tests for BranchInfo entity

@@ -1,9 +1,9 @@
-import { JsonDocument, DocumentType } from '../../../../src/domain/entities/JsonDocument';
-import { DocumentId } from '../../../../src/domain/entities/DocumentId';
-import { DocumentPath } from '../../../../src/domain/entities/DocumentPath';
-import { Tag } from '../../../../src/domain/entities/Tag';
-import { DomainError } from '../../../../src/shared/errors/DomainError';
-import { SCHEMA_VERSION } from '../../../../src/schemas/v2/json-document';
+import { JsonDocument, DocumentType } from '../../../../src/domain/entities/JsonDocument.js';
+import { DocumentId } from '../../../../src/domain/entities/DocumentId.js';
+import { DocumentPath } from '../../../../src/domain/entities/DocumentPath.js';
+import { Tag } from '../../../../src/domain/entities/Tag.js';
+import { DomainError } from '../../../../src/shared/errors/DomainError.js';
+import { SCHEMA_VERSION } from '../../../../src/schemas/v2/json-document.js';
 
 describe('JsonDocument', () => {
   // Setup common test data

@@ -1,7 +1,7 @@
-import { MemoryDocument } from '../../../../src/domain/entities/MemoryDocument';
-import { DocumentPath } from '../../../../src/domain/entities/DocumentPath';
-import { Tag } from '../../../../src/domain/entities/Tag';
-import { BaseJsonDocument } from '../../../../src/schemas/json-document';
+import { MemoryDocument } from '../../../../src/domain/entities/MemoryDocument.js';
+import { DocumentPath } from '../../../../src/domain/entities/DocumentPath.js';
+import { Tag } from '../../../../src/domain/entities/Tag.js';
+import { BaseJsonDocument } from '../../../../src/schemas/json-document.js';
 
 describe('MemoryDocument', () => {
   // Test fixtures

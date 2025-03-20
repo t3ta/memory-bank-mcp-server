@@ -1,5 +1,5 @@
-import { DocumentPath } from '../../../../src/domain/entities/DocumentPath';
-import { DomainError, DomainErrorCodes } from '../../../../src/shared/errors/DomainError';
+import { DocumentPath } from '../../../../src/domain/entities/DocumentPath.js';
+import { DomainError, DomainErrorCodes } from '../../../../src/shared/errors/DomainError.js';
 
 describe('DocumentPath', () => {
   describe('create', () => {
