@@ -226,6 +226,13 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
   public get documentType(): DocumentType {
     return this._documentType;
   }
+  
+  /**
+   * Set the document type (internal use only for testing)
+   */
+  public set documentType(type: DocumentType) {
+    (this as any)._documentType = type;
+  }
 
   /**
    * Get the document tags
