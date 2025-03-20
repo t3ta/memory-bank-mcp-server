@@ -10,7 +10,7 @@ import {
   SystemPatternsJson,
   JsonDocument,
   BaseJsonDocument
-} from '../../schemas/json-document';
+} from '../../schemas/json-document.js';
 
 /**
  * Convert JSON document to Markdown format

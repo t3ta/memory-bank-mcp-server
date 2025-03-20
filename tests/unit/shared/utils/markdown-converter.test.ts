@@ -1,4 +1,4 @@
-import { jsonToMarkdown } from '../markdown-converter';
+import { jsonToMarkdown } from '../markdown-converter.js';
 import {
   BranchContextJson,
   ActiveContextJson,
@@ -6,7 +6,7 @@ import {
   SystemPatternsJson,
   JsonDocument,
   BaseJsonDocument,
-} from '../../../schemas/json-document';
+} from '../../../schemas/json-document.js';
 
 describe('markdown-converter', () => {
   describe('jsonToMarkdown', () => {

@@ -1,21 +1,21 @@
 import { promises as fs } from 'node:fs';
 import * as path from 'node:path';
 import { v4 as uuidv4 } from 'uuid';
-import { IConfigProvider } from '../../../src/infrastructure/config/interfaces/IConfigProvider';
-import { IGlobalMemoryBankRepository } from '../../../src/domain/repositories/IGlobalMemoryBankRepository';
-import { ITagIndexRepository } from '../../../src/domain/repositories/ITagIndexRepository';
-import { IFileSystemService } from '../../../src/infrastructure/storage/interfaces/IFileSystemService';
-import { BranchController } from '../../../src/interface/controllers/BranchController';
-import { FileSystemBranchMemoryBankRepository } from '../../../src/infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository';
-import { WriteBranchDocumentUseCase } from '../../../src/application/usecases/branch/WriteBranchDocumentUseCase';
-import { ReadBranchDocumentUseCase } from '../../../src/application/usecases/branch/ReadBranchDocumentUseCase';
-import { SearchDocumentsByTagsUseCase } from '../../../src/application/usecases/common/SearchDocumentsByTagsUseCase';
-import { UpdateTagIndexUseCase } from '../../../src/application/usecases/common/UpdateTagIndexUseCase';
-import { GetRecentBranchesUseCase } from '../../../src/application/usecases/common/GetRecentBranchesUseCase';
-import { ReadBranchCoreFilesUseCase } from '../../../src/application/usecases/common/ReadBranchCoreFilesUseCase';
-import { CreateBranchCoreFilesUseCase } from '../../../src/application/usecases/common/CreateBranchCoreFilesUseCase';
-import { MCPResponsePresenter } from '../../../src/interface/presenters/MCPResponsePresenter';
-import { MCPErrorResponse } from '../../../src/interface/presenters/types/MCPResponse';
+import { IConfigProvider } from '../../../../src/infrastructure/config/interfaces/IConfigProvider.js';
+import { IGlobalMemoryBankRepository } from '../../../../src/domain/repositories/IGlobalMemoryBankRepository.js';
+import { ITagIndexRepository } from '../../../../src/domain/repositories/ITagIndexRepository.js';
+import { IFileSystemService } from '../../../../src/infrastructure/storage/interfaces/IFileSystemService.js';
+import { BranchController } from '../../../../src/interface/controllers/BranchController.js';
+import { FileSystemBranchMemoryBankRepository } from '../../../../src/infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.js';
+import { WriteBranchDocumentUseCase } from '../../../../src/application/usecases/branch/WriteBranchDocumentUseCase.js';
+import { ReadBranchDocumentUseCase } from '../../../../src/application/usecases/branch/ReadBranchDocumentUseCase.js';
+import { SearchDocumentsByTagsUseCase } from '../../../../src/application/usecases/common/SearchDocumentsByTagsUseCase.js';
+import { UpdateTagIndexUseCase } from '../../../../src/application/usecases/common/UpdateTagIndexUseCase.js';
+import { GetRecentBranchesUseCase } from '../../../../src/application/usecases/common/GetRecentBranchesUseCase.js';
+import { ReadBranchCoreFilesUseCase } from '../../../../src/application/usecases/common/ReadBranchCoreFilesUseCase.js';
+import { CreateBranchCoreFilesUseCase } from '../../../../src/application/usecases/common/CreateBranchCoreFilesUseCase.js';
+import { MCPResponsePresenter } from '../../../../src/interface/presenters/MCPResponsePresenter.js';
+import { MCPErrorResponse } from '../../../../src/interface/presenters/types/MCPResponse.js';
 
 /**
  * Integration Test: Markdown Write Block
