@@ -16,6 +16,11 @@
   - JsonDocument.test.tsの未使用インポート削除
   - JsonTemplateLoader.test.tsのモックオブジェクト型付け修正
   - テスト用のマークダウンコンバーターモジュール実装
+- ESLintの設定と依存関係修正
+  - ESLintプラグインのインストール（eslint-plugin-import, @typescript-eslint/eslint-plugin, @typescript-eslint/parser, globals）
+  - requireからdynamic importへの移行（循環参照問題の解決）
+  - lintコマンドのエラー出力を調整
+  - TypeScriptファイル・テストファイル向けの特化したルールセット作成
 
 ## 未実装の機能
 
@@ -44,7 +49,19 @@ TypeScript 5.8.2のビルドおよびテストエラーの一部を修正しま�
    - package.jsonのTypeScriptバージョンを5.8.2に更新
    - 関連するJest設定の調整
 
-現在のビルド状態は改善されていますが、複数のエラーが残っています。特にmigration関連のモジュールと一部のテストファイルにエラーが残存しています。また、まだすべてのインポートパスが更新されていないため、ビルドとテストの完全な成功には至っていません。
+4. **ESLint設定の再構築**:
+   - ESLintの設定ファイル（eslint.config.js）の完全な再構築
+   - 適切なTypeScriptサポートと正しいプラグイン設定
+   - srcディレクトリとtestsディレクトリで異なるルールを適用
+   - Node.jsの型定義に関する問題解決
+   - 未使用変数の警告を柔軟に設定（アンダースコアプレフィックスで抑制可能）
+   - 警告とエラーの分離によるCIパイプライン対策
+
+5. **コード修正**:
+   - src/shared/utils/json-to-markdown/index.tsでのrequire文をdynamic importに置き換え
+   - NodeJS型定義に関する対応
+
+現在のビルド状態は改善されており、`yarn lint`コマンドは警告は表示するものの正常に完了するようになりました。しかし、まだ複数のエラーが残っています。特にmigration関連のモジュールと一部のテストファイルにエラーが残存しています。また、まだすべてのインポートパスが更新されていないため、ビルドとテストの完全な成功には至っていません。
 
 ## 次のステップ
 
@@ -62,3 +79,6 @@ TypeScript 5.8.2のビルドおよびテストエラーの一部を修正しま�
 - skippedテストの扱いが未解決
 - テスト間の依存関係による不安定性
 - 一部のテスト用モジュールの不足
+- ESLint警告が多数残っている（主に未使用変数・インポート）
+- NodeJS.ErrnoException型の扱いが完全に解決していない
+- 一部のコードで循環参照の可能性がある
