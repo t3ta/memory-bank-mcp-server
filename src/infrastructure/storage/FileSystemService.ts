@@ -1,4 +1,4 @@
-import { promises as fs } from 'node:fs';
+import { promises as fs, Dirent } from 'node:fs';
 import { createReadStream } from 'node:fs';
 import path from 'node:path';
 import { IFileSystemService } from './interfaces/IFileSystemService.js';
@@ -6,6 +6,8 @@ import {
   InfrastructureError,
   InfrastructureErrorCodes,
 } from '../../shared/errors/InfrastructureError.js';
+import { withFileSystemRetry } from '../repositories/file-system/FileSystemRetryUtils.js';
+import { logger } from '../../shared/utils/logger.js';
 
 /**
  * Implementation of file system service
@@ -17,33 +19,39 @@ export class FileSystemService implements IFileSystemService {
    * @returns Promise resolving to file content as string
    */
   async readFile(filePath: string): Promise<string> {
-    try {
-      return await fs.readFile(filePath, 'utf-8');
-    } catch (error) {
-      if (error instanceof Error) {
-        const nodeError = error as NodeJS.ErrnoException;
+    return withFileSystemRetry(
+      `readFile(${filePath})`,
+      async () => {
+        try {
+          logger.debug(`Reading file: ${filePath}`);
+          return await fs.readFile(filePath, 'utf-8');
+        } catch (error) {
+          if (error instanceof Error) {
+            const nodeError = error as NodeJS.ErrnoException;
 
-        if (nodeError.code === 'ENOENT') {
-          throw new InfrastructureError(
-            InfrastructureErrorCodes.FILE_NOT_FOUND,
-            `File not found: ${filePath}`
-          );
-        }
+            if (nodeError.code === 'ENOENT') {
+              throw new InfrastructureError(
+                InfrastructureErrorCodes.FILE_NOT_FOUND,
+                `File not found: ${filePath}`
+              );
+            }
 
-        if (nodeError.code === 'EACCES') {
+            if (nodeError.code === 'EACCES') {
+              throw new InfrastructureError(
+                InfrastructureErrorCodes.FILE_PERMISSION_ERROR,
+                `Permission denied: ${filePath}`
+              );
+            }
+          }
+
           throw new InfrastructureError(
-            InfrastructureErrorCodes.FILE_PERMISSION_ERROR,
-            `Permission denied: ${filePath}`
+            InfrastructureErrorCodes.FILE_READ_ERROR,
+            `Failed to read file: ${filePath}`,
+            { originalError: error }
           );
         }
       }
-
-      throw new InfrastructureError(
-        InfrastructureErrorCodes.FILE_READ_ERROR,
-        `Failed to read file: ${filePath}`,
-        { originalError: error }
-      );
-    }
+    );
   }
 
   /**
@@ -53,34 +61,40 @@ export class FileSystemService implements IFileSystemService {
    * @returns Promise resolving when write is complete
    */
   async writeFile(filePath: string, content: string): Promise<void> {
-    try {
-      // Ensure directory exists
-      await this.createDirectory(path.dirname(filePath));
+    return withFileSystemRetry(
+      `writeFile(${filePath})`,
+      async () => {
+        try {
+          // Ensure directory exists
+          await this.createDirectory(path.dirname(filePath));
 
-      // Write file
-      await fs.writeFile(filePath, content, 'utf-8');
-    } catch (error) {
-      if (error instanceof InfrastructureError) {
-        throw error;
-      }
+          // Write file
+          logger.debug(`Writing file: ${filePath}`);
+          await fs.writeFile(filePath, content, 'utf-8');
+        } catch (error) {
+          if (error instanceof InfrastructureError) {
+            throw error;
+          }
 
-      if (error instanceof Error) {
-        const nodeError = error as NodeJS.ErrnoException;
+          if (error instanceof Error) {
+            const nodeError = error as NodeJS.ErrnoException;
 
-        if (nodeError.code === 'EACCES') {
+            if (nodeError.code === 'EACCES') {
+              throw new InfrastructureError(
+                InfrastructureErrorCodes.FILE_PERMISSION_ERROR,
+                `Permission denied: ${filePath}`
+              );
+            }
+          }
+
           throw new InfrastructureError(
-            InfrastructureErrorCodes.FILE_PERMISSION_ERROR,
-            `Permission denied: ${filePath}`
+            InfrastructureErrorCodes.FILE_WRITE_ERROR,
+            `Failed to write file: ${filePath}`,
+            { originalError: error }
           );
         }
       }
-
-      throw new InfrastructureError(
-        InfrastructureErrorCodes.FILE_WRITE_ERROR,
-        `Failed to write file: ${filePath}`,
-        { originalError: error }
-      );
-    }
+    );
   }
 
   /**
@@ -137,26 +151,33 @@ export class FileSystemService implements IFileSystemService {
    * @returns Promise resolving when directory is created
    */
   async createDirectory(dirPath: string): Promise<void> {
-    try {
-      await fs.mkdir(dirPath, { recursive: true });
-    } catch (error) {
-      if (error instanceof Error) {
-        const nodeError = error as NodeJS.ErrnoException;
+    return withFileSystemRetry(
+      `createDirectory(${dirPath})`,
+      async () => {
+        try {
+          logger.debug(`Creating directory: ${dirPath}`);
+          await fs.mkdir(dirPath, { recursive: true });
+        } catch (error) {
+          if (error instanceof Error) {
+            const nodeError = error as NodeJS.ErrnoException;
 
-        if (nodeError.code === 'EACCES') {
+            if (nodeError.code === 'EACCES') {
+              throw new InfrastructureError(
+                InfrastructureErrorCodes.FILE_PERMISSION_ERROR,
+                `Permission denied: ${dirPath}`
+              );
+            }
+          }
+
           throw new InfrastructureError(
-            InfrastructureErrorCodes.FILE_PERMISSION_ERROR,
-            `Permission denied: ${dirPath}`
+            InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
+            `Failed to create directory: ${dirPath}`,
+            { originalError: error }
           );
         }
-      }
-
-      throw new InfrastructureError(
-        InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
-        `Failed to create directory: ${dirPath}`,
-        { originalError: error }
-      );
-    }
+      },
+      { maxRetries: 2 } // Fewer retries for directory creation
+    );
   }
 
   /**
@@ -180,48 +201,77 @@ export class FileSystemService implements IFileSystemService {
    * @returns Promise resolving to array of file paths
    */
   async listFiles(dirPath: string): Promise<string[]> {
-    try {
-      const entries = await fs.readdir(dirPath, { withFileTypes: true });
+    return withFileSystemRetry(
+      `listFiles(${dirPath})`,
+      async () => {
+        try {
+          logger.debug(`Listing files in directory: ${dirPath}`);
+          const entries = await fs.readdir(dirPath, { withFileTypes: true });
 
-      const files: string[] = [];
+          const files: string[] = [];
 
-      for (const entry of entries) {
-        const fullPath = path.join(dirPath, entry.name);
+          // Process entries in parallel with batching
+          const processEntries = async (entries: Dirent[]) => {
+            const results = await Promise.all(
+              entries.map(async (entry) => {
+                const fullPath = path.join(dirPath, entry.name);
 
-        if (entry.isFile()) {
-          files.push(fullPath);
-        } else if (entry.isDirectory()) {
-          const subFiles = await this.listFiles(fullPath);
-          files.push(...subFiles);
-        }
-      }
+                if (entry.isFile()) {
+                  return [fullPath];
+                } else if (entry.isDirectory()) {
+                  try {
+                    const subFiles = await this.listFiles(fullPath);
+                    return subFiles;
+                  } catch (error) {
+                    // Log but continue if a subdirectory fails
+                    logger.warn(`Error listing subdirectory ${fullPath}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                    return [];
+                  }
+                }
+                return [];
+              })
+            );
 
-      return files;
-    } catch (error) {
-      if (error instanceof Error) {
-        const nodeError = error as NodeJS.ErrnoException;
+            // Flatten results
+            return results.flat();
+          };
 
-        if (nodeError.code === 'ENOENT') {
+          // Process files in batches of 10
+          const batchSize = 10;
+          for (let i = 0; i < entries.length; i += batchSize) {
+            const batch = entries.slice(i, i + batchSize);
+            const batchFiles = await processEntries(batch);
+            files.push(...batchFiles);
+          }
+
+          return files;
+        } catch (error) {
+          if (error instanceof Error) {
+            const nodeError = error as NodeJS.ErrnoException;
+
+            if (nodeError.code === 'ENOENT') {
+              throw new InfrastructureError(
+                InfrastructureErrorCodes.FILE_NOT_FOUND,
+                `Directory not found: ${dirPath}`
+              );
+            }
+
+            if (nodeError.code === 'EACCES') {
+              throw new InfrastructureError(
+                InfrastructureErrorCodes.FILE_PERMISSION_ERROR,
+                `Permission denied: ${dirPath}`
+              );
+            }
+          }
+
           throw new InfrastructureError(
-            InfrastructureErrorCodes.FILE_NOT_FOUND,
-            `Directory not found: ${dirPath}`
+            InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
+            `Failed to list files: ${dirPath}`,
+            { originalError: error }
           );
         }
-
-        if (nodeError.code === 'EACCES') {
-          throw new InfrastructureError(
-            InfrastructureErrorCodes.FILE_PERMISSION_ERROR,
-            `Permission denied: ${dirPath}`
-          );
-        }
       }
-
-      throw new InfrastructureError(
-        InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
-        `Failed to list files: ${dirPath}`,
-        { originalError: error }
-      );
-    }
+    );
   }
 
   /**

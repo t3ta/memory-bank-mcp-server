@@ -9,6 +9,9 @@ import { InfrastructureError, InfrastructureErrorCodes } from "../../../shared/e
 import { logger } from "../../../shared/utils/logger.js";
 import { FileSystemTagIndexRepository } from "./FileSystemTagIndexRepositoryBase.js";
 
+// 並列処理の設定
+const CONCURRENCY_LIMIT = 5; // 同時に処理するドキュメント数の上限
+
 
 /**
  * Implementation of ITagIndexRepository interface methods
@@ -41,10 +44,37 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
       const documentPaths = await this.branchRepository.listDocuments(branchInfo);
       const documents: (MemoryDocument | JsonDocument)[] = [];
 
-      // Load all documents from the repository
-      for (const path of documentPaths) {
-        const document = await this.branchRepository.getDocument(branchInfo, path);
-        if (document) {
+      logger.info(`Found ${documentPaths.length} document paths in branch: ${branchInfo.name}`);
+
+      // バッチ処理で並列にドキュメントを読み込む
+      const processBatch = async (pathBatch: DocumentPath[]) => {
+        const batchPromises = pathBatch.map(async (path) => {
+          try {
+            const document = await this.branchRepository.getDocument(branchInfo, path);
+            if (document) {
+              return document;
+            }
+          } catch (error) {
+            logger.warn(`Error loading document ${path.value}: ${(error as Error).message}`);
+          }
+          return null;
+        });
+
+        const batchResults = await Promise.all(batchPromises);
+        // TypeScript workaround: use a standard filter with a type assertion
+        return batchResults.filter(doc => doc !== null) as Array<MemoryDocument | JsonDocument>;
+      };
+
+      // ドキュメントパスをバッチに分割して処理
+      const batches: DocumentPath[][] = [];
+      for (let i = 0; i < documentPaths.length; i += CONCURRENCY_LIMIT) {
+        batches.push(documentPaths.slice(i, i + CONCURRENCY_LIMIT));
+      }
+
+      // 各バッチを順次処理
+      for (const batch of batches) {
+        const batchDocuments = await processBatch(batch);
+        for (const document of batchDocuments) {
           documents.push(document);
           documentsMap.set(document.path.value, document);
         }
@@ -127,10 +157,37 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
       const documentPaths = await this.globalRepository.listDocuments();
       const documents: (MemoryDocument | JsonDocument)[] = [];
 
-      // Load all documents from the repository
-      for (const path of documentPaths) {
-        const document = await this.globalRepository.getDocument(path);
-        if (document) {
+      logger.info(`Found ${documentPaths.length} document paths in global memory bank`);
+
+      // バッチ処理で並列にドキュメントを読み込む
+      const processBatch = async (pathBatch: DocumentPath[]) => {
+        const batchPromises = pathBatch.map(async (path) => {
+          try {
+            const document = await this.globalRepository.getDocument(path);
+            if (document) {
+              return document;
+            }
+          } catch (error) {
+            logger.warn(`Error loading global document ${path.value}: ${(error as Error).message}`);
+          }
+          return null;
+        });
+
+        const batchResults = await Promise.all(batchPromises);
+        // TypeScript workaround: use a standard filter with a type assertion
+        return batchResults.filter(doc => doc !== null) as Array<MemoryDocument | JsonDocument>;
+      };
+
+      // ドキュメントパスをバッチに分割して処理
+      const batches: DocumentPath[][] = [];
+      for (let i = 0; i < documentPaths.length; i += CONCURRENCY_LIMIT) {
+        batches.push(documentPaths.slice(i, i + CONCURRENCY_LIMIT));
+      }
+
+      // 各バッチを順次処理
+      for (const batch of batches) {
+        const batchDocuments = await processBatch(batch);
+        for (const document of batchDocuments) {
           documents.push(document);
           documentsMap.set(document.path.value, document);
         }
