@@ -1,0 +1,50 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "cli-e2e-tests-active-context",
+    "title": "CLI E2E Tests Active Context",
+    "documentType": "active_context",
+    "path": "feature/add-cli-e2e-tests/activeContext.json",
+    "tags": [
+      "tests",
+      "e2e",
+      "cli",
+      "active"
+    ],
+    "lastModified": "2025-03-21T10:30:00Z",
+    "createdAt": "2025-03-21T10:00:00Z",
+    "version": 1
+  },
+  "content": {
+    "currentTask": "Set up the initial E2E test infrastructure for CLI testing",
+    "recentChanges": [
+      "Created branch feature/add-cli-e2e-tests",
+      "Created initial test strategy documentation",
+      "Added test:e2e script to package.json"
+    ],
+    "activeDecisions": [
+      "Use Jest as the test framework for E2E tests",
+      "Create a dedicated /tests/e2e directory structure",
+      "Implement tests that run the actual CLI executable",
+      "Use temporary directories for isolated test environments"
+    ],
+    "activeConsiderations": [
+      "How to ensure tests don't interfere with each other",
+      "How to capture CLI output (stdout, stderr) effectively",
+      "How to handle test data creation and cleanup",
+      "How to test both success and error scenarios consistently"
+    ],
+    "nextSteps": [
+      "Create the basic directory structure for E2E tests",
+      "Implement the CLI runner utility for executing commands",
+      "Set up test environment helpers for directory creation and cleanup",
+      "Implement a basic test to verify CLI startup functionality"
+    ],
+    "blockingIssues": [],
+    "resources": [
+      "Existing test utils in /tests/utils/",
+      "Jest documentation for testing Node.js applications",
+      "Existing CLI implementation in /src/cli/"
+    ]
+  }
+}

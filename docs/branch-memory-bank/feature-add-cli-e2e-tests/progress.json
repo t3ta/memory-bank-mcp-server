@@ -1,0 +1,113 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "cli-e2e-tests-progress",
+    "title": "CLI E2E Tests Progress",
+    "documentType": "progress",
+    "path": "feature/add-cli-e2e-tests/progress.json",
+    "tags": [
+      "tests",
+      "e2e",
+      "cli",
+      "progress"
+    ],
+    "lastModified": "2025-03-21T11:30:00Z",
+    "createdAt": "2025-03-21T10:00:00Z",
+    "version": 1
+  },
+  "content": {
+    "completed": [
+      {
+        "task": "Create branch for CLI E2E tests implementation",
+        "date": "2025-03-21T09:30:00Z",
+        "notes": "Created feature/add-cli-e2e-tests branch"
+      },
+      {
+        "task": "Add test:e2e script to package.json",
+        "date": "2025-03-21T09:45:00Z",
+        "notes": "Added script pointing to e2e test directory"
+      },
+      {
+        "task": "Create test plan documentation",
+        "date": "2025-03-21T10:30:00Z",
+        "notes": "Documented test strategy and implementation plan"
+      },
+      {
+        "task": "Set up base E2E test directory structure",
+        "date": "2025-03-21T14:00:00Z",
+        "notes": "Created directory structure for E2E tests"
+      },
+      {
+        "task": "Implement CLI runner utility",
+        "date": "2025-03-21T14:30:00Z",
+        "notes": "Created utilities for running CLI commands in tests"
+      },
+      {
+        "task": "Implement test environment helpers",
+        "date": "2025-03-21T15:00:00Z",
+        "notes": "Created helpers for test environment setup and teardown"
+      },
+      {
+        "task": "Implement basic CLI startup test",
+        "date": "2025-03-21T15:30:00Z",
+        "notes": "Created basic CLI functionality tests"
+      },
+      {
+        "task": "Implement global command tests",
+        "date": "2025-03-21T16:00:00Z",
+        "notes": "Created tests for read-global and write-global commands"
+      },
+      {
+        "task": "Implement JSON command tests",
+        "date": "2025-03-21T16:30:00Z",
+        "notes": "Created tests for json create and read commands"
+      }
+    ],
+    "inProgress": [],
+    "pending": [
+      {
+        "task": "Fix failing tests to match actual CLI behavior",
+        "priority": "Medium",
+        "dependencies": []
+      },
+      {
+        "task": "Implement utility command tests",
+        "priority": "Low",
+        "dependencies": [
+          "Fix failing tests to match actual CLI behavior"
+        ]
+      },
+      {
+        "task": "Implement migration command tests",
+        "priority": "Low",
+        "dependencies": [
+          "Fix failing tests to match actual CLI behavior"
+        ]
+      }
+    ],
+    "blockers": [],
+    "currentStatus": {
+      "phase": "Implementation",
+      "percentComplete": 70,
+      "nextMilestone": "Complete all CLI command tests",
+      "estimatedCompletion": "2025-03-28T17:00:00Z"
+    },
+    "knownIssues": [
+      {
+        "issue": "Some tests are failing due to mismatch between expected and actual CLI behavior",
+        "impact": "Medium",
+        "resolution": "Update tests to match actual behavior"
+      },
+      {
+        "issue": "JSON document handling tests are failing",
+        "impact": "Medium",
+        "resolution": "Investigate JSON implementation in CLI"
+      },
+      {
+        "issue": "Timeout in some command tests",
+        "impact": "Low",
+        "resolution": "Adjust timeout settings or fix commands that hang"
+      }
+    ]
+  }
+}

@@ -1,0 +1,148 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "cli-e2e-tests-system-patterns",
+    "title": "CLI E2E Tests System Patterns",
+    "documentType": "system_patterns",
+    "path": "feature/add-cli-e2e-tests/systemPatterns.json",
+    "tags": [
+      "tests",
+      "e2e",
+      "cli",
+      "architecture"
+    ],
+    "lastModified": "2025-03-21T11:00:00Z",
+    "createdAt": "2025-03-21T10:00:00Z",
+    "version": 1
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "decision": "Use child_process.spawn for CLI execution",
+        "rationale": "Allows for capturing stdout/stderr and exit codes, providing a real-world testing environment",
+        "alternatives": [
+          "Mock CLI execution",
+          "Use programmatic API instead of CLI"
+        ],
+        "implications": [
+          "Tests will be slower but more realistic",
+          "Need to handle process management"
+        ]
+      },
+      {
+        "decision": "Create isolated test directories for each test",
+        "rationale": "Prevents tests from interfering with each other and allows for clean environment setup",
+        "alternatives": [
+          "Shared test directory with cleanup between tests"
+        ],
+        "implications": [
+          "More complex setup/teardown logic",
+          "Better test isolation",
+          "Slower test execution"
+        ]
+      },
+      {
+        "decision": "Run tests sequentially",
+        "rationale": "Avoids potential race conditions and interference between tests that manipulate the filesystem",
+        "alternatives": [
+          "Parallel test execution with careful isolation"
+        ],
+        "implications": [
+          "Slower overall test execution",
+          "More reliable test results"
+        ]
+      },
+      {
+        "decision": "Use temporary directories that are cleaned up after tests",
+        "rationale": "Ensures tests don't leave behind artifacts that could affect subsequent test runs",
+        "alternatives": [
+          "Fixed test directories with manual cleanup"
+        ],
+        "implications": [
+          "Need robust cleanup mechanisms",
+          "More complex setup/teardown"
+        ]
+      }
+    ],
+    "fileStructure": {
+      "testDirectory": "/tests/e2e/",
+      "keyFiles": [
+        {
+          "path": "/tests/e2e/helpers/cli-runner.ts",
+          "purpose": "Utility for executing CLI commands and capturing their output"
+        },
+        {
+          "path": "/tests/e2e/helpers/setup.ts",
+          "purpose": "Functions for creating and cleaning up test environments"
+        },
+        {
+          "path": "/tests/e2e/helpers/test-utils.ts",
+          "purpose": "Common test utilities for creating test data, assertions, etc."
+        },
+        {
+          "path": "/tests/e2e/cli.test.ts",
+          "purpose": "Basic tests for CLI functionality"
+        },
+        {
+          "path": "/tests/e2e/commands/global/read-global.test.ts",
+          "purpose": "Tests for the read-global command"
+        },
+        {
+          "path": "/tests/e2e/commands/global/write-global.test.ts",
+          "purpose": "Tests for the write-global command"
+        }
+      ],
+      "directoryStructure": [
+        "/tests/e2e/helpers/",
+        "/tests/e2e/commands/global/",
+        "/tests/e2e/commands/json/",
+        "/tests/e2e/commands/utils/",
+        "/tests/e2e/commands/migration/"
+      ]
+    },
+    "dependencies": [
+      {
+        "name": "jest",
+        "usage": "Test framework for running the E2E tests"
+      },
+      {
+        "name": "child_process",
+        "usage": "Node.js module for spawning the CLI process"
+      },
+      {
+        "name": "fs-extra",
+        "usage": "File system operations with Promise support for test setup/teardown"
+      },
+      {
+        "name": "path",
+        "usage": "Path manipulation for working with file paths"
+      },
+      {
+        "name": "uuid",
+        "usage": "Generating unique identifiers for test directories"
+      }
+    ],
+    "testingPatterns": [
+      {
+        "pattern": "Temporary test directories",
+        "description": "Create unique temporary directories for each test to ensure isolation"
+      },
+      {
+        "pattern": "CLI process spawning",
+        "description": "Spawn actual CLI processes to test command execution in a real environment"
+      },
+      {
+        "pattern": "Output capture",
+        "description": "Capture stdout and stderr from CLI processes to verify output"
+      },
+      {
+        "pattern": "Filesystem verification",
+        "description": "Verify that files are created, modified, or deleted as expected"
+      },
+      {
+        "pattern": "Test environment cleanup",
+        "description": "Clean up all test artifacts after each test to prevent interference"
+      }
+    ]
+  }
+}
