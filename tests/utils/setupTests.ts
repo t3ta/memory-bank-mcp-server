@@ -1,3 +1,9 @@
+// FileSystemRetryUtils モックも追加
+jest.mock('../../src/infrastructure/repositories/file-system/FileSystemRetryUtils.js', () => ({
+  withFileSystemRetry: (operationName, fn) => fn(),
+  isRetryableError: () => false,
+}), { virtual: true });
+
 /**
  * Jest setup file for ESM environment
  * This file is executed before each test file
@@ -6,6 +12,16 @@
 // ESM-specific setup
 import { jest } from '@jest/globals';
 import { reset } from 'ts-mockito';
+
+// Logger モックをグローバルに定義
+jest.mock('../../src/shared/utils/logger.js', () => ({
+  logger: {
+    info: jest.fn(),
+    debug: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+}), { virtual: true });
 
 // Silence console logs during tests
 // global.console = {

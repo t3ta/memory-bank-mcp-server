@@ -26,6 +26,6 @@
   "metadata": {
     "lastUpdated": "2025-03-19T10:00:00.000Z",
     "author": "Team",
-    "tags": ["設計", "技術的負債", "リファクタリング", "統合テスト", "メモリバンク"]
+    "tags": ["design", "tech-debt", "refactoring", "integration-test", "memory-bank"]
   }
 }

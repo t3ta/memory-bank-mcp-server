@@ -34,6 +34,6 @@
   "metadata": {
     "lastUpdated": "2025-03-19T10:00:00.000Z",
     "author": "Team",
-    "tags": ["テスト", "TDD", "統合テスト", "品質保証", "コントローラー"]
+    "tags": ["test", "tdd", "integration-test", "qa", "controller"]
   }
 }

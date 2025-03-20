@@ -4,13 +4,6 @@ tags: #index #meta
 
 | タグ | 件数 | ドキュメント |
 |-----|------|-------------|
-| #-- | 1 | [json-global-design-issues.json](/json-global-design-issues.json) |
-| #--- | 1 | [integration-test-strategy.json](/integration-test-strategy.json) |
-| #---- | 1 | [integration-test-strategy.json](/integration-test-strategy.json) |
-| #----- | 3 | [integration-test-strategy.json](/integration-test-strategy.json), [json-global-design-issues.json](/json-global-design-issues.json), [json-global-design-issues.json](/json-global-design-issues.json) |
-| #------ | 1 | [json-global-design-issues.json](/json-global-design-issues.json) |
-| #------- | 1 | [integration-test-strategy.json](/integration-test-strategy.json) |
-| #-------- | 1 | [json-global-design-issues.json](/json-global-design-issues.json) |
 | #architecture | 11 | [architecture-decisions.json](/architecture-decisions.json), [アーキテクチャ決定記録](/architecture-decisions.md), [architecture.json](/architecture.json), [System Architecture](/architecture.md), [domain-models.json](/domain-models.json), [ドメインモデル](/domain-models.md), [e2e-to-integration-test-approach.json](/e2e-to-integration-test-approach.json), [E2E から Integration テストへの移行アプローチ](/e2e-to-integration-test-approach.md), [json-based-architecture.json](/json-based-architecture.json), [Memory Bank 2.0: JSON ベースアーキテクチャ詳細設計](/json-based-architecture.md), [v2.0-design-decisions.json](/v2.0-design-decisions.json) |
 | #automation | 2 | [ci-cd/workflows.json](/ci-cd/workflows.json), [CI/CD Workflows](/ci-cd/workflows.md) |
 | #best-practices | 2 | [coding-standards.json](/coding-standards.json), [Coding Standards](/coding-standards.md) |
@@ -52,7 +45,6 @@ tags: #index #meta
 | #standards | 2 | [coding-standards.json](/coding-standards.json), [Coding Standards](/coding-standards.md) |
 | #summary | 1 | [project-overview.json](/project-overview.json) |
 | #system-design | 2 | [architecture.json](/architecture.json), [System Architecture](/architecture.md) |
-| #tdd | 1 | [integration-test-strategy.json](/integration-test-strategy.json) |
 | #tech-stack | 2 | [tech-stack.json](/tech-stack.json), [Technology Stack](/tech-stack.md) |
 | #template | 2 | [template-system-json-i18n-design.json](/template-system-json-i18n-design.json), [テンプレートシステムのJSON化と多言語対応 - 設計仕様書](/template-system-json-i18n-design.md) |
 | #terminology | 2 | [glossary.json](/glossary.json), [Glossary](/glossary.md) |
