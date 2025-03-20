@@ -4,6 +4,7 @@ import type { TagIndex } from "../../../schemas/tag-index/tag-index-schema.js";
 import type { FileSystemService } from "../../storage/FileSystemService.js";
 import type { FileSystemBranchMemoryBankRepository } from "./FileSystemBranchMemoryBankRepository.js";
 import type { FileSystemGlobalMemoryBankRepository } from "./FileSystemGlobalMemoryBankRepository.js";
+import { logger } from "../../../shared/utils/logger.js";
 
 
 /**
@@ -11,6 +12,11 @@ import type { FileSystemGlobalMemoryBankRepository } from "./FileSystemGlobalMem
  * This class provides compatibility between the v2 tag index repository and the v1 format
  */
 export class FileSystemTagIndexRepositoryV1Bridge {
+  // キャッシュ管理
+  private branchIndexCache = new Map<string, TagIndex>();
+  private globalIndexCache: TagIndex | null = null;
+  private readonly CACHE_TTL_MS = 30000; // 30秒キャッシュを保持
+
   /**
    * Constructor
    * @param fileSystemService File system service
@@ -34,6 +40,9 @@ export class FileSystemTagIndexRepositoryV1Bridge {
    * @returns Promise resolving when done
    */
   async saveBranchTagIndex(branchInfo: BranchInfo, tagIndex: TagIndex): Promise<void> {
+    // キャッシュに保存
+    this.branchIndexCache.set(branchInfo.safeName, tagIndex);
+    logger.debug(`Saved branch tag index to cache: ${branchInfo.name}`);
     return this.branchRepository.saveTagIndex(branchInfo, tagIndex);
   }
 
@@ -43,7 +52,19 @@ export class FileSystemTagIndexRepositoryV1Bridge {
    * @returns Promise resolving to tag index if found, null otherwise
    */
   async getBranchTagIndex(branchInfo: BranchInfo): Promise<TagIndex | null> {
-    return this.branchRepository.getTagIndex(branchInfo);
+    // キャッシュチェック
+    const cachedIndex = this.branchIndexCache.get(branchInfo.safeName);
+    if (cachedIndex) {
+      logger.debug(`Using cached branch tag index for ${branchInfo.name}`);
+      return cachedIndex;
+    }
+
+    const index = await this.branchRepository.getTagIndex(branchInfo);
+    if (index) {
+      this.branchIndexCache.set(branchInfo.safeName, index);
+      logger.debug(`Loaded and cached branch tag index for ${branchInfo.name}`);
+    }
+    return index;
   }
 
   /**
@@ -52,6 +73,9 @@ export class FileSystemTagIndexRepositoryV1Bridge {
    * @returns Promise resolving when done
    */
   async saveGlobalTagIndex(tagIndex: TagIndex): Promise<void> {
+    // キャッシュに保存
+    this.globalIndexCache = tagIndex;
+    logger.debug(`Saved global tag index to cache`);
     return this.globalRepository.saveTagIndex(tagIndex);
   }
 
@@ -60,7 +84,18 @@ export class FileSystemTagIndexRepositoryV1Bridge {
    * @returns Promise resolving to tag index if found, null otherwise
    */
   async getGlobalTagIndex(): Promise<TagIndex | null> {
-    return this.globalRepository.getTagIndex();
+    // キャッシュチェック
+    if (this.globalIndexCache) {
+      logger.debug(`Using cached global tag index`);
+      return this.globalIndexCache;
+    }
+
+    const index = await this.globalRepository.getTagIndex();
+    if (index) {
+      this.globalIndexCache = index;
+      logger.debug(`Loaded and cached global tag index`);
+    }
+    return index;
   }
 
   /**
