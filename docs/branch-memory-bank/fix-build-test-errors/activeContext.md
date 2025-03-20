@@ -1,4 +1,4 @@
-# 現在の作業状況
+# アクティブコンテキスト
 
 ## 現在の作業内容
 
@@ -8,21 +8,24 @@ TypeScript 5.8.2バージョンアップデートに伴うビルドエラーと�
 2. テストコードの型エラー解決
 3. 未使用変数/インポートの修正
 4. モックオブジェクトの型付け強化
+5. 重複する型インポートの解決（ドメイン層とスキーマ層）
+6. migration関連ファイルの型エラー修正
 
 ## 最近の変更点
 
 - **TypeScriptバージョン更新**: package.jsonでTypeScriptを5.8.2に更新
-- **アプリケーションレイヤーの修正**: 
-  - common/usecase内のすべてのファイルのインポートパス修正
-  - branch/usecase内のファイルのインポートパス修正
-  - global/usecase内のファイルのインポートパス修正
-  - json/usecaseインデックスファイルの修正
-- **テストファイルの修正**: 
-  - error-handling.testの型安全対応
-  - テスト用のmarkdown-converterモジュール実装
-  - context-controller.testの未使用関数削除
-  - SimpleGlobalMemoryBankRepositoryとSimpleBranchMemoryBankRepositoryの未使用変数修正
-  - JsonTemplateLoader.testのモックオブジェクト型付け強化
+- **アプリケーションレイヤーの修正**:
+  - `WriteGlobalDocumentUseCase.ts`: 重複する`MemoryDocument`インポートを削除
+  - `WriteJsonDocumentUseCase.ts`: 重複する`JsonDocument`インポートを解決
+  - `ReadJsonDocumentUseCase.ts`: 適切な型インポートに修正
+  - `SearchJsonDocumentsUseCase.ts`: `DocumentType`を明示的にインポート
+  - `UpdateJsonIndexUseCase.ts`: 適切な型インポートを追加
+- **Migration関連ファイルの修正**:
+  - `SystemPatternsConverter.ts`: 重複する`JsonDocument`インポートを解決し、`uuid`を追加
+  - `ConverterFactory.ts`: `DocumentType`を明示的にインポート
+  - `markdown-parser.ts`: スキーマのv2フィールドに対応するよう型を拡張
+- **メインファイルの修正**:
+  - `main/index.ts`: `Constants`のインポートを`import type`から通常の`import`に変更
 
 ## アクティブな決定事項
 
@@ -30,18 +33,20 @@ TypeScript 5.8.2バージョンアップデートに伴うビルドエラーと�
 - **未使用コードの整理**: 使用されていない変数や関数を削除または修正する
 - **モック型付けの強化**: モックオブジェクトには具体的な型を提供し、型エラーを防止する
 - **テスト用環境の整備**: 必要なテスト用モジュールを作成して、テスト実行の安定性を向上させる
+- **型インポートの整理**: 同名の型が複数の場所からインポートされている場合は、重複を排除。クラスとしても使用する場合は`import type`ではなく通常の`import`を使用する
+- **拡張フィールドの型対応**: v2スキーマで追加されたフィールド（id, createdAt, version）を既存の型定義に追加する
 
 ## 検討事項
 
-- **migration関連ファイルの扱い**: migration関連のファイルが多数のエラーを発生させているため、どう対処するか検討が必要
+- **FileSystemリポジトリの型問題**: リポジトリの実装が正しいインターフェースを満たしていない問題をどう解決するか
 - **テスト間の依存問題**: テスト間で依存関係があり、順序に依存するテストが存在する可能性がある
 - **未使用コードの検出方法**: TypeScriptの型チェッカーで検出される未使用コードを体系的に特定する方法
+- **型定義の整理**: ドメイン層の実装クラスとスキーマ層の型定義が混在していることによる問題への対応
+- **ドメインエンティティとリポジトリの整合性**: リポジトリインターフェースが返す型とドメインエンティティの整合性を保証する方法
 
 ## 次のステップ
 
-1. migration関連のインポートパス修正
-2. interface, domain, infrastructureレイヤーのインポートパス修正
-3. Json関連の未使用コード修正
-4. テスト用モジュールのインポートパス修正
-5. 最終的なビルドとテスト実行による検証
-6. コミット準備と変更内容のまとめ
+1. `FileSystemBranchMemoryBankRepository`などのリポジトリ実装の型問題を解決する
+2. インターフェース層のコントローラーの型エラー解決
+3. インフラストラクチャ層の他のファイルを修正
+4. 残りのエラーを一つずつ解決していく

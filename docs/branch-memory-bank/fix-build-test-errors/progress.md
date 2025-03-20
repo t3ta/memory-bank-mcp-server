@@ -1,31 +1,31 @@
-# ビルドエラーとテストエラーの修正に関する進捗状況
+# 進捗状況
 
-## 実装済みの機能
+## 動作している機能
 
-- TypeScript 5.8.2へのバージョン更新完了
-- applicationレイヤーのインポートパス修正 (.js拡張子追加)
-  - common/ ディレクトリ内のすべてのインポートパス修正
-  - branch/ ディレクトリ内のすべてのインポートパス修正
-  - global/ ディレクトリ内のすべてのインポートパス修正
-  - JSON関連のインポートインデックス修正
-- テスト統合に関するエラー修正
-  - error-handling.test.tsのany型エラー修正
-  - context-controller.test.tsの未使用変数削除
-  - global-controller.test.tsの未使用インポート削除
-  - json-global-controller.test.tsの未使用インポート削除
-  - JsonDocument.test.tsの未使用インポート削除
-  - JsonTemplateLoader.test.tsのモックオブジェクト型付け修正
-  - テスト用のマークダウンコンバーターモジュール実装
-- ESLintの設定と依存関係修正
-  - ESLintプラグインのインストール（eslint-plugin-import, @typescript-eslint/eslint-plugin, @typescript-eslint/parser, globals）
-  - requireからdynamic importへの移行（循環参照問題の解決）
-  - lintコマンドのエラー出力を調整
-  - TypeScriptファイル・テストファイル向けの特化したルールセット作成
+- **基本的なビルドの修正**:
+  - `WriteGlobalDocumentUseCase.ts` の重複する型インポートの解決
+  - `WriteJsonDocumentUseCase.ts` の型インポート問題の解決
+  - `ReadJsonDocumentUseCase.ts` のスキーマからのインポートを削除
+  - `SearchJsonDocumentsUseCase.ts` の `DocumentType` インポート追加
+  - `UpdateJsonIndexUseCase.ts` の型インポート追加
+- **Migration関連ファイルの修正**:
+  - `SystemPatternsConverter.ts` の重複インポート解決と `uuid` 追加
+  - `ConverterFactory.ts` の `DocumentType` 明示的インポート
+  - `markdown-parser.ts` のスキーマv2フィールド対応
+- **メインファイルの修正**:
+  - `main/index.ts` の `Constants` インポート修正
 
 ## 未実装の機能
 
-- migration関連のインポートパスの修正
+- FileSystemリポジトリ実装の型エラー修正
+  - `FileSystemBranchMemoryBankRepository.ts`
+  - `FileSystemGlobalMemoryBankRepository.ts`
+  - `FileSystemJsonDocumentRepository.ts`
+  - `FileSystemMemoryDocumentRepository.ts`
 - interfaceレイヤーのインポートパス修正
+  - `BranchController.ts`
+  - `GlobalController.ts`
+  - コントローラーインターフェースの修正
 - domainレイヤーのインポートパス修正
 - infrastructureレイヤーのインポートパス修正
 - Json関連のDomainErrorCodesの未使用警告修正
@@ -33,48 +33,33 @@
 
 ## 現在の状態
 
-TypeScript 5.8.2のビルドおよびテストエラーの一部を修正しました。主に以下の変更を行いました：
+TypeScript 5.8.2のビルドおよびテストエラーの修正を進めています。アプリケーション層とmigration関連の型エラーの一部を解決しました：
 
-1. **インポートパスの修正**:
-   - ESモジュール方式に対応するため、インポートパスに.js拡張子を追加
-   - applicationレイヤーの主要なユースケースクラスのインポートパス修正完了
+1. **型の衝突解決**:
+   - 同名の型が複数の場所（ドメイン層とスキーマ層）からインポートされていた問題を修正
+   - `WriteGlobalDocumentUseCase.ts` で重複インポートを削除
+   - `WriteJsonDocumentUseCase.ts` で適切なクラスインポートを使用
+   - `SystemPatternsConverter.ts` の重複する `JsonDocument` 型のインポートを削除
 
-2. **テストの問題修正**:
-   - 未使用変数/インポートの削除
-   - any型エラーの解決と型安全なコード作成
-   - モックオブジェクトの型付け修正
-   - 不足しているテスト用モジュールの作成
+2. **Missing type/import修正**:
+   - `ConverterFactory.ts` に `DocumentType` 型を明示的にインポート
+   - `SystemPatternsConverter.ts` に `uuidv4` をインポート
+   - `markdown-parser.ts` の型定義をv2スキーマフィールドに対応
+   - `main/index.ts` の `Constants` インポートを修正
 
-3. **バージョン更新**:
-   - package.jsonのTypeScriptバージョンを5.8.2に更新
-   - 関連するJest設定の調整
-
-4. **ESLint設定の再構築**:
-   - ESLintの設定ファイル（eslint.config.js）の完全な再構築
-   - 適切なTypeScriptサポートと正しいプラグイン設定
-   - srcディレクトリとtestsディレクトリで異なるルールを適用
-   - Node.jsの型定義に関する問題解決
-   - 未使用変数の警告を柔軟に設定（アンダースコアプレフィックスで抑制可能）
-   - 警告とエラーの分離によるCIパイプライン対策
-
-5. **コード修正**:
-   - src/shared/utils/json-to-markdown/index.tsでのrequire文をdynamic importに置き換え
-   - NodeJS型定義に関する対応
-
-現在のビルド状態は改善されており、`yarn lint`コマンドは警告は表示するものの正常に完了するようになりました。しかし、まだ複数のエラーが残っています。特にmigration関連のモジュールと一部のテストファイルにエラーが残存しています。また、まだすべてのインポートパスが更新されていないため、ビルドとテストの完全な成功には至っていません。
-
-## 次のステップ
-
-1. migration関連のインポートパス修正
-2. 残りのレイヤー（interface, domain, infrastructure）のインポートパス修正
-3. Json関連の未使用コード問題の解決
-4. テスト用モジュールのインポートパス修正
-5. ビルドとテストの再実行による検証
-6. 最終的なコミット準備
+3. **現在のビルド状態**:
+   - エラーは165個に減少（当初180以上）
+   - 39ファイルにまだエラーが残存
+   - 主にリポジトリの実装がインターフェースの型を満たしていない問題が残っている
 
 ## 既知の問題
 
-- migration関連のモジュールのインポートパス未修正
+- FileSystemリポジトリの型互換性問題:
+  ```
+  Argument of type 'FileSystemBranchMemoryBankRepository' is not assignable to parameter of type 'IBranchMemoryBankRepository'.
+  The types returned by 'getDocument(...)' are incompatible between these types.
+  Type 'Promise<{ path?: string; tags?: string[]; lastModified?: Date; content?: string; }>' is not assignable to type 'Promise<MemoryDocument>'.
+  ```
 - 一部のモックオブジェクトの型定義が不完全
 - skippedテストの扱いが未解決
 - テスト間の依存関係による不安定性
