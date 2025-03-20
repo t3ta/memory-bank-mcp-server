@@ -1,75 +1,57 @@
 {
   "schema": "memory_document_v2",
   "metadata": {
-    "id": "3690e91d-b175-40f8-a774-c133aa61032a",
-    "title": "Memory Bank MCP Server: E2E Test Implementation",
-    "documentType": "generic",
-    "path": "e2e-test-implementation.md",
-    "tags": [],
-    "lastModified": "2025-03-18T11:34:46.943Z",
-    "createdAt": "2025-03-18T11:34:46.943Z",
+    "id": "e2e-test-implementation",
+    "title": "E2E Test Implementation Guide",
+    "documentType": "guide",
+    "path": "e2e-test-implementation.json",
+    "tags": [
+      "testing",
+      "e2e",
+      "cli",
+      "implementation"
+    ],
+    "lastModified": "2025-03-21T10:00:00.000Z",
+    "createdAt": "2025-03-21T10:00:00.000Z",
     "version": 1
   },
   "content": {
-    "implementation_overview": "The E2E test implementation for the Memory Bank MCP Server is now complete, following the strategy outlined in the [E2E Test Strategy](./e2e-test-strategy.md) document. The implementation provides comprehensive test coverage for all MCP tools and includes proper error handling and edge case testing.\n",
-    "implementation_structure": [
-      "The E2E test suite is organized according to the four-phase approach defined in the strategy:",
-      "**Setup Module**: `tests/e2e/setup.ts`",
-      "Creates isolated test environments",
-      "Handles test directory setup and cleanup",
-      "Provides utility functions for test file generation",
-      "**Server Management**: `tests/e2e/helpers/test-server.ts`",
-      "Controls server startup and shutdown",
-      "Manages server processes",
-      "Handles server output monitoring",
-      "**Client Operations**: `tests/e2e/helpers/mcp-client.ts`",
-      "Provides wrapper methods for all MCP tools",
-      "Manages client connections",
-      "Handles error detection and propagation",
-      "**Test Utilities**: `tests/e2e/helpers/test-utils.ts`",
-      "Content generation helpers",
-      "Response extraction utilities",
-      "Branch and directory creation helpers",
-      "**Tool Enumeration**: `tests/e2e/tools/list-tools.test.ts`",
-      "Verifies all tools are available",
-      "Validates tool schemas",
-      "Tests consistency of responses",
-      "**Branch Memory Operations**: `tests/e2e/tools/branch-memory.test.ts`",
-      "Read/write document tests",
-      "Nested path support",
-      "Content type handling",
-      "Multi-branch tests",
-      "**Global Memory Operations**: `tests/e2e/tools/global-memory.test.ts`",
-      "Read/write document tests",
-      "Nested path support",
-      "Content type handling",
-      "Isolation from branch memory",
-      "**Rules Retrieval**: `tests/e2e/tools/read-rules.test.ts`",
-      "Multi-language support",
-      "Structure validation",
-      "Error handling for invalid languages",
-      "**Branch History**: `tests/e2e/tools/recent-branches.test.ts`",
-      "Recent branch listing",
-      "Limit parameter tests",
-      "Timestamp ordering verification",
-      "**Context Aggregation**: `tests/e2e/tools/read-context.test.ts`",
-      "Full context retrieval",
-      "Selective component retrieval",
-      "Parameter validation",
-      "**Parameter Validation**: `tests/e2e/error-handling/invalid-params.test.ts`",
-      "Missing required parameters",
-      "Invalid parameter types",
-      "Invalid tool names",
-      "**Missing Resources**: `tests/e2e/error-handling/missing-resources.test.ts`",
-      "Non-existent branches",
-      "Non-existent documents",
-      "Path validation",
-      "**Concurrent Access**: `tests/e2e/error-handling/concurrent-access.test.ts`",
-      "Simultaneous writes",
-      "Concurrent reads and writes",
-      "Cross-resource operations"
-    ],
-    "test_execution": "To run the E2E tests:\n```bash\nnpm test -- tests/e2e\nnpm test -- tests/e2e/tools\nnpm test -- tests/e2e/tools/list-tools.test.ts\n```\n",
-    "considerations_for_future_enhancement": "1. **Performance Testing**: Add tests that measure response times under load\n2. **Stress Testing**: Validate system stability with extended operations\n3. **Security Testing**: Add tests for proper authorization and access controls\n4. **Upgrade Testing**: Ensure backward compatibility during version upgrades\n5. **Snapshot Testing**: Compare responses against known good snapshots\n6. **Monitoring Integration**: Add tests that validate monitoring capabilities"
+    "sections": [
+      {
+        "id": "introduction",
+        "title": "Introduction",
+        "content": "This document outlines the implementation approach for end-to-end (E2E) tests in the Memory Bank CLI."
+      },
+      {
+        "id": "test_structure",
+        "title": "Test Structure",
+        "content": "E2E tests for the CLI are organized by command category. Each command has its own test file and is located in the appropriate subdirectory under `tests/e2e/commands/`.\n\nFor example:\n- `tests/e2e/commands/branch/read-branch.test.ts` - Tests for the read-branch command\n- `tests/e2e/commands/global/read-global.test.ts` - Tests for the read-global command\n- `tests/e2e/commands/context/read-context.test.ts` - Tests for the read-context command"
+      },
+      {
+        "id": "helper_utilities",
+        "title": "Helper Utilities",
+        "content": "Several helper utilities are available in the `tests/e2e/helpers/` directory to make E2E testing easier:\n\n1. `cli-runner.ts` - Provides utilities for executing CLI commands in tests\n2. `setup.ts` - Functions for creating test directories and files\n3. `test-utils.ts` - Assertion utilities and other test helpers"
+      },
+      {
+        "id": "test_pattern",
+        "title": "Test Pattern",
+        "content": "E2E tests typically follow this pattern:\n\n1. **Setup**: Create temporary test directories and files\n2. **Execute**: Run the CLI command with various arguments\n3. **Assert**: Verify the command output and effects\n4. **Cleanup**: Remove temporary test directories"
+      },
+      {
+        "id": "best_practices",
+        "title": "Best Practices",
+        "content": "When implementing E2E tests, follow these best practices:\n\n1. Test both success and failure cases\n2. Test with different option combinations\n3. Verify command output format (JSON vs. pretty/text)\n4. Check for correct exit codes (0 for success, non-zero for failure)\n5. Use a clean test environment for each test case\n6. Use the provided helper utilities where possible\n7. Make test descriptions clear and specific"
+      },
+      {
+        "id": "recent_updates",
+        "title": "Recent Updates",
+        "content": "Recent changes to the E2E test implementation:\n\n1. Added support for JSON document tests\n2. Implemented tests for context-related commands\n3. Updated ReadRulesUseCase to read from JSON templates instead of Markdown files\n4. Created helper utilities for testing JSON documents"
+      },
+      {
+        "id": "command_categories",
+        "title": "Command Categories",
+        "content": "The CLI commands are organized into these categories:\n\n1. **Branch Commands** - Operations on branch memory bank\n2. **Global Commands** - Operations on global memory bank\n3. **JSON Commands** - Operations specific to JSON documents\n4. **Context Commands** - Reading rules and context information\n5. **Utility Commands** - Misc. utilities like recent-branches\n6. **Migration Commands** - Commands for migrating between formats"
+      }
+    ]
   }
 }

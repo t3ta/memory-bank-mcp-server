@@ -1,9 +1,9 @@
 // Import dependencies
 import { setupContainer } from './di/providers.js';
 import { logger } from '../shared/utils/logger.js';
-// Interfaces can be imported as types
 import { IGlobalController } from '../interface/controllers/interfaces/IGlobalController.js';
 import { IBranchController } from '../interface/controllers/interfaces/IBranchController.js';
+import { IContextController } from '../interface/controllers/interfaces/IContextController.js';
 import { CliOptions } from '../infrastructure/config/WorkspaceConfig.js';
 import { Constants } from './config/constants.js';
 
@@ -15,6 +15,7 @@ class Application {
   private readonly options: CliOptions;
   private globalController?: IGlobalController;
   private branchController?: IBranchController;
+  private contextController?: IContextController;
 
   /**
    * Constructor
@@ -39,6 +40,7 @@ class Application {
       // Cast the result instead of using generic parameters
       this.globalController = container.get('globalController') as IGlobalController;
       this.branchController = container.get('branchController') as IBranchController;
+      this.contextController = container.get('contextController') as IContextController;
 
       logger.info('Application initialized successfully');
     } catch (error) {
@@ -71,7 +73,17 @@ class Application {
     return this.branchController;
   }
 
-  // getPullRequestTool method removed
+  /**
+   * Get context controller
+   * @returns Context controller
+   */
+  getContextController(): IContextController {
+    if (!this.contextController) {
+      throw new Error('Application not initialized. Call initialize() first.');
+    }
+
+    return this.contextController;
+  }
 }
 
 // Export as ESM
