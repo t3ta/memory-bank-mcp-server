@@ -175,8 +175,9 @@ describe('JsonGlobalController Integration Tests', () => {
 
     // 失敗結果の検証
     expect(readResult.success).toBe(false);
-    if ('error' in readResult) {
-      expect(readResult.error).toBeDefined();
+    if (!readResult.success) {
+      const errorResponse = readResult as { success: false, error: { code: string, message: string } };
+      expect(errorResponse.error).toBeDefined();
     } else {
       fail('存在しないJSONドキュメントの読み込みが成功してしまいました');
     }
@@ -202,7 +203,7 @@ describe('JsonGlobalController Integration Tests', () => {
     expect(writeResult).toBeDefined();
     
     // 成功の場合は内容の確認を行う
-    if (writeResult.success && 'data' in writeResult) {
+    if (writeResult.success) {
       expect(writeResult.data.document).toBeDefined();
       expect(writeResult.data.document.id).toBeDefined();
       expect(writeResult.data.document.path).toBe(docPath);
@@ -219,7 +220,7 @@ describe('JsonGlobalController Integration Tests', () => {
     expect(readResult).toBeDefined();
     
     // 成功の場合は内容の確認を行う
-    if (readResult.success && 'data' in readResult) {
+    if (readResult.success) {
       expect(readResult.data.id).toBeDefined();
       expect(readResult.data.path).toBe(docPath);
       expect(readResult.data.title).toBe(docTitle);
@@ -463,8 +464,9 @@ describe('JsonGlobalController Integration Tests', () => {
 
     // バリデーションエラーの検証
     expect(writeResultNoTitle.success).toBe(false);
-    if ('error' in writeResultNoTitle) {
-      expect(writeResultNoTitle.error.code).toContain('VALIDATION_ERROR');
+    if (!writeResultNoTitle.success) {
+      const errorResponse = writeResultNoTitle as { success: false, error: { code: string, message: string } };
+      expect(errorResponse.error.code).toContain('VALIDATION_ERROR');
     } else {
       fail('タイトルなしのドキュメント作成でエラーが発生しませんでした');
     }
@@ -479,8 +481,9 @@ describe('JsonGlobalController Integration Tests', () => {
 
     // バリデーションエラーの検証
     expect(writeResultNoType.success).toBe(false);
-    if ('error' in writeResultNoType) {
-      expect(writeResultNoType.error.code).toContain('VALIDATION_ERROR');
+    if (!writeResultNoType.success) {
+      const errorResponse = writeResultNoType as { success: false, error: { code: string, message: string } };
+      expect(errorResponse.error.code).toContain('VALIDATION_ERROR');
     } else {
       fail('タイプなしのドキュメント作成でエラーが発生しませんでした');
     }
@@ -495,8 +498,9 @@ describe('JsonGlobalController Integration Tests', () => {
 
     // バリデーションエラーの検証
     expect(writeResultNoContent.success).toBe(false);
-    if ('error' in writeResultNoContent) {
-      expect(writeResultNoContent.error.code).toContain('VALIDATION_ERROR');
+    if (!writeResultNoContent.success) {
+      const errorResponse = writeResultNoContent as { success: false, error: { code: string, message: string } };
+      expect(errorResponse.error.code).toContain('VALIDATION_ERROR');
     } else {
       fail('コンテンツなしのドキュメント作成でエラーが発生しませんでした');
     }
@@ -508,10 +512,11 @@ describe('JsonGlobalController Integration Tests', () => {
 
     // エラー結果の検証
     expect(deleteResult.success).toBe(false);
-    if ('error' in deleteResult) {
+    if (!deleteResult.success) {
       // 実装にはエラーコードが異なる可能性があるので、コードごとのチェックは行わず存在だけを確認
-      expect(deleteResult.error).toBeDefined();
-      expect(deleteResult.error.message).toContain('must be provided');
+      const errorResponse = deleteResult as { success: false, error: { code: string, message: string } };
+      expect(errorResponse.error).toBeDefined();
+      expect(errorResponse.error.message).toContain('must be provided');
     } else {
       fail('パスやIDを指定せずに削除してもエラーが発生しませんでした');
     }
@@ -534,7 +539,7 @@ describe('JsonGlobalController Integration Tests', () => {
     expect(listResult).toBeDefined();
     
     // 成功の場合は中身の確認を行う
-    if (listResult.success && 'data' in listResult) {
+    if (listResult.success) {
       expect(Array.isArray(listResult.data)).toBe(true);
       // テスト用ドキュメントが含まれているか確認
       if (listResult.data.length > 0) {
@@ -547,9 +552,10 @@ describe('JsonGlobalController Integration Tests', () => {
       }
     }
     // エラーの場合はエラーコードの存在を確認
-    else if ('error' in listResult) {
-      expect(listResult.error).toBeDefined();
-      console.log(`リストエラー: ${listResult.error.code} - ${listResult.error.message}`);
+    else {
+      const errorResponse = listResult as { success: false, error: { code: string, message: string } };
+      expect(errorResponse.error).toBeDefined();
+      console.log(`リストエラー: ${errorResponse.error.code} - ${errorResponse.error.message}`);
     }
   });
 
@@ -608,7 +614,7 @@ describe('JsonGlobalController Integration Tests', () => {
     expect(validSearchResult).toBeDefined();
     
     // 成功の場合は中身の確認を行う
-    if (validSearchResult.success && 'data' in validSearchResult) {
+    if (validSearchResult.success) {
       expect(Array.isArray(validSearchResult.data)).toBe(true);
       // テスト用ドキュメントが含まれているか確認
       if (validSearchResult.data.length > 0) {
@@ -617,9 +623,10 @@ describe('JsonGlobalController Integration Tests', () => {
       }
     }
     // エラーの場合はエラーコードの存在を確認
-    else if ('error' in validSearchResult) {
-      expect(validSearchResult.error).toBeDefined();
-      console.log(`検索エラー: ${validSearchResult.error.code} - ${validSearchResult.error.message}`);
+    else {
+      const errorResponse = validSearchResult as { success: false, error: { code: string, message: string } };
+      expect(errorResponse.error).toBeDefined();
+      console.log(`検索エラー: ${errorResponse.error.code} - ${errorResponse.error.message}`);
     }
   });
 });

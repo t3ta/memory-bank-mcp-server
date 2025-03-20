@@ -192,8 +192,9 @@ describe('GlobalController Integration Tests', () => {
 
     // 書き込み結果の検証
     expect(writeResult.success).toBe(true);
-    if ('error' in writeResult) {
-      expect(writeResult.error).toBeDefined();
+    if (!writeResult.success) {
+      const errorResponse = writeResult as { success: false, error: { code: string, message: string } };
+      expect(errorResponse.error).toBeDefined();
     } else {
       expect('error' in writeResult).toBe(false);
     }
@@ -212,7 +213,7 @@ describe('GlobalController Integration Tests', () => {
 
     // 読み込み結果の検証
     expect(readResult.success).toBe(true);
-    if ('data' in readResult) {
+    if (readResult.success) {
       expect(readResult.data.content).toEqual(content);
     } else {
       fail('読み込みが成功するはずが失敗しました');
@@ -228,8 +229,9 @@ describe('GlobalController Integration Tests', () => {
 
     // 失敗結果の検証
     expect(readResult.success).toBe(false);
-    if ('error' in readResult) {
-      expect(readResult.error).toBeDefined();
+    if (!readResult.success) {
+      const errorResponse = readResult as { success: false, error: { code: string, message: string } };
+      expect(errorResponse.error).toBeDefined();
     } else {
       fail('存在しないファイルの読み込みが成功してしまいました');
     }
@@ -261,7 +263,7 @@ describe('GlobalController Integration Tests', () => {
     // 読み込み結果の検証
     expect(readResult.success).toBe(true);
 
-    if ('data' in readResult) {
+    if (readResult.success) {
       expect(readResult.data.content).toEqual(content);
 
       // JSONとして解析できることを確認

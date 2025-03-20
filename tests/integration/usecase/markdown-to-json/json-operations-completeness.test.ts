@@ -78,6 +78,7 @@ describe('JSON Operations Completeness Integration Tests', () => {
     globalRepository = new FileSystemGlobalMemoryBankRepository(fileSystemService, configProvider);
 
     // Create mock TagRepository
+    let tagRepository: MockTagRepository;
     class MockTagRepository extends FileSystemTagIndexRepositoryImpl {
       constructor() {
         super(fileSystemService, testDir, testDir, repository, globalRepository);

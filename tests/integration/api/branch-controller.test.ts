@@ -177,8 +177,9 @@ describe('BranchController Integration Tests', () => {
     // 書き込み結果の検証
     console.log('Test - Write result:', JSON.stringify(writeResult, null, 2));
     // エラーがあれば詳細情報を表示
-    if (!writeResult.success && 'error' in writeResult) {
-      console.error('Test - Error details:', writeResult.error);
+    if (!writeResult.success) {
+      const errorResponse = writeResult as { success: false, error: { code: string, message: string } };
+      console.error('Test - Error details:', errorResponse.error);
     }
     console.log('Test - Branch name:', testBranch);
     console.log('Test - Document path:', docPath);
@@ -228,15 +229,16 @@ describe('BranchController Integration Tests', () => {
     const readResult = await controller.readDocument(testBranch, docPath);
 
     // エラー詳細の表示
-    if (!readResult.success && 'error' in readResult) {
-      console.log('Test - Read error:', JSON.stringify(readResult.error, null, 2));
-    } else if (readResult.success && 'data' in readResult) {
+    if (!readResult.success) {
+      const errorResponse = readResult as { success: false, error: { code: string, message: string } };
+      console.log('Test - Read error:', JSON.stringify(errorResponse.error, null, 2));
+    } else {
       console.log('Test - Read result:', JSON.stringify(readResult.data, null, 2));
     }
 
     // 読み込み結果の検証
     expect(readResult.success).toBe(true);
-    if (readResult.success && 'data' in readResult) {
+    if (readResult.success) {
       // readResult.data.contentがオブジェクト、JSON文字列、テキストのどれか判定
       console.log('Read content type:', typeof readResult.data.content);
       console.log('Read content:', readResult.data.content);
@@ -278,8 +280,9 @@ describe('BranchController Integration Tests', () => {
 
     // 失敗結果の検証
     expect(readResult.success).toBe(false);
-    if (!readResult.success && 'error' in readResult) {
-      expect(readResult.error).toBeDefined();
+    if (!readResult.success) {
+      const errorResponse = readResult as { success: false, error: { code: string, message: string } };
+      expect(errorResponse.error).toBeDefined();
     }
   });
 
@@ -293,8 +296,9 @@ describe('BranchController Integration Tests', () => {
 
     // 失敗結果の検証
     expect(readResult.success).toBe(false);
-    if (!readResult.success && 'error' in readResult) {
-      expect(readResult.error).toBeDefined();
+    if (!readResult.success) {
+      const errorResponse = readResult as { success: false, error: { code: string, message: string } };
+      expect(errorResponse.error).toBeDefined();
     }
   });
 
@@ -454,8 +458,9 @@ describe('BranchController Integration Tests', () => {
       const writeResult = await controller.writeDocument(testBranch, `${key}.json`, content);
       expect(writeResult.success).toBe(true);
       if (!writeResult.success) {
-        console.error(`Failed to write ${key}.json:`, writeResult.error);
-      }
+      const errorResponse = writeResult as { success: false, error: { code: string, message: string } };
+        console.error(`Failed to write ${key}.json:`, errorResponse.error);
+        }
     }
 
     // Read core files
@@ -473,12 +478,13 @@ describe('BranchController Integration Tests', () => {
       // Verify content structure is preserved (for at least one file)
       // Extract content for better type safety
       if (typeof readResult.data.activeContext === 'object' && readResult.data.activeContext !== null) {
-        const activeContent = readResult.data.activeContext.content;
-        if (typeof activeContent === 'object' && activeContent !== null) {
+        const activeContentObj = readResult.data.activeContext.content;
+        if (typeof activeContentObj === 'object' && activeContentObj !== null) {
           // Now safely check properties
-          expect(Object.keys(activeContent)).toContain('currentWork');
+          expect(Object.keys(activeContentObj)).toContain('currentWork');
           // Extra safety check: Check specific content value if it exists
-          if ('currentWork' in activeContent) {
+          const activeContent = activeContentObj as any;
+          if (activeContent && 'currentWork' in activeContent) {
             expect((activeContent as any).currentWork).toBe("Testing core files operations");
           }
         }

@@ -14,16 +14,16 @@ import { WriteBranchDocumentUseCase } from '../../../src/application/usecases/br
 import { ReadBranchDocumentUseCase } from '../../../src/application/usecases/branch/ReadBranchDocumentUseCase';
 import { SearchDocumentsByTagsUseCase } from '../../../src/application/usecases/common/SearchDocumentsByTagsUseCase';
 import { UpdateTagIndexUseCase } from '../../../src/application/usecases/common/UpdateTagIndexUseCase';
-import { GetRecentBranchesUseCase } from '../../../src/application/usecases/common/GetRecentBranchesUseCase';
-import { ReadBranchCoreFilesUseCase } from '../../../src/application/usecases/common/ReadBranchCoreFilesUseCase';
-import { CreateBranchCoreFilesUseCase } from '../../../src/application/usecases/common/CreateBranchCoreFilesUseCase';
-import { MCPResponsePresenter } from '../../../src/interface/presenters/MCPResponsePresenter';
-import { FileSystemTagIndexRepository } from '../../../src/infrastructure/repositories/file-system/index';
-import { MarkdownToJsonMigrator } from '../../../src/migration/MarkdownToJsonMigrator';
-import { MigrationBackup } from '../../../src/migration/MigrationBackup';
-import { MigrationValidator } from '../../../src/migration/MigrationValidator';
-import { ConverterFactory } from '../../../src/migration/converters/ConverterFactory';
-import { logger } from '../../../src/shared/utils/logger';
+import { GetRecentBranchesUseCase } from '../../../../src/application/usecases/common/GetRecentBranchesUseCase';
+import { ReadBranchCoreFilesUseCase } from '../../../../src/application/usecases/common/ReadBranchCoreFilesUseCase';
+import { CreateBranchCoreFilesUseCase } from '../../../../src/application/usecases/common/CreateBranchCoreFilesUseCase';
+import { MCPResponsePresenter } from '../../../../src/interface/presenters/MCPResponsePresenter';
+import { FileSystemTagIndexRepository } from '../../../../src/infrastructure/repositories/file-system/index';
+import { MarkdownToJsonMigrator } from '../../../../src/migration/MarkdownToJsonMigrator';
+import { MigrationBackup } from '../../../../src/migration/MigrationBackup';
+import { MigrationValidator } from '../../../../src/migration/MigrationValidator';
+import { ConverterFactory } from '../../../../src/migration/converters/ConverterFactory';
+import { logger } from '../../../../src/shared/utils/logger';
 
 /**
  * Integration Test: Markdown-to-JSON Migration
