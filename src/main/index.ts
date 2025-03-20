@@ -1,11 +1,11 @@
 // Import dependencies
-import { setupContainer } from '../.jsdi/providers.js';
-import { Constants } from '../.jsconfig/constants.js';
-import { logger } from '..shared/utils/logger.js';
+import { setupContainer } from './di/providers.js';
+import { logger } from '../shared/utils/logger.js';
 // Interfaces can be imported as types
-import { IGlobalController } from '..interface/controllers/interfaces/IGlobalController.js';
-import { IBranchController } from '..interface/controllers/interfaces/IBranchController.js';
-import { CliOptions } from '..infrastructure/config/WorkspaceConfig.js';
+import { IGlobalController } from '../interface/controllers/interfaces/IGlobalController.js';
+import { IBranchController } from '../interface/controllers/interfaces/IBranchController.js';
+import { CliOptions } from '../infrastructure/config/WorkspaceConfig.js';
+import type { Constants } from './config/constants.js';
 
 /**
  * Application main class

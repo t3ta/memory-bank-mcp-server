@@ -3,17 +3,16 @@
  *
  * Converts system patterns markdown documents to JSON
  */
-import { v4 as uuidv4 } from 'uuid';
-import { BaseConverter } from '../.jsBaseConverter.js';
-import { parseMarkdownForMigration, TechnicalDecision } from '..utils/MarkdownParser.js';
-import { JsonDocument } from '../domain/entities/JsonDocument.js';
-import { DocumentPath } from '../domain/entities/DocumentPath.js';
-import { DocumentId } from '../domain/entities/DocumentId.js';
-import { Tag } from '../domain/entities/Tag.js';
-import {
-  SystemPatternsContentV2,
-  TechnicalDecisionContentV2,
-} from '../schemas/v2/json-document.js';
+import { DocumentId } from "../../domain/entities/DocumentId.js";
+import type { DocumentPath } from "../../domain/entities/DocumentPath.js";
+import { JsonDocument } from "../../domain/entities/JsonDocument.js";
+import { Tag } from "../../domain/entities/Tag.js";
+import type { JsonDocument } from "../../schemas/json-document.js";
+import type { TechnicalDecisionContentV2, SystemPatternsContentV2 } from "../../schemas/v2/json-document.js";
+import { parseMarkdownForMigration, type TechnicalDecision } from "../utils/MarkdownParser.js";
+import type { BaseConverter } from "./BaseConverter.js";
+
+
 
 /**
  * Converter for system patterns documents

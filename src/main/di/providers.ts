@@ -1,47 +1,47 @@
-import { DIContainer } from '../.jsDIContainer.js';
-import path from 'path';
+import { DIContainer } from './DIContainer.js';
+import path from 'node:path';
 
 // Domain layer
 
 // Application layer
-import { ReadGlobalDocumentUseCase } from '../application/usecases/global/ReadGlobalDocumentUseCase.js';
-import { WriteGlobalDocumentUseCase } from '..application/usecases/global/WriteGlobalDocumentUseCase.js';
-import { ReadBranchDocumentUseCase } from '..application/usecases/branch/ReadBranchDocumentUseCase.js';
-import { WriteBranchDocumentUseCase } from '..application/usecases/branch/WriteBranchDocumentUseCase.js';
-import { SearchDocumentsByTagsUseCase } from '..application/usecases/common/SearchDocumentsByTagsUseCase.js';
-import { UpdateTagIndexUseCase } from '..application/usecases/common/UpdateTagIndexUseCase.js';
-import { UpdateTagIndexUseCaseV2 } from '..application/usecases/common/UpdateTagIndexUseCaseV2.js';
-import { GetRecentBranchesUseCase } from '..application/usecases/common/GetRecentBranchesUseCase.js';
-import { ReadBranchCoreFilesUseCase } from '..application/usecases/common/ReadBranchCoreFilesUseCase.js';
-import { CreateBranchCoreFilesUseCase } from '..application/usecases/common/CreateBranchCoreFilesUseCase.js';
+import { ReadGlobalDocumentUseCase } from '../../application/usecases/global/ReadGlobalDocumentUseCase.js';
+import { WriteGlobalDocumentUseCase } from '../../application/usecases/global/WriteGlobalDocumentUseCase.js';
+import { ReadBranchDocumentUseCase } from '../../application/usecases/branch/ReadBranchDocumentUseCase.js';
+import { WriteBranchDocumentUseCase } from '../../application/usecases/branch/WriteBranchDocumentUseCase.js';
+import { SearchDocumentsByTagsUseCase } from '../../application/usecases/common/SearchDocumentsByTagsUseCase.js';
+import { UpdateTagIndexUseCase } from '../../application/usecases/common/UpdateTagIndexUseCase.js';
+import { UpdateTagIndexUseCaseV2 } from '../../application/usecases/common/UpdateTagIndexUseCaseV2.js';
+import { GetRecentBranchesUseCase } from '../../application/usecases/common/GetRecentBranchesUseCase.js';
+import { ReadBranchCoreFilesUseCase } from '../../application/usecases/common/ReadBranchCoreFilesUseCase.js';
+import { CreateBranchCoreFilesUseCase } from '../../application/usecases/common/CreateBranchCoreFilesUseCase.js';
 
 // Infrastructure layer
-import { IFileSystemService } from '..infrastructure/storage/interfaces/IFileSystemService.js';
-import { FileSystemService } from '..infrastructure/storage/FileSystemService.js';
-import { IConfigProvider } from '..infrastructure/config/interfaces/IConfigProvider.js';
-import { ConfigProvider } from '..infrastructure/config/ConfigProvider.js';
-import { FileSystemGlobalMemoryBankRepository } from '..infrastructure/repositories/file-system/FileSystemGlobalMemoryBankRepository.js';
-import { FileSystemBranchMemoryBankRepository } from '..infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.js';
-import { FileSystemTagIndexRepositoryV1Bridge } from '..infrastructure/repositories/file-system/FileSystemTagIndexRepositoryV1Bridge.js';
+import { IFileSystemService } from '../../infrastructure/storage/interfaces/IFileSystemService.js';
+import { FileSystemService } from '../../infrastructure/storage/FileSystemService.js';
+import { IConfigProvider } from '../../infrastructure/config/interfaces/IConfigProvider.js';
+import { ConfigProvider } from '../../infrastructure/config/ConfigProvider.js';
+import { FileSystemGlobalMemoryBankRepository } from '../../infrastructure/repositories/file-system/FileSystemGlobalMemoryBankRepository.js';
+import { FileSystemBranchMemoryBankRepository } from '../../infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.js';
+import { FileSystemTagIndexRepositoryV1Bridge } from '../../infrastructure/repositories/file-system/FileSystemTagIndexRepositoryV1Bridge.js';
 
 // Interface layer
-import { MCPResponsePresenter } from '..interface/presenters/MCPResponsePresenter.js';
-import { JsonResponsePresenter } from '..interface/presenters/JsonResponsePresenter.js';
-import { GlobalController } from '..interface/controllers/GlobalController.js';
-import { BranchController } from '..interface/controllers/BranchController.js';
-import { JsonBranchController } from '..interface/controllers/json/JsonBranchController.js';
-import { JsonGlobalController } from '..interface/controllers/json/JsonGlobalController.js';
+import { MCPResponsePresenter } from '../../interface/presenters/MCPResponsePresenter.js';
+import { JsonResponsePresenter } from '../../interface/presenters/JsonResponsePresenter.js';
+import { GlobalController } from '../../interface/controllers/GlobalController.js';
+import { BranchController } from '../../interface/controllers/BranchController.js';
+import { JsonBranchController } from '../../interface/controllers/json/JsonBranchController.js';
+import { JsonGlobalController } from '../../interface/controllers/json/JsonGlobalController.js';
 
 // CLI options type
-import { CliOptions } from '..infrastructure/config/WorkspaceConfig.js';
-import { UseCaseFactory } from '..factory/use-case-factory.js';
+import { CliOptions } from '../../infrastructure/config/WorkspaceConfig.js';
+import { UseCaseFactory } from '../../factory/use-case-factory.js';
 import type {
   DeleteJsonDocumentUseCase,
   ReadJsonDocumentUseCase,
   SearchJsonDocumentsUseCase,
   UpdateJsonIndexUseCase,
   WriteJsonDocumentUseCase,
-} from '..application/usecases/index.js';
+} from '../../application/usecases/index.js';
 
 /**
  * Register infrastructure services

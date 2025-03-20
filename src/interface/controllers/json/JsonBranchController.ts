@@ -1,20 +1,14 @@
-import { IBranchController } from '..interfaces/IBranchController.js';
-import { DocumentType } from '../../domain/entities/JsonDocument.js';
-import { MCPResponse } from '../presenters/types/index.js';
-import { DocumentDTO, JsonDocumentDTO } from '../../application/dtos/index.js';
-import { DomainError } from '../../shared/errors/DomainError.js';
-import { ApplicationError } from '../../shared/errors/ApplicationError.js';
-import { InfrastructureError } from '../../shared/errors/InfrastructureError.js';
-import { IResponsePresenter } from '../presenters/interfaces/IResponsePresenter.js';
-import { logger } from '../../shared/utils/logger.js';
+import type { DocumentDTO } from "../../../application/dtos/DocumentDTO.js";
+import type { JsonDocumentDTO } from "../../../application/dtos/JsonDocumentDTO.js";
+import type { ReadJsonDocumentUseCase, WriteJsonDocumentUseCase, DeleteJsonDocumentUseCase, SearchJsonDocumentsUseCase, UpdateJsonIndexUseCase, GetRecentBranchesUseCase } from "../../../application/usecases/index.js";
+import { ApplicationError } from "../../../shared/errors/ApplicationError.js";
+import { DomainError } from "../../../shared/errors/DomainError.js";
+import { InfrastructureError } from "../../../shared/errors/InfrastructureError.js";
+import { logger } from "../../../shared/utils/logger.js";
+import type { IResponsePresenter } from "../../presenters/interfaces/IResponsePresenter.js";
+import type { MCPResponse } from "../../presenters/types/MCPResponse.js";
+import type { IBranchController } from "../interfaces/IBranchController.js";
 
-// Import use cases
-import { ReadJsonDocumentUseCase } from '../../application/usecases/json/ReadJsonDocumentUseCase.js';
-import { WriteJsonDocumentUseCase } from '../../application/usecases/json/WriteJsonDocumentUseCase.js';
-import { DeleteJsonDocumentUseCase } from '../../application/usecases/json/DeleteJsonDocumentUseCase.js';
-import { SearchJsonDocumentsUseCase } from '../../application/usecases/json/SearchJsonDocumentsUseCase.js';
-import { UpdateJsonIndexUseCase } from '../../application/usecases/json/UpdateJsonIndexUseCase.js';
-import { GetRecentBranchesUseCase } from '../../application/usecases/common/GetRecentBranchesUseCase.js';
 
 /**
  * Controller for JSON branch memory bank operations

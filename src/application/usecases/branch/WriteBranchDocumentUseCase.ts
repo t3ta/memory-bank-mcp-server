@@ -1,16 +1,16 @@
-import { IUseCase } from '../interfaces/IUseCase.js';
-import { DocumentDTO } from '../dtos/DocumentDTO.js';
-import { WriteDocumentDTO } from '../dtos/WriteDocumentDTO.js';
-import { IBranchMemoryBankRepository } from '../../domain/repositories/IBranchMemoryBankRepository.js';
-import { DocumentPath } from '../../domain/entities/DocumentPath.js';
-import { BranchInfo } from '../../domain/entities/BranchInfo.js';
-import { MemoryDocument } from '../../domain/entities/MemoryDocument.js';
-import { Tag } from '../../domain/entities/Tag.js';
-import { DomainError } from '../../shared/errors/DomainError.js';
+import { IUseCase } from '../../interfaces/IUseCase.js';
+import { DocumentDTO } from '../../dtos/DocumentDTO.js';
+import { WriteDocumentDTO } from '../../dtos/WriteDocumentDTO.js';
+import { IBranchMemoryBankRepository } from '../../../domain/repositories/IBranchMemoryBankRepository.js';
+import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
+import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
+import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
+import { Tag } from '../../../domain/entities/Tag.js';
+import { DomainError } from '../../../shared/errors/DomainError.js';
 import {
   ApplicationError,
   ApplicationErrorCodes,
-} from '../../shared/errors/ApplicationError.js';
+} from '../../../shared/errors/ApplicationError.js';
 
 /**
  * Input data for write branch document use case

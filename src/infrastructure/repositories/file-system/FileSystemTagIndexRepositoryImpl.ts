@@ -1,19 +1,14 @@
-import { BranchInfo } from '../../domain/entities/BranchInfo.js';
-import { DocumentPath } from '../../domain/entities/DocumentPath.js';
-import { JsonDocument } from '../../domain/entities/JsonDocument.js';
-import { MemoryDocument } from '../../domain/entities/MemoryDocument.js';
-import { Tag } from '../../domain/entities/Tag.js';
-import {
-  TagIndexOptions,
-  TagIndexUpdateResult,
-} from '../../domain/repositories/ITagIndexRepository.js';
-import { DocumentReference } from '../../schemas/v2/tag-index.js';
-import { logger } from '../../shared/utils/logger.js';
-import {
-  InfrastructureError,
-  InfrastructureErrorCodes,
-} from '../../shared/errors/InfrastructureError.js';
-import { FileSystemTagIndexRepository } from '../.jsFileSystemTagIndexRepositoryBase.js';
+import type { BranchInfo } from "../../../domain/entities/BranchInfo.js";
+import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
+import type { Tag } from "../../../domain/entities/Tag.js";
+import type { TagIndexOptions, TagIndexUpdateResult } from "../../../domain/repositories/ITagIndexRepository.js";
+import type { MemoryDocument } from "../../../schemas/index.js";
+import type { JsonDocument } from "../../../schemas/json-document.js";
+import type { DocumentReference } from "../../../schemas/v2/tag-index.js";
+import { InfrastructureError, InfrastructureErrorCodes } from "../../../shared/errors/InfrastructureError.js";
+import { logger } from "../../../shared/utils/logger.js";
+import { FileSystemTagIndexRepository } from "./FileSystemTagIndexRepositoryBase.js";
+
 
 /**
  * Implementation of ITagIndexRepository interface methods

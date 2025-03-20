@@ -1,6 +1,6 @@
-import { JsonDocument } from '../../../domain/entities/JsonDocument.js';
-import { BaseDocumentTypeConverter } from '..DocumentTypeConverter.js';
-import { MarkdownBuilder } from '..MarkdownBuilder.js';
+import { JsonDocument } from '../../../../domain/entities/JsonDocument.js';
+import { BaseDocumentTypeConverter } from '../DocumentTypeConverter.js';
+import { MarkdownBuilder } from '../MarkdownBuilder.js';
 
 /**
  * Converter for Progress documents

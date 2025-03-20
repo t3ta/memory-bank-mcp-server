@@ -1,13 +1,12 @@
-import { IUseCase } from '../interfaces/IUseCase.js';
-import { IBranchMemoryBankRepository } from '../../domain/repositories/IBranchMemoryBankRepository.js';
-import { CoreFilesDTO } from '../dtos/CoreFilesDTO.js';
-import { BranchInfo } from '../../domain/entities/BranchInfo.js';
-import { DocumentPath } from '../../domain/entities/DocumentPath.js';
-import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
+import { IBranchMemoryBankRepository } from '../../../domain/repositories/IBranchMemoryBankRepository.js';
+import { CoreFilesDTO } from '../../dtos/CoreFilesDTO.js';
+import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
+import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
+import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
 import {
   ApplicationError,
   ApplicationErrorCodes,
-} from '../../shared/errors/ApplicationError.js';
+} from '../../../shared/errors/ApplicationError.js';
 
 /**
  * Input data for reading branch core files
@@ -302,6 +301,7 @@ export class ReadBranchCoreFilesUseCase
 }
 
 // Export the interfaces from CoreFilesDTO for convenience
-import { ActiveContextDTO, ProgressDTO } from '../dtos/CoreFilesDTO.js';
+import { ActiveContextDTO, ProgressDTO } from '../..//dtos/CoreFilesDTO.js';
 // SystemPatternsDTO is used in the coreFiles assignment, but TypeScript doesn't detect it correctly
-import type { SystemPatternsDTO } from '../dtos/CoreFilesDTO.js';
+import type { SystemPatternsDTO } from '../../dtos/CoreFilesDTO.js'; import type { IUseCase } from '../../interfaces/IUseCase.js';
+

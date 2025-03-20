@@ -4,16 +4,16 @@
  * This module provides functionality to migrate Markdown documents to JSON format.
  * It handles different document types and ensures output conforms to JSON schemas.
  */
-import path from 'path';
-import { promises as fs } from 'fs';
-import { DocumentPath } from '..domain/entities/DocumentPath.js';
-import { DocumentId } from '..domain/entities/DocumentId.js';
-import { JsonDocument, DocumentType } from '..domain/entities/JsonDocument.js';
-import { DomainError, DomainErrorCodes } from '..shared/errors/DomainError.js';
-import { MigrationBackup } from '../.jsMigrationBackup.js';
-import { MigrationValidator } from '../.jsMigrationValidator.js';
-import { ConverterFactory } from '../.jsconverters/ConverterFactory.js';
-import { Logger } from '..shared/utils/logger.js';
+import path from 'node:path';
+import { promises as fs } from 'node:fs';
+import { DocumentPath } from '../domain/entities/DocumentPath.js';
+import { DocumentId } from '../domain/entities/DocumentId.js';
+import { JsonDocument, DocumentType } from '../domain/entities/JsonDocument.js';
+import { DomainError, DomainErrorCodes } from '../shared/errors/DomainError.js';
+import { MigrationBackup } from './MigrationBackup.js';
+import { MigrationValidator } from './MigrationValidator.js';
+import { ConverterFactory } from './converters/ConverterFactory.js';
+import { Logger } from '../shared/utils/logger.js';
 
 /**
  * Migration options
@@ -142,21 +142,21 @@ export class MarkdownToJsonMigrator {
     try {
       // Create backup if requested
       if (createBackup) {
-        this.logger.info(`Creating backup of directory: ${directory}`);
+        this.logger.info('Creating backup of directory: %s', [directory]);
         const backupPath = await this.backupService.createBackup(directory);
         result.stats.backupPath = backupPath;
-        this.logger.info(`Backup created at: ${backupPath}`);
+        this.logger.info('Backup created at: %s', [backupPath]);
       }
 
       // Find all markdown files in directory and subdirectories
       const files = await this.findMarkdownFiles(directory);
-      this.logger.info(`Found ${files.length} Markdown files to process: ${files.join(', ')}`);
+      this.logger.info('Found %d Markdown files to process: %s', [files.length, files.join(', ')]);
 
       // Process each file
       for (const file of files) {
-        this.logger.info(`Processing file: ${file}`);
+        this.logger.info('Processing file: %s', [file]);
         try {
-          this.logger.debug(`Processing file: ${file}`);
+          this.logger.debug('Processing file: %s', [file]);
 
           // Create document path
           const relativePath = path.relative(directory, file);
@@ -164,7 +164,7 @@ export class MarkdownToJsonMigrator {
 
           // Skip non-markdown files
           if (!documentPath.isMarkdown) {
-            this.logger.debug(`Skipping non-markdown file: ${file}`);
+            this.logger.debug('Skipping non-markdown file: %s', [file]);
             result.stats.skippedCount++;
             continue;
           }
@@ -174,7 +174,7 @@ export class MarkdownToJsonMigrator {
           const jsonExists = await this.fileExists(jsonPath);
 
           if (jsonExists && !overwriteExisting) {
-            this.logger.debug(`Skipping already migrated file: ${file}`);
+            this.logger.debug('Skipping already migrated file: %s', [file]);
             result.stats.skippedCount++;
             continue;
           }
@@ -188,7 +188,7 @@ export class MarkdownToJsonMigrator {
             // Delete original if requested
             if (deleteOriginals) {
               await fs.unlink(file);
-              this.logger.debug(`Deleted original file: ${file}`);
+              this.logger.debug('Deleted original file: %s', [file]);
             }
           } else {
             result.stats.failureCount++;
@@ -198,7 +198,7 @@ export class MarkdownToJsonMigrator {
             });
           }
         } catch (error) {
-          this.logger.error(`Error migrating file ${file}: ${(error as Error).message}`);
+          this.logger.error('Error migrating file %s: %s', [file, (error as Error).message]);
           result.stats.failureCount++;
           result.stats.failures.push({
             path: file,
@@ -208,8 +208,8 @@ export class MarkdownToJsonMigrator {
       }
 
       // Log summary
-      this.logger.info(
-        `Migration complete. Success: ${result.stats.successCount}, Failed: ${result.stats.failureCount}, Skipped: ${result.stats.skippedCount}`
+      this.logger.info('Migration complete. Success: %d, Failed: %d, Skipped: %d',
+        [result.stats.successCount, result.stats.failureCount, result.stats.skippedCount]
       );
 
       // Set success flag based on failure count
@@ -217,7 +217,7 @@ export class MarkdownToJsonMigrator {
 
       return result;
     } catch (error) {
-      this.logger.error(`Fatal error during migration: ${(error as Error).message}`);
+      this.logger.error('Fatal error during migration: %s', [(error as Error).message]);
 
       return {
         success: false,
@@ -272,11 +272,11 @@ export class MarkdownToJsonMigrator {
 
       // Write JSON file
       await fs.writeFile(outputPath, jsonDocument.toString(true), 'utf-8');
-      this.logger.debug(`Successfully converted ${filePath} to ${outputPath}`);
+      this.logger.debug('Successfully converted %s to %s', [filePath, outputPath]);
 
       return true;
     } catch (error) {
-      this.logger.error(`Failed to migrate file ${filePath}: ${(error as Error).message}`);
+      this.logger.error('Failed to migrate file %s: %s', [filePath, (error as Error).message]);
       return false;
     }
   }
@@ -356,11 +356,11 @@ export class MarkdownToJsonMigrator {
    * @returns Array of file paths
    */
   private async findMarkdownFiles(directory: string): Promise<string[]> {
-    this.logger.info(`Finding markdown files in directory: ${directory}`);
+    this.logger.info('Finding markdown files in directory: %s', [directory]);
     const result: string[] = [];
 
     const entries = await fs.readdir(directory, { withFileTypes: true });
-    this.logger.info(`Directory entries in ${directory}: ${entries.map(e => e.name).join(', ')}`);
+    this.logger.info('Directory entries in %s: %s', [directory, entries.map(e => e.name).join(', ')]);
 
     for (const entry of entries) {
       const fullPath = path.join(directory, entry.name);
@@ -368,7 +368,7 @@ export class MarkdownToJsonMigrator {
       if (entry.isDirectory()) {
         // Recursively process subdirectories
         const subdirFiles = await this.findMarkdownFiles(fullPath);
-        result.push(..subdirFiles);
+        result.push(...subdirFiles);
       } else if (entry.isFile() && entry.name.endsWith('.md')) {
         // Add markdown files
         result.push(fullPath);

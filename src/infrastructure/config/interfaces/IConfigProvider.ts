@@ -1,5 +1,6 @@
-import { WorkspaceConfig, CliOptions } from '..WorkspaceConfig.js';
-import { Language } from '../../shared/types/index.js';
+import type { Language } from '../../../schemas/v2/i18n-schema.js';
+import { WorkspaceConfig, CliOptions } from '../WorkspaceConfig.js';
+
 
 /**
  * Interface for configuration provider

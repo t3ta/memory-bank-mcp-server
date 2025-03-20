@@ -1,13 +1,11 @@
-import { IUseCase } from '../interfaces/IUseCase.js';
-import { IBranchMemoryBankRepository } from '../../domain/repositories/IBranchMemoryBankRepository.js';
-import { IGlobalMemoryBankRepository } from '../../domain/repositories/IGlobalMemoryBankRepository.js';
-import { BranchInfo } from '../../domain/entities/BranchInfo.js';
-import { Tag } from '../../domain/entities/Tag.js';
-import {
-  ApplicationError,
-  ApplicationErrorCodes,
-} from '../../shared/errors/ApplicationError.js';
-import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
+import { BranchInfo } from "../../../domain/entities/BranchInfo.js";
+import { Tag } from "../../../domain/entities/Tag.js";
+import type { IBranchMemoryBankRepository } from "../../../domain/repositories/IBranchMemoryBankRepository.js";
+import type { IGlobalMemoryBankRepository } from "../../../domain/repositories/IGlobalMemoryBankRepository.js";
+import { ApplicationError, ApplicationErrorCodes } from "../../../shared/errors/ApplicationError.js";
+import { DomainError, DomainErrorCodes } from "../../../shared/errors/DomainError.js";
+import type { IUseCase } from "../../interfaces/IUseCase.js";
+
 
 /**
  * Input data for updating tag index

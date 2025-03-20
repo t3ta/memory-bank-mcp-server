@@ -1,13 +1,13 @@
 /**
  * Factory for creating appropriate converters based on document type
  */
-import { DocumentType } from '../domain/entities/JsonDocument.js';
-import { BaseConverter } from '../.jsBaseConverter.js';
-import { BranchContextConverter } from '../.jsBranchContextConverter.js';
-import { ActiveContextConverter } from '../.jsActiveContextConverter.js';
-import { SystemPatternsConverter } from '../.jsSystemPatternsConverter.js';
-import { ProgressConverter } from '../.jsProgressConverter.js';
-import { GenericConverter } from '../.jsGenericConverter.js';
+import { ActiveContextConverter } from "./ActiveContextConverter.js";
+import type { BaseConverter } from "./BaseConverter.js";
+import { BranchContextConverter } from "./BranchContextConverter.js";
+import { GenericConverter } from "./GenericConverter.js";
+import { ProgressConverter } from "./ProgressConverter.js";
+import { SystemPatternsConverter } from "./SystemPatternsConverter.js";
+
 
 /**
  * Factory for creating document type-specific converters

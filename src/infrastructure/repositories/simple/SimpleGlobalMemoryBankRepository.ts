@@ -1,11 +1,13 @@
-import * as path from 'node:path';
-import { promises as fs } from 'node:fs';
-import { IGlobalMemoryBankRepository } from '../../domain/repositories/IGlobalMemoryBankRepository.js';
-import { MemoryDocument } from '../domain/entities/MemoryDocument.js';
-import { DocumentPath } from '../domain/entities/DocumentPath.js';
-import { Tag } from '../domain/entities/Tag.js';
-import { InfrastructureError, InfrastructureErrorCodes } from '../shared/errors/InfrastructureError.js';
-import { TagIndex } from '../schemas/tag-index/tag-index-schema.js';
+import path from "path";
+import fs from "fs/promises";
+import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
+import { MemoryDocument } from "../../../domain/entities/MemoryDocument.js";
+import type { Tag } from "../../../domain/entities/Tag.js";
+import type { IGlobalMemoryBankRepository } from "../../../domain/repositories/IGlobalMemoryBankRepository.js";
+import type { MemoryDocument } from "../../../schemas/index.js";
+import type { TagIndex } from "../../../schemas/tag-index/tag-index-schema.js";
+import { InfrastructureError, InfrastructureErrorCodes } from "../../../shared/errors/InfrastructureError.js";
+
 
 /**
  * Simple file system implementation of global memory bank repository for testing

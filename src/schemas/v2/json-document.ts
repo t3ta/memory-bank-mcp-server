@@ -9,7 +9,7 @@
  * - Explicit versioning
  */
 import { z } from 'zod';
-import { FlexibleDateSchema, TagSchema } from '..common.js';
+import { FlexibleDateSchema, TagSchema } from '../common.js';
 
 // Schema version identifier - used for migration and compatibility
 export const SCHEMA_VERSION = 'memory_document_v2';

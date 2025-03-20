@@ -1,11 +1,11 @@
-import { promises as fs } from 'fs';
-import { createReadStream } from 'fs';
-import path from 'path';
-import { IFileSystemService } from '../.jsinterfaces/IFileSystemService.js';
+import { promises as fs } from 'node:fs';
+import { createReadStream } from 'node:fs';
+import path from 'node:path';
+import { IFileSystemService } from './interfaces/IFileSystemService.js';
 import {
   InfrastructureError,
   InfrastructureErrorCodes,
-} from '../shared/errors/InfrastructureError.js';
+} from '../../shared/errors/InfrastructureError.js';
 
 /**
  * Implementation of file system service
@@ -93,7 +93,7 @@ export class FileSystemService implements IFileSystemService {
       const stats = await fs.stat(filePath);
       return stats.isFile();
     } catch (_error) {
-      // エラーをキャッチしたが使わない場合は戻り値のみを返す
+      // When catching an error but not using it, just return the value
       return false;
     }
   }
@@ -169,7 +169,7 @@ export class FileSystemService implements IFileSystemService {
       const stats = await fs.stat(dirPath);
       return stats.isDirectory();
     } catch (_error) {
-      // エラーをキャッチしたが使わない場合は戻り値のみを返す
+      // When catching an error but not using it, just return the value
       return false;
     }
   }
@@ -192,7 +192,7 @@ export class FileSystemService implements IFileSystemService {
           files.push(fullPath);
         } else if (entry.isDirectory()) {
           const subFiles = await this.listFiles(fullPath);
-          files.push(..subFiles);
+          files.push(...subFiles);
         }
       }
 
@@ -225,13 +225,6 @@ export class FileSystemService implements IFileSystemService {
   }
 
   /**
-   * Read a chunk of a file
-   * @param filePath File path
-   * @param start Starting position in bytes
-   * @param length Number of bytes to read
-   * @returns Promise resolving to the chunk content as string
-   */
-  /**
    * Get the path to the branch memory bank directory
    * @param branchName Branch name
    * @returns Path to branch memory bank directory
@@ -250,6 +243,13 @@ export class FileSystemService implements IFileSystemService {
     return { memoryBankRoot: 'docs' };
   }
 
+  /**
+   * Read a chunk of a file
+   * @param filePath File path
+   * @param start Starting position in bytes
+   * @param length Number of bytes to read
+   * @returns Promise resolving to the chunk content as string
+   */
   async readFileChunk(filePath: string, start: number, length: number): Promise<string> {
     try {
       // Check if file exists first

@@ -1,14 +1,12 @@
-import { IUseCase } from '../interfaces/IUseCase.js';
-import { IJsonDocumentRepository } from '../../domain/repositories/IJsonDocumentRepository.js';
-import { BranchInfo } from '../../domain/entities/BranchInfo.js';
-import { DocumentPath } from '../../domain/entities/DocumentPath.js';
-import { DocumentId } from '../../domain/entities/DocumentId.js';
-import { JsonDocument } from '../../domain/entities/JsonDocument.js';
-import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
-import {
-  ApplicationError,
-  ApplicationErrorCodes,
-} from '../../shared/errors/ApplicationError.js';
+import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
+import { DocumentId } from '../../../domain/entities/DocumentId.js';
+import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
+import type { IJsonDocumentRepository } from '../../../domain/repositories/IJsonDocumentRepository.js';
+import type { JsonDocument } from '../../../schemas/json-document.js';
+import { ApplicationError, ApplicationErrorCodes } from '../../../shared/errors/ApplicationError.js';
+import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
+import type { IUseCase } from '../../interfaces/IUseCase.js';
+
 
 /**
  * Input data for read JSON document use case
@@ -56,7 +54,7 @@ export interface ReadJsonDocumentOutput {
     /**
      * Document type
      */
-    documentType: import('../../../domain/entities/JsonDocument').DocumentType;
+    documentType: import('../../../domain/entities/JsonDocument.js').DocumentType;
 
     /**
      * Document tags

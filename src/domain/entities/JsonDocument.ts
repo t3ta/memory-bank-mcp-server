@@ -1,7 +1,7 @@
-import { DocumentId } from '../.jsDocumentId.js';
-import { DocumentPath } from '../.jsDocumentPath.js';
-import { Tag } from '../.jsTag.js';
-import { DomainError, DomainErrorCodes } from '../shared/errors/DomainError.js';
+import { DocumentId } from './DocumentId.js';
+import { DocumentPath } from './DocumentPath.js';
+import { Tag } from './Tag.js';
+import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
 
 // Import JSON schemas
 import {
@@ -9,15 +9,10 @@ import {
   BaseJsonDocumentV2Schema,
   BaseJsonDocumentV2,
   BranchContextJsonV2Schema,
-  // BranchContextJsonV2,
   ActiveContextJsonV2Schema,
-  // ActiveContextJsonV2,
   ProgressJsonV2Schema,
-  // ProgressJsonV2,
   SystemPatternsJsonV2Schema,
-  // SystemPatternsJsonV2,
-  // DocumentMetadataV2,
-} from '../schemas/v2/json-document.js';
+} from '../../schemas/v2/json-document.js';
 
 /**
  * Type discriminator for document types
@@ -196,7 +191,7 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
       path,
       title,
       documentType,
-      [..tags], // Defensive copy
+      [...tags], // Defensive copy
       content,
       new Date(lastModified),
       new Date(createdAt),
@@ -236,7 +231,7 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
    * Get the document tags
    */
   public get tags(): Tag[] {
-    return [..this._tags]; // Return defensive copy
+    return [...this._tags]; // Return defensive copy
   }
 
   /**
@@ -385,7 +380,7 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
       this._path,
       this._title,
       this._documentType,
-      [..this._tags, tag],
+      [...this._tags, tag],
       this._content,
       new Date(), // Update lastModified
       this._createdAt,
@@ -427,7 +422,7 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
       this._path,
       this._title,
       this._documentType,
-      [..tags], // Defensive copy
+      [...tags], // Defensive copy
       this._content,
       new Date(), // Update lastModified
       this._createdAt,

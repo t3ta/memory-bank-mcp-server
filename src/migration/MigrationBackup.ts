@@ -3,9 +3,9 @@
  *
  * Creates backups of directories before migration and provides rollback functionality
  */
-import path from 'path';
-import { promises as fs } from 'fs';
-import { Logger } from '..shared/utils/logger.js';
+import path from 'node:path';
+import { promises as fs } from 'node:fs';
+import { Logger } from '../shared/utils/logger.js';
 
 /**
  * Service for creating backups before migration and rolling back if needed

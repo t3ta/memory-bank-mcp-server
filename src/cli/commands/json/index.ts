@@ -1,11 +1,11 @@
-import { Argv } from 'yargs';
-import { CreateJsonCommand } from '../.jscreate-json.js';
-import { ReadJsonCommand } from '../.jsread-json.js';
-import { UpdateJsonCommand } from '../.jsupdate-json.js';
-import { DeleteJsonCommand } from '../.jsdelete-json.js';
-import { SearchJsonCommand } from '../.jssearch-json.js';
-import { ListJsonCommand } from '../.jslist-json.js';
-import { BuildIndexCommand } from '../.jsbuild-index.js';
+import type { Argv } from "yargs";
+import { BuildIndexCommand } from "./build-index.js";
+import { CreateJsonCommand } from "./create-json.js";
+import { DeleteJsonCommand } from "./delete-json.js";
+import { ListJsonCommand } from "./list-json.js";
+import { ReadJsonCommand } from "./read-json.js";
+import { SearchJsonCommand } from "./search-json.js";
+import { UpdateJsonCommand } from "./update-json.js";
 
 /**
  * Register all JSON commands with yargs

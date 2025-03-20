@@ -45,9 +45,9 @@ jest.mock('/Users/t3ta/workspace/memory-bank-mcp-server/src/domain/entities/Bran
   const originalModule = jest.requireActual('/Users/t3ta/workspace/memory-bank-mcp-server/src/domain/entities/BranchInfo') as any;
 
   return {
-    ..originalModule,
+    ...originalModule,
     BranchInfo: {
-      ..originalModule.BranchInfo,
+      ...originalModule.BranchInfo,
       create: function (branchName: string) {
         // globalという名前のブランチを特別に許可する（テスト用）
         if (branchName === 'global') {
@@ -293,7 +293,7 @@ describe('DeleteJsonDocumentUseCase', () => {
       );
 
       when(jsonRepositoryMock.exists(deepEqual(branchInfo), deepEqual(documentPath))).thenThrow(
-        domainError
+        domainError as Error
       );
 
       // Act & Assert

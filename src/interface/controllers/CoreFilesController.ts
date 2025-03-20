@@ -1,8 +1,8 @@
-import { ReadBranchCoreFilesUseCase } from "../../application/usecases/common/ReadBranchCoreFilesUseCase";
-import { CreateBranchCoreFilesUseCase } from "../../application/usecases/common/CreateBranchCoreFilesUseCase";
-import { CoreFilesDTO } from "../../application/dtos/CoreFilesDTO";
-import { DomainError } from "../../shared/errors/DomainError";
-import { ApplicationError } from "../../shared/errors/ApplicationError";
+import { ReadBranchCoreFilesUseCase } from '../../application/usecases/common/ReadBranchCoreFilesUseCase.js';
+import { CreateBranchCoreFilesUseCase } from '../../application/usecases/common/CreateBranchCoreFilesUseCase.js';
+import { CoreFilesDTO } from '../../application/dtos/CoreFilesDTO.js';
+import { DomainError } from '../../shared/errors/DomainError.js';
+import { ApplicationError } from '../../shared/errors/ApplicationError.js';
 
 /**
  * Response interface for core files operations

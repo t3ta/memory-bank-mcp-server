@@ -1,15 +1,14 @@
-import path from 'path';
-import { promises as fs } from 'fs';
-import {
-  IBranchMemoryBankRepository,
-  RecentBranch
-} from '../domain/repositories/IBranchMemoryBankRepository.js';
-import { MemoryDocument } from '../domain/entities/MemoryDocument.js';
-import { DocumentPath } from '../domain/entities/DocumentPath.js';
-import { BranchInfo } from '../domain/entities/BranchInfo.js';
-import { Tag } from '../domain/entities/Tag.js';
-import { DomainError, DomainErrorCodes } from '../shared/errors/DomainError.js';
-import { TagIndex } from '../schemas/tag-index/tag-index-schema.js';
+import path from "path";
+import fs from "fs/promises";
+import { BranchInfo } from "../../domain/entities/BranchInfo.js";
+import { DocumentPath } from "../../domain/entities/DocumentPath.js";
+import type { MemoryDocument } from "../../domain/entities/MemoryDocument.js";
+import type { Tag } from "../../domain/entities/Tag.js";
+import type { IBranchMemoryBankRepository } from "../../domain/repositories/IBranchMemoryBankRepository.js";
+import type { MemoryDocument, RecentBranch } from "../../schemas/index.js";
+import type { TagIndex } from "../../schemas/tag-index/tag-index-schema.js";
+import { DomainError, DomainErrorCodes } from "../../shared/errors/DomainError.js";
+
 
 /**
  * Simple file system implementation of branch memory bank repository for testing

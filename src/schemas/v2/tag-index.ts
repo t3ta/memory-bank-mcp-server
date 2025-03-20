@@ -9,8 +9,7 @@
  */
 
 import { z } from 'zod';
-import { TagSchema, FlexibleDateSchema } from '..common.js';
-import { SCHEMA_VERSION } from '../.jsjson-document.js';
+import { TagSchema, FlexibleDateSchema } from '../common.js';
 
 // Schema version identifier
 export const TAG_INDEX_VERSION = 'tag_index_v1';

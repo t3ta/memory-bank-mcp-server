@@ -4,13 +4,13 @@
  * Converts branch context markdown documents to JSON
  */
 import { v4 as uuidv4 } from 'uuid';
-import { BaseConverter } from '../.jsBaseConverter.js';
-import { parseMarkdownForMigration } from '..utils/MarkdownParser.js';
-import { JsonDocument } from '../domain/entities/JsonDocument.js';
-import { DocumentPath } from '../domain/entities/DocumentPath.js';
-import { DocumentId } from '../domain/entities/DocumentId.js';
-import { Tag } from '../domain/entities/Tag.js';
-import { BranchContextContentV2 } from '../schemas/v2/json-document.js';
+import { BaseConverter } from './BaseConverter.js';
+import { parseMarkdownForMigration } from '../utils/MarkdownParser.js';
+import { JsonDocument } from '../../domain/entities/JsonDocument.js';
+import { DocumentPath } from '../../domain/entities/DocumentPath.js';
+import { DocumentId } from '../../domain/entities/DocumentId.js';
+import { Tag } from '../../domain/entities/Tag.js';
+import { BranchContextContentV2 } from '../../schemas/v2/json-document.js';
 
 /**
  * Converter for branch context documents
@@ -37,7 +37,7 @@ export class BranchContextConverter implements BaseConverter {
       completed: story.completed,
     }));
 
-    // Add any challenges from "解決する課題" section
+    // Add any challenges from "解決する課題.js" section
     if (Array.isArray(parsed.content.challenges)) {
       parsed.content.challenges.forEach((challenge) => {
         userStories.push({
@@ -47,7 +47,7 @@ export class BranchContextConverter implements BaseConverter {
       });
     }
 
-    // Add any features from "必要な機能" section
+    // Add any features from "必要な機能.js" section
     if (Array.isArray(parsed.content.features)) {
       parsed.content.features.forEach((feature) => {
         userStories.push({
@@ -57,7 +57,7 @@ export class BranchContextConverter implements BaseConverter {
       });
     }
 
-    // Add any expectations from "期待される動作" section
+    // Add any expectations from "期待される動作.js" section
     if (Array.isArray(parsed.content.expectations)) {
       parsed.content.expectations.forEach((expectation) => {
         userStories.push({

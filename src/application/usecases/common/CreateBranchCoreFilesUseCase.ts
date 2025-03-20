@@ -1,15 +1,15 @@
-import { IUseCase } from '../interfaces/IUseCase.js';
-import { IBranchMemoryBankRepository } from '../domain/repositories/IBranchMemoryBankRepository.js';
-import { CoreFilesDTO } from '..dtos/CoreFilesDTO.js';
-import { BranchInfo } from '../domain/entities/BranchInfo.js';
-import { DocumentPath } from '../domain/entities/DocumentPath.js';
-import { MemoryDocument } from '../domain/entities/MemoryDocument.js';
-import { DomainError, DomainErrorCodes } from '../shared/errors/DomainError.js';
+import { IUseCase } from '../../interfaces/IUseCase.js';
+import { IBranchMemoryBankRepository } from '../../../domain/repositories/IBranchMemoryBankRepository.js';
+import { CoreFilesDTO } from '../../dtos/CoreFilesDTO.js';
+import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
+import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
+import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
+import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
 import {
   ApplicationError,
   ApplicationErrorCodes,
-} from '../shared/errors/ApplicationError.js';
-import { Tag } from '../domain/entities/Tag.js';
+} from '../../../shared/errors/ApplicationError.js';
+import { Tag } from '../../../domain/entities/Tag.js';
 
 /**
  * Input data for creating/updating branch core files
@@ -404,4 +404,4 @@ import {
   ProgressDTO,
   SystemPatternsDTO,
   TechnicalDecisionDTO
-} from '..dtos/CoreFilesDTO.js';
+} from '../../dtos/CoreFilesDTO.js';

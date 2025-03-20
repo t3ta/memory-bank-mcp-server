@@ -6,9 +6,9 @@
  * マイグレーション設定に基づいて適切なユースケースを提供します。
  */
 
-import { IBranchMemoryBankRepository } from '..domain/repositories/IBranchMemoryBankRepository.js';
-import { WriteBranchDocumentUseCase } from '..application/usecases/branch/WriteBranchDocumentUseCase.js';
-import { migrationConfig } from '..config/migration-config.js';
+import { IBranchMemoryBankRepository } from '../domain/repositories/IBranchMemoryBankRepository.js';
+import { WriteBranchDocumentUseCase } from '../application/usecases/branch/WriteBranchDocumentUseCase.js';
+import { migrationConfig } from '../config/migration-config.js';
 
 /**
  * ユースケースファクトリー

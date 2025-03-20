@@ -1,6 +1,8 @@
-import { IController } from '../.jsIController.js';
-import { MCPResponse } from '../presenters/types/index.js';
-import { DocumentDTO, JsonDocumentDTO } from '../../application/dtos/index.js';
+import type { DocumentDTO } from "../../../application/dtos/DocumentDTO.js";
+import type { JsonDocumentDTO } from "../../../application/dtos/JsonDocumentDTO.js";
+import type { MCPResponse } from "../../presenters/types/MCPResponse.js";
+import type { IController } from "./IController.js";
+
 
 /**
  * Interface for global memory bank controller

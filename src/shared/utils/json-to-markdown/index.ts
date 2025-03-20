@@ -1,18 +1,18 @@
 // Export main converter
-export { JsonToMarkdownConverter, JsonToMarkdownOptions } from '../.jsJsonToMarkdownConverter.js';
+export { JsonToMarkdownConverter, JsonToMarkdownOptions } from './JsonToMarkdownConverter.js';
 
 // Export builder
-export { MarkdownBuilder } from '../.jsMarkdownBuilder.js';
+export { MarkdownBuilder } from './MarkdownBuilder.js';
 
 // Export interfaces
-export { IDocumentTypeConverter, BaseDocumentTypeConverter } from '../.jsDocumentTypeConverter.js';
+export { IDocumentTypeConverter, BaseDocumentTypeConverter } from './DocumentTypeConverter.js';
 
 // Export converters
-export { BranchContextConverter } from '../.jsconverters/BranchContextConverter.js';
-export { ActiveContextConverter } from '../.jsconverters/ActiveContextConverter.js';
-export { ProgressConverter } from '../.jsconverters/ProgressConverter.js';
-export { SystemPatternsConverter } from '../.jsconverters/SystemPatternsConverter.js';
-export { GenericConverter } from '../.jsconverters/GenericConverter.js';
+export { BranchContextConverter } from './converters/BranchContextConverter.js';
+export { ActiveContextConverter } from './converters/ActiveContextConverter.js';
+export { ProgressConverter } from './converters/ProgressConverter.js';
+export { SystemPatternsConverter } from './converters/SystemPatternsConverter.js';
+export { GenericConverter } from './converters/GenericConverter.js';
 
 // Factory function to create a fully configured converter
 export async function createDefaultConverter() {

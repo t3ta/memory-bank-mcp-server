@@ -1,9 +1,9 @@
 // Export bridge for backward compatibility
-export * from '../.jsFileSystemTagIndexRepositoryV1Bridge.js';
+export * from './FileSystemTagIndexRepositoryV1Bridge.js';
 
 // Export actual implementation
-export * from '../.jsFileSystemTagIndexRepositoryImpl.js';
+export * from './FileSystemTagIndexRepositoryImpl.js';
 
 // Add compatibility alias to simplify migration
-import { FileSystemTagIndexRepositoryImpl } from '../.jsFileSystemTagIndexRepositoryImpl.js';
+import { FileSystemTagIndexRepositoryImpl } from './FileSystemTagIndexRepositoryImpl.js';
 export const FileSystemTagIndexRepository = FileSystemTagIndexRepositoryImpl;

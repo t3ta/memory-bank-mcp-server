@@ -1,19 +1,19 @@
 // Global memory bank use cases
-export * from '../.jsglobal/ReadGlobalDocumentUseCase.js';
-export * from '../.jsglobal/WriteGlobalDocumentUseCase.js';
+export * from './global/ReadGlobalDocumentUseCase.js';
+export * from './global/WriteGlobalDocumentUseCase.js';
 
 // Branch memory bank use cases
-export * from '../.jsbranch/ReadBranchDocumentUseCase.js';
-export * from '../.jsbranch/WriteBranchDocumentUseCase.js';
+export * from './branch/ReadBranchDocumentUseCase.js';
+export * from './branch/WriteBranchDocumentUseCase.js';
 
 // Common use cases
-export * from '../.jscommon/SearchDocumentsByTagsUseCase.js';
-export * from '../.jscommon/UpdateTagIndexUseCase.js';
-export * from '../.jscommon/GetRecentBranchesUseCase.js';
-export * from '../.jscommon/ReadBranchCoreFilesUseCase.js';
-export * from '../.jscommon/CreateBranchCoreFilesUseCase.js';
-export * from '../.jscommon/ReadContextUseCase.js';
-export * from '../.jscommon/ReadRulesUseCase.js';
+export * from './common/SearchDocumentsByTagsUseCase.js';
+export * from './common/UpdateTagIndexUseCase.js';
+export * from './common/GetRecentBranchesUseCase.js';
+export * from './common/ReadBranchCoreFilesUseCase.js';
+export * from './common/CreateBranchCoreFilesUseCase.js';
+export * from './common/ReadContextUseCase.js';
+export * from './common/ReadRulesUseCase.js';
 
 // JSON document use cases
-export * from '../.jsjson/index.js';
+export * from './json/index.js';

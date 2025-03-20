@@ -1,16 +1,14 @@
-import { IUseCase } from '../interfaces/IUseCase.js';
-import { IJsonDocumentRepository } from '../../domain/repositories/IJsonDocumentRepository.js';
-import { BranchInfo } from '../../domain/entities/BranchInfo.js';
-import { DocumentPath } from '../../domain/entities/DocumentPath.js';
-import { DocumentId } from '../../domain/entities/DocumentId.js';
-import { JsonDocument, DocumentType } from '../../domain/entities/JsonDocument.js';
-import { Tag } from '../../domain/entities/Tag.js';
-import { DomainError } from '../../shared/errors/DomainError.js';
-import {
-  ApplicationError,
-  ApplicationErrorCodes,
-} from '../../shared/errors/ApplicationError.js';
-import { IIndexService } from '../../infrastructure/index/interfaces/IIndexService.js';
+import { BranchInfo } from "../../../domain/entities/BranchInfo.js";
+import { DocumentId } from "../../../domain/entities/DocumentId.js";
+import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
+import type { JsonDocument } from "../../../domain/entities/JsonDocument.js";
+import { Tag } from "../../../domain/entities/Tag.js";
+import type { IJsonDocumentRepository } from "../../../domain/repositories/IJsonDocumentRepository.js";
+import type { IIndexService } from "../../../infrastructure/index/index.js";
+import type { JsonDocument } from "../../../schemas/json-document.js";
+import { ApplicationError, ApplicationErrorCodes } from "../../../shared/errors/ApplicationError.js";
+import { DomainError } from "../../../shared/errors/DomainError.js";
+import type { IUseCase } from "../../interfaces/IUseCase.js";
 
 /**
  * Input data for write JSON document use case

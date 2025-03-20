@@ -1,8 +1,8 @@
-import { MemoryDocument } from '..entities/MemoryDocument.js';
-import { DocumentPath } from '..entities/DocumentPath.js';
-import { BranchInfo } from '..entities/BranchInfo.js';
-import { Tag } from '..entities/Tag.js';
-import { TagIndex } from '../schemas/tag-index/tag-index-schema.js';
+import type { TagIndex } from "../../schemas/tag-index/tag-index-schema.js";
+import type { BranchInfo } from "../entities/BranchInfo.js";
+import type { DocumentPath } from "../entities/DocumentPath.js";
+import type { MemoryDocument } from "../entities/MemoryDocument.js";
+import type { Tag } from "../entities/Tag.js";
 
 /**
  * Interface for recent branch information

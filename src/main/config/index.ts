@@ -1,1 +1,1 @@
-export * from '../.jsconstants.js';
+export * from '../constants.js';

@@ -1,22 +1,21 @@
-import path from 'path';
-import { promises as fs } from 'fs';
+import path from 'node:path';
 
-import { BranchInfo } from '../domain/entities/BranchInfo.js';
-import { DocumentId } from '../domain/entities/DocumentId.js';
-import { DocumentPath } from '../domain/entities/DocumentPath.js';
-import { JsonDocument, DocumentType } from '../domain/entities/JsonDocument.js';
-import { Tag } from '../domain/entities/Tag.js';
-import { IFileSystemService } from '../infrastructure/storage/interfaces/IFileSystemService.js';
+import { BranchInfo } from '../../domain/entities/BranchInfo.js';
+import { DocumentId } from '../../domain/entities/DocumentId.js';
+import { DocumentPath } from '../../domain/entities/DocumentPath.js';
+import { JsonDocument, DocumentType } from '../../domain/entities/JsonDocument.js';
+import { Tag } from '../../domain/entities/Tag.js';
+import { IFileSystemService } from '../storage/interfaces/IFileSystemService.js';
 import {
   InfrastructureError,
   InfrastructureErrorCodes,
-} from '../shared/errors/InfrastructureError.js';
-import { IIndexService } from '../.jsinterfaces/IIndexService.js';
+} from '../../shared/errors/InfrastructureError.js';
+import { IIndexService } from './interfaces/IIndexService.js';
 import {
   DocumentReference,
   DocumentIndex,
   INDEX_SCHEMA_VERSION,
-} from '../schemas/v2/index-schema.js';
+} from '../../schemas/v2/index-schema.js';
 
 /**
  * Implementation of the document index service
@@ -241,7 +240,7 @@ export class IndexService implements IIndexService {
       // For each additional tag, keep only documents that have that tag too
       for (let i = 1; i < tags.length; i++) {
         const tagDocs = new Set(index.tagIndex[tags[i].value] || []);
-        matchingIds = new Set([..matchingIds].filter((id) => tagDocs.has(id)));
+        matchingIds = new Set([...matchingIds].filter((id) => tagDocs.has(id)));
       }
     } else {
       // Documents can have any of the tags - union of all tag document sets

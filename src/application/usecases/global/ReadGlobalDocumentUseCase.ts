@@ -1,12 +1,10 @@
-import { IUseCase } from '../interfaces/IUseCase.js';
-import { DocumentDTO } from '../dtos/DocumentDTO.js';
-import { IGlobalMemoryBankRepository } from '../../domain/repositories/IGlobalMemoryBankRepository.js';
-import { DocumentPath } from '../../domain/entities/DocumentPath.js';
-import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
-import {
-  ApplicationError,
-  ApplicationErrorCodes,
-} from '../../shared/errors/ApplicationError.js';
+import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
+import type { IGlobalMemoryBankRepository } from "../../../domain/repositories/IGlobalMemoryBankRepository.js";
+import { ApplicationError, ApplicationErrorCodes } from "../../../shared/errors/ApplicationError.js";
+import { DomainError, DomainErrorCodes } from "../../../shared/errors/DomainError.js";
+import type { DocumentDTO } from "../../dtos/DocumentDTO.js";
+import type { IUseCase } from "../../interfaces/IUseCase.js";
+
 
 /**
  * Input data for read global document use case

@@ -1,6 +1,6 @@
-# システムパターン
+# System Patterns
 
-## 技術的決定事項
+## Technical Decisions
 
 ### 既存マネージャークラスとmodelsディレクトリの削除
 
@@ -737,7 +737,7 @@ export class MemoryDocument {
   }
 
   public get tags(): Tag[] {
-    return [..this.props.tags];
+    return [...this.props.tags];
   }
 
   public get lastModified(): Date {
@@ -756,7 +756,7 @@ export class MemoryDocument {
 
     return new MemoryDocument({
       ..this.props,
-      tags: [..this.props.tags, tag],
+      tags: [...this.props.tags, tag],
       lastModified: new Date()
     });
   }

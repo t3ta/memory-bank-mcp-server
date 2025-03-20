@@ -1,15 +1,4 @@
-/**
- * Supported languages
- */
-export type Language = 'en' | 'ja';
-
-/**
- * Types of memory banks available in the system
- */
-export enum _MemoryBankType {
-  _GLOBAL = 'global',
-  _BRANCH = 'branch',
-}
+import type { Language } from "../../schemas/v2/i18n-schema.js";
 
 /**
  * Core files required for branch memory bank

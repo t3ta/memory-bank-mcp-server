@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 import { IMemoryDocumentRepository } from '../../domain/repositories/IMemoryDocumentRepository.js';
 import { MemoryDocument } from '../../domain/entities/MemoryDocument.js';
 import { DocumentPath } from '../../domain/entities/DocumentPath.js';

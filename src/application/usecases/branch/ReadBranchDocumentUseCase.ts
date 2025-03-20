@@ -1,13 +1,13 @@
-import { IUseCase } from '../interfaces/IUseCase.js';
-import { DocumentDTO } from '../dtos/DocumentDTO.js';
-import { IBranchMemoryBankRepository } from '../../domain/repositories/IBranchMemoryBankRepository.js';
-import { DocumentPath } from '../../domain/entities/DocumentPath.js';
-import { BranchInfo } from '../../domain/entities/BranchInfo.js';
-import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
+import { IUseCase } from '../../interfaces/IUseCase.js';
+import { DocumentDTO } from '../../dtos/DocumentDTO.js';
+import { IBranchMemoryBankRepository } from '../../../domain/repositories/IBranchMemoryBankRepository.js';
+import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
+import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
+import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
 import {
   ApplicationError,
   ApplicationErrorCodes,
-} from '../../shared/errors/ApplicationError.js';
+} from '../../../shared/errors/ApplicationError.js';
 
 /**
  * Input data for read branch document use case

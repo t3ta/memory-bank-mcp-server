@@ -1,10 +1,8 @@
 import { z } from 'zod';
-import { ValidationErrorType } from '..shared/types/index.js';
-import { parseDateSafely } from '..shared/utils/index.js';
+import { ValidationErrorType } from '../shared/types/index.js';
+import type { parseDateSafely } from '../shared/utils/index.js';
+import { FlexibleDateSchema, TagSchema } from './common.js';
 
-// Import and re-export common schemas
-import { FlexibleDateSchema, TagSchema } from '../.jscommon.js';
-export { FlexibleDateSchema, TagSchema } from '../.jscommon.js';
 
 // Path schema
 export const PathSchema = z
@@ -184,10 +182,10 @@ export const WriteBranchCoreFilesArgsSchema = z
   .merge(BaseToolArgsSchema);
 
 // Export json document schemas
-export * from '../.jsjson-document.js';
+export * from './json-document.js';
 
 // Export v2 json document schemas
-export * as V2 from '../.jsv2/index.js';
+export * as V2 from './v2/index.js';
 
 // Re-export date utility function
 export { parseDateSafely };

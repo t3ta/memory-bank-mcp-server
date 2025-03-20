@@ -1,11 +1,11 @@
-import { IPresenter } from '../.jsinterfaces/IPresenter.js';
-import { IResponsePresenter } from '../.jsinterfaces/IResponsePresenter.js';
-import { MCPResponse, MCPSuccessResponse, MCPErrorResponse } from '../.jstypes/index.js';
-import { BaseError } from '../shared/errors/BaseError.js';
-import { DomainError } from '../shared/errors/DomainError.js';
-import { ApplicationError } from '../shared/errors/ApplicationError.js';
-import { InfrastructureError } from '../shared/errors/InfrastructureError.js';
-import { logger } from '../shared/utils/logger.js';
+import { ApplicationError } from "../../shared/errors/ApplicationError.js";
+import { BaseError } from "../../shared/errors/BaseError.js";
+import { DomainError } from "../../shared/errors/DomainError.js";
+import { InfrastructureError } from "../../shared/errors/InfrastructureError.js";
+import { logger } from "../../shared/utils/logger.js";
+import type { IPresenter } from "./interfaces/IPresenter.js";
+import type { IResponsePresenter } from "./interfaces/IResponsePresenter.js";
+import type { MCPResponse, MCPSuccessResponse, MCPErrorResponse } from "./types/MCPResponse.js";
 
 /**
  * Presenter for MCP server responses

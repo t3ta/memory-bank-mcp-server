@@ -1,21 +1,22 @@
-import { IContextController } from '../.jsinterfaces/IContextController.js';
-import { ReadContextUseCase, ContextRequest, ContextResult } from '../application/usecases/common/ReadContextUseCase.js';
-import { ReadRulesUseCase, RulesResult } from '../application/usecases/common/ReadRulesUseCase.js';
-import { DomainError } from '../shared/errors/DomainError.js';
-import { ApplicationError } from '../shared/errors/ApplicationError.js';
-import { InfrastructureError } from '../shared/errors/InfrastructureError.js';
+import { IContextController } from './interfaces/IContextController.js';
+import { ReadContextUseCase, ContextRequest, ContextResult } from '../../application/usecases/common/ReadContextUseCase.js';
+import { ReadRulesUseCase, RulesResult } from '../../application/usecases/common/ReadRulesUseCase.js';
+import { DomainError } from '../../shared/errors/DomainError.js';
+import { ApplicationError } from '../../shared/errors/ApplicationError.js';
+import { InfrastructureError } from '../../shared/errors/InfrastructureError.js';
+import { BaseError } from '../../shared/errors/BaseError.js';
 
 /**
- * コンテキストコントローラー
- * ルールやコンテキスト情報を取得するためのコントローラー
+ * Context Controller
+ * Controller for retrieving rules and context information
  */
 export class ContextController implements IContextController {
   readonly _type = 'controller' as const;
 
   /**
-   * コンストラクタ
-   * @param readContextUseCase コンテキスト読み込みユースケース
-   * @param readRulesUseCase ルール読み込みユースケース
+   * Constructor
+   * @param readContextUseCase Use case for reading context
+   * @param readRulesUseCase Use case for reading rules
    */
   constructor(
     private readonly readContextUseCase: ReadContextUseCase,
@@ -23,9 +24,9 @@ export class ContextController implements IContextController {
   ) { }
 
   /**
-   * 指定された言語のルールを読み込む
-   * @param language 言語コード ('en', 'ja', 'zh')
-   * @returns ルール読み込み結果
+   * Read rules for the specified language
+   * @param language Language code ('en', 'ja', 'zh')
+   * @returns Rules reading result
    */
   async readRules(language: string): Promise<{
     success: boolean;
@@ -44,9 +45,9 @@ export class ContextController implements IContextController {
   }
 
   /**
-   * コンテキストを読み込む
-   * @param request コンテキストリクエスト
-   * @returns コンテキスト読み込み結果
+   * Read context information
+   * @param request Context request
+   * @returns Context reading result
    */
   async readContext(request: ContextRequest): Promise<{
     success: boolean;
@@ -57,20 +58,20 @@ export class ContextController implements IContextController {
     const contextResult: ContextResult = {};
 
     try {
-      // サニタイズ
+      // Sanitize
       const sanitizedRequest = {
-        ..request,
-        // デフォルト値の設定
+        ...request,
+        // Set default values
         includeRules: request.includeRules !== undefined ? request.includeRules : false,
         includeBranchMemory: request.includeBranchMemory !== undefined ? request.includeBranchMemory : false,
         includeGlobalMemory: request.includeGlobalMemory !== undefined ? request.includeGlobalMemory : false
       };
 
-      // 存在しないブランチをリクエストされた場合は明示的にエラーを返す
+      // Return an explicit error if a non-existent branch is requested
       if (sanitizedRequest.includeBranchMemory) {
-        // ブランチが存在するか確認のために簡単なテスト
+        // Simple test to check if the branch exists
         try {
-          // ブランチメモリだけを対象に確認
+          // Check only against branch memory
           await this.readContextUseCase.execute({
             branch: sanitizedRequest.branch,
             language: sanitizedRequest.language,
@@ -79,22 +80,22 @@ export class ContextController implements IContextController {
             includeGlobalMemory: false
           });
         } catch (error) {
-          // ブランチが存在しない場合はここでエラーになる
+          // Error occurs here if the branch doesn't exist
           return this.handleError(error);
         }
       }
 
-      // ルールを読み込む（includeRulesが指定されている場合）
+      // Load rules (if includeRules is specified)
       if (sanitizedRequest.includeRules) {
         try {
           contextResult.rules = await this.readRulesUseCase.execute(sanitizedRequest.language);
         } catch (error) {
           console.error(`Failed to read rules: ${error instanceof Error ? error.message : 'Unknown error'}`);
-          // ルールの読み込みに失敗しても、他のコンテキストは読み込む
+          // Continue loading other contexts even if rules loading fails
         }
       }
 
-      // ブランチメモリーを読み込む場合
+      // Load branch memory if requested
       if (sanitizedRequest.includeBranchMemory) {
         try {
           const branchData = await this.readContextUseCase.execute({
@@ -109,11 +110,11 @@ export class ContextController implements IContextController {
           }
         } catch (error) {
           console.error(`Failed to read branch memory: ${error instanceof Error ? error.message : 'Unknown error'}`);
-          // 既にブランチの存在チェックをしているので、ここでエラーになるのは予期しない
+          // Unexpected error since we've already checked branch existence
         }
       }
 
-      // グローバルメモリーを読み込む場合
+      // Load global memory if requested
       if (sanitizedRequest.includeGlobalMemory) {
         try {
           const globalData = await this.readContextUseCase.execute({
@@ -128,7 +129,7 @@ export class ContextController implements IContextController {
           }
         } catch (error) {
           console.error(`Failed to read global memory: ${error instanceof Error ? error.message : 'Unknown error'}`);
-          // グローバルメモリーの読み込みが失敗した場合でもエラーを返さない
+          // Don't return an error even if global memory loading fails
         }
       }
 
@@ -142,9 +143,9 @@ export class ContextController implements IContextController {
   }
 
   /**
-   * エラーハンドリング
-   * @param error エラーオブジェクト
-   * @returns エラー情報を含むレスポンス
+   * Error handling
+   * @param error Error object
+   * @returns Response containing error information
    */
   private handleError(error: any): {
     success: boolean;
@@ -154,12 +155,16 @@ export class ContextController implements IContextController {
 
     let errorMessage: string;
 
-    if (
-      error instanceof DomainError ||
-      error instanceof ApplicationError ||
-      error instanceof InfrastructureError
-    ) {
-      errorMessage = `${error.code}: ${error.message}`;
+    if (error instanceof Error) {
+      // Check for our custom error types that extend BaseError
+      if (error instanceof DomainError ||
+          error instanceof ApplicationError ||
+          error instanceof InfrastructureError) {
+        const baseError = error as BaseError;
+        errorMessage = `${baseError.code}: ${baseError.message}`;
+      } else {
+        errorMessage = error.message;
+      }
     } else {
       errorMessage = error instanceof Error
         ? error.message

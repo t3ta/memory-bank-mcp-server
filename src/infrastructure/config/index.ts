@@ -1,3 +1,3 @@
-export * from '../.jsinterfaces/IConfigProvider.js';
-export * from '../.jsConfigProvider.js';
-export * from '../.jsWorkspaceConfig.js';
+export * from './interfaces/IConfigProvider.js';
+export * from './ConfigProvider.js';
+export * from './WorkspaceConfig.js';

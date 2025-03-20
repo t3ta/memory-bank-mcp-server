@@ -5,7 +5,7 @@
  * similar to existing markdown-parser.ts but tailored for migration
  */
 import crypto from 'crypto';
-import { DocumentType } from '../domain/entities/JsonDocument.js';
+import { DocumentType } from '../../domain/entities/JsonDocument.js';
 
 /**
  * Common structure for parsed markdown content

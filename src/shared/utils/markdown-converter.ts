@@ -1,12 +1,4 @@
-import {
-  JsonDocument,
-  BaseJsonDocument,
-  BranchContextJson,
-  ActiveContextJson,
-  ProgressJson,
-  SystemPatternsJson,
-  TechnicalDecisionContent,
-} from '../../../schemas/json-document.js';
+import type { JsonDocument, BaseJsonDocument, BranchContextJson, ActiveContextJson, ProgressJson, SystemPatternsJson, TechnicalDecisionContent } from "../../schemas/json-document.js";
 
 // 型ガード関数群
 function isValidStringArray(arr: unknown): arr is string[] {

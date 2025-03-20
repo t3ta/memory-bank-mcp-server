@@ -4,13 +4,13 @@
  * Converts active context markdown documents to JSON
  */
 import { v4 as uuidv4 } from 'uuid';
-import { BaseConverter } from '../.jsBaseConverter.js';
-import { parseMarkdownForMigration } from '..utils/MarkdownParser.js';
-import { JsonDocument } from '../domain/entities/JsonDocument.js';
-import { DocumentPath } from '../domain/entities/DocumentPath.js';
-import { DocumentId } from '../domain/entities/DocumentId.js';
-import { Tag } from '../domain/entities/Tag.js';
-import { ActiveContextContentV2 } from '../schemas/v2/json-document.js';
+import { BaseConverter } from './BaseConverter.js';
+import { parseMarkdownForMigration } from '../utils/MarkdownParser.js';
+import { JsonDocument } from '../../domain/entities/JsonDocument.js';
+import { DocumentPath } from '../../domain/entities/DocumentPath.js';
+import { DocumentId } from '../../domain/entities/DocumentId.js';
+import { Tag } from '../../domain/entities/Tag.js';
+import { ActiveContextContentV2 } from '../../schemas/v2/json-document.js';
 
 /**
  * Converter for active context documents

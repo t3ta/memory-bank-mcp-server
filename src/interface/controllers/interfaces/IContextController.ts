@@ -1,6 +1,6 @@
-import { Result } from '../../shared/types/Result.js';
-import { ContextRequest, ContextResult } from '../../application/usecases/common/ReadContextUseCase.js';
-import { RulesResult } from '../../application/usecases/common/ReadRulesUseCase.js';
+
+import type { Result } from "@modelcontextprotocol/sdk/types.js";
+import type { RulesResult, ContextRequest, ContextResult } from "../../../application/usecases/index.js";
 
 /**
  * コンテキストコントローラーインターフェース

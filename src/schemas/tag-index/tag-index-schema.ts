@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { TagSchema } from '..common.js';
+import { TagSchema } from '../common.js';
 
 /**
  * Schema for a tag index entry.

@@ -1,24 +1,16 @@
-import { BranchInfo } from '../../domain/entities/BranchInfo.js';
-import { IBranchMemoryBankRepository } from '../../domain/repositories/IBranchMemoryBankRepository.js';
-import { IGlobalMemoryBankRepository } from '../../domain/repositories/IGlobalMemoryBankRepository.js';
-import { DocumentId } from '../../domain/entities/DocumentId.js';
-import { JsonDocument } from '../../domain/entities/JsonDocument.js';
-import { MemoryDocument } from '../../domain/entities/MemoryDocument.js';
-import { FileSystemService } from '../storage/FileSystemService.js';
-import path from 'path';
-import { logger } from '../../shared/utils/logger.js';
-import {
-  BranchTagIndex,
-  GlobalTagIndex,
-  DocumentReference,
-  TAG_INDEX_VERSION,
-  BranchTagIndexSchema,
-  GlobalTagIndexSchema,
-} from '../../schemas/v2/tag-index.js';
-import {
-  InfrastructureError,
-  InfrastructureErrorCodes,
-} from '../../shared/errors/InfrastructureError.js';
+import path from "path";
+import type { BranchInfo } from "../../../domain/entities/BranchInfo.js";
+import { DocumentId } from "../../../domain/entities/DocumentId.js";
+import { JsonDocument } from "../../../domain/entities/JsonDocument.js";
+import type { IBranchMemoryBankRepository } from "../../../domain/repositories/IBranchMemoryBankRepository.js";
+import type { IGlobalMemoryBankRepository } from "../../../domain/repositories/IGlobalMemoryBankRepository.js";
+import type { MemoryDocument } from "../../../schemas/index.js";
+import type { JsonDocument } from "../../../schemas/json-document.js";
+import { type BranchTagIndex, BranchTagIndexSchema, type GlobalTagIndex, GlobalTagIndexSchema, type DocumentReference, TAG_INDEX_VERSION } from "../../../schemas/v2/tag-index.js";
+import { InfrastructureError, InfrastructureErrorCodes } from "../../../shared/errors/InfrastructureError.js";
+import { logger } from "../../../shared/utils/logger.js";
+import type { FileSystemService } from "../../storage/FileSystemService.js";
+
 
 /**
  * Implementation of ITagIndexRepository for file system storage

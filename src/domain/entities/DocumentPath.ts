@@ -1,4 +1,4 @@
-import { DomainError, DomainErrorCodes } from '../shared/errors/DomainError.js';
+import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
 
 // DocumentType without importing JsonDocument to avoid circular dependency
 type DocumentType =

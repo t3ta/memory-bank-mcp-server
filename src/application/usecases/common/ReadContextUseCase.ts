@@ -1,8 +1,8 @@
-import { IBranchMemoryBankRepository } from '../../domain/repositories/IBranchMemoryBankRepository.js';
-import { IGlobalMemoryBankRepository } from '../domain/repositories/IGlobalMemoryBankRepository.js';
-import { BranchInfo } from '../domain/entities/BranchInfo.js';
-import { DomainError, DomainErrorCodes } from '../shared/errors/DomainError.js';
-import { RulesResult } from '../.jsReadRulesUseCase.js';
+import { BranchInfo } from "../../../domain/entities/BranchInfo.js";
+import type { IBranchMemoryBankRepository } from "../../../domain/repositories/IBranchMemoryBankRepository.js";
+import type { IGlobalMemoryBankRepository } from "../../../domain/repositories/IGlobalMemoryBankRepository.js";
+import { DomainError, DomainErrorCodes } from "../../../shared/errors/DomainError.js";
+import type { RulesResult } from "./ReadRulesUseCase.js";
 
 export type ContextRequest = {
   branch: string;

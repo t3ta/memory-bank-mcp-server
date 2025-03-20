@@ -1,5 +1,5 @@
-import { DocumentMetadataV2 as DocumentMetadata } from '../schemas/v2/json-document.js';
 import crypto from 'crypto';
+import type { DocumentMetadata } from '../../schemas/json-document.js';
 
 /**
  * Parse markdown document to extract metadata and content sections

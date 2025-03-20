@@ -3,15 +3,13 @@
 import { promises as fs } from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Server } from '@modelcontextprotocol/sdk/dist/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/dist/server/stdio.js';
-import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/dist/types.js';
-import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-
-// Import the application
+import yargs from 'yargs/yargs';
 import { createApplication, Application } from './main/index.js';
 import { logger } from './shared/utils/index.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js';
+import { Server } from 'node:http';
 
 // Helper function to render template with translations
 function renderTemplate(template: any, translations: any): string {

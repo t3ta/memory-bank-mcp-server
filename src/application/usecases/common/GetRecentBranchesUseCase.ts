@@ -1,10 +1,10 @@
-import { IUseCase } from '../interfaces/IUseCase.js';
-import { IBranchMemoryBankRepository } from '../../domain/repositories/IBranchMemoryBankRepository.js';
-import { RecentBranchDTO } from '../dtos/RecentBranchDTO.js';
+import { IUseCase } from '../../interfaces/IUseCase.js';
+import { IBranchMemoryBankRepository } from '../../../domain/repositories/IBranchMemoryBankRepository.js';
+import { RecentBranchDTO } from '../../dtos/RecentBranchDTO.js';
 import {
   ApplicationError,
   ApplicationErrorCodes,
-} from '../../shared/errors/ApplicationError.js';
+} from '../../../shared/errors/ApplicationError.js';
 
 /**
  * Input data for getting recent branches

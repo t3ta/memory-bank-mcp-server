@@ -1,17 +1,15 @@
-import path from 'path';
+import path from "path";
+import { BranchInfo } from "../../../domain/entities/BranchInfo.js";
+import type { DocumentId } from "../../../domain/entities/DocumentId.js";
+import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
+import type { JsonDocument } from "../../../domain/entities/JsonDocument.js";
+import type { Tag } from "../../../domain/entities/Tag.js";
+import type { IJsonDocumentRepository } from "../../../domain/repositories/IJsonDocumentRepository.js";
+import type { JsonDocument } from "../../../schemas/json-document.js";
+import { InfrastructureError, InfrastructureErrorCodes } from "../../../shared/errors/InfrastructureError.js";
+import type { IIndexService } from "../../index/index.js";
+import type { IFileSystemService } from "../../storage/interfaces/IFileSystemService.js";
 
-import { IJsonDocumentRepository } from '../../domain/repositories/IJsonDocumentRepository.js';
-import { BranchInfo } from '../../domain/entities/BranchInfo.js';
-import { DocumentId } from '../../domain/entities/DocumentId.js';
-import { DocumentPath } from '../../domain/entities/DocumentPath.js';
-import { JsonDocument, DocumentType } from '../../domain/entities/JsonDocument.js';
-import { Tag } from '../../domain/entities/Tag.js';
-import { IFileSystemService } from '../../infrastructure/storage/interfaces/IFileSystemService.js';
-import {
-  InfrastructureError,
-  InfrastructureErrorCodes,
-} from '../../shared/errors/InfrastructureError.js';
-import { IIndexService } from '../index/interfaces/IIndexService.js';
 
 /**
  * File system implementation of the JSON document repository

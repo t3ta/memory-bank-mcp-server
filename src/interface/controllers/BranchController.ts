@@ -1,25 +1,16 @@
-import { IBranchController } from '../.jsinterfaces/IBranchController.js';
-import { DocumentType } from '../domain/entities/JsonDocument.js';
-import { ReadBranchDocumentUseCase } from '../application/usecases/branch/ReadBranchDocumentUseCase.js';
-import { WriteBranchDocumentUseCase } from '../application/usecases/branch/WriteBranchDocumentUseCase.js';
-import { SearchDocumentsByTagsUseCase } from '../application/usecases/common/SearchDocumentsByTagsUseCase.js';
-import { UpdateTagIndexUseCase } from '../application/usecases/common/UpdateTagIndexUseCase.js';
-import { UpdateTagIndexUseCaseV2 } from '../application/usecases/common/UpdateTagIndexUseCaseV2.js';
-import { GetRecentBranchesUseCase } from '../application/usecases/common/GetRecentBranchesUseCase.js';
-import { ReadBranchCoreFilesUseCase } from '../application/usecases/common/ReadBranchCoreFilesUseCase.js';
-import { CreateBranchCoreFilesUseCase } from '../application/usecases/common/CreateBranchCoreFilesUseCase.js';
-import { ReadJsonDocumentUseCase } from '../application/usecases/json/ReadJsonDocumentUseCase.js';
-import { WriteJsonDocumentUseCase } from '../application/usecases/json/WriteJsonDocumentUseCase.js';
-import { DeleteJsonDocumentUseCase } from '../application/usecases/json/DeleteJsonDocumentUseCase.js';
-import { SearchJsonDocumentsUseCase } from '../application/usecases/json/SearchJsonDocumentsUseCase.js';
-import { UpdateJsonIndexUseCase } from '../application/usecases/json/UpdateJsonIndexUseCase.js';
-import { MCPResponsePresenter } from '..presenters/MCPResponsePresenter.js';
-import { MCPResponse } from '..presenters/types/index.js';
-import { DocumentDTO, CoreFilesDTO, JsonDocumentDTO } from '../application/dtos/index.js';
-import { DomainError } from '../shared/errors/DomainError.js';
-import { ApplicationError } from '../shared/errors/ApplicationError.js';
-import { InfrastructureError } from '../shared/errors/InfrastructureError.js';
-import { logger } from '../shared/utils/logger.js';
+import type { CoreFilesDTO } from "../../application/dtos/CoreFilesDTO.js";
+import type { DocumentDTO } from "../../application/dtos/DocumentDTO.js";
+import type { JsonDocumentDTO } from "../../application/dtos/JsonDocumentDTO.js";
+import type { UpdateTagIndexUseCaseV2 } from "../../application/usecases/common/UpdateTagIndexUseCaseV2.js";
+import type { ReadJsonDocumentUseCase, WriteJsonDocumentUseCase, DeleteJsonDocumentUseCase, SearchJsonDocumentsUseCase, UpdateJsonIndexUseCase, ReadBranchDocumentUseCase, WriteBranchDocumentUseCase, SearchDocumentsByTagsUseCase, UpdateTagIndexUseCase, GetRecentBranchesUseCase, ReadBranchCoreFilesUseCase, CreateBranchCoreFilesUseCase } from "../../application/usecases/index.js";
+import { ApplicationError } from "../../shared/errors/ApplicationError.js";
+import { DomainError } from "../../shared/errors/DomainError.js";
+import { InfrastructureError } from "../../shared/errors/InfrastructureError.js";
+import { logger } from "../../shared/utils/logger.js";
+import type { MCPResponsePresenter } from "../presenters/MCPResponsePresenter.js";
+import type { MCPResponse } from "../presenters/types/MCPResponse.js";
+import type { IBranchController } from "./interfaces/IBranchController.js";
+
 
 /**
  * Controller for branch memory bank operations
