@@ -10,8 +10,8 @@ import { InfrastructureError, InfrastructureErrorCodes } from '../../../../src/s
 
 // withFileSystemRetry をモック化して、リトライ機能をテストから分離
 jest.mock('../../../../src/infrastructure/repositories/file-system/FileSystemRetryUtils.js', () => ({
-  withFileSystemRetry: jest.fn((operationName, fn) => fn()),
-  isRetryableError: jest.fn(() => false),
+  withFileSystemRetry: jest.fn<Promise<any>, [string, () => Promise<any>, object?]>((operationName, fn) => fn()),
+  isRetryableError: jest.fn<boolean, [unknown]>(() => false),
 }));
 
 // fs/promises モジュールをモック化
@@ -47,7 +47,7 @@ describe('FileSystemService', () => {
       // Setup
       const filePath = '/test/file.txt';
       const fileContent = 'Test file content';
-      (fs.readFile as jest.Mock).mockResolvedValue(fileContent);
+      (fs.readFile as jest.Mock<Promise<string>>).mockResolvedValue(fileContent);
 
       // Act
       const result = await fileSystemService.readFile(filePath);
@@ -62,7 +62,7 @@ describe('FileSystemService', () => {
       const filePath = '/test/nonexistent.txt';
       const error = new Error('File not found');
       (error as any).code = 'ENOENT';
-      (fs.readFile as jest.Mock).mockRejectedValue(error);
+      (fs.readFile as jest.Mock<Promise<string>>).mockRejectedValue(error);
 
       // Act & Assert
       await expect(fileSystemService.readFile(filePath)).rejects.toThrow(InfrastructureError);
@@ -76,7 +76,7 @@ describe('FileSystemService', () => {
       const filePath = '/test/protected.txt';
       const error = new Error('Permission denied');
       (error as any).code = 'EACCES';
-      (fs.readFile as jest.Mock).mockRejectedValue(error);
+      (fs.readFile as jest.Mock<Promise<string>>).mockRejectedValue(error);
 
       // Act & Assert
       await expect(fileSystemService.readFile(filePath)).rejects.toThrow(InfrastructureError);
@@ -89,7 +89,7 @@ describe('FileSystemService', () => {
       // Setup
       const filePath = '/test/error.txt';
       const error = new Error('Unknown error');
-      (fs.readFile as jest.Mock).mockRejectedValue(error);
+      (fs.readFile as jest.Mock<Promise<string>>).mockRejectedValue(error);
 
       // Act & Assert
       await expect(fileSystemService.readFile(filePath)).rejects.toThrow(InfrastructureError);
@@ -107,8 +107,8 @@ describe('FileSystemService', () => {
       const content = 'Test content to write';
       
       // Mock directory exists check and file write
-      (fs.mkdir as jest.Mock).mockResolvedValue(undefined);
-      (fs.writeFile as jest.Mock).mockResolvedValue(undefined);
+      (fs.mkdir as jest.Mock<Promise<void>>).mockResolvedValue(undefined);
+      (fs.writeFile as jest.Mock<Promise<void>>).mockResolvedValue(undefined);
 
       // Act
       await fileSystemService.writeFile(filePath, content);
@@ -126,8 +126,8 @@ describe('FileSystemService', () => {
       (error as any).code = 'EACCES';
       
       // Mock directory creation success but file write failure
-      (fs.mkdir as jest.Mock).mockResolvedValue(undefined);
-      (fs.writeFile as jest.Mock).mockRejectedValue(error);
+      (fs.mkdir as jest.Mock<Promise<void>>).mockResolvedValue(undefined);
+      (fs.writeFile as jest.Mock<Promise<void>>).mockRejectedValue(error);
 
       // Act & Assert
       await expect(fileSystemService.writeFile(filePath, content)).rejects.toThrow(InfrastructureError);
@@ -143,8 +143,8 @@ describe('FileSystemService', () => {
       const error = new Error('Unknown error');
       
       // Mock directory creation success but file write failure
-      (fs.mkdir as jest.Mock).mockResolvedValue(undefined);
-      (fs.writeFile as jest.Mock).mockRejectedValue(error);
+      (fs.mkdir as jest.Mock<Promise<void>>).mockResolvedValue(undefined);
+      (fs.writeFile as jest.Mock<Promise<void>>).mockRejectedValue(error);
 
       // Act & Assert
       await expect(fileSystemService.writeFile(filePath, content)).rejects.toThrow(InfrastructureError);
@@ -158,7 +158,7 @@ describe('FileSystemService', () => {
     it('should return true when file exists', async () => {
       // Setup
       const filePath = '/test/exists.txt';
-      (fs.stat as jest.Mock).mockResolvedValue({
+      (fs.stat as jest.Mock<Promise<{ isFile: () => boolean }>>).mockResolvedValue({
         isFile: () => true,
       });
 
@@ -173,7 +173,7 @@ describe('FileSystemService', () => {
     it('should return false when path exists but is not a file', async () => {
       // Setup
       const dirPath = '/test/dir';
-      (fs.stat as jest.Mock).mockResolvedValue({
+      (fs.stat as jest.Mock<Promise<{ isFile: () => boolean }>>).mockResolvedValue({
         isFile: () => false,
       });
 
@@ -189,7 +189,7 @@ describe('FileSystemService', () => {
       // Setup
       const filePath = '/test/nonexistent.txt';
       const error = new Error('File not found');
-      (fs.stat as jest.Mock).mockRejectedValue(error);
+      (fs.stat as jest.Mock<Promise<{ isFile: () => boolean }>>).mockRejectedValue(error);
 
       // Act
       const result = await fileSystemService.fileExists(filePath);
@@ -204,7 +204,7 @@ describe('FileSystemService', () => {
     it('should create directory successfully', async () => {
       // Setup
       const dirPath = '/test/newdir';
-      (fs.mkdir as jest.Mock).mockResolvedValue(undefined);
+      (fs.mkdir as jest.Mock<Promise<void>>).mockResolvedValue(undefined);
 
       // Act
       await fileSystemService.createDirectory(dirPath);
@@ -249,7 +249,7 @@ describe('FileSystemService', () => {
       const file2 = '/test/subdir/file2.txt';
       
       // Mock directory entries
-      (fs.readdir as jest.Mock).mockImplementation((dir) => {
+      (fs.readdir as jest.Mock).mockImplementation((dir: string) => {
         if (dir === rootDir) {
           return Promise.resolve([
             { name: 'file1.txt', isFile: () => true, isDirectory: () => false },
@@ -305,7 +305,7 @@ describe('FileSystemService', () => {
       const rootDir = '/test';
       
       // Mock batch processing behavior
-      (fs.readdir as jest.Mock).mockImplementation((dir) => {
+      (fs.readdir as jest.Mock).mockImplementation((dir: string) => {
         if (dir === rootDir) {
           return Promise.resolve([
             { name: 'file1.txt', isFile: () => true, isDirectory: () => false },

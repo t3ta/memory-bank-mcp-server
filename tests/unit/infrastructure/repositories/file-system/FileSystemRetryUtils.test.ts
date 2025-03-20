@@ -4,10 +4,10 @@
 
 import { jest } from '@jest/globals';
 import { InfrastructureError, InfrastructureErrorCodes } from '../../../../../src/shared/errors/InfrastructureError.js';
-import { withRetry, isRetryableError, withFileSystemRetry } from '../../../../../src/infrastructure/repositories/file-system/FileSystemRetryUtils.js';
+import { withRetry, isRetryableError, withFileSystemRetry, FILE_SYSTEM_BUSY, TEMPORARY_ERROR, IO_ERROR } from '../../../../../src/infrastructure/repositories/file-system/FileSystemRetryUtils.js';
 
 // Logger をモック化
-jest.mock('../../../../../src/shared/utils/logger.js', () => ({
+jest.mock('../../../../../src/shared/utils/logger', () => ({
   logger: {
     info: jest.fn(),
     debug: jest.fn(),
@@ -45,18 +45,21 @@ describe('FileSystemRetryUtils', () => {
 
     it('should identify specific InfrastructureError codes as retryable', () => {
       const busyError = new InfrastructureError(
-        InfrastructureErrorCodes.FILE_SYSTEM_BUSY,
-        'File system is busy'
+        InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
+        'File system is busy',
+        { code: FILE_SYSTEM_BUSY }
       );
 
       const tempError = new InfrastructureError(
-        InfrastructureErrorCodes.TEMPORARY_ERROR,
-        'Temporary error'
+        InfrastructureErrorCodes.CONFIGURATION_ERROR,
+        'Temporary error',
+        { code: TEMPORARY_ERROR }
       );
 
       const ioError = new InfrastructureError(
-        InfrastructureErrorCodes.IO_ERROR,
-        'IO error'
+        InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
+        'IO error',
+        { code: IO_ERROR }
       );
 
       // Act & Assert
@@ -88,14 +91,17 @@ describe('FileSystemRetryUtils', () => {
   describe('withRetry', () => {
     it('should return the result if the operation succeeds on first attempt', async () => {
       // Setup
-      const operation = jest.fn().mockResolvedValue('success');
+      const operation = async () => {
+        return 'success';
+      };
+      const operationSpy = jest.fn(operation);
 
       // Act
-      const result = await withRetry(operation);
+      const result = await withRetry(operationSpy);
 
       // Assert
       expect(result).toBe('success');
-      expect(operation).toHaveBeenCalledTimes(1);
+      expect(operationSpy).toHaveBeenCalledTimes(1);
     });
 
     it('should retry the operation if it fails with a retryable error', async () => {
@@ -103,12 +109,16 @@ describe('FileSystemRetryUtils', () => {
       const error = new Error('Temporary error');
       (error as any).code = 'ETIMEDOUT';
 
-      const operation = jest.fn()
-        .mockRejectedValueOnce(error)
-        .mockResolvedValueOnce('success');
+      const operation = async () => {
+        if (operationSpy.mock.calls.length === 1) {
+          throw error;
+        }
+        return 'success';
+      };
+      const operationSpy = jest.fn(operation);
 
       // Act
-      const resultPromise = withRetry(operation);
+      const resultPromise = withRetry(operationSpy);
       
       // Fast-forward timers to resolve the delay
       jest.runAllTimers();
@@ -117,7 +127,7 @@ describe('FileSystemRetryUtils', () => {
 
       // Assert
       expect(result).toBe('success');
-      expect(operation).toHaveBeenCalledTimes(2);
+      expect(operationSpy).toHaveBeenCalledTimes(2);
     });
 
     it('should respect maxRetries option', async () => {
@@ -125,22 +135,24 @@ describe('FileSystemRetryUtils', () => {
       const error = new Error('Temporary error');
       (error as any).code = 'ETIMEDOUT';
 
-      const operation = jest.fn()
-        .mockRejectedValueOnce(error)
-        .mockRejectedValueOnce(error)
-        .mockRejectedValueOnce(error)
-        .mockResolvedValueOnce('success');
+      const operation = async () => {
+        if (operationSpy.mock.calls.length <= 3) {
+          throw error;
+        }
+        return 'success';
+      };
+      const operationSpy = jest.fn(operation);
 
       // Act & Assert
       // Should fail because maxRetries is 2 (allowing 3 attempts total)
-      const resultPromise = withRetry(operation, { maxRetries: 2 });
+      const resultPromise = withRetry(operationSpy, { maxRetries: 2 });
       
       // Fast-forward timers to resolve all delays
       jest.runAllTimers();
       jest.runAllTimers();
       
       await expect(resultPromise).rejects.toThrow('Temporary error');
-      expect(operation).toHaveBeenCalledTimes(3); // Initial + 2 retries
+      expect(operationSpy).toHaveBeenCalledTimes(3); // Initial + 2 retries
     });
 
     it('should use exponential backoff', async () => {
@@ -148,16 +160,21 @@ describe('FileSystemRetryUtils', () => {
       const error = new Error('Temporary error');
       (error as any).code = 'ETIMEDOUT';
 
-      const operation = jest.fn()
-        .mockRejectedValueOnce(error)
-        .mockRejectedValueOnce(error)
-        .mockResolvedValueOnce('success');
+      const operation = async () => {
+        if (operationSpy.mock.calls.length === 1) {
+          throw error;
+        } else if (operationSpy.mock.calls.length === 2) {
+          throw error;
+        }
+        return 'success';
+      };
+      const operationSpy = jest.fn(operation);
 
       // Spy on setTimeout
       const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
 
       // Act
-      const resultPromise = withRetry(operation, { 
+      const resultPromise = withRetry(operationSpy, { 
         baseDelay: 100,
         backoffFactor: 2
       });
@@ -172,7 +189,7 @@ describe('FileSystemRetryUtils', () => {
 
       // Assert
       expect(result).toBe('success');
-      expect(operation).toHaveBeenCalledTimes(3);
+      expect(operationSpy).toHaveBeenCalledTimes(3);
       
       // Verify setTimeout was called with expected delays
       expect(setTimeoutSpy).toHaveBeenNthCalledWith(1, expect.any(Function), 100);
@@ -183,13 +200,14 @@ describe('FileSystemRetryUtils', () => {
       // Setup
       const error = new Error('Non-retryable error');
 
-      const operation = jest.fn()
-        .mockRejectedValueOnce(error)
-        .mockResolvedValueOnce('success');
+      const operation = async () => {
+        throw error;
+      };
+      const operationSpy = jest.fn(operation);
 
       // Act & Assert
-      await expect(withRetry(operation)).rejects.toThrow('Non-retryable error');
-      expect(operation).toHaveBeenCalledTimes(1); // No retries
+      await expect(withRetry(operationSpy)).rejects.toThrow('Non-retryable error');
+      expect(operationSpy).toHaveBeenCalledTimes(1); // No retries
     });
 
     it('should honor custom error filter', async () => {
@@ -197,12 +215,16 @@ describe('FileSystemRetryUtils', () => {
       const error = new Error('Custom retryable error');
       const customFilter = (err: unknown) => err instanceof Error && err.message.includes('custom');
 
-      const operation = jest.fn()
-        .mockRejectedValueOnce(error)
-        .mockResolvedValueOnce('success');
+      const operation = async () => {
+        if (operationSpy.mock.calls.length === 1) {
+          throw error;
+        }
+        return 'success';
+      };
+      const operationSpy = jest.fn(operation);
 
       // Act
-      const resultPromise = withRetry(operation, { retryableErrorFilter: customFilter });
+      const resultPromise = withRetry(operationSpy, { retryableErrorFilter: customFilter });
       
       // Fast-forward timers
       jest.runAllTimers();
@@ -211,31 +233,37 @@ describe('FileSystemRetryUtils', () => {
 
       // Assert
       expect(result).toBe('success');
-      expect(operation).toHaveBeenCalledTimes(2);
+      expect(operationSpy).toHaveBeenCalledTimes(2);
     });
   });
 
   describe('withFileSystemRetry', () => {
     it('should wrap operations with retry logic', async () => {
       // Setup
-      const operation = jest.fn().mockResolvedValue('success');
+      const operation = async () => {
+        return 'success';
+      };
+      const operationSpy = jest.fn(operation);
 
       // Act
-      const result = await withFileSystemRetry('test operation', operation);
+      const result = await withFileSystemRetry('test operation', operationSpy);
 
       // Assert
       expect(result).toBe('success');
-      expect(operation).toHaveBeenCalledTimes(1);
+      expect(operationSpy).toHaveBeenCalledTimes(1);
     });
 
     it('should wrap errors in InfrastructureError', async () => {
       // Setup
       const error = new Error('Random error');
-      const operation = jest.fn().mockRejectedValue(error);
+      const operation = async () => {
+        throw error;
+      };
+      const operationSpy = jest.fn(operation);
 
       // Act & Assert
-      await expect(withFileSystemRetry('test operation', operation)).rejects.toThrow(InfrastructureError);
-      await expect(withFileSystemRetry('test operation', operation)).rejects.toThrow(/File system operation 'test operation' failed/);
+      await expect(withFileSystemRetry('test operation', operationSpy)).rejects.toThrow(InfrastructureError);
+      await expect(withFileSystemRetry('test operation', operationSpy)).rejects.toThrow(/File system operation 'test operation' failed/);
     });
 
     it('should pass through InfrastructureErrors unchanged', async () => {
@@ -244,11 +272,14 @@ describe('FileSystemRetryUtils', () => {
         InfrastructureErrorCodes.FILE_NOT_FOUND,
         'Custom error message'
       );
-      const operation = jest.fn().mockRejectedValue(error);
+      const operation = async () => {
+        throw error;
+      };
+      const operationSpy = jest.fn(operation);
 
       // Act & Assert
-      await expect(withFileSystemRetry('test operation', operation)).rejects.toBe(error);
-      await expect(withFileSystemRetry('test operation', operation)).rejects.toThrow('Custom error message');
+      await expect(withFileSystemRetry('test operation', operationSpy)).rejects.toBe(error);
+      await expect(withFileSystemRetry('test operation', operationSpy)).rejects.toThrow('Custom error message');
     });
 
     it('should retry with custom options', async () => {
@@ -256,12 +287,16 @@ describe('FileSystemRetryUtils', () => {
       const error = new Error('Temporary error');
       (error as any).code = 'EBUSY';
 
-      const operation = jest.fn()
-        .mockRejectedValueOnce(error)
-        .mockResolvedValueOnce('success');
+      const operation = async () => {
+        if (operationSpy.mock.calls.length === 1) {
+          throw error;
+        }
+        return 'success';
+      };
+      const operationSpy = jest.fn(operation);
 
       // Act
-      const resultPromise = withFileSystemRetry('test operation', operation, {
+      const resultPromise = withFileSystemRetry('test operation', operationSpy, {
         maxRetries: 1,
         baseDelay: 50
       });
@@ -273,7 +308,7 @@ describe('FileSystemRetryUtils', () => {
 
       // Assert
       expect(result).toBe('success');
-      expect(operation).toHaveBeenCalledTimes(2);
+      expect(operationSpy).toHaveBeenCalledTimes(2);
     });
   });
 });

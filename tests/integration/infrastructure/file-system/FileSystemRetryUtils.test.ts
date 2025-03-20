@@ -42,7 +42,9 @@ describe('FileSystemRetryUtils Integration Tests', () => {
       
       // カウンタとモックオペレーション
       let attemptCount = 0;
-      const operation = jest.fn().mockImplementation(async () => {
+      
+      // 通常の関数として実装
+      const operation = async () => {
         attemptCount++;
         
         // 最初の2回は失敗
@@ -54,10 +56,13 @@ describe('FileSystemRetryUtils Integration Tests', () => {
         
         // 3回目は成功
         return await fs.readFile(filePath, 'utf-8');
-      });
+      };
+      
+      // スパイを設定
+      const operationSpy = jest.fn(operation);
       
       // リトライ付きで操作を実行
-      const result = await withRetry(operation, {
+      const result = await withRetry(operationSpy, {
         maxRetries: 5,
         baseDelay: 100
       });
@@ -65,43 +70,49 @@ describe('FileSystemRetryUtils Integration Tests', () => {
       // 検証
       expect(result).toBe(content);
       expect(attemptCount).toBe(3);
-      expect(operation).toHaveBeenCalledTimes(3);
+      expect(operationSpy).toHaveBeenCalledTimes(3);
     });
     
     it('should fail after maximum retries', async () => {
       // 常に失敗する操作
-      const operation = jest.fn().mockImplementation(() => {
+      const operation = async () => {
         const error = new Error('Persistent error');
         (error as any).code = 'EBUSY';
-        return Promise.reject(error);
-      });
+        throw error;
+      };
+      
+      // スパイを設定
+      const operationSpy = jest.fn(operation);
       
       // リトライ付きで操作を実行
-      await expect(withRetry(operation, {
+      await expect(withRetry(operationSpy, {
         maxRetries: 3,
         baseDelay: 50
       })).rejects.toThrow('Persistent error');
       
       // 検証 - 初回 + 3回のリトライ = 4回呼ばれるはず
-      expect(operation).toHaveBeenCalledTimes(4);
+      expect(operationSpy).toHaveBeenCalledTimes(4);
     });
     
     it('should not retry on non-retryable errors', async () => {
       // 非リトライ可能なエラーで失敗する操作
-      const operation = jest.fn().mockImplementation(() => {
+      const operation = async () => {
         const error = new Error('Non-retryable error');
         (error as any).code = 'ENOENT';
-        return Promise.reject(error);
-      });
+        throw error;
+      };
+      
+      // スパイを設定
+      const operationSpy = jest.fn(operation);
       
       // リトライ付きで操作を実行
-      await expect(withRetry(operation, {
+      await expect(withRetry(operationSpy, {
         maxRetries: 3,
         baseDelay: 50
       })).rejects.toThrow('Non-retryable error');
       
       // 検証 - 1回だけ呼ばれるはず
-      expect(operation).toHaveBeenCalledTimes(1);
+      expect(operationSpy).toHaveBeenCalledTimes(1);
     });
   });
   
