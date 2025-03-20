@@ -5,4 +5,4 @@
 /**
  * Simply redirect to the implementation in the parent directory
  */
-export { jsonToMarkdown } from '../markdown-converter';
+export { jsonToMarkdown } from '../../../../src/shared/utils/markdown-converter.js';

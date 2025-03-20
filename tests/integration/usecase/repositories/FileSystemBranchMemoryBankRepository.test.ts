@@ -1,16 +1,18 @@
+/**
+ * @jest-environment node
+ */
 // This file currently has TypeScript compilation issues
 // Tests are temporarily disabled to fix the immediate runtime errors
 
-import { FileSystemBranchMemoryBankRepository } from '../FileSystemBranchMemoryBankRepository';
-import { IFileSystemService } from '../../../storage/interfaces/IFileSystemService';
-import { IConfigProvider } from '../../../config/interfaces/IConfigProvider';
-import { MemoryDocument } from '../../../../domain/entities/MemoryDocument';
-import { BranchInfo } from '../../../../domain/entities/BranchInfo';
-import { Tag } from '../../../../domain/entities/Tag';
-import { DocumentPath } from '../../../../domain/entities/DocumentPath';
+import { FileSystemBranchMemoryBankRepository } from '../../../../src/infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.js';
+import { IFileSystemService } from '../../../../src/infrastructure/storage/interfaces/IFileSystemService.js';
+import { IConfigProvider } from '../../../../src/infrastructure/config/interfaces/IConfigProvider.js';
+import { MemoryDocument } from '../../../../src/domain/entities/MemoryDocument.js';
+import { BranchInfo } from '../../../../src/domain/entities/BranchInfo.js';
+import { Tag } from '../../../../src/domain/entities/Tag.js';
+import { DocumentPath } from '../../../../src/domain/entities/DocumentPath.js';
 
-// Mock for FileSystemMemoryDocumentRepository
-jest.mock('../FileSystemMemoryDocumentRepository');
+// No need for jest mock as we're using a simple test here
 
 describe('Temporary FileSystemBranchMemoryBankRepository Tests', () => {
   it('should skip tests with TypeScript issues', () => {

@@ -1,4 +1,4 @@
-import { MarkdownBuilder } from '../../json-to-markdown/MarkdownBuilder';
+import { MarkdownBuilder } from '../../../../../src/shared/utils/json-to-markdown/MarkdownBuilder.js';
 
 describe('MarkdownBuilder', () => {
   let builder: MarkdownBuilder;

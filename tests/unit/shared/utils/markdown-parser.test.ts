@@ -1,5 +1,5 @@
-import { parseMarkdown } from '../markdown-parser';
-import { DocumentMetadataV2 as DocumentMetadata } from '../../../schemas/v2/json-document';
+import { parseMarkdown } from '../../../../src/shared/utils/markdown-parser.js';
+import { DocumentMetadataV2 as DocumentMetadata } from '../../../../src/schemas/v2/json-document.js';
 
 describe('markdown-parser', () => {
   describe('parseMarkdown', () => {
