@@ -5,7 +5,7 @@ import { logger } from '../shared/utils/logger.js';
 import { IGlobalController } from '../interface/controllers/interfaces/IGlobalController.js';
 import { IBranchController } from '../interface/controllers/interfaces/IBranchController.js';
 import { CliOptions } from '../infrastructure/config/WorkspaceConfig.js';
-import type { Constants } from './config/constants.js';
+import { Constants } from './config/constants.js';
 
 /**
  * Application main class

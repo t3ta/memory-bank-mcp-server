@@ -1,6 +1,7 @@
 /**
  * Factory for creating appropriate converters based on document type
  */
+import { DocumentType } from "../../domain/entities/JsonDocument.js";
 import { ActiveContextConverter } from "./ActiveContextConverter.js";
 import type { BaseConverter } from "./BaseConverter.js";
 import { BranchContextConverter } from "./BranchContextConverter.js";
