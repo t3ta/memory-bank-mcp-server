@@ -41,6 +41,7 @@ export class ReadRulesUseCase {
     try {
       // ルールファイルのパス
       const filePath = path.join(this.rulesDir, `rules-${language}.md`);
+      console.log('Rules file path:', filePath);
 
       // ファイル読み込み
       const content = await fs.readFile(filePath, 'utf-8');

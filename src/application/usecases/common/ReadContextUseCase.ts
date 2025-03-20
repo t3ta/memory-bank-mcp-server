@@ -43,7 +43,8 @@ export class ReadContextUseCase {
     const result: ContextResult = {};
 
     // デバッグログを追加
-    console.log(`ReadContextUseCase.execute: ${JSON.stringify(request)}`);
+    console.log(`ReadContextUseCase.execute: ${JSON.stringify(request, null, 2)}`);
+      console.log(`Adding debug details: branchRepository=${this.branchRepository.constructor.name}, globalRepository=${this.globalRepository.constructor.name}`);
 
     try {
       // ブランチの存在確認（ブランチメモリが必要な場合のみ）

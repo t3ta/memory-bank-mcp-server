@@ -34,6 +34,8 @@ export class ContextController implements IContextController {
     error?: string;
   }> {
     try {
+      // Debug
+      console.log('Reading rules for language:', language);
       const result = await this.readRulesUseCase.execute(language);
       return {
         success: true,
@@ -151,7 +153,7 @@ export class ContextController implements IContextController {
     success: boolean;
     error: string;
   } {
-    console.error('ContextController error:', error);
+    console.error('ContextController error DETAILS:', error instanceof Error ? error.stack : error);
 
     let errorMessage: string;
 
