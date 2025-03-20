@@ -1,5 +1,6 @@
 import { BranchInfo } from "../../../domain/entities/BranchInfo.js";
 import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
+import type { JsonDocument } from "../../../domain/entities/JsonDocument.js";
 import type { IJsonDocumentRepository } from "../../../domain/repositories/IJsonDocumentRepository.js";
 import type { IIndexService } from "../../../infrastructure/index/index.js";
 import { ApplicationError, ApplicationErrorCodes } from "../../../shared/errors/ApplicationError.js";

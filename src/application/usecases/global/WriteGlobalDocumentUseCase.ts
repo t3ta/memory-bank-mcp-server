@@ -1,7 +1,7 @@
 import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
+import { MemoryDocument } from "../../../domain/entities/MemoryDocument.js";
 import { Tag } from "../../../domain/entities/Tag.js";
 import type { IGlobalMemoryBankRepository } from "../../../domain/repositories/IGlobalMemoryBankRepository.js";
-import { MemoryDocument } from "../../../schemas/v2/index.js";
 import type { ApplicationError, ApplicationErrorCodes } from "../../../shared/errors/ApplicationError.js";
 import { DomainError } from "../../../shared/errors/DomainError.js";
 import type { DocumentDTO } from "../../dtos/DocumentDTO.js";
