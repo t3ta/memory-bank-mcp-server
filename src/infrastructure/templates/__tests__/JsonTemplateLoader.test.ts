@@ -1,12 +1,12 @@
 /**
  * Tests for JsonTemplateLoader.ts
  */
-import { JsonTemplateLoader } from '../JsonTemplateLoader.js';
-import { JsonTemplate } from '../../../schemas/v2/template-schema.js';
-import { IFileSystemService } from '../../storage/interfaces/IFileSystemService.js';
-import { II18nProvider } from '../../i18n/interfaces/II18nProvider.js';
-import { Language } from '../../../schemas/v2/i18n-schema.js';
-import path from 'path';
+import { jest } from '@jest/globals';
+import { JsonTemplateLoader } from '../JsonTemplateLoader';
+import { JsonTemplate } from '../../../schemas/v2/template-schema';
+import { IFileSystemService } from '../../storage/interfaces/IFileSystemService';
+import { II18nProvider } from '../../i18n/interfaces/II18nProvider';
+import { Language } from '../../../schemas/v2/i18n-schema';
 
 // Mock file system service
 const mockFileSystemService: jest.Mocked<IFileSystemService> = {
@@ -18,9 +18,9 @@ const mockFileSystemService: jest.Mocked<IFileSystemService> = {
   directoryExists: jest.fn(),
   listFiles: jest.fn(),
   getFileStats: jest.fn(),
-  readFileChunk: jest.fn(),
-  getBranchMemoryPath: jest.fn(),
-  getConfig: jest.fn(),
+  readFileChunk: jest.fn().mockReturnValue(Promise.resolve('')) as jest.Mock<Promise<string>>,
+  getBranchMemoryPath: jest.fn().mockReturnValue('') as jest.Mock<string>,
+  getConfig: jest.fn().mockReturnValue({ memoryBankRoot: '' }) as jest.Mock<{ memoryBankRoot: string, [key: string]: any }>,
 };
 
 // Mock i18n provider
@@ -235,7 +235,7 @@ describe.skip('JsonTemplateLoader', () => {
     it('should throw error if language not supported', async () => {
       // Arrange
       const templateId = 'test-template';
-      const language = 'fr'; // Not supported in our sample
+      const language = 'fr' as Language; // Not supported in our sample
 
       // Make sure language check fails
       mockI18nProvider.isLanguageSupported.mockReturnValue(false);
