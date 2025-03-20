@@ -1,0 +1,19 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "c4b44e0b-1ebb-438d-9d54-da162ccadca3",
+    "title": "Markdown→JSON移行実装",
+    "documentType": "generic",
+    "path": "markdown-to-json-migration-implementation.md",
+    "tags": [],
+    "lastModified": "2025-03-18T16:01:31.750Z",
+    "createdAt": "2025-03-18T16:01:31.750Z",
+    "version": 1
+  },
+  "content": {
+    "rawContent": "# Markdown→JSON移行実装\n\n## 実装概要\n\nMarkdownドキュメント形式からJSON形式への移行を進めるため、以下の機能を実装しました：\n\n1. **Markdown書き込み禁止機能**\n2. **マイグレーション設定管理**\n3. **ユースケースファクトリー**\n4. **テストケース**\n\n## 実装内容\n\n### 1. WriteBranchDocumentUseCaseの拡張\n\n`WriteBranchDocumentUseCase`クラスに`disableMarkdownWrites`オプションを追加し、Markdownファイルへの書き込みを制御できるようにしました。\n\n```typescript\nconstructor(\n  private readonly branchRepository: IBranchMemoryBankRepository,\n  options?: {\n    /**\n     * Whether to disable Markdown writes\n     * @default false\n     */\n    disableMarkdownWrites?: boolean;\n  }\n) {\n  this.disableMarkdownWrites = options?.disableMarkdownWrites ?? false;\n}\n```\n\nドキュメントパスが`.md`で終わる場合、設定に基づいてエラーを投げるようにしました：\n\n```typescript\n// Check if markdown writes are disabled\nif (this.disableMarkdownWrites && documentPath.isMarkdown) {\n  const jsonPath = documentPath.value.replace(/\\.md$/, '.json');\n  throw new ApplicationError(\n    ApplicationErrorCodes.OPERATION_NOT_ALLOWED,\n    `Writing to Markdown files is disabled. Please use JSON format instead: ${jsonPath}`\n  );\n}\n```\n\n### 2. マイグレーション設定ファイル\n\n`src/config/migration-config.ts`に設定ファイルを作成し、マイグレーション関連の設定を一元管理できるようにしました。\n\n```typescript\nexport interface MigrationConfig {\n  disableMarkdownWrites: boolean;\n  enableAutoMigration: boolean;\n  forceJsonFormat: boolean;\n  showMigrationNotices: boolean;\n}\n```\n\n環境変数による設定切替も実装：\n\n```typescript\nexport function getMigrationConfig(): MigrationConfig {\n  return {\n    disableMarkdownWrites: process.env.NODE_ENV === 'production' || \n                           process.env.DISABLE_MARKDOWN_WRITES === 'true',\n    enableAutoMigration: process.env.ENABLE_AUTO_MIGRATION === 'true',\n    forceJsonFormat: process.env.FORCE_JSON_FORMAT === 'true',\n    showMigrationNotices: process.env.SHOW_MIGRATION_NOTICES !== 'false'\n  };\n}\n```\n\n### 3. ユースケースファクトリー\n\n`src/factory/use-case-factory.ts`にファクトリークラスを実装しました。マイグレーション設定に基づいて適切なユースケースを提供します。\n\n```typescript\nexport class UseCaseFactory {\n  static createWriteBranchDocumentUseCase(\n    branchRepository: IBranchMemoryBankRepository\n  ): WriteBranchDocumentUseCase {\n    return new WriteBranchDocumentUseCase(branchRepository, {\n      disableMarkdownWrites: migrationConfig.disableMarkdownWrites\n    });\n  }\n}\n```\n\n### 4. DIコンテナ設定の修正\n\n`src/main/di/providers.ts`内の`writeBranchDocumentUseCase`ファクトリーをファクトリークラスを使用するように更新しました。\n\n```typescript\ncontainer.registerFactory('writeBranchDocumentUseCase', () => {\n  const branchRepository = container.get(\n    'branchMemoryBankRepository'\n  ) as FileSystemBranchMemoryBankRepository;\n\n  // ファクトリーを使用してマイグレーション設定付きのUseCaseを取得\n  return UseCaseFactory.createWriteBranchDocumentUseCase(branchRepository);\n});\n```\n\n### 5. テスト実装\n\n以下のテストケースを実装しました：\n\n#### Markdown書き込みブロックテスト\n\n`tests/integration/markdown-to-json/markdown-write-block.test.ts`\n\n- 通常モードでのMarkdown書き込み\n- 禁止モードでのMarkdown書き込み（エラー確認）\n- JSON書き込み（成功確認）\n- Markdown読み取り（成功確認）\n\n#### マイグレーションテスト\n\n`tests/integration/markdown-to-json/markdown-to-json-migration.test.ts`\n\n- Markdownファイルの変換\n- バックアップと復元\n- 移行後の読み取り\n- 既存ファイルの処理\n\n#### JSON操作の完全性テスト\n\n`tests/integration/markdown-to-json/json-operations-completeness.test.ts`\n\n- 基本CRUD操作\n- タグ管理\n- 複雑なJSONデータ\n- 特殊文字/エスケープシーケンス処理\n- 大量データ処理\n\n## 運用方針\n\n1. 開発環境：デフォルトでMarkdown書き込み許可（柔軟な開発）\n2. 本番環境：Markdown書き込み禁止（JSON移行を推進）\n3. 将来的には段階的にMarkdown読み取りも制限\n\n## 今後の課題\n\n1. 自動マイグレーション機能の実装\n2. 完全移行のためのデータ検証\n3. YAMLフォーマットへの最終移行準備\n",
+    "sections": {
+      "": "1. 自動マイグレーション機能の実装\n2. 完全移行のためのデータ検証\n3. YAMLフォーマットへの最終移行準備"
+    }
+  }
+}

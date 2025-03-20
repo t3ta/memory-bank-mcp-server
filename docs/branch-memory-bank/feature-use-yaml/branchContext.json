@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "5ff9380d-bb61-4261-bff2-15fa33e8b96c",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-18T06:46:30.616Z",
+    "createdAt": "2025-03-18T06:46:30.616Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "feature/use-yaml",
+    "purpose": "このブランチの目的を記述してください",
+    "createdAt": "2025-03-18T06:46:30.616Z",
+    "userStories": [
+      {
+        "id": "ed963a7e-da11-4698-953e-4b8218412716",
+        "description": "解決する課題1",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "8c9b24db-6623-4223-a38b-11023bd87259",
+        "description": "解決する課題2",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "3d526d7d-e359-4d6b-9eb1-efef71e190f4",
+        "description": "解決する課題3",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": ""
+  }
+}

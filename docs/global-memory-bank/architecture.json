@@ -16,18 +16,101 @@
     "version": 1
   },
   "content": {
-    "overview": "Memory Bank MCP Server implements a clean architecture (also known as onion architecture) design pattern. This architecture separates the application into concentric layers, with domain logic at the center and infrastructure details at the periphery. This separation allows for better testability, maintainability, and flexibility.\n",
-    "core_principles": "1. **Dependency Rule**: Dependencies always point inward. Inner layers don't know about outer layers.\n2. **Domain-Centric**: The domain (business logic) is at the center of the architecture.\n3. **Separation of Concerns**: Each layer has a specific responsibility.\n4. **Framework Independence**: The core business logic doesn't depend on frameworks.\n5. **Testability**: The architecture makes the system easy to test.\n",
-    "architectural_layers": "The application is structured into the following layers, from innermost to outermost:\nThe domain layer is the core of the application, containing:\n**Entities**: Core business objects (e.g., MemoryDocument, BranchInfo, Tag)\n**Value Objects**: Immutable objects with equality based on attributes (e.g., DocumentPath)\n**Repository Interfaces**: Abstractions for data access\n**Domain Services**: Domain-specific business logic\nThis layer has no dependencies on other layers or external frameworks.The application layer coordinates the domain objects to perform tasks:\n**Use Cases**: Implementations of specific business operations\n**DTOs**: Data Transfer Objects for input/output mapping\n**Interfaces**: Abstractions used by the application layer\nThis layer depends only on the domain layer.The infrastructure layer provides implementations for external concerns:\n**Repositories**: Implementations of domain repository interfaces\n**Storage Services**: File system interactions, database access\n**Configuration**: Application configuration management\n**External Integrations**: Interactions with external systems\nThis layer depends on the domain and application layers.The interface layer handles the interaction with users or external systems:\n**Controllers**: Handle incoming requests\n**Presenters**: Format data for output\n**Validators**: Validate input data\nThis layer depends on the application layer.The main layer is the composition root and entry point of the application:\n**Dependency Injection**: Setup of the DI container\n**Configuration**: Application-wide configuration\n**Bootstrapping**: Startup logic\nThis layer depends on all other layers.",
-    "components": "**Dependency Injection Container**: Manages dependencies across the application\n**Controllers**: BranchController, GlobalController\n**Use Cases**: ReadBranchDocumentUseCase, WriteGlobalDocumentUseCase, etc.\n**Repositories**: FileSystemBranchMemoryBankRepository, FileSystemGlobalMemoryBankRepository\n**Entities**: MemoryDocument, BranchInfo, Tag\n**Value Objects**: DocumentPath\n**Services**: FileSystemService, ConfigProvider\n```┌────────────────────────────────────────────────────────────────┐\n│                          Main Layer                            │\n│                                                                │\n│    ┌────────────────────────────────────────────────────┐     │\n│    │                   Interface Layer                   │     │\n│    │                                                     │     │\n│    │    ┌────────────────────────────────────────┐      │     │\n│    │    │            Application Layer            │      │     │\n│    │    │                                         │      │     │\n│    │    │    ┌────────────────────────────┐      │      │     │\n│    │    │    │        Domain Layer         │      │      │     │\n│    │    │    │                             │      │      │     │\n│    │    │    │  - Entities                 │      │      │     │\n│    │    │    │  - Value Objects            │      │      │     │\n│    │    │    │  - Repository Interfaces    │      │      │     │\n│    │    │    │  - Domain Services          │      │      │     │\n│    │    │    └────────────────────────────┘      │      │     │\n│    │    │                                         │      │     │\n│    │    │  - Use Cases                            │      │     │\n│    │    │  - DTOs                                 │      │     │\n│    │    │  - Application Services                 │      │     │\n│    │    └────────────────────────────────────────┘      │     │\n│    │                                                     │     │\n│    │  - Controllers                                      │     │\n│    │  - Presenters                                       │     │\n│    │  - Validators                                       │     │\n│    └────────────────────────────────────────────────────┘     │\n│                                                                │\n│  ┌──────────────────────────────────────────────────────────┐ │\n│  │                   Infrastructure Layer                    │ │\n│  │                                                           │ │\n│  │  - Repository Implementations                             │ │\n│  │  - Storage Services                                       │ │\n│  │  - External Integrations                                  │ │\n│  └──────────────────────────────────────────────────────────┘ │\n│                                                                │\n│  - Dependency Injection                                        │\n│  - Bootstrapping                                               │\n└────────────────────────────────────────────────────────────────┘\n```\n",
-    "design_decisions": [
-      "**Context**: The original codebase was difficult to maintain and extend, with tightly coupled components and unclear separation of concerns.\n**Decision**: We adopted clean architecture to create a more maintainable and testable codebase.\n**Consequences**:\nImproved separation of concerns\nEnhanced testability\nBetter maintainability\nMore explicit dependencies\nInitial development overhead for setting up architectural boundaries\n**Context**: The original code had data access logic scattered throughout manager classes.**Decision**: We implemented the repository pattern to abstract data access.\n**Consequences**:\nCentralized data access logic\nAbility to swap storage mechanisms\nEasier mocking for tests\nClear separation of data access from business logic\n**Context**: The domain concepts were not clearly modeled in the original code.**Decision**: We applied DDD principles to model core domain concepts as entities and value objects.\n**Consequences**:\nRicher domain model\nEncapsulation of business rules in the domain\nMore intuitive code organization\nBetter alignment with business requirements\n**Context**: Original code had direct dependencies between components, making testing difficult.**Decision**: Implemented a dependency injection container to manage dependencies.\n**Consequences**:",
-      "Reduced coupling between components",
-      "Improved testability",
-      "More explicit dependencies",
-      "Enhanced configurability"
+    "overview": "Memory Bank MCP Server implements a clean architecture (also known as onion architecture) design pattern. This architecture separates the application into concentric layers, with domain logic at the center and infrastructure details at the periphery. This separation allows for better testability, maintainability, and flexibility.",
+    "core_principles": [
+      "Dependency Rule: Dependencies always point inward. Inner layers don't know about outer layers.",
+      "Domain-Centric: The domain (business logic) is at the center of the architecture.",
+      "Separation of Concerns: Each layer has a specific responsibility.",
+      "Framework Independence: The core business logic doesn't depend on frameworks.",
+      "Testability: The architecture makes the system easy to test."
     ],
-    "migration_strategy": "The migration from the old architecture to clean architecture follows a phased approach:\n1. Define domain layer (entities, value objects, repository interfaces)\n2. Implement application layer (use cases, DTOs)\n3. Implement infrastructure layer (repository implementations, services)\n4. Implement interface layer (controllers, presenters)\n5. Update entry point to use the new architecture\n6. Phase out old code gradually\n7. Add comprehensive tests\n8. Update documentation\n",
+    "architectural_layers": [
+      {
+        "layer": "Domain Layer",
+        "description": "The domain layer is the core of the application, containing entities, value objects, repository interfaces, and domain services. This layer has no dependencies on other layers or external frameworks."
+      },
+      {
+        "layer": "Application Layer",
+        "description": "The application layer coordinates the domain objects to perform tasks, including use cases, DTOs, and interfaces. This layer depends only on the domain layer."
+      },
+      {
+        "layer": "Infrastructure Layer",
+        "description": "The infrastructure layer provides implementations for external concerns, including repositories, storage services, configuration, and external integrations. This layer depends on the domain and application layers."
+      },
+      {
+        "layer": "Interface Layer",
+        "description": "The interface layer handles the interaction with users or external systems, including controllers, presenters, and validators. This layer depends on the application layer."
+      },
+      {
+        "layer": "Main Layer",
+        "description": "The main layer is the composition root and entry point of the application, including dependency injection, configuration, and bootstrapping. This layer depends on all other layers."
+      }
+    ],
+    "components": {
+      "primary": [
+        "Dependency Injection Container: Manages dependencies across the application",
+        "Controllers: BranchController, GlobalController",
+        "Use Cases: ReadBranchDocumentUseCase, WriteGlobalDocumentUseCase, etc.",
+        "Repositories: FileSystemBranchMemoryBankRepository, FileSystemGlobalMemoryBankRepository",
+        "Entities: MemoryDocument, BranchInfo, Tag",
+        "Value Objects: DocumentPath",
+        "Services: FileSystemService, ConfigProvider"
+      ],
+      "diagram": "┌────────────────────────────────────────────────────────────────┐\n│                          Main Layer                            │\n│                                                                │\n│    ┌────────────────────────────────────────────────────┐     │\n│    │                   Interface Layer                   │     │\n│    │                                                     │     │\n│    │    ┌────────────────────────────────────────┐      │     │\n│    │    │            Application Layer            │      │     │\n│    │    │                                         │      │     │\n│    │    │    ┌────────────────────────────┐      │      │     │\n│    │    │    │        Domain Layer         │      │      │     │\n│    │    │    │                             │      │      │     │\n│    │    │    │  - Entities                 │      │      │     │\n│    │    │    │  - Value Objects            │      │      │     │\n│    │    │    │  - Repository Interfaces    │      │      │     │\n│    │    │    │  - Domain Services          │      │      │     │\n│    │    │    └────────────────────────────┘      │      │     │\n│    │    │                                         │      │     │\n│    │    │  - Use Cases                            │      │     │\n│    │    │  - DTOs                                 │      │     │\n│    │    │  - Application Services                 │      │     │\n│    │    └────────────────────────────────────────┘      │     │\n│    │                                                     │     │\n│    │  - Controllers                                      │     │\n│    │  - Presenters                                       │     │\n│    │  - Validators                                       │     │\n│    └────────────────────────────────────────────────────┘     │\n│                                                                │\n│  ┌──────────────────────────────────────────────────────────┐ │\n│  │                   Infrastructure Layer                    │ │\n│  │                                                           │ │\n│  │  - Repository Implementations                             │ │\n│  │  - Storage Services                                       │ │\n│  │  - External Integrations                                  │ │\n│  └──────────────────────────────────────────────────────────┘ │\n│                                                                │\n│  - Dependency Injection                                        │\n│  - Bootstrapping                                               │\n└────────────────────────────────────────────────────────────────┘"
+    },
+    "design_decisions": [
+      {
+        "context": "The original codebase was difficult to maintain and extend, with tightly coupled components and unclear separation of concerns.",
+        "decision": "We adopted clean architecture to create a more maintainable and testable codebase.",
+        "consequences": [
+          "Improved separation of concerns",
+          "Enhanced testability",
+          "Better maintainability",
+          "More explicit dependencies",
+          "Initial development overhead for setting up architectural boundaries"
+        ]
+      },
+      {
+        "context": "The original code had data access logic scattered throughout manager classes.",
+        "decision": "We implemented the repository pattern to abstract data access.",
+        "consequences": [
+          "Centralized data access logic",
+          "Ability to swap storage mechanisms",
+          "Easier mocking for tests",
+          "Clear separation of data access from business logic"
+        ]
+      },
+      {
+        "context": "The domain concepts were not clearly modeled in the original code.",
+        "decision": "We applied DDD principles to model core domain concepts as entities and value objects.",
+        "consequences": [
+          "Richer domain model",
+          "Encapsulation of business rules in the domain",
+          "More intuitive code organization",
+          "Better alignment with business requirements"
+        ]
+      },
+      {
+        "context": "Original code had direct dependencies between components, making testing difficult.",
+        "decision": "Implemented a dependency injection container to manage dependencies.",
+        "consequences": [
+          "Reduced coupling between components",
+          "Improved testability",
+          "More explicit dependencies",
+          "Enhanced configurability"
+        ]
+      }
+    ],
+    "migration_strategy": [
+      "Define domain layer (entities, value objects, repository interfaces)",
+      "Implement application layer (use cases, DTOs)",
+      "Implement infrastructure layer (repository implementations, services)",
+      "Implement interface layer (controllers, presenters)",
+      "Update entry point to use the new architecture",
+      "Phase out old code gradually",
+      "Add comprehensive tests",
+      "Update documentation"
+    ],
     "further_reading": [
       "[Clean Architecture by Robert C. Martin](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)",
       "[Domain-Driven Design by Eric Evans](https://domainlanguage.com/ddd/)",

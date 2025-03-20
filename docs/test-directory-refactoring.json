@@ -1,0 +1,19 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "a9166320-461c-4485-8343-3b43969bf6dd",
+    "title": "テストディレクトリのリファクタリング",
+    "documentType": "generic",
+    "path": "test-directory-refactoring.md",
+    "tags": [],
+    "lastModified": "2025-03-19T04:18:11.203Z",
+    "createdAt": "2025-03-19T04:18:11.203Z",
+    "version": 1
+  },
+  "content": {
+    "rawContent": "# テストディレクトリのリファクタリング\n\n## 新しいディレクトリ構造\n\n```\ntests/\n  ├── unit/                     # ユニットテスト\n  │   ├── domain/              # ドメインレイヤーのテスト\n  │   ├── application/         # アプリケーションレイヤーのテスト\n  │   │   └── usecases/       # ユースケースのテスト\n  │   │       ├── branch/     # ブランチ関連のユースケース\n  │   │       ├── common/     # 共通ユースケース\n  │   │       ├── global/     # グローバル関連のユースケース\n  │   │       └── json/       # JSON関連のユースケース\n  │   └── interface/          # インターフェースレイヤーのテスト\n  ├── integration/             # 統合テスト\n  │   ├── api/               # APIレベルの統合テスト（コントローラー）\n  │   └── usecase/          # ユースケースレベルの統合テスト\n  │       ├── markdown-to-json/  # マークダウンからJSONへの変換テスト\n  │       ├── repositories/      # リポジトリの統合テスト\n  │       └── infrastructure/    # インフラストラクチャの統合テスト\n  └── e2e/                    # エンドツーエンドテスト\n\n```\n\n## 主な変更点\n\n1. テストの種類による明確な分離\n   - ユニットテスト (`tests/unit/`)\n   - 統合テスト (`tests/integration/`)\n   - E2Eテスト (`tests/e2e/`)\n\n2. クリーンアーキテクチャに合わせた構造化\n   - ドメインレイヤー\n   - アプリケーションレイヤー\n   - インターフェースレイヤー\n   - インフラストラクチャレイヤー\n\n3. モジュールインポートの標準化\n   - すべてのテストファイルで相対パスを使用\n   - srcディレクトリからの正確なパス指定\n\n## 設定の変更\n\n### Jest の設定 (jest.config.js)\n\n```javascript\nmodule.exports = {\n  ...\n  moduleNameMapper: {\n    '^(\\\\.{1,2}/.*)\\\\.js$': '$1',\n    '^@modelcontextprotocol/sdk(.*)$': '<rootDir>/node_modules/@modelcontextprotocol/sdk/dist/esm$1',\n    '^src/(.*)$': '<rootDir>/src/$1',\n    '^src/(.*)\\.js$': '<rootDir>/src/$1',\n    '(.+)\\\\.js': '$1'\n  },\n  modulePaths: ['<rootDir>', '<rootDir>/src'],\n  moduleDirectories: ['node_modules', 'src'],\n  ...\n}\n```\n\n### TypeScript の設定 (tsconfig.test.json)\n\n```json\n{\n  \"extends\": \"./tsconfig.json\",\n  \"compilerOptions\": {\n    \"rootDir\": \".\",\n    \"baseUrl\": \".\",\n    \"paths\": {\n      \"src/*\": [\"./src/*\"]\n    },\n    ...\n  }\n}\n```\n\n## 移行のメリット\n\n1. テストの種類が明確に分離され、目的に応じたテストの特定が容易になった\n2. クリーンアーキテクチャの各レイヤーに対応したテスト構造により、テストカバレッジの把握が容易になった\n3. パスの標準化により、テストファイルの移動や新規作成が容易になった\n4. テストの意図とスコープが明確になり、保守性が向上した\n\n## 今後の課題\n\n1. E2Eテストの実装と配置の検討\n2. テストヘルパーやファクトリの整備\n3. テストデータの管理方法の標準化\n4. CIパイプラインでのテスト実行の最適化\n",
+    "sections": {
+      "": "1. E2Eテストの実装と配置の検討\n2. テストヘルパーやファクトリの整備\n3. テストデータの管理方法の標準化\n4. CIパイプラインでのテスト実行の最適化"
+    }
+  }
+}

@@ -1,0 +1,271 @@
+{
+  "schema": "tag_index_v1",
+  "metadata": {
+    "updatedAt": "2025-03-19T12:40:16.492Z",
+    "documentCount": 53,
+    "fullRebuild": true,
+    "context": "global"
+  },
+  "index": {
+    "architecture": [
+      "architecture-decisions.json",
+      "architecture-decisions.md",
+      "architecture.json",
+      "architecture.md",
+      "domain-models.json",
+      "domain-models.md",
+      "e2e-to-integration-test-approach.json",
+      "e2e-to-integration-test-approach.md",
+      "json-based-architecture.json",
+      "json-based-architecture.md",
+      "v2.0-design-decisions.json"
+    ],
+    "decision": [
+      "architecture-decisions.json",
+      "architecture-decisions.md"
+    ],
+    "json": [
+      "architecture-decisions.json",
+      "architecture-decisions.md",
+      "domain-models.json",
+      "domain-models.md",
+      "json-based-architecture.json",
+      "json-based-architecture.md",
+      "template-system-json-i18n-design.json",
+      "template-system-json-i18n-design.md",
+      "v2-implementation-plan.json",
+      "v2-implementation-plan.md"
+    ],
+    "version-2": [
+      "architecture-decisions.json",
+      "architecture-decisions.md",
+      "json-based-architecture.json",
+      "json-based-architecture.md",
+      "v2-implementation-plan.json",
+      "v2-implementation-plan.md"
+    ],
+    "system-design": [
+      "architecture.json",
+      "architecture.md"
+    ],
+    "clean-architecture": [
+      "architecture.json",
+      "architecture.md"
+    ],
+    "onion-architecture": [
+      "architecture.json",
+      "architecture.md"
+    ],
+    "troubleshooting": [
+      "ci-cd/memory-bank-errors.json",
+      "ci-cd/memory-bank-errors.md"
+    ],
+    "memory-bank": [
+      "ci-cd/memory-bank-errors.json",
+      "ci-cd/memory-bank-errors.md"
+    ],
+    "errors": [
+      "ci-cd/memory-bank-errors.json",
+      "ci-cd/memory-bank-errors.md"
+    ],
+    "ci-cd": [
+      "ci-cd/workflows.json",
+      "ci-cd/workflows.md"
+    ],
+    "github-actions": [
+      "ci-cd/workflows.json",
+      "ci-cd/workflows.md"
+    ],
+    "automation": [
+      "ci-cd/workflows.json",
+      "ci-cd/workflows.md"
+    ],
+    "workflows": [
+      "ci-cd/workflows.json",
+      "ci-cd/workflows.md"
+    ],
+    "standards": [
+      "coding-standards.json",
+      "coding-standards.md"
+    ],
+    "best-practices": [
+      "coding-standards.json",
+      "coding-standards.md"
+    ],
+    "typescript": [
+      "coding-standards.json",
+      "coding-standards.md"
+    ],
+    "clean-code": [
+      "coding-standards.json",
+      "coding-standards.md"
+    ],
+    "domain": [
+      "domain-models.json",
+      "domain-models.md"
+    ],
+    "models": [
+      "domain-models.json",
+      "domain-models.md"
+    ],
+    "document-model": [
+      "domain-models.json",
+      "domain-models.md"
+    ],
+    "testing": [
+      "e2e-to-integration-test-approach.json",
+      "e2e-to-integration-test-approach.md"
+    ],
+    "integration-tests": [
+      "e2e-to-integration-test-approach.json",
+      "e2e-to-integration-test-approach.md"
+    ],
+    "glossary": [
+      "glossary.json",
+      "glossary.md"
+    ],
+    "terminology": [
+      "glossary.json",
+      "glossary.md"
+    ],
+    "definitions": [
+      "glossary.json",
+      "glossary.md"
+    ],
+    "---": [
+      "integration-test-strategy.json"
+    ],
+    "tdd": [
+      "integration-test-strategy.json"
+    ],
+    "-----": [
+      "integration-test-strategy.json",
+      "json-global-design-issues.json",
+      "json-global-design-issues.json"
+    ],
+    "----": [
+      "integration-test-strategy.json"
+    ],
+    "-------": [
+      "integration-test-strategy.json"
+    ],
+    "design": [
+      "json-based-architecture.json",
+      "json-based-architecture.md",
+      "read-context-command-design.json",
+      "read-context-command-design.md",
+      "template-system-json-i18n-design.json",
+      "template-system-json-i18n-design.md",
+      "v2.0-design-decisions.json"
+    ],
+    "--": [
+      "json-global-design-issues.json"
+    ],
+    "--------": [
+      "json-global-design-issues.json"
+    ],
+    "------": [
+      "json-global-design-issues.json"
+    ],
+    "overview": [
+      "project-overview.json"
+    ],
+    "summary": [
+      "project-overview.json"
+    ],
+    "project": [
+      "project-overview.json"
+    ],
+    "v2-0": [
+      "project-overview.json",
+      "release-v2.0.0.json",
+      "v2.0-design-decisions.json"
+    ],
+    "mcp": [
+      "read-context-command-design.json",
+      "read-context-command-design.md",
+      "read-context-command-implementation.json",
+      "read-context-command-implementation.md"
+    ],
+    "command": [
+      "read-context-command-design.json",
+      "read-context-command-design.md",
+      "read-context-command-implementation.json",
+      "read-context-command-implementation.md"
+    ],
+    "context": [
+      "read-context-command-design.json",
+      "read-context-command-design.md",
+      "read-context-command-implementation.json",
+      "read-context-command-implementation.md"
+    ],
+    "v2": [
+      "read-context-command-design.json",
+      "read-context-command-design.md",
+      "read-context-command-implementation.json",
+      "read-context-command-implementation.md",
+      "template-system-json-i18n-design.json",
+      "template-system-json-i18n-design.md"
+    ],
+    "implementation": [
+      "read-context-command-implementation.json",
+      "read-context-command-implementation.md",
+      "v2-implementation-plan.json",
+      "v2-implementation-plan.md"
+    ],
+    "release": [
+      "release-v2.0.0.json"
+    ],
+    "pr": [
+      "release-v2.0.0.json"
+    ],
+    "changelog": [
+      "release-v2.0.0.json"
+    ],
+    "index": [
+      "tags/index.json"
+    ],
+    "meta": [
+      "tags/index.json"
+    ],
+    "tech-stack": [
+      "tech-stack.json",
+      "tech-stack.md"
+    ],
+    "infrastructure": [
+      "tech-stack.json",
+      "tech-stack.md"
+    ],
+    "dependencies": [
+      "tech-stack.json",
+      "tech-stack.md"
+    ],
+    "template": [
+      "template-system-json-i18n-design.json",
+      "template-system-json-i18n-design.md"
+    ],
+    "i18n": [
+      "template-system-json-i18n-design.json",
+      "template-system-json-i18n-design.md"
+    ],
+    "l10n": [
+      "template-system-json-i18n-design.json",
+      "template-system-json-i18n-design.md"
+    ],
+    "guide": [
+      "user-guide.json",
+      "user-guide.md"
+    ],
+    "documentation": [
+      "user-guide.json",
+      "user-guide.md"
+    ],
+    "plan": [
+      "v2-implementation-plan.json",
+      "v2-implementation-plan.md"
+    ],
+    "decisions": [
+      "v2.0-design-decisions.json"
+    ]
+  }
+}
