@@ -3,7 +3,7 @@ import { DocumentPath } from './DocumentPath.js';
 import { Tag } from './Tag.js';
 import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
 
-// Import JSON schemas
+// Schema imports - these define validation and structure
 import {
   SCHEMA_VERSION,
   BaseJsonDocumentV2Schema,

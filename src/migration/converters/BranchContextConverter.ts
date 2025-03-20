@@ -10,6 +10,7 @@ import { JsonDocument } from '../../domain/entities/JsonDocument.js';
 import { DocumentPath } from '../../domain/entities/DocumentPath.js';
 import { DocumentId } from '../../domain/entities/DocumentId.js';
 import { Tag } from '../../domain/entities/Tag.js';
+// Import type from schema layer
 import { BranchContextContentV2 } from '../../schemas/v2/json-document.js';
 
 /**
