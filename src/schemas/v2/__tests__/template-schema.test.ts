@@ -6,7 +6,7 @@ import {
   validateJsonTemplate,
   createJsonTemplate,
   createJsonTemplateSection,
-} from '../template-schema.js';
+} from '../template-schema';
 import { ZodError } from 'zod';
 
 describe('JSON Template Schema', () => {

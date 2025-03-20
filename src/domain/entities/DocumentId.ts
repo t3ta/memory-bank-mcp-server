@@ -1,5 +1,5 @@
 import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
-import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
+import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError';
 
 /**
  * Value object representing a document ID

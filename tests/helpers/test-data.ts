@@ -1,10 +1,10 @@
-import { MemoryDocument } from '../../src/domain/entities/MemoryDocument.js';
-import { DocumentPath } from '../../src/domain/entities/DocumentPath.js';
-import { Tag } from '../../src/domain/entities/Tag.js';
-import { BranchInfo } from '../../src/domain/entities/BranchInfo.js';
-import { TagIndex } from '../../src/schemas/tag-index/tag-index-schema.js';
-import { JsonDocument, DocumentType } from '../../src/domain/entities/JsonDocument.js';
-import { DocumentId } from '../../src/domain/entities/DocumentId.js';
+import { MemoryDocument } from '../../src/domain/entities/MemoryDocument';
+import { DocumentPath } from '../../src/domain/entities/DocumentPath';
+import { Tag } from '../../src/domain/entities/Tag';
+import { BranchInfo } from '../../src/domain/entities/BranchInfo';
+import { TagIndex } from '../../src/schemas/tag-index/tag-index-schema';
+import { JsonDocument, DocumentType } from '../../src/domain/entities/JsonDocument';
+import { DocumentId } from '../../src/domain/entities/DocumentId';
 
 /**
  * Helper function to create a test document

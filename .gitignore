@@ -34,3 +34,10 @@ logs/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Test related
+tests/.temp
+**/.jest-cache
+
+# Local files
+.local/

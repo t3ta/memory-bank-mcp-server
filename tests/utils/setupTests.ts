@@ -1,35 +1,50 @@
 /**
- * Jest setup file
+ * Jest setup file for ESM environment
  * This file is executed before each test file
  */
-// Extend Jest matchers if needed
-// import 'jest-extended';
+
+// ESM-specific setup
+import { jest } from '@jest/globals';
+import { reset } from 'ts-mockito';
 
 // Silence console logs during tests
-global.console = {
-  ...console,
-  // Uncomment to silence specific console methods during tests
-  // log: jest.fn(),
-  // info: jest.fn(),
-  // debug: jest.fn(),
-  // warn: jest.fn(),
-  // error: jest.fn(),
-};
+// global.console = {
+//   ...console,
+//   // コンソール出力を無効化
+//   log: jest.fn(),
+//   info: jest.fn(),
+//   debug: jest.fn(),
+//   warn: jest.fn(),
+//   error: jest.fn(),
+// };
 
 // Set timezone for consistent Date handling in tests
 process.env.TZ = 'UTC';
 
 // Add any global test setup here
 
-// Import ts-mockito for mocking
-import { reset } from 'ts-mockito';
-
-// Reset all mocks before each test
+// In ESM mode, we need to use beforeEach from Jest globals explicitly
 beforeEach(() => {
-  // Jest's built-in reset
+  // Clear mocks and reset ts-mockito
   jest.clearAllMocks();
-
-  // You can add specific ts-mockito reset logic here if needed
-  // Note: ts-mockito's reset() function is for resetting specific mocks,
-  // not for global reset like Jest's clearAllMocks()
+  reset(); // ts-mockitoのモックをキレイにリセットするんだから！
+  
+  // Add any other setup logic here
 });
+
+// Add afterEach cleanup if needed
+afterEach(() => {
+  // Clean up resources, close connections, etc.
+});
+
+// Add afterAll global cleanup
+afterAll(async () => {
+  // Force cleanup of any remaining resources
+  jest.useRealTimers(); // Make sure we're using real timers
+  
+  // Delay a bit to allow any pending async operations to complete
+  await new Promise(resolve => setTimeout(resolve, 100));
+});
+
+// Increase timeout for E2E tests
+jest.setTimeout(60000);

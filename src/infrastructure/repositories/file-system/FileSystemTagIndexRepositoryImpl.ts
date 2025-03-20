@@ -1,19 +1,19 @@
-import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
-import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
-import { JsonDocument } from '../../../domain/entities/JsonDocument.js';
-import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
-import { Tag } from '../../../domain/entities/Tag.js';
+import { BranchInfo } from '../../../domain/entities/BranchInfo';
+import { DocumentPath } from '../../../domain/entities/DocumentPath';
+import { JsonDocument } from '../../../domain/entities/JsonDocument';
+import { MemoryDocument } from '../../../domain/entities/MemoryDocument';
+import { Tag } from '../../../domain/entities/Tag';
 import {
   TagIndexOptions,
   TagIndexUpdateResult,
-} from '../../../domain/repositories/ITagIndexRepository.js';
-import { DocumentReference } from '../../../schemas/v2/tag-index.js';
-import { logger } from '../../../shared/utils/logger.js';
+} from '../../../domain/repositories/ITagIndexRepository';
+import { DocumentReference } from '../../../schemas/v2/tag-index';
+import { logger } from '../../../shared/utils/logger';
 import {
   InfrastructureError,
   InfrastructureErrorCodes,
-} from '../../../shared/errors/InfrastructureError.js';
-import { FileSystemTagIndexRepository } from './FileSystemTagIndexRepositoryBase.js';
+} from '../../../shared/errors/InfrastructureError';
+import { FileSystemTagIndexRepository } from './FileSystemTagIndexRepositoryBase';
 
 /**
  * Implementation of ITagIndexRepository interface methods

@@ -4,14 +4,14 @@
  */
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { IFileSystemService } from '../storage/interfaces/IFileSystemService.js';
+import { IFileSystemService } from '../storage/interfaces/IFileSystemService';
 import {
   Language,
   TranslationKey,
   isValidLanguage,
   TranslationFile,
-} from '../../schemas/v2/i18n-schema.js';
-import { II18nProvider } from './interfaces/II18nProvider.js';
+} from '../../schemas/v2/i18n-schema';
+import { II18nProvider } from './interfaces/II18nProvider';
 
 /**
  * Implementation of II18nProvider
@@ -28,7 +28,8 @@ export class I18nProvider implements II18nProvider {
    * @param fileSystemService Service for file system operations
    */
   constructor(private readonly fileSystemService: IFileSystemService) {
-    const dirname = path.dirname(fileURLToPath(import.meta.url));
+    // CommonJS compatible path resolution
+    const dirname = __dirname;
     this.translationsPath = path.join(dirname, 'translations');
   }
 

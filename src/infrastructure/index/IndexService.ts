@@ -1,22 +1,22 @@
 import path from 'path';
 import { promises as fs } from 'fs';
 
-import { BranchInfo } from '../../domain/entities/BranchInfo.js';
-import { DocumentId } from '../../domain/entities/DocumentId.js';
-import { DocumentPath } from '../../domain/entities/DocumentPath.js';
-import { JsonDocument, DocumentType } from '../../domain/entities/JsonDocument.js';
-import { Tag } from '../../domain/entities/Tag.js';
-import { IFileSystemService } from '../../infrastructure/storage/interfaces/IFileSystemService.js';
+import { BranchInfo } from '../../domain/entities/BranchInfo';
+import { DocumentId } from '../../domain/entities/DocumentId';
+import { DocumentPath } from '../../domain/entities/DocumentPath';
+import { JsonDocument, DocumentType } from '../../domain/entities/JsonDocument';
+import { Tag } from '../../domain/entities/Tag';
+import { IFileSystemService } from '../../infrastructure/storage/interfaces/IFileSystemService';
 import {
   InfrastructureError,
   InfrastructureErrorCodes,
-} from '../../shared/errors/InfrastructureError.js';
-import { IIndexService } from './interfaces/IIndexService.js';
+} from '../../shared/errors/InfrastructureError';
+import { IIndexService } from './interfaces/IIndexService';
 import {
   DocumentReference,
   DocumentIndex,
   INDEX_SCHEMA_VERSION,
-} from '../../schemas/v2/index-schema.js';
+} from '../../schemas/v2/index-schema';
 
 /**
  * Implementation of the document index service

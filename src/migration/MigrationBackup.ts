@@ -5,7 +5,7 @@
  */
 import path from 'path';
 import { promises as fs } from 'fs';
-import { Logger } from '../shared/utils/logger.js';
+import { Logger } from '../shared/utils/logger';
 
 /**
  * Service for creating backups before migration and rolling back if needed

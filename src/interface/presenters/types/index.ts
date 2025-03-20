@@ -1,1 +1,1 @@
-export * from './MCPResponse.js';
+export * from './MCPResponse';

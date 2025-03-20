@@ -1,3 +1,4 @@
-export * from './IController.js';
-export * from './IBranchController.js';
-export * from './IGlobalController.js';
+export * from './IController';
+export * from './IBranchController';
+export * from './IGlobalController';
+export * from './IContextController';

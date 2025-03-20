@@ -1,7 +1,7 @@
 import { Argv } from 'yargs';
-import { ReadBranchCommand } from './read-branch.js';
-import { WriteBranchCommand } from './write-branch.js';
-import { ReadCoreFilesCommand } from './read-core-files.js';
+import { ReadBranchCommand } from './read-branch';
+import { WriteBranchCommand } from './write-branch';
+import { ReadCoreFilesCommand } from './read-core-files';
 
 /**
  * Register all branch memory bank commands with yargs

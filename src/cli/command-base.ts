@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { logger } from '../shared/utils/logger.js';
+import { logger } from '../shared/utils/logger';
 
 /**
  * Base class for all CLI commands

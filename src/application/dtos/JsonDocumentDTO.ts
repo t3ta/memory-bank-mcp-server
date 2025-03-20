@@ -1,4 +1,4 @@
-import { DocumentType } from '../../domain/entities/JsonDocument.js';
+import { DocumentType } from '../../domain/entities/JsonDocument';
 
 /**
  * DTO for a JSON document

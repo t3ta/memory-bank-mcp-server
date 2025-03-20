@@ -8,11 +8,11 @@ import chalk from 'chalk';
 import {
   MarkdownToJsonMigrator,
   MigrationOptions,
-} from '../../../migration/MarkdownToJsonMigrator.js';
-import { MigrationBackup } from '../../../migration/MigrationBackup.js';
-import { MigrationValidator } from '../../../migration/MigrationValidator.js';
-import { ConverterFactory } from '../../../migration/converters/ConverterFactory.js';
-import { createConsoleLogger } from '../../../shared/utils/logger.js';
+} from '../../../migration/MarkdownToJsonMigrator';
+import { MigrationBackup } from '../../../migration/MigrationBackup';
+import { MigrationValidator } from '../../../migration/MigrationValidator';
+import { ConverterFactory } from '../../../migration/converters/ConverterFactory';
+import { createConsoleLogger } from '../../../shared/utils/logger';
 
 interface MigrateArgs {
   directory: string;

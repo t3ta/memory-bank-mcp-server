@@ -1,7 +1,7 @@
-import { DocumentId } from './DocumentId.js';
-import { DocumentPath } from './DocumentPath.js';
-import { Tag } from './Tag.js';
-import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
+import { DocumentId } from './DocumentId';
+import { DocumentPath } from './DocumentPath';
+import { Tag } from './Tag';
+import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError';
 
 // Import JSON schemas
 import {
@@ -17,7 +17,7 @@ import {
   SystemPatternsJsonV2Schema,
   SystemPatternsJsonV2,
   DocumentMetadataV2,
-} from '../../schemas/v2/json-document.js';
+} from '../../schemas/v2/json-document';
 
 /**
  * Type discriminator for document types

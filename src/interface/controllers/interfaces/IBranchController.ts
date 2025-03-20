@@ -1,6 +1,6 @@
-import { IController } from './IController.js';
-import { MCPResponse } from '../../presenters/types/index.js';
-import { DocumentDTO, JsonDocumentDTO } from '../../../application/dtos/index.js';
+import { IController } from './IController';
+import { MCPResponse } from '../../presenters/types/index';
+import { DocumentDTO, JsonDocumentDTO } from '../../../application/dtos/index';
 
 /**
  * Interface for branch memory bank controller

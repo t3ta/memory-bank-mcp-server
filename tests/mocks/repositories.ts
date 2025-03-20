@@ -2,16 +2,16 @@ import { mock, instance, when, anyString, anything, deepEqual } from 'ts-mockito
 import {
   IBranchMemoryBankRepository,
   RecentBranch,
-} from '../../src/domain/repositories/IBranchMemoryBankRepository.js';
-import { IGlobalMemoryBankRepository } from '../../src/domain/repositories/IGlobalMemoryBankRepository.js';
-import { IJsonDocumentRepository } from '../../src/domain/repositories/IJsonDocumentRepository.js';
-import { BranchInfo } from '../../src/domain/entities/BranchInfo.js';
-import { DocumentPath } from '../../src/domain/entities/DocumentPath.js';
-import { MemoryDocument } from '../../src/domain/entities/MemoryDocument.js';
-import { JsonDocument, DocumentType } from '../../src/domain/entities/JsonDocument.js';
-import { DocumentId } from '../../src/domain/entities/DocumentId.js';
-import { Tag } from '../../src/domain/entities/Tag.js';
-import { TagIndex } from '../../src/schemas/tag-index/tag-index-schema.js';
+} from '../../src/domain/repositories/IBranchMemoryBankRepository';
+import { IGlobalMemoryBankRepository } from '../../src/domain/repositories/IGlobalMemoryBankRepository';
+import { IJsonDocumentRepository } from '../../src/domain/repositories/IJsonDocumentRepository';
+import { BranchInfo } from '../../src/domain/entities/BranchInfo';
+import { DocumentPath } from '../../src/domain/entities/DocumentPath';
+import { MemoryDocument } from '../../src/domain/entities/MemoryDocument';
+import { JsonDocument, DocumentType } from '../../src/domain/entities/JsonDocument';
+import { DocumentId } from '../../src/domain/entities/DocumentId';
+import { Tag } from '../../src/domain/entities/Tag';
+import { TagIndex } from '../../src/schemas/tag-index/tag-index-schema';
 
 /**
  * Mock classes for repositories

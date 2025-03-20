@@ -1,10 +1,10 @@
-import { IResponsePresenter } from './interfaces/IResponsePresenter.js';
-import { MCPResponse, MCPSuccessResponse, MCPErrorResponse } from './types/index.js';
-import { BaseError } from '../../shared/errors/BaseError.js';
-import { DomainError } from '../../shared/errors/DomainError.js';
-import { ApplicationError } from '../../shared/errors/ApplicationError.js';
-import { InfrastructureError } from '../../shared/errors/InfrastructureError.js';
-import { logger } from '../../shared/utils/logger.js';
+import { IResponsePresenter } from './interfaces/IResponsePresenter';
+import { MCPResponse, MCPSuccessResponse, MCPErrorResponse } from './types/index';
+import { BaseError } from '../../shared/errors/BaseError';
+import { DomainError } from '../../shared/errors/DomainError';
+import { ApplicationError } from '../../shared/errors/ApplicationError';
+import { InfrastructureError } from '../../shared/errors/InfrastructureError';
+import { logger } from '../../shared/utils/logger';
 
 /**
  * Presenter for JSON responses

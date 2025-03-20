@@ -93,6 +93,11 @@ export interface SystemPatternsDTO {
  */
 export interface CoreFilesDTO {
   /**
+   * Branch context information (raw string)
+   */
+  branchContext?: string;
+
+  /**
    * Active context information
    */
   activeContext?: ActiveContextDTO;

@@ -1,12 +1,12 @@
-import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
-import { IBranchMemoryBankRepository } from '../../../domain/repositories/IBranchMemoryBankRepository.js';
-import { IGlobalMemoryBankRepository } from '../../../domain/repositories/IGlobalMemoryBankRepository.js';
-import { DocumentId } from '../../../domain/entities/DocumentId.js';
-import { JsonDocument } from '../../../domain/entities/JsonDocument.js';
-import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
-import { FileSystemService } from '../../storage/FileSystemService.js';
+import { BranchInfo } from '../../../domain/entities/BranchInfo';
+import { IBranchMemoryBankRepository } from '../../../domain/repositories/IBranchMemoryBankRepository';
+import { IGlobalMemoryBankRepository } from '../../../domain/repositories/IGlobalMemoryBankRepository';
+import { DocumentId } from '../../../domain/entities/DocumentId';
+import { JsonDocument } from '../../../domain/entities/JsonDocument';
+import { MemoryDocument } from '../../../domain/entities/MemoryDocument';
+import { FileSystemService } from '../../storage/FileSystemService';
 import path from 'path';
-import { logger } from '../../../shared/utils/logger.js';
+import { logger } from '../../../shared/utils/logger';
 import {
   BranchTagIndex,
   GlobalTagIndex,
@@ -14,11 +14,11 @@ import {
   TAG_INDEX_VERSION,
   BranchTagIndexSchema,
   GlobalTagIndexSchema,
-} from '../../../schemas/v2/tag-index.js';
+} from '../../../schemas/v2/tag-index';
 import {
   InfrastructureError,
   InfrastructureErrorCodes,
-} from '../../../shared/errors/InfrastructureError.js';
+} from '../../../shared/errors/InfrastructureError';
 
 /**
  * Implementation of ITagIndexRepository for file system storage

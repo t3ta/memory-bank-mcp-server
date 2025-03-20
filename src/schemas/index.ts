@@ -1,9 +1,10 @@
 import { z } from 'zod';
-import { ValidationErrorType } from '../shared/types/index.js';
+import { ValidationErrorType } from '../shared/types/index';
+import { parseDateSafely } from '../shared/utils/index';
 
 // Import and re-export common schemas
-import { FlexibleDateSchema, TagSchema } from './common.js';
-export { FlexibleDateSchema, TagSchema } from './common.js';
+import { FlexibleDateSchema, TagSchema } from './common';
+export { FlexibleDateSchema, TagSchema } from './common';
 
 // Path schema
 export const PathSchema = z
@@ -183,34 +184,13 @@ export const WriteBranchCoreFilesArgsSchema = z
   .merge(BaseToolArgsSchema);
 
 // Export json document schemas
-export * from './json-document.js';
+export * from './json-document';
 
 // Export v2 json document schemas
-export * as V2 from './v2/index.js';
+export * as V2 from './v2/index';
 
-// Date utility function
-export const parseDateSafely = (dateInput: string | Date): Date => {
-  try {
-    if (dateInput instanceof Date) {
-      return dateInput;
-    }
-
-    const date = new Date(dateInput);
-
-    if (isNaN(date.getTime())) {
-      throw new Error(`Invalid date: ${dateInput}`);
-    }
-
-    return date;
-  } catch (err) {
-    // 明示的にエラーを使用
-    console.error(
-      `日付パース中にエラーが発生しました: ${err instanceof Error ? err.message : String(err)}`
-    );
-    // デフォルト値として現在時刻を返す
-    return new Date();
-  }
-};
+// Re-export date utility function
+export { parseDateSafely };
 
 // Type inference helpers
 export type MemoryDocument = z.infer<typeof MemoryDocumentSchema>;

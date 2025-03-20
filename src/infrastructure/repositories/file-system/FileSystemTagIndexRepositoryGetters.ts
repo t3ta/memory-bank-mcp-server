@@ -1,12 +1,12 @@
-import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
-import { Tag } from '../../../domain/entities/Tag.js';
-import { ITagIndexRepository } from '../../../domain/repositories/ITagIndexRepository.js';
-import { logger } from '../../../shared/utils/logger.js';
+import { BranchInfo } from '../../../domain/entities/BranchInfo';
+import { Tag } from '../../../domain/entities/Tag';
+import { ITagIndexRepository } from '../../../domain/repositories/ITagIndexRepository';
+import { logger } from '../../../shared/utils/logger';
 import {
   InfrastructureError,
   InfrastructureErrorCodes,
-} from '../../../shared/errors/InfrastructureError.js';
-import { FileSystemTagIndexRepositoryModifiers } from './FileSystemTagIndexRepositoryModifiers.js';
+} from '../../../shared/errors/InfrastructureError';
+import { FileSystemTagIndexRepositoryModifiers } from './FileSystemTagIndexRepositoryModifiers';
 
 /**
  * Implementation of getter methods for ITagIndexRepository

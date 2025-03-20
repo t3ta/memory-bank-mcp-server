@@ -16,7 +16,7 @@ import {
   ProgressJsonV2Schema,
   SystemPatternsJsonV2Schema,
   JsonDocumentV2Schema,
-} from '../json-document.js';
+} from '../json-document';
 
 describe('JSON Document Schema v2', () => {
   // Common test data

@@ -1,14 +1,14 @@
 import path from 'path';
-import { FileSystemService } from '../../storage/FileSystemService.js';
-import { FileSystemBranchMemoryBankRepository } from './FileSystemBranchMemoryBankRepository.js';
-import { FileSystemGlobalMemoryBankRepository } from './FileSystemGlobalMemoryBankRepository.js';
-import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
-import { TagIndex } from '../../../schemas/tag-index/tag-index-schema.js';
-import { logger } from '../../../shared/utils/logger.js';
+import { FileSystemService } from '../../storage/FileSystemService';
+import { FileSystemBranchMemoryBankRepository } from './FileSystemBranchMemoryBankRepository';
+import { FileSystemGlobalMemoryBankRepository } from './FileSystemGlobalMemoryBankRepository';
+import { BranchInfo } from '../../../domain/entities/BranchInfo';
+import { TagIndex } from '../../../schemas/tag-index/tag-index-schema';
+import { logger } from '../../../shared/utils/logger';
 import {
   InfrastructureError,
   InfrastructureErrorCodes,
-} from '../../../shared/errors/InfrastructureError.js';
+} from '../../../shared/errors/InfrastructureError';
 
 /**
  * Bridge implementation for V1 tag index format

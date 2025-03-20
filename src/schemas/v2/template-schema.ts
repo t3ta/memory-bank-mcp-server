@@ -3,7 +3,7 @@
  * Defines the structure for JSON templates with internationalization support.
  */
 import { z } from 'zod';
-import { TranslationKey, Language } from './i18n-schema.js';
+import { TranslationKey, Language } from './i18n-schema';
 
 /**
  * LanguageMap type for multilingual text

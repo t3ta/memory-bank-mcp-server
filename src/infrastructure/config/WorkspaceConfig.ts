@@ -1,4 +1,4 @@
-import { Language } from '../../shared/types/index.js';
+import { Language } from '../../shared/types/index';
 
 /**
  * Workspace configuration

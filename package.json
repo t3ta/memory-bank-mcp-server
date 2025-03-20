@@ -1,8 +1,8 @@
 {
   "name": "memory-bank-mcp-server",
   "version": "2.0.1",
-  "description": "MCP server for managing project documentation and context across sessions",
   "type": "module",
+  "description": "MCP server for managing project documentation and context across sessions",
   "main": "dist/index.js",
   "bin": {
     "memory-bank-mcp-server": "./dist/index.js",
@@ -17,16 +17,19 @@
     "prepare": "husky",
     "build": "tsc && chmod +x dist/index.js && chmod +x dist/cli/index.js && npm run copy-templates",
     "clean": "rm -rf dist",
+    "clean:temp": "node tests/utils/clean-temp.js",
     "copy-templates": "mkdir -p dist/templates && cp -r src/templates/* dist/templates/",
     "start": "node dist/index.js",
-    "dev": "NODE_OPTIONS='--experimental-specifier-resolution=node' ts-node --esm src/index.ts",
-    "cli": "NODE_OPTIONS='--experimental-specifier-resolution=node' ts-node --esm src/cli/index.ts",
+    "dev": "ts-node src/index.ts",
+    "cli": "ts-node src/cli/index.ts",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write 'src/**/*.ts'",
-    "test": "jest --config=jest.config.cjs --no-coverage --silent",
-    "test:watch": "jest --config=jest.config.cjs --watch",
-    "test:coverage": "jest --config=jest.config.cjs --coverage",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' jest --no-coverage",
+    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' jest --watch",
+    "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage",
+    "test:e2e": "NODE_OPTIONS='--experimental-vm-modules' jest --no-coverage --testMatch='**/tests/e2e/**/*.test.ts' --runInBand",
+    "test:integration": "NODE_OPTIONS='--experimental-vm-modules' jest --no-coverage --testMatch='**/tests/integration/**/*.test.ts' --config=tests/integration/jest.config.ts",
     "prepublishOnly": "npm run lint && npm test && npm run build"
   },
   "keywords": [
@@ -40,7 +43,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "0.5.0",
+    "@modelcontextprotocol/sdk": "^0.5.0",
     "uuid": "^11.1.0",
     "yargs": "^17.7.2",
     "zod": "^3.24.2"
@@ -62,7 +65,7 @@
     "ts-mockito": "^2.6.1",
     "ts-node": "^10.9.1",
     "ts-prune": "^0.10.3",
-    "typescript": "^5.0.0",
+    "typescript": "^5.8.2",
     "typescript-eslint": "^8.26.1"
   },
   "engines": {

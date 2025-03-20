@@ -3,12 +3,12 @@
  * Loads and processes JSON templates with internationalization support
  */
 import path from 'path';
-import { JsonTemplate, validateJsonTemplate } from '../../schemas/v2/template-schema.js';
-import { Language } from '../../schemas/v2/i18n-schema.js';
-import { IFileSystemService } from '../storage/interfaces/IFileSystemService.js';
-import { II18nProvider } from '../i18n/interfaces/II18nProvider.js';
-import { TemplateRenderer } from './TemplateRenderer.js';
-import { ITemplateLoader } from './interfaces/ITemplateLoader.js';
+import { JsonTemplate, validateJsonTemplate } from '../../schemas/v2/template-schema';
+import { Language } from '../../schemas/v2/i18n-schema';
+import { IFileSystemService } from '../storage/interfaces/IFileSystemService';
+import { II18nProvider } from '../i18n/interfaces/II18nProvider';
+import { TemplateRenderer } from './TemplateRenderer';
+import { ITemplateLoader } from './interfaces/ITemplateLoader';
 
 /**
  * Implementation of ITemplateLoader for JSON templates

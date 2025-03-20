@@ -4,15 +4,15 @@
  * Validates JSON documents against their respective schemas
  */
 import { z } from 'zod';
-import { DocumentType } from '../domain/entities/JsonDocument.js';
-import { Logger } from '../shared/utils/logger.js';
+import { DocumentType } from '../domain/entities/JsonDocument';
+import { Logger } from '../shared/utils/logger';
 import {
   BaseJsonDocumentV2Schema,
   BranchContextJsonV2Schema,
   ActiveContextJsonV2Schema,
   ProgressJsonV2Schema,
   SystemPatternsJsonV2Schema,
-} from '../schemas/v2/json-document.js';
+} from '../schemas/v2/json-document';
 
 /**
  * Validation result

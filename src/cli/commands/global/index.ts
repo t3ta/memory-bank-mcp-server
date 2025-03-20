@@ -1,6 +1,6 @@
 import { Argv } from 'yargs';
-import { ReadGlobalCommand } from './read-global.js';
-import { WriteGlobalCommand } from './write-global.js';
+import { ReadGlobalCommand } from './read-global';
+import { WriteGlobalCommand } from './write-global';
 
 /**
  * Register all global memory bank commands with yargs

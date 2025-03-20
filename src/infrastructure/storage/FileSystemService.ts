@@ -1,11 +1,11 @@
 import { promises as fs } from 'fs';
 import { createReadStream } from 'fs';
 import path from 'path';
-import { IFileSystemService } from './interfaces/IFileSystemService.js';
+import { IFileSystemService } from './interfaces/IFileSystemService';
 import {
   InfrastructureError,
   InfrastructureErrorCodes,
-} from '../../shared/errors/InfrastructureError.js';
+} from '../../shared/errors/InfrastructureError';
 
 /**
  * Implementation of file system service

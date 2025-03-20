@@ -1,7 +1,7 @@
-import { DocumentPath } from './DocumentPath.js';
-import { Tag } from './Tag.js';
-import { BaseJsonDocument } from '../../schemas/json-document.js';
-import { DomainError } from '../../shared/errors/DomainError.js';
+import { DocumentPath } from './DocumentPath';
+import { Tag } from './Tag';
+import { BaseJsonDocument } from '../../schemas/json-document';
+import { DomainError } from '../../shared/errors/DomainError';
 
 /**
  * Props for MemoryDocument entity

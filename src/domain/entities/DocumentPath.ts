@@ -1,4 +1,4 @@
-import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
+import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError';
 
 // DocumentType without importing JsonDocument to avoid circular dependency
 type DocumentType =
@@ -86,7 +86,9 @@ export class DocumentPath {
    * Check if this document is a markdown file
    */
   public get isMarkdown(): boolean {
-    return this.extension.toLowerCase() === 'md';
+    const ext = this.extension.toLowerCase();
+    console.log(`Checking if file is markdown: ${this._value}, extension: ${ext}`);
+    return ext === 'md';
   }
 
   /**
@@ -127,7 +129,7 @@ export class DocumentPath {
    * @returns Inferred document type or 'generic' if cannot determine
    */
   public inferDocumentType(): DocumentType {
-    const lcFilename = this.filename.toLowerCase();
+    // Only use basename, filename is not needed
     const lcBasename = this.basename.toLowerCase();
 
     if (lcBasename.includes('branchcontext') || lcBasename.includes('branch-context')) {

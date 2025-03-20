@@ -1,4 +1,4 @@
-import { MCPResponse } from '../types/index.js';
+import { MCPResponse } from '../types/index';
 
 /**
  * Interface for response presenters

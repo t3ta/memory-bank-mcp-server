@@ -1,4 +1,4 @@
-import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
+import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError';
 
 /**
  * Value object representing a document tag

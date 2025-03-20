@@ -1,9 +1,9 @@
-import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
-import { DocumentId } from '../../../domain/entities/DocumentId.js';
-import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
-import { JsonDocument, DocumentType } from '../../../domain/entities/JsonDocument.js';
-import { Tag } from '../../../domain/entities/Tag.js';
-import { DocumentReference } from '../../../schemas/v2/index-schema.js';
+import { BranchInfo } from '../../../domain/entities/BranchInfo';
+import { DocumentId } from '../../../domain/entities/DocumentId';
+import { DocumentPath } from '../../../domain/entities/DocumentPath';
+import { JsonDocument, DocumentType } from '../../../domain/entities/JsonDocument';
+import { Tag } from '../../../domain/entities/Tag';
+import { DocumentReference } from '../../../schemas/v2/index-schema';
 
 /**
  * Interface for the document index service

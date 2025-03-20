@@ -1,8 +1,8 @@
 import { Argv } from 'yargs';
-import { registerJsonCommands } from './json/index.js';
-import { registerGlobalCommands } from './global/index.js';
-import { registerUtilCommands } from './utils/index.js';
-import { registerMigrationCommands } from './migration/index.js';
+import { registerJsonCommands } from './json/index';
+import { registerGlobalCommands } from './global/index';
+import { registerUtilCommands } from './utils/index';
+import { registerMigrationCommands } from './migration/index';
 
 /**
  * Register all CLI commands with yargs

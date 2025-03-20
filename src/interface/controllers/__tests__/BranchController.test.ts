@@ -1,16 +1,17 @@
-import { BranchController } from '../BranchController.js';
-import { ReadBranchDocumentUseCase } from '../../../application/usecases/branch/ReadBranchDocumentUseCase.js';
-import { WriteBranchDocumentUseCase } from '../../../application/usecases/branch/WriteBranchDocumentUseCase.js';
-import { SearchDocumentsByTagsUseCase } from '../../../application/usecases/common/SearchDocumentsByTagsUseCase.js';
-import { UpdateTagIndexUseCase } from '../../../application/usecases/common/UpdateTagIndexUseCase.js';
-import { GetRecentBranchesUseCase } from '../../../application/usecases/common/GetRecentBranchesUseCase.js';
-import { ReadBranchCoreFilesUseCase } from '../../../application/usecases/common/ReadBranchCoreFilesUseCase.js';
-import { CreateBranchCoreFilesUseCase } from '../../../application/usecases/common/CreateBranchCoreFilesUseCase.js';
-import { MCPResponsePresenter } from '../../presenters/MCPResponsePresenter.js';
-import { DocumentDTO } from '../../../application/dtos/DocumentDTO.js';
-import { DomainError } from '../../../shared/errors/DomainError.js';
-import { ApplicationError } from '../../../shared/errors/ApplicationError.js';
-import { InfrastructureError } from '../../../shared/errors/InfrastructureError.js';
+import { jest } from '@jest/globals';
+import { BranchController } from '../BranchController';
+import { ReadBranchDocumentUseCase } from '../../../application/usecases/branch/ReadBranchDocumentUseCase';
+import { WriteBranchDocumentUseCase } from '../../../application/usecases/branch/WriteBranchDocumentUseCase';
+import { SearchDocumentsByTagsUseCase } from '../../../application/usecases/common/SearchDocumentsByTagsUseCase';
+import { UpdateTagIndexUseCase } from '../../../application/usecases/common/UpdateTagIndexUseCase';
+import { GetRecentBranchesUseCase } from '../../../application/usecases/common/GetRecentBranchesUseCase';
+import { ReadBranchCoreFilesUseCase } from '../../../application/usecases/common/ReadBranchCoreFilesUseCase';
+import { CreateBranchCoreFilesUseCase } from '../../../application/usecases/common/CreateBranchCoreFilesUseCase';
+import { MCPResponsePresenter } from '../../presenters/MCPResponsePresenter';
+import { DocumentDTO } from '../../../application/dtos/DocumentDTO';
+import { DomainError } from '../../../shared/errors/DomainError';
+import { ApplicationError } from '../../../shared/errors/ApplicationError';
+import { InfrastructureError } from '../../../shared/errors/InfrastructureError';
 
 // Mock use cases
 const mockReadBranchDocumentUseCase = {

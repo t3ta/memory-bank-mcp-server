@@ -1,8 +1,8 @@
-import { BranchInfo } from '../entities/BranchInfo.js';
-import { DocumentId } from '../entities/DocumentId.js';
-import { DocumentPath } from '../entities/DocumentPath.js';
-import { JsonDocument, DocumentType } from '../entities/JsonDocument.js';
-import { Tag } from '../entities/Tag.js';
+import { BranchInfo } from '../entities/BranchInfo';
+import { DocumentId } from '../entities/DocumentId';
+import { DocumentPath } from '../entities/DocumentPath';
+import { JsonDocument, DocumentType } from '../entities/JsonDocument';
+import { Tag } from '../entities/Tag';
 
 /**
  * Repository interface for managing JSON documents

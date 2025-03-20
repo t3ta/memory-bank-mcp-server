@@ -17,12 +17,12 @@ export { GenericConverter } from './converters/GenericConverter.js';
 // Factory function to create a fully configured converter
 export function createDefaultConverter() {
   // Import here to avoid circular dependency
-  const { JsonToMarkdownConverter } = require('./JsonToMarkdownConverter.js');
-  const { BranchContextConverter } = require('./converters/BranchContextConverter.js');
-  const { ActiveContextConverter } = require('./converters/ActiveContextConverter.js');
-  const { ProgressConverter } = require('./converters/ProgressConverter.js');
-  const { SystemPatternsConverter } = require('./converters/SystemPatternsConverter.js');
-  const { GenericConverter } = require('./converters/GenericConverter.js');
+  const { JsonToMarkdownConverter } = require('./JsonToMarkdownConverter');
+  const { BranchContextConverter } = require('./converters/BranchContextConverter');
+  const { ActiveContextConverter } = require('./converters/ActiveContextConverter');
+  const { ProgressConverter } = require('./converters/ProgressConverter');
+  const { SystemPatternsConverter } = require('./converters/SystemPatternsConverter');
+  const { GenericConverter } = require('./converters/GenericConverter');
 
   // Create converter instance
   const converter = new JsonToMarkdownConverter();

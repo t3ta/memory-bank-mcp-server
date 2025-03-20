@@ -1,9 +1,9 @@
 // Export file system repositories
-export * from './file-system/FileSystemBranchMemoryBankRepository.js';
-export * from './file-system/FileSystemGlobalMemoryBankRepository.js';
-export * from './file-system/FileSystemMemoryDocumentRepository.js';
-export * from './file-system/FileSystemTagIndexRepositoryImpl.js';
-export * from './file-system/FileSystemJsonDocumentRepository.js';
+export * from './file-system/FileSystemBranchMemoryBankRepository';
+export * from './file-system/FileSystemGlobalMemoryBankRepository';
+export * from './file-system/FileSystemMemoryDocumentRepository';
+export * from './file-system/FileSystemTagIndexRepositoryImpl';
+export * from './file-system/FileSystemJsonDocumentRepository';
 
 // Export mock repositories
-export * from './mock/MockJsonDocumentRepository.js';
+export * from './mock/MockJsonDocumentRepository';

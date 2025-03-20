@@ -10,9 +10,16 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "declaration": true,
-    "preserveConstEnums": false,
+    "preserveConstEnums": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "resolveJsonModule": true
   },
   "include": [
     "src/**/*"

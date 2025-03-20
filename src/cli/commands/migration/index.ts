@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { MigrateCommand } from './MigrateCommand.js';
+import { MigrateCommand } from './MigrateCommand';
 
 /**
  * Register all migration-related commands with yargs

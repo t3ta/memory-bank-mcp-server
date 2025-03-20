@@ -1,16 +1,16 @@
 import path from 'path';
-import { IMemoryDocumentRepository } from '../../../domain/repositories/IMemoryDocumentRepository.js';
-import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
-import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
-import { Tag } from '../../../domain/entities/Tag.js';
-import { IFileSystemService } from '../../storage/interfaces/IFileSystemService.js';
+import { IMemoryDocumentRepository } from '../../../domain/repositories/IMemoryDocumentRepository';
+import { MemoryDocument } from '../../../domain/entities/MemoryDocument';
+import { DocumentPath } from '../../../domain/entities/DocumentPath';
+import { Tag } from '../../../domain/entities/Tag';
+import { IFileSystemService } from '../../storage/interfaces/IFileSystemService';
 import {
   InfrastructureError,
   InfrastructureErrorCodes,
-} from '../../../shared/errors/InfrastructureError.js';
-import { DomainError } from '../../../shared/errors/DomainError.js';
-import { extractTags } from '../../../shared/utils/index.js';
-import { logger } from '../../../shared/utils/logger.js';
+} from '../../../shared/errors/InfrastructureError';
+import { DomainError } from '../../../shared/errors/DomainError';
+import { extractTags } from '../../../shared/utils/index';
+import { logger } from '../../../shared/utils/logger';
 
 /**
  * File system based implementation of memory document repository
@@ -49,10 +49,33 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
       if (path.isJSON) {
         try {
           // Parse JSON content
-          const jsonDoc = JSON.parse(content);
+          const jsonObj = JSON.parse(content);
 
-          // Convert JSON to MemoryDocument
-          return MemoryDocument.fromJSON(jsonDoc, path);
+          // Check if it's a schema-compliant document or regular JSON
+          if (jsonObj.schema === 'memory_document_v1' && jsonObj.metadata && jsonObj.content) {
+            // It's a schema-compliant document - convert using fromJSON
+            return MemoryDocument.fromJSON(jsonObj, path);
+          } else {
+            // It's a regular JSON - create a MemoryDocument with the raw content
+            const stats = await this.fileSystemService.getFileStats(filePath);
+            
+            // Extract tags if they exist in a metadata field
+            let tags: Tag[] = [];
+            if (jsonObj.metadata && Array.isArray(jsonObj.metadata.tags)) {
+              try {
+                tags = jsonObj.metadata.tags.map((tag: string) => Tag.create(tag));
+              } catch (tagError) {
+                logger.warn(`Ignoring invalid tags in ${path.value}:`, tagError);
+              }
+            }
+            
+            return MemoryDocument.create({
+              path,
+              content,
+              tags,
+              lastModified: stats.lastModified,
+            });
+          }
         } catch (error) {
           // Check if this is a tag validation error
           if (error instanceof DomainError && error.code === 'DOMAIN_ERROR.INVALID_TAG_FORMAT') {
@@ -74,7 +97,9 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
                 logger.warn(`Sanitized tags in ${path.value}: ${JSON.stringify(jsonDoc.metadata.tags)}`);
                 
                 // Try to create memory document with sanitized tags
-                return MemoryDocument.fromJSON(jsonDoc, path);
+                if (jsonDoc.schema === 'memory_document_v1' && jsonDoc.metadata && jsonDoc.content) {
+                  return MemoryDocument.fromJSON(jsonDoc, path);
+                }
               }
             } catch (recoveryError) {
               logger.error(`Failed to recover document ${path.value}:`, recoveryError);

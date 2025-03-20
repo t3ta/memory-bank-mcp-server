@@ -6,14 +6,14 @@
  */
 import path from 'path';
 import { promises as fs } from 'fs';
-import { DocumentPath } from '../domain/entities/DocumentPath.js';
-import { DocumentId } from '../domain/entities/DocumentId.js';
-import { JsonDocument, DocumentType } from '../domain/entities/JsonDocument.js';
-import { DomainError, DomainErrorCodes } from '../shared/errors/DomainError.js';
-import { MigrationBackup } from './MigrationBackup.js';
-import { MigrationValidator } from './MigrationValidator.js';
-import { ConverterFactory } from './converters/ConverterFactory.js';
-import { Logger } from '../shared/utils/logger.js';
+import { DocumentPath } from '../domain/entities/DocumentPath';
+import { DocumentId } from '../domain/entities/DocumentId';
+import { JsonDocument, DocumentType } from '../domain/entities/JsonDocument';
+import { DomainError, DomainErrorCodes } from '../shared/errors/DomainError';
+import { MigrationBackup } from './MigrationBackup';
+import { MigrationValidator } from './MigrationValidator';
+import { ConverterFactory } from './converters/ConverterFactory';
+import { Logger } from '../shared/utils/logger';
 
 /**
  * Migration options
@@ -150,10 +150,11 @@ export class MarkdownToJsonMigrator {
 
       // Find all markdown files in directory and subdirectories
       const files = await this.findMarkdownFiles(directory);
-      this.logger.info(`Found ${files.length} Markdown files to process`);
+      this.logger.info(`Found ${files.length} Markdown files to process: ${files.join(', ')}`);
 
       // Process each file
       for (const file of files) {
+        this.logger.info(`Processing file: ${file}`);
         try {
           this.logger.debug(`Processing file: ${file}`);
 
@@ -355,9 +356,11 @@ export class MarkdownToJsonMigrator {
    * @returns Array of file paths
    */
   private async findMarkdownFiles(directory: string): Promise<string[]> {
+    this.logger.info(`Finding markdown files in directory: ${directory}`);
     const result: string[] = [];
 
     const entries = await fs.readdir(directory, { withFileTypes: true });
+      this.logger.info(`Directory entries in ${directory}: ${entries.map(e => e.name).join(', ')}`);
 
     for (const entry of entries) {
       const fullPath = path.join(directory, entry.name);

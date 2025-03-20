@@ -7,8 +7,8 @@
 
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { registerAllCommands } from './commands/index.js';
-import { logger } from '../shared/utils/logger.js';
+import { registerAllCommands } from './commands/index';
+import { logger } from '../shared/utils/logger';
 
 // Setup the CLI with common configuration
 const cli = yargs(hideBin(process.argv))

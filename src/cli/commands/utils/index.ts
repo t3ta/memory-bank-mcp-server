@@ -1,5 +1,5 @@
 import { Argv } from 'yargs';
-import { RecentBranchesCommand } from './recent-branches.js';
+import { RecentBranchesCommand } from './recent-branches';
 
 /**
  * Register all utility commands with yargs

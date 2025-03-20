@@ -1,14 +1,14 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-import { IConfigProvider } from './interfaces/IConfigProvider.js';
-import { WorkspaceConfig, CliOptions } from './WorkspaceConfig.js';
-import { Language } from '../../shared/types/index.js';
-import { BranchInfo } from '../../domain/entities/BranchInfo.js';
+import { IConfigProvider } from './interfaces/IConfigProvider';
+import { WorkspaceConfig, CliOptions } from './WorkspaceConfig';
+import { Language } from '../../shared/types/index';
+import { BranchInfo } from '../../domain/entities/BranchInfo';
 import {
   InfrastructureError,
   InfrastructureErrorCodes,
-} from '../../shared/errors/InfrastructureError.js';
-import { DomainError } from '../../shared/errors/DomainError.js';
+} from '../../shared/errors/InfrastructureError';
+import { DomainError } from '../../shared/errors/DomainError';
 
 /**
  * Implementation of configuration provider

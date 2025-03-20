@@ -1,8 +1,8 @@
 import { Argv } from 'yargs';
-import { CommandBase } from '../../command-base.js';
-import createApplication from '../../../main/index.js';
-import { logger } from '../../../shared/utils/logger.js';
-import { readInput } from '../../utils/input-reader.js';
+import { CommandBase } from '../../command-base';
+import { createApplication } from '../../../main/index';
+import { logger } from '../../../shared/utils/logger';
+import { readInput } from '../../utils/input-reader';
 
 /**
  * Command to update an existing JSON document

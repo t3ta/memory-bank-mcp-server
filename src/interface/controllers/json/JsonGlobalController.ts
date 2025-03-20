@@ -1,19 +1,19 @@
-import { IGlobalController } from '../interfaces/IGlobalController.js';
-import { DocumentType } from '../../../domain/entities/JsonDocument.js';
-import { MCPResponse } from '../../presenters/types/index.js';
-import { DocumentDTO, JsonDocumentDTO } from '../../../application/dtos/index.js';
-import { DomainError } from '../../../shared/errors/DomainError.js';
-import { ApplicationError } from '../../../shared/errors/ApplicationError.js';
-import { InfrastructureError } from '../../../shared/errors/InfrastructureError.js';
-import { IResponsePresenter } from '../../presenters/interfaces/IResponsePresenter.js';
-import { logger } from '../../../shared/utils/logger.js';
+import { IGlobalController } from '../interfaces/IGlobalController';
+import { DocumentType } from '../../../domain/entities/JsonDocument';
+import { MCPResponse } from '../../presenters/types/index';
+import { DocumentDTO, JsonDocumentDTO } from '../../../application/dtos/index';
+import { DomainError } from '../../../shared/errors/DomainError';
+import { ApplicationError } from '../../../shared/errors/ApplicationError';
+import { InfrastructureError } from '../../../shared/errors/InfrastructureError';
+import { IResponsePresenter } from '../../presenters/interfaces/IResponsePresenter';
+import { logger } from '../../../shared/utils/logger';
 
 // Import use cases
-import { ReadJsonDocumentUseCase } from '../../../application/usecases/json/ReadJsonDocumentUseCase.js';
-import { WriteJsonDocumentUseCase } from '../../../application/usecases/json/WriteJsonDocumentUseCase.js';
-import { DeleteJsonDocumentUseCase } from '../../../application/usecases/json/DeleteJsonDocumentUseCase.js';
-import { SearchJsonDocumentsUseCase } from '../../../application/usecases/json/SearchJsonDocumentsUseCase.js';
-import { UpdateJsonIndexUseCase } from '../../../application/usecases/json/UpdateJsonIndexUseCase.js';
+import { ReadJsonDocumentUseCase } from '../../../application/usecases/json/ReadJsonDocumentUseCase';
+import { WriteJsonDocumentUseCase } from '../../../application/usecases/json/WriteJsonDocumentUseCase';
+import { DeleteJsonDocumentUseCase } from '../../../application/usecases/json/DeleteJsonDocumentUseCase';
+import { SearchJsonDocumentsUseCase } from '../../../application/usecases/json/SearchJsonDocumentsUseCase';
+import { UpdateJsonIndexUseCase } from '../../../application/usecases/json/UpdateJsonIndexUseCase';
 
 /**
  * Controller for JSON global memory bank operations

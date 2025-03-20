@@ -1,14 +1,14 @@
-import { IUseCase } from '../../interfaces/IUseCase.js';
-import { IJsonDocumentRepository } from '../../../domain/repositories/IJsonDocumentRepository.js';
-import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
-import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
-import { DocumentId } from '../../../domain/entities/DocumentId.js';
-import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
+import { IUseCase } from '../../interfaces/IUseCase';
+import { IJsonDocumentRepository } from '../../../domain/repositories/IJsonDocumentRepository';
+import { BranchInfo } from '../../../domain/entities/BranchInfo';
+import { DocumentPath } from '../../../domain/entities/DocumentPath';
+import { DocumentId } from '../../../domain/entities/DocumentId';
+import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError';
 import {
   ApplicationError,
   ApplicationErrorCodes,
-} from '../../../shared/errors/ApplicationError.js';
-import { IIndexService } from '../../../infrastructure/index/interfaces/IIndexService.js';
+} from '../../../shared/errors/ApplicationError';
+import { IIndexService } from '../../../infrastructure/index/interfaces/IIndexService';
 
 /**
  * Input data for delete JSON document use case
@@ -101,8 +101,11 @@ export class DeleteJsonDocumentUseCase
         : this.jsonRepository;
 
       // Create branch info
+      // 注意: グローバルメモリバンクの操作でもBranchInfoを使用しています
+      // TODO: 将来的には設計を見直し、グローバルメモリバンクではBranchInfoに依存しない設計にすべき
+      // 現在はWriteJsonDocumentUseCaseとの整合性のために'feature/global'を使用
       const branchInfo = isGlobal
-        ? BranchInfo.create('global')
+        ? BranchInfo.create('feature/global') 
         : BranchInfo.create(input.branchName!);
 
       let success = false;

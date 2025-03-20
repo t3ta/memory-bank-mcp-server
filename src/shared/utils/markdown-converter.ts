@@ -8,6 +8,26 @@ import {
   TechnicalDecisionContent,
 } from '../../schemas/json-document.js';
 
+// 型ガード関数群
+function isValidStringArray(arr: unknown): arr is string[] {
+  return Array.isArray(arr) && arr.every(item => typeof item === 'string');
+}
+
+function isValidPath(path: unknown): path is string {
+  return typeof path === 'string' && path.trim().length > 0;
+}
+
+function isValidUserStory(story: unknown): story is { completed: boolean; description: string } {
+  return (
+    typeof story === 'object' &&
+    story !== null &&
+    'completed' in story &&
+    'description' in story &&
+    typeof (story as { completed: unknown }).completed === 'boolean' &&
+    typeof (story as { description: unknown }).description === 'string'
+  );
+}
+
 /**
  * Convert a JSON document to Markdown format
  * @param document JSON document to convert
@@ -17,11 +37,11 @@ export function jsonToMarkdown(document: JsonDocument | BaseJsonDocument): strin
   const { metadata } = document;
 
   // Basic metadata sections
-  let markdown = `# ${metadata.title}\n\n`;
+  let markdown = `# ${metadata.title || 'Untitled Document'}\n\n`;
 
   // Add tags if present
-  if (metadata.tags && metadata.tags.length > 0) {
-    markdown += `tags: ${metadata.tags.map((tag: string) => `#${tag}`).join(' ')}\n\n`;
+  if (isValidStringArray(metadata.tags) && metadata.tags.length > 0) {
+    markdown += `tags: ${metadata.tags.map(tag => `#${tag}`).join(' ')}\n\n`;
   }
 
   // Select converter based on document type
@@ -50,21 +70,20 @@ export function jsonToMarkdown(document: JsonDocument | BaseJsonDocument): strin
  * Convert a branch context document to Markdown
  */
 function branchContextToMarkdown(document: BranchContextJson): string {
-  const { content } = document;
+  const { content, metadata } = document;
   let markdown = '';
 
   markdown += `## 目的\n\n`;
-  markdown += `ブランチ: ${document.metadata.path.split('/').pop()?.replace('.json', '')}\n`;
-  markdown += `作成日時: ${
-    content.createdAt instanceof Date ? content.createdAt.toISOString() : content.createdAt
-  }\n\n`;
+  markdown += `ブランチ: ${isValidPath(metadata.path) ? metadata.path.split('/').pop()?.replace('.json', '') : 'Unknown'}\n`;
+  markdown += `作成日時: ${content.createdAt instanceof Date ? content.createdAt.toISOString() : String(content.createdAt)
+    }\n\n`;
 
   markdown += content.purpose ? `${content.purpose}\n\n` : '';
 
   markdown += `## ユーザーストーリー\n\n`;
 
-  if (content.userStories && content.userStories.length > 0) {
-    content.userStories.forEach((story) => {
+  if (Array.isArray(content.userStories) && content.userStories.length > 0) {
+    content.userStories.filter(isValidUserStory).forEach((story) => {
       markdown += `- [${story.completed ? 'x' : ' '}] ${story.description}\n`;
     });
   } else {
@@ -88,7 +107,7 @@ function activeContextToMarkdown(document: ActiveContextJson): string {
   markdown += '\n';
 
   markdown += `## 最近の変更点\n\n`;
-  if (content.recentChanges && content.recentChanges.length > 0) {
+  if (isValidStringArray(content.recentChanges) && content.recentChanges.length > 0) {
     content.recentChanges.forEach((change) => {
       markdown += `- ${change}\n`;
     });
@@ -98,7 +117,7 @@ function activeContextToMarkdown(document: ActiveContextJson): string {
   markdown += '\n';
 
   markdown += `## アクティブな決定事項\n\n`;
-  if (content.activeDecisions && content.activeDecisions.length > 0) {
+  if (isValidStringArray(content.activeDecisions) && content.activeDecisions.length > 0) {
     content.activeDecisions.forEach((decision) => {
       markdown += `- ${decision}\n`;
     });
@@ -108,7 +127,7 @@ function activeContextToMarkdown(document: ActiveContextJson): string {
   markdown += '\n';
 
   markdown += `## 検討事項\n\n`;
-  if (content.considerations && content.considerations.length > 0) {
+  if (isValidStringArray(content.considerations) && content.considerations.length > 0) {
     content.considerations.forEach((consideration) => {
       markdown += `- ${consideration}\n`;
     });
@@ -118,7 +137,7 @@ function activeContextToMarkdown(document: ActiveContextJson): string {
   markdown += '\n';
 
   markdown += `## 次のステップ\n\n`;
-  if (content.nextSteps && content.nextSteps.length > 0) {
+  if (isValidStringArray(content.nextSteps) && content.nextSteps.length > 0) {
     content.nextSteps.forEach((step) => {
       markdown += `- ${step}\n`;
     });
@@ -137,7 +156,7 @@ function progressToMarkdown(document: ProgressJson): string {
   let markdown = '';
 
   markdown += `## 動作している機能\n\n`;
-  if (content.workingFeatures && content.workingFeatures.length > 0) {
+  if (isValidStringArray(content.workingFeatures) && content.workingFeatures.length > 0) {
     content.workingFeatures.forEach((feature) => {
       markdown += `- ${feature}\n`;
     });
@@ -147,7 +166,7 @@ function progressToMarkdown(document: ProgressJson): string {
   markdown += '\n';
 
   markdown += `## 未実装の機能\n\n`;
-  if (content.pendingImplementation && content.pendingImplementation.length > 0) {
+  if (isValidStringArray(content.pendingImplementation) && content.pendingImplementation.length > 0) {
     content.pendingImplementation.forEach((feature) => {
       markdown += `- ${feature}\n`;
     });
@@ -161,7 +180,7 @@ function progressToMarkdown(document: ProgressJson): string {
   markdown += '\n';
 
   markdown += `## 既知の問題\n\n`;
-  if (content.knownIssues && content.knownIssues.length > 0) {
+  if (isValidStringArray(content.knownIssues) && content.knownIssues.length > 0) {
     content.knownIssues.forEach((issue) => {
       markdown += `- ${issue}\n`;
     });
@@ -181,8 +200,8 @@ function systemPatternsToMarkdown(document: SystemPatternsJson): string {
 
   markdown += `## 技術的決定事項\n\n`;
 
-  if (content.technicalDecisions && content.technicalDecisions.length > 0) {
-    content.technicalDecisions.forEach((decision) => {
+  if (Array.isArray(content.technicalDecisions) && content.technicalDecisions.length > 0) {
+    content.technicalDecisions.forEach((decision: TechnicalDecisionContent) => {
       markdown += technicalDecisionToMarkdown(decision);
     });
   } else {
@@ -207,9 +226,13 @@ function technicalDecisionToMarkdown(decision: TechnicalDecisionContent): string
   markdown += `${decision.decision}\n\n`;
 
   markdown += `#### 影響\n`;
-  decision.consequences.forEach((consequence) => {
-    markdown += `- ${consequence}\n`;
-  });
+  if (Array.isArray(decision.consequences) && decision.consequences.length > 0) {
+    decision.consequences.forEach((consequence) => {
+      markdown += `- ${consequence}\n`;
+    });
+  } else {
+    markdown += '_影響なし_\n';
+  }
   markdown += '\n';
 
   return markdown;

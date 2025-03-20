@@ -1,8 +1,8 @@
-import { BranchInfo } from '../entities/BranchInfo.js';
-import { DocumentPath } from '../entities/DocumentPath.js';
-import { MemoryDocument } from '../entities/MemoryDocument.js';
-import { Tag } from '../entities/Tag.js';
-import { JsonDocument } from '../entities/JsonDocument.js';
+import { BranchInfo } from '../entities/BranchInfo';
+import { DocumentPath } from '../entities/DocumentPath';
+import { MemoryDocument } from '../entities/MemoryDocument';
+import { Tag } from '../entities/Tag';
+import { JsonDocument } from '../entities/JsonDocument';
 
 /**
  * Common options for tag index operations

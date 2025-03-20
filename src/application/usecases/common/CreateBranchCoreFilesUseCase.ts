@@ -45,18 +45,18 @@ export interface CreateBranchCoreFilesOutput {
  * Use case for creating or updating core files in a branch memory bank
  */
 export class CreateBranchCoreFilesUseCase
-  implements IUseCase<CreateBranchCoreFilesInput, CreateBranchCoreFilesOutput>
-{
+  implements IUseCase<CreateBranchCoreFilesInput, CreateBranchCoreFilesOutput> {
   // Core file paths
   private readonly ACTIVE_CONTEXT_PATH = 'activeContext.json';
   private readonly PROGRESS_PATH = 'progress.json';
   private readonly SYSTEM_PATTERNS_PATH = 'systemPatterns.json';
+  private readonly BRANCH_CONTEXT_PATH = 'branchContext.json';
 
   /**
    * Constructor
    * @param branchRepository Branch memory bank repository
    */
-  constructor(private readonly branchRepository: IBranchMemoryBankRepository) {}
+  constructor(private readonly branchRepository: IBranchMemoryBankRepository) { }
 
   /**
    * Execute the use case
@@ -91,6 +91,19 @@ export class CreateBranchCoreFilesUseCase
       }
 
       const updatedFiles: string[] = [];
+
+      // Update each core file if provided
+      if (input.files.branchContext) {
+        const document = MemoryDocument.create({
+          path: DocumentPath.create(this.BRANCH_CONTEXT_PATH),
+          content: input.files.branchContext,
+          tags: [Tag.create('core'), Tag.create('branch-context')],
+          lastModified: new Date(),
+        });
+
+        await this.branchRepository.saveDocument(branchInfo, document);
+        updatedFiles.push(this.BRANCH_CONTEXT_PATH);
+      }
 
       // Update each core file if provided
       if (input.files.activeContext) {
@@ -189,7 +202,7 @@ export class CreateBranchCoreFilesUseCase
    * @param changes Array of change strings
    * @returns Structured changes
    */
-  private formatRecentChanges(changes: string[]): Array<{date: string, description: string}> {
+  private formatRecentChanges(changes: string[]): Array<{ date: string, description: string }> {
     return changes.map(change => ({
       date: new Date().toISOString(),
       description: change
@@ -201,7 +214,7 @@ export class CreateBranchCoreFilesUseCase
    * @param decisions Array of decision strings
    * @returns Structured decisions
    */
-  private formatActiveDecisions(decisions: string[]): Array<{id: string, description: string, reason?: string}> {
+  private formatActiveDecisions(decisions: string[]): Array<{ id: string, description: string, reason?: string }> {
     return decisions.map(decision => ({
       id: this.generateUUID(),
       description: decision
@@ -213,7 +226,7 @@ export class CreateBranchCoreFilesUseCase
    * @param considerations Array of consideration strings
    * @returns Structured considerations
    */
-  private formatConsiderations(considerations: string[]): Array<{id: string, description: string, status: string}> {
+  private formatConsiderations(considerations: string[]): Array<{ id: string, description: string, status: string }> {
     return considerations.map(consideration => ({
       id: this.generateUUID(),
       description: consideration,
@@ -226,7 +239,7 @@ export class CreateBranchCoreFilesUseCase
    * @param steps Array of step strings
    * @returns Structured steps
    */
-  private formatNextSteps(steps: string[]): Array<{id: string, description: string, priority: string}> {
+  private formatNextSteps(steps: string[]): Array<{ id: string, description: string, priority: string }> {
     return steps.map(step => ({
       id: this.generateUUID(),
       description: step,
@@ -272,7 +285,7 @@ export class CreateBranchCoreFilesUseCase
    * @param features Array of feature strings
    * @returns Structured features
    */
-  private formatWorkingFeatures(features: string[]): Array<{id: string, description: string, implementedAt: string}> {
+  private formatWorkingFeatures(features: string[]): Array<{ id: string, description: string, implementedAt: string }> {
     return features.map(feature => ({
       id: this.generateUUID(),
       description: feature,
@@ -285,7 +298,7 @@ export class CreateBranchCoreFilesUseCase
    * @param items Array of pending item strings
    * @returns Structured pending items
    */
-  private formatPendingImplementation(items: string[]): Array<{id: string, description: string, priority: string, estimatedCompletion?: string}> {
+  private formatPendingImplementation(items: string[]): Array<{ id: string, description: string, priority: string, estimatedCompletion?: string }> {
     return items.map(item => ({
       id: this.generateUUID(),
       description: item,
@@ -298,7 +311,7 @@ export class CreateBranchCoreFilesUseCase
    * @param issues Array of issue strings
    * @returns Structured issues
    */
-  private formatKnownIssues(issues: string[]): Array<{id: string, description: string, severity: string, workaround?: string}> {
+  private formatKnownIssues(issues: string[]): Array<{ id: string, description: string, severity: string, workaround?: string }> {
     return issues.map(issue => ({
       id: this.generateUUID(),
       description: issue,
@@ -377,7 +390,7 @@ export class CreateBranchCoreFilesUseCase
    * @returns UUID string
    */
   private generateUUID(): string {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
       const r = Math.random() * 16 | 0;
       const v = c === 'x' ? r : (r & 0x3 | 0x8);
       return v.toString(16);

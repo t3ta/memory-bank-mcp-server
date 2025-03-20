@@ -1,22 +1,22 @@
-import { IGlobalController } from './interfaces/IGlobalController.js';
-import { DocumentType } from '../../domain/entities/JsonDocument.js';
-import { ReadGlobalDocumentUseCase } from '../../application/usecases/global/ReadGlobalDocumentUseCase.js';
-import { WriteGlobalDocumentUseCase } from '../../application/usecases/global/WriteGlobalDocumentUseCase.js';
-import { SearchDocumentsByTagsUseCase } from '../../application/usecases/common/SearchDocumentsByTagsUseCase.js';
-import { UpdateTagIndexUseCase } from '../../application/usecases/common/UpdateTagIndexUseCase.js';
-import { UpdateTagIndexUseCaseV2 } from '../../application/usecases/common/UpdateTagIndexUseCaseV2.js';
-import { ReadJsonDocumentUseCase } from '../../application/usecases/json/ReadJsonDocumentUseCase.js';
-import { WriteJsonDocumentUseCase } from '../../application/usecases/json/WriteJsonDocumentUseCase.js';
-import { DeleteJsonDocumentUseCase } from '../../application/usecases/json/DeleteJsonDocumentUseCase.js';
-import { SearchJsonDocumentsUseCase } from '../../application/usecases/json/SearchJsonDocumentsUseCase.js';
-import { UpdateJsonIndexUseCase } from '../../application/usecases/json/UpdateJsonIndexUseCase.js';
-import { MCPResponsePresenter } from '../presenters/MCPResponsePresenter.js';
-import { MCPResponse } from '../presenters/types/index.js';
-import { DocumentDTO, JsonDocumentDTO } from '../../application/dtos/index.js';
-import { DomainError } from '../../shared/errors/DomainError.js';
-import { ApplicationError } from '../../shared/errors/ApplicationError.js';
-import { InfrastructureError } from '../../shared/errors/InfrastructureError.js';
-import { logger } from '../../shared/utils/logger.js';
+import { IGlobalController } from './interfaces/IGlobalController';
+import { DocumentType } from '../../domain/entities/JsonDocument';
+import { ReadGlobalDocumentUseCase } from '../../application/usecases/global/ReadGlobalDocumentUseCase';
+import { WriteGlobalDocumentUseCase } from '../../application/usecases/global/WriteGlobalDocumentUseCase';
+import { SearchDocumentsByTagsUseCase } from '../../application/usecases/common/SearchDocumentsByTagsUseCase';
+import { UpdateTagIndexUseCase } from '../../application/usecases/common/UpdateTagIndexUseCase';
+import { UpdateTagIndexUseCaseV2 } from '../../application/usecases/common/UpdateTagIndexUseCaseV2';
+import { ReadJsonDocumentUseCase } from '../../application/usecases/json/ReadJsonDocumentUseCase';
+import { WriteJsonDocumentUseCase } from '../../application/usecases/json/WriteJsonDocumentUseCase';
+import { DeleteJsonDocumentUseCase } from '../../application/usecases/json/DeleteJsonDocumentUseCase';
+import { SearchJsonDocumentsUseCase } from '../../application/usecases/json/SearchJsonDocumentsUseCase';
+import { UpdateJsonIndexUseCase } from '../../application/usecases/json/UpdateJsonIndexUseCase';
+import { MCPResponsePresenter } from '../presenters/MCPResponsePresenter';
+import { MCPResponse } from '../presenters/types/index';
+import { DocumentDTO, JsonDocumentDTO } from '../../application/dtos/index';
+import { DomainError } from '../../shared/errors/DomainError';
+import { ApplicationError } from '../../shared/errors/ApplicationError';
+import { InfrastructureError } from '../../shared/errors/InfrastructureError';
+import { logger } from '../../shared/utils/logger';
 
 /**
  * Controller for global memory bank operations

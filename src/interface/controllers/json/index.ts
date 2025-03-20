@@ -1,2 +1,2 @@
-export * from './JsonBranchController.js';
-export * from './JsonGlobalController.js';
+export * from './JsonBranchController';
+export * from './JsonGlobalController';

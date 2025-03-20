@@ -4,13 +4,13 @@
  * Converts branch context markdown documents to JSON
  */
 import { v4 as uuidv4 } from 'uuid';
-import { BaseConverter } from './BaseConverter.js';
-import { parseMarkdownForMigration } from '../utils/MarkdownParser.js';
-import { JsonDocument } from '../../domain/entities/JsonDocument.js';
-import { DocumentPath } from '../../domain/entities/DocumentPath.js';
-import { DocumentId } from '../../domain/entities/DocumentId.js';
-import { Tag } from '../../domain/entities/Tag.js';
-import { BranchContextContentV2 } from '../../schemas/v2/json-document.js';
+import { BaseConverter } from './BaseConverter';
+import { parseMarkdownForMigration } from '../utils/MarkdownParser';
+import { JsonDocument } from '../../domain/entities/JsonDocument';
+import { DocumentPath } from '../../domain/entities/DocumentPath';
+import { DocumentId } from '../../domain/entities/DocumentId';
+import { Tag } from '../../domain/entities/Tag';
+import { BranchContextContentV2 } from '../../schemas/v2/json-document';
 
 /**
  * Converter for branch context documents

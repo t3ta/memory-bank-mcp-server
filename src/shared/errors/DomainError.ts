@@ -24,8 +24,8 @@ export const DomainErrorCodes = {
   BRANCH_ALREADY_EXISTS: 'BRANCH_ALREADY_EXISTS',
   VALIDATION_ERROR: 'VALIDATION_ERROR',
   UNAUTHORIZED_ACCESS: 'UNAUTHORIZED_ACCESS',
-  // 追加したエラーコード
   INVALID_TAG: 'INVALID_TAG',
+  REPOSITORY_ERROR: 'REPOSITORY_ERROR',
 } as const;
 
 export type DomainErrorCode = keyof typeof DomainErrorCodes;

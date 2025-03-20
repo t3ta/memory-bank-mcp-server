@@ -1,13 +1,13 @@
-import { IUseCase } from '../../interfaces/IUseCase.js';
-import { IJsonDocumentRepository } from '../../../domain/repositories/IJsonDocumentRepository.js';
-import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
-import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
-import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
+import { IUseCase } from '../../interfaces/IUseCase';
+import { IJsonDocumentRepository } from '../../../domain/repositories/IJsonDocumentRepository';
+import { BranchInfo } from '../../../domain/entities/BranchInfo';
+import { DocumentPath } from '../../../domain/entities/DocumentPath';
+import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError';
 import {
   ApplicationError,
   ApplicationErrorCodes,
-} from '../../../shared/errors/ApplicationError.js';
-import { IIndexService } from '../../../infrastructure/index/interfaces/IIndexService.js';
+} from '../../../shared/errors/ApplicationError';
+import { IIndexService } from '../../../infrastructure/index/interfaces/IIndexService';
 
 /**
  * Input data for update JSON index use case

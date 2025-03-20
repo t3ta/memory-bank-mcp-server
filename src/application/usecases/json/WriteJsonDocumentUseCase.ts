@@ -1,16 +1,16 @@
-import { IUseCase } from '../../interfaces/IUseCase.js';
-import { IJsonDocumentRepository } from '../../../domain/repositories/IJsonDocumentRepository.js';
-import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
-import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
-import { DocumentId } from '../../../domain/entities/DocumentId.js';
-import { JsonDocument, DocumentType } from '../../../domain/entities/JsonDocument.js';
-import { Tag } from '../../../domain/entities/Tag.js';
-import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
+import { IUseCase } from '../../interfaces/IUseCase';
+import { IJsonDocumentRepository } from '../../../domain/repositories/IJsonDocumentRepository';
+import { BranchInfo } from '../../../domain/entities/BranchInfo';
+import { DocumentPath } from '../../../domain/entities/DocumentPath';
+import { DocumentId } from '../../../domain/entities/DocumentId';
+import { JsonDocument, DocumentType } from '../../../domain/entities/JsonDocument';
+import { Tag } from '../../../domain/entities/Tag';
+import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError';
 import {
   ApplicationError,
   ApplicationErrorCodes,
-} from '../../../shared/errors/ApplicationError.js';
-import { IIndexService } from '../../../infrastructure/index/interfaces/IIndexService.js';
+} from '../../../shared/errors/ApplicationError';
+import { IIndexService } from '../../../infrastructure/index/interfaces/IIndexService';
 
 /**
  * Input data for write JSON document use case
@@ -158,8 +158,10 @@ export class WriteJsonDocumentUseCase
         : this.jsonRepository;
 
       // Create branch info - BranchInfo validation requires feature/ or fix/ prefix
+      // 注意: グローバルメモリバンクの操作でもBranchInfoを使用しています
+      // TODO: 将来的には設計を見直し、グローバルメモリバンクではBranchInfoに依存しない設計にすべき
       const branchInfo = isGlobal
-        ? BranchInfo.create('feature/global') // 変更: 'global' -> 'feature/global'
+        ? BranchInfo.create('feature/global')
         : BranchInfo.create(input.branchName!);
 
       // Create document path

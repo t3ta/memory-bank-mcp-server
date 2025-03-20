@@ -5,12 +5,12 @@
  * Used as a fallback when no specific converter is available
  */
 import { v4 as uuidv4 } from 'uuid';
-import { BaseConverter } from './BaseConverter.js';
-import { parseMarkdownForMigration } from '../utils/MarkdownParser.js';
-import { JsonDocument } from '../../domain/entities/JsonDocument.js';
-import { DocumentPath } from '../../domain/entities/DocumentPath.js';
-import { DocumentId } from '../../domain/entities/DocumentId.js';
-import { Tag } from '../../domain/entities/Tag.js';
+import { BaseConverter } from './BaseConverter';
+import { parseMarkdownForMigration } from '../utils/MarkdownParser';
+import { JsonDocument } from '../../domain/entities/JsonDocument';
+import { DocumentPath } from '../../domain/entities/DocumentPath';
+import { DocumentId } from '../../domain/entities/DocumentId';
+import { Tag } from '../../domain/entities/Tag';
 
 /**
  * Converter for generic documents

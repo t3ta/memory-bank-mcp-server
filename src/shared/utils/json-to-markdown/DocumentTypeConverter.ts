@@ -56,7 +56,7 @@ export abstract class BaseDocumentTypeConverter implements IDocumentTypeConverte
 
     // Add tags if present
     if (document.tags && document.tags.length > 0) {
-      md.tags(document.tags.map((tag) => tag.value));
+      md.tags(document.tags.filter(tag => tag && typeof tag === 'object' && 'value' in tag).map((tag) => tag.value));
     }
 
     // Call implementation specific conversion

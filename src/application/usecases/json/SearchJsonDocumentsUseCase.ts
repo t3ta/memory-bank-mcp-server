@@ -1,14 +1,14 @@
-import { IUseCase } from '../../interfaces/IUseCase.js';
-import { IJsonDocumentRepository } from '../../../domain/repositories/IJsonDocumentRepository.js';
-import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
-import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
-import { Tag } from '../../../domain/entities/Tag.js';
-import { DocumentType } from '../../../domain/entities/JsonDocument.js';
-import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
+import { IUseCase } from '../../interfaces/IUseCase';
+import { IJsonDocumentRepository } from '../../../domain/repositories/IJsonDocumentRepository';
+import { BranchInfo } from '../../../domain/entities/BranchInfo';
+import { DocumentPath } from '../../../domain/entities/DocumentPath';
+import { Tag } from '../../../domain/entities/Tag';
+import { DocumentType } from '../../../domain/entities/JsonDocument';
+import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError';
 import {
   ApplicationError,
   ApplicationErrorCodes,
-} from '../../../shared/errors/ApplicationError.js';
+} from '../../../shared/errors/ApplicationError';
 
 /**
  * Input data for search JSON documents use case
