@@ -6,6 +6,9 @@ import { MarkdownBuilder } from './MarkdownBuilder.js';
  *
  * Each document type (branch_context, active_context, etc.) implements
  * this interface to provide custom conversion logic.
+ *
+ * @deprecated This interface is deprecated in v2.1.0 as Markdown support has been removed.
+ * All documents should use JSON format only.
  */
 export interface IDocumentTypeConverter {
   /**
@@ -26,6 +29,9 @@ export interface IDocumentTypeConverter {
 
 /**
  * Base class for document type converters with common functionality
+ * 
+ * @deprecated This class is deprecated in v2.1.0 as Markdown support has been removed.
+ * All documents should use JSON format only.
  */
 export abstract class BaseDocumentTypeConverter implements IDocumentTypeConverter {
   /**

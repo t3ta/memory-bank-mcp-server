@@ -4,6 +4,11 @@ import { MarkdownBuilder } from './MarkdownBuilder.js';
 import { SharedUtilsError, SharedUtilsErrorCodes } from '../../errors/SharedUtilsError.js';
 
 /**
+ * @deprecated This class is deprecated in v2.1.0 as Markdown support has been removed.
+ * All documents should use JSON format only.
+ */
+
+/**
  * Options for JSON to Markdown conversion
  */
 export interface JsonToMarkdownOptions {
@@ -61,8 +66,12 @@ export class JsonToMarkdownConverter {
    * @param options Conversion options
    * @returns Markdown string
    * @throws SharedUtilsError if no converter found for document type
+   * @deprecated This method is deprecated in v2.1.0 as Markdown support has been removed.
+   * All documents should use JSON format only.
    */
   convert(document: JsonDocument, options: JsonToMarkdownOptions = {}): string {
+    console.warn('DEPRECATED: JsonToMarkdownConverter is deprecated in v2.1.0. Markdown support has been removed.');
+    console.warn('Please use JSON format only for all documents.');
     // Merge options with defaults
     const mergedOptions: JsonToMarkdownOptions = {
       ...DEFAULT_OPTIONS,

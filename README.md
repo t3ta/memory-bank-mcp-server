@@ -1,8 +1,8 @@
-# Memory Bank MCP Server 2.0
+# Memory Bank MCP Server 2.1.0
+
+A Memory Bank implementation for managing project documentation and context across sessions. This server helps Claude maintain consistent project knowledge through global and branch-specific memory banks. Version 2.1.0 introduces JSON-only document storage, removing Markdown support completely for better structure and validation.
 
 This project is inspired by [Cline Memory Bank](https://github.com/nickbaumann98/cline_docs/blob/main/prompting/custom%20instructions%20library/cline-memory-bank.md) from the [nickbaumann98/cline_docs](https://github.com/nickbaumann98/cline_docs) repository, which provides an excellent foundation for managing Claude's memory in software projects.
-
-A Memory Bank implementation for managing project documentation and context across sessions. This server helps Claude maintain consistent project knowledge through global and branch-specific memory banks. Version 2.0 introduces JSON-based structured document storage, enhanced API, and multilingual support.
 
 ## Usage
 
@@ -61,6 +61,25 @@ memory-bank --help
 - **--file, -f**: Read content from file (for write commands)
 - **--format**: Output format for read-core-files ('json' or 'pretty', default: 'pretty')
 
+## What's New in 2.1.0
+
+### Complete Migration to JSON
+
+Memory Bank 2.1.0 completes the migration to JSON-based documents:
+
+- **Markdown support has been completely removed**
+- All documents must use JSON format
+- Improved validation and structure through JSON schemas
+- Better programmatic access and data consistency
+
+### Migration Tools
+
+To help users transition from Markdown to JSON:
+
+- The `migrate` command converts existing Markdown files to JSON
+- Automatic backup of original files before conversion
+- Schema validation ensures proper format
+
 ## What's New in 2.0
 
 ### JSON-based Document Structure
@@ -95,14 +114,14 @@ JSON documents follow this structure:
 
 ### Markdown to JSON Migration
 
-Memory Bank 2.0 includes built-in migration tools:
+Memory Bank 2.0 introduced built-in migration tools:
 
 - Automatic migration on server startup
 - Original file backups before conversion
 - Schema validation for generated JSON files
 - Manual migration commands
 
-During the transition period, both formats are supported, but Markdown support will eventually be deprecated.
+**Note**: As of version 2.1.0, Markdown support has been completely removed. All documents must use JSON format.
 
 ### Enhanced API
 
@@ -146,7 +165,7 @@ docs/global-memory-bank/
   └── tags/                  # Information organization
 ```
 
-> Note: Both .md and .json formats are supported, but .json is recommended for new documents.
+> Note: As of version 2.1.0, only .json format is supported.
 
 ### Branch Memory Bank
 
@@ -167,7 +186,7 @@ docs/branch-memory-bank/feature-login/
   └── progress.json        # Implementation status
 ```
 
-> Note: Both .md and .json formats are supported, but .json is recommended for new documents.
+> Note: As of version 2.1.0, only .json format is supported.
 
 ## API
 
