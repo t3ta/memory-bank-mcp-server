@@ -1,79 +1,39 @@
 {
   "schema": "memory_document_v2",
   "metadata": {
-    "id": "e65331c6-2ef0-4509-be58-2d30cc85bf22",
-    "title": "アクティブコンテキスト",
+    "id": "active-context",
+    "title": "Active Context",
     "documentType": "active_context",
     "path": "activeContext.json",
     "tags": [
+      "core",
       "active-context"
     ],
-    "lastModified": "2025-03-21T02:40:41.887Z",
-    "createdAt": "2025-03-21T02:40:41.887Z",
-    "version": 1
+    "lastModified": "2025-03-21T09:45:00.000Z",
+    "createdAt": "2025-03-21T02:46:55.121Z",
+    "version": 4
   },
   "content": {
-    "currentWork": "現在取り組んでいる作業の説明",
-    "recentChanges": [
+    "sections": [
       {
-        "date": "2025-03-21T02:40:41.887Z",
-        "description": "変更点1"
+        "title": "Current Work",
+        "content": "We are implementing the tag reorganization and directory structure improvements for the Global Memory Bank. After analyzing the current structure and creating a comprehensive plan, we are now moving to the execution phase of our strategy."
       },
       {
-        "date": "2025-03-21T02:40:41.887Z",
-        "description": "変更点2"
+        "title": "Recent Changes",
+        "content": "1. Created backups of important index files in `/docs/global-memory-bank/backups/2025-03-21/`\n2. Generated a comprehensive tag reorganization strategy using shitauke\n3. Created a detailed implementation plan in `tag-reorganization-implementation-plan.json`\n4. Identified 10 logical tag categories to improve organization\n5. Planned consolidation of similar tags (e.g., merging version tags)"
       },
       {
-        "date": "2025-03-21T02:40:41.887Z",
-        "description": "変更点3"
-      }
-    ],
-    "activeDecisions": [
-      {
-        "id": "69027bf9-51df-4b14-84e9-1afe054adfcd",
-        "description": "決定事項1"
+        "title": "Active Decisions",
+        "content": "1. Implement the 10 tag categories as defined in our plan to create a logical organization structure\n2. Begin with directory restructuring as it is least disruptive to the system\n3. Apply a gradual approach to tag consolidation to maintain system stability\n4. Maintain both index files during transition for backward compatibility\n5. Focus on creating proper documentation for each category"
       },
       {
-        "id": "5376411f-84bc-495e-a13d-44f9c9714e98",
-        "description": "決定事項2"
+        "title": "Considerations",
+        "content": "1. Need to test each change carefully as the indexing mechanism is core to the system\n2. Should create prototype implementations in a test branch before applying to main system\n3. Some changes may require modifications to code that generates the indexes\n4. User feedback will be critical to ensure the new structure is intuitive"
       },
       {
-        "id": "ee11fcc5-3955-4b5d-a4f8-c2b9b7c6092a",
-        "description": "決定事項3"
-      }
-    ],
-    "considerations": [
-      {
-        "id": "c2bd599d-971b-4a88-8282-f4f33a7610d7",
-        "description": "検討事項1",
-        "status": "open"
-      },
-      {
-        "id": "8343c7b1-4653-4b54-9a08-577d3800d63e",
-        "description": "検討事項2",
-        "status": "open"
-      },
-      {
-        "id": "0f32bbae-751b-413d-b4a3-024d8bdbb2e3",
-        "description": "検討事項3",
-        "status": "open"
-      }
-    ],
-    "nextSteps": [
-      {
-        "id": "28f9b9a4-4762-49cd-9e9a-8b9ec68ffc75",
-        "description": "次のステップ1",
-        "priority": "high"
-      },
-      {
-        "id": "7beee28e-4d03-432f-8093-c5e07308aced",
-        "description": "次のステップ2",
-        "priority": "medium"
-      },
-      {
-        "id": "d06e78d6-daae-4f67-b096-ae45fdfd4a25",
-        "description": "次のステップ3",
-        "priority": "low"
+        "title": "Next Steps",
+        "content": "1. **Begin Directory Structure Implementation**\n   - Create the new directory structure with category folders\n   - Start with the `01-project/` directory\n   - Add README.json files to each new directory\n\n2. **Prepare For Tag Category Implementation**\n   - Create a test branch for tag category implementation\n   - Design the extended format for `tags/index.json` to include categories\n   - Determine how the system will interact with categorized tags\n\n3. **Plan Tag Consolidation Process**\n   - Create detailed mapping of tags to be consolidated\n   - Document the steps for updating document tags\n   - Design the transition process to maintain backward compatibility\n\n4. **Create Documentation**\n   - Update user guides to explain the new structure\n   - Create guides for team members on how to use the new tag system"
       }
     ]
   }
