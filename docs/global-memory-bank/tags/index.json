@@ -9,8 +9,8 @@
       "index",
       "meta"
     ],
-    "lastModified": "2025-03-21T08:10:26.050Z",
-    "createdAt": "2025-03-21T08:10:26.050Z",
+    "lastModified": "2025-03-21T17:12:00.695Z",
+    "createdAt": "2025-03-21T17:12:00.695Z",
     "version": 1
   },
   "content": {
@@ -35,7 +35,7 @@
         ]
       },
       "documentation": {
-        "count": 15,
+        "count": 16,
         "documents": [
           {
             "path": "01-project/README.json",
@@ -84,6 +84,10 @@
           {
             "path": "meta/consolidated-memory-bank-meta.json",
             "title": "meta/consolidated-memory-bank-meta.json"
+          },
+          {
+            "path": "meta/document-type-standards.json",
+            "title": "meta/document-type-standards.json"
           },
           {
             "path": "meta/global-memory-bank-reference.json",
@@ -518,7 +522,7 @@
         ]
       },
       "refactoring": {
-        "count": 7,
+        "count": 9,
         "documents": [
           {
             "path": "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
@@ -545,13 +549,21 @@
             "title": "meta/global-memory-bank-indexing-mechanism.json"
           },
           {
+            "path": "meta/redundant-files-removal-plan.json",
+            "title": "meta/redundant-files-removal-plan.json"
+          },
+          {
             "path": "meta/reorganization-plan.json",
             "title": "meta/reorganization-plan.json"
+          },
+          {
+            "path": "meta/reorganization-summary.json",
+            "title": "meta/reorganization-summary.json"
           }
         ]
       },
       "memory-bank": {
-        "count": 14,
+        "count": 19,
         "documents": [
           {
             "path": "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
@@ -578,6 +590,18 @@
             "title": "09-refactoring/json-global-design-issues.json"
           },
           {
+            "path": "auto-initialization-fix.json",
+            "title": "auto-initialization-fix.json"
+          },
+          {
+            "path": "auto-initialization-test.json",
+            "title": "auto-initialization-test.json"
+          },
+          {
+            "path": "initialization-behavior.json",
+            "title": "initialization-behavior.json"
+          },
+          {
             "path": "meta/consolidated-memory-bank-meta.json",
             "title": "meta/consolidated-memory-bank-meta.json"
           },
@@ -598,8 +622,16 @@
             "title": "meta/global-memory-bank-reference.json"
           },
           {
+            "path": "meta/redundant-files-removal-plan.json",
+            "title": "meta/redundant-files-removal-plan.json"
+          },
+          {
             "path": "meta/reorganization-plan.json",
             "title": "meta/reorganization-plan.json"
+          },
+          {
+            "path": "meta/reorganization-summary.json",
+            "title": "meta/reorganization-summary.json"
           },
           {
             "path": "tags/tag_categorization.json",
@@ -612,7 +644,7 @@
         ]
       },
       "plan": {
-        "count": 5,
+        "count": 6,
         "documents": [
           {
             "path": "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
@@ -627,6 +659,10 @@
             "title": "06-releases/v2-implementation-plan.json"
           },
           {
+            "path": "meta/redundant-files-removal-plan.json",
+            "title": "meta/redundant-files-removal-plan.json"
+          },
+          {
             "path": "meta/reorganization-plan.json",
             "title": "meta/reorganization-plan.json"
           },
@@ -637,7 +673,7 @@
         ]
       },
       "meta": {
-        "count": 13,
+        "count": 15,
         "documents": [
           {
             "path": "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
@@ -656,10 +692,6 @@
             "title": "09-refactoring/analysis/global-memory-bank-analysis-raw.json"
           },
           {
-            "path": "_global_index.json",
-            "title": "_global_index.json"
-          },
-          {
             "path": "meta/README.json",
             "title": "meta/README.json"
           },
@@ -668,12 +700,24 @@
             "title": "meta/consolidated-memory-bank-meta.json"
           },
           {
+            "path": "meta/document-type-standards.json",
+            "title": "meta/document-type-standards.json"
+          },
+          {
             "path": "meta/global-memory-bank-navigation.json",
             "title": "meta/global-memory-bank-navigation.json"
           },
           {
+            "path": "meta/redundant-files-removal-plan.json",
+            "title": "meta/redundant-files-removal-plan.json"
+          },
+          {
             "path": "meta/reorganization-plan.json",
             "title": "meta/reorganization-plan.json"
+          },
+          {
+            "path": "meta/reorganization-summary.json",
+            "title": "meta/reorganization-summary.json"
           },
           {
             "path": "tags/README.json",
@@ -774,7 +818,7 @@
         ]
       },
       "reference": {
-        "count": 4,
+        "count": 5,
         "documents": [
           {
             "path": "03-implementation/cli-commands.json",
@@ -783,6 +827,10 @@
           {
             "path": "meta/consolidated-memory-bank-meta.json",
             "title": "meta/consolidated-memory-bank-meta.json"
+          },
+          {
+            "path": "meta/document-type-standards.json",
+            "title": "meta/document-type-standards.json"
           },
           {
             "path": "meta/global-memory-bank-reference.json",
@@ -977,15 +1025,11 @@
         ]
       },
       "index": {
-        "count": 8,
+        "count": 7,
         "documents": [
           {
             "path": "05-testing/tag-search-system-test-plan.json",
             "title": "05-testing/tag-search-system-test-plan.json"
-          },
-          {
-            "path": "_global_index.json",
-            "title": "_global_index.json"
           },
           {
             "path": "meta/consolidated-memory-bank-meta.json",
@@ -1058,7 +1102,7 @@
         ]
       },
       "changelog": {
-        "count": 2,
+        "count": 3,
         "documents": [
           {
             "path": "06-releases/consolidated-v2-release.json",
@@ -1067,6 +1111,10 @@
           {
             "path": "06-releases/release-v2.0.0.json",
             "title": "06-releases/release-v2.0.0.json"
+          },
+          {
+            "path": "meta/reorganization-summary.json",
+            "title": "meta/reorganization-summary.json"
           }
         ]
       },
@@ -1168,6 +1216,77 @@
           {
             "path": "09-refactoring/analysis/global-memory-bank-analysis-raw.json",
             "title": "09-refactoring/analysis/global-memory-bank-analysis-raw.json"
+          }
+        ]
+      },
+      "system-design": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "architecture.json",
+            "title": "architecture.json"
+          }
+        ]
+      },
+      "fix": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "auto-initialization-fix.json",
+            "title": "auto-initialization-fix.json"
+          }
+        ]
+      },
+      "auto-initialization": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "auto-initialization-fix.json",
+            "title": "auto-initialization-fix.json"
+          },
+          {
+            "path": "auto-initialization-test.json",
+            "title": "auto-initialization-test.json"
+          }
+        ]
+      },
+      "test": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "auto-initialization-test.json",
+            "title": "auto-initialization-test.json"
+          }
+        ]
+      },
+      "standards": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "coding-standards.json",
+            "title": "coding-standards.json"
+          },
+          {
+            "path": "meta/document-type-standards.json",
+            "title": "meta/document-type-standards.json"
+          }
+        ]
+      },
+      "initialization": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "initialization-behavior.json",
+            "title": "initialization-behavior.json"
+          }
+        ]
+      },
+      "behavior": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "initialization-behavior.json",
+            "title": "initialization-behavior.json"
           }
         ]
       },
