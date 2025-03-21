@@ -84,11 +84,13 @@ export class DocumentPath {
 
   /**
    * Check if this document is a markdown file
+   * @deprecated Markdown support is deprecated in v2.1.0
    */
   public get isMarkdown(): boolean {
     const ext = this.extension.toLowerCase();
     console.log(`Checking if file is markdown: ${this._value}, extension: ${ext}`);
-    return ext === 'md';
+    // Always return false as Markdown support is removed in v2.1.0
+    return false;
   }
 
   /**
@@ -166,16 +168,16 @@ export class DocumentPath {
 
   /**
    * Create a corresponding JSON path for a markdown path and vice versa
+   * @deprecated Markdown support is deprecated in v2.1.0
    * @returns New DocumentPath with converted extension
    */
   public toAlternateFormat(): DocumentPath {
-    if (this.isMarkdown) {
-      return this.withExtension('json');
-    } else if (this.isJSON) {
-      return this.withExtension('md');
-    } else {
-      // No conversion for other file types
+    if (this.isJSON) {
+      // No longer convert JSON to Markdown as Markdown support is removed in v2.1.0
       return this;
+    } else {
+      // Always convert to JSON for other file types
+      return this.withExtension('json');
     }
   }
 }

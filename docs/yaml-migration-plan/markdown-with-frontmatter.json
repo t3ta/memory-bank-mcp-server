@@ -1,0 +1,21 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "5681e055-2c1c-45a7-b47e-88c9bd8111f2",
+    "title": "Markdownとフロントマターを活用したハイブリッドアプローチ",
+    "documentType": "generic",
+    "path": "markdown-with-frontmatter.md",
+    "tags": [],
+    "lastModified": "2025-03-21T19:30:40.795Z",
+    "createdAt": "2025-03-21T19:30:40.795Z",
+    "version": 1
+  },
+  "content": {
+    "markdown": [
+      "Markdownは以下の点で優れています：\n1. **人間にとっての読みやすさと書きやすさ**:\nシンプルな構文\nテキストエディタで直接編集可能\n学習曲線が緩やか\n2. **リッチコンテンツのサポート**:\nコードブロック（シンタックスハイライト付き）\n表\nリンクと画像\nリスト（順序付き/順序なし）\n3. **図表のサポート**:\nMermaid図表の直接埋め込み\nPlantUML、Draw.io等の図表の埋め込み\n数式（MathJax/KaTeX）\n4. **広範なツールサポート**:",
+      "VSCode、JetBrains IDEs等のエディタサポート",
+      "プレビュー機能",
+      "Git等のバージョン管理システムとの親和性"
+    ]
+  }
+}

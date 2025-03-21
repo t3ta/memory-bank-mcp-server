@@ -1,0 +1,16 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "76ad0e99-9d13-4cef-959a-bebf95e216a5",
+    "title": "JSONスキーマのYAML表現",
+    "documentType": "generic",
+    "path": "json-schema-as-yaml.md",
+    "tags": [],
+    "lastModified": "2025-03-21T19:30:40.794Z",
+    "createdAt": "2025-03-21T19:30:40.794Z",
+    "version": 1
+  },
+  "content": {
+    "yaml": "JSONからYAMLへの移行は以下の手順で行うことができます：\n1. **ライブラリの導入**：\n```bash\nnpm install js-yaml @types/js-yaml\n```\n2. **変換ユーティリティの実装**：\n```typescript\nimport fs from 'fs/promises';\nimport yaml from 'js-yaml';\nimport path from 'path';\nasync function convertJsonToYaml(jsonFilePath: string): Promise<void> {\n// JSONファイルを読み込む\nconst jsonContent = await fs.readFile(jsonFilePath, 'utf-8');\nconst jsonData = JSON.parse(jsonContent);\n// YAMLに変換\nconst yamlContent = yaml.dump(jsonData, {\nindent: 2,\nlineWidth: 100,\nnoRefs: true,\n});\n// 拡張子を.yamlに変更して保存\nconst yamlFilePath = jsonFilePath.replace(/\\.json$/, '.yaml');\nawait fs.writeFile(yamlFilePath, yamlContent, 'utf-8');\nconsole.log(`Converted ${jsonFilePath} to ${yamlFilePath}`);\n}\n```\n3. **読み込み機能の実装**：\n```typescript\nasync function readYamlFile<T>(filePath: string): Promise<T> {\nconst content = await fs.readFile(filePath, 'utf-8');\nreturn yaml.load(content) as T;\n}\n```\n4. **書き込み機能の実装**：\n```typescript\nasync function writeYamlFile<T>(filePath: string, data: T): Promise<void> {\nconst yamlContent = yaml.dump(data, {\nindent: 2,\nlineWidth: 100,\nnoRefs: true,\n});\nawait fs.writeFile(filePath, yamlContent, 'utf-8');\n}\n```\n5. **リポジトリの拡張**：\n```typescript\nclass YamlMemoryDocumentRepository implements IMemoryDocumentRepository {\nconstructor(\nprivate readonly basePath: string,\nprivate readonly fileSystemService: IFileSystemService\n) {}\nasync findByPath(path: DocumentPath): Promise<MemoryDocument | null> {\nconst filePath = this.resolvePath(path.value);\nif (!await this.fileSystemService.fileExists(filePath)) {\nreturn null;\n}\nconst content = await this.fileSystemService.readFile(filePath);\nconst data = yaml.load(content) as any;\n// データからMemoryDocumentを構築\nreturn MemoryDocument.create({\npath,\ncontent: JSON.stringify(data.content),\nlastModified: new Date(data.metadata.lastModified),\n});\n}\nasync save(document: MemoryDocument): Promise<void> {\nconst filePath = this.resolvePath(document.path.value);\n// YAMLデータを構築\nconst data = {\nschema: \"memory_document_v2\",\nmetadata: {\nid: document.id,\ntitle: document.title,\ndocumentType: document.documentType,\npath: document.path.value,\nlastModified: document.lastModified.toISOString(),\ncreatedAt: document.createdAt.toISOString(),\nversion: document.version\n},\ncontent: JSON.parse(document.content)\n};\n// YAMLに変換して保存\nconst yamlContent = yaml.dump(data, {\nindent: 2,\nlineWidth: 100,\nnoRefs: true,\n});\nawait this.fileSystemService.writeFile(filePath, yamlContent);\n}\n// その他のメソッド...\n}\n```\n"
+  }
+}

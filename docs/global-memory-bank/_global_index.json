@@ -1,8 +1,8 @@
 {
   "schema": "tag_index_v1",
   "metadata": {
-    "updatedAt": "2025-03-21T17:12:00.665Z",
-    "documentCount": 75,
+    "updatedAt": "2025-03-21T19:32:50.338Z",
+    "documentCount": 70,
     "fullRebuild": true,
     "context": "global"
   },
@@ -26,14 +26,14 @@
       "meta/consolidated-memory-bank-meta.json",
       "meta/document-type-standards.json",
       "meta/global-memory-bank-reference.json",
-      "tags/README.json",
-      "user-guide.json"
+      "tags/README.json"
     ],
     "guide": [
       "01-project/README.json",
       "02-architecture/README.json",
       "03-implementation/README.json",
       "04-guides/README.json",
+      "04-guides/migration-guide.json",
       "04-guides/user-guide.json",
       "05-testing/README.json",
       "06-releases/README.json",
@@ -44,12 +44,10 @@
       "meta/consolidated-memory-bank-meta.json",
       "meta/global-memory-bank-navigation.json",
       "meta/global-memory-bank-reference.json",
-      "tags/README.json",
-      "user-guide.json"
+      "tags/README.json"
     ],
     "best-practices": [
-      "01-project/coding-standards.json",
-      "coding-standards.json"
+      "01-project/coding-standards.json"
     ],
     "typescript": [
       "01-project/coding-standards.json"
@@ -58,12 +56,10 @@
       "01-project/coding-standards.json"
     ],
     "domain": [
-      "01-project/domain-models.json",
-      "domain-models.json"
+      "01-project/domain-models.json"
     ],
     "models": [
-      "01-project/domain-models.json",
-      "domain-models.json"
+      "01-project/domain-models.json"
     ],
     "architecture": [
       "01-project/domain-models.json",
@@ -75,9 +71,7 @@
       "02-architecture/json-based-architecture-details.json",
       "02-architecture/json-based-architecture.json",
       "05-testing/e2e-to-integration-test-approach.json",
-      "06-releases/v2-design-decisions.json",
-      "architecture.json",
-      "domain-models.json"
+      "06-releases/v2-design-decisions.json"
     ],
     "json": [
       "01-project/domain-models.json",
@@ -86,6 +80,7 @@
       "02-architecture/consolidated-architecture.json",
       "02-architecture/json-based-architecture-details.json",
       "02-architecture/json-based-architecture.json",
+      "04-guides/migration-guide.json",
       "04-guides/migration-policy.json",
       "06-releases/v2-implementation-plan.json",
       "08-i18n/template-system-json-i18n-design.json"
@@ -94,12 +89,10 @@
       "01-project/domain-models.json"
     ],
     "glossary": [
-      "01-project/glossary.json",
-      "glossary.json"
+      "01-project/glossary.json"
     ],
     "terminology": [
-      "01-project/glossary.json",
-      "glossary.json"
+      "01-project/glossary.json"
     ],
     "definitions": [
       "01-project/glossary.json"
@@ -123,13 +116,11 @@
       "08-i18n/template-system-json-i18n-design.json"
     ],
     "tech-stack": [
-      "01-project/tech-stack.json",
-      "tech-stack.json"
+      "01-project/tech-stack.json"
     ],
     "infrastructure": [
       "01-project/tech-stack.json",
-      "07-infrastructure/README.json",
-      "tech-stack.json"
+      "07-infrastructure/README.json"
     ],
     "design": [
       "02-architecture/README.json",
@@ -246,9 +237,11 @@
       "03-implementation/read-context-command-implementation.json"
     ],
     "migration": [
+      "04-guides/migration-guide.json",
       "04-guides/migration-policy.json"
     ],
     "markdown": [
+      "04-guides/migration-guide.json",
       "04-guides/migration-policy.json"
     ],
     "policy": [
@@ -348,9 +341,6 @@
     "raw-data": [
       "09-refactoring/analysis/global-memory-bank-analysis-raw.json"
     ],
-    "system-design": [
-      "architecture.json"
-    ],
     "fix": [
       "auto-initialization-fix.json"
     ],
@@ -360,10 +350,6 @@
     ],
     "test": [
       "auto-initialization-test.json"
-    ],
-    "standards": [
-      "coding-standards.json",
-      "meta/document-type-standards.json"
     ],
     "initialization": [
       "initialization-behavior.json"
@@ -381,6 +367,9 @@
       "tags/README.json",
       "tags/tag_categorization.json",
       "tags/tag_index_update_plan.json"
+    ],
+    "standards": [
+      "meta/document-type-standards.json"
     ]
   }
 }
