@@ -54,10 +54,18 @@ export class ReadContextUseCase {
         console.log(`Branch ${branch} exists: ${branchExists}`);
 
         if (!branchExists) {
-          throw new DomainError(
-            DomainErrorCodes.BRANCH_NOT_FOUND,
-            `Branch not found: ${branch}`
-          );
+          console.log(`Branch ${branch} not found, auto-initializing...`);
+          try {
+            const branchInfo = BranchInfo.create(branch);
+            await this.branchRepository.initialize(branchInfo);
+            console.log(`Branch ${branch} auto-initialized successfully`);
+          } catch (initError) {
+            console.error(`Failed to auto-initialize branch ${branch}:`, initError);
+            throw new DomainError(
+              DomainErrorCodes.BRANCH_INITIALIZATION_FAILED,
+              `Failed to auto-initialize branch: ${branch}`
+            );
+          }
         }
       }
 

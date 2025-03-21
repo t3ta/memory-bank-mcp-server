@@ -69,23 +69,8 @@ export class ContextController implements IContextController {
         includeGlobalMemory: request.includeGlobalMemory !== undefined ? request.includeGlobalMemory : false
       };
 
-      // Return an explicit error if a non-existent branch is requested
-      if (sanitizedRequest.includeBranchMemory) {
-        // Simple test to check if the branch exists
-        try {
-          // Check only against branch memory
-          await this.readContextUseCase.execute({
-            branch: sanitizedRequest.branch,
-            language: sanitizedRequest.language,
-            includeRules: false,
-            includeBranchMemory: true,
-            includeGlobalMemory: false
-          });
-        } catch (error) {
-          // Error occurs here if the branch doesn't exist
-          return this.handleError(error);
-        }
-      }
+      // Branch check is no longer needed here as ReadContextUseCase now handles auto-initialization
+      // ReadContextUseCase will automatically initialize the branch if it doesn't exist
 
       // Load rules (if includeRules is specified)
       if (sanitizedRequest.includeRules) {
