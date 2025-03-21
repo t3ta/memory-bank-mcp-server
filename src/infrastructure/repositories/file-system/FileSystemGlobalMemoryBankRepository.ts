@@ -20,19 +20,19 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
   private readonly globalMemoryPath: string;
   private readonly defaultStructure: Record<string, string> = {
     'architecture.json':
-      '{\n  "schema": "memory_document_v2",\n  "metadata": {\n    "id": "architecture",\n    "title": "システムアーキテクチャ",\n    "documentType": "generic",\n    "path": "architecture.json",\n    "tags": ["architecture", "system-design"],\n    "lastModified": "' + new Date().toISOString() + '",\n    "createdAt": "' + new Date().toISOString() + '",\n    "version": 1\n  },\n  "content": {\n    "sections": [\n      {\n        "title": "概要",\n        "content": "[システムアーキテクチャの説明]"\n      },\n      {\n        "title": "コンポーネント",\n        "content": "[主要なシステムコンポーネントの一覧と説明]"\n      },\n      {\n        "title": "設計上の決定事項",\n        "content": "[重要なアーキテクチャ上の決定事項]"\n      }\n    ]\n  }\n}',
+      '{\n  "schema": "memory_document_v2",\n  "metadata": {\n    "id": "architecture",\n    "title": "System Architecture",\n    "documentType": "generic",\n    "path": "architecture.json",\n    "tags": ["architecture", "system-design"],\n    "lastModified": "' + new Date().toISOString() + '",\n    "createdAt": "' + new Date().toISOString() + '",\n    "version": 1\n  },\n  "content": {\n    "sections": [\n      {\n        "title": "Overview",\n        "content": "[Description of system architecture]"\n      },\n      {\n        "title": "Components",\n        "content": "[List and description of main system components]"\n      },\n      {\n        "title": "Design Decisions",\n        "content": "[Important architectural decisions]"\n      }\n    ]\n  }\n}',
     'coding-standards.json':
-      '{\n  "schema": "memory_document_v2",\n  "metadata": {\n    "id": "coding-standards",\n    "title": "コーディング規約",\n    "documentType": "generic",\n    "path": "coding-standards.json",\n    "tags": ["standards", "best-practices"],\n    "lastModified": "' + new Date().toISOString() + '",\n    "createdAt": "' + new Date().toISOString() + '",\n    "version": 1\n  },\n  "content": {\n    "sections": [\n      {\n        "title": "一般的なガイドライン",\n        "content": "[一般的なコーディングガイドライン]"\n      },\n      {\n        "title": "言語固有の規約",\n        "content": "[言語固有の規約について]"\n      }\n    ]\n  }\n}',
+      '{\n  "schema": "memory_document_v2",\n  "metadata": {\n    "id": "coding-standards",\n    "title": "Coding Standards",\n    "documentType": "generic",\n    "path": "coding-standards.json",\n    "tags": ["standards", "best-practices"],\n    "lastModified": "' + new Date().toISOString() + '",\n    "createdAt": "' + new Date().toISOString() + '",\n    "version": 1\n  },\n  "content": {\n    "sections": [\n      {\n        "title": "General Guidelines",\n        "content": "[General coding guidelines]"\n      },\n      {\n        "title": "Language-Specific Standards",\n        "content": "[Language-specific standards]"\n      }\n    ]\n  }\n}',
     'domain-models.json':
-      '{\n  "schema": "memory_document_v2",\n  "metadata": {\n    "id": "domain-models",\n    "title": "ドメインモデル",\n    "documentType": "generic",\n    "path": "domain-models.json",\n    "tags": ["domain", "models", "architecture"],\n    "lastModified": "' + new Date().toISOString() + '",\n    "createdAt": "' + new Date().toISOString() + '",\n    "version": 1\n  },\n  "content": {\n    "sections": [\n      {\n        "title": "コアモデル",\n        "content": "[コアドメインモデルの定義]"\n      },\n      {\n        "title": "関連性",\n        "content": "[モデル間の関連性について]"\n      }\n    ]\n  }\n}',
+      '{\n  "schema": "memory_document_v2",\n  "metadata": {\n    "id": "domain-models",\n    "title": "Domain Models",\n    "documentType": "generic",\n    "path": "domain-models.json",\n    "tags": ["domain", "models", "architecture"],\n    "lastModified": "' + new Date().toISOString() + '",\n    "createdAt": "' + new Date().toISOString() + '",\n    "version": 1\n  },\n  "content": {\n    "sections": [\n      {\n        "title": "Core Models",\n        "content": "[Definition of core domain models]"\n      },\n      {\n        "title": "Relationships",\n        "content": "[Relationships between models]"\n      }\n    ]\n  }\n}',
     'glossary.json':
-      '{\n  "schema": "memory_document_v2",\n  "metadata": {\n    "id": "glossary",\n    "title": "用語集",\n    "documentType": "generic",\n    "path": "glossary.json",\n    "tags": ["glossary", "terminology"],\n    "lastModified": "' + new Date().toISOString() + '",\n    "createdAt": "' + new Date().toISOString() + '",\n    "version": 1\n  },\n  "content": {\n    "sections": [\n      {\n        "title": "用語",\n        "content": "[プロジェクト固有の用語の一覧と定義]"\n      },\n      {\n        "title": "略語",\n        "content": "[よく使用される略語の一覧と定義]"\n      }\n    ]\n  }\n}',
+      '{\n  "schema": "memory_document_v2",\n  "metadata": {\n    "id": "glossary",\n    "title": "Glossary",\n    "documentType": "generic",\n    "path": "glossary.json",\n    "tags": ["glossary", "terminology"],\n    "lastModified": "' + new Date().toISOString() + '",\n    "createdAt": "' + new Date().toISOString() + '",\n    "version": 1\n  },\n  "content": {\n    "sections": [\n      {\n        "title": "Terms",\n        "content": "[List and definition of project-specific terms]"\n      },\n      {\n        "title": "Abbreviations",\n        "content": "[List and definition of commonly used abbreviations]"\n      }\n    ]\n  }\n}',
     'tech-stack.json':
-      '{\n  "schema": "memory_document_v2",\n  "metadata": {\n    "id": "tech-stack",\n    "title": "技術スタック",\n    "documentType": "generic",\n    "path": "tech-stack.json",\n    "tags": ["tech-stack", "infrastructure"],\n    "lastModified": "' + new Date().toISOString() + '",\n    "createdAt": "' + new Date().toISOString() + '",\n    "version": 1\n  },\n  "content": {\n    "sections": [\n      {\n        "title": "バックエンド技術",\n        "content": "[バックエンド技術の一覧]"\n      },\n      {\n        "title": "フロントエンド技術",\n        "content": "[フロントエンド技術の一覧]"\n      },\n      {\n        "title": "インフラストラクチャ",\n        "content": "[インフラストラクチャコンポーネントの説明]"\n      }\n    ]\n  }\n}',
+      '{\n  "schema": "memory_document_v2",\n  "metadata": {\n    "id": "tech-stack",\n    "title": "Technology Stack",\n    "documentType": "generic",\n    "path": "tech-stack.json",\n    "tags": ["tech-stack", "infrastructure"],\n    "lastModified": "' + new Date().toISOString() + '",\n    "createdAt": "' + new Date().toISOString() + '",\n    "version": 1\n  },\n  "content": {\n    "sections": [\n      {\n        "title": "Backend Technologies",\n        "content": "[List of backend technologies]"\n      },\n      {\n        "title": "Frontend Technologies",\n        "content": "[List of frontend technologies]"\n      },\n      {\n        "title": "Infrastructure",\n        "content": "[Description of infrastructure components]"\n      }\n    ]\n  }\n}',
     'user-guide.json':
-      '{\n  "schema": "memory_document_v2",\n  "metadata": {\n    "id": "user-guide",\n    "title": "ユーザーガイド",\n    "documentType": "generic",\n    "path": "user-guide.json",\n    "tags": ["guide", "documentation"],\n    "lastModified": "' + new Date().toISOString() + '",\n    "createdAt": "' + new Date().toISOString() + '",\n    "version": 1\n  },\n  "content": {\n    "sections": [\n      {\n        "title": "概要",\n        "content": "[システムの概要]"\n      },\n      {\n        "title": "使用方法",\n        "content": "[システムの使用方法について]"\n      }\n    ]\n  }\n}',
+      '{\n  "schema": "memory_document_v2",\n  "metadata": {\n    "id": "user-guide",\n    "title": "User Guide",\n    "documentType": "generic",\n    "path": "user-guide.json",\n    "tags": ["guide", "documentation"],\n    "lastModified": "' + new Date().toISOString() + '",\n    "createdAt": "' + new Date().toISOString() + '",\n    "version": 1\n  },\n  "content": {\n    "sections": [\n      {\n        "title": "Overview",\n        "content": "[System overview]"\n      },\n      {\n        "title": "Usage",\n        "content": "[How to use the system]"\n      }\n    ]\n  }\n}',
     'tags/index.json':
-      '{\n  "schema": "memory_document_v2",\n  "metadata": {\n    "id": "tags-index",\n    "title": "タグインデックス",\n    "documentType": "generic",\n    "path": "tags/index.json",\n    "tags": ["index", "meta"],\n    "lastModified": "' + new Date().toISOString() + '",\n    "createdAt": "' + new Date().toISOString() + '",\n    "version": 1\n  },\n  "content": {\n    "sections": [\n      {\n        "title": "タグ一覧",\n        "content": "[タグの一覧と説明]"\n      }\n    ]\n  }\n}',
+      '{\n  "schema": "memory_document_v2",\n  "metadata": {\n    "id": "tags-index",\n    "title": "Tags Index",\n    "documentType": "generic",\n    "path": "tags/index.json",\n    "tags": ["index", "meta"],\n    "lastModified": "' + new Date().toISOString() + '",\n    "createdAt": "' + new Date().toISOString() + '",\n    "version": 1\n  },\n  "content": {\n    "sections": [\n      {\n        "title": "Tags List",\n        "content": "[List and description of tags]"\n      }\n    ]\n  }\n}',
   };
 
   /**
@@ -343,7 +343,7 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
         schema: "memory_document_v2",
         metadata: {
           id: "tags-index",
-          title: "タグインデックス",
+          title: "Tags Index",
           documentType: "generic",
           path: "tags/index.json",
           tags: ["index", "meta"],
@@ -354,8 +354,8 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
         content: {
           sections: [
             {
-              title: "タグ一覧",
-              content: "タグとドキュメントの関連付け"
+              title: "Tags List",
+              content: "Mapping between tags and documents"
             }
           ],
           tagMap: Object.fromEntries(
@@ -444,7 +444,7 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
         schema: "memory_document_v2",
         metadata: {
           id: "tags-index",
-          title: "タグインデックス",
+          title: "Tags Index",
           documentType: "generic",
           path: "tags/index.json",
           tags: ["index", "meta"],
@@ -455,8 +455,8 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
         content: {
           sections: [
             {
-              title: "タグ一覧",
-              content: "タグとドキュメントの関連付け"
+              title: "Tags List",
+              content: "Mapping between tags and documents"
             }
           ],
           tagMap: Object.fromEntries(
