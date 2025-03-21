@@ -7,11 +7,11 @@
     "path": "v2.0-design-decisions.json",
     "tags": [
       "design",
-      "decisions",
+      "decision",
       "architecture",
-      "v2-0"
+      "v2"
     ],
-    "lastModified": "2025-03-17T13:40:00.000Z",
+    "lastModified": "2025-03-21T07:21:59.910Z",
     "createdAt": "2025-03-17T13:40:00.000Z",
     "version": 1
   },

@@ -1,0 +1,42 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "directory-restructure-results",
+    "title": "ディレクトリ再構築の結果",
+    "documentType": "results",
+    "path": "directory-restructure-results.json",
+    "tags": [
+      "directory",
+      "structure",
+      "reorganization",
+      "results"
+    ],
+    "lastModified": "2025-03-21T17:30:00.000Z",
+    "createdAt": "2025-03-21T17:30:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "概要",
+        "content": "このドキュメントでは、グローバルメモリバンクのディレクトリ再構築の結果をまとめています。カテゴリ分類による新しいディレクトリ構造を作成し、すべてのファイルを適切なカテゴリに移動しました。"
+      },
+      {
+        "title": "実施項目",
+        "content": "1. **カテゴリディレクトリの作成**\n   - 01-project: プロジェクト関連のドキュメント\n   - 02-architecture: アーキテクチャ関連のドキュメント\n   - 03-implementation: 実装関連のドキュメント\n   - 04-guides: ガイド関連のドキュメント\n   - 05-testing: テスト関連のドキュメント\n   - 06-releases: リリース関連のドキュメント\n   - 07-infrastructure: インフラ関連のドキュメント\n   - 08-i18n: 国際化関連のドキュメント\n   - 09-refactoring: リファクタリング関連のドキュメント\n\n2. **未整理ディレクトリの移動**\n   - `ci-cd` → `07-infrastructure/ci-cd`\n   - `analysis` → `09-refactoring/analysis`\n   - `projects` → `01-project/projects`\n\n3. **ファイルの移動**\n   - ci-cd/memory-bank-errors.json → 07-infrastructure/ci-cd/memory-bank-errors.json\n   - ci-cd/workflows.json → 07-infrastructure/ci-cd/workflows.json\n   - analysis/global-memory-bank-analysis-raw.json → 09-refactoring/analysis/global-memory-bank-analysis-raw.json\n   - projects/memory-bank-mcp-server.json → 01-project/projects/memory-bank-mcp-server.json"
+      },
+      {
+        "title": "移動前後の構造",
+        "content": "### 移動前\n```\ndocs/global-memory-bank/\n  ├── 01-project/\n  ├── 02-architecture/\n  ├── ...\n  ├── ci-cd/\n  │   ├── memory-bank-errors.json\n  │   └── workflows.json\n  ├── analysis/\n  │   └── global-memory-bank-analysis-raw.json\n  └── projects/\n      └── memory-bank-mcp-server.json\n```\n\n### 移動後\n```\ndocs/global-memory-bank/\n  ├── 01-project/\n  │   ├── ...\n  │   └── projects/\n  │       └── memory-bank-mcp-server.json\n  ├── 02-architecture/\n  ├── ...\n  ├── 07-infrastructure/\n  │   ├── ...\n  │   └── ci-cd/\n  │       ├── memory-bank-errors.json\n  │       └── workflows.json\n  ├── ...\n  └── 09-refactoring/\n      ├── ...\n      └── analysis/\n          └── global-memory-bank-analysis-raw.json\n```"
+      },
+      {
+        "title": "残存問題",
+        "content": "1. **空ディレクトリ**\n   - 元のディレクトリ（ci-cd, analysis, projects）が空のまま残っています\n   - これらは将来的に削除すべきです\n\n2. **参照整合性**\n   - ファイルの移動に伴い、一部のドキュメント内の相対パス参照が壊れている可能性があります\n   - 特に移動したファイルへの参照については確認が必要です"
+      },
+      {
+        "title": "次のステップ",
+        "content": "1. **変更のコミット**\n   - ファイル移動の変更をgitにコミットします\n\n2. **参照の修正**\n   - 移動したファイルへの参照がある場合は更新します\n\n3. **空ディレクトリの削除**\n   - 元の空ディレクトリを削除します\n\n4. **全体構造の検証**\n   - 新しいディレクトリ構造でのナビゲーションとアクセス性を検証します"
+      }
+    ]
+  }
+}

@@ -12,15 +12,15 @@
       "tdd",
       "qa"
     ],
-    "lastModified": "2025-03-21T11:10:00.000Z",
+    "lastModified": "2025-03-21T12:30:00.000Z",
     "createdAt": "2025-03-21T11:10:00.000Z",
-    "version": 1
+    "version": 2
   },
   "content": {
     "sections": [
       {
         "title": "概要",
-        "content": "このドキュメントは、Memory Bank MCPサーバーのためのテスト戦略と実装アプローチを総合的にまとめたものです。テストは主にエンド・ツー・エンド（E2E）テストと統合テストの2つのカテゴリに分かれ、近年は直接的な統合テストアプローチへの移行が進んでいます。"
+        "content": "このドキュメントは、Memory Bank MCPサーバーのためのテスト戦略と実装アプローチを総合的にまとめたものです。テストは主にエンド・ツー・エンド（E2E）テストと統合テストの2つのカテゴリに分かれ、近年は直接的な統合テストアプローチへの移行が進んでいます。このドキュメントでは、両方のテスト手法の詳細と実装方法について説明します。"
       },
       {
         "title": "テスト戦略の概要",
@@ -233,6 +233,13 @@
         ]
       },
       {
+        "title": "タグ検索システムテスト",
+        "content": "タグ検索システムは、Memory Bank 2.0の重要な機能の一つです。その機能のテストには特別な注意が必要です。",
+        "currentStatus": "タグ検索システムの実装状況：\n\n- タグインデックスの基本構造は実装済み（`FileSystemTagIndexRepositoryImpl`）\n- JSONドキュメント用のインデックスシステムも実装済み（`IndexService`）\n- CLIコマンド（`search-json`、`build-index`）も実装済み\n- コントローラー（`JsonBranchController`、`JsonGlobalController`）も実装済み\n\n現在のテスト状況：\n\n- テストは書かれているが、すべて`it.skip`でスキップされている状態\n- テストがスキップされている理由は不明（実装変更、バグ、開発中など）",
+        "implementationPlan": "タグ検索システムを完全に実装するための修正方針：\n\n1. **テストの有効化と実行**:\n   - スキップされているテストを有効化（`it.skip` → `it`）\n   - テストを実行して具体的な問題を特定\n   - 必要に応じてテストを最新の実装に合わせて更新\n\n2. **インデックス構築の確認**:\n   - `updateBranchTagIndex`と`updateGlobalTagIndex`の動作確認\n   - インデックスファイル（`tag-index.json`）の構造確認\n   - インデックス更新のパフォーマンス確認\n\n3. **タグ検索機能の確認**:\n   - `findBranchDocumentsByTags`と`findGlobalDocumentsByTags`の動作確認\n   - AND検索とOR検索の動作確認\n   - 検索結果の正確性確認",
+        "expectedResults": "この計画を実施することで、以下の結果が期待されます：\n\n1. タグ検索システムの完全な実装と検証\n2. テストによる実装の正確性の確認\n3. パフォーマンスと信頼性の向上\n4. ユーザーエクスペリエンスの向上（検索機能の改善）"
+      },
+      {
         "title": "テストパラメータとカバレッジ",
         "content": "適切なテストカバレッジを確保するために、以下のパラメータバリエーションをテストすることを推奨します：",
         "contentTypes": [
@@ -259,6 +266,23 @@
           "小さなコンテンツ（数バイト）",
           "中くらいのコンテンツ（数KB）",
           "大きなコンテンツ（システム制限に近い）"
+        ]
+      },
+      {
+        "title": "テストディレクトリのリファクタリング",
+        "content": "テストコードの管理をより効率的にするため、テストディレクトリ構造のリファクタリングを実施しました。",
+        "newStructure": "```\ntests/\n  ├── unit/                     # ユニットテスト\n  │   ├── domain/              # ドメインレイヤーのテスト\n  │   ├── application/         # アプリケーションレイヤーのテスト\n  │   │   └── usecases/       # ユースケースのテスト\n  │   │       ├── branch/     # ブランチ関連のユースケース\n  │   │       ├── common/     # 共通ユースケース\n  │   │       ├── global/     # グローバル関連のユースケース\n  │   │       └── json/       # JSON関連のユースケース\n  │   └── interface/          # インターフェースレイヤーのテスト\n  ├── integration/             # 統合テスト\n  │   ├── api/               # APIレベルの統合テスト（コントローラー）\n  │   └── usecase/          # ユースケースレベルの統合テスト\n  │       ├── markdown-to-json/  # マークダウンからJSONへの変換テスト\n  │       ├── repositories/      # リポジトリの統合テスト\n  │       └── infrastructure/    # インフラストラクチャの統合テスト\n  └── e2e/                    # エンドツーエンドテスト\n```",
+        "changes": [
+          "テストの種類による明確な分離（ユニット、統合、E2E）",
+          "クリーンアーキテクチャに合わせた構造化",
+          "モジュールインポートの標準化",
+          "テストの意図とスコープの明確化"
+        ],
+        "benefits": [
+          "テストの種類が明確に分離され、目的に応じたテストの特定が容易になった",
+          "クリーンアーキテクチャの各レイヤーに対応したテスト構造により、テストカバレッジの把握が容易になった",
+          "パスの標準化により、テストファイルの移動や新規作成が容易になった",
+          "テストの意図とスコープが明確になり、保守性が向上した"
         ]
       },
       {
@@ -328,6 +352,21 @@
             "id": "integration-test-details",
             "path": "05-testing/integration-test-details.json",
             "title": "統合テスト詳細"
+          },
+          {
+            "id": "e2e-test-implementation",
+            "path": "05-testing/e2e-test-implementation.json",
+            "title": "E2Eテスト実装ガイド"
+          },
+          {
+            "id": "e2e-to-integration-test-approach",
+            "path": "05-testing/e2e-to-integration-test-approach.json",
+            "title": "E2Eから統合テストへの移行アプローチ"
+          },
+          {
+            "id": "tag-search-system-test-plan",
+            "path": "05-testing/tag-search-system-test-plan.json",
+            "title": "タグ検索システム実装計画"
           }
         ]
       }

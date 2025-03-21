@@ -6,12 +6,11 @@
     "documentType": "generic",
     "path": "coding-standards.md",
     "tags": [
-      "standards",
       "best-practices",
       "typescript",
       "clean-code"
     ],
-    "lastModified": "2025-03-17T02:13:31.718Z",
+    "lastModified": "2025-03-21T07:21:59.893Z",
     "createdAt": "2025-03-17T02:13:31.718Z",
     "version": 1
   },

@@ -1,0 +1,42 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "fixed-read-context-implementation",
+    "title": "read_contextの実装を修正",
+    "documentType": "implementation",
+    "path": "fixed-read-context-implementation.json",
+    "tags": [
+      "bug-fix",
+      "read-context",
+      "global-memory",
+      "implementation"
+    ],
+    "lastModified": "2025-03-21T10:20:00.000Z",
+    "createdAt": "2025-03-21T10:20:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "バグの概要",
+        "content": "`read_context`コマンドがグローバルメモリバンクから返すデータが空になっていました。サブディレクトリに新しいJSONファイルがあるにもかかわらず、ルートディレクトリにある古い（内容が空の）MDファイルが優先的に読み込まれる問題がありました。"
+      },
+      {
+        "title": "原因",
+        "content": "`FileSystemMemoryDocumentRepository.list()`メソッドは、同じベース名をもつ`.md`ファイルと`.json`ファイルがある場合、最初に見つかったファイル（多くの場合`.md`ファイル）を優先していました。ファイルのユニーク性を判断する際、ファイルパスを完全なパス（拡張子込み）で比較していたため、`architecture.md`と`architecture.json`は別々のファイルとして扱われていました。しかし、あるファイルが先にリストに追加されると、その後に見つかった同じベース名のファイルは無視されていました。"
+      },
+      {
+        "title": "修正内容",
+        "content": "`FileSystemMemoryDocumentRepository.list()`メソッドを修正し、ファイルをベース名（拡張子なし）でグループ化するようにしました。同じベース名のファイルが複数ある場合は`.json`ファイルを優先するようにしました。\n\n具体的な修正内容：\n\n1. ファイルを拡張子なしのベース名でグループ化するMap（`fileGroups`）を追加\n2. 各ファイルをディレクトリパスを含めたベース名をキーとしてグループ化\n3. 同じベース名のグループから`.json`ファイルを優先的に選択（なければ`.md`ファイル）\n4. 詳細なデバッグログを追加して、問題が発生した場合の追跡を容易に\n\nこの修正により、ディレクトリ構造を変更した後も、適切なファイル（JSONファイル優先）が選択されるようになりました。"
+      },
+      {
+        "title": "テスト",
+        "content": "修正後は、再編成されたグローバルメモリバンク構造（01-project, 02-architectureなどのサブディレクトリ）のJSON形式のファイルが正しく認識され、`read_context`コマンドが適切なデータを返すようになりました。"
+      },
+      {
+        "title": "今後の推奨事項",
+        "content": "1. 今後同様の問題を避けるため、ファイル読み込みロジックではファイルの優先順位を明示的に考慮する\n2. マークダウンからJSONへの移行が完了したら、古い`.md`ファイルを削除して混乱を避ける\n3. ファイル形式の変更や構造変更を行う際は、全体的な影響を考慮し、関連するコードも修正する"
+      }
+    ]
+  }
+}

@@ -1,277 +1,370 @@
 {
   "schema": "tag_index_v1",
   "metadata": {
-    "updatedAt": "2025-03-21T02:42:06.911Z",
-    "documentCount": 39,
-    "fullRebuild": true,
-    "context": "global"
+    "id": "global-tag-index",
+    "title": "グローバルタグインデックス",
+    "documentType": "index",
+    "path": "_global_index.json",
+    "tags": [
+      "index",
+      "meta"
+    ],
+    "lastModified": "2025-03-21T07:21:59.933Z",
+    "createdAt": "2025-03-21T07:21:59.933Z",
+    "version": 1
   },
   "index": {
-    "analysis": [
-      "analysis/global-memory-bank-analysis-raw.json",
-      "global-memory-bank-index-analysis.json",
-      "global-memory-bank-indexing-mechanism.json",
-      "global-memory-bank-organized-analysis.json"
-    ],
-    "memory-bank": [
-      "analysis/global-memory-bank-analysis-raw.json",
-      "ci-cd/memory-bank-errors.json",
-      "global-memory-bank-cleanup-implementation-plan.json",
-      "global-memory-bank-cleanup-strategy.json",
-      "global-memory-bank-index-analysis.json",
-      "global-memory-bank-indexing-mechanism.json",
-      "global-memory-bank-navigation.json",
-      "global-memory-bank-organized-analysis.json",
-      "global-memory-bank-reference.json",
-      "json-global-design-issues.json",
-      "tags/reorganization-plan.json"
-    ],
-    "meta": [
-      "analysis/global-memory-bank-analysis-raw.json",
-      "global-memory-bank-cleanup-implementation-plan.json",
-      "global-memory-bank-cleanup-strategy.json",
-      "global-memory-bank-navigation.json",
-      "global-memory-bank-organized-analysis.json",
-      "tags/reorganization-plan.json"
-    ],
-    "raw-data": [
-      "analysis/global-memory-bank-analysis-raw.json"
-    ],
-    "architecture": [
-      "architecture-decisions.json",
-      "architecture.json",
-      "domain-models.json",
-      "e2e-to-integration-test-approach.json",
-      "json-based-architecture.json",
-      "v2.0-design-decisions.json"
-    ],
-    "decision": [
-      "architecture-decisions.json"
-    ],
-    "json": [
-      "architecture-decisions.json",
-      "domain-models.json",
-      "json-based-architecture.json",
-      "migration-policy.json",
-      "template-system-json-i18n-design.json",
-      "v2-implementation-plan.json"
-    ],
-    "version-2": [
-      "architecture-decisions.json",
-      "json-based-architecture.json",
-      "v2-implementation-plan.json"
-    ],
-    "system-design": [
-      "architecture.json"
-    ],
-    "troubleshooting": [
-      "ci-cd/memory-bank-errors.json"
-    ],
-    "errors": [
-      "ci-cd/memory-bank-errors.json"
-    ],
-    "ci-cd": [
-      "ci-cd/workflows.json"
-    ],
-    "github-actions": [
-      "ci-cd/workflows.json"
-    ],
-    "automation": [
-      "ci-cd/workflows.json"
-    ],
-    "workflows": [
-      "ci-cd/workflows.json"
-    ],
-    "cli": [
-      "cli-commands.json",
-      "e2e-test-implementation.json"
-    ],
-    "commands": [
-      "cli-commands.json"
-    ],
-    "reference": [
-      "cli-commands.json",
-      "global-memory-bank-reference.json"
-    ],
-    "standards": [
-      "coding-standards.json"
-    ],
-    "best-practices": [
-      "coding-standards.json"
-    ],
-    "typescript": [
-      "coding-standards.json"
-    ],
-    "clean-code": [
-      "coding-standards.json"
-    ],
-    "domain": [
-      "domain-models.json"
-    ],
-    "models": [
-      "domain-models.json"
-    ],
-    "document-model": [
-      "domain-models.json"
-    ],
-    "testing": [
-      "e2e-test-implementation.json",
-      "e2e-to-integration-test-approach.json"
-    ],
-    "e2e": [
-      "e2e-test-implementation.json"
-    ],
-    "implementation": [
-      "e2e-test-implementation.json",
-      "read-context-command-implementation.json",
-      "v2-implementation-plan.json"
-    ],
-    "integration-tests": [
-      "e2e-to-integration-test-approach.json"
-    ],
-    "refactoring": [
-      "global-memory-bank-cleanup-implementation-plan.json",
-      "global-memory-bank-cleanup-strategy.json",
-      "global-memory-bank-index-analysis.json",
-      "global-memory-bank-indexing-mechanism.json",
-      "json-global-design-issues.json",
-      "tags/reorganization-plan.json"
-    ],
-    "plan": [
-      "global-memory-bank-cleanup-implementation-plan.json",
-      "global-memory-bank-cleanup-strategy.json",
-      "tags/reorganization-plan.json",
-      "v2-implementation-plan.json"
-    ],
-    "organization": [
-      "global-memory-bank-cleanup-implementation-plan.json",
-      "global-memory-bank-cleanup-strategy.json",
-      "global-memory-bank-organized-analysis.json"
-    ],
-    "tech-debt": [
-      "global-memory-bank-index-analysis.json",
-      "global-memory-bank-indexing-mechanism.json",
-      "json-global-design-issues.json"
-    ],
-    "tag": [
-      "global-memory-bank-indexing-mechanism.json"
-    ],
-    "index": [
-      "global-memory-bank-indexing-mechanism.json"
-    ],
-    "navigation": [
-      "global-memory-bank-navigation.json"
-    ],
-    "guide": [
-      "global-memory-bank-navigation.json",
-      "global-memory-bank-reference.json",
-      "user-guide.json"
+    "project": [
+      "docs/global-memory-bank/01-project/README.json",
+      "docs/global-memory-bank/01-project/project-overview.json"
     ],
     "documentation": [
-      "global-memory-bank-reference.json",
-      "user-guide.json"
+      "docs/global-memory-bank/01-project/README.json",
+      "docs/global-memory-bank/02-architecture/README.json",
+      "docs/global-memory-bank/03-implementation/README.json",
+      "docs/global-memory-bank/04-guides/README.json",
+      "docs/global-memory-bank/04-guides/user-guide.json",
+      "docs/global-memory-bank/05-testing/README.json",
+      "docs/global-memory-bank/06-releases/README.json",
+      "docs/global-memory-bank/07-infrastructure/README.json",
+      "docs/global-memory-bank/08-i18n/README.json",
+      "docs/global-memory-bank/09-refactoring/README.json",
+      "docs/global-memory-bank/meta/README.json",
+      "docs/global-memory-bank/meta/consolidated-memory-bank-meta.json",
+      "docs/global-memory-bank/meta/global-memory-bank-reference.json",
+      "docs/global-memory-bank/tags/README.json",
+      "docs/global-memory-bank/user-guide.json"
+    ],
+    "guide": [
+      "docs/global-memory-bank/01-project/README.json",
+      "docs/global-memory-bank/02-architecture/README.json",
+      "docs/global-memory-bank/03-implementation/README.json",
+      "docs/global-memory-bank/04-guides/README.json",
+      "docs/global-memory-bank/04-guides/user-guide.json",
+      "docs/global-memory-bank/05-testing/README.json",
+      "docs/global-memory-bank/06-releases/README.json",
+      "docs/global-memory-bank/07-infrastructure/README.json",
+      "docs/global-memory-bank/08-i18n/README.json",
+      "docs/global-memory-bank/09-refactoring/README.json",
+      "docs/global-memory-bank/meta/README.json",
+      "docs/global-memory-bank/meta/consolidated-memory-bank-meta.json",
+      "docs/global-memory-bank/meta/global-memory-bank-navigation.json",
+      "docs/global-memory-bank/meta/global-memory-bank-reference.json",
+      "docs/global-memory-bank/tags/README.json",
+      "docs/global-memory-bank/user-guide.json"
+    ],
+    "best-practices": [
+      "docs/global-memory-bank/01-project/coding-standards.json",
+      "docs/global-memory-bank/coding-standards.json"
+    ],
+    "typescript": [
+      "docs/global-memory-bank/01-project/coding-standards.json"
+    ],
+    "clean-code": [
+      "docs/global-memory-bank/01-project/coding-standards.json"
+    ],
+    "domain": [
+      "docs/global-memory-bank/01-project/domain-models.json",
+      "docs/global-memory-bank/domain-models.json"
+    ],
+    "models": [
+      "docs/global-memory-bank/01-project/domain-models.json",
+      "docs/global-memory-bank/domain-models.json"
+    ],
+    "architecture": [
+      "docs/global-memory-bank/01-project/domain-models.json",
+      "docs/global-memory-bank/02-architecture/README.json",
+      "docs/global-memory-bank/02-architecture/architecture-decisions-details.json",
+      "docs/global-memory-bank/02-architecture/architecture-decisions.json",
+      "docs/global-memory-bank/02-architecture/architecture.json",
+      "docs/global-memory-bank/02-architecture/consolidated-architecture.json",
+      "docs/global-memory-bank/02-architecture/json-based-architecture-details.json",
+      "docs/global-memory-bank/02-architecture/json-based-architecture.json",
+      "docs/global-memory-bank/05-testing/e2e-to-integration-test-approach.json",
+      "docs/global-memory-bank/06-releases/v2-design-decisions.json",
+      "docs/global-memory-bank/architecture.json",
+      "docs/global-memory-bank/domain-models.json"
+    ],
+    "json": [
+      "docs/global-memory-bank/01-project/domain-models.json",
+      "docs/global-memory-bank/02-architecture/architecture-decisions-details.json",
+      "docs/global-memory-bank/02-architecture/architecture-decisions.json",
+      "docs/global-memory-bank/02-architecture/consolidated-architecture.json",
+      "docs/global-memory-bank/02-architecture/json-based-architecture-details.json",
+      "docs/global-memory-bank/02-architecture/json-based-architecture.json",
+      "docs/global-memory-bank/04-guides/migration-policy.json",
+      "docs/global-memory-bank/06-releases/v2-implementation-plan.json",
+      "docs/global-memory-bank/08-i18n/template-system-json-i18n-design.json"
+    ],
+    "document-model": [
+      "docs/global-memory-bank/01-project/domain-models.json"
     ],
     "glossary": [
-      "glossary.json"
+      "docs/global-memory-bank/01-project/glossary.json",
+      "docs/global-memory-bank/glossary.json"
     ],
     "terminology": [
-      "glossary.json"
+      "docs/global-memory-bank/01-project/glossary.json",
+      "docs/global-memory-bank/glossary.json"
     ],
     "definitions": [
-      "glossary.json"
-    ],
-    "test": [
-      "integration-test-strategy.json"
-    ],
-    "tdd": [
-      "integration-test-strategy.json"
-    ],
-    "integration-test": [
-      "integration-test-strategy.json",
-      "json-global-design-issues.json"
-    ],
-    "qa": [
-      "integration-test-strategy.json"
-    ],
-    "controller": [
-      "integration-test-strategy.json"
-    ],
-    "design": [
-      "json-based-architecture.json",
-      "json-global-design-issues.json",
-      "read-context-command-design.json",
-      "template-system-json-i18n-design.json",
-      "v2.0-design-decisions.json"
-    ],
-    "migration": [
-      "migration-policy.json"
-    ],
-    "markdown": [
-      "migration-policy.json"
-    ],
-    "policy": [
-      "migration-policy.json"
+      "docs/global-memory-bank/01-project/glossary.json"
     ],
     "overview": [
-      "project-overview.json"
-    ],
-    "summary": [
-      "project-overview.json"
-    ],
-    "project": [
-      "project-overview.json"
-    ],
-    "v2-0": [
-      "project-overview.json",
-      "release-v2.0.0.json",
-      "v2.0-design-decisions.json"
-    ],
-    "mcp": [
-      "read-context-command-design.json",
-      "read-context-command-implementation.json"
-    ],
-    "command": [
-      "read-context-command-design.json",
-      "read-context-command-implementation.json"
-    ],
-    "context": [
-      "read-context-command-design.json",
-      "read-context-command-implementation.json"
+      "docs/global-memory-bank/01-project/project-overview.json"
     ],
     "v2": [
-      "read-context-command-design.json",
-      "read-context-command-implementation.json",
-      "template-system-json-i18n-design.json"
-    ],
-    "release": [
-      "release-v2.0.0.json"
-    ],
-    "pr": [
-      "release-v2.0.0.json"
-    ],
-    "changelog": [
-      "release-v2.0.0.json"
+      "docs/global-memory-bank/01-project/project-overview.json",
+      "docs/global-memory-bank/02-architecture/architecture-decisions-details.json",
+      "docs/global-memory-bank/02-architecture/architecture-decisions.json",
+      "docs/global-memory-bank/02-architecture/consolidated-architecture.json",
+      "docs/global-memory-bank/02-architecture/json-based-architecture-details.json",
+      "docs/global-memory-bank/02-architecture/json-based-architecture.json",
+      "docs/global-memory-bank/03-implementation/read-context-command-design.json",
+      "docs/global-memory-bank/03-implementation/read-context-command-implementation.json",
+      "docs/global-memory-bank/06-releases/consolidated-v2-release.json",
+      "docs/global-memory-bank/06-releases/release-v2.0.0.json",
+      "docs/global-memory-bank/06-releases/v2-design-decisions.json",
+      "docs/global-memory-bank/06-releases/v2-implementation-plan.json",
+      "docs/global-memory-bank/08-i18n/template-system-json-i18n-design.json"
     ],
     "tech-stack": [
-      "tech-stack.json"
+      "docs/global-memory-bank/01-project/tech-stack.json",
+      "docs/global-memory-bank/tech-stack.json"
     ],
     "infrastructure": [
-      "tech-stack.json"
+      "docs/global-memory-bank/01-project/tech-stack.json",
+      "docs/global-memory-bank/07-infrastructure/README.json",
+      "docs/global-memory-bank/tech-stack.json"
     ],
-    "dependencies": [
-      "tech-stack.json"
+    "design": [
+      "docs/global-memory-bank/02-architecture/README.json",
+      "docs/global-memory-bank/02-architecture/consolidated-architecture.json",
+      "docs/global-memory-bank/02-architecture/json-based-architecture-details.json",
+      "docs/global-memory-bank/02-architecture/json-based-architecture.json",
+      "docs/global-memory-bank/03-implementation/read-context-command-design.json",
+      "docs/global-memory-bank/06-releases/v2-design-decisions.json",
+      "docs/global-memory-bank/08-i18n/template-system-json-i18n-design.json",
+      "docs/global-memory-bank/09-refactoring/json-global-design-issues.json"
     ],
-    "template": [
-      "template-system-json-i18n-design.json"
+    "decision": [
+      "docs/global-memory-bank/02-architecture/architecture-decisions-details.json",
+      "docs/global-memory-bank/02-architecture/architecture-decisions.json",
+      "docs/global-memory-bank/02-architecture/consolidated-architecture.json",
+      "docs/global-memory-bank/06-releases/v2-design-decisions.json"
+    ],
+    "refactoring": [
+      "docs/global-memory-bank/02-architecture/global-memory-bank-cleanup-implementation-plan.json",
+      "docs/global-memory-bank/02-architecture/global-memory-bank-cleanup-strategy.json",
+      "docs/global-memory-bank/09-refactoring/README.json",
+      "docs/global-memory-bank/09-refactoring/json-global-design-issues.json",
+      "docs/global-memory-bank/meta/global-memory-bank-index-analysis.json",
+      "docs/global-memory-bank/meta/global-memory-bank-indexing-mechanism.json",
+      "docs/global-memory-bank/meta/reorganization-plan.json"
+    ],
+    "memory-bank": [
+      "docs/global-memory-bank/02-architecture/global-memory-bank-cleanup-implementation-plan.json",
+      "docs/global-memory-bank/02-architecture/global-memory-bank-cleanup-strategy.json",
+      "docs/global-memory-bank/02-architecture/global-memory-bank-organized-analysis.json",
+      "docs/global-memory-bank/09-refactoring/json-global-design-issues.json",
+      "docs/global-memory-bank/analysis/global-memory-bank-analysis-raw.json",
+      "docs/global-memory-bank/ci-cd/memory-bank-errors.json",
+      "docs/global-memory-bank/meta/consolidated-memory-bank-meta.json",
+      "docs/global-memory-bank/meta/global-memory-bank-index-analysis.json",
+      "docs/global-memory-bank/meta/global-memory-bank-indexing-mechanism.json",
+      "docs/global-memory-bank/meta/global-memory-bank-navigation.json",
+      "docs/global-memory-bank/meta/global-memory-bank-reference.json",
+      "docs/global-memory-bank/meta/reorganization-plan.json",
+      "docs/global-memory-bank/tags/tag_categorization.json",
+      "docs/global-memory-bank/tags/tag_index_update_plan.json"
+    ],
+    "plan": [
+      "docs/global-memory-bank/02-architecture/global-memory-bank-cleanup-implementation-plan.json",
+      "docs/global-memory-bank/02-architecture/global-memory-bank-cleanup-strategy.json",
+      "docs/global-memory-bank/06-releases/v2-implementation-plan.json",
+      "docs/global-memory-bank/meta/reorganization-plan.json",
+      "docs/global-memory-bank/tags/tag_index_update_plan.json"
+    ],
+    "meta": [
+      "docs/global-memory-bank/02-architecture/global-memory-bank-cleanup-implementation-plan.json",
+      "docs/global-memory-bank/02-architecture/global-memory-bank-cleanup-strategy.json",
+      "docs/global-memory-bank/02-architecture/global-memory-bank-organized-analysis.json",
+      "docs/global-memory-bank/analysis/global-memory-bank-analysis-raw.json",
+      "docs/global-memory-bank/meta/README.json",
+      "docs/global-memory-bank/meta/consolidated-memory-bank-meta.json",
+      "docs/global-memory-bank/meta/global-memory-bank-navigation.json",
+      "docs/global-memory-bank/meta/reorganization-plan.json",
+      "docs/global-memory-bank/tags/README.json",
+      "docs/global-memory-bank/tags/index.json",
+      "docs/global-memory-bank/tags/tag_categorization.json",
+      "docs/global-memory-bank/tags/tag_index_update_plan.json"
+    ],
+    "organization": [
+      "docs/global-memory-bank/02-architecture/global-memory-bank-cleanup-implementation-plan.json",
+      "docs/global-memory-bank/02-architecture/global-memory-bank-cleanup-strategy.json",
+      "docs/global-memory-bank/02-architecture/global-memory-bank-organized-analysis.json"
+    ],
+    "analysis": [
+      "docs/global-memory-bank/02-architecture/global-memory-bank-organized-analysis.json",
+      "docs/global-memory-bank/analysis/global-memory-bank-analysis-raw.json",
+      "docs/global-memory-bank/meta/consolidated-memory-bank-meta.json",
+      "docs/global-memory-bank/meta/global-memory-bank-index-analysis.json",
+      "docs/global-memory-bank/meta/global-memory-bank-indexing-mechanism.json"
+    ],
+    "implementation": [
+      "docs/global-memory-bank/03-implementation/README.json",
+      "docs/global-memory-bank/03-implementation/read-context-command-implementation.json",
+      "docs/global-memory-bank/05-testing/e2e-test-implementation.json",
+      "docs/global-memory-bank/06-releases/consolidated-v2-release.json",
+      "docs/global-memory-bank/06-releases/v2-implementation-plan.json"
+    ],
+    "cli": [
+      "docs/global-memory-bank/03-implementation/cli-commands.json",
+      "docs/global-memory-bank/05-testing/e2e-test-implementation.json"
+    ],
+    "reference": [
+      "docs/global-memory-bank/03-implementation/cli-commands.json",
+      "docs/global-memory-bank/meta/consolidated-memory-bank-meta.json",
+      "docs/global-memory-bank/meta/global-memory-bank-reference.json",
+      "docs/global-memory-bank/tags/tag_categorization.json"
+    ],
+    "mcp": [
+      "docs/global-memory-bank/03-implementation/read-context-command-design.json",
+      "docs/global-memory-bank/03-implementation/read-context-command-implementation.json"
+    ],
+    "command": [
+      "docs/global-memory-bank/03-implementation/read-context-command-design.json",
+      "docs/global-memory-bank/03-implementation/read-context-command-implementation.json"
+    ],
+    "context": [
+      "docs/global-memory-bank/03-implementation/read-context-command-design.json",
+      "docs/global-memory-bank/03-implementation/read-context-command-implementation.json"
+    ],
+    "#migration": [
+      "docs/global-memory-bank/04-guides/migration-guide.json"
+    ],
+    "#json": [
+      "docs/global-memory-bank/04-guides/migration-guide.json"
+    ],
+    "#markdown": [
+      "docs/global-memory-bank/04-guides/migration-guide.json"
+    ],
+    "#guide": [
+      "docs/global-memory-bank/04-guides/migration-guide.json"
+    ],
+    "migration": [
+      "docs/global-memory-bank/04-guides/migration-policy.json"
+    ],
+    "markdown": [
+      "docs/global-memory-bank/04-guides/migration-policy.json"
+    ],
+    "policy": [
+      "docs/global-memory-bank/04-guides/migration-policy.json"
+    ],
+    "testing": [
+      "docs/global-memory-bank/05-testing/README.json",
+      "docs/global-memory-bank/05-testing/consolidated-test-strategy.json",
+      "docs/global-memory-bank/05-testing/e2e-test-implementation.json",
+      "docs/global-memory-bank/05-testing/e2e-to-integration-test-approach.json",
+      "docs/global-memory-bank/05-testing/integration-test-details.json",
+      "docs/global-memory-bank/05-testing/tag-search-system-test-plan.json"
+    ],
+    "e2e": [
+      "docs/global-memory-bank/05-testing/consolidated-test-strategy.json",
+      "docs/global-memory-bank/05-testing/e2e-test-implementation.json"
+    ],
+    "integration-test": [
+      "docs/global-memory-bank/05-testing/consolidated-test-strategy.json",
+      "docs/global-memory-bank/05-testing/e2e-to-integration-test-approach.json",
+      "docs/global-memory-bank/05-testing/integration-test-details.json",
+      "docs/global-memory-bank/09-refactoring/json-global-design-issues.json"
+    ],
+    "tdd": [
+      "docs/global-memory-bank/05-testing/consolidated-test-strategy.json",
+      "docs/global-memory-bank/05-testing/integration-test-details.json"
+    ],
+    "qa": [
+      "docs/global-memory-bank/05-testing/consolidated-test-strategy.json",
+      "docs/global-memory-bank/05-testing/integration-test-details.json"
+    ],
+    "controller": [
+      "docs/global-memory-bank/05-testing/integration-test-details.json"
+    ],
+    "tag-system": [
+      "docs/global-memory-bank/05-testing/tag-search-system-test-plan.json"
+    ],
+    "search": [
+      "docs/global-memory-bank/05-testing/tag-search-system-test-plan.json"
+    ],
+    "index": [
+      "docs/global-memory-bank/05-testing/tag-search-system-test-plan.json",
+      "docs/global-memory-bank/meta/consolidated-memory-bank-meta.json",
+      "docs/global-memory-bank/meta/global-memory-bank-indexing-mechanism.json",
+      "docs/global-memory-bank/tags/README.json",
+      "docs/global-memory-bank/tags/index.json",
+      "docs/global-memory-bank/tags/tag_categorization.json",
+      "docs/global-memory-bank/tags/tag_index_update_plan.json"
+    ],
+    "implementation-plan": [
+      "docs/global-memory-bank/05-testing/tag-search-system-test-plan.json"
+    ],
+    "release": [
+      "docs/global-memory-bank/06-releases/README.json",
+      "docs/global-memory-bank/06-releases/consolidated-v2-release.json",
+      "docs/global-memory-bank/06-releases/release-v2.0.0.json"
+    ],
+    "version": [
+      "docs/global-memory-bank/06-releases/README.json"
+    ],
+    "planning": [
+      "docs/global-memory-bank/06-releases/consolidated-v2-release.json"
+    ],
+    "changelog": [
+      "docs/global-memory-bank/06-releases/consolidated-v2-release.json",
+      "docs/global-memory-bank/06-releases/release-v2.0.0.json"
+    ],
+    "pr": [
+      "docs/global-memory-bank/06-releases/release-v2.0.0.json"
+    ],
+    "operations": [
+      "docs/global-memory-bank/07-infrastructure/README.json"
     ],
     "i18n": [
-      "template-system-json-i18n-design.json"
+      "docs/global-memory-bank/08-i18n/README.json",
+      "docs/global-memory-bank/08-i18n/template-system-json-i18n-design.json"
     ],
     "l10n": [
-      "template-system-json-i18n-design.json"
+      "docs/global-memory-bank/08-i18n/README.json",
+      "docs/global-memory-bank/08-i18n/template-system-json-i18n-design.json"
     ],
-    "decisions": [
-      "v2.0-design-decisions.json"
+    "template": [
+      "docs/global-memory-bank/08-i18n/template-system-json-i18n-design.json"
+    ],
+    "tech-debt": [
+      "docs/global-memory-bank/09-refactoring/README.json",
+      "docs/global-memory-bank/09-refactoring/json-global-design-issues.json",
+      "docs/global-memory-bank/meta/global-memory-bank-index-analysis.json",
+      "docs/global-memory-bank/meta/global-memory-bank-indexing-mechanism.json"
+    ],
+    "raw-data": [
+      "docs/global-memory-bank/analysis/global-memory-bank-analysis-raw.json"
+    ],
+    "troubleshooting": [
+      "docs/global-memory-bank/ci-cd/memory-bank-errors.json"
+    ],
+    "ci-cd": [
+      "docs/global-memory-bank/ci-cd/workflows.json"
+    ],
+    "navigation": [
+      "docs/global-memory-bank/meta/consolidated-memory-bank-meta.json",
+      "docs/global-memory-bank/meta/global-memory-bank-navigation.json"
+    ],
+    "tag": [
+      "docs/global-memory-bank/meta/consolidated-memory-bank-meta.json",
+      "docs/global-memory-bank/meta/global-memory-bank-indexing-mechanism.json",
+      "docs/global-memory-bank/tags/README.json",
+      "docs/global-memory-bank/tags/tag_categorization.json",
+      "docs/global-memory-bank/tags/tag_index_update_plan.json"
     ]
   }
 }

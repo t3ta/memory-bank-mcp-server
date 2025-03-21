@@ -34,6 +34,13 @@
   "metadata": {
     "lastUpdated": "2025-03-19T10:00:00.000Z",
     "author": "Team",
-    "tags": ["test", "tdd", "integration-test", "qa", "controller"]
+    "tags": [
+      "testing",
+      "tdd",
+      "integration-test",
+      "qa",
+      "controller"
+    ],
+    "lastModified": "2025-03-21T07:21:59.906Z"
   }
 }

@@ -6,12 +6,9 @@
     "documentType": "generic",
     "path": "workflows.md",
     "tags": [
-      "ci-cd",
-      "github-actions",
-      "automation",
-      "workflows"
+      "ci-cd"
     ],
-    "lastModified": "2025-03-17T02:13:31.718Z",
+    "lastModified": "2025-03-21T07:21:59.913Z",
     "createdAt": "2025-03-17T02:13:31.718Z",
     "version": 1
   },

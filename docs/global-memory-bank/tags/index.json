@@ -3,1446 +3,1440 @@
   "metadata": {
     "id": "tags-index",
     "title": "タグインデックス",
-    "documentType": "generic",
+    "documentType": "index",
     "path": "tags/index.json",
     "tags": [
       "index",
       "meta"
     ],
-    "lastModified": "2025-03-21T05:09:34.580Z",
-    "createdAt": "2025-03-21T05:09:34.580Z",
+    "lastModified": "2025-03-21T07:21:59.924Z",
+    "createdAt": "2025-03-21T07:21:59.924Z",
     "version": 1
   },
   "content": {
     "sections": [
       {
-        "title": "タグ一覧",
-        "content": "タグとドキュメントの関連付け"
+        "title": "タグインデックスについて",
+        "content": "このドキュメントはグローバルメモリバンク内のすべてのドキュメントのタグを索引化したものです。タグは論理的なカテゴリにグループ化され、関連するドキュメントへのリンクを提供します。"
       }
     ],
     "tagMap": {
       "project": {
         "count": 2,
+        "category": "project-foundation",
         "documents": [
           {
-            "path": "01-project/README.json",
-            "title": "01-project/README.json"
+            "path": "docs/global-memory-bank/01-project/README.json",
+            "title": "Project Directory README"
           },
           {
-            "path": "01-project/project-overview.json",
-            "title": "01-project/project-overview.json"
+            "path": "docs/global-memory-bank/01-project/project-overview.json",
+            "title": "プロジェクト概要"
           }
         ]
       },
       "documentation": {
-        "count": 17,
+        "count": 15,
+        "category": "documentation-guides",
         "documents": [
           {
-            "path": "01-project/README.json",
-            "title": "01-project/README.json"
+            "path": "docs/global-memory-bank/01-project/README.json",
+            "title": "Project Directory README"
           },
           {
-            "path": "02-architecture/README.json",
-            "title": "02-architecture/README.json"
+            "path": "docs/global-memory-bank/02-architecture/README.json",
+            "title": "Architecture Directory README"
           },
           {
-            "path": "03-implementation/README.json",
-            "title": "03-implementation/README.json"
+            "path": "docs/global-memory-bank/03-implementation/README.json",
+            "title": "Implementation Directory README"
           },
           {
-            "path": "04-guides/README.json",
-            "title": "04-guides/README.json"
+            "path": "docs/global-memory-bank/04-guides/README.json",
+            "title": "Guides Directory README"
           },
           {
-            "path": "04-guides/user-guide.json",
-            "title": "04-guides/user-guide.json"
+            "path": "docs/global-memory-bank/04-guides/user-guide.json",
+            "title": "ユーザーガイド"
           },
           {
-            "path": "05-testing/README.json",
-            "title": "05-testing/README.json"
+            "path": "docs/global-memory-bank/05-testing/README.json",
+            "title": "Testing Directory README"
           },
           {
-            "path": "06-releases/README.json",
-            "title": "06-releases/README.json"
+            "path": "docs/global-memory-bank/06-releases/README.json",
+            "title": "Releases Directory README"
           },
           {
-            "path": "07-infrastructure/README.json",
-            "title": "07-infrastructure/README.json"
+            "path": "docs/global-memory-bank/07-infrastructure/README.json",
+            "title": "Infrastructure Directory README"
           },
           {
-            "path": "08-i18n/README.json",
-            "title": "08-i18n/README.json"
+            "path": "docs/global-memory-bank/08-i18n/README.json",
+            "title": "Internationalization Directory README"
           },
           {
-            "path": "09-refactoring/README.json",
-            "title": "09-refactoring/README.json"
+            "path": "docs/global-memory-bank/09-refactoring/README.json",
+            "title": "Refactoring Directory README"
           },
           {
-            "path": "backups/2025-03-21/meta-originals/global-memory-bank-reference.json",
-            "title": "backups/2025-03-21/meta-originals/global-memory-bank-reference.json"
+            "path": "docs/global-memory-bank/meta/README.json",
+            "title": "Meta Directory README"
           },
           {
-            "path": "meta/README.json",
-            "title": "meta/README.json"
+            "path": "docs/global-memory-bank/meta/consolidated-memory-bank-meta.json",
+            "title": "Consolidated Memory Bank Meta Information"
           },
           {
-            "path": "meta/consolidated-memory-bank-meta.json",
-            "title": "meta/consolidated-memory-bank-meta.json"
+            "path": "docs/global-memory-bank/meta/global-memory-bank-reference.json",
+            "title": "グローバルメモリバンク リファレンスガイド"
           },
           {
-            "path": "meta/global-memory-bank-reference.json",
-            "title": "meta/global-memory-bank-reference.json"
+            "path": "docs/global-memory-bank/tags/README.json",
+            "title": "Tags Directory README"
           },
           {
-            "path": "tags/README.json",
-            "title": "tags/README.json"
-          },
-          {
-            "path": "user-guide.json",
-            "title": "user-guide.json"
-          },
-          {
-            "path": "user-guide.md",
+            "path": "docs/global-memory-bank/user-guide.json",
             "title": "ユーザーガイド"
           }
         ]
       },
       "guide": {
-        "count": 19,
+        "count": 16,
+        "category": "documentation-guides",
         "documents": [
           {
-            "path": "01-project/README.json",
-            "title": "01-project/README.json"
+            "path": "docs/global-memory-bank/01-project/README.json",
+            "title": "Project Directory README"
           },
           {
-            "path": "02-architecture/README.json",
-            "title": "02-architecture/README.json"
+            "path": "docs/global-memory-bank/02-architecture/README.json",
+            "title": "Architecture Directory README"
           },
           {
-            "path": "03-implementation/README.json",
-            "title": "03-implementation/README.json"
+            "path": "docs/global-memory-bank/03-implementation/README.json",
+            "title": "Implementation Directory README"
           },
           {
-            "path": "04-guides/README.json",
-            "title": "04-guides/README.json"
+            "path": "docs/global-memory-bank/04-guides/README.json",
+            "title": "Guides Directory README"
           },
           {
-            "path": "04-guides/user-guide.json",
-            "title": "04-guides/user-guide.json"
+            "path": "docs/global-memory-bank/04-guides/user-guide.json",
+            "title": "ユーザーガイド"
           },
           {
-            "path": "05-testing/README.json",
-            "title": "05-testing/README.json"
+            "path": "docs/global-memory-bank/05-testing/README.json",
+            "title": "Testing Directory README"
           },
           {
-            "path": "06-releases/README.json",
-            "title": "06-releases/README.json"
+            "path": "docs/global-memory-bank/06-releases/README.json",
+            "title": "Releases Directory README"
           },
           {
-            "path": "07-infrastructure/README.json",
-            "title": "07-infrastructure/README.json"
+            "path": "docs/global-memory-bank/07-infrastructure/README.json",
+            "title": "Infrastructure Directory README"
           },
           {
-            "path": "08-i18n/README.json",
-            "title": "08-i18n/README.json"
+            "path": "docs/global-memory-bank/08-i18n/README.json",
+            "title": "Internationalization Directory README"
           },
           {
-            "path": "09-refactoring/README.json",
-            "title": "09-refactoring/README.json"
+            "path": "docs/global-memory-bank/09-refactoring/README.json",
+            "title": "Refactoring Directory README"
           },
           {
-            "path": "backups/2025-03-21/meta-originals/global-memory-bank-navigation.json",
-            "title": "backups/2025-03-21/meta-originals/global-memory-bank-navigation.json"
+            "path": "docs/global-memory-bank/meta/README.json",
+            "title": "Meta Directory README"
           },
           {
-            "path": "backups/2025-03-21/meta-originals/global-memory-bank-reference.json",
-            "title": "backups/2025-03-21/meta-originals/global-memory-bank-reference.json"
+            "path": "docs/global-memory-bank/meta/consolidated-memory-bank-meta.json",
+            "title": "Consolidated Memory Bank Meta Information"
           },
           {
-            "path": "meta/README.json",
-            "title": "meta/README.json"
+            "path": "docs/global-memory-bank/meta/global-memory-bank-navigation.json",
+            "title": "グローバルメモリバンク ナビゲーションガイド"
           },
           {
-            "path": "meta/consolidated-memory-bank-meta.json",
-            "title": "meta/consolidated-memory-bank-meta.json"
+            "path": "docs/global-memory-bank/meta/global-memory-bank-reference.json",
+            "title": "グローバルメモリバンク リファレンスガイド"
           },
           {
-            "path": "meta/global-memory-bank-navigation.json",
-            "title": "meta/global-memory-bank-navigation.json"
+            "path": "docs/global-memory-bank/tags/README.json",
+            "title": "Tags Directory README"
           },
           {
-            "path": "meta/global-memory-bank-reference.json",
-            "title": "meta/global-memory-bank-reference.json"
-          },
-          {
-            "path": "tags/README.json",
-            "title": "tags/README.json"
-          },
-          {
-            "path": "user-guide.json",
-            "title": "user-guide.json"
-          },
-          {
-            "path": "user-guide.md",
+            "path": "docs/global-memory-bank/user-guide.json",
             "title": "ユーザーガイド"
           }
         ]
       },
-      "standards": {
-        "count": 3,
-        "documents": [
-          {
-            "path": "01-project/coding-standards.json",
-            "title": "01-project/coding-standards.json"
-          },
-          {
-            "path": "coding-standards.json",
-            "title": "coding-standards.json"
-          },
-          {
-            "path": "coding-standards.md",
-            "title": "コーディング規約"
-          }
-        ]
-      },
       "best-practices": {
-        "count": 3,
+        "count": 2,
+        "category": "implementation-technology",
         "documents": [
           {
-            "path": "01-project/coding-standards.json",
-            "title": "01-project/coding-standards.json"
+            "path": "docs/global-memory-bank/01-project/coding-standards.json",
+            "title": "Coding Standards"
           },
           {
-            "path": "coding-standards.json",
-            "title": "coding-standards.json"
-          },
-          {
-            "path": "coding-standards.md",
+            "path": "docs/global-memory-bank/coding-standards.json",
             "title": "コーディング規約"
           }
         ]
       },
       "typescript": {
         "count": 1,
+        "category": "implementation-technology",
         "documents": [
           {
-            "path": "01-project/coding-standards.json",
-            "title": "01-project/coding-standards.json"
+            "path": "docs/global-memory-bank/01-project/coding-standards.json",
+            "title": "Coding Standards"
           }
         ]
       },
       "clean-code": {
         "count": 1,
+        "category": "implementation-technology",
         "documents": [
           {
-            "path": "01-project/coding-standards.json",
-            "title": "01-project/coding-standards.json"
+            "path": "docs/global-memory-bank/01-project/coding-standards.json",
+            "title": "Coding Standards"
           }
         ]
       },
       "domain": {
-        "count": 3,
+        "count": 2,
+        "category": "project-foundation",
         "documents": [
           {
-            "path": "01-project/domain-models.json",
-            "title": "01-project/domain-models.json"
+            "path": "docs/global-memory-bank/01-project/domain-models.json",
+            "title": "ドメインモデル"
           },
           {
-            "path": "domain-models.json",
-            "title": "domain-models.json"
-          },
-          {
-            "path": "domain-models.md",
+            "path": "docs/global-memory-bank/domain-models.json",
             "title": "ドメインモデル"
           }
         ]
       },
       "models": {
-        "count": 3,
+        "count": 2,
+        "category": "project-foundation",
         "documents": [
           {
-            "path": "01-project/domain-models.json",
-            "title": "01-project/domain-models.json"
+            "path": "docs/global-memory-bank/01-project/domain-models.json",
+            "title": "ドメインモデル"
           },
           {
-            "path": "domain-models.json",
-            "title": "domain-models.json"
-          },
-          {
-            "path": "domain-models.md",
+            "path": "docs/global-memory-bank/domain-models.json",
             "title": "ドメインモデル"
           }
         ]
       },
       "architecture": {
-        "count": 14,
+        "count": 12,
+        "category": "design-architecture",
         "documents": [
           {
-            "path": "01-project/domain-models.json",
-            "title": "01-project/domain-models.json"
+            "path": "docs/global-memory-bank/01-project/domain-models.json",
+            "title": "ドメインモデル"
           },
           {
-            "path": "02-architecture/README.json",
-            "title": "02-architecture/README.json"
+            "path": "docs/global-memory-bank/02-architecture/README.json",
+            "title": "Architecture Directory README"
           },
           {
-            "path": "02-architecture/architecture-decisions-details.json",
-            "title": "02-architecture/architecture-decisions-details.json"
+            "path": "docs/global-memory-bank/02-architecture/architecture-decisions-details.json",
+            "title": "アーキテクチャ決定事項詳細"
           },
           {
-            "path": "02-architecture/architecture-decisions.json",
-            "title": "02-architecture/architecture-decisions.json"
+            "path": "docs/global-memory-bank/02-architecture/architecture-decisions.json",
+            "title": "アーキテクチャ決定記録"
           },
           {
-            "path": "02-architecture/architecture.json",
-            "title": "02-architecture/architecture.json"
-          },
-          {
-            "path": "02-architecture/consolidated-architecture.json",
-            "title": "02-architecture/consolidated-architecture.json"
-          },
-          {
-            "path": "02-architecture/json-based-architecture-details.json",
-            "title": "02-architecture/json-based-architecture-details.json"
-          },
-          {
-            "path": "02-architecture/json-based-architecture.json",
-            "title": "02-architecture/json-based-architecture.json"
-          },
-          {
-            "path": "05-testing/e2e-to-integration-test-approach.json",
-            "title": "05-testing/e2e-to-integration-test-approach.json"
-          },
-          {
-            "path": "06-releases/v2-design-decisions.json",
-            "title": "06-releases/v2-design-decisions.json"
-          },
-          {
-            "path": "architecture.json",
-            "title": "architecture.json"
-          },
-          {
-            "path": "architecture.md",
+            "path": "docs/global-memory-bank/02-architecture/architecture.json",
             "title": "システムアーキテクチャ"
           },
           {
-            "path": "domain-models.json",
-            "title": "domain-models.json"
+            "path": "docs/global-memory-bank/02-architecture/consolidated-architecture.json",
+            "title": "統合アーキテクチャドキュメント"
           },
           {
-            "path": "domain-models.md",
+            "path": "docs/global-memory-bank/02-architecture/json-based-architecture-details.json",
+            "title": "JSONベースアーキテクチャ詳細設計"
+          },
+          {
+            "path": "docs/global-memory-bank/02-architecture/json-based-architecture.json",
+            "title": "Memory Bank 2.0: JSON ベースアーキテクチャ詳細設計"
+          },
+          {
+            "path": "docs/global-memory-bank/05-testing/e2e-to-integration-test-approach.json",
+            "title": "E2E から Integration テストへの移行アプローチ"
+          },
+          {
+            "path": "docs/global-memory-bank/06-releases/v2-design-decisions.json",
+            "title": "v2.0 設計上の決定事項"
+          },
+          {
+            "path": "docs/global-memory-bank/architecture.json",
+            "title": "システムアーキテクチャ"
+          },
+          {
+            "path": "docs/global-memory-bank/domain-models.json",
             "title": "ドメインモデル"
           }
         ]
       },
       "json": {
         "count": 9,
+        "category": "implementation-technology",
         "documents": [
           {
-            "path": "01-project/domain-models.json",
-            "title": "01-project/domain-models.json"
+            "path": "docs/global-memory-bank/01-project/domain-models.json",
+            "title": "ドメインモデル"
           },
           {
-            "path": "02-architecture/architecture-decisions-details.json",
-            "title": "02-architecture/architecture-decisions-details.json"
+            "path": "docs/global-memory-bank/02-architecture/architecture-decisions-details.json",
+            "title": "アーキテクチャ決定事項詳細"
           },
           {
-            "path": "02-architecture/architecture-decisions.json",
-            "title": "02-architecture/architecture-decisions.json"
+            "path": "docs/global-memory-bank/02-architecture/architecture-decisions.json",
+            "title": "アーキテクチャ決定記録"
           },
           {
-            "path": "02-architecture/consolidated-architecture.json",
-            "title": "02-architecture/consolidated-architecture.json"
+            "path": "docs/global-memory-bank/02-architecture/consolidated-architecture.json",
+            "title": "統合アーキテクチャドキュメント"
           },
           {
-            "path": "02-architecture/json-based-architecture-details.json",
-            "title": "02-architecture/json-based-architecture-details.json"
+            "path": "docs/global-memory-bank/02-architecture/json-based-architecture-details.json",
+            "title": "JSONベースアーキテクチャ詳細設計"
           },
           {
-            "path": "02-architecture/json-based-architecture.json",
-            "title": "02-architecture/json-based-architecture.json"
+            "path": "docs/global-memory-bank/02-architecture/json-based-architecture.json",
+            "title": "Memory Bank 2.0: JSON ベースアーキテクチャ詳細設計"
           },
           {
-            "path": "04-guides/migration-policy.json",
-            "title": "04-guides/migration-policy.json"
+            "path": "docs/global-memory-bank/04-guides/migration-policy.json",
+            "title": "Markdown から JSON 形式への移行ポリシー"
           },
           {
-            "path": "06-releases/v2-implementation-plan.json",
-            "title": "06-releases/v2-implementation-plan.json"
+            "path": "docs/global-memory-bank/06-releases/v2-implementation-plan.json",
+            "title": "Memory Bank 2.0: 実装計画"
           },
           {
-            "path": "08-i18n/template-system-json-i18n-design.json",
-            "title": "08-i18n/template-system-json-i18n-design.json"
+            "path": "docs/global-memory-bank/08-i18n/template-system-json-i18n-design.json",
+            "title": "テンプレートシステムのJSON化と多言語対応 - 設計仕様書"
           }
         ]
       },
       "document-model": {
         "count": 1,
+        "category": "project-foundation",
         "documents": [
           {
-            "path": "01-project/domain-models.json",
-            "title": "01-project/domain-models.json"
+            "path": "docs/global-memory-bank/01-project/domain-models.json",
+            "title": "ドメインモデル"
           }
         ]
       },
       "glossary": {
-        "count": 3,
+        "count": 2,
+        "category": "project-foundation",
         "documents": [
           {
-            "path": "01-project/glossary.json",
-            "title": "01-project/glossary.json"
+            "path": "docs/global-memory-bank/01-project/glossary.json",
+            "title": "Glossary"
           },
           {
-            "path": "glossary.json",
-            "title": "glossary.json"
-          },
-          {
-            "path": "glossary.md",
+            "path": "docs/global-memory-bank/glossary.json",
             "title": "用語集"
           }
         ]
       },
       "terminology": {
-        "count": 3,
+        "count": 2,
+        "category": "project-foundation",
         "documents": [
           {
-            "path": "01-project/glossary.json",
-            "title": "01-project/glossary.json"
+            "path": "docs/global-memory-bank/01-project/glossary.json",
+            "title": "Glossary"
           },
           {
-            "path": "glossary.json",
-            "title": "glossary.json"
-          },
-          {
-            "path": "glossary.md",
+            "path": "docs/global-memory-bank/glossary.json",
             "title": "用語集"
           }
         ]
       },
       "definitions": {
         "count": 1,
+        "category": "project-foundation",
         "documents": [
           {
-            "path": "01-project/glossary.json",
-            "title": "01-project/glossary.json"
+            "path": "docs/global-memory-bank/01-project/glossary.json",
+            "title": "Glossary"
           }
         ]
       },
       "overview": {
         "count": 1,
+        "category": "project-foundation",
         "documents": [
           {
-            "path": "01-project/project-overview.json",
-            "title": "01-project/project-overview.json"
+            "path": "docs/global-memory-bank/01-project/project-overview.json",
+            "title": "プロジェクト概要"
           }
         ]
       },
-      "summary": {
-        "count": 1,
+      "v2": {
+        "count": 13,
+        "category": "version-releases",
         "documents": [
           {
-            "path": "01-project/project-overview.json",
-            "title": "01-project/project-overview.json"
-          }
-        ]
-      },
-      "v2-0": {
-        "count": 3,
-        "documents": [
-          {
-            "path": "01-project/project-overview.json",
-            "title": "01-project/project-overview.json"
+            "path": "docs/global-memory-bank/01-project/project-overview.json",
+            "title": "プロジェクト概要"
           },
           {
-            "path": "06-releases/release-v2.0.0.json",
-            "title": "06-releases/release-v2.0.0.json"
+            "path": "docs/global-memory-bank/02-architecture/architecture-decisions-details.json",
+            "title": "アーキテクチャ決定事項詳細"
           },
           {
-            "path": "06-releases/v2-design-decisions.json",
-            "title": "06-releases/v2-design-decisions.json"
+            "path": "docs/global-memory-bank/02-architecture/architecture-decisions.json",
+            "title": "アーキテクチャ決定記録"
+          },
+          {
+            "path": "docs/global-memory-bank/02-architecture/consolidated-architecture.json",
+            "title": "統合アーキテクチャドキュメント"
+          },
+          {
+            "path": "docs/global-memory-bank/02-architecture/json-based-architecture-details.json",
+            "title": "JSONベースアーキテクチャ詳細設計"
+          },
+          {
+            "path": "docs/global-memory-bank/02-architecture/json-based-architecture.json",
+            "title": "Memory Bank 2.0: JSON ベースアーキテクチャ詳細設計"
+          },
+          {
+            "path": "docs/global-memory-bank/03-implementation/read-context-command-design.json",
+            "title": "`read_context`コマンド設計書"
+          },
+          {
+            "path": "docs/global-memory-bank/03-implementation/read-context-command-implementation.json",
+            "title": "`read_context`コマンド実装ガイド"
+          },
+          {
+            "path": "docs/global-memory-bank/06-releases/consolidated-v2-release.json",
+            "title": "Memory Bank 2.0 統合リリース情報"
+          },
+          {
+            "path": "docs/global-memory-bank/06-releases/release-v2.0.0.json",
+            "title": "リリース v2.0.0"
+          },
+          {
+            "path": "docs/global-memory-bank/06-releases/v2-design-decisions.json",
+            "title": "v2.0 設計上の決定事項"
+          },
+          {
+            "path": "docs/global-memory-bank/06-releases/v2-implementation-plan.json",
+            "title": "Memory Bank 2.0: 実装計画"
+          },
+          {
+            "path": "docs/global-memory-bank/08-i18n/template-system-json-i18n-design.json",
+            "title": "テンプレートシステムのJSON化と多言語対応 - 設計仕様書"
           }
         ]
       },
       "tech-stack": {
-        "count": 3,
+        "count": 2,
+        "category": "implementation-technology",
         "documents": [
           {
-            "path": "01-project/tech-stack.json",
-            "title": "01-project/tech-stack.json"
+            "path": "docs/global-memory-bank/01-project/tech-stack.json",
+            "title": "Technology Stack"
           },
           {
-            "path": "tech-stack.json",
-            "title": "tech-stack.json"
-          },
-          {
-            "path": "tech-stack.md",
+            "path": "docs/global-memory-bank/tech-stack.json",
             "title": "技術スタック"
           }
         ]
       },
       "infrastructure": {
-        "count": 4,
+        "count": 3,
+        "category": "implementation-technology",
         "documents": [
           {
-            "path": "01-project/tech-stack.json",
-            "title": "01-project/tech-stack.json"
+            "path": "docs/global-memory-bank/01-project/tech-stack.json",
+            "title": "Technology Stack"
           },
           {
-            "path": "07-infrastructure/README.json",
-            "title": "07-infrastructure/README.json"
+            "path": "docs/global-memory-bank/07-infrastructure/README.json",
+            "title": "Infrastructure Directory README"
           },
           {
-            "path": "tech-stack.json",
-            "title": "tech-stack.json"
-          },
-          {
-            "path": "tech-stack.md",
+            "path": "docs/global-memory-bank/tech-stack.json",
             "title": "技術スタック"
-          }
-        ]
-      },
-      "dependencies": {
-        "count": 1,
-        "documents": [
-          {
-            "path": "01-project/tech-stack.json",
-            "title": "01-project/tech-stack.json"
           }
         ]
       },
       "design": {
         "count": 8,
+        "category": "design-architecture",
         "documents": [
           {
-            "path": "02-architecture/README.json",
-            "title": "02-architecture/README.json"
+            "path": "docs/global-memory-bank/02-architecture/README.json",
+            "title": "Architecture Directory README"
           },
           {
-            "path": "02-architecture/consolidated-architecture.json",
-            "title": "02-architecture/consolidated-architecture.json"
+            "path": "docs/global-memory-bank/02-architecture/consolidated-architecture.json",
+            "title": "統合アーキテクチャドキュメント"
           },
           {
-            "path": "02-architecture/json-based-architecture-details.json",
-            "title": "02-architecture/json-based-architecture-details.json"
+            "path": "docs/global-memory-bank/02-architecture/json-based-architecture-details.json",
+            "title": "JSONベースアーキテクチャ詳細設計"
           },
           {
-            "path": "02-architecture/json-based-architecture.json",
-            "title": "02-architecture/json-based-architecture.json"
+            "path": "docs/global-memory-bank/02-architecture/json-based-architecture.json",
+            "title": "Memory Bank 2.0: JSON ベースアーキテクチャ詳細設計"
           },
           {
-            "path": "03-implementation/read-context-command-design.json",
-            "title": "03-implementation/read-context-command-design.json"
+            "path": "docs/global-memory-bank/03-implementation/read-context-command-design.json",
+            "title": "`read_context`コマンド設計書"
           },
           {
-            "path": "06-releases/v2-design-decisions.json",
-            "title": "06-releases/v2-design-decisions.json"
+            "path": "docs/global-memory-bank/06-releases/v2-design-decisions.json",
+            "title": "v2.0 設計上の決定事項"
           },
           {
-            "path": "08-i18n/template-system-json-i18n-design.json",
-            "title": "08-i18n/template-system-json-i18n-design.json"
+            "path": "docs/global-memory-bank/08-i18n/template-system-json-i18n-design.json",
+            "title": "テンプレートシステムのJSON化と多言語対応 - 設計仕様書"
           },
           {
-            "path": "09-refactoring/json-global-design-issues.json",
-            "title": "09-refactoring/json-global-design-issues.json"
+            "path": "docs/global-memory-bank/09-refactoring/json-global-design-issues.json",
+            "title": "json-global-design-issues.json"
           }
         ]
       },
       "decision": {
-        "count": 3,
-        "documents": [
-          {
-            "path": "02-architecture/architecture-decisions-details.json",
-            "title": "02-architecture/architecture-decisions-details.json"
-          },
-          {
-            "path": "02-architecture/architecture-decisions.json",
-            "title": "02-architecture/architecture-decisions.json"
-          },
-          {
-            "path": "02-architecture/consolidated-architecture.json",
-            "title": "02-architecture/consolidated-architecture.json"
-          }
-        ]
-      },
-      "version-2": {
-        "count": 7,
-        "documents": [
-          {
-            "path": "02-architecture/architecture-decisions-details.json",
-            "title": "02-architecture/architecture-decisions-details.json"
-          },
-          {
-            "path": "02-architecture/architecture-decisions.json",
-            "title": "02-architecture/architecture-decisions.json"
-          },
-          {
-            "path": "02-architecture/consolidated-architecture.json",
-            "title": "02-architecture/consolidated-architecture.json"
-          },
-          {
-            "path": "02-architecture/json-based-architecture-details.json",
-            "title": "02-architecture/json-based-architecture-details.json"
-          },
-          {
-            "path": "02-architecture/json-based-architecture.json",
-            "title": "02-architecture/json-based-architecture.json"
-          },
-          {
-            "path": "06-releases/consolidated-v2-release.json",
-            "title": "06-releases/consolidated-v2-release.json"
-          },
-          {
-            "path": "06-releases/v2-implementation-plan.json",
-            "title": "06-releases/v2-implementation-plan.json"
-          }
-        ]
-      },
-      "system-design": {
         "count": 4,
+        "category": "design-architecture",
         "documents": [
           {
-            "path": "02-architecture/architecture.json",
-            "title": "02-architecture/architecture.json"
+            "path": "docs/global-memory-bank/02-architecture/architecture-decisions-details.json",
+            "title": "アーキテクチャ決定事項詳細"
           },
           {
-            "path": "02-architecture/consolidated-architecture.json",
-            "title": "02-architecture/consolidated-architecture.json"
+            "path": "docs/global-memory-bank/02-architecture/architecture-decisions.json",
+            "title": "アーキテクチャ決定記録"
           },
           {
-            "path": "architecture.json",
-            "title": "architecture.json"
+            "path": "docs/global-memory-bank/02-architecture/consolidated-architecture.json",
+            "title": "統合アーキテクチャドキュメント"
           },
           {
-            "path": "architecture.md",
-            "title": "システムアーキテクチャ"
+            "path": "docs/global-memory-bank/06-releases/v2-design-decisions.json",
+            "title": "v2.0 設計上の決定事項"
           }
         ]
       },
       "refactoring": {
-        "count": 10,
+        "count": 7,
+        "category": "refactoring-tech-debt",
         "documents": [
           {
-            "path": "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
-            "title": "02-architecture/global-memory-bank-cleanup-implementation-plan.json"
+            "path": "docs/global-memory-bank/02-architecture/global-memory-bank-cleanup-implementation-plan.json",
+            "title": "Global Memory Bank Cleanup Implementation Plan"
           },
           {
-            "path": "02-architecture/global-memory-bank-cleanup-strategy.json",
-            "title": "02-architecture/global-memory-bank-cleanup-strategy.json"
+            "path": "docs/global-memory-bank/02-architecture/global-memory-bank-cleanup-strategy.json",
+            "title": "グローバルメモリバンク クリーンアップ戦略"
           },
           {
-            "path": "09-refactoring/README.json",
-            "title": "09-refactoring/README.json"
+            "path": "docs/global-memory-bank/09-refactoring/README.json",
+            "title": "Refactoring Directory README"
           },
           {
-            "path": "09-refactoring/json-global-design-issues.json",
-            "title": "09-refactoring/json-global-design-issues.json"
+            "path": "docs/global-memory-bank/09-refactoring/json-global-design-issues.json",
+            "title": "json-global-design-issues.json"
           },
           {
-            "path": "backups/2025-03-21/meta-originals/global-memory-bank-index-analysis.json",
-            "title": "backups/2025-03-21/meta-originals/global-memory-bank-index-analysis.json"
+            "path": "docs/global-memory-bank/meta/global-memory-bank-index-analysis.json",
+            "title": "グローバルメモリバンク インデックス分析"
           },
           {
-            "path": "backups/2025-03-21/meta-originals/global-memory-bank-indexing-mechanism.json",
-            "title": "backups/2025-03-21/meta-originals/global-memory-bank-indexing-mechanism.json"
+            "path": "docs/global-memory-bank/meta/global-memory-bank-indexing-mechanism.json",
+            "title": "グローバルメモリバンク インデックス機構の解析"
           },
           {
-            "path": "backups/2025-03-21/meta-originals/reorganization-plan.json",
-            "title": "backups/2025-03-21/meta-originals/reorganization-plan.json"
-          },
-          {
-            "path": "meta/global-memory-bank-index-analysis.json",
-            "title": "meta/global-memory-bank-index-analysis.json"
-          },
-          {
-            "path": "meta/global-memory-bank-indexing-mechanism.json",
-            "title": "meta/global-memory-bank-indexing-mechanism.json"
-          },
-          {
-            "path": "meta/reorganization-plan.json",
-            "title": "meta/reorganization-plan.json"
+            "path": "docs/global-memory-bank/meta/reorganization-plan.json",
+            "title": "Global Memory Bank タグ再編成計画"
           }
         ]
       },
       "memory-bank": {
-        "count": 17,
+        "count": 14,
+        "category": "meta-miscellaneous",
         "documents": [
           {
-            "path": "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
-            "title": "02-architecture/global-memory-bank-cleanup-implementation-plan.json"
+            "path": "docs/global-memory-bank/02-architecture/global-memory-bank-cleanup-implementation-plan.json",
+            "title": "Global Memory Bank Cleanup Implementation Plan"
           },
           {
-            "path": "02-architecture/global-memory-bank-cleanup-strategy.json",
-            "title": "02-architecture/global-memory-bank-cleanup-strategy.json"
+            "path": "docs/global-memory-bank/02-architecture/global-memory-bank-cleanup-strategy.json",
+            "title": "グローバルメモリバンク クリーンアップ戦略"
           },
           {
-            "path": "02-architecture/global-memory-bank-organized-analysis.json",
-            "title": "02-architecture/global-memory-bank-organized-analysis.json"
+            "path": "docs/global-memory-bank/02-architecture/global-memory-bank-organized-analysis.json",
+            "title": "グローバルメモリバンク 整理分析"
           },
           {
-            "path": "09-refactoring/json-global-design-issues.json",
-            "title": "09-refactoring/json-global-design-issues.json"
+            "path": "docs/global-memory-bank/09-refactoring/json-global-design-issues.json",
+            "title": "json-global-design-issues.json"
           },
           {
-            "path": "analysis/global-memory-bank-analysis-raw.json",
-            "title": "analysis/global-memory-bank-analysis-raw.json"
+            "path": "docs/global-memory-bank/analysis/global-memory-bank-analysis-raw.json",
+            "title": "グローバルメモリバンク 生データ分析"
           },
           {
-            "path": "backups/2025-03-21/meta-originals/global-memory-bank-index-analysis.json",
-            "title": "backups/2025-03-21/meta-originals/global-memory-bank-index-analysis.json"
+            "path": "docs/global-memory-bank/ci-cd/memory-bank-errors.json",
+            "title": "Memory Bank Error Troubleshooting"
           },
           {
-            "path": "backups/2025-03-21/meta-originals/global-memory-bank-indexing-mechanism.json",
-            "title": "backups/2025-03-21/meta-originals/global-memory-bank-indexing-mechanism.json"
+            "path": "docs/global-memory-bank/meta/consolidated-memory-bank-meta.json",
+            "title": "Consolidated Memory Bank Meta Information"
           },
           {
-            "path": "backups/2025-03-21/meta-originals/global-memory-bank-navigation.json",
-            "title": "backups/2025-03-21/meta-originals/global-memory-bank-navigation.json"
+            "path": "docs/global-memory-bank/meta/global-memory-bank-index-analysis.json",
+            "title": "グローバルメモリバンク インデックス分析"
           },
           {
-            "path": "backups/2025-03-21/meta-originals/global-memory-bank-reference.json",
-            "title": "backups/2025-03-21/meta-originals/global-memory-bank-reference.json"
+            "path": "docs/global-memory-bank/meta/global-memory-bank-indexing-mechanism.json",
+            "title": "グローバルメモリバンク インデックス機構の解析"
           },
           {
-            "path": "backups/2025-03-21/meta-originals/reorganization-plan.json",
-            "title": "backups/2025-03-21/meta-originals/reorganization-plan.json"
+            "path": "docs/global-memory-bank/meta/global-memory-bank-navigation.json",
+            "title": "グローバルメモリバンク ナビゲーションガイド"
           },
           {
-            "path": "ci-cd/memory-bank-errors.json",
-            "title": "ci-cd/memory-bank-errors.json"
+            "path": "docs/global-memory-bank/meta/global-memory-bank-reference.json",
+            "title": "グローバルメモリバンク リファレンスガイド"
           },
           {
-            "path": "meta/consolidated-memory-bank-meta.json",
-            "title": "meta/consolidated-memory-bank-meta.json"
+            "path": "docs/global-memory-bank/meta/reorganization-plan.json",
+            "title": "Global Memory Bank タグ再編成計画"
           },
           {
-            "path": "meta/global-memory-bank-index-analysis.json",
-            "title": "meta/global-memory-bank-index-analysis.json"
+            "path": "docs/global-memory-bank/tags/tag_categorization.json",
+            "title": "タグカテゴリ定義"
           },
           {
-            "path": "meta/global-memory-bank-indexing-mechanism.json",
-            "title": "meta/global-memory-bank-indexing-mechanism.json"
-          },
-          {
-            "path": "meta/global-memory-bank-navigation.json",
-            "title": "meta/global-memory-bank-navigation.json"
-          },
-          {
-            "path": "meta/global-memory-bank-reference.json",
-            "title": "meta/global-memory-bank-reference.json"
-          },
-          {
-            "path": "meta/reorganization-plan.json",
-            "title": "meta/reorganization-plan.json"
+            "path": "docs/global-memory-bank/tags/tag_index_update_plan.json",
+            "title": "タグインデックス更新計画"
           }
         ]
       },
       "plan": {
         "count": 5,
+        "category": "meta-miscellaneous",
         "documents": [
           {
-            "path": "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
-            "title": "02-architecture/global-memory-bank-cleanup-implementation-plan.json"
+            "path": "docs/global-memory-bank/02-architecture/global-memory-bank-cleanup-implementation-plan.json",
+            "title": "Global Memory Bank Cleanup Implementation Plan"
           },
           {
-            "path": "02-architecture/global-memory-bank-cleanup-strategy.json",
-            "title": "02-architecture/global-memory-bank-cleanup-strategy.json"
+            "path": "docs/global-memory-bank/02-architecture/global-memory-bank-cleanup-strategy.json",
+            "title": "グローバルメモリバンク クリーンアップ戦略"
           },
           {
-            "path": "06-releases/v2-implementation-plan.json",
-            "title": "06-releases/v2-implementation-plan.json"
+            "path": "docs/global-memory-bank/06-releases/v2-implementation-plan.json",
+            "title": "Memory Bank 2.0: 実装計画"
           },
           {
-            "path": "backups/2025-03-21/meta-originals/reorganization-plan.json",
-            "title": "backups/2025-03-21/meta-originals/reorganization-plan.json"
+            "path": "docs/global-memory-bank/meta/reorganization-plan.json",
+            "title": "Global Memory Bank タグ再編成計画"
           },
           {
-            "path": "meta/reorganization-plan.json",
-            "title": "meta/reorganization-plan.json"
+            "path": "docs/global-memory-bank/tags/tag_index_update_plan.json",
+            "title": "タグインデックス更新計画"
           }
         ]
       },
       "meta": {
-        "count": 14,
+        "count": 12,
+        "category": "meta-miscellaneous",
         "documents": [
           {
-            "path": "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
-            "title": "02-architecture/global-memory-bank-cleanup-implementation-plan.json"
+            "path": "docs/global-memory-bank/02-architecture/global-memory-bank-cleanup-implementation-plan.json",
+            "title": "Global Memory Bank Cleanup Implementation Plan"
           },
           {
-            "path": "02-architecture/global-memory-bank-cleanup-strategy.json",
-            "title": "02-architecture/global-memory-bank-cleanup-strategy.json"
+            "path": "docs/global-memory-bank/02-architecture/global-memory-bank-cleanup-strategy.json",
+            "title": "グローバルメモリバンク クリーンアップ戦略"
           },
           {
-            "path": "02-architecture/global-memory-bank-organized-analysis.json",
-            "title": "02-architecture/global-memory-bank-organized-analysis.json"
+            "path": "docs/global-memory-bank/02-architecture/global-memory-bank-organized-analysis.json",
+            "title": "グローバルメモリバンク 整理分析"
           },
           {
-            "path": "analysis/global-memory-bank-analysis-raw.json",
-            "title": "analysis/global-memory-bank-analysis-raw.json"
+            "path": "docs/global-memory-bank/analysis/global-memory-bank-analysis-raw.json",
+            "title": "グローバルメモリバンク 生データ分析"
           },
           {
-            "path": "backups/2025-03-21/index.json",
-            "title": "backups/2025-03-21/index.json"
+            "path": "docs/global-memory-bank/meta/README.json",
+            "title": "Meta Directory README"
           },
           {
-            "path": "backups/2025-03-21/meta-originals/global-memory-bank-navigation.json",
-            "title": "backups/2025-03-21/meta-originals/global-memory-bank-navigation.json"
+            "path": "docs/global-memory-bank/meta/consolidated-memory-bank-meta.json",
+            "title": "Consolidated Memory Bank Meta Information"
           },
           {
-            "path": "backups/2025-03-21/meta-originals/reorganization-plan.json",
-            "title": "backups/2025-03-21/meta-originals/reorganization-plan.json"
+            "path": "docs/global-memory-bank/meta/global-memory-bank-navigation.json",
+            "title": "グローバルメモリバンク ナビゲーションガイド"
           },
           {
-            "path": "backups/2025-03-21/tags/index.json",
-            "title": "backups/2025-03-21/tags/index.json"
+            "path": "docs/global-memory-bank/meta/reorganization-plan.json",
+            "title": "Global Memory Bank タグ再編成計画"
           },
           {
-            "path": "meta/README.json",
-            "title": "meta/README.json"
+            "path": "docs/global-memory-bank/tags/README.json",
+            "title": "Tags Directory README"
           },
           {
-            "path": "meta/consolidated-memory-bank-meta.json",
-            "title": "meta/consolidated-memory-bank-meta.json"
+            "path": "docs/global-memory-bank/tags/index.json",
+            "title": "タグインデックス"
           },
           {
-            "path": "meta/global-memory-bank-navigation.json",
-            "title": "meta/global-memory-bank-navigation.json"
+            "path": "docs/global-memory-bank/tags/tag_categorization.json",
+            "title": "タグカテゴリ定義"
           },
           {
-            "path": "meta/reorganization-plan.json",
-            "title": "meta/reorganization-plan.json"
-          },
-          {
-            "path": "tags/README.json",
-            "title": "tags/README.json"
-          },
-          {
-            "path": "tags/index.json",
-            "title": "tags/index.json"
+            "path": "docs/global-memory-bank/tags/tag_index_update_plan.json",
+            "title": "タグインデックス更新計画"
           }
         ]
       },
       "organization": {
         "count": 3,
+        "category": "refactoring-tech-debt",
         "documents": [
           {
-            "path": "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
-            "title": "02-architecture/global-memory-bank-cleanup-implementation-plan.json"
+            "path": "docs/global-memory-bank/02-architecture/global-memory-bank-cleanup-implementation-plan.json",
+            "title": "Global Memory Bank Cleanup Implementation Plan"
           },
           {
-            "path": "02-architecture/global-memory-bank-cleanup-strategy.json",
-            "title": "02-architecture/global-memory-bank-cleanup-strategy.json"
+            "path": "docs/global-memory-bank/02-architecture/global-memory-bank-cleanup-strategy.json",
+            "title": "グローバルメモリバンク クリーンアップ戦略"
           },
           {
-            "path": "02-architecture/global-memory-bank-organized-analysis.json",
-            "title": "02-architecture/global-memory-bank-organized-analysis.json"
+            "path": "docs/global-memory-bank/02-architecture/global-memory-bank-organized-analysis.json",
+            "title": "グローバルメモリバンク 整理分析"
           }
         ]
       },
       "analysis": {
-        "count": 7,
+        "count": 5,
+        "category": "meta-miscellaneous",
         "documents": [
           {
-            "path": "02-architecture/global-memory-bank-organized-analysis.json",
-            "title": "02-architecture/global-memory-bank-organized-analysis.json"
+            "path": "docs/global-memory-bank/02-architecture/global-memory-bank-organized-analysis.json",
+            "title": "グローバルメモリバンク 整理分析"
           },
           {
-            "path": "analysis/global-memory-bank-analysis-raw.json",
-            "title": "analysis/global-memory-bank-analysis-raw.json"
+            "path": "docs/global-memory-bank/analysis/global-memory-bank-analysis-raw.json",
+            "title": "グローバルメモリバンク 生データ分析"
           },
           {
-            "path": "backups/2025-03-21/meta-originals/global-memory-bank-index-analysis.json",
-            "title": "backups/2025-03-21/meta-originals/global-memory-bank-index-analysis.json"
+            "path": "docs/global-memory-bank/meta/consolidated-memory-bank-meta.json",
+            "title": "Consolidated Memory Bank Meta Information"
           },
           {
-            "path": "backups/2025-03-21/meta-originals/global-memory-bank-indexing-mechanism.json",
-            "title": "backups/2025-03-21/meta-originals/global-memory-bank-indexing-mechanism.json"
+            "path": "docs/global-memory-bank/meta/global-memory-bank-index-analysis.json",
+            "title": "グローバルメモリバンク インデックス分析"
           },
           {
-            "path": "meta/consolidated-memory-bank-meta.json",
-            "title": "meta/consolidated-memory-bank-meta.json"
-          },
-          {
-            "path": "meta/global-memory-bank-index-analysis.json",
-            "title": "meta/global-memory-bank-index-analysis.json"
-          },
-          {
-            "path": "meta/global-memory-bank-indexing-mechanism.json",
-            "title": "meta/global-memory-bank-indexing-mechanism.json"
+            "path": "docs/global-memory-bank/meta/global-memory-bank-indexing-mechanism.json",
+            "title": "グローバルメモリバンク インデックス機構の解析"
           }
         ]
       },
       "implementation": {
         "count": 5,
+        "category": "implementation-technology",
         "documents": [
           {
-            "path": "03-implementation/README.json",
-            "title": "03-implementation/README.json"
+            "path": "docs/global-memory-bank/03-implementation/README.json",
+            "title": "Implementation Directory README"
           },
           {
-            "path": "03-implementation/read-context-command-implementation.json",
-            "title": "03-implementation/read-context-command-implementation.json"
+            "path": "docs/global-memory-bank/03-implementation/read-context-command-implementation.json",
+            "title": "`read_context`コマンド実装ガイド"
           },
           {
-            "path": "05-testing/e2e-test-implementation.json",
-            "title": "05-testing/e2e-test-implementation.json"
+            "path": "docs/global-memory-bank/05-testing/e2e-test-implementation.json",
+            "title": "E2E Test Implementation Guide"
           },
           {
-            "path": "06-releases/consolidated-v2-release.json",
-            "title": "06-releases/consolidated-v2-release.json"
+            "path": "docs/global-memory-bank/06-releases/consolidated-v2-release.json",
+            "title": "Memory Bank 2.0 統合リリース情報"
           },
           {
-            "path": "06-releases/v2-implementation-plan.json",
-            "title": "06-releases/v2-implementation-plan.json"
+            "path": "docs/global-memory-bank/06-releases/v2-implementation-plan.json",
+            "title": "Memory Bank 2.0: 実装計画"
           }
         ]
       },
       "cli": {
         "count": 2,
+        "category": "infrastructure-operations",
         "documents": [
           {
-            "path": "03-implementation/cli-commands.json",
-            "title": "03-implementation/cli-commands.json"
+            "path": "docs/global-memory-bank/03-implementation/cli-commands.json",
+            "title": "CLI コマンド一覧"
           },
           {
-            "path": "05-testing/e2e-test-implementation.json",
-            "title": "05-testing/e2e-test-implementation.json"
-          }
-        ]
-      },
-      "commands": {
-        "count": 1,
-        "documents": [
-          {
-            "path": "03-implementation/cli-commands.json",
-            "title": "03-implementation/cli-commands.json"
+            "path": "docs/global-memory-bank/05-testing/e2e-test-implementation.json",
+            "title": "E2E Test Implementation Guide"
           }
         ]
       },
       "reference": {
         "count": 4,
+        "category": "documentation-guides",
         "documents": [
           {
-            "path": "03-implementation/cli-commands.json",
-            "title": "03-implementation/cli-commands.json"
+            "path": "docs/global-memory-bank/03-implementation/cli-commands.json",
+            "title": "CLI コマンド一覧"
           },
           {
-            "path": "backups/2025-03-21/meta-originals/global-memory-bank-reference.json",
-            "title": "backups/2025-03-21/meta-originals/global-memory-bank-reference.json"
+            "path": "docs/global-memory-bank/meta/consolidated-memory-bank-meta.json",
+            "title": "Consolidated Memory Bank Meta Information"
           },
           {
-            "path": "meta/consolidated-memory-bank-meta.json",
-            "title": "meta/consolidated-memory-bank-meta.json"
+            "path": "docs/global-memory-bank/meta/global-memory-bank-reference.json",
+            "title": "グローバルメモリバンク リファレンスガイド"
           },
           {
-            "path": "meta/global-memory-bank-reference.json",
-            "title": "meta/global-memory-bank-reference.json"
+            "path": "docs/global-memory-bank/tags/tag_categorization.json",
+            "title": "タグカテゴリ定義"
           }
         ]
       },
       "mcp": {
         "count": 2,
+        "category": "implementation-technology",
         "documents": [
           {
-            "path": "03-implementation/read-context-command-design.json",
-            "title": "03-implementation/read-context-command-design.json"
+            "path": "docs/global-memory-bank/03-implementation/read-context-command-design.json",
+            "title": "`read_context`コマンド設計書"
           },
           {
-            "path": "03-implementation/read-context-command-implementation.json",
-            "title": "03-implementation/read-context-command-implementation.json"
+            "path": "docs/global-memory-bank/03-implementation/read-context-command-implementation.json",
+            "title": "`read_context`コマンド実装ガイド"
           }
         ]
       },
       "command": {
         "count": 2,
+        "category": "implementation-technology",
         "documents": [
           {
-            "path": "03-implementation/read-context-command-design.json",
-            "title": "03-implementation/read-context-command-design.json"
+            "path": "docs/global-memory-bank/03-implementation/read-context-command-design.json",
+            "title": "`read_context`コマンド設計書"
           },
           {
-            "path": "03-implementation/read-context-command-implementation.json",
-            "title": "03-implementation/read-context-command-implementation.json"
+            "path": "docs/global-memory-bank/03-implementation/read-context-command-implementation.json",
+            "title": "`read_context`コマンド実装ガイド"
           }
         ]
       },
       "context": {
         "count": 2,
+        "category": "implementation-technology",
         "documents": [
           {
-            "path": "03-implementation/read-context-command-design.json",
-            "title": "03-implementation/read-context-command-design.json"
+            "path": "docs/global-memory-bank/03-implementation/read-context-command-design.json",
+            "title": "`read_context`コマンド設計書"
           },
           {
-            "path": "03-implementation/read-context-command-implementation.json",
-            "title": "03-implementation/read-context-command-implementation.json"
+            "path": "docs/global-memory-bank/03-implementation/read-context-command-implementation.json",
+            "title": "`read_context`コマンド実装ガイド"
           }
         ]
       },
-      "v2": {
-        "count": 4,
+      "#migration": {
+        "count": 1,
+        "category": "uncategorized",
         "documents": [
           {
-            "path": "03-implementation/read-context-command-design.json",
-            "title": "03-implementation/read-context-command-design.json"
-          },
+            "path": "docs/global-memory-bank/04-guides/migration-guide.json",
+            "title": "Markdown から JSON への移行ガイド"
+          }
+        ]
+      },
+      "#json": {
+        "count": 1,
+        "category": "uncategorized",
+        "documents": [
           {
-            "path": "03-implementation/read-context-command-implementation.json",
-            "title": "03-implementation/read-context-command-implementation.json"
-          },
+            "path": "docs/global-memory-bank/04-guides/migration-guide.json",
+            "title": "Markdown から JSON への移行ガイド"
+          }
+        ]
+      },
+      "#markdown": {
+        "count": 1,
+        "category": "uncategorized",
+        "documents": [
           {
-            "path": "06-releases/consolidated-v2-release.json",
-            "title": "06-releases/consolidated-v2-release.json"
-          },
+            "path": "docs/global-memory-bank/04-guides/migration-guide.json",
+            "title": "Markdown から JSON への移行ガイド"
+          }
+        ]
+      },
+      "#guide": {
+        "count": 1,
+        "category": "uncategorized",
+        "documents": [
           {
-            "path": "08-i18n/template-system-json-i18n-design.json",
-            "title": "08-i18n/template-system-json-i18n-design.json"
+            "path": "docs/global-memory-bank/04-guides/migration-guide.json",
+            "title": "Markdown から JSON への移行ガイド"
           }
         ]
       },
       "migration": {
         "count": 1,
+        "category": "refactoring-tech-debt",
         "documents": [
           {
-            "path": "04-guides/migration-policy.json",
-            "title": "04-guides/migration-policy.json"
+            "path": "docs/global-memory-bank/04-guides/migration-policy.json",
+            "title": "Markdown から JSON 形式への移行ポリシー"
           }
         ]
       },
       "markdown": {
         "count": 1,
+        "category": "refactoring-tech-debt",
         "documents": [
           {
-            "path": "04-guides/migration-policy.json",
-            "title": "04-guides/migration-policy.json"
+            "path": "docs/global-memory-bank/04-guides/migration-policy.json",
+            "title": "Markdown から JSON 形式への移行ポリシー"
           }
         ]
       },
       "policy": {
         "count": 1,
+        "category": "documentation-guides",
         "documents": [
           {
-            "path": "04-guides/migration-policy.json",
-            "title": "04-guides/migration-policy.json"
+            "path": "docs/global-memory-bank/04-guides/migration-policy.json",
+            "title": "Markdown から JSON 形式への移行ポリシー"
           }
         ]
       },
       "testing": {
-        "count": 5,
+        "count": 6,
+        "category": "testing-quality",
         "documents": [
           {
-            "path": "05-testing/README.json",
-            "title": "05-testing/README.json"
+            "path": "docs/global-memory-bank/05-testing/README.json",
+            "title": "Testing Directory README"
           },
           {
-            "path": "05-testing/consolidated-test-strategy.json",
-            "title": "05-testing/consolidated-test-strategy.json"
+            "path": "docs/global-memory-bank/05-testing/consolidated-test-strategy.json",
+            "title": "Memory Bank テスト戦略統合ドキュメント"
           },
           {
-            "path": "05-testing/e2e-test-implementation.json",
-            "title": "05-testing/e2e-test-implementation.json"
+            "path": "docs/global-memory-bank/05-testing/e2e-test-implementation.json",
+            "title": "E2E Test Implementation Guide"
           },
           {
-            "path": "05-testing/e2e-to-integration-test-approach.json",
-            "title": "05-testing/e2e-to-integration-test-approach.json"
+            "path": "docs/global-memory-bank/05-testing/e2e-to-integration-test-approach.json",
+            "title": "E2E から Integration テストへの移行アプローチ"
           },
           {
-            "path": "05-testing/tag-search-system-test-plan.json",
-            "title": "05-testing/tag-search-system-test-plan.json"
-          }
-        ]
-      },
-      "test": {
-        "count": 2,
-        "documents": [
-          {
-            "path": "05-testing/README.json",
-            "title": "05-testing/README.json"
+            "path": "docs/global-memory-bank/05-testing/integration-test-details.json",
+            "title": "integration-test-details.json"
           },
           {
-            "path": "05-testing/integration-test-details.json",
-            "title": "05-testing/integration-test-details.json"
+            "path": "docs/global-memory-bank/05-testing/tag-search-system-test-plan.json",
+            "title": "タグ検索システム実装計画"
           }
         ]
       },
       "e2e": {
         "count": 2,
+        "category": "testing-quality",
         "documents": [
           {
-            "path": "05-testing/consolidated-test-strategy.json",
-            "title": "05-testing/consolidated-test-strategy.json"
+            "path": "docs/global-memory-bank/05-testing/consolidated-test-strategy.json",
+            "title": "Memory Bank テスト戦略統合ドキュメント"
           },
           {
-            "path": "05-testing/e2e-test-implementation.json",
-            "title": "05-testing/e2e-test-implementation.json"
+            "path": "docs/global-memory-bank/05-testing/e2e-test-implementation.json",
+            "title": "E2E Test Implementation Guide"
           }
         ]
       },
       "integration-test": {
-        "count": 3,
+        "count": 4,
+        "category": "testing-quality",
         "documents": [
           {
-            "path": "05-testing/consolidated-test-strategy.json",
-            "title": "05-testing/consolidated-test-strategy.json"
+            "path": "docs/global-memory-bank/05-testing/consolidated-test-strategy.json",
+            "title": "Memory Bank テスト戦略統合ドキュメント"
           },
           {
-            "path": "05-testing/integration-test-details.json",
-            "title": "05-testing/integration-test-details.json"
+            "path": "docs/global-memory-bank/05-testing/e2e-to-integration-test-approach.json",
+            "title": "E2E から Integration テストへの移行アプローチ"
           },
           {
-            "path": "09-refactoring/json-global-design-issues.json",
-            "title": "09-refactoring/json-global-design-issues.json"
+            "path": "docs/global-memory-bank/05-testing/integration-test-details.json",
+            "title": "integration-test-details.json"
+          },
+          {
+            "path": "docs/global-memory-bank/09-refactoring/json-global-design-issues.json",
+            "title": "json-global-design-issues.json"
           }
         ]
       },
       "tdd": {
         "count": 2,
+        "category": "testing-quality",
         "documents": [
           {
-            "path": "05-testing/consolidated-test-strategy.json",
-            "title": "05-testing/consolidated-test-strategy.json"
+            "path": "docs/global-memory-bank/05-testing/consolidated-test-strategy.json",
+            "title": "Memory Bank テスト戦略統合ドキュメント"
           },
           {
-            "path": "05-testing/integration-test-details.json",
-            "title": "05-testing/integration-test-details.json"
+            "path": "docs/global-memory-bank/05-testing/integration-test-details.json",
+            "title": "integration-test-details.json"
           }
         ]
       },
       "qa": {
         "count": 2,
+        "category": "testing-quality",
         "documents": [
           {
-            "path": "05-testing/consolidated-test-strategy.json",
-            "title": "05-testing/consolidated-test-strategy.json"
+            "path": "docs/global-memory-bank/05-testing/consolidated-test-strategy.json",
+            "title": "Memory Bank テスト戦略統合ドキュメント"
           },
           {
-            "path": "05-testing/integration-test-details.json",
-            "title": "05-testing/integration-test-details.json"
-          }
-        ]
-      },
-      "integration-tests": {
-        "count": 1,
-        "documents": [
-          {
-            "path": "05-testing/e2e-to-integration-test-approach.json",
-            "title": "05-testing/e2e-to-integration-test-approach.json"
+            "path": "docs/global-memory-bank/05-testing/integration-test-details.json",
+            "title": "integration-test-details.json"
           }
         ]
       },
       "controller": {
         "count": 1,
+        "category": "testing-quality",
         "documents": [
           {
-            "path": "05-testing/integration-test-details.json",
-            "title": "05-testing/integration-test-details.json"
+            "path": "docs/global-memory-bank/05-testing/integration-test-details.json",
+            "title": "integration-test-details.json"
           }
         ]
       },
       "tag-system": {
         "count": 1,
+        "category": "testing-quality",
         "documents": [
           {
-            "path": "05-testing/tag-search-system-test-plan.json",
-            "title": "05-testing/tag-search-system-test-plan.json"
+            "path": "docs/global-memory-bank/05-testing/tag-search-system-test-plan.json",
+            "title": "タグ検索システム実装計画"
           }
         ]
       },
       "search": {
         "count": 1,
+        "category": "testing-quality",
         "documents": [
           {
-            "path": "05-testing/tag-search-system-test-plan.json",
-            "title": "05-testing/tag-search-system-test-plan.json"
+            "path": "docs/global-memory-bank/05-testing/tag-search-system-test-plan.json",
+            "title": "タグ検索システム実装計画"
           }
         ]
       },
       "index": {
-        "count": 8,
+        "count": 7,
+        "category": "meta-miscellaneous",
         "documents": [
           {
-            "path": "05-testing/tag-search-system-test-plan.json",
-            "title": "05-testing/tag-search-system-test-plan.json"
+            "path": "docs/global-memory-bank/05-testing/tag-search-system-test-plan.json",
+            "title": "タグ検索システム実装計画"
           },
           {
-            "path": "backups/2025-03-21/index.json",
-            "title": "backups/2025-03-21/index.json"
+            "path": "docs/global-memory-bank/meta/consolidated-memory-bank-meta.json",
+            "title": "Consolidated Memory Bank Meta Information"
           },
           {
-            "path": "backups/2025-03-21/meta-originals/global-memory-bank-indexing-mechanism.json",
-            "title": "backups/2025-03-21/meta-originals/global-memory-bank-indexing-mechanism.json"
+            "path": "docs/global-memory-bank/meta/global-memory-bank-indexing-mechanism.json",
+            "title": "グローバルメモリバンク インデックス機構の解析"
           },
           {
-            "path": "backups/2025-03-21/tags/index.json",
-            "title": "backups/2025-03-21/tags/index.json"
+            "path": "docs/global-memory-bank/tags/README.json",
+            "title": "Tags Directory README"
           },
           {
-            "path": "meta/consolidated-memory-bank-meta.json",
-            "title": "meta/consolidated-memory-bank-meta.json"
+            "path": "docs/global-memory-bank/tags/index.json",
+            "title": "タグインデックス"
           },
           {
-            "path": "meta/global-memory-bank-indexing-mechanism.json",
-            "title": "meta/global-memory-bank-indexing-mechanism.json"
+            "path": "docs/global-memory-bank/tags/tag_categorization.json",
+            "title": "タグカテゴリ定義"
           },
           {
-            "path": "tags/README.json",
-            "title": "tags/README.json"
-          },
-          {
-            "path": "tags/index.json",
-            "title": "tags/index.json"
+            "path": "docs/global-memory-bank/tags/tag_index_update_plan.json",
+            "title": "タグインデックス更新計画"
           }
         ]
       },
       "implementation-plan": {
         "count": 1,
+        "category": "testing-quality",
         "documents": [
           {
-            "path": "05-testing/tag-search-system-test-plan.json",
-            "title": "05-testing/tag-search-system-test-plan.json"
+            "path": "docs/global-memory-bank/05-testing/tag-search-system-test-plan.json",
+            "title": "タグ検索システム実装計画"
           }
         ]
       },
       "release": {
         "count": 3,
+        "category": "version-releases",
         "documents": [
           {
-            "path": "06-releases/README.json",
-            "title": "06-releases/README.json"
+            "path": "docs/global-memory-bank/06-releases/README.json",
+            "title": "Releases Directory README"
           },
           {
-            "path": "06-releases/consolidated-v2-release.json",
-            "title": "06-releases/consolidated-v2-release.json"
+            "path": "docs/global-memory-bank/06-releases/consolidated-v2-release.json",
+            "title": "Memory Bank 2.0 統合リリース情報"
           },
           {
-            "path": "06-releases/release-v2.0.0.json",
-            "title": "06-releases/release-v2.0.0.json"
+            "path": "docs/global-memory-bank/06-releases/release-v2.0.0.json",
+            "title": "リリース v2.0.0"
           }
         ]
       },
       "version": {
         "count": 1,
+        "category": "version-releases",
         "documents": [
           {
-            "path": "06-releases/README.json",
-            "title": "06-releases/README.json"
+            "path": "docs/global-memory-bank/06-releases/README.json",
+            "title": "Releases Directory README"
           }
         ]
       },
       "planning": {
         "count": 1,
+        "category": "version-releases",
         "documents": [
           {
-            "path": "06-releases/consolidated-v2-release.json",
-            "title": "06-releases/consolidated-v2-release.json"
+            "path": "docs/global-memory-bank/06-releases/consolidated-v2-release.json",
+            "title": "Memory Bank 2.0 統合リリース情報"
           }
         ]
       },
       "changelog": {
         "count": 2,
+        "category": "version-releases",
         "documents": [
           {
-            "path": "06-releases/consolidated-v2-release.json",
-            "title": "06-releases/consolidated-v2-release.json"
+            "path": "docs/global-memory-bank/06-releases/consolidated-v2-release.json",
+            "title": "Memory Bank 2.0 統合リリース情報"
           },
           {
-            "path": "06-releases/release-v2.0.0.json",
-            "title": "06-releases/release-v2.0.0.json"
+            "path": "docs/global-memory-bank/06-releases/release-v2.0.0.json",
+            "title": "リリース v2.0.0"
           }
         ]
       },
       "pr": {
         "count": 1,
+        "category": "version-releases",
         "documents": [
           {
-            "path": "06-releases/release-v2.0.0.json",
-            "title": "06-releases/release-v2.0.0.json"
-          }
-        ]
-      },
-      "decisions": {
-        "count": 1,
-        "documents": [
-          {
-            "path": "06-releases/v2-design-decisions.json",
-            "title": "06-releases/v2-design-decisions.json"
+            "path": "docs/global-memory-bank/06-releases/release-v2.0.0.json",
+            "title": "リリース v2.0.0"
           }
         ]
       },
       "operations": {
         "count": 1,
+        "category": "infrastructure-operations",
         "documents": [
           {
-            "path": "07-infrastructure/README.json",
-            "title": "07-infrastructure/README.json"
+            "path": "docs/global-memory-bank/07-infrastructure/README.json",
+            "title": "Infrastructure Directory README"
           }
         ]
       },
       "i18n": {
         "count": 2,
+        "category": "internationalization-localization",
         "documents": [
           {
-            "path": "08-i18n/README.json",
-            "title": "08-i18n/README.json"
+            "path": "docs/global-memory-bank/08-i18n/README.json",
+            "title": "Internationalization Directory README"
           },
           {
-            "path": "08-i18n/template-system-json-i18n-design.json",
-            "title": "08-i18n/template-system-json-i18n-design.json"
+            "path": "docs/global-memory-bank/08-i18n/template-system-json-i18n-design.json",
+            "title": "テンプレートシステムのJSON化と多言語対応 - 設計仕様書"
           }
         ]
       },
       "l10n": {
         "count": 2,
+        "category": "internationalization-localization",
         "documents": [
           {
-            "path": "08-i18n/README.json",
-            "title": "08-i18n/README.json"
+            "path": "docs/global-memory-bank/08-i18n/README.json",
+            "title": "Internationalization Directory README"
           },
           {
-            "path": "08-i18n/template-system-json-i18n-design.json",
-            "title": "08-i18n/template-system-json-i18n-design.json"
+            "path": "docs/global-memory-bank/08-i18n/template-system-json-i18n-design.json",
+            "title": "テンプレートシステムのJSON化と多言語対応 - 設計仕様書"
           }
         ]
       },
       "template": {
         "count": 1,
+        "category": "internationalization-localization",
         "documents": [
           {
-            "path": "08-i18n/template-system-json-i18n-design.json",
-            "title": "08-i18n/template-system-json-i18n-design.json"
+            "path": "docs/global-memory-bank/08-i18n/template-system-json-i18n-design.json",
+            "title": "テンプレートシステムのJSON化と多言語対応 - 設計仕様書"
           }
         ]
       },
       "tech-debt": {
-        "count": 6,
+        "count": 4,
+        "category": "refactoring-tech-debt",
         "documents": [
           {
-            "path": "09-refactoring/README.json",
-            "title": "09-refactoring/README.json"
+            "path": "docs/global-memory-bank/09-refactoring/README.json",
+            "title": "Refactoring Directory README"
           },
           {
-            "path": "09-refactoring/json-global-design-issues.json",
-            "title": "09-refactoring/json-global-design-issues.json"
+            "path": "docs/global-memory-bank/09-refactoring/json-global-design-issues.json",
+            "title": "json-global-design-issues.json"
           },
           {
-            "path": "backups/2025-03-21/meta-originals/global-memory-bank-index-analysis.json",
-            "title": "backups/2025-03-21/meta-originals/global-memory-bank-index-analysis.json"
+            "path": "docs/global-memory-bank/meta/global-memory-bank-index-analysis.json",
+            "title": "グローバルメモリバンク インデックス分析"
           },
           {
-            "path": "backups/2025-03-21/meta-originals/global-memory-bank-indexing-mechanism.json",
-            "title": "backups/2025-03-21/meta-originals/global-memory-bank-indexing-mechanism.json"
-          },
-          {
-            "path": "meta/global-memory-bank-index-analysis.json",
-            "title": "meta/global-memory-bank-index-analysis.json"
-          },
-          {
-            "path": "meta/global-memory-bank-indexing-mechanism.json",
-            "title": "meta/global-memory-bank-indexing-mechanism.json"
+            "path": "docs/global-memory-bank/meta/global-memory-bank-indexing-mechanism.json",
+            "title": "グローバルメモリバンク インデックス機構の解析"
           }
         ]
       },
       "raw-data": {
         "count": 1,
+        "category": "meta-miscellaneous",
         "documents": [
           {
-            "path": "analysis/global-memory-bank-analysis-raw.json",
-            "title": "analysis/global-memory-bank-analysis-raw.json"
-          }
-        ]
-      },
-      "tag": {
-        "count": 4,
-        "documents": [
-          {
-            "path": "backups/2025-03-21/meta-originals/global-memory-bank-indexing-mechanism.json",
-            "title": "backups/2025-03-21/meta-originals/global-memory-bank-indexing-mechanism.json"
-          },
-          {
-            "path": "meta/consolidated-memory-bank-meta.json",
-            "title": "meta/consolidated-memory-bank-meta.json"
-          },
-          {
-            "path": "meta/global-memory-bank-indexing-mechanism.json",
-            "title": "meta/global-memory-bank-indexing-mechanism.json"
-          },
-          {
-            "path": "tags/README.json",
-            "title": "tags/README.json"
-          }
-        ]
-      },
-      "navigation": {
-        "count": 3,
-        "documents": [
-          {
-            "path": "backups/2025-03-21/meta-originals/global-memory-bank-navigation.json",
-            "title": "backups/2025-03-21/meta-originals/global-memory-bank-navigation.json"
-          },
-          {
-            "path": "meta/consolidated-memory-bank-meta.json",
-            "title": "meta/consolidated-memory-bank-meta.json"
-          },
-          {
-            "path": "meta/global-memory-bank-navigation.json",
-            "title": "meta/global-memory-bank-navigation.json"
+            "path": "docs/global-memory-bank/analysis/global-memory-bank-analysis-raw.json",
+            "title": "グローバルメモリバンク 生データ分析"
           }
         ]
       },
       "troubleshooting": {
         "count": 1,
+        "category": "infrastructure-operations",
         "documents": [
           {
-            "path": "ci-cd/memory-bank-errors.json",
-            "title": "ci-cd/memory-bank-errors.json"
-          }
-        ]
-      },
-      "errors": {
-        "count": 1,
-        "documents": [
-          {
-            "path": "ci-cd/memory-bank-errors.json",
-            "title": "ci-cd/memory-bank-errors.json"
+            "path": "docs/global-memory-bank/ci-cd/memory-bank-errors.json",
+            "title": "Memory Bank Error Troubleshooting"
           }
         ]
       },
       "ci-cd": {
         "count": 1,
+        "category": "infrastructure-operations",
         "documents": [
           {
-            "path": "ci-cd/workflows.json",
-            "title": "ci-cd/workflows.json"
+            "path": "docs/global-memory-bank/ci-cd/workflows.json",
+            "title": "CI/CD Workflows"
           }
         ]
       },
-      "github-actions": {
-        "count": 1,
+      "navigation": {
+        "count": 2,
+        "category": "documentation-guides",
         "documents": [
           {
-            "path": "ci-cd/workflows.json",
-            "title": "ci-cd/workflows.json"
+            "path": "docs/global-memory-bank/meta/consolidated-memory-bank-meta.json",
+            "title": "Consolidated Memory Bank Meta Information"
+          },
+          {
+            "path": "docs/global-memory-bank/meta/global-memory-bank-navigation.json",
+            "title": "グローバルメモリバンク ナビゲーションガイド"
           }
         ]
       },
-      "automation": {
-        "count": 1,
+      "tag": {
+        "count": 5,
+        "category": "meta-miscellaneous",
         "documents": [
           {
-            "path": "ci-cd/workflows.json",
-            "title": "ci-cd/workflows.json"
-          }
-        ]
-      },
-      "workflows": {
-        "count": 1,
-        "documents": [
+            "path": "docs/global-memory-bank/meta/consolidated-memory-bank-meta.json",
+            "title": "Consolidated Memory Bank Meta Information"
+          },
           {
-            "path": "ci-cd/workflows.json",
-            "title": "ci-cd/workflows.json"
+            "path": "docs/global-memory-bank/meta/global-memory-bank-indexing-mechanism.json",
+            "title": "グローバルメモリバンク インデックス機構の解析"
+          },
+          {
+            "path": "docs/global-memory-bank/tags/README.json",
+            "title": "Tags Directory README"
+          },
+          {
+            "path": "docs/global-memory-bank/tags/tag_categorization.json",
+            "title": "タグカテゴリ定義"
+          },
+          {
+            "path": "docs/global-memory-bank/tags/tag_index_update_plan.json",
+            "title": "タグインデックス更新計画"
           }
         ]
       }
-    }
+    },
+    "categories": [
+      {
+        "id": "project-foundation",
+        "title": "1. プロジェクト基盤 (project-foundation)",
+        "tags": [
+          "project",
+          "overview",
+          "summary",
+          "domain",
+          "document-model",
+          "models",
+          "glossary",
+          "terminology",
+          "definitions"
+        ]
+      },
+      {
+        "id": "design-architecture",
+        "title": "2. 設計・アーキテクチャ (design-architecture)",
+        "tags": [
+          "architecture",
+          "design",
+          "system-design",
+          "decision",
+          "decisions"
+        ]
+      },
+      {
+        "id": "implementation-technology",
+        "title": "3. 実装・技術 (implementation-technology)",
+        "tags": [
+          "implementation",
+          "tech-stack",
+          "infrastructure",
+          "dependencies",
+          "typescript",
+          "clean-code",
+          "standards",
+          "best-practices",
+          "json",
+          "command",
+          "mcp",
+          "context"
+        ]
+      },
+      {
+        "id": "documentation-guides",
+        "title": "4. ドキュメント・ガイド (documentation-guides)",
+        "tags": [
+          "documentation",
+          "guide",
+          "reference",
+          "policy",
+          "navigation"
+        ]
+      },
+      {
+        "id": "testing-quality",
+        "title": "5. テスト・品質 (testing-quality)",
+        "tags": [
+          "testing",
+          "test",
+          "e2e",
+          "integration-test",
+          "integration-tests",
+          "tdd",
+          "qa",
+          "controller",
+          "tag-system",
+          "search",
+          "implementation-plan"
+        ]
+      },
+      {
+        "id": "version-releases",
+        "title": "6. バージョン・リリース (version-releases)",
+        "tags": [
+          "release",
+          "v2",
+          "v2-0",
+          "version-2",
+          "version",
+          "changelog",
+          "pr",
+          "planning"
+        ]
+      },
+      {
+        "id": "infrastructure-operations",
+        "title": "7. インフラ・運用 (infrastructure-operations)",
+        "tags": [
+          "ci-cd",
+          "github-actions",
+          "automation",
+          "workflows",
+          "cli",
+          "commands",
+          "operations",
+          "troubleshooting",
+          "errors"
+        ]
+      },
+      {
+        "id": "internationalization-localization",
+        "title": "8. 国際化・多言語 (internationalization-localization)",
+        "tags": [
+          "i18n",
+          "l10n",
+          "template"
+        ]
+      },
+      {
+        "id": "refactoring-tech-debt",
+        "title": "9. リファクタリング・技術的負債 (refactoring-tech-debt)",
+        "tags": [
+          "refactoring",
+          "tech-debt",
+          "migration",
+          "markdown",
+          "organization"
+        ]
+      },
+      {
+        "id": "meta-miscellaneous",
+        "title": "10. メタ・その他 (meta-miscellaneous)",
+        "tags": [
+          "meta",
+          "index",
+          "tag",
+          "memory-bank",
+          "analysis",
+          "plan",
+          "raw-data"
+        ]
+      }
+    ]
   }
 }

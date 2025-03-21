@@ -310,11 +310,11 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
     try {
       // List all files
       const files = await this.fileSystemService.listFiles(this.basePath);
+      logger.debug(`FileSystemMemoryDocumentRepository.list() found ${files.length} files`);
 
-      // Convert to document paths and remove duplicates
-      const uniquePaths = new Set<string>();
-      const paths: DocumentPath[] = [];
-
+      // グループ化: 拡張子を除いたベース名でファイルをグループ化
+      const fileGroups = new Map<string, { md?: string, json?: string }>();
+      
       for (const file of files) {
         try {
           // Get relative path
@@ -335,22 +335,47 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
             continue;
           }
 
-          // Only process paths we haven't seen before
-          if (!uniquePaths.has(relativePath)) {
-            try {
-              uniquePaths.add(relativePath);
-              const documentPath = DocumentPath.create(relativePath);
-              paths.push(documentPath);
-            } catch (error) {
-              logger.error('Error creating document path:', {
-                path: relativePath,
-                error: error instanceof Error ? error.message : String(error),
-              });
-            }
+          // ベース名（拡張子なし）とファイル拡張子を取得
+          const extension = path.extname(relativePath);
+          // ディレクトリパスを保持したベース名を取得
+          const dirPath = path.dirname(relativePath);
+          const baseName = path.basename(relativePath, extension);
+          const baseNameWithDir = path.join(dirPath, baseName);
+          
+          logger.debug(`Processing file: ${relativePath}, baseNameWithDir: ${baseNameWithDir}, extension: ${extension}`);
+          
+          // グループに追加
+          const group = fileGroups.get(baseNameWithDir) || { md: undefined, json: undefined };
+          if (extension === '.md') {
+            group.md = relativePath;
+          } else if (extension === '.json') {
+            group.json = relativePath;
           }
+          fileGroups.set(baseNameWithDir, group);
         } catch (error) {
           logger.error('Error processing file path:', {
             path: file,
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
+      }
+
+      // JSONファイルを優先、なければMDファイルを使用
+      const paths: DocumentPath[] = [];
+      logger.debug(`Found ${fileGroups.size} unique base files`);
+      
+      for (const [baseNameWithDir, group] of fileGroups) {
+        try {
+          // JSONファイルを優先
+          const pathToUse = group.json || group.md;
+          if (pathToUse) {
+            logger.debug(`Using ${pathToUse} for base ${baseNameWithDir} (JSON: ${!!group.json}, MD: ${!!group.md})`);
+            const documentPath = DocumentPath.create(pathToUse);
+            paths.push(documentPath);
+          }
+        } catch (error) {
+          logger.error('Error creating document path:', {
+            baseNameWithDir,
             error: error instanceof Error ? error.message : String(error),
           });
         }

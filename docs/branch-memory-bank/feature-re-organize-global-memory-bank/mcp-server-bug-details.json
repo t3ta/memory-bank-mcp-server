@@ -1,0 +1,42 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "mcp-server-bug-details",
+    "title": "MCPサーバーの読み込みバグ詳細",
+    "documentType": "analysis",
+    "path": "mcp-server-bug-details.json",
+    "tags": [
+      "bug",
+      "read-context",
+      "global-memory",
+      "analysis"
+    ],
+    "lastModified": "2025-03-21T09:45:00.000Z",
+    "createdAt": "2025-03-21T08:47:00.000Z",
+    "version": 2
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "バグの概要",
+        "content": "`read_context`関数を使用すると、グローバルメモリバンクが空（すべてのファイルが空のMarkdownファイル）として返される。実際には、グローバルメモリバンクは再編成されてJSONファイル形式で存在しており、有効なコンテンツを持っている。"
+      },
+      {
+        "title": "詳細分析",
+        "content": "## 状況\n\n- `feature/re-organize-global-memory-bank`ブランチでは、グローバルメモリバンクのリファクタリングを行っている\n- MarkdownからJSONへの移行が進行中\n- ディレクトリ構造も変更され、カテゴリベースの整理された構造になっている（01-project, 02-architecture など）\n- 関連するファイルを統合して、より大きくまとまりのあるドキュメントが作成されている\n\n## コード調査\n\n`ReadContextUseCase`、`IGlobalMemoryBankRepository`、`FileSystemGlobalMemoryBankRepository`、`FileSystemMemoryDocumentRepository`のコードを調査した結果、以下の点が判明した:\n\n1. `FileSystemMemoryDocumentRepository.list()`メソッドは`.md`と`.json`の両方のファイルを検出可能\n2. `read_context`が呼び出されたとき、空の.mdファイルのみが返されている\n3. 同時に、有効なコンテンツを持つ.jsonファイルが実際に存在している\n4. マイグレーションロジックはMarkdownToJsonMigratorにあるが、自動でこのプロセスを開始するメカニズムがあるようである"
+      },
+      {
+        "title": "考えられる原因",
+        "content": "追加調査の結果、以下の可能性が高い原因として特定された：\n\n1. **優先順位の問題**: `FileSystemMemoryDocumentRepository.list()`の実装を見ると、.mdファイルと.jsonファイルの両方を検出しリストに追加するが、その後のコードで同名のファイルが重複して処理されるのを避ける際に、最初に見つかったバージョン（おそらく.md）が優先される可能性がある\n\n```typescript\n// Only process paths we haven't seen before\nif (!uniquePaths.has(relativePath)) {\n  try {\n    uniquePaths.add(relativePath);\n    const documentPath = DocumentPath.create(relativePath);\n    paths.push(documentPath);\n  } catch (error) { ... }\n}\n```\n\nここでの問題は、マークダウンからJSONへの変換時に、例えば「architecture.md」と「architecture.json」の両方が存在する場合、どちらか一方しかリストに追加されないということ。そして空の.mdファイルが優先されると、内容のある.jsonファイルが無視される結果になる。\n\n2. **インデックス不整合**: タグインデックスなどの内部インデックスが新しいディレクトリ構造やJSONファイルを反映していない可能性がある\n\n3. **ディレクトリスキャンの問題**: ディレクトリリストアップの際に、新しいカテゴリディレクトリ（01-project, 02-architectureなど）を正しく処理できていない可能性がある"
+      },
+      {
+        "title": "次のステップ",
+        "content": "1. `FileSystemMemoryDocumentRepository.list()`メソッドを修正し、同名の.mdと.jsonファイルが存在する場合に.jsonファイルを優先するようにする\n\n2. あるいは、JSONファイルの内容を読み込めるように`read_context`の実装を修正する\n\n```typescript\n// FileSystemMemoryDocumentRepository.list()の修正案：\nprivate async list(): Promise<DocumentPath[]> {\n  // ... 既存のコード ...\n  \n  // ファイルをリストアップする際に、.jsonファイルを先に処理するか、\n  // またはユニークなパスを判断する際のロジックを変更する\n  // 例えば：\n  const paths: DocumentPath[] = [];\n  const uniqueBaseNames = new Map<string, DocumentPath>();\n  \n  for (const file of files) {\n    // ... 前処理 ...\n    const documentPath = DocumentPath.create(relativePath);\n    const baseName = path.basename(relativePath, path.extname(relativePath));\n    \n    // 既に同じベース名のファイルがあるかチェック\n    if (uniqueBaseNames.has(baseName)) {\n      const existingPath = uniqueBaseNames.get(baseName)!;\n      // .jsonファイルが優先されるようにする\n      if (documentPath.isJSON && !existingPath.isJSON) {\n        uniqueBaseNames.set(baseName, documentPath);\n      }\n    } else {\n      uniqueBaseNames.set(baseName, documentPath);\n    }\n  }\n  \n  // 最終的なパスリストを構築\n  for (const docPath of uniqueBaseNames.values()) {\n    paths.push(docPath);\n  }\n  \n  return paths;\n}\n```\n\n3. また、新しいディレクトリ構造を正しくスキャンできるように、`FileSystemService.listFiles()`が再帰的にサブディレクトリを処理していることも確認する必要がある"
+      },
+      {
+        "title": "見つかった具体的な問題",
+        "content": "- `read_context`が返すグローバルメモリには空の.mdファイルしか含まれていない\n- 実際のグローバルメモリバンクのディレクトリには有効なJSONファイルが存在する\n- 調査の結果、同名の.mdファイルと.jsonファイルが存在する場合に、.mdファイルが優先されることが最も可能性の高い原因\n- これはおそらく、マークダウンからJSONへの移行過程における一時的な問題\n- 解決方法としては、.jsonファイルを優先するか、または.mdファイルを完全に除去することが考えられる"
+      }
+    ]
+  }
+}

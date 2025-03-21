@@ -5,8 +5,10 @@
     "title": "システムアーキテクチャ",
     "documentType": "generic",
     "path": "architecture.json",
-    "tags": ["architecture", "system-design"],
-    "lastModified": "2025-03-21T01:46:03.123Z",
+    "tags": [
+      "architecture"
+    ],
+    "lastModified": "2025-03-21T07:21:59.899Z",
     "createdAt": "2025-03-21T01:46:03.123Z",
     "version": 1
   },
