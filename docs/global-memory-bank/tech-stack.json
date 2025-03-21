@@ -1,0 +1,29 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "tech-stack",
+    "title": "技術スタック",
+    "documentType": "generic",
+    "path": "tech-stack.json",
+    "tags": ["tech-stack", "infrastructure"],
+    "lastModified": "2025-03-21T05:09:30.399Z",
+    "createdAt": "2025-03-21T05:09:30.399Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "バックエンド技術",
+        "content": "[バックエンド技術の一覧]"
+      },
+      {
+        "title": "フロントエンド技術",
+        "content": "[フロントエンド技術の一覧]"
+      },
+      {
+        "title": "インフラストラクチャ",
+        "content": "[インフラストラクチャコンポーネントの説明]"
+      }
+    ]
+  }
+}

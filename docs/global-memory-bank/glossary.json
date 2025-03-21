@@ -1,0 +1,25 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "glossary",
+    "title": "用語集",
+    "documentType": "generic",
+    "path": "glossary.json",
+    "tags": ["glossary", "terminology"],
+    "lastModified": "2025-03-21T05:09:30.399Z",
+    "createdAt": "2025-03-21T05:09:30.399Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "用語",
+        "content": "[プロジェクト固有の用語の一覧と定義]"
+      },
+      {
+        "title": "略語",
+        "content": "[よく使用される略語の一覧と定義]"
+      }
+    ]
+  }
+}

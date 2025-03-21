@@ -1,0 +1,25 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "domain-models",
+    "title": "ドメインモデル",
+    "documentType": "generic",
+    "path": "domain-models.json",
+    "tags": ["domain", "models", "architecture"],
+    "lastModified": "2025-03-21T05:09:30.399Z",
+    "createdAt": "2025-03-21T05:09:30.399Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "コアモデル",
+        "content": "[コアドメインモデルの定義]"
+      },
+      {
+        "title": "関連性",
+        "content": "[モデル間の関連性について]"
+      }
+    ]
+  }
+}
