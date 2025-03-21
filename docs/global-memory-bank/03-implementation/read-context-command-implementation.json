@@ -3,8 +3,8 @@
   "metadata": {
     "id": "43e6cf1c-8bd9-40be-813d-ce72566cb625",
     "title": "`read_context`コマンド実装ガイド",
-    "documentType": "generic",
-    "path": "read-context-command-implementation.md",
+    "documentType": "implementation",
+    "path": "03-implementation/read-context-command-implementation.json",
     "tags": [
       "implementation",
       "mcp",

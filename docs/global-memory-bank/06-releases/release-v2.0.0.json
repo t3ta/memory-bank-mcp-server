@@ -3,8 +3,8 @@
   "metadata": {
     "id": "release-v2.0.0-001",
     "title": "リリース v2.0.0",
-    "documentType": "generic",
-    "path": "release-v2.0.0.json",
+    "documentType": "changelog",
+    "path": "06-releases/release-v2.0.0.json",
     "tags": [
       "release",
       "v2",
