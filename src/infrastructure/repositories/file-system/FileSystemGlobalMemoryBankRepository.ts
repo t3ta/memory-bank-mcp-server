@@ -1,4 +1,92 @@
-import path from 'node:path';
+  private getDefaultTemplate(language: Language, type: string): string {
+    // Basic templates only for most important types
+    // Future enhancement: Load from actual template files
+    const templates: Record<Language, Record<string, string>> = {
+      en: {
+        'tags/index.json': `{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "tags-index",
+    "title": "Tags Index",
+    "documentType": "generic",
+    "path": "tags/index.json",
+    "tags": ["index", "meta"],
+    "lastModified": "${new Date().toISOString()}",
+    "createdAt": "${new Date().toISOString()}",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "Tags List",
+        "content": "[List and description of tags]"
+      }
+    ]
+  }
+}`
+      },
+      ja: {
+        'tags/index.json': `{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "tags-index",
+    "title": "タグインデックス",
+    "documentType": "generic",
+    "path": "tags/index.json",
+    "tags": ["index", "meta"],
+    "lastModified": "${new Date().toISOString()}",
+    "createdAt": "${new Date().toISOString()}",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "タグ一覧",
+        "content": "[タグの一覧と説明]"
+      }
+    ]
+  }
+}`
+      },
+      zh: {
+        'tags/index.json': `{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "tags-index",
+    "title": "标签索引",
+    "documentType": "generic",
+    "path": "tags/index.json",
+    "tags": ["index", "meta"],
+    "lastModified": "${new Date().toISOString()}",
+    "createdAt": "${new Date().toISOString()}",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "标签列表",
+        "content": "[标签列表和描述]"
+      }
+    ]
+  }
+}`
+      }
+    };
+    
+    // Check if template exists for this language
+    if (templates[language] && templates[language][type]) {
+      return templates[language][type];
+    }
+    
+    // Fall back to English template if not found
+    if (templates.en[type]) {
+      return templates.en[type];
+    }
+    
+    // No template found, return empty string (shouldn't happen)
+    return '';
+  }import path from 'node:path';
+import type { Language } from '../../../schemas/v2/i18n-schema.js';
 import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
 import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
 import { Tag } from '../../../domain/entities/Tag.js';
@@ -18,22 +106,20 @@ import { FileSystemMemoryDocumentRepository } from './FileSystemMemoryDocumentRe
 export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRepository {
   private readonly documentRepository: FileSystemMemoryDocumentRepository;
   private readonly globalMemoryPath: string;
-  private readonly defaultStructure: Record<string, string> = {
-    'architecture.json':
-      '{\n  "schema": "memory_document_v2",\n  "metadata": {\n    "id": "architecture",\n    "title": "System Architecture",\n    "documentType": "generic",\n    "path": "architecture.json",\n    "tags": ["architecture", "system-design"],\n    "lastModified": "' + new Date().toISOString() + '",\n    "createdAt": "' + new Date().toISOString() + '",\n    "version": 1\n  },\n  "content": {\n    "sections": [\n      {\n        "title": "Overview",\n        "content": "[Description of system architecture]"\n      },\n      {\n        "title": "Components",\n        "content": "[List and description of main system components]"\n      },\n      {\n        "title": "Design Decisions",\n        "content": "[Important architectural decisions]"\n      }\n    ]\n  }\n}',
-    'coding-standards.json':
-      '{\n  "schema": "memory_document_v2",\n  "metadata": {\n    "id": "coding-standards",\n    "title": "Coding Standards",\n    "documentType": "generic",\n    "path": "coding-standards.json",\n    "tags": ["standards", "best-practices"],\n    "lastModified": "' + new Date().toISOString() + '",\n    "createdAt": "' + new Date().toISOString() + '",\n    "version": 1\n  },\n  "content": {\n    "sections": [\n      {\n        "title": "General Guidelines",\n        "content": "[General coding guidelines]"\n      },\n      {\n        "title": "Language-Specific Standards",\n        "content": "[Language-specific standards]"\n      }\n    ]\n  }\n}',
-    'domain-models.json':
-      '{\n  "schema": "memory_document_v2",\n  "metadata": {\n    "id": "domain-models",\n    "title": "Domain Models",\n    "documentType": "generic",\n    "path": "domain-models.json",\n    "tags": ["domain", "models", "architecture"],\n    "lastModified": "' + new Date().toISOString() + '",\n    "createdAt": "' + new Date().toISOString() + '",\n    "version": 1\n  },\n  "content": {\n    "sections": [\n      {\n        "title": "Core Models",\n        "content": "[Definition of core domain models]"\n      },\n      {\n        "title": "Relationships",\n        "content": "[Relationships between models]"\n      }\n    ]\n  }\n}',
-    'glossary.json':
-      '{\n  "schema": "memory_document_v2",\n  "metadata": {\n    "id": "glossary",\n    "title": "Glossary",\n    "documentType": "generic",\n    "path": "glossary.json",\n    "tags": ["glossary", "terminology"],\n    "lastModified": "' + new Date().toISOString() + '",\n    "createdAt": "' + new Date().toISOString() + '",\n    "version": 1\n  },\n  "content": {\n    "sections": [\n      {\n        "title": "Terms",\n        "content": "[List and definition of project-specific terms]"\n      },\n      {\n        "title": "Abbreviations",\n        "content": "[List and definition of commonly used abbreviations]"\n      }\n    ]\n  }\n}',
-    'tech-stack.json':
-      '{\n  "schema": "memory_document_v2",\n  "metadata": {\n    "id": "tech-stack",\n    "title": "Technology Stack",\n    "documentType": "generic",\n    "path": "tech-stack.json",\n    "tags": ["tech-stack", "infrastructure"],\n    "lastModified": "' + new Date().toISOString() + '",\n    "createdAt": "' + new Date().toISOString() + '",\n    "version": 1\n  },\n  "content": {\n    "sections": [\n      {\n        "title": "Backend Technologies",\n        "content": "[List of backend technologies]"\n      },\n      {\n        "title": "Frontend Technologies",\n        "content": "[List of frontend technologies]"\n      },\n      {\n        "title": "Infrastructure",\n        "content": "[Description of infrastructure components]"\n      }\n    ]\n  }\n}',
-    'user-guide.json':
-      '{\n  "schema": "memory_document_v2",\n  "metadata": {\n    "id": "user-guide",\n    "title": "User Guide",\n    "documentType": "generic",\n    "path": "user-guide.json",\n    "tags": ["guide", "documentation"],\n    "lastModified": "' + new Date().toISOString() + '",\n    "createdAt": "' + new Date().toISOString() + '",\n    "version": 1\n  },\n  "content": {\n    "sections": [\n      {\n        "title": "Overview",\n        "content": "[System overview]"\n      },\n      {\n        "title": "Usage",\n        "content": "[How to use the system]"\n      }\n    ]\n  }\n}',
-    'tags/index.json':
-      '{\n  "schema": "memory_document_v2",\n  "metadata": {\n    "id": "tags-index",\n    "title": "Tags Index",\n    "documentType": "generic",\n    "path": "tags/index.json",\n    "tags": ["index", "meta"],\n    "lastModified": "' + new Date().toISOString() + '",\n    "createdAt": "' + new Date().toISOString() + '",\n    "version": 1\n  },\n  "content": {\n    "sections": [\n      {\n        "title": "Tags List",\n        "content": "[List and description of tags]"\n      }\n    ]\n  }\n}',
-  };
+  private language: Language = 'en';
+  
+  // Get template structure based on current language
+  private get defaultStructure(): Record<string, string> {
+    // Select templates based on language
+    switch (this.language) {
+      case 'ja':
+        return this.getJapaneseTemplates();
+      case 'zh':
+        return this.getChineseTemplates();
+      default:
+        return this.getEnglishTemplates();
+    }
+  }
 
   /**
    * Constructor
@@ -49,6 +135,9 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
       this.globalMemoryPath,
       this.fileSystemService
     );
+    
+    // Set language from config
+    this.language = this.configProvider.getLanguage();
   }
 
   /**
@@ -295,6 +384,27 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
     }
   }
 
+  // Get tag index title and content based on language
+  private getTagIndexTitleAndContent(): { title: string; content: string } {
+    switch (this.language) {
+      case 'ja':
+        return {
+          title: "タグインデックス",
+          content: "タグとドキュメントの関連付け"
+        };
+      case 'zh':
+        return {
+          title: "标签索引",
+          content: "标签和文档的映射关系"
+        };
+      default: // 'en'
+        return {
+          title: "Tags Index",
+          content: "Mapping between tags and documents"
+        };
+    }
+  }
+
   /**
    * Updates the legacy tags/index.md file for backward compatibility
    * @returns Promise resolving when done
@@ -339,11 +449,12 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
       }
 
       // Create JSON tags index
+      const tagTitleAndContent = this.getTagIndexTitleAndContent();
       const tagsDocument = {
         schema: "memory_document_v2",
         metadata: {
           id: "tags-index",
-          title: "Tags Index",
+          title: tagTitleAndContent.title,
           documentType: "generic",
           path: "tags/index.json",
           tags: ["index", "meta"],
@@ -355,7 +466,7 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
           sections: [
             {
               title: "Tags List",
-              content: "Mapping between tags and documents"
+              content: tagTitleAndContent.content
             }
           ],
           tagMap: Object.fromEntries(
@@ -440,11 +551,12 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
       }
 
       // Create JSON tags index
+      const tagTitleAndContent = this.getTagIndexTitleAndContent();
       const tagsDocument = {
         schema: "memory_document_v2",
         metadata: {
           id: "tags-index",
-          title: "Tags Index",
+          title: tagTitleAndContent.title,
           documentType: "generic",
           path: "tags/index.json",
           tags: ["index", "meta"],
@@ -456,7 +568,7 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
           sections: [
             {
               title: "Tags List",
-              content: "Mapping between tags and documents"
+              content: tagTitleAndContent.content
             }
           ],
           tagMap: Object.fromEntries(
