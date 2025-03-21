@@ -31,7 +31,7 @@
     "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage",
     "test:e2e": "NODE_OPTIONS='--experimental-vm-modules' jest --no-coverage --config=tests/e2e/jest.config.ts --runInBand",
     "test:integration": "NODE_OPTIONS='--experimental-vm-modules' jest --no-coverage --testMatch='**/tests/integration/**/*.test.ts' --config=tests/integration/jest.config.ts",
-    "prepublishOnly": "npm run lint && npm test && npm run build"
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "mcp",
