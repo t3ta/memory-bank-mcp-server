@@ -1,39 +1,17 @@
 {
-  "schema": "memory_document_v2",
+  "schema": "memory_document_v1",
   "metadata": {
-    "id": "active-context",
-    "title": "アクティブコンテキスト",
+    "title": "activeContext.json",
     "documentType": "active_context",
     "path": "activeContext.json",
-    "tags": [
-      "core",
-      "active-context"
-    ],
-    "lastModified": "2025-03-22T16:35:00.000Z",
-    "createdAt": "2025-03-21T17:10:18.486Z",
-    "version": 1
+    "tags": [],
+    "lastModified": "2025-03-21T19:03:56.252Z"
   },
   "content": {
-    "currentWork": "作業完了 - ReadBranchCoreFilesUseCaseに自動初期化機能を追加",
-    "recentChanges": [
-      "ReadBranchCoreFilesUseCaseにブランチが存在しない場合に自動的に初期化する処理を追加",
-      "テストを更新して新しい動作を確認できるように修正",
-      "エラー処理を改善してDomainErrorとApplicationErrorが適切に伝播するように修正",
-      "自動初期化機能に関するメモリバンクドキュメントを作成",
-      "全ての変更をコミット済み"
-    ],
-    "activeDecisions": [
-      "ReadBranchCoreFilesUseCaseとReadContextUseCaseの動作を一致させる",
-      "ブランチが存在しない場合に自動的に初期化する処理を追加する",
-      "package-lock.jsonやyarn.lockなどの自動生成ファイルはコミット対象外とする"
-    ],
-    "considerations": [
-      "今後似たようなユースケースでも一貫性を維持する",
-      "自動初期化時のテンプレート内容をより充実させることを検討"
-    ],
-    "nextSteps": [
-      "PRをマージする",
-      "必要であれば他のユースケースもチェックして同様のパターンを探す"
-    ]
+    "currentWork": "{\\n  \\\"schema\\\": \\\"memory_document_v2\\\",\\n  \\\"metadata\\\": {\\n    \\\"id\\\": \\\"active-context\\\",\\n    \\\"title\\\": \\\"アクティブコンテキスト\\\",\\n    \\\"documentType\\\": \\\"active_context\\\",\\n    \\\"path\\\": \\\"activeContext.json\\\",\\n    \\\"tags\\\": [\\\"core\\\", \\\"active-context\\\"],\\n    \\\"lastModified\\\": \\\"2025-03-22T13:35:00.000Z\\\",\\n    \\\"createdAt\\\": \\\"2025-03-21T18:54:37.189Z\\\",\\n    \\\"version\\\": 1\\n  },\\n  \\\"content\\\": {\\n    \\\"currentWork\\\": \\\"実装完了。ファイル構造の修正作業も完了。\\\",\\n    \\\"recentChanges\\\": [\\n      \\\"FileSystemGlobalMemoryBankRepository.tsのファイル構造を修正\\\",\\n      \\\"破損していたファイル構造を修正し、必要なテンプレートメソッドを実装\\\",\\n      \\\"getEnglishTemplates, getJapaneseTemplates, getChineseTemplatesメソッドを追加\\\",\\n      \\\"getDefaultTemplateメソッドの位置と実装を修正\\\"\\n    ],\\n    \\\"activeDecisions\\\": [\\n      \\\"実装は完了したと判断\\\",\\n      \\\"テストエラーは本PRの範囲外と判断\\\"\\n    ],\\n    \\\"considerations\\\": [\\n      \\\"テストエラーは別のPRで対応するか検討\\\"\\n    ],\\n    \\\"nextSteps\\\": [\\n      \\\"PRをマージする準備を整える\\\",\\n      \\\"コードレビューを依頼する\\\"\\n    ]\\n  }\\n}",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": []
   }
 }
