@@ -2,7 +2,7 @@
  * JSON Template Loader
  * Loads and processes JSON templates with internationalization support
  */
-import path from 'path';
+import path from 'node:path';
 import { JsonTemplate, validateJsonTemplate } from '../../schemas/v2/template-schema.js';
 import { Language } from '../../schemas/v2/i18n-schema.js';
 import { IFileSystemService } from '../storage/interfaces/IFileSystemService.js';
@@ -101,7 +101,7 @@ export class JsonTemplateLoader implements ITemplateLoader {
         (error as Error).message.includes('Invalid JSON')
       ) {
         console.warn(
-          `JSON template ${templateId} not found or invalid, falling back to legacy template...`
+          `JSON template ${templateId} not found or invalid, falling back to legacy template..`
         );
 
         try {

@@ -1,0 +1,38 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "architecture-directory-readme",
+    "title": "Architecture Directory README",
+    "documentType": "guide",
+    "path": "02-architecture/README.json",
+    "tags": [
+      "architecture",
+      "design",
+      "documentation",
+      "guide"
+    ],
+    "lastModified": "2025-03-21T13:00:00.000Z",
+    "createdAt": "2025-03-21T13:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "Architecture Directory",
+        "content": "The `02-architecture` directory contains documents related to the system architecture, design decisions, architectural patterns, and structural aspects of the project. This is the place to look for understanding how the system is designed and why certain architectural choices were made."
+      },
+      {
+        "title": "Purpose",
+        "content": "This directory serves as a central location for architectural information. The documents here define the structure of the system, the relationships between components, and the principles guiding the design. This directory is essential for developers working on system-wide changes or trying to understand the big picture."
+      },
+      {
+        "title": "Key Documents",
+        "content": "- **consolidated-architecture.json**: Comprehensive document covering architecture, decisions, and JSON-based structure\n- **architecture-decisions-details.json**: Detailed explanation of architecture decisions\n- **json-based-architecture-details.json**: Details of the JSON-based architecture\n\nAdditional documents include:\n- Domain model definitions\n- Component diagrams and explanations\n- API design principles"
+      },
+      {
+        "title": "Related Tags",
+        "content": "Common tags for documents in this directory include:\n- architecture\n- design\n- system-design\n- decision\n- json\n- domain\n- models"
+      }
+    ]
+  }
+}

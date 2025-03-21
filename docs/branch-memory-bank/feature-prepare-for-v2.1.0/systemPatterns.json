@@ -1,0 +1,74 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "c4b59e87-3f2d-4b8a-9a5c-f7e812d56e9d",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "core",
+      "system-patterns",
+      "release-preparation"
+    ],
+    "lastModified": "2025-03-22T00:00:00.000Z",
+    "createdAt": "2025-03-21T19:24:24.966Z",
+    "version": 1
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "json-migration",
+        "title": "JSONへの完全移行",
+        "context": "Memory Bank 2.0ではMarkdownとJSONの両方のフォーマットをサポートしていたが、2.1.0ではJSONのみをサポートすることが決定した。",
+        "decision": "Memory Bank 2.1.0では、すべてのファイルがJSON形式に移行し、Markdownサポートを完全に廃止する。",
+        "impacts": [
+          "データの一貫性と検証が向上する",
+          "プログラミングによるアクセスが容易になる",
+          "既存のMarkdownファイルはすべて移行される必要がある",
+          "移行ツールを提供し、移行プロセスをスムーズに行う"
+        ]
+      },
+      {
+        "id": "version-update",
+        "title": "バージョン更新",
+        "context": "新機能と改善によりバージョンを2.0.1から2.1.0に更新する必要がある。",
+        "decision": "package.jsonのバージョンフィールドを2.1.0に更新し、関連するドキュメントも更新する。",
+        "impacts": [
+          "新しいバージョン番号がnpmパッケージとリポジトリに反映される",
+          "リリースノートには2.0.1から2.1.0への変更点が記載される",
+          "エンドユーザーにバージョン更新と新機能を通知する"
+        ]
+      },
+      {
+        "id": "documentation-update",
+        "title": "ドキュメント更新",
+        "context": "バージョン更新と機能変更に伴い、ドキュメントの更新が必要。",
+        "decision": "READMEとユーザーガイドを更新し、新しい機能とJSONベースのアプローチについて詳しく説明する。",
+        "impacts": [
+          "ユーザーは新しい機能をより理解しやすくなる",
+          "移行ガイドによりユーザーの移行プロセスをサポートする",
+          "バージョン2.1.0の変更点と改善点を明確に伝える"
+        ]
+      }
+    ],
+    "directoryStructure": {
+      "id": "memory-bank-structure",
+      "title": "Memory Bankディレクトリ構造",
+      "description": "Memory Bank 2.1.0ではJSONファイルのみをサポートし、以下のディレクトリ構造を維持します：",
+      "structure": [
+        {
+          "path": "docs/global-memory-bank/",
+          "description": "プロジェクト全体に関わる共通知識を格納するディレクトリ"
+        },
+        {
+          "path": "docs/branch-memory-bank/",
+          "description": "ブランチごとのメモリーバンクを格納するディレクトリ"
+        },
+        {
+          "path": "docs/branch-memory-bank/feature-xxx/",
+          "description": "特定のブランチのメモリーバンクディレクトリ"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "e2064dfb-f4a8-43a3-bcb8-6bc6552596fe",
+    "title": "Codeモード実行計画",
+    "documentType": "generic",
+    "path": "codeMode.md",
+    "tags": [],
+    "lastModified": "2025-03-18T11:49:34.438Z",
+    "createdAt": "2025-03-18T11:49:34.438Z",
+    "version": 1
+  },
+  "content": {
+    "rawContent": "# Codeモード実行計画\n\n## 現状と問題点\n\nE2Eテスト実装において、以下の問題が確認されています：\n\n1. **CommonJS/ESM互換性問題**: \n   - プロジェクトがCommonJSへの途中移行段階\n   - ビルド後のコードで`require`と`import`の混在\n   - モジュール解決の問題\n\n2. **テスト環境の問題**:\n   - サーバープロセスの起動失敗\n   - 型チェックエラー\n\n3. **TypeScript構成の問題**:\n   - tsconfig.jsonの設定が混在\n\n## 計画的アプローチ\n\n1. **既存の変更を確認**:\n   - package.jsonのtype設定\n   - tsconfig.jsonの設定\n   - CommonJS関連の変更点\n\n2. **単一テスト検証**:\n   - 最小限のテストケースで検証\n   - サーバー起動の検証\n   - コンパイルエラーの解消\n\n3. **統合と検証**:\n   - テスト実行環境の整備\n   - 全テストケースの検証\n\n## 成功基準\n\n1. テストが正常にコンパイルされる\n2. サーバーが正常に起動する\n3. 基本的なツールテストが成功する\n",
+    "sections": {
+      "": "1. テストが正常にコンパイルされる\n2. サーバーが正常に起動する\n3. 基本的なツールテストが成功する"
+    }
+  }
+}

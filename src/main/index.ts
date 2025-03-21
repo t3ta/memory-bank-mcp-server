@@ -1,18 +1,21 @@
+// Import dependencies
 import { setupContainer } from './di/providers.js';
-import { Constants } from './config/constants.js';
 import { logger } from '../shared/utils/logger.js';
 import { IGlobalController } from '../interface/controllers/interfaces/IGlobalController.js';
 import { IBranchController } from '../interface/controllers/interfaces/IBranchController.js';
+import { IContextController } from '../interface/controllers/interfaces/IContextController.js';
 import { CliOptions } from '../infrastructure/config/WorkspaceConfig.js';
+import { Constants } from './config/constants.js';
 
 /**
  * Application main class
  * Initializes and manages the application lifecycle
  */
-export class Application {
+class Application {
   private readonly options: CliOptions;
   private globalController?: IGlobalController;
   private branchController?: IBranchController;
+  private contextController?: IContextController;
 
   /**
    * Constructor
@@ -28,14 +31,16 @@ export class Application {
    */
   async initialize(): Promise<void> {
     try {
-      logger.info('Initializing application...');
+      logger.info('Initializing application..');
 
       // Setup DI container
       const container = await setupContainer(this.options);
 
       // Get controllers
-      this.globalController = container.get<IGlobalController>('globalController');
-      this.branchController = container.get<IBranchController>('branchController');
+      // Cast the result instead of using generic parameters
+      this.globalController = container.get('globalController') as IGlobalController;
+      this.branchController = container.get('branchController') as IBranchController;
+      this.contextController = container.get('contextController') as IContextController;
 
       logger.info('Application initialized successfully');
     } catch (error) {
@@ -68,12 +73,24 @@ export class Application {
     return this.branchController;
   }
 
-  // getPullRequestTool method removed
+  /**
+   * Get context controller
+   * @returns Context controller
+   */
+  getContextController(): IContextController {
+    if (!this.contextController) {
+      throw new Error('Application not initialized. Call initialize() first.');
+    }
+
+    return this.contextController;
+  }
 }
 
-// Export default for use as a module
-export default async function createApplication(options?: CliOptions): Promise<Application> {
+// Export as ESM
+export async function createApplication(options?: CliOptions): Promise<Application> {
   const app = new Application(options);
   await app.initialize();
   return app;
 }
+
+export { Application };

@@ -1,1 +1,3 @@
-`read_context`
+1. `git_status`
+2. `read_context`
+3. `write_branch_memory_bank`

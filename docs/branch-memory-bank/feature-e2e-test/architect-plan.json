@@ -1,0 +1,19 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "35a5caff-7a37-46c6-9354-fde6c210a8cf",
+    "title": "テスト構造リファクタリング計画",
+    "documentType": "generic",
+    "path": "architect-plan.md",
+    "tags": [],
+    "lastModified": "2025-03-19T15:52:06.958Z",
+    "createdAt": "2025-03-19T15:52:06.958Z",
+    "version": 1
+  },
+  "content": {
+    "rawContent": "# テスト構造リファクタリング計画\n\n## 現状分析\n\n### 問題点\n\n1. **テストファイルの配置場所に一貫性がない**:\n   - `tests/integration/api/branch-controller.test.ts` - 現在の統合テスト（インタフェースレイヤー）\n   - `src/interface/controllers/__tests__/BranchController.test.ts` - モックベースの新しいユニットテスト\n   - `tests/unit/interface/controllers/BranchController.test.ts` - おそらく移行中のファイル\n\n2. **テストの種類と構造が混在**:\n   - 一部のテストは詳細なコメントと分かりやすい構造がある\n   - 他のテストはコメントが少なく構造も不明確\n\n3. **重複するテストコード**:\n   - 同じコンポーネントを異なる方法でテストするコードが複数存在\n\n4. **インポートパスの問題**:\n   - 相対パスによるインポートと絶対パスによるインポートの混在\n   - `src/` のようなエイリアスを使用しているテストと使用していないテストがある\n\n### 進行中の対応\n\n1. `docs/test-directory-refactoring.md` で定義された新しいディレクトリ構造への移行\n2. クリーンアーキテクチャの層に合わせたテストの整理\n3. テストの種類（ユニット、統合、E2E）による明確な分離\n4. モックベースのテスト手法の導入（特にインターフェースレイヤー）\n\n## 解決策\n\n### テストの種類と配置場所の整理\n\n1. **ユニットテスト（ `tests/unit/` ）**:\n   - ドメインレイヤー: `tests/unit/domain/`\n   - アプリケーションレイヤー: `tests/unit/application/`\n   - インターフェースレイヤー: `tests/unit/interface/`\n   - インフラストラクチャレイヤー: `tests/unit/infrastructure/`\n   - 共有ユーティリティ: `tests/unit/shared/`\n\n2. **統合テスト（ `tests/integration/` ）**:\n   - APIレベルの統合テスト: `tests/integration/api/`\n   - ユースケースレベルの統合テスト: `tests/integration/usecase/`\n   - リポジトリの統合テスト: `tests/integration/repositories/`\n\n3. **E2Eテスト（ `tests/e2e/` ）**:\n   - 完全なエンドツーエンドテスト\n\n### コントローラーテストの配置場所に関する決定\n\nコントローラーテストの配置場所に関して、以下の3つの選択肢があります：\n\n#### 選択肢1: `src/interface/controllers/__tests__/`\n- **利点**: テスト対象のコードの近くに配置されるためナビゲーションが容易\n- **欠点**: ソースディレクトリ内にテストコードが混在し、ビルド時に除外する必要がある\n- **適合**: 主にユニットテスト向き（モックを多用）\n\n#### 選択肢2: `tests/unit/interface/controllers/`\n- **利点**: クリーンアーキテクチャの構造と一致し、ソースコードとテストの分離が明確\n- **欠点**: テスト対象コードからの相対的な距離が遠い\n- **適合**: ユニットテスト向き（モックを多用）\n\n#### 選択肢3: `tests/integration/api/`\n- **利点**: 統合テストとしての性質を明確にし、APIレベルのテストに適している\n- **欠点**: モックを使用したユニットテストには適していない\n- **適合**: 統合テスト向き（実際のコンポーネントを使用）\n\n### 推奨アプローチ\n\n**ハイブリッドアプローチ**:\n\n1. **ユニットテスト**: `tests/unit/interface/controllers/BranchController.test.ts`\n   - モックを多用した純粋なユニットテスト\n   - コントローラーの個々のメソッドをテスト\n   - ユースケースやプレゼンターのモックを使用\n\n2. **統合テスト**: `tests/integration/api/branch-controller.test.ts`\n   - 実際のリポジトリとユースケースを使用した統合テスト\n   - エンドツーエンドのAPIフローをテスト\n   - ファイルシステムのような外部依存のみをモック\n\n3. **_src_ ディレクトリ内のテストを避ける**: \n   - `src/interface/controllers/__tests__/` のファイルは、`tests/unit/interface/controllers/` に移動\n   - ソースコードとテストコードを明確に分離\n\n## 実施計画\n\n### フェーズ1: 配置場所の決定と標準化\n\n1. **コントローラーテストの配置場所を決定する**\n   - ユニットテスト: `tests/unit/interface/controllers/`\n   - 統合テスト: `tests/integration/api/`\n\n2. **既存のテストファイルの移動（必要な場合）**\n   - `src/interface/controllers/__tests__/BranchController.test.ts` → `tests/unit/interface/controllers/BranchController.test.ts`\n   - `tests/integration/api/branch-controller.test.ts` はそのまま維持（ただし内容は整理する）\n\n### フェーズ2: テストコードの整理と標準化\n\n1. **テスト内容の重複を解消する**\n   - ユニットテスト: コントローラー内のロジックとエラーハンドリングに焦点\n   - 統合テスト: 実際のファイルシステム操作と結果の検証に焦点\n\n2. **テストコードのスタイルとコメントを標準化する**\n   - 各テストファイルの冒頭に目的と対象を明記\n   - テストケースの命名規則を統一\n   - テストシナリオの構成（Arrange-Act-Assert）を明確に\n\n### フェーズ3: インポートパスとテスト設定の整理\n\n1. **インポートパスの標準化**\n   - 絶対パス（`src/`）を優先して使用\n   - 相対パスを必要に応じて修正\n\n2. **Jest設定の最適化**\n   - テストディレクトリ構造の変更に合わせて設定を調整\n   - モジュールエイリアスの設定を確認\n\n## 実装スケジュール\n\n1. **フェーズ1**（今日）:\n   - 配置場所の決定\n   - ファイル移動のステップを計画\n\n2. **フェーズ2**（明日〜数日）:\n   - テストコードの整理\n   - テストの重複除去\n   - コメント追加と標準化\n\n3. **フェーズ3**（〜1週間）:\n   - インポートパスの修正\n   - Jest設定の調整\n   - 残りのテストに移行パターンを適用\n",
+    "sections": {
+      "": "1. **フェーズ1**（今日）:\n- 配置場所の決定\n- ファイル移動のステップを計画\n\n2. **フェーズ2**（明日〜数日）:\n- テストコードの整理\n- テストの重複除去\n- コメント追加と標準化\n\n3. **フェーズ3**（〜1週間）:\n- インポートパスの修正\n- Jest設定の調整\n- 残りのテストに移行パターンを適用"
+    }
+  }
+}

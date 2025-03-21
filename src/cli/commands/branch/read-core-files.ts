@@ -1,7 +1,8 @@
-import { Argv } from 'yargs';
-import { CommandBase } from '../../command-base.js';
-import createApplication from '../../../main/index.js';
-import { logger } from '../../../shared/utils/logger.js';
+import type { Argv } from "yargs";
+import { createApplication } from "../../../main/index.js";
+import { logger } from "../../../shared/utils/logger.js";
+import { CommandBase } from "../../command-base.js";
+
 
 /**
  * Command to read all core files from a branch memory bank
@@ -67,7 +68,7 @@ export class ReadCoreFilesCommand extends CommandBase {
 
       // Handle response
       if (!result.success) {
-        logger.error(`Error reading core files: ${result.error.message}`);
+        logger.error(`Error reading core files: ${(result as any).error.message}`);
         process.exit(1);
       }
 

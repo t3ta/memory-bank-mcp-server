@@ -1,9 +1,10 @@
-import { IJsonDocumentRepository } from '../../../domain/repositories/IJsonDocumentRepository.js';
-import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
-import { DocumentId } from '../../../domain/entities/DocumentId.js';
-import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
-import { JsonDocument, DocumentType } from '../../../domain/entities/JsonDocument.js';
-import { Tag } from '../../../domain/entities/Tag.js';
+import type { BranchInfo } from "../../../domain/entities/BranchInfo.js";
+import { DocumentId } from "../../../domain/entities/DocumentId.js";
+import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
+import { JsonDocument, DocumentType } from "../../../domain/entities/JsonDocument.js";
+import type { Tag } from "../../../domain/entities/Tag.js";
+import type { IJsonDocumentRepository } from "../../../domain/repositories/IJsonDocumentRepository.js";
+
 
 /**
  * In-memory implementation of the JSON document repository

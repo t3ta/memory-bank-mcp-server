@@ -38,13 +38,12 @@ export interface ReadBranchDocumentOutput {
  * Use case for reading a document from branch memory bank
  */
 export class ReadBranchDocumentUseCase
-  implements IUseCase<ReadBranchDocumentInput, ReadBranchDocumentOutput>
-{
+  implements IUseCase<ReadBranchDocumentInput, ReadBranchDocumentOutput> {
   /**
    * Constructor
    * @param branchRepository Branch memory bank repository
    */
-  constructor(private readonly branchRepository: IBranchMemoryBankRepository) {}
+  constructor(private readonly branchRepository: IBranchMemoryBankRepository) { }
 
   /**
    * Execute the use case

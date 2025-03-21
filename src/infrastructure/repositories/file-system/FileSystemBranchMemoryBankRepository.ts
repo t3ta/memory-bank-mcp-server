@@ -1,22 +1,19 @@
-import path from 'path';
-import {
-  IBranchMemoryBankRepository,
-  RecentBranch,
-} from '../../../domain/repositories/IBranchMemoryBankRepository.js';
-import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
-import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
-import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
-import { Tag } from '../../../domain/entities/Tag.js';
-import { IFileSystemService } from '../../storage/interfaces/IFileSystemService.js';
-import { IConfigProvider } from '../../config/interfaces/IConfigProvider.js';
-import {
-  InfrastructureError,
-  InfrastructureErrorCodes,
-} from '../../../shared/errors/InfrastructureError.js';
-import { DomainError } from '../../../shared/errors/DomainError.js';
-import { FileSystemMemoryDocumentRepository } from './FileSystemMemoryDocumentRepository.js';
-import { extractSectionContent, logger } from '../../../shared/utils/index.js';
-import { TagIndex } from '../../../schemas/tag-index/tag-index-schema.js';
+import path from "path";
+import { BranchInfo } from "../../../domain/entities/BranchInfo.js";
+import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
+import type { Tag } from "../../../domain/entities/Tag.js";
+import { MemoryDocument } from "../../../domain/entities/MemoryDocument.js";
+import type { IBranchMemoryBankRepository, RecentBranch } from "../../../domain/repositories/IBranchMemoryBankRepository.js";
+import type { TagIndex } from "../../../schemas/tag-index/tag-index-schema.js";
+import { DomainError } from "../../../shared/errors/DomainError.js";
+import { InfrastructureError, InfrastructureErrorCodes } from "../../../shared/errors/InfrastructureError.js";
+import { extractSectionContent } from "../../../shared/utils/index.js";
+import { logger } from "../../../shared/utils/logger.js";
+import type { IConfigProvider } from "../../config/index.js";
+import type { IFileSystemService } from "../../storage/interfaces/IFileSystemService.js";
+import { FileSystemMemoryDocumentRepository } from "./FileSystemMemoryDocumentRepository.js";
+
+
 
 /**
  * File system implementation of branch memory bank repository
@@ -423,7 +420,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
 
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_WRITE_ERROR,
-        `Failed to save document to branch memory bank: ${document.path.value}`,
+        `Failed to save document to branch memory bank: ${document.path instanceof DocumentPath ? document.path.value : document.path}`,
         { originalError: error }
       );
     }
@@ -544,6 +541,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
             const content = activeContext.content;
 
             // Extract current work and recent changes
+            // Check if document is in JSON format
             if (activeContext.isJSON) {
               try {
                 const jsonContent = JSON.parse(content);
@@ -553,13 +551,13 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
                 );
 
                 recentBranches.push({
-                  branchInfo,
-                  lastModified,
-                  summary: {
-                    currentWork,
-                    recentChanges,
-                  },
-                });
+                branchInfo,
+                lastModified,
+                summary: {
+                currentWork,
+                recentChanges,
+                },
+                } as RecentBranch);
                 continue;
               } catch (jsonError) {
                 logger.debug(`Error parsing JSON content for ${branchInfo.name}:`, jsonError);
@@ -572,7 +570,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
               .split('\n')
               .filter(line => line.trim().startsWith('- '))
               .map((line: string) => line.replace(/^-\s*/, '').trim()
-            );
+              );
 
             recentBranches.push({
               branchInfo,
@@ -581,14 +579,14 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
                 currentWork,
                 recentChanges,
               },
-            });
+            } as RecentBranch);
           } else {
             // Include branch even without active context details
             recentBranches.push({
               branchInfo,
               lastModified,
               summary: {},
-            });
+            } as RecentBranch);
           }
         } catch (error) {
           // Skip branches with errors
@@ -763,6 +761,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
         if (tags.length === 0) return true;
 
         // Check if any of the search tags matches document's tags
+        // Since doc is properly typed as MemoryDocument, we can use hasTag
         return tags.some((searchTag: Tag) => doc.hasTag(searchTag));
       });
     } catch (error: unknown) {
@@ -796,6 +795,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
         // Fall back to regular method if no index exists
         logger.debug(`No tag index found, falling back to regular method`);
         const docs = await this.findDocumentsByTags(branchInfo, tags);
+        // Convert properly typed MemoryDocument objects to DocumentPath objects
         return docs.map((doc) => doc.path);
       }
 

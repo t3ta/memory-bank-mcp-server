@@ -1,0 +1,42 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "tags-reorganization-plan",
+    "title": "Global Memory Bank タグ再編成計画",
+    "documentType": "plan",
+    "path": "tags/reorganization-plan.json",
+    "tags": [
+      "meta",
+      "plan",
+      "memory-bank",
+      "refactoring"
+    ],
+    "lastModified": "2025-03-21T02:45:00.000Z",
+    "createdAt": "2025-03-21T02:45:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "現状の問題点",
+        "content": "現状のグローバルメモリバンクには以下の問題が存在しています：\n\n1. **Markdownファイルと JSONファイルの混在**: `_global_index.json` にはMD形式とJSON形式の両方のファイルが登録されていますが、`tags/index.json` にはJSONファイルのみがリストされており、整合性が取れていません。\n\n2. **タグ管理の重複**: タグの情報が `_global_index.json` と `tags/index.json` の両方に存在し、管理が複雑化しています。\n\n3. **ドキュメントのメタデータが不足**: タグ付けされているドキュメントの中には、適切なタイトルや説明が不足しているものがあります。"
+      },
+      {
+        "title": "再編成方針",
+        "content": "以下の方針でグローバルメモリバンクを再編成します：\n\n1. **ファイル形式の統一**: Markdownファイルは除外し、JSONファイルのみを正式なドキュメントとして扱います。\n\n2. **タグインデックスの一元化**: `_global_index.json` を廃止し、`tags/index.json` を唯一のタグインデックスとして使用します。\n\n3. **メタデータの充実**: 各ドキュメントに適切なタイトルと説明を追加します。\n\n4. **タグの整理**: 重複や類似したタグをマージし、より一貫性のあるタグ体系を構築します。\n\n5. **カテゴリの導入**: 関連するタグをカテゴリでグループ化し、ナビゲーションを容易にします。"
+      },
+      {
+        "title": "実装手順",
+        "content": "1. **JSONファイルのみを対象にした新しいインデックスを作成**\n   - `tags/index.json` を基に、JSONファイルのみを含む新しいインデックスを作成します。\n\n2. **タグの再分類**\n   - 類似したタグをマージします (例: \"version-2\" と \"v2-0\" と \"v2\")\n   - 使用頻度の低いタグを見直します\n   - カテゴリ構造を導入します\n\n3. **ドキュメントのメタデータを充実**\n   - 各ドキュメントのタイトルと説明を見直し、必要に応じて追加します\n\n4. **`_global_index.json` の廃止**\n   - 移行が完了したら、`_global_index.json` を使用しないようにします\n\n5. **新しいインデックス生成メカニズムの実装**\n   - JSONファイルのみを対象とした新しいインデックス生成ロジックを実装します"
+      },
+      {
+        "title": "提案されるタグカテゴリ",
+        "content": "以下のようなカテゴリ構造を導入します：\n\n1. **プロジェクト基盤**\n   - overview, project, summary\n\n2. **設計・アーキテクチャ**\n   - architecture, design, system-design, clean-architecture, onion-architecture\n\n3. **実装・技術**\n   - implementation, tech-stack, infrastructure, dependencies\n\n4. **ドキュメント・ガイド**\n   - documentation, guide, glossary, terminology, definitions\n\n5. **テスト・品質**\n   - testing, test, integration-test, integration-tests, qa, tdd\n\n6. **バージョン・リリース**\n   - version-2, v2-0, v2, release, changelog\n\n7. **インフラ・運用**\n   - ci-cd, github-actions, automation, workflows\n\n8. **国際化・多言語**\n   - i18n, l10n, template\n\n9. **リファクタリング・技術的負債**\n   - refactoring, tech-debt\n\n10. **その他・メタ**\n    - meta, index"
+      },
+      {
+        "title": "移行計画",
+        "content": "1. **既存の機能への影響分析**\n   - 現在のタグ体系に依存している機能を特定し、影響を分析します\n\n2. **段階的な移行**\n   - まず新しいタグインデックスを作成します\n   - 既存のシステムに影響を与えないようにテストを行います\n   - 問題がなければ新しいインデックスへの切り替えを完了します\n\n3. **ユーザーへの通知**\n   - タグ体系の変更について、影響を受けるユーザーに通知します\n\n4. **ドキュメントの更新**\n   - 新しいタグ体系に関するドキュメントを更新します"
+      }
+    ]
+  }
+}

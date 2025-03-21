@@ -1,0 +1,37 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "project-directory-readme",
+    "title": "Project Directory README",
+    "documentType": "guide",
+    "path": "01-project/README.json",
+    "tags": [
+      "project",
+      "documentation",
+      "guide"
+    ],
+    "lastModified": "2025-03-21T12:55:00.000Z",
+    "createdAt": "2025-03-21T12:55:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "Project Directory",
+        "content": "The `01-project` directory contains foundational documents related to the overall project, its goals, structure, and core information. This is the starting point for understanding the project as a whole."
+      },
+      {
+        "title": "Purpose",
+        "content": "This directory serves as a central location for high-level project information. The documents here provide context about what the project is, why it exists, and what it aims to accomplish. This directory should be the first place to look for newcomers to the project."
+      },
+      {
+        "title": "Key Documents",
+        "content": "- **project-overview.json**: Overview of the project, its purpose, and main features\n- **tech-stack.json**: Summary of the technologies used in the project\n\nAdditional documents may include:\n- Project goals and mission statements\n- High-level roadmaps\n- Project history and evolution"
+      },
+      {
+        "title": "Related Tags",
+        "content": "Common tags for documents in this directory include:\n- overview\n- project\n- summary"
+      }
+    ]
+  }
+}

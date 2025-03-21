@@ -1,0 +1,106 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "tag-index-update-plan",
+    "title": "タグインデックス更新計画",
+    "documentType": "plan",
+    "path": "tags/tag_index_update_plan.json",
+    "tags": [
+      "meta",
+      "plan",
+      "index",
+      "tag",
+      "memory-bank"
+    ],
+    "lastModified": "2025-03-21T14:00:00.000Z",
+    "createdAt": "2025-03-21T14:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "概要",
+        "content": "このドキュメントでは、タグ再編成計画に基づいてタグインデックスを更新するための具体的な手順を提供します。`tag_categorization.json`で定義されたタグカテゴリと統合ルールに従って、グローバルメモリバンク内のすべてのドキュメントのタグを更新し、新しいタグインデックスを生成します。"
+      },
+      {
+        "title": "目標",
+        "content": "この更新計画の主な目標は以下の通りです：\n\n1. **カテゴリに基づくタグ整理**: 各タグを適切なカテゴリに分類し、関連タグをグループ化します\n2. **タグの標準化**: 類似タグを統合し、一貫性のある命名規則を適用します\n3. **メタデータの充実**: すべてのドキュメントに適切なタイトルと説明を付与します\n4. **索引の一元化**: `tags/index.json`を唯一の信頼できるソースとして確立します\n5. **ナビゲーションの改善**: カテゴリによる階層的なナビゲーションを提供します"
+      },
+      {
+        "title": "リスク分析",
+        "content": "タグインデックスの更新には以下のリスクが伴います：\n\n1. **既存の参照への影響**: 特定のタグに依存するコードやドキュメントが機能しなくなる可能性があります\n2. **データの損失**: タグの統合中に情報が失われる可能性があります\n3. **一貫性の欠如**: 一部のドキュメントが新しいスキーマに適合しない可能性があります\n\n**リスク軽減策**:\n- すべての変更の前にバックアップを作成します\n- 変更を段階的に適用し、各ステップで検証を行います\n- 古いタグから新しいタグへのマッピングを維持します\n- すべての変更を文書化し、影響を受けるユーザーに通知します"
+      },
+      {
+        "title": "更新手順",
+        "content": "タグインデックスの更新は以下の手順で行います：",
+        "steps": [
+          {
+            "step": 1,
+            "title": "現在の状態のバックアップ",
+            "description": "`_global_index.json`と`tags/index.json`の両方をバックアップディレクトリにコピーします。",
+            "commands": [
+              "mkdir -p docs/global-memory-bank/backups/2025-03-21/tags-update",
+              "cp docs/global-memory-bank/_global_index.json docs/global-memory-bank/backups/2025-03-21/tags-update/",
+              "cp docs/global-memory-bank/tags/index.json docs/global-memory-bank/backups/2025-03-21/tags-update/"
+            ]
+          },
+          {
+            "step": 2,
+            "title": "すべてのJSONファイルの収集",
+            "description": "グローバルメモリバンク内のすべてのJSONファイルをスキャンし、リストを作成します。",
+            "pseudo_code": "function scanJsonFiles(directory) {\n  const files = [];\n  for each file in directory {\n    if (file is directory) {\n      files.push(...scanJsonFiles(file));\n    } else if (file.extension === '.json') {\n      files.push(file.path);\n    }\n  }\n  return files;\n}"
+          },
+          {
+            "step": 3,
+            "title": "各ドキュメントのタグ更新",
+            "description": "各JSONファイルを読み取り、`tag_categorization.json`の定義に従ってタグを更新します。",
+            "pseudo_code": "function updateDocumentTags(filePath, tagCategorization) {\n  const document = readFile(filePath);\n  if (!document.metadata || !document.metadata.tags) return;\n  \n  const updatedTags = [];\n  for each tag in document.metadata.tags {\n    if (tagCategorization.tagAliases[tag]) {\n      // タグがエイリアスの場合、標準タグに置き換え\n      updatedTags.push(tagCategorization.tagAliases[tag]);\n    } else {\n      updatedTags.push(tag);\n    }\n  }\n  \n  // 重複の削除\n  document.metadata.tags = [...new Set(updatedTags)];\n  \n  // カテゴリタグの追加（オプション）\n  addCategoryTags(document, tagCategorization);\n  \n  writeFile(filePath, document);\n}"
+          },
+          {
+            "step": 4,
+            "title": "新しいタグインデックスの生成",
+            "description": "更新されたドキュメントからタグインデックスを再生成します。",
+            "pseudo_code": "function generateTagIndex(jsonFiles, tagCategorization) {\n  const tagMap = {};\n  \n  for each filePath in jsonFiles {\n    const document = readFile(filePath);\n    if (!document.metadata || !document.metadata.tags) continue;\n    \n    for each tag in document.metadata.tags {\n      if (!tagMap[tag]) {\n        tagMap[tag] = {\n          count: 0,\n          documents: [],\n          category: tagCategorization.tagCategoryMappings[tag] || 'uncategorized'\n        };\n      }\n      \n      tagMap[tag].count++;\n      tagMap[tag].documents.push({\n        path: filePath,\n        title: document.metadata.title || filePath\n      });\n    }\n  }\n  \n  return {\n    schema: 'memory_document_v2',\n    metadata: {\n      id: 'tags-index',\n      title: 'タグインデックス',\n      documentType: 'index',\n      path: 'tags/index.json',\n      tags: ['index', 'meta'],\n      lastModified: new Date().toISOString(),\n      createdAt: /* ... */,\n      version: /* ... */\n    },\n    content: {\n      sections: [/* ... */],\n      tagMap: tagMap,\n      categories: tagCategorization.sections.map(section => ({\n        id: section.title.split(' ')[0].toLowerCase(),\n        title: section.title,\n        tags: section.tags\n      }))\n    }\n  };\n}"
+          },
+          {
+            "step": 5,
+            "title": "レガシーインデックスの更新（一時的）",
+            "description": "互換性のために`_global_index.json`も更新します。",
+            "pseudo_code": "function updateLegacyIndex(jsonFiles) {\n  const index = { schema: 'tag_index_v1', metadata: { /*...*/ }, index: {} };\n  \n  for each filePath in jsonFiles {\n    const document = readFile(filePath);\n    if (!document.metadata || !document.metadata.tags) continue;\n    \n    for each tag in document.metadata.tags {\n      if (!index.index[tag]) index.index[tag] = [];\n      if (!index.index[tag].includes(filePath)) {\n        index.index[tag].push(filePath);\n      }\n    }\n  }\n  \n  writeFile('docs/global-memory-bank/_global_index.json', index);\n}"
+          },
+          {
+            "step": 6,
+            "title": "インデックスの検証",
+            "description": "生成されたインデックスが正しく機能することを確認します。",
+            "checks": [
+              "すべてのドキュメントがインデックスに含まれていること",
+              "タグカテゴリが正しく適用されていること",
+              "タグエイリアスが正しく解決されていること",
+              "レガシーインデックスが互換性を維持していること"
+            ]
+          }
+        ]
+      },
+      {
+        "title": "新しいタグインデックス構造",
+        "content": "新しいタグインデックスは`tags/index.json`に保存され、以下の構造を持ちます：",
+        "code": {
+          "lang": "json",
+          "content": "{\n  \"schema\": \"memory_document_v2\",\n  \"metadata\": {\n    \"id\": \"tags-index\",\n    \"title\": \"タグインデックス\",\n    \"documentType\": \"index\",\n    \"path\": \"tags/index.json\",\n    \"tags\": [\"index\", \"meta\"],\n    \"lastModified\": \"...\",\n    \"createdAt\": \"...\",\n    \"version\": 2\n  },\n  \"content\": {\n    \"sections\": [\n      {\n        \"title\": \"タグ一覧\",\n        \"content\": \"タグとドキュメントの関連付け\"\n      }\n    ],\n    \"tagMap\": {\n      \"architecture\": {\n        \"count\": 14,\n        \"category\": \"design-architecture\",\n        \"documents\": [...]\n      },\n      \"design\": {\n        \"count\": 8,\n        \"category\": \"design-architecture\",\n        \"documents\": [...]\n      },\n      // 他のタグも同様の構造\n    },\n    \"categories\": [\n      {\n        \"id\": \"project-foundation\",\n        \"title\": \"1. プロジェクト基盤 (project-foundation)\",\n        \"tags\": [\"project\", \"overview\", ...]\n      },\n      // 他のカテゴリも同様の構造\n    ]\n  }\n}"
+        }
+      },
+      {
+        "title": "メンテナンス計画",
+        "content": "タグインデックスは以下のように維持されます：\n\n1. **自動更新**: ドキュメントが作成または更新されるたびに、インデックスは自動的に更新されます\n2. **定期的な監査**: タグの使用状況を定期的に監査し、新しいタグを適切なカテゴリに分類します\n3. **ドキュメント**: タグの追加や変更に関するガイドラインを提供し、タグシステムの一貫性を維持します\n4. **レガシーサポート**: 一定期間は両方のインデックスを維持し、段階的に`_global_index.json`の使用を廃止します"
+      },
+      {
+        "title": "全体スケジュール",
+        "content": "タグインデックスの更新は以下のスケジュールで行います：\n\n1. **準備フェーズ** (1日目): バックアップ作成、スクリプト準備\n2. **更新フェーズ** (2日目): ドキュメントタグ更新、インデックス生成\n3. **検証フェーズ** (2日目): インデックスの検証、問題の修正\n4. **展開フェーズ** (3日目): 新しいインデックスの展開、ユーザー通知\n5. **モニタリングフェーズ** (3-5日目): 問題の監視と対応"
+      },
+      {
+        "title": "次のステップ",
+        "content": "1. `tag_categorization.json`の最終確認\n2. タグ更新スクリプトの実装\n3. テスト環境での更新プロセスの検証\n4. 本番環境での更新作業の実施\n5. ドキュメントとガイドラインの更新"
+      }
+    ]
+  }
+}

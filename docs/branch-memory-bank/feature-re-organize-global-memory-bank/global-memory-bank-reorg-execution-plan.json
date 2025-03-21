@@ -1,0 +1,54 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "global-memory-bank-reorg-execution-plan",
+    "title": "グローバルメモリバンク再編成の実行計画",
+    "documentType": "execution_plan",
+    "path": "global-memory-bank-reorg-execution-plan.json",
+    "tags": [
+      "plan",
+      "execution",
+      "global-memory-bank",
+      "reorganization"
+    ],
+    "lastModified": "2025-03-21T12:00:00.000Z",
+    "createdAt": "2025-03-21T12:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "概要",
+        "content": "この文書では、グローバルメモリバンク再編成の実行計画を詳細に記述します。実装計画のフェーズに沿って、具体的な作業ステップとアプローチを定義します。"
+      },
+      {
+        "title": "現状の課題",
+        "content": "現在のグローバルメモリバンクには以下の課題があります：\n\n1. **ファイル数の増加**: 関連する内容が複数のファイルに分散され、全体像の把握が難しい\n2. **タグの不一貫性**: 類似するタグが乱立し、検索性が低下している\n3. **ファイル形式の混在**: MarkdownとJSONの両方が使用されている\n4. **インデックスの冗長性**: _global_index.jsonとtags/index.jsonの二重管理\n5. **パス参照の不安定性**: ファイル移動によって参照が壊れる可能性"
+      },
+      {
+        "title": "フェーズ2: ファイル統合",
+        "content": "### 2.1 アーキテクチャ関連ドキュメントの統合\n\n**対象ファイル:**\n- `/02-architecture/architecture.json`\n- `/02-architecture/architecture-decisions.json`\n- `/02-architecture/architecture-decisions-details.json`\n- `/02-architecture/json-based-architecture.json`\n- `/02-architecture/json-based-architecture-details.json`\n- `/architecture.json`\n- `/architecture.md`\n\n**アプローチ:**\n1. 新しい統合ファイル `/02-architecture/consolidated-architecture.json` を作成（既に存在）\n2. 各ファイルの内容を適切なセクションに整理して統合\n3. 各オリジナルファイルからの情報を失わないよう注意\n4. 統合後、元のファイルへの参照を新ファイルへの参照に更新\n\n### 2.2 テスト関連ドキュメントの統合\n\n**対象ファイル:**\n- `/05-testing/e2e-test-implementation.json`\n- `/05-testing/e2e-test-strategy-details.json`\n- `/05-testing/e2e-to-integration-test-approach.json`\n- `/05-testing/integration-test-details.json`\n\n**アプローチ:**\n1. 新しい統合ファイル `/05-testing/consolidated-test-strategy.json` を作成（既に存在）\n2. テストタイプ（E2E、インテグレーション）ごとに明確なセクションを作成\n3. 実装詳細と戦略を区別する構造を持たせる\n4. 統合後、元のファイルへの参照を新ファイルへの参照に更新\n\n### 2.3 バージョン関連ドキュメントの統合\n\n**対象ファイル:**\n- `/06-releases/v2-implementation-plan.json`\n- `/06-releases/v2-design-decisions.json`\n- `/06-releases/release-v2.0.0.json`\n\n**アプローチ:**\n1. 新しい統合ファイル `/06-releases/consolidated-v2-release.json` を作成（既に存在）\n2. 設計決定、実装計画、リリースノートを明確に分けた構造を作成\n3. 各バージョンの変更履歴を維持\n4. 統合後、元のファイルへの参照を新ファイルへの参照に更新\n\n### 2.4 メタ情報ドキュメントの統合\n\n**対象ファイル:**\n- `/meta/global-memory-bank-navigation.json`\n- `/meta/global-memory-bank-reference.json`\n- `/meta/global-memory-bank-index-analysis.json`\n- `/meta/global-memory-bank-indexing-mechanism.json`\n- `/meta/reorganization-plan.json`\n\n**アプローチ:**\n1. 新しい統合ファイル `/meta/consolidated-memory-bank-meta.json` を作成（既に存在）\n2. ナビゲーション、リファレンス、インデックス分析、タグ構造を網羅する構造を作成\n3. メモリバンクの使用方法と構造に関する包括的なガイドになるように構成\n4. 統合後、元のファイルへの参照を新ファイルへの参照に更新"
+      },
+      {
+        "title": "フェーズ3: タグ再編成",
+        "content": "### 3.1 タグカテゴリの実装\n\n**カテゴリの構造:**\n1. **project-foundation**: プロジェクトの基盤に関するタグ\n   - `project`, `overview`, `structure`, `goals`, `domain`, `glossary`, etc.\n2. **design-architecture**: 設計とアーキテクチャに関するタグ\n   - `architecture`, `design`, `patterns`, `decisions`, `system-design`, etc.\n3. **implementation-technology**: 実装とテクノロジーに関するタグ\n   - `implementation`, `code`, `api`, `algorithm`, `technology`, etc.\n4. **documentation-guides**: ドキュメントとガイドに関するタグ\n   - `documentation`, `guide`, `tutorial`, `reference`, `handbook`, etc.\n5. **testing-quality**: テストと品質に関するタグ\n   - `testing`, `quality`, `qa`, `e2e`, `integration-test`, `unit-test`, etc.\n6. **version-releases**: バージョンとリリースに関するタグ\n   - `version`, `release`, `changelog`, `v2`, `updates`, etc.\n7. **infrastructure-operations**: インフラと運用に関するタグ\n   - `infrastructure`, `operations`, `deployment`, `monitoring`, `ci-cd`, etc.\n8. **i18n-l10n**: 国際化とローカライゼーションに関するタグ\n   - `i18n`, `l10n`, `languages`, `translation`, etc.\n9. **refactoring-tech-debt**: リファクタリングと技術的負債に関するタグ\n   - `refactoring`, `tech-debt`, `optimization`, `legacy`, etc.\n10. **meta-misc**: メタ情報と雑多なタグ\n    - `meta`, `index`, `tag`, `miscellaneous`, etc.\n\n### 3.2 タグの統合\n\n**統合するタグの例:**\n- `version-2`, `v2-0`, `v2` → `v2`\n- `system-design` → `architecture`\n- `guide`, `tutorial`, `handbook` → `guide`（関連しつつも区別が必要な場合は保持）\n\n### 3.3 ドキュメントタグの更新\n\n1. 既存のすべてのドキュメントのタグを洗い出し\n2. 新しいカテゴリ体系に基づいてタグの再割り当て\n3. タグの一貫性を確保するための検証"
+      },
+      {
+        "title": "フェーズ4: ドキュメント改善",
+        "content": "### 4.1 ドキュメントタイプの標準化\n\n**標準ドキュメントタイプ:**\n- `design`: 設計文書\n- `implementation`: 実装文書\n- `guide`: ガイド文書\n- `reference`: リファレンス文書\n- `analysis`: 分析文書\n- `plan`: 計画文書\n\n### 4.2 セクション構造の改善\n\n1. 各ドキュメントに適切なセクション構造を追加\n2. 構造の一貫性を確保\n3. 階層的な情報構造の実現\n\n### 4.3 言語の一貫性確保\n\n1. すべてのドキュメントのタイトルと内容を英語に統一\n2. 必要に応じて日本語サブタイトルを追加"
+      },
+      {
+        "title": "フェーズ5～8",
+        "content": "ディレクトリ再構築は既に部分的に完了していますが、以下のフェーズも順次実施します：\n\n- フェーズ5: ディレクトリ再構築（残りのファイル移動）\n- フェーズ6: インデックス更新\n- フェーズ7: 検証とテスト\n- フェーズ8: 最終クリーンアップ\n\nこれらのフェーズについては、フェーズ2～4の作業の進捗に応じて詳細化します。"
+      },
+      {
+        "title": "実施順序と優先度",
+        "content": "1. **最初に実施**: アーキテクチャ関連ドキュメントの統合\n2. **次に実施**: テスト関連ドキュメントの統合\n3. **次に実施**: バージョン関連ドキュメントの統合\n4. **最後に実施**: メタ情報ドキュメントの統合\n\nドキュメント統合が進んだ段階で、タグシステムの再編成と文書改善を並行して進めます。"
+      },
+      {
+        "title": "次のステップ",
+        "content": "1. アーキテクチャ関連ドキュメントの詳細分析\n2. 統合ドキュメントの構造設計\n3. 最初の統合ドキュメントのドラフト作成\n4. レビューと調整\n5. 残りのファイル統合の継続"
+      }
+    ]
+  }
+}

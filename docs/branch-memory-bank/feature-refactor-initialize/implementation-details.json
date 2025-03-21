@@ -1,0 +1,40 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "implementation-details",
+    "title": "実装の詳細",
+    "documentType": "generic",
+    "path": "implementation-details.json",
+    "tags": [
+      "implementation",
+      "code-changes"
+    ],
+    "lastModified": "2025-03-22T15:25:00.000Z",
+    "createdAt": "2025-03-22T15:25:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "修正内容の概要",
+        "content": "ReadBranchCoreFilesUseCaseクラスにブランチが存在しない場合に自動的に初期化する処理を追加しました。これにより、ReadContextUseCaseと同じ動作になります。"
+      },
+      {
+        "title": "変更されたファイル",
+        "content": "- src/application/usecases/common/ReadBranchCoreFilesUseCase.ts\n- tests/unit/application/usecases/common/ReadBranchCoreFilesUseCase.test.ts"
+      },
+      {
+        "title": "主な変更点",
+        "content": "以下のコードを：\n\n```typescript\n// Check if branch exists\nconst branchExists = await this.branchRepository.exists(input.branchName);\n\nif (!branchExists) {\n  throw new DomainError(\n    DomainErrorCodes.BRANCH_NOT_FOUND,\n    `Branch \"${input.branchName}\" not found`\n  );\n}\n```\n\n以下のように修正しました：\n\n```typescript\n// Check if branch exists\nconst branchExists = await this.branchRepository.exists(input.branchName);\n\nif (!branchExists) {\n  console.log(`Branch ${input.branchName} not found, auto-initializing...`);\n  try {\n    await this.branchRepository.initialize(branchInfo);\n    console.log(`Branch ${input.branchName} auto-initialized successfully`);\n  } catch (initError) {\n    console.error(`Failed to auto-initialize branch ${input.branchName}:`, initError);\n    throw new DomainError(\n      DomainErrorCodes.BRANCH_INITIALIZATION_FAILED,\n      `Failed to auto-initialize branch: ${input.branchName}`\n    );\n  }\n}\n```"
+      },
+      {
+        "title": "テストの変更点",
+        "content": "テストファイルに以下の新しいテストケースを追加しました：\n\n1. ブランチが存在しない場合に自動的に初期化されることを確認するテスト\n2. 自動初期化が失敗した場合にエラーがスローされることを確認するテスト"
+      },
+      {
+        "title": "エラー処理",
+        "content": "- ブランチが存在しない場合にDomainErrorCodes.BRANCH_NOT_FOUNDをスローする代わりに、自動初期化を試みます\n- 自動初期化に失敗した場合はDomainErrorCodes.BRANCH_INITIALIZATION_FAILEDをスローします\n- このエラーハンドリングはReadContextUseCaseと同様の方法で実装しています"
+      }
+    ]
+  }
+}

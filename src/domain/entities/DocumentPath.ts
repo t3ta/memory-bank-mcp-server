@@ -12,7 +12,7 @@ type DocumentType =
  * Value object representing a document path
  */
 export class DocumentPath {
-  private constructor(private readonly _value: string) {}
+  private constructor(private readonly _value: string) { }
 
   /**
    * Factory method to create a new DocumentPath
@@ -84,9 +84,12 @@ export class DocumentPath {
 
   /**
    * Check if this document is a markdown file
+   * @deprecated Markdown support is deprecated in v2.1.0
    */
   public get isMarkdown(): boolean {
-    return this.extension.toLowerCase() === 'md';
+    const ext = this.extension.toLowerCase();
+    // Always return false as Markdown support is removed in v2.1.0
+    return false;
   }
 
   /**
@@ -127,7 +130,7 @@ export class DocumentPath {
    * @returns Inferred document type or 'generic' if cannot determine
    */
   public inferDocumentType(): DocumentType {
-    const lcFilename = this.filename.toLowerCase();
+    // Only use basename, filename is not needed
     const lcBasename = this.basename.toLowerCase();
 
     if (lcBasename.includes('branchcontext') || lcBasename.includes('branch-context')) {
@@ -164,16 +167,16 @@ export class DocumentPath {
 
   /**
    * Create a corresponding JSON path for a markdown path and vice versa
+   * @deprecated Markdown support is deprecated in v2.1.0
    * @returns New DocumentPath with converted extension
    */
   public toAlternateFormat(): DocumentPath {
-    if (this.isMarkdown) {
-      return this.withExtension('json');
-    } else if (this.isJSON) {
-      return this.withExtension('md');
-    } else {
-      // No conversion for other file types
+    if (this.isJSON) {
+      // No longer convert JSON to Markdown as Markdown support is removed in v2.1.0
       return this;
+    } else {
+      // Always convert to JSON for other file types
+      return this.withExtension('json');
     }
   }
 }

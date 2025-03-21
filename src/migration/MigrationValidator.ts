@@ -36,7 +36,7 @@ export class MigrationValidator {
   /**
    * @param logger Logger instance
    */
-  constructor(private readonly logger: Logger) {}
+  constructor(private readonly logger: Logger) { }
 
   /**
    * Validate a JSON document against its schema

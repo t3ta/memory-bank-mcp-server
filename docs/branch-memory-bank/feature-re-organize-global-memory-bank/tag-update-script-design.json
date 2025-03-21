@@ -1,0 +1,63 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "tag-update-script-design",
+    "title": "タグ更新スクリプト設計",
+    "documentType": "design",
+    "path": "tag-update-script-design.json",
+    "tags": [
+      "design",
+      "implementation",
+      "tag",
+      "script",
+      "typescript"
+    ],
+    "lastModified": "2025-03-21T15:00:00.000Z",
+    "createdAt": "2025-03-21T15:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "概要",
+        "content": "このドキュメントではタグ更新スクリプトの詳細設計について説明します。スクリプトはTypeScriptで実装され、グローバルメモリバンク内のすべてのJSONドキュメントのタグを更新し、新しいタグインデックスを生成します。"
+      },
+      {
+        "title": "要件",
+        "content": "タグ更新スクリプトは以下の要件を満たす必要があります：\n\n1. **機能要件**\n   - グローバルメモリバンク内のすべてのJSONファイルをスキャン\n   - `tag_categorization.json`の定義に基づいてタグを更新\n   - 新しい形式のタグインデックスを生成\n   - レガシーインデックス（`_global_index.json`）も更新\n   - バックアップと復元機能\n   - 詳細なログ出力\n\n2. **非機能要件**\n   - エラー時の堅牢性\n   - 再実行可能性\n   - パフォーマンス（大量のファイル処理）\n   - 検証可能性（更新前後の比較）"
+      },
+      {
+        "title": "アーキテクチャ",
+        "content": "スクリプトは以下のコンポーネントで構成されます：\n\n1. **FileScanner**: ファイルシステムを再帰的にスキャンし、JSONファイルを収集\n2. **TagProcessor**: タグカテゴリ定義を読み込み、タグの更新処理を実行\n3. **IndexGenerator**: 新しいタグインデックスを生成\n4. **BackupManager**: バックアップと復元機能を提供\n5. **Logger**: 詳細なログ出力と統計情報の収集\n6. **Config**: スクリプト設定の管理\n\nこれらのコンポーネント間の相互作用を図示すると：\n\n```\nConfig <-- Main --> Logger\n  ↓         ↓\nBackupManager  FileScanner\n  ↓         ↓\n  ↓       TagProcessor\n  ↓         ↓\n  └-----> IndexGenerator\n```"
+      },
+      {
+        "title": "主要コンポーネント",
+        "content": "### 1. FileScanner\n\n```typescript\ninterface FileScannerOptions {\n  rootDir: string;\n  excludeDirs?: string[];\n  fileExtensions?: string[];\n}\n\nclass FileScanner {\n  constructor(private options: FileScannerOptions, private logger: Logger) {}\n  \n  async scanFiles(): Promise<string[]> {\n    // ディレクトリを再帰的にスキャンしてファイルパスのリストを返す\n  }\n  \n  private shouldExcludeDir(dirPath: string): boolean {\n    // 除外すべきディレクトリかどうかを判定\n  }\n  \n  private isTargetFile(filePath: string): boolean {\n    // 対象とするファイルかどうかを判定\n  }\n}\n```\n\n### 2. TagProcessor\n\n```typescript\ninterface TagCategorization {\n  tagCategoryMappings: Record<string, string>;\n  tagAliases: Record<string, string>;\n  // その他のプロパティ\n}\n\ninterface Document {\n  schema: string;\n  metadata: {\n    id: string;\n    title: string;\n    documentType: string;\n    path: string;\n    tags: string[];\n    // その他のメタデータ\n  };\n  content: any;\n}\n\nclass TagProcessor {\n  private tagCategorization: TagCategorization;\n  \n  constructor(private logger: Logger) {}\n  \n  async loadTagCategorization(filePath: string): Promise<void> {\n    // タグカテゴリ定義ファイルを読み込む\n  }\n  \n  async processFile(filePath: string): Promise<boolean> {\n    // ファイルを読み込み、タグを更新して保存\n  }\n  \n  private updateTags(document: Document): string[] {\n    // ドキュメントのタグを更新\n    const updatedTags: string[] = [];\n    \n    // 既存のタグをループ\n    for (const tag of document.metadata.tags) {\n      // エイリアスがある場合は置き換え\n      const updatedTag = this.tagCategorization.tagAliases[tag] || tag;\n      updatedTags.push(updatedTag);\n    }\n    \n    // 重複を除去\n    return [...new Set(updatedTags)];\n  }\n}\n```\n\n### 3. IndexGenerator\n\n```typescript\ninterface TagIndexEntry {\n  count: number;\n  category: string;\n  documents: Array<{\n    path: string;\n    title: string;\n  }>;\n}\n\ninterface TagIndex {\n  schema: string;\n  metadata: {\n    id: string;\n    title: string;\n    documentType: string;\n    path: string;\n    tags: string[];\n    lastModified: string;\n    createdAt: string;\n    version: number;\n  };\n  content: {\n    sections: Array<{\n      title: string;\n      content: string;\n    }>;\n    tagMap: Record<string, TagIndexEntry>;\n    categories: Array<{\n      id: string;\n      title: string;\n      tags: string[];\n    }>;\n  };\n}\n\nclass IndexGenerator {\n  constructor(\n    private tagProcessor: TagProcessor,\n    private logger: Logger\n  ) {}\n  \n  async generateIndex(files: string[]): Promise<TagIndex> {\n    // ファイルからタグインデックスを生成\n  }\n  \n  async saveIndex(index: TagIndex, filePath: string): Promise<void> {\n    // インデックスをファイルに保存\n  }\n  \n  async generateLegacyIndex(files: string[]): Promise<any> {\n    // レガシー形式のインデックスを生成\n  }\n  \n  async saveLegacyIndex(index: any, filePath: string): Promise<void> {\n    // レガシーインデックスをファイルに保存\n  }\n}\n```\n\n### 4. BackupManager\n\n```typescript\ninterface BackupOptions {\n  backupDir: string;\n  timestamp: string;\n  files: string[];\n}\n\nclass BackupManager {\n  constructor(private logger: Logger) {}\n  \n  async createBackup(options: BackupOptions): Promise<string> {\n    // 指定されたファイルのバックアップを作成\n  }\n  \n  async restoreFromBackup(backupDir: string): Promise<boolean> {\n    // バックアップからファイルを復元\n  }\n  \n  listBackups(): string[] {\n    // 利用可能なバックアップのリストを返す\n  }\n}\n```\n\n### 5. Logger\n\n```typescript\nenum LogLevel {\n  DEBUG,\n  INFO,\n  WARNING,\n  ERROR\n}\n\nclass Logger {\n  private logs: Array<{\n    level: LogLevel;\n    message: string;\n    timestamp: Date;\n  }> = [];\n  \n  constructor(private logLevel: LogLevel = LogLevel.INFO) {}\n  \n  debug(message: string): void {\n    this.log(LogLevel.DEBUG, message);\n  }\n  \n  info(message: string): void {\n    this.log(LogLevel.INFO, message);\n  }\n  \n  warning(message: string): void {\n    this.log(LogLevel.WARNING, message);\n  }\n  \n  error(message: string): void {\n    this.log(LogLevel.ERROR, message);\n  }\n  \n  private log(level: LogLevel, message: string): void {\n    if (level >= this.logLevel) {\n      const logEntry = {\n        level,\n        message,\n        timestamp: new Date()\n      };\n      this.logs.push(logEntry);\n      console.log(`[${LogLevel[level]}] ${message}`);\n    }\n  }\n  \n  getStats(): any {\n    // ログの統計情報を返す\n  }\n  \n  saveToFile(filePath: string): Promise<void> {\n    // ログをファイルに保存\n  }\n}\n```\n\n### 6. Config\n\n```typescript\ninterface ScriptConfig {\n  rootDir: string;\n  backupDir: string;\n  excludeDirs: string[];\n  tagCategorizationPath: string;\n  newIndexPath: string;\n  legacyIndexPath: string;\n  logLevel: LogLevel;\n  dryRun: boolean;\n}\n\nclass Config {\n  private config: ScriptConfig;\n  \n  constructor(configPath?: string) {\n    this.config = this.loadDefaultConfig();\n    if (configPath) {\n      this.loadFromFile(configPath);\n    }\n  }\n  \n  private loadDefaultConfig(): ScriptConfig {\n    return {\n      rootDir: 'docs/global-memory-bank',\n      backupDir: 'docs/global-memory-bank/backups',\n      excludeDirs: ['backups'],\n      tagCategorizationPath: 'docs/global-memory-bank/tags/tag_categorization.json',\n      newIndexPath: 'docs/global-memory-bank/tags/index.json',\n      legacyIndexPath: 'docs/global-memory-bank/_global_index.json',\n      logLevel: LogLevel.INFO,\n      dryRun: false\n    };\n  }\n  \n  private loadFromFile(configPath: string): void {\n    // ファイルから設定を読み込む\n  }\n  \n  getConfig(): ScriptConfig {\n    return this.config;\n  }\n  \n  updateConfig(partialConfig: Partial<ScriptConfig>): void {\n    this.config = { ...this.config, ...partialConfig };\n  }\n}\n```"
+      },
+      {
+        "title": "メインスクリプト",
+        "content": "```typescript\nasync function main() {\n  try {\n    // 設定の読み込み\n    const config = new Config();\n    \n    // コマンドライン引数の処理\n    // ...\n    \n    // ロガーの初期化\n    const logger = new Logger(config.getConfig().logLevel);\n    \n    // バックアップマネージャーの初期化\n    const backupManager = new BackupManager(logger);\n    \n    // ファイルスキャナーの初期化\n    const fileScanner = new FileScanner({\n      rootDir: config.getConfig().rootDir,\n      excludeDirs: config.getConfig().excludeDirs,\n      fileExtensions: ['.json']\n    }, logger);\n    \n    // タグプロセッサーの初期化\n    const tagProcessor = new TagProcessor(logger);\n    await tagProcessor.loadTagCategorization(config.getConfig().tagCategorizationPath);\n    \n    // インデックスジェネレーターの初期化\n    const indexGenerator = new IndexGenerator(tagProcessor, logger);\n    \n    // ファイルのスキャン\n    logger.info('ファイルのスキャンを開始します...');\n    const files = await fileScanner.scanFiles();\n    logger.info(`${files.length}個のJSONファイルが見つかりました`);\n    \n    // バックアップの作成\n    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');\n    const backupDir = await backupManager.createBackup({\n      backupDir: config.getConfig().backupDir,\n      timestamp,\n      files: [\n        config.getConfig().newIndexPath,\n        config.getConfig().legacyIndexPath,\n        ...files\n      ]\n    });\n    logger.info(`バックアップを作成しました: ${backupDir}`);\n    \n    if (!config.getConfig().dryRun) {\n      // タグの更新\n      logger.info('タグの更新を開始します...');\n      let successCount = 0;\n      for (const file of files) {\n        if (await tagProcessor.processFile(file)) {\n          successCount++;\n        }\n      }\n      logger.info(`${successCount}/${files.length}ファイルのタグを更新しました`);\n      \n      // インデックスの生成と保存\n      logger.info('新しいタグインデックスを生成します...');\n      const newIndex = await indexGenerator.generateIndex(files);\n      await indexGenerator.saveIndex(newIndex, config.getConfig().newIndexPath);\n      \n      logger.info('レガシーインデックスを更新します...');\n      const legacyIndex = await indexGenerator.generateLegacyIndex(files);\n      await indexGenerator.saveLegacyIndex(legacyIndex, config.getConfig().legacyIndexPath);\n    } else {\n      logger.info('ドライランモード: 実際の変更は行われません');\n    }\n    \n    // 完了\n    logger.info('タグ更新プロセスが完了しました');\n    const stats = logger.getStats();\n    console.log('統計情報:', stats);\n    \n    // ログの保存\n    await logger.saveToFile(`docs/global-memory-bank/backups/${timestamp}/update-log.json`);\n  } catch (error) {\n    console.error('エラーが発生しました:', error);\n    process.exit(1);\n  }\n}\n\n// スクリプトを実行\nmain();\n```"
+      },
+      {
+        "title": "実装順序",
+        "content": "このスクリプトは以下の順序で実装します：\n\n1. プロジェクト設定とパッケージのセットアップ\n2. Loggerクラスの実装と単体テスト\n3. ConfigクラスとBackupManagerクラスの実装と単体テスト\n4. FileScannerクラスの実装と単体テスト\n5. TagProcessorクラスの実装と単体テスト\n6. IndexGeneratorクラスの実装と単体テスト\n7. メインスクリプトの実装\n8. 統合テスト\n9. ドキュメント作成"
+      },
+      {
+        "title": "テストアプローチ",
+        "content": "1. **単体テスト**\n   - 各クラスの機能を個別にテスト\n   - モックまたはスタブを使用して外部依存性を分離\n   - エッジケースと例外ケースをカバー\n\n2. **統合テスト**\n   - テスト用の小規模なファイルセットを使用\n   - 実際のファイルシステム操作を含む\n   - エンドツーエンドのフローをテスト\n\n3. **マニュアルテスト**\n   - 開発環境で実行して結果を検証\n   - ドライランモードでの実行を最初に行う\n   - バックアップと復元の動作確認"
+      },
+      {
+        "title": "成功基準",
+        "content": "スクリプトが成功したと見なす基準：\n\n1. すべてのJSONファイルがスキャンされ、タグが更新される\n2. タグの整合性が維持される（不正なタグの除去、エイリアスの解決）\n3. 新しいタグインデックスが正しく生成される\n4. レガシーインデックスが更新される\n5. バックアップが正常に作成される\n6. 詳細なログが出力される\n7. エラー時に適切に復旧できる"
+      },
+      {
+        "title": "開発スケジュール",
+        "content": "このスクリプトの開発に関する予定スケジュール：\n\n- 日1: 設計、プロジェクト設定、基本クラス（Logger、Config）の実装\n- 日2: FileScanner、BackupManager、TagProcessor、IndexGeneratorの実装\n- 日3: メインスクリプトの実装、テスト、デバッグ\n- 日4: 統合テスト、ドキュメント作成、レビュー\n- 日5: 本番環境での実行、問題の修正、完了"
+      },
+      {
+        "title": "次のステップ",
+        "content": "1. プロジェクト構造の設定\n2. パッケージのインストール（fs-extra、minimist、chalk、その他必要なもの）\n3. テスト環境の設定\n4. 最初のクラス（Logger）の実装\n5. 実装プランのレビュー"
+      }
+    ]
+  }
+}

@@ -1,0 +1,172 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "a9c7b8d6-e5f4-4c3d-b2a1-0f9e8d7c6b5a",
+    "title": "Memory Bank v2.1.0 リリース計画",
+    "documentType": "release_plan",
+    "path": "06-releases/v2.1.0-release-plan.json",
+    "tags": [
+      "release",
+      "v2.1.0",
+      "json-migration",
+      "planning"
+    ],
+    "lastModified": "2025-03-22T00:00:00.000Z",
+    "createdAt": "2025-03-22T00:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "version": "2.1.0",
+    "plannedReleaseDate": "2025-03-31",
+    "overview": "Memory Bank 2.1.0は、データ構造の改善と操作性の向上に焦点を当てた重要なリリースです。このバージョンでは、すべてのドキュメントがJSON形式に移行され、Markdownサポートが完全に廃止されます。",
+    "goals": [
+      {
+        "id": "json-migration",
+        "title": "JSONへの完全移行",
+        "description": "すべてのMarkdownファイルをJSON形式に変換し、Markdownサポートを完全に廃止する。",
+        "priority": "高"
+      },
+      {
+        "id": "version-update",
+        "title": "バージョン更新",
+        "description": "package.jsonのバージョンを2.0.1から2.1.0に更新する。",
+        "priority": "高"
+      },
+      {
+        "id": "documentation",
+        "title": "ドキュメント更新",
+        "description": "すべてのドキュメントを更新し、新しい機能と変更点を詳細に説明する。",
+        "priority": "中"
+      },
+      {
+        "id": "testing",
+        "title": "テスト実行と品質保証",
+        "description": "すべてのテストを実行し、機能が正常に動作することを確認する。",
+        "priority": "高"
+      }
+    ],
+    "tasks": [
+      {
+        "id": "task-1",
+        "title": "残りのMarkdownファイルの特定",
+        "description": "プロジェクト内の残りのMarkdownファイルを特定し、移行が必要なファイルのリストを作成する。",
+        "assignee": "開発チーム",
+        "status": "未着手",
+        "priority": "高"
+      },
+      {
+        "id": "task-2",
+        "title": "MarkdownからJSONへの変換",
+        "description": "特定されたMarkdownファイルをJSON形式に変換する。",
+        "assignee": "開発チーム",
+        "status": "未着手",
+        "priority": "高"
+      },
+      {
+        "id": "task-3",
+        "title": "Markdownサポートの削除",
+        "description": "コードベースからMarkdownサポートを削除し、JSONのみをサポートするように変更する。",
+        "assignee": "開発チーム",
+        "status": "未着手",
+        "priority": "高"
+      },
+      {
+        "id": "task-4",
+        "title": "バージョン更新",
+        "description": "package.jsonのバージョンを2.1.0に更新する。",
+        "assignee": "開発チーム",
+        "status": "未着手",
+        "priority": "高"
+      },
+      {
+        "id": "task-5",
+        "title": "テスト実行",
+        "description": "すべてのテストを実行し、機能が正常に動作することを確認する。",
+        "assignee": "QAチーム",
+        "status": "未着手",
+        "priority": "高"
+      },
+      {
+        "id": "task-6",
+        "title": "リリースノート作成",
+        "description": "2.1.0のリリースノートを作成し、変更点を詳細に記述する。",
+        "assignee": "ドキュメントチーム",
+        "status": "進行中",
+        "priority": "中"
+      },
+      {
+        "id": "task-7",
+        "title": "ドキュメント更新",
+        "description": "READMEとユーザーガイドを更新し、新しい機能と変更点を説明する。",
+        "assignee": "ドキュメントチーム",
+        "status": "未着手",
+        "priority": "中"
+      },
+      {
+        "id": "task-8",
+        "title": "最終レビュー",
+        "description": "すべての変更をレビューし、リリースの準備が整っていることを確認する。",
+        "assignee": "全チーム",
+        "status": "未着手",
+        "priority": "高"
+      }
+    ],
+    "risks": [
+      {
+        "id": "risk-1",
+        "title": "下位互換性の問題",
+        "description": "Markdownサポートの廃止により、古いバージョンとの互換性が失われる可能性がある。",
+        "mitigation": "移行ツールを提供し、ユーザーがスムーズに移行できるようにする。",
+        "probability": "中",
+        "impact": "高"
+      },
+      {
+        "id": "risk-2",
+        "title": "ユーザー混乱",
+        "description": "JSONフォーマットへの完全移行により、一部のユーザーが混乱する可能性がある。",
+        "mitigation": "詳細なドキュメントと移行ガイドを提供し、サポートを強化する。",
+        "probability": "高",
+        "impact": "中"
+      },
+      {
+        "id": "risk-3",
+        "title": "テスト漏れ",
+        "description": "JSONへの移行に伴い、テストが不十分で未発見のバグが残る可能性がある。",
+        "mitigation": "テストカバレッジを向上させ、エッジケースもテストする。",
+        "probability": "低",
+        "impact": "高"
+      }
+    ],
+    "dependencies": [
+      {
+        "id": "dep-1",
+        "title": "JSON変換ツール",
+        "description": "MarkdownからJSONへの変換を行うツールが正常に動作する必要がある。",
+        "status": "確認済み"
+      },
+      {
+        "id": "dep-2",
+        "title": "JSONスキーマバリデーション",
+        "description": "変換されたJSONファイルが正しいスキーマに従っていることを検証する機能が必要。",
+        "status": "確認済み"
+      }
+    ],
+    "approvals": [
+      {
+        "role": "技術リード",
+        "status": "未承認",
+        "comments": ""
+      },
+      {
+        "role": "プロダクトマネージャー",
+        "status": "未承認",
+        "comments": ""
+      },
+      {
+        "role": "QAリード",
+        "status": "未承認",
+        "comments": ""
+      }
+    ]
+  }
+}

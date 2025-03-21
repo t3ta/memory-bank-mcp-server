@@ -1,25 +1,17 @@
-import { IBranchController } from './interfaces/IBranchController.js';
-import { DocumentType } from '../../domain/entities/JsonDocument.js';
-import { ReadBranchDocumentUseCase } from '../../application/usecases/branch/ReadBranchDocumentUseCase.js';
-import { WriteBranchDocumentUseCase } from '../../application/usecases/branch/WriteBranchDocumentUseCase.js';
-import { SearchDocumentsByTagsUseCase } from '../../application/usecases/common/SearchDocumentsByTagsUseCase.js';
-import { UpdateTagIndexUseCase } from '../../application/usecases/common/UpdateTagIndexUseCase.js';
-import { UpdateTagIndexUseCaseV2 } from '../../application/usecases/common/UpdateTagIndexUseCaseV2.js';
-import { GetRecentBranchesUseCase } from '../../application/usecases/common/GetRecentBranchesUseCase.js';
-import { ReadBranchCoreFilesUseCase } from '../../application/usecases/common/ReadBranchCoreFilesUseCase.js';
-import { CreateBranchCoreFilesUseCase } from '../../application/usecases/common/CreateBranchCoreFilesUseCase.js';
-import { ReadJsonDocumentUseCase } from '../../application/usecases/json/ReadJsonDocumentUseCase.js';
-import { WriteJsonDocumentUseCase } from '../../application/usecases/json/WriteJsonDocumentUseCase.js';
-import { DeleteJsonDocumentUseCase } from '../../application/usecases/json/DeleteJsonDocumentUseCase.js';
-import { SearchJsonDocumentsUseCase } from '../../application/usecases/json/SearchJsonDocumentsUseCase.js';
-import { UpdateJsonIndexUseCase } from '../../application/usecases/json/UpdateJsonIndexUseCase.js';
-import { MCPResponsePresenter } from '../presenters/MCPResponsePresenter.js';
-import { MCPResponse } from '../presenters/types/index.js';
-import { DocumentDTO, CoreFilesDTO, JsonDocumentDTO } from '../../application/dtos/index.js';
-import { DomainError } from '../../shared/errors/DomainError.js';
-import { ApplicationError } from '../../shared/errors/ApplicationError.js';
-import { InfrastructureError } from '../../shared/errors/InfrastructureError.js';
-import { logger } from '../../shared/utils/logger.js';
+import type { CoreFilesDTO } from "../../application/dtos/CoreFilesDTO.js";
+import type { DocumentDTO } from "../../application/dtos/DocumentDTO.js";
+import type { JsonDocumentDTO } from "../../application/dtos/JsonDocumentDTO.js";
+import type { UpdateTagIndexUseCaseV2 } from "../../application/usecases/common/UpdateTagIndexUseCaseV2.js";
+import type { ReadJsonDocumentUseCase, WriteJsonDocumentUseCase, DeleteJsonDocumentUseCase, SearchJsonDocumentsUseCase, UpdateJsonIndexUseCase, ReadBranchDocumentUseCase, WriteBranchDocumentUseCase, SearchDocumentsByTagsUseCase, UpdateTagIndexUseCase, GetRecentBranchesUseCase, ReadBranchCoreFilesUseCase, CreateBranchCoreFilesUseCase } from "../../application/usecases/index.js";
+import { DocumentType } from "../../domain/entities/JsonDocument.js";
+import { ApplicationError } from "../../shared/errors/ApplicationError.js";
+import { DomainError } from "../../shared/errors/DomainError.js";
+import { InfrastructureError } from "../../shared/errors/InfrastructureError.js";
+import { logger } from "../../shared/utils/logger.js";
+import type { MCPResponsePresenter } from "../presenters/MCPResponsePresenter.js";
+import type { MCPResponse } from "../presenters/types/MCPResponse.js";
+import type { IBranchController } from "./interfaces/IBranchController.js";
+
 
 /**
  * Controller for branch memory bank operations
@@ -28,12 +20,13 @@ import { logger } from '../../shared/utils/logger.js';
 export class BranchController implements IBranchController {
   readonly _type = 'controller' as const;
 
-  private readonly coreFiles = [
-    'branchContext.md',
-    'activeContext.md',
-    'systemPatterns.md',
-    'progress.md',
-  ];
+  // Note: This array is used for reference but the actual core files are determined by the use case
+  // private readonly coreFiles = [
+  //   'branchContext.md',
+  //   'activeContext.md',
+  //   'systemPatterns.md',
+  //   'progress.md',
+  // ];
 
   /**
    * Constructor
@@ -151,10 +144,43 @@ export class BranchController implements IBranchController {
       // Format response to maintain backward compatibility
       const formattedResult: Record<string, DocumentDTO> = {};
 
+      // Determine which file extension to use (.json preferred)
+      let useJsonExtension = true;
+      
+      // Check for existence of files to determine extension preference
+      try {
+        // Try to find a branchContext file to check which extension is available
+        // Check json first
+        await this.readBranchDocumentUseCase.execute({
+          branchName,
+          path: 'branchContext.json',
+        });
+        useJsonExtension = true;
+        logger.debug(`Using .json extension for files in branch ${branchName}`);
+      } catch (jsonError) {
+        try {
+          // Try md if json failed
+          await this.readBranchDocumentUseCase.execute({
+            branchName,
+            path: 'branchContext.md',
+          });
+          useJsonExtension = false;
+          logger.debug(`Using .md extension for files in branch ${branchName}`);
+        } catch (mdError) {
+          // If both fail, default to json (forward compatible)
+          useJsonExtension = true;
+          logger.debug(`No core files found, defaulting to .json extension for branch ${branchName}`);
+        }
+      }
+      
+      // File extension to use based on availability
+      const extension = useJsonExtension ? '.json' : '.md';
+
       // If activeContext exists in the result
       if (result.files.activeContext) {
-        formattedResult['activeContext.md'] = {
-          path: 'activeContext.md',
+        const fileName = `activeContext${extension}`;
+        formattedResult[fileName] = {
+          path: fileName,
           content: this.generateActiveContextContent(result.files.activeContext),
           tags: ['core', 'active-context'],
           lastModified: new Date().toISOString(),
@@ -163,8 +189,9 @@ export class BranchController implements IBranchController {
 
       // If progress exists in the result
       if (result.files.progress) {
-        formattedResult['progress.md'] = {
-          path: 'progress.md',
+        const fileName = `progress${extension}`;
+        formattedResult[fileName] = {
+          path: fileName,
           content: this.generateProgressContent(result.files.progress),
           tags: ['core', 'progress'],
           lastModified: new Date().toISOString(),
@@ -173,29 +200,49 @@ export class BranchController implements IBranchController {
 
       // If systemPatterns exists in the result
       if (result.files.systemPatterns) {
-        formattedResult['systemPatterns.md'] = {
-          path: 'systemPatterns.md',
+        const fileName = `systemPatterns${extension}`;
+        formattedResult[fileName] = {
+          path: fileName,
           content: this.generateSystemPatternsContent(result.files.systemPatterns),
           tags: ['core', 'system-patterns'],
           lastModified: new Date().toISOString(),
         };
       }
 
-      // For branchContext.md, we still use the old approach
-      // since it's not included in the core files DTO
+      // For branchContext, try both extensions (.json first, then .md as fallback)
       try {
-        const branchContextResult = await this.readBranchDocumentUseCase.execute({
-          branchName,
-          path: 'branchContext.md',
-        });
+        const branchFileName = `branchContext${extension}`;
+        let branchContextResult;
+      
+        try {
+          branchContextResult = await this.readBranchDocumentUseCase.execute({
+            branchName,
+            path: branchFileName,
+          });
+        } catch (primaryError) {
+          logger.warn(`Could not find ${branchFileName}, trying fallback extension`);
+          // If first extension fails, try the other one
+          const fallbackExtension = useJsonExtension ? '.md' : '.json';
+          const fallbackFileName = `branchContext${fallbackExtension}`;
+          
+          branchContextResult = await this.readBranchDocumentUseCase.execute({
+            branchName,
+            path: fallbackFileName,
+          });
+          
+          // If fallback worked, use that extension for this file
+          formattedResult[fallbackFileName] = branchContextResult.document;
+          return this.presenter.present(formattedResult);
+        }
 
-        formattedResult['branchContext.md'] = branchContextResult.document;
+        formattedResult[branchFileName] = branchContextResult.document;
       } catch (error) {
-        logger.error(`Error reading branchContext.md from branch ${branchName}:`, error);
+        logger.error(`Error reading branchContext file from branch ${branchName}:`, error);
 
         // Add empty placeholder for missing file
-        formattedResult['branchContext.md'] = {
-          path: 'branchContext.md',
+        const fallbackFileName = `branchContext${extension}`;
+        formattedResult[fallbackFileName] = {
+          path: fallbackFileName,
           content: '',
           tags: ['core', 'branch-context'],
           lastModified: new Date().toISOString(),
@@ -262,7 +309,7 @@ export class BranchController implements IBranchController {
       }
 
       // Use the new CreateBranchCoreFilesUseCase
-      let result;
+      let result: any;
       if (Object.keys(coreFiles).length > 0) {
         result = await this.createBranchCoreFilesUseCase.execute({
           branchName,
@@ -512,10 +559,10 @@ export class BranchController implements IBranchController {
         // Parse consequences list
         const consequences = consequencesMatch
           ? consequencesMatch[1]
-              .trim()
-              .split('\n')
-              .filter((line) => line.startsWith('- '))
-              .map((line) => line.substring(2).trim())
+            .trim()
+            .split('\n')
+            .filter((line) => line.startsWith('- '))
+            .map((line) => line.substring(2).trim())
           : [];
 
         return {

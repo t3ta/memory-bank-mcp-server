@@ -1,0 +1,38 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "infrastructure-directory-readme",
+    "title": "Infrastructure Directory README",
+    "documentType": "guide",
+    "path": "07-infrastructure/README.json",
+    "tags": [
+      "infrastructure",
+      "operations",
+      "documentation",
+      "guide"
+    ],
+    "lastModified": "2025-03-21T13:25:00.000Z",
+    "createdAt": "2025-03-21T13:25:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "Infrastructure Directory",
+        "content": "The `07-infrastructure` directory contains documents related to CI/CD pipelines, automation, operational procedures, deployment, and infrastructure configuration. This directory focuses on the operational aspects of the system."
+      },
+      {
+        "title": "Purpose",
+        "content": "This directory serves as a central location for infrastructure and operations-related information. The documents here define how the system is deployed, automated, and maintained. This directory is essential for understanding the operational aspects of the system and for maintaining its infrastructure."
+      },
+      {
+        "title": "Key Documents",
+        "content": "- **ci-cd/workflows.json**: CI/CD pipeline configurations and workflows\n- **cli-commands.json**: CLI commands for operational tasks\n\nAdditional documents include:\n- Infrastructure diagrams\n- Deployment procedures\n- Monitoring and alerting configuration\n- Scaling strategies"
+      },
+      {
+        "title": "Related Tags",
+        "content": "Common tags for documents in this directory include:\n- ci-cd\n- github-actions\n- automation\n- workflows\n- cli\n- commands\n- infrastructure"
+      }
+    ]
+  }
+}

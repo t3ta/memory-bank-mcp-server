@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "a6de2ea6-c477-463d-a9f4-bc36e20022de",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-22T12:30:00.000Z",
+    "createdAt": "2025-03-21T17:02:22.931Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "feature/refactor-initialize",
+    "purpose": "グローバルメモリバンクの初期化処理の改善",
+    "createdAt": "2025-03-21T17:02:22.931Z",
+    "userStories": [
+      {
+        "id": "69e893fd-29fa-4729-8e25-591e65eff2cf",
+        "description": "ブランチが存在しない場合に自動的に初期化する機能を改善する",
+        "completed": true,
+        "priority": 1
+      },
+      {
+        "id": "bbfd9730-3f0f-4346-a5c6-ab3267919340",
+        "description": "ReadBranchCoreFilesUseCaseとReadContextUseCaseの動作を一致させる",
+        "completed": true,
+        "priority": 2
+      },
+      {
+        "id": "ba49bbda-5008-41d2-b4d8-cecc10192fae",
+        "description": "テストを更新して新しい動作を確認する",
+        "completed": true,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": "このブランチでは、メモリバンクが存在しない時に初期化されず、エラーが返ってしまう問題を修正しています。特に、`ReadBranchCoreFilesUseCase`クラスにブランチが存在しない場合に自動的に初期化する処理を追加しました。これにより、`read_context`ツールを使用する際にブランチが存在しない場合でもエラーが発生しなくなります。"
+  }
+}

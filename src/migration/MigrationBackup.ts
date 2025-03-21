@@ -3,8 +3,8 @@
  *
  * Creates backups of directories before migration and provides rollback functionality
  */
-import path from 'path';
-import { promises as fs } from 'fs';
+import path from 'node:path';
+import { promises as fs } from 'node:fs';
 import { Logger } from '../shared/utils/logger.js';
 
 /**
@@ -14,7 +14,7 @@ export class MigrationBackup {
   /**
    * @param logger Logger instance
    */
-  constructor(private readonly logger: Logger) {}
+  constructor(private readonly logger: Logger) { }
 
   /**
    * Create a backup of a directory

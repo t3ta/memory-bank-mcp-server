@@ -1,0 +1,37 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "testing-directory-readme",
+    "title": "Testing Directory README",
+    "documentType": "guide",
+    "path": "05-testing/README.json",
+    "tags": [
+      "testing",
+      "documentation",
+      "guide"
+    ],
+    "lastModified": "2025-03-21T07:21:59.904Z",
+    "createdAt": "2025-03-21T13:15:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "Testing Directory",
+        "content": "The `05-testing` directory contains documents related to testing strategies, test implementations, quality assurance, and testing best practices. This directory focuses on ensuring the quality and reliability of the system through effective testing."
+      },
+      {
+        "title": "Purpose",
+        "content": "This directory serves as a central location for testing-related information. The documents here define testing strategies, explain test implementations, and provide guidance on quality assurance practices. This directory is valuable for developers implementing tests and for understanding the quality assurance process."
+      },
+      {
+        "title": "Key Documents",
+        "content": "- **consolidated-test-strategy.json**: Comprehensive document covering all testing strategies\n- **e2e-test-implementation.json**: Implementation details for end-to-end tests\n- **integration-test-details.json**: Details of integration testing approach\n\nAdditional documents include:\n- Test patterns and best practices\n- Test coverage requirements\n- QA processes and workflows"
+      },
+      {
+        "title": "Related Tags",
+        "content": "Common tags for documents in this directory include:\n- testing\n- test\n- integration-test\n- qa\n- tdd\n- e2e"
+      }
+    ]
+  }
+}

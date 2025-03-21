@@ -1,0 +1,123 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "consolidated-memory-bank-meta",
+    "title": "Consolidated Memory Bank Meta Information",
+    "documentType": "reference",
+    "path": "meta/consolidated-memory-bank-meta.json",
+    "tags": [
+      "navigation",
+      "guide",
+      "reference",
+      "meta",
+      "memory-bank",
+      "documentation",
+      "analysis",
+      "index",
+      "tag"
+    ],
+    "lastModified": "2025-03-21T14:15:00.000Z",
+    "createdAt": "2025-03-21T12:45:00.000Z",
+    "version": 2
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "About This Document",
+        "content": "This document is a consolidated reference for the Global Memory Bank. It combines information from multiple source documents to provide a comprehensive guide to navigation, document organization, tag structure, and indexing mechanisms. This document merges information from:\n\n1. `meta/global-memory-bank-navigation.json` - Navigation guide\n2. `meta/global-memory-bank-reference.json` - Reference guide\n3. `meta/global-memory-bank-index-analysis.json` - Index structure analysis\n4. `meta/global-memory-bank-indexing-mechanism.json` - Index mechanism analysis\n5. `meta/reorganization-plan.json` - Tag reorganization plan\n\nIt serves as a unified entry point for understanding and navigating the Global Memory Bank."
+      },
+      {
+        "title": "About the Global Memory Bank",
+        "content": "The Global Memory Bank is a central repository for documentation shared across the entire project. It contains important information about design decisions, architecture, coding standards, test strategies, and more. This reference guide explains how to efficiently access documents within the Global Memory Bank."
+      },
+      {
+        "title": "Category Structure",
+        "content": "The Global Memory Bank documents are organized into the following 10 categories:"
+      },
+      {
+        "title": "1. Project Foundation",
+        "content": "Documents containing project overview and basic information\n\n**Related Tags**:\n- overview\n- project\n- summary\n\n**Key Documents**:\n- project-overview.json - Project overview and main features\n- tech-stack.json - Technology stack and infrastructure information"
+      },
+      {
+        "title": "2. Design & Architecture",
+        "content": "Documents related to system design, architecture, and domain models\n\n**Related Tags**:\n- architecture\n- design\n- system-design\n- domain\n- models\n- document-model\n\n**Key Documents**:\n- 02-architecture/consolidated-architecture.json - Comprehensive architecture document\n- domain-models.json - Domain models and conceptual design"
+      },
+      {
+        "title": "3. Implementation & Technology",
+        "content": "Documents related to code implementation, technical details, and implementation plans\n\n**Related Tags**:\n- implementation\n- tech-stack\n- infrastructure\n- dependencies\n- typescript\n- clean-code\n\n**Key Documents**:\n- read-context-command-implementation.json - Implementation details for read_context command\n- tech-stack.json - Details of technology and infrastructure configuration\n- coding-standards.json - Coding conventions and standards"
+      },
+      {
+        "title": "4. Documentation & Guides",
+        "content": "User guides, glossaries, coding standards, and other guidelines\n\n**Related Tags**:\n- documentation\n- guide\n- glossary\n- terminology\n- definitions\n- standards\n- best-practices\n\n**Key Documents**:\n- user-guide.json - User guide and usage instructions\n- glossary.json - Glossary and definitions\n- coding-standards.json - Coding standards and best practices"
+      },
+      {
+        "title": "5. Testing & Quality",
+        "content": "Documents related to test strategy, test implementation, and quality assurance\n\n**Related Tags**:\n- testing\n- test\n- integration-test\n- qa\n- tdd\n- controller\n- e2e\n\n**Key Documents**:\n- 05-testing/consolidated-test-strategy.json - Comprehensive test strategy document"
+      },
+      {
+        "title": "6. Version & Releases",
+        "content": "Documents related to release information, version management, and change logs\n\n**Related Tags**:\n- v2\n- release\n- changelog\n- plan\n- decisions\n\n**Key Documents**:\n- 06-releases/consolidated-v2-release.json - Comprehensive Version 2 document"
+      },
+      {
+        "title": "7. Infrastructure & Operations",
+        "content": "Documents related to CI/CD, automation, and operations\n\n**Related Tags**:\n- ci-cd\n- github-actions\n- automation\n- workflows\n- cli\n- commands\n- reference\n\n**Key Documents**:\n- ci-cd/workflows.json - CI/CD pipeline and GitHub Actions\n- cli-commands.json - CLI command reference"
+      },
+      {
+        "title": "8. Internationalization & Localization",
+        "content": "Documents related to internationalization, localization, and template systems\n\n**Related Tags**:\n- i18n\n- l10n\n- template\n\n**Key Documents**:\n- template-system-json-i18n-design.json - Template system and I18N design\n- multilingual-support-plan.json - Multilingual support plan"
+      },
+      {
+        "title": "9. Refactoring & Technical Debt",
+        "content": "Documents related to refactoring, technical debt, and migration\n\n**Related Tags**:\n- refactoring\n- tech-debt\n- migration\n- policy\n- markdown\n- json\n\n**Key Documents**:\n- json-global-design-issues.json - JSON global design issues\n- migration-policy.json - Migration policy"
+      },
+      {
+        "title": "10. Meta & Miscellaneous",
+        "content": "Meta information, context management, and troubleshooting documents\n\n**Related Tags**:\n- meta\n- index\n- command\n- context\n- mcp\n- troubleshooting\n- errors\n- memory-bank\n\n**Key Documents**:\n- meta/consolidated-memory-bank-meta.json - This consolidated meta information document\n- tags/index.json - Tag index\n- read-context-command-design.json - read_context command design\n- ci-cd/memory-bank-errors.json - Memory bank error troubleshooting"
+      },
+      {
+        "title": "Directory Structure",
+        "content": "The Global Memory Bank directory structure is as follows:\n\n```\ndocs/global-memory-bank/\n├── 01-project/            # Project foundation\n├── 02-architecture/       # Design & Architecture\n├── 03-implementation/     # Implementation & Technology\n├── 04-guides/             # Documentation & Guides\n├── 05-testing/            # Testing & Quality\n├── 06-releases/           # Version & Releases\n├── 07-infrastructure/     # Infrastructure & Operations\n├── 08-i18n/               # Internationalization & Localization\n├── 09-refactoring/        # Refactoring & Technical Debt\n├── meta/                  # Meta information & Indexes\n├── _global_index.json     # Global tag index (legacy)\n├── backups/               # Backup directory\n└── tags/                  # Tag-related documents\n    ├── index.json         # Tag index (new)\n    └── README.json        # Tags directory information\n```"
+      },
+      {
+        "title": "Accessing the Memory Bank",
+        "content": "There are several ways to access the Global Memory Bank:\n\n### CLI Commands\n\n```bash\n# Read a document from the global memory bank\nnpx memory-bank read-global <path>\n\n# Write a document to the global memory bank\nnpx memory-bank write-global <path> [content]\n```\n\n### MCP Commands\n\n```javascript\n// Read a document from the global memory bank\nread_global_memory_bank({ path: \"<path>\" })\n\n// Write a document to the global memory bank\nwrite_global_memory_bank({ path: \"<path>\", content: \"<content>\" })\n\n// Read all context information at once\nread_context({ includeGlobalMemory: true })\n```"
+      },
+      {
+        "title": "Tag System and Navigation",
+        "content": "Documents in the Global Memory Bank are classified by tags. The following tag categories have been established to improve navigation and organization:\n\n1. **Project Foundation** - overview, project, summary\n2. **Design & Architecture** - architecture, design, system-design\n3. **Implementation & Technology** - implementation, tech-stack, dependencies\n4. **Documentation & Guides** - documentation, guide, reference\n5. **Testing & Quality** - testing, test, qa, tdd\n6. **Version & Releases** - v2, release, changelog\n7. **Infrastructure & Operations** - ci-cd, automation, workflows\n8. **Internationalization & Localization** - i18n, l10n, template\n9. **Refactoring & Technical Debt** - refactoring, tech-debt\n10. **Meta & Miscellaneous** - meta, index\n\nTo find documents on a specific topic, use these indices to locate relevant tags and access associated documents."
+      },
+      {
+        "title": "Current Index Structure",
+        "content": "The Global Memory Bank currently has two index systems:\n\n1. **_global_index.json**: An older index that lists both Markdown (`.md`) and JSON (`.json`) files. It uses the `tag_index_v1` schema and serves as the primary index for search functionality.\n\n2. **tags/index.json**: A newer index that lists only JSON files. It uses the `memory_document_v2` schema and provides richer metadata about documents.\n\nThis dual structure creates complexity in tag management and lacks consistency."
+      },
+      {
+        "title": "Index Update Mechanism",
+        "content": "Both indices are automatically updated when documents are added, updated, or deleted. The process flow works as follows:\n\n1. When a document is saved, the `saveDocument` method is called\n2. `saveDocument` calls `generateAndSaveTagIndex`\n3. `generateAndSaveTagIndex` then:\n   - Scans all documents to collect tags\n   - Generates and saves `_global_index.json`\n   - Calls `updateLegacyTagsIndex` to update `tags/index.json`\n\nThis mechanism ensures that new documents are automatically added to the indices without manual intervention."
+      },
+      {
+        "title": "Current Issues and Challenges",
+        "content": "Several issues have been identified with the current structure:\n\n1. **Mixed File Formats**: `_global_index.json` contains both MD and JSON format files, while `tags/index.json` only lists JSON files.\n\n2. **Duplicate Tag Management**: Tag information exists in both indices, complicating management.\n\n3. **Insufficient Document Metadata**: Some tagged documents lack appropriate titles and descriptions.\n\n4. **Tag Inconsistencies**: There are mismatches between tags in different indices.\n\n5. **Language Inconsistency**: Document titles are mixed between English and Japanese.\n\n6. **Lack of Tag Categories**: Tags are not organized into logical categories for easier navigation."
+      },
+      {
+        "title": "Improvement Recommendations",
+        "content": "Based on the analysis, we recommend the following improvements:\n\n1. **Unified Source of Truth**: Designate one index as the \"single source of truth\" and either deprecate the other or auto-generate it from the primary index.\n\n2. **Enhanced Tag Index**: Use the current `memory_document_v2` schema-based tag index as the foundation and improve it with:\n   - Proper document titles\n   - Category structure (grouping tags)\n   - Comprehensive indexing of all JSON documents\n\n3. **Automated Index Generation**: Implement a mechanism to periodically scan all Global Memory Bank documents and automatically update the tag index.\n\n4. **Migration Path**: Once the migration from Markdown to JSON is complete, officially deprecate `_global_index.json`.\n\n5. **Improved Navigation**: The consolidated meta information document (this document) serves as an intermediate solution until indices are fully reorganized."
+      },
+      {
+        "title": "Implementation Plan",
+        "content": "The implementation plan for improving the Global Memory Bank consists of 8 phases:\n\n1. **Backup and Preparation** - Creating backups and analyzing file relationships\n2. **File Consolidation** - Merging related documents into comprehensive documents with clear sections\n3. **Tag Reorganization** - Implementing tag categories and consolidating similar tags\n4. **Documentation Improvement** - Standardizing document types, adding proper section structure, and ensuring consistent language\n5. **Directory Restructuring** - Creating category-based directories and moving documents accordingly\n6. **Index Updates** - Updating both index files and enhancing the tag index format\n7. **Verification and Testing** - Performing functional testing, document review, and user acceptance testing\n8. **Final Cleanup** - Deleting redundant files, updating global documentation, and creating a change summary\n\nThis phased approach ensures a systematic and controlled process for reorganizing the Global Memory Bank."
+      },
+      {
+        "title": "Document Creation and Updates",
+        "content": "When creating new documents or updating existing ones, follow these practices:\n\n1. **Use the Correct Schema**: All documents should use the `memory_document_v2` schema\n\n2. **Include Appropriate Metadata**: Include necessary metadata such as ID, title, document type, path, and tags\n\n3. **Meaningful Tagging**: Use tags that accurately represent the document's content and maintain consistency with the existing tag system\n\n4. **Structured Content**: Organize content into logical sections with appropriate titles and content\n\n5. **Add Reference Links**: Include references to related documents to improve discoverability"
+      },
+      {
+        "title": "Usage Guide",
+        "content": "This navigation guide can be used in the following ways:\n\n1. **Browse by Category**: Select a relevant area from the categories above to find related documents\n2. **Search by Tag**: Find an interesting tag and refer to documents associated with that tag\n3. **Search by Document Name**: If you know a specific document name, access it directly from the category\n\nUse this consolidated meta information document as a starting point when you can't find needed information from other documents."
+      },
+      {
+        "title": "Related Resources",
+        "content": "For more detailed information, refer to the following documents:\n\n- 02-architecture/architecture-decisions-details.json - Detailed architecture decisions\n- migration-policy.json - Document migration policy\n- 05-testing/consolidated-test-strategy.json - Consolidated test strategy document\n- 06-releases/consolidated-v2-release.json - Consolidated Version 2 document\n\nThis consolidated meta information document serves as a starting point to assist with using the Global Memory Bank. For specific details, refer to the linked documents above."
+      }
+    ]
+  }
+}

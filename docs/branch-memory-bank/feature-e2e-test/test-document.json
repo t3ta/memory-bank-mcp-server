@@ -1,0 +1,19 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "7a94c448-11dc-4cfc-b731-bb5cc0c7ca55",
+    "title": "テスト用ドキュメント",
+    "documentType": "generic",
+    "path": "test-document.md",
+    "tags": [],
+    "lastModified": "2025-03-18T17:35:24.830Z",
+    "createdAt": "2025-03-18T17:35:24.830Z",
+    "version": 1
+  },
+  "content": {
+    "rawContent": "# テスト用ドキュメント\n\nこれはテスト用のドキュメントです。",
+    "sections": {
+      "main": "これはテスト用のドキュメントです。"
+    }
+  }
+}

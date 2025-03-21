@@ -1,0 +1,375 @@
+{
+  "schema": "tag_index_v1",
+  "metadata": {
+    "updatedAt": "2025-03-21T19:32:50.338Z",
+    "documentCount": 70,
+    "fullRebuild": true,
+    "context": "global"
+  },
+  "index": {
+    "project": [
+      "01-project/README.json",
+      "01-project/project-overview.json"
+    ],
+    "documentation": [
+      "01-project/README.json",
+      "02-architecture/README.json",
+      "03-implementation/README.json",
+      "04-guides/README.json",
+      "04-guides/user-guide.json",
+      "05-testing/README.json",
+      "06-releases/README.json",
+      "07-infrastructure/README.json",
+      "08-i18n/README.json",
+      "09-refactoring/README.json",
+      "meta/README.json",
+      "meta/consolidated-memory-bank-meta.json",
+      "meta/document-type-standards.json",
+      "meta/global-memory-bank-reference.json",
+      "tags/README.json"
+    ],
+    "guide": [
+      "01-project/README.json",
+      "02-architecture/README.json",
+      "03-implementation/README.json",
+      "04-guides/README.json",
+      "04-guides/migration-guide.json",
+      "04-guides/user-guide.json",
+      "05-testing/README.json",
+      "06-releases/README.json",
+      "07-infrastructure/README.json",
+      "08-i18n/README.json",
+      "09-refactoring/README.json",
+      "meta/README.json",
+      "meta/consolidated-memory-bank-meta.json",
+      "meta/global-memory-bank-navigation.json",
+      "meta/global-memory-bank-reference.json",
+      "tags/README.json"
+    ],
+    "best-practices": [
+      "01-project/coding-standards.json"
+    ],
+    "typescript": [
+      "01-project/coding-standards.json"
+    ],
+    "clean-code": [
+      "01-project/coding-standards.json"
+    ],
+    "domain": [
+      "01-project/domain-models.json"
+    ],
+    "models": [
+      "01-project/domain-models.json"
+    ],
+    "architecture": [
+      "01-project/domain-models.json",
+      "02-architecture/README.json",
+      "02-architecture/architecture-decisions-details.json",
+      "02-architecture/architecture-decisions.json",
+      "02-architecture/architecture.json",
+      "02-architecture/consolidated-architecture.json",
+      "02-architecture/json-based-architecture-details.json",
+      "02-architecture/json-based-architecture.json",
+      "05-testing/e2e-to-integration-test-approach.json",
+      "06-releases/v2-design-decisions.json"
+    ],
+    "json": [
+      "01-project/domain-models.json",
+      "02-architecture/architecture-decisions-details.json",
+      "02-architecture/architecture-decisions.json",
+      "02-architecture/consolidated-architecture.json",
+      "02-architecture/json-based-architecture-details.json",
+      "02-architecture/json-based-architecture.json",
+      "04-guides/migration-guide.json",
+      "04-guides/migration-policy.json",
+      "06-releases/v2-implementation-plan.json",
+      "08-i18n/template-system-json-i18n-design.json"
+    ],
+    "document-model": [
+      "01-project/domain-models.json"
+    ],
+    "glossary": [
+      "01-project/glossary.json"
+    ],
+    "terminology": [
+      "01-project/glossary.json"
+    ],
+    "definitions": [
+      "01-project/glossary.json"
+    ],
+    "overview": [
+      "01-project/project-overview.json"
+    ],
+    "v2": [
+      "01-project/project-overview.json",
+      "02-architecture/architecture-decisions-details.json",
+      "02-architecture/architecture-decisions.json",
+      "02-architecture/consolidated-architecture.json",
+      "02-architecture/json-based-architecture-details.json",
+      "02-architecture/json-based-architecture.json",
+      "03-implementation/read-context-command-design.json",
+      "03-implementation/read-context-command-implementation.json",
+      "06-releases/consolidated-v2-release.json",
+      "06-releases/release-v2.0.0.json",
+      "06-releases/v2-design-decisions.json",
+      "06-releases/v2-implementation-plan.json",
+      "08-i18n/template-system-json-i18n-design.json"
+    ],
+    "tech-stack": [
+      "01-project/tech-stack.json"
+    ],
+    "infrastructure": [
+      "01-project/tech-stack.json",
+      "07-infrastructure/README.json"
+    ],
+    "design": [
+      "02-architecture/README.json",
+      "02-architecture/consolidated-architecture.json",
+      "02-architecture/json-based-architecture-details.json",
+      "02-architecture/json-based-architecture.json",
+      "03-implementation/read-context-command-design.json",
+      "06-releases/v2-design-decisions.json",
+      "08-i18n/template-system-json-i18n-design.json",
+      "09-refactoring/json-global-design-issues.json"
+    ],
+    "decision": [
+      "02-architecture/architecture-decisions-details.json",
+      "02-architecture/architecture-decisions.json",
+      "02-architecture/consolidated-architecture.json",
+      "06-releases/v2-design-decisions.json"
+    ],
+    "refactoring": [
+      "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
+      "02-architecture/global-memory-bank-cleanup-strategy.json",
+      "09-refactoring/README.json",
+      "09-refactoring/json-global-design-issues.json",
+      "meta/global-memory-bank-index-analysis.json",
+      "meta/global-memory-bank-indexing-mechanism.json",
+      "meta/redundant-files-removal-plan.json",
+      "meta/reorganization-plan.json",
+      "meta/reorganization-summary.json"
+    ],
+    "memory-bank": [
+      "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
+      "02-architecture/global-memory-bank-cleanup-strategy.json",
+      "02-architecture/global-memory-bank-organized-analysis.json",
+      "07-infrastructure/ci-cd/memory-bank-errors.json",
+      "09-refactoring/analysis/global-memory-bank-analysis-raw.json",
+      "09-refactoring/json-global-design-issues.json",
+      "auto-initialization-fix.json",
+      "auto-initialization-test.json",
+      "initialization-behavior.json",
+      "meta/consolidated-memory-bank-meta.json",
+      "meta/global-memory-bank-index-analysis.json",
+      "meta/global-memory-bank-indexing-mechanism.json",
+      "meta/global-memory-bank-navigation.json",
+      "meta/global-memory-bank-reference.json",
+      "meta/redundant-files-removal-plan.json",
+      "meta/reorganization-plan.json",
+      "meta/reorganization-summary.json",
+      "tags/tag_categorization.json",
+      "tags/tag_index_update_plan.json"
+    ],
+    "plan": [
+      "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
+      "02-architecture/global-memory-bank-cleanup-strategy.json",
+      "06-releases/v2-implementation-plan.json",
+      "meta/redundant-files-removal-plan.json",
+      "meta/reorganization-plan.json",
+      "tags/tag_index_update_plan.json"
+    ],
+    "meta": [
+      "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
+      "02-architecture/global-memory-bank-cleanup-strategy.json",
+      "02-architecture/global-memory-bank-organized-analysis.json",
+      "09-refactoring/analysis/global-memory-bank-analysis-raw.json",
+      "meta/README.json",
+      "meta/consolidated-memory-bank-meta.json",
+      "meta/document-type-standards.json",
+      "meta/global-memory-bank-navigation.json",
+      "meta/redundant-files-removal-plan.json",
+      "meta/reorganization-plan.json",
+      "meta/reorganization-summary.json",
+      "tags/README.json",
+      "tags/tag_categorization.json",
+      "tags/tag_index_update_plan.json"
+    ],
+    "organization": [
+      "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
+      "02-architecture/global-memory-bank-cleanup-strategy.json",
+      "02-architecture/global-memory-bank-organized-analysis.json"
+    ],
+    "analysis": [
+      "02-architecture/global-memory-bank-organized-analysis.json",
+      "09-refactoring/analysis/global-memory-bank-analysis-raw.json",
+      "meta/consolidated-memory-bank-meta.json",
+      "meta/global-memory-bank-index-analysis.json",
+      "meta/global-memory-bank-indexing-mechanism.json"
+    ],
+    "implementation": [
+      "03-implementation/README.json",
+      "03-implementation/read-context-command-implementation.json",
+      "05-testing/e2e-test-implementation.json",
+      "06-releases/consolidated-v2-release.json",
+      "06-releases/v2-implementation-plan.json"
+    ],
+    "cli": [
+      "03-implementation/cli-commands.json",
+      "05-testing/e2e-test-implementation.json"
+    ],
+    "reference": [
+      "03-implementation/cli-commands.json",
+      "meta/consolidated-memory-bank-meta.json",
+      "meta/document-type-standards.json",
+      "meta/global-memory-bank-reference.json",
+      "tags/tag_categorization.json"
+    ],
+    "mcp": [
+      "03-implementation/read-context-command-design.json",
+      "03-implementation/read-context-command-implementation.json"
+    ],
+    "command": [
+      "03-implementation/read-context-command-design.json",
+      "03-implementation/read-context-command-implementation.json"
+    ],
+    "context": [
+      "03-implementation/read-context-command-design.json",
+      "03-implementation/read-context-command-implementation.json"
+    ],
+    "migration": [
+      "04-guides/migration-guide.json",
+      "04-guides/migration-policy.json"
+    ],
+    "markdown": [
+      "04-guides/migration-guide.json",
+      "04-guides/migration-policy.json"
+    ],
+    "policy": [
+      "04-guides/migration-policy.json"
+    ],
+    "testing": [
+      "05-testing/README.json",
+      "05-testing/consolidated-test-strategy.json",
+      "05-testing/e2e-test-implementation.json",
+      "05-testing/e2e-to-integration-test-approach.json",
+      "05-testing/integration-test-details.json",
+      "05-testing/tag-search-system-test-plan.json"
+    ],
+    "e2e": [
+      "05-testing/consolidated-test-strategy.json",
+      "05-testing/e2e-test-implementation.json"
+    ],
+    "integration-test": [
+      "05-testing/consolidated-test-strategy.json",
+      "05-testing/e2e-to-integration-test-approach.json",
+      "05-testing/integration-test-details.json",
+      "09-refactoring/json-global-design-issues.json"
+    ],
+    "tdd": [
+      "05-testing/consolidated-test-strategy.json",
+      "05-testing/integration-test-details.json"
+    ],
+    "qa": [
+      "05-testing/consolidated-test-strategy.json",
+      "05-testing/integration-test-details.json"
+    ],
+    "controller": [
+      "05-testing/integration-test-details.json"
+    ],
+    "tag-system": [
+      "05-testing/tag-search-system-test-plan.json"
+    ],
+    "search": [
+      "05-testing/tag-search-system-test-plan.json"
+    ],
+    "index": [
+      "05-testing/tag-search-system-test-plan.json",
+      "meta/consolidated-memory-bank-meta.json",
+      "meta/global-memory-bank-indexing-mechanism.json",
+      "tags/README.json",
+      "tags/tag_categorization.json",
+      "tags/tag_index_update_plan.json"
+    ],
+    "implementation-plan": [
+      "05-testing/tag-search-system-test-plan.json"
+    ],
+    "release": [
+      "06-releases/README.json",
+      "06-releases/consolidated-v2-release.json",
+      "06-releases/release-v2.0.0.json"
+    ],
+    "version": [
+      "06-releases/README.json"
+    ],
+    "planning": [
+      "06-releases/consolidated-v2-release.json"
+    ],
+    "changelog": [
+      "06-releases/consolidated-v2-release.json",
+      "06-releases/release-v2.0.0.json",
+      "meta/reorganization-summary.json"
+    ],
+    "pr": [
+      "06-releases/release-v2.0.0.json"
+    ],
+    "operations": [
+      "07-infrastructure/README.json"
+    ],
+    "troubleshooting": [
+      "07-infrastructure/ci-cd/memory-bank-errors.json"
+    ],
+    "ci-cd": [
+      "07-infrastructure/ci-cd/workflows.json"
+    ],
+    "i18n": [
+      "08-i18n/README.json",
+      "08-i18n/template-system-json-i18n-design.json"
+    ],
+    "l10n": [
+      "08-i18n/README.json",
+      "08-i18n/template-system-json-i18n-design.json"
+    ],
+    "template": [
+      "08-i18n/template-system-json-i18n-design.json"
+    ],
+    "tech-debt": [
+      "09-refactoring/README.json",
+      "09-refactoring/json-global-design-issues.json",
+      "meta/global-memory-bank-index-analysis.json",
+      "meta/global-memory-bank-indexing-mechanism.json"
+    ],
+    "raw-data": [
+      "09-refactoring/analysis/global-memory-bank-analysis-raw.json"
+    ],
+    "fix": [
+      "auto-initialization-fix.json"
+    ],
+    "auto-initialization": [
+      "auto-initialization-fix.json",
+      "auto-initialization-test.json"
+    ],
+    "test": [
+      "auto-initialization-test.json"
+    ],
+    "initialization": [
+      "initialization-behavior.json"
+    ],
+    "behavior": [
+      "initialization-behavior.json"
+    ],
+    "navigation": [
+      "meta/consolidated-memory-bank-meta.json",
+      "meta/global-memory-bank-navigation.json"
+    ],
+    "tag": [
+      "meta/consolidated-memory-bank-meta.json",
+      "meta/global-memory-bank-indexing-mechanism.json",
+      "tags/README.json",
+      "tags/tag_categorization.json",
+      "tags/tag_index_update_plan.json"
+    ],
+    "standards": [
+      "meta/document-type-standards.json"
+    ]
+  }
+}

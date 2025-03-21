@@ -1,0 +1,43 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "tags-directory-readme",
+    "title": "Tags Directory README",
+    "documentType": "guide",
+    "path": "tags/README.json",
+    "tags": [
+      "meta",
+      "tag",
+      "index",
+      "documentation",
+      "guide"
+    ],
+    "lastModified": "2025-03-21T13:40:00.000Z",
+    "createdAt": "2025-03-21T13:40:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "Tags Directory",
+        "content": "The `tags` directory contains documents related to the tag system, tag indices, and tag organization. This directory is central to the navigational structure of the Global Memory Bank."
+      },
+      {
+        "title": "Purpose",
+        "content": "This directory serves as a central location for tag-related information. The documents here define the tagging system, provide indices for finding documents by tag, and outline strategies for organizing and categorizing tags. This directory is critical for navigating and discovering documents within the Global Memory Bank."
+      },
+      {
+        "title": "Key Documents",
+        "content": "- **index.json**: Main tag index connecting tags to documents\n- **reorganization-plan.json**: Plan for reorganizing and improving the tag system\n- **README.json**: This file, providing information about the tags directory\n\nNote: In the future, the tag system may be reorganized based on the reorganization plan, potentially moving some tags-related files to the meta directory."
+      },
+      {
+        "title": "Usage",
+        "content": "The tag system can be accessed through:\n\n1. Direct access to index.json to browse all tags\n2. The consolidated meta information document in the meta directory\n3. Command-line or API functions for searching by tag\n\nWhen adding new documents to the Global Memory Bank, consult the tag system to ensure consistent tagging."
+      },
+      {
+        "title": "Related Tags",
+        "content": "Common tags for documents in this directory include:\n- meta\n- tag\n- index\n- memory-bank\n- organization\n- refactoring"
+      }
+    ]
+  }
+}

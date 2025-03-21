@@ -15,14 +15,14 @@ export { SystemPatternsConverter } from './converters/SystemPatternsConverter.js
 export { GenericConverter } from './converters/GenericConverter.js';
 
 // Factory function to create a fully configured converter
-export function createDefaultConverter() {
-  // Import here to avoid circular dependency
-  const { JsonToMarkdownConverter } = require('./JsonToMarkdownConverter.js');
-  const { BranchContextConverter } = require('./converters/BranchContextConverter.js');
-  const { ActiveContextConverter } = require('./converters/ActiveContextConverter.js');
-  const { ProgressConverter } = require('./converters/ProgressConverter.js');
-  const { SystemPatternsConverter } = require('./converters/SystemPatternsConverter.js');
-  const { GenericConverter } = require('./converters/GenericConverter.js');
+export async function createDefaultConverter() {
+  // Import here to avoid circular dependency - using dynamic imports
+  const { JsonToMarkdownConverter } = await import('./JsonToMarkdownConverter.js');
+  const { BranchContextConverter } = await import('./converters/BranchContextConverter.js');
+  const { ActiveContextConverter } = await import('./converters/ActiveContextConverter.js');
+  const { ProgressConverter } = await import('./converters/ProgressConverter.js');
+  const { SystemPatternsConverter } = await import('./converters/SystemPatternsConverter.js');
+  const { GenericConverter } = await import('./converters/GenericConverter.js');
 
   // Create converter instance
   const converter = new JsonToMarkdownConverter();

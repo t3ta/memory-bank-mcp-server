@@ -1,18 +1,16 @@
 #!/usr/bin/env node
 
-import { promises as fs } from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
-import yargs from 'yargs';
+import { promises as fs } from 'node:fs';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { hideBin } from 'yargs/helpers';
-
-// Import the application
-import createApplication from './main/index.js';
-import { Application } from './main/index.js';
+import yargs from 'yargs/yargs';
+import { createApplication, Application } from './main/index.js';
 import { logger } from './shared/utils/index.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { Server as MCPServer } from '@modelcontextprotocol/sdk/server/index.js';
+import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js';
+import { Server } from 'node:http';
 
 // Helper function to render template with translations
 function renderTemplate(template: any, translations: any): string {
@@ -65,10 +63,12 @@ const argv = yargs(hideBin(process.argv))
   .help()
   .parseSync();
 
-// New application instance
-let app: Application | null;
+// Get directory paths with ESM support
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// Available tools definition
+// New application instance
+let app: Application | null = null;
 const AVAILABLE_TOOLS = [
   // create_pull_request tool definition removed
   {
@@ -197,7 +197,7 @@ const AVAILABLE_TOOLS = [
 ];
 
 // Create a server
-const server = new Server(
+const server = new MCPServer(
   {
     name: 'memory-bank-mcp-server',
     version: '2.0.0',
@@ -217,7 +217,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 });
 
 // Add tool request handler
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
+server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
   const { name, arguments: args } = request.params;
   logger.debug('Tool call received:', { name, args });
 
@@ -257,7 +257,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       if (!app) {
         throw new Error('Application not initialized');
       }
-      await app.getBranchController().writeDocument(branch, path, content);
+
+      // ドキュメントの書き込みを試行し、結果を確認
+      const response = await app.getBranchController().writeDocument(branch, path, content);
+      if (!response.success) {
+        throw new Error((response as any).error?.message || 'Failed to write document');
+      }
+
       return { content: [{ type: 'text', text: 'Document written successfully' }] };
     }
 
@@ -274,7 +280,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
       const response = await app.getBranchController().readDocument(branch, path);
       if (!response.success) {
-        throw new Error(response.error.message);
+        throw new Error((response as any).error.message);
       }
 
       return {
@@ -290,7 +296,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         throw new Error('Invalid arguments for read_rules');
       }
 
-      const dirname = path.dirname(fileURLToPath(import.meta.url));
+      const dirname = __dirname;
 
       try {
         // Load template structure
@@ -359,7 +365,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       if (!app) {
         throw new Error('Application not initialized');
       }
-      await app.getGlobalController().writeDocument(path, content);
+
+      // ドキュメントの書き込みを試行し、結果を確認
+      const response = await app.getGlobalController().writeDocument(path, content);
+      if (!response.success) {
+        throw new Error((response as any).error?.message || 'Failed to write document');
+      }
+
       return { content: [{ type: 'text', text: 'Document written successfully' }] };
     }
 
@@ -375,7 +387,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
       const response = await app.getGlobalController().readDocument(path);
       if (!response.success) {
-        throw new Error(response.error.message);
+        throw new Error((response as any).error.message);
       }
 
       return {
@@ -392,7 +404,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
       const response = await app.getBranchController().getRecentBranches(limit);
       if (!response.success) {
-        throw new Error(response.error.message);
+        throw new Error((response as any).error.message);
       }
 
       return {
@@ -434,7 +446,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         }
 
         try {
-          const dirname = path.dirname(fileURLToPath(import.meta.url));
+          const dirname = __dirname;
 
           // Load template structure
           const templatePath = path.join(dirname, 'templates', 'json', 'rules.json');
@@ -462,14 +474,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           // Fall back to legacy files if available
           try {
             // Try JSON format first
-            const dirname = path.dirname(fileURLToPath(import.meta.url));
+            const dirname = __dirname;
             const jsonFilePath = path.join(dirname, 'templates', 'json', `rules-${language}.json`);
             const content = await fs.readFile(jsonFilePath, 'utf-8');
             result.rules = { content };
           } catch (jsonError) {
             // Fall back to markdown file
             try {
-              const dirname = path.dirname(fileURLToPath(import.meta.url));
+              const dirname = __dirname;
               const mdFilePath = path.join(dirname, 'templates', `rules-${language}.md`);
               const content = await fs.readFile(mdFilePath, 'utf-8');
               result.rules = { content };
@@ -485,7 +497,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         logger.debug(`Including branch memory bank for branch: ${branch}`);
         const branchResponse = await app.getBranchController().readCoreFiles(branch);
         if (!branchResponse.success) {
-          throw new Error(branchResponse.error.message);
+          throw new Error((branchResponse as any).error.message);
         }
         result.branchMemory = branchResponse.data;
       }
@@ -495,7 +507,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         logger.debug('Including global memory bank in context');
         const globalResponse = await app.getGlobalController().readCoreFiles();
         if (!globalResponse.success) {
-          throw new Error(globalResponse.error.message);
+          throw new Error((globalResponse as any).error.message);
         }
         result.globalMemory = globalResponse.data;
       }
@@ -518,29 +530,29 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 });
 
 // Error handling
-server.onerror = (error) => {
+(server as any).onerror = (error: any) => {
   logger.error('[MCP Server Error]', error);
 };
 
 // Process termination handling
 process.on('SIGINT', async () => {
-  logger.info('Received SIGINT signal, shutting down...');
+  logger.info('Received SIGINT signal, shutting down..');
   await cleanup();
   process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
-  logger.info('Received SIGTERM signal, shutting down...');
+  logger.info('Received SIGTERM signal, shutting down..');
   await cleanup();
   process.exit(0);
 });
 
 // Cleanup function to properly release resources
 async function cleanup() {
-  logger.info('Cleaning up resources...');
+  logger.info('Cleaning up resources..');
   try {
     // Close the server connection if it's open
-    await server.close();
+    await (server as any).close();
     logger.info('Server connection closed');
 
     // Release application resources if available
@@ -565,13 +577,13 @@ async function cleanup() {
 
 // Start the server
 async function main() {
-  logger.info('Starting Memory Bank MCP Server...');
+  logger.info('Starting Memory Bank MCP Server..');
   const transport = new StdioServerTransport();
 
-  logger.debug('Connecting transport...');
-  await server.connect(transport);
+  logger.debug('Connecting transport..');
+  await (server as any).connect(transport);
 
-  logger.debug('Initializing application...');
+  logger.debug('Initializing application..');
   // Initialize a new application
   app = await createApplication({
     memoryRoot: argv.docs as string,
@@ -579,50 +591,8 @@ async function main() {
     verbose: false,
   });
 
-  // Auto-migration: Convert Markdown files to JSON on startup
-  try {
-    logger.info('Starting auto-migration of Markdown files to JSON...');
-
-    // Import required classes for migration
-    const { MarkdownToJsonMigrator } = await import('./migration/MarkdownToJsonMigrator.js');
-    const { MigrationBackup } = await import('./migration/MigrationBackup.js');
-    const { MigrationValidator } = await import('./migration/MigrationValidator.js');
-    const { ConverterFactory } = await import('./migration/converters/ConverterFactory.js');
-
-    // Create migrator with required dependencies
-    const backupService = new MigrationBackup(logger);
-    const validator = new MigrationValidator(logger);
-    const converterFactory = new ConverterFactory();
-    const migrator = new MarkdownToJsonMigrator(backupService, validator, converterFactory, logger);
-
-    // Configure migration options
-    const migrationOptions = {
-      createBackup: false,  // バックアップ作成を無効化
-      overwriteExisting: false,
-      validateJson: true,
-      deleteOriginals: false,
-    };
-
-    // Run migration on the docs directory
-    const result = await migrator.migrateDirectory(argv.docs as string, migrationOptions);
-
-    // Log migration results
-    if (result.success) {
-      logger.info(
-        `Auto-migration completed successfully. Migrated: ${result.stats.successCount}, Skipped: ${result.stats.skippedCount}`
-      );
-    } else {
-      logger.warn(
-        `Auto-migration completed with issues. Migrated: ${result.stats.successCount}, Failed: ${result.stats.failureCount}, Skipped: ${result.stats.skippedCount}`
-      );
-      if (result.stats.failures.length > 0) {
-        logger.warn(`Failed migrations: ${result.stats.failures.map((f) => f.path).join(', ')}`);
-      }
-    }
-  } catch (error) {
-    logger.error('Error during auto-migration:', error);
-    // Continue server startup even if migration fails
-  }
+  // Auto-migration disabled for testing
+  logger.info('Auto-migration disabled for testing');
 
   logger.info(`Memory Bank MCP Server running on stdio`);
   logger.info(`Using new clean architecture implementation`);

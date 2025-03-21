@@ -1,4 +1,5 @@
-import { Language } from '../../shared/types/index.js';
+import type { Language } from "../../schemas/v2/i18n-schema.js";
+
 
 /**
  * Workspace configuration

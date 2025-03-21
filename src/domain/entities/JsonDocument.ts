@@ -3,20 +3,15 @@ import { DocumentPath } from './DocumentPath.js';
 import { Tag } from './Tag.js';
 import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
 
-// Import JSON schemas
+// Schema imports - these define validation and structure
 import {
   SCHEMA_VERSION,
   BaseJsonDocumentV2Schema,
   BaseJsonDocumentV2,
   BranchContextJsonV2Schema,
-  BranchContextJsonV2,
   ActiveContextJsonV2Schema,
-  ActiveContextJsonV2,
   ProgressJsonV2Schema,
-  ProgressJsonV2,
   SystemPatternsJsonV2Schema,
-  SystemPatternsJsonV2,
-  DocumentMetadataV2,
 } from '../../schemas/v2/json-document.js';
 
 /**
@@ -44,7 +39,7 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
     private readonly _lastModified: Date,
     private readonly _createdAt: Date,
     private readonly _version: number
-  ) {}
+  ) { }
 
   /**
    * Parse a JSON string into a JsonDocument
@@ -92,24 +87,22 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
     const documentType = metadata.documentType as DocumentType;
 
     // Then validate against specific document type schema
-    let validatedDocument: BaseJsonDocumentV2;
-
     try {
       switch (documentType) {
         case 'branch_context':
-          validatedDocument = BranchContextJsonV2Schema.parse(jsonData);
+          BranchContextJsonV2Schema.parse(jsonData);
           break;
         case 'active_context':
-          validatedDocument = ActiveContextJsonV2Schema.parse(jsonData);
+          ActiveContextJsonV2Schema.parse(jsonData);
           break;
         case 'progress':
-          validatedDocument = ProgressJsonV2Schema.parse(jsonData);
+          ProgressJsonV2Schema.parse(jsonData);
           break;
         case 'system_patterns':
-          validatedDocument = SystemPatternsJsonV2Schema.parse(jsonData);
+          SystemPatternsJsonV2Schema.parse(jsonData);
           break;
         default:
-          validatedDocument = BaseJsonDocumentV2Schema.parse(jsonData);
+          BaseJsonDocumentV2Schema.parse(jsonData);
           break;
       }
     } catch (error) {
@@ -232,6 +225,13 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
    */
   public get documentType(): DocumentType {
     return this._documentType;
+  }
+  
+  /**
+   * Set the document type (internal use only for testing)
+   */
+  public set documentType(type: DocumentType) {
+    (this as any)._documentType = type;
   }
 
   /**

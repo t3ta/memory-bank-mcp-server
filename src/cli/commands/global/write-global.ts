@@ -1,8 +1,9 @@
-import { Argv } from 'yargs';
-import { CommandBase } from '../../command-base.js';
-import createApplication from '../../../main/index.js';
-import { logger } from '../../../shared/utils/logger.js';
-import { readInput } from '../../utils/input-reader.js';
+import type { Argv } from "yargs";
+import { createApplication } from "../../../main/index.js";
+import { logger } from "../../../shared/utils/logger.js";
+import { CommandBase } from "../../command-base.js";
+import { readInput } from "../../utils/input-reader.js";
+
 
 /**
  * Command to write a document to global memory bank
@@ -76,7 +77,7 @@ export class WriteGlobalCommand extends CommandBase {
 
       // Handle response
       if (!result.success) {
-        logger.error(`Error writing document: ${result.error.message}`);
+        logger.error(`Error writing document: ${(result as any).error.message}`);
         process.exit(1);
       }
 

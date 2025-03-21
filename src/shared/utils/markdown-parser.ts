@@ -1,13 +1,10 @@
-import { DocumentMetadataV2 as DocumentMetadata } from '../../schemas/v2/json-document.js';
 import crypto from 'crypto';
+import type { DocumentMetadata } from '../../schemas/json-document.js';
 
 /**
- * Parse markdown document to extract metadata and content sections
- * @param content Markdown content to parse
- * @param path Document path
- * @returns Object with metadata and structured content
+ * Technical decision structure for system patterns
  */
-export interface SystemPatternsTechnicalDecision {
+export interface TechnicalDecision {
   title: string;
   context: string;
   decision: string;
@@ -33,7 +30,7 @@ export interface ParsedMarkdownContent {
   knownIssues?: string[];
 
   // System patterns
-  technicalDecisions?: SystemPatternsTechnicalDecision[];
+  technicalDecisions?: TechnicalDecision[];
 
   // Generic sections
   [key: string]: unknown;
@@ -48,7 +45,7 @@ export function parseMarkdown(
 } {
   // Initialize result
   const result: {
-    metadata: Partial<DocumentMetadata>;
+    metadata: Partial<DocumentMetadata & { id?: string; createdAt?: Date; version?: number }>;
     content: Record<string, unknown>;
   } = {
     metadata: {

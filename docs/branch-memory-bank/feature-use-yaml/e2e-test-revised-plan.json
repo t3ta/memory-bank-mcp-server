@@ -1,0 +1,219 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "a9c2f573-8eab-4b52-b0c1-d7e3b2a04f8a",
+    "title": "改訂版：YAML機能のE2Eテスト計画",
+    "documentType": "generic",
+    "path": "e2e-test-revised-plan.json",
+    "tags": [
+      "test",
+      "e2e",
+      "yaml",
+      "plan",
+      "revised"
+    ],
+    "lastModified": "2025-03-18T10:30:00.000Z",
+    "createdAt": "2025-03-18T10:30:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": "YAMLドキュメント形式サポート機能のエンドツーエンドテスト計画の改訂版。実装状況を踏まえてテスト計画を再構築しています。",
+    "currentStatus": {
+      "implementedTests": [
+        "TC-01: サーバー起動・基本動作テスト（server-startup.test.ts）",
+        "TC-02, TC-03: YAMLドキュメント操作テスト（yaml-document-operations.test.ts）"
+      ],
+      "pendingTests": [
+        "TC-04: JSONからYAMLへの移行テスト（migration-json-to-yaml.test.ts）",
+        "TC-05: MarkdownからYAMLへの移行テスト（migration-markdown-to-yaml.test.ts）",
+        "TC-06: バッチ移行テスト（batch-migration.test.ts）",
+        "TC-07: エラーハンドリングテスト（error-handling.test.ts）",
+        "TC-08: パフォーマンステスト（performance.test.ts）"
+      ],
+      "challenges": [
+        "MCPプロトコルのバージョン変更（SDK 1.7.0）による対応が必要",
+        "テスト実行時のタイミング問題やサーバー起動に関する課題",
+        "フィクスチャ管理のさらなる改善の余地"
+      ]
+    },
+    "testFrameworkStatus": {
+      "implementedTestFramework": [
+        "テスト環境のセットアップ（setup.ts）",
+        "クリーンアップ処理（cleanup.ts）",
+        "MCPクライアントヘルパー（mcp-client.ts）",
+        "テスト用サーバー制御（test-server.ts）",
+        "ファイルシステムヘルパー（file-system.ts）"
+      ],
+      "improvementNeeded": [
+        "MCPクライアントのSDK 1.7.0対応の完全化",
+        "レスポンス解析処理の安定化",
+        "テストタイムアウト設定の最適化",
+        "テスト実行の並列化検討"
+      ]
+    },
+    "revisedTestCases": [
+      {
+        "id": "TC-04-R",
+        "name": "JSONからYAMLへの移行テスト（改訂版）",
+        "description": "既存のJSONドキュメントをYAML形式に移行する機能を検証",
+        "steps": [
+          "既存のJSONドキュメントを準備（fixtures/branch-context.jsonなど）",
+          "write_branch_memory_bankを使用してJSONファイルを読み取り、YAMLとして書き出す",
+          "生成されたYAMLファイルの構造と内容が期待通りであることを確認",
+          "元のJSONファイルと生成されたYAMLファイルの内容の同一性を検証"
+        ],
+        "expectedResults": "JSONドキュメントがYAML形式に正しく移行され、すべての情報が保持される",
+        "testFile": "tests/e2e/yaml/migration-json-to-yaml.test.ts"
+      },
+      {
+        "id": "TC-05-R",
+        "name": "MarkdownからYAMLへの移行テスト（改訂版）",
+        "description": "既存のMarkdownドキュメントをYAML形式に移行する機能を検証",
+        "steps": [
+          "既存のMarkdownドキュメントを準備（frontmatterあり/なし両方のパターン）",
+          "write_branch_memory_bankを使用してMarkdownファイルを読み取り、YAMLとして書き出す",
+          "生成されたYAMLファイルの構造と内容が期待通りであることを確認",
+          "元のMarkdownとYAMLの内容の対応関係を検証"
+        ],
+        "expectedResults": "Markdownドキュメントが構造化されたYAML形式に正しく移行される",
+        "testFile": "tests/e2e/yaml/migration-markdown-to-yaml.test.ts"
+      },
+      {
+        "id": "TC-06-R",
+        "name": "バッチ移行テスト（改訂版）",
+        "description": "複数のファイルを一括でYAML形式に移行する機能を検証",
+        "steps": [
+          "複数のJSONおよびMarkdownファイルを準備",
+          "バッチ移行用のAPIを呼び出す、または個別にwrite_branch_memory_bankを使用して移行",
+          "すべての生成されたYAMLファイルが正しいことを確認",
+          "エラーケースが適切に処理されることを確認"
+        ],
+        "expectedResults": "複数のファイルが一括で正しく移行される",
+        "testFile": "tests/e2e/yaml/batch-migration.test.ts"
+      },
+      {
+        "id": "TC-07-R",
+        "name": "エラーハンドリングテスト（改訂版）",
+        "description": "YAMLファイル操作に関するエラーハンドリングを検証",
+        "steps": [
+          "無効なYAMLフォーマットのファイルを作成しようとする",
+          "スキーマ検証に失敗するデータを送信する",
+          "存在しないブランチやパスに対する操作を試みる",
+          "権限のないディレクトリに対する操作を試みる"
+        ],
+        "expectedResults": "適切なエラーメッセージが返され、システムの安定性が保たれる",
+        "testFile": "tests/e2e/yaml/error-handling.test.ts"
+      },
+      {
+        "id": "TC-08-R",
+        "name": "パフォーマンステスト（改訂版）",
+        "description": "大規模なYAMLファイルに対するパフォーマンスを検証",
+        "steps": [
+          "大量のデータを含むYAMLファイルを生成",
+          "読み取りおよび更新操作の実行時間を測定",
+          "メモリ使用量を監視"
+        ],
+        "expectedResults": "大規模なYAMLファイルでも許容可能なパフォーマンスで動作する",
+        "testFile": "tests/e2e/yaml/performance.test.ts",
+        "notes": "性能目標: 1MBのYAMLファイルの読み取り・書き込みが2秒以内"
+      }
+    ],
+    "implementationPriority": [
+      {
+        "priority": 1,
+        "test": "TC-04-R: JSONからYAMLへの移行テスト",
+        "reasoning": "基本的な変換機能を検証する最も重要なテスト。既存コンポーネントの多くはJSON形式で、これらのYAML変換が正しく行われることが重要。"
+      },
+      {
+        "priority": 2,
+        "test": "TC-05-R: MarkdownからYAMLへの移行テスト",
+        "reasoning": "YAMLへの移行機能の完全性を検証するために重要。Markdownはプロジェクト内で広く使われているため、正確な変換が必要。"
+      },
+      {
+        "priority": 3,
+        "test": "TC-07-R: エラーハンドリングテスト",
+        "reasoning": "システムの安定性を確保するために重要。無効な入力やエラー状況での動作を検証することでシステムの堅牢性を高める。"
+      },
+      {
+        "priority": 4,
+        "test": "TC-06-R: バッチ移行テスト",
+        "reasoning": "実際の移行作業では複数ファイルを扱うことが多いため、バッチ処理の正確性と効率を検証する必要がある。"
+      },
+      {
+        "priority": 5,
+        "test": "TC-08-R: パフォーマンステスト",
+        "reasoning": "システムの性能要件を満たすことを確認するために重要だが、基本機能の正確性が確認された後で実施するのが適切。"
+      }
+    ],
+    "implementationApproach": {
+      "migration-json-to-yaml": {
+        "overview": "JSONからYAMLへの移行テスト実装アプローチ",
+        "steps": [
+          "標準的なJSONファイルと複雑なJSONファイルの両方をフィクスチャとして用意",
+          "write_branch_memory_bankを使用してYAMLファイルとして保存",
+          "生成されたYAMLファイルの構造を検証",
+          "読み取り操作でYAMLファイルが正しく解析されることを確認",
+          "元のJSONと変換後のYAMLの内容の同一性を検証"
+        ],
+        "sampleCode": "// JSONからYAMLへの変換テスト\nit('should convert JSON document to YAML format', async () => {\n  // JSONファイルの読み取り\n  const jsonContent = await readJsonFile(jsonFixturePath);\n  \n  // write_branch_memory_bankでYAMLとして保存\n  const writeResult = await client.callTool('write_branch_memory_bank', {\n    branch: testEnv.testBranch,\n    path: 'converted-document.yaml',\n    content: JSON.stringify(jsonContent)\n  });\n  \n  // 応答の検証\n  expect(writeResult).toContain('Document written successfully');\n  \n  // 生成されたYAMLファイルの検証\n  const yamlPath = path.join(testEnv.branchDir, 'converted-document.yaml');\n  const yamlContent = await readYamlFile(yamlPath);\n  \n  // 内容の検証\n  expect(yamlContent.schema).toBe(jsonContent.schema);\n  expect(yamlContent.metadata.title).toBe(jsonContent.metadata.title);\n  // その他の検証..\n});"
+      },
+      "migration-markdown-to-yaml": {
+        "overview": "MarkdownからYAMLへの移行テスト実装アプローチ",
+        "steps": [
+          "frontmatterあり/なしの両方のMarkdownファイルをフィクスチャとして用意",
+          "write_branch_memory_bankを使用してYAMLファイルとして保存",
+          "生成されたYAMLファイルの構造を検証",
+          "Markdownの構造（frontmatter、見出し、リスト、コードブロックなど）がYAMLに正しく変換されることを確認"
+        ],
+        "sampleCode": "// MarkdownからYAMLへの変換テスト\nit('should convert Markdown document with frontmatter to YAML format', async () => {\n  // Markdownファイルの読み取り\n  const mdContent = await readTextFile(mdFixturePath);\n  \n  // write_branch_memory_bankでYAMLとして保存\n  const writeResult = await client.callTool('write_branch_memory_bank', {\n    branch: testEnv.testBranch,\n    path: 'converted-md-document.yaml',\n    content: mdContent\n  });\n  \n  // 応答の検証\n  expect(writeResult).toContain('Document written successfully');\n  \n  // 生成されたYAMLファイルの検証\n  const yamlPath = path.join(testEnv.branchDir, 'converted-md-document.yaml');\n  const yamlContent = await readYamlFile(yamlPath);\n  \n  // frontmatterの検証\n  expect(yamlContent.metadata.title).toBe('Expected Title');\n  // コンテンツ変換の検証\n  expect(yamlContent.content).toHaveProperty('sections');\n  // その他の検証..\n});"
+      }
+    },
+    "timelineAndResources": {
+      "phase1": {
+        "tasks": [
+          "TC-04-R: JSONからYAMLへの移行テスト実装",
+          "TC-05-R: MarkdownからYAMLへの移行テスト実装"
+        ],
+        "estimatedTime": "2-3日",
+        "deliverables": "2つのテストケースの完全な実装とドキュメント"
+      },
+      "phase2": {
+        "tasks": [
+          "TC-07-R: エラーハンドリングテスト実装",
+          "TC-06-R: バッチ移行テスト実装"
+        ],
+        "estimatedTime": "2-3日",
+        "deliverables": "エラーハンドリングとバッチ処理のテスト実装"
+      },
+      "phase3": {
+        "tasks": [
+          "TC-08-R: パフォーマンステスト実装",
+          "すべてのテストの統合と最終調整",
+          "テストレポートの生成"
+        ],
+        "estimatedTime": "1-2日",
+        "deliverables": "完全なE2Eテストスイートとレポート"
+      }
+    },
+    "riskMitigation": [
+      {
+        "risk": "MCPプロトコルのバージョン変更による互換性問題",
+        "mitigation": "レスポンス解析の汎用化と、マルチバージョン対応のクライアントヘルパーの実装"
+      },
+      {
+        "risk": "大規模YAMLファイルのパフォーマンス問題",
+        "mitigation": "段階的なサイズ増加によるテストと、タイムアウト設定の最適化"
+      },
+      {
+        "risk": "テスト環境の不安定性",
+        "mitigation": "より堅牢なサーバー起動・停止メカニズムの実装とリトライロジックの改善"
+      }
+    ],
+    "nextSteps": [
+      "TC-04-R（JSONからYAMLへの移行テスト）の詳細実装に着手",
+      "必要なテストフィクスチャの作成または拡充",
+      "MCPクライアントヘルパーのSDK 1.7.0互換性の完全対応",
+      "テスト実行の安定性向上のための調整"
+    ]
+  }
+}

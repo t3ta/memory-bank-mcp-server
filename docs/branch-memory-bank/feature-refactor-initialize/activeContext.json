@@ -1,0 +1,17 @@
+{
+  "schema": "memory_document_v1",
+  "metadata": {
+    "title": "activeContext.json",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [],
+    "lastModified": "2025-03-21T19:03:56.252Z"
+  },
+  "content": {
+    "currentWork": "{\\n  \\\"schema\\\": \\\"memory_document_v2\\\",\\n  \\\"metadata\\\": {\\n    \\\"id\\\": \\\"active-context\\\",\\n    \\\"title\\\": \\\"アクティブコンテキスト\\\",\\n    \\\"documentType\\\": \\\"active_context\\\",\\n    \\\"path\\\": \\\"activeContext.json\\\",\\n    \\\"tags\\\": [\\\"core\\\", \\\"active-context\\\"],\\n    \\\"lastModified\\\": \\\"2025-03-22T13:35:00.000Z\\\",\\n    \\\"createdAt\\\": \\\"2025-03-21T18:54:37.189Z\\\",\\n    \\\"version\\\": 1\\n  },\\n  \\\"content\\\": {\\n    \\\"currentWork\\\": \\\"実装完了。ファイル構造の修正作業も完了。\\\",\\n    \\\"recentChanges\\\": [\\n      \\\"FileSystemGlobalMemoryBankRepository.tsのファイル構造を修正\\\",\\n      \\\"破損していたファイル構造を修正し、必要なテンプレートメソッドを実装\\\",\\n      \\\"getEnglishTemplates, getJapaneseTemplates, getChineseTemplatesメソッドを追加\\\",\\n      \\\"getDefaultTemplateメソッドの位置と実装を修正\\\"\\n    ],\\n    \\\"activeDecisions\\\": [\\n      \\\"実装は完了したと判断\\\",\\n      \\\"テストエラーは本PRの範囲外と判断\\\"\\n    ],\\n    \\\"considerations\\\": [\\n      \\\"テストエラーは別のPRで対応するか検討\\\"\\n    ],\\n    \\\"nextSteps\\\": [\\n      \\\"PRをマージする準備を整える\\\",\\n      \\\"コードレビューを依頼する\\\"\\n    ]\\n  }\\n}",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": []
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "47dbd939-c0ec-4abc-be81-c70a336c00fb",
+    "title": "CommonJS移行計画 - E2Eテスト対応",
+    "documentType": "generic",
+    "path": "code-mode-plan.md",
+    "tags": [],
+    "lastModified": "2025-03-18T13:12:58.865Z",
+    "createdAt": "2025-03-18T13:12:58.865Z",
+    "version": 1
+  },
+  "content": {
+    "1_": [
+      "[ ] `\"type\": \"module\"` の削除",
+      "[ ] ESM固有のスクリプトコマンドの調整",
+      "[ ] 必要なdevDependenciesの確認と追加",
+      "[ ] Node.js互換性設定の確認",
+      "[x] `\"module\": \"commonjs\"` の設定確認",
+      "[x] `\"moduleResolution\": \"node\"` の設定確認",
+      "[x] ESM固有の設定が削除されていることを確認",
+      "[x] Jest設定ファイルがCommonJS形式 (jest.config.cjs) になっていることを確認",
+      "[ ] moduleNameMapperの調整（必要に応じて）",
+      "[ ] transformの設定最適化",
+      "[ ] テストタイムアウト設定の確認"
+    ],
+    "2_": [
+      "[ ] serverManager.ts の変換",
+      "[ ] import文をrequireに変更",
+      "[ ] export文をmodule.exportsに変更",
+      "[ ] mcp-client.ts の変換",
+      "[ ] import文をrequireに変更",
+      "[ ] export文をmodule.exportsに変更",
+      "[ ] test-utils.ts の変換",
+      "[ ] import文をrequireに変更",
+      "[ ] export文をmodule.exportsに変更",
+      "[ ] 各テストファイル (.test.ts) のimport文変換",
+      "[ ] テスト内のESM固有の構文をCommonJS互換に変更",
+      "[ ] 非同期処理の扱いを確認・調整",
+      "[ ] setup.ts の変換",
+      "[ ] 関連するヘルパーファイルの参照方法を調整"
+    ],
+    "3_": [
+      "[ ] サーバープロセス起動方法の改善",
+      "[ ] JSON-RPCクライアント通信の安定化",
+      "[ ] レスポンスパーシングの改善",
+      "[ ] エラーハンドリングの強化",
+      "[ ] テスト環境の完全な分離方法の実装",
+      "[ ] 確実なクリーンアップ処理の実装",
+      "[ ] テスト間の依存関係の排除",
+      "[ ] 長時間実行テストの最適化",
+      "[ ] サーバー起動の効率化（可能な場合は再利用）"
+    ],
+    "4_": [
+      "[ ] 全テスト実行での検証",
+      "[ ] エッジケースの確認",
+      "[ ] カバレッジの確認",
+      "[ ] 移行内容のドキュメント化",
+      "[ ] テスト実行方法の更新",
+      "[ ] 今後のメンテナンスガイドライン作成"
+    ]
+  }
+}

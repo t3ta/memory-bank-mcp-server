@@ -1,0 +1,66 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "f7a5e2d1-9c6b-4e80-b3a7-d8f2c9e1b7d3",
+    "title": "リリースノート v2.1.0",
+    "documentType": "release_notes",
+    "path": "releaseNotes.json",
+    "tags": [
+      "release-notes",
+      "documentation",
+      "v2.1.0"
+    ],
+    "lastModified": "2025-03-22T00:00:00.000Z",
+    "createdAt": "2025-03-22T00:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "version": "2.1.0",
+    "releaseDate": "2025-03-31",
+    "summary": "Memory Bank 2.1.0は、データ構造の標準化と操作性の向上に焦点を当てた重要なリリースです。最も重要な変更点は、Markdownサポートの完全な廃止と、JSON形式への完全移行です。",
+    "majorChanges": [
+      {
+        "title": "Markdownサポートの廃止",
+        "description": "Memory Bank 2.1.0では、Markdownサポートが完全に廃止され、すべてのドキュメントはJSON形式である必要があります。これにより、データの一貫性が向上し、プログラミングによるアクセスが容易になります。",
+        "impact": "高",
+        "type": "breaking-change"
+      },
+      {
+        "title": "DocumentPath.tsの修正",
+        "description": "isMarkdownメソッドが常にfalseを返すように修正され、JSONのみのサポートが強化されました。",
+        "impact": "中",
+        "type": "breaking-change"
+      },
+      {
+        "title": "JSON-to-Markdown変換の非推奨化",
+        "description": "JSONからMarkdownへの変換機能が非推奨となり、警告メッセージが表示されるようになりました。",
+        "impact": "中",
+        "type": "breaking-change"
+      }
+    ],
+    "minorChanges": [
+      {
+        "title": "READMEの更新",
+        "description": "READMEがJSON形式のみのサポートを反映するよう更新されました。"
+      },
+      {
+        "title": "ドキュメントの改善",
+        "description": "ドキュメントがJSONのみのサポートを明確に説明するように更新されました。"
+      },
+      {
+        "title": "パフォーマンスの改善",
+        "description": "Markdownサポートの削除により、内部処理が単純化され、パフォーマンスが向上しました。"
+      }
+    ],
+    "migrationGuide": {
+      "title": "移行ガイド",
+      "steps": [
+        "Memory Bank 2.1.0をインストールする",
+        "既存のMarkdownファイルがある場合は、移行ツールを実行する: `memory-bank migrate`",
+        "すべてのMarkdownファイルがJSONに変換されたことを確認する",
+        "必要に応じて手動で調整を行う"
+      ],
+      "notes": "この更新はMarkdownサポートを完全に廃止するため、既存のMarkdownファイルを使用している場合は、必ず移行ツールを実行してJSONに変換してください。移行プロセス中に問題が発生した場合は、GitHubのIssueトラッカーで報告してください。"
+    }
+  }
+}

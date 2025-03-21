@@ -2,8 +2,7 @@
  * I18n Provider Implementation
  * Provides internationalization services for the application
  */
-import path from 'path';
-import { fileURLToPath } from 'url';
+import path from 'node:path';
 import { IFileSystemService } from '../storage/interfaces/IFileSystemService.js';
 import {
   Language,
@@ -28,7 +27,8 @@ export class I18nProvider implements II18nProvider {
    * @param fileSystemService Service for file system operations
    */
   constructor(private readonly fileSystemService: IFileSystemService) {
-    const dirname = path.dirname(fileURLToPath(import.meta.url));
+    // CommonJS compatible path resolution
+    const dirname = __dirname;
     this.translationsPath = path.join(dirname, 'translations');
   }
 

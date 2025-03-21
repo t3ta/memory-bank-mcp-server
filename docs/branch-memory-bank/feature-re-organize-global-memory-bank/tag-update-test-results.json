@@ -1,0 +1,50 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "tag-update-test-results",
+    "title": "タグ更新スクリプトのテスト結果",
+    "documentType": "test_results",
+    "path": "tag-update-test-results.json",
+    "tags": [
+      "test",
+      "tag",
+      "script",
+      "results"
+    ],
+    "lastModified": "2025-03-21T17:00:00.000Z",
+    "createdAt": "2025-03-21T17:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "テスト概要",
+        "content": "グローバルメモリバンクのタグ更新スクリプトのテスト実行結果をまとめたドキュメントです。スクリプトは`scripts/tag-update`ディレクトリにTypeScriptで実装され、ドライランモードで実行されました。"
+      },
+      {
+        "title": "環境設定",
+        "content": "- TypeScriptプロジェクトとして実装\n- 依存パッケージ：fs-extra, chalk, minimist\n- プロジェクトルートパス：`/Users/t3ta/workspace/memory-bank-mcp-server`\n- グローバルメモリバンクパス：`/Users/t3ta/workspace/memory-bank-mcp-server/docs/global-memory-bank`\n- タグカテゴリ定義：`/Users/t3ta/workspace/memory-bank-mcp-server/docs/global-memory-bank/tags/tag_categorization.json`"
+      },
+      {
+        "title": "実行コマンド",
+        "content": "```bash\ncd /Users/t3ta/workspace/memory-bank-mcp-server/scripts/tag-update\nyarn install\nyarn build\nyarn start --dry-run --verbose\n```"
+      },
+      {
+        "title": "テスト結果サマリー",
+        "content": "- スクリプトが正常に実行完了\n- ドライランモードのため、実際の変更は適用されていない\n- バックアップが正常に作成された：`docs/global-memory-bank/backups/tag-update-2025-03-21T07-19-04-716Z`\n- 70個のJSONファイルが処理された\n- 21個のファイルがタグ更新対象として特定された\n- 49個のファイルに変更は必要ない\n- 38個のタグが更新対象（追加: 12個、削除: 26個）\n- 新しいタグインデックスが生成され、78個のタグが含まれる"
+      },
+      {
+        "title": "問題点と修正",
+        "content": "実行中に以下の問題が発見され、修正されました：\n\n1. **ビルドエラー**\n   - `logger.info('統計情報:', tagProcessor.getStats());`で複数の引数を渡していた\n   - テンプレートリテラルとJSONを使用して修正：\n     ```typescript\n     logger.info(`統計情報: ${JSON.stringify(tagProcessor.getStats())}`);\n     ```\n\n2. **ファイルパスの問題**\n   - 実行ディレクトリが`scripts/tag-update`のとき、相対パスでプロジェクトルートを特定できない\n   - `path.resolve(process.cwd(), '../..')`で2レベル上のディレクトリをプロジェクトルートとして設定\n\n3. **タグ更新処理のスキップ**\n   - ドライランモード（`--dry-run`）で実行時にタグ更新処理がスキップされていた\n   - 条件分岐を修正して、ドライランモードでもタグ更新処理を実行するよう変更（ただし実際のファイル保存はスキップ）"
+      },
+      {
+        "title": "詳細ログ",
+        "content": "```\n[07:19:46] [INFO   ] グローバルメモリバンクタグ更新スクリプト\n[07:19:46] [INFO   ] 実行モード: ドライラン（変更は適用されません）\n[07:19:46] [INFO   ] 設定:\n[07:19:46] [INFO   ]   ルートディレクトリ: /Users/t3ta/workspace/memory-bank-mcp-server/docs/global-memory-bank\n[07:19:46] [INFO   ]   バックアップディレクトリ: /Users/t3ta/workspace/memory-bank-mcp-server/docs/global-memory-bank/backups\n[07:19:46] [INFO   ]   タグカテゴリ定義: /Users/t3ta/workspace/memory-bank-mcp-server/docs/global-memory-bank/tags/tag_categorization.json\n[07:19:46] [INFO   ]   新インデックスパス: /Users/t3ta/workspace/memory-bank-mcp-server/docs/global-memory-bank/tags/index.json\n[07:19:46] [INFO   ]   レガシーインデックスパス: /Users/t3ta/workspace/memory-bank-mcp-server/docs/global-memory-bank/_global_index.json\n[07:19:46] [INFO   ] ファイルのスキャンを開始します...\n[07:19:46] [INFO   ] スキャン完了: 70ファイルが見つかりました\n[07:19:46] [INFO   ] バックアップを作成しています...\n[07:19:46] [INFO   ] バックアップディレクトリを作成しました: /Users/t3ta/workspace/memory-bank-mcp-server/docs/global-memory-bank/backups/tag-update-2025-03-21T07-19-04-716Z\n[07:19:46] [INFO   ] 72個のファイルをバックアップしました\n[07:19:46] [INFO   ] バックアップを作成しました: /Users/t3ta/workspace/memory-bank-mcp-server/docs/global-memory-bank/backups/tag-update-2025-03-21T07-19-04-716Z\n[07:19:46] [INFO   ] タグの更新を開始します...\n[07:19:46] [INFO   ] 処理状況: 70/70 ファイル (100%)\n[07:19:46] [INFO   ] タグの更新が完了しました\n[07:19:46] [INFO   ] 処理ファイル数: 70\n[07:19:46] [INFO   ] 更新ファイル数: 21\n[07:19:46] [INFO   ] スキップファイル数: 49\n[07:19:46] [INFO   ] 失敗ファイル数: 0\n[07:19:46] [INFO   ] タグ更新数: 38 (追加: 12, 削除: 26)\n[07:19:46] [INFO   ] 新しいタグインデックスを生成しています...\n[07:19:46] [INFO   ] タグインデックスを生成しました: 78個のタグ\n[07:19:46] [INFO   ] インデックスを保存しました（ドライラン）: /Users/t3ta/workspace/memory-bank-mcp-server/docs/global-memory-bank/tags/index.json\n[07:19:46] [INFO   ] レガシーインデックスを生成しています...\n[07:19:46] [INFO   ] レガシーインデックスを生成しました: 78個のタグ\n[07:19:46] [INFO   ] インデックスを保存しました（ドライラン）: /Users/t3ta/workspace/memory-bank-mcp-server/docs/global-memory-bank/_global_index.json\n[07:19:46] [INFO   ] 処理が完了しました\n[07:19:46] [INFO   ] ドライランモードのため、実際の変更は適用されていません\n[07:19:46] [INFO   ] 変更を適用するには、--dry-run オプションを外して再実行してください\n[07:19:46] [INFO   ] 統計情報: {\"processedFiles\":70,\"updatedFiles\":21,\"skippedFiles\":49,\"failedFiles\":0,\"tagsUpdated\":38,\"tagsAdded\":12,\"tagsRemoved\":26}\n[07:19:46] [INFO   ] タグ更新プロセスのドライランが正常に完了しました\n```"
+      },
+      {
+        "title": "次のステップ",
+        "content": "テスト実行が成功したため、以下の手順で本番実行に進むことが可能です：\n\n1. バックアップが正常に作成されたことを再確認\n2. チーム内で最終確認\n3. 本番実行コマンドの実行：\n   ```bash\n   cd /Users/t3ta/workspace/memory-bank-mcp-server/scripts/tag-update\n   yarn start\n   ```\n4. 実行結果の検証\n   - 更新されたファイルの確認\n   - 新しいタグインデックスの内容確認\n   - 使用上の問題がないか確認\n\n5. 問題があった場合のバックアップからの復元\n   - 現時点では自動復元コマンドは実装されていないため、手動でバックアップから復元する必要があります"
+      }
+    ]
+  }
+}

@@ -1,0 +1,348 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "tag-categorization",
+    "title": "タグカテゴリ定義",
+    "documentType": "reference",
+    "path": "tags/tag_categorization.json",
+    "tags": [
+      "meta",
+      "tag",
+      "index",
+      "reference",
+      "memory-bank"
+    ],
+    "lastModified": "2025-03-21T13:50:00.000Z",
+    "createdAt": "2025-03-21T13:50:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "タグカテゴリ定義について",
+        "content": "このドキュメントはグローバルメモリバンクで使用されるタグをカテゴリごとに整理し、類似タグのマッピングを定義します。タグを論理的なカテゴリにグループ化することで、ナビゲーションの改善とタグ管理の効率化を図ります。\n\nこの定義に基づいて、各ドキュメントのタグが更新され、`tags/index.json`が再構築されます。"
+      },
+      {
+        "title": "カテゴリ構造",
+        "content": "タグは以下の10のカテゴリに分類されます。各カテゴリには、そのカテゴリに関連するタグのリストが含まれています。"
+      },
+      {
+        "title": "1. プロジェクト基盤 (project-foundation)",
+        "content": "プロジェクトの基本情報、概要、目標に関連するタグです。",
+        "tags": [
+          "project",
+          "overview",
+          "summary",
+          "domain",
+          "document-model",
+          "models",
+          "glossary",
+          "terminology",
+          "definitions"
+        ],
+        "primaryTags": [
+          "project",
+          "domain",
+          "glossary"
+        ],
+        "tagMappings": {
+          "summary": "overview"
+        }
+      },
+      {
+        "title": "2. 設計・アーキテクチャ (design-architecture)",
+        "content": "システム設計、アーキテクチャ、設計原則に関連するタグです。",
+        "tags": [
+          "architecture",
+          "design",
+          "system-design",
+          "decision",
+          "decisions"
+        ],
+        "primaryTags": [
+          "architecture",
+          "design",
+          "decision"
+        ],
+        "tagMappings": {
+          "system-design": "architecture",
+          "decisions": "decision"
+        }
+      },
+      {
+        "title": "3. 実装・技術 (implementation-technology)",
+        "content": "コード実装、技術スタック、依存関係に関連するタグです。",
+        "tags": [
+          "implementation",
+          "tech-stack",
+          "infrastructure",
+          "dependencies",
+          "typescript",
+          "clean-code",
+          "standards",
+          "best-practices",
+          "json",
+          "command",
+          "mcp",
+          "context"
+        ],
+        "primaryTags": [
+          "implementation",
+          "tech-stack",
+          "infrastructure",
+          "json"
+        ],
+        "tagMappings": {
+          "dependencies": "tech-stack",
+          "standards": "best-practices"
+        }
+      },
+      {
+        "title": "4. ドキュメント・ガイド (documentation-guides)",
+        "content": "ユーザーガイド、ドキュメント、参照情報に関連するタグです。",
+        "tags": [
+          "documentation",
+          "guide",
+          "reference",
+          "policy",
+          "navigation"
+        ],
+        "primaryTags": [
+          "documentation",
+          "guide",
+          "reference"
+        ],
+        "tagMappings": {}
+      },
+      {
+        "title": "5. テスト・品質 (testing-quality)",
+        "content": "テスト戦略、テスト実装、品質保証に関連するタグです。",
+        "tags": [
+          "testing",
+          "test",
+          "e2e",
+          "integration-test",
+          "integration-tests",
+          "tdd",
+          "qa",
+          "controller",
+          "tag-system",
+          "search",
+          "implementation-plan"
+        ],
+        "primaryTags": [
+          "testing",
+          "e2e",
+          "integration-test",
+          "qa"
+        ],
+        "tagMappings": {
+          "test": "testing",
+          "integration-tests": "integration-test"
+        }
+      },
+      {
+        "title": "6. バージョン・リリース (version-releases)",
+        "content": "リリース情報、バージョン管理、変更履歴に関連するタグです。",
+        "tags": [
+          "release",
+          "v2",
+          "v2-0",
+          "version-2",
+          "version",
+          "changelog",
+          "pr",
+          "planning"
+        ],
+        "primaryTags": [
+          "release",
+          "v2",
+          "changelog"
+        ],
+        "tagMappings": {
+          "version-2": "v2",
+          "v2-0": "v2"
+        }
+      },
+      {
+        "title": "7. インフラ・運用 (infrastructure-operations)",
+        "content": "CI/CD、自動化、運用に関連するタグです。",
+        "tags": [
+          "ci-cd",
+          "github-actions",
+          "automation",
+          "workflows",
+          "cli",
+          "commands",
+          "operations",
+          "troubleshooting",
+          "errors"
+        ],
+        "primaryTags": [
+          "ci-cd",
+          "cli",
+          "operations"
+        ],
+        "tagMappings": {
+          "github-actions": "ci-cd",
+          "automation": "ci-cd",
+          "workflows": "ci-cd",
+          "commands": "cli",
+          "errors": "troubleshooting"
+        }
+      },
+      {
+        "title": "8. 国際化・多言語 (internationalization-localization)",
+        "content": "国際化、ローカライゼーション、多言語対応に関連するタグです。",
+        "tags": [
+          "i18n",
+          "l10n",
+          "template"
+        ],
+        "primaryTags": [
+          "i18n",
+          "l10n"
+        ],
+        "tagMappings": {}
+      },
+      {
+        "title": "9. リファクタリング・技術的負債 (refactoring-tech-debt)",
+        "content": "リファクタリング、技術的負債、コード改善に関連するタグです。",
+        "tags": [
+          "refactoring",
+          "tech-debt",
+          "migration",
+          "markdown",
+          "organization"
+        ],
+        "primaryTags": [
+          "refactoring",
+          "tech-debt",
+          "migration"
+        ],
+        "tagMappings": {}
+      },
+      {
+        "title": "10. メタ・その他 (meta-miscellaneous)",
+        "content": "メタ情報、インデックス、その他の分類に当てはまらないタグです。",
+        "tags": [
+          "meta",
+          "index",
+          "tag",
+          "memory-bank",
+          "analysis",
+          "plan",
+          "raw-data"
+        ],
+        "primaryTags": [
+          "meta",
+          "index",
+          "memory-bank",
+          "plan"
+        ],
+        "tagMappings": {}
+      }
+    ],
+    "tagCategoryMappings": {
+      "project": "project-foundation",
+      "overview": "project-foundation",
+      "summary": "project-foundation",
+      "domain": "project-foundation",
+      "document-model": "project-foundation",
+      "models": "project-foundation",
+      "glossary": "project-foundation",
+      "terminology": "project-foundation",
+      "definitions": "project-foundation",
+      
+      "architecture": "design-architecture",
+      "design": "design-architecture",
+      "system-design": "design-architecture",
+      "decision": "design-architecture",
+      "decisions": "design-architecture",
+      
+      "implementation": "implementation-technology",
+      "tech-stack": "implementation-technology",
+      "infrastructure": "implementation-technology",
+      "dependencies": "implementation-technology",
+      "typescript": "implementation-technology",
+      "clean-code": "implementation-technology",
+      "standards": "implementation-technology",
+      "best-practices": "implementation-technology",
+      "json": "implementation-technology",
+      "command": "implementation-technology",
+      "mcp": "implementation-technology",
+      "context": "implementation-technology",
+      
+      "documentation": "documentation-guides",
+      "guide": "documentation-guides",
+      "reference": "documentation-guides",
+      "policy": "documentation-guides",
+      "navigation": "documentation-guides",
+      
+      "testing": "testing-quality",
+      "test": "testing-quality",
+      "e2e": "testing-quality",
+      "integration-test": "testing-quality",
+      "integration-tests": "testing-quality",
+      "tdd": "testing-quality",
+      "qa": "testing-quality",
+      "controller": "testing-quality",
+      "tag-system": "testing-quality",
+      "search": "testing-quality",
+      "implementation-plan": "testing-quality",
+      
+      "release": "version-releases",
+      "v2": "version-releases",
+      "v2-0": "version-releases",
+      "version-2": "version-releases",
+      "version": "version-releases",
+      "changelog": "version-releases",
+      "pr": "version-releases",
+      "planning": "version-releases",
+      
+      "ci-cd": "infrastructure-operations",
+      "github-actions": "infrastructure-operations",
+      "automation": "infrastructure-operations",
+      "workflows": "infrastructure-operations",
+      "cli": "infrastructure-operations",
+      "commands": "infrastructure-operations",
+      "operations": "infrastructure-operations",
+      "troubleshooting": "infrastructure-operations",
+      "errors": "infrastructure-operations",
+      
+      "i18n": "internationalization-localization",
+      "l10n": "internationalization-localization",
+      "template": "internationalization-localization",
+      
+      "refactoring": "refactoring-tech-debt",
+      "tech-debt": "refactoring-tech-debt",
+      "migration": "refactoring-tech-debt",
+      "markdown": "refactoring-tech-debt",
+      "organization": "refactoring-tech-debt",
+      
+      "meta": "meta-miscellaneous",
+      "index": "meta-miscellaneous",
+      "tag": "meta-miscellaneous",
+      "memory-bank": "meta-miscellaneous",
+      "analysis": "meta-miscellaneous",
+      "plan": "meta-miscellaneous",
+      "raw-data": "meta-miscellaneous"
+    },
+    "tagAliases": {
+      "summary": "overview",
+      "system-design": "architecture",
+      "decisions": "decision",
+      "dependencies": "tech-stack",
+      "standards": "best-practices",
+      "test": "testing",
+      "integration-tests": "integration-test",
+      "version-2": "v2",
+      "v2-0": "v2",
+      "github-actions": "ci-cd",
+      "automation": "ci-cd",
+      "workflows": "ci-cd",
+      "commands": "cli",
+      "errors": "troubleshooting"
+    }
+  }
+}

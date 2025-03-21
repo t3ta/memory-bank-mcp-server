@@ -1,0 +1,32 @@
+{
+  "schema": "memory_document_v1",
+  "metadata": {
+    "id": "branch-context-doc",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "core",
+      "branch-context"
+    ],
+    "lastModified": "2025-03-21T01:50:00.000Z"
+  },
+  "content": {
+    "purpose": "このブランチの目的は、CLIのエンドツーエンド（E2E）テストを追加して、CLIツールの機能性と安定性を確保することです。",
+    "background": "メモリバンクCLIは、メモリバンクの管理と操作のために使用されるコマンドラインツールです。現在、いくつかの基本的なE2Eテストが実装されていますが、CLIの全コマンドをカバーするためには追加のテストが必要です。",
+    "userStories": [
+      {
+        "description": "開発者として、CLIツールの全コマンドが適切にテストされていることを確認したい",
+        "completed": false
+      },
+      {
+        "description": "開発者として、将来のコード変更が既存の機能を壊さないよう、自動テストでカバーしたい",
+        "completed": false
+      },
+      {
+        "description": "開発者として、CLIツールの安定性を向上させ、バグを減らしたい",
+        "completed": false
+      }
+    ]
+  }
+}

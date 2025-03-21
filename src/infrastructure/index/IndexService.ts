@@ -1,12 +1,11 @@
-import path from 'path';
-import { promises as fs } from 'fs';
+import path from 'node:path';
 
 import { BranchInfo } from '../../domain/entities/BranchInfo.js';
 import { DocumentId } from '../../domain/entities/DocumentId.js';
 import { DocumentPath } from '../../domain/entities/DocumentPath.js';
 import { JsonDocument, DocumentType } from '../../domain/entities/JsonDocument.js';
 import { Tag } from '../../domain/entities/Tag.js';
-import { IFileSystemService } from '../../infrastructure/storage/interfaces/IFileSystemService.js';
+import { IFileSystemService } from '../storage/interfaces/IFileSystemService.js';
 import {
   InfrastructureError,
   InfrastructureErrorCodes,
@@ -35,7 +34,7 @@ export class IndexService implements IIndexService {
   constructor(
     private readonly fileSystemService: IFileSystemService,
     private readonly rootPath: string
-  ) {}
+  ) { }
 
   /**
    * Initialize the index for a branch
