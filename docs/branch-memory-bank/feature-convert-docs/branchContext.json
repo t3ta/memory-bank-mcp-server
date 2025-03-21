@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "5ab24b8f-fcc3-4d08-8972-be7c27f384ab",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-21T01:29:07.744Z",
+    "createdAt": "2025-03-21T01:29:07.744Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "feature/convert-docs",
+    "purpose": "このブランチの目的を記述してください",
+    "createdAt": "2025-03-21T01:29:07.744Z",
+    "userStories": [
+      {
+        "id": "95e6a272-c406-4c58-a485-e789f58842c2",
+        "description": "解決する課題1",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "e7d9cfad-b6df-4269-b02d-659ec9c23fd2",
+        "description": "解決する課題2",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "c19e6af0-3129-4900-b646-53c560454ad6",
+        "description": "解決する課題3",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": ""
+  }
+}
