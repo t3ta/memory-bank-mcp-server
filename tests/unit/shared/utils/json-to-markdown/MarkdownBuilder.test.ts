@@ -1,6 +1,6 @@
 import { MarkdownBuilder } from '../../../../../src/shared/utils/json-to-markdown/MarkdownBuilder.js';
 
-describe('MarkdownBuilder', () => {
+describe('MarkdownBuilder (Deprecated)', () => {
   let builder: MarkdownBuilder;
 
   beforeEach(() => {

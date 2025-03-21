@@ -1,7 +1,7 @@
 import { parseMarkdown } from '../../../../src/shared/utils/markdown-parser.js';
 import { DocumentMetadataV2 as DocumentMetadata } from '../../../../src/schemas/v2/json-document.js';
 
-describe('markdown-parser', () => {
+describe('markdown-parser (Deprecated)', () => {
   describe('parseMarkdown', () => {
     it('should parse a basic markdown document with title and tags', () => {
       // Arrange

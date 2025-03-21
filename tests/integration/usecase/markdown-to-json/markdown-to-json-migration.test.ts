@@ -29,8 +29,11 @@ import { logger } from '../../../../src/shared/utils/logger.js';
  * Integration Test: Markdown-to-JSON Migration
  *
  * Testing migration from Markdown file format to JSON
+ * 
+ * @deprecated This test is for the migration functionality which is still supported
+ * but will be eventually removed in future versions as Markdown support is being phased out.
  */
-describe('Markdown to JSON Migration Integration Tests', () => {
+describe('Markdown to JSON Migration Integration Tests (Migration Tool)', () => {
   // Test directories
   let testDir: string;
   let branchDir: string;

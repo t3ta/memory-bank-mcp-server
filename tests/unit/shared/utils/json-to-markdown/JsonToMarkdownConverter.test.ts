@@ -46,7 +46,7 @@ function createMockDocument(
   });
 }
 
-describe('JsonToMarkdownConverter', () => {
+describe('JsonToMarkdownConverter (Deprecated)', () => {
   let converter: JsonToMarkdownConverter;
   let mockTypeConverter: IDocumentTypeConverter;
 
