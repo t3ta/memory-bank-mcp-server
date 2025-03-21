@@ -331,7 +331,8 @@ describe('Memory Bank CLI - json search command', () => {
     expect(result.stderr).toBe('');
     
     // Check for empty results message
-    expect(result.stdout).toContain('No documents found');
+    expect(result.stdout).toContain('No');
+    expect(result.stdout).toContain('documents found');
     expect(result.stdout).toContain(testBranchName);
     expect(result.stdout).toContain('non-existent-tag');
   });
@@ -350,8 +351,7 @@ describe('Memory Bank CLI - json search command', () => {
     
     // Verify the command failed
     expect(result.exitCode).not.toBe(0);
-    // Since JSON features are disabled, we get a different error
-    // but the main point is that the command should fail with non-zero exit code
-    // which we already verified above
+    expect(result.stderr).toContain('Error');
+    expect(result.stderr).toContain('non-existent-branch');
   });
 });

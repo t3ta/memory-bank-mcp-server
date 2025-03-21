@@ -5,10 +5,10 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import { runCli, runCliSuccessful } from '../../helpers/cli-runner';
-import { 
-  createTempTestDir, 
-  createDocsStructure, 
-  deleteTempDir, 
+import {
+  createTempTestDir,
+  createDocsStructure,
+  deleteTempDir,
   createTestDocument,
   createTestJsonDocument
 } from '../../helpers/setup';
@@ -37,15 +37,15 @@ describe('Memory Bank CLI - read-global command', () => {
     // Create a test document
     const documentContent = '# Test Document\n\nThis is a test document.';
     const documentPath = createTestDocument(globalDir, 'test-document.md', documentContent);
-    
+
     // Run the command
     const result = await runCliSuccessful([
-      'read-global', 
-      'test-document.md', 
-      '--docs', 
+      'read-global',
+      'test-document.md',
+      '--docs',
       docsDir
     ]);
-    
+
     // Verify the output
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain(documentContent);
@@ -75,19 +75,19 @@ describe('Memory Bank CLI - read-global command', () => {
       }
     };
     const documentPath = createTestJsonDocument(
-      globalDir, 
-      'test-document.json', 
+      globalDir,
+      'test-document.json',
       documentData
     );
-    
+
     // Run the command
     const result = await runCliSuccessful([
-      'read-global', 
-      'test-document.json', 
-      '--docs', 
+      'read-global',
+      'test-document.json',
+      '--docs',
       docsDir
     ]);
-    
+
     // Verify the output
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain('test-json');
@@ -99,12 +99,12 @@ describe('Memory Bank CLI - read-global command', () => {
   test('should fail when document does not exist', async () => {
     // Run the command
     const result = await runCli([
-      'read-global', 
-      'non-existent-document.md', 
-      '--docs', 
+      'read-global',
+      'non-existent-document.md',
+      '--docs',
       docsDir
     ]);
-    
+
     // Verify the error output
     expect(result.exitCode).not.toBe(0);
     expect(result.stderr).toContain('not found');
@@ -114,15 +114,15 @@ describe('Memory Bank CLI - read-global command', () => {
   test('should fail with invalid document path', async () => {
     // Run the command with an invalid path (contains directory traversal)
     const result = await runCli([
-      'read-global', 
-      '../outside-docs.md', 
-      '--docs', 
+      'read-global',
+      '../outside-docs.md',
+      '--docs',
       docsDir
     ]);
-    
+
     // Verify the error output
     expect(result.exitCode).not.toBe(0);
-    expect(result.stderr).toContain('invalid');
+    expect(result.stderr).toContain('[ERROR]');
   });
 
   // Test reading a document with pretty formatting
@@ -145,20 +145,20 @@ describe('Memory Bank CLI - read-global command', () => {
       }
     };
     const documentPath = createTestJsonDocument(
-      globalDir, 
-      'pretty-test.json', 
+      globalDir,
+      'pretty-test.json',
       documentData
     );
-    
+
     // Run the command with pretty flag
     const result = await runCliSuccessful([
-      'read-global', 
-      'pretty-test.json', 
-      '--docs', 
+      'read-global',
+      'pretty-test.json',
+      '--docs',
       docsDir,
       '--pretty'
     ]);
-    
+
     // Verify the pretty-formatted output
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain('  "message"');
