@@ -257,7 +257,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
       if (!app) {
         throw new Error('Application not initialized');
       }
-      await app.getBranchController().writeDocument(branch, path, content);
+
+      // ドキュメントの書き込みを試行し、結果を確認
+      const response = await app.getBranchController().writeDocument(branch, path, content);
+      if (!response.success) {
+        throw new Error((response as any).error?.message || 'Failed to write document');
+      }
+
       return { content: [{ type: 'text', text: 'Document written successfully' }] };
     }
 
@@ -359,7 +365,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
       if (!app) {
         throw new Error('Application not initialized');
       }
-      await app.getGlobalController().writeDocument(path, content);
+
+      // ドキュメントの書き込みを試行し、結果を確認
+      const response = await app.getGlobalController().writeDocument(path, content);
+      if (!response.success) {
+        throw new Error((response as any).error?.message || 'Failed to write document');
+      }
+
       return { content: [{ type: 'text', text: 'Document written successfully' }] };
     }
 

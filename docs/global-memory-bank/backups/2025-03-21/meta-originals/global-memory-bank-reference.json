@@ -1,0 +1,50 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "global-memory-bank-reference",
+    "title": "グローバルメモリバンク リファレンスガイド",
+    "documentType": "reference",
+    "path": "global-memory-bank-reference.json",
+    "tags": [
+      "reference",
+      "memory-bank",
+      "guide",
+      "documentation"
+    ],
+    "lastModified": "2025-03-21T03:45:00.000Z",
+    "createdAt": "2025-03-21T03:45:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "グローバルメモリバンクについて",
+        "content": "グローバルメモリバンクは、プロジェクト全体で共有されるドキュメントを保管する中央リポジトリです。設計決定、アーキテクチャ、コーディング規約、テスト戦略など、プロジェクトに関する重要な情報が含まれています。このリファレンスガイドでは、グローバルメモリバンク内のドキュメントに効率的にアクセスするための方法を説明します。"
+      },
+      {
+        "title": "主要ドキュメント一覧",
+        "content": "以下は、グローバルメモリバンク内の最も重要なドキュメントのリストです：\n\n### プロジェクト情報\n- **[project-overview.json](/docs/global-memory-bank/project-overview.json)**: プロジェクトの概要、目的、主要機能\n- **[tech-stack.json](/docs/global-memory-bank/tech-stack.json)**: 使用している技術スタックとインフラ情報\n\n### アーキテクチャとドメインモデル\n- **[architecture.json](/docs/global-memory-bank/architecture.json)**: システムのアーキテクチャと設計原則\n- **[domain-models.json](/docs/global-memory-bank/domain-models.json)**: ドメインモデルと概念設計\n- **[json-based-architecture.json](/docs/global-memory-bank/json-based-architecture.json)**: JSONベースのアーキテクチャの詳細\n\n### 機能実装\n- **[read-context-command-design.json](/docs/global-memory-bank/read-context-command-design.json)**: read_contextコマンドの設計\n- **[read-context-command-implementation.json](/docs/global-memory-bank/read-context-command-implementation.json)**: read_contextコマンドの実装詳細\n\n### テスト戦略\n- **[integration-test-strategy.json](/docs/global-memory-bank/integration-test-strategy.json)**: 統合テスト戦略\n- **[e2e-test-implementation.json](/docs/global-memory-bank/e2e-test-implementation.json)**: エンドツーエンドテストの実装\n\n### ユーザーガイドと参照情報\n- **[user-guide.json](/docs/global-memory-bank/user-guide.json)**: ユーザーガイドと使用方法\n- **[glossary.json](/docs/global-memory-bank/glossary.json)**: 用語集と定義\n- **[coding-standards.json](/docs/global-memory-bank/coding-standards.json)**: コーディング規約とベストプラクティス\n- **[cli-commands.json](/docs/global-memory-bank/cli-commands.json)**: CLIコマンドリファレンス\n\n### バージョンと計画\n- **[release-v2.0.0.json](/docs/global-memory-bank/release-v2.0.0.json)**: バージョン2.0.0のリリースノート\n- **[v2-implementation-plan.json](/docs/global-memory-bank/v2-implementation-plan.json)**: バージョン2の実装計画"
+      },
+      {
+        "title": "メモリバンクへのアクセス方法",
+        "content": "グローバルメモリバンクにアクセスするには、以下の方法があります：\n\n### CLIコマンド\n\n```bash\n# グローバルメモリバンクからドキュメントを読み取る\nnpx memory-bank read-global <path>\n\n# グローバルメモリバンクにドキュメントを書き込む\nnpx memory-bank write-global <path> [content]\n```\n\n### MCPコマンド\n\n```javascript\n// グローバルメモリバンクからドキュメントを読み取る\nread_global_memory_bank({ path: \"<path>\" })\n\n// グローバルメモリバンクにドキュメントを書き込む\nwrite_global_memory_bank({ path: \"<path>\", content: \"<content>\" })\n\n// 全てのコンテキスト情報を一度に読み取る\nread_context({ includeGlobalMemory: true })\n```"
+      },
+      {
+        "title": "ディレクトリ構造",
+        "content": "グローバルメモリバンクのディレクトリ構造は以下のようになっています：\n\n```\ndocs/global-memory-bank/\n├── _global_index.json           # グローバルタグインデックス（旧）\n├── architecture-decisions.json  # アーキテクチャ決定\n├── architecture.json            # アーキテクチャ概要\n├── ci-cd/                       # CI/CD関連ドキュメント\n│   ├── memory-bank-errors.json  # メモリバンクエラー対応\n│   └── workflows.json           # CI/CDワークフロー\n├── cli-commands.json            # CLIコマンドリファレンス\n├── coding-standards.json        # コーディング規約\n├── domain-models.json           # ドメインモデル\n├── glossary.json                # 用語集\n├── project-overview.json        # プロジェクト概要\n├── tags/                        # タグ関連ドキュメント\n│   ├── index.json               # タグインデックス（新）\n│   └── reorganization-plan.json # タグ再編成計画\n└── ... その他のドキュメント\n```"
+      },
+      {
+        "title": "タグとナビゲーション",
+        "content": "グローバルメモリバンク内のドキュメントは、タグによって分類されています。以下のドキュメントがナビゲーションに役立ちます：\n\n- **[tags/index.json](/docs/global-memory-bank/tags/index.json)**: すべてのタグと関連ドキュメントのインデックス\n- **[global-memory-bank-navigation.json](/docs/global-memory-bank/global-memory-bank-navigation.json)**: カテゴリ別にタグを整理したナビゲーションガイド\n\n特定のトピックに関するドキュメントを見つけるには、これらのインデックスを使用して関連するタグを探し、そのタグに関連付けられたドキュメントを参照してください。"
+      },
+      {
+        "title": "ドキュメントの更新と追加",
+        "content": "新しいドキュメントを作成したり既存のドキュメントを更新したりする場合は、以下のプラクティスに従ってください：\n\n1. **正しいスキーマを使用**: 全てのドキュメントは `memory_document_v2` スキーマを使用します\n\n2. **適切なメタデータを含める**: ID、タイトル、ドキュメントタイプ、パス、タグなどの必要なメタデータを含めてください\n\n3. **有意義なタグ付け**: 文書の内容を正確に表すタグを使用し、既存のタグシステムに一貫性を持たせるように努めてください\n\n4. **構造化されたコンテンツ**: コンテンツを論理的なセクションに分け、適切なタイトルと内容で構成します\n\n5. **参照リンクの追加**: 関連するドキュメントへの参照を含めて、情報の発見性を向上させます"
+      },
+      {
+        "title": "関連資料",
+        "content": "さらに詳しい情報は、以下のドキュメントを参照してください：\n\n- **[global-memory-bank-index-analysis.json](/docs/global-memory-bank/global-memory-bank-index-analysis.json)**: インデックスシステムの現状分析と改善提案\n- **[migration-policy.json](/docs/global-memory-bank/migration-policy.json)**: ドキュメントマイグレーションポリシー\n- **[json-global-design-issues.json](/docs/global-memory-bank/json-global-design-issues.json)**: グローバル設計の課題\n\nこのリファレンスガイドは、グローバルメモリバンクの使用を支援するための出発点として機能します。特定の詳細については、上記のリンクされたドキュメントを参照してください。"
+      }
+    ]
+  }
+}

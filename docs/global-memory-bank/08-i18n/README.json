@@ -1,0 +1,38 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "i18n-directory-readme",
+    "title": "Internationalization Directory README",
+    "documentType": "guide",
+    "path": "08-i18n/README.json",
+    "tags": [
+      "i18n",
+      "l10n",
+      "documentation",
+      "guide"
+    ],
+    "lastModified": "2025-03-21T13:30:00.000Z",
+    "createdAt": "2025-03-21T13:30:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "Internationalization Directory",
+        "content": "The `08-i18n` directory contains documents related to internationalization (i18n), localization (l10n), template systems, and language support. This directory focuses on making the system accessible to users from different regions and language backgrounds."
+      },
+      {
+        "title": "Purpose",
+        "content": "This directory serves as a central location for internationalization-related information. The documents here define how the system supports multiple languages, cultural conventions, and region-specific requirements. This directory is important for understanding how to implement and maintain multilingual support in the system."
+      },
+      {
+        "title": "Key Documents",
+        "content": "- **template-system-json-i18n-design.json**: Design of the template system with i18n support\n- **multilingual-support-plan.json**: Plan for implementing multilingual support\n\nAdditional documents include:\n- Translation workflows\n- Locale-specific configurations\n- Cultural adaptation guidelines"
+      },
+      {
+        "title": "Related Tags",
+        "content": "Common tags for documents in this directory include:\n- i18n\n- l10n\n- template\n- internationalization\n- localization\n- languages"
+      }
+    ]
+  }
+}

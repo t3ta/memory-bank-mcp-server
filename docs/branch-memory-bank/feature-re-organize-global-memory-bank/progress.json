@@ -1,87 +1,35 @@
 {
   "schema": "memory_document_v2",
   "metadata": {
-    "id": "progress-status",
-    "title": "進捗状況",
+    "id": "progress",
+    "title": "Global Memory Bank Reorganization Progress",
     "documentType": "progress",
     "path": "progress.json",
     "tags": [
-      "progress",
-      "status",
-      "implementation"
+      "core",
+      "progress"
     ],
-    "lastModified": "2025-03-21T13:00:00.000Z",
-    "createdAt": "2025-03-21T13:00:00.000Z",
-    "version": 1
+    "lastModified": "2025-03-21T14:25:00.000Z",
+    "createdAt": "2025-03-21T04:35:19.426Z",
+    "version": 4
   },
   "content": {
-    "workingFeatures": [
+    "sections": [
       {
-        "id": "basic-memory-operations",
-        "description": "基本的なメモリバンクの読み書き機能"
+        "title": "動作している機能",
+        "content": "現在、以下の機能が完了しています：\n\n1. **フェーズ1: バックアップと準備**\n   - バックアップディレクトリの作成と元ファイルのバックアップ\n   - ファイル関係の分析と統合計画の策定\n\n2. **フェーズ2: ファイル統合** (完了)\n   - アーキテクチャ関連ドキュメントの統合\n   - テスト関連ドキュメントの統合\n   - バージョン関連ドキュメントの統合\n   - メタ情報関連ドキュメントの統合\n\n3. **フェーズ3: タグ再編成** (完了)\n   - タグカテゴリの実装（10カテゴリの定義）\n   - タグの統合（例: version-2, v2-0, v2 の統合）\n   - カテゴリごとの主要ドキュメントの明示\n\n4. **フェーズ4: ドキュメント改善** (部分的に完了)\n   - 新規作成したドキュメントのタイトルと言語の統一（英語）\n   - 新規ドキュメントの適切なセクション構造の実装\n\n5. **フェーズ5: ディレクトリ再構築** (完了)\n   - 主要カテゴリディレクトリの作成（01-project から 09-refactoring）\n   - metaディレクトリの作成\n   - 各ディレクトリにREADMEファイルを追加\n   - 統合されたメタ情報ドキュメントを適切なディレクトリに配置"
       },
       {
-        "id": "branch-management",
-        "description": "ブランチごとのメモリバンク管理"
+        "title": "未実装の機能",
+        "content": "以下の機能はまだ実装されていません：\n\n1. **フェーズ4: ドキュメント改善** (残作業)\n   - 既存ドキュメントのタイプの標準化\n   - 既存ドキュメントの言語統一（日本語から英語へ）\n\n2. **フェーズ6: インデックス更新**\n   - _global_index.json の更新\n   - タグインデックス形式の拡張（カテゴリ情報の追加）\n\n3. **フェーズ7: 検証とテスト**\n   - 参照の機能テスト\n   - 統合ドキュメントのレビュー\n   - ユーザー受け入れテスト\n\n4. **フェーズ8: 最終クリーンアップ**\n   - 冗長ファイルの削除\n   - グローバルドキュメントの更新\n   - 変更サマリーの作成"
       },
       {
-        "id": "directory-structure",
-        "description": "グローバルメモリバンクの新しいディレクトリ構造（実装済み）"
+        "title": "現在の状態",
+        "content": "実装計画の8フェーズのうち、フェーズ1、フェーズ2、フェーズ3、フェーズ5が完了し、フェーズ4が部分的に完了しています。フェーズ6、7、8はまだ着手されていません。ここまでで、大幅な再編成が実現しており、特にタグカテゴリの導入と統合ドキュメントの作成によって、ナビゲーション性が向上しています。\n\n現在の優先事項は：\n1. インデックスファイルの更新（フェーズ6）\n2. 残りのドキュメント改善タスク（フェーズ4の残り）\n3. 検証とテスト（フェーズ7）\n\nタグ再編成（フェーズ3）は完了しましたが、新しいタグ構造がすべてのドキュメントに適用されるためには、インデックスの更新が必要です。"
       },
       {
-        "id": "file-migration",
-        "description": "大部分のJSONファイルを適切なカテゴリディレクトリへ移動（完了）"
-      }
-    ],
-    "pendingImplementation": [
-      {
-        "id": "index-update",
-        "description": "インデックスファイルの更新",
-        "priority": "high"
-      },
-      {
-        "id": "path-references-update",
-        "description": "ファイル内の相対パス参照の更新",
-        "priority": "medium"
-      },
-      {
-        "id": "tag-system-rebuild",
-        "description": "タグシステムの再構築",
-        "priority": "medium"
-      },
-      {
-        "id": "markdown-to-json",
-        "description": "マークダウンからJSONへの自動変換機能",
-        "priority": "low"
-      },
-      {
-        "id": "search-enhancement",
-        "description": "ドキュメント検索機能の拡張",
-        "priority": "low"
-      }
-    ],
-    "status": "in-development",
-    "completionPercentage": 65,
-    "currentState": {
-      "phase": "ディレクトリ再構築",
-      "progress": "ほぼ完了",
-      "details": "ルートディレクトリにあった大部分のJSONファイルを適切なカテゴリディレクトリに移動することができた。以下のディレクトリ構造が実装されている：\n- `01-project/`: プロジェクト基本情報関連\n- `02-architecture/`: アーキテクチャ設計関連\n- `03-implementation/`: 実装詳細関連\n- `04-guides/`: ユーザーガイド・移行ガイド関連\n- `05-testing/`: テスト戦略・実装関連\n- `06-releases/`: リリース情報関連\n- `08-i18n/`: 多言語サポート関連\n- `09-refactoring/`: リファクタリング・設計問題関連\n\n全36ファイルについて適切なディレクトリに移動が完了。"
-    },
-    "knownIssues": [
-      {
-        "id": "old-path-references",
-        "description": "インデックスファイル（`_global_index.json`）にはまだ古いパス参照が含まれている",
-        "severity": "medium"
-      },
-      {
-        "id": "internal-path-references",
-        "description": "一部のJSONファイルには旧パスが含まれている可能性があり、更新が必要",
-        "severity": "medium"
-      },
-      {
-        "id": "index-update-mechanism",
-        "description": "インデックス更新のための仕組みが必要",
-        "severity": "low"
+        "title": "既知の問題",
+        "content": "1. **言語の混在**: 既存のドキュメントタイトルの多くがまだ日本語で記述されており、英語への統一が必要\n\n2. **インデックスの不整合**: 新しいタグカテゴリが`tags/index.json`に実装されましたが、`_global_index.json`はまだ更新されていません\n\n3. **古いファイル参照**: 統合ドキュメントの内部リンクの一部は、旧ファイルパスを参照している可能性があります\n\n4. **未更新のドキュメントタイプ**: 多くのドキュメントが標準化されたドキュメントタイプを使用していない\n\n5. **不完全なディレクトリ構造**: 一部のファイルが適切なカテゴリディレクトリに移動されていない\n\n6. **重複コンテンツ**: 統合ドキュメントと元のドキュメントの両方が存在し、冗長性がある"
       }
     ]
   }

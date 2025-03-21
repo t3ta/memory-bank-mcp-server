@@ -1,0 +1,37 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "meta-directory-readme",
+    "title": "Meta Directory README",
+    "documentType": "guide",
+    "path": "meta/README.json",
+    "tags": [
+      "meta",
+      "documentation",
+      "guide"
+    ],
+    "lastModified": "2025-03-21T12:50:00.000Z",
+    "createdAt": "2025-03-21T12:50:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "Meta Directory",
+        "content": "The `meta` directory contains documents related to the Global Memory Bank structure, organization, and meta-information. This includes navigation guides, reference documents, index analyses, and other meta-level documentation."
+      },
+      {
+        "title": "Purpose",
+        "content": "This directory serves as a central location for information about how the Global Memory Bank itself is structured and how to effectively navigate and use it. The documents in this directory are designed to help users understand the organization, tagging system, and overall architecture of the Global Memory Bank."
+      },
+      {
+        "title": "Key Documents",
+        "content": "- **consolidated-memory-bank-meta.json**: A comprehensive guide that consolidates navigation, reference, and index information\n- **README.json**: This file, providing information about the meta directory\n\nIn the future, this directory will also contain:\n- Updated tag index files\n- Memory bank structure definitions\n- Search and navigation utilities"
+      },
+      {
+        "title": "Usage",
+        "content": "Documents in this directory should be consulted when:\n\n1. You need to understand how the Global Memory Bank is organized\n2. You are looking for guidance on how to find specific documents\n3. You want to understand the tagging system and categories\n4. You need information about indexing mechanisms and meta-structures"
+      }
+    ]
+  }
+}

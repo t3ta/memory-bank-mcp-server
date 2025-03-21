@@ -1,0 +1,37 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "implementation-directory-readme",
+    "title": "Implementation Directory README",
+    "documentType": "guide",
+    "path": "03-implementation/README.json",
+    "tags": [
+      "implementation",
+      "documentation",
+      "guide"
+    ],
+    "lastModified": "2025-03-21T13:05:00.000Z",
+    "createdAt": "2025-03-21T13:05:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "Implementation Directory",
+        "content": "The `03-implementation` directory contains documents related to code implementation, technology choices, coding patterns, and implementation details. This directory focuses on how the architectural concepts are translated into actual code."
+      },
+      {
+        "title": "Purpose",
+        "content": "This directory serves as a central location for implementation-related information. The documents here explain how specific features are implemented, what technologies are used, and how the code is organized. This directory is valuable for developers working on implementing features or understanding the codebase."
+      },
+      {
+        "title": "Key Documents",
+        "content": "- **read-context-command-implementation.json**: Implementation details for the read_context command\n- **coding-standards-implementation.json**: Implementation aspects of coding standards\n\nAdditional documents include:\n- Implementation patterns and best practices\n- Module implementations\n- Code structure and organization details"
+      },
+      {
+        "title": "Related Tags",
+        "content": "Common tags for documents in this directory include:\n- implementation\n- tech-stack\n- dependencies\n- typescript\n- clean-code"
+      }
+    ]
+  }
+}

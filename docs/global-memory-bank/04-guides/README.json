@@ -1,0 +1,36 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "guides-directory-readme",
+    "title": "Guides Directory README",
+    "documentType": "guide",
+    "path": "04-guides/README.json",
+    "tags": [
+      "guide",
+      "documentation"
+    ],
+    "lastModified": "2025-03-21T13:10:00.000Z",
+    "createdAt": "2025-03-21T13:10:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "Guides Directory",
+        "content": "The `04-guides` directory contains user guides, tutorials, how-to documents, and reference materials that help users understand how to use the system. This directory is focused on end-user documentation and practical guidance."
+      },
+      {
+        "title": "Purpose",
+        "content": "This directory serves as a central location for documentation that guides users in using the system. These documents explain concepts, provide step-by-step instructions, and offer reference information to make the system more accessible. This directory is essential for new users and as a reference for experienced users."
+      },
+      {
+        "title": "Key Documents",
+        "content": "- **user-guide.json**: Comprehensive guide for using the system\n- **glossary.json**: Definitions of key terms and concepts\n\nAdditional documents include:\n- Tutorials for specific tasks\n- API documentation\n- FAQ and troubleshooting guides"
+      },
+      {
+        "title": "Related Tags",
+        "content": "Common tags for documents in this directory include:\n- documentation\n- guide\n- reference\n- glossary\n- terminology\n- definitions\n- standards\n- best-practices"
+      }
+    ]
+  }
+}

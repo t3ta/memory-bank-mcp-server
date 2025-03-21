@@ -9,9 +9,9 @@
       "index",
       "meta"
     ],
-    "lastModified": "2025-03-21T08:55:00.000Z",
+    "lastModified": "2025-03-21T14:00:00.000Z",
     "createdAt": "2025-03-21T02:46:32.880Z",
-    "version": 2
+    "version": 3
   },
   "content": {
     "sections": [
@@ -21,4 +21,56 @@
       },
       {
         "title": "Tag Categories",
-        "content": "Tags are organized into the following categories to improve navigation and discoverability:\n\n1. **Project Foundation** - Tags related to project overview, summaries, and general project information\n2. **Design & Architecture** - Tags related to system design, architecture patterns, and design decisions\n3. **Implementation & Technology** - Tags related to code implementation, tech stack, and dependencies\n4. **Documentation & Guides** - Tags related to user guides, references, and glossaries\n5. **Testing & Quality** - Tags related to testing strategies, QA, and TDD\n6. **Version & Releases** - Tags related to versions, releases, and changelogs\n7. **Infrastructure & Operations** - Tags related to CI/CD, workflows, and automation\n8. **Internationalization & Localization** - Tags related to i18n, l10n, and templates\n9. **Refactoring & Technical
+        "content": "Tags are organized into the following categories to improve navigation and discoverability:\n\n1. **Project Foundation** - Tags related to project overview, summaries, and general project information\n2. **Design & Architecture** - Tags related to system design, architecture patterns, and design decisions\n3. **Implementation & Technology** - Tags related to code implementation, tech stack, and dependencies\n4. **Documentation & Guides** - Tags related to user guides, references, and glossaries\n5. **Testing & Quality** - Tags related to testing strategies, QA, and TDD\n6. **Version & Releases** - Tags related to versions, releases, and changelogs\n7. **Infrastructure & Operations** - Tags related to CI/CD, workflows, and automation\n8. **Internationalization & Localization** - Tags related to i18n, l10n, and templates\n9. **Refactoring & Technical Debt** - Tags related to refactoring, technical debt, and improvements\n10. **Meta & Miscellaneous** - Tags related to meta information, indices, and other miscellaneous content"
+      },
+      {
+        "title": "Project Foundation",
+        "content": "**Tags in this category**:\n\n- `overview` - General overview documents\n- `project` - Project-specific information\n- `summary` - Summary documents\n\n**Key documents**:\n- `project-overview.json` - Project overview and main features\n- `tech-stack.json` - Technology stack overview"
+      },
+      {
+        "title": "Design & Architecture",
+        "content": "**Tags in this category**:\n\n- `architecture` - Architecture documents (includes former `system-design`)\n- `design` - Design documents and decisions\n- `domain` - Domain model descriptions\n- `models` - Data and domain models\n- `document-model` - Document modeling\n- `decision` - Architecture and design decisions\n\n**Key documents**:\n- `architecture.json` - System architecture and design principles\n- `domain-models.json` - Domain models and conceptual design\n- `json-based-architecture.json` - JSON-based architecture details"
+      },
+      {
+        "title": "Implementation & Technology",
+        "content": "**Tags in this category**:\n\n- `implementation` - Implementation details\n- `tech-stack` - Technology stack documentation\n- `infrastructure` - Infrastructure components\n- `dependencies` - External dependencies\n- `typescript` - TypeScript-specific implementation\n- `clean-code` - Clean code standards and patterns\n\n**Key documents**:\n- `read-context-command-implementation.json` - Implementation details for read_context command\n- `tech-stack.json` - Technology stack details\n- `coding-standards.json` - Coding standards and practices"
+      },
+      {
+        "title": "Documentation & Guides",
+        "content": "**Tags in this category**:\n\n- `documentation` - General documentation\n- `guide` - User and developer guides\n- `glossary` - Term definitions\n- `terminology` - Technical terminology\n- `definitions` - Concept definitions\n- `standards` - Code and documentation standards\n- `best-practices` - Best practices and recommendations\n- `reference` - Reference documentation\n\n**Key documents**:\n- `user-guide.json` - User guide and usage instructions\n- `glossary.json` - Glossary and definitions\n- `coding-standards.json` - Coding standards and best practices"
+      },
+      {
+        "title": "Testing & Quality",
+        "content": "**Tags in this category**:\n\n- `testing` - General testing documentation\n- `test` - Test implementation details\n- `integration-test` - Integration testing (consolidates `integration-tests`)\n- `qa` - Quality assurance processes\n- `tdd` - Test-driven development\n- `e2e` - End-to-end testing\n- `controller` - Controller testing\n\n**Key documents**:\n- `integration-test-strategy.json` - Integration test strategy\n- `e2e-test-implementation.json` - End-to-end test implementation\n- `e2e-to-integration-test-approach.json` - E2E to integration test approach"
+      },
+      {
+        "title": "Version & Releases",
+        "content": "**Tags in this category**:\n\n- `v2` - Version 2 documentation (consolidates `version-2`, `v2-0`)\n- `release` - Release information\n- `changelog` - Change logs\n- `pr` - Pull request documentation\n- `decisions` - Version-specific decisions\n\n**Key documents**:\n- `release-v2.0.0.json` - Version 2.0.0 release notes\n- `v2-implementation-plan.json` - Version 2 implementation plan"
+      },
+      {
+        "title": "Infrastructure & Operations",
+        "content": "**Tags in this category**:\n\n- `ci-cd` - CI/CD pipeline documentation\n- `github-actions` - GitHub Actions workflows\n- `automation` - Automation processes\n- `workflows` - Workflow descriptions\n- `cli` - Command-line interface\n- `commands` - Command documentation\n\n**Key documents**:\n- `ci-cd/workflows.json` - CI/CD pipeline and GitHub Actions\n- `cli-commands.json` - CLI command reference"
+      },
+      {
+        "title": "Internationalization & Localization",
+        "content": "**Tags in this category**:\n\n- `i18n` - Internationalization\n- `l10n` - Localization\n- `template` - Template systems\n\n**Key documents**:\n- `template-system-json-i18n-design.json` - Template system and i18n design"
+      },
+      {
+        "title": "Refactoring & Technical Debt",
+        "content": "**Tags in this category**:\n\n- `refactoring` - Refactoring plans and implementation\n- `tech-debt` - Technical debt documentation\n- `migration` - Migration strategies and plans\n- `policy` - Migration and refactoring policies\n- `markdown` - Markdown to JSON migration\n- `json` - JSON-related refactoring\n\n**Key documents**:\n- `json-global-design-issues.json` - JSON global design issues\n- `migration-policy.json` - Migration policy"
+      },
+      {
+        "title": "Meta & Miscellaneous",
+        "content": "**Tags in this category**:\n\n- `meta` - Meta information about the Memory Bank\n- `index` - Index and navigation\n- `memory-bank` - Memory Bank system documentation\n- `navigation` - Navigation guides\n- `context` - Context management\n- `mcp` - MCP-specific documentation\n- `tag` - Tag system documentation\n- `troubleshooting` - Troubleshooting guides\n- `errors` - Error handling\n\n**Key documents**:\n- `meta/consolidated-memory-bank-meta.json` - Consolidated meta information\n- `ci-cd/memory-bank-errors.json` - Memory Bank error troubleshooting"
+      },
+      {
+        "title": "Tag Map",
+        "content": "Below is a mapping of all tags to their respective categories:\n\n```json\n{\n  \"Project Foundation\": [\"overview\", \"project\", \"summary\"],\n  \"Design & Architecture\": [\"architecture\", \"design\", \"domain\", \"models\", \"document-model\", \"decision\", \"system-design\"],\n  \"Implementation & Technology\": [\"implementation\", \"tech-stack\", \"infrastructure\", \"dependencies\", \"typescript\", \"clean-code\"],\n  \"Documentation & Guides\": [\"documentation\", \"guide\", \"glossary\", \"terminology\", \"definitions\", \"standards\", \"best-practices\", \"reference\"],\n  \"Testing & Quality\": [\"testing\", \"test\", \"integration-test\", \"integration-tests\", \"qa\", \"tdd\", \"e2e\", \"controller\"],\n  \"Version & Releases\": [\"v2\", \"version-2\", \"v2-0\", \"release\", \"changelog\", \"pr\", \"decisions\"],\n  \"Infrastructure & Operations\": [\"ci-cd\", \"github-actions\", \"automation\", \"workflows\", \"cli\", \"commands\"],\n  \"Internationalization & Localization\": [\"i18n\", \"l10n\", \"template\"],\n  \"Refactoring & Technical Debt\": [\"refactoring\", \"tech-debt\", \"migration\", \"policy\", \"markdown\", \"json\"],\n  \"Meta & Miscellaneous\": [\"meta\", \"index\", \"memory-bank\", \"navigation\", \"context\", \"mcp\", \"tag\", \"troubleshooting\", \"errors\"]\n}\n```"
+      },
+      {
+        "title": "Using This Index",
+        "content": "This index can be used in several ways:\n\n1. **Browse by category**: Find a relevant category from the sections above and explore related tags\n2. **Browse by tag**: Find a specific tag in the tag map and see which category it belongs to\n3. **Search for documents**: Use a tag to find documents with that tag in the global memory bank\n\nFor a more comprehensive guide to navigating the Global Memory Bank, see the consolidated meta information document at `meta/consolidated-memory-bank-meta.json`."
+      }
+    ]
+  }
+}

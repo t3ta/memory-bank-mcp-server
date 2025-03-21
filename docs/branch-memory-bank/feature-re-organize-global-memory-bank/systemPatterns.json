@@ -1,55 +1,51 @@
 {
   "schema": "memory_document_v2",
   "metadata": {
-    "id": "system-patterns-1",
-    "title": "System Patterns for Global Memory Bank Reorganization",
+    "id": "system-patterns",
+    "title": "Global Memory Bank Reorganization System Patterns",
     "documentType": "system_patterns",
     "path": "systemPatterns.json",
     "tags": [
       "core",
-      "system-patterns",
-      "migration",
-      "markdown-to-json"
+      "system-patterns"
     ],
-    "lastModified": "2025-03-21T09:35:00.000Z",
-    "createdAt": "2025-03-21T03:29:03.847Z",
-    "version": 1
+    "lastModified": "2025-03-21T12:22:00.000Z",
+    "createdAt": "2025-03-21T04:35:19.426Z",
+    "version": 2
   },
   "content": {
-    "technicalDecisions": [
+    "sections": [
       {
-        "title": "Markdownからの移行戦略",
-        "context": "メモリバンクはMarkdownベースからJSONベースへの移行を進めている。その過程でドキュメントの移行方法とツールを決定する必要がある。",
-        "decision": "プログラム的な変換（MarkdownToJsonMigrator）とAI支援（shitauke）の両方を活用する。シンプルなドキュメントはプログラム的変換、複雑な構造を持つドキュメントはAI支援変換を使い分ける。",
-        "consequences": [
-          "高い精度でのJSONへの変換が可能になる",
-          "複雑な構造も適切に保持できる",
-          "日本語を含むコンテンツも正確に処理できる",
-          "AIによる処理は外部依存となるためフォールバック手段を用意する必要がある"
-        ]
+        "title": "技術的決定事項",
+        "content": "グローバルメモリバンクの再編成に関する主要な技術的決定事項をまとめています。"
       },
       {
-        "title": "JSON構造の標準化",
-        "context": "グローバルメモリバンクの多様なドキュメントをJSON形式に変換するにあたり、一貫性のあるスキーマ定義が必要。",
-        "decision": "すべてのJSONドキュメントは共通のメタデータ構造を持ち、コンテンツ部分はドキュメントタイプ固有の構造に従う。共通スキーマを定義し、バリデーションを行う。",
-        "consequences": [
-          "一貫性のあるドキュメント構造",
-          "プログラムによるアクセスと操作が容易になる",
-          "バリデーションによるデータ品質の向上",
-          "新しいドキュメントタイプの追加が標準化される"
-        ]
+        "title": "JSONベースのドキュメント構造",
+        "content": "### コンテキスト\nメモリバンク2.0ではMarkdownからJSONへの移行を進めており、グローバルメモリバンクもJSON形式に統一する必要があります。\n\n### 決定事項\nすべてのドキュメントを統一されたJSON形式に変換し、以下の構造に従います：\n\n```json\n{\n  \"schema\": \"memory_document_v2\",\n  \"metadata\": {\n    \"id\": \"unique-id\",\n    \"title\": \"Document Title\",\n    \"documentType\": \"document_type\",\n    \"path\": \"relative/path.json\",\n    \"tags\": [\"tag1\", \"tag2\"],\n    \"lastModified\": \"YYYY-MM-DDTHH:MM:SS.SSSZ\",\n    \"createdAt\": \"YYYY-MM-DDTHH:MM:SS.SSSZ\",\n    \"version\": 1\n  },\n  \"content\": {\n    \"sections\": [\n      {\n        \"title\": \"Section Title\",\n        \"content\": \"Section content...\"\n      }\n    ]\n  }\n}\n```\n\n### 影響\n- スキーマ検証が可能になる\n- プログラムによるドキュメント操作が容易になる\n- 一貫性のあるドキュメント構造が保証される"
       },
       {
-        "title": "shitaukeとの統合",
-        "context": "外部ツールであるshitaukeを使ってマークダウンからJSONへの変換を効率化したい。",
-        "decision": "shitaukeはCLIツールとして提供され、最適化されたプロンプトを使用してAIモデル（Gemini）によるマークダウン文書の構造化JSONへの変換を行う。マイグレーションプロセスにshitaukeを組み込み、複雑な文書構造の変換に活用する。",
-        "consequences": [
-          "人間の介入なしに高品質な変換が可能",
-          "書式情報（太字、リンクなど）が適切に保持される",
-          "一貫性のある出力形式が確保される",
-          "AIモデルへの依存性が生じる",
-          "処理コストと時間がかかる可能性がある"
-        ]
+        "title": "カテゴリベースのディレクトリ構造",
+        "content": "### コンテキスト\n現在のグローバルメモリバンクではファイルが多数あり、整理が難しい状態です。\n\n### 決定事項\n以下のカテゴリベースのディレクトリ構造を採用します：\n\n```\ndocs/global-memory-bank/\n├── 01-project/            # プロジェクト基盤\n├── 02-architecture/       # 設計・アーキテクチャ\n├── 03-implementation/     # 実装・技術\n├── 04-guides/             # ドキュメント・ガイド\n├── 05-testing/            # テスト・品質\n├── 06-releases/           # バージョン・リリース\n├── 07-infrastructure/     # インフラ・運用\n├── 08-i18n/               # 国際化・多言語\n├── 09-refactoring/        # リファクタリング・技術的負債\n└── meta/                  # メタ情報・インデックス\n```\n\n### 影響\n- ドキュメントの発見性が向上する\n- 関連するドキュメントが集約される\n- ディレクトリ名の数字プレフィックスにより順序が明確になる"
+      },
+      {
+        "title": "ドキュメント統合戦略",
+        "content": "### コンテキスト\n関連する複数の小さなドキュメントが存在し、情報が断片化している状態です。\n\n### 決定事項\n関連するドキュメントを統合し、以下の3つの主要な統合ドキュメントを作成します：\n\n1. アーキテクチャ統合ドキュメント\n   - `architecture.json`\n   - `architecture-decisions.json`\n   - `json-based-architecture.json`\n\n2. テスト戦略統合ドキュメント\n   - `e2e-test-implementation.json`\n   - `e2e-test-strategy.json`\n   - `e2e-to-integration-test-approach.json`\n   - `integration-test-strategy.json`\n\n3. バージョン2統合ドキュメント\n   - `v2-implementation-plan.json`\n   - `v2.0-design-decisions.json`\n   - `release-v2.0.0.json`\n\n4. メタ情報統合ドキュメント（予定）\n   - `global-memory-bank-navigation.json`\n   - `global-memory-bank-reference.json`\n   - `global-memory-bank-index-analysis.json`\n   - `global-memory-bank-indexing-mechanism.json`\n   - `tags/reorganization-plan.json`\n\n### 影響\n- ドキュメント数が削減される\n- 関連情報が1か所にまとまり、一貫性が向上する\n- セクション構造を使用して情報を整理できる"
+      },
+      {
+        "title": "タグカテゴリシステム",
+        "content": "### コンテキスト\n現在のタグシステムは整理されておらず、類似タグが多数存在しています。\n\n### 決定事項\n以下の10カテゴリでタグを整理します：\n\n1. **プロジェクト基盤** - overview, project, summary\n2. **設計・アーキテクチャ** - architecture, design, system-design\n3. **実装・技術** - implementation, tech-stack, dependencies\n4. **ドキュメント・ガイド** - documentation, guide, reference\n5. **テスト・品質** - testing, test, qa, tdd\n6. **バージョン・リリース** - v2, release, changelog\n7. **インフラ・運用** - ci-cd, automation, workflows\n8. **国際化・多言語** - i18n, l10n, template\n9. **リファクタリング・技術的負債** - refactoring, tech-debt\n10. **その他・メタ** - meta, index\n\n### 影響\n- タグの検索性と発見性が向上する\n- 関連するタグがグループ化される\n- タグの重複が減少する"
+      },
+      {
+        "title": "インデックス機構",
+        "content": "### コンテキスト\n現在、`_global_index.json` と `tags/index.json` の2つのインデックスファイルが存在し、管理が複雑です。\n\n### 決定事項\n`tags/index.json` を主要なインデックスとして使用し、タグカテゴリ情報を含むように拡張します。移行期間中は両方のインデックスを維持しますが、最終的には `_global_index.json` を廃止します。\n\n### 影響\n- インデックス管理が簡素化される\n- タグカテゴリによる検索が可能になる\n- 一貫性のあるインデックス構造が確保される"
+      },
+      {
+        "title": "ドキュメントタイプの標準化",
+        "content": "### コンテキスト\n現在のドキュメントタイプは一貫性がなく、様々な値が使用されています。\n\n### 決定事項\n以下の標準ドキュメントタイプを定義します：\n\n- `architecture` - アーキテクチャドキュメント\n- `design` - 設計ドキュメント\n- `implementation` - 実装ドキュメント\n- `guide` - ガイドドキュメント\n- `reference` - リファレンスドキュメント\n- `analysis` - 分析ドキュメント\n- `plan` - 計画ドキュメント\n- `index` - インデックスドキュメント\n\n### 影響\n- ドキュメントの分類が明確になる\n- タイプによる検索が容易になる\n- ドキュメント構造の予測可能性が向上する"
+      },
+      {
+        "title": "関連ファイルとディレクトリ構造",
+        "content": "### 主要ファイル\n- `/docs/global-memory-bank/_global_index.json` - 現在のグローバルインデックス\n- `/docs/global-memory-bank/tags/index.json` - タグインデックス\n- `/docs/global-memory-bank/tags/reorganization-plan.json` - タグ再編成計画\n- `/docs/global-memory-bank/02-architecture/consolidated-architecture.json` - 統合アーキテクチャドキュメント\n- `/docs/global-memory-bank/05-testing/consolidated-test-strategy.json` - 統合テスト戦略ドキュメント\n- `/docs/global-memory-bank/06-releases/consolidated-v2-release.json` - 統合バージョン2ドキュメント\n\n### 実装済みディレクトリ\n- `/docs/global-memory-bank/01-project/`\n- `/docs/global-memory-bank/02-architecture/`\n- `/docs/global-memory-bank/03-implementation/`\n- `/docs/global-memory-bank/04-guides/`\n- `/docs/global-memory-bank/05-testing/`\n- `/docs/global-memory-bank/06-releases/`\n- `/docs/global-memory-bank/07-infrastructure/`\n- `/docs/global-memory-bank/08-i18n/`\n- `/docs/global-memory-bank/09-refactoring/`\n\n### 未実装ディレクトリ\n- `/docs/global-memory-bank/meta/`"
       }
     ]
   }

@@ -2,98 +2,38 @@
   "schema": "memory_document_v2",
   "metadata": {
     "id": "active-context",
-    "title": "アクティブコンテキスト",
-    "documentType": "context",
+    "title": "Global Memory Bank Reorganization Active Context",
+    "documentType": "active_context",
     "path": "activeContext.json",
     "tags": [
-      "active",
-      "context",
-      "current-work"
+      "core",
+      "active-context"
     ],
-    "lastModified": "2025-03-21T13:05:00.000Z",
-    "createdAt": "2025-03-21T13:05:00.000Z",
-    "version": 1
+    "lastModified": "2025-03-21T14:20:00.000Z",
+    "createdAt": "2025-03-21T04:35:19.426Z",
+    "version": 4
   },
   "content": {
-    "currentWork": "グローバルメモリバンクの再編成を実施中。ディレクトリ構造の整理とファイルの移動が完了。36ファイルを適切なカテゴリディレクトリに移動し、ファイル移動マッピングを作成した。",
-    "recentChanges": [
+    "sections": [
       {
-        "date": "2025-03-21T13:00:00.000Z",
-        "description": "グローバルメモリバンクのディレクトリ構造を実装：\n- `01-project/`: プロジェクト基本情報関連\n- `02-architecture/`: アーキテクチャ設計関連\n- `03-implementation/`: 実装詳細関連\n- `04-guides/`: ユーザーガイド・移行ガイド関連\n- `05-testing/`: テスト戦略・実装関連\n- `06-releases/`: リリース情報関連\n- `08-i18n/`: 多言語サポート関連\n- `09-refactoring/`: リファクタリング・設計問題関連"
+        "title": "現在の作業内容",
+        "content": "グローバルメモリバンクの再編成と整理を行っています。現在、8フェーズの実装計画に基づいて作業が進行中です。メタ情報関連のドキュメントをmetaディレクトリに統合および移動し、すべてのカテゴリディレクトリにREADMEファイルを追加しました。さらに、タグの再編成とカテゴリ化を実施しました。次の課題はインデックスファイルの更新とドキュメントの言語の統一です。"
       },
       {
-        "date": "2025-03-21T12:30:00.000Z",
-        "description": "各カテゴリディレクトリにファイルを移動：\n- テスト関連6ファイル\n- リリース関連3ファイル\n- アーキテクチャ関連14ファイル\n- 実装関連4ファイル\n- プロジェクト関連5ファイル\n- ガイド関連3ファイル\n- 多言語関連2ファイル\n- リファクタリング関連1ファイル"
+        "title": "最近の変更点",
+        "content": "以下の作業が完了しました：\n\n1. メタ情報関連ドキュメントの統合と移動\n   - 5つのメタ情報ドキュメントをバックアップ\n   - すべてのメタ情報ドキュメントをmetaディレクトリに移動\n   - 統合ドキュメントの内部パス参照を更新\n\n2. タグの再編成とカテゴリ化\n   - `tags/index.json`ファイルを更新して10のカテゴリを定義\n   - 類似タグの統合（例：`version-2`、`v2-0`、`v2`を`v2`に統合）\n   - カテゴリごとの主要ドキュメントの明示\n\n3. すべてのカテゴリディレクトリのREADMEファイル追加\n   - 01-projectから09-refactoringまでのディレクトリ\n   - metaディレクトリ\n   - tagsディレクトリ"
       },
       {
-        "date": "2025-03-21T12:45:00.000Z",
-        "description": "ファイル移動マッピングを作成し、メモリバンクに保存"
-      }
-    ],
-    "activeDecisions": [
-      {
-        "id": "dir-structure-decision",
-        "description": "グローバルメモリバンクをカテゴリベースのディレクトリ構造に整理する",
-        "status": "completed"
+        "title": "アクティブな決定事項",
+        "content": "1. metaディレクトリを作成し、メタ情報関連のドキュメントをそこに集約\n2. タグを10のカテゴリに整理（プロジェクト基盤、設計・アーキテクチャなど）\n3. 類似タグを統合して、より一貫性のあるタグシステムを構築\n4. 新規作成するドキュメントは全て英語で統一\n5. 各ディレクトリの目的を明確にするためにREADMEファイルを追加"
       },
       {
-        "id": "file-movement-decision",
-        "description": "関連するドキュメントを適切なカテゴリディレクトリに移動する",
-        "status": "completed"
+        "title": "検討事項",
+        "content": "1. メインインデックスファイルの更新戦略\n   - `_global_index.json`も更新すべきか、`tags/index.json`に集中すべきか\n   - タグカテゴリがインデックス生成時に自動的に維持される仕組みの構築\n\n2. 残りのドキュメントの言語統一\n   - 既存の日本語ドキュメントの英語化の進め方\n   - 翻訳の優先順位の設定\n\n3. 検証と最終クリーンアップ\n   - 最終的に削除するべきファイルとタイミング\n   - 検証のアプローチ（自動テスト vs. 手動レビュー）"
       },
       {
-        "id": "naming-convention-decision",
-        "description": "命名規則を統一し、ファイル名を標準化する",
-        "status": "in-progress"
-      },
-      {
-        "id": "mapping-creation-decision",
-        "description": "ファイル移動マッピングを作成し、パス更新の基礎資料とする",
-        "status": "completed"
-      }
-    ],
-    "considerations": [
-      {
-        "id": "index-update-consideration",
-        "description": "インデックスファイルの更新方法\n- 手動でパスを更新するか、自動更新ツールを作成するか\n- 新しいインデックス生成メカニズムの構築が必要か",
-        "status": "open"
-      },
-      {
-        "id": "path-reference-consideration",
-        "description": "ファイル内の相対パス参照の更新方法",
-        "status": "open"
-      },
-      {
-        "id": "tag-system-consideration",
-        "description": "タグシステムの標準化と再構築方法",
-        "status": "open"
-      },
-      {
-        "id": "markdown-conversion-consideration",
-        "description": "shitaukeツールを活用したMarkdown→JSON変換の実装方法",
-        "status": "open"
-      }
-    ],
-    "nextSteps": [
-      {
-        "id": "update-index",
-        "description": "インデックスファイル（`_global_index.json`）を更新する",
-        "priority": "high"
-      },
-      {
-        "id": "update-path-references",
-        "description": "ファイル内の相対パス参照を更新する",
-        "priority": "medium"
-      },
-      {
-        "id": "rebuild-tag-system",
-        "description": "タグシステムを再構築する",
-        "priority": "medium"
-      },
-      {
-        "id": "convert-markdown-files",
-        "description": "マークダウンファイルの変換を検討（shitaukeツールの活用）",
-        "priority": "low"
+        "title": "次のステップ",
+        "content": "1. インデックスファイルの更新（Phase 6）\n   - `_global_index.json`の更新またはMetaデータの追加\n   - タグカテゴリ情報の追加\n\n2. ドキュメントの言語統一（Phase 4の残作業）\n   - 主要な日本語ドキュメントの英語化\n   - ドキュメントタイプの標準化\n\n3. 検証とテスト（Phase 7）\n   - 参照の機能テスト\n   - ユーザー視点でのナビゲーション性の確認\n\n4. 最終クリーンアップ（Phase 8）の準備\n   - 冗長ファイルのリスト作成\n   - 変更サマリーの準備"
       }
     ]
   }
