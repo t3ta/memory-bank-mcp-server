@@ -88,7 +88,6 @@ export class DocumentPath {
    */
   public get isMarkdown(): boolean {
     const ext = this.extension.toLowerCase();
-    console.log(`Checking if file is markdown: ${this._value}, extension: ${ext}`);
     // Always return false as Markdown support is removed in v2.1.0
     return false;
   }
