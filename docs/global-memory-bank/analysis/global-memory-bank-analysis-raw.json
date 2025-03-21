@@ -1,0 +1,1314 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "global-memory-bank-analysis-raw",
+    "title": "グローバルメモリバンク 生データ分析",
+    "documentType": "analysis",
+    "path": "analysis/global-memory-bank-analysis-raw.json",
+    "tags": [
+      "analysis",
+      "memory-bank",
+      "meta",
+      "raw-data"
+    ],
+    "lastModified": "2025-03-21T02:12:46.858Z",
+    "createdAt": "2025-03-21T02:12:46.858Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "分析概要",
+        "content": "グローバルメモリバンク内の33ドキュメントを分析した結果です。この生データをもとに、Geminiによる詳細な分析とカテゴリ分類が行われます。"
+      },
+      {
+        "title": "タグ統計",
+        "content": "全62個のユニークなタグが見つかりました。"
+      }
+    ],
+    "tagStatistics": [
+      {
+        "tag": "memory-bank",
+        "count": 7,
+        "documents": [
+          "analysis/global-memory-bank-analysis-raw.json",
+          "ci-cd/memory-bank-errors.json",
+          "global-memory-bank-index-analysis.json",
+          "global-memory-bank-indexing-mechanism.json",
+          "global-memory-bank-navigation.json",
+          "global-memory-bank-reference.json",
+          "tags/reorganization-plan.json"
+        ]
+      },
+      {
+        "tag": "architecture",
+        "count": 6,
+        "documents": [
+          "architecture-decisions.json",
+          "architecture.json",
+          "domain-models.json",
+          "e2e-to-integration-test-approach.json",
+          "json-based-architecture.json",
+          "v2.0-design-decisions.json"
+        ]
+      },
+      {
+        "tag": "json",
+        "count": 6,
+        "documents": [
+          "architecture-decisions.json",
+          "domain-models.json",
+          "json-based-architecture.json",
+          "migration-policy.json",
+          "template-system-json-i18n-design.json",
+          "v2-implementation-plan.json"
+        ]
+      },
+      {
+        "tag": "meta",
+        "count": 4,
+        "documents": [
+          "analysis/global-memory-bank-analysis-raw.json",
+          "global-memory-bank-navigation.json",
+          "tags/index.json",
+          "tags/reorganization-plan.json"
+        ]
+      },
+      {
+        "tag": "design",
+        "count": 4,
+        "documents": [
+          "json-based-architecture.json",
+          "read-context-command-design.json",
+          "template-system-json-i18n-design.json",
+          "v2.0-design-decisions.json"
+        ]
+      },
+      {
+        "tag": "analysis",
+        "count": 3,
+        "documents": [
+          "analysis/global-memory-bank-analysis-raw.json",
+          "global-memory-bank-index-analysis.json",
+          "global-memory-bank-indexing-mechanism.json"
+        ]
+      },
+      {
+        "tag": "version-2",
+        "count": 3,
+        "documents": [
+          "architecture-decisions.json",
+          "json-based-architecture.json",
+          "v2-implementation-plan.json"
+        ]
+      },
+      {
+        "tag": "implementation",
+        "count": 3,
+        "documents": [
+          "e2e-test-implementation.json",
+          "read-context-command-implementation.json",
+          "v2-implementation-plan.json"
+        ]
+      },
+      {
+        "tag": "refactoring",
+        "count": 3,
+        "documents": [
+          "global-memory-bank-index-analysis.json",
+          "global-memory-bank-indexing-mechanism.json",
+          "tags/reorganization-plan.json"
+        ]
+      },
+      {
+        "tag": "guide",
+        "count": 3,
+        "documents": [
+          "global-memory-bank-navigation.json",
+          "global-memory-bank-reference.json",
+          "user-guide.json"
+        ]
+      },
+      {
+        "tag": "v2-0",
+        "count": 3,
+        "documents": [
+          "project-overview.json",
+          "release-v2.0.0.json",
+          "v2.0-design-decisions.json"
+        ]
+      },
+      {
+        "tag": "v2",
+        "count": 3,
+        "documents": [
+          "read-context-command-design.json",
+          "read-context-command-implementation.json",
+          "template-system-json-i18n-design.json"
+        ]
+      },
+      {
+        "tag": "cli",
+        "count": 2,
+        "documents": [
+          "cli-commands.json",
+          "e2e-test-implementation.json"
+        ]
+      },
+      {
+        "tag": "reference",
+        "count": 2,
+        "documents": [
+          "cli-commands.json",
+          "global-memory-bank-reference.json"
+        ]
+      },
+      {
+        "tag": "testing",
+        "count": 2,
+        "documents": [
+          "e2e-test-implementation.json",
+          "e2e-to-integration-test-approach.json"
+        ]
+      },
+      {
+        "tag": "tech-debt",
+        "count": 2,
+        "documents": [
+          "global-memory-bank-index-analysis.json",
+          "global-memory-bank-indexing-mechanism.json"
+        ]
+      },
+      {
+        "tag": "index",
+        "count": 2,
+        "documents": [
+          "global-memory-bank-indexing-mechanism.json",
+          "tags/index.json"
+        ]
+      },
+      {
+        "tag": "documentation",
+        "count": 2,
+        "documents": [
+          "global-memory-bank-reference.json",
+          "user-guide.json"
+        ]
+      },
+      {
+        "tag": "mcp",
+        "count": 2,
+        "documents": [
+          "read-context-command-design.json",
+          "read-context-command-implementation.json"
+        ]
+      },
+      {
+        "tag": "command",
+        "count": 2,
+        "documents": [
+          "read-context-command-design.json",
+          "read-context-command-implementation.json"
+        ]
+      },
+      {
+        "tag": "context",
+        "count": 2,
+        "documents": [
+          "read-context-command-design.json",
+          "read-context-command-implementation.json"
+        ]
+      },
+      {
+        "tag": "plan",
+        "count": 2,
+        "documents": [
+          "tags/reorganization-plan.json",
+          "v2-implementation-plan.json"
+        ]
+      },
+      {
+        "tag": "raw-data",
+        "count": 1,
+        "documents": [
+          "analysis/global-memory-bank-analysis-raw.json"
+        ]
+      },
+      {
+        "tag": "decision",
+        "count": 1,
+        "documents": [
+          "architecture-decisions.json"
+        ]
+      },
+      {
+        "tag": "system-design",
+        "count": 1,
+        "documents": [
+          "architecture.json"
+        ]
+      },
+      {
+        "tag": "troubleshooting",
+        "count": 1,
+        "documents": [
+          "ci-cd/memory-bank-errors.json"
+        ]
+      },
+      {
+        "tag": "errors",
+        "count": 1,
+        "documents": [
+          "ci-cd/memory-bank-errors.json"
+        ]
+      },
+      {
+        "tag": "ci-cd",
+        "count": 1,
+        "documents": [
+          "ci-cd/workflows.json"
+        ]
+      },
+      {
+        "tag": "github-actions",
+        "count": 1,
+        "documents": [
+          "ci-cd/workflows.json"
+        ]
+      },
+      {
+        "tag": "automation",
+        "count": 1,
+        "documents": [
+          "ci-cd/workflows.json"
+        ]
+      },
+      {
+        "tag": "workflows",
+        "count": 1,
+        "documents": [
+          "ci-cd/workflows.json"
+        ]
+      },
+      {
+        "tag": "commands",
+        "count": 1,
+        "documents": [
+          "cli-commands.json"
+        ]
+      },
+      {
+        "tag": "standards",
+        "count": 1,
+        "documents": [
+          "coding-standards.json"
+        ]
+      },
+      {
+        "tag": "best-practices",
+        "count": 1,
+        "documents": [
+          "coding-standards.json"
+        ]
+      },
+      {
+        "tag": "typescript",
+        "count": 1,
+        "documents": [
+          "coding-standards.json"
+        ]
+      },
+      {
+        "tag": "clean-code",
+        "count": 1,
+        "documents": [
+          "coding-standards.json"
+        ]
+      },
+      {
+        "tag": "domain",
+        "count": 1,
+        "documents": [
+          "domain-models.json"
+        ]
+      },
+      {
+        "tag": "models",
+        "count": 1,
+        "documents": [
+          "domain-models.json"
+        ]
+      },
+      {
+        "tag": "document-model",
+        "count": 1,
+        "documents": [
+          "domain-models.json"
+        ]
+      },
+      {
+        "tag": "e2e",
+        "count": 1,
+        "documents": [
+          "e2e-test-implementation.json"
+        ]
+      },
+      {
+        "tag": "integration-tests",
+        "count": 1,
+        "documents": [
+          "e2e-to-integration-test-approach.json"
+        ]
+      },
+      {
+        "tag": "tag",
+        "count": 1,
+        "documents": [
+          "global-memory-bank-indexing-mechanism.json"
+        ]
+      },
+      {
+        "tag": "navigation",
+        "count": 1,
+        "documents": [
+          "global-memory-bank-navigation.json"
+        ]
+      },
+      {
+        "tag": "glossary",
+        "count": 1,
+        "documents": [
+          "glossary.json"
+        ]
+      },
+      {
+        "tag": "terminology",
+        "count": 1,
+        "documents": [
+          "glossary.json"
+        ]
+      },
+      {
+        "tag": "definitions",
+        "count": 1,
+        "documents": [
+          "glossary.json"
+        ]
+      },
+      {
+        "tag": "migration",
+        "count": 1,
+        "documents": [
+          "migration-policy.json"
+        ]
+      },
+      {
+        "tag": "markdown",
+        "count": 1,
+        "documents": [
+          "migration-policy.json"
+        ]
+      },
+      {
+        "tag": "policy",
+        "count": 1,
+        "documents": [
+          "migration-policy.json"
+        ]
+      },
+      {
+        "tag": "overview",
+        "count": 1,
+        "documents": [
+          "project-overview.json"
+        ]
+      },
+      {
+        "tag": "summary",
+        "count": 1,
+        "documents": [
+          "project-overview.json"
+        ]
+      },
+      {
+        "tag": "project",
+        "count": 1,
+        "documents": [
+          "project-overview.json"
+        ]
+      },
+      {
+        "tag": "release",
+        "count": 1,
+        "documents": [
+          "release-v2.0.0.json"
+        ]
+      },
+      {
+        "tag": "pr",
+        "count": 1,
+        "documents": [
+          "release-v2.0.0.json"
+        ]
+      },
+      {
+        "tag": "changelog",
+        "count": 1,
+        "documents": [
+          "release-v2.0.0.json"
+        ]
+      },
+      {
+        "tag": "tech-stack",
+        "count": 1,
+        "documents": [
+          "tech-stack.json"
+        ]
+      },
+      {
+        "tag": "infrastructure",
+        "count": 1,
+        "documents": [
+          "tech-stack.json"
+        ]
+      },
+      {
+        "tag": "dependencies",
+        "count": 1,
+        "documents": [
+          "tech-stack.json"
+        ]
+      },
+      {
+        "tag": "template",
+        "count": 1,
+        "documents": [
+          "template-system-json-i18n-design.json"
+        ]
+      },
+      {
+        "tag": "i18n",
+        "count": 1,
+        "documents": [
+          "template-system-json-i18n-design.json"
+        ]
+      },
+      {
+        "tag": "l10n",
+        "count": 1,
+        "documents": [
+          "template-system-json-i18n-design.json"
+        ]
+      },
+      {
+        "tag": "decisions",
+        "count": 1,
+        "documents": [
+          "v2.0-design-decisions.json"
+        ]
+      }
+    ],
+    "documentsByType": {
+      "analysis": [
+        {
+          "path": "analysis/global-memory-bank-analysis-raw.json",
+          "title": "グローバルメモリバンク 生データ分析",
+          "documentType": "analysis",
+          "tags": [
+            "analysis",
+            "memory-bank",
+            "meta",
+            "raw-data"
+          ],
+          "lastModified": "2025-03-21T02:11:45.160Z",
+          "contentSections": 2
+        },
+        {
+          "path": "global-memory-bank-index-analysis.json",
+          "title": "グローバルメモリバンク インデックス分析",
+          "documentType": "analysis",
+          "tags": [
+            "analysis",
+            "memory-bank",
+            "tech-debt",
+            "refactoring"
+          ],
+          "lastModified": "2025-03-21T03:35:00.000Z",
+          "contentSections": 7
+        },
+        {
+          "path": "global-memory-bank-indexing-mechanism.json",
+          "title": "グローバルメモリバンク インデックス機構の解析",
+          "documentType": "analysis",
+          "tags": [
+            "analysis",
+            "memory-bank",
+            "tech-debt",
+            "refactoring",
+            "tag",
+            "index"
+          ],
+          "lastModified": "2025-03-21T04:30:00.000Z",
+          "contentSections": 7
+        }
+      ],
+      "generic": [
+        {
+          "path": "architecture-decisions.json",
+          "title": "アーキテクチャ決定記録",
+          "documentType": "generic",
+          "tags": [
+            "architecture",
+            "decision",
+            "json",
+            "version-2"
+          ],
+          "lastModified": "2025-03-17T02:13:31.716Z",
+          "contentSections": 0
+        },
+        {
+          "path": "architecture.json",
+          "title": "システムアーキテクチャ",
+          "documentType": "generic",
+          "tags": [
+            "architecture",
+            "system-design"
+          ],
+          "lastModified": "2025-03-21T01:46:03.123Z",
+          "contentSections": 3
+        },
+        {
+          "path": "ci-cd/memory-bank-errors.json",
+          "title": "Memory Bank Error Troubleshooting",
+          "documentType": "generic",
+          "tags": [
+            "troubleshooting",
+            "memory-bank",
+            "errors"
+          ],
+          "lastModified": "2025-03-17T02:13:31.717Z",
+          "contentSections": 0
+        },
+        {
+          "path": "ci-cd/workflows.json",
+          "title": "CI/CD Workflows",
+          "documentType": "generic",
+          "tags": [
+            "ci-cd",
+            "github-actions",
+            "automation",
+            "workflows"
+          ],
+          "lastModified": "2025-03-17T02:13:31.718Z",
+          "contentSections": 0
+        },
+        {
+          "path": "cli-commands.json",
+          "title": "CLI コマンド一覧",
+          "documentType": "generic",
+          "tags": [
+            "cli",
+            "commands",
+            "reference"
+          ],
+          "lastModified": "2025-03-21T00:52:11.3NZ",
+          "contentSections": 0
+        },
+        {
+          "path": "coding-standards.json",
+          "title": "Coding Standards",
+          "documentType": "generic",
+          "tags": [
+            "standards",
+            "best-practices",
+            "typescript",
+            "clean-code"
+          ],
+          "lastModified": "2025-03-17T02:13:31.718Z",
+          "contentSections": 0
+        },
+        {
+          "path": "commonjs-migration-plan.json",
+          "title": "CommonJS移行計画 - AI実装ガイド",
+          "documentType": "generic",
+          "tags": [],
+          "lastModified": "2025-03-18T11:34:46.942Z",
+          "contentSections": 0
+        },
+        {
+          "path": "domain-models.json",
+          "title": "ドメインモデル",
+          "documentType": "generic",
+          "tags": [
+            "domain",
+            "models",
+            "architecture",
+            "json",
+            "document-model"
+          ],
+          "lastModified": "2025-03-17T02:13:31.719Z"
+        },
+        {
+          "path": "e2e-test-strategy.json",
+          "title": "Memory Bank MCP Server: E2E Testing Strategy",
+          "documentType": "generic",
+          "tags": [],
+          "lastModified": "2025-03-18T10:07:54.716Z",
+          "contentSections": 0
+        },
+        {
+          "path": "e2e-to-integration-test-approach.json",
+          "title": "E2E から Integration テストへの移行アプローチ",
+          "documentType": "generic",
+          "tags": [
+            "testing",
+            "architecture",
+            "integration-tests"
+          ],
+          "lastModified": "2025-03-18T16:01:31.754Z",
+          "contentSections": 0
+        },
+        {
+          "path": "glossary.json",
+          "title": "Glossary",
+          "documentType": "generic",
+          "tags": [
+            "glossary",
+            "terminology",
+            "definitions"
+          ],
+          "lastModified": "2025-03-17T02:13:31.719Z",
+          "contentSections": 0
+        },
+        {
+          "path": "json-based-architecture.json",
+          "title": "Memory Bank 2.0: JSON ベースアーキテクチャ詳細設計",
+          "documentType": "generic",
+          "tags": [
+            "architecture",
+            "json",
+            "design",
+            "version-2"
+          ],
+          "lastModified": "2025-03-17T02:13:31.720Z"
+        },
+        {
+          "path": "migration-policy.json",
+          "title": "Markdown から JSON 形式への移行ポリシー",
+          "documentType": "generic",
+          "tags": [
+            "migration",
+            "json",
+            "markdown",
+            "policy"
+          ],
+          "lastModified": "2025-03-21T00:52:06.3NZ",
+          "contentSections": 0
+        },
+        {
+          "path": "multilingual-support-plan.json",
+          "title": "多言語対応計画（中国語サポート）",
+          "documentType": "generic",
+          "tags": [],
+          "lastModified": "2025-03-17T02:13:31.720Z"
+        },
+        {
+          "path": "project-overview.json",
+          "title": "プロジェクト概要",
+          "documentType": "generic",
+          "tags": [
+            "overview",
+            "summary",
+            "project",
+            "v2-0"
+          ],
+          "lastModified": "2025-03-17T13:30:00.000Z",
+          "contentSections": 0
+        },
+        {
+          "path": "projects/memory-bank-mcp-server.json",
+          "title": "Memory Bank MCP Server プロジェクトの状態",
+          "documentType": "generic",
+          "tags": [],
+          "lastModified": "2025-03-19T15:52:06.966Z",
+          "contentSections": 0
+        },
+        {
+          "path": "read-context-command-design.json",
+          "title": "`read_context`コマンド設計書",
+          "documentType": "generic",
+          "tags": [
+            "design",
+            "mcp",
+            "command",
+            "context",
+            "v2"
+          ],
+          "lastModified": "2025-03-17T02:13:31.721Z",
+          "contentSections": 0
+        },
+        {
+          "path": "read-context-command-implementation.json",
+          "title": "`read_context`コマンド実装ガイド",
+          "documentType": "generic",
+          "tags": [
+            "implementation",
+            "mcp",
+            "command",
+            "context",
+            "v2"
+          ],
+          "lastModified": "2025-03-17T02:13:31.721Z"
+        },
+        {
+          "path": "release-v2.0.0.json",
+          "title": "リリース v2.0.0",
+          "documentType": "generic",
+          "tags": [
+            "release",
+            "v2-0",
+            "pr",
+            "changelog"
+          ],
+          "lastModified": "2025-03-17T13:35:00.000Z",
+          "contentSections": 0
+        },
+        {
+          "path": "tags/index.json",
+          "title": "タグインデックス",
+          "documentType": "generic",
+          "tags": [
+            "index",
+            "meta"
+          ],
+          "lastModified": "2025-03-21T02:05:19.071Z",
+          "contentSections": 1
+        },
+        {
+          "path": "tech-stack.json",
+          "title": "Technology Stack",
+          "documentType": "generic",
+          "tags": [
+            "tech-stack",
+            "infrastructure",
+            "dependencies"
+          ],
+          "lastModified": "2025-03-17T02:13:31.722Z",
+          "contentSections": 0
+        },
+        {
+          "path": "template-system-json-i18n-design.json",
+          "title": "テンプレートシステムのJSON化と多言語対応 - 設計仕様書",
+          "documentType": "generic",
+          "tags": [
+            "design",
+            "template",
+            "json",
+            "i18n",
+            "l10n",
+            "v2"
+          ],
+          "lastModified": "2025-03-17T02:13:31.723Z",
+          "contentSections": 0
+        },
+        {
+          "path": "test-report.json",
+          "title": "テストレポート",
+          "documentType": "generic",
+          "tags": [],
+          "lastModified": "2025-03-17T02:13:31.723Z"
+        },
+        {
+          "path": "user-guide.json",
+          "title": "ユーザーガイド",
+          "documentType": "generic",
+          "tags": [
+            "guide",
+            "documentation"
+          ],
+          "lastModified": "2025-03-17T02:13:31.723Z"
+        },
+        {
+          "path": "v2-implementation-plan.json",
+          "title": "Memory Bank 2.0: 実装計画",
+          "documentType": "generic",
+          "tags": [
+            "implementation",
+            "plan",
+            "version-2",
+            "json"
+          ],
+          "lastModified": "2025-03-17T02:13:31.724Z",
+          "contentSections": 0
+        },
+        {
+          "path": "v2.0-design-decisions.json",
+          "title": "v2.0 設計上の決定事項",
+          "documentType": "generic",
+          "tags": [
+            "design",
+            "decisions",
+            "architecture",
+            "v2-0"
+          ],
+          "lastModified": "2025-03-17T13:40:00.000Z",
+          "contentSections": 0
+        }
+      ],
+      "guide": [
+        {
+          "path": "e2e-test-implementation.json",
+          "title": "E2E Test Implementation Guide",
+          "documentType": "guide",
+          "tags": [
+            "testing",
+            "e2e",
+            "cli",
+            "implementation"
+          ],
+          "lastModified": "2025-03-21T10:00:00.000Z",
+          "contentSections": 7
+        },
+        {
+          "path": "global-memory-bank-navigation.json",
+          "title": "グローバルメモリバンク ナビゲーションガイド",
+          "documentType": "guide",
+          "tags": [
+            "navigation",
+            "guide",
+            "memory-bank",
+            "meta"
+          ],
+          "lastModified": "2025-03-21T03:20:00.000Z",
+          "contentSections": 13
+        }
+      ],
+      "reference": [
+        {
+          "path": "global-memory-bank-reference.json",
+          "title": "グローバルメモリバンク リファレンスガイド",
+          "documentType": "reference",
+          "tags": [
+            "reference",
+            "memory-bank",
+            "guide",
+            "documentation"
+          ],
+          "lastModified": "2025-03-21T03:45:00.000Z",
+          "contentSections": 7
+        }
+      ],
+      "plan": [
+        {
+          "path": "tags/reorganization-plan.json",
+          "title": "Global Memory Bank タグ再編成計画",
+          "documentType": "plan",
+          "tags": [
+            "meta",
+            "plan",
+            "memory-bank",
+            "refactoring"
+          ],
+          "lastModified": "2025-03-21T02:45:00.000Z",
+          "contentSections": 5
+        }
+      ]
+    },
+    "allDocuments": [
+      {
+        "path": "analysis/global-memory-bank-analysis-raw.json",
+        "title": "グローバルメモリバンク 生データ分析",
+        "documentType": "analysis",
+        "tags": [
+          "analysis",
+          "memory-bank",
+          "meta",
+          "raw-data"
+        ],
+        "lastModified": "2025-03-21T02:11:45.160Z",
+        "contentSections": 2
+      },
+      {
+        "path": "architecture-decisions.json",
+        "title": "アーキテクチャ決定記録",
+        "documentType": "generic",
+        "tags": [
+          "architecture",
+          "decision",
+          "json",
+          "version-2"
+        ],
+        "lastModified": "2025-03-17T02:13:31.716Z",
+        "contentSections": 0
+      },
+      {
+        "path": "architecture.json",
+        "title": "システムアーキテクチャ",
+        "documentType": "generic",
+        "tags": [
+          "architecture",
+          "system-design"
+        ],
+        "lastModified": "2025-03-21T01:46:03.123Z",
+        "contentSections": 3
+      },
+      {
+        "path": "ci-cd/memory-bank-errors.json",
+        "title": "Memory Bank Error Troubleshooting",
+        "documentType": "generic",
+        "tags": [
+          "troubleshooting",
+          "memory-bank",
+          "errors"
+        ],
+        "lastModified": "2025-03-17T02:13:31.717Z",
+        "contentSections": 0
+      },
+      {
+        "path": "ci-cd/workflows.json",
+        "title": "CI/CD Workflows",
+        "documentType": "generic",
+        "tags": [
+          "ci-cd",
+          "github-actions",
+          "automation",
+          "workflows"
+        ],
+        "lastModified": "2025-03-17T02:13:31.718Z",
+        "contentSections": 0
+      },
+      {
+        "path": "cli-commands.json",
+        "title": "CLI コマンド一覧",
+        "documentType": "generic",
+        "tags": [
+          "cli",
+          "commands",
+          "reference"
+        ],
+        "lastModified": "2025-03-21T00:52:11.3NZ",
+        "contentSections": 0
+      },
+      {
+        "path": "coding-standards.json",
+        "title": "Coding Standards",
+        "documentType": "generic",
+        "tags": [
+          "standards",
+          "best-practices",
+          "typescript",
+          "clean-code"
+        ],
+        "lastModified": "2025-03-17T02:13:31.718Z",
+        "contentSections": 0
+      },
+      {
+        "path": "commonjs-migration-plan.json",
+        "title": "CommonJS移行計画 - AI実装ガイド",
+        "documentType": "generic",
+        "tags": [],
+        "lastModified": "2025-03-18T11:34:46.942Z",
+        "contentSections": 0
+      },
+      {
+        "path": "domain-models.json",
+        "title": "ドメインモデル",
+        "documentType": "generic",
+        "tags": [
+          "domain",
+          "models",
+          "architecture",
+          "json",
+          "document-model"
+        ],
+        "lastModified": "2025-03-17T02:13:31.719Z"
+      },
+      {
+        "path": "e2e-test-implementation.json",
+        "title": "E2E Test Implementation Guide",
+        "documentType": "guide",
+        "tags": [
+          "testing",
+          "e2e",
+          "cli",
+          "implementation"
+        ],
+        "lastModified": "2025-03-21T10:00:00.000Z",
+        "contentSections": 7
+      },
+      {
+        "path": "e2e-test-strategy.json",
+        "title": "Memory Bank MCP Server: E2E Testing Strategy",
+        "documentType": "generic",
+        "tags": [],
+        "lastModified": "2025-03-18T10:07:54.716Z",
+        "contentSections": 0
+      },
+      {
+        "path": "e2e-to-integration-test-approach.json",
+        "title": "E2E から Integration テストへの移行アプローチ",
+        "documentType": "generic",
+        "tags": [
+          "testing",
+          "architecture",
+          "integration-tests"
+        ],
+        "lastModified": "2025-03-18T16:01:31.754Z",
+        "contentSections": 0
+      },
+      {
+        "path": "global-memory-bank-index-analysis.json",
+        "title": "グローバルメモリバンク インデックス分析",
+        "documentType": "analysis",
+        "tags": [
+          "analysis",
+          "memory-bank",
+          "tech-debt",
+          "refactoring"
+        ],
+        "lastModified": "2025-03-21T03:35:00.000Z",
+        "contentSections": 7
+      },
+      {
+        "path": "global-memory-bank-indexing-mechanism.json",
+        "title": "グローバルメモリバンク インデックス機構の解析",
+        "documentType": "analysis",
+        "tags": [
+          "analysis",
+          "memory-bank",
+          "tech-debt",
+          "refactoring",
+          "tag",
+          "index"
+        ],
+        "lastModified": "2025-03-21T04:30:00.000Z",
+        "contentSections": 7
+      },
+      {
+        "path": "global-memory-bank-navigation.json",
+        "title": "グローバルメモリバンク ナビゲーションガイド",
+        "documentType": "guide",
+        "tags": [
+          "navigation",
+          "guide",
+          "memory-bank",
+          "meta"
+        ],
+        "lastModified": "2025-03-21T03:20:00.000Z",
+        "contentSections": 13
+      },
+      {
+        "path": "global-memory-bank-reference.json",
+        "title": "グローバルメモリバンク リファレンスガイド",
+        "documentType": "reference",
+        "tags": [
+          "reference",
+          "memory-bank",
+          "guide",
+          "documentation"
+        ],
+        "lastModified": "2025-03-21T03:45:00.000Z",
+        "contentSections": 7
+      },
+      {
+        "path": "glossary.json",
+        "title": "Glossary",
+        "documentType": "generic",
+        "tags": [
+          "glossary",
+          "terminology",
+          "definitions"
+        ],
+        "lastModified": "2025-03-17T02:13:31.719Z",
+        "contentSections": 0
+      },
+      {
+        "path": "json-based-architecture.json",
+        "title": "Memory Bank 2.0: JSON ベースアーキテクチャ詳細設計",
+        "documentType": "generic",
+        "tags": [
+          "architecture",
+          "json",
+          "design",
+          "version-2"
+        ],
+        "lastModified": "2025-03-17T02:13:31.720Z"
+      },
+      {
+        "path": "migration-policy.json",
+        "title": "Markdown から JSON 形式への移行ポリシー",
+        "documentType": "generic",
+        "tags": [
+          "migration",
+          "json",
+          "markdown",
+          "policy"
+        ],
+        "lastModified": "2025-03-21T00:52:06.3NZ",
+        "contentSections": 0
+      },
+      {
+        "path": "multilingual-support-plan.json",
+        "title": "多言語対応計画（中国語サポート）",
+        "documentType": "generic",
+        "tags": [],
+        "lastModified": "2025-03-17T02:13:31.720Z"
+      },
+      {
+        "path": "project-overview.json",
+        "title": "プロジェクト概要",
+        "documentType": "generic",
+        "tags": [
+          "overview",
+          "summary",
+          "project",
+          "v2-0"
+        ],
+        "lastModified": "2025-03-17T13:30:00.000Z",
+        "contentSections": 0
+      },
+      {
+        "path": "projects/memory-bank-mcp-server.json",
+        "title": "Memory Bank MCP Server プロジェクトの状態",
+        "documentType": "generic",
+        "tags": [],
+        "lastModified": "2025-03-19T15:52:06.966Z",
+        "contentSections": 0
+      },
+      {
+        "path": "read-context-command-design.json",
+        "title": "`read_context`コマンド設計書",
+        "documentType": "generic",
+        "tags": [
+          "design",
+          "mcp",
+          "command",
+          "context",
+          "v2"
+        ],
+        "lastModified": "2025-03-17T02:13:31.721Z",
+        "contentSections": 0
+      },
+      {
+        "path": "read-context-command-implementation.json",
+        "title": "`read_context`コマンド実装ガイド",
+        "documentType": "generic",
+        "tags": [
+          "implementation",
+          "mcp",
+          "command",
+          "context",
+          "v2"
+        ],
+        "lastModified": "2025-03-17T02:13:31.721Z"
+      },
+      {
+        "path": "release-v2.0.0.json",
+        "title": "リリース v2.0.0",
+        "documentType": "generic",
+        "tags": [
+          "release",
+          "v2-0",
+          "pr",
+          "changelog"
+        ],
+        "lastModified": "2025-03-17T13:35:00.000Z",
+        "contentSections": 0
+      },
+      {
+        "path": "tags/index.json",
+        "title": "タグインデックス",
+        "documentType": "generic",
+        "tags": [
+          "index",
+          "meta"
+        ],
+        "lastModified": "2025-03-21T02:05:19.071Z",
+        "contentSections": 1
+      },
+      {
+        "path": "tags/reorganization-plan.json",
+        "title": "Global Memory Bank タグ再編成計画",
+        "documentType": "plan",
+        "tags": [
+          "meta",
+          "plan",
+          "memory-bank",
+          "refactoring"
+        ],
+        "lastModified": "2025-03-21T02:45:00.000Z",
+        "contentSections": 5
+      },
+      {
+        "path": "tech-stack.json",
+        "title": "Technology Stack",
+        "documentType": "generic",
+        "tags": [
+          "tech-stack",
+          "infrastructure",
+          "dependencies"
+        ],
+        "lastModified": "2025-03-17T02:13:31.722Z",
+        "contentSections": 0
+      },
+      {
+        "path": "template-system-json-i18n-design.json",
+        "title": "テンプレートシステムのJSON化と多言語対応 - 設計仕様書",
+        "documentType": "generic",
+        "tags": [
+          "design",
+          "template",
+          "json",
+          "i18n",
+          "l10n",
+          "v2"
+        ],
+        "lastModified": "2025-03-17T02:13:31.723Z",
+        "contentSections": 0
+      },
+      {
+        "path": "test-report.json",
+        "title": "テストレポート",
+        "documentType": "generic",
+        "tags": [],
+        "lastModified": "2025-03-17T02:13:31.723Z"
+      },
+      {
+        "path": "user-guide.json",
+        "title": "ユーザーガイド",
+        "documentType": "generic",
+        "tags": [
+          "guide",
+          "documentation"
+        ],
+        "lastModified": "2025-03-17T02:13:31.723Z"
+      },
+      {
+        "path": "v2-implementation-plan.json",
+        "title": "Memory Bank 2.0: 実装計画",
+        "documentType": "generic",
+        "tags": [
+          "implementation",
+          "plan",
+          "version-2",
+          "json"
+        ],
+        "lastModified": "2025-03-17T02:13:31.724Z",
+        "contentSections": 0
+      },
+      {
+        "path": "v2.0-design-decisions.json",
+        "title": "v2.0 設計上の決定事項",
+        "documentType": "generic",
+        "tags": [
+          "design",
+          "decisions",
+          "architecture",
+          "v2-0"
+        ],
+        "lastModified": "2025-03-17T13:40:00.000Z",
+        "contentSections": 0
+      }
+    ]
+  }
+}

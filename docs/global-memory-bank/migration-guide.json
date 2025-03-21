@@ -4,7 +4,7 @@
     "id": "6c601de3-ad96-473c-a162-edaf773abd55",
     "title": "Markdown から JSON への移行ガイド",
     "documentType": "generic",
-    "path": "migration-guide.md",
+    "path": "migration-guide.json",
     "tags": [
       "#migration",
       "#json",

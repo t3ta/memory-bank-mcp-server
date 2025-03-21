@@ -9,8 +9,8 @@
       "index",
       "meta"
     ],
-    "lastModified": "2025-03-21T01:46:03.140Z",
-    "createdAt": "2025-03-21T01:46:03.140Z",
+    "lastModified": "2025-03-21T02:42:06.936Z",
+    "createdAt": "2025-03-21T02:42:06.936Z",
     "version": 1
   },
   "content": {
@@ -21,8 +21,120 @@
       }
     ],
     "tagMap": {
+      "analysis": {
+        "count": 4,
+        "documents": [
+          {
+            "path": "analysis/global-memory-bank-analysis-raw.json",
+            "title": "analysis/global-memory-bank-analysis-raw.json"
+          },
+          {
+            "path": "global-memory-bank-index-analysis.json",
+            "title": "global-memory-bank-index-analysis.json"
+          },
+          {
+            "path": "global-memory-bank-indexing-mechanism.json",
+            "title": "global-memory-bank-indexing-mechanism.json"
+          },
+          {
+            "path": "global-memory-bank-organized-analysis.json",
+            "title": "global-memory-bank-organized-analysis.json"
+          }
+        ]
+      },
+      "memory-bank": {
+        "count": 11,
+        "documents": [
+          {
+            "path": "analysis/global-memory-bank-analysis-raw.json",
+            "title": "analysis/global-memory-bank-analysis-raw.json"
+          },
+          {
+            "path": "ci-cd/memory-bank-errors.json",
+            "title": "ci-cd/memory-bank-errors.json"
+          },
+          {
+            "path": "global-memory-bank-cleanup-implementation-plan.json",
+            "title": "global-memory-bank-cleanup-implementation-plan.json"
+          },
+          {
+            "path": "global-memory-bank-cleanup-strategy.json",
+            "title": "global-memory-bank-cleanup-strategy.json"
+          },
+          {
+            "path": "global-memory-bank-index-analysis.json",
+            "title": "global-memory-bank-index-analysis.json"
+          },
+          {
+            "path": "global-memory-bank-indexing-mechanism.json",
+            "title": "global-memory-bank-indexing-mechanism.json"
+          },
+          {
+            "path": "global-memory-bank-navigation.json",
+            "title": "global-memory-bank-navigation.json"
+          },
+          {
+            "path": "global-memory-bank-organized-analysis.json",
+            "title": "global-memory-bank-organized-analysis.json"
+          },
+          {
+            "path": "global-memory-bank-reference.json",
+            "title": "global-memory-bank-reference.json"
+          },
+          {
+            "path": "json-global-design-issues.json",
+            "title": "json-global-design-issues.json"
+          },
+          {
+            "path": "tags/reorganization-plan.json",
+            "title": "tags/reorganization-plan.json"
+          }
+        ]
+      },
+      "meta": {
+        "count": 7,
+        "documents": [
+          {
+            "path": "analysis/global-memory-bank-analysis-raw.json",
+            "title": "analysis/global-memory-bank-analysis-raw.json"
+          },
+          {
+            "path": "global-memory-bank-cleanup-implementation-plan.json",
+            "title": "global-memory-bank-cleanup-implementation-plan.json"
+          },
+          {
+            "path": "global-memory-bank-cleanup-strategy.json",
+            "title": "global-memory-bank-cleanup-strategy.json"
+          },
+          {
+            "path": "global-memory-bank-navigation.json",
+            "title": "global-memory-bank-navigation.json"
+          },
+          {
+            "path": "global-memory-bank-organized-analysis.json",
+            "title": "global-memory-bank-organized-analysis.json"
+          },
+          {
+            "path": "tags/index.json",
+            "title": "tags/index.json"
+          },
+          {
+            "path": "tags/reorganization-plan.json",
+            "title": "tags/reorganization-plan.json"
+          }
+        ]
+      },
+      "raw-data": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "analysis/global-memory-bank-analysis-raw.json",
+            "title": "analysis/global-memory-bank-analysis-raw.json"
+          }
+        ]
+      },
       "architecture": {
-        "count": 8,
+        "count": 6,
         "documents": [
           {
             "path": "architecture-decisions.json",
@@ -33,16 +145,8 @@
             "title": "architecture.json"
           },
           {
-            "path": "architecture.md",
-            "title": "システムアーキテクチャ"
-          },
-          {
             "path": "domain-models.json",
             "title": "domain-models.json"
-          },
-          {
-            "path": "domain-models.md",
-            "title": "ドメインモデル"
           },
           {
             "path": "e2e-to-integration-test-approach.json",
@@ -114,15 +218,11 @@
         ]
       },
       "system-design": {
-        "count": 2,
+        "count": 1,
         "documents": [
           {
             "path": "architecture.json",
             "title": "architecture.json"
-          },
-          {
-            "path": "architecture.md",
-            "title": "システムアーキテクチャ"
           }
         ]
       },
@@ -132,19 +232,6 @@
           {
             "path": "ci-cd/memory-bank-errors.json",
             "title": "ci-cd/memory-bank-errors.json"
-          }
-        ]
-      },
-      "memory-bank": {
-        "count": 2,
-        "documents": [
-          {
-            "path": "ci-cd/memory-bank-errors.json",
-            "title": "ci-cd/memory-bank-errors.json"
-          },
-          {
-            "path": "json-global-design-issues.json",
-            "title": "json-global-design-issues.json"
           }
         ]
       },
@@ -216,37 +303,33 @@
         ]
       },
       "reference": {
-        "count": 1,
+        "count": 2,
         "documents": [
           {
             "path": "cli-commands.json",
             "title": "cli-commands.json"
+          },
+          {
+            "path": "global-memory-bank-reference.json",
+            "title": "global-memory-bank-reference.json"
           }
         ]
       },
       "standards": {
-        "count": 2,
+        "count": 1,
         "documents": [
           {
             "path": "coding-standards.json",
             "title": "coding-standards.json"
-          },
-          {
-            "path": "coding-standards.md",
-            "title": "コーディング規約"
           }
         ]
       },
       "best-practices": {
-        "count": 2,
+        "count": 1,
         "documents": [
           {
             "path": "coding-standards.json",
             "title": "coding-standards.json"
-          },
-          {
-            "path": "coding-standards.md",
-            "title": "コーディング規約"
           }
         ]
       },
@@ -269,28 +352,20 @@
         ]
       },
       "domain": {
-        "count": 2,
+        "count": 1,
         "documents": [
           {
             "path": "domain-models.json",
             "title": "domain-models.json"
-          },
-          {
-            "path": "domain-models.md",
-            "title": "ドメインモデル"
           }
         ]
       },
       "models": {
-        "count": 2,
+        "count": 1,
         "documents": [
           {
             "path": "domain-models.json",
             "title": "domain-models.json"
-          },
-          {
-            "path": "domain-models.md",
-            "title": "ドメインモデル"
           }
         ]
       },
@@ -351,29 +426,166 @@
           }
         ]
       },
-      "glossary": {
+      "refactoring": {
+        "count": 6,
+        "documents": [
+          {
+            "path": "global-memory-bank-cleanup-implementation-plan.json",
+            "title": "global-memory-bank-cleanup-implementation-plan.json"
+          },
+          {
+            "path": "global-memory-bank-cleanup-strategy.json",
+            "title": "global-memory-bank-cleanup-strategy.json"
+          },
+          {
+            "path": "global-memory-bank-index-analysis.json",
+            "title": "global-memory-bank-index-analysis.json"
+          },
+          {
+            "path": "global-memory-bank-indexing-mechanism.json",
+            "title": "global-memory-bank-indexing-mechanism.json"
+          },
+          {
+            "path": "json-global-design-issues.json",
+            "title": "json-global-design-issues.json"
+          },
+          {
+            "path": "tags/reorganization-plan.json",
+            "title": "tags/reorganization-plan.json"
+          }
+        ]
+      },
+      "plan": {
+        "count": 4,
+        "documents": [
+          {
+            "path": "global-memory-bank-cleanup-implementation-plan.json",
+            "title": "global-memory-bank-cleanup-implementation-plan.json"
+          },
+          {
+            "path": "global-memory-bank-cleanup-strategy.json",
+            "title": "global-memory-bank-cleanup-strategy.json"
+          },
+          {
+            "path": "tags/reorganization-plan.json",
+            "title": "tags/reorganization-plan.json"
+          },
+          {
+            "path": "v2-implementation-plan.json",
+            "title": "v2-implementation-plan.json"
+          }
+        ]
+      },
+      "organization": {
+        "count": 3,
+        "documents": [
+          {
+            "path": "global-memory-bank-cleanup-implementation-plan.json",
+            "title": "global-memory-bank-cleanup-implementation-plan.json"
+          },
+          {
+            "path": "global-memory-bank-cleanup-strategy.json",
+            "title": "global-memory-bank-cleanup-strategy.json"
+          },
+          {
+            "path": "global-memory-bank-organized-analysis.json",
+            "title": "global-memory-bank-organized-analysis.json"
+          }
+        ]
+      },
+      "tech-debt": {
+        "count": 3,
+        "documents": [
+          {
+            "path": "global-memory-bank-index-analysis.json",
+            "title": "global-memory-bank-index-analysis.json"
+          },
+          {
+            "path": "global-memory-bank-indexing-mechanism.json",
+            "title": "global-memory-bank-indexing-mechanism.json"
+          },
+          {
+            "path": "json-global-design-issues.json",
+            "title": "json-global-design-issues.json"
+          }
+        ]
+      },
+      "tag": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "global-memory-bank-indexing-mechanism.json",
+            "title": "global-memory-bank-indexing-mechanism.json"
+          }
+        ]
+      },
+      "index": {
         "count": 2,
+        "documents": [
+          {
+            "path": "global-memory-bank-indexing-mechanism.json",
+            "title": "global-memory-bank-indexing-mechanism.json"
+          },
+          {
+            "path": "tags/index.json",
+            "title": "tags/index.json"
+          }
+        ]
+      },
+      "navigation": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "global-memory-bank-navigation.json",
+            "title": "global-memory-bank-navigation.json"
+          }
+        ]
+      },
+      "guide": {
+        "count": 3,
+        "documents": [
+          {
+            "path": "global-memory-bank-navigation.json",
+            "title": "global-memory-bank-navigation.json"
+          },
+          {
+            "path": "global-memory-bank-reference.json",
+            "title": "global-memory-bank-reference.json"
+          },
+          {
+            "path": "user-guide.json",
+            "title": "user-guide.json"
+          }
+        ]
+      },
+      "documentation": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "global-memory-bank-reference.json",
+            "title": "global-memory-bank-reference.json"
+          },
+          {
+            "path": "user-guide.json",
+            "title": "user-guide.json"
+          }
+        ]
+      },
+      "glossary": {
+        "count": 1,
         "documents": [
           {
             "path": "glossary.json",
             "title": "glossary.json"
-          },
-          {
-            "path": "glossary.md",
-            "title": "用語集"
           }
         ]
       },
       "terminology": {
-        "count": 2,
+        "count": 1,
         "documents": [
           {
             "path": "glossary.json",
             "title": "glossary.json"
-          },
-          {
-            "path": "glossary.md",
-            "title": "用語集"
           }
         ]
       },
@@ -457,24 +669,6 @@
           {
             "path": "v2.0-design-decisions.json",
             "title": "v2.0-design-decisions.json"
-          }
-        ]
-      },
-      "tech-debt": {
-        "count": 1,
-        "documents": [
-          {
-            "path": "json-global-design-issues.json",
-            "title": "json-global-design-issues.json"
-          }
-        ]
-      },
-      "refactoring": {
-        "count": 1,
-        "documents": [
-          {
-            "path": "json-global-design-issues.json",
-            "title": "json-global-design-issues.json"
           }
         ]
       },
@@ -633,28 +827,20 @@
         ]
       },
       "tech-stack": {
-        "count": 2,
+        "count": 1,
         "documents": [
           {
             "path": "tech-stack.json",
             "title": "tech-stack.json"
-          },
-          {
-            "path": "tech-stack.md",
-            "title": "技術スタック"
           }
         ]
       },
       "infrastructure": {
-        "count": 2,
+        "count": 1,
         "documents": [
           {
             "path": "tech-stack.json",
             "title": "tech-stack.json"
-          },
-          {
-            "path": "tech-stack.md",
-            "title": "技術スタック"
           }
         ]
       },
@@ -691,41 +877,6 @@
           {
             "path": "template-system-json-i18n-design.json",
             "title": "template-system-json-i18n-design.json"
-          }
-        ]
-      },
-      "guide": {
-        "count": 2,
-        "documents": [
-          {
-            "path": "user-guide.json",
-            "title": "user-guide.json"
-          },
-          {
-            "path": "user-guide.md",
-            "title": "ユーザーガイド"
-          }
-        ]
-      },
-      "documentation": {
-        "count": 2,
-        "documents": [
-          {
-            "path": "user-guide.json",
-            "title": "user-guide.json"
-          },
-          {
-            "path": "user-guide.md",
-            "title": "ユーザーガイド"
-          }
-        ]
-      },
-      "plan": {
-        "count": 1,
-        "documents": [
-          {
-            "path": "v2-implementation-plan.json",
-            "title": "v2-implementation-plan.json"
           }
         ]
       },
