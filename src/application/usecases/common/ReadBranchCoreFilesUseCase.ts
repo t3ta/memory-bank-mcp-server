@@ -33,11 +33,11 @@ export interface ReadBranchCoreFilesOutput {
  */
 export class ReadBranchCoreFilesUseCase
   implements IUseCase<ReadBranchCoreFilesInput, ReadBranchCoreFilesOutput> {
-  // Core file paths
-  private readonly ACTIVE_CONTEXT_PATH = 'activeContext.md';
-  private readonly PROGRESS_PATH = 'progress.md';
-  private readonly SYSTEM_PATTERNS_PATH = 'systemPatterns.md';
-  private readonly BRANCH_CONTEXT_PATH = 'branchContext.md';
+  // Core file paths - support both .md and .json extensions during transition
+  private readonly ACTIVE_CONTEXT_PATHS = ['activeContext.json', 'activeContext.md'];
+  private readonly PROGRESS_PATHS = ['progress.json', 'progress.md'];
+  private readonly SYSTEM_PATTERNS_PATHS = ['systemPatterns.json', 'systemPatterns.md'];
+  private readonly BRANCH_CONTEXT_PATHS = ['branchContext.json', 'branchContext.md'];
 
   /**
    * Constructor
@@ -70,22 +70,51 @@ export class ReadBranchCoreFilesUseCase
         );
       }
 
-      // Read each core file
-      const activeContextDoc = await this.branchRepository.getDocument(
-        branchInfo,
-        DocumentPath.create(this.ACTIVE_CONTEXT_PATH)
-      );
+      // Read each core file - try both extensions during transition
+      // Active Context
+      let activeContextDoc = null;
+      for (const path of this.ACTIVE_CONTEXT_PATHS) {
+        try {
+          activeContextDoc = await this.branchRepository.getDocument(
+            branchInfo,
+            DocumentPath.create(path)
+          );
+          break; // If successful, stop trying other paths
+        } catch (error) {
+          // Continue to next path if this one fails
+          console.log(`Trying next path for activeContext, ${path} not found`);
+        }
+      }
 
-      const progressDoc = await this.branchRepository.getDocument(
-        branchInfo,
-        DocumentPath.create(this.PROGRESS_PATH)
-      );
+      // Progress
+      let progressDoc = null;
+      for (const path of this.PROGRESS_PATHS) {
+        try {
+          progressDoc = await this.branchRepository.getDocument(
+            branchInfo,
+            DocumentPath.create(path)
+          );
+          break; // If successful, stop trying other paths
+        } catch (error) {
+          // Continue to next path if this one fails
+          console.log(`Trying next path for progress, ${path} not found`);
+        }
+      }
 
-      // Also read branch context to match test expectations
-      const branchContextDoc = await this.branchRepository.getDocument(
-        branchInfo,
-        DocumentPath.create(this.BRANCH_CONTEXT_PATH)
-      );
+      // Branch Context
+      let branchContextDoc = null;
+      for (const path of this.BRANCH_CONTEXT_PATHS) {
+        try {
+          branchContextDoc = await this.branchRepository.getDocument(
+            branchInfo,
+            DocumentPath.create(path)
+          );
+          break; // If successful, stop trying other paths
+        } catch (error) {
+          // Continue to next path if this one fails
+          console.log(`Trying next path for branchContext, ${path} not found`);
+        }
+      }
       // Initialize the output DTO
       const coreFiles: CoreFilesDTO = {};
 
@@ -104,21 +133,29 @@ export class ReadBranchCoreFilesUseCase
         coreFiles.progress = this.parseProgress(progressDoc.content);
       }
 
-      // Check if systemPatterns exists
-      const systemPatternsPath = DocumentPath.create(this.SYSTEM_PATTERNS_PATH);
-
       // Initialize system patterns with empty arrays
       const systemPatterns: SystemPatternsDTO = {
         technicalDecisions: [],
       };
       coreFiles.systemPatterns = systemPatterns;
+      
+      // Try to find system patterns document with either extension
+      let systemPatternsDoc = null;
+      for (const path of this.SYSTEM_PATTERNS_PATHS) {
+        try {
+          systemPatternsDoc = await this.branchRepository.getDocument(
+            branchInfo,
+            DocumentPath.create(path)
+          );
+          break; // If successful, stop trying other paths
+        } catch (error) {
+          // Continue to next path if this one fails
+          console.log(`Trying next path for systemPatterns, ${path} not found`);
+        }
+      }
 
       try {
-        // Try to get the document to check if it exists
-        const systemPatternsDoc = await this.branchRepository.getDocument(
-          branchInfo,
-          systemPatternsPath
-        );
+        // Check if we found a document
 
         // If document exists, process it
         if (systemPatternsDoc) {

@@ -144,10 +144,43 @@ export class BranchController implements IBranchController {
       // Format response to maintain backward compatibility
       const formattedResult: Record<string, DocumentDTO> = {};
 
+      // Determine which file extension to use (.json preferred)
+      let useJsonExtension = true;
+      
+      // Check for existence of files to determine extension preference
+      try {
+        // Try to find a branchContext file to check which extension is available
+        // Check json first
+        await this.readBranchDocumentUseCase.execute({
+          branchName,
+          path: 'branchContext.json',
+        });
+        useJsonExtension = true;
+        logger.debug(`Using .json extension for files in branch ${branchName}`);
+      } catch (jsonError) {
+        try {
+          // Try md if json failed
+          await this.readBranchDocumentUseCase.execute({
+            branchName,
+            path: 'branchContext.md',
+          });
+          useJsonExtension = false;
+          logger.debug(`Using .md extension for files in branch ${branchName}`);
+        } catch (mdError) {
+          // If both fail, default to json (forward compatible)
+          useJsonExtension = true;
+          logger.debug(`No core files found, defaulting to .json extension for branch ${branchName}`);
+        }
+      }
+      
+      // File extension to use based on availability
+      const extension = useJsonExtension ? '.json' : '.md';
+
       // If activeContext exists in the result
       if (result.files.activeContext) {
-        formattedResult['activeContext.md'] = {
-          path: 'activeContext.md',
+        const fileName = `activeContext${extension}`;
+        formattedResult[fileName] = {
+          path: fileName,
           content: this.generateActiveContextContent(result.files.activeContext),
           tags: ['core', 'active-context'],
           lastModified: new Date().toISOString(),
@@ -156,8 +189,9 @@ export class BranchController implements IBranchController {
 
       // If progress exists in the result
       if (result.files.progress) {
-        formattedResult['progress.md'] = {
-          path: 'progress.md',
+        const fileName = `progress${extension}`;
+        formattedResult[fileName] = {
+          path: fileName,
           content: this.generateProgressContent(result.files.progress),
           tags: ['core', 'progress'],
           lastModified: new Date().toISOString(),
@@ -166,29 +200,49 @@ export class BranchController implements IBranchController {
 
       // If systemPatterns exists in the result
       if (result.files.systemPatterns) {
-        formattedResult['systemPatterns.md'] = {
-          path: 'systemPatterns.md',
+        const fileName = `systemPatterns${extension}`;
+        formattedResult[fileName] = {
+          path: fileName,
           content: this.generateSystemPatternsContent(result.files.systemPatterns),
           tags: ['core', 'system-patterns'],
           lastModified: new Date().toISOString(),
         };
       }
 
-      // For branchContext.md, we still use the old approach
-      // since it's not included in the core files DTO
+      // For branchContext, try both extensions (.json first, then .md as fallback)
       try {
-        const branchContextResult = await this.readBranchDocumentUseCase.execute({
-          branchName,
-          path: 'branchContext.md',
-        });
+        const branchFileName = `branchContext${extension}`;
+        let branchContextResult;
+      
+        try {
+          branchContextResult = await this.readBranchDocumentUseCase.execute({
+            branchName,
+            path: branchFileName,
+          });
+        } catch (primaryError) {
+          logger.warn(`Could not find ${branchFileName}, trying fallback extension`);
+          // If first extension fails, try the other one
+          const fallbackExtension = useJsonExtension ? '.md' : '.json';
+          const fallbackFileName = `branchContext${fallbackExtension}`;
+          
+          branchContextResult = await this.readBranchDocumentUseCase.execute({
+            branchName,
+            path: fallbackFileName,
+          });
+          
+          // If fallback worked, use that extension for this file
+          formattedResult[fallbackFileName] = branchContextResult.document;
+          return this.presenter.present(formattedResult);
+        }
 
-        formattedResult['branchContext.md'] = branchContextResult.document;
+        formattedResult[branchFileName] = branchContextResult.document;
       } catch (error) {
-        logger.error(`Error reading branchContext.md from branch ${branchName}:`, error);
+        logger.error(`Error reading branchContext file from branch ${branchName}:`, error);
 
         // Add empty placeholder for missing file
-        formattedResult['branchContext.md'] = {
-          path: 'branchContext.md',
+        const fallbackFileName = `branchContext${extension}`;
+        formattedResult[fallbackFileName] = {
+          path: fallbackFileName,
           content: '',
           tags: ['core', 'branch-context'],
           lastModified: new Date().toISOString(),

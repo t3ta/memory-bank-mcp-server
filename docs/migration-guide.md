@@ -282,7 +282,7 @@ Memory Bank 2.0では、テンプレートシステムもJSON化されていま�
         "contentKey": "template.content.global_memory_bank",
         "isOptional": false
       },
-      // 他のセクション...
+      // 他のセクション..
     ],
     "placeholders": {}
   }
@@ -300,8 +300,8 @@ Memory Bank 2.0では、テンプレートシステムもJSON化されていま�
     "template.title.rules": "Memory Bank Rules",
     "template.description.rules": "Explanation of memory bank usage rules and structure",
     "template.section.global_memory_bank": "Global Memory Bank",
-    "template.content.global_memory_bank": "The \"Global Memory Bank\" manages common knowledge...",
-    // 他の翻訳...
+    "template.content.global_memory_bank": "The \"Global Memory Bank\" manages common knowledge..",
+    // 他の翻訳..
   },
   "metadata": {
     "version": "1.0.0",

@@ -46,7 +46,7 @@ tests/
 
 ```javascript
 module.exports = {
-  ...
+  ..
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
     '^@modelcontextprotocol/sdk(.*)$': '<rootDir>/node_modules/@modelcontextprotocol/sdk/dist/esm$1',
@@ -56,7 +56,7 @@ module.exports = {
   },
   modulePaths: ['<rootDir>', '<rootDir>/src'],
   moduleDirectories: ['node_modules', 'src'],
-  ...
+  ..
 }
 ```
 
@@ -71,7 +71,7 @@ module.exports = {
     "paths": {
       "src/*": ["./src/*"]
     },
-    ...
+    ..
   }
 }
 ```

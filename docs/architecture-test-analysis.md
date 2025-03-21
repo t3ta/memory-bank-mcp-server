@@ -26,7 +26,7 @@ describe('DeleteJsonDocumentUseCase', () => {
 
   // テストケースが長く、複数の責務が混在
   it('should delete a document by path', async () => {
-    // ...
+    // ..
   });
 });
 ```
@@ -44,7 +44,7 @@ describe('JSON Operations Completeness Integration Tests', () => {
   let repository: FileSystemBranchMemoryBankRepository;
   let jsonRepository: FileSystemJsonDocumentRepository;
   let tagRepository: FileSystemTagIndexRepositoryImpl;
-  // ...
+  // ..
 
   // テストケースが大きすぎる
   it('should perform basic CRUD operations on JSON documents', async () => {
@@ -67,7 +67,7 @@ const controller = new BranchController(
   readBranchUseCase,
   writeBranchUseCase,
   searchDocumentsUseCase,
-  // ... 多くの依存関係
+  // .. 多くの依存関係
 );
 ```
 
@@ -109,9 +109,9 @@ tests/
 ```typescript
 // tests/helpers/test-builder.ts
 export class TestBuilder {
-  static createDocument() { /* ... */ }
-  static createRepository() { /* ... */ }
-  // ...
+  static createDocument() { /* .. */ }
+  static createRepository() { /* .. */ }
+  // ..
 }
 ```
 
@@ -140,9 +140,9 @@ describe('DeleteJsonDocumentUseCase', () => {
 ```typescript
 // tests/factories/document-factory.ts
 export class DocumentFactory {
-  static createBasicDocument() { /* ... */ }
-  static createComplexDocument() { /* ... */ }
-  static createWithTags(tags: string[]) { /* ... */ }
+  static createBasicDocument() { /* .. */ }
+  static createComplexDocument() { /* .. */ }
+  static createWithTags(tags: string[]) { /* .. */ }
 }
 ```
 
@@ -171,7 +171,7 @@ export class InMemoryRepository implements IJsonDocumentRepository {
   async findById(id: string): Promise<JsonDocument | null> {
     return this.documents.get(id) || null;
   }
-  // ...
+  // ..
 }
 ```
 
