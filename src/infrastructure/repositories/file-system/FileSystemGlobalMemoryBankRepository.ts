@@ -1,91 +1,4 @@
-  private getDefaultTemplate(language: Language, type: string): string {
-    // Basic templates only for most important types
-    // Future enhancement: Load from actual template files
-    const templates: Record<Language, Record<string, string>> = {
-      en: {
-        'tags/index.json': `{
-  "schema": "memory_document_v2",
-  "metadata": {
-    "id": "tags-index",
-    "title": "Tags Index",
-    "documentType": "generic",
-    "path": "tags/index.json",
-    "tags": ["index", "meta"],
-    "lastModified": "${new Date().toISOString()}",
-    "createdAt": "${new Date().toISOString()}",
-    "version": 1
-  },
-  "content": {
-    "sections": [
-      {
-        "title": "Tags List",
-        "content": "[List and description of tags]"
-      }
-    ]
-  }
-}`
-      },
-      ja: {
-        'tags/index.json': `{
-  "schema": "memory_document_v2",
-  "metadata": {
-    "id": "tags-index",
-    "title": "タグインデックス",
-    "documentType": "generic",
-    "path": "tags/index.json",
-    "tags": ["index", "meta"],
-    "lastModified": "${new Date().toISOString()}",
-    "createdAt": "${new Date().toISOString()}",
-    "version": 1
-  },
-  "content": {
-    "sections": [
-      {
-        "title": "タグ一覧",
-        "content": "[タグの一覧と説明]"
-      }
-    ]
-  }
-}`
-      },
-      zh: {
-        'tags/index.json': `{
-  "schema": "memory_document_v2",
-  "metadata": {
-    "id": "tags-index",
-    "title": "标签索引",
-    "documentType": "generic",
-    "path": "tags/index.json",
-    "tags": ["index", "meta"],
-    "lastModified": "${new Date().toISOString()}",
-    "createdAt": "${new Date().toISOString()}",
-    "version": 1
-  },
-  "content": {
-    "sections": [
-      {
-        "title": "标签列表",
-        "content": "[标签列表和描述]"
-      }
-    ]
-  }
-}`
-      }
-    };
-    
-    // Check if template exists for this language
-    if (templates[language] && templates[language][type]) {
-      return templates[language][type];
-    }
-    
-    // Fall back to English template if not found
-    if (templates.en[type]) {
-      return templates.en[type];
-    }
-    
-    // No template found, return empty string (shouldn't happen)
-    return '';
-  }import path from 'node:path';
+import path from 'node:path';
 import type { Language } from '../../../schemas/v2/i18n-schema.js';
 import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
 import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
@@ -108,7 +21,9 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
   private readonly globalMemoryPath: string;
   private language: Language = 'en';
   
-  // Get template structure based on current language
+  /**
+   * Get default templates based on current language
+   */
   private get defaultStructure(): Record<string, string> {
     // Select templates based on language
     switch (this.language) {
@@ -119,6 +34,127 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
       default:
         return this.getEnglishTemplates();
     }
+  }
+
+  // getTemplatesForLanguage is no longer needed as defaultStructure now handles language selection directly
+
+  /**
+   * Get English templates for default structure
+   * @returns Record of file paths to template content
+   */
+  private getEnglishTemplates(): Record<string, string> {
+    return {
+      'tags/index.json': `{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "tags-index",
+    "title": "Tags Index",
+    "documentType": "generic",
+    "path": "tags/index.json",
+    "tags": ["index", "meta"],
+    "lastModified": "${new Date().toISOString()}",
+    "createdAt": "${new Date().toISOString()}",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "Tags List",
+        "content": "[List and description of tags]"
+      }
+    ]
+  }
+}`
+    };
+  }
+
+  /**
+   * Get Japanese templates for default structure
+   * @returns Record of file paths to template content
+   */
+  private getJapaneseTemplates(): Record<string, string> {
+    return {
+      'tags/index.json': `{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "tags-index",
+    "title": "タグインデックス",
+    "documentType": "generic",
+    "path": "tags/index.json",
+    "tags": ["index", "meta"],
+    "lastModified": "${new Date().toISOString()}",
+    "createdAt": "${new Date().toISOString()}",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "タグ一覧",
+        "content": "[タグの一覧と説明]"
+      }
+    ]
+  }
+}`
+    };
+  }
+
+  /**
+   * Get Chinese templates for default structure
+   * @returns Record of file paths to template content
+   */
+  private getChineseTemplates(): Record<string, string> {
+    return {
+      'tags/index.json': `{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "tags-index",
+    "title": "标签索引",
+    "documentType": "generic",
+    "path": "tags/index.json",
+    "tags": ["index", "meta"],
+    "lastModified": "${new Date().toISOString()}",
+    "createdAt": "${new Date().toISOString()}",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "标签列表",
+        "content": "[标签列表和描述]"
+      }
+    ]
+  }
+}`
+    };
+  }
+
+  /**
+   * Get template for specific language and type
+   * @param language Target language
+   * @param type Template type
+   * @returns Template content as string
+   */
+  private getDefaultTemplate(language: Language, type: string): string {
+    // Basic templates only for most important types
+    // Future enhancement: Load from actual template files
+    const templates: Record<Language, Record<string, string>> = {
+      en: this.getEnglishTemplates(),
+      ja: this.getJapaneseTemplates(),
+      zh: this.getChineseTemplates()
+    };
+    
+    // Check if template exists for this language
+    if (templates[language] && templates[language][type]) {
+      return templates[language][type];
+    }
+    
+    // Fall back to English template if not found
+    if (templates.en[type]) {
+      return templates.en[type];
+    }
+    
+    // No template found, return empty string (shouldn't happen)
+    return '';
   }
 
   /**
