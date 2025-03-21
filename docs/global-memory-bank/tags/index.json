@@ -9,14 +9,14 @@
       "index",
       "meta"
     ],
-    "lastModified": "2025-03-21T17:12:00.695Z",
-    "createdAt": "2025-03-21T17:12:00.695Z",
+    "lastModified": "2025-03-21T19:06:45.509Z",
+    "createdAt": "2025-03-21T19:06:45.509Z",
     "version": 1
   },
   "content": {
     "sections": [
       {
-        "title": "タグ一覧",
+        "title": "Tags List",
         "content": "タグとドキュメントの関連付け"
       }
     ],
@@ -35,7 +35,7 @@
         ]
       },
       "documentation": {
-        "count": 16,
+        "count": 15,
         "documents": [
           {
             "path": "01-project/README.json",
@@ -96,15 +96,11 @@
           {
             "path": "tags/README.json",
             "title": "tags/README.json"
-          },
-          {
-            "path": "user-guide.json",
-            "title": "user-guide.json"
           }
         ]
       },
       "guide": {
-        "count": 16,
+        "count": 15,
         "documents": [
           {
             "path": "01-project/README.json",
@@ -165,23 +161,15 @@
           {
             "path": "tags/README.json",
             "title": "tags/README.json"
-          },
-          {
-            "path": "user-guide.json",
-            "title": "user-guide.json"
           }
         ]
       },
       "best-practices": {
-        "count": 2,
+        "count": 1,
         "documents": [
           {
             "path": "01-project/coding-standards.json",
             "title": "01-project/coding-standards.json"
-          },
-          {
-            "path": "coding-standards.json",
-            "title": "coding-standards.json"
           }
         ]
       },
@@ -204,33 +192,25 @@
         ]
       },
       "domain": {
-        "count": 2,
+        "count": 1,
         "documents": [
           {
             "path": "01-project/domain-models.json",
             "title": "01-project/domain-models.json"
-          },
-          {
-            "path": "domain-models.json",
-            "title": "domain-models.json"
           }
         ]
       },
       "models": {
-        "count": 2,
+        "count": 1,
         "documents": [
           {
             "path": "01-project/domain-models.json",
             "title": "01-project/domain-models.json"
-          },
-          {
-            "path": "domain-models.json",
-            "title": "domain-models.json"
           }
         ]
       },
       "architecture": {
-        "count": 12,
+        "count": 10,
         "documents": [
           {
             "path": "01-project/domain-models.json",
@@ -271,14 +251,6 @@
           {
             "path": "06-releases/v2-design-decisions.json",
             "title": "06-releases/v2-design-decisions.json"
-          },
-          {
-            "path": "architecture.json",
-            "title": "architecture.json"
-          },
-          {
-            "path": "domain-models.json",
-            "title": "domain-models.json"
           }
         ]
       },
@@ -333,28 +305,20 @@
         ]
       },
       "glossary": {
-        "count": 2,
+        "count": 1,
         "documents": [
           {
             "path": "01-project/glossary.json",
             "title": "01-project/glossary.json"
-          },
-          {
-            "path": "glossary.json",
-            "title": "glossary.json"
           }
         ]
       },
       "terminology": {
-        "count": 2,
+        "count": 1,
         "documents": [
           {
             "path": "01-project/glossary.json",
             "title": "01-project/glossary.json"
-          },
-          {
-            "path": "glossary.json",
-            "title": "glossary.json"
           }
         ]
       },
@@ -434,20 +398,16 @@
         ]
       },
       "tech-stack": {
-        "count": 2,
+        "count": 1,
         "documents": [
           {
             "path": "01-project/tech-stack.json",
             "title": "01-project/tech-stack.json"
-          },
-          {
-            "path": "tech-stack.json",
-            "title": "tech-stack.json"
           }
         ]
       },
       "infrastructure": {
-        "count": 3,
+        "count": 2,
         "documents": [
           {
             "path": "01-project/tech-stack.json",
@@ -456,10 +416,6 @@
           {
             "path": "07-infrastructure/README.json",
             "title": "07-infrastructure/README.json"
-          },
-          {
-            "path": "tech-stack.json",
-            "title": "tech-stack.json"
           }
         ]
       },
@@ -1219,15 +1175,6 @@
           }
         ]
       },
-      "system-design": {
-        "count": 1,
-        "documents": [
-          {
-            "path": "architecture.json",
-            "title": "architecture.json"
-          }
-        ]
-      },
       "fix": {
         "count": 1,
         "documents": [
@@ -1256,19 +1203,6 @@
           {
             "path": "auto-initialization-test.json",
             "title": "auto-initialization-test.json"
-          }
-        ]
-      },
-      "standards": {
-        "count": 2,
-        "documents": [
-          {
-            "path": "coding-standards.json",
-            "title": "coding-standards.json"
-          },
-          {
-            "path": "meta/document-type-standards.json",
-            "title": "meta/document-type-standards.json"
           }
         ]
       },
@@ -1325,6 +1259,15 @@
           {
             "path": "tags/tag_index_update_plan.json",
             "title": "tags/tag_index_update_plan.json"
+          }
+        ]
+      },
+      "standards": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "meta/document-type-standards.json",
+            "title": "meta/document-type-standards.json"
           }
         ]
       }
