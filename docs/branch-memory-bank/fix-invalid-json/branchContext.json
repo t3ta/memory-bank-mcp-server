@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "7fec8271-03c7-48a1-91d7-34d14781b003",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-21T19:15:23.324Z",
+    "createdAt": "2025-03-21T19:10:08.324Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "fix/invalid-json",
+    "purpose": "JSONファイルの無効なフォーマットを修正するためのブランチ",
+    "createdAt": "2025-03-21T19:10:08.324Z",
+    "userStories": [
+      {
+        "id": "44a350ed-759a-45b9-a057-515676d32e69",
+        "description": "タグ形式の修正: タグは小文字のアルファベット、数字、ハイフンのみを使用する形式にする",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "518527d1-b913-46ff-b2c5-fc758f5e6193",
+        "description": "日時フォーマットの修正: lastModifiedなどの日時フィールドをISO 8601形式に修正する",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "8160f3b8-ed82-4f36-912e-175ded81c5f3",
+        "description": "その他のJSON形式エラーを修正する",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": "エラーログによると、04-guides/migration-guide.jsonファイルに問題がある。タグに#プレフィックスが付いており、lastModifiedの日時フォーマットが不正になっている。これを修正する必要がある。"
+  }
+}

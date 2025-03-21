@@ -1,0 +1,60 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "active-context-uuid",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context",
+      "fix-invalid-json"
+    ],
+    "lastModified": "2025-03-21T19:42:23.324Z",
+    "createdAt": "2025-03-21T19:10:08.324Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "無効なJSON形式の修正作業が完了しました。問題のファイルを修正し、コミットしました。",
+    "recentChanges": [
+      {
+        "date": "2025-03-21T19:40:00.324Z",
+        "description": "migration-guide.jsonのタグと日時フォーマットを修正し、コミット完了"
+      },
+      {
+        "date": "2025-03-21T19:18:23.324Z",
+        "description": "問題の特定: タグに#プレフィックスが付いており、lastModifiedの日時フォーマットが不正"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "decision-uuid-1",
+        "description": "タグからプレフィックス#を削除し、タグ命名規則（小文字のアルファベット、数字、ハイフンのみ）に準拠させる",
+        "reason": "タグシステムのルールに従うため"
+      },
+      {
+        "id": "decision-uuid-2",
+        "description": "lastModifiedの日時フォーマットを正しいISO 8601形式に修正する",
+        "reason": "有効なJSON形式かつ標準的な日時フォーマットにするため"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "consideration-uuid-2",
+        "description": "タグ形式のバリデーションを強化する必要があるかもしれない",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "step-uuid-3",
+        "description": "PRを作成して変更をマージする",
+        "priority": "high"
+      },
+      {
+        "id": "step-uuid-4",
+        "description": "フォーマット検証を強化する方法を検討する",
+        "priority": "medium"
+      }
+    ]
+  }
+}

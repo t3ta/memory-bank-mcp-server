@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "progress-uuid",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress",
+      "fix-invalid-json"
+    ],
+    "lastModified": "2025-03-21T19:40:23.324Z",
+    "createdAt": "2025-03-21T19:10:08.324Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "feature-uuid-1",
+        "description": "04-guides/migration-guide.jsonのタグ形式修正",
+        "implementedAt": "2025-03-21T19:35:00Z"
+      },
+      {
+        "id": "feature-uuid-2",
+        "description": "04-guides/migration-guide.jsonの日時フォーマット修正",
+        "implementedAt": "2025-03-21T19:35:00Z"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "pending-uuid-3",
+        "description": "タグ形式検証を強化するための対策検討",
+        "priority": "medium",
+        "estimatedCompletion": "2025-03-21T21:00:00Z"
+      }
+    ],
+    "status": "completed",
+    "completionPercentage": 90,
+    "knownIssues": []
+  }
+}

@@ -9,8 +9,8 @@
       "index",
       "meta"
     ],
-    "lastModified": "2025-03-21T19:07:51.048Z",
-    "createdAt": "2025-03-21T19:07:51.048Z",
+    "lastModified": "2025-03-21T19:14:40.917Z",
+    "createdAt": "2025-03-21T19:14:40.917Z",
     "version": 1
   },
   "content": {
@@ -100,7 +100,7 @@
         ]
       },
       "guide": {
-        "count": 15,
+        "count": 16,
         "documents": [
           {
             "path": "01-project/README.json",
@@ -117,6 +117,10 @@
           {
             "path": "04-guides/README.json",
             "title": "04-guides/README.json"
+          },
+          {
+            "path": "04-guides/migration-guide.json",
+            "title": "04-guides/migration-guide.json"
           },
           {
             "path": "04-guides/user-guide.json",
@@ -255,7 +259,7 @@
         ]
       },
       "json": {
-        "count": 9,
+        "count": 10,
         "documents": [
           {
             "path": "01-project/domain-models.json",
@@ -280,6 +284,10 @@
           {
             "path": "02-architecture/json-based-architecture.json",
             "title": "02-architecture/json-based-architecture.json"
+          },
+          {
+            "path": "04-guides/migration-guide.json",
+            "title": "04-guides/migration-guide.json"
           },
           {
             "path": "04-guides/migration-policy.json",
@@ -838,8 +846,12 @@
         ]
       },
       "migration": {
-        "count": 1,
+        "count": 2,
         "documents": [
+          {
+            "path": "04-guides/migration-guide.json",
+            "title": "04-guides/migration-guide.json"
+          },
           {
             "path": "04-guides/migration-policy.json",
             "title": "04-guides/migration-policy.json"
@@ -847,8 +859,12 @@
         ]
       },
       "markdown": {
-        "count": 1,
+        "count": 2,
         "documents": [
+          {
+            "path": "04-guides/migration-guide.json",
+            "title": "04-guides/migration-guide.json"
+          },
           {
             "path": "04-guides/migration-policy.json",
             "title": "04-guides/migration-policy.json"
