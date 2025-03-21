@@ -1,0 +1,45 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "core-architecture",
+    "title": "システムアーキテクチャ基本情報",
+    "documentType": "core",
+    "path": "core/architecture.json",
+    "tags": [
+      "architecture",
+      "system-design",
+      "core"
+    ],
+    "lastModified": "2025-03-22T02:10:15.000Z",
+    "createdAt": "2025-03-21T08:40:50.132Z",
+    "version": 2
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "概要",
+        "content": "Memory Bank MCPサーバーはクリーンアーキテクチャを基盤とした設計になっています。このドキュメントではシステム全体のアーキテクチャの基本的な概念を説明します。詳細な情報は `02-architecture/` ディレクトリを参照してください。"
+      },
+      {
+        "title": "アーキテクチャの原則",
+        "content": "- **関心の分離**: 各レイヤーには明確な責任があります\n- **依存関係のルール**: 内側のレイヤーは外側のレイヤーに依存しません\n- **ビジネスルールの独立性**: ドメインレイヤーは技術的な実装詳細から独立しています\n- **テスト可能性**: すべてのビジネスロジックは容易にテスト可能です"
+      },
+      {
+        "title": "レイヤー構造",
+        "content": "システムは以下の4つの主要レイヤーで構成されています：\n\n1. **エンティティ層（Entities）**: システムのコアビジネスルールを表現\n2. **ユースケース層（Use Cases）**: アプリケーション特有のビジネスルール\n3. **インターフェースアダプター層（Interface Adapters）**: 外部システムとの通信を抽象化\n4. **フレームワーク・ドライバー層（Frameworks & Drivers）**: 外部フレームワークやライブラリ\n\n各レイヤーの詳細な説明は `02-architecture/architecture.json` を参照してください。"
+      },
+      {
+        "title": "コアコンポーネント",
+        "content": "- **CLI**: コマンドラインインターフェース\n- **MCPサーバー**: メインのアプリケーションサーバー\n- **リポジトリ実装**: ファイルシステムベースのデータストレージ\n- **メモリバンク**: プロジェクト情報の保存と管理\n\nこれらのコンポーネントの詳細な説明は `02-architecture/components.json` を参照してください。"
+      },
+      {
+        "title": "重要な設計決定",
+        "content": "1. **JSONベースのドキュメント構造**: 構造化されたデータモデル（v2.0以降）\n2. **タグシステム**: 情報の効率的な分類と検索のため\n3. **ブランチ別メモリバンク**: 現在の作業コンテキストの保存\n4. **グローバルメモリバンク**: プロジェクト全体の共有情報\n\n詳細な設計決定事項は `02-architecture/architecture-decisions.json` を参照してください。"
+      },
+      {
+        "title": "関連ドキュメント",
+        "content": "- [アーキテクチャの詳細情報](../02-architecture/architecture.json)\n- [設計決定の詳細情報](../02-architecture/architecture-decisions.json)\n- [JSON基盤のアーキテクチャ](../02-architecture/json-based-architecture.json)\n- [統合アーキテクチャドキュメント](../02-architecture/consolidated-architecture.json)"
+      }
+    ]
+  }
+}

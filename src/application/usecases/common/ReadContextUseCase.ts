@@ -10,6 +10,7 @@ export type ContextRequest = {
   includeRules?: boolean;
   includeBranchMemory?: boolean;
   includeGlobalMemory?: boolean;
+  coreOnly?: boolean; // 追加: コアファイルのみを読み込むオプション
 };
 
 export type ContextResult = {
@@ -39,7 +40,7 @@ export class ReadContextUseCase {
    * @throws When branch does not exist
    */
   async execute(request: ContextRequest): Promise<ContextResult> {
-    const { branch, includeBranchMemory, includeGlobalMemory } = request;
+    const { branch, includeBranchMemory, includeGlobalMemory, coreOnly = true } = request;
     const result: ContextResult = {};
 
     // デバッグログを追加
@@ -78,8 +79,8 @@ export class ReadContextUseCase {
 
       // グローバルメモリーを読み込む
       if (includeGlobalMemory) {
-        console.log(`Reading global memory`);
-        result.globalMemory = await this.readGlobalMemory();
+        console.log(`Reading global memory with coreOnly=${coreOnly}`);
+        result.globalMemory = await this.readGlobalMemory(coreOnly);
         console.log(`Global memory keys: ${Object.keys(result.globalMemory || {}).join(', ')}`);
       }
 
@@ -118,13 +119,20 @@ export class ReadContextUseCase {
 
   /**
    * Read global memory
+   * @param coreOnly Whether to read only core files
    * @returns Object with document paths as keys and content as values
    */
-  private async readGlobalMemory(): Promise<Record<string, string>> {
-    const paths = await this.globalRepository.listDocuments();
+  private async readGlobalMemory(coreOnly: boolean = true): Promise<Record<string, string>> {
+    let paths = await this.globalRepository.listDocuments();
     const result: Record<string, string> = {};
-
-    console.log(`readGlobalMemory paths: ${paths.map(p => p.value).join(', ')}`);
+    
+    // coreOnlyフラグに基づいてパスをフィルタリング
+    if (coreOnly) {
+      console.log('Filtering for core files only');
+      paths = paths.filter(p => p.value.startsWith('core/'));
+    }
+    
+    console.log(`readGlobalMemory paths (coreOnly=${coreOnly}): ${paths.map(p => p.value).join(', ')}`);
 
     for (const path of paths) {
       console.log(`Reading global document: ${path.value}`);
