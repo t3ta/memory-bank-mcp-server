@@ -1,37 +1,56 @@
 {
   "schema": "memory_document_v2",
   "metadata": {
-    "id": "e0a897ed-f08d-4fd9-a4b0-94852e9e131a",
-    "title": "システムパターン",
+    "id": "system-patterns-1",
+    "title": "System Patterns for Global Memory Bank Reorganization",
     "documentType": "system_patterns",
     "path": "systemPatterns.json",
     "tags": [
-      "system-patterns"
+      "core",
+      "system-patterns",
+      "migration",
+      "markdown-to-json"
     ],
-    "lastModified": "2025-03-21T02:40:41.888Z",
-    "createdAt": "2025-03-21T02:40:41.888Z",
+    "lastModified": "2025-03-21T09:35:00.000Z",
+    "createdAt": "2025-03-21T03:29:03.847Z",
     "version": 1
   },
   "content": {
     "technicalDecisions": [
       {
-        "id": "f3b6a3df-05da-4894-9c32-160e0276ae44",
-        "title": "決定事項のタイトル",
-        "context": "決定の背景や理由",
-        "decision": "具体的な決定内容",
-        "consequences": {
-          "positive": [
-            "影響1",
-            "影響2",
-            "影響3"
-          ],
-          "negative": []
-        },
-        "status": "proposed",
-        "date": "2025-03-21T02:40:41.888Z",
-        "alternatives": []
+        "title": "Markdownからの移行戦略",
+        "context": "メモリバンクはMarkdownベースからJSONベースへの移行を進めている。その過程でドキュメントの移行方法とツールを決定する必要がある。",
+        "decision": "プログラム的な変換（MarkdownToJsonMigrator）とAI支援（shitauke）の両方を活用する。シンプルなドキュメントはプログラム的変換、複雑な構造を持つドキュメントはAI支援変換を使い分ける。",
+        "consequences": [
+          "高い精度でのJSONへの変換が可能になる",
+          "複雑な構造も適切に保持できる",
+          "日本語を含むコンテンツも正確に処理できる",
+          "AIによる処理は外部依存となるためフォールバック手段を用意する必要がある"
+        ]
+      },
+      {
+        "title": "JSON構造の標準化",
+        "context": "グローバルメモリバンクの多様なドキュメントをJSON形式に変換するにあたり、一貫性のあるスキーマ定義が必要。",
+        "decision": "すべてのJSONドキュメントは共通のメタデータ構造を持ち、コンテンツ部分はドキュメントタイプ固有の構造に従う。共通スキーマを定義し、バリデーションを行う。",
+        "consequences": [
+          "一貫性のあるドキュメント構造",
+          "プログラムによるアクセスと操作が容易になる",
+          "バリデーションによるデータ品質の向上",
+          "新しいドキュメントタイプの追加が標準化される"
+        ]
+      },
+      {
+        "title": "shitaukeとの統合",
+        "context": "外部ツールであるshitaukeを使ってマークダウンからJSONへの変換を効率化したい。",
+        "decision": "shitaukeはCLIツールとして提供され、最適化されたプロンプトを使用してAIモデル（Gemini）によるマークダウン文書の構造化JSONへの変換を行う。マイグレーションプロセスにshitaukeを組み込み、複雑な文書構造の変換に活用する。",
+        "consequences": [
+          "人間の介入なしに高品質な変換が可能",
+          "書式情報（太字、リンクなど）が適切に保持される",
+          "一貫性のある出力形式が確保される",
+          "AIモデルへの依存性が生じる",
+          "処理コストと時間がかかる可能性がある"
+        ]
       }
-    ],
-    "implementationPatterns": []
+    ]
   }
 }

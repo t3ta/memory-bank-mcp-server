@@ -2,38 +2,98 @@
   "schema": "memory_document_v2",
   "metadata": {
     "id": "active-context",
-    "title": "Active Context",
-    "documentType": "active_context",
+    "title": "アクティブコンテキスト",
+    "documentType": "context",
     "path": "activeContext.json",
     "tags": [
-      "core",
-      "active-context"
+      "active",
+      "context",
+      "current-work"
     ],
-    "lastModified": "2025-03-21T09:45:00.000Z",
-    "createdAt": "2025-03-21T02:46:55.121Z",
-    "version": 4
+    "lastModified": "2025-03-21T13:05:00.000Z",
+    "createdAt": "2025-03-21T13:05:00.000Z",
+    "version": 1
   },
   "content": {
-    "sections": [
+    "currentWork": "グローバルメモリバンクの再編成を実施中。ディレクトリ構造の整理とファイルの移動が完了。36ファイルを適切なカテゴリディレクトリに移動し、ファイル移動マッピングを作成した。",
+    "recentChanges": [
       {
-        "title": "Current Work",
-        "content": "We are implementing the tag reorganization and directory structure improvements for the Global Memory Bank. After analyzing the current structure and creating a comprehensive plan, we are now moving to the execution phase of our strategy."
+        "date": "2025-03-21T13:00:00.000Z",
+        "description": "グローバルメモリバンクのディレクトリ構造を実装：\n- `01-project/`: プロジェクト基本情報関連\n- `02-architecture/`: アーキテクチャ設計関連\n- `03-implementation/`: 実装詳細関連\n- `04-guides/`: ユーザーガイド・移行ガイド関連\n- `05-testing/`: テスト戦略・実装関連\n- `06-releases/`: リリース情報関連\n- `08-i18n/`: 多言語サポート関連\n- `09-refactoring/`: リファクタリング・設計問題関連"
       },
       {
-        "title": "Recent Changes",
-        "content": "1. Created backups of important index files in `/docs/global-memory-bank/backups/2025-03-21/`\n2. Generated a comprehensive tag reorganization strategy using shitauke\n3. Created a detailed implementation plan in `tag-reorganization-implementation-plan.json`\n4. Identified 10 logical tag categories to improve organization\n5. Planned consolidation of similar tags (e.g., merging version tags)"
+        "date": "2025-03-21T12:30:00.000Z",
+        "description": "各カテゴリディレクトリにファイルを移動：\n- テスト関連6ファイル\n- リリース関連3ファイル\n- アーキテクチャ関連14ファイル\n- 実装関連4ファイル\n- プロジェクト関連5ファイル\n- ガイド関連3ファイル\n- 多言語関連2ファイル\n- リファクタリング関連1ファイル"
       },
       {
-        "title": "Active Decisions",
-        "content": "1. Implement the 10 tag categories as defined in our plan to create a logical organization structure\n2. Begin with directory restructuring as it is least disruptive to the system\n3. Apply a gradual approach to tag consolidation to maintain system stability\n4. Maintain both index files during transition for backward compatibility\n5. Focus on creating proper documentation for each category"
+        "date": "2025-03-21T12:45:00.000Z",
+        "description": "ファイル移動マッピングを作成し、メモリバンクに保存"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "dir-structure-decision",
+        "description": "グローバルメモリバンクをカテゴリベースのディレクトリ構造に整理する",
+        "status": "completed"
       },
       {
-        "title": "Considerations",
-        "content": "1. Need to test each change carefully as the indexing mechanism is core to the system\n2. Should create prototype implementations in a test branch before applying to main system\n3. Some changes may require modifications to code that generates the indexes\n4. User feedback will be critical to ensure the new structure is intuitive"
+        "id": "file-movement-decision",
+        "description": "関連するドキュメントを適切なカテゴリディレクトリに移動する",
+        "status": "completed"
       },
       {
-        "title": "Next Steps",
-        "content": "1. **Begin Directory Structure Implementation**\n   - Create the new directory structure with category folders\n   - Start with the `01-project/` directory\n   - Add README.json files to each new directory\n\n2. **Prepare For Tag Category Implementation**\n   - Create a test branch for tag category implementation\n   - Design the extended format for `tags/index.json` to include categories\n   - Determine how the system will interact with categorized tags\n\n3. **Plan Tag Consolidation Process**\n   - Create detailed mapping of tags to be consolidated\n   - Document the steps for updating document tags\n   - Design the transition process to maintain backward compatibility\n\n4. **Create Documentation**\n   - Update user guides to explain the new structure\n   - Create guides for team members on how to use the new tag system"
+        "id": "naming-convention-decision",
+        "description": "命名規則を統一し、ファイル名を標準化する",
+        "status": "in-progress"
+      },
+      {
+        "id": "mapping-creation-decision",
+        "description": "ファイル移動マッピングを作成し、パス更新の基礎資料とする",
+        "status": "completed"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "index-update-consideration",
+        "description": "インデックスファイルの更新方法\n- 手動でパスを更新するか、自動更新ツールを作成するか\n- 新しいインデックス生成メカニズムの構築が必要か",
+        "status": "open"
+      },
+      {
+        "id": "path-reference-consideration",
+        "description": "ファイル内の相対パス参照の更新方法",
+        "status": "open"
+      },
+      {
+        "id": "tag-system-consideration",
+        "description": "タグシステムの標準化と再構築方法",
+        "status": "open"
+      },
+      {
+        "id": "markdown-conversion-consideration",
+        "description": "shitaukeツールを活用したMarkdown→JSON変換の実装方法",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "update-index",
+        "description": "インデックスファイル（`_global_index.json`）を更新する",
+        "priority": "high"
+      },
+      {
+        "id": "update-path-references",
+        "description": "ファイル内の相対パス参照を更新する",
+        "priority": "medium"
+      },
+      {
+        "id": "rebuild-tag-system",
+        "description": "タグシステムを再構築する",
+        "priority": "medium"
+      },
+      {
+        "id": "convert-markdown-files",
+        "description": "マークダウンファイルの変換を検討（shitaukeツールの活用）",
+        "priority": "low"
       }
     ]
   }

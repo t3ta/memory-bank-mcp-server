@@ -1,0 +1,188 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "consolidated-v2-release",
+    "title": "Memory Bank 2.0 統合リリース情報",
+    "documentType": "release",
+    "path": "06-releases/consolidated-v2-release.json",
+    "tags": [
+      "release",
+      "v2",
+      "version-2",
+      "planning",
+      "changelog",
+      "implementation"
+    ],
+    "lastModified": "2025-03-21T11:45:00.000Z",
+    "createdAt": "2025-03-21T11:45:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "概要",
+        "content": "このドキュメントは、Memory Bank 2.0リリースに関連する実装計画、設計決定、およびリリース情報を統合したものです。Version 2.0は、JSONベースのドキュメント構造、マルチリンガルサポート、クリーンアーキテクチャなど、多くの重要な改善を含む大規模アップデートです。"
+      },
+      {
+        "title": "リリース情報",
+        "sections": [
+          {
+            "title": "バージョン情報",
+            "version": "2.0.0",
+            "releaseDate": "2025-03-17",
+            "summary": "Memory Bank MCP Serverの初のメジャーバージョン。JSONベースのドキュメント構造、マルチリンガルサポート、クリーンアーキテクチャの完全実装が含まれています。"
+          },
+          {
+            "title": "主要な変更点",
+            "changes": [
+              {
+                "title": "JSONベースのドキュメント構造",
+                "description": "MarkdownベースからJSONベースのドキュメント構造への移行",
+                "details": [
+                  "スキーマによる堅牢な型検証",
+                  "構造化されたデータアクセスと操作",
+                  "ドキュメントメタデータとコンテンツの明確な分離"
+                ],
+                "commits": [
+                  "6ecbc9104e5cba7e2f030d14827f93f801814954",
+                  "5191a9960f6267cb2782f831d289e6895b286ffc"
+                ]
+              },
+              {
+                "title": "マイグレーションツール",
+                "description": "既存のMarkdownファイルをJSONに自動変換",
+                "details": [
+                  "バックアップ機能とスキーマ検証",
+                  "移行期間中の両形式のサポート",
+                  "自動マイグレーションの設定オプション"
+                ],
+                "commits": [
+                  "dda49c2c5ae80e063878436ce6f8cfa616c68bfb"
+                ]
+              },
+              {
+                "title": "マルチリンガルサポート",
+                "description": "英語、日本語、中国語のサポート追加",
+                "details": [
+                  "言語固有のテンプレートと翻訳",
+                  "国際化（i18n）インフラストラクチャの整備",
+                  "言語設定オプション"
+                ],
+                "commits": [
+                  "a0133e55866a82e16987de44aa798044a9365489"
+                ]
+              },
+              {
+                "title": "APIの拡張",
+                "description": "新しい`read_context`コマンドの追加",
+                "details": [
+                  "ブランチメモリバンク、グローバルメモリバンク、ルールを一度に取得可能",
+                  "`read_branch_core_files`と`read_global_core_files`コマンドを置き換え",
+                  "効率的なコンテキスト取得"
+                ],
+                "commits": [
+                  "5b864caaf9e5f18ad6d661ad95d25a2dd7b258b1",
+                  "ab81db5f5bd06c90d09594a1c883913c6f014236"
+                ]
+              },
+              {
+                "title": "クリーンアーキテクチャの完全実装",
+                "description": "ドメイン層、アプリケーション層、インフラストラクチャ層、インターフェース層に分離",
+                "details": [
+                  "リポジトリパターンとファクトリメソッドの適用",
+                  "ユースケース駆動設計",
+                  "依存性の明示的な注入"
+                ],
+                "commits": [
+                  "2d93e392635ac81b05327a5d15cdb6632a8d9690"
+                ]
+              }
+            ]
+          },
+          {
+            "title": "テスト結果",
+            "results": {
+              "testSuites": "38/39通過（1スキップ）",
+              "totalTests": "431/440通過（9スキップ）",
+              "ciPipeline": "成功"
+            }
+          },
+          {
+            "title": "既知の問題",
+            "issues": [
+              "マイグレーション中に大量のバックアップディレクトリが作成される問題を修正（`createBackup`オプションをデフォルトで`false`に設定）",
+              "特定のテストファイルが一時的に無効化されている（CI/CDパイプラインの修正が必要）"
+            ]
+          },
+          {
+            "title": "今後の計画",
+            "plans": [
+              "Markdownサポートの段階的廃止（将来のリリースで）",
+              "CLIツールの機能強化",
+              "Web UIの開発検討",
+              "データベースバックエンド（SurrealDB）の追加"
+            ]
+          },
+          {
+            "title": "関連ドキュメント",
+            "documents": {
+              "migrationGuide": "04-guides/migration-guide.json",
+              "jsonSchema": "src/schemas/v2/json-document.ts",
+              "readContextImplementation": "03-implementation/read-context-command-implementation.json"
+            }
+          }
+        ]
+      },
+      {
+        "title": "マイグレーションガイド",
+        "sections": [
+          {
+            "title": "自動マイグレーション",
+            "description": "Memory Bank MCP Server 2.0.0は、起動時に既存のMarkdownファイルを検出し、JSONに自動変換します",
+            "command": "npx memory-bank-mcp-server"
+          },
+          {
+            "title": "手動マイグレーション",
+            "description": "特定のファイルやディレクトリを手動で変換する場合",
+            "command": "npx memory-bank migrate ./docs/path/to/file.md",
+            "status": "計画中"
+          },
+          {
+            "title": "設定",
+            "description": "構成ファイルの更新例",
+            "example": {
+              "mcpServers": {
+                "memory-bank": {
+                  "command": "npx",
+                  "args": [
+                    "-y",
+                    "memory-bank-mcp-server"
+                  ],
+                  "env": {
+                    "MEMORY_BANK_ROOT": "/path/to/docs",
+                    "MEMORY_BANK_LANGUAGE": "ja"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "title": "参照先",
+        "references": [
+          {
+            "id": "v2-design-decisions",
+            "path": "06-releases/v2-design-decisions.json",
+            "title": "V2.0設計上の決定事項"
+          },
+          {
+            "id": "v2-implementation-plan",
+            "path": "06-releases/v2-implementation-plan.json",
+            "title": "V2.0実装計画詳細"
+          }
+        ]
+      }
+    ]
+  }
+}

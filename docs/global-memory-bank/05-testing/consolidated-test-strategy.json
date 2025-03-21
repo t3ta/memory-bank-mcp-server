@@ -1,0 +1,336 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "consolidated-test-strategy",
+    "title": "Memory Bank テスト戦略統合ドキュメント",
+    "documentType": "testing",
+    "path": "05-testing/consolidated-test-strategy.json",
+    "tags": [
+      "testing",
+      "e2e",
+      "integration-test",
+      "tdd",
+      "qa"
+    ],
+    "lastModified": "2025-03-21T11:10:00.000Z",
+    "createdAt": "2025-03-21T11:10:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "概要",
+        "content": "このドキュメントは、Memory Bank MCPサーバーのためのテスト戦略と実装アプローチを総合的にまとめたものです。テストは主にエンド・ツー・エンド（E2E）テストと統合テストの2つのカテゴリに分かれ、近年は直接的な統合テストアプローチへの移行が進んでいます。"
+      },
+      {
+        "title": "テスト戦略の概要",
+        "content": "Memory Bankプロジェクトでは、以下の原則に基づいてテストを実施しています：",
+        "principles": [
+          "分離 (Isolation): 各テストは独立した環境で実行される",
+          "再現性 (Reproducibility): テストは繰り返し実行しても一貫した結果を生成する",
+          "完全性 (Completeness): すべてのMCPツールと重要なユーザーフローがカバーされる",
+          "エラー検証 (Error Validation): 正常パスとエラーシナリオの両方をテストする",
+          "非干渉 (Non-interference): テストは後始末をして痕跡を残さない",
+          "TDDアプローチ: 失敗するテストを先に書き、コードを修正してテストを通し、リファクタリングする"
+        ]
+      },
+      {
+        "title": "テスト手法の進化",
+        "sections": [
+          {
+            "title": "初期アプローチ: E2Eテスト",
+            "content": "初期の段階では、エンド・ツー・エンド（E2E）テストに焦点を当て、以下の構造でテスト実装を進めていました：",
+            "structure": "E2Eテスト構造は以下の4つのフェーズで構成されています：",
+            "phases": [
+              {
+                "name": "フェーズ1: テストインフラストラクチャ",
+                "description": "環境設定と終了処理、サーバープロセス管理、クライアント接続抽象化、一般的な操作のためのテストユーティリティなど、基盤となるテストフレームワークを確立します。",
+                "keyFiles": [
+                  "tests/e2e/setup.ts",
+                  "tests/e2e/helpers/test-server.ts",
+                  "tests/e2e/helpers/mcp-client.ts",
+                  "tests/e2e/helpers/test-utils.ts"
+                ]
+              },
+              {
+                "name": "フェーズ2: コアメモリ操作",
+                "description": "基本的なデータストレージと取得機能を検証します：ツール列挙、ブランチメモリバンクの読み取り/書き込み操作、グローバルメモリバンクの読み取り/書き込み操作。",
+                "keyFiles": [
+                  "tests/e2e/tools/list-tools.test.ts",
+                  "tests/e2e/tools/branch-memory.test.ts",
+                  "tests/e2e/tools/global-memory.test.ts"
+                ]
+              },
+              {
+                "name": "フェーズ3: メタデータとコンテキスト操作",
+                "description": "コンテキスト情報を提供するシステムの能力を検証します：複数言語でのルール取得、最近のブランチ履歴追跡、包括的なコンテキスト集約。",
+                "keyFiles": [
+                  "tests/e2e/tools/read-rules.test.ts",
+                  "tests/e2e/tools/recent-branches.test.ts",
+                  "tests/e2e/tools/read-context.test.ts"
+                ]
+              },
+              {
+                "name": "フェーズ4: エラー処理とエッジケース",
+                "description": "システムの回復力とエラー管理能力をテストします：無効なパラメータの処理、存在しないリソースの参照、同時アクセスパターン。",
+                "keyFiles": [
+                  "tests/e2e/error-handling/invalid-params.test.ts",
+                  "tests/e2e/error-handling/missing-resources.test.ts",
+                  "tests/e2e/error-handling/concurrent-access.test.ts"
+                ]
+              }
+            ]
+          },
+          {
+            "title": "現在のアプローチ: 統合テスト重視",
+            "content": "E2Eテストの課題を解決するため、より直接的な統合テスト方式に移行しました：",
+            "reasons": [
+              "実行速度の向上: サーバー起動オーバーヘッドの削減、並列実行の効率化",
+              "安定性向上: プロセス間通信の問題解消、環境依存の低減",
+              "デバッグの容易化: 問題の局所化が容易、より詳細なエラー情報",
+              "メンテナンス性向上: テストコードの簡素化、テストのモジュール性向上"
+            ],
+            "approach": [
+              {
+                "name": "コンポーネント直接テスト",
+                "description": "コントローラ、リポジトリ、ユースケースを直接インスタンス化し、サーバープロセスを経由せず内部コンポーネントを直接検証します。これにより、テスト環境の完全な制御が可能になります。"
+              },
+              {
+                "name": "テスト分離",
+                "description": "各テスト用に独立した一時ディレクトリを使用し、テストコンテキストを明確に分離します。また、クリーンアップメカニズムを強化しています。"
+              },
+              {
+                "name": "ファイルシステム検証",
+                "description": "ファイルシステム操作を直接検証し、コントローラ出力とファイルシステム状態の両方を検証します。これにより、パフォーマンスの向上と信頼性の確保が可能になります。"
+              }
+            ],
+            "structure": "```\ntests/\n├── integration/\n│   ├── setup.ts                 # テスト環境セットアップ用共通ファイル\n│   ├── controllers/             # コントローラーレベルの統合テスト\n│   │   ├── branch-controller.test.ts\n│   │   └── global-controller.test.ts\n│   ├── repositories/            # リポジトリレベルの統合テスト\n│   ├── simple/                  # シンプルな単体機能テスト\n│   │   └── file-system.test.ts  # 基本的なファイルシステム操作テスト\n│   └── markdown-to-json/        # 特定機能の統合テスト\n│       └── json-operations-completeness.test.ts\n├── unit/                        # 純粋な単体テスト\n├── utils/                       # テスト用ユーティリティ\n│   └── clean-temp.js            # 一時ディレクトリクリーンアップ用\n└── .jest-cache/                 # Jestキャッシュディレクトリ\n```"
+          }
+        ]
+      },
+      {
+        "title": "テスト実装ガイド",
+        "sections": [
+          {
+            "title": "E2Eテスト実装",
+            "content": "E2Eテストの実装には以下のアプローチを推奨します：",
+            "structure": "E2E テストは CLI コマンドのカテゴリ別に構成されています。各コマンドは独自のテストファイルを持ち、`tests/e2e/commands/`の適切なサブディレクトリに配置されています。",
+            "examples": [
+              "`tests/e2e/commands/branch/read-branch.test.ts` - read-branch コマンドのテスト",
+              "`tests/e2e/commands/global/read-global.test.ts` - read-global コマンドのテスト",
+              "`tests/e2e/commands/context/read-context.test.ts` - read-context コマンドのテスト"
+            ],
+            "helpers": [
+              {
+                "name": "cli-runner.ts",
+                "description": "テスト内でCLIコマンドを実行するためのユーティリティを提供します"
+              },
+              {
+                "name": "setup.ts",
+                "description": "テストディレクトリとファイルを作成するための関数を提供します"
+              },
+              {
+                "name": "test-utils.ts",
+                "description": "アサーションユーティリティやその他のテストヘルパーを提供します"
+              }
+            ],
+            "pattern": "E2Eテストは通常、以下のパターンに従います：\n\n1. **セットアップ**: 一時的なテストディレクトリとファイルを作成\n2. **実行**: 様々な引数でCLIコマンドを実行\n3. **検証**: コマンド出力と効果を検証\n4. **クリーンアップ**: 一時的なテストディレクトリを削除",
+            "bestPractices": [
+              "成功ケースと失敗ケースの両方をテストする",
+              "異なるオプションの組み合わせをテストする",
+              "コマンド出力のフォーマット（JSONとプリティ/テキスト）を検証する",
+              "正しい終了コードを確認する（成功は0、失敗は非ゼロ）",
+              "各テストケースにクリーンなテスト環境を使用する",
+              "可能な限り提供されたヘルパーユーティリティを使用する",
+              "テストの説明を明確かつ具体的にする"
+            ],
+            "commandCategories": [
+              {
+                "name": "ブランチコマンド",
+                "description": "ブランチメモリバンクに対する操作"
+              },
+              {
+                "name": "グローバルコマンド",
+                "description": "グローバルメモリバンクに対する操作"
+              },
+              {
+                "name": "JSONコマンド",
+                "description": "JSONドキュメント特有の操作"
+              },
+              {
+                "name": "コンテキストコマンド",
+                "description": "ルールやコンテキスト情報の読み取り"
+              },
+              {
+                "name": "ユーティリティコマンド",
+                "description": "recent-branchesなどの各種ユーティリティ"
+              },
+              {
+                "name": "マイグレーションコマンド",
+                "description": "フォーマット間のマイグレーションコマンド"
+              }
+            ]
+          },
+          {
+            "title": "統合テスト実装",
+            "content": "統合テストの実装には以下のアプローチを推奨します：",
+            "goals": [
+              "各コントローラーの主要機能を統合テストでカバーする",
+              "ユニットテストでは見つけにくい、コンポーネント間の連携の問題を検出する",
+              "リファクタリング時のセーフティネットとして機能させる"
+            ],
+            "currentCoverage": "現在、以下のコントローラーの統合テストが実装されています：\n\n- GlobalController: 基本的なドキュメント操作のテスト\n- BranchController: ブランチメモリ操作のテスト\n- JsonGlobalController: 基本的なJSONドキュメント操作のテスト (部分的に実装)",
+            "futurePlans": {
+              "controllers": [
+                {
+                  "name": "JsonGlobalController",
+                  "tests": [
+                    "JSONドキュメントの作成・読み取り",
+                    "JSONドキュメントの削除",
+                    "JSONドキュメントの検索",
+                    "タグ操作"
+                  ]
+                },
+                {
+                  "name": "JsonBranchController",
+                  "tests": [
+                    "ブランチ内JSONドキュメントの操作",
+                    "ブランチ間でのドキュメント共有"
+                  ]
+                }
+              ],
+              "scenarios": [
+                {
+                  "name": "エラーハンドリング",
+                  "tests": [
+                    "各種エラーケースの適切な処理を確認",
+                    "不正な入力に対する堅牢性"
+                  ]
+                },
+                {
+                  "name": "パフォーマンス特性",
+                  "tests": [
+                    "大量のドキュメントがある場合の挙動",
+                    "大きなJSONドキュメントの操作"
+                  ]
+                }
+              ]
+            },
+            "notes": [
+              "モックの使用は最小限に抑え、実際のコンポーネントを使用する",
+              "テスト環境のセットアップとクリーンアップを確実に行う",
+              "テスト間の依存関係を避ける",
+              "テストの実行時間を適切に保つ"
+            ],
+            "challenges": "統合テスト開発中に見つかった設計上の課題：\n\n- グローバルメモリバンク操作においてもBranchInfoを使用している点\n  - 詳細は `09-refactoring/json-global-design-issues.json` を参照",
+            "direction": [
+              "既存のテストを安定させる",
+              "カバレッジを徐々に拡大する",
+              "CI/CDパイプラインに統合する",
+              "設計上の課題が見つかれば文書化し、リファクタリングの対象とする"
+            ]
+          }
+        ]
+      },
+      {
+        "title": "テストパラメータとカバレッジ",
+        "content": "適切なテストカバレッジを確保するために、以下のパラメータバリエーションをテストすることを推奨します：",
+        "contentTypes": [
+          "プレーンテキスト",
+          "マークダウン",
+          "JSON構造",
+          "Unicode文字",
+          "バイナリデータ表現（該当する場合）"
+        ],
+        "paths": [
+          "シンプルなパス",
+          "ネストされたパス",
+          "特殊文字",
+          "非常に長いパス",
+          "予約名"
+        ],
+        "languages": [
+          "英語 (en)",
+          "日本語 (ja)",
+          "中国語 (zh)"
+        ],
+        "sizes": [
+          "空のコンテンツ",
+          "小さなコンテンツ（数バイト）",
+          "中くらいのコンテンツ（数KB）",
+          "大きなコンテンツ（システム制限に近い）"
+        ]
+      },
+      {
+        "title": "テスト実行戦略",
+        "content": "テストの実行は以下の戦略に基づいて行います：",
+        "strategies": [
+          {
+            "name": "開発中",
+            "description": "アクティブな開発中に対象となるテストを実行します"
+          },
+          {
+            "name": "コミット前",
+            "description": "変更をコミットする前に影響を受けるテストを実行します"
+          },
+          {
+            "name": "CIパイプライン",
+            "description": "すべてのPRで完全なテストスイートを実行します"
+          },
+          {
+            "name": "スケジュール",
+            "description": "本番環境に近い環境で定期的に完全なスイートを実行します"
+          }
+        ]
+      },
+      {
+        "title": "成功基準",
+        "content": "テスト実装は以下の条件を満たした場合に成功とみなされます：",
+        "criteria": [
+          "すべてのMCPツールが包括的なテストカバレッジを持つ",
+          "すべてのテストがCI環境で一貫して合格する",
+          "エラーシナリオが適切に検出され処理される",
+          "テストのドキュメントが各テストの目的と範囲を明確に説明している",
+          "テストスイートの実行時間がCI/CDワークフローに適している"
+        ]
+      },
+      {
+        "title": "将来の考慮事項",
+        "content": "初期実装には含まれていませんが、将来のエンハンスメントとして以下の追加テストカテゴリを検討すべきです：",
+        "futureCategories": [
+          {
+            "name": "パフォーマンステスト",
+            "description": "負荷下でのシステム動作を検証します"
+          },
+          {
+            "name": "ストレステスト",
+            "description": "長時間操作でのシステムの安定性を検証します"
+          },
+          {
+            "name": "セキュリティテスト",
+            "description": "適切な認可とアクセス制御を確認します"
+          },
+          {
+            "name": "アップグレードテスト",
+            "description": "バージョンアップグレード中の後方互換性を確保します"
+          }
+        ]
+      },
+      {
+        "title": "参照先",
+        "references": [
+          {
+            "id": "e2e-test-strategy-details",
+            "path": "05-testing/e2e-test-strategy-details.json",
+            "title": "E2Eテスト戦略詳細"
+          },
+          {
+            "id": "integration-test-details",
+            "path": "05-testing/integration-test-details.json",
+            "title": "統合テスト詳細"
+          }
+        ]
+      }
+    ]
+  }
+}

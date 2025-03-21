@@ -1,35 +1,87 @@
 {
   "schema": "memory_document_v2",
   "metadata": {
-    "id": "progress",
-    "title": "Progress Report",
+    "id": "progress-status",
+    "title": "進捗状況",
     "documentType": "progress",
     "path": "progress.json",
     "tags": [
-      "core",
-      "progress"
+      "progress",
+      "status",
+      "implementation"
     ],
-    "lastModified": "2025-03-21T09:50:00.000Z",
-    "createdAt": "2025-03-21T02:46:55.121Z",
-    "version": 4
+    "lastModified": "2025-03-21T13:00:00.000Z",
+    "createdAt": "2025-03-21T13:00:00.000Z",
+    "version": 1
   },
   "content": {
-    "sections": [
+    "workingFeatures": [
       {
-        "title": "Working Features",
-        "content": "1. Current memory bank structure is functional\n2. Both index systems (`_global_index.json` and `tags/index.json`) are operational\n3. We have a complete backup of critical files\n4. Comprehensive strategy and implementation plan documents have been created"
+        "id": "basic-memory-operations",
+        "description": "基本的なメモリバンクの読み書き機能"
       },
       {
-        "title": "Unimplemented Features",
-        "content": "1. **Directory Structure** - New category-based directory structure\n2. **Tag Categories** - Implementation of 10 logical tag categories\n3. **Tag Consolidation** - Merging of similar tags\n4. **Enhanced Index Format** - Extended `tags/index.json` format with categories\n5. **README Files** - Category documentation for each directory"
+        "id": "branch-management",
+        "description": "ブランチごとのメモリバンク管理"
       },
       {
-        "title": "Current Status",
-        "content": "We have completed Phase 1 (Backup and Preparation) and are ready to begin Phase 5 (Directory Restructuring), followed by Phase 3 (Tag Reorganization). We are following a phased approach starting with least disruptive changes.\n\n**Current Phase**: Transitioning from Phase 1 to Phase 5\n**Next Phase**: Phase 5 (Directory Restructuring)\n**Progress**: 20% of the overall implementation plan\n\n**Milestone Tracking**:\n- ✅ Analysis and planning complete\n- ✅ Backup creation complete\n- ✅ Implementation plan created\n- ⏳ Directory structure implementation in progress\n- ⏳ Tag category implementation planned\n- ⏳ Tag consolidation planned\n- ⏳ Index format improvements planned"
+        "id": "directory-structure",
+        "description": "グローバルメモリバンクの新しいディレクトリ構造（実装済み）"
       },
       {
-        "title": "Known Issues",
-        "content": "1. Direct manipulation of index files is not recommended due to automatic generation\n2. System currently treats `tags/index.json` as \"legacy\" despite it being the newer format\n3. Moving files may require updates to references throughout the system\n4. The transition period will require maintaining both index formats for compatibility\n5. Tag consolidation will require careful updating of all document tags"
+        "id": "file-migration",
+        "description": "大部分のJSONファイルを適切なカテゴリディレクトリへ移動（完了）"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "index-update",
+        "description": "インデックスファイルの更新",
+        "priority": "high"
+      },
+      {
+        "id": "path-references-update",
+        "description": "ファイル内の相対パス参照の更新",
+        "priority": "medium"
+      },
+      {
+        "id": "tag-system-rebuild",
+        "description": "タグシステムの再構築",
+        "priority": "medium"
+      },
+      {
+        "id": "markdown-to-json",
+        "description": "マークダウンからJSONへの自動変換機能",
+        "priority": "low"
+      },
+      {
+        "id": "search-enhancement",
+        "description": "ドキュメント検索機能の拡張",
+        "priority": "low"
+      }
+    ],
+    "status": "in-development",
+    "completionPercentage": 65,
+    "currentState": {
+      "phase": "ディレクトリ再構築",
+      "progress": "ほぼ完了",
+      "details": "ルートディレクトリにあった大部分のJSONファイルを適切なカテゴリディレクトリに移動することができた。以下のディレクトリ構造が実装されている：\n- `01-project/`: プロジェクト基本情報関連\n- `02-architecture/`: アーキテクチャ設計関連\n- `03-implementation/`: 実装詳細関連\n- `04-guides/`: ユーザーガイド・移行ガイド関連\n- `05-testing/`: テスト戦略・実装関連\n- `06-releases/`: リリース情報関連\n- `08-i18n/`: 多言語サポート関連\n- `09-refactoring/`: リファクタリング・設計問題関連\n\n全36ファイルについて適切なディレクトリに移動が完了。"
+    },
+    "knownIssues": [
+      {
+        "id": "old-path-references",
+        "description": "インデックスファイル（`_global_index.json`）にはまだ古いパス参照が含まれている",
+        "severity": "medium"
+      },
+      {
+        "id": "internal-path-references",
+        "description": "一部のJSONファイルには旧パスが含まれている可能性があり、更新が必要",
+        "severity": "medium"
+      },
+      {
+        "id": "index-update-mechanism",
+        "description": "インデックス更新のための仕組みが必要",
+        "severity": "low"
       }
     ]
   }

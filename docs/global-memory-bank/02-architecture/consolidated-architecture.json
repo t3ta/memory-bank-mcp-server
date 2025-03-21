@@ -1,0 +1,63 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "consolidated-architecture",
+    "title": "統合アーキテクチャドキュメント",
+    "documentType": "architecture",
+    "path": "02-architecture/consolidated-architecture.json",
+    "tags": [
+      "architecture",
+      "system-design",
+      "decision",
+      "json",
+      "design",
+      "version-2"
+    ],
+    "lastModified": "2025-03-21T10:30:00.000Z",
+    "createdAt": "2025-03-21T10:30:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "概要",
+        "content": "このドキュメントはMemory Bank 2.0のアーキテクチャ設計、決定事項、JSONベースのデータ構造に関する包括的な情報を提供します。バージョン2.0では、Markdownサポートを完全に廃止し、JSONをデータ保存形式として一本化します。このドキュメントは以下3つのドキュメントを統合したものです：architecture.json、architecture-decisions.json、json-based-architecture.json"
+      },
+      {
+        "title": "システムアーキテクチャ概要",
+        "content": "Memory Bank 2.0は、クリーンアーキテクチャのプリンシパルに従い、ドメイン層、アプリケーション層、インフラストラクチャ層、インターフェース層の明確な分離を実現しています。JSONをデータ形式として採用することで、スキーマ検証やプログラムによる操作の容易さを確保しています。"
+      },
+      {
+        "title": "主要コンポーネント",
+        "content": "システムは以下の主要コンポーネントから構成されています：\n\n- ドメインエンティティ（JsonDocument, DocumentId, DocumentPath など）\n- リポジトリインターフェース（IMemoryDocumentRepository など）\n- ユースケース（各種CRUD操作のためのApplicationサービス）\n- インフラストラクチャサービス（FileSystemService, IndexService など）\n- インターフェースアダプター（CLI, REST API など）"
+      },
+      {
+        "title": "アーキテクチャ決定事項",
+        "content": "JSONデータ形式への移行、スキーマ駆動設計の採用、インデックス機構の改善など、Memory Bank 2.0の重要な設計決定を含みます。詳細は architecture-decisions-details.json を参照してください。"
+      },
+      {
+        "title": "データモデル",
+        "content": "Memory Bank 2.0で使用するJSONスキーマやデータモデルについての詳細情報です。エンティティ構造、リレーションシップ、バリデーションについて定義しています。詳細は json-based-architecture-details.json を参照してください。"
+      },
+      {
+        "title": "マイグレーション戦略",
+        "content": "既存のMarkdownファイルからJSONへの移行に関する情報です。バックアップ対策、検証ステップ、ロールバック計画なども含まれています。"
+      },
+      {
+        "title": "参照先",
+        "references": [
+          {
+            "id": "architecture-decisions-details",
+            "path": "02-architecture/architecture-decisions-details.json",
+            "title": "アーキテクチャ決定事項詳細"
+          },
+          {
+            "id": "json-based-architecture-details",
+            "path": "02-architecture/json-based-architecture-details.json",
+            "title": "JSONベースアーキテクチャ詳細設計"
+          }
+        ]
+      }
+    ]
+  }
+}
