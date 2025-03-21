@@ -3,78 +3,18 @@
   "metadata": {
     "id": "a320b8f4-dce1-41ae-aa2c-b421d64afbd7",
     "title": "アクティブコンテキスト",
-    "documentType": "active_context",
-    "path": "activeContext.json",
-    "tags": [
-      "active-context"
-    ],
-    "lastModified": "2025-03-19T23:34:56.396Z",
+    "documentType": "generic",
+    "path": "activeContext.md",
+    "tags": [],
+    "lastModified": "2025-03-21T01:02:58.3NZ",
     "createdAt": "2025-03-19T23:34:56.396Z",
     "version": 1
   },
   "content": {
-    "currentWork": "現在取り組んでいる作業の説明",
-    "recentChanges": [
-      {
-        "date": "2025-03-19T23:34:56.396Z",
-        "description": "変更点1"
-      },
-      {
-        "date": "2025-03-19T23:34:56.396Z",
-        "description": "変更点2"
-      },
-      {
-        "date": "2025-03-19T23:34:56.396Z",
-        "description": "変更点3"
-      }
-    ],
-    "activeDecisions": [
-      {
-        "id": "43388d42-55c5-4fe2-9b46-3aded3a2c30c",
-        "description": "決定事項1"
-      },
-      {
-        "id": "dffd4fbf-5845-4cbc-ba7d-bfad5d828981",
-        "description": "決定事項2"
-      },
-      {
-        "id": "a1d90bba-4ea5-4581-b7ca-c27c437f3180",
-        "description": "決定事項3"
-      }
-    ],
-    "considerations": [
-      {
-        "id": "beb3bd05-a088-4c69-b2d5-7900cda8836c",
-        "description": "検討事項1",
-        "status": "open"
-      },
-      {
-        "id": "07ae90d2-87dd-446f-84c2-dfb15623190a",
-        "description": "検討事項2",
-        "status": "open"
-      },
-      {
-        "id": "53a752a5-ea6b-4990-9086-925ae39652b7",
-        "description": "検討事項3",
-        "status": "open"
-      }
-    ],
-    "nextSteps": [
-      {
-        "id": "0d064c9f-10e5-4cda-a019-99807cf41540",
-        "description": "次のステップ1",
-        "priority": "high"
-      },
-      {
-        "id": "dce852de-a667-4f98-a2b9-2008a9b529ba",
-        "description": "次のステップ2",
-        "priority": "medium"
-      },
-      {
-        "id": "4362e7d6-f4bc-4a62-b182-52196725848b",
-        "description": "次のステップ3",
-        "priority": "low"
-      }
-    ]
+    "現在の作業内容": "TypeScript 5.8.2バージョンアップデートに伴うビルドエラーとテストエラーの修正を進めています。主に以下の課題に取り組んでいます：\n\n1. ESモジュールのインポートパスに.js拡張子を追加\n2. テストコードの型エラー解決\n3. 未使用変数/インポートの修正\n4. モックオブジェクトの型付け強化\n5. 重複する型インポートの解決（ドメイン層とスキーマ層）\n6. リポジトリ実装の型互換性問題",
+    "最近の変更点": "- **コントローラー層の完全修正**:\n  - IContextControllerの戻り値型を具体的なオブジェクト型に修正\n  - GlobalControllerとBranchControllerにDocumentType型をインポート\n  - result型のimplicitAny問題を解決\n  - インターフェース層の相対パスを修正\n\n- **FileSystemTagIndexRepositoryBaseの改善**:\n  - DocumentPathのインポートを追加\n  - createDocumentReferenceメソッドでのpath処理を改善\n  - FileSystemServiceをIFileSystemServiceインターフェースに変更\n\n- **テストファイルの国際化と修復**:\n  - file-system.test.tsとcontext-controller.test.tsの日本語コメントを英語化\n  - 難読化されていたエラーの根本原因を特定（BranchInfo検証とテストパターンの競合）\n  - モックリポジトリを拡張し、BranchInfoのsafeName要件に対応\n  - スキップされていたテストケースを再起動\n  - ビルドとテストの両方が安定的に通過する状態を回復",
+    "アクティブな決定事項": "- **ESモジュール使用の継続**: Node.jsでESモジュール形式を維持し、TypeScript 5.8.2の要件に合わせてインポートパスに拡張子を追加\n- **未使用コードの整理**: 使用されていない変数や関数を削除または修正する\n- **型安全性の強化**: 積極的な型チェックと条件分岐による型互換性の保証\n- **インスタンス型チェックを活用**: `instanceof`を利用した動的型チェックを導入し、型安全性と互換性を両立\n- **インターフェースへの依存**: 具体的な実装クラスよりもインターフェース型への依存を優先し、疎結合を促進\n- **型キャストの戦略的使用**: モジュール間の非互換性に対処するため、`as`演算子によるキャストを必要な箇所で導入\n- **複雑な型定義の簡素化**: 返り値の型をインラインで定義し、わかりやすくする\n- **ブランチ命名規則の厳格化**: ブランチ名には必ず「/」を含めることを徹底（例: feature/name, fix/issue）",
+    "検討事項": "- **インフラ層の次のターゲット**: FileSystemTagIndexRepositoryの関連ファイルとFileSystemJsonDocumentRepositoryのどちらを先に修正すべきか\n- **残りのスキップテスト復活戦略**: 残る9個のスキップテストの修復と段階的な復活方法\n- **テスト改善の粒度**: 基本機能確保と細部の改善のバランスをどう取るか\n- **リファクタリングの範囲決定**: ビルド・テスト修正に留めるか、コード品質向上も含めるか\n- **ローカリゼーション戦略**: 残存する日本語コメントの英語化を継続するかどうか",
+    "次のステップ": "1. 残りの簡略化したテストファイルの構造的復元\n2. FileSystemTagIndexRepositoryの関連ファイル修正の完了\n3. FileSystemJsonDocumentRepositoryの型エラー修正\n4. 残る9つのスキップテストの復活\n5. コードカバレッジチェックと改善\n6. リファクタリングによるコードベースの安定化"
   }
 }
