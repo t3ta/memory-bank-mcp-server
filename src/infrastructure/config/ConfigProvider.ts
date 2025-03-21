@@ -219,10 +219,10 @@ export class ConfigProvider implements IConfigProvider {
    * @returns Valid language
    */
   private validateLanguage(language: string): Language {
-    if (language !== 'en' && language !== 'ja') {
+    if (language !== 'en' && language !== 'ja' && language !== 'zh') {
       throw new InfrastructureError(
         InfrastructureErrorCodes.CONFIGURATION_ERROR,
-        `Invalid language: ${language}. Supported languages are 'en' and 'ja'.`
+        `Invalid language: ${language}. Supported languages are 'en', 'ja', and 'zh'.`
       );
     }
 
