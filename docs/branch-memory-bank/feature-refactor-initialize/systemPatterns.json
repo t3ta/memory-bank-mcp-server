@@ -1,0 +1,48 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "system-patterns",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "core",
+      "system-patterns"
+    ],
+    "lastModified": "2025-03-22T15:20:00.000Z",
+    "createdAt": "2025-03-21T17:10:18.486Z",
+    "version": 1
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "title": "ブランチ自動初期化の一貫性",
+        "context": "ReadBranchCoreFilesUseCaseとReadContextUseCaseでブランチが存在しない場合の動作に違いがあった",
+        "decision": "両クラスで同じ動作をするように修正し、ブランチが存在しない場合は自動的に初期化する",
+        "consequences": [
+          "メモリバンクが存在しない場合でもエラーが発生しなくなる",
+          "一貫した動作により保守性が向上する",
+          "ユーザー体験が向上する"
+        ]
+      },
+      {
+        "title": "テストフレームワーク",
+        "context": "テストフレームワークを選択する必要がある",
+        "decision": "Jestを使用する",
+        "consequences": [
+          "TypeScriptとの統合が良い",
+          "モック機能が充実"
+        ]
+      },
+      {
+        "title": "ディレクトリ構造",
+        "context": "ファイル配置の規則を定義する必要がある",
+        "decision": "クリーンアーキテクチャに従う",
+        "consequences": [
+          "関心の分離が明確",
+          "テスト可能性の向上"
+        ]
+      }
+    ]
+  }
+}

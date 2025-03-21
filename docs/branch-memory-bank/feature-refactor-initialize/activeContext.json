@@ -1,0 +1,37 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "active-context",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "core",
+      "active-context"
+    ],
+    "lastModified": "2025-03-22T15:10:00.000Z",
+    "createdAt": "2025-03-21T17:10:18.486Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "グローバルメモリバンクの初期化処理の改善",
+    "recentChanges": [
+      "ReadBranchCoreFilesUseCaseにブランチが存在しない場合に自動的に初期化する処理を追加",
+      "テストを更新して新しい動作を確認できるように"
+    ],
+    "activeDecisions": [
+      "ReadBranchCoreFilesUseCaseとReadContextUseCaseの動作を一致させる",
+      "ブランチが存在しない場合に自動的に初期化する処理を追加する"
+    ],
+    "considerations": [
+      "既存のテストケースとの互換性",
+      "エラーハンドリングの一貫性"
+    ],
+    "nextSteps": [
+      "現在の変更点について確認する",
+      "必要に応じて追加の修正・改善を行う",
+      "テストを実行して動作を検証する",
+      "コミットして変更を確定する"
+    ]
+  }
+}

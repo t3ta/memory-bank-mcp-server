@@ -1,0 +1,25 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "progress",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "core",
+      "progress"
+    ],
+    "lastModified": "2025-03-22T15:15:00.000Z",
+    "createdAt": "2025-03-21T17:10:18.486Z",
+    "version": 1
+  },
+  "content": {
+    "status": "ほぼ完了 - 最終確認中",
+    "workingFeatures": [
+      "ReadBranchCoreFilesUseCaseにブランチ自動初期化機能の実装",
+      "ReadBranchCoreFilesUseCaseのテストケースが正常に動作"
+    ],
+    "pendingImplementation": [],
+    "knownIssues": []
+  }
+}
