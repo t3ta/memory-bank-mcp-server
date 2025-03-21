@@ -1,18 +1,14 @@
-import path from 'path';
-import { promises as fs } from 'fs';
+import path from "path";
+import { BranchInfo } from "../../../domain/entities/BranchInfo.js";
+import { DocumentId } from "../../../domain/entities/DocumentId.js";
+import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
+import { JsonDocument, DocumentType } from "../../../domain/entities/JsonDocument.js";
+import type { Tag } from "../../../domain/entities/Tag.js";
+import { IJsonDocumentRepository } from "../../../domain/repositories/IJsonDocumentRepository.js";
+import { InfrastructureError, InfrastructureErrorCodes } from "../../../shared/errors/InfrastructureError.js";
+import type { IIndexService } from "../../index/interfaces/IIndexService.js";
+import type { IFileSystemService } from "../../storage/interfaces/IFileSystemService.js";
 
-import { IJsonDocumentRepository } from '../../../domain/repositories/IJsonDocumentRepository.js';
-import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
-import { DocumentId } from '../../../domain/entities/DocumentId.js';
-import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
-import { JsonDocument, DocumentType } from '../../../domain/entities/JsonDocument.js';
-import { Tag } from '../../../domain/entities/Tag.js';
-import { IFileSystemService } from '../../../infrastructure/storage/interfaces/IFileSystemService.js';
-import {
-  InfrastructureError,
-  InfrastructureErrorCodes,
-} from '../../../shared/errors/InfrastructureError.js';
-import { IIndexService } from '../../index/interfaces/IIndexService.js';
 
 /**
  * File system implementation of the JSON document repository
@@ -29,7 +25,7 @@ export class FileSystemJsonDocumentRepository implements IJsonDocumentRepository
     private readonly fileSystemService: IFileSystemService,
     private readonly indexService: IIndexService,
     private readonly rootPath: string
-  ) {}
+  ) { }
 
   /**
    * Get the absolute file path for a document
@@ -477,7 +473,7 @@ export class FileSystemJsonDocumentRepository implements IJsonDocumentRepository
     }
 
     // Rebuild index with found documents
-    await this.indexService.buildIndex(branchInfo, jsonDocuments);
+    await this.indexService.buildIndex(branchInfo, jsonDocuments as unknown as any[]);
 
     return documents;
   }

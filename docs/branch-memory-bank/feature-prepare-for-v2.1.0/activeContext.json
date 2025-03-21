@@ -1,0 +1,60 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "d9e72f3a-1b6c-4d8f-9a7c-e5d832b71e5f",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "core",
+      "active-context",
+      "release-preparation"
+    ],
+    "lastModified": "2025-03-22T00:00:00.000Z",
+    "createdAt": "2025-03-21T19:24:24.966Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": {
+      "title": "現在の作業内容",
+      "items": [
+        "Memory Bank 2.1.0リリース準備の最終段階",
+        "Markdownサポートの完全な廃止の実装",
+        "テスト修正と実行"
+      ]
+    },
+    "recentChanges": {
+      "title": "最近の変更点",
+      "items": [
+        "JSONからMarkdownへの変換機能を非推奨化",
+        "テストファイルに非推奨マークを追加",
+        "READMEを更新してMarkdownサポート廃止を明記",
+        "リリースノートを最終化"
+      ]
+    },
+    "activeDecisions": {
+      "title": "アクティブな決定事項",
+      "items": [
+        "バージョン2.1.0ではMarkdownサポートを完全に廃止し、JSON形式のみをサポートする",
+        "MarkdownからJSONへの変換機能は移行ツールとして維持",
+        "JSONからMarkdownへの変換機能は非推奨としてマーク",
+        "テストコードもMarkdownテストを非推奨としてマーク"
+      ]
+    },
+    "considerations": {
+      "title": "検討事項",
+      "items": [
+        "テストがすべて通過するかの確認",
+        "将来バージョンでの完全なMarkdown関連コード削除の計画"
+      ]
+    },
+    "nextSteps": {
+      "title": "次のステップ",
+      "items": [
+        "テストを実行して正常に通過することを確認",
+        "必要に応じて追加修正",
+        "リリースブランチへのマージ準備"
+      ]
+    }
+  }
+}

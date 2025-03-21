@@ -1,0 +1,50 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "system-patterns-global-memory-bank-reorg",
+    "title": "グローバルメモリバンク再編成のシステムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "core",
+      "system-patterns",
+      "global-memory-bank",
+      "reorganization"
+    ],
+    "lastModified": "2025-03-21T14:45:00.000Z",
+    "createdAt": "2025-03-21T05:11:41.671Z",
+    "version": 4
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "技術的決定事項",
+        "content": "グローバルメモリバンクの再編成において、以下の技術的決定を行いました："
+      },
+      {
+        "title": "ドキュメント統合パターン",
+        "content": "#### コンテキスト\n\n関連する複数のドキュメントが散在し、情報の全体像の把握が難しい状況でした。\n\n#### 決定事項\n\n関連するドキュメントを1つの統合ドキュメントにまとめ、セクション構造で整理することにしました。\n\n#### 影響\n\n- 情報の重複を削減\n- 関連情報の一貫性の確保\n- ナビゲーションの改善\n- ファイル数の削減\n\nこのパターンを適用して以下の統合ドキュメントを作成しました：\n- `/02-architecture/consolidated-architecture.json`\n- `/05-testing/consolidated-test-strategy.json`\n- `/06-releases/consolidated-v2-release.json`\n- `/meta/consolidated-memory-bank-meta.json`"
+      },
+      {
+        "title": "カテゴリディレクトリ構造",
+        "content": "#### コンテキスト\n\nグローバルメモリバンクのファイルが平坦な構造で管理されており、関連情報の発見が困難でした。\n\n#### 決定事項\n\n番号付きのカテゴリディレクトリ構造を導入し、関連ファイルをまとめることにしました：\n\n```\n01-project/\n02-architecture/\n03-implementation/\n04-guides/\n05-testing/\n06-releases/\n07-infrastructure/\n08-i18n/\n09-refactoring/\n```\n\n#### 影響\n\n- 関連ファイルのグループ化\n- カテゴリによる階層的ナビゲーション\n- トピックごとの情報発見容易化\n- 新ファイル追加時の整理容易化"
+      },
+      {
+        "title": "タグカテゴリシステム",
+        "content": "#### コンテキスト\n\nタグが非構造化され、一貫性がなく、類似タグが乱立していました。\n\n#### 決定事項\n\nタグを10のカテゴリに分類し、類似タグを統合するルールを定義しました：\n\n1. プロジェクト基盤 (project-foundation)\n2. 設計・アーキテクチャ (design-architecture)\n3. 実装・技術 (implementation-technology)\n4. ドキュメント・ガイド (documentation-guides)\n5. テスト・品質 (testing-quality)\n6. バージョン・リリース (version-releases)\n7. インフラ・運用 (infrastructure-operations)\n8. 国際化・多言語 (internationalization-localization)\n9. リファクタリング・技術的負債 (refactoring-tech-debt)\n10. メタ・その他 (meta-miscellaneous)\n\n#### 影響\n\n- タグの一貫性向上\n- 関連タグのグループ化\n- 検索性の向上\n- メタデータの標準化"
+      },
+      {
+        "title": "新インデックス構造",
+        "content": "#### コンテキスト\n\n複数のインデックスファイル（`_global_index.json`と`tags/index.json`）があり、維持が困難でした。\n\n#### 決定事項\n\n`tags/index.json`を拡張して、タグとドキュメントの関連付けだけでなく、カテゴリ情報も持たせる構造にしました。\n\n```json\n{\n  \"tagMap\": {\n    \"architecture\": {\n      \"count\": 14,\n      \"category\": \"design-architecture\",\n      \"documents\": [...]\n    }\n  },\n  \"categories\": [\n    {\n      \"id\": \"project-foundation\",\n      \"title\": \"1. プロジェクト基盤\",\n      \"tags\": [\"project\", ...]\n    }\n  ]\n}\n```\n\n#### 影響\n\n- インデックスの一元化\n- カテゴリによるタグの整理\n- より豊富なメタデータ\n- 検索とナビゲーションの改善"
+      },
+      {
+        "title": "段階的移行戦略",
+        "content": "#### コンテキスト\n\n既存のドキュメントとインデックスを一度に変更すると、リスクが高く、問題が発生した際の復旧が困難です。\n\n#### 決定事項\n\n段階的な移行戦略を採用しました：\n1. バックアップの作成\n2. 統合ドキュメントの作成（オリジナルは保持）\n3. 新しいタグ定義とインデックス構造の設計\n4. スクリプトによるタグ更新と新インデックス生成\n5. 両方のインデックスの維持（一定期間）\n6. 検証完了後のオリジナルファイルの削除\n\n#### 影響\n\n- リスクの軽減\n- 問題発生時の復旧容易化\n- 互換性の維持\n- 変更の検証機会確保"
+      },
+      {
+        "title": "タグ更新スクリプト設計",
+        "content": "#### コンテキスト\n\nすべてのドキュメントのタグを手動で更新するのは非効率的で、エラーが発生しやすい状況です。\n\n#### 決定事項\n\nTypeScriptスクリプトを開発して、タグの更新とインデックスの再生成を自動化することにしました。スクリプトは以下の機能を持ちます：\n\n1. ファイルスキャン: グローバルメモリバンク内のすべてのJSONファイルを探索\n2. タグ更新: `tag_categorization.json`のルールに基づいてタグを更新\n3. インデックス生成: 更新されたドキュメントから新しいインデックスを生成\n4. エラーハンドリング: 問題発生時のロギングと復元機能\n\n#### 影響\n\n- 処理の自動化による効率向上\n- エラーリスクの軽減\n- 一貫性の確保\n- 再実行可能性\n\nこのスクリプトはフェーズ3「タグ再編成」の中核となる実装です。"
+      }
+    ]
+  }
+}

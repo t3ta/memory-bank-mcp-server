@@ -3,16 +3,13 @@
  *
  * CLI command to migrate Markdown files to JSON format
  */
-import { CommandModule } from 'yargs';
-import chalk from 'chalk';
-import {
-  MarkdownToJsonMigrator,
-  MigrationOptions,
-} from '../../../migration/MarkdownToJsonMigrator.js';
-import { MigrationBackup } from '../../../migration/MigrationBackup.js';
-import { MigrationValidator } from '../../../migration/MigrationValidator.js';
-import { ConverterFactory } from '../../../migration/converters/ConverterFactory.js';
-import { createConsoleLogger } from '../../../shared/utils/logger.js';
+import chalk from "chalk";
+import type { CommandModule } from "yargs";
+import { ConverterFactory } from "../../../migration/converters/ConverterFactory.js";
+import { MarkdownToJsonMigrator, type MigrationOptions } from "../../../migration/MarkdownToJsonMigrator.js";
+import { MigrationBackup } from "../../../migration/MigrationBackup.js";
+import { MigrationValidator } from "../../../migration/MigrationValidator.js";
+import { createConsoleLogger } from "../../../shared/utils/logger.js";
 
 interface MigrateArgs {
   directory: string;
@@ -132,7 +129,7 @@ export const MigrateCommand: CommandModule<{}, MigrateArgs> = {
       }
 
       // Execute migration
-      console.log(chalk.blue('Starting migration...'));
+      console.log(chalk.blue('Starting migration..'));
 
       let result;
       if (args.file) {

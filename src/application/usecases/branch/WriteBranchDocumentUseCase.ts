@@ -41,13 +41,27 @@ export interface WriteBranchDocumentOutput {
  * Use case for writing a document to branch memory bank
  */
 export class WriteBranchDocumentUseCase
-  implements IUseCase<WriteBranchDocumentInput, WriteBranchDocumentOutput>
-{
+  implements IUseCase<WriteBranchDocumentInput, WriteBranchDocumentOutput> {
+  // Flag to disable Markdown writing
+  private readonly disableMarkdownWrites: boolean;
+
   /**
    * Constructor
    * @param branchRepository Branch memory bank repository
+   * @param options Options for the use case
    */
-  constructor(private readonly branchRepository: IBranchMemoryBankRepository) {}
+  constructor(
+    private readonly branchRepository: IBranchMemoryBankRepository,
+    options?: {
+      /**
+       * Whether to disable Markdown writes
+       * @default false
+       */
+      disableMarkdownWrites?: boolean;
+    }
+  ) {
+    this.disableMarkdownWrites = options?.disableMarkdownWrites ?? false;
+  }
 
   /**
    * Execute the use case
@@ -83,6 +97,15 @@ export class WriteBranchDocumentUseCase
       const branchInfo = BranchInfo.create(input.branchName);
       const documentPath = DocumentPath.create(input.document.path);
       const tags = (input.document.tags ?? []).map((tag) => Tag.create(tag));
+
+      // Check if markdown writes are disabled
+      if (this.disableMarkdownWrites && documentPath.isMarkdown) {
+        const jsonPath = documentPath.value.replace(/\.md$/, '.json');
+        throw new ApplicationError(
+          ApplicationErrorCodes.OPERATION_NOT_ALLOWED,
+          `Writing to Markdown files is disabled. Please use JSON format instead: ${jsonPath}`
+        );
+      }
 
       // Check if branch exists and initialize if needed
       const branchExists = await this.branchRepository.exists(input.branchName);

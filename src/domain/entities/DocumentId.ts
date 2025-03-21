@@ -6,7 +6,7 @@ import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.j
  * Used to uniquely identify documents regardless of their path
  */
 export class DocumentId {
-  private constructor(private readonly _value: string) {}
+  private constructor(private readonly _value: string) { }
 
   /**
    * Factory method to create a new DocumentId

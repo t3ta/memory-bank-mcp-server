@@ -1,0 +1,38 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "refactoring-directory-readme",
+    "title": "Refactoring Directory README",
+    "documentType": "guide",
+    "path": "09-refactoring/README.json",
+    "tags": [
+      "refactoring",
+      "tech-debt",
+      "documentation",
+      "guide"
+    ],
+    "lastModified": "2025-03-21T13:35:00.000Z",
+    "createdAt": "2025-03-21T13:35:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "Refactoring Directory",
+        "content": "The `09-refactoring` directory contains documents related to refactoring efforts, technical debt management, code improvement initiatives, and migration strategies. This directory focuses on improving and evolving the existing codebase to maintain its quality and sustainability."
+      },
+      {
+        "title": "Purpose",
+        "content": "This directory serves as a central location for refactoring and technical debt-related information. The documents here identify areas for improvement, define refactoring strategies, and track progress in addressing technical debt. This directory is important for maintaining the long-term health of the codebase."
+      },
+      {
+        "title": "Key Documents",
+        "content": "- **json-global-design-issues.json**: Analysis of design issues in the global JSON structure\n- **migration-policy.json**: Policies for migrating between different systems or formats\n\nAdditional documents include:\n- Technical debt inventories\n- Refactoring plans and roadmaps\n- Code quality metrics and targets"
+      },
+      {
+        "title": "Related Tags",
+        "content": "Common tags for documents in this directory include:\n- refactoring\n- tech-debt\n- migration\n- policy\n- markdown\n- json"
+      }
+    ]
+  }
+}

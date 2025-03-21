@@ -35,13 +35,12 @@ export interface GetRecentBranchesOutput {
  * Use case for getting recent branches
  */
 export class GetRecentBranchesUseCase
-  implements IUseCase<GetRecentBranchesInput, GetRecentBranchesOutput>
-{
+  implements IUseCase<GetRecentBranchesInput, GetRecentBranchesOutput> {
   /**
    * Constructor
    * @param branchRepository Branch memory bank repository
    */
-  constructor(private readonly branchRepository: IBranchMemoryBankRepository) {}
+  constructor(private readonly branchRepository: IBranchMemoryBankRepository) { }
 
   /**
    * Execute the use case

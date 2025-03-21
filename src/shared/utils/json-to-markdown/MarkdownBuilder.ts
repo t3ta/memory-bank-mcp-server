@@ -3,6 +3,9 @@
  *
  * Provides a fluent interface for creating markdown content
  * with proper formatting and structure.
+ * 
+ * @deprecated This class is deprecated in v2.1.0 as Markdown support has been removed.
+ * All documents should use JSON format only.
  */
 export class MarkdownBuilder {
   private content: string[];

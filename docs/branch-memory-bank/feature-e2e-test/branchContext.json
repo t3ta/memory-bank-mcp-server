@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "ebe579fc-895e-4dd7-9088-1e189651f9f4",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-18T11:37:47.319Z",
+    "createdAt": "2025-03-18T11:37:47.319Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "feature/e2e-test",
+    "purpose": "このブランチの目的を記述してください",
+    "createdAt": "2025-03-18T11:37:47.319Z",
+    "userStories": [
+      {
+        "id": "c74aa0ee-bdc1-475f-904b-8a5ae677d6d5",
+        "description": "解決する課題1",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "5b96fa44-457d-4376-bb0d-81e3bbfe9397",
+        "description": "解決する課題2",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "a3850523-33ef-4989-857c-74fd7a0680b7",
+        "description": "解決する課題3",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": ""
+  }
+}

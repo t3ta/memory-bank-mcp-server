@@ -1,13 +1,10 @@
-import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
-import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
-import { JsonDocument } from '../../../domain/entities/JsonDocument.js';
-import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
-import { logger } from '../../../shared/utils/logger.js';
-import {
-  InfrastructureError,
-  InfrastructureErrorCodes,
-} from '../../../shared/errors/InfrastructureError.js';
-import { FileSystemTagIndexRepositoryImpl } from './FileSystemTagIndexRepositoryImpl.js';
+import type { BranchInfo } from "../../../domain/entities/BranchInfo.js";
+import type { DocumentPath } from "../../../domain/entities/DocumentPath.js";
+import { MemoryDocument } from "../../../domain/entities/MemoryDocument.js";
+import { JsonDocument } from "../../../domain/entities/JsonDocument.js";
+import { InfrastructureError, InfrastructureErrorCodes } from "../../../shared/errors/InfrastructureError.js";
+import { logger } from "../../../shared/utils/logger.js";
+import { FileSystemTagIndexRepositoryImpl } from "./FileSystemTagIndexRepositoryImpl.js";
 
 /**
  * Implementation of document modification operations for ITagIndexRepository

@@ -1,14 +1,15 @@
-import { promises as fs } from 'fs';
-import path from 'path';
+import { promises as fs } from 'node:fs';
+import path from 'node:path';
 import { IConfigProvider } from './interfaces/IConfigProvider.js';
 import { WorkspaceConfig, CliOptions } from './WorkspaceConfig.js';
-import { Language } from '../../shared/types/index.js';
+
 import { BranchInfo } from '../../domain/entities/BranchInfo.js';
 import {
   InfrastructureError,
   InfrastructureErrorCodes,
 } from '../../shared/errors/InfrastructureError.js';
 import { DomainError } from '../../shared/errors/DomainError.js';
+import type { Language } from '../../schemas/v2/i18n-schema.js';
 
 /**
  * Implementation of configuration provider
@@ -218,10 +219,10 @@ export class ConfigProvider implements IConfigProvider {
    * @returns Valid language
    */
   private validateLanguage(language: string): Language {
-    if (language !== 'en' && language !== 'ja') {
+    if (language !== 'en' && language !== 'ja' && language !== 'zh') {
       throw new InfrastructureError(
         InfrastructureErrorCodes.CONFIGURATION_ERROR,
-        `Invalid language: ${language}. Supported languages are 'en' and 'ja'.`
+        `Invalid language: ${language}. Supported languages are 'en', 'ja', and 'zh'.`
       );
     }
 

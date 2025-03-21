@@ -1,0 +1,13 @@
+{
+  "schema": "memory_document_v1",
+  "metadata": {
+    "title": "commonjs-migration-plan.json",
+    "documentType": "generic",
+    "path": "commonjs-migration-plan.json",
+    "tags": [],
+    "lastModified": "2025-03-18T12:20:27.998Z"
+  },
+  "content": {
+    "text": "{\n  \"title\": \"CommonJS移行計画 - E2Eテスト対応\",\n  \"description\": \"Memory Bank MCP ServerのE2Eテスト環境をCommonJSに移行するための計画\",\n  \"goal\": \"E2Eテストの安定稼働を実現するためのモジュールシステム調整\",\n  \"approach\": \"段階的なCommonJS移行\",\n  \"phases\": [\n    {\n      \"name\": \"設定調整フェーズ\",\n      \"tasks\": [\n        {\n          \"id\": \"config-1\",\n          \"title\": \"package.jsonの更新\",\n          \"description\": \"ESM関連の設定を削除し、CommonJSとして動作するよう調整\",\n          \"changes\": [\n            \"「type: module」の削除\",\n            \"ESM固有のスクリプトの調整\"\n          ],\n          \"status\": \"pending\"\n        },\n        {\n          \"id\": \"config-2\",\n          \"title\": \"tsconfig.jsonの確認\",\n          \"description\": \"TypeScriptの設定がCommonJSに適切に設定されていることを確認\",\n          \"changes\": [\n            \"「module」が「commonjs」に設定されているか確認\",\n            \"「moduleResolution」が「node」に設定されているか確認\"\n          ],\n          \"status\": \"completed\"\n        },\n        {\n          \"id\": \"config-3\",\n          \"title\": \"Jest設定の最適化\",\n          \"description\": \"Jest設定をCommonJS環境に最適化\",\n          \"changes\": [\n            \"moduleNameMapperの調整\",\n            \"transformの設定確認\"\n          ],\n          \"status\": \"in-progress\"\n        }\n      ]\n    },\n    {\n      \"name\": \"テストコード修正フェーズ\",\n      \"tasks\": [\n        {\n          \"id\": \"test-1\",\n          \"title\": \"ヘルパーモジュールの変換\",\n          \"description\": \"テストヘルパーモジュールをCommonJS形式に変換\",\n          \"changes\": [\n            \"import"
+  }
+}

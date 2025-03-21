@@ -1,14 +1,12 @@
-import { IUseCase } from '../../interfaces/IUseCase.js';
-import { IJsonDocumentRepository } from '../../../domain/repositories/IJsonDocumentRepository.js';
 import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
-import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
 import { DocumentId } from '../../../domain/entities/DocumentId.js';
-import { JsonDocument } from '../../../domain/entities/JsonDocument.js';
+import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
+import type { JsonDocument } from '../../../domain/entities/JsonDocument.js';
+import type { IJsonDocumentRepository } from '../../../domain/repositories/IJsonDocumentRepository.js';
+import { ApplicationError, ApplicationErrorCodes } from '../../../shared/errors/ApplicationError.js';
 import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
-import {
-  ApplicationError,
-  ApplicationErrorCodes,
-} from '../../../shared/errors/ApplicationError.js';
+import type { IUseCase } from '../../interfaces/IUseCase.js';
+
 
 /**
  * Input data for read JSON document use case
@@ -94,8 +92,7 @@ export interface ReadJsonDocumentOutput {
  * Use case for reading a JSON document
  */
 export class ReadJsonDocumentUseCase
-  implements IUseCase<ReadJsonDocumentInput, ReadJsonDocumentOutput>
-{
+  implements IUseCase<ReadJsonDocumentInput, ReadJsonDocumentOutput> {
   /**
    * Constructor
    * @param jsonRepository JSON document repository
@@ -104,7 +101,7 @@ export class ReadJsonDocumentUseCase
   constructor(
     private readonly jsonRepository: IJsonDocumentRepository,
     private readonly globalRepository?: IJsonDocumentRepository
-  ) {}
+  ) { }
 
   /**
    * Execute the use case

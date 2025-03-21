@@ -1,7 +1,7 @@
-import { Argv } from 'yargs';
-import { CommandBase } from '../../command-base.js';
-import createApplication from '../../../main/index.js';
-import { logger } from '../../../shared/utils/logger.js';
+import type { Argv } from "yargs";
+import { createApplication } from "../../../main/index.js";
+import { logger } from "../../../shared/utils/logger.js";
+import { CommandBase } from "../../command-base.js";
 
 /**
  * Command to search for JSON documents

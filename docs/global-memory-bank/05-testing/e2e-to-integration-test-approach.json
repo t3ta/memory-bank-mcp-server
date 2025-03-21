@@ -1,0 +1,24 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "a5d47575-0b34-475f-8a3e-25db77ee6077",
+    "title": "E2E から Integration テストへの移行アプローチ",
+    "documentType": "generic",
+    "path": "e2e-to-integration-test-approach.md",
+    "tags": [
+      "testing",
+      "architecture",
+      "integration-test"
+    ],
+    "lastModified": "2025-03-21T07:21:59.906Z",
+    "createdAt": "2025-03-18T16:01:31.754Z",
+    "version": 1
+  },
+  "content": {
+    "_": [
+      "上記の課題を解決するため、より直接的な統合テスト方式に移行します：\n1. **コンポーネント直接テスト**:\nコントローラ、リポジトリ、ユースケースを直接インスタンス化\nサーバープロセスを経由せず、内部コンポーネントを直接検証\nテスト環境の完全な制御を可能に\n2. **テスト分離**:\n各テスト用に独立した一時ディレクトリを使用\nテストコンテキストの明確な分離\nクリーンアップメカニズムの強化\n3. **ファイルシステム検証**:\nファイルシステム操作の直接検証\nコントローラ出力とファイルシステム状態の両方を検証\nパフォーマンス向上と信頼性確保\n```tests/\n├── integration/\n│   ├── setup.ts                 # テスト環境セットアップ用共通ファイル\n│   ├── controllers/             # コントローラーレベルの統合テスト\n│   │   ├── branch-controller.test.ts\n│   │   └── global-controller.test.ts\n│   ├── repositories/            # リポジトリレベルの統合テスト\n│   ├── simple/                  # シンプルな単体機能テスト\n│   │   └── file-system.test.ts  # 基本的なファイルシステム操作テスト\n│   └── markdown-to-json/        # 特定機能の統合テスト\n│       └── json-operations-completeness.test.ts\n├── unit/                        # 純粋な単体テスト\n├── utils/                       # テスト用ユーティリティ\n│   └── clean-temp.js            # 一時ディレクトリクリーンアップ用\n└── .jest-cache/                 # Jestキャッシュディレクトリ\n```\n1. **実行速度の向上**:\nサーバー起動オーバーヘッドの削減\n並列実行の効率化\n2. **安定性向上**:\nプロセス間通信の問題解消\n環境依存の低減\n3. **デバッグの容易化**:\n問題の局所化が容易\nより詳細なエラー情報\n4. **メンテナンス性向上**:",
+      "テストコードの簡素化",
+      "テストのモジュール性向上"
+    ]
+  }
+}

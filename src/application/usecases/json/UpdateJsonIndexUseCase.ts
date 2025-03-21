@@ -1,13 +1,12 @@
-import { IUseCase } from '../../interfaces/IUseCase.js';
-import { IJsonDocumentRepository } from '../../../domain/repositories/IJsonDocumentRepository.js';
-import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
-import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
-import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
-import {
-  ApplicationError,
-  ApplicationErrorCodes,
-} from '../../../shared/errors/ApplicationError.js';
-import { IIndexService } from '../../../infrastructure/index/interfaces/IIndexService.js';
+import { BranchInfo } from "../../../domain/entities/BranchInfo.js";
+import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
+import type { JsonDocument } from "../../../domain/entities/JsonDocument.js";
+import type { IJsonDocumentRepository } from "../../../domain/repositories/IJsonDocumentRepository.js";
+import type { IIndexService } from "../../../infrastructure/index/index.js";
+import { ApplicationError, ApplicationErrorCodes } from "../../../shared/errors/ApplicationError.js";
+import { DomainError, DomainErrorCodes } from "../../../shared/errors/DomainError.js";
+import type { IUseCase } from "../../interfaces/IUseCase.js";
+
 
 /**
  * Input data for update JSON index use case
@@ -63,8 +62,7 @@ export interface UpdateJsonIndexOutput {
  * Use case for updating JSON document indexes
  */
 export class UpdateJsonIndexUseCase
-  implements IUseCase<UpdateJsonIndexInput, UpdateJsonIndexOutput>
-{
+  implements IUseCase<UpdateJsonIndexInput, UpdateJsonIndexOutput> {
   /**
    * Constructor
    * @param jsonRepository JSON document repository
@@ -75,7 +73,7 @@ export class UpdateJsonIndexUseCase
     private readonly jsonRepository: IJsonDocumentRepository,
     private readonly indexService: IIndexService,
     private readonly globalRepository?: IJsonDocumentRepository
-  ) {}
+  ) { }
 
   /**
    * Execute the use case

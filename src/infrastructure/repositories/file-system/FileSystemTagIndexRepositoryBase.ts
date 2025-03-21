@@ -1,24 +1,16 @@
-import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
-import { IBranchMemoryBankRepository } from '../../../domain/repositories/IBranchMemoryBankRepository.js';
-import { IGlobalMemoryBankRepository } from '../../../domain/repositories/IGlobalMemoryBankRepository.js';
-import { DocumentId } from '../../../domain/entities/DocumentId.js';
-import { JsonDocument } from '../../../domain/entities/JsonDocument.js';
-import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
-import { FileSystemService } from '../../storage/FileSystemService.js';
-import path from 'path';
-import { logger } from '../../../shared/utils/logger.js';
-import {
-  BranchTagIndex,
-  GlobalTagIndex,
-  DocumentReference,
-  TAG_INDEX_VERSION,
-  BranchTagIndexSchema,
-  GlobalTagIndexSchema,
-} from '../../../schemas/v2/tag-index.js';
-import {
-  InfrastructureError,
-  InfrastructureErrorCodes,
-} from '../../../shared/errors/InfrastructureError.js';
+import path from "path";
+import type { BranchInfo } from "../../../domain/entities/BranchInfo.js";
+import { DocumentId } from "../../../domain/entities/DocumentId.js";
+import type { DocumentPath } from "../../../domain/entities/DocumentPath.js";
+import { JsonDocument } from "../../../domain/entities/JsonDocument.js";
+import { MemoryDocument } from "../../../domain/entities/MemoryDocument.js";
+import type { IBranchMemoryBankRepository } from "../../../domain/repositories/IBranchMemoryBankRepository.js";
+import type { IGlobalMemoryBankRepository } from "../../../domain/repositories/IGlobalMemoryBankRepository.js";
+import { type BranchTagIndex, BranchTagIndexSchema, type GlobalTagIndex, GlobalTagIndexSchema, type DocumentReference, TAG_INDEX_VERSION } from "../../../schemas/v2/tag-index.js";
+import { InfrastructureError, InfrastructureErrorCodes } from "../../../shared/errors/InfrastructureError.js";
+import { logger } from "../../../shared/utils/logger.js";
+import type { IFileSystemService } from "../../storage/interfaces/IFileSystemService.js";
+
 
 /**
  * Implementation of ITagIndexRepository for file system storage
@@ -27,6 +19,11 @@ export abstract class FileSystemTagIndexRepository {
   protected static readonly GLOBAL_INDEX_FILENAME = 'tag-index.json';
   protected static readonly BRANCH_INDEX_FILENAME = 'tag-index.json';
 
+  // キャッシュ管理
+  private branchIndexCache = new Map<string, { index: BranchTagIndex, lastUpdated: Date }>();
+  private globalIndexCache: { index: GlobalTagIndex, lastUpdated: Date } | null = null;
+  private readonly CACHE_TTL_MS = 30000; // 30秒キャッシュを保持
+
   /**
    * Create a new FileSystemTagIndexRepository instance
    * @param fileSystem File system service
@@ -34,12 +31,12 @@ export abstract class FileSystemTagIndexRepository {
    * @param globalMemoryBankPath Path to global memory bank
    */
   constructor(
-    protected readonly fileSystem: FileSystemService,
+    protected readonly fileSystem: IFileSystemService,
     protected readonly branchMemoryBankRoot: string,
     protected readonly globalMemoryBankPath: string,
     protected readonly branchRepository: IBranchMemoryBankRepository,
     protected readonly globalRepository: IGlobalMemoryBankRepository
-  ) {}
+  ) { }
 
   /**
    * Get path to branch index file
@@ -69,7 +66,18 @@ export abstract class FileSystemTagIndexRepository {
    * @returns Promise resolving to branch index or null if not found
    */
   protected async readBranchIndex(branchInfo: BranchInfo): Promise<BranchTagIndex | null> {
+    const branchKey = branchInfo.safeName;
+    const now = new Date();
+    
+    // キャッシュチェック
+    const cachedData = this.branchIndexCache.get(branchKey);
+    if (cachedData && (now.getTime() - cachedData.lastUpdated.getTime()) < this.CACHE_TTL_MS) {
+      logger.debug(`Using cached branch index for ${branchInfo.name}`);
+      return cachedData.index;
+    }
+
     const indexPath = this.getBranchIndexPath(branchInfo);
+    logger.debug(`Reading branch index from disk: ${indexPath}`);
 
     try {
       const exists = await this.fileSystem.fileExists(indexPath);
@@ -82,6 +90,10 @@ export abstract class FileSystemTagIndexRepository {
 
       // Validate index data
       const validatedData = BranchTagIndexSchema.parse(indexData);
+      
+      // キャッシュに保存
+      this.branchIndexCache.set(branchKey, { index: validatedData, lastUpdated: now });
+      
       return validatedData;
     } catch (error) {
       if (error instanceof SyntaxError) {
@@ -115,7 +127,16 @@ export abstract class FileSystemTagIndexRepository {
    * @returns Promise resolving to global index or null if not found
    */
   protected async readGlobalIndex(): Promise<GlobalTagIndex | null> {
+    const now = new Date();
+    
+    // キャッシュチェック
+    if (this.globalIndexCache && (now.getTime() - this.globalIndexCache.lastUpdated.getTime()) < this.CACHE_TTL_MS) {
+      logger.debug('Using cached global index');
+      return this.globalIndexCache.index;
+    }
+
     const indexPath = this.getGlobalIndexPath();
+    logger.debug(`Reading global index from disk: ${indexPath}`);
 
     try {
       const exists = await this.fileSystem.fileExists(indexPath);
@@ -128,6 +149,10 @@ export abstract class FileSystemTagIndexRepository {
 
       // Validate index data
       const validatedData = GlobalTagIndexSchema.parse(indexData);
+      
+      // キャッシュに保存
+      this.globalIndexCache = { index: validatedData, lastUpdated: now };
+      
       return validatedData;
     } catch (error) {
       if (error instanceof SyntaxError) {
@@ -164,6 +189,7 @@ export abstract class FileSystemTagIndexRepository {
    */
   protected async writeBranchIndex(branchInfo: BranchInfo, index: BranchTagIndex): Promise<void> {
     const indexPath = this.getBranchIndexPath(branchInfo);
+    const branchKey = branchInfo.safeName;
 
     try {
       // Ensure directory exists
@@ -173,6 +199,10 @@ export abstract class FileSystemTagIndexRepository {
       // Write the file
       const content = JSON.stringify(index, null, 2);
       await this.fileSystem.writeFile(indexPath, content);
+      
+      // キャッシュを更新
+      this.branchIndexCache.set(branchKey, { index, lastUpdated: new Date() });
+      logger.debug(`Updated branch index cache for ${branchInfo.name}`);
     } catch (error) {
       logger.error(`Error writing branch tag index file: ${indexPath}`, error);
       throw new InfrastructureError(
@@ -199,6 +229,10 @@ export abstract class FileSystemTagIndexRepository {
       // Write the file
       const content = JSON.stringify(index, null, 2);
       await this.fileSystem.writeFile(indexPath, content);
+      
+      // キャッシュを更新
+      this.globalIndexCache = { index, lastUpdated: new Date() };
+      logger.debug('Updated global index cache');
     } catch (error) {
       logger.error(`Error writing global tag index file: ${indexPath}`, error);
       throw new InfrastructureError(
@@ -214,6 +248,30 @@ export abstract class FileSystemTagIndexRepository {
    * @param document Memory document
    * @returns Document reference
    */
+  /**
+   * キャッシュを無効化する
+   * @param branchInfo ブランチ情報、nullの場合はグローバルキャッシュを無効化
+   */
+  protected invalidateCache(branchInfo: BranchInfo | null = null): void {
+    if (branchInfo) {
+      const branchKey = branchInfo.safeName;
+      this.branchIndexCache.delete(branchKey);
+      logger.debug(`Invalidated branch index cache for ${branchInfo.name}`);
+    } else {
+      this.globalIndexCache = null;
+      logger.debug('Invalidated global index cache');
+    }
+  }
+
+  /**
+   * すべてのキャッシュを無効化する
+   */
+  protected invalidateAllCaches(): void {
+    this.branchIndexCache.clear();
+    this.globalIndexCache = null;
+    logger.debug('Invalidated all index caches');
+  }
+
   protected createDocumentReference(document: MemoryDocument | JsonDocument): DocumentReference {
     // Handle different document types
     if (document instanceof JsonDocument) {
@@ -224,15 +282,14 @@ export abstract class FileSystemTagIndexRepository {
         lastModified: document.lastModified,
       };
     } else {
-      // Legacy MemoryDocument doesn't have id or title
-      // Generate a deterministic ID based on path
-      const pathHash = document.path.value;
-      const id = DocumentId.create(pathHash.padEnd(36, '0').substring(0, 36));
+      // Legacy MemoryDocument's path is always a DocumentPath object
+      const pathValue = document.path.value;
+      const id = DocumentId.create(pathValue.padEnd(36, '0').substring(0, 36));
 
       return {
         id: id.value,
-        path: document.path.value,
-        title: document.path.basename || document.path.value,
+        path: pathValue,
+        title: path.basename(pathValue) || pathValue,
         lastModified: document.lastModified,
       };
     }

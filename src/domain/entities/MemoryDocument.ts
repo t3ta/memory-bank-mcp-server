@@ -272,7 +272,7 @@ export class MemoryDocument {
         throw e; // Re-throw if it's not a format error
       }
     });
-    
+
     return MemoryDocument.create({
       path,
       content: JSON.stringify(jsonDoc, null, 2),

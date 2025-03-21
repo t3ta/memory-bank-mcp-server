@@ -1,0 +1,19 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "17a27410-1b69-41a5-969a-09e49a99dcb1",
+    "title": "Build Fix for feature/filesystem-improvement",
+    "documentType": "generic",
+    "path": "build-fix.md",
+    "tags": [],
+    "lastModified": "2025-03-20T15:14:51.492Z",
+    "createdAt": "2025-03-20T15:14:51.492Z",
+    "version": 1
+  },
+  "content": {
+    "rawContent": "# Build Fix for feature/filesystem-improvement\n\n## エラー修正内容\n\n以下の修正を行い、TypeScriptのビルドエラーを修正しました：\n\n### 1. FileSystemService.ts\n\n- **問題**: `fs.Dirent`型が見つからないエラー\n- **修正**: `node:fs`から直接`Dirent`をインポートするように変更\n```typescript\nimport { promises as fs, Dirent } from 'node:fs';\n```\n\n### 2. FileSystemRetryUtils.ts\n\n- **問題**: `InfrastructureErrorCodes`が値として使われているが、型として使用されているエラー\n- **修正**: \n  - 一時的な定数を作成\n  - `as string`でキャストして対応\n\n### 3. FileSystemTagIndexRepositoryImpl.ts\n\n- **問題**: 型述語(type predicate)の型が互換性がないエラー\n- **修正**: `filter`に型述語を使わず、代わりにTypeScriptの型アサーションを使う方法に変更\n```typescript\nreturn batchResults.filter(doc => doc !== null) as Array<MemoryDocument | JsonDocument>;\n```\n\n## 学んだこと\n\n1. TypeScriptの型システムでは、型述語(`is`)を使う場合、指定する型は常にパラメータの型と互換性がある必要がある\n2. 複合型を扱う場合、時には型アサーション(`as`)を使うほうが簡潔なコードになる場合がある\n3. Node.jsモジュールからの型インポートは、明示的に行う必要がある場合がある\n\n## 注意点\n\n複合型のフィルタリングには以下の方法があります：\n\n1. 型述語（type predicate）を使う方法\n```typescript\narray.filter((item): item is SomeType => condition)\n```\n\n2. 型アサーション（type assertion）を使う方法\n```typescript\narray.filter(item => condition) as SomeType[]\n```\n\n今回は2番目の方法を選択しました。これはTypeScriptコンパイラにとって扱いやすいためです。\n",
+    "sections": {
+      "": "複合型のフィルタリングには以下の方法があります：\n\n1. 型述語（type predicate）を使う方法\n```typescript\narray.filter((item): item is SomeType => condition)\n```\n\n2. 型アサーション（type assertion）を使う方法\n```typescript\narray.filter(item => condition) as SomeType[]\n```\n\n今回は2番目の方法を選択しました。これはTypeScriptコンパイラにとって扱いやすいためです。"
+    }
+  }
+}

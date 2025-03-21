@@ -1,0 +1,42 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "3912b076-210a-4a6a-b63b-fb9158fb24f7",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context",
+      "release-preparation"
+    ],
+    "lastModified": "2025-03-22T00:00:00.000Z",
+    "createdAt": "2025-03-21T19:21:32.359Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "feature/prepare-for-v2.1.0",
+    "purpose": "Memory Bankのバージョン2.1.0リリースの準備を行う。バージョンアップに伴う必要な変更を実装し、テストを通過させ、ドキュメントを更新する。",
+    "createdAt": "2025-03-21T19:21:32.359Z",
+    "userStories": [
+      {
+        "id": "5ba0658e-6a9b-4bd4-8edb-260fe5c8d2a3",
+        "description": "Memory Bankのバージョンを2.0.1から2.1.0に更新する",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "fcc0a77f-6575-4e82-919d-6f5f8c5c2018",
+        "description": "すべてのファイルをJSON形式に移行し、Markdownファイルのサポートを完全に廃止する",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "f0cb90a2-b37a-45d5-8b4d-b5aeec60f615",
+        "description": "リリースノートを作成しドキュメントを更新する",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": "このブランチでは、Memory Bank 2.1.0リリースに向けた最終調整を行います。特に、Markdownからの完全移行とJSON形式への標準化に焦点を当てます。バージョン更新とともに、必要なドキュメントの更新を行い、テストがすべて通過することを確認します。"
+  }
+}

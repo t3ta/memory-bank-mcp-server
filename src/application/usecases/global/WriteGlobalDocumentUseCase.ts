@@ -1,15 +1,13 @@
-import { IUseCase } from '../../interfaces/IUseCase.js';
-import { DocumentDTO } from '../../dtos/DocumentDTO.js';
-import { WriteDocumentDTO } from '../../dtos/WriteDocumentDTO.js';
-import { IGlobalMemoryBankRepository } from '../../../domain/repositories/IGlobalMemoryBankRepository.js';
-import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
-import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
-import { Tag } from '../../../domain/entities/Tag.js';
-import { DomainError } from '../../../shared/errors/DomainError.js';
-import {
-  ApplicationError,
-  ApplicationErrorCodes,
-} from '../../../shared/errors/ApplicationError.js';
+import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
+import { MemoryDocument } from "../../../domain/entities/MemoryDocument.js";
+import { Tag } from "../../../domain/entities/Tag.js";
+import type { IGlobalMemoryBankRepository } from "../../../domain/repositories/IGlobalMemoryBankRepository.js";
+import { ApplicationError, ApplicationErrorCodes } from "../../../shared/errors/ApplicationError.js";
+import { DomainError } from "../../../shared/errors/DomainError.js";
+import type { DocumentDTO } from "../../dtos/DocumentDTO.js";
+import type { WriteDocumentDTO } from "../../dtos/WriteDocumentDTO.js";
+import type { IUseCase } from "../../interfaces/IUseCase.js";
+
 
 /**
  * Input data for write global document use case
@@ -35,13 +33,27 @@ export interface WriteGlobalDocumentOutput {
  * Use case for writing a document to global memory bank
  */
 export class WriteGlobalDocumentUseCase
-  implements IUseCase<WriteGlobalDocumentInput, WriteGlobalDocumentOutput>
-{
+  implements IUseCase<WriteGlobalDocumentInput, WriteGlobalDocumentOutput> {
+  // Flag to disable Markdown writing
+  private readonly disableMarkdownWrites: boolean;
+
   /**
    * Constructor
    * @param globalRepository Global memory bank repository
+   * @param options Options for the use case
    */
-  constructor(private readonly globalRepository: IGlobalMemoryBankRepository) {}
+  constructor(
+    private readonly globalRepository: IGlobalMemoryBankRepository,
+    options?: {
+      /**
+       * Whether to disable Markdown writes
+       * @default false
+       */
+      disableMarkdownWrites?: boolean;
+    }
+  ) {
+    this.disableMarkdownWrites = options?.disableMarkdownWrites ?? false;
+  }
 
   /**
    * Execute the use case
@@ -72,6 +84,15 @@ export class WriteGlobalDocumentUseCase
       // Create domain objects
       const documentPath = DocumentPath.create(input.document.path);
       const tags = (input.document.tags ?? []).map((tag) => Tag.create(tag));
+
+      // Check if markdown writes are disabled
+      if (this.disableMarkdownWrites && documentPath.isMarkdown) {
+        const jsonPath = documentPath.value.replace(/\.md$/, '.json');
+        throw new ApplicationError(
+          ApplicationErrorCodes.OPERATION_NOT_ALLOWED,
+          `Writing to Markdown files is disabled. Please use JSON format instead: ${jsonPath}`
+        );
+      }
 
       // Initialize global memory bank if needed
       await this.globalRepository.initialize();

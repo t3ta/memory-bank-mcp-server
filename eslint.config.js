@@ -1,100 +1,74 @@
-// @ts-check
-import eslint from '@eslint/js';
-import prettierPlugin from 'eslint-plugin-prettier';
-import unusedImportsPlugin from 'eslint-plugin-unused-imports';
-import tseslint from 'typescript-eslint';
+import js from '@eslint/js';
+import importPlugin from 'eslint-plugin-import';
+import typescriptEslint from '@typescript-eslint/eslint-plugin';
+import typescriptParser from '@typescript-eslint/parser';
+import globals from 'globals';
 
-export default tseslint.config(
-  eslint.configs.recommended,
-  ...tseslint.configs.recommended,
-  // ...tseslint.configs.recommendedTypeChecked, // 一時的に厳格な型チェックを無効化
-  {
-    // Prettierプラグインの設定
-    plugins: {
-      prettier: prettierPlugin,
-      'unused-imports': unusedImportsPlugin,
-    },
-    rules: {
-      // Prettierルール
-      'prettier/prettier': [
-        'warn',
-        {
-          semi: true,
-          trailingComma: 'es5',
-          singleQuote: true,
-          printWidth: 100,
-          tabWidth: 2,
-          useTabs: false,
-          bracketSpacing: true,
-          arrowParens: 'always',
-          endOfLine: 'lf',
-        },
-      ],
-
-      // 一般的なルール
-      'no-console': ['warn', { allow: ['error', 'warn', 'info'] }],
-      'no-unused-vars': ['warn', { 
-        args: 'none', 
-        vars: 'all', 
-        varsIgnorePattern: '^_',
-        argsIgnorePattern: '^_',
-        caughtErrorsIgnorePattern: '^_',
-      }],
-      'prefer-const': 'warn',
-      'no-var': 'warn',
-      eqeqeq: ['warn', 'always', { null: 'ignore' }],
-    },
+// 共通の設定
+const baseConfig = {
+  plugins: {
+    import: importPlugin,
+    '@typescript-eslint': typescriptEslint
   },
-  {
-    // TypeScriptファイル用の設定
-    files: ['**/*.ts'],
-    languageOptions: {
-      parser: tseslint.parser,
-      parserOptions: {
-        project: ['./tsconfig.json', './tsconfig.test.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
-    rules: {
-      // TypeScriptルール
-      '@typescript-eslint/explicit-module-boundary-types': 'warn',
-      '@typescript-eslint/no-explicit-any': 'off', // 後で警告に戻す
-      '@typescript-eslint/no-unused-vars': [
-        'warn',
-        { 
-          args: 'none', 
-          vars: 'all', 
-          varsIgnorePattern: '^_',
-          argsIgnorePattern: '^_',
-          caughtErrorsIgnorePattern: '^_',
-        },
-      ],
-      '@typescript-eslint/no-empty-object-type': 'warn',
-      // '@typescript-eslint/no-floating-promises': 'warn',
-      // '@typescript-eslint/no-misused-promises': 'warn',
-      '@typescript-eslint/no-namespace': 'warn',
-    },
+  languageOptions: {
+  parser: typescriptParser,
+    parserOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module'
   },
-  {
-    // テストファイル用の特別ルール
-    files: ['**/*.test.ts'],
-    rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/explicit-module-boundary-types': 'off',
-      'no-unused-vars': 'off', // テストファイルでは未使用変数を許可
-      '@typescript-eslint/no-unused-vars': 'off', // テストファイルでは未使用変数を許可
-    },
+  globals: {
+      ..globals.node,
+      ..globals.jest,
+      NodeJS: 'readonly'
+    }
   },
-  {
-    // 無視するファイルやディレクトリ
-    ignores: [
-      'node_modules/**',
-      'dist/**',
-      'coverage/**',
-      '**/*.d.ts',
-      'jest.config.cjs',
-      'scripts/**/*.js',
-      'eslint.config.js',
-    ],
+  rules: {
+    // Enforce ESM patterns
+    'import/no-commonjs': 'error',
+    '@typescript-eslint/no-var-requires': 'error',
+    'import/no-unresolved': 'off', // Keep this off since it depends on config
+    'no-unused-vars': 'off', // Turn off base rule
+    'no-undef': 'off', // Turn off undefined variable check for NodeJS types
+    '@typescript-eslint/no-unused-vars': ['warn', {
+      'argsIgnorePattern': '^_',
+      'varsIgnorePattern': '^_',
+      'ignoreRestSiblings': true
+    }]
   }
-);
+};
+
+// テスト用の設定（より緩い）
+const testConfig = {
+  ..baseConfig,
+  rules: {
+    ..baseConfig.rules,
+    '@typescript-eslint/no-unused-vars': 'off', // テストでは未使用変数を許可
+    'no-undef': 'off' // テストでは未定義変数の警告を無効化
+  }
+};
+
+export default [
+  {
+    ignores: ['**/dist/**', '**/node_modules/**']
+  },
+  js.configs.recommended,
+  {
+    ..baseConfig,
+    // src 配下のファイルに基本設定を適用
+    files: ['src/**/*.ts'],
+    rules: {
+      ..baseConfig.rules,
+      // 警告をエラーにしない設定
+      '@typescript-eslint/no-unused-vars': ['warn', {
+        'argsIgnorePattern': '^_',
+        'varsIgnorePattern': '^_',
+        'ignoreRestSiblings': true
+      }]
+    }
+  },
+  {
+    ..testConfig,
+    // tests 配下のファイルにテスト用設定を適用
+    files: ['tests/**/*.ts', 'tests/**/*.js']
+  }
+];

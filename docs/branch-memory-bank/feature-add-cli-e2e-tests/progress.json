@@ -1,0 +1,42 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "progress",
+    "title": "Progress",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "core",
+      "progress"
+    ],
+    "lastModified": "2025-03-21T01:32:25.801Z",
+    "createdAt": "2025-03-20T23:39:25.801Z",
+    "version": 1
+  },
+  "content": {
+    "currentState": "すべてのJSONコマンドのE2Eテストについて.skipを解除し、実装に合わせた修正を行いました。テストは実行可能な状態になっていますが、実際の実装状況によっては一部失敗する可能性があります。",
+    "workingFeatures": [
+      "基本的なBranchコマンドのE2Eテスト",
+      "基本的なGlobalコマンドのE2Eテスト",
+      "ContextコマンドのE2Eテスト",
+      "MigrationコマンドのE2Eテスト",
+      "RecentBranchesコマンドのE2Eテスト",
+      "JSONコマンドのE2Eテスト (全テストのスキップ解除済み)：",
+      "- json-basic.test.ts - 作成・読み取りテスト",
+      "- build-index.test.ts - インデックス構築テスト",
+      "- update-json.test.ts - 更新機能テスト",
+      "- delete-json.test.ts - 削除機能テスト",
+      "- list-json.test.ts - リスト表示テスト",
+      "- search-json.test.ts - 検索機能テスト"
+    ],
+    "pendingImplementation": [
+      "テスト実行結果の確認と必要に応じた追加の修正",
+      "テストカバレッジの分析と不足しているテストケースの追加"
+    ],
+    "knownIssues": [
+      "テストの一部は実際の実装状況によっては失敗する可能性があるため、実行時に確認が必要",
+      "テストの期待値が実際の出力と完全に一致しない可能性がある（特に出力フォーマットが変更された場合）",
+      "JSONドキュメント機能が完全に実装されていない場合、一部のテストは失敗する可能性がある"
+    ]
+  }
+}

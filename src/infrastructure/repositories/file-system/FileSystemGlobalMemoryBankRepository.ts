@@ -1,18 +1,17 @@
-import path from 'path';
-import { IGlobalMemoryBankRepository } from '../../../domain/repositories/IGlobalMemoryBankRepository.js';
-import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
+import path from 'node:path';
+import type { Language } from '../../../schemas/v2/i18n-schema.js';
 import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
+import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
 import { Tag } from '../../../domain/entities/Tag.js';
-import { IFileSystemService } from '../../storage/interfaces/IFileSystemService.js';
-import { IConfigProvider } from '../../config/interfaces/IConfigProvider.js';
-import {
-  InfrastructureError,
-  InfrastructureErrorCodes,
-} from '../../../shared/errors/InfrastructureError.js';
+import type { IGlobalMemoryBankRepository } from '../../../domain/repositories/IGlobalMemoryBankRepository.js';
+import type { TagIndex } from '../../../schemas/tag-index/tag-index-schema.js';
 import { DomainError } from '../../../shared/errors/DomainError.js';
-import { FileSystemMemoryDocumentRepository } from './FileSystemMemoryDocumentRepository.js';
+import { InfrastructureError, InfrastructureErrorCodes } from '../../../shared/errors/InfrastructureError.js';
 import { logger } from '../../../shared/utils/logger.js';
-import { TagIndex } from '../../../schemas/tag-index/tag-index-schema.js';
+import type { IConfigProvider } from '../../config/index.js';
+import type { IFileSystemService } from '../../storage/interfaces/IFileSystemService.js';
+import { FileSystemMemoryDocumentRepository } from './FileSystemMemoryDocumentRepository.js';
+
 
 /**
  * File system implementation of global memory bank repository
@@ -20,22 +19,143 @@ import { TagIndex } from '../../../schemas/tag-index/tag-index-schema.js';
 export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRepository {
   private readonly documentRepository: FileSystemMemoryDocumentRepository;
   private readonly globalMemoryPath: string;
-  private readonly defaultStructure: Record<string, string> = {
-    'architecture.md':
-      '# システムアーキテクチャ\n\ntags: #architecture #system-design\n\n## 概要\n\n[システムアーキテクチャの説明]\n\n## コンポーネント\n\n[主要なシステムコンポーネントの一覧と説明]\n\n## 設計上の決定事項\n\n[重要なアーキテクチャ上の決定事項]\n',
-    'coding-standards.md':
-      '# コーディング規約\n\ntags: #standards #best-practices\n\n## 一般的なガイドライン\n\n[一般的なコーディングガイドライン]\n\n## 言語固有の規約\n\n[言語固有の規約について]\n',
-    'domain-models.md':
-      '# ドメインモデル\n\ntags: #domain #models #architecture\n\n## コアモデル\n\n[コアドメインモデルの定義]\n\n## 関連性\n\n[モデル間の関連性について]\n',
-    'glossary.md':
-      '# 用語集\n\ntags: #glossary #terminology\n\n## 用語\n\n[プロジェクト固有の用語の一覧と定義]\n\n## 略語\n\n[よく使用される略語の一覧と定義]\n',
-    'tech-stack.md':
-      '# 技術スタック\n\ntags: #tech-stack #infrastructure\n\n## バックエンド技術\n\n[バックエンド技術の一覧]\n\n## フロントエンド技術\n\n[フロントエンド技術の一覧]\n\n## インフラストラクチャ\n\n[インフラストラクチャコンポーネントの説明]\n',
-    'user-guide.md':
-      '# ユーザーガイド\n\ntags: #guide #documentation\n\n## 概要\n\n[システムの概要]\n\n## 使用方法\n\n[システムの使用方法について]\n',
-    'tags/index.md':
-      '# タグインデックス\n\ntags: #index #meta\n\n## タグ一覧\n\n[タグの一覧と説明]\n',
-  };
+  private language: Language = 'en';
+  
+  /**
+   * Get default templates based on current language
+   */
+  private get defaultStructure(): Record<string, string> {
+    // Select templates based on language
+    switch (this.language) {
+      case 'ja':
+        return this.getJapaneseTemplates();
+      case 'zh':
+        return this.getChineseTemplates();
+      default:
+        return this.getEnglishTemplates();
+    }
+  }
+
+  // getTemplatesForLanguage is no longer needed as defaultStructure now handles language selection directly
+
+  /**
+   * Get English templates for default structure
+   * @returns Record of file paths to template content
+   */
+  private getEnglishTemplates(): Record<string, string> {
+    return {
+      'tags/index.json': `{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "tags-index",
+    "title": "Tags Index",
+    "documentType": "generic",
+    "path": "tags/index.json",
+    "tags": ["index", "meta"],
+    "lastModified": "${new Date().toISOString()}",
+    "createdAt": "${new Date().toISOString()}",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "Tags List",
+        "content": "[List and description of tags]"
+      }
+    ]
+  }
+}`
+    };
+  }
+
+  /**
+   * Get Japanese templates for default structure
+   * @returns Record of file paths to template content
+   */
+  private getJapaneseTemplates(): Record<string, string> {
+    return {
+      'tags/index.json': `{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "tags-index",
+    "title": "タグインデックス",
+    "documentType": "generic",
+    "path": "tags/index.json",
+    "tags": ["index", "meta"],
+    "lastModified": "${new Date().toISOString()}",
+    "createdAt": "${new Date().toISOString()}",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "タグ一覧",
+        "content": "[タグの一覧と説明]"
+      }
+    ]
+  }
+}`
+    };
+  }
+
+  /**
+   * Get Chinese templates for default structure
+   * @returns Record of file paths to template content
+   */
+  private getChineseTemplates(): Record<string, string> {
+    return {
+      'tags/index.json': `{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "tags-index",
+    "title": "标签索引",
+    "documentType": "generic",
+    "path": "tags/index.json",
+    "tags": ["index", "meta"],
+    "lastModified": "${new Date().toISOString()}",
+    "createdAt": "${new Date().toISOString()}",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "标签列表",
+        "content": "[标签列表和描述]"
+      }
+    ]
+  }
+}`
+    };
+  }
+
+  /**
+   * Get template for specific language and type
+   * @param language Target language
+   * @param type Template type
+   * @returns Template content as string
+   */
+  private getDefaultTemplate(language: Language, type: string): string {
+    // Basic templates only for most important types
+    // Future enhancement: Load from actual template files
+    const templates: Record<Language, Record<string, string>> = {
+      en: this.getEnglishTemplates(),
+      ja: this.getJapaneseTemplates(),
+      zh: this.getChineseTemplates()
+    };
+    
+    // Check if template exists for this language
+    if (templates[language] && templates[language][type]) {
+      return templates[language][type];
+    }
+    
+    // Fall back to English template if not found
+    if (templates.en[type]) {
+      return templates.en[type];
+    }
+    
+    // No template found, return empty string (shouldn't happen)
+    return '';
+  }
 
   /**
    * Constructor
@@ -51,6 +171,9 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
       this.globalMemoryPath,
       this.fileSystemService
     );
+    
+    // Set language from config
+    this.language = this.configProvider.getLanguage();
   }
 
   /**
@@ -125,8 +248,8 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
     try {
       await this.documentRepository.save(document);
 
-      // Update tags index if document is markdown
-      if (document.isMarkdown && document.path.value !== 'tags/index.md') {
+      // Update tags index if document is markdown or JSON
+      if ((document.isMarkdown || document.isJSON) && document.path.value !== 'tags/index.md' && document.path.value !== 'tags/index.json') {
         // Generate and save the tag index
         await this.generateAndSaveTagIndex();
       }
@@ -163,7 +286,7 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
       const result = await this.documentRepository.delete(path);
 
       // Update tags index if document was deleted
-      if (result && path.value !== 'tags/index.md') {
+      if (result && path.value !== 'tags/index.md' && path.value !== 'tags/index.json') {
         // Generate and save the tag index
         await this.generateAndSaveTagIndex();
       }
@@ -249,7 +372,7 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
 
       for (const docPath of allPaths) {
         // Skip the tags index itself
-        if (docPath.value === 'tags/index.md') {
+        if (docPath.value === 'tags/index.json' || docPath.value === 'tags/index.md') {
           continue;
         }
 
@@ -297,6 +420,27 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
     }
   }
 
+  // Get tag index title and content based on language
+  private getTagIndexTitleAndContent(): { title: string; content: string } {
+    switch (this.language) {
+      case 'ja':
+        return {
+          title: "タグインデックス",
+          content: "タグとドキュメントの関連付け"
+        };
+      case 'zh':
+        return {
+          title: "标签索引",
+          content: "标签和文档的映射关系"
+        };
+      default: // 'en'
+        return {
+          title: "Tags Index",
+          content: "Mapping between tags and documents"
+        };
+    }
+  }
+
   /**
    * Updates the legacy tags/index.md file for backward compatibility
    * @returns Promise resolving when done
@@ -311,7 +455,7 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
 
       for (const docPath of allPaths) {
         // Skip the tags index itself
-        if (docPath.value === 'tags/index.md') {
+        if (docPath.value === 'tags/index.json' || docPath.value === 'tags/index.md') {
           continue;
         }
 
@@ -340,35 +484,49 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
         }
       }
 
-      // Create tags index content
-      let indexContent = '# タグインデックス\n\ntags: #index #meta\n\n';
+      // Create JSON tags index
+      const tagTitleAndContent = this.getTagIndexTitleAndContent();
+      const tagsDocument = {
+        schema: "memory_document_v2",
+        metadata: {
+          id: "tags-index",
+          title: tagTitleAndContent.title,
+          documentType: "generic",
+          path: "tags/index.json",
+          tags: ["index", "meta"],
+          lastModified: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          version: 1
+        },
+        content: {
+          sections: [
+            {
+              title: "Tags List",
+              content: tagTitleAndContent.content
+            }
+          ],
+          tagMap: Object.fromEntries(
+            Array.from(tagMap.entries()).map(([tag, info]) => {
+              return [tag, {
+                count: info.count,
+                documents: info.documents.map(d => {
+                  const doc = documents.find((doc) => doc.path.value === d);
+                  return {
+                    path: d,
+                    title: doc?.title || d
+                  };
+                })
+              }];
+            })
+          )
+        }
+      };
 
-      // Add table header
-      indexContent += '| タグ | 件数 | ドキュメント |\n';
-      indexContent += '|-----|------|-------------|\n';
-
-      // Sort tags by name
-      const sortedTags = Array.from(tagMap.keys()).sort();
-
-      for (const tag of sortedTags) {
-        const info = tagMap.get(tag)!;
-
-        // Format document links
-        const docLinks = info.documents
-          .map((d) => {
-            // Get doc title if possible
-            const doc = documents.find((doc) => doc.path.value === d);
-            const title = doc?.title || d;
-
-            return `[${title}](/${d})`;
-          })
-          .join(', ');
-
-        indexContent += `| #${tag} | ${info.count} | ${docLinks} |\n`;
-      }
+      // Convert to JSON string with pretty formatting
+      const indexContent = JSON.stringify(tagsDocument, null, 2);
 
       // Direct path - used to avoid circular reference
-      const indexPath = DocumentPath.create('tags/index.md');
+      const indexPath = DocumentPath.create('tags/index.json');
       const fullPath = path.join(this.globalMemoryPath, indexPath.value);
       await this.fileSystemService.createDirectory(path.dirname(fullPath));
       await this.fileSystemService.writeFile(fullPath, indexContent);
@@ -428,35 +586,49 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
         }
       }
 
-      // Create tags index content
-      let indexContent = '# タグインデックス\n\ntags: #index #meta\n\n';
+      // Create JSON tags index
+      const tagTitleAndContent = this.getTagIndexTitleAndContent();
+      const tagsDocument = {
+        schema: "memory_document_v2",
+        metadata: {
+          id: "tags-index",
+          title: tagTitleAndContent.title,
+          documentType: "generic",
+          path: "tags/index.json",
+          tags: ["index", "meta"],
+          lastModified: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          version: 1
+        },
+        content: {
+          sections: [
+            {
+              title: "Tags List",
+              content: tagTitleAndContent.content
+            }
+          ],
+          tagMap: Object.fromEntries(
+            Array.from(tagMap.entries()).map(([tag, info]) => {
+              return [tag, {
+                count: info.count,
+                documents: info.documents.map(d => {
+                  const doc = documents.find((doc) => doc.path.value === d);
+                  return {
+                    path: d,
+                    title: doc?.title || d
+                  };
+                })
+              }];
+            })
+          )
+        }
+      };
 
-      // Add table header
-      indexContent += '| タグ | 件数 | ドキュメント |\n';
-      indexContent += '|-----|------|-------------|\n';
-
-      // Sort tags by name
-      const sortedTags = Array.from(tagMap.keys()).sort();
-
-      for (const tag of sortedTags) {
-        const info = tagMap.get(tag)!;
-
-        // Format document links
-        const docLinks = info.documents
-          .map((d) => {
-            // Get doc title if possible
-            const doc = documents.find((doc) => doc.path.value === d);
-            const title = doc?.title || d;
-
-            return `[${title}](/${d})`;
-          })
-          .join(', ');
-
-        indexContent += `| #${tag} | ${info.count} | ${docLinks} |\n`;
-      }
+      // Convert to JSON string with pretty formatting
+      const indexContent = JSON.stringify(tagsDocument, null, 2);
 
       // Create or update tags index
-      const indexPath = DocumentPath.create('tags/index.md');
+      const indexPath = DocumentPath.create('tags/index.json');
 
       if (!skipSaveDocument) {
         // Normal path - might cause circular reference if called from saveDocument

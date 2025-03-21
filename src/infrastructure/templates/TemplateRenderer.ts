@@ -33,10 +33,10 @@ export class TemplateRenderer {
   ): string {
     if ('schema' in template) {
       // It's a JSON template
-      return this.renderJsonTemplateToMarkdown(template, language, variables);
+      return this.renderJsonTemplateToMarkdown(template as JsonTemplate, language, variables);
     } else {
       // It's a base template (array-based)
-      return this.renderBaseTemplateToMarkdown(template, language, variables);
+      return this.renderBaseTemplateToMarkdown(template as BaseTemplate, language, variables);
     }
   }
 
@@ -99,7 +99,7 @@ export class TemplateRenderer {
     // Add sections
     for (const [sectionId, section] of Object.entries(template.content.sections)) {
       const sectionContent = this.renderJsonSection(
-        section,
+        section as { title: Record<string, string>; content?: Record<string, string>; optional?: boolean; },
         language,
         variables,
         template.content.placeholders
@@ -174,7 +174,11 @@ export class TemplateRenderer {
    * @returns Markdown formatted string for the section
    */
   private renderJsonSection(
-    section: any,
+    section: {
+      title: Record<string, string>;
+      content?: Record<string, string>;
+      optional?: boolean;
+    },
     language: Language,
     variables?: Record<string, string>,
     placeholders?: Record<string, string>

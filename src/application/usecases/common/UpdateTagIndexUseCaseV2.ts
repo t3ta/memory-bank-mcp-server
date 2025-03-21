@@ -66,8 +66,7 @@ export interface UpdateTagIndexOutput {
  * Use case for updating tag index with JSON persistence
  */
 export class UpdateTagIndexUseCaseV2
-  implements IUseCase<UpdateTagIndexInput, UpdateTagIndexOutput>
-{
+  implements IUseCase<UpdateTagIndexInput, UpdateTagIndexOutput> {
   /**
    * Constructor
    * @param globalRepository Global memory bank repository
@@ -78,7 +77,7 @@ export class UpdateTagIndexUseCaseV2
     private readonly globalRepository: IGlobalMemoryBankRepository,
     private readonly branchRepository: IBranchMemoryBankRepository,
     private readonly tagIndexRepository?: any
-  ) {}
+  ) { }
 
   /**
    * Execute the use case

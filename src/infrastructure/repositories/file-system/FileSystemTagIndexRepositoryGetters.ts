@@ -1,12 +1,9 @@
-import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
-import { Tag } from '../../../domain/entities/Tag.js';
-import { ITagIndexRepository } from '../../../domain/repositories/ITagIndexRepository.js';
-import { logger } from '../../../shared/utils/logger.js';
-import {
-  InfrastructureError,
-  InfrastructureErrorCodes,
-} from '../../../shared/errors/InfrastructureError.js';
-import { FileSystemTagIndexRepositoryModifiers } from './FileSystemTagIndexRepositoryModifiers.js';
+import type { BranchInfo } from "../../../domain/entities/BranchInfo.js";
+import { Tag } from "../../../domain/entities/Tag.js";
+import type { ITagIndexRepository } from "../../../domain/repositories/ITagIndexRepository.js";
+import { InfrastructureError, InfrastructureErrorCodes } from "../../../shared/errors/InfrastructureError.js";
+import { logger } from "../../../shared/utils/logger.js";
+import { FileSystemTagIndexRepositoryModifiers } from "./FileSystemTagIndexRepositoryModifiers.js";
 
 /**
  * Implementation of getter methods for ITagIndexRepository
@@ -14,8 +11,7 @@ import { FileSystemTagIndexRepositoryModifiers } from './FileSystemTagIndexRepos
  */
 export class FileSystemTagIndexRepository
   extends FileSystemTagIndexRepositoryModifiers
-  implements ITagIndexRepository
-{
+  implements ITagIndexRepository {
   /**
    * Get all tags in branch tag index
    * @param branchInfo Branch information

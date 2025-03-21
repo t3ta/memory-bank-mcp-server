@@ -1,7 +1,7 @@
-import { MemoryDocument } from '../entities/MemoryDocument.js';
-import { DocumentPath } from '../entities/DocumentPath.js';
-import { Tag } from '../entities/Tag.js';
-import { TagIndex } from '../../schemas/tag-index/tag-index-schema.js';
+import type { TagIndex } from "../../schemas/tag-index/tag-index-schema.js";
+import type { DocumentPath } from "../entities/DocumentPath.js";
+import type { MemoryDocument } from "../entities/MemoryDocument.js";
+import type { Tag } from "../entities/Tag.js";
 
 /**
  * Repository interface for global memory bank

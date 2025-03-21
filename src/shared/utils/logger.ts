@@ -4,6 +4,9 @@
  * Provides a simple logging interface with different log levels
  */
 
+import { info, warn, error } from "node:console";
+import type { unknown, string } from "zod";
+
 /**
  * Log levels
  */

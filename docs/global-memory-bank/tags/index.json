@@ -1,22 +1,1292 @@
 {
   "schema": "memory_document_v2",
   "metadata": {
-    "id": "62ac2e3b-b826-49e4-b86a-49ff6357c852",
+    "id": "tags-index",
     "title": "タグインデックス",
     "documentType": "generic",
-    "path": "index.md",
+    "path": "tags/index.json",
     "tags": [
       "index",
       "meta"
     ],
-    "lastModified": "2025-03-17T02:13:31.722Z",
-    "createdAt": "2025-03-17T02:13:31.722Z",
+    "lastModified": "2025-03-21T19:32:50.368Z",
+    "createdAt": "2025-03-21T19:32:50.368Z",
     "version": 1
   },
   "content": {
-    "rawContent": "# タグインデックス\n\ntags: #index #meta\n\n| タグ | 件数 | ドキュメント |\n|-----|------|-------------|\n| #architecture | 4 | [アーキテクチャ決定記録](/architecture-decisions.md), [System Architecture](/architecture.md), [ドメインモデル](/domain-models.md), [Memory Bank 2.0: JSON ベースアーキテクチャ詳細設計](/json-based-architecture.md) |\n| #automation | 1 | [CI/CD Workflows](/ci-cd/workflows.md) |\n| #best-practices | 1 | [Coding Standards](/coding-standards.md) |\n| #ci-cd | 1 | [CI/CD Workflows](/ci-cd/workflows.md) |\n| #clean-architecture | 1 | [System Architecture](/architecture.md) |\n| #clean-code | 1 | [Coding Standards](/coding-standards.md) |\n| #command | 2 | [`read_context`コマンド設計書](/read-context-command-design.md), [`read_context`コマンド実装ガイド](/read-context-command-implementation.md) |\n| #context | 2 | [`read_context`コマンド設計書](/read-context-command-design.md), [`read_context`コマンド実装ガイド](/read-context-command-implementation.md) |\n| #decision | 1 | [アーキテクチャ決定記録](/architecture-decisions.md) |\n| #definitions | 1 | [Glossary](/glossary.md) |\n| #dependencies | 1 | [Technology Stack](/tech-stack.md) |\n| #design | 3 | [Memory Bank 2.0: JSON ベースアーキテクチャ詳細設計](/json-based-architecture.md), [`read_context`コマンド設計書](/read-context-command-design.md), [テンプレートシステムのJSON化と多言語対応 - 設計仕様書](/template-system-json-i18n-design.md) |\n| #document-model | 1 | [ドメインモデル](/domain-models.md) |\n| #documentation | 1 | [ユーザーガイド](/user-guide.md) |\n| #domain | 1 | [ドメインモデル](/domain-models.md) |\n| #errors | 1 | [Memory Bank Error Troubleshooting](/ci-cd/memory-bank-errors.md) |\n| #github-actions | 1 | [CI/CD Workflows](/ci-cd/workflows.md) |\n| #glossary | 1 | [Glossary](/glossary.md) |\n| #guide | 1 | [ユーザーガイド](/user-guide.md) |\n| #i18n | 1 | [テンプレートシステムのJSON化と多言語対応 - 設計仕様書](/template-system-json-i18n-design.md) |\n| #implementation | 2 | [`read_context`コマンド実装ガイド](/read-context-command-implementation.md), [Memory Bank 2.0: 実装計画](/v2-implementation-plan.md) |\n| #infrastructure | 1 | [Technology Stack](/tech-stack.md) |\n| #json | 5 | [アーキテクチャ決定記録](/architecture-decisions.md), [ドメインモデル](/domain-models.md), [Memory Bank 2.0: JSON ベースアーキテクチャ詳細設計](/json-based-architecture.md), [テンプレートシステムのJSON化と多言語対応 - 設計仕様書](/template-system-json-i18n-design.md), [Memory Bank 2.0: 実装計画](/v2-implementation-plan.md) |\n| #l10n | 1 | [テンプレートシステムのJSON化と多言語対応 - 設計仕様書](/template-system-json-i18n-design.md) |\n| #mcp | 2 | [`read_context`コマンド設計書](/read-context-command-design.md), [`read_context`コマンド実装ガイド](/read-context-command-implementation.md) |\n| #memory-bank | 1 | [Memory Bank Error Troubleshooting](/ci-cd/memory-bank-errors.md) |\n| #models | 1 | [ドメインモデル](/domain-models.md) |\n| #onion-architecture | 1 | [System Architecture](/architecture.md) |\n| #plan | 1 | [Memory Bank 2.0: 実装計画](/v2-implementation-plan.md) |\n| #standards | 1 | [Coding Standards](/coding-standards.md) |\n| #system-design | 1 | [System Architecture](/architecture.md) |\n| #tech-stack | 1 | [Technology Stack](/tech-stack.md) |\n| #template | 1 | [テンプレートシステムのJSON化と多言語対応 - 設計仕様書](/template-system-json-i18n-design.md) |\n| #terminology | 1 | [Glossary](/glossary.md) |\n| #troubleshooting | 1 | [Memory Bank Error Troubleshooting](/ci-cd/memory-bank-errors.md) |\n| #typescript | 1 | [Coding Standards](/coding-standards.md) |\n| #v2 | 3 | [`read_context`コマンド設計書](/read-context-command-design.md), [`read_context`コマンド実装ガイド](/read-context-command-implementation.md), [テンプレートシステムのJSON化と多言語対応 - 設計仕様書](/template-system-json-i18n-design.md) |\n| #version-2 | 3 | [アーキテクチャ決定記録](/architecture-decisions.md), [Memory Bank 2.0: JSON ベースアーキテクチャ詳細設計](/json-based-architecture.md), [Memory Bank 2.0: 実装計画](/v2-implementation-plan.md) |\n| #workflows | 1 | [CI/CD Workflows](/ci-cd/workflows.md) |\n",
-    "sections": {
-      "main": "| タグ | 件数 | ドキュメント |\n|-----|------|-------------|\n| #architecture | 4 | [アーキテクチャ決定記録](/architecture-decisions.md), [System Architecture](/architecture.md), [ドメインモデル](/domain-models.md), [Memory Bank 2.0: JSON ベースアーキテクチャ詳細設計](/json-based-architecture.md) |\n| #automation | 1 | [CI/CD Workflows](/ci-cd/workflows.md) |\n| #best-practices | 1 | [Coding Standards](/coding-standards.md) |\n| #ci-cd | 1 | [CI/CD Workflows](/ci-cd/workflows.md) |\n| #clean-architecture | 1 | [System Architecture](/architecture.md) |\n| #clean-code | 1 | [Coding Standards](/coding-standards.md) |\n| #command | 2 | [`read_context`コマンド設計書](/read-context-command-design.md), [`read_context`コマンド実装ガイド](/read-context-command-implementation.md) |\n| #context | 2 | [`read_context`コマンド設計書](/read-context-command-design.md), [`read_context`コマンド実装ガイド](/read-context-command-implementation.md) |\n| #decision | 1 | [アーキテクチャ決定記録](/architecture-decisions.md) |\n| #definitions | 1 | [Glossary](/glossary.md) |\n| #dependencies | 1 | [Technology Stack](/tech-stack.md) |\n| #design | 3 | [Memory Bank 2.0: JSON ベースアーキテクチャ詳細設計](/json-based-architecture.md), [`read_context`コマンド設計書](/read-context-command-design.md), [テンプレートシステムのJSON化と多言語対応 - 設計仕様書](/template-system-json-i18n-design.md) |\n| #document-model | 1 | [ドメインモデル](/domain-models.md) |\n| #documentation | 1 | [ユーザーガイド](/user-guide.md) |\n| #domain | 1 | [ドメインモデル](/domain-models.md) |\n| #errors | 1 | [Memory Bank Error Troubleshooting](/ci-cd/memory-bank-errors.md) |\n| #github-actions | 1 | [CI/CD Workflows](/ci-cd/workflows.md) |\n| #glossary | 1 | [Glossary](/glossary.md) |\n| #guide | 1 | [ユーザーガイド](/user-guide.md) |\n| #i18n | 1 | [テンプレートシステムのJSON化と多言語対応 - 設計仕様書](/template-system-json-i18n-design.md) |\n| #implementation | 2 | [`read_context`コマンド実装ガイド](/read-context-command-implementation.md), [Memory Bank 2.0: 実装計画](/v2-implementation-plan.md) |\n| #infrastructure | 1 | [Technology Stack](/tech-stack.md) |\n| #json | 5 | [アーキテクチャ決定記録](/architecture-decisions.md), [ドメインモデル](/domain-models.md), [Memory Bank 2.0: JSON ベースアーキテクチャ詳細設計](/json-based-architecture.md), [テンプレートシステムのJSON化と多言語対応 - 設計仕様書](/template-system-json-i18n-design.md), [Memory Bank 2.0: 実装計画](/v2-implementation-plan.md) |\n| #l10n | 1 | [テンプレートシステムのJSON化と多言語対応 - 設計仕様書](/template-system-json-i18n-design.md) |\n| #mcp | 2 | [`read_context`コマンド設計書](/read-context-command-design.md), [`read_context`コマンド実装ガイド](/read-context-command-implementation.md) |\n| #memory-bank | 1 | [Memory Bank Error Troubleshooting](/ci-cd/memory-bank-errors.md) |\n| #models | 1 | [ドメインモデル](/domain-models.md) |\n| #onion-architecture | 1 | [System Architecture](/architecture.md) |\n| #plan | 1 | [Memory Bank 2.0: 実装計画](/v2-implementation-plan.md) |\n| #standards | 1 | [Coding Standards](/coding-standards.md) |\n| #system-design | 1 | [System Architecture](/architecture.md) |\n| #tech-stack | 1 | [Technology Stack](/tech-stack.md) |\n| #template | 1 | [テンプレートシステムのJSON化と多言語対応 - 設計仕様書](/template-system-json-i18n-design.md) |\n| #terminology | 1 | [Glossary](/glossary.md) |\n| #troubleshooting | 1 | [Memory Bank Error Troubleshooting](/ci-cd/memory-bank-errors.md) |\n| #typescript | 1 | [Coding Standards](/coding-standards.md) |\n| #v2 | 3 | [`read_context`コマンド設計書](/read-context-command-design.md), [`read_context`コマンド実装ガイド](/read-context-command-implementation.md), [テンプレートシステムのJSON化と多言語対応 - 設計仕様書](/template-system-json-i18n-design.md) |\n| #version-2 | 3 | [アーキテクチャ決定記録](/architecture-decisions.md), [Memory Bank 2.0: JSON ベースアーキテクチャ詳細設計](/json-based-architecture.md), [Memory Bank 2.0: 実装計画](/v2-implementation-plan.md) |\n| #workflows | 1 | [CI/CD Workflows](/ci-cd/workflows.md) |"
+    "sections": [
+      {
+        "title": "Tags List",
+        "content": "タグとドキュメントの関連付け"
+      }
+    ],
+    "tagMap": {
+      "project": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "01-project/README.json",
+            "title": "01-project/README.json"
+          },
+          {
+            "path": "01-project/project-overview.json",
+            "title": "01-project/project-overview.json"
+          }
+        ]
+      },
+      "documentation": {
+        "count": 15,
+        "documents": [
+          {
+            "path": "01-project/README.json",
+            "title": "01-project/README.json"
+          },
+          {
+            "path": "02-architecture/README.json",
+            "title": "02-architecture/README.json"
+          },
+          {
+            "path": "03-implementation/README.json",
+            "title": "03-implementation/README.json"
+          },
+          {
+            "path": "04-guides/README.json",
+            "title": "04-guides/README.json"
+          },
+          {
+            "path": "04-guides/user-guide.json",
+            "title": "04-guides/user-guide.json"
+          },
+          {
+            "path": "05-testing/README.json",
+            "title": "05-testing/README.json"
+          },
+          {
+            "path": "06-releases/README.json",
+            "title": "06-releases/README.json"
+          },
+          {
+            "path": "07-infrastructure/README.json",
+            "title": "07-infrastructure/README.json"
+          },
+          {
+            "path": "08-i18n/README.json",
+            "title": "08-i18n/README.json"
+          },
+          {
+            "path": "09-refactoring/README.json",
+            "title": "09-refactoring/README.json"
+          },
+          {
+            "path": "meta/README.json",
+            "title": "meta/README.json"
+          },
+          {
+            "path": "meta/consolidated-memory-bank-meta.json",
+            "title": "meta/consolidated-memory-bank-meta.json"
+          },
+          {
+            "path": "meta/document-type-standards.json",
+            "title": "meta/document-type-standards.json"
+          },
+          {
+            "path": "meta/global-memory-bank-reference.json",
+            "title": "meta/global-memory-bank-reference.json"
+          },
+          {
+            "path": "tags/README.json",
+            "title": "tags/README.json"
+          }
+        ]
+      },
+      "guide": {
+        "count": 16,
+        "documents": [
+          {
+            "path": "01-project/README.json",
+            "title": "01-project/README.json"
+          },
+          {
+            "path": "02-architecture/README.json",
+            "title": "02-architecture/README.json"
+          },
+          {
+            "path": "03-implementation/README.json",
+            "title": "03-implementation/README.json"
+          },
+          {
+            "path": "04-guides/README.json",
+            "title": "04-guides/README.json"
+          },
+          {
+            "path": "04-guides/migration-guide.json",
+            "title": "04-guides/migration-guide.json"
+          },
+          {
+            "path": "04-guides/user-guide.json",
+            "title": "04-guides/user-guide.json"
+          },
+          {
+            "path": "05-testing/README.json",
+            "title": "05-testing/README.json"
+          },
+          {
+            "path": "06-releases/README.json",
+            "title": "06-releases/README.json"
+          },
+          {
+            "path": "07-infrastructure/README.json",
+            "title": "07-infrastructure/README.json"
+          },
+          {
+            "path": "08-i18n/README.json",
+            "title": "08-i18n/README.json"
+          },
+          {
+            "path": "09-refactoring/README.json",
+            "title": "09-refactoring/README.json"
+          },
+          {
+            "path": "meta/README.json",
+            "title": "meta/README.json"
+          },
+          {
+            "path": "meta/consolidated-memory-bank-meta.json",
+            "title": "meta/consolidated-memory-bank-meta.json"
+          },
+          {
+            "path": "meta/global-memory-bank-navigation.json",
+            "title": "meta/global-memory-bank-navigation.json"
+          },
+          {
+            "path": "meta/global-memory-bank-reference.json",
+            "title": "meta/global-memory-bank-reference.json"
+          },
+          {
+            "path": "tags/README.json",
+            "title": "tags/README.json"
+          }
+        ]
+      },
+      "best-practices": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "01-project/coding-standards.json",
+            "title": "01-project/coding-standards.json"
+          }
+        ]
+      },
+      "typescript": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "01-project/coding-standards.json",
+            "title": "01-project/coding-standards.json"
+          }
+        ]
+      },
+      "clean-code": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "01-project/coding-standards.json",
+            "title": "01-project/coding-standards.json"
+          }
+        ]
+      },
+      "domain": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "01-project/domain-models.json",
+            "title": "01-project/domain-models.json"
+          }
+        ]
+      },
+      "models": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "01-project/domain-models.json",
+            "title": "01-project/domain-models.json"
+          }
+        ]
+      },
+      "architecture": {
+        "count": 10,
+        "documents": [
+          {
+            "path": "01-project/domain-models.json",
+            "title": "01-project/domain-models.json"
+          },
+          {
+            "path": "02-architecture/README.json",
+            "title": "02-architecture/README.json"
+          },
+          {
+            "path": "02-architecture/architecture-decisions-details.json",
+            "title": "02-architecture/architecture-decisions-details.json"
+          },
+          {
+            "path": "02-architecture/architecture-decisions.json",
+            "title": "02-architecture/architecture-decisions.json"
+          },
+          {
+            "path": "02-architecture/architecture.json",
+            "title": "02-architecture/architecture.json"
+          },
+          {
+            "path": "02-architecture/consolidated-architecture.json",
+            "title": "02-architecture/consolidated-architecture.json"
+          },
+          {
+            "path": "02-architecture/json-based-architecture-details.json",
+            "title": "02-architecture/json-based-architecture-details.json"
+          },
+          {
+            "path": "02-architecture/json-based-architecture.json",
+            "title": "02-architecture/json-based-architecture.json"
+          },
+          {
+            "path": "05-testing/e2e-to-integration-test-approach.json",
+            "title": "05-testing/e2e-to-integration-test-approach.json"
+          },
+          {
+            "path": "06-releases/v2-design-decisions.json",
+            "title": "06-releases/v2-design-decisions.json"
+          }
+        ]
+      },
+      "json": {
+        "count": 10,
+        "documents": [
+          {
+            "path": "01-project/domain-models.json",
+            "title": "01-project/domain-models.json"
+          },
+          {
+            "path": "02-architecture/architecture-decisions-details.json",
+            "title": "02-architecture/architecture-decisions-details.json"
+          },
+          {
+            "path": "02-architecture/architecture-decisions.json",
+            "title": "02-architecture/architecture-decisions.json"
+          },
+          {
+            "path": "02-architecture/consolidated-architecture.json",
+            "title": "02-architecture/consolidated-architecture.json"
+          },
+          {
+            "path": "02-architecture/json-based-architecture-details.json",
+            "title": "02-architecture/json-based-architecture-details.json"
+          },
+          {
+            "path": "02-architecture/json-based-architecture.json",
+            "title": "02-architecture/json-based-architecture.json"
+          },
+          {
+            "path": "04-guides/migration-guide.json",
+            "title": "04-guides/migration-guide.json"
+          },
+          {
+            "path": "04-guides/migration-policy.json",
+            "title": "04-guides/migration-policy.json"
+          },
+          {
+            "path": "06-releases/v2-implementation-plan.json",
+            "title": "06-releases/v2-implementation-plan.json"
+          },
+          {
+            "path": "08-i18n/template-system-json-i18n-design.json",
+            "title": "08-i18n/template-system-json-i18n-design.json"
+          }
+        ]
+      },
+      "document-model": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "01-project/domain-models.json",
+            "title": "01-project/domain-models.json"
+          }
+        ]
+      },
+      "glossary": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "01-project/glossary.json",
+            "title": "01-project/glossary.json"
+          }
+        ]
+      },
+      "terminology": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "01-project/glossary.json",
+            "title": "01-project/glossary.json"
+          }
+        ]
+      },
+      "definitions": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "01-project/glossary.json",
+            "title": "01-project/glossary.json"
+          }
+        ]
+      },
+      "overview": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "01-project/project-overview.json",
+            "title": "01-project/project-overview.json"
+          }
+        ]
+      },
+      "v2": {
+        "count": 13,
+        "documents": [
+          {
+            "path": "01-project/project-overview.json",
+            "title": "01-project/project-overview.json"
+          },
+          {
+            "path": "02-architecture/architecture-decisions-details.json",
+            "title": "02-architecture/architecture-decisions-details.json"
+          },
+          {
+            "path": "02-architecture/architecture-decisions.json",
+            "title": "02-architecture/architecture-decisions.json"
+          },
+          {
+            "path": "02-architecture/consolidated-architecture.json",
+            "title": "02-architecture/consolidated-architecture.json"
+          },
+          {
+            "path": "02-architecture/json-based-architecture-details.json",
+            "title": "02-architecture/json-based-architecture-details.json"
+          },
+          {
+            "path": "02-architecture/json-based-architecture.json",
+            "title": "02-architecture/json-based-architecture.json"
+          },
+          {
+            "path": "03-implementation/read-context-command-design.json",
+            "title": "03-implementation/read-context-command-design.json"
+          },
+          {
+            "path": "03-implementation/read-context-command-implementation.json",
+            "title": "03-implementation/read-context-command-implementation.json"
+          },
+          {
+            "path": "06-releases/consolidated-v2-release.json",
+            "title": "06-releases/consolidated-v2-release.json"
+          },
+          {
+            "path": "06-releases/release-v2.0.0.json",
+            "title": "06-releases/release-v2.0.0.json"
+          },
+          {
+            "path": "06-releases/v2-design-decisions.json",
+            "title": "06-releases/v2-design-decisions.json"
+          },
+          {
+            "path": "06-releases/v2-implementation-plan.json",
+            "title": "06-releases/v2-implementation-plan.json"
+          },
+          {
+            "path": "08-i18n/template-system-json-i18n-design.json",
+            "title": "08-i18n/template-system-json-i18n-design.json"
+          }
+        ]
+      },
+      "tech-stack": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "01-project/tech-stack.json",
+            "title": "01-project/tech-stack.json"
+          }
+        ]
+      },
+      "infrastructure": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "01-project/tech-stack.json",
+            "title": "01-project/tech-stack.json"
+          },
+          {
+            "path": "07-infrastructure/README.json",
+            "title": "07-infrastructure/README.json"
+          }
+        ]
+      },
+      "design": {
+        "count": 8,
+        "documents": [
+          {
+            "path": "02-architecture/README.json",
+            "title": "02-architecture/README.json"
+          },
+          {
+            "path": "02-architecture/consolidated-architecture.json",
+            "title": "02-architecture/consolidated-architecture.json"
+          },
+          {
+            "path": "02-architecture/json-based-architecture-details.json",
+            "title": "02-architecture/json-based-architecture-details.json"
+          },
+          {
+            "path": "02-architecture/json-based-architecture.json",
+            "title": "02-architecture/json-based-architecture.json"
+          },
+          {
+            "path": "03-implementation/read-context-command-design.json",
+            "title": "03-implementation/read-context-command-design.json"
+          },
+          {
+            "path": "06-releases/v2-design-decisions.json",
+            "title": "06-releases/v2-design-decisions.json"
+          },
+          {
+            "path": "08-i18n/template-system-json-i18n-design.json",
+            "title": "08-i18n/template-system-json-i18n-design.json"
+          },
+          {
+            "path": "09-refactoring/json-global-design-issues.json",
+            "title": "09-refactoring/json-global-design-issues.json"
+          }
+        ]
+      },
+      "decision": {
+        "count": 4,
+        "documents": [
+          {
+            "path": "02-architecture/architecture-decisions-details.json",
+            "title": "02-architecture/architecture-decisions-details.json"
+          },
+          {
+            "path": "02-architecture/architecture-decisions.json",
+            "title": "02-architecture/architecture-decisions.json"
+          },
+          {
+            "path": "02-architecture/consolidated-architecture.json",
+            "title": "02-architecture/consolidated-architecture.json"
+          },
+          {
+            "path": "06-releases/v2-design-decisions.json",
+            "title": "06-releases/v2-design-decisions.json"
+          }
+        ]
+      },
+      "refactoring": {
+        "count": 9,
+        "documents": [
+          {
+            "path": "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
+            "title": "02-architecture/global-memory-bank-cleanup-implementation-plan.json"
+          },
+          {
+            "path": "02-architecture/global-memory-bank-cleanup-strategy.json",
+            "title": "02-architecture/global-memory-bank-cleanup-strategy.json"
+          },
+          {
+            "path": "09-refactoring/README.json",
+            "title": "09-refactoring/README.json"
+          },
+          {
+            "path": "09-refactoring/json-global-design-issues.json",
+            "title": "09-refactoring/json-global-design-issues.json"
+          },
+          {
+            "path": "meta/global-memory-bank-index-analysis.json",
+            "title": "meta/global-memory-bank-index-analysis.json"
+          },
+          {
+            "path": "meta/global-memory-bank-indexing-mechanism.json",
+            "title": "meta/global-memory-bank-indexing-mechanism.json"
+          },
+          {
+            "path": "meta/redundant-files-removal-plan.json",
+            "title": "meta/redundant-files-removal-plan.json"
+          },
+          {
+            "path": "meta/reorganization-plan.json",
+            "title": "meta/reorganization-plan.json"
+          },
+          {
+            "path": "meta/reorganization-summary.json",
+            "title": "meta/reorganization-summary.json"
+          }
+        ]
+      },
+      "memory-bank": {
+        "count": 19,
+        "documents": [
+          {
+            "path": "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
+            "title": "02-architecture/global-memory-bank-cleanup-implementation-plan.json"
+          },
+          {
+            "path": "02-architecture/global-memory-bank-cleanup-strategy.json",
+            "title": "02-architecture/global-memory-bank-cleanup-strategy.json"
+          },
+          {
+            "path": "02-architecture/global-memory-bank-organized-analysis.json",
+            "title": "02-architecture/global-memory-bank-organized-analysis.json"
+          },
+          {
+            "path": "07-infrastructure/ci-cd/memory-bank-errors.json",
+            "title": "07-infrastructure/ci-cd/memory-bank-errors.json"
+          },
+          {
+            "path": "09-refactoring/analysis/global-memory-bank-analysis-raw.json",
+            "title": "09-refactoring/analysis/global-memory-bank-analysis-raw.json"
+          },
+          {
+            "path": "09-refactoring/json-global-design-issues.json",
+            "title": "09-refactoring/json-global-design-issues.json"
+          },
+          {
+            "path": "auto-initialization-fix.json",
+            "title": "auto-initialization-fix.json"
+          },
+          {
+            "path": "auto-initialization-test.json",
+            "title": "auto-initialization-test.json"
+          },
+          {
+            "path": "initialization-behavior.json",
+            "title": "initialization-behavior.json"
+          },
+          {
+            "path": "meta/consolidated-memory-bank-meta.json",
+            "title": "meta/consolidated-memory-bank-meta.json"
+          },
+          {
+            "path": "meta/global-memory-bank-index-analysis.json",
+            "title": "meta/global-memory-bank-index-analysis.json"
+          },
+          {
+            "path": "meta/global-memory-bank-indexing-mechanism.json",
+            "title": "meta/global-memory-bank-indexing-mechanism.json"
+          },
+          {
+            "path": "meta/global-memory-bank-navigation.json",
+            "title": "meta/global-memory-bank-navigation.json"
+          },
+          {
+            "path": "meta/global-memory-bank-reference.json",
+            "title": "meta/global-memory-bank-reference.json"
+          },
+          {
+            "path": "meta/redundant-files-removal-plan.json",
+            "title": "meta/redundant-files-removal-plan.json"
+          },
+          {
+            "path": "meta/reorganization-plan.json",
+            "title": "meta/reorganization-plan.json"
+          },
+          {
+            "path": "meta/reorganization-summary.json",
+            "title": "meta/reorganization-summary.json"
+          },
+          {
+            "path": "tags/tag_categorization.json",
+            "title": "tags/tag_categorization.json"
+          },
+          {
+            "path": "tags/tag_index_update_plan.json",
+            "title": "tags/tag_index_update_plan.json"
+          }
+        ]
+      },
+      "plan": {
+        "count": 6,
+        "documents": [
+          {
+            "path": "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
+            "title": "02-architecture/global-memory-bank-cleanup-implementation-plan.json"
+          },
+          {
+            "path": "02-architecture/global-memory-bank-cleanup-strategy.json",
+            "title": "02-architecture/global-memory-bank-cleanup-strategy.json"
+          },
+          {
+            "path": "06-releases/v2-implementation-plan.json",
+            "title": "06-releases/v2-implementation-plan.json"
+          },
+          {
+            "path": "meta/redundant-files-removal-plan.json",
+            "title": "meta/redundant-files-removal-plan.json"
+          },
+          {
+            "path": "meta/reorganization-plan.json",
+            "title": "meta/reorganization-plan.json"
+          },
+          {
+            "path": "tags/tag_index_update_plan.json",
+            "title": "tags/tag_index_update_plan.json"
+          }
+        ]
+      },
+      "meta": {
+        "count": 15,
+        "documents": [
+          {
+            "path": "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
+            "title": "02-architecture/global-memory-bank-cleanup-implementation-plan.json"
+          },
+          {
+            "path": "02-architecture/global-memory-bank-cleanup-strategy.json",
+            "title": "02-architecture/global-memory-bank-cleanup-strategy.json"
+          },
+          {
+            "path": "02-architecture/global-memory-bank-organized-analysis.json",
+            "title": "02-architecture/global-memory-bank-organized-analysis.json"
+          },
+          {
+            "path": "09-refactoring/analysis/global-memory-bank-analysis-raw.json",
+            "title": "09-refactoring/analysis/global-memory-bank-analysis-raw.json"
+          },
+          {
+            "path": "meta/README.json",
+            "title": "meta/README.json"
+          },
+          {
+            "path": "meta/consolidated-memory-bank-meta.json",
+            "title": "meta/consolidated-memory-bank-meta.json"
+          },
+          {
+            "path": "meta/document-type-standards.json",
+            "title": "meta/document-type-standards.json"
+          },
+          {
+            "path": "meta/global-memory-bank-navigation.json",
+            "title": "meta/global-memory-bank-navigation.json"
+          },
+          {
+            "path": "meta/redundant-files-removal-plan.json",
+            "title": "meta/redundant-files-removal-plan.json"
+          },
+          {
+            "path": "meta/reorganization-plan.json",
+            "title": "meta/reorganization-plan.json"
+          },
+          {
+            "path": "meta/reorganization-summary.json",
+            "title": "meta/reorganization-summary.json"
+          },
+          {
+            "path": "tags/README.json",
+            "title": "tags/README.json"
+          },
+          {
+            "path": "tags/index.json",
+            "title": "tags/index.json"
+          },
+          {
+            "path": "tags/tag_categorization.json",
+            "title": "tags/tag_categorization.json"
+          },
+          {
+            "path": "tags/tag_index_update_plan.json",
+            "title": "tags/tag_index_update_plan.json"
+          }
+        ]
+      },
+      "organization": {
+        "count": 3,
+        "documents": [
+          {
+            "path": "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
+            "title": "02-architecture/global-memory-bank-cleanup-implementation-plan.json"
+          },
+          {
+            "path": "02-architecture/global-memory-bank-cleanup-strategy.json",
+            "title": "02-architecture/global-memory-bank-cleanup-strategy.json"
+          },
+          {
+            "path": "02-architecture/global-memory-bank-organized-analysis.json",
+            "title": "02-architecture/global-memory-bank-organized-analysis.json"
+          }
+        ]
+      },
+      "analysis": {
+        "count": 5,
+        "documents": [
+          {
+            "path": "02-architecture/global-memory-bank-organized-analysis.json",
+            "title": "02-architecture/global-memory-bank-organized-analysis.json"
+          },
+          {
+            "path": "09-refactoring/analysis/global-memory-bank-analysis-raw.json",
+            "title": "09-refactoring/analysis/global-memory-bank-analysis-raw.json"
+          },
+          {
+            "path": "meta/consolidated-memory-bank-meta.json",
+            "title": "meta/consolidated-memory-bank-meta.json"
+          },
+          {
+            "path": "meta/global-memory-bank-index-analysis.json",
+            "title": "meta/global-memory-bank-index-analysis.json"
+          },
+          {
+            "path": "meta/global-memory-bank-indexing-mechanism.json",
+            "title": "meta/global-memory-bank-indexing-mechanism.json"
+          }
+        ]
+      },
+      "implementation": {
+        "count": 5,
+        "documents": [
+          {
+            "path": "03-implementation/README.json",
+            "title": "03-implementation/README.json"
+          },
+          {
+            "path": "03-implementation/read-context-command-implementation.json",
+            "title": "03-implementation/read-context-command-implementation.json"
+          },
+          {
+            "path": "05-testing/e2e-test-implementation.json",
+            "title": "05-testing/e2e-test-implementation.json"
+          },
+          {
+            "path": "06-releases/consolidated-v2-release.json",
+            "title": "06-releases/consolidated-v2-release.json"
+          },
+          {
+            "path": "06-releases/v2-implementation-plan.json",
+            "title": "06-releases/v2-implementation-plan.json"
+          }
+        ]
+      },
+      "cli": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "03-implementation/cli-commands.json",
+            "title": "03-implementation/cli-commands.json"
+          },
+          {
+            "path": "05-testing/e2e-test-implementation.json",
+            "title": "05-testing/e2e-test-implementation.json"
+          }
+        ]
+      },
+      "reference": {
+        "count": 5,
+        "documents": [
+          {
+            "path": "03-implementation/cli-commands.json",
+            "title": "03-implementation/cli-commands.json"
+          },
+          {
+            "path": "meta/consolidated-memory-bank-meta.json",
+            "title": "meta/consolidated-memory-bank-meta.json"
+          },
+          {
+            "path": "meta/document-type-standards.json",
+            "title": "meta/document-type-standards.json"
+          },
+          {
+            "path": "meta/global-memory-bank-reference.json",
+            "title": "meta/global-memory-bank-reference.json"
+          },
+          {
+            "path": "tags/tag_categorization.json",
+            "title": "tags/tag_categorization.json"
+          }
+        ]
+      },
+      "mcp": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "03-implementation/read-context-command-design.json",
+            "title": "03-implementation/read-context-command-design.json"
+          },
+          {
+            "path": "03-implementation/read-context-command-implementation.json",
+            "title": "03-implementation/read-context-command-implementation.json"
+          }
+        ]
+      },
+      "command": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "03-implementation/read-context-command-design.json",
+            "title": "03-implementation/read-context-command-design.json"
+          },
+          {
+            "path": "03-implementation/read-context-command-implementation.json",
+            "title": "03-implementation/read-context-command-implementation.json"
+          }
+        ]
+      },
+      "context": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "03-implementation/read-context-command-design.json",
+            "title": "03-implementation/read-context-command-design.json"
+          },
+          {
+            "path": "03-implementation/read-context-command-implementation.json",
+            "title": "03-implementation/read-context-command-implementation.json"
+          }
+        ]
+      },
+      "migration": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "04-guides/migration-guide.json",
+            "title": "04-guides/migration-guide.json"
+          },
+          {
+            "path": "04-guides/migration-policy.json",
+            "title": "04-guides/migration-policy.json"
+          }
+        ]
+      },
+      "markdown": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "04-guides/migration-guide.json",
+            "title": "04-guides/migration-guide.json"
+          },
+          {
+            "path": "04-guides/migration-policy.json",
+            "title": "04-guides/migration-policy.json"
+          }
+        ]
+      },
+      "policy": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "04-guides/migration-policy.json",
+            "title": "04-guides/migration-policy.json"
+          }
+        ]
+      },
+      "testing": {
+        "count": 6,
+        "documents": [
+          {
+            "path": "05-testing/README.json",
+            "title": "05-testing/README.json"
+          },
+          {
+            "path": "05-testing/consolidated-test-strategy.json",
+            "title": "05-testing/consolidated-test-strategy.json"
+          },
+          {
+            "path": "05-testing/e2e-test-implementation.json",
+            "title": "05-testing/e2e-test-implementation.json"
+          },
+          {
+            "path": "05-testing/e2e-to-integration-test-approach.json",
+            "title": "05-testing/e2e-to-integration-test-approach.json"
+          },
+          {
+            "path": "05-testing/integration-test-details.json",
+            "title": "05-testing/integration-test-details.json"
+          },
+          {
+            "path": "05-testing/tag-search-system-test-plan.json",
+            "title": "05-testing/tag-search-system-test-plan.json"
+          }
+        ]
+      },
+      "e2e": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "05-testing/consolidated-test-strategy.json",
+            "title": "05-testing/consolidated-test-strategy.json"
+          },
+          {
+            "path": "05-testing/e2e-test-implementation.json",
+            "title": "05-testing/e2e-test-implementation.json"
+          }
+        ]
+      },
+      "integration-test": {
+        "count": 4,
+        "documents": [
+          {
+            "path": "05-testing/consolidated-test-strategy.json",
+            "title": "05-testing/consolidated-test-strategy.json"
+          },
+          {
+            "path": "05-testing/e2e-to-integration-test-approach.json",
+            "title": "05-testing/e2e-to-integration-test-approach.json"
+          },
+          {
+            "path": "05-testing/integration-test-details.json",
+            "title": "05-testing/integration-test-details.json"
+          },
+          {
+            "path": "09-refactoring/json-global-design-issues.json",
+            "title": "09-refactoring/json-global-design-issues.json"
+          }
+        ]
+      },
+      "tdd": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "05-testing/consolidated-test-strategy.json",
+            "title": "05-testing/consolidated-test-strategy.json"
+          },
+          {
+            "path": "05-testing/integration-test-details.json",
+            "title": "05-testing/integration-test-details.json"
+          }
+        ]
+      },
+      "qa": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "05-testing/consolidated-test-strategy.json",
+            "title": "05-testing/consolidated-test-strategy.json"
+          },
+          {
+            "path": "05-testing/integration-test-details.json",
+            "title": "05-testing/integration-test-details.json"
+          }
+        ]
+      },
+      "controller": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "05-testing/integration-test-details.json",
+            "title": "05-testing/integration-test-details.json"
+          }
+        ]
+      },
+      "tag-system": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "05-testing/tag-search-system-test-plan.json",
+            "title": "05-testing/tag-search-system-test-plan.json"
+          }
+        ]
+      },
+      "search": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "05-testing/tag-search-system-test-plan.json",
+            "title": "05-testing/tag-search-system-test-plan.json"
+          }
+        ]
+      },
+      "index": {
+        "count": 7,
+        "documents": [
+          {
+            "path": "05-testing/tag-search-system-test-plan.json",
+            "title": "05-testing/tag-search-system-test-plan.json"
+          },
+          {
+            "path": "meta/consolidated-memory-bank-meta.json",
+            "title": "meta/consolidated-memory-bank-meta.json"
+          },
+          {
+            "path": "meta/global-memory-bank-indexing-mechanism.json",
+            "title": "meta/global-memory-bank-indexing-mechanism.json"
+          },
+          {
+            "path": "tags/README.json",
+            "title": "tags/README.json"
+          },
+          {
+            "path": "tags/index.json",
+            "title": "tags/index.json"
+          },
+          {
+            "path": "tags/tag_categorization.json",
+            "title": "tags/tag_categorization.json"
+          },
+          {
+            "path": "tags/tag_index_update_plan.json",
+            "title": "tags/tag_index_update_plan.json"
+          }
+        ]
+      },
+      "implementation-plan": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "05-testing/tag-search-system-test-plan.json",
+            "title": "05-testing/tag-search-system-test-plan.json"
+          }
+        ]
+      },
+      "release": {
+        "count": 3,
+        "documents": [
+          {
+            "path": "06-releases/README.json",
+            "title": "06-releases/README.json"
+          },
+          {
+            "path": "06-releases/consolidated-v2-release.json",
+            "title": "06-releases/consolidated-v2-release.json"
+          },
+          {
+            "path": "06-releases/release-v2.0.0.json",
+            "title": "06-releases/release-v2.0.0.json"
+          }
+        ]
+      },
+      "version": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "06-releases/README.json",
+            "title": "06-releases/README.json"
+          }
+        ]
+      },
+      "planning": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "06-releases/consolidated-v2-release.json",
+            "title": "06-releases/consolidated-v2-release.json"
+          }
+        ]
+      },
+      "changelog": {
+        "count": 3,
+        "documents": [
+          {
+            "path": "06-releases/consolidated-v2-release.json",
+            "title": "06-releases/consolidated-v2-release.json"
+          },
+          {
+            "path": "06-releases/release-v2.0.0.json",
+            "title": "06-releases/release-v2.0.0.json"
+          },
+          {
+            "path": "meta/reorganization-summary.json",
+            "title": "meta/reorganization-summary.json"
+          }
+        ]
+      },
+      "pr": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "06-releases/release-v2.0.0.json",
+            "title": "06-releases/release-v2.0.0.json"
+          }
+        ]
+      },
+      "operations": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "07-infrastructure/README.json",
+            "title": "07-infrastructure/README.json"
+          }
+        ]
+      },
+      "troubleshooting": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "07-infrastructure/ci-cd/memory-bank-errors.json",
+            "title": "07-infrastructure/ci-cd/memory-bank-errors.json"
+          }
+        ]
+      },
+      "ci-cd": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "07-infrastructure/ci-cd/workflows.json",
+            "title": "07-infrastructure/ci-cd/workflows.json"
+          }
+        ]
+      },
+      "i18n": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "08-i18n/README.json",
+            "title": "08-i18n/README.json"
+          },
+          {
+            "path": "08-i18n/template-system-json-i18n-design.json",
+            "title": "08-i18n/template-system-json-i18n-design.json"
+          }
+        ]
+      },
+      "l10n": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "08-i18n/README.json",
+            "title": "08-i18n/README.json"
+          },
+          {
+            "path": "08-i18n/template-system-json-i18n-design.json",
+            "title": "08-i18n/template-system-json-i18n-design.json"
+          }
+        ]
+      },
+      "template": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "08-i18n/template-system-json-i18n-design.json",
+            "title": "08-i18n/template-system-json-i18n-design.json"
+          }
+        ]
+      },
+      "tech-debt": {
+        "count": 4,
+        "documents": [
+          {
+            "path": "09-refactoring/README.json",
+            "title": "09-refactoring/README.json"
+          },
+          {
+            "path": "09-refactoring/json-global-design-issues.json",
+            "title": "09-refactoring/json-global-design-issues.json"
+          },
+          {
+            "path": "meta/global-memory-bank-index-analysis.json",
+            "title": "meta/global-memory-bank-index-analysis.json"
+          },
+          {
+            "path": "meta/global-memory-bank-indexing-mechanism.json",
+            "title": "meta/global-memory-bank-indexing-mechanism.json"
+          }
+        ]
+      },
+      "raw-data": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "09-refactoring/analysis/global-memory-bank-analysis-raw.json",
+            "title": "09-refactoring/analysis/global-memory-bank-analysis-raw.json"
+          }
+        ]
+      },
+      "fix": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "auto-initialization-fix.json",
+            "title": "auto-initialization-fix.json"
+          }
+        ]
+      },
+      "auto-initialization": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "auto-initialization-fix.json",
+            "title": "auto-initialization-fix.json"
+          },
+          {
+            "path": "auto-initialization-test.json",
+            "title": "auto-initialization-test.json"
+          }
+        ]
+      },
+      "test": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "auto-initialization-test.json",
+            "title": "auto-initialization-test.json"
+          }
+        ]
+      },
+      "initialization": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "initialization-behavior.json",
+            "title": "initialization-behavior.json"
+          }
+        ]
+      },
+      "behavior": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "initialization-behavior.json",
+            "title": "initialization-behavior.json"
+          }
+        ]
+      },
+      "navigation": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "meta/consolidated-memory-bank-meta.json",
+            "title": "meta/consolidated-memory-bank-meta.json"
+          },
+          {
+            "path": "meta/global-memory-bank-navigation.json",
+            "title": "meta/global-memory-bank-navigation.json"
+          }
+        ]
+      },
+      "tag": {
+        "count": 5,
+        "documents": [
+          {
+            "path": "meta/consolidated-memory-bank-meta.json",
+            "title": "meta/consolidated-memory-bank-meta.json"
+          },
+          {
+            "path": "meta/global-memory-bank-indexing-mechanism.json",
+            "title": "meta/global-memory-bank-indexing-mechanism.json"
+          },
+          {
+            "path": "tags/README.json",
+            "title": "tags/README.json"
+          },
+          {
+            "path": "tags/tag_categorization.json",
+            "title": "tags/tag_categorization.json"
+          },
+          {
+            "path": "tags/tag_index_update_plan.json",
+            "title": "tags/tag_index_update_plan.json"
+          }
+        ]
+      },
+      "standards": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "meta/document-type-standards.json",
+            "title": "meta/document-type-standards.json"
+          }
+        ]
+      }
     }
   }
 }

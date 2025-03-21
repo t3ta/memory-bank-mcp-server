@@ -1,0 +1,38 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "releases-directory-readme",
+    "title": "Releases Directory README",
+    "documentType": "guide",
+    "path": "06-releases/README.json",
+    "tags": [
+      "release",
+      "version",
+      "documentation",
+      "guide"
+    ],
+    "lastModified": "2025-03-21T13:20:00.000Z",
+    "createdAt": "2025-03-21T13:20:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "Releases Directory",
+        "content": "The `06-releases` directory contains documents related to version releases, release notes, version planning, and version-specific information. This directory focuses on the evolution of the system across different versions."
+      },
+      {
+        "title": "Purpose",
+        "content": "This directory serves as a central location for release-related information. The documents here provide details about each version, what changes were made, and what is planned for future versions. This directory is important for understanding the system's evolution and tracking changes between versions."
+      },
+      {
+        "title": "Key Documents",
+        "content": "- **consolidated-v2-release.json**: Comprehensive document about Version 2.0\n- **release-v2.0.0.json**: Specific release notes for Version 2.0.0\n- **v2-implementation-plan.json**: Implementation plan for Version 2\n\nAdditional documents include:\n- Release schedules\n- Version roadmaps\n- Migration guides between versions"
+      },
+      {
+        "title": "Related Tags",
+        "content": "Common tags for documents in this directory include:\n- v2\n- release\n- changelog\n- plan\n- decisions"
+      }
+    ]
+  }
+}

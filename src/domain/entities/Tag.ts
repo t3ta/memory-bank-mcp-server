@@ -4,7 +4,7 @@ import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.j
  * Value object representing a document tag
  */
 export class Tag {
-  private constructor(private readonly _value: string) {}
+  private constructor(private readonly _value: string) { }
 
   /**
    * Factory method to create a new Tag

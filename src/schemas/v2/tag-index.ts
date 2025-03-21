@@ -10,7 +10,6 @@
 
 import { z } from 'zod';
 import { TagSchema, FlexibleDateSchema } from '../common.js';
-import { SCHEMA_VERSION } from './json-document.js';
 
 // Schema version identifier
 export const TAG_INDEX_VERSION = 'tag_index_v1';

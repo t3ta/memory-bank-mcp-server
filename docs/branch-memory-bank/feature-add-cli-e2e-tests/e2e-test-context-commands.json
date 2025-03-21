@@ -1,0 +1,52 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "e2e-test-context-commands",
+    "title": "E2E Tests for Context Commands",
+    "documentType": "technical-documentation",
+    "path": "e2e-test-context-commands.json",
+    "tags": [
+      "e2e-tests",
+      "cli",
+      "context",
+      "implementation"
+    ],
+    "lastModified": "2025-03-21T12:00:00.000Z",
+    "createdAt": "2025-03-21T12:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "id": "overview",
+        "title": "Overview",
+        "content": "This document records the implementation of E2E tests for context-related CLI commands, specifically `read-context` and `read-rules`, as well as the resolution of issues related to Markdown file prohibition."
+      },
+      {
+        "id": "identified_issues",
+        "title": "Identified Issues",
+        "content": "- Direct writing to Markdown files was prohibited but not consistently enforced in the rules\n- ReadRulesUseCase was still using the old method of reading from Markdown files\n- E2E tests needed to be created for new CLI commands (`read-context` and `read-rules`)\n- Dependencies for these commands were not properly registered in the DI container"
+      },
+      {
+        "id": "implemented_changes",
+        "title": "Implemented Changes",
+        "content": "### Rules Updates\n- Updated rules in all language files (EN, JA, ZH) to explicitly state that direct writing to Markdown files is prohibited\n- Added emphasis that all memory bank operations should use JSON format\n\n### ReadRulesUseCase Improvements\n- Modified to read from JSON files instead of Markdown\n- Implemented a fallback mechanism to check multiple paths:\n  1. First try templates/json/rules-{lang}.json\n  2. Then try templates/rules-{lang}.json\n  3. Finally fall back to rules-{lang}.json\n- Added better error handling and logging\n\n### E2E Test Implementation\n- Created test files:\n  - `read-context.test.ts` - for testing the read-context command\n  - `read-rules.test.ts` - for testing the read-rules command\n- Set up a robust test environment with appropriate test document fixtures\n- Implemented fallback paths in the test environment to ensure tests work in various configurations\n\n### Dependency Injection\n- Registered ContextController in the DI container\n- Added ReadRulesUseCase and ReadContextUseCase to the container\n- Updated the Application class to expose getContextController()\n- Fixed command registration to include context commands"
+      },
+      {
+        "id": "key_concepts",
+        "title": "Key Concepts",
+        "content": "### Multi-Path Exploration\nThe ReadRulesUseCase now explores multiple paths to find the rules JSON files, providing better flexibility and backward compatibility with existing deployments.\n\n### JSON-Only Approach\nMemory bank operations now explicitly require JSON format, which provides better structure, validation, and reliability compared to Markdown.\n\n### Robust Test Environment\nThe test environment has been designed to be more resilient, with multiple fallback locations for template files to ensure tests work regardless of the file structure."
+      },
+      {
+        "id": "lessons_learned",
+        "title": "Lessons Learned",
+        "content": "1. Rules should always be kept up-to-date to maintain consistency\n2. Legacy methods should be identified and replaced systematically\n3. Inconsistent document formats can cause issues in command execution\n4. Test environments should accurately mimic production environments including all possible file paths\n5. Dependencies must be properly registered for commands to work correctly"
+      },
+      {
+        "id": "future_improvements",
+        "title": "Future Improvements",
+        "content": "- Consider adding a migration utility to convert any remaining Markdown files to JSON format\n- Implement validation checks at startup to warn about Markdown files that need conversion\n- Expand the test suite to include more edge cases and error conditions\n- Create comprehensive documentation about the JSON-only approach for future developers"
+      }
+    ]
+  }
+}

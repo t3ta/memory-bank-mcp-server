@@ -1,0 +1,423 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "consolidated-v2-release",
+    "title": "Memory Bank 2.0 統合リリース情報",
+    "documentType": "release",
+    "path": "06-releases/consolidated-v2-release.json",
+    "tags": [
+      "release",
+      "v2",
+      "planning",
+      "changelog",
+      "implementation"
+    ],
+    "lastModified": "2025-03-21T07:21:59.908Z",
+    "createdAt": "2025-03-21T11:45:00.000Z",
+    "version": 2
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "概要",
+        "content": "このドキュメントは、Memory Bank 2.0リリースに関連する実装計画、設計決定、およびリリース情報を統合したものです。Version 2.0は、JSONベースのドキュメント構造、マルチリンガルサポート、クリーンアーキテクチャなど、多くの重要な改善を含む大規模アップデートです。"
+      },
+      {
+        "title": "設計上の決定事項",
+        "sections": [
+          {
+            "title": "JSONベースのドキュメント構造への移行",
+            "content": "以前のバージョンではMarkdownを使用していたが、構造化データの管理や検索、フィルタリングが難しかった。将来的なデータベース移行への道筋も考慮する必要があった。",
+            "decision": "JSON形式をプライマリな保存形式として採用し、Markdownをプレゼンテーション用として位置づける。",
+            "rationale": [
+              "スキーマに基づく検証によるデータの整合性確保",
+              "構造化データとしての操作が容易",
+              "検索・フィルタリング機能の拡張が容易",
+              "将来的なデータベース移行への道筋"
+            ],
+            "consequences": {
+              "positive": [
+                "タイプセーフなスキーマによる堅牢性向上",
+                "プログラムによるアクセスと操作が容易",
+                "メタデータと内容の明確な分離"
+              ],
+              "negative": [
+                "実装の複雑性増加",
+                "人間による直接編集が難しい",
+                "マイグレーション作業が必要"
+              ]
+            },
+            "implementation": "JSONスキーマを定義し、ドキュメントタイプごとに専用のバリデーション処理を実装。マイグレーションツールを作成して既存のMarkdownを変換。"
+          },
+          {
+            "title": "クリーンアーキテクチャの採用",
+            "content": "元のコードベースは保守や拡張が難しく、責任分離が明確でなかった。",
+            "decision": "ドメイン中心のクリーンアーキテクチャを採用し、依存関係が内側に向かうように設計する。",
+            "rationale": [
+              "関心事の明確な分離",
+              "テスト容易性の向上",
+              "ビジネスロジックとインフラストラクチャの分離",
+              "変更に強い設計"
+            ],
+            "consequences": {
+              "positive": [
+                "コードの責任範囲が明確",
+                "テストがより簡単",
+                "ドメインロジックが純粋に保たれる",
+                "将来的な拡張が容易"
+              ],
+              "negative": [
+                "初期の開発オーバーヘッド",
+                "ボイラープレートコードの増加",
+                "学習曲線"
+              ]
+            },
+            "implementation": "ドメイン、アプリケーション、インフラストラクチャ、インターフェースの各層を明確に分離し、依存性注入を使用して結合。"
+          },
+          {
+            "title": "マルチリンガルサポートの導入",
+            "content": "国際的なユーザーベースからの要望があり、複数言語でのサポートが必要だった。",
+            "decision": "英語、日本語、中国語のサポートを追加し、言語固有のテンプレートとメッセージを提供する。",
+            "rationale": [
+              "国際的なユーザーへのアクセス拡大",
+              "ユーザー体験の向上",
+              "地域ごとのカスタマイズ可能性"
+            ],
+            "consequences": {
+              "positive": [
+                "より広範なユーザーベースにアクセス可能",
+                "ローカライズされたユーザー体験",
+                "国際的なコラボレーションの促進"
+              ],
+              "negative": [
+                "翻訳とメンテナンスのオーバーヘッド",
+                "テスト複雑性の増加",
+                "コンテンツ同期の課題"
+              ]
+            },
+            "implementation": "i18nインフラストラクチャを構築し、言語ファイルを外部化。ユーザーが言語を指定できるように環境変数とコマンドラインオプションを追加。"
+          },
+          {
+            "title": "read_contextコマンドの導入",
+            "content": "ユーザーは複数のコマンドを実行してコンテキスト情報を取得する必要があり、使い勝手が悪かった。",
+            "decision": "ブランチメモリバンク、グローバルメモリバンク、ルールを一度に取得できる統合コマンドを作成する。",
+            "rationale": [
+              "ユーザー体験の向上",
+              "効率的なコンテキスト取得",
+              "AI assistantとの統合の簡素化"
+            ],
+            "consequences": {
+              "positive": [
+                "コマンド実行回数の削減",
+                "統一されたコンテキスト表現",
+                "AI assistantの効率向上"
+              ],
+              "negative": [
+                "応答サイズの増加",
+                "処理時間の増加",
+                "エラーハンドリングの複雑化"
+              ]
+            },
+            "implementation": "既存のコントローラーを拡張し、新しいread_contextコマンドを実装。オプションで各部分の取得を制御可能にする。"
+          },
+          {
+            "title": "自動マイグレーション機能",
+            "content": "ユーザーが手動でMarkdownからJSONに変換するのは手間がかかり、エラーが発生しやすい。",
+            "decision": "サーバー起動時に自動的にMarkdownファイルを検出してJSONに変換する機能を追加する。",
+            "rationale": [
+              "移行の労力削減",
+              "エラーリスクの低減",
+              "利用開始時の摩擦軽減"
+            ],
+            "consequences": {
+              "positive": [
+                "シームレスな移行体験",
+                "一貫したデータ形式",
+                "ユーザーの技術的負担軽減"
+              ],
+              "negative": [
+                "予期しない変換による問題",
+                "大量のバックアップファイル生成",
+                "複雑なドキュメントの変換精度"
+              ]
+            },
+            "implementation": "MarkdownToJsonMigrator、MigrationBackup、MigrationValidator、ConverterFactoryクラスを実装し、起動時に自動実行するよう設定。"
+          }
+        ]
+      },
+      {
+        "title": "実装計画の進捗",
+        "content": "Memory Bank 2.0の実装は以下のフェーズで進められています。現在はすべてのフェーズが完了し、安定版のリリースが行われました。",
+        "phases": [
+          {
+            "phase": "フェーズ1: プロジェクト初期化とアーキテクチャ設計",
+            "status": "完了",
+            "description": "クリーンアーキテクチャの設計、ディレクトリ構造の検討、初期実装"
+          },
+          {
+            "phase": "フェーズ2: JSONスキーマの定義",
+            "status": "完了",
+            "description": "各ドキュメントタイプのJSONスキーマを定義、バリデーション処理の実装"
+          },
+          {
+            "phase": "フェーズ3: ドメイン層の実装",
+            "status": "完了",
+            "description": "エンティティ、値オブジェクト、ドメインサービスの実装"
+          },
+          {
+            "phase": "フェーズ4: アプリケーション層の実装",
+            "status": "完了",
+            "description": "ユースケース、DTO、ポートの実装"
+          },
+          {
+            "phase": "フェーズ5: インフラストラクチャ層の実装",
+            "status": "完了",
+            "description": "リポジトリ、永続化、外部サービスの実装"
+          },
+          {
+            "phase": "フェーズ6: インターフェース層の実装",
+            "status": "完了",
+            "description": "コントローラー、プレゼンターの実装"
+          },
+          {
+            "phase": "フェーズ7: マイグレーションツールの実装",
+            "status": "完了",
+            "description": "MarkdownからJSONへの変換ツールの実装"
+          },
+          {
+            "phase": "フェーズ8: テストの実装",
+            "status": "完了",
+            "description": "単体テスト、統合テスト、E2Eテストの実装"
+          },
+          {
+            "phase": "フェーズ9: JSONコントローラーとDIコンテナの実装",
+            "status": "完了",
+            "description": "JSONブランチコントローラー、JSONグローバルコントローラー、依存性注入コンテナの実装"
+          },
+          {
+            "phase": "フェーズ10: Markdownサポートの段階的廃止",
+            "status": "進行中",
+            "description": "Markdown関連コードの依存関係分析、削除計画の実装"
+          },
+          {
+            "phase": "フェーズ11: ドキュメントとサンプルの作成",
+            "status": "完了",
+            "description": "JSONサンプル、スキーマドキュメント、ガイドの作成"
+          },
+          {
+            "phase": "フェーズ12: テストとQA",
+            "status": "完了",
+            "description": "統合テスト、パフォーマンステスト、バグ修正"
+          }
+        ],
+        "currentStatus": "現在の開発状態はフェーズ10（Markdownサポートの段階的廃止）のみが進行中で、それ以外のフェーズはすべて完了しています。今後のリリースでMarkdownサポートは完全に廃止される予定です。"
+      },
+      {
+        "title": "リリース情報",
+        "sections": [
+          {
+            "title": "バージョン情報",
+            "version": "2.0.0",
+            "releaseDate": "2025-03-17",
+            "summary": "Memory Bank MCP Serverの初のメジャーバージョン。JSONベースのドキュメント構造、マルチリンガルサポート、クリーンアーキテクチャの完全実装が含まれています。"
+          },
+          {
+            "title": "主要な変更点",
+            "changes": [
+              {
+                "title": "JSONベースのドキュメント構造",
+                "description": "MarkdownベースからJSONベースのドキュメント構造への移行",
+                "details": [
+                  "スキーマによる堅牢な型検証",
+                  "構造化されたデータアクセスと操作",
+                  "ドキュメントメタデータとコンテンツの明確な分離"
+                ],
+                "commits": [
+                  "6ecbc9104e5cba7e2f030d14827f93f801814954",
+                  "5191a9960f6267cb2782f831d289e6895b286ffc"
+                ]
+              },
+              {
+                "title": "マイグレーションツール",
+                "description": "既存のMarkdownファイルをJSONに自動変換",
+                "details": [
+                  "バックアップ機能とスキーマ検証",
+                  "移行期間中の両形式のサポート",
+                  "自動マイグレーションの設定オプション"
+                ],
+                "commits": [
+                  "dda49c2c5ae80e063878436ce6f8cfa616c68bfb"
+                ]
+              },
+              {
+                "title": "マルチリンガルサポート",
+                "description": "英語、日本語、中国語のサポート追加",
+                "details": [
+                  "言語固有のテンプレートと翻訳",
+                  "国際化（i18n）インフラストラクチャの整備",
+                  "言語設定オプション"
+                ],
+                "commits": [
+                  "a0133e55866a82e16987de44aa798044a9365489"
+                ]
+              },
+              {
+                "title": "APIの拡張",
+                "description": "新しい`read_context`コマンドの追加",
+                "details": [
+                  "ブランチメモリバンク、グローバルメモリバンク、ルールを一度に取得可能",
+                  "`read_branch_core_files`と`read_global_core_files`コマンドを置き換え",
+                  "効率的なコンテキスト取得"
+                ],
+                "commits": [
+                  "5b864caaf9e5f18ad6d661ad95d25a2dd7b258b1",
+                  "ab81db5f5bd06c90d09594a1c883913c6f014236"
+                ]
+              },
+              {
+                "title": "クリーンアーキテクチャの完全実装",
+                "description": "ドメイン層、アプリケーション層、インフラストラクチャ層、インターフェース層に分離",
+                "details": [
+                  "リポジトリパターンとファクトリメソッドの適用",
+                  "ユースケース駆動設計",
+                  "依存性の明示的な注入"
+                ],
+                "commits": [
+                  "2d93e392635ac81b05327a5d15cdb6632a8d9690"
+                ]
+              }
+            ]
+          },
+          {
+            "title": "テスト結果",
+            "results": {
+              "testSuites": "38/39通過（1スキップ）",
+              "totalTests": "431/440通過（9スキップ）",
+              "ciPipeline": "成功"
+            }
+          },
+          {
+            "title": "既知の問題",
+            "issues": [
+              "マイグレーション中に大量のバックアップディレクトリが作成される問題を修正（`createBackup`オプションをデフォルトで`false`に設定）",
+              "特定のテストファイルが一時的に無効化されている（CI/CDパイプラインの修正が必要）"
+            ]
+          },
+          {
+            "title": "今後の計画",
+            "plans": [
+              "Markdownサポートの段階的廃止（将来のリリースで）",
+              "CLIツールの機能強化",
+              "Web UIの開発検討",
+              "データベースバックエンド（SurrealDB）の追加"
+            ]
+          },
+          {
+            "title": "関連ドキュメント",
+            "documents": {
+              "migrationGuide": "04-guides/migration-guide.json",
+              "jsonSchema": "src/schemas/v2/json-document.ts",
+              "readContextImplementation": "03-implementation/read-context-command-implementation.json"
+            }
+          }
+        ]
+      },
+      {
+        "title": "マイグレーションガイド",
+        "sections": [
+          {
+            "title": "自動マイグレーション",
+            "description": "Memory Bank MCP Server 2.0.0は、起動時に既存のMarkdownファイルを検出し、JSONに自動変換します",
+            "command": "npx memory-bank-mcp-server"
+          },
+          {
+            "title": "手動マイグレーション",
+            "description": "特定のファイルやディレクトリを手動で変換する場合",
+            "command": "npx memory-bank migrate ./docs/path/to/file.md",
+            "status": "計画中"
+          },
+          {
+            "title": "設定",
+            "description": "構成ファイルの更新例",
+            "example": {
+              "mcpServers": {
+                "memory-bank": {
+                  "command": "npx",
+                  "args": [
+                    "-y",
+                    "memory-bank-mcp-server"
+                  ],
+                  "env": {
+                    "MEMORY_BANK_ROOT": "/path/to/docs",
+                    "MEMORY_BANK_LANGUAGE": "ja"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "title": "アーキテクチャモデル",
+        "sections": [
+          {
+            "title": "レイヤー依存関係",
+            "content": "各層は内側の層のみに依存し、外側の層に依存しない。",
+            "diagram": "```\nインターフェース層 → アプリケーション層 → ドメイン層 ← インフラストラクチャ層\n```"
+          },
+          {
+            "title": "パッケージ構造",
+            "content": "src/{domain, application, infrastructure, interface, main}という明確な構造で、責任範囲を分離。",
+            "structure": "```\nsrc/\n├── domain/           # エンティティ、値オブジェクト、ドメインサービス\n├── application/      # ユースケース、DTO、ポート\n├── infrastructure/   # リポジトリ実装、外部サービス連携\n├── interface/        # コントローラー、プレゼンター\n└── main/             # アプリケーションエントリーポイント、DI設定\n```"
+          },
+          {
+            "title": "データフロー",
+            "content": "外部リクエスト → インターフェース層 → アプリケーション層 → ドメイン層 → インフラストラクチャ層 → 永続化/外部システム",
+            "description": "データは外部からインターフェース層を通じてアプリケーション層に入り、ドメイン層で処理され、必要に応じてインフラストラクチャ層を通じて永続化される。"
+          }
+        ]
+      },
+      {
+        "title": "技術的負債",
+        "content": "現在認識されている技術的負債は以下の通りです：",
+        "items": [
+          {
+            "description": "一部のテストの無効化",
+            "reason": "CI/CDパイプラインの問題を回避するため",
+            "plan": "テストを修正し、将来のリリースで再有効化する"
+          },
+          {
+            "description": "Markdownのサポート継続",
+            "reason": "後方互換性のため",
+            "plan": "将来のリリースで段階的に廃止する"
+          },
+          {
+            "description": "ロギングの改善",
+            "reason": "現在のログレベルと出力形式が最適でない",
+            "plan": "構造化ロギングの実装と適切なレベル制御を導入する"
+          }
+        ]
+      },
+      {
+        "title": "参照先",
+        "references": [
+          {
+            "id": "v2-design-decisions",
+            "path": "06-releases/v2-design-decisions.json",
+            "title": "V2.0設計上の決定事項"
+          },
+          {
+            "id": "v2-implementation-plan",
+            "path": "06-releases/v2-implementation-plan.json",
+            "title": "V2.0実装計画詳細"
+          },
+          {
+            "id": "release-v2.0.0",
+            "path": "06-releases/release-v2.0.0.json",
+            "title": "リリースV2.0.0"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,4 +1,4 @@
-import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
+import { DomainError, DomainErrorCodes } from "../../shared/errors/DomainError.js";
 
 /**
  * Value object representing branch information
@@ -8,7 +8,7 @@ export class BranchInfo {
     private readonly _name: string,
     private readonly _displayName: string,
     private readonly _type: 'feature' | 'fix'
-  ) {}
+  ) { }
 
   /**
    * Factory method to create a new BranchInfo
@@ -21,16 +21,21 @@ export class BranchInfo {
       throw new DomainError(DomainErrorCodes.INVALID_BRANCH_NAME, 'Branch name cannot be empty');
     }
 
-    // Branch name should start with feature/ or fix/
-    if (!branchName.startsWith('feature/') && !branchName.startsWith('fix/')) {
+    // Branch name should contain a slash for namespacing
+    if (!branchName.includes('/')) {
       throw new DomainError(
         DomainErrorCodes.INVALID_BRANCH_NAME,
-        'Branch name must start with "feature/" or "fix/"'
+        'Branch name must include a namespace prefix with slash (e.g. "feature/my-branch")'
       );
     }
 
-    // Get branch type
-    const type = branchName.startsWith('feature/') ? 'feature' : 'fix';
+    // Get branch type and namespace
+    const namespacePrefix = branchName.split('/')[0];
+
+    // For backward compatibility
+    const type = namespacePrefix === 'feature' ? 'feature' :
+      namespacePrefix === 'fix' ? 'fix' :
+        'feature'; // Default to feature for other prefixes
 
     // Get display name by removing the prefix
     const displayName = branchName.substring(branchName.indexOf('/') + 1);

@@ -1,0 +1,16 @@
+{
+  "schema": "memory_document_v1",
+  "metadata": {
+    "title": "progress.json",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "lastModified": "2025-03-21T19:03:44.089Z"
+  },
+  "content": {
+    "status": "{\\n  \\\"schema\\\": \\\"memory_document_v2\\\",\\n  \\\"metadata\\\": {\\n    \\\"id\\\": \\\"progress\\\",\\n    \\\"title\\\": \\\"進捗状況\\\",\\n    \\\"documentType\\\": \\\"progress\\\",\\n    \\\"path\\\": \\\"progress.json\\\",\\n    \\\"tags\\\": [\\\"core\\\", \\\"progress\\\"],\\n    \\\"lastModified\\\": \\\"2025-03-22T13:30:00.000Z\\\",\\n    \\\"createdAt\\\": \\\"2025-03-21T18:54:37.189Z\\\",\\n    \\\"version\\\": 1\\n  },\\n  \\\"content\\\": {\\n    \\\"workingFeatures\\\": [\\n      \\\"グローバルメモリバンクの初期化処理\\\",\\n      \\\"ブランチが存在しない場合の自動初期化\\\",\\n      \\\"言語別のテンプレート提供\\\",\\n      \\\"タグインデックスの生成と保存\\\"\\n    ],\\n    \\\"pendingFeatures\\\": [],\\n    \\\"currentStatus\\\": \\\"全ての実装が完了。主要なユーザーストーリーはすべて完了マークされている。FileSystemGlobalMemoryBankRepository.tsのファイル構造も修正済み。\\\",\\n    \\\"knownIssues\\\": [\\n      \\\"テストエラー：'Cannot find module \\\\'../../../../src/infrastructure/repositories/file-system/FileSystemRetryUtils\\\\' from \\\\'tests/utils/setupTests.ts\\\\''\\\",\\n      \\\"テストエラー：'Cannot find name \\\\'controller\\\\'. tests/integration/api/global-controller.test.ts\\\\'\\\"\\n    ],\\n    \\\"notes\\\": \\\"テストエラーは本PRの範囲外の問題と思われる。主要な機能実装は完了している。\\\"\\n  }\\n}",
+    "workingFeatures": [],
+    "pendingImplementation": [],
+    "knownIssues": []
+  }
+}

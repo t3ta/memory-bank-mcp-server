@@ -43,6 +43,7 @@ export const BaseJsonDocumentV2Schema = z.object({
 // Branch Context document type
 export const BranchContextContentV2Schema = z.object({
   purpose: z.string().min(1, 'Purpose cannot be empty'),
+  background: z.string().optional(),
   userStories: z
     .array(
       z.object({
@@ -81,6 +82,7 @@ export const ProgressContentV2Schema = z.object({
   workingFeatures: z.array(z.string()).default([]),
   pendingImplementation: z.array(z.string()).default([]),
   status: z.string().optional(),
+  currentState: z.string().optional(),
   knownIssues: z.array(z.string()).default([]),
 });
 
@@ -143,6 +145,7 @@ export const JsonDocumentV2Schema = z
       z.object({
         documentType: z.literal('branch_context'),
         purpose: z.string().min(1),
+        background: z.string().optional(),
         userStories: z
           .array(
             z.object({
@@ -165,6 +168,7 @@ export const JsonDocumentV2Schema = z
         workingFeatures: z.array(z.string()).default([]),
         pendingImplementation: z.array(z.string()).default([]),
         status: z.string().optional(),
+        currentState: z.string().optional(),
         knownIssues: z.array(z.string()).default([]),
       }),
       z.object({

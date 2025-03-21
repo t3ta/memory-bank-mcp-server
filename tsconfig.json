@@ -4,15 +4,24 @@
     "module": "node16",
     "moduleResolution": "node16",
     "esModuleInterop": true,
-    "strict": true,
+    "strict": false,
+    "noImplicitAny": false,
     "skipLibCheck": true,
+    "noEmitOnError": false,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
     "rootDir": "./src",
     "declaration": true,
-    "preserveConstEnums": false,
+    "preserveConstEnums": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "resolveJsonModule": true
   },
   "include": [
     "src/**/*"

@@ -1,0 +1,185 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "file-migration-map",
+    "title": "ファイル移動マッピング",
+    "documentType": "reference",
+    "path": "file-migration-map.json",
+    "tags": [
+      "migration",
+      "file-movement",
+      "reference"
+    ],
+    "lastModified": "2025-03-21T12:45:00.000Z",
+    "createdAt": "2025-03-21T12:45:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "description": "グローバルメモリバンク再編成において、どのファイルがどのディレクトリに移動されたかを記録するマッピング",
+    "fileMigrations": [
+      {
+        "source": "e2e-test-strategy.json",
+        "destination": "05-testing/e2e-test-strategy-details.json"
+      },
+      {
+        "source": "integration-test-strategy.json",
+        "destination": "05-testing/integration-test-details.json"
+      },
+      {
+        "source": "e2e-test-implementation.json",
+        "destination": "05-testing/e2e-test-implementation.json"
+      },
+      {
+        "source": "e2e-to-integration-test-approach.json",
+        "destination": "05-testing/e2e-to-integration-test-approach.json"
+      },
+      {
+        "source": "test-directory-refactoring.json",
+        "destination": "05-testing/test-directory-refactoring.json"
+      },
+      {
+        "source": "test-report.json",
+        "destination": "05-testing/test-report.json"
+      },
+      {
+        "source": "release-v2.0.0.json",
+        "destination": "06-releases/release-v2.0.0.json"
+      },
+      {
+        "source": "v2-implementation-plan.json",
+        "destination": "06-releases/v2-implementation-plan.json"
+      },
+      {
+        "source": "v2.0-design-decisions.json",
+        "destination": "06-releases/v2-design-decisions.json"
+      },
+      {
+        "source": "architecture.json",
+        "destination": "02-architecture/architecture.json"
+      },
+      {
+        "source": "architecture-decisions.json",
+        "destination": "02-architecture/architecture-decisions.json"
+      },
+      {
+        "source": "json-based-architecture.json",
+        "destination": "02-architecture/json-based-architecture.json"
+      },
+      {
+        "source": "read-context-command-implementation.json",
+        "destination": "03-implementation/read-context-command-implementation.json"
+      },
+      {
+        "source": "read-context-command-design.json",
+        "destination": "03-implementation/read-context-command-design.json"
+      },
+      {
+        "source": "cli-commands.json",
+        "destination": "03-implementation/cli-commands.json"
+      },
+      {
+        "source": "project-overview.json",
+        "destination": "01-project/project-overview.json"
+      },
+      {
+        "source": "tech-stack.json",
+        "destination": "01-project/tech-stack.json"
+      },
+      {
+        "source": "domain-models.json",
+        "destination": "01-project/domain-models.json"
+      },
+      {
+        "source": "coding-standards.json",
+        "destination": "01-project/coding-standards.json"
+      },
+      {
+        "source": "glossary.json",
+        "destination": "01-project/glossary.json"
+      },
+      {
+        "source": "user-guide.json",
+        "destination": "04-guides/user-guide.json"
+      },
+      {
+        "source": "migration-guide.json",
+        "destination": "04-guides/migration-guide.json"
+      },
+      {
+        "source": "migration-policy.json",
+        "destination": "04-guides/migration-policy.json"
+      },
+      {
+        "source": "multilingual-support-plan.json",
+        "destination": "08-i18n/multilingual-support-plan.json"
+      },
+      {
+        "source": "template-system-json-i18n-design.json",
+        "destination": "08-i18n/template-system-json-i18n-design.json"
+      },
+      {
+        "source": "json-global-design-issues.json",
+        "destination": "09-refactoring/json-global-design-issues.json"
+      },
+      {
+        "source": "global-memory-bank-cleanup-implementation-plan.json",
+        "destination": "02-architecture/global-memory-bank-cleanup-implementation-plan.json"
+      },
+      {
+        "source": "global-memory-bank-cleanup-strategy.json",
+        "destination": "02-architecture/global-memory-bank-cleanup-strategy.json"
+      },
+      {
+        "source": "global-memory-bank-index-analysis.json",
+        "destination": "02-architecture/global-memory-bank-index-analysis.json"
+      },
+      {
+        "source": "global-memory-bank-indexing-mechanism.json",
+        "destination": "02-architecture/global-memory-bank-indexing-mechanism.json"
+      },
+      {
+        "source": "global-memory-bank-navigation.json",
+        "destination": "02-architecture/global-memory-bank-navigation.json"
+      },
+      {
+        "source": "global-memory-bank-organized-analysis.json",
+        "destination": "02-architecture/global-memory-bank-organized-analysis.json"
+      },
+      {
+        "source": "global-memory-bank-reference.json",
+        "destination": "02-architecture/global-memory-bank-reference.json"
+      },
+      {
+        "source": "json-templates.json",
+        "destination": "02-architecture/json-templates.json"
+      },
+      {
+        "source": "json-templates-new.json",
+        "destination": "02-architecture/json-templates-new.json"
+      },
+      {
+        "source": "architecture-test-analysis-new.json",
+        "destination": "02-architecture/architecture-test-analysis-new.json"
+      },
+      {
+        "source": "commonjs-migration-plan.json",
+        "destination": "03-implementation/commonjs-migration-plan.json"
+      }
+    ],
+    "remainingFiles": [
+      "_global_index.json",
+      "analysis/*",
+      "backups/*",
+      "ci-cd/*",
+      "meta/*",
+      "projects/*",
+      "tags/*"
+    ],
+    "nextSteps": [
+      "インデックスファイル（`_global_index.json`）を更新する",
+      "各ファイル内の相対パス参照を更新する",
+      "タグシステムを再構築する",
+      "構造化されていないマークダウンファイルがあれば、JSONに変換する"
+    ]
+  }
+}

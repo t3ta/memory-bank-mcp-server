@@ -1,6 +1,7 @@
-import { MemoryDocument } from '../entities/MemoryDocument.js';
-import { DocumentPath } from '../entities/DocumentPath.js';
-import { Tag } from '../entities/Tag.js';
+import type { DocumentPath } from "../entities/DocumentPath.js";
+import type { MemoryDocument } from "../entities/MemoryDocument.js";
+import type { Tag } from "../entities/Tag.js";
+
 
 /**
  * Repository interface for memory documents

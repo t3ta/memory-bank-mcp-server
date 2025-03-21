@@ -1,19 +1,18 @@
-import { IPresenter } from './interfaces/IPresenter.js';
-import { IResponsePresenter } from './interfaces/IResponsePresenter.js';
-import { MCPResponse, MCPSuccessResponse, MCPErrorResponse } from './types/index.js';
-import { BaseError } from '../../shared/errors/BaseError.js';
-import { DomainError } from '../../shared/errors/DomainError.js';
-import { ApplicationError } from '../../shared/errors/ApplicationError.js';
-import { InfrastructureError } from '../../shared/errors/InfrastructureError.js';
-import { logger } from '../../shared/utils/logger.js';
+import { ApplicationError } from "../../shared/errors/ApplicationError.js";
+import { BaseError } from "../../shared/errors/BaseError.js";
+import { DomainError } from "../../shared/errors/DomainError.js";
+import { InfrastructureError } from "../../shared/errors/InfrastructureError.js";
+import { logger } from "../../shared/utils/logger.js";
+import type { IPresenter } from "./interfaces/IPresenter.js";
+import type { IResponsePresenter } from "./interfaces/IResponsePresenter.js";
+import type { MCPResponse, MCPSuccessResponse, MCPErrorResponse } from "./types/MCPResponse.js";
 
 /**
  * Presenter for MCP server responses
  * Transforms application output into standardized MCP response format
  */
 export class MCPResponsePresenter
-  implements IPresenter<MCPResponse, MCPResponse>, IResponsePresenter
-{
+  implements IPresenter<MCPResponse, MCPResponse>, IResponsePresenter {
   /**
    * Present success response
    * @param data Data to present

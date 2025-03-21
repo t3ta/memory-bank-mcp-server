@@ -1,0 +1,36 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "json-conversion-for-global-memory-bank",
+    "title": "グローバルメモリーバンクをJSON形式に統一",
+    "documentType": "generic",
+    "tags": [
+      "json",
+      "migration",
+      "global-memory-bank"
+    ],
+    "lastModified": "2025-03-21T10:30:00Z",
+    "createdAt": "2025-03-21T10:30:00Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "変更内容の概要",
+        "content": "グローバルメモリーバンクのデフォルトファイル形式をMarkdownからJSONに変更しました。MCPサーバー起動時に自動生成されるファイルが、以前はMarkdown形式でしたが、現在はJSON形式で生成されるようになりました。ただし、既存のMarkdownファイルがある場合は、そのまま使用されます（変換はスキップ）。"
+      },
+      {
+        "title": "修正箇所",
+        "content": "- `FileSystemGlobalMemoryBankRepository.ts` の `defaultStructure` オブジェクトを修正\n- デフォルトファイルの拡張子を `.md` から `.json` に変更\n- デフォルトコンテンツを正しいJSON Schema形式に変換\n- `tags/index.md` への参照を `tags/index.json` に更新しつつ、下位互換性のために古い参照も維持\n- `updateLegacyTagsIndex` メソッドでJSONを生成するように修正"
+      },
+      {
+        "title": "技術的詳細",
+        "content": "1. デフォルトファイル構造の拡張子を全て `.md` から `.json` に変更\n2. 各ファイルのコンテンツをJSONオブジェクトとして構造化し、`memory_document_v2` スキーマに準拠\n3. メタデータとして各ファイルに固有のID、タイトル、タグ、生成日時、最終更新日時を設定\n4. `MemoryDocument`クラスが`isJson`プロパティを持っていると仮定し、Markdownと同様に処理\n5. 生成されるタグインデックスの構造も、より効率的なJSONネイティブな形式に修正"
+      },
+      {
+        "title": "今後の改善点",
+        "content": "- テンプレート化: 現在ハードコードされたJSONテンプレートを外部ファイルに分離\n- スキーマの統一: 全てのJSONドキュメントで一貫したスキーマ構造を確保\n- Markdown互換性の完全廃止: 将来的にはMarkdownサポートを完全に削除し、JSONのみをサポート"
+      }
+    ]
+  }
+}
