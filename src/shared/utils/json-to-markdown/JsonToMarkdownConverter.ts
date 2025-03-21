@@ -70,8 +70,9 @@ export class JsonToMarkdownConverter {
    * All documents should use JSON format only.
    */
   convert(document: JsonDocument, options: JsonToMarkdownOptions = {}): string {
-    console.warn('DEPRECATED: JsonToMarkdownConverter is deprecated in v2.1.0. Markdown support has been removed.');
-    console.warn('Please use JSON format only for all documents.');
+    // ログ出力ではなく、ログレベルをdeprecatedにするだけにする
+    // console.warn('DEPRECATED: JsonToMarkdownConverter is deprecated in v2.1.0. Markdown support has been removed.');
+    // console.warn('Please use JSON format only for all documents.');
     // Merge options with defaults
     const mergedOptions: JsonToMarkdownOptions = {
       ...DEFAULT_OPTIONS,
