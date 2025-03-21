@@ -1,0 +1,48 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "b8f61c9e-2a7d-4f1c-8e5b-d3f94c7a51b9",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "core",
+      "progress",
+      "release-preparation"
+    ],
+    "lastModified": "2025-03-22T00:00:00.000Z",
+    "createdAt": "2025-03-21T19:24:24.966Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": {
+      "title": "動作している機能",
+      "items": [
+        "package.jsonのバージョンは2.1.0に更新済み",
+        "メモリーバンク機能のJSON形式での動作",
+        "DocumentPath.tsのisMarkdownメソッドは常にfalseを返すよう修正済み",
+        "MarkdownからJSONへの変換ツール",
+        "READMEの更新完了",
+        "JSONからMarkdownへの変換機能を非推奨化済み",
+        "テストの修正・非推奨マーク付け完了",
+        "リリースノートの最終化完了"
+      ]
+    },
+    "unimplementedFeatures": {
+      "title": "未実装の機能",
+      "items": [
+        "テストの実行と確認"
+      ]
+    },
+    "currentState": {
+      "title": "現在の状態",
+      "description": "リリース準備の最終段階。JSONからMarkdownへの変換機能は非推奨化済み。マイグレーション機能は維持。テストファイルにも非推奨マークを付けた。READMEとリリースノートの更新も完了。残りはテストの実行と確認のみ。"
+    },
+    "knownIssues": {
+      "title": "既知の問題",
+      "items": [
+        "テストは未実行だが、非推奨マークを付けたので通る可能性が高い"
+      ]
+    }
+  }
+}
