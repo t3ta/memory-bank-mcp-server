@@ -39,7 +39,22 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
       const exists = await this.fileSystemService.fileExists(filePath);
 
       if (!exists) {
-        return null;
+        // Try alternate format (.md <-> .json)
+        const alternatePath = path.toAlternateFormat();
+        const alternateFilePath = this.resolvePath(alternatePath.value);
+        
+        console.log(`File not found at ${filePath}, trying alternate format: ${alternateFilePath}`);
+        
+        const alternateExists = await this.fileSystemService.fileExists(alternateFilePath);
+        
+        if (!alternateExists) {
+          console.log(`Alternate format not found either: ${alternateFilePath}`);
+          return null;
+        }
+        
+        console.log(`Found document in alternate format: ${alternateFilePath}`);
+        // Recursively call findByPath with the alternate path
+        return this.findByPath(alternatePath);
       }
 
       // Read file content
