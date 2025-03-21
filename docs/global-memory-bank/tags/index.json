@@ -1,19 +1,743 @@
 {
   "schema": "memory_document_v2",
   "metadata": {
-    "id": "62ac2e3b-b826-49e4-b86a-49ff6357c852",
+    "id": "tags-index",
     "title": "タグインデックス",
     "documentType": "generic",
-    "path": "index.md",
+    "path": "tags/index.json",
     "tags": [
-      "#index",
-      "#meta"
+      "index",
+      "meta"
     ],
-    "lastModified": "2025-03-21T00:57:30.3NZ",
-    "createdAt": "2025-03-17T02:13:31.722Z",
+    "lastModified": "2025-03-21T01:46:03.140Z",
+    "createdAt": "2025-03-21T01:46:03.140Z",
     "version": 1
   },
   "content": {
-    "タグインデックス": "| タグ | 件数 | ドキュメント |\n|-----|------|-------------|\n| #architecture | 11 | [architecture-decisions.json](/architecture-decisions.json), [アーキテクチャ決定記録](/architecture-decisions.md), [architecture.json](/architecture.json), [System Architecture](/architecture.md), [domain-models.json](/domain-models.json), [ドメインモデル](/domain-models.md), [e2e-to-integration-test-approach.json](/e2e-to-integration-test-approach.json), [E2E から Integration テストへの移行アプローチ](/e2e-to-integration-test-approach.md), [json-based-architecture.json](/json-based-architecture.json), [Memory Bank 2.0: JSON ベースアーキテクチャ詳細設計](/json-based-architecture.md), [v2.0-design-decisions.json](/v2.0-design-decisions.json) |\n| #automation | 2 | [ci-cd/workflows.json](/ci-cd/workflows.json), [CI/CD Workflows](/ci-cd/workflows.md) |\n| #best-practices | 2 | [coding-standards.json](/coding-standards.json), [Coding Standards](/coding-standards.md) |\n| #changelog | 1 | [release-v2.0.0.json](/release-v2.0.0.json) |\n| #ci-cd | 2 | [ci-cd/workflows.json](/ci-cd/workflows.json), [CI/CD Workflows](/ci-cd/workflows.md) |\n| #clean-architecture | 2 | [architecture.json](/architecture.json), [System Architecture](/architecture.md) |\n| #clean-code | 2 | [coding-standards.json](/coding-standards.json), [Coding Standards](/coding-standards.md) |\n| #cli | 2 | [CLI コマンド一覧](/cli-commands.md), [e2e-test-implementation.json](/e2e-test-implementation.json) |\n| #command | 4 | [read-context-command-design.json](/read-context-command-design.json), [`read_context`コマンド設計書](/read-context-command-design.md), [read-context-command-implementation.json](/read-context-command-implementation.json), [`read_context`コマンド実装ガイド](/read-context-command-implementation.md) |\n| #commands | 1 | [CLI コマンド一覧](/cli-commands.md) |\n| #context | 4 | [read-context-command-design.json](/read-context-command-design.json), [`read_context`コマンド設計書](/read-context-command-design.md), [read-context-command-implementation.json](/read-context-command-implementation.json), [`read_context`コマンド実装ガイド](/read-context-command-implementation.md) |\n| #controller | 1 | [integration-test-strategy.json](/integration-test-strategy.json) |\n| #decision | 2 | [architecture-decisions.json](/architecture-decisions.json), [アーキテクチャ決定記録](/architecture-decisions.md) |\n| #decisions | 1 | [v2.0-design-decisions.json](/v2.0-design-decisions.json) |\n| #definitions | 2 | [glossary.json](/glossary.json), [Glossary](/glossary.md) |\n| #dependencies | 2 | [tech-stack.json](/tech-stack.json), [Technology Stack](/tech-stack.md) |\n| #design | 8 | [json-based-architecture.json](/json-based-architecture.json), [Memory Bank 2.0: JSON ベースアーキテクチャ詳細設計](/json-based-architecture.md), [json-global-design-issues.json](/json-global-design-issues.json), [read-context-command-design.json](/read-context-command-design.json), [`read_context`コマンド設計書](/read-context-command-design.md), [template-system-json-i18n-design.json](/template-system-json-i18n-design.json), [テンプレートシステムのJSON化と多言語対応 - 設計仕様書](/template-system-json-i18n-design.md), [v2.0-design-decisions.json](/v2.0-design-decisions.json) |\n| #document-model | 2 | [domain-models.json](/domain-models.json), [ドメインモデル](/domain-models.md) |\n| #documentation | 2 | [user-guide.json](/user-guide.json), [ユーザーガイド](/user-guide.md) |\n| #domain | 2 | [domain-models.json](/domain-models.json), [ドメインモデル](/domain-models.md) |\n| #e2e | 1 | [e2e-test-implementation.json](/e2e-test-implementation.json) |\n| #errors | 2 | [ci-cd/memory-bank-errors.json](/ci-cd/memory-bank-errors.json), [Memory Bank Error Troubleshooting](/ci-cd/memory-bank-errors.md) |\n| #github-actions | 2 | [ci-cd/workflows.json](/ci-cd/workflows.json), [CI/CD Workflows](/ci-cd/workflows.md) |\n| #glossary | 2 | [glossary.json](/glossary.json), [Glossary](/glossary.md) |\n| #guide | 2 | [user-guide.json](/user-guide.json), [ユーザーガイド](/user-guide.md) |\n| #i18n | 2 | [template-system-json-i18n-design.json](/template-system-json-i18n-design.json), [テンプレートシステムのJSON化と多言語対応 - 設計仕様書](/template-system-json-i18n-design.md) |\n| #implementation | 5 | [e2e-test-implementation.json](/e2e-test-implementation.json), [read-context-command-implementation.json](/read-context-command-implementation.json), [`read_context`コマンド実装ガイド](/read-context-command-implementation.md), [v2-implementation-plan.json](/v2-implementation-plan.json), [Memory Bank 2.0: 実装計画](/v2-implementation-plan.md) |\n| #index | 1 | [tags/index.json](/tags/index.json) |\n| #infrastructure | 2 | [tech-stack.json](/tech-stack.json), [Technology Stack](/tech-stack.md) |\n| #integration-test | 2 | [integration-test-strategy.json](/integration-test-strategy.json), [json-global-design-issues.json](/json-global-design-issues.json) |\n| #integration-tests | 2 | [e2e-to-integration-test-approach.json](/e2e-to-integration-test-approach.json), [E2E から Integration テストへの移行アプローチ](/e2e-to-integration-test-approach.md) |\n| #json | 11 | [architecture-decisions.json](/architecture-decisions.json), [アーキテクチャ決定記録](/architecture-decisions.md), [domain-models.json](/domain-models.json), [ドメインモデル](/domain-models.md), [json-based-architecture.json](/json-based-architecture.json), [Memory Bank 2.0: JSON ベースアーキテクチャ詳細設計](/json-based-architecture.md), [Markdown から JSON 形式への移行ポリシー](/migration-policy.md), [template-system-json-i18n-design.json](/template-system-json-i18n-design.json), [テンプレートシステムのJSON化と多言語対応 - 設計仕様書](/template-system-json-i18n-design.md), [v2-implementation-plan.json](/v2-implementation-plan.json), [Memory Bank 2.0: 実装計画](/v2-implementation-plan.md) |\n| #l10n | 2 | [template-system-json-i18n-design.json](/template-system-json-i18n-design.json), [テンプレートシステムのJSON化と多言語対応 - 設計仕様書](/template-system-json-i18n-design.md) |\n| #markdown | 1 | [Markdown から JSON 形式への移行ポリシー](/migration-policy.md) |\n| #mcp | 4 | [read-context-command-design.json](/read-context-command-design.json), [`read_context`コマンド設計書](/read-context-command-design.md), [read-context-command-implementation.json](/read-context-command-implementation.json), [`read_context`コマンド実装ガイド](/read-context-command-implementation.md) |\n| #memory-bank | 3 | [ci-cd/memory-bank-errors.json](/ci-cd/memory-bank-errors.json), [Memory Bank Error Troubleshooting](/ci-cd/memory-bank-errors.md), [json-global-design-issues.json](/json-global-design-issues.json) |\n| #meta | 1 | [tags/index.json](/tags/index.json) |\n| #migration | 1 | [Markdown から JSON 形式への移行ポリシー](/migration-policy.md) |\n| #models | 2 | [domain-models.json](/domain-models.json), [ドメインモデル](/domain-models.md) |\n| #onion-architecture | 2 | [architecture.json](/architecture.json), [System Architecture](/architecture.md) |\n| #overview | 1 | [project-overview.json](/project-overview.json) |\n| #plan | 2 | [v2-implementation-plan.json](/v2-implementation-plan.json), [Memory Bank 2.0: 実装計画](/v2-implementation-plan.md) |\n| #policy | 1 | [Markdown から JSON 形式への移行ポリシー](/migration-policy.md) |\n| #pr | 1 | [release-v2.0.0.json](/release-v2.0.0.json) |\n| #project | 1 | [project-overview.json](/project-overview.json) |\n| #qa | 1 | [integration-test-strategy.json](/integration-test-strategy.json) |\n| #refactoring | 1 | [json-global-design-issues.json](/json-global-design-issues.json) |\n| #reference | 1 | [CLI コマンド一覧](/cli-commands.md) |\n| #release | 1 | [release-v2.0.0.json](/release-v2.0.0.json) |\n| #standards | 2 | [coding-standards.json](/coding-standards.json), [Coding Standards](/coding-standards.md) |\n| #summary | 1 | [project-overview.json](/project-overview.json) |\n| #system-design | 2 | [architecture.json](/architecture.json), [System Architecture](/architecture.md) |\n| #tdd | 1 | [integration-test-strategy.json](/integration-test-strategy.json) |\n| #tech-debt | 1 | [json-global-design-issues.json](/json-global-design-issues.json) |\n| #tech-stack | 2 | [tech-stack.json](/tech-stack.json), [Technology Stack](/tech-stack.md) |\n| #template | 2 | [template-system-json-i18n-design.json](/template-system-json-i18n-design.json), [テンプレートシステムのJSON化と多言語対応 - 設計仕様書](/template-system-json-i18n-design.md) |\n| #terminology | 2 | [glossary.json](/glossary.json), [Glossary](/glossary.md) |\n| #test | 1 | [integration-test-strategy.json](/integration-test-strategy.json) |\n| #testing | 3 | [e2e-test-implementation.json](/e2e-test-implementation.json), [e2e-to-integration-test-approach.json](/e2e-to-integration-test-approach.json), [E2E から Integration テストへの移行アプローチ](/e2e-to-integration-test-approach.md) |\n| #troubleshooting | 2 | [ci-cd/memory-bank-errors.json](/ci-cd/memory-bank-errors.json), [Memory Bank Error Troubleshooting](/ci-cd/memory-bank-errors.md) |\n| #typescript | 2 | [coding-standards.json](/coding-standards.json), [Coding Standards](/coding-standards.md) |\n| #v2 | 6 | [read-context-command-design.json](/read-context-command-design.json), [`read_context`コマンド設計書](/read-context-command-design.md), [read-context-command-implementation.json](/read-context-command-implementation.json), [`read_context`コマンド実装ガイド](/read-context-command-implementation.md), [template-system-json-i18n-design.json](/template-system-json-i18n-design.json), [テンプレートシステムのJSON化と多言語対応 - 設計仕様書](/template-system-json-i18n-design.md) |\n| #v2-0 | 3 | [project-overview.json](/project-overview.json), [release-v2.0.0.json](/release-v2.0.0.json), [v2.0-design-decisions.json](/v2.0-design-decisions.json) |\n| #version-2 | 6 | [architecture-decisions.json](/architecture-decisions.json), [アーキテクチャ決定記録](/architecture-decisions.md), [json-based-architecture.json](/json-based-architecture.json), [Memory Bank 2.0: JSON ベースアーキテクチャ詳細設計](/json-based-architecture.md), [v2-implementation-plan.json](/v2-implementation-plan.json), [Memory Bank 2.0: 実装計画](/v2-implementation-plan.md) |\n| #workflows | 2 | [ci-cd/workflows.json](/ci-cd/workflows.json), [CI/CD Workflows](/ci-cd/workflows.md) |"
+    "sections": [
+      {
+        "title": "タグ一覧",
+        "content": "タグとドキュメントの関連付け"
+      }
+    ],
+    "tagMap": {
+      "architecture": {
+        "count": 8,
+        "documents": [
+          {
+            "path": "architecture-decisions.json",
+            "title": "architecture-decisions.json"
+          },
+          {
+            "path": "architecture.json",
+            "title": "architecture.json"
+          },
+          {
+            "path": "architecture.md",
+            "title": "システムアーキテクチャ"
+          },
+          {
+            "path": "domain-models.json",
+            "title": "domain-models.json"
+          },
+          {
+            "path": "domain-models.md",
+            "title": "ドメインモデル"
+          },
+          {
+            "path": "e2e-to-integration-test-approach.json",
+            "title": "e2e-to-integration-test-approach.json"
+          },
+          {
+            "path": "json-based-architecture.json",
+            "title": "json-based-architecture.json"
+          },
+          {
+            "path": "v2.0-design-decisions.json",
+            "title": "v2.0-design-decisions.json"
+          }
+        ]
+      },
+      "decision": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "architecture-decisions.json",
+            "title": "architecture-decisions.json"
+          }
+        ]
+      },
+      "json": {
+        "count": 6,
+        "documents": [
+          {
+            "path": "architecture-decisions.json",
+            "title": "architecture-decisions.json"
+          },
+          {
+            "path": "domain-models.json",
+            "title": "domain-models.json"
+          },
+          {
+            "path": "json-based-architecture.json",
+            "title": "json-based-architecture.json"
+          },
+          {
+            "path": "migration-policy.json",
+            "title": "migration-policy.json"
+          },
+          {
+            "path": "template-system-json-i18n-design.json",
+            "title": "template-system-json-i18n-design.json"
+          },
+          {
+            "path": "v2-implementation-plan.json",
+            "title": "v2-implementation-plan.json"
+          }
+        ]
+      },
+      "version-2": {
+        "count": 3,
+        "documents": [
+          {
+            "path": "architecture-decisions.json",
+            "title": "architecture-decisions.json"
+          },
+          {
+            "path": "json-based-architecture.json",
+            "title": "json-based-architecture.json"
+          },
+          {
+            "path": "v2-implementation-plan.json",
+            "title": "v2-implementation-plan.json"
+          }
+        ]
+      },
+      "system-design": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "architecture.json",
+            "title": "architecture.json"
+          },
+          {
+            "path": "architecture.md",
+            "title": "システムアーキテクチャ"
+          }
+        ]
+      },
+      "troubleshooting": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "ci-cd/memory-bank-errors.json",
+            "title": "ci-cd/memory-bank-errors.json"
+          }
+        ]
+      },
+      "memory-bank": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "ci-cd/memory-bank-errors.json",
+            "title": "ci-cd/memory-bank-errors.json"
+          },
+          {
+            "path": "json-global-design-issues.json",
+            "title": "json-global-design-issues.json"
+          }
+        ]
+      },
+      "errors": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "ci-cd/memory-bank-errors.json",
+            "title": "ci-cd/memory-bank-errors.json"
+          }
+        ]
+      },
+      "ci-cd": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "ci-cd/workflows.json",
+            "title": "ci-cd/workflows.json"
+          }
+        ]
+      },
+      "github-actions": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "ci-cd/workflows.json",
+            "title": "ci-cd/workflows.json"
+          }
+        ]
+      },
+      "automation": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "ci-cd/workflows.json",
+            "title": "ci-cd/workflows.json"
+          }
+        ]
+      },
+      "workflows": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "ci-cd/workflows.json",
+            "title": "ci-cd/workflows.json"
+          }
+        ]
+      },
+      "cli": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "cli-commands.json",
+            "title": "cli-commands.json"
+          },
+          {
+            "path": "e2e-test-implementation.json",
+            "title": "e2e-test-implementation.json"
+          }
+        ]
+      },
+      "commands": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "cli-commands.json",
+            "title": "cli-commands.json"
+          }
+        ]
+      },
+      "reference": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "cli-commands.json",
+            "title": "cli-commands.json"
+          }
+        ]
+      },
+      "standards": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "coding-standards.json",
+            "title": "coding-standards.json"
+          },
+          {
+            "path": "coding-standards.md",
+            "title": "コーディング規約"
+          }
+        ]
+      },
+      "best-practices": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "coding-standards.json",
+            "title": "coding-standards.json"
+          },
+          {
+            "path": "coding-standards.md",
+            "title": "コーディング規約"
+          }
+        ]
+      },
+      "typescript": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "coding-standards.json",
+            "title": "coding-standards.json"
+          }
+        ]
+      },
+      "clean-code": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "coding-standards.json",
+            "title": "coding-standards.json"
+          }
+        ]
+      },
+      "domain": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "domain-models.json",
+            "title": "domain-models.json"
+          },
+          {
+            "path": "domain-models.md",
+            "title": "ドメインモデル"
+          }
+        ]
+      },
+      "models": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "domain-models.json",
+            "title": "domain-models.json"
+          },
+          {
+            "path": "domain-models.md",
+            "title": "ドメインモデル"
+          }
+        ]
+      },
+      "document-model": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "domain-models.json",
+            "title": "domain-models.json"
+          }
+        ]
+      },
+      "testing": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "e2e-test-implementation.json",
+            "title": "e2e-test-implementation.json"
+          },
+          {
+            "path": "e2e-to-integration-test-approach.json",
+            "title": "e2e-to-integration-test-approach.json"
+          }
+        ]
+      },
+      "e2e": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "e2e-test-implementation.json",
+            "title": "e2e-test-implementation.json"
+          }
+        ]
+      },
+      "implementation": {
+        "count": 3,
+        "documents": [
+          {
+            "path": "e2e-test-implementation.json",
+            "title": "e2e-test-implementation.json"
+          },
+          {
+            "path": "read-context-command-implementation.json",
+            "title": "read-context-command-implementation.json"
+          },
+          {
+            "path": "v2-implementation-plan.json",
+            "title": "v2-implementation-plan.json"
+          }
+        ]
+      },
+      "integration-tests": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "e2e-to-integration-test-approach.json",
+            "title": "e2e-to-integration-test-approach.json"
+          }
+        ]
+      },
+      "glossary": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "glossary.json",
+            "title": "glossary.json"
+          },
+          {
+            "path": "glossary.md",
+            "title": "用語集"
+          }
+        ]
+      },
+      "terminology": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "glossary.json",
+            "title": "glossary.json"
+          },
+          {
+            "path": "glossary.md",
+            "title": "用語集"
+          }
+        ]
+      },
+      "definitions": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "glossary.json",
+            "title": "glossary.json"
+          }
+        ]
+      },
+      "test": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "integration-test-strategy.json",
+            "title": "integration-test-strategy.json"
+          }
+        ]
+      },
+      "tdd": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "integration-test-strategy.json",
+            "title": "integration-test-strategy.json"
+          }
+        ]
+      },
+      "integration-test": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "integration-test-strategy.json",
+            "title": "integration-test-strategy.json"
+          },
+          {
+            "path": "json-global-design-issues.json",
+            "title": "json-global-design-issues.json"
+          }
+        ]
+      },
+      "qa": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "integration-test-strategy.json",
+            "title": "integration-test-strategy.json"
+          }
+        ]
+      },
+      "controller": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "integration-test-strategy.json",
+            "title": "integration-test-strategy.json"
+          }
+        ]
+      },
+      "design": {
+        "count": 5,
+        "documents": [
+          {
+            "path": "json-based-architecture.json",
+            "title": "json-based-architecture.json"
+          },
+          {
+            "path": "json-global-design-issues.json",
+            "title": "json-global-design-issues.json"
+          },
+          {
+            "path": "read-context-command-design.json",
+            "title": "read-context-command-design.json"
+          },
+          {
+            "path": "template-system-json-i18n-design.json",
+            "title": "template-system-json-i18n-design.json"
+          },
+          {
+            "path": "v2.0-design-decisions.json",
+            "title": "v2.0-design-decisions.json"
+          }
+        ]
+      },
+      "tech-debt": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "json-global-design-issues.json",
+            "title": "json-global-design-issues.json"
+          }
+        ]
+      },
+      "refactoring": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "json-global-design-issues.json",
+            "title": "json-global-design-issues.json"
+          }
+        ]
+      },
+      "migration": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "migration-policy.json",
+            "title": "migration-policy.json"
+          }
+        ]
+      },
+      "markdown": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "migration-policy.json",
+            "title": "migration-policy.json"
+          }
+        ]
+      },
+      "policy": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "migration-policy.json",
+            "title": "migration-policy.json"
+          }
+        ]
+      },
+      "overview": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "project-overview.json",
+            "title": "project-overview.json"
+          }
+        ]
+      },
+      "summary": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "project-overview.json",
+            "title": "project-overview.json"
+          }
+        ]
+      },
+      "project": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "project-overview.json",
+            "title": "project-overview.json"
+          }
+        ]
+      },
+      "v2-0": {
+        "count": 3,
+        "documents": [
+          {
+            "path": "project-overview.json",
+            "title": "project-overview.json"
+          },
+          {
+            "path": "release-v2.0.0.json",
+            "title": "release-v2.0.0.json"
+          },
+          {
+            "path": "v2.0-design-decisions.json",
+            "title": "v2.0-design-decisions.json"
+          }
+        ]
+      },
+      "mcp": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "read-context-command-design.json",
+            "title": "read-context-command-design.json"
+          },
+          {
+            "path": "read-context-command-implementation.json",
+            "title": "read-context-command-implementation.json"
+          }
+        ]
+      },
+      "command": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "read-context-command-design.json",
+            "title": "read-context-command-design.json"
+          },
+          {
+            "path": "read-context-command-implementation.json",
+            "title": "read-context-command-implementation.json"
+          }
+        ]
+      },
+      "context": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "read-context-command-design.json",
+            "title": "read-context-command-design.json"
+          },
+          {
+            "path": "read-context-command-implementation.json",
+            "title": "read-context-command-implementation.json"
+          }
+        ]
+      },
+      "v2": {
+        "count": 3,
+        "documents": [
+          {
+            "path": "read-context-command-design.json",
+            "title": "read-context-command-design.json"
+          },
+          {
+            "path": "read-context-command-implementation.json",
+            "title": "read-context-command-implementation.json"
+          },
+          {
+            "path": "template-system-json-i18n-design.json",
+            "title": "template-system-json-i18n-design.json"
+          }
+        ]
+      },
+      "release": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "release-v2.0.0.json",
+            "title": "release-v2.0.0.json"
+          }
+        ]
+      },
+      "pr": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "release-v2.0.0.json",
+            "title": "release-v2.0.0.json"
+          }
+        ]
+      },
+      "changelog": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "release-v2.0.0.json",
+            "title": "release-v2.0.0.json"
+          }
+        ]
+      },
+      "tech-stack": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "tech-stack.json",
+            "title": "tech-stack.json"
+          },
+          {
+            "path": "tech-stack.md",
+            "title": "技術スタック"
+          }
+        ]
+      },
+      "infrastructure": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "tech-stack.json",
+            "title": "tech-stack.json"
+          },
+          {
+            "path": "tech-stack.md",
+            "title": "技術スタック"
+          }
+        ]
+      },
+      "dependencies": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "tech-stack.json",
+            "title": "tech-stack.json"
+          }
+        ]
+      },
+      "template": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "template-system-json-i18n-design.json",
+            "title": "template-system-json-i18n-design.json"
+          }
+        ]
+      },
+      "i18n": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "template-system-json-i18n-design.json",
+            "title": "template-system-json-i18n-design.json"
+          }
+        ]
+      },
+      "l10n": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "template-system-json-i18n-design.json",
+            "title": "template-system-json-i18n-design.json"
+          }
+        ]
+      },
+      "guide": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "user-guide.json",
+            "title": "user-guide.json"
+          },
+          {
+            "path": "user-guide.md",
+            "title": "ユーザーガイド"
+          }
+        ]
+      },
+      "documentation": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "user-guide.json",
+            "title": "user-guide.json"
+          },
+          {
+            "path": "user-guide.md",
+            "title": "ユーザーガイド"
+          }
+        ]
+      },
+      "plan": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "v2-implementation-plan.json",
+            "title": "v2-implementation-plan.json"
+          }
+        ]
+      },
+      "decisions": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "v2.0-design-decisions.json",
+            "title": "v2.0-design-decisions.json"
+          }
+        ]
+      }
+    }
   }
 }

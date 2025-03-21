@@ -1,0 +1,29 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "architecture",
+    "title": "システムアーキテクチャ",
+    "documentType": "generic",
+    "path": "architecture.json",
+    "tags": ["architecture", "system-design"],
+    "lastModified": "2025-03-21T01:46:03.123Z",
+    "createdAt": "2025-03-21T01:46:03.123Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "概要",
+        "content": "[システムアーキテクチャの説明]"
+      },
+      {
+        "title": "コンポーネント",
+        "content": "[主要なシステムコンポーネントの一覧と説明]"
+      },
+      {
+        "title": "設計上の決定事項",
+        "content": "[重要なアーキテクチャ上の決定事項]"
+      }
+    ]
+  }
+}
