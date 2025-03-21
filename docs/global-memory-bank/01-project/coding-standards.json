@@ -3,8 +3,8 @@
   "metadata": {
     "id": "d7ca88d8-814d-4ce5-9111-fa084d848538",
     "title": "Coding Standards",
-    "documentType": "generic",
-    "path": "coding-standards.md",
+    "documentType": "reference",
+    "path": "01-project/coding-standards.json",
     "tags": [
       "best-practices",
       "typescript",
