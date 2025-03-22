@@ -1,30 +1,3 @@
-  it('Markdownファイルへの書き込みが禁止されていること', async () => {
-    // テストデータ - マークダウン形式
-    const docPath = 'test-markdown-disabled.md';
-    const content = `# マークダウン禁止テスト
-
-このドキュメントは書き込みが禁止されるはずです。
-`;
-
-    // ドキュメント書き込み
-    const writeResult = await controller.writeDocument(docPath, content);
-
-    // 書き込み結果の検証 - 失敗するはず
-    expect(writeResult.success).toBe(false);
-    if (!writeResult.success) {
-      // エラーメッセージを確認
-      expect(writeResult.error.message).toContain('Writing to Markdown files is disabled');
-      expect(writeResult.error.message).toContain('.json');
-    } else {
-      fail('マークダウンファイルへの書き込みが失敗するはずが成功してしまいました');
-    }
-
-    // ファイルが存在しないことを確認
-    const filePath = path.join(globalDir, docPath);
-    const fileExists = await fileExistsAsync(filePath);
-    expect(fileExists).toBe(false);
-  });
-
 import { promises as fs } from 'node:fs';
 import * as path from 'node:path';
 import { v4 as uuidv4 } from 'uuid';
@@ -300,6 +273,33 @@ describe('GlobalController Integration Tests', () => {
     } else {
       fail('JSONファイルの読み込みが失敗しました');
     }
+  });
+  
+  it('Markdownファイルへの書き込みが禁止されていること', async () => {
+    // テストデータ - マークダウン形式
+    const docPath = 'test-markdown-disabled.md';
+    const content = `# マークダウン禁止テスト
+
+このドキュメントは書き込みが禁止されるはずです。
+`;
+
+    // ドキュメント書き込み
+    const writeResult = await controller.writeDocument(docPath, content);
+
+    // 書き込み結果の検証 - 失敗するはず
+    expect(writeResult.success).toBe(false);
+    if (!writeResult.success) {
+      // エラーメッセージを確認
+      expect(writeResult.error.message).toContain('Writing to Markdown files is disabled');
+      expect(writeResult.error.message).toContain('.json');
+    } else {
+      fail('マークダウンファイルへの書き込みが失敗するはずが成功してしまいました');
+    }
+
+    // ファイルが存在しないことを確認
+    const filePath = path.join(globalDir, docPath);
+    const fileExists = await fileExistsAsync(filePath);
+    expect(fileExists).toBe(false);
   });
 
   // TODO: タグ検索のテスト
