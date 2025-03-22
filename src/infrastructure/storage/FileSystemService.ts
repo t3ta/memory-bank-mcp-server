@@ -24,7 +24,8 @@ export class FileSystemService implements IFileSystemService {
       async () => {
         try {
           logger.debug(`Reading file: ${filePath}`);
-          return await fs.readFile(filePath, 'utf-8');
+          const buffer = await fs.readFile(filePath);
+          return buffer.toString('utf8');
         } catch (error) {
           if (error instanceof Error) {
             const nodeError = error as NodeJS.ErrnoException;
@@ -70,7 +71,8 @@ export class FileSystemService implements IFileSystemService {
 
           // Write file
           logger.debug(`Writing file: ${filePath}`);
-          await fs.writeFile(filePath, content, 'utf-8');
+          const buffer = Buffer.from(content, 'utf8');
+          await fs.writeFile(filePath, buffer);
         } catch (error) {
           if (error instanceof InfrastructureError) {
             throw error;
@@ -331,7 +333,7 @@ export class FileSystemService implements IFileSystemService {
         const stream = createReadStream(filePath, {
           start,
           end: start + length - 1,
-          encoding: 'utf8',
+          encoding: null // バイナリモードで読み込み
         });
 
         // Handle stream events

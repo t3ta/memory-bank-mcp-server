@@ -12,11 +12,13 @@ import { Constants } from './config/constants.js';
  * Application main class
  * Initializes and manages the application lifecycle
  */
+export class Application {
+  private options: CliOptions;
+  private container: any;
   private globalController?: IGlobalController;
   private branchController?: IBranchController;
   private contextController?: IContextController;
   private templateController?: ITemplateController;
-  private contextController?: IContextController;
 
   /**
    * Constructor
@@ -33,16 +35,14 @@ import { Constants } from './config/constants.js';
   async initialize(): Promise<void> {
     try {
       logger.info('Initializing application..');
-      this.globalController = container.get('globalController') as IGlobalController;
-      this.branchController = container.get('branchController') as IBranchController;
-      this.contextController = container.get('contextController') as IContextController;
-      this.templateController = container.get('templateController') as ITemplateController;
 
-      // Get controllers
-      // Cast the result instead of using generic parameters
-      this.globalController = container.get('globalController') as IGlobalController;
-      this.branchController = container.get('branchController') as IBranchController;
-      this.contextController = container.get('contextController') as IContextController;
+      // Setup DI container
+      this.container = await setupContainer(this.options);
+
+      this.globalController = this.container.get('globalController') as IGlobalController;
+      this.branchController = this.container.get('branchController') as IBranchController;
+      this.contextController = this.container.get('contextController') as IContextController;
+      this.templateController = this.container.get('templateController') as ITemplateController;
 
       logger.info('Application initialized successfully');
     } catch (error) {
@@ -69,6 +69,16 @@ import { Constants } from './config/constants.js';
    */
   getBranchController(): IBranchController {
     if (!this.branchController) {
+      throw new Error('Application not initialized. Call initialize() first.');
+    }
+
+    return this.branchController;
+  }
+
+  /**
+   * Get context controller
+   * @returns Context controller
+   */
   getContextController(): IContextController {
     if (!this.contextController) {
       throw new Error('Application not initialized. Call initialize() first.');
@@ -88,13 +98,6 @@ import { Constants } from './config/constants.js';
 
     return this.templateController;
   }
-  getContextController(): IContextController {
-    if (!this.contextController) {
-      throw new Error('Application not initialized. Call initialize() first.');
-    }
-
-    return this.contextController;
-  }
 }
 
 // Export as ESM
@@ -103,5 +106,3 @@ export async function createApplication(options?: CliOptions): Promise<Applicati
   await app.initialize();
   return app;
 }
-
-export { Application };

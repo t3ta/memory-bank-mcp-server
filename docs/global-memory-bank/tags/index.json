@@ -9,8 +9,8 @@
       "index",
       "meta"
     ],
-    "lastModified": "2025-03-22T05:16:21.613Z",
-    "createdAt": "2025-03-22T05:16:21.613Z",
+    "lastModified": "2025-03-22T09:45:17.825Z",
+    "createdAt": "2025-03-22T09:45:17.825Z",
     "version": 1
   },
   "content": {
@@ -100,7 +100,7 @@
         ]
       },
       "guide": {
-        "count": 16,
+        "count": 17,
         "documents": [
           {
             "path": "01-project/README.json",
@@ -165,6 +165,10 @@
           {
             "path": "tags/README.json",
             "title": "tags/README.json"
+          },
+          {
+            "path": "template-system-usage.json",
+            "title": "template-system-usage.json"
           }
         ]
       },
@@ -214,7 +218,7 @@
         ]
       },
       "architecture": {
-        "count": 10,
+        "count": 11,
         "documents": [
           {
             "path": "01-project/domain-models.json",
@@ -255,6 +259,10 @@
           {
             "path": "06-releases/v2-design-decisions.json",
             "title": "06-releases/v2-design-decisions.json"
+          },
+          {
+            "path": "template-system.json",
+            "title": "template-system.json"
           }
         ]
       },
@@ -1039,7 +1047,7 @@
         ]
       },
       "release": {
-        "count": 3,
+        "count": 4,
         "documents": [
           {
             "path": "06-releases/README.json",
@@ -1052,6 +1060,10 @@
           {
             "path": "06-releases/release-v2.0.0.json",
             "title": "06-releases/release-v2.0.0.json"
+          },
+          {
+            "path": "06-releases/v2.1.0-release-plan.json",
+            "title": "06-releases/v2.1.0-release-plan.json"
           }
         ]
       },
@@ -1065,11 +1077,15 @@
         ]
       },
       "planning": {
-        "count": 1,
+        "count": 2,
         "documents": [
           {
             "path": "06-releases/consolidated-v2-release.json",
             "title": "06-releases/consolidated-v2-release.json"
+          },
+          {
+            "path": "06-releases/v2.1.0-release-plan.json",
+            "title": "06-releases/v2.1.0-release-plan.json"
           }
         ]
       },
@@ -1096,6 +1112,24 @@
           {
             "path": "06-releases/release-v2.0.0.json",
             "title": "06-releases/release-v2.0.0.json"
+          }
+        ]
+      },
+      "v2-1-0": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "06-releases/v2.1.0-release-plan.json",
+            "title": "06-releases/v2.1.0-release-plan.json"
+          }
+        ]
+      },
+      "json-migration": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "06-releases/v2.1.0-release-plan.json",
+            "title": "06-releases/v2.1.0-release-plan.json"
           }
         ]
       },
@@ -1127,7 +1161,7 @@
         ]
       },
       "i18n": {
-        "count": 2,
+        "count": 4,
         "documents": [
           {
             "path": "08-i18n/README.json",
@@ -1136,6 +1170,14 @@
           {
             "path": "08-i18n/template-system-json-i18n-design.json",
             "title": "08-i18n/template-system-json-i18n-design.json"
+          },
+          {
+            "path": "template-system-usage.json",
+            "title": "template-system-usage.json"
+          },
+          {
+            "path": "template-system.json",
+            "title": "template-system.json"
           }
         ]
       },
@@ -1284,6 +1326,28 @@
           {
             "path": "meta/document-type-standards.json",
             "title": "meta/document-type-standards.json"
+          }
+        ]
+      },
+      "templates": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "template-system-usage.json",
+            "title": "template-system-usage.json"
+          },
+          {
+            "path": "template-system.json",
+            "title": "template-system.json"
+          }
+        ]
+      },
+      "usage": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "template-system-usage.json",
+            "title": "template-system-usage.json"
           }
         ]
       }

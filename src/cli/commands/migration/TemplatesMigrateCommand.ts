@@ -7,7 +7,8 @@ import chalk from "chalk";
 import type { CommandModule } from "yargs";
 import path from 'path';
 import { FileTemplateRepository } from '../../../infrastructure/templates/FileTemplateRepository.js';
-import { MarkdownMigrationService } from '../../../migration/MarkdownMigrationService.js';
+import { MarkdownMigrationService, MigrationOptions } from '../../../migration/MarkdownMigrationService.js';
+import { MigrationStatus } from '../../../migration/MigrationReport.js';
 import { Language } from '../../../domain/i18n/Language.js';
 import { createConsoleLogger } from "../../../shared/utils/logger.js";
 
@@ -121,8 +122,13 @@ export const TemplatesMigrateCommand: CommandModule<{}, TemplatesMigrateArgs> = 
 
       // Execute migration
       console.log(chalk.blue('Starting template migration...'));
-      let migratedIds: string[] = [];
-
+      
+      // Migration options
+      const migrationOptions: MigrationOptions = {
+        force: args.force,
+        defaultLanguage: args.language as any
+      };
+      
       if (args.templateId) {
         // Check if template already exists
         const exists = await templateRepository.templateExists(args.templateId);
@@ -133,27 +139,40 @@ export const TemplatesMigrateCommand: CommandModule<{}, TemplatesMigrateArgs> = 
           process.exit(0);
         }
         
-        // Migrate specific template
-        const templateId = await migrationService.migrateTemplate(args.templateId);
-        migratedIds = [templateId];
-      } else {
-        // Migrate all templates
-        migratedIds = await migrationService.migrateAllTemplates();
-      }
-
-      // Display results
-      console.log();
-      if (migratedIds.length > 0) {
-        console.log(chalk.green.bold(`✅ Successfully migrated ${migratedIds.length} templates!`));
-        console.log();
-        console.log(chalk.yellow('Migrated templates:'));
+        // Find the Markdown file for the specific template
+        const templateFile = path.join(markdownDir, `${args.templateId}.md`);
         
-        for (const id of migratedIds) {
-          console.log(`${chalk.green('✓')} ${chalk.cyan(id)}`);
+        // Migrate specific template
+        const templateId = await migrationService.migrateTemplate(templateFile, migrationOptions);
+        
+        // Display results
+        console.log();
+        if (templateId) {
+          console.log(chalk.green.bold(`✅ Successfully migrated template ${args.templateId}!`));
+        } else {
+          console.log(chalk.yellow(`Template ${args.templateId} was skipped.`));
         }
       } else {
-        console.log(chalk.yellow('No templates were migrated. They may already exist or no templates were found.'));
-        console.log(chalk.yellow('Use --force to override existing templates.'));
+        // Migrate all templates
+        const report = await migrationService.migrateAllTemplates(migrationOptions);
+        
+        // Get successful migrations
+        const successfulMigrations = report.getEntriesByStatus(MigrationStatus.SUCCESS);
+        
+        // Display results
+        console.log();
+        if (successfulMigrations.length > 0) {
+          console.log(chalk.green.bold(`✅ Successfully migrated ${successfulMigrations.length} templates!`));
+          console.log();
+          console.log(chalk.yellow('Migrated templates:'));
+          
+          for (const entry of successfulMigrations) {
+            console.log(`${chalk.green('✓')} ${chalk.cyan(entry.id)}`);
+          }
+        } else {
+          console.log(chalk.yellow('No templates were migrated. They may already exist or no templates were found.'));
+          console.log(chalk.yellow('Use --force to override existing templates.'));
+        }
       }
 
       // Exit

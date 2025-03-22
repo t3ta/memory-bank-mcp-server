@@ -6,6 +6,9 @@ import { IndexService } from '../../infrastructure/index/IndexService.js';
 import { IIndexService } from '../../infrastructure/index/interfaces/IIndexService.js';
 import { FileSystemJsonDocumentRepository } from '../../infrastructure/repositories/file-system/FileSystemJsonDocumentRepository.js';
 import { IJsonDocumentRepository } from '../../domain/repositories/IJsonDocumentRepository.js';
+import { II18nRepository } from '../../domain/i18n/II18nRepository.js';
+import { ITemplateRepository } from '../../domain/templates/ITemplateRepository.js';
+import { TemplateService } from '../../application/templates/TemplateService.js';
 
 // Domain layer
 
@@ -73,34 +76,30 @@ export async function registerInfrastructureServices(
   await configProvider.initialize(options);
 
   // Register repositories
-  container.registerFactory('globalMemoryBankRepository', () => {
-    const fileSystemService = container.get<IFileSystemService>('fileSystemService');
-    const configProvider = container.get<IConfigProvider>('configProvider');
+  container.registerFactory('globalMemoryBankRepository', async () => {
+    const fileSystemService = await container.get<IFileSystemService>('fileSystemService');
+    const configProvider = await container.get<IConfigProvider>('configProvider');
 
     return new FileSystemGlobalMemoryBankRepository(fileSystemService, configProvider);
   });
 
-  container.registerFactory('branchMemoryBankRepository', () => {
-    const fileSystemService = container.get<IFileSystemService>('fileSystemService');
-    const configProvider = container.get<IConfigProvider>('configProvider');
+  container.registerFactory('branchMemoryBankRepository', async () => {
+    const fileSystemService = await container.get<IFileSystemService>('fileSystemService');
+    const configProvider = await container.get<IConfigProvider>('configProvider');
 
     return new FileSystemBranchMemoryBankRepository(fileSystemService, configProvider);
   });
 
   // Register tag index repository
-  container.registerFactory('tagIndexRepository', () => {
-    const fileSystemService = container.get<IFileSystemService>('fileSystemService');
-    const configProvider = container.get<IConfigProvider>('configProvider');
-    const globalRepository = container.get(
-      'globalMemoryBankRepository'
-    ) as FileSystemGlobalMemoryBankRepository;
-    const branchRepository = container.get(
-      'branchMemoryBankRepository'
-    ) as FileSystemBranchMemoryBankRepository;
+  container.registerFactory('tagIndexRepository', async () => {
+    const fileSystemService = await container.get<IFileSystemService>('fileSystemService');
+    const configProvider = await container.get<IConfigProvider>('configProvider');
+    const globalRepository = await container.get<FileSystemGlobalMemoryBankRepository>('globalMemoryBankRepository');
+    const branchRepository = await container.get<FileSystemBranchMemoryBankRepository>('branchMemoryBankRepository');
     // Get the branch memory bank root directory without using getBranchMemoryPath
-    const config = configProvider.getConfig();
+    const config = await configProvider.getConfig();
     const branchMemoryBankRoot = path.join(config.memoryBankRoot, 'branch-memory-bank');
-    const globalMemoryBankPath = configProvider.getGlobalMemoryPath();
+    const globalMemoryBankPath = await configProvider.getGlobalMemoryPath();
 
     return new FileSystemTagIndexRepositoryV1Bridge(
       fileSystemService as FileSystemService,
@@ -110,82 +109,83 @@ export async function registerInfrastructureServices(
       globalRepository
     );
   });
-  
+
   // Register index service
+  container.registerFactory('indexService', async () => {
+    const fileSystemService = await container.get<IFileSystemService>('fileSystemService');
+    const configProvider = await container.get<IConfigProvider>('configProvider');
+    const config = await configProvider.getConfig();
+
+    // Set up index root path
+    const indexRoot = path.join(config.memoryBankRoot, 'indices');
+
+    return new IndexService(fileSystemService, indexRoot);
+  });
+
   // Register template repository
-  container.registerFactory('templateRepository', () => {
-    const fileSystemService = container.get<IFileSystemService>('fileSystemService');
-    const configProvider = container.get<IConfigProvider>('configProvider');
-    const config = configProvider.getConfig();
-    
+  container.registerFactory('templateRepository', async () => {
+    const fileSystemService = await container.get<IFileSystemService>('fileSystemService');
+    const configProvider = await container.get<IConfigProvider>('configProvider');
+    const config = await configProvider.getConfig();
+
     // Set up template directory path
     const templateDir = path.join(config.memoryBankRoot, 'templates', 'json');
-    
+
     // Import and instantiate the FileTemplateRepository
-    const { FileTemplateRepository } = require('../../infrastructure/templates/FileTemplateRepository.js');
+    const { FileTemplateRepository } = await import('../../infrastructure/templates/FileTemplateRepository.js');
     const templateRepository = new FileTemplateRepository(templateDir);
-    
+
     // Initialize the repository
-    templateRepository.initialize().catch(error => {
+    await templateRepository.initialize().catch(error => {
       console.error('Failed to initialize template repository:', error);
     });
-    
+
     return templateRepository;
   });
-  
+
   // Register i18n repository
-  container.registerFactory('i18nRepository', () => {
-    const fileSystemService = container.get<IFileSystemService>('fileSystemService');
-    const configProvider = container.get<IConfigProvider>('configProvider');
-    const config = configProvider.getConfig();
-    
+  container.registerFactory('i18nRepository', async () => {
+    const fileSystemService = await container.get<IFileSystemService>('fileSystemService');
+    const configProvider = await container.get<IConfigProvider>('configProvider');
+    const config = await configProvider.getConfig();
+
     // Set up translations directory path
     const translationsDir = path.join(config.memoryBankRoot, 'translations');
-    
+
     // Import and instantiate the FileI18nRepository
-    const { FileI18nRepository } = require('../../infrastructure/i18n/FileI18nRepository.js');
+    const { FileI18nRepository } = await import('../../infrastructure/i18n/FileI18nRepository.js');
     const i18nRepository = new FileI18nRepository(translationsDir);
-    
+
     // Initialize the repository
-    i18nRepository.initialize().catch(error => {
+    await i18nRepository.initialize().catch(error => {
       console.error('Failed to initialize i18n repository:', error);
     });
-    
+
     return i18nRepository;
   });
 
-    const fileSystemService = container.get<IFileSystemService>('fileSystemService');
-    const configProvider = container.get<IConfigProvider>('configProvider');
-    const config = configProvider.getConfig();
-    
-    // Set up index root path
-    const indexRoot = path.join(config.memoryBankRoot, 'indices');
-    
-    return new IndexService(fileSystemService, indexRoot);
-  });
-  
   // Register JSON document repositories
-  container.registerFactory('branchJsonDocumentRepository', () => {
-    const fileSystemService = container.get<IFileSystemService>('fileSystemService');
-    const indexService = container.get<IIndexService>('indexService');
-    const configProvider = container.get<IConfigProvider>('configProvider');
-    const config = configProvider.getConfig();
-    
+  container.registerFactory('branchJsonDocumentRepository', async () => {
+    const fileSystemService = await container.get<IFileSystemService>('fileSystemService');
+    const indexService = await container.get<IIndexService>('indexService');
+    const configProvider = await container.get<IConfigProvider>('configProvider');
+    const config = await configProvider.getConfig();
+
     // Branch JSON document root path
     const branchJsonRoot = path.join(config.memoryBankRoot, 'branch-json');
-    
+
     return new FileSystemJsonDocumentRepository(fileSystemService, indexService, branchJsonRoot);
   });
-  
-  container.registerFactory('globalJsonDocumentRepository', () => {
-    const fileSystemService = container.get<IFileSystemService>('fileSystemService');
-    const indexService = container.get<IIndexService>('indexService');
-    const configProvider = container.get<IConfigProvider>('configProvider');
-    const config = configProvider.getConfig();
-    
+
+  container.registerFactory('globalJsonDocumentRepository', async () => {
+    const fileSystemService = await container.get<IFileSystemService>('fileSystemService');
+    const indexService = await container.get<IIndexService>('indexService');
+    const configProvider = await container.get<IConfigProvider>('configProvider');
+    const config = await configProvider.getConfig();
+
     // Global JSON document root path
     const globalJsonRoot = path.join(config.memoryBankRoot, 'global-json');
-    
+
     return new FileSystemJsonDocumentRepository(fileSystemService, indexService, globalJsonRoot);
   });
 }
@@ -194,22 +194,22 @@ export async function registerInfrastructureServices(
  * Register application services
  * @param container DI Container
  */
-export function registerApplicationServices(container: DIContainer): void {
+export async function registerApplicationServices(container: DIContainer): Promise<void> {
   // Register use cases
-  container.registerFactory('readGlobalDocumentUseCase', () => {
+  container.registerFactory('readGlobalDocumentUseCase', async () => {
     // Use explicit type assertion for proper type safety
-    const globalRepository = container.get(
+    const globalRepository = await container.get<FileSystemGlobalMemoryBankRepository>(
       'globalMemoryBankRepository'
-    ) as FileSystemGlobalMemoryBankRepository;
+    );
 
     return new ReadGlobalDocumentUseCase(globalRepository);
   });
 
-  container.registerFactory('writeGlobalDocumentUseCase', () => {
+  container.registerFactory('writeGlobalDocumentUseCase', async () => {
     // Use explicit type assertion for proper type safety
-    const globalRepository = container.get(
+    const globalRepository = await container.get<FileSystemGlobalMemoryBankRepository>(
       'globalMemoryBankRepository'
-    ) as FileSystemGlobalMemoryBankRepository;
+    );
 
     // Use factory to get properly configured WriteGlobalDocumentUseCase with migration settings
     return UseCaseFactory.createWriteGlobalDocumentUseCase(globalRepository);
@@ -235,199 +235,195 @@ export function registerApplicationServices(container: DIContainer): void {
   });
 
   // Register common use cases
-  container.registerFactory('readRulesUseCase', () => {
-    const configProvider = container.get<IConfigProvider>('configProvider');
-    const config = configProvider.getConfig();
+  container.registerFactory('readRulesUseCase', async () => {
+    const configProvider = await container.get<IConfigProvider>('configProvider');
+    const config = await configProvider.getConfig();
     const rulesDir = config.memoryBankRoot;
-    
+
     // 同期的に新しいReadRulesUseCaseを作成 - コンバーターなしで
     return new ReadRulesUseCase(rulesDir);
   });
-  
-  container.registerFactory('readContextUseCase', () => {
-    const branchRepository = container.get(
+
+  container.registerFactory('readContextUseCase', async () => {
+    const branchRepository = await container.get<FileSystemBranchMemoryBankRepository>(
       'branchMemoryBankRepository'
-    ) as FileSystemBranchMemoryBankRepository;
-    const globalRepository = container.get(
+    );
+    const globalRepository = await container.get<FileSystemGlobalMemoryBankRepository>(
       'globalMemoryBankRepository'
-    ) as FileSystemGlobalMemoryBankRepository;
-    
+    );
+
     return new ReadContextUseCase(branchRepository, globalRepository);
   });
-  container.registerFactory('searchDocumentsByTagsUseCase', () => {
+
+  container.registerFactory('searchDocumentsByTagsUseCase', async () => {
     // Use explicit type assertion for proper type safety
-    const globalRepository = container.get(
+    const globalRepository = await container.get<FileSystemGlobalMemoryBankRepository>(
       'globalMemoryBankRepository'
-    ) as FileSystemGlobalMemoryBankRepository;
-    const branchRepository = container.get(
+    );
+    const branchRepository = await container.get<FileSystemBranchMemoryBankRepository>(
       'branchMemoryBankRepository'
-    ) as FileSystemBranchMemoryBankRepository;
+    );
 
     return new SearchDocumentsByTagsUseCase(globalRepository, branchRepository);
   });
 
-  container.registerFactory('updateTagIndexUseCase', () => {
+  container.registerFactory('updateTagIndexUseCase', async () => {
     // Use explicit type assertion for proper type safety
-    const globalRepository = container.get(
+    const globalRepository = await container.get<FileSystemGlobalMemoryBankRepository>(
       'globalMemoryBankRepository'
-    ) as FileSystemGlobalMemoryBankRepository;
-    const branchRepository = container.get(
+    );
+    const branchRepository = await container.get<FileSystemBranchMemoryBankRepository>(
       'branchMemoryBankRepository'
-    ) as FileSystemBranchMemoryBankRepository;
+    );
 
     return new UpdateTagIndexUseCase(globalRepository, branchRepository);
   });
 
   // Register the V2 version of the UpdateTagIndexUseCase
-  container.registerFactory('updateTagIndexUseCaseV2', () => {
+  container.registerFactory('updateTagIndexUseCaseV2', async () => {
     // Use explicit type assertion for proper type safety
-    const globalRepository = container.get(
+    const globalRepository = await container.get<FileSystemGlobalMemoryBankRepository>(
       'globalMemoryBankRepository'
-    ) as FileSystemGlobalMemoryBankRepository;
-    const branchRepository = container.get(
+    );
+    const branchRepository = await container.get<FileSystemBranchMemoryBankRepository>(
       'branchMemoryBankRepository'
-    ) as FileSystemBranchMemoryBankRepository;
-    const tagIndexRepository = container.get(
+    );
+    const tagIndexRepository = await container.get<FileSystemTagIndexRepositoryV1Bridge>(
       'tagIndexRepository'
-    ) as FileSystemTagIndexRepositoryV1Bridge;
+    );
 
     return new UpdateTagIndexUseCaseV2(globalRepository, branchRepository, tagIndexRepository);
   });
 
   // Register JSON document use cases
-  container.registerFactory('readJsonDocumentUseCase', () => {
-    const branchJsonRepo = container.get('branchJsonDocumentRepository') as IJsonDocumentRepository;
-    const globalJsonRepo = container.get('globalJsonDocumentRepository') as IJsonDocumentRepository;
-    
+  container.registerFactory('readJsonDocumentUseCase', async () => {
+    const branchJsonRepo = await container.get<IJsonDocumentRepository>('branchJsonDocumentRepository');
+    const globalJsonRepo = await container.get<IJsonDocumentRepository>('globalJsonDocumentRepository');
+
     return new ReadJsonDocumentUseCase(branchJsonRepo, globalJsonRepo);
   });
-  
-  container.registerFactory('writeJsonDocumentUseCase', () => {
-    const branchJsonRepo = container.get('branchJsonDocumentRepository') as IJsonDocumentRepository;
-    const globalJsonRepo = container.get('globalJsonDocumentRepository') as IJsonDocumentRepository;
-    const indexService = container.get('indexService') as IIndexService;
-    
+
+  container.registerFactory('writeJsonDocumentUseCase', async () => {
+    const branchJsonRepo = await container.get<IJsonDocumentRepository>('branchJsonDocumentRepository');
+    const globalJsonRepo = await container.get<IJsonDocumentRepository>('globalJsonDocumentRepository');
+    const indexService = await container.get<IIndexService>('indexService');
+
     return new WriteJsonDocumentUseCase(branchJsonRepo, indexService, globalJsonRepo);
   });
-  
-  container.registerFactory('deleteJsonDocumentUseCase', () => {
-    const branchJsonRepo = container.get('branchJsonDocumentRepository') as IJsonDocumentRepository;
-    const globalJsonRepo = container.get('globalJsonDocumentRepository') as IJsonDocumentRepository;
-    const indexService = container.get('indexService') as IIndexService;
-    
+
+  container.registerFactory('deleteJsonDocumentUseCase', async () => {
+    const branchJsonRepo = await container.get<IJsonDocumentRepository>('branchJsonDocumentRepository');
+    const globalJsonRepo = await container.get<IJsonDocumentRepository>('globalJsonDocumentRepository');
+    const indexService = await container.get<IIndexService>('indexService');
+
     return new DeleteJsonDocumentUseCase(branchJsonRepo, indexService, globalJsonRepo);
   });
-  
-  container.registerFactory('searchJsonDocumentsUseCase', () => {
-    const branchJsonRepo = container.get('branchJsonDocumentRepository') as IJsonDocumentRepository;
-    const globalJsonRepo = container.get('globalJsonDocumentRepository') as IJsonDocumentRepository;
-    
+
+  container.registerFactory('searchJsonDocumentsUseCase', async () => {
+    const branchJsonRepo = await container.get<IJsonDocumentRepository>('branchJsonDocumentRepository');
+    const globalJsonRepo = await container.get<IJsonDocumentRepository>('globalJsonDocumentRepository');
+
     return new SearchJsonDocumentsUseCase(branchJsonRepo, globalJsonRepo);
   });
-  
-  container.registerFactory('updateJsonIndexUseCase', () => {
-    const branchJsonRepo = container.get('branchJsonDocumentRepository') as IJsonDocumentRepository;
-    const globalJsonRepo = container.get('globalJsonDocumentRepository') as IJsonDocumentRepository;
-    const indexService = container.get('indexService') as IIndexService;
-    
+
+  container.registerFactory('updateJsonIndexUseCase', async () => {
+    const branchJsonRepo = await container.get<IJsonDocumentRepository>('branchJsonDocumentRepository');
+    const globalJsonRepo = await container.get<IJsonDocumentRepository>('globalJsonDocumentRepository');
+    const indexService = await container.get<IIndexService>('indexService');
+
     return new UpdateJsonIndexUseCase(branchJsonRepo, indexService, globalJsonRepo);
   });
 
-  container.registerFactory('getRecentBranchesUseCase', () => {
+  container.registerFactory('getRecentBranchesUseCase', async () => {
     // Use explicit type assertion for proper type safety
-    const branchRepository = container.get(
+    const branchRepository = await container.get<FileSystemBranchMemoryBankRepository>(
       'branchMemoryBankRepository'
-    ) as FileSystemBranchMemoryBankRepository;
+    );
 
     return new GetRecentBranchesUseCase(branchRepository);
   });
 
   // Register core files use cases
-  container.registerFactory('readBranchCoreFilesUseCase', () => {
+  container.registerFactory('readBranchCoreFilesUseCase', async () => {
     // Use explicit type assertion for proper type safety
-    const branchRepository = container.get(
+    const branchRepository = await container.get<FileSystemBranchMemoryBankRepository>(
       'branchMemoryBankRepository'
-    ) as FileSystemBranchMemoryBankRepository;
+    );
 
     return new ReadBranchCoreFilesUseCase(branchRepository);
   });
 
-  container.registerFactory('createBranchCoreFilesUseCase', () => {
+  container.registerFactory('createBranchCoreFilesUseCase', async () => {
     // Use explicit type assertion for proper type safety
-    const branchRepository = container.get(
+    const branchRepository = await container.get<FileSystemBranchMemoryBankRepository>(
       'branchMemoryBankRepository'
-    ) as FileSystemBranchMemoryBankRepository;
+    );
 
     return new CreateBranchCoreFilesUseCase(branchRepository);
   });
 
   // Register template and i18n services
-  container.registerFactory('i18nService', () => {
-    const i18nRepository = container.get('i18nRepository');
-    
+  container.registerFactory('i18nService', async () => {
+    const i18nRepository = container.get('i18nRepository') as II18nRepository;
+
     // Import and instantiate the I18nService
-    const { I18nService } = require('../../application/i18n/I18nService.js');
+    const { I18nService } = await import('../../application/i18n/I18nService.js');
     return new I18nService(i18nRepository);
   });
-  
-  container.registerFactory('templateService', () => {
-    const templateRepository = container.get('templateRepository');
-    
+
+  container.registerFactory('templateService', async () => {
+    const templateRepository = container.get('templateRepository') as ITemplateRepository;
+
     // Import and instantiate the TemplateService
-    const { TemplateService } = require('../../application/templates/TemplateService.js');
+    const { TemplateService } = await import('../../application/templates/TemplateService.js');
     return new TemplateService(templateRepository);
   });
-  
-  container.registerFactory('markdownMigrationService', () => {
-    const templateRepository = container.get('templateRepository');
-    const configProvider = container.get<IConfigProvider>('configProvider');
-    const config = configProvider.getConfig();
-    
+
+  container.registerFactory('markdownMigrationService', async () => {
+    const templateRepository = container.get('templateRepository') as ITemplateRepository;
+    const configProvider = await container.get<IConfigProvider>('configProvider');
+    const config = await configProvider.getConfig();
+
     // Set up markdown and backup directory paths
     const markdownDir = path.join(config.memoryBankRoot, 'templates', 'markdown');
     const backupDir = path.join(config.memoryBankRoot, 'templates', 'backup');
-    
+
     // Import and instantiate the MarkdownMigrationService
-    const { MarkdownMigrationService } = require('../../migration/MarkdownMigrationService.js');
+    const { MarkdownMigrationService } = await import('../../migration/MarkdownMigrationService.js');
     return new MarkdownMigrationService(templateRepository, markdownDir, backupDir);
   });
-
-
-  // Pull Request use cases section removed
 }
 
 /**
  * Register interface services
  * @param container DI Container
  */
-export function registerInterfaceServices(container: DIContainer): void {
+export async function registerInterfaceServices(container: DIContainer): Promise<void> {
   // Register presenters
   container.register('mcpResponsePresenter', new MCPResponsePresenter());
   container.register('jsonResponsePresenter', new JsonResponsePresenter());
 
-  container.registerFactory('contextController', () => {
-    const readContextUseCase = container.get('readContextUseCase') as ReadContextUseCase;
-    const readRulesUseCase = container.get('readRulesUseCase') as ReadRulesUseCase;
-    
+  container.registerFactory('contextController', async () => {
+    const readContextUseCase = await container.get<ReadContextUseCase>('readContextUseCase');
+    const readRulesUseCase = await container.get<ReadRulesUseCase>('readRulesUseCase');
+
     return new ContextController(readContextUseCase, readRulesUseCase);
   });
 
-  // Register tools section removed
-
   // Register JSON controllers
-  container.registerFactory('jsonBranchController', () => {
+  container.registerFactory('jsonBranchController', async () => {
     // Get required use cases
-    const readJsonDocumentUseCase = container.get('readJsonDocumentUseCase') as ReadJsonDocumentUseCase;
-    const writeJsonDocumentUseCase = container.get('writeJsonDocumentUseCase') as WriteJsonDocumentUseCase;
-    const deleteJsonDocumentUseCase = container.get('deleteJsonDocumentUseCase') as DeleteJsonDocumentUseCase;
-    const searchJsonDocumentsUseCase = container.get('searchJsonDocumentsUseCase') as SearchJsonDocumentsUseCase;
-    const updateJsonIndexUseCase = container.get('updateJsonIndexUseCase') as UpdateJsonIndexUseCase;
-    const getRecentBranchesUseCase = container.get(
+    const readJsonDocumentUseCase = await container.get<ReadJsonDocumentUseCase>('readJsonDocumentUseCase');
+    const writeJsonDocumentUseCase = await container.get<WriteJsonDocumentUseCase>('writeJsonDocumentUseCase');
+    const deleteJsonDocumentUseCase = await container.get<DeleteJsonDocumentUseCase>('deleteJsonDocumentUseCase');
+    const searchJsonDocumentsUseCase = await container.get<SearchJsonDocumentsUseCase>('searchJsonDocumentsUseCase');
+    const updateJsonIndexUseCase = await container.get<UpdateJsonIndexUseCase>('updateJsonIndexUseCase');
+    const getRecentBranchesUseCase = await container.get<GetRecentBranchesUseCase>(
       'getRecentBranchesUseCase'
-    ) as GetRecentBranchesUseCase;
+    );
 
     // Get presenter
-    const presenter = container.get('jsonResponsePresenter') as JsonResponsePresenter;
+    const presenter = await container.get<JsonResponsePresenter>('jsonResponsePresenter');
 
     return new JsonBranchController(
       readJsonDocumentUseCase,
@@ -440,16 +436,16 @@ export function registerInterfaceServices(container: DIContainer): void {
     );
   });
 
-  container.registerFactory('jsonGlobalController', () => {
+  container.registerFactory('jsonGlobalController', async () => {
     // Get required use cases
-    const readJsonDocumentUseCase = container.get('readJsonDocumentUseCase') as ReadJsonDocumentUseCase;
-    const writeJsonDocumentUseCase = container.get('writeJsonDocumentUseCase') as WriteJsonDocumentUseCase;
-    const deleteJsonDocumentUseCase = container.get('deleteJsonDocumentUseCase') as DeleteJsonDocumentUseCase;
-    const searchJsonDocumentsUseCase = container.get('searchJsonDocumentsUseCase') as SearchJsonDocumentsUseCase;
-    const updateJsonIndexUseCase = container.get('updateJsonIndexUseCase') as UpdateJsonIndexUseCase;
+    const readJsonDocumentUseCase = await container.get<ReadJsonDocumentUseCase>('readJsonDocumentUseCase');
+    const writeJsonDocumentUseCase = await container.get<WriteJsonDocumentUseCase>('writeJsonDocumentUseCase');
+    const deleteJsonDocumentUseCase = await container.get<DeleteJsonDocumentUseCase>('deleteJsonDocumentUseCase');
+    const searchJsonDocumentsUseCase = await container.get<SearchJsonDocumentsUseCase>('searchJsonDocumentsUseCase');
+    const updateJsonIndexUseCase = await container.get<UpdateJsonIndexUseCase>('updateJsonIndexUseCase');
 
     // Get presenter
-    const presenter = container.get('jsonResponsePresenter') as JsonResponsePresenter;
+    const presenter = await container.get<JsonResponsePresenter>('jsonResponsePresenter');
 
     return new JsonGlobalController(
       readJsonDocumentUseCase,
@@ -462,29 +458,29 @@ export function registerInterfaceServices(container: DIContainer): void {
   });
 
   // Register controllers
-  container.registerFactory('globalController', () => {
+  container.registerFactory('globalController', async () => {
     // Use explicit type assertion for proper type safety
-    const readGlobalDocumentUseCase = container.get(
+    const readGlobalDocumentUseCase = await container.get<ReadGlobalDocumentUseCase>(
       'readGlobalDocumentUseCase'
-    ) as ReadGlobalDocumentUseCase;
-    const writeGlobalDocumentUseCase = container.get(
+    );
+    const writeGlobalDocumentUseCase = await container.get<WriteGlobalDocumentUseCase>(
       'writeGlobalDocumentUseCase'
-    ) as WriteGlobalDocumentUseCase;
-    const searchDocumentsByTagsUseCase = container.get(
+    );
+    const searchDocumentsByTagsUseCase = await container.get<SearchDocumentsByTagsUseCase>(
       'searchDocumentsByTagsUseCase'
-    ) as SearchDocumentsByTagsUseCase;
-    const updateTagIndexUseCase = container.get('updateTagIndexUseCase') as UpdateTagIndexUseCase;
-    const presenter = container.get('mcpResponsePresenter') as MCPResponsePresenter;
+    );
+    const updateTagIndexUseCase = await container.get<UpdateTagIndexUseCase>('updateTagIndexUseCase');
+    const presenter = await container.get<MCPResponsePresenter>('mcpResponsePresenter');
 
     // Get optional use cases
-    const updateTagIndexUseCaseV2 = container.get(
+    const updateTagIndexUseCaseV2 = await container.get<UpdateTagIndexUseCaseV2>(
       'updateTagIndexUseCaseV2'
-    ) as UpdateTagIndexUseCaseV2;
-    const readJsonDocumentUseCase = container.get('readJsonDocumentUseCase') as ReadJsonDocumentUseCase;
-    const writeJsonDocumentUseCase = container.get('writeJsonDocumentUseCase') as WriteJsonDocumentUseCase;
-    const deleteJsonDocumentUseCase = container.get('deleteJsonDocumentUseCase') as DeleteJsonDocumentUseCase;
-    const searchJsonDocumentsUseCase = container.get('searchJsonDocumentsUseCase') as SearchJsonDocumentsUseCase;
-    const updateJsonIndexUseCase = container.get('updateJsonIndexUseCase') as UpdateJsonIndexUseCase;
+    );
+    const readJsonDocumentUseCase = await container.get<ReadJsonDocumentUseCase>('readJsonDocumentUseCase');
+    const writeJsonDocumentUseCase = await container.get<WriteJsonDocumentUseCase>('writeJsonDocumentUseCase');
+    const deleteJsonDocumentUseCase = await container.get<DeleteJsonDocumentUseCase>('deleteJsonDocumentUseCase');
+    const searchJsonDocumentsUseCase = await container.get<SearchJsonDocumentsUseCase>('searchJsonDocumentsUseCase');
+    const updateJsonIndexUseCase = await container.get<UpdateJsonIndexUseCase>('updateJsonIndexUseCase');
 
     return new GlobalController(
       readGlobalDocumentUseCase,
@@ -552,16 +548,17 @@ export function registerInterfaceServices(container: DIContainer): void {
         deleteJsonDocumentUseCase,
         searchJsonDocumentsUseCase,
         updateJsonIndexUseCase,
-  // Register template controller
-  container.registerFactory('templateController', () => {
-    const templateService = container.get('templateService');
-    
-    // Import and instantiate the TemplateController
-    const { TemplateController } = require('../../interface/controllers/TemplateController.js');
-    return new TemplateController(templateService);
+      } // Pass optional dependencies
+    );
   });
 
-    );
+  // Register template controller
+  container.registerFactory('templateController', async () => {
+    const templateService = container.get('templateService') as TemplateService;
+
+    // Import and instantiate the TemplateController
+    const { TemplateController } = await import('../../interface/controllers/TemplateController.js');
+    return new TemplateController(templateService);
   });
 }
 
@@ -571,9 +568,9 @@ export function registerInterfaceServices(container: DIContainer): void {
  */
 export async function initializeRepositories(container: DIContainer): Promise<void> {
   // Initialize global memory bank
-  const globalRepository = container.get(
+  const globalRepository = await container.get<FileSystemGlobalMemoryBankRepository>(
     'globalMemoryBankRepository'
-  ) as FileSystemGlobalMemoryBankRepository;
+  );
   await globalRepository.initialize();
 
   // Note: Branch repositories are initialized on-demand when a branch is accessed

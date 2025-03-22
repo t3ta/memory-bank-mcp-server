@@ -70,7 +70,6 @@ const __dirname = path.dirname(__filename);
 // New application instance
 let app: Application | null = null;
 const AVAILABLE_TOOLS = [
-  // create_pull_request tool definition removed
   {
     name: 'list_tools',
     description: 'List all available tools',
@@ -101,29 +100,7 @@ const AVAILABLE_TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-  {
-    name: 'get_template',
-    description: 'Get a template by ID and language',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        id: { 
-          type: 'string',
-          description: 'Template ID to retrieve' 
-        },
-        language: { 
-          type: 'string', 
-          enum: ['en', 'ja', 'zh'],
-          description: 'Language code (en, ja, or zh)'
-        },
-        variables: {
-          type: 'object',
-          description: 'Optional variables for template substitution'
-        }
-      },
-      required: ['id', 'language']
-    }
-  },
+        path: { type: 'string' },
         branch: {
           type: 'string',
           description: 'Branch name',
@@ -215,6 +192,29 @@ const AVAILABLE_TOOLS = [
         },
       },
     },
+  },
+  {
+    name: 'get_template',
+    description: 'Get a template by ID and language',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        id: { 
+          type: 'string',
+          description: 'Template ID to retrieve' 
+        },
+        language: { 
+          type: 'string', 
+          enum: ['en', 'ja', 'zh'],
+          description: 'Language code (en, ja, or zh)'
+        },
+        variables: {
+          type: 'object',
+          description: 'Optional variables for template substitution'
+        }
+      },
+      required: ['id', 'language']
+    }
   },
 ];
 
@@ -465,33 +465,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         logger.debug('Including rules in context');
         if (!['en', 'ja', 'zh'].includes(language)) {
           throw new Error('Invalid language for rules');
-    case 'get_template': {
-      const id = params.id as string;
-      const language = params.language as string;
-      const variables = params.variables as Record<string, string> | undefined;
-
-      if (!id || !language) {
-        throw new Error('Invalid arguments for get_template');
-      }
-
-      if (!['en', 'ja', 'zh'].includes(language)) {
-        throw new Error(`Invalid language code: ${language}`);
-      }
-
-      if (!app) {
-        throw new Error('Application not initialized');
-      }
-
-      // 現時点ではMarkdown形式で取得
-      const response = await app.getTemplateController().getTemplateAsMarkdown(id, language as any, variables);
-      
-      return {
-        content: [{ type: 'text', text: response }],
-        _meta: { lastModified: new Date().toISOString() }
-      };
-    }
-
-
+        }
 
         try {
           const dirname = __dirname;
@@ -570,7 +544,31 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
       };
     }
 
-    // create_pull_request case removed
+    case 'get_template': {
+      const id = params.id as string;
+      const language = params.language as string;
+      const variables = params.variables as Record<string, string> | undefined;
+
+      if (!id || !language) {
+        throw new Error('Invalid arguments for get_template');
+      }
+
+      if (!['en', 'ja', 'zh'].includes(language)) {
+        throw new Error(`Invalid language code: ${language}`);
+      }
+
+      if (!app) {
+        throw new Error('Application not initialized');
+      }
+
+      // 現時点ではMarkdown形式で取得
+      const response = await app.getTemplateController().getTemplateAsMarkdown(id, language as any, variables);
+      
+      return {
+        content: [{ type: 'text', text: response }],
+        _meta: { lastModified: new Date().toISOString() }
+      };
+    }
 
     default:
       throw new Error(`Unknown tool: ${name}`);
