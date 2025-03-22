@@ -149,7 +149,7 @@ describe('GlobalController Integration Tests', () => {
     };
 
     repository = new FileSystemGlobalMemoryBankRepository(fileSystemService, configProvider);
-    writeUseCase = new WriteGlobalDocumentUseCase(repository);
+    writeUseCase = new WriteGlobalDocumentUseCase(repository, { disableMarkdownWrites: true });
     readUseCase = new ReadGlobalDocumentUseCase(repository);
 
     // GlobalController に必要なパラメータを追加
@@ -290,8 +290,9 @@ describe('GlobalController Integration Tests', () => {
     expect(writeResult.success).toBe(false);
     if (!writeResult.success) {
       // エラーメッセージを確認
-      expect(writeResult.error.message).toContain('Writing to Markdown files is disabled');
-      expect(writeResult.error.message).toContain('.json');
+      const errorResponse = writeResult as { success: false, error: { code: string, message: string } };
+      expect(errorResponse.error.message).toContain('Writing to Markdown files is disabled');
+      expect(errorResponse.error.message).toContain('.json');
     } else {
       fail('マークダウンファイルへの書き込みが失敗するはずが成功してしまいました');
     }
