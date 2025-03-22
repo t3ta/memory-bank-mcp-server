@@ -4,6 +4,7 @@ import { logger } from '../shared/utils/logger.js';
 import { IGlobalController } from '../interface/controllers/interfaces/IGlobalController.js';
 import { IBranchController } from '../interface/controllers/interfaces/IBranchController.js';
 import { IContextController } from '../interface/controllers/interfaces/IContextController.js';
+import { ITemplateController } from '../interface/controllers/interfaces/ITemplateController.js';
 import { CliOptions } from '../infrastructure/config/WorkspaceConfig.js';
 import { Constants } from './config/constants.js';
 
@@ -11,10 +12,10 @@ import { Constants } from './config/constants.js';
  * Application main class
  * Initializes and manages the application lifecycle
  */
-class Application {
-  private readonly options: CliOptions;
   private globalController?: IGlobalController;
   private branchController?: IBranchController;
+  private contextController?: IContextController;
+  private templateController?: ITemplateController;
   private contextController?: IContextController;
 
   /**
@@ -32,9 +33,10 @@ class Application {
   async initialize(): Promise<void> {
     try {
       logger.info('Initializing application..');
-
-      // Setup DI container
-      const container = await setupContainer(this.options);
+      this.globalController = container.get('globalController') as IGlobalController;
+      this.branchController = container.get('branchController') as IBranchController;
+      this.contextController = container.get('contextController') as IContextController;
+      this.templateController = container.get('templateController') as ITemplateController;
 
       // Get controllers
       // Cast the result instead of using generic parameters
@@ -67,16 +69,25 @@ class Application {
    */
   getBranchController(): IBranchController {
     if (!this.branchController) {
+  getContextController(): IContextController {
+    if (!this.contextController) {
       throw new Error('Application not initialized. Call initialize() first.');
     }
 
-    return this.branchController;
+    return this.contextController;
   }
 
   /**
-   * Get context controller
-   * @returns Context controller
+   * Get template controller
+   * @returns Template controller
    */
+  getTemplateController(): ITemplateController {
+    if (!this.templateController) {
+      throw new Error('Application not initialized. Call initialize() first.');
+    }
+
+    return this.templateController;
+  }
   getContextController(): IContextController {
     if (!this.contextController) {
       throw new Error('Application not initialized. Call initialize() first.');

@@ -1,0 +1,72 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "template-system-usage",
+    "title": "テンプレートシステムの使い方ガイド",
+    "documentType": "document",
+    "path": "template-system-usage.json",
+    "tags": [
+      "guide",
+      "templates",
+      "i18n",
+      "usage"
+    ],
+    "lastModified": "2025-03-22T09:05:15.761Z",
+    "createdAt": "2025-03-22T09:05:15.761Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "id": "intro",
+        "title": "はじめに",
+        "content": "このガイドでは、Memory Bank 2.0の新しいJSON-basedテンプレートシステムの使い方について説明します。テンプレートの取得、作成、更新、削除など、一般的な操作の方法を紹介します。"
+      },
+      {
+        "id": "getting-templates",
+        "title": "テンプレートの取得",
+        "content": "テンプレートを取得するには、MCPサーバーを通じて`get_template`ツールを使用します。\n\n```json\n{\n  \"name\": \"get_template\",\n  \"arguments\": {\n    \"id\": \"rules\",\n    \"language\": \"ja\",\n    \"variables\": {\n      \"userName\": \"ユーザー名\"\n    }\n  }\n}\n```\n\nこのコマンドは、指定された言語でテンプレートをMarkdown形式で返します。`variables`パラメータを使用すると、テンプレート内の変数を置き換えることができます。変数は`{{variable-name}}`形式でテンプレート内に記述されます。"
+      },
+      {
+        "id": "using-cli",
+        "title": "CLIツールの使用",
+        "content": "### テンプレートの移行\n\n既存のMarkdownテンプレートをJSONテンプレートに変換するには、以下のコマンドを使用します：\n\n```bash\nmemory-bank migrate-templates --markdown-dir ./templates/markdown --output-dir ./templates/json --backup-dir ./templates/backup\n```\n\n特定のテンプレートのみを変換する場合は、`--template-id`オプションを使用します：\n\n```bash\nmemory-bank migrate-templates --template-id rules --markdown-dir ./templates/markdown --output-dir ./templates/json\n```\n\n### Markdownの生成\n\nJSONテンプレートからMarkdownファイルを生成するには、以下のコマンドを使用します：\n\n```bash\nmemory-bank generate-markdown --template-id rules --language en --output-dir ./templates/generated\n```\n\nすべてのテンプレートを生成する場合は、`--template-id`を省略します：\n\n```bash\nmemory-bank generate-markdown --language en --output-dir ./templates/generated\n```"
+      },
+      {
+        "id": "template-structure",
+        "title": "テンプレートの構造",
+        "content": "JSONテンプレートは以下の構造を持っています：\n\n```json\n{\n  \"id\": \"template-id\",\n  \"type\": \"template-type\",\n  \"names\": {\n    \"en\": \"Template Name in English\",\n    \"ja\": \"Template Name in Japanese\"\n  },\n  \"sections\": [\n    {\n      \"id\": \"section1\",\n      \"titles\": {\n        \"en\": \"Section Title in English\",\n        \"ja\": \"Section Title in Japanese\"\n      },\n      \"contents\": {\n        \"en\": \"Section Content in English\",\n        \"ja\": \"Section Content in Japanese\"\n      },\n      \"isOptional\": false\n    }\n  ],\n  \"lastModified\": \"2025-03-22T00:00:00Z\"\n}\n```\n\n各フィールドの説明：\n\n- `id`: テンプレートを一意に識別するID\n- `type`: テンプレートのタイプ（例：「system」、「user」など）\n- `names`: 各言語におけるテンプレートの名前\n- `sections`: テンプレートのセクションの配列\n  - `id`: セクションを一意に識別するID\n  - `titles`: 各言語におけるセクションのタイトル\n  - `contents`: 各言語におけるセクションのコンテンツ\n  - `isOptional`: このセクションが省略可能かどうか\n- `lastModified`: テンプレートの最終更新日時"
+      },
+      {
+        "id": "translation-structure",
+        "title": "翻訳ファイルの構造",
+        "content": "翻訳JSONファイルは以下の構造を持っています：\n\n```json\n{\n  \"language\": \"en\",\n  \"translations\": {\n    \"greeting\": \"Hello\",\n    \"welcome\": \"Welcome, {{name}}!\",\n    \"template.title.rules\": \"Memory Bank Rules\"\n  },\n  \"lastModified\": \"2025-03-22T00:00:00Z\"\n}\n```\n\n各フィールドの説明：\n\n- `language`: 翻訳の言語コード\n- `translations`: キーと翻訳テキストのマップ\n- `lastModified`: 翻訳ファイルの最終更新日時\n\n翻訳キーの命名規則には以下のような階層的な構造を使用します：\n\n- `template.title.<template-id>`: テンプレートの名前\n- `template.section.<section-id>`: セクションのタイトル\n- `template.content.<section-id>`: セクションのコンテンツ"
+      },
+      {
+        "id": "creating-templates",
+        "title": "テンプレートの作成と更新",
+        "content": "新しいテンプレートを作成するには、以下の手順を実行します：\n\n1. テンプレートのJSONファイルを作成する\n2. 翻訳用のJSONファイルを作成または更新する\n3. テンプレートJSONファイルを適切なディレクトリに配置する\n\n既存のテンプレートを更新するには、テンプレートJSONファイルを直接編集するか、`TemplateController`を使用して更新します。テンプレートの更新は不変性を保持するため、常に新しいインスタンスを作成します。"
+      },
+      {
+        "id": "variables",
+        "title": "変数の使用",
+        "content": "テンプレート内で変数を使用するには、`{{variable-name}}`形式で記述します。変数はテンプレートの取得時に`variables`パラメータで指定された値に置き換えられます。\n\n例：\n\n```json\n{\n  \"contents\": {\n    \"en\": \"Hello, {{userName}}! Welcome to our service.\",\n    \"ja\": \"こんにちは、{{userName}}さん！サービスへようこそ。\"\n  }\n}\n```\n\n変数を指定してテンプレートを取得：\n\n```json\n{\n  \"name\": \"get_template\",\n  \"arguments\": {\n    \"id\": \"welcome\",\n    \"language\": \"ja\",\n    \"variables\": {\n      \"userName\": \"田中\"\n    }\n  }\n}\n```\n\n結果：\n\n```\nこんにちは、田中さん！サービスへようこそ。\n```"
+      },
+      {
+        "id": "programmatic-access",
+        "title": "プログラムからのアクセス",
+        "content": "プログラムからテンプレートシステムを使用するには、`TemplateService`と`I18nService`を利用します。\n\n```typescript\n// テンプレートサービスの取得\nconst templateService = container.get('templateService');\n\n// テンプレートの取得\nconst template = await templateService.getTemplate('rules');\n\n// テンプレートのMarkdown形式での取得\nconst language = new Language('ja');\nconst markdown = await templateService.getTemplateAsMarkdown('rules', language, { userName: '田中' });\n\n// テンプレートの作成\nconst newTemplate = await templateService.createTemplate(\n  'new-template',\n  'user',\n  { en: 'New Template', ja: '新しいテンプレート' }\n);\n\n// セクションの追加\nconst updatedTemplate = await templateService.addOrUpdateSection(\n  'new-template',\n  'section1',\n  { en: 'Section Title', ja: 'セクションタイトル' },\n  { en: 'Section Content', ja: 'セクションコンテンツ' }\n);\n```"
+      },
+      {
+        "id": "troubleshooting",
+        "title": "トラブルシューティング",
+        "content": "### テンプレートが見つからない\n\n- テンプレートIDが正しいことを確認する\n- テンプレートファイルが正しいディレクトリに配置されていることを確認する\n- テンプレートのJSONファイルが正しい形式であることを確認する\n\n### 翻訳が表示されない\n\n- 指定した言語コードがサポートされていることを確認する\n- 翻訳ファイルが正しいディレクトリに配置されていることを確認する\n- 翻訳キーがテンプレートと一致していることを確認する\n\n### 変数が置き換えられない\n\n- 変数の記述形式が`{{variable-name}}`であることを確認する\n- `variables`パラメータで正しいキーと値を指定していることを確認する"
+      },
+      {
+        "id": "migration-tips",
+        "title": "移行のヒント",
+        "content": "1. **段階的な移行**\n   - 一度にすべてのテンプレートを移行するのではなく、重要なものから順に移行する\n   - 移行中は両方の形式をサポートし、互換性を確保する\n\n2. **翻訳の統合**\n   - 既存の翻訳をJSONファイルに統合する\n   - 翻訳キーの命名規則を一貫させる\n\n3. **テスト**\n   - 移行後のテンプレートが正しく動作することを確認する\n   - 複数の言語でテストする\n   - 変数の置き換えが正しく行われることを確認する\n\n4. **バックアップ**\n   - 移行前に必ず既存のテンプレートをバックアップする\n   - `--backup-dir`オプションを使用して自動バックアップを有効にする"
+      }
+    ]
+  }
+}

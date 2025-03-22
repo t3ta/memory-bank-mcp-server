@@ -112,7 +112,48 @@ export async function registerInfrastructureServices(
   });
   
   // Register index service
-  container.registerFactory('indexService', () => {
+  // Register template repository
+  container.registerFactory('templateRepository', () => {
+    const fileSystemService = container.get<IFileSystemService>('fileSystemService');
+    const configProvider = container.get<IConfigProvider>('configProvider');
+    const config = configProvider.getConfig();
+    
+    // Set up template directory path
+    const templateDir = path.join(config.memoryBankRoot, 'templates', 'json');
+    
+    // Import and instantiate the FileTemplateRepository
+    const { FileTemplateRepository } = require('../../infrastructure/templates/FileTemplateRepository.js');
+    const templateRepository = new FileTemplateRepository(templateDir);
+    
+    // Initialize the repository
+    templateRepository.initialize().catch(error => {
+      console.error('Failed to initialize template repository:', error);
+    });
+    
+    return templateRepository;
+  });
+  
+  // Register i18n repository
+  container.registerFactory('i18nRepository', () => {
+    const fileSystemService = container.get<IFileSystemService>('fileSystemService');
+    const configProvider = container.get<IConfigProvider>('configProvider');
+    const config = configProvider.getConfig();
+    
+    // Set up translations directory path
+    const translationsDir = path.join(config.memoryBankRoot, 'translations');
+    
+    // Import and instantiate the FileI18nRepository
+    const { FileI18nRepository } = require('../../infrastructure/i18n/FileI18nRepository.js');
+    const i18nRepository = new FileI18nRepository(translationsDir);
+    
+    // Initialize the repository
+    i18nRepository.initialize().catch(error => {
+      console.error('Failed to initialize i18n repository:', error);
+    });
+    
+    return i18nRepository;
+  });
+
     const fileSystemService = container.get<IFileSystemService>('fileSystemService');
     const configProvider = container.get<IConfigProvider>('configProvider');
     const config = configProvider.getConfig();
@@ -320,7 +361,37 @@ export function registerApplicationServices(container: DIContainer): void {
     return new CreateBranchCoreFilesUseCase(branchRepository);
   });
 
-  // 循環参照を防ぐために、この部分は削除
+  // Register template and i18n services
+  container.registerFactory('i18nService', () => {
+    const i18nRepository = container.get('i18nRepository');
+    
+    // Import and instantiate the I18nService
+    const { I18nService } = require('../../application/i18n/I18nService.js');
+    return new I18nService(i18nRepository);
+  });
+  
+  container.registerFactory('templateService', () => {
+    const templateRepository = container.get('templateRepository');
+    
+    // Import and instantiate the TemplateService
+    const { TemplateService } = require('../../application/templates/TemplateService.js');
+    return new TemplateService(templateRepository);
+  });
+  
+  container.registerFactory('markdownMigrationService', () => {
+    const templateRepository = container.get('templateRepository');
+    const configProvider = container.get<IConfigProvider>('configProvider');
+    const config = configProvider.getConfig();
+    
+    // Set up markdown and backup directory paths
+    const markdownDir = path.join(config.memoryBankRoot, 'templates', 'markdown');
+    const backupDir = path.join(config.memoryBankRoot, 'templates', 'backup');
+    
+    // Import and instantiate the MarkdownMigrationService
+    const { MarkdownMigrationService } = require('../../migration/MarkdownMigrationService.js');
+    return new MarkdownMigrationService(templateRepository, markdownDir, backupDir);
+  });
+
 
   // Pull Request use cases section removed
 }
@@ -481,7 +552,15 @@ export function registerInterfaceServices(container: DIContainer): void {
         deleteJsonDocumentUseCase,
         searchJsonDocumentsUseCase,
         updateJsonIndexUseCase,
-      } // Pass optional dependencies
+  // Register template controller
+  container.registerFactory('templateController', () => {
+    const templateService = container.get('templateService');
+    
+    // Import and instantiate the TemplateController
+    const { TemplateController } = require('../../interface/controllers/TemplateController.js');
+    return new TemplateController(templateService);
+  });
+
     );
   });
 }

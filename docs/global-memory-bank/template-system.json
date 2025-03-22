@@ -1,0 +1,81 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "template-system",
+    "title": "新テンプレートシステム (JSON-based Templates)",
+    "documentType": "document",
+    "path": "template-system.json",
+    "tags": [
+      "architecture",
+      "templates",
+      "i18n"
+    ],
+    "lastModified": "2025-03-22T08:55:15.761Z",
+    "createdAt": "2025-03-22T08:55:15.761Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "id": "overview",
+        "title": "概要",
+        "content": "Memory Bank 2.0では、従来のMarkdownベースのテンプレートシステムからJSON構造化データベースのテンプレートシステムへと移行します。このドキュメントでは、新しいテンプレートシステムの設計と使用方法について説明します。"
+      },
+      {
+        "id": "design-principles",
+        "title": "設計原則",
+        "content": "新テンプレートシステムは以下の原則に基づいて設計されています：\n\n1. **ドメイン駆動設計**: ドメインモデルを中心に設計し、アプリケーション、インフラストラクチャ層を明確に分離\n2. **バリューオブジェクト**: Language、Translation、Template、Sectionをバリューオブジェクトとして実装し、不変性を確保\n3. **リポジトリパターン**: データへのアクセスをリポジトリインターフェースで抽象化\n4. **多言語対応**: 翻訳をファーストクラスの概念として組み込み、複数言語間の切り替えを容易に\n5. **マイグレーション対応**: 既存のMarkdownテンプレートから新JSONテンプレートへの移行を支援"
+      },
+      {
+        "id": "domain-models",
+        "title": "ドメインモデル",
+        "content": "### Language\nサポートされている言語を表すバリューオブジェクト。現在は `en`, `ja`, `zh` をサポート。\n\n### Translation\n特定の言語における翻訳テキストを表すバリューオブジェクト。キーと言語と翻訳テキストの組み合わせ。\n\n### Template\nテンプレート全体を表すバリューオブジェクト。ID、タイプ、多言語の名前、セクションのコレクションを持つ。\n\n### Section\nテンプレート内のセクションを表すバリューオブジェクト。ID、多言語のタイトル、多言語のコンテンツ、オプション設定を持つ。"
+      },
+      {
+        "id": "repositories",
+        "title": "リポジトリ",
+        "content": "### ITemplateRepository\nテンプレートデータへのアクセスを抽象化するインターフェース。\n\n### II18nRepository\n翻訳データへのアクセスを抽象化するインターフェース。\n\n### FileTemplateRepository\nファイルシステムでJSONテンプレートを管理する実装。\n\n### FileI18nRepository\nファイルシステムで翻訳データを管理する実装。"
+      },
+      {
+        "id": "services",
+        "title": "サービス",
+        "content": "### TemplateService\nテンプレートの取得、作成、更新、削除などの操作を提供するアプリケーションサービス。\n\n### I18nService\n現在の言語設定の管理や翻訳の取得を提供するアプリケーションサービス。\n\n### MarkdownMigrationService\n既存のMarkdownテンプレートをJSONテンプレートに変換するためのサービス。"
+      },
+      {
+        "id": "controllers",
+        "title": "コントローラー",
+        "content": "### TemplateController\nテンプレートサービスへのインターフェースを提供するコントローラー。MCPサーバーとテンプレートサービスの橋渡しをします。"
+      },
+      {
+        "id": "cli-commands",
+        "title": "CLIコマンド",
+        "content": "### migrate-templates\n既存のMarkdownテンプレートをJSONテンプレートに変換するためのコマンド。\n\n```bash\nmemory-bank migrate-templates --markdown-dir ./templates/markdown --output-dir ./templates/json --backup-dir ./templates/backup\n```\n\n### generate-markdown\nJSONテンプレートからMarkdownファイルを生成するためのコマンド。\n\n```bash\nmemory-bank generate-markdown --template-id rules --language en --output-dir ./templates/generated\n```"
+      },
+      {
+        "id": "mcp-api",
+        "title": "MCP API 拡張",
+        "content": "### get_template\nテンプレートをMarkdown形式で取得するためのAPIエンドポイント。\n\n```json\n{\n  \"name\": \"get_template\",\n  \"arguments\": {\n    \"id\": \"rules\",\n    \"language\": \"ja\",\n    \"variables\": {\n      \"userName\": \"John\"\n    }\n  }\n}\n```"
+      },
+      {
+        "id": "file-formats",
+        "title": "ファイル形式",
+        "content": "### テンプレートJSONファイル\n\n```json\n{\n  \"id\": \"template-id\",\n  \"type\": \"template-type\",\n  \"names\": {\n    \"en\": \"Template Name in English\",\n    \"ja\": \"Template Name in Japanese\"\n  },\n  \"sections\": [\n    {\n      \"id\": \"section1\",\n      \"titles\": {\n        \"en\": \"Section Title in English\",\n        \"ja\": \"Section Title in Japanese\"\n      },\n      \"contents\": {\n        \"en\": \"Section Content in English\",\n        \"ja\": \"Section Content in Japanese\"\n      },\n      \"isOptional\": false\n    }\n  ],\n  \"lastModified\": \"2025-03-22T00:00:00Z\"\n}\n```\n\n### 翻訳JSONファイル\n\n```json\n{\n  \"language\": \"en\",\n  \"translations\": {\n    \"greeting\": \"Hello\",\n    \"welcome\": \"Welcome, {{name}}!\",\n    \"template.title.rules\": \"Memory Bank Rules\"\n  },\n  \"lastModified\": \"2025-03-22T00:00:00Z\"\n}\n```"
+      },
+      {
+        "id": "migration-guide",
+        "title": "移行ガイド",
+        "content": "既存のMarkdownテンプレートから新しいJSONテンプレートへの移行は段階的に行うことができます。\n\n1. **準備フェーズ**\n   - `migrate-templates`コマンドで既存のMarkdownテンプレートをJSONに変換\n   - 変換されたJSONテンプレートを確認し、必要に応じて調整\n\n2. **移行フェーズ**\n   - 新しいテンプレートシステムの統合\n   - 両方の形式（MarkdownとJSON）を一時的にサポート\n\n3. **完全移行フェーズ**\n   - すべてのテンプレートがJSONに移行されたことを確認\n   - Markdownテンプレートのサポートを終了\n\n既存のMarkdownテンプレートファイルは、移行プロセス中はバックアップディレクトリに保存されます。"
+      },
+      {
+        "id": "best-practices",
+        "title": "ベストプラクティス",
+        "content": "1. **一貫した命名規則**\n   - テンプレートIDは小文字、ハイフン区切りの命名規則を使用する\n   - セクションIDは小文字、ハイフン区切りの命名規則を使用する\n   - 翻訳キーはドット区切りの階層的な命名規則を使用する\n\n2. **翻訳キーの構造化**\n   - `template.title.<template-id>`: テンプレートの名前\n   - `template.section.<section-id>`: セクションのタイトル\n   - `template.content.<section-id>`: セクションのコンテンツ\n\n3. **変数の活用**\n   - ユーザー名やタイムスタンプなどの動的な値には変数を使用する\n   - 変数は`{{variable-name}}`の形式で指定する\n\n4. **テンプレートのモジュール化**\n   - 再利用可能なセクションを持つテンプレートを作成する\n   - 共通のセクションを複数のテンプレートで共有する"
+      },
+      {
+        "id": "future-enhancements",
+        "title": "今後の拡張",
+        "content": "1. **テンプレート参照機能**\n   - テンプレート間の参照をサポートし、共通のセクションを共有可能に\n\n2. **バージョン管理**\n   - テンプレートのバージョン履歴を管理する機能\n\n3. **テンプレートエディタ**\n   - JSONテンプレートを視覚的に編集するためのUIツール\n\n4. **拡張変数システム**\n   - 条件付き表示や繰り返しなど、より高度な変数処理\n\n5. **追加言語のサポート**\n   - より多くの言語をサポートし、グローバル展開を強化"
+      }
+    ]
+  }
+}
