@@ -1,7 +1,8 @@
 /**
  * Unit tests for Markdown Migration Service
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
+import { vi } from 'jest';
 import fs from 'fs/promises';
 import path from 'path';
 import { MarkdownMigrationService } from '../../../src/migration/MarkdownMigrationService.js';

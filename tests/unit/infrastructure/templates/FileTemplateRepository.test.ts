@@ -1,7 +1,8 @@
 /**
  * Unit tests for FileTemplateRepository
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
+import { vi } from 'jest';
 import fs from 'fs/promises';
 import path from 'path';
 import { FileTemplateRepository } from '../../../../src/infrastructure/templates/FileTemplateRepository.js';
