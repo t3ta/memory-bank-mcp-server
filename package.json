@@ -26,7 +26,7 @@
     "lint": "eslint . --ext .ts --max-warnings 1000 || true",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write 'src/**/*.ts'",
-    "test": "NODE_OPTIONS='--experimental-vm-modules' jest --no-coverage --testMatch='**/tests/**/*.test.ts' --testPathIgnorePatterns='tests/e2e'",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' jest --testPathIgnorePatterns='tests/e2e'",
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' jest --watch",
     "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage",
     "test:e2e": "NODE_OPTIONS='--experimental-vm-modules' jest --no-coverage --config=tests/e2e/jest.config.ts --runInBand",
