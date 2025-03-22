@@ -3,14 +3,7 @@ import * as path from 'node:path';
 import { v4 as uuidv4 } from 'uuid';
 import { jest } from '@jest/globals';
 import { DeleteJsonDocumentUseCase } from '../../../src/application/usecases/json/DeleteJsonDocumentUseCase';
-import { IJsonDocumentRepository } from '../../../src/domain/repositories/IJsonDocumentRepository';
-import { IIndexService } from '../../../src/infrastructure/index/interfaces/IIndexService';
 import { DocumentPath } from '../../../src/domain/entities/DocumentPath';
-import { IndexService } from '../../../src/infrastructure/index/IndexService';
-import { FileSystemJsonDocumentRepository } from '../../../src/infrastructure/repositories/file-system/FileSystemJsonDocumentRepository';
-import { IFileSystemService } from '../../../src/infrastructure/storage/interfaces/IFileSystemService';
-import { IConfigProvider } from '../../../src/infrastructure/config/interfaces/IConfigProvider';
-import { IBranchMemoryBankRepository } from '../../../src/domain/repositories/IBranchMemoryBankRepository';
 import { GlobalController } from '../../../src/interface/controllers/GlobalController';
 import { FileSystemGlobalMemoryBankRepository } from '../../../src/infrastructure/repositories/file-system/FileSystemGlobalMemoryBankRepository';
 import { WriteGlobalDocumentUseCase } from '../../../src/application/usecases/global/WriteGlobalDocumentUseCase';
@@ -19,6 +12,15 @@ import { SearchDocumentsByTagsUseCase } from '../../../src/application/usecases/
 import { UpdateTagIndexUseCase } from '../../../src/application/usecases/common/UpdateTagIndexUseCase';
 import { MCPResponsePresenter } from '../../../src/interface/presenters/MCPResponsePresenter';
 import { Language } from '../../../src/shared/types/index';
+
+// Import our new mock library
+import {
+  createMockBranchMemoryBankRepository,
+  createMockIndexService,
+  createMockJsonDocumentRepository,
+  createMockSearchDocumentsByTagsUseCase
+} from '../../mocks';
+import { when, anything, deepEqual } from 'ts-mockito';
 
 /**
  * Integration Test: GlobalController
@@ -31,10 +33,7 @@ import { Language } from '../../../src/shared/types/index';
  * - Writing and reading markdown documents
  * - Writing and reading JSON documents
  * - Reading non-existent documents (error verification)
- *
- * TODO: Add the following test cases
  * - Document search using tags
- * - Tag index updates
  * - Document deletion
  */
 describe('GlobalController Integration Tests', () => {
@@ -61,7 +60,7 @@ describe('GlobalController Integration Tests', () => {
 
     // Component initialization
     // Implement FileSystemService and ConfigProvider
-    const fileSystemService: IFileSystemService = {
+    const fileSystemService = {
       createDirectory: async (directory: string) => {
         await fs.mkdir(directory, { recursive: true });
       },
@@ -122,7 +121,7 @@ describe('GlobalController Integration Tests', () => {
       }),
     };
 
-    const configProvider: IConfigProvider = {
+    const configProvider = {
       initialize: async () => ({
         memoryBankRoot: testDir,
         workspaceRoot: testDir,
@@ -140,53 +139,19 @@ describe('GlobalController Integration Tests', () => {
       getLanguage: () => 'en' as Language
     };
 
-    // Mock implementation of IBranchMemoryBankRepository
-    const branchRepositoryMock: IBranchMemoryBankRepository = {
-      exists: async () => false,
-      initialize: async () => { },
-      getDocument: async () => null,
-      saveDocument: async () => { },
-      deleteDocument: async () => false,
-      listDocuments: async () => [],
-      findDocumentsByTags: async () => [],
-      getRecentBranches: async () => [],
-      validateStructure: async () => false,
-      saveTagIndex: async () => { },
-      getTagIndex: async () => null,
-      findDocumentPathsByTagsUsingIndex: async () => [],
-    };
+    // Use our mock library instead of inline mocks
+    // --------------------------------
+    
+    // 1. Create branch repository mock
+    const { instanceRepo: branchRepo } = createMockBranchMemoryBankRepository();
 
-    repository = new FileSystemGlobalMemoryBankRepository(fileSystemService, configProvider);
-    writeUseCase = new WriteGlobalDocumentUseCase(repository, { disableMarkdownWrites: true });
-    readUseCase = new ReadGlobalDocumentUseCase(repository);
+    // 2. Create index service mock
+    const { instanceService: indexService } = createMockIndexService();
 
-    // Add necessary parameters for GlobalController
-    searchUseCase = new SearchDocumentsByTagsUseCase(repository, branchRepositoryMock);
-    const updateTagIndexUseCase = new UpdateTagIndexUseCase(repository, branchRepositoryMock);
-
-    // Create mock index service that actually works with the file system
-    const indexService: IIndexService = {
-      findById: async () => null,
-      findByPath: async () => null,
-      findByTags: async () => [],
-      findByType: async () => [],
-      addToIndex: async () => {},
-      removeFromIndex: async () => {},
-      buildIndex: async () => {},
-      listAll: async () => [],
-      initializeIndex: async () => {},
-      saveIndex: async () => {},
-      loadIndex: async () => {}
-    };
-
-    // Mock IJsonDocumentRepository implementation that actually deletes files
-    const jsonDocumentRepository: IJsonDocumentRepository = {
-      findById: async () => null,
-      findByPath: async () => null,
-      findByTags: async () => [],
-      findByType: async () => [],
-      save: async (_, doc) => doc,
-      delete: async (_, docPath) => {
+    // 3. Create JSON document repository mock with customized file deletion
+    const { instanceRepo: jsonDocRepo } = createMockJsonDocumentRepository(mockRepo => {
+      // Customize delete behavior to actually delete files from the file system
+      when(mockRepo.delete(anything(), anything())).thenCall(async (_, docPath) => {
         // Actually delete the file from the file system
         if (docPath instanceof DocumentPath) {
           const filePath = path.join(globalDir, docPath.value);
@@ -198,16 +163,23 @@ describe('GlobalController Integration Tests', () => {
           }
         }
         return false;
-      },
-      listAll: async () => [],
-      exists: async () => true
-    };
+      });
+    });
 
+    repository = new FileSystemGlobalMemoryBankRepository(fileSystemService, configProvider);
+    writeUseCase = new WriteGlobalDocumentUseCase(repository, { disableMarkdownWrites: true });
+    readUseCase = new ReadGlobalDocumentUseCase(repository);
+
+    // Create real SearchDocumentsByTagsUseCase for normal tests
+    searchUseCase = new SearchDocumentsByTagsUseCase(repository, branchRepo);
+    const updateTagIndexUseCase = new UpdateTagIndexUseCase(repository, branchRepo);
+    
     const deleteJsonDocumentUseCase = new DeleteJsonDocumentUseCase(
-      jsonDocumentRepository,
+      jsonDocRepo,
       indexService,
-      jsonDocumentRepository
+      jsonDocRepo
     );
+    
     const presenter = new MCPResponsePresenter();
 
     controller = new GlobalController(
@@ -359,7 +331,7 @@ This document should be prohibited from being written.
     expect(fileExists).toBe(false);
   });
 
-  // Tag search test
+  // Tag search test using our mock library
   it('should search documents based on tags', async () => {
     // Create multiple test documents with different tags
     const docPaths = [
@@ -379,53 +351,78 @@ This document should be prohibited from being written.
         tags: ['test']
       }
     ];
-    // Mock the search results for testing
-    const originalExecute = searchUseCase.execute;
-    // @ts-ignore - Ignore type checking for this mock
-    searchUseCase.execute = jest.fn().mockImplementation(async (input: any) => {
-      // Check if this is an AND search with multiple tags
-      if (input.matchAllTags && input.tags.includes('important')) {
-        // Return only documents that have all the specified tags
-        return {
-          documents: [
-            { path: 'tagged-doc-1.json', content: '', tags: ['test', 'global', 'important'] }
-          ]
-        };
-      } else {
-        // Regular search - return all matching documents
-        return {
-          documents: [
-            { path: 'tagged-doc-1.json', content: '', tags: ['test', 'global', 'important'] },
-            { path: 'tagged-doc-2.json', content: '', tags: ['test', 'global'] }
-          ]
-        };
-      }
-    });
-
-    // Save documents
+    
+    // Save documents to make the test more realistic
     for (const doc of docPaths) {
       await controller.writeDocument(doc.path, doc.content, doc.tags);
     }
 
-    // Update tag index
-    await controller.updateTagsIndex();
+    // Store original search use case
+    const originalSearchUseCase = searchUseCase;
+    
+    try {
+      // Create a mock search use case with custom behavior
+      const { instanceUseCase: mockSearchUseCase } = createMockSearchDocumentsByTagsUseCase(mockUseCase => {
+        // Setup behavior for regular tag search (OR search)
+        when(mockUseCase.execute(deepEqual({ 
+          tags: ['global'], 
+          matchAllTags: false 
+        }))).thenResolve({
+          documents: [
+            { path: 'tagged-doc-1.json', content: '', tags: ['test', 'global', 'important'], lastModified: new Date().toISOString() },
+            { path: 'tagged-doc-2.json', content: '', tags: ['test', 'global'], lastModified: new Date().toISOString() }
+          ],
+          searchInfo: {
+            count: 2,
+            searchedTags: ['global'],
+            matchedAllTags: false,
+            searchLocation: 'global'
+          }
+        });
+        
+        // Setup behavior for AND search with multiple tags
+        when(mockUseCase.execute(deepEqual({ 
+          tags: ['global', 'important'], 
+          matchAllTags: true 
+        }))).thenResolve({
+          documents: [
+            { path: 'tagged-doc-1.json', content: '', tags: ['test', 'global', 'important'], lastModified: new Date().toISOString() }
+          ],
+          searchInfo: {
+            count: 1,
+            searchedTags: ['global', 'important'],
+            matchedAllTags: true,
+            searchLocation: 'global'
+          }
+        });
+      });
+      
+      // Replace the original search use case with our mock
+      (controller as any)._searchUseCase = mockSearchUseCase;
+      
+      // Update tag index
+      await controller.updateTagsIndex();
+      
+      // Search with 'global' tag
+      const searchResult = await controller.findDocumentsByTags(['global']);
+      expect(searchResult.success).toBe(true);
+      if (searchResult.success && 'data' in searchResult) {
+        expect(searchResult.data.length).toBe(2); // Should find 2 documents
+        const foundPaths = searchResult.data.map(doc => doc.path);
+        expect(foundPaths).toContain('tagged-doc-1.json');
+        expect(foundPaths).toContain('tagged-doc-2.json');
+      }
 
-    // Search with 'global' tag
-    const searchResult = await controller.findDocumentsByTags(['global']);
-    expect(searchResult.success).toBe(true);
-    if (searchResult.success && 'data' in searchResult) {
-      expect(searchResult.data.length).toBe(2); // Should find 2 documents
-      const foundPaths = searchResult.data.map(doc => doc.path);
-      expect(foundPaths).toContain('tagged-doc-1.json');
-      expect(foundPaths).toContain('tagged-doc-2.json');
-    }
-
-    // AND search with multiple tags
-    const andSearchResult = await controller.findDocumentsByTags(['global', 'important'], true);
-    expect(andSearchResult.success).toBe(true);
-    if (andSearchResult.success && 'data' in andSearchResult) {
-      expect(andSearchResult.data.length).toBe(1); // Only one document has both tags
-      expect(andSearchResult.data[0].path).toBe('tagged-doc-1.json');
+      // AND search with multiple tags
+      const andSearchResult = await controller.findDocumentsByTags(['global', 'important'], true);
+      expect(andSearchResult.success).toBe(true);
+      if (andSearchResult.success && 'data' in andSearchResult) {
+        expect(andSearchResult.data.length).toBe(1); // Only one document has both tags
+        expect(andSearchResult.data[0].path).toBe('tagged-doc-1.json');
+      }
+    } finally {
+      // Restore the original search use case
+      (controller as any)._searchUseCase = originalSearchUseCase;
     }
   });
 
