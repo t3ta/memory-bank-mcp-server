@@ -13,10 +13,10 @@ import { TagIndex } from '../../../src/schemas/tag-index/tag-index-schema';
  * 
  * @example
  * // 基本的な使い方
- * const { mockRepo, instanceRepo } = createMockGlobalMemoryBankRepository();
+ * const { mock, instance } = createMockGlobalMemoryBankRepository();
  * 
  * // カスタマイズした使い方
- * const { mockRepo, instanceRepo } = createMockGlobalMemoryBankRepository(mockRepo => {
+ * const { mock, instance } = createMockGlobalMemoryBankRepository(mockRepo => {
  *   // 特定のドキュメントパスの取得をカスタマイズ
  *   when(mockRepo.getDocument(deepEqual(new DocumentPath('test/path.md')))).thenResolve({
  *     // カスタムドキュメント
@@ -26,8 +26,8 @@ import { TagIndex } from '../../../src/schemas/tag-index/tag-index-schema';
 export function createMockGlobalMemoryBankRepository(
   customizations?: (mockRepo: IGlobalMemoryBankRepository) => void
 ): {
-  mockRepo: IGlobalMemoryBankRepository;
-  instanceRepo: IGlobalMemoryBankRepository;
+  mock: IGlobalMemoryBankRepository;
+  instance: IGlobalMemoryBankRepository;
 } {
   const mockRepo = mock<IGlobalMemoryBankRepository>();
 
@@ -51,7 +51,7 @@ export function createMockGlobalMemoryBankRepository(
 
   // 実際のインスタンスを返す
   return {
-    mockRepo,
-    instanceRepo: instance(mockRepo)
+    mock: mockRepo,
+    instance: instance(mockRepo)
   };
 }

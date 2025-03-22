@@ -15,10 +15,10 @@ import { DocumentReference } from '../../../src/schemas/v2/index-schema';
  * 
  * @example
  * // 基本的な使い方
- * const { mockService, instanceService } = createMockIndexService();
+ * const { mock, instance } = createMockIndexService();
  * 
  * // カスタマイズした使い方
- * const { mockService, instanceService } = createMockIndexService(mockService => {
+ * const { mock, instance } = createMockIndexService(mockService => {
  *   // 特定のIDに対する検索結果をカスタマイズ
  *   when(mockService.findById(
  *     anything(), 
@@ -34,8 +34,8 @@ import { DocumentReference } from '../../../src/schemas/v2/index-schema';
 export function createMockIndexService(
   customizations?: (mockService: IIndexService) => void
 ): {
-  mockService: IIndexService;
-  instanceService: IIndexService;
+  mock: IIndexService;
+  instance: IIndexService;
 } {
   const mockService = mock<IIndexService>();
 
@@ -59,7 +59,7 @@ export function createMockIndexService(
 
   // 実際のインスタンスを返す
   return {
-    mockService,
-    instanceService: instance(mockService)
+    mock: mockService,
+    instance: instance(mockService)
   };
 }

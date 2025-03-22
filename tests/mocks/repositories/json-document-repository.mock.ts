@@ -7,31 +7,31 @@ import { Tag } from '../../../src/domain/entities/Tag';
 import { BranchInfo } from '../../../src/domain/entities/BranchInfo';
 
 /**
- * JSONɭ�����ݸ��n�ï�\Y�
+ * JSONドキュメントリポジトリのモックを作成する
  * 
- * @param customizations ���ޤ��p - �ïn/�D����ޤ�Y�_�n����ï
- * @returns �ïU�_�ݸ��h]n���n�ָ���
+ * @param customizations カスタマイズ関数 - モックの振る舞いをカスタマイズするためのコールバック
+ * @returns モックされたリポジトリとそのインスタンスのオブジェクト
  * 
  * @example
- * // �,�jD�
- * const { mockRepo, instanceRepo } = createMockJsonDocumentRepository();
+ * // 基本的な使い方
+ * const { mock, instance } = createMockJsonDocumentRepository();
  * 
- * // ���ޤ�W_D�
- * const { mockRepo, instanceRepo } = createMockJsonDocumentRepository(mockRepo => {
+ * // カスタマイズした使い方
+ * const { mock, instance } = createMockJsonDocumentRepository(mockRepo => {
  *   when(mockRepo.findById(deepEqual(new DocumentId('123')))).thenResolve({
- *     // ����ɭ����
+ *     // カスタム返却値
  *   } as JsonDocument);
  * });
  */
 export function createMockJsonDocumentRepository(
   customizations?: (mockRepo: IJsonDocumentRepository) => void
 ): {
-  mockRepo: IJsonDocumentRepository;
-  instanceRepo: IJsonDocumentRepository;
+  mock: IJsonDocumentRepository;
+  instance: IJsonDocumentRepository;
 } {
   const mockRepo = mock<IJsonDocumentRepository>();
 
-  // �թ��n/�D�-�
+  // デフォルトの振る舞いを設定
   when(mockRepo.findById(anything())).thenResolve(null);
   when(mockRepo.findByPath(anything(), anything())).thenResolve(null);
   when(mockRepo.findByTags(anything(), anything(), anything())).thenResolve([]);
@@ -43,14 +43,14 @@ export function createMockJsonDocumentRepository(
   );
   when(mockRepo.delete(anything(), anything())).thenResolve(true);
 
-  // ���ޤ��pLB�p�L
+  // カスタマイズ関数があれば実行
   if (customizations) {
     customizations(mockRepo);
   }
 
-  // ��n����Y
+  // 実際のインスタンスを返す
   return {
-    mockRepo,
-    instanceRepo: instance(mockRepo)
+    mock: mockRepo,
+    instance: instance(mockRepo)
   };
 }

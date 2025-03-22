@@ -15,10 +15,10 @@ import { ApplicationError } from '../../../src/shared/errors/ApplicationError';
  * 
  * @example
  * // 基本的な使い方
- * const { mockUseCase, instanceUseCase } = createMockSearchDocumentsByTagsUseCase();
+ * const { mock, instance } = createMockSearchDocumentsByTagsUseCase();
  * 
  * // カスタマイズした使い方
- * const { mockUseCase, instanceUseCase } = createMockSearchDocumentsByTagsUseCase(mockUseCase => {
+ * const { mock, instance } = createMockSearchDocumentsByTagsUseCase(mockUseCase => {
  *   // 特定の入力に対する出力をカスタマイズ
  *   when(mockUseCase.execute(deepEqual({
  *     tags: ['important', 'documentation'],
@@ -39,8 +39,8 @@ import { ApplicationError } from '../../../src/shared/errors/ApplicationError';
 export function createMockSearchDocumentsByTagsUseCase(
   customizations?: (mockUseCase: IUseCase<SearchDocumentsByTagsInput, SearchDocumentsByTagsOutput>) => void
 ): {
-  mockUseCase: IUseCase<SearchDocumentsByTagsInput, SearchDocumentsByTagsOutput>;
-  instanceUseCase: IUseCase<SearchDocumentsByTagsInput, SearchDocumentsByTagsOutput>;
+  mock: IUseCase<SearchDocumentsByTagsInput, SearchDocumentsByTagsOutput>;
+  instance: IUseCase<SearchDocumentsByTagsInput, SearchDocumentsByTagsOutput>;
 } {
   const mockUseCase = mock<IUseCase<SearchDocumentsByTagsInput, SearchDocumentsByTagsOutput>>();
 
@@ -62,7 +62,7 @@ export function createMockSearchDocumentsByTagsUseCase(
 
   // 実際のインスタンスを返す
   return {
-    mockUseCase,
-    instanceUseCase: instance(mockUseCase)
+    mock: mockUseCase,
+    instance: instance(mockUseCase)
   };
 }

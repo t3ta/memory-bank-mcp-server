@@ -17,10 +17,10 @@ import { TagIndex } from '../../../src/schemas/tag-index/tag-index-schema';
  * 
  * @example
  * // 基本的な使い方
- * const { mockRepo, instanceRepo } = createMockBranchMemoryBankRepository();
+ * const { mock, instance } = createMockBranchMemoryBankRepository();
  * 
  * // カスタマイズした使い方
- * const { mockRepo, instanceRepo } = createMockBranchMemoryBankRepository(mockRepo => {
+ * const { mock, instance } = createMockBranchMemoryBankRepository(mockRepo => {
  *   // 特定のブランチの存在チェックをカスタマイズ
  *   when(mockRepo.exists('feature-branch')).thenResolve(true);
  *   when(mockRepo.exists('non-existent-branch')).thenResolve(false);
@@ -29,8 +29,8 @@ import { TagIndex } from '../../../src/schemas/tag-index/tag-index-schema';
 export function createMockBranchMemoryBankRepository(
   customizations?: (mockRepo: IBranchMemoryBankRepository) => void
 ): {
-  mockRepo: IBranchMemoryBankRepository;
-  instanceRepo: IBranchMemoryBankRepository;
+  mock: IBranchMemoryBankRepository;
+  instance: IBranchMemoryBankRepository;
 } {
   const mockRepo = mock<IBranchMemoryBankRepository>();
 
@@ -55,7 +55,7 @@ export function createMockBranchMemoryBankRepository(
 
   // 実際のインスタンスを返す
   return {
-    mockRepo,
-    instanceRepo: instance(mockRepo)
+    mock: mockRepo,
+    instance: instance(mockRepo)
   };
 }
