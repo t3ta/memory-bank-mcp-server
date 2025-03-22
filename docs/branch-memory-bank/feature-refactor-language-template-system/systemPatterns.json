@@ -1,140 +1,62 @@
 {
   "schema": "memory_document_v2",
   "metadata": {
-    "id": "f4e2b1a3-c987-4e12-b543-76d509e8f123",
+    "id": "8d3f91a5-e742-4b1d-a9c6-21d0ba17f543",
     "title": "システムパターン",
     "documentType": "system_patterns",
     "path": "systemPatterns.json",
     "tags": [
-      "system-patterns",
-      "architecture",
-      "design"
+      "core",
+      "system-patterns"
     ],
-    "lastModified": "2025-03-22T06:15:23.466Z",
-    "createdAt": "2025-03-22T06:15:23.466Z",
-    "version": 1
+    "lastModified": "2025-03-22T08:23:15.000Z",
+    "createdAt": "2025-03-22T05:09:47.466Z",
+    "version": 2
   },
   "content": {
     "technicalDecisions": [
       {
-        "id": "td-01",
-        "title": "言語テンプレートシステムのアーキテクチャ",
-        "context": "現在の言語テンプレートシステムはJSONとMarkdownの混在、およびレガシーな実装が存在し、拡張性とメンテナンス性に課題がある",
-        "decision": "クリーンアーキテクチャに基づいて言語テンプレートシステムを再設計し、JSONベースのテンプレート形式に統一する",
-        "impact": [
-          "コードの責任分離が明確になり、メンテナンス性が向上する",
-          "新しい言語やテンプレートタイプの追加が容易になる",
-          "テンプレートのバリデーションが強化され、エラー処理が改善される"
-        ],
-        "status": "decided"
+        "title": "クリーンアーキテクチャの採用",
+        "context": "テンプレートシステムのコード構造を整理し、テスト容易性と保守性を高める必要がある",
+        "decision": "ドメイン駆動設計とクリーンアーキテクチャのプラクティスを採用",
+        "impact": "- 関心の分離による保守性の向上\n- テスト容易性の向上\n- 拡張性の向上\n- 実装詳細からビジネスロジックの分離"
       },
       {
-        "id": "td-02",
-        "title": "テンプレートローダーの改善",
-        "context": "現在のJsonTemplateLoaderクラスには、レガシーなテンプレート読み込み処理と新しいJSON形式のサポートが混在している",
-        "decision": "テンプレートローダーをStrategy Pattern（戦略パターン）を使って再実装し、フォーマット別の読み込みロジックを分離する",
-        "impact": [
-          "新しいテンプレート形式を追加する際の拡張性が向上する",
-          "レガシーサポートとモダンな実装を明確に分離できる",
-          "テスト可能性が向上する"
-        ],
-        "status": "proposed"
+        "title": "バリューオブジェクトパターンの採用",
+        "context": "テンプレート関連のドメインモデルをどのように実装するか",
+        "decision": "イミュータブルなバリューオブジェクトとして実装",
+        "impact": "- 副作用の少ないコード\n- 不変条件の保証\n- 一貫性のある振る舞い\n- 予測可能な動作"
       },
       {
-        "id": "td-03",
-        "title": "国際化（i18n）処理の改善",
-        "context": "現在のI18nProviderクラスは単一の責任原則（SRP）に反し、複数の責任を持っている",
-        "decision": "I18nProviderをより小さな責務を持つコンポーネントに分割し、Factory Pattern（ファクトリーパターン）を導入する",
-        "impact": [
-          "言語ごとの翻訳ロジックをより柔軟に拡張できるようになる",
-          "テストが容易になり、バグの発見と修正が迅速になる",
-          "新しい言語サポートの追加プロセスが標準化される"
-        ],
-        "status": "proposed"
+        "title": "リポジトリパターンの採用",
+        "context": "データアクセスロジックをビジネスロジックから分離する必要がある",
+        "decision": "リポジトリパターンを採用し、インターフェースによる抽象化を行う",
+        "impact": "- 依存性の逆転による疎結合\n- テスト容易性の向上\n- 実装の詳細を隠蔽\n- 将来的なストレージ層の変更に対する柔軟性"
+      },
+      {
+        "title": "JSON形式への移行",
+        "context": "現在のシステムはMarkdownとJSONが混在しており一貫性がない",
+        "decision": "すべてのテンプレートをJSON形式で標準化",
+        "impact": "- データ構造の一貫性\n- バリデーションの容易さ\n- プログラムからのアクセスの向上\n- スキーマによる型安全性"
+      },
+      {
+        "title": "段階的移行戦略",
+        "context": "既存のコードを一度に置き換えるとシステムが不安定になるリスクがある",
+        "decision": "古いコードと新しいコードを一定期間並行して維持し、段階的に移行する",
+        "impact": "- 移行期間中の安定性確保\n- 既存機能への影響を最小化\n- 問題発生時のロールバック容易性\n- テストとデバッグの簡素化"
       }
     ],
     "directoryStructure": {
-      "description": "リファクタリング後の言語テンプレートシステムのディレクトリ構造",
-      "structure": [
-        {
-          "path": "src/domain/templates",
-          "description": "テンプレートのドメインモデルとビジネスロジック"
-        },
-        {
-          "path": "src/domain/i18n",
-          "description": "国際化のドメインモデルとビジネスロジック"
-        },
-        {
-          "path": "src/application/templates",
-          "description": "テンプレート操作のユースケース（アプリケーションサービス）"
-        },
-        {
-          "path": "src/application/i18n",
-          "description": "国際化のユースケース（アプリケーションサービス）"
-        },
-        {
-          "path": "src/infrastructure/templates",
-          "description": "テンプレート関連のインフラストラクチャ実装（ファイルシステム、データベースなど）"
-        },
-        {
-          "path": "src/infrastructure/i18n",
-          "description": "国際化関連のインフラストラクチャ実装（翻訳ファイルの読み込みなど）"
-        }
-      ]
+      "title": "ディレクトリ構造",
+      "content": "クリーンアーキテクチャに沿った層ごとの分離を実施：\n\n```\nsrc/\n  domain/          # ドメイン層（ビジネスロジック）\n    i18n/          # 国際化関連のドメインモデル\n    templates/     # テンプレート関連のドメインモデル\n      defaults/    # デフォルトテンプレートファイル\n  application/     # アプリケーション層（ユースケース）\n    i18n/          # 国際化関連のサービス\n    templates/     # テンプレート関連のサービス\n  infrastructure/  # インフラ層（技術的実装詳細）\n    i18n/          # 国際化関連のリポジトリ実装\n    templates/     # テンプレート関連のリポジトリ実装\ntests/\n  unit/           # ユニットテスト\n    domain/\n    application/\n    infrastructure/\n  integration/     # 結合テスト\n```"
     },
-    "keyComponents": [
-      {
-        "name": "ITemplateRepository",
-        "type": "インターフェース",
-        "responsibility": "テンプレートの保存と取得を担当する抽象レイヤー",
-        "dependencies": []
-      },
-      {
-        "name": "TemplateService",
-        "type": "クラス",
-        "responsibility": "テンプレート操作のビジネスロジックを実装するサービス",
-        "dependencies": [
-          "ITemplateRepository",
-          "II18nProvider"
-        ]
-      },
-      {
-        "name": "TemplateFormatStrategy",
-        "type": "インターフェース",
-        "responsibility": "様々なテンプレート形式（JSON、Markdown）をサポートするための戦略パターン",
-        "dependencies": []
-      },
-      {
-        "name": "JsonTemplateStrategy",
-        "type": "クラス",
-        "responsibility": "JSON形式のテンプレートを処理する具体的な戦略",
-        "dependencies": [
-          "TemplateFormatStrategy"
-        ]
-      },
-      {
-        "name": "MarkdownTemplateStrategy",
-        "type": "クラス",
-        "responsibility": "Markdown形式のテンプレートを処理する具体的な戦略（レガシーサポート）",
-        "dependencies": [
-          "TemplateFormatStrategy"
-        ]
-      },
-      {
-        "name": "I18nService",
-        "type": "クラス",
-        "responsibility": "国際化関連の操作を集約するサービス",
-        "dependencies": [
-          "II18nRepository",
-          "TranslationFactory"
-        ]
-      },
-      {
-        "name": "TranslationFactory",
-        "type": "クラス",
-        "responsibility": "言語ごとの翻訳リソースを生成するファクトリー",
-        "dependencies": []
-      }
-    ]
+    "testingStrategy": {
+      "title": "テスト戦略",
+      "content": "1. **ドメインモデルのテスト**\n   - バリデーションロジック\n   - ビジネスルール\n   - オブジェクトの不変条件\n\n2. **リポジトリのテスト**\n   - モック化されたファイルシステムを使用\n   - 保存と取得の整合性\n   - エラーハンドリング\n\n3. **サービスのテスト**\n   - モック化されたリポジトリを使用\n   - ビジネスフローの検証\n   - エッジケースの処理"
+    },
+    "migrationStrategy": {
+      "title": "移行戦略",
+      "content": "1. **新旧コードの並行運用**\n   - 古いコードへの参照をコメントアウト・TODO付与\n   - 新しいディレクトリ構造を優先的に検索\n   - フォールバックとして古いパスも維持\n\n2. **データ移行**\n   - 重要なテンプレートファイルを新しい場所に複製\n   - 古いファイルは移行完了まで保持\n\n3. **コード整理**\n   - 移行完了後に古いコードを完全削除\n   - 不要なディレクトリの削除\n\n4. **テスト検証**\n   - 各段階でのテスト実行による検証"
+    }
   }
 }
