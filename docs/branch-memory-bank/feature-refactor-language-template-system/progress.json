@@ -1,0 +1,130 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "d8e5f2a1-b6c7-4d89-9e10-32a7b45f98c6",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress",
+      "status"
+    ],
+    "lastModified": "2025-03-22T08:45:42.466Z",
+    "createdAt": "2025-03-22T06:35:42.466Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "wf-01",
+        "description": "現在の言語テンプレートシステムの分析と課題点の特定",
+        "completedAt": "2025-03-22T06:35:42.466Z",
+        "status": "完了",
+        "reference": "integrated-refactoring-plan.json#currentArchitecture"
+      },
+      {
+        "id": "wf-02",
+        "description": "既存の調査結果（feature-language-template-system）の分析",
+        "completedAt": "2025-03-22T08:15:22.466Z",
+        "status": "完了",
+        "reference": "integrated-refactoring-plan.json#analysisResults"
+      },
+      {
+        "id": "wf-03",
+        "description": "リファクタリング計画の策定",
+        "completedAt": "2025-03-22T07:15:22.466Z",
+        "status": "完了",
+        "reference": "integrated-refactoring-plan.json"
+      },
+      {
+        "id": "wf-04",
+        "description": "新しいアーキテクチャの設計",
+        "completedAt": "2025-03-22T07:15:22.466Z",
+        "status": "完了",
+        "reference": "integrated-refactoring-plan.json#newArchitecture"
+      },
+      {
+        "id": "wf-05",
+        "description": "調査結果とリファクタリング計画の統合",
+        "completedAt": "2025-03-22T08:15:22.466Z",
+        "status": "完了",
+        "reference": "integrated-refactoring-plan.json"
+      }
+    ],
+    "unimplementedFeatures": [
+      {
+        "id": "uf-01",
+        "description": "ドメインモデルの設計と実装",
+        "estimatedCompletion": "Phase 1",
+        "priority": "高",
+        "reference": "integrated-refactoring-plan.json#implementationPhases[0]"
+      },
+      {
+        "id": "uf-02",
+        "description": "テンプレートローダーの戦略パターンによる再実装",
+        "estimatedCompletion": "Phase 3",
+        "priority": "高",
+        "reference": "integrated-refactoring-plan.json#implementationPhases[2].tasks[0]"
+      },
+      {
+        "id": "uf-03",
+        "description": "国際化システムのリファクタリング",
+        "estimatedCompletion": "Phase 2-3",
+        "priority": "中",
+        "reference": "integrated-refactoring-plan.json#implementationPhases[1].tasks[1]"
+      },
+      {
+        "id": "uf-04",
+        "description": "テンプレートレンダラーの機能改善",
+        "estimatedCompletion": "Phase 2",
+        "priority": "中",
+        "reference": "integrated-refactoring-plan.json#implementationPhases[1].tasks[2]"
+      },
+      {
+        "id": "uf-05",
+        "description": "テストカバレッジの向上",
+        "estimatedCompletion": "Phase 4",
+        "priority": "中",
+        "reference": "integrated-refactoring-plan.json#implementationPhases[3]"
+      },
+      {
+        "id": "uf-06",
+        "description": "ドキュメントの更新",
+        "estimatedCompletion": "Phase 5",
+        "priority": "低",
+        "reference": "integrated-refactoring-plan.json#implementationPhases[4].tasks[0]"
+      }
+    ],
+    "currentStatus": "計画フェーズ完了 - 既存の調査結果（feature-language-template-system）とリファクタリング計画を統合した包括的な文書（integrated-refactoring-plan.json）を作成。次のステップはドメインモデルの実装開始。",
+    "knownIssues": [
+      {
+        "id": "ki-01",
+        "description": "現在の実装では、JSONとMarkdownの混在により、テンプレート処理のロジックが複雑化している",
+        "severity": "中",
+        "workaround": "当面は両方のフォーマットをサポートしつつ、新規の開発ではJSONフォーマットを優先的に使用する",
+        "reference": "integrated-refactoring-plan.json#analysisResults.identifiedIssues[0]"
+      },
+      {
+        "id": "ki-02",
+        "description": "国際化機能が密結合しており、新しい言語の追加や翻訳キーの管理が煩雑",
+        "severity": "中",
+        "workaround": "翻訳キーの追加・変更時は手動でCSVファイルを更新し、整合性を維持する",
+        "reference": "integrated-refactoring-plan.json#analysisResults.identifiedIssues[1]"
+      },
+      {
+        "id": "ki-03",
+        "description": "テンプレートのバリデーションが十分でなく、不正なテンプレートが原因でランタイムエラーが発生する可能性がある",
+        "severity": "高",
+        "workaround": "新しいテンプレートを追加する際は、手動での入念なテストを実施する",
+        "reference": "integrated-refactoring-plan.json#analysisResults.identifiedIssues[3]"
+      }
+    ],
+    "completionMetrics": {
+      "totalPlannedTasks": 16,
+      "completedTasks": 5,
+      "progressPercentage": 31,
+      "remainingEffort": "大",
+      "nextMilestone": "ドメインモデルの実装完了"
+    }
+  }
+}

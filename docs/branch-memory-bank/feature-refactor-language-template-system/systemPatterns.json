@@ -1,0 +1,140 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "f4e2b1a3-c987-4e12-b543-76d509e8f123",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "system-patterns",
+      "architecture",
+      "design"
+    ],
+    "lastModified": "2025-03-22T06:15:23.466Z",
+    "createdAt": "2025-03-22T06:15:23.466Z",
+    "version": 1
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "td-01",
+        "title": "言語テンプレートシステムのアーキテクチャ",
+        "context": "現在の言語テンプレートシステムはJSONとMarkdownの混在、およびレガシーな実装が存在し、拡張性とメンテナンス性に課題がある",
+        "decision": "クリーンアーキテクチャに基づいて言語テンプレートシステムを再設計し、JSONベースのテンプレート形式に統一する",
+        "impact": [
+          "コードの責任分離が明確になり、メンテナンス性が向上する",
+          "新しい言語やテンプレートタイプの追加が容易になる",
+          "テンプレートのバリデーションが強化され、エラー処理が改善される"
+        ],
+        "status": "decided"
+      },
+      {
+        "id": "td-02",
+        "title": "テンプレートローダーの改善",
+        "context": "現在のJsonTemplateLoaderクラスには、レガシーなテンプレート読み込み処理と新しいJSON形式のサポートが混在している",
+        "decision": "テンプレートローダーをStrategy Pattern（戦略パターン）を使って再実装し、フォーマット別の読み込みロジックを分離する",
+        "impact": [
+          "新しいテンプレート形式を追加する際の拡張性が向上する",
+          "レガシーサポートとモダンな実装を明確に分離できる",
+          "テスト可能性が向上する"
+        ],
+        "status": "proposed"
+      },
+      {
+        "id": "td-03",
+        "title": "国際化（i18n）処理の改善",
+        "context": "現在のI18nProviderクラスは単一の責任原則（SRP）に反し、複数の責任を持っている",
+        "decision": "I18nProviderをより小さな責務を持つコンポーネントに分割し、Factory Pattern（ファクトリーパターン）を導入する",
+        "impact": [
+          "言語ごとの翻訳ロジックをより柔軟に拡張できるようになる",
+          "テストが容易になり、バグの発見と修正が迅速になる",
+          "新しい言語サポートの追加プロセスが標準化される"
+        ],
+        "status": "proposed"
+      }
+    ],
+    "directoryStructure": {
+      "description": "リファクタリング後の言語テンプレートシステムのディレクトリ構造",
+      "structure": [
+        {
+          "path": "src/domain/templates",
+          "description": "テンプレートのドメインモデルとビジネスロジック"
+        },
+        {
+          "path": "src/domain/i18n",
+          "description": "国際化のドメインモデルとビジネスロジック"
+        },
+        {
+          "path": "src/application/templates",
+          "description": "テンプレート操作のユースケース（アプリケーションサービス）"
+        },
+        {
+          "path": "src/application/i18n",
+          "description": "国際化のユースケース（アプリケーションサービス）"
+        },
+        {
+          "path": "src/infrastructure/templates",
+          "description": "テンプレート関連のインフラストラクチャ実装（ファイルシステム、データベースなど）"
+        },
+        {
+          "path": "src/infrastructure/i18n",
+          "description": "国際化関連のインフラストラクチャ実装（翻訳ファイルの読み込みなど）"
+        }
+      ]
+    },
+    "keyComponents": [
+      {
+        "name": "ITemplateRepository",
+        "type": "インターフェース",
+        "responsibility": "テンプレートの保存と取得を担当する抽象レイヤー",
+        "dependencies": []
+      },
+      {
+        "name": "TemplateService",
+        "type": "クラス",
+        "responsibility": "テンプレート操作のビジネスロジックを実装するサービス",
+        "dependencies": [
+          "ITemplateRepository",
+          "II18nProvider"
+        ]
+      },
+      {
+        "name": "TemplateFormatStrategy",
+        "type": "インターフェース",
+        "responsibility": "様々なテンプレート形式（JSON、Markdown）をサポートするための戦略パターン",
+        "dependencies": []
+      },
+      {
+        "name": "JsonTemplateStrategy",
+        "type": "クラス",
+        "responsibility": "JSON形式のテンプレートを処理する具体的な戦略",
+        "dependencies": [
+          "TemplateFormatStrategy"
+        ]
+      },
+      {
+        "name": "MarkdownTemplateStrategy",
+        "type": "クラス",
+        "responsibility": "Markdown形式のテンプレートを処理する具体的な戦略（レガシーサポート）",
+        "dependencies": [
+          "TemplateFormatStrategy"
+        ]
+      },
+      {
+        "name": "I18nService",
+        "type": "クラス",
+        "responsibility": "国際化関連の操作を集約するサービス",
+        "dependencies": [
+          "II18nRepository",
+          "TranslationFactory"
+        ]
+      },
+      {
+        "name": "TranslationFactory",
+        "type": "クラス",
+        "responsibility": "言語ごとの翻訳リソースを生成するファクトリー",
+        "dependencies": []
+      }
+    ]
+  }
+}

@@ -1,0 +1,147 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "a7c46d9b-2e31-4f89-ae53-9c8e54f21dba",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context",
+      "current-work"
+    ],
+    "lastModified": "2025-03-22T08:30:38.466Z",
+    "createdAt": "2025-03-22T06:25:38.466Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": {
+      "description": "言語テンプレートシステムの詳細分析に基づくリファクタリング計画を作成し、実装を開始する",
+      "details": [
+        "現在のコードベースの分析を行い、課題点と改善点を特定した",
+        "既存の言語テンプレートシステムの調査結果（feature-language-template-system）を分析した",
+        "リファクタリングの基本方針と優先順位を決定した",
+        "新しいアーキテクチャの設計を進めている",
+        "詳細なリファクタリング計画を「integrated-refactoring-plan.json」に記録した"
+      ]
+    },
+    "recentChanges": [
+      {
+        "date": "2025-03-22",
+        "description": "言語テンプレートシステムの調査結果を分析",
+        "author": "チーム"
+      },
+      {
+        "date": "2025-03-22",
+        "description": "リファクタリング計画の初期ドラフト作成",
+        "author": "チーム"
+      },
+      {
+        "date": "2025-03-22",
+        "description": "詳細な実装計画とフェーズ分けを完了",
+        "author": "チーム"
+      },
+      {
+        "date": "2025-03-22",
+        "description": "調査結果とリファクタリング計画を統合した文書の作成",
+        "author": "チーム"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "ad-01",
+        "description": "クリーンアーキテクチャパターンを採用して、関心の分離を明確にする",
+        "status": "確定",
+        "reference": "integrated-refactoring-plan.json#newArchitecture"
+      },
+      {
+        "id": "ad-02",
+        "description": "テンプレート処理と国際化処理を分離し、それぞれのドメインモデルを整理する",
+        "status": "確定",
+        "reference": "integrated-refactoring-plan.json#newArchitecture.layers[0]"
+      },
+      {
+        "id": "ad-03",
+        "description": "戦略パターンを採用して、異なるテンプレート形式の処理を柔軟に切り替えられるようにする",
+        "status": "確定",
+        "reference": "integrated-refactoring-plan.json#designPatterns[0]"
+      },
+      {
+        "id": "ad-04",
+        "description": "ファクトリーパターンを採用して、言語ごとの翻訳リソース生成を柔軟にする",
+        "status": "確定",
+        "reference": "integrated-refactoring-plan.json#designPatterns[1]"
+      },
+      {
+        "id": "ad-05",
+        "description": "段階的なマイグレーション戦略を採用し、既存機能の互換性を維持する",
+        "status": "確定",
+        "reference": "integrated-refactoring-plan.json#migrationStrategy"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "c-01",
+        "description": "既存の調査結果にあった「多言語対応計画」をどのように取り込むか",
+        "options": [
+          "多言語対応計画をリファクタリング計画の一部として取り込む",
+          "リファクタリング完了後に別プロジェクトとして多言語対応計画を実施する",
+          "リファクタリングと並行して多言語対応計画を進める"
+        ],
+        "recommendation": "アーキテクチャのリファクタリングを先に完了させ、新しい基盤の上で多言語対応を強化する方針が効率的",
+        "reference": "integrated-refactoring-plan.json#implementationPhases"
+      },
+      {
+        "id": "c-02",
+        "description": "既存のテンプレートとの後方互換性をどこまで維持するか",
+        "options": [
+          "完全な互換性を維持する（工数大）",
+          "主要な機能のみ互換性を維持し、マイナーな機能は削除して単純化する（工数中）",
+          "互換性を考慮せず、完全に新しいシステムに置き換える（工数小だが移行リスク大）"
+        ],
+        "recommendation": "アダプタパターンを使用して主要な機能の互換性を維持する方針で決定",
+        "reference": "integrated-refactoring-plan.json#migrationStrategy.backwardsCompatibility"
+      },
+      {
+        "id": "c-03",
+        "description": "テンプレートのバリデーション強化の方法",
+        "options": [
+          "Zodスキーマによる型安全な検証の強化",
+          "カスタムバリデーターの実装",
+          "JSONスキーマによる検証"
+        ],
+        "recommendation": "現在のZodスキーマをベースに、より厳密なバリデーションをドメインモデルに組み込む方向で決定",
+        "reference": "integrated-refactoring-plan.json#newArchitecture.layers[0].components[0]"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "ns-01",
+        "description": "ドメインモデルの実装開始",
+        "estimatedEffort": "中",
+        "dependsOn": [],
+        "reference": "integrated-refactoring-plan.json#implementationPhases[0]"
+      },
+      {
+        "id": "ns-02",
+        "description": "単体テストのフレームワーク整備",
+        "estimatedEffort": "小",
+        "dependsOn": [],
+        "reference": "integrated-refactoring-plan.json#testingStrategy.unitTesting"
+      },
+      {
+        "id": "ns-03",
+        "description": "チーム内でのコードレビュープロセスの確立",
+        "estimatedEffort": "小",
+        "dependsOn": [],
+        "reference": "systemPatterns.json#technicalDecisions[0]"
+      },
+      {
+        "id": "ns-04",
+        "description": "既存の調査結果（language-template-system-analysis.json）から得られた知見の取り込み",
+        "estimatedEffort": "小",
+        "dependsOn": [],
+        "reference": "integrated-refactoring-plan.json#analysisResults"
+      }
+    ]
+  }
+}
