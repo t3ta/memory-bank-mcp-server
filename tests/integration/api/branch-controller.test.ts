@@ -22,7 +22,7 @@ import { BranchInfo } from '../../../src/domain/entities/BranchInfo';
 import { DocumentPath } from '../../../src/domain/entities/DocumentPath';
 import { Tag } from '../../../src/domain/entities/Tag';
 import { TagIndex } from '../../../src/schemas/tag-index/tag-index-schema';
-import { 
+import {
   createMockBranchRepository,
   createMockGlobalRepository
 } from '../../../tests/mocks/repositories';
@@ -95,11 +95,11 @@ describe('BranchController (Integration)', () => {
 
     // Create branch repository mock
     branchRepositoryMockObj = createMockBranchRepository();
-    
+
     // Setup mock behavior for branch repository
     when(branchRepositoryMockObj.mock.exists(TEST_BRANCH)).thenResolve(true);
     when(branchRepositoryMockObj.mock.exists('feature/nonexistent-branch')).thenResolve(false);
-    
+
     // Setup getDocument behavior
     when(branchRepositoryMockObj.mock.getDocument(deepEqual(testBranchInfo), deepEqual(DocumentPath.create(TEST_DOCUMENT_PATH))))
       .thenResolve(testDocument as any);
@@ -107,7 +107,7 @@ describe('BranchController (Integration)', () => {
     // Setup findDocumentsByTags behavior
     when(branchRepositoryMockObj.mock.findDocumentsByTags(anything(), anything()))
       .thenResolve([testDocument as any]);
-    
+
     // Setup getRecentBranches behavior
     when(branchRepositoryMockObj.mock.getRecentBranches(anything())).thenResolve(recentBranches);
     when(branchRepositoryMockObj.mock.getRecentBranches(1)).thenResolve([recentBranches[0]]);
@@ -115,7 +115,7 @@ describe('BranchController (Integration)', () => {
     // Setup listDocuments behavior
     when(branchRepositoryMockObj.mock.listDocuments(anything()))
       .thenResolve([DocumentPath.create(TEST_DOCUMENT_PATH)]);
-      
+
     branchRepositoryMock = branchRepositoryMockObj.instance;
 
     // Create global repository mock
@@ -186,10 +186,10 @@ describe('BranchController (Integration)', () => {
     it('should handle nonexistent document error', async () => {
       // Arrange
       const nonExistentPath = 'nonexistent.md';
-      
+
       // Setup mock to return null for this specific path
       when(branchRepositoryMockObj.mock.getDocument(
-        anything(), 
+        anything(),
         deepEqual(DocumentPath.create(nonExistentPath))
       )).thenResolve(null);
 
@@ -208,7 +208,7 @@ describe('BranchController (Integration)', () => {
     it('should handle nonexistent branch error', async () => {
       // Arrange
       const nonExistentBranch = 'feature/nonexistent-branch'; // Adding prefix to make it valid
-      
+
       // Already set up in beforeEach
       // when(branchRepositoryMockObj.mock.exists(nonExistentBranch)).thenResolve(false);
 
@@ -281,16 +281,16 @@ describe('BranchController (Integration)', () => {
     it('should initialize a nonexistent branch when writing', async () => {
       // Arrange
       const nonExistentBranch = 'feature/nonexistent-branch'; // Adding prefix to make it valid
-      
+
       // Mock for branch initialization
       when(branchRepositoryMockObj.mock.initialize(anything())).thenResolve();
-      
+
       // Mock write document behavior
       jest.spyOn(writeBranchDocumentUseCase, 'execute').mockImplementationOnce(async (input) => {
         // Call the initialize method
         const branchInfo = BranchInfo.create(input.branchName);
         await branchRepositoryMock.initialize(branchInfo);
-        
+
         // Create a document mock for saveDocument
         const documentMock = {
           path: DocumentPath.create(input.document.path),
@@ -298,10 +298,10 @@ describe('BranchController (Integration)', () => {
           tags: (input.document.tags || []).map(tag => Tag.create(tag)),
           lastModified: new Date()
         };
-        
+
         // Call saveDocument
         await branchRepositoryMock.saveDocument(branchInfo, documentMock as any);
-        
+
         return {
           document: {
             path: input.document.path,
@@ -363,13 +363,13 @@ describe('BranchController (Integration)', () => {
     it('should return empty array when no documents match tags', async () => {
       // Arrange
       const nonMatchingTags = ['nonexistent-tag'];
-      
+
       // Setup mock to return empty array for non-matching tags
       when(branchRepositoryMockObj.mock.findDocumentsByTags(
-        anything(), 
+        anything(),
         anything()
       )).thenResolve([]);
-      
+
       // Mock the search use case
       jest.spyOn(searchDocumentsByTagsUseCase, 'execute').mockResolvedValueOnce({
         documents: [],
@@ -471,30 +471,150 @@ describe('BranchController (Integration)', () => {
       // so we don't verify that call
     });
   });
+// Error handling tests
+describe('error handling', () => {
+  it('should handle domain errors correctly', async () => {
+    // Arrange
+    const errorMessage = 'Invalid document path';
 
-  // Error handling tests
-  describe('error handling', () => {
-    it('should handle domain errors correctly', async () => {
-      // Arrange
-      const errorMessage = 'Invalid document path';
-      
-      // Setup mock to throw error
-      when(branchRepositoryMockObj.mock.getDocument(
-        anything(), 
-        deepEqual(DocumentPath.create('invalid.md'))
-      )).thenThrow(new DomainError('INVALID_PATH', errorMessage));
+    // Setup mock to throw error
+    when(branchRepositoryMockObj.mock.getDocument(
+      anything(),
+      deepEqual(DocumentPath.create('invalid.md'))
+    )).thenThrow(new DomainError('INVALID_PATH', errorMessage));
 
-      // Act
-      const result = await branchController.readDocument(TEST_BRANCH, 'invalid.md');
+    // Act
+    const result = await branchController.readDocument(TEST_BRANCH, 'invalid.md');
 
-      // Assert
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        const errorResponse = result as MCPErrorResponse;
-        expect(errorResponse.error).toBeDefined();
-        expect(errorResponse.error.code).toContain('DOMAIN_ERROR.INVALID_PATH');
-        expect(errorResponse.error.message).toBe(errorMessage);
-      }
+    // Assert
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const errorResponse = result as MCPErrorResponse;
+      expect(errorResponse.error).toBeDefined();
+      expect(errorResponse.error.code).toContain('DOMAIN_ERROR.INVALID_PATH');
+      expect(errorResponse.error.message).toBe(errorMessage);
+    }
+  });
+
+  it.skip('should handle repository unavailable error', async () => {
+    // Arrange
+    when(branchRepositoryMockObj.mock.getDocument(anything(), anything()))
+      .thenReject(new Error('Database connection failed'));
+
+    // Act
+    const result = await branchController.readDocument(TEST_BRANCH, TEST_DOCUMENT_PATH);
+
+    // Assert
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const errorResponse = result as MCPErrorResponse;
+      expect(errorResponse.error.code).toContain('INFRASTRUCTURE_ERROR');
+    }
+  });
+
+  it.skip('should handle timeout errors', async () => {
+    // Arrange
+    when(branchRepositoryMockObj.mock.getDocument(anything(), anything()))
+      .thenReject(new Error('Operation timed out'));
+
+    // Act
+    const result = await branchController.readDocument(TEST_BRANCH, TEST_DOCUMENT_PATH);
+
+    // Assert
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const errorResponse = result as MCPErrorResponse;
+      expect(errorResponse.error.code).toContain('TIMEOUT_ERROR');
+    }
+  });
+});
+
+describe('complex scenarios', () => {
+  it.skip('should handle documents with special characters', async () => {
+    // Arrange
+    const specialCharsDoc = {
+      path: 'テスト文書.md',
+      content: '# 日本語のコンテンツ\n\n特殊文字を含むテスト',
+      tags: ['日本語', 'テスト'],
+      lastModified: new Date(),
+      toDTO: () => ({
+        path: 'テスト文書.md',
+        content: '# 日本語のコンテンツ\n\n特殊文字を含むテスト',
+        tags: ['日本語', 'テスト'],
+        lastModified: new Date().toISOString()
+      })
+    };
+
+    when(branchRepositoryMockObj.mock.getDocument(
+      anything(),
+      deepEqual(DocumentPath.create('テスト文書.md'))
+    )).thenResolve(specialCharsDoc as any);
+
+    // Act
+    const result = await branchController.readDocument(TEST_BRANCH, 'テスト文書.md');
+
+    // Assert
+    expect(result.success).toBe(true);
+    if (result.success) {
+      const successResponse = result as MCPSuccessResponse<DocumentDTO>;
+      expect(successResponse.data.content).toContain('日本語のコンテンツ');
+    }
+  });
+
+  it.skip('should handle large documents', async () => {
+    // Arrange
+    const largeContent = 'x'.repeat(1000000); // 1MB
+    const largeDoc = {
+      path: 'large-doc.md',
+      content: largeContent,
+      tags: ['large'],
+      lastModified: new Date(),
+      toDTO: () => ({
+        path: 'large-doc.md',
+        content: largeContent,
+        tags: ['large'],
+        lastModified: new Date().toISOString()
+      })
+    };
+
+    when(branchRepositoryMockObj.mock.getDocument(
+      anything(),
+      deepEqual(DocumentPath.create('large-doc.md'))
+    )).thenResolve(largeDoc as any);
+
+    // Act
+    const result = await branchController.readDocument(TEST_BRANCH, 'large-doc.md');
+
+    // Assert
+    expect(result.success).toBe(true);
+    if (result.success) {
+      const successResponse = result as MCPSuccessResponse<DocumentDTO>;
+      expect(successResponse.data.content.length).toBe(1000000);
+    }
+  });
+});
+
+describe('concurrent operations', () => {
+  it.skip('should handle concurrent document writes', async () => {
+    // Arrange
+    const writeOperations = Array.from({ length: 5 }, (_, i) => ({
+      content: `Content ${i}`,
+      promise: branchController.writeDocument(
+        TEST_BRANCH,
+        TEST_DOCUMENT_PATH,
+        `Content ${i}`,
+        TEST_TAGS
+      ) as Promise<MCPSuccessResponse<DocumentDTO>>
+    }));
+
+    // Act
+    const results = await Promise.all(writeOperations.map(op => op.promise));
+
+    // Assert
+    results.forEach((result, index) => {
+      expect(result.success).toBe(true);
+      expect(result.data.content).toBe(`Content ${index}`);
     });
   });
+});
 });

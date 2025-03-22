@@ -64,17 +64,11 @@ export class ReadBranchCoreFilesUseCase
       const branchExists = await this.branchRepository.exists(input.branchName);
 
       if (!branchExists) {
-        console.log(`Branch ${input.branchName} not found, auto-initializing...`);
-        try {
-          await this.branchRepository.initialize(branchInfo);
-          console.log(`Branch ${input.branchName} auto-initialized successfully`);
-        } catch (initError) {
-          console.error(`Failed to auto-initialize branch ${input.branchName}:`, initError);
-          throw new DomainError(
-            DomainErrorCodes.BRANCH_INITIALIZATION_FAILED,
-            `Failed to auto-initialize branch: ${input.branchName}`
-          );
-        }
+        console.log(`Branch ${input.branchName} not found`);
+        throw new DomainError(
+          DomainErrorCodes.BRANCH_NOT_FOUND,
+          `Branch not found: ${input.branchName}`
+        );
       }
 
       // Read each core file - try both extensions during transition
