@@ -83,7 +83,29 @@ export class WriteGlobalDocumentUseCase
 
       // Create domain objects
       const documentPath = DocumentPath.create(input.document.path);
-      const tags = (input.document.tags ?? []).map((tag) => Tag.create(tag));
+
+      // Extract tags from document content if it's JSON
+      let tags: Tag[] = [];
+      if (documentPath.value.endsWith('.json')) {
+        try {
+          const parsed = JSON.parse(input.document.content);
+          if (parsed.metadata?.tags) {
+            console.log('[DEBUG] Found tags in metadata:', parsed.metadata.tags);
+            tags = parsed.metadata.tags.map((tag: string) => {
+              console.log(`[DEBUG] Creating tag: "${tag}"`);
+              return Tag.create(tag);
+            });
+          }
+        } catch (error) {
+          console.error('[DEBUG] Failed to parse document content as JSON:', error);
+        }
+      }
+
+      // Fallback to provided tags if no tags were found in metadata
+      if (tags.length === 0) {
+        console.log('[DEBUG] Using provided tags:', input.document.tags);
+        tags = (input.document.tags ?? []).map((tag) => Tag.create(tag));
+      }
 
       // Check if markdown writes are disabled
       if (this.disableMarkdownWrites && documentPath.value.toLowerCase().endsWith('.md')) {

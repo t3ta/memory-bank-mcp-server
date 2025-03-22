@@ -184,15 +184,29 @@ export class GlobalController implements IGlobalController {
   ): Promise<MCPResponse<DocumentDTO[]>> {
     try {
       logger.info(`Finding global documents by tags: ${tags.join(', ')}`);
+      console.log('[DEBUG] Search request:', { tags, matchAllTags });
 
+      // SearchDocumentsByTagsUseCaseに検索を委譲
       const result = await this.searchDocumentsByTagsUseCase.execute({
         tags,
         matchAllTags,
         branchName: undefined, // Search in global memory bank
       });
 
+      logger.debug('Search result:', {
+        tags,
+        matchAllTags,
+        documentsFound: result.documents.length,
+        searchInfo: result.searchInfo
+      });
+
       return this.presenter.present(result.documents);
     } catch (error) {
+      logger.error('Failed to search documents by tags:', {
+        tags,
+        matchAllTags,
+        error: error instanceof Error ? error.message : String(error)
+      });
       return this.handleError(error);
     }
   }
@@ -203,6 +217,14 @@ export class GlobalController implements IGlobalController {
    * @returns Formatted error response
    */
   private handleError(error: any): MCPResponse {
+    logger.error('Error details:', {
+      errorType: error.constructor.name,
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      stack: error instanceof Error ? error.stack : undefined
+    });
+
     if (
       error instanceof DomainError ||
       error instanceof ApplicationError ||

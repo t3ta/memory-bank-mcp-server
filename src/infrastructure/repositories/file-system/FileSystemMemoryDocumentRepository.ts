@@ -34,6 +34,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
   async findByPath(path: DocumentPath): Promise<MemoryDocument | null> {
     try {
       const filePath = this.resolvePath(path.value);
+      console.log(`[DEBUG] Finding document at path: ${filePath}`);
 
       // Check if file exists
       const exists = await this.fileSystemService.fileExists(filePath);
@@ -42,16 +43,17 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
         // Try alternate format (.md <-> .json)
         const alternatePath = path.toAlternateFormat();
         const alternateFilePath = this.resolvePath(alternatePath.value);
-        
+        console.log(`[DEBUG] File not found at ${filePath}, trying alternate format: ${alternateFilePath}`);
+
         console.log(`File not found at ${filePath}, trying alternate format: ${alternateFilePath}`);
-        
+
         const alternateExists = await this.fileSystemService.fileExists(alternateFilePath);
-        
+
         if (!alternateExists) {
           console.log(`Alternate format not found either: ${alternateFilePath}`);
           return null;
         }
-        
+
         console.log(`Found document in alternate format: ${alternateFilePath}`);
         // Recursively call findByPath with the alternate path
         return this.findByPath(alternatePath);
@@ -59,17 +61,22 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
 
       // Read file content
       const content = await this.fileSystemService.readFile(filePath);
+      console.log(`[DEBUG] File content read from ${filePath}`);
 
       // Handle JSON files differently
       if (path.isJSON) {
         try {
           // Parse JSON content
           const jsonObj = JSON.parse(content);
+          console.log(`[DEBUG] JSON parsed for ${filePath}, schema:`, jsonObj.schema);
 
           // Check if it's a schema-compliant document or regular JSON
           if (jsonObj.schema === 'memory_document_v1' && jsonObj.metadata && jsonObj.content) {
+            console.log(`[DEBUG] Schema-compliant document found at ${filePath}, metadata:`, jsonObj.metadata);
             // It's a schema-compliant document - convert using fromJSON
-            return MemoryDocument.fromJSON(jsonObj, path);
+            const doc = MemoryDocument.fromJSON(jsonObj, path);
+            console.log(`[DEBUG] Created document from JSON with tags:`, doc.tags.map(t => t.value));
+            return doc;
           } else {
             // It's a regular JSON - create a MemoryDocument with the raw content
             const stats = await this.fileSystemService.getFileStats(filePath);
@@ -178,6 +185,8 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
       // List all files
       const files = await this.fileSystemService.listFiles(this.basePath);
 
+      console.log(`[DEBUG] Found ${files.length} files in ${this.basePath}`);
+
       // Convert to document paths
       const documents: MemoryDocument[] = [];
 
@@ -191,6 +200,8 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
             continue;
           }
 
+          console.log(`[DEBUG] Processing file: ${relativePath}`);
+
           // Create document path
           const documentPath = DocumentPath.create(relativePath);
 
@@ -198,12 +209,26 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
           const document = await this.findByPath(documentPath);
 
           if (document) {
-            // Check if document has all tags
-            const hasAllTags = tags.every((tag) => document.hasTag(tag));
+            const docTags = document.tags.map(t => t.value);
+            const searchTags = tags.map(t => t.value);
+            console.log(`[DEBUG] Document ${relativePath} has tags:`, docTags);
+            console.log(`[DEBUG] Searching for tags:`, searchTags);
 
-            if (hasAllTags) {
+            // Check if document has any of the tags
+            const hasAnyTags = tags.some((tag) => {
+              const hasTag = document.hasTag(tag);
+              console.log(`[DEBUG] Checking tag "${tag.value}" against document ${relativePath}: ${hasTag}`);
+              return hasTag;
+            });
+
+            if (hasAnyTags) {
+              console.log(`[DEBUG] Adding document ${relativePath} to results`);
               documents.push(document);
+            } else {
+              console.log(`[DEBUG] Document ${relativePath} does not match any search tags`);
             }
+          } else {
+            console.log(`[DEBUG] No document found for ${relativePath}`);
           }
         } catch (error) {
           // Skip files that can't be read or don't match path format
@@ -211,6 +236,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
         }
       }
 
+      logger.debug(`Found ${documents.length} documents matching tags:`, tags.map(t => t.value));
       return documents;
     } catch (error) {
       if (error instanceof DomainError) {
@@ -329,7 +355,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
 
       // グループ化: 拡張子を除いたベース名でファイルをグループ化
       const fileGroups = new Map<string, { md?: string, json?: string }>();
-      
+
       for (const file of files) {
         try {
           // Get relative path
@@ -356,9 +382,9 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
           const dirPath = path.dirname(relativePath);
           const baseName = path.basename(relativePath, extension);
           const baseNameWithDir = path.join(dirPath, baseName);
-          
+
           logger.debug(`Processing file: ${relativePath}, baseNameWithDir: ${baseNameWithDir}, extension: ${extension}`);
-          
+
           // グループに追加
           const group = fileGroups.get(baseNameWithDir) || { md: undefined, json: undefined };
           if (extension === '.md') {
@@ -378,7 +404,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
       // JSONファイルを優先、なければMDファイルを使用
       const paths: DocumentPath[] = [];
       logger.debug(`Found ${fileGroups.size} unique base files`);
-      
+
       for (const [baseNameWithDir, group] of fileGroups) {
         try {
           // JSONファイルを優先

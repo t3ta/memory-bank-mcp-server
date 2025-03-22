@@ -74,7 +74,16 @@ export class MemoryDocument {
    * @returns boolean indicating if document has tag
    */
   public hasTag(tag: Tag): boolean {
-    return this.props.tags.some((t) => t.equals(tag));
+    console.log('[DEBUG] Checking tag:', {
+      documentTags: this.props.tags.map(t => t.value),
+      searchTag: tag.value
+    });
+    const hasTag = this.props.tags.some((t) => {
+      const matches = t.equals(tag);
+      console.log(`[DEBUG] Tag comparison: ${t.value} equals ${tag.value} = ${matches}`);
+      return matches;
+    });
+    return hasTag;
   }
 
   /**
@@ -255,30 +264,42 @@ export class MemoryDocument {
    * @returns Markdown formatted string
    */
   public static fromJSON(jsonDoc: BaseJsonDocument, path: DocumentPath): MemoryDocument {
+    console.log('[DEBUG] Creating MemoryDocument from JSON:', {
+      path: path.value,
+      metadata: jsonDoc.metadata
+    });
+
     // Sanitize tags before creating Tag objects
     const sanitizedTags = (jsonDoc.metadata.tags || []).map((tag: string) => {
       // First try to create the tag as is
       try {
-        return Tag.create(tag);
+        const tagObj = Tag.create(tag);
+        console.log(`[DEBUG] Created tag: ${tagObj.value} from ${tag}`);
+        return tagObj;
       } catch (e: unknown) {
         // If creation fails, sanitize the tag
         if (e instanceof DomainError && e.code === 'DOMAIN_ERROR.INVALID_TAG_FORMAT') {
           // Make lowercase and replace invalid characters with hyphens
           const sanitizedTagStr = tag.toLowerCase().replace(/[^a-z0-9-]/g, '-');
           // Log the sanitization for debugging
-          console.warn(`Sanitized tag '${tag}' to '${sanitizedTagStr}'`);
-          return Tag.create(sanitizedTagStr);
+          console.warn(`[DEBUG] Sanitized tag '${tag}' to '${sanitizedTagStr}'`);
+          const tagObj = Tag.create(sanitizedTagStr);
+          console.log(`[DEBUG] Created sanitized tag: ${tagObj.value}`);
+          return tagObj;
         }
         throw e; // Re-throw if it's not a format error
       }
     });
 
-    return MemoryDocument.create({
+    const doc = MemoryDocument.create({
       path,
       content: JSON.stringify(jsonDoc, null, 2),
       tags: sanitizedTags,
       lastModified: new Date(jsonDoc.metadata.lastModified),
     });
+
+    console.log('[DEBUG] Created MemoryDocument with tags:', doc.tags.map(t => t.value));
+    return doc;
   }
 
   /**

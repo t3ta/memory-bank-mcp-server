@@ -94,7 +94,19 @@ export class SearchDocumentsByTagsUseCase
       }
 
       // Convert tag strings to Tag domain objects
-      const tags = input.tags.map((tag) => Tag.create(tag));
+      console.log('[DEBUG] Converting search tags:', input.tags);
+      const tags = input.tags.map((tag) => {
+        try {
+          console.log(`[DEBUG] Creating tag: "${tag}"`);
+          const tagObj = Tag.create(tag);
+          console.log(`[DEBUG] Created tag object: ${tagObj.value}`);
+          return tagObj;
+        } catch (error) {
+          console.error(`[DEBUG] Failed to create tag "${tag}":`, error);
+          throw error;
+        }
+      });
+      console.log('[DEBUG] All tags converted:', tags.map(t => t.value));
 
       // Set default values
       const matchAllTags = input.matchAllTags ?? false;
@@ -118,17 +130,44 @@ export class SearchDocumentsByTagsUseCase
         const branchInfo = BranchInfo.create(input.branchName);
         documents = await this.branchRepository.findDocumentsByTags(branchInfo, tags);
       } else {
-        // Search in global memory bank
+        console.log('[DEBUG] Searching in global memory bank with tags:', tags.map(t => t.value));
         documents = await this.globalRepository.findDocumentsByTags(tags);
+        console.log('[DEBUG] Found documents:', documents.map(d => d.path.value));
       }
+
+      console.log('[DEBUG] Before filtering:', {
+        totalDocuments: documents.length,
+        matchAllTags,
+        searchTags: tags.map(t => t.value)
+      });
 
       // Filter documents if matchAllTags is true
       if (matchAllTags && tags.length > 1) {
         documents = documents.filter((doc) => {
           // Check if document contains all the search tags
-          return tags.every((searchTag) => doc.tags.some((docTag) => docTag.equals(searchTag)));
+          const hasAllTags = tags.every((searchTag) => {
+            const hasTag = doc.tags.some((docTag) => docTag.equals(searchTag));
+            console.log('[DEBUG] Document tag check:', {
+              document: doc.path.value,
+              searchTag: searchTag.value,
+              documentTags: doc.tags.map(t => t.value),
+              hasTag
+            });
+            return hasTag;
+          });
+          console.log(`[DEBUG] Document ${doc.path.value} matches all tags: ${hasAllTags}`);
+          return hasAllTags;
         });
       }
+
+      console.log('[DEBUG] After filtering:', {
+        matchingDocuments: documents.length,
+        documents: documents.map(d => ({
+          path: d.path.value,
+          tags: d.tags.map(t => t.value),
+          hasAllRequiredTags: matchAllTags ? tags.every(tag => d.tags.some(dt => dt.equals(tag))) : 'N/A'
+        }))
+      });
 
       // Transform to DTOs
       const documentDTOs = documents.map((doc) => ({

@@ -42,6 +42,11 @@ export class Tag {
    * @returns boolean indicating equality
    */
   public equals(other: Tag): boolean {
+    console.log('[DEBUG] Comparing tags:', {
+      thisTag: this._value,
+      otherTag: other._value,
+      isEqual: this._value === other._value
+    });
     return this._value === other._value;
   }
 
