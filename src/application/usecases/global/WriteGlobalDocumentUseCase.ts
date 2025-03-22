@@ -86,7 +86,7 @@ export class WriteGlobalDocumentUseCase
       const tags = (input.document.tags ?? []).map((tag) => Tag.create(tag));
 
       // Check if markdown writes are disabled
-      if (this.disableMarkdownWrites && documentPath.isMarkdown) {
+      if (this.disableMarkdownWrites && documentPath.value.toLowerCase().endsWith('.md')) {
         const jsonPath = documentPath.value.replace(/\.md$/, '.json');
         throw new ApplicationError(
           ApplicationErrorCodes.OPERATION_NOT_ALLOWED,
