@@ -1,38 +1,17 @@
 {
-  "schema": "memory_document_v2",
+  "schema": "memory_document_v1",
   "metadata": {
-    "id": "9e1fc36b-b7b8-437b-8f6c-37a9a20a0776",
-    "title": "アクティブコンテキスト",
+    "title": "activeContext.json",
     "documentType": "active_context",
     "path": "activeContext.json",
-    "tags": [
-      "core",
-      "active-context"
-    ],
-    "lastModified": "2025-03-22T08:18:32.000Z",
-    "createdAt": "2025-03-22T05:09:47.466Z",
-    "version": 3
+    "tags": [],
+    "lastModified": "2025-03-22T07:52:08.195Z"
   },
   "content": {
-    "currentWork": {
-      "title": "現在の作業内容",
-      "content": "言語テンプレートシステムのリファクタリングが完了。クリーンアップ作業として古いコードの参照修正と不要ファイルの削除も実施中。\n\n1. ドメインモデル（Language, Translation, Section, Template）\n2. リポジトリインターフェース（II18nRepository, ITemplateRepository）\n3. ファイルベースの実装（FileI18nRepository, FileTemplateRepository）\n4. アプリケーションサービス（I18nService, TemplateService）\n5. すべてのコンポーネントのユニットテスト\n6. 古い実装の参照修正とファイル削除"
-    },
-    "recentChanges": {
-      "title": "最近の変更点",
-      "content": "1. TemplateServiceの実装完了\n2. TemplateServiceのテスト作成完了\n3. FileTemplateRepositoryのテスト作成完了\n4. 古いmarkdown-converterとmarkdown-parserのexportを削除（index.ts）\n5. ReadRulesUseCaseの参照パスを新しいディレクトリ構造に合わせて修正\n6. 新規ディレクトリ構造（domain/templates/defaults）に初期データ移行"
-    },
-    "activeDecisions": {
-      "title": "アクティブな決定事項",
-      "content": "1. JSONベースのテンプレート形式を採用\n2. ドメインモデルはValue Objectパターンを使用（イミュータブルな実装）\n3. 多言語対応を最初からサポート\n4. リポジトリパターンを使用してデータアクセス層を抽象化\n5. アプリケーションサービスによるドメインロジックのカプセル化\n6. 古いコードと新しいコードの段階的移行を行う（一部並行期間あり）"
-    },
-    "considerations": {
-      "title": "検討事項",
-      "content": "1. キャッシュ戦略 - 現在はシンプルなインメモリキャッシュを使用しているが、将来的にLRUキャッシュなど改善の余地がある\n2. 旧テンプレートシステムからの移行戦略 - 段階的に移行するためのアダプターを検討中\n3. パフォーマンス最適化 - 大量のテンプレートを扱う場合の最適化\n4. 古いテンプレートファイルの完全削除のタイミング - システム全体に影響を与える可能性があるため注意が必要"
-    },
-    "nextSteps": {
-      "title": "次のステップ",
-      "content": "1. テストを実行して変更による不具合がないか確認\n2. 例としてのテンプレート作成とテスト\n3. リファクタリング後のシステムを使った実際のテンプレートの移行テスト\n4. 移行ツールの作成\n5. templates/jsonディレクトリの完全削除（移行完了後）"
-    }
+    "currentWork": "{\n  \\\"schema\\\": \\\"memory_document_v2\\\",\n  \\\"metadata\\\": {\n    \\\"id\\\": \\\"active-context\\\",\n    \\\"title\\\": \\\"アクティブコンテキスト\\\",\n    \\\"documentType\\\": \\\"active_context\\\",\n    \\\"path\\\": \\\"activeContext.json\\\",\n    \\\"tags\\\": [\n      \\\"core\\\",\n      \\\"active-context\\\"\n    ],\n    \\\"lastModified\\\": \\\"2025-03-22T08:35:10.761Z\\\",\n    \\\"createdAt\\\": \\\"2025-03-22T07:34:29.761Z\\\",\n    \\\"version\\\": 1\n  },\n  \\\"content\\\": {\n    \\\"currentWork\\\": \\\"言語テンプレートシステムのリファクタリングの実装と修正\\\",\n    \\\"recentChanges\\\": [\n      \\\"vitestからJestへの参照を修正 (I18nService.test.ts)\\\",\n      \\\"TemplateService クラスを実装\\\",\n      \\\"TemplateServiceのテストを実装\\\",\n      \\\"MarkdownMigrationService クラスを実装\\\",\n      \\\"MarkdownMigrationServiceのテストを実装\\\",\n      \\\"CLIコマンド (migrate-templates, generate-markdown) を追加\\\",\n      \\\"既存のmigrationコマンド体系に新コマンドを登録\\\"\n    ],\n    \\\"activeDecisions\\\": [\n      \\\"JSONとMarkdownの混在による複雑さを解消し、JSONベースのテンプレートシステムに統一する\\\",\n      \\\"ドメイン層、アプリケーション層、インフラストラクチャ層の分離を徹底する\\\",\n      \\\"Language、Translation、Template、Sectionをバリューオブジェクトとして実装する\\\",\n      \\\"多言語対応を強化し、各言語ごとの翻訳を効率的に管理できるようにする\\\",\n      \\\"マイグレーション期間中はMarkdownフォーマットとJSONフォーマットの両方をサポートする\\\"\n    ],\n    \\\"considerationPoints\\\": [\n      \\\"テストの実行環境の設定が必要 (vitestからJestへ)\\\",\n      \\\"既存のMarkdownベースコードからの段階的な移行が必要\\\",\n      \\\"移行ツールの使いやすさとエラーハンドリングの強化\\\",\n      \\\"テンプレートの検証とバリデーションのさらなる強化\\\"\n    ],\n    \\\"nextSteps\\\": [\n      \\\"テストをすべて修正して実行可能にする\\\",\n      \\\"コマンドラインツールのエラーハンドリングを改善する\\\",\n      \\\"ドキュメントを更新して新しいテンプレートシステムの使い方を説明する\\\",\n      \\\"移行計画を策定して既存ユーザーにガイダンスを提供する\\\"\n    ]\n  }\n}",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": []
   }
 }

@@ -1,34 +1,16 @@
 {
-  "schema": "memory_document_v2",
+  "schema": "memory_document_v1",
   "metadata": {
-    "id": "c7a69c32-1a8d-45f1-9e59-c2c3f0e9a3a1",
-    "title": "進捗状況",
+    "title": "progress.json",
     "documentType": "progress",
     "path": "progress.json",
-    "tags": [
-      "core",
-      "progress"
-    ],
-    "lastModified": "2025-03-22T08:20:41.000Z",
-    "createdAt": "2025-03-22T05:09:47.466Z",
-    "version": 3
+    "tags": [],
+    "lastModified": "2025-03-22T07:52:18.439Z"
   },
   "content": {
-    "workingFeatures": {
-      "title": "動作している機能",
-      "content": "1. 言語（Language）ドメインモデル\n2. 翻訳（Translation）ドメインモデル\n3. テンプレートセクション（Section）ドメインモデル\n4. テンプレート（Template）ドメインモデル\n5. 翻訳リポジトリインターフェース（II18nRepository）\n6. テンプレートリポジトリインターフェース（ITemplateRepository）\n7. ファイルベースの翻訳リポジトリ（FileI18nRepository）\n8. ファイルベースのテンプレートリポジトリ（FileTemplateRepository）\n9. 国際化サービス（I18nService）\n10. テンプレートサービス（TemplateService）\n11. ドメインモデルのユニットテスト\n12. リポジトリのユニットテスト\n13. サービスのユニットテスト\n14. 新しいディレクトリ構造（domain/templates）\n15. 古い実装からの参照修正"
-    },
-    "pendingFeatures": {
-      "title": "未実装の機能",
-      "content": "1. 実際のテンプレートを使った結合テスト\n2. 旧システムからの移行ツール\n3. ドキュメンテーション\n4. 古いテンプレートファイル（templates/json/）の完全削除"
-    },
-    "currentStatus": {
-      "title": "現在の状態",
-      "content": "基本実装完了。全てのコア機能とテストが実装され、古いコードの参照修正まで実施済み。現在は古いコードと新しいコードが共存状態で、後方互換性を保ちながらリファクタリングを進めている。\n\n2025-03-22: Template関連の実装とテストを追加し、コミット完了。\n2025-03-22: 古いmarkdown-converterとmarkdown-parserの参照を削除し、パス修正を実施。新しいディレクトリ構造にルールファイルを配置。"
-    },
-    "knownIssues": {
-      "title": "既知の問題",
-      "content": "1. 旧テンプレート形式からのデータ移行パスが未検討\n2. パフォーマンステストが未実施\n3. 現在の実装はキャッシュのTTLや無効化のロジックが未実装\n4. 古いテンプレートファイルへの参照が残っている可能性がある（migration用途）"
-    }
+    "status": "{\n  \\\"schema\\\": \\\"memory_document_v2\\\",\n  \\\"metadata\\\": {\n    \\\"id\\\": \\\"progress\\\",\n    \\\"title\\\": \\\"進捗状況\\\",\n    \\\"documentType\\\": \\\"progress\\\",\n    \\\"path\\\": \\\"progress.json\\\",\n    \\\"tags\\\": [\n      \\\"core\\\",\n      \\\"progress\\\"\n    ],\n    \\\"lastModified\\\": \\\"2025-03-22T08:35:15.761Z\\\",\n    \\\"createdAt\\\": \\\"2025-03-22T07:34:29.761Z\\\",\n    \\\"version\\\": 1\n  },\n  \\\"content\\\": {\n    \\\"workingFeatures\\\": [\n      \\\"ドメインモデル（Language, Translation, Template, Section）の基本実装が完了\\\",\n      \\\"リポジトリインターフェース（II18nRepository, ITemplateRepository）の定義が完了\\\",\n      \\\"ファイルベースのリポジトリ実装（FileI18nRepository, FileTemplateRepository）の基本実装が完了\\\",\n      \\\"I18nServiceの基本実装が完了\\\",\n      \\\"TemplateServiceの実装が完了\\\",\n      \\\"MarkdownMigrationServiceの実装が完了\\\",\n      \\\"CLIコマンド（migrate-templates, generate-markdown）の実装が完了\\\"\n    ],\n    \\\"pendingFeatures\\\": [\n      \\\"テスト環境の設定（vitestからJestへの移行）\\\",\n      \\\"既存のMarkdownベースのコードとの互換性を確保する移行コード\\\",\n      \\\"アプリケーションへの統合\\\",\n      \\\"ドキュメント更新\\\",\n      \\\"移行計画の策定\\\"\n    ],\n    \\\"currentStatus\\\": \\\"実装完了・テスト中\\\",\n    \\\"knownIssues\\\": [\n      \\\"テストがvitestをインポートしているが、プロジェクトはJestを使用している\\\",\n      \\\"yarn testの実行で複数のテストが失敗している\\\",\n      \\\"翻訳ファイルのフォーマット変更に伴う互換性の問題\\\",\n      \\\"既存機能との統合が未完了\\\"\n    ]\n  }\n}",
+    "workingFeatures": [],
+    "pendingImplementation": [],
+    "knownIssues": []
   }
 }
