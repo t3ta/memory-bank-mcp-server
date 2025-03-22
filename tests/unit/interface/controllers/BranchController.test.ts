@@ -10,9 +10,16 @@ import { ReadBranchCoreFilesUseCase } from '../../../../src/application/usecases
 import { CreateBranchCoreFilesUseCase } from '../../../../src/application/usecases/common/CreateBranchCoreFilesUseCase';
 import { MCPResponsePresenter } from '../../../../src/interface/presenters/MCPResponsePresenter';
 import { DocumentDTO } from '../../../../src/application/dtos/DocumentDTO';
+import { JsonDocumentDTO } from '../../../../src/application/dtos/JsonDocumentDTO';
 import { DomainError } from '../../../../src/shared/errors/DomainError';
 import { ApplicationError } from '../../../../src/shared/errors/ApplicationError';
 import { InfrastructureError } from '../../../../src/shared/errors/InfrastructureError';
+import { ReadJsonDocumentUseCase } from '../../../../src/application/usecases/json/ReadJsonDocumentUseCase';
+import { WriteJsonDocumentUseCase } from '../../../../src/application/usecases/json/WriteJsonDocumentUseCase';
+import { DeleteJsonDocumentUseCase } from '../../../../src/application/usecases/json/DeleteJsonDocumentUseCase';
+import { SearchJsonDocumentsUseCase } from '../../../../src/application/usecases/json/SearchJsonDocumentsUseCase';
+import { UpdateJsonIndexUseCase } from '../../../../src/application/usecases/json/UpdateJsonIndexUseCase';
+import { DocumentType } from '../../../../src/domain/entities/JsonDocument';
 
 // Mock use cases
 const mockReadBranchDocumentUseCase = {
@@ -21,6 +28,10 @@ const mockReadBranchDocumentUseCase = {
 
 const mockWriteBranchDocumentUseCase = {
   execute: jest.fn(),
+  branchRepository: {
+    exists: jest.fn().mockResolvedValue(true),
+    saveTagIndex: jest.fn().mockResolvedValue(true),
+  },
 } as unknown as jest.Mocked<WriteBranchDocumentUseCase>;
 
 const mockSearchDocumentsByTagsUseCase = {
@@ -42,6 +53,27 @@ const mockReadBranchCoreFilesUseCase = {
 const mockCreateBranchCoreFilesUseCase = {
   execute: jest.fn(),
 } as unknown as jest.Mocked<CreateBranchCoreFilesUseCase>;
+
+// Mock JSON use cases
+const mockReadJsonDocumentUseCase = {
+  execute: jest.fn(),
+} as unknown as jest.Mocked<ReadJsonDocumentUseCase>;
+
+const mockWriteJsonDocumentUseCase = {
+  execute: jest.fn(),
+} as unknown as jest.Mocked<WriteJsonDocumentUseCase>;
+
+const mockDeleteJsonDocumentUseCase = {
+  execute: jest.fn(),
+} as unknown as jest.Mocked<DeleteJsonDocumentUseCase>;
+
+const mockSearchJsonDocumentsUseCase = {
+  execute: jest.fn(),
+} as unknown as jest.Mocked<SearchJsonDocumentsUseCase>;
+
+const mockUpdateJsonIndexUseCase = {
+  execute: jest.fn(),
+} as unknown as jest.Mocked<UpdateJsonIndexUseCase>;
 
 // Mock presenter
 const mockPresenter = {
@@ -65,7 +97,14 @@ describe('BranchController', () => {
       mockGetRecentBranchesUseCase,
       mockReadBranchCoreFilesUseCase,
       mockCreateBranchCoreFilesUseCase,
-      mockPresenter
+      mockPresenter,
+      {
+        readJsonDocumentUseCase: mockReadJsonDocumentUseCase,
+        writeJsonDocumentUseCase: mockWriteJsonDocumentUseCase,
+        deleteJsonDocumentUseCase: mockDeleteJsonDocumentUseCase,
+        searchJsonDocumentsUseCase: mockSearchJsonDocumentsUseCase,
+        updateJsonIndexUseCase: mockUpdateJsonIndexUseCase,
+      }
     );
   });
 
