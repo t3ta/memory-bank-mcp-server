@@ -97,7 +97,9 @@ export class ContextController implements IContextController {
           }
         } catch (error) {
           console.error(`Failed to read branch memory: ${error instanceof Error ? error.message : 'Unknown error'}`);
-          // Unexpected error since we've already checked branch existence
+          // If branch memory was requested but failed, we should fail the entire request
+          // because this is a critical error (like non-existent branch)
+          throw error;
         }
       }
 

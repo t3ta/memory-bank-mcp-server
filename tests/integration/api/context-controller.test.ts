@@ -292,16 +292,17 @@ describe('ContextController Integration Tests with Mocks', () => {
     expect(contextResult.data?.branchMemory?.['config.json']).toContain('"value": 123');
   });
 
-  it('Should return an error when reading context of non-existent branch', async () => {
-    // Set up for non-existent branch
-    console.log('Testing non-existent branch:', nonExistentBranch);
+  it('Should return an error when branch auto-initialization fails', async () => {
+    // このテストでは、存在しないブランチを自動初期化する過程でエラーが発生するケースをテストします
+    // (例: 権限不足、ディスク容量不足、ネットワークエラーなど様々な理由で初期化が失敗する可能性がある)
+    console.log('Testing auto-initialization failure for branch:', nonExistentBranch);
     
     try {
       const contextResult = await controller.readContext({
         branch: nonExistentBranch,
         language: 'en',
         includeRules: false,
-        includeBranchMemory: true,
+        includeBranchMemory: true, // ブランチメモリを要求 → 自動初期化が試みられる
         includeGlobalMemory: false
       });
 
@@ -311,7 +312,7 @@ describe('ContextController Integration Tests with Mocks', () => {
         data: contextResult.data
       });
 
-      // Verify failure result - THIS IS THE TEST THAT WAS FAILING
+      // 自動初期化が失敗した場合はエラーが返されるべき
       expect(contextResult.success).toBe(false);
       expect(contextResult.error).toBeDefined();
       expect(contextResult.error).toContain('branch');
