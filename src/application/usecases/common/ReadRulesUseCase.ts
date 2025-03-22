@@ -49,9 +49,9 @@ export class ReadRulesUseCase {
     try {
       // JSONファイルのパス - 複数のパスを試す
       const possiblePaths = [
-        // 新しいパス (templates/json/rules-{lang}.json)
-        path.join(this.rulesDir, 'templates', 'json', `rules-${language}.json`),
-        // 第二候補 (templates/rules-{lang}.json)
+        // 新しいパス (templates/json に替わって domain/templates が使われるようになった)
+        path.join(this.rulesDir, 'domain', 'templates', `rules-${language}.json`),
+        // 以前のパス (旧システムとの互換性のため)
         path.join(this.rulesDir, 'templates', `rules-${language}.json`),
         // フォールバック
         path.join(this.rulesDir, `rules-${language}.json`)

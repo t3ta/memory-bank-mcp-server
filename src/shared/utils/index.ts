@@ -1,5 +1,6 @@
-export * from './markdown-converter.js';
-export * from './markdown-parser.js';
+// These exports have been replaced by json-to-markdown and are kept
+// temporarily for backward compatibility
+// TODO: Remove after migration is complete
 export * from './logger.js';
 
 // Date utilities
