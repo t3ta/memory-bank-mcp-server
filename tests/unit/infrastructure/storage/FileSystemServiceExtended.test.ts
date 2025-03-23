@@ -367,15 +367,15 @@ describe('FileSystemService Extended Tests', () => {
     it('should throw FILE_PERMISSION_ERROR when permission is denied', async () => {
       // Setup
       const filePath = '/test/protected-stats.txt';
-      const error = new Error('Permission denied');
-      (error as any).code = 'EACCES';
-      mockStat.mockImplementation(() => Promise.reject(error));
+      const fileError = new Error('Permission denied');
+      (fileError as any).code = 'EACCES';
+      mockStat.mockImplementation(() => Promise.reject(fileError));
       
       // Act & Assert
       await expect(fileSystemService.getFileStats(filePath)).rejects.toThrow(InfrastructureError);
-      const error = await fileSystemService.getFileStats(filePath).catch(e => e);
-      console.log('Actual error code:', error.code);
-      await expect(error).toMatchObject({
+      const resultError = await fileSystemService.getFileStats(filePath).catch(e => e);
+      console.log('Actual error code:', resultError.code);
+      await expect(resultError).toMatchObject({
         code: `INFRA_ERROR.${InfrastructureErrorCodes.FILE_PERMISSION_ERROR}`,
       });
     });

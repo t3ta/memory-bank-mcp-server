@@ -29,8 +29,8 @@ const mockReadBranchDocumentUseCase = {
 const mockWriteBranchDocumentUseCase = {
   execute: jest.fn(),
   branchRepository: {
-    exists: jest.fn().mockResolvedValue(true),
-    saveTagIndex: jest.fn().mockResolvedValue(true),
+    exists: jest.fn(() => Promise.resolve(true)),
+    saveTagIndex: jest.fn(() => Promise.resolve(true)),
   },
 } as unknown as jest.Mocked<WriteBranchDocumentUseCase>;
 
