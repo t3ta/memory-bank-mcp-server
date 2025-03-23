@@ -116,41 +116,21 @@ describe('ContextController Integration Tests with Mocks', () => {
     // Mock ReadContextUseCase instead of creating a real one
     const mockReadContextUseCase = mock<ReadContextUseCase>();
 
-    // Mock the execute method to behave differently based on branch
-    when(mockReadContextUseCase.execute(deepEqual({
-      branch: testBranch,
-      language: anything(),
-      includeRules: anything(),
-      includeBranchMemory: anything(),
-      includeGlobalMemory: anything()
-    }))).thenResolve({
-      branchMemory: branchDocuments,
-      globalMemory: globalDocuments
-    });
-
-    // When non-existent branch is requested with includeBranchMemory=true, throw an error
-    when(mockReadContextUseCase.execute(deepEqual({
-      branch: nonExistentBranch,
-      language: anything(),
-      includeRules: anything(),
-      includeBranchMemory: true,
-      includeGlobalMemory: anything()
-    }))).thenThrow(
-      new DomainError(
-        DomainErrorCodes.BRANCH_INITIALIZATION_FAILED,
-        `Failed to auto-initialize branch: ${nonExistentBranch}`
-      )
-    );
-
-    // When only global memory is requested for non-existent branch, it should still work
-    when(mockReadContextUseCase.execute(deepEqual({
-      branch: nonExistentBranch,
-      language: anything(),
-      includeRules: anything(),
-      includeBranchMemory: false,
-      includeGlobalMemory: true
-    }))).thenResolve({
-      globalMemory: globalDocuments
+    // Since we now always load all data regardless of include flags,
+    // just make it return branch and global memory for valid branches
+    when(mockReadContextUseCase.execute(anything())).thenCall((request) => {
+      if (request.branch === testBranch) {
+        return Promise.resolve({
+          branchMemory: branchDocuments,
+          globalMemory: globalDocuments
+        });
+      } else if (request.branch === nonExistentBranch) {
+        throw new DomainError(
+          DomainErrorCodes.BRANCH_INITIALIZATION_FAILED,
+          `Failed to auto-initialize branch: ${nonExistentBranch}`
+        );
+      }
+      return Promise.resolve({});
     });
 
     readContextUseCase = instance(mockReadContextUseCase);
@@ -229,54 +209,54 @@ describe('ContextController Integration Tests with Mocks', () => {
     expect(context?.globalMemory?.['glossary.md']).toBeDefined();
   });
 
-    it('Should be able to read branch memory only context', async () => {
-    // Read branch memory only context
+    it('Should be able to read branch memory only context (includeRules=false is ignored)', async () => {
+    // Read branch memory only context, but note that includeRules=false is now ignored
     const branchOnlyResult = await controller.readContext({
       branch: testBranch,
       language: 'en',
-      includeRules: false,
+      includeRules: false,  // This is now ignored, rules will always be included
       includeBranchMemory: true,
-      includeGlobalMemory: false
+      includeGlobalMemory: false  // This is now ignored, global memory will always be included
     });
 
     // Verify read result
     expect(branchOnlyResult.success).toBe(true);
     expect(branchOnlyResult.data).toBeDefined();
-    expect(branchOnlyResult.data?.rules).toBeUndefined();
+    expect(branchOnlyResult.data?.rules).toBeDefined();  // Rules are now always included
     expect(branchOnlyResult.data?.branchMemory).toBeDefined();
     expect(branchOnlyResult.data?.branchMemory?.['branchContext.md']).toBeDefined();
     expect(branchOnlyResult.data?.branchMemory?.['activeContext.md']).toBeDefined();
-    expect(branchOnlyResult.data?.globalMemory).toBeUndefined();
+    expect(branchOnlyResult.data?.globalMemory).toBeDefined();  // Global memory is now always included
   });
 
-    it('Should be able to read global memory only context', async () => {
-    // Read global memory only context
+    it('Should be able to read global memory only context (includeRules=false is ignored)', async () => {
+    // Read global memory only context, but note that includeRules=false and includeBranchMemory=false are now ignored
     const globalOnlyResult = await controller.readContext({
       branch: testBranch,
       language: 'en',
-      includeRules: false,
-      includeBranchMemory: false,
+      includeRules: false,  // This is now ignored, rules will always be included
+      includeBranchMemory: false,  // This is now ignored, branch memory will always be included
       includeGlobalMemory: true
     });
 
     // Verify read result
     expect(globalOnlyResult.success).toBe(true);
     expect(globalOnlyResult.data).toBeDefined();
-    expect(globalOnlyResult.data?.rules).toBeUndefined();
-    expect(globalOnlyResult.data?.branchMemory).toBeUndefined();
+    expect(globalOnlyResult.data?.rules).toBeDefined();  // Rules are now always included
+    expect(globalOnlyResult.data?.branchMemory).toBeDefined();  // Branch memory is now always included
     expect(globalOnlyResult.data?.globalMemory).toBeDefined();
     expect(globalOnlyResult.data?.globalMemory?.['architecture.md']).toBeDefined();
     expect(globalOnlyResult.data?.globalMemory?.['glossary.md']).toBeDefined();
   });
 
-    it('Should be able to read rules only context', async () => {
-    // Read rules only context
+    it('Should be able to read rules only context (includeBranchMemory=false is ignored)', async () => {
+    // Read rules only context, but note that includeBranchMemory=false and includeGlobalMemory=false are now ignored
     const rulesOnlyResult = await controller.readContext({
       branch: testBranch,
       language: 'en',
       includeRules: true,
-      includeBranchMemory: false,
-      includeGlobalMemory: false
+      includeBranchMemory: false,  // This is now ignored, branch memory will always be included
+      includeGlobalMemory: false  // This is now ignored, global memory will always be included
     });
 
     // Verify read result
@@ -284,8 +264,8 @@ describe('ContextController Integration Tests with Mocks', () => {
     expect(rulesOnlyResult.data).toBeDefined();
     expect(rulesOnlyResult.data?.rules).toBeDefined();
     expect(rulesOnlyResult.data?.rules?.content).toContain('English rules');
-    expect(rulesOnlyResult.data?.branchMemory).toBeUndefined();
-    expect(rulesOnlyResult.data?.globalMemory).toBeUndefined();
+    expect(rulesOnlyResult.data?.branchMemory).toBeDefined();  // Branch memory is now always included
+    expect(rulesOnlyResult.data?.globalMemory).toBeDefined();  // Global memory is now always included
   });
 
     it('Should support both JSON and MD file formats', async () => {

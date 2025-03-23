@@ -42,18 +42,21 @@ export class ReadContextCommand extends CommandBase {
       })
       .option('include-rules', {
         type: 'boolean',
-        description: 'Include rules in the context',
+        description: 'Include rules in the context (deprecated, always included)',
         default: true,
+        hidden: true,
       })
       .option('include-branch-memory', {
         type: 'boolean',
-        description: 'Include branch memory in the context',
+        description: 'Include branch memory in the context (deprecated, always included)',
         default: true,
+        hidden: true,
       })
       .option('include-global-memory', {
         type: 'boolean',
-        description: 'Include global memory in the context',
+        description: 'Include global memory in the context (deprecated, always included)',
         default: true,
+        hidden: true,
       })
       .option('format', {
         type: 'string',
@@ -61,8 +64,7 @@ export class ReadContextCommand extends CommandBase {
         choices: ['json', 'pretty'],
         default: 'json',
       })
-      .example('$0 read-context feature/login', 'Read all context for branch feature/login')
-      .example('$0 read-context feature/login --no-include-global-memory', 'Read context without global memory');
+      .example('$0 read-context feature/login', 'Read all context for branch feature/login');
   }
 
   /**
@@ -76,13 +78,21 @@ export class ReadContextCommand extends CommandBase {
         verbose: argv.verbose,
       });
 
+      // Check if any include options are set to false and warn the user
+      if (argv.includeRules === false || argv.includeBranchMemory === false || argv.includeGlobalMemory === false) {
+        logger.warn('Include options are deprecated and ignored. All context components are always included.');
+      }
+
+      // Always include all components regardless of include* flags
       const request = {
         branch: argv.branch as string,
         language: argv.language as string,
-        includeRules: argv.includeRules as boolean,
-        includeBranchMemory: argv.includeBranchMemory as boolean,
-        includeGlobalMemory: argv.includeGlobalMemory as boolean
+        includeRules: true,
+        includeBranchMemory: true,
+        includeGlobalMemory: true
       };
+
+      logger.info(`Reading context for branch: ${request.branch}, language: ${request.language}`);
 
       const result = await app
         .getContextController()

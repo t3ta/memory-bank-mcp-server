@@ -93,14 +93,9 @@ describe("ContextController", () => {
       when(readRulesUseCaseMock.execute("en")).thenResolve(mockRulesResult);
       
       // Need to setup mock based on different params
-      when(readContextUseCaseMock.execute(anything())).thenCall((request) => {
-        if (request.includeBranchMemory && !request.includeGlobalMemory && !request.includeRules) {
-          return Promise.resolve({ branchMemory: mockBranchMemory });
-        }
-        if (!request.includeBranchMemory && request.includeGlobalMemory && !request.includeRules) {
-          return Promise.resolve({ globalMemory: mockGlobalMemory });
-        }
-        return Promise.resolve({});
+      when(readContextUseCaseMock.execute(anything())).thenResolve({
+        branchMemory: mockBranchMemory,
+        globalMemory: mockGlobalMemory
       });
 
       // Act
@@ -157,15 +152,9 @@ describe("ContextController", () => {
       // Rules fails but other components succeed
       when(readRulesUseCaseMock.execute("en")).thenReject(new Error("Rules error"));
       
-      // Only branch memory succeeds, global memory fails
-      when(readContextUseCaseMock.execute(anything())).thenCall((request) => {
-        if (request.includeBranchMemory && !request.includeGlobalMemory && !request.includeRules) {
-          return Promise.resolve({ branchMemory: mockBranchMemory });
-        }
-        if (!request.includeBranchMemory && request.includeGlobalMemory && !request.includeRules) {
-          return Promise.reject(new Error("Global memory error"));
-        }
-        return Promise.resolve({});
+      // Always return branch memory only
+      when(readContextUseCaseMock.execute(anything())).thenResolve({
+        branchMemory: mockBranchMemory
       });
 
       // Act
@@ -177,6 +166,7 @@ describe("ContextController", () => {
       if (result.data) {
         expect(result.data.rules).toBeUndefined();
         expect(result.data.branchMemory).toEqual(mockBranchMemory);
+        // globalMemory should be undefined since this test simulates a case where it's not available
         expect(result.data.globalMemory).toBeUndefined();
       }
     });
