@@ -1,0 +1,15 @@
+{
+  "schema": "memory_document_v1",
+  "metadata": {
+    "title": "branchContext.json",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [],
+    "lastModified": "2025-03-23T17:31:09.023Z"
+  },
+  "content": {
+    "purpose": "{\\n  \\\"schema\\\": \\\"memory_document_v2\\\",\\n  \\\"metadata\\\": {\\n    \\\"id\\\": \\\"3771cf57-db07-4c5d-aeb7-661c21a0b719\\\",\\n    \\\"title\\\": \\\"ブランチコンテキスト\\\",\\n    \\\"documentType\\\": \\\"branch_context\\\",\\n    \\\"path\\\": \\\"branchContext.json\\\",\\n    \\\"tags\\\": [\\n      \\\"branch-context\\\"\\n    ],\\n    \\\"lastModified\\\": \\\"2025-03-24T02:44:23.000Z\\\",\\n    \\\"createdAt\\\": \\\"2025-03-23T17:29:56.684Z\\\",\\n    \\\"version\\\": 1\\n  },\\n  \\\"content\\\": {\\n    \\\"branchName\\\": \\\"feature/improve-read-context\\\",\\n    \\\"purpose\\\": \\\"read_context機能の改善を行い、よりロバストで使いやすいAPIを提供する\\\",\\n    \\\"createdAt\\\": \\\"2025-03-23T17:29:56.684Z\\\",\\n    \\\"userStories\\\": [\\n      {\\n        \\\"id\\\": \\\"e79e64c1-9947-44d2-8fd7-505ef167d8c2\\\",\\n        \\\"description\\\": \\\"read_context呼び出し時のエラーハンドリングを改善する\\\",\\n        \\\"completed\\\": false,\\n        \\\"priority\\\": 1\\n      },\\n      {\\n        \\\"id\\\": \\\"10bf830b-8963-4c85-a840-0c9c7df36cf1\\\",\\n        \\\"description\\\": \\\"デバッグログを充実させて問題の追跡を容易にする\\\",\\n        \\\"completed\\\": false,\\n        \\\"priority\\\": 2\\n      },\\n      {\\n        \\\"id\\\": \\\"d23489ff-aad7-44f4-b14d-01ee4c2bb179\\\",\\n        \\\"description\\\": \\\"存在しないブランチへのアクセスを自動的に初期化するように改善する\\\",\\n        \\\"completed\\\": false,\\n        \\\"priority\\\": 3\\n      }\\n    ],\\n    \\\"additionalNotes\\\": \\\"このタスクはメモリバンクのMCPサーバー改善の一環であり、クライアントがメモリバンクにより簡単にアクセスできるようにする目的がある。特にエラーハンドリングとデバッグ機能の強化に焦点を当てている。\\\"\\n  }\\n}",
+    "createdAt": "2025-03-23T17:31:09.023Z",
+    "userStories": []
+  }
+}

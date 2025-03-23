@@ -266,7 +266,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         throw new Error('Application not initialized');
       }
 
-      // ドキュメントの書き込みを試行し、結果を確認
+      // Try to write the document and check the result
       const response = await app.getBranchController().writeDocument(branch, path, content);
       if (!response.success) {
         throw new Error((response as any).error?.message || 'Failed to write document');
@@ -374,7 +374,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         throw new Error('Application not initialized');
       }
 
-      // ドキュメントの書き込みを試行し、結果を確認
+      // Try to write the document and check the result
       const response = await app.getGlobalController().writeDocument(path, content);
       if (!response.success) {
         throw new Error((response as any).error?.message || 'Failed to write document');
@@ -409,74 +409,55 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
     case 'read_context': {
       const branch = (params.branch as string | undefined) || '_current_';
       const language = (params.language as string) || 'ja';
-      const includeRules = params.includeRules !== false; // デフォルトはtrue
-      const includeBranchMemory = params.includeBranchMemory !== false; // デフォルトはtrue
-      const includeGlobalMemory = params.includeGlobalMemory !== false; // デフォルトはtrue
+      // Include options are always true now, but kept for backwards compatibility
+      const includeRules = true;
+      const includeBranchMemory = true; 
+      const includeGlobalMemory = true;
 
       logger.info(`Reading context (branch: ${branch || 'none'}, language: ${language})`);
+      
+      // Warn if include options were specified as false (they'll be ignored)
+      if (params.includeRules === false || params.includeBranchMemory === false || params.includeGlobalMemory === false) {
+        logger.warn('Include options are deprecated and ignored. All context components are always included.');
+      }
 
-      // ブランチメモリバンクを含める場合は、ブランチ名が必須
-      if (includeBranchMemory && !branch) {
-        throw new Error('Branch name is required when includeBranchMemory is true');
+      // Branch name is required
+      if (!branch) {
+        throw new Error('Branch name is required for read_context');
       }
 
       if (!app) {
         throw new Error('Application not initialized');
       }
 
-      // 結果を格納するオブジェクト
-      const result: Record<string, any> = {};
+      try {
+        // Use ContextController to get all context info at once
+        logger.debug('Requesting context from ContextController');
+        const response = await app.getContextController().readContext({
+          branch,
+          language,
+          includeRules,
+          includeBranchMemory,
+          includeGlobalMemory
+        });
 
-      // ルールを取得
-      if (includeRules) {
-        logger.debug('Including rules in context');
-        if (!['en', 'ja', 'zh'].includes(language)) {
-          throw new Error('Invalid language for rules');
+        if (!response.success) {
+          throw new Error(response.error || 'Failed to read context');
         }
 
-        try {
-          const dirname = __dirname;
-
-          // Load template structure
-          const templatePath = path.join(dirname, 'templates', 'json', 'rules.json');
-          const templateContent = await fs.readFile(templatePath, 'utf-8');
-          const template = JSON.parse(templateContent);
-
-          // Load language translations
-          const translationsPath = path.join(
-            dirname,
-            'infrastructure',
-            'i18n',
-            'translations',
-            `${language}.json`
-          );
-          const translationsContent = await fs.readFile(translationsPath, 'utf-8');
-          const translations = JSON.parse(translationsContent);
-
-          // Render template with translations
-          const renderedContent = renderTemplate(template, translations);
-
-          result.rules = { content: renderedContent };
-        } catch (error) {
-          logger.error('Error reading rules:', error);
-
-          // Fall back to legacy files if available
-          try {
-            // Try JSON format first
-            const dirname = __dirname;
-            const jsonFilePath = path.join(dirname, 'templates', 'json', `rules-${language}.json`);
-            const content = await fs.readFile(jsonFilePath, 'utf-8');
-            result.rules = { content };
-          } catch (jsonError) {
-            // Fall back to markdown file
-            try {
-              const dirname = __dirname;
-              const mdFilePath = path.join(dirname, 'templates', `rules-${language}.md`);
-              const content = await fs.readFile(mdFilePath, 'utf-8');
-              result.rules = { content };
-            } catch (mdError) {
-              throw new Error(`Failed to read rules in ${language}: ${(error as Error).message}`);
-            }
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(response.data, null, 2),
+            },
+          ],
+        };
+      } catch (error) {
+        logger.error('Error reading context:', error);
+        throw error;
+      }
+    }
           }
         }
       }
@@ -528,7 +509,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         throw new Error('Application not initialized');
       }
 
-      // 現時点ではMarkdown形式で取得
+      // Currently returns template in Markdown format
       const response = await app.getTemplateController().getTemplateAsMarkdown(id, language as any, variables);
 
       return {
