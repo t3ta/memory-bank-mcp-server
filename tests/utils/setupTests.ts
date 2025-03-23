@@ -20,7 +20,15 @@ jest.mock('../../src/shared/utils/logger.js', () => ({
     debug: jest.fn(),
     warn: jest.fn(),
     error: jest.fn(),
+    setLevel: jest.fn(),
   },
+  createConsoleLogger: jest.fn().mockReturnValue({
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+    setLevel: jest.fn(),
+  }),
 }), { virtual: true });
 
 // Silence console logs during tests

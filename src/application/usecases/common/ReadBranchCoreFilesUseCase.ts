@@ -354,7 +354,8 @@ export class ReadBranchCoreFilesUseCase
 }
 
 // Export the interfaces from CoreFilesDTO for convenience
-import { ActiveContextDTO, ProgressDTO } from '../..//dtos/CoreFilesDTO.js';
+import { ActiveContextDTO, ProgressDTO } from '../../dtos/CoreFilesDTO.js';
 // SystemPatternsDTO is used in the coreFiles assignment, but TypeScript doesn't detect it correctly
-import type { SystemPatternsDTO } from '../../dtos/CoreFilesDTO.js'; import type { IUseCase } from '../../interfaces/IUseCase.js';
+import type { SystemPatternsDTO } from '../../dtos/CoreFilesDTO.js'; 
+import type { IUseCase } from '../../interfaces/IUseCase.js';
 

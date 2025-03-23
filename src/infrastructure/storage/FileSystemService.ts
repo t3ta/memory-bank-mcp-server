@@ -333,7 +333,7 @@ export class FileSystemService implements IFileSystemService {
         const stream = createReadStream(filePath, {
           start,
           end: start + length - 1,
-          encoding: null // バイナリモードで読み込み
+          encoding: null // Read in binary mode
         });
 
         // Handle stream events

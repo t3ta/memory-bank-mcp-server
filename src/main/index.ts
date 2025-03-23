@@ -39,10 +39,11 @@ export class Application {
       // Setup DI container
       this.container = await setupContainer(this.options);
 
-      this.globalController = this.container.get('globalController') as IGlobalController;
-      this.branchController = this.container.get('branchController') as IBranchController;
-      this.contextController = this.container.get('contextController') as IContextController;
-      this.templateController = this.container.get('templateController') as ITemplateController;
+      // Await promises from DI container to get actual controller instances
+      this.globalController = await this.container.get('globalController') as IGlobalController;
+      this.branchController = await this.container.get('branchController') as IBranchController;
+      this.contextController = await this.container.get('contextController') as IContextController;
+      this.templateController = await this.container.get('templateController') as ITemplateController;
 
       logger.info('Application initialized successfully');
     } catch (error) {

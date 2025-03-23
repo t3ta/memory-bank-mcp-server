@@ -8,4 +8,12 @@ export const logger = {
   debug: jest.fn(),
   warn: jest.fn(),
   error: jest.fn(),
+  setLevel: jest.fn(),
+};
+
+export const createConsoleLogger = jest.fn().mockReturnValue(logger);
+
+export default {
+  logger,
+  createConsoleLogger,
 };

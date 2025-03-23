@@ -15,15 +15,11 @@ import { IGlobalMemoryBankRepository } from '../../../../../src/domain/repositor
 import { FileSystemTagIndexRepository } from '../../../../../src/infrastructure/repositories/file-system/FileSystemTagIndexRepositoryBase';
 import { FileSystemTagIndexRepositoryImpl } from '../../../../../src/infrastructure/repositories/file-system/FileSystemTagIndexRepositoryImpl';
 import { IFileSystemService } from '../../../../../src/infrastructure/storage/interfaces/IFileSystemService';
-import { BranchTagIndex, GlobalTagIndex } from '../../../../../src/schemas/v2/tag-index';
+import { BranchTagIndex, GlobalTagIndex, TAG_INDEX_VERSION } from '../../../../../src/schemas/v2/tag-index';
 
-// Logger をモック化
-jest.mock('../../../../../src/shared/utils/logger', () => {
-  // モックファイルを直接importして使用
-  return require('../../../../../tests/mocks/mockLogger');
-});
+// Logger はsetupTests.tsでモック化済み
 
-describe.skip('FileSystemTagIndexRepositoryImpl', () => {
+describe('FileSystemTagIndexRepositoryImpl', () => {
   // テスト用のモックを作成
   const mockFileSystem = mock<IFileSystemService>();
   const mockBranchRepository = mock<IBranchMemoryBankRepository>();
@@ -52,11 +48,11 @@ describe.skip('FileSystemTagIndexRepositoryImpl', () => {
     );
   });
 
-  describe.skip('readBranchIndex', () => {
+  describe('readBranchIndex', () => {
     it('should return cached branch index when available', async () => {
       // Setup: Create a test index and put it in cache by reading it once
       const testIndex: BranchTagIndex = {
-        schema: 'tag_index_v1',
+        schema: TAG_INDEX_VERSION,
         metadata: {
           indexType: 'branch',
           branchName: BRANCH_NAME,
@@ -96,14 +92,14 @@ describe.skip('FileSystemTagIndexRepositoryImpl', () => {
 
       // Assert: Should get cache without file access
       expect(result).toBeDefined();
-      expect(result?.schema).toBe('tag_index_v1');
+      expect(result?.schema).toBe(TAG_INDEX_VERSION);
       verify(mockFileSystem.readFile(indexPath)).never();
     });
 
     it('should read from disk if index not in cache', async () => {
       // Setup: Create a test index
       const testIndex: BranchTagIndex = {
-        schema: 'tag_index_v1',
+        schema: TAG_INDEX_VERSION,
         metadata: {
           indexType: 'branch',
           branchName: BRANCH_NAME,
@@ -136,7 +132,7 @@ describe.skip('FileSystemTagIndexRepositoryImpl', () => {
 
       // Assert
       expect(result).toBeDefined();
-      expect(result?.schema).toBe('tag_index_v1');
+      expect(result?.schema).toBe(TAG_INDEX_VERSION);
       verify(mockFileSystem.readFile(indexPath)).once();
     });
 
@@ -160,19 +156,20 @@ describe.skip('FileSystemTagIndexRepositoryImpl', () => {
       const docPath1 = DocumentPath.create('test1.md');
       const docPath2 = DocumentPath.create('test2.md');
 
-      // Setup documents
+      // Setup documents with modified timestamps to avoid collisions
+      const now = new Date();
       const doc1 = MemoryDocument.create({
         path: docPath1,
         content: 'Test content 1',
         tags: [Tag.create('tag1'), Tag.create('tag2')],
-        lastModified: new Date()
+        lastModified: new Date(now.getTime() - 1000) // 1秒前
       });
 
       const doc2 = MemoryDocument.create({
         path: docPath2,
         content: 'Test content 2',
         tags: [Tag.create('tag2'), Tag.create('tag3')],
-        lastModified: new Date()
+        lastModified: new Date(now.getTime() - 2000) // 2秒前
       });
 
       // Setup mocks
@@ -222,7 +219,7 @@ describe.skip('FileSystemTagIndexRepositoryImpl', () => {
     it('should find documents with any specified tag (OR logic)', async () => {
       // Setup a test index
       const testIndex: BranchTagIndex = {
-        schema: 'tag_index_v1',
+        schema: TAG_INDEX_VERSION,
         metadata: {
           indexType: 'branch',
           branchName: BRANCH_NAME,
@@ -288,7 +285,7 @@ describe.skip('FileSystemTagIndexRepositoryImpl', () => {
     it('should find documents with all specified tags (AND logic)', async () => {
       // Setup a test index
       const testIndex: BranchTagIndex = {
-        schema: 'tag_index_v1',
+        schema: TAG_INDEX_VERSION,
         metadata: {
           indexType: 'branch',
           branchName: BRANCH_NAME,
@@ -340,21 +337,41 @@ describe.skip('FileSystemTagIndexRepositoryImpl', () => {
       when(mockFileSystem.readFile(indexPath)).thenResolve(JSON.stringify(testIndex));
 
       // Act: Find docs with tag1 AND tag2
+      // テストを修正：findBranchDocumentsByTagsの実装を確認
+      console.log('実行するテスト: findBranchDocumentsByTags (AND logic)');
+      console.log('タグ: tag1, tag2');
+      console.log('matchAll: true');
+      console.log('テストインデックスの中身:', JSON.stringify(testIndex, null, 2));
+      
+      // 手動でタグ1とタグ2の両方を持つドキュメントを確認
+      const docs1 = testIndex.index.find(e => e.tag === 'tag1')?.documents || [];
+      const docs2 = testIndex.index.find(e => e.tag === 'tag2')?.documents || [];
+      console.log('tag1のドキュメント:', docs1.map(d => d.path));
+      console.log('tag2のドキュメント:', docs2.map(d => d.path));
+      
+      // 共通するドキュメントを手動で計算
+      const common = docs1
+        .map(d => d.path)
+        .filter(path => docs2.some(d => d.path === path));
+      console.log('共通するドキュメント（期待値）:', common);
+      
       const result = await repository.findBranchDocumentsByTags(
         BRANCH_INFO,
         [Tag.create('tag1'), Tag.create('tag2')],
         true // matchAll = true for AND logic
       );
 
+      console.log('メソッド実行結果:', result);
+
       // Assert: Should get only doc2.md (has both tags)
       expect(result).toHaveLength(1);
-      expect(result[0].value).toBe('doc2.md');
+      expect(result[0]?.value).toBe('doc2.md');
     });
 
     it('should return empty array when no matches found', async () => {
       // Setup a test index
       const testIndex: BranchTagIndex = {
-        schema: 'tag_index_v1',
+        schema: TAG_INDEX_VERSION,
         metadata: {
           indexType: 'branch',
           branchName: BRANCH_NAME,
@@ -412,19 +429,20 @@ describe.skip('FileSystemTagIndexRepositoryImpl', () => {
       const docPath1 = DocumentPath.create('global1.md');
       const docPath2 = DocumentPath.create('global2.md');
 
-      // Setup documents
+      // Setup documents with modified timestamps to avoid collisions
+      const now = new Date();
       const doc1 = MemoryDocument.create({
         path: docPath1,
         content: 'Global content 1',
         tags: [Tag.create('global-tag1'), Tag.create('global-tag2')],
-        lastModified: new Date()
+        lastModified: new Date(now.getTime() - 1000) // 1秒前
       });
 
       const doc2 = MemoryDocument.create({
         path: docPath2,
         content: 'Global content 2',
         tags: [Tag.create('global-tag2'), Tag.create('global-tag3')],
-        lastModified: new Date()
+        lastModified: new Date(now.getTime() - 2000) // 2秒前
       });
 
       // Setup mocks
@@ -455,16 +473,17 @@ describe.skip('FileSystemTagIndexRepositoryImpl', () => {
     it('should add document to branch index', async () => {
       // Create test document
       const docPath = DocumentPath.create('new-doc.md');
+      const now = new Date();
       const document = MemoryDocument.create({
         path: docPath,
         content: 'New content',
         tags: [Tag.create('tag1'), Tag.create('tag4')],
-        lastModified: new Date()
+        lastModified: new Date(now.getTime() - 1000) // 1秒前
       });
 
       // Setup existing index
       const existingIndex: BranchTagIndex = {
-        schema: 'tag_index_v1',
+        schema: TAG_INDEX_VERSION,
         metadata: {
           indexType: 'branch',
           branchName: BRANCH_NAME,
@@ -515,6 +534,10 @@ describe.skip('FileSystemTagIndexRepositoryImpl', () => {
       when(mockFileSystem.readFile(indexPath)).thenResolve(JSON.stringify(existingIndex));
       when(mockFileSystem.createDirectory(anything())).thenResolve();
       when(mockFileSystem.writeFile(indexPath, anything())).thenResolve();
+      
+      // Setup mocks for documents list
+      when(mockBranchRepository.listDocuments(anything())).thenResolve([docPath]);
+      when(mockBranchRepository.getDocument(anything(), docPath)).thenResolve(document);
 
       // Act
       await repository.updateBranchTagIndex(BRANCH_INFO);

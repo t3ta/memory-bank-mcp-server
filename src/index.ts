@@ -147,21 +147,7 @@ const AVAILABLE_TOOLS = [
       required: ['language'],
     },
   },
-  {
-    name: 'get_recent_branches',
-    description: 'Get recently updated branch memory banks',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        limit: {
-          type: 'number',
-          description: 'Maximum number of branches to return (default: 10, max: 100)',
-          minimum: 1,
-          maximum: 100,
-        },
-      },
-    },
-  },
+  // get_recent_branches tools removed
   {
     name: 'read_context',
     description:
@@ -418,26 +404,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
       };
     }
 
-    case 'get_recent_branches': {
-      const limit = params.limit as number | undefined;
-
-      if (!app) {
-        throw new Error('Application not initialized');
-      }
-      const response = await app.getBranchController().getRecentBranches(limit);
-      if (!response.success) {
-        throw new Error((response as any).error.message);
-      }
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(response.success ? response.data : {}, null, 2),
-          },
-        ],
-      };
-    }
+    // 'get_recent_branches' handler removed
 
     case 'read_context': {
       const branch = params.branch as string | undefined;
