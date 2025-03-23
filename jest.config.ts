@@ -14,6 +14,7 @@ export default {
     'unit/infrastructure/templates/FileTemplateRepository.test.ts',
     'unit/interface/controllers/BranchController.test.ts',
     'unit/migration/MarkdownMigrationService.test.ts',
+    '.*ts-mockito-backup.*', // バックアップディレクトリを除外
   ],
   transform: {
     '^.+\\.tsx?$': ['ts-jest', {
