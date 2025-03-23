@@ -8,16 +8,12 @@ export default {
   roots: ['<rootDir>/src/', '<rootDir>/tests/'],
   testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
   testPathIgnorePatterns: [
-    // Skip failing tests temporarily until they can be properly fixed
-    'unit/domain/entities/MemoryDocument.test.ts',
-    'unit/infrastructure/i18n/FileI18nRepository.test.ts',
-    'unit/infrastructure/repositories/file-system/FileSystemTagIndexRepositoryImpl.test.ts',
-    'unit/infrastructure/storage/FileSystemService.test.ts',
+    // Still need fixes for these tests
+    // 'unit/infrastructure/repositories/file-system/FileSystemTagIndexRepositoryImpl.test.ts', // 一時的にコメントアウト
+    // 'unit/infrastructure/storage/FileSystemService.test.ts', // 一時的にコメントを外す
     'unit/infrastructure/templates/FileTemplateRepository.test.ts',
     'unit/interface/controllers/BranchController.test.ts',
-    'unit/interface/controllers/ContextController.test.ts',
     'unit/migration/MarkdownMigrationService.test.ts',
-    'unit/shared/utils/markdown-parser.test.ts',
   ],
   transform: {
     '^.+\\.tsx?$': ['ts-jest', {
@@ -29,7 +25,8 @@ export default {
     '^(\\.{1,2}/.*)\\.js$': '$1',
     '^@modelcontextprotocol/sdk(.*)$': '<rootDir>/node_modules/@modelcontextprotocol/sdk/dist/esm$1',
     '^src/(.*)$': '<rootDir>/src/$1',
-    '(.+)\\.js': '$1'
+    '(.+)\\.js': '$1',
+    '^../../../../src/(.*)$': '<rootDir>/src/$1'
   },
   modulePaths: ['<rootDir>', '<rootDir>/src'],
   moduleDirectories: ['node_modules', 'src'],

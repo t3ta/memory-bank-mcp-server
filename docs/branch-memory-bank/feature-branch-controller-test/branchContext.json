@@ -1,0 +1,86 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "branch-context-feature-branch-controller-test",
+    "title": "Branch Context - feature/branch-controller-test",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context",
+      "controller",
+      "bug-fix",
+      "read-context",
+      "dependency-injection"
+    ],
+    "lastModified": "2025-03-23T11:30:00.000Z",
+    "createdAt": "2025-03-23T11:30:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "purpose": "このブランチは `read-context` コマンドとBranchControllerのテストと修正のためのブランチです。特にDIコンテナからのコントローラー取得時のPromise解決の問題を解決します。",
+    "userStories": [
+      {
+        "id": "US-1",
+        "title": "read-contextコマンドが正しく機能するようにする",
+        "description": "ユーザーがread-contextコマンドを使用してブランチとグローバルメモリバンクの情報を一度に取得できるようにします。",
+        "acceptance": [
+          "read-contextコマンドがエラーなく実行できる",
+          "指定したブランチのメモリバンク情報が表示される",
+          "グローバルメモリバンク情報が表示される",
+          "ルール情報が表示される"
+        ]
+      },
+      {
+        "id": "US-2",
+        "title": "DIコンテナのawaitバグを修正する",
+        "description": "DIコンテナからコントローラーを取得する際にPromiseを正しく解決するように修正します。",
+        "acceptance": [
+          "Application.initialize()メソッドでコントローラー取得時にawaitを使用している",
+          "コントローラーのメソッドが正しく呼び出せる",
+          "Promiseではなく実際のコントローラーインスタンスが取得できる"
+        ]
+      }
+    ],
+    "technicalContext": {
+      "affectedComponents": [
+        {
+          "name": "Application",
+          "path": "src/main/index.ts",
+          "description": "コントローラーの取得とDIコンテナの初期化を行うクラス"
+        },
+        {
+          "name": "ContextController",
+          "path": "src/interface/controllers/ContextController.ts",
+          "description": "コンテキスト情報を取得するためのコントローラー"
+        },
+        {
+          "name": "setupContainer",
+          "path": "src/main/di/providers.ts",
+          "description": "DIコンテナのセットアップと依存関係の登録を行う関数"
+        }
+      ],
+      "bugDescription": "Application.initialize()メソッドでDIコンテナからコントローラーを取得する際に、Promiseを解決せずに直接使用していたために、コントローラーのメソッドにアクセスできない問題がありました。",
+      "fixDescription": "DIコンテナからコントローラーを取得する際にawaitを使用することで、Promiseを解決し実際のコントローラーインスタンスを取得するように修正しました。"
+    },
+    "objectives": [
+      "DIコンテナからのコントローラー取得時にPromiseを解決するよう修正",
+      "read-contextコマンドが正しく機能するか確認",
+      "コードのリファクタリングと改善",
+      "テストの追加と改善"
+    ],
+    "priorities": {
+      "high": [
+        "DIコンテナからのコントローラー取得のバグ修正",
+        "read-contextコマンドの動作確認"
+      ],
+      "medium": [
+        "テストの追加",
+        "コードのリファクタリング"
+      ],
+      "low": [
+        "ドキュメントの更新",
+        "パフォーマンスの最適化"
+      ]
+    }
+  }
+}

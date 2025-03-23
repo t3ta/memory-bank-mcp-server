@@ -185,12 +185,12 @@ const AVAILABLE_TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-        id: { 
+        id: {
           type: 'string',
-          description: 'Template ID to retrieve' 
+          description: 'Template ID to retrieve'
         },
-        language: { 
-          type: 'string', 
+        language: {
+          type: 'string',
           enum: ['en', 'ja', 'zh'],
           description: 'Language code (en, ja, or zh)'
         },
@@ -407,7 +407,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
     // 'get_recent_branches' handler removed
 
     case 'read_context': {
-      const branch = params.branch as string | undefined;
+      const branch = (params.branch as string | undefined) || '_current_';
       const language = (params.language as string) || 'ja';
       const includeRules = params.includeRules !== false; // デフォルトはtrue
       const includeBranchMemory = params.includeBranchMemory !== false; // デフォルトはtrue
@@ -530,7 +530,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 
       // 現時点ではMarkdown形式で取得
       const response = await app.getTemplateController().getTemplateAsMarkdown(id, language as any, variables);
-      
+
       return {
         content: [{ type: 'text', text: response }],
         _meta: { lastModified: new Date().toISOString() }
