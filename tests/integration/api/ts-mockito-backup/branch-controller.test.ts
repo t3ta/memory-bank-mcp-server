@@ -1,5 +1,3 @@
-// @ts-nocheck
-// This file was automatically converted from ts-mockito to jest.fn()
 /**
  * @jest-environment node
  */
@@ -107,7 +105,7 @@ describe('BranchController (Integration)', () => {
       .thenResolve(testDocument as any);
 
     // Setup findDocumentsByTags behavior
-    when(branchRepositoryMockObj.mock.findDocumentsByTags(expect.expect.anything(), expect.expect.anything()))
+    when(branchRepositoryMockObj.mock.findDocumentsByTags(expect.anything(), expect.anything()))
       .thenResolve([testDocument as any]);
 
     // Setup getRecentBranches behavior
@@ -115,7 +113,7 @@ describe('BranchController (Integration)', () => {
     branchRepositoryMockObj.mock.getRecentBranches = jest.fn().mockResolvedValue([recentBranches[0]]);
 
     // Setup listDocuments behavior
-    when(branchRepositoryMockObj.mock.listDocuments(expect.expect.anything()))
+    when(branchRepositoryMockObj.mock.listDocuments(expect.anything()))
       .thenResolve([DocumentPath.create(TEST_DOCUMENT_PATH)]);
 
     branchRepositoryMock = branchRepositoryMockObj.instance;
@@ -191,7 +189,7 @@ describe('BranchController (Integration)', () => {
 
       // Setup mock to return null for this specific path
       when(branchRepositoryMockObj.mock.getDocument(
-        expect.expect.anything(),
+        expect.anything(),
         DocumentPath.create(nonExistentPath)
       )).thenResolve(null);
 
@@ -368,8 +366,8 @@ describe('BranchController (Integration)', () => {
 
       // Setup mock to return empty array for non-matching tags
       when(branchRepositoryMockObj.mock.findDocumentsByTags(
-        expect.expect.anything(),
-        expect.expect.anything()
+        expect.anything(),
+        expect.anything()
       )).thenResolve([]);
 
       // Mock the search use case
@@ -481,7 +479,7 @@ describe('error handling', () => {
 
     // Setup mock to throw error
     when(branchRepositoryMockObj.mock.getDocument(
-      expect.expect.anything(),
+      expect.anything(),
       DocumentPath.create('invalid.md')
     )).thenThrow(new DomainError('INVALID_PATH', errorMessage));
 
@@ -500,7 +498,7 @@ describe('error handling', () => {
 
   it.skip('should handle repository unavailable error', async () => {
     // Arrange
-    when(branchRepositoryMockObj.mock.getDocument(expect.expect.anything(), expect.expect.anything()))
+    when(branchRepositoryMockObj.mock.getDocument(expect.anything(), expect.anything()))
       .thenReject(new Error('Database connection failed'));
 
     // Act
@@ -516,7 +514,7 @@ describe('error handling', () => {
 
   it.skip('should handle timeout errors', async () => {
     // Arrange
-    when(branchRepositoryMockObj.mock.getDocument(expect.expect.anything(), expect.expect.anything()))
+    when(branchRepositoryMockObj.mock.getDocument(expect.anything(), expect.anything()))
       .thenReject(new Error('Operation timed out'));
 
     // Act
@@ -548,7 +546,7 @@ describe('complex scenarios', () => {
     };
 
     when(branchRepositoryMockObj.mock.getDocument(
-      expect.expect.anything(),
+      expect.anything(),
       DocumentPath.create('テスト文書.md')
     )).thenResolve(specialCharsDoc as any);
 
@@ -580,7 +578,7 @@ describe('complex scenarios', () => {
     };
 
     when(branchRepositoryMockObj.mock.getDocument(
-      expect.expect.anything(),
+      expect.anything(),
       DocumentPath.create('large-doc.md')
     )).thenResolve(largeDoc as any);
 

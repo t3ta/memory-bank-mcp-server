@@ -1,5 +1,3 @@
-// @ts-nocheck
-// This file was automatically converted from ts-mockito to jest.fn()
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 // ts-mockito import removed;
 import { ReadJsonDocumentUseCase } from '../../../../../src/application/usecases/json/ReadJsonDocumentUseCase';

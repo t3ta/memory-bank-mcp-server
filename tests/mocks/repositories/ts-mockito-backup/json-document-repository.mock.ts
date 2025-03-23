@@ -1,5 +1,3 @@
-// @ts-nocheck
-// This file was automatically converted from ts-mockito to jest.fn()
 // ts-mockito import removed;
 import { IJsonDocumentRepository } from '../../../src/domain/repositories/IJsonDocumentRepository';
 import { JsonDocument, DocumentType } from '../../../src/domain/entities/JsonDocument';
@@ -40,7 +38,7 @@ export function createMockJsonDocumentRepository(
   mockRepo.findByType = jest.fn().mockResolvedValue([]);
   mockRepo.listAll = jest.fn().mockResolvedValue([]);
   mockRepo.exists = jest.fn().mockResolvedValue(true);
-  when(mockRepo.save(expect.expect.anything(), expect.expect.anything())).thenCall(
+  when(mockRepo.save(expect.anything(), expect.anything())).thenCall(
     (_, document: JsonDocument) => Promise.resolve(document)
   );
   mockRepo.delete = jest.fn().mockResolvedValue(true);

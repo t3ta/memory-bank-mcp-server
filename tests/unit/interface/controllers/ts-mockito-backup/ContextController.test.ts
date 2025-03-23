@@ -1,5 +1,3 @@
-// @ts-nocheck
-// This file was automatically converted from ts-mockito to jest.fn()
 import { jest, describe, it, expect, beforeEach } from '@jest/globals';
 import { ContextController } from "../../../../src/interface/controllers/ContextController";
 import { ReadContextUseCase } from "../../../../src/application/usecases/common/ReadContextUseCase";
@@ -95,7 +93,7 @@ describe("ContextController", () => {
       readRulesUseCaseMock.execute = jest.fn().mockResolvedValue(mockRulesResult);
       
       // Need to setup mock based on different params
-      when(readContextUseCaseMock.execute(expect.expect.anything())).thenResolve({
+      when(readContextUseCaseMock.execute(expect.anything())).thenResolve({
         branchMemory: mockBranchMemory,
         globalMemory: mockGlobalMemory
       });
@@ -127,7 +125,7 @@ describe("ContextController", () => {
         "Branch not found: feature/non-existent"
       );
 
-      when(readContextUseCaseMock.execute(expect.expect.anything())).thenReject(mockError);
+      when(readContextUseCaseMock.execute(expect.anything())).thenReject(mockError);
 
       // Act
       const result = await controller.readContext(mockRequest);
@@ -155,7 +153,7 @@ describe("ContextController", () => {
       when(readRulesUseCaseMock.execute("en")).thenReject(new Error("Rules error"));
       
       // Always return branch memory only
-      when(readContextUseCaseMock.execute(expect.expect.anything())).thenResolve({
+      when(readContextUseCaseMock.execute(expect.anything())).thenResolve({
         branchMemory: mockBranchMemory
       });
 

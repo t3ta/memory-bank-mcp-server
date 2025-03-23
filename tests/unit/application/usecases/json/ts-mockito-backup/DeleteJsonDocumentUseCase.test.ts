@@ -1,5 +1,3 @@
-// @ts-nocheck
-// This file was automatically converted from ts-mockito to jest.fn()
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 // ts-mockito import removed;
 import { DeleteJsonDocumentUseCase } from '../../../../../src/application/usecases/json/DeleteJsonDocumentUseCase';
@@ -256,9 +254,9 @@ describe('DeleteJsonDocumentUseCase', () => {
       expect(result.details.identifier).toBe(testDocumentPath);
 
       // Verify repository methods were called - deepEqualよりanythingの方が柔軟
-      verify(globalRepositoryMock.exists(expect.expect.anything(), documentPath)).once();
-      verify(globalRepositoryMock.delete(expect.expect.anything(), documentPath)).once();
-      verify(indexServiceMock.removeFromIndex(expect.expect.anything(), documentPath)).once();
+      verify(globalRepositoryMock.exists(expect.anything(), documentPath)).once();
+      verify(globalRepositoryMock.delete(expect.anything(), documentPath)).once();
+      verify(indexServiceMock.removeFromIndex(expect.anything(), documentPath)).once();
       expect(jsonRepositoryMock.exists).not.toHaveBeenCalled();
     });
   });

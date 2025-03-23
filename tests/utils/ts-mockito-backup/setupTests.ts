@@ -1,5 +1,3 @@
-// @ts-nocheck
-// This file was automatically converted from ts-mockito to jest.fn()
 // FileSystemRetryUtils モックも追加
 jest.mock('../../src/infrastructure/repositories/file-system/FileSystemRetryUtils.js', () => ({
   withFileSystemRetry: (operationName, fn) => fn(),

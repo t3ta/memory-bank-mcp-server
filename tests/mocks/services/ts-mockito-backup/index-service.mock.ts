@@ -1,5 +1,3 @@
-// @ts-nocheck
-// This file was automatically converted from ts-mockito to jest.fn()
 // ts-mockito import removed;
 import { IIndexService } from '../../../src/infrastructure/index/interfaces/IIndexService';
 import { BranchInfo } from '../../../src/domain/entities/BranchInfo';
@@ -23,7 +21,7 @@ import { DocumentReference } from '../../../src/schemas/v2/index-schema';
  * const { mock, instance } = createMockIndexService(mockService => {
  *   // 特定のIDに対する検索結果をカスタマイズ
  *   when(mockService.findById(
- *     expect.expect.anything(), 
+ *     expect.anything(), 
  *     new DocumentId('12345678-1234-1234-1234-123456789012')
  *   )).thenResolve({
  *     id: '12345678-1234-1234-1234-123456789012',

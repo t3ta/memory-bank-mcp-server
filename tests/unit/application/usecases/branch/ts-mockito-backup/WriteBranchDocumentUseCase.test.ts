@@ -1,5 +1,3 @@
-// @ts-nocheck
-// This file was automatically converted from ts-mockito to jest.fn()
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 // ts-mockito import removed;
 import { WriteBranchDocumentUseCase } from '../../../../../src/application/usecases/branch/WriteBranchDocumentUseCase';
@@ -75,7 +73,7 @@ describe('WriteBranchDocumentUseCase', () => {
     // Verify repository calls
     verify(mockBranchRepo.exists(testBranchName)).once();
     verify(mockBranchRepo.getDocument(branchInfo, docPath)).once();
-    verify(mockBranchRepo.saveDocument(expect.expect.anything(), expect.expect.anything())).once();
+    verify(mockBranchRepo.saveDocument(expect.anything(), expect.anything())).once();
   });
 
   it('should initialize the branch if it does not exist', async () => {
@@ -137,7 +135,7 @@ describe('WriteBranchDocumentUseCase', () => {
     expect(result.document.tags).toEqual(testDocumentTags);
 
     // Verify saveDocument was called
-    verify(mockBranchRepo.saveDocument(expect.expect.anything(), expect.expect.anything())).once();
+    verify(mockBranchRepo.saveDocument(expect.anything(), expect.anything())).once();
   });
 
   it('should update content while preserving tags if tags are not provided', async () => {
@@ -176,7 +174,7 @@ describe('WriteBranchDocumentUseCase', () => {
     expect(result.document.tags).toEqual(existingTags.map((tag) => tag.value));
 
     // Verify saveDocument was called
-    verify(mockBranchRepo.saveDocument(expect.expect.anything(), expect.expect.anything())).once();
+    verify(mockBranchRepo.saveDocument(expect.anything(), expect.anything())).once();
   });
 
   it('should throw ApplicationError when branch name is empty', async () => {

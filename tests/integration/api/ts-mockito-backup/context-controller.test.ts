@@ -1,5 +1,3 @@
-// @ts-nocheck
-// This file was automatically converted from ts-mockito to jest.fn()
 import { ContextController } from '../../../src/interface/controllers/ContextController.js';
 import { ReadContextUseCase } from '../../../src/application/usecases/common/ReadContextUseCase.js';
 import { ReadRulesUseCase } from '../../../src/application/usecases/common/ReadRulesUseCase.js';
@@ -120,7 +118,7 @@ describe('ContextController Integration Tests with Mocks', () => {
 
     // Since we now always load all data regardless of include flags,
     // just make it return branch and global memory for valid branches
-    when(mockReadContextUseCase.execute(expect.expect.anything())).thenCall((request) => {
+    when(mockReadContextUseCase.execute(expect.anything())).thenCall((request) => {
       if (request.branch === testBranch) {
         return Promise.resolve({
           branchMemory: branchDocuments,

@@ -1,5 +1,3 @@
-// @ts-nocheck
-// This file was automatically converted from ts-mockito to jest.fn()
 // ts-mockito import removed;
 import { IGlobalMemoryBankRepository } from '../../../src/domain/repositories/IGlobalMemoryBankRepository';
 import { DocumentPath } from '../../../src/domain/entities/DocumentPath';

@@ -1,5 +1,3 @@
-// @ts-nocheck
-// This file was automatically converted from ts-mockito to jest.fn()
 import { promises as fs } from 'node:fs';
 import * as path from 'node:path';
 import { v4 as uuidv4 } from 'uuid';
@@ -154,7 +152,7 @@ describe('GlobalController Integration Tests', () => {
     const { mock: mockJsonDocRepo, instance: jsonDocRepo } = createMockJsonDocumentRepository();
 
     // Customize delete behavior to actually delete files from the file system
-    when(mockJsonDocRepo.delete(expect.expect.anything(), expect.expect.anything())).thenCall(async (_, docPath) => {
+    when(mockJsonDocRepo.delete(expect.anything(), expect.anything())).thenCall(async (_, docPath) => {
       // Actually delete the file from the file system
       if (docPath instanceof DocumentPath) {
         const filePath = path.join(globalDir, docPath.value);
@@ -248,7 +246,7 @@ describe('GlobalController Integration Tests', () => {
     if (readResult.success) {
       expect(readResult.data.content).toEqual(content);
     } else {
-      expect('Test should have failed').toBe(false) // 'Read should have succeeded but failed';
+      fail('Read should have succeeded but failed');
     }
   });
 
@@ -265,7 +263,7 @@ describe('GlobalController Integration Tests', () => {
       const errorResponse = readResult as { success: false, error: { code: string, message: string } };
       expect(errorResponse.error).toBeDefined();
     } else {
-      expect('Test should have failed').toBe(false) // 'Reading a non-existent file unexpectedly succeeded';
+      fail('Reading a non-existent file unexpectedly succeeded');
     }
   });
 
@@ -303,7 +301,7 @@ describe('GlobalController Integration Tests', () => {
       expect(parsedData.title).toEqual(data.title);
       expect(parsedData.items.length).toEqual(5);
     } else {
-      expect('Test should have failed').toBe(false) // 'JSON file read failed';
+      fail('JSON file read failed');
     }
   });
 
@@ -326,7 +324,7 @@ This document should be prohibited from being written.
       expect(errorResponse.error.message).toContain('Writing to Markdown files is disabled');
       expect(errorResponse.error.message).toContain('.json');
     } else {
-      expect('Test should have failed').toBe(false) // 'Writing to Markdown file should have failed but succeeded';
+      fail('Writing to Markdown file should have failed but succeeded');
     }
 
     // Verify file doesn't exist

@@ -1,5 +1,3 @@
-// @ts-nocheck
-// This file was automatically converted from ts-mockito to jest.fn()
 /**
  * @jest-environment node
  */
@@ -193,7 +191,7 @@ describe('FileSystemTagIndexRepositoryImpl', () => {
       expect(result.documentCount).toBe(2);
       expect(result.tags).toHaveLength(3);
       expect(result.tags.sort()).toEqual(['tag1', 'tag2', 'tag3'].sort());
-      verify(mockFileSystem.writeFile(indexPath, expect.expect.anything())).once();
+      verify(mockFileSystem.writeFile(indexPath, expect.anything())).once();
     });
 
     it('should handle empty document list', async () => {
@@ -213,7 +211,7 @@ describe('FileSystemTagIndexRepositoryImpl', () => {
       expect(result).toBeDefined();
       expect(result.documentCount).toBe(0);
       expect(result.tags).toHaveLength(0);
-      verify(mockFileSystem.writeFile(indexPath, expect.expect.anything())).once();
+      verify(mockFileSystem.writeFile(indexPath, expect.anything())).once();
     });
   });
 
@@ -466,7 +464,7 @@ describe('FileSystemTagIndexRepositoryImpl', () => {
       expect(result.documentCount).toBe(2);
       expect(result.tags).toHaveLength(3);
       expect(result.tags.sort()).toEqual(['global-tag1', 'global-tag2', 'global-tag3'].sort());
-      verify(mockFileSystem.writeFile(indexPath, expect.expect.anything())).once();
+      verify(mockFileSystem.writeFile(indexPath, expect.anything())).once();
     });
   });
 
@@ -545,7 +543,7 @@ describe('FileSystemTagIndexRepositoryImpl', () => {
       await repository.updateBranchTagIndex(BRANCH_INFO);
 
       // Assert: Verify file was written
-      verify(mockFileSystem.writeFile(indexPath, expect.expect.anything())).once();
+      verify(mockFileSystem.writeFile(indexPath, expect.anything())).once();
 
       // We need to capture the written content to verify the update
       // This is a bit complex with ts-mockito, so we'll just verify basic aspects

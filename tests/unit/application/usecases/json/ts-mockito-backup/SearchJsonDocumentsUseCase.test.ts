@@ -1,5 +1,3 @@
-// @ts-nocheck
-// This file was automatically converted from ts-mockito to jest.fn()
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 // ts-mockito import removed;
 import { SearchJsonDocumentsUseCase } from '../../../../../src/application/usecases/json/SearchJsonDocumentsUseCase';
@@ -121,7 +119,7 @@ describe('SearchJsonDocumentsUseCase', () => {
         true
       );
 
-      when(jsonRepositoryMock.findByTags(branchInfo, expect.expect.anything(), false)).thenResolve(
+      when(jsonRepositoryMock.findByTags(branchInfo, expect.anything(), false)).thenResolve(
         expectedDocuments
       );
 
@@ -143,7 +141,7 @@ describe('SearchJsonDocumentsUseCase', () => {
 
       // Verify repository methods were called
       verify(jsonRepositoryMock.exists(branchInfo, dummyPath)).once();
-      verify(jsonRepositoryMock.findByTags(branchInfo, expect.expect.anything(), false)).once();
+      verify(jsonRepositoryMock.findByTags(branchInfo, expect.anything(), false)).once();
     });
 
     it('should search documents with matchAllTags option', async () => {
@@ -161,7 +159,7 @@ describe('SearchJsonDocumentsUseCase', () => {
         true
       );
 
-      when(jsonRepositoryMock.findByTags(branchInfo, expect.expect.anything(), true)).thenResolve(
+      when(jsonRepositoryMock.findByTags(branchInfo, expect.anything(), true)).thenResolve(
         expectedDocuments
       );
 
@@ -180,7 +178,7 @@ describe('SearchJsonDocumentsUseCase', () => {
       expect(result.searchInfo.matchedAllTags).toBe(true);
 
       // Verify repository methods were called
-      verify(jsonRepositoryMock.findByTags(branchInfo, expect.expect.anything(), true)).once();
+      verify(jsonRepositoryMock.findByTags(branchInfo, expect.anything(), true)).once();
     });
 
     it('should search documents by type', async () => {
@@ -259,7 +257,7 @@ describe('SearchJsonDocumentsUseCase', () => {
       const expectedDocuments = [testDocuments[0], testDocuments[2]];
 
       // Mock repository behavior
-      when(globalRepositoryMock.findByTags(branchInfo, expect.expect.anything(), false)).thenResolve(
+      when(globalRepositoryMock.findByTags(branchInfo, expect.anything(), false)).thenResolve(
         expectedDocuments
       );
 
@@ -274,7 +272,7 @@ describe('SearchJsonDocumentsUseCase', () => {
       expect(result.searchInfo.searchLocation).toBe('global');
 
       // Verify repository methods were called
-      verify(globalRepositoryMock.findByTags(branchInfo, expect.expect.anything(), false)).once();
+      verify(globalRepositoryMock.findByTags(branchInfo, expect.anything(), false)).once();
       expect(jsonRepositoryMock.findByTags).not.toHaveBeenCalled();
     });
   });
@@ -312,7 +310,7 @@ describe('SearchJsonDocumentsUseCase', () => {
         true
       );
 
-      when(jsonRepositoryMock.findByTags(branchInfo, expect.expect.anything(), false)).thenThrow(
+      when(jsonRepositoryMock.findByTags(branchInfo, expect.anything(), false)).thenThrow(
         domainError
       );
 
@@ -336,7 +334,7 @@ describe('SearchJsonDocumentsUseCase', () => {
         true
       );
 
-      when(jsonRepositoryMock.findByTags(branchInfo, expect.expect.anything(), false)).thenThrow(
+      when(jsonRepositoryMock.findByTags(branchInfo, expect.anything(), false)).thenThrow(
         unknownError
       );
 

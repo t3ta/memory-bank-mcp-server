@@ -1,5 +1,3 @@
-// @ts-nocheck
-// This file was automatically converted from ts-mockito to jest.fn()
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 // ts-mockito import removed;
 import { WriteJsonDocumentUseCase } from '../../../../../src/application/usecases/json/WriteJsonDocumentUseCase';
@@ -82,7 +80,7 @@ describe('WriteJsonDocumentUseCase', () => {
         jsonRepositoryMock.findByPath(branchInfo, documentPath)
       ).thenResolve(null);
 
-      when(jsonRepositoryMock.save(branchInfo, expect.expect.anything())).thenCall(
+      when(jsonRepositoryMock.save(branchInfo, expect.anything())).thenCall(
         (branchInfo, document) => Promise.resolve(document)
       );
 
@@ -113,8 +111,8 @@ describe('WriteJsonDocumentUseCase', () => {
 
       // Verify repository methods were called
       verify(jsonRepositoryMock.findByPath(branchInfo, documentPath)).once();
-      verify(jsonRepositoryMock.save(branchInfo, expect.expect.anything())).once();
-      verify(indexServiceMock.addToIndex(branchInfo, expect.expect.anything())).once();
+      verify(jsonRepositoryMock.save(branchInfo, expect.anything())).once();
+      verify(indexServiceMock.addToIndex(branchInfo, expect.anything())).once();
     });
 
     it('should update an existing document', async () => {
@@ -129,7 +127,7 @@ describe('WriteJsonDocumentUseCase', () => {
         jsonRepositoryMock.findByPath(branchInfo, documentPath)
       ).thenResolve(existingDocument);
 
-      when(jsonRepositoryMock.save(branchInfo, expect.expect.anything())).thenCall(
+      when(jsonRepositoryMock.save(branchInfo, expect.anything())).thenCall(
         (branchInfo, document) => Promise.resolve(document)
       );
 
@@ -159,8 +157,8 @@ describe('WriteJsonDocumentUseCase', () => {
 
       // Verify repository methods were called
       verify(jsonRepositoryMock.findByPath(branchInfo, documentPath)).once();
-      verify(jsonRepositoryMock.save(branchInfo, expect.expect.anything())).once();
-      verify(indexServiceMock.addToIndex(branchInfo, expect.expect.anything())).once();
+      verify(jsonRepositoryMock.save(branchInfo, expect.anything())).once();
+      verify(indexServiceMock.addToIndex(branchInfo, expect.anything())).once();
     });
   });
 
@@ -175,7 +173,7 @@ describe('WriteJsonDocumentUseCase', () => {
         globalRepositoryMock.findByPath(branchInfo, documentPath)
       ).thenResolve(null);
 
-      when(globalRepositoryMock.save(branchInfo, expect.expect.anything())).thenCall(
+      when(globalRepositoryMock.save(branchInfo, expect.anything())).thenCall(
         (branchInfo, document) => Promise.resolve(document)
       );
 
@@ -206,8 +204,8 @@ describe('WriteJsonDocumentUseCase', () => {
       verify(
         globalRepositoryMock.findByPath(branchInfo, documentPath)
       ).once();
-      verify(globalRepositoryMock.save(branchInfo, expect.expect.anything())).once();
-      verify(indexServiceMock.addToIndex(branchInfo, expect.expect.anything())).once();
+      verify(globalRepositoryMock.save(branchInfo, expect.anything())).once();
+      verify(indexServiceMock.addToIndex(branchInfo, expect.anything())).once();
       expect(jsonRepositoryMock.findByPath).not.toHaveBeenCalled();
     });
   });

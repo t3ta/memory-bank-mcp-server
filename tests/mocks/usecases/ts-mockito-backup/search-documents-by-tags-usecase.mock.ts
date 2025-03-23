@@ -1,5 +1,3 @@
-// @ts-nocheck
-// This file was automatically converted from ts-mockito to jest.fn()
 // ts-mockito import removed;
 import { 
   SearchDocumentsByTagsUseCase,
@@ -47,7 +45,7 @@ export function createMockSearchDocumentsByTagsUseCase(
   const mockUseCase = mock<IUseCase<SearchDocumentsByTagsInput, SearchDocumentsByTagsOutput>>();
 
   // デフォルトの振る舞いを設定
-  when(mockUseCase.execute(expect.expect.anything())).thenResolve({
+  when(mockUseCase.execute(expect.anything())).thenResolve({
     documents: [],
     searchInfo: {
       count: 0,

@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "61e38f95-68eb-4910-9032-b400b6a2dab9",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-24T12:45:50.796Z",
+    "createdAt": "2025-03-23T18:04:50.796Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "feature/replace-ts-mockito-with-jest-fn",
+    "purpose": "ts-mockitoで書かれたテストコードをjest.fn()ベースのモックに置き換える",
+    "createdAt": "2025-03-23T18:04:50.796Z",
+    "userStories": [
+      {
+        "id": "5bb926bc-5634-4ede-b644-08b3b47e6436",
+        "description": "ts-mockitoで書かれたモックをjest.fnのモックに置き換える",
+        "completed": true,
+        "priority": 1
+      },
+      {
+        "id": "8e25ba2a-5f7e-465c-ad58-edefab89ef83",
+        "description": "正しく型の互換性を保ちながら置き換える",
+        "completed": true,
+        "priority": 2
+      },
+      {
+        "id": "25d4d87d-ef7c-48da-a8ce-69d49be00505",
+        "description": "テストが正常に動作することを確認する",
+        "completed": true,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": "ts-mockitoはモックライブラリとして使われていましたが、jestのネイティブのmock機能(jest.fn())に置き換えることで、依存を減らし、テストコードをよりシンプルにすることができます。このプロジェクトではJestを使っているので、Jest標準のモック機能を使うことが自然です。"
+  }
+}

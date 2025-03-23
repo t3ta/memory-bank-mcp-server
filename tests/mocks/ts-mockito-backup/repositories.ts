@@ -1,5 +1,3 @@
-// @ts-nocheck
-// This file was automatically converted from ts-mockito to jest.fn()
 // ts-mockito import removed;
 import {
   IBranchMemoryBankRepository,

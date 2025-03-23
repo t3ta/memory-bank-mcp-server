@@ -1,5 +1,3 @@
-// @ts-nocheck
-// This file was automatically converted from ts-mockito to jest.fn()
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 // ts-mockito import removed;
 import { UpdateJsonIndexUseCase } from '../../../../../src/application/usecases/json/UpdateJsonIndexUseCase';
@@ -214,8 +212,8 @@ describe('UpdateJsonIndexUseCase', () => {
       expect(result.updateInfo.fullRebuild).toBe(true);
 
       // Verify repository and service methods were called
-      verify(globalRepositoryMock.listAll(expect.expect.anything())).once();
-      verify(indexServiceMock.buildIndex(expect.expect.anything(), testDocuments)).once();
+      verify(globalRepositoryMock.listAll(expect.anything())).once();
+      verify(indexServiceMock.buildIndex(expect.anything(), testDocuments)).once();
       expect(jsonRepositoryMock.listAll).not.toHaveBeenCalled();
     });
   });
