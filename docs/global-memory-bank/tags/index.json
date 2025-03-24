@@ -9,8 +9,8 @@
       "index",
       "meta"
     ],
-    "lastModified": "2025-03-24T08:18:17.666Z",
-    "createdAt": "2025-03-24T08:18:17.666Z",
+    "lastModified": "2025-03-24T12:31:34.566Z",
+    "createdAt": "2025-03-24T12:31:34.566Z",
     "version": 1
   },
   "content": {
@@ -104,7 +104,7 @@
         ]
       },
       "guide": {
-        "count": 19,
+        "count": 20,
         "documents": [
           {
             "path": "01-project/README.json",
@@ -145,6 +145,10 @@
           {
             "path": "08-i18n/README.json",
             "title": "08-i18n/README.json"
+          },
+          {
+            "path": "08-i18n/template-system-usage.json",
+            "title": "08-i18n/template-system-usage.json"
           },
           {
             "path": "09-refactoring/README.json",
@@ -1233,7 +1237,7 @@
         ]
       },
       "i18n": {
-        "count": 4,
+        "count": 6,
         "documents": [
           {
             "path": "08-i18n/README.json",
@@ -1242,6 +1246,14 @@
           {
             "path": "08-i18n/template-system-json-i18n-design.json",
             "title": "08-i18n/template-system-json-i18n-design.json"
+          },
+          {
+            "path": "08-i18n/template-system-usage.json",
+            "title": "08-i18n/template-system-usage.json"
+          },
+          {
+            "path": "08-i18n/template-system.json",
+            "title": "08-i18n/template-system.json"
           },
           {
             "path": "template-system-usage.json",
@@ -1267,11 +1279,32 @@
         ]
       },
       "template": {
-        "count": 1,
+        "count": 3,
         "documents": [
           {
             "path": "08-i18n/template-system-json-i18n-design.json",
             "title": "08-i18n/template-system-json-i18n-design.json"
+          },
+          {
+            "path": "08-i18n/template-system-usage.json",
+            "title": "08-i18n/template-system-usage.json"
+          },
+          {
+            "path": "08-i18n/template-system.json",
+            "title": "08-i18n/template-system.json"
+          }
+        ]
+      },
+      "internationalization": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "08-i18n/template-system-usage.json",
+            "title": "08-i18n/template-system-usage.json"
+          },
+          {
+            "path": "08-i18n/template-system.json",
+            "title": "08-i18n/template-system.json"
           }
         ]
       },

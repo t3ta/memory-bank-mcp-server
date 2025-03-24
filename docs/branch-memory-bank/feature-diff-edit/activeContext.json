@@ -1,0 +1,124 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "7f210bd6-beaf-4dbf-a536-f55779fb9224",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context",
+      "json-patch",
+      "tdd"
+    ],
+    "lastModified": "2025-03-24T19:20:00.000Z",
+    "createdAt": "2025-03-24T09:55:09.524Z",
+    "version": 3
+  },
+  "content": {
+    "currentWork": "fast-json-patchライブラリを活用したJSONドキュメントの部分編集機能の実装計画",
+    "recentChanges": [
+      {
+        "date": "2025-03-24T19:20:00.000Z",
+        "description": "実装アプローチを変更: カスタム実装からfast-json-patchライブラリの活用へ方針転換"
+      },
+      {
+        "date": "2025-03-24T16:30:00.000Z",
+        "description": "RFC 6902に基づいた実装詳細の具体化と作業計画の更新"
+      },
+      {
+        "date": "2025-03-24T09:55:09.524Z",
+        "description": "機能の基本設計を作成"
+      },
+      {
+        "date": "2025-03-24T09:55:09.524Z",
+        "description": "詳細設計を作成"
+      },
+      {
+        "date": "2025-03-24T09:55:09.524Z",
+        "description": "TDD実装計画を作成"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "f03f7e0f-4efd-48d7-8c26-1a34b31c08df",
+        "description": "RFC 6902準拠のJSON Patch実装を採用"
+      },
+      {
+        "id": "74637354-8cf3-4774-a615-11fce1dae992",
+        "description": "配列操作を含む全機能を最初から実装"
+      },
+      {
+        "id": "661ca46a-f0ad-4734-b663-8f22a976ee85",
+        "description": "TDDアプローチで実装を進める"
+      },
+      {
+        "id": "28b6e5a3-dd18-4cf2-a58b-63a5c1b87f8d",
+        "description": "ValueObjectパターンを使用してJSONパスと操作を表現"
+      },
+      {
+        "id": "5f9a7b8c-2d3e-4f6g-8h9i-1j2k3l4m5n6o",
+        "description": "fast-json-patchライブラリを採用し、アダプターパターンで統合する"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "cb594c5f-34a4-463f-8722-f6b55d747a0b",
+        "description": "マージ戦略の詳細化",
+        "status": "in-progress"
+      },
+      {
+        "id": "ef4233ec-f37a-429b-a584-d1738fea7f1d",
+        "description": "バリデーションルールの具体化",
+        "status": "in-progress"
+      },
+      {
+        "id": "9e56d21f-4c72-4d1e-af72-e9b8e7d3b9a4",
+        "description": "エラー処理とエラーコードの整理",
+        "status": "open"
+      },
+      {
+        "id": "b3a67d2c-f8a3-4e9c-8d30-1c54ad3c6e5f",
+        "description": "性能最適化戦略の検討",
+        "status": "resolved",
+        "resolution": "fast-json-patchライブラリは既に最適化されており、追加の最適化は必要なし"
+      },
+      {
+        "id": "7a6b5c4d-3e2f-1g0h-9i8j-7k6l5m4n3o2p",
+        "description": "ライブラリの依存性管理とバージョン互換性の確認",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "3c4d5e6f-7g8h-9i0j-1k2l-3m4n5o6p7q8r",
+        "description": "fast-json-patchライブラリのインストールと基本機能検証",
+        "priority": "high"
+      },
+      {
+        "id": "f9886b2d-69d3-41c1-a7e1-12faaebab596",
+        "description": "JsonPathクラスとfast-json-patchの互換性設計",
+        "priority": "high"
+      },
+      {
+        "id": "68574217-c393-4e26-bd1a-f7458417d0cd",
+        "description": "JsonPatchOperationクラスとfast-json-patchの互換性設計",
+        "priority": "high"
+      },
+      {
+        "id": "1d01855e-57c3-4c94-a31f-e5c8ff1026c1",
+        "description": "FastJsonPatchAdapterの設計と実装",
+        "priority": "medium"
+      },
+      {
+        "id": "a4c38f7e-b9d1-472c-9b1c-efae2d7c8b59",
+        "description": "JsonPatchServiceインターフェースの設計",
+        "priority": "medium"
+      },
+      {
+        "id": "76e5f02d-29d8-4857-9c3a-b2d0e6f9a8c7",
+        "description": "CLIコマンドとインターフェースの設計",
+        "priority": "low"
+      }
+    ]
+  }
+}
