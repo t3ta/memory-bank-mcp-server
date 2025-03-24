@@ -1,6 +1,6 @@
 {
   "name": "memory-bank-mcp-server",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "type": "module",
   "description": "MCP server for managing project documentation and context across sessions",
   "main": "dist/index.js",

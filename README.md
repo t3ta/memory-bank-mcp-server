@@ -1,65 +1,39 @@
-# Memory Bank MCP Server 2.1.0
+# Memory Bank MCP Server 2.2.0
 
-A Memory Bank implementation for managing project documentation and context across sessions. This server helps Claude maintain consistent project knowledge through global and branch-specific memory banks. Version 2.1.0 introduces JSON-only document storage, removing Markdown support completely for better structure and validation.
+A Memory Bank implementation for managing project documentation and context across sessions. This server helps Claude maintain consistent project knowledge through global and branch-specific memory banks. Version 2.2.0 enhances JSON Patch support and adds workspace options along with numerous improvements.
 
 This project is inspired by [Cline Memory Bank](https://github.com/nickbaumann98/cline_docs/blob/main/prompting/custom%20instructions%20library/cline-memory-bank.md) from the [nickbaumann98/cline_docs](https://github.com/nickbaumann98/cline_docs) repository, which provides an excellent foundation for managing Claude's memory in software projects.
 
-## What's New in 2.1.0
+## What's New in 2.2.0
 
-### JSON Patch Support (RFC 6902)
+### Enhanced JSON Patch Implementation
 
-Memory Bank 2.1.0 adds partial document update capability via JSON Patch (RFC 6902):
+Version 2.2.0 enhances the JSON Patch implementation with:
 
-- **Efficient Document Updates**: Apply targeted changes without full document replacement
-- **Complete RFC 6902 Support**: All operations (add, remove, replace, move, copy, test) fully implemented
-- **Built-in Validation**: Automatic validation of patch operations before applying
-- **Array Operations**: Full support for array manipulation (append, insert, remove elements)
-- **Atomic Operations**: All patches in a request are applied as a single transaction
+- **Updated Implementation**: Improved JSON Patch adapter and operation handling
+- **Better Error Codes**: Enhanced error reporting for patch operations
+- **Comprehensive Documentation**: Added detailed templates and examples
+- **Event Handling**: Improved document event handling with patch operations
 
-Example usage:
+### CLI Workspace Option Enhancement
 
-```javascript
-// Example patch operations
-const patches = [
-  { op: "add", path: "/content/newProperty", value: "New Value" },
-  { op: "replace", path: "/metadata/title", value: "Updated Title" },
-  { op: "remove", path: "/content/deprecated" },
-  { op: "add", path: "/content/items/-", value: "New Item" }  // Add to array end
-];
+- **Direct Root Directory Specification**: Command line now supports specifying the project root directory directly
+- **Flexible Project Management**: Work with different projects more seamlessly
 
-// Apply patches to a document
-write_branch_memory_bank({
-  branch: "feature/my-feature",
-  path: "myDocument.json",
-  patches: patches  // Using patches instead of content
-});
-```
+### Template System Integration
 
-### Complete Migration to JSON
+- **Template Loading Support**: ReadRulesUseCase now supports template loading
+- **Improved Error Handling**: Better error codes and handling throughout the system
 
-Memory Bank 2.1.0 completes the migration to JSON-based documents:
+### Testing Improvements
 
-- **Markdown support has been completely removed**
-- All documents must use JSON format
-- Improved validation and structure through JSON schemas
-- Better programmatic access and data consistency
+- **Test Framework Migration**: Replaced ts-mockito with jest.fn() for better testing
+- **Simplified Testing Setup**: Removed E2E test setup for more streamlined testing
 
-### Migration Tools
+### Logging Enhancements
 
-To help users transition from Markdown to JSON:
-
-- The `migrate` command converts existing Markdown files to JSON
-- Automatic backup of original files before conversion
-- Schema validation ensures proper format
-
-### Multiple Workspace Support
-
-Memory Bank 2.1.0 introduces the ability to work with multiple project workspaces:
-
-- New `--workspace` / `-w` command-line option for specifying project workspace directory
-- MCP tools now accept `workspace` and `docs` parameters to work with different projects
-- Priority-based path resolution (tool parameter > CLI option > environment variable > default)
-- Enhanced flexibility for managing multiple projects with a single server instance
+- **Logger Replacement**: Replaced console.log with logger across all files (except CLI)
+- **Logging Adjustments**: Improved handling of empty code changes
 
 ## Usage
 
@@ -193,7 +167,7 @@ docs/global-memory-bank/
   └── tags/                  # Information organization
 ```
 
-> Note: As of version 2.1.0, only .json format is supported.
+> Note: Only .json format is supported.
 
 ### Branch Memory Bank
 
@@ -214,7 +188,7 @@ docs/branch-memory-bank/feature-login/
   └── progress.json        # Implementation status
 ```
 
-> Note: As of version 2.1.0, only .json format is supported.
+> Note: Only .json format is supported.
 
 ## API
 
