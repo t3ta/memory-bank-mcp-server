@@ -29,7 +29,6 @@
     "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' jest --watch",
     "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage",
-    "test:e2e": "NODE_OPTIONS='--experimental-vm-modules' jest --no-coverage --config=tests/e2e/jest.config.ts --runInBand",
     "test:integration": "NODE_OPTIONS='--experimental-vm-modules' jest --no-coverage --testMatch='**/tests/integration/**/*.test.ts' --config=tests/integration/jest.config.ts",
     "test:list-failures": "NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest --no-coverage --json --testLocationInResults --silent --testMatch='**/tests/**/*.test.ts' --testPathIgnorePatterns='tests/e2e' 2>/dev/null | jq -r '[.testResults[] | select(.status == \"failed\") | .name] | .[]' | sed 's#.*/tests/##' | sort",
     "prepublishOnly": "npm run build"
