@@ -8,10 +8,6 @@ import type { RulesResult } from "./ReadRulesUseCase.js";
 export type ContextRequest = {
   branch: string;
   language: string;
-  // これらのオプションは廃止予定だが、後方互換性のために残す
-  includeRules?: boolean;
-  includeBranchMemory?: boolean;
-  includeGlobalMemory?: boolean;
 };
 
 export type ContextResult = {
@@ -49,7 +45,7 @@ export class ReadContextUseCase {
     logger.debug(`Repository details: branchRepository=${this.branchRepository.constructor.name}, globalRepository=${this.globalRepository.constructor.name}`);
 
     try {
-      // ブランチの存在確認 - 常に実行（includeオプション無視）
+      // ブランチの存在確認
       logger.info(`Checking branch existence: ${branch}`);
       const branchExists = await this.branchRepository.exists(branch);
       logger.debug(`Branch ${branch} exists: ${branchExists}`);
@@ -69,20 +65,15 @@ export class ReadContextUseCase {
         }
       }
 
-      // ブランチメモリーを読み込む - 常に実行（includeオプション無視）
+      // ブランチメモリーを読み込む
       logger.info(`Reading branch memory for: ${branch}`);
       result.branchMemory = await this.readBranchMemory(branch);
       logger.debug(`Branch memory keys: ${Object.keys(result.branchMemory).join(', ')}`);
 
-      // グローバルメモリーを読み込む - 常に実行（includeオプション無視）
-      logger.info(`Reading global memory`);
+      // グローバルメモリー（コアファイルのみ）を読み込む
+      logger.info(`Reading global memory (core files only)`);
       result.globalMemory = await this.readGlobalMemory();
       logger.debug(`Global memory keys: ${Object.keys(result.globalMemory || {}).join(', ')}`);
-      
-      // ログでincludeオプションが無視されたことを通知
-      if (request.includeRules === false || request.includeBranchMemory === false || request.includeGlobalMemory === false) {
-        logger.warn('Include options are deprecated and ignored. All context components are always included.');
-      }
 
       return result;
     } catch (error) {
@@ -124,13 +115,17 @@ export class ReadContextUseCase {
   }
 
   /**
-   * Read global memory
+   * Read global memory (core files only)
    * @returns Object with document paths as keys and content as values
    */
   private async readGlobalMemory(): Promise<Record<string, string>> {
-    const paths = await this.globalRepository.listDocuments();
+    let paths = await this.globalRepository.listDocuments();
     const result: Record<string, string> = {};
-
+    
+    // コアファイルのみをフィルタリング
+    logger.debug('Filtering for core files only');
+    paths = paths.filter(p => p.value.startsWith('core/'));
+    
     logger.debug(`Reading global memory paths: ${paths.map(p => p.value).join(', ')}`);
 
     for (const path of paths) {

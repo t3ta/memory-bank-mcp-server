@@ -1,0 +1,25 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "coding-standards",
+    "title": "コーディング規約",
+    "documentType": "generic",
+    "path": "coding-standards.json",
+    "tags": ["standards", "best-practices"],
+    "lastModified": "2025-03-21T16:40:21.542Z",
+    "createdAt": "2025-03-21T16:40:21.542Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "一般的なガイドライン",
+        "content": "[一般的なコーディングガイドライン]"
+      },
+      {
+        "title": "言語固有の規約",
+        "content": "[言語固有の規約について]"
+      }
+    ]
+  }
+}
