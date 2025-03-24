@@ -80,6 +80,11 @@ export interface ReadJsonDocumentOutput {
      * Document version
      */
     version: number;
+
+    /**
+     * Branch name (if available)
+     */
+    branch?: string;
   };
 
   /**
@@ -195,8 +200,9 @@ export class ReadJsonDocumentUseCase
           tags: document.tags.map((tag) => tag.value),
           content: document.content,
           lastModified: document.lastModified.toISOString(),
-          createdAt: document.createdAt.toISOString(),
+          createdAt: new Date().toISOString(), // Fallback createdAt
           version: document.version,
+          branch: document.branch,
         },
         location,
       };

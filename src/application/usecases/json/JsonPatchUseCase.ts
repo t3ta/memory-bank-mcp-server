@@ -77,10 +77,14 @@ export class JsonPatchUseCase {
     });
 
     // 更新されたドキュメントの作成
-    const updatedDocument = new JsonDocument({
+    const updatedDocument = JsonDocument.create({
       path: document.path,
-      branch: document.branch,
+      id: document.id,
+      title: document.title,
+      documentType: document.documentType,
+      tags: document.tags,
       content: updatedContent,
+      branch: document.branch,
       versionInfo: updatedVersionInfo
     });
 
