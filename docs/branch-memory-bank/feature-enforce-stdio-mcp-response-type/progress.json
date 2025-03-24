@@ -8,9 +8,9 @@
     "tags": [
       "progress"
     ],
-    "lastModified": "2025-03-24T07:30:00.000Z",
+    "lastModified": "2025-03-24T07:40:00.000Z",
     "createdAt": "2025-03-24T04:47:12.665Z",
-    "version": 8
+    "version": 9
   },
   "content": {
     "workingFeatures": [
@@ -78,12 +78,17 @@
         "id": "a1b2c3d4-e5f6-7g8h-9i0j-1k2l3m4n5o6p",
         "description": "src/infrastructure/repositories/simple/SimpleBranchMemoryBankRepository.tsの文字列テンプレート記法バグの修正とconsole.logをlogger.debugに置き換え",
         "implementedAt": "2025-03-24T07:30:00.000Z"
+      },
+      {
+        "id": "b2c3d4e5-f6g7-8h9i-0j1k-2l3m4n5o6p7q",
+        "description": "cliディレクトリ内のconsole.log使用の調査と非対応の判断（CLIツールは標準出力に結果を表示する必要があるため）",
+        "implementedAt": "2025-03-24T07:40:00.000Z"
       }
     ],
     "pendingImplementation": [
       {
         "id": "c19944c6-9fe2-4b98-8df3-f99d9f985383",
-        "description": "ESLintルールの導入検討 - console.*の使用を禁止し、ロガーの使用を強制する",
+        "description": "ESLintルールの導入検討 - console.*の使用を禁止し、適切な例外ケース（cliディレクトリなど）を設定する",
         "priority": "low"
       },
       {
@@ -92,8 +97,8 @@
         "priority": "high"
       }
     ],
-    "status": "ほぼ全ての指定ファイルの修正が完了。cli/ ディレクトリ以外のすべてのファイルのconsole.logをlogger系に置き換え。テンプレート文字列記法のバグも修正。",
-    "completionPercentage": 95,
+    "status": "すべての必要な修正が完了。cliディレクトリのconsole.log使用は標準出力へ結果を表示するための合理的な使用のため変更不要と判断。ESLintルールによる今後のコード品質担保は保留タスク。",
+    "completionPercentage": 98,
     "knownIssues": [
       {
         "id": "7ceba6df-17a1-4b76-bf9f-fb0ca08356ff",
@@ -118,6 +123,12 @@
         "description": "SimpleBranchMemoryBankRepository.tsで文字列テンプレートが正しく使われていないバグ（${変数}がそのまま出力される）",
         "severity": "high",
         "status": "resolved"
+      },
+      {
+        "id": "2b3c4d5e-6f7g-8h9i-0j1k-2l3m4n5o6p7q",
+        "description": "cliディレクトリ内のファイルでconsole.logが使用されているが、CLIツールとしての標準出力使用は正当",
+        "severity": "low",
+        "status": "wontfix"
       }
     ]
   }
