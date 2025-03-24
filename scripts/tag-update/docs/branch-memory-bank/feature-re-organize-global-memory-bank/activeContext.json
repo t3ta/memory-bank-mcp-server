@@ -1,0 +1,80 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "cb95014e-32ca-460a-ad08-972689c2e873",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context"
+    ],
+    "lastModified": "2025-03-21T15:40:15.858Z",
+    "createdAt": "2025-03-21T15:40:15.858Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "現在取り組んでいる作業の説明",
+    "recentChanges": [
+      {
+        "date": "2025-03-21T15:40:15.858Z",
+        "description": "変更点1"
+      },
+      {
+        "date": "2025-03-21T15:40:15.858Z",
+        "description": "変更点2"
+      },
+      {
+        "date": "2025-03-21T15:40:15.858Z",
+        "description": "変更点3"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "a6696418-a262-4975-86a1-30c8f3bfb183",
+        "description": "決定事項1"
+      },
+      {
+        "id": "f049ed73-3925-4945-91d4-c0b8e253b0fb",
+        "description": "決定事項2"
+      },
+      {
+        "id": "bd4fa28c-fdf2-4613-97ae-2d9e8f1841bd",
+        "description": "決定事項3"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "ca211b52-6ff6-4b39-849e-5935b3d616b4",
+        "description": "検討事項1",
+        "status": "open"
+      },
+      {
+        "id": "bc1e819f-1fd5-4f1a-b546-eea8c2a9a10d",
+        "description": "検討事項2",
+        "status": "open"
+      },
+      {
+        "id": "f05211d3-58b1-43b1-a7c3-e9b155af59fb",
+        "description": "検討事項3",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "17683c93-db71-491a-aeaf-2427d36db815",
+        "description": "次のステップ1",
+        "priority": "high"
+      },
+      {
+        "id": "74fd02f8-64f3-4e9f-82d0-c352c0f1cb0a",
+        "description": "次のステップ2",
+        "priority": "medium"
+      },
+      {
+        "id": "3c458c59-19f4-4df3-addb-73632f4c4822",
+        "description": "次のステップ3",
+        "priority": "low"
+      }
+    ]
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "13cd33ed-d71a-4303-b055-fb35e340635e",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress"
+    ],
+    "lastModified": "2025-03-24T11:40:18.287Z",
+    "createdAt": "2025-03-24T09:21:18.287Z",
+    "version": 5
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "adbfac25-a47d-4c95-8cfb-ce4ed84e035b",
+        "description": "コマンドラインパーサーに--workspaceオプションを追加",
+        "implementedAt": "2025-03-24T10:30:18.287Z"
+      },
+      {
+        "id": "1530c98c-6f60-4098-9bb7-973b8b69ea40",
+        "description": "アプリケーション作成時にworkspaceオプションを渡す",
+        "implementedAt": "2025-03-24T10:35:18.287Z"
+      },
+      {
+        "id": "f8e92a1d-45c7-4b3c-9e8d-8f09a5d9c7b2",
+        "description": "MCPツール定義にworkspaceとdocsパラメータを追加",
+        "implementedAt": "2025-03-24T10:45:18.287Z"
+      },
+      {
+        "id": "c7a93b5d-21e6-4f9d-b8a7-e5d9f2c8a3e1",
+        "description": "パス解決のためのヘルパー関数を実装",
+        "implementedAt": "2025-03-24T10:50:18.287Z"
+      },
+      {
+        "id": "d2e81c4f-37a9-4e2b-9c5d-f1e3a7b9d8c6",
+        "description": "一部のツールハンドラでworkspaceとdocsパラメータの処理を実装",
+        "implementedAt": "2025-03-24T11:05:18.287Z"
+      },
+      {
+        "id": "9d17b235-6e87-48a0-b6c3-f5d81e7c2e34",
+        "description": "残りのツールハンドラでworkspaceとdocsパラメータの処理を実装",
+        "implementedAt": "2025-03-24T11:30:18.287Z"
+      },
+      {
+        "id": "2b58e7a1-f4d3-49c7-b39e-7c84a5f1d8e2",
+        "description": "ブランチ名のrequired設定の修正とバリデーション強化",
+        "implementedAt": "2025-03-24T11:40:18.287Z"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "a83d19da-6c8e-4281-a11e-545d3ce6db14",
+        "description": "ヘルプテキストの更新",
+        "priority": "medium"
+      },
+      {
+        "id": "fcf37c23-7e9c-43de-98e4-e4f0a1dcfe9b",
+        "description": "テストケースの追加",
+        "priority": "medium"
+      },
+      {
+        "id": "3f8b6c1a-9d27-4e5f-8f92-7e3d5b6a9c0d",
+        "description": "READMEにworkspaceオプションの説明を追加",
+        "priority": "medium"
+      }
+    ],
+    "status": "コードの実装完了：全てのツールハンドラでworkspaceパラメータに対応し、必須パラメータのバリデーションも強化",
+    "completionPercentage": 85,
+    "knownIssues": []
+  }
+}

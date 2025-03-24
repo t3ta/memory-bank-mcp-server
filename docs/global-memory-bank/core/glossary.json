@@ -1,0 +1,46 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "core-glossary",
+    "title": "用語集",
+    "documentType": "core",
+    "path": "core/glossary.json",
+    "tags": [
+      "glossary",
+      "terminology",
+      "definitions",
+      "core"
+    ],
+    "lastModified": "2025-03-22T02:25:10.000Z",
+    "createdAt": "2025-03-21T08:40:50.132Z",
+    "version": 2
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "概要",
+        "content": "このドキュメントではMemory Bank MCPサーバーで使用される主要な用語と略語を定義します。詳細は `01-project/glossary.json` を参照してください。"
+      },
+      {
+        "title": "主要用語",
+        "content": "### メモリバンク (Memory Bank)\nセッション間で情報を保持するための構造化された永続的ストレージシステム。ブランチごとに独立したメモリバンクが存在し、また全体で共有するグローバルメモリバンクも存在します。\n\n### MCP (Memory-enabled Co-Pilot)\nメモリ機能を持つ協働支援ツール。過去のコンテキストを保持しながら開発作業を支援します。\n\n### コアドキュメント (Core Document)\nシステムの基本理解に必要な中心的なドキュメント。core/ディレクトリに保存されます。\n\n### ブランチメモリバンク (Branch Memory Bank)\n特定のブランチ（機能実装や修正作業）に関連する情報を保存するためのメモリバンク。\n\n### グローバルメモリバンク (Global Memory Bank)\nプロジェクト全体に関わる共通の情報を保存するメモリバンク。すべてのブランチから参照可能です。\n\n### アクティブコンテキスト (Active Context)\n現在の作業状況、最近の変更、アクティブな決定事項など、現在のコンテキストを表すドキュメント。\n\n### システムパターン (System Patterns)\n重要な技術的決定事項やアーキテクチャパターンを記録するドキュメント。\n\n### タグシステム (Tag System)\nドキュメントを分類し、検索を容易にするためのタグ付けシステム。特定のルールに従います。"
+      },
+      {
+        "title": "略語・頭字語",
+        "content": "- **MCP**: Memory-enabled Co-Pilot\n- **MB**: Memory Bank\n- **GMB**: Global Memory Bank\n- **BMB**: Branch Memory Bank\n- **DDD**: Domain-Driven Design\n- **CA**: Clean Architecture\n- **AC**: Active Context\n- **SP**: System Patterns\n- **BC**: Branch Context"
+      },
+      {
+        "title": "技術用語",
+        "content": "- **ドメインモデル**: システムの中心的な概念を表現するモデル\n- **ユースケース**: システムが実行する特定の操作や機能\n- **リポジトリ**: データの永続化と取得を担当するコンポーネント\n- **コントローラー**: 外部リクエストを受け取り、適切なユースケースにルーティングするコンポーネント\n- **アダプター**: 外部システムとの通信を担当するコンポーネント\n- **エンティティ**: ビジネスルールを含む基本的なオブジェクト\n- **値オブジェクト**: 同一性を持たない不変のオブジェクト\n- **ファクトリ**: 複雑なオブジェクトの作成を担当するコンポーネント"
+      },
+      {
+        "title": "プロジェクト固有の用語",
+        "content": "- **ドキュメントスキーマ**: memory_document_v2などのドキュメント構造バージョン\n- **メタデータ**: ドキュメントのID、タイトル、パスなどの情報\n- **セクション**: ドキュメントの内容を区切る単位\n- **プレースホルダ**: 国際化のための置換可能なテキスト\n- **コアファイル**: branchContext.json, activeContext.json, systemPatterns.json, progress.jsonの4つの必須ファイル\n- **タグインデックス**: タグとドキュメントの関連を管理するインデックス\n- **ドキュメントタイプ**: ドキュメントの種類を示す識別子"
+      },
+      {
+        "title": "関連ドキュメント",
+        "content": "- [詳細な用語集](../01-project/glossary.json)\n- [ドキュメントタイプの標準](../meta/document-type-standards.json)"
+      }
+    ]
+  }
+}

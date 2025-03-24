@@ -1,0 +1,45 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "active-context",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "core",
+      "active-context"
+    ],
+    "lastModified": "2025-03-22T09:12:30.000Z",
+    "createdAt": "2025-03-22T08:36:19.040Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "id": "currentWork",
+        "title": "現在の作業内容",
+        "content": "言語テンプレートシステムのリファクタリングを実施中。MarkdownベースからJSONベースのテンプレートシステムへの移行作業を進めている。\n\n現在の実装状況:\n1. ドメインモデル: Template、Sectionクラスなどの基本構造を実装\n2. 国際化（i18n）対応: Language、Translationクラスを実装\n3. リポジトリ層: FileTemplateRepository、FileI18nRepositoryを実装\n4. マイグレーションツール: migrate-templatesコマンドを実装"
+      },
+      {
+        "id": "recentChanges",
+        "title": "最近の変更点",
+        "content": "1. 古いMarkdownパーサー関連ファイルの削除（markdown-converter.ts、markdown-parser.ts）\n2. JSONベースの新しいドメインモデルとリポジトリの実装\n3. 多言語対応（i18n）機能の強化\n4. Markdownから新JSON形式へのマイグレーションツールの追加"
+      },
+      {
+        "id": "activeDecisions",
+        "title": "アクティブな決定事項",
+        "content": "1. テンプレートと翻訳はすべてJSON形式で管理する\n2. バリューオブジェクトパターンを採用し、不変性を確保\n3. 翻訳キーと値のマッピングを効率化するためのキャッシュ機構を導入\n4. 既存のMarkdownファイルに対する後方互換性を一時的に維持しつつ、最終的にはJSON形式に完全移行"
+      },
+      {
+        "id": "considerations",
+        "title": "検討事項",
+        "content": "1. FileSystemServiceのキャッシュ機構をI18nRepositoryやTemplateRepositoryと連携させる方法\n2. プロジェクト全体にわたる既存のMarkdownファイルのスムーズな移行戦略\n3. テンプレートのバージョン管理手法\n4. テストカバレッジの拡充（特にマイグレーション機能のテスト）"
+      },
+      {
+        "id": "nextSteps",
+        "title": "次のステップ",
+        "content": "1. 既存のMarkdownファイルを一括変換するためのバッチ処理の実装\n2. 新しいテンプレートシステムを使用するためのドキュメンテーションの作成\n3. 移行状況を監視するためのレポート機能の追加\n4. 未実装のテストケースの追加と実行"
+      }
+    ]
+  }
+}

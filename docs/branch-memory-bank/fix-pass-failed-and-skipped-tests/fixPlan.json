@@ -1,0 +1,98 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "a6f4de98-0ca2-4b6f-93d7-e96bb5b9ae8d",
+    "title": "修正計画",
+    "documentType": "fix_plan",
+    "path": "fixPlan.json",
+    "tags": [
+      "fix-plan"
+    ],
+    "lastModified": "2025-03-24T07:42:20.567Z",
+    "createdAt": "2025-03-24T07:42:20.567Z",
+    "version": 1
+  },
+  "content": {
+    "prioritizedFixes": [
+      {
+        "file": "src/application/usecases/common/ReadBranchCoreFilesUseCase.ts",
+        "issues": [
+          {
+            "description": "parseSystemPatternsメソッドが正しく技術的決定事項を抽出できていない",
+            "solution": "parseSystemPatternsメソッドを修正して、技術的決定事項のタイトル、コンテキスト、決定事項、および影響を正しく抽出するよう実装する",
+            "testsCovered": [
+              "should handle multiple technical decisions in system patterns"
+            ]
+          },
+          {
+            "description": "ドキュメントが見つからない場合のsystemPatterns初期化処理が不足している",
+            "solution": "systemPatternsが未定義の場合にデフォルト値を設定する処理を追加",
+            "testsCovered": [
+              "should handle partial document exists scenarios",
+              "should handle error getting system patterns document",
+              "should auto-initialize branch if it does not exist"
+            ]
+          },
+          {
+            "description": "空のセクションが適切にパースできていない",
+            "solution": "parseActiveContextメソッドの正規表現パターンを修正して、空セクションを正しく処理する",
+            "testsCovered": [
+              "should handle empty sections in documents"
+            ]
+          }
+        ],
+        "changeDetails": {
+          "parseSystemPatterns": {
+            "current": "セクションタイトルのみを抽出し、コンテキスト、決定事項、影響などの詳細を取得していない",
+            "needed": "技術的決定事項セクション内の各サブセクション（コンテキスト、決定事項、影響）を正しく抽出"
+          },
+          "systemPatternsInitialization": {
+            "current": "モジュール処理フロー中でsystemPatternsが未定義の場合にデフォルト値を設定する処理が不足",
+            "needed": "systemPatternsが未定義の場合は、{ technicalDecisions: [] }というデフォルト値を設定"
+          },
+          "parseActiveContext": {
+            "current": "空のセクションを適切に処理できていない",
+            "needed": "正規表現パターンを修正して、空のセクションを正しく検出し、空の配列を返すように修正"
+          }
+        }
+      }
+    ],
+    "laterFixes": [
+      {
+        "file": "tests/unit/infrastructure/templates/FileTemplateRepository.test.ts",
+        "issues": [
+          {
+            "description": "インポートエラー: IFileSystem モジュールが見つからない",
+            "solution": "適切なパスに修正するか、モックを使用するよう変更"
+          },
+          {
+            "description": "インポートエラー: Language モジュールが見つからない",
+            "solution": "適切なパスに修正"
+          },
+          {
+            "description": "ファイルが途中で終わっている構文エラー",
+            "solution": "ファイルを完成させる"
+          }
+        ]
+      },
+      {
+        "file": "tests/unit/migration/MarkdownMigrationService.test.ts",
+        "issues": [
+          {
+            "description": "タイプエラー: mockFsのメソッドに適切な型が設定されていない",
+            "solution": "適切な型を設定するか、型定義を修正する"
+          }
+        ]
+      },
+      {
+        "file": "tests/unit/interface/controllers/BranchController.test.ts",
+        "issues": [
+          {
+            "description": "jest.config.tsのtestPathIgnorePatternsで除外されている",
+            "solution": "テストを修正してから除外を解除する"
+          }
+        ]
+      }
+    ]
+  }
+}

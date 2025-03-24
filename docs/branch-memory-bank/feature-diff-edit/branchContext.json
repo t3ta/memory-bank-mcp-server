@@ -1,0 +1,43 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "ff840cea-8989-4d52-9fd0-1a72b6ae41a2",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context",
+      "feature",
+      "json-patch"
+    ],
+    "lastModified": "2025-03-24T09:55:09.523Z",
+    "createdAt": "2025-03-24T09:55:09.523Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "feature/diff-edit",
+    "purpose": "メモリバンクにJSONドキュメントの部分編集機能を実装する",
+    "createdAt": "2025-03-24T09:55:09.523Z",
+    "userStories": [
+      {
+        "id": "911b5b15-bebd-4274-b940-176ade3b9029",
+        "description": "JSONドキュメントの特定フィールドのみを更新できるようにする",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "57f3d2f7-03c2-4bfd-876b-72ed9cf44aec",
+        "description": "配列操作を含む完全なJSON Patchをサポートする",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "21a69813-b825-4b0e-b8c2-504f653ae46e",
+        "description": "TDDアプローチで品質を確保しながら実装を進める",
+        "completed": false,
+        "priority": 1
+      }
+    ],
+    "additionalNotes": "RFC 6902（JSON Patch）仕様に準拠した実装を行う。配列操作を含む全機能を最初から実装することで、後での仕様変更を避ける。"
+  }
+}

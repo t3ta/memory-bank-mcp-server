@@ -1,0 +1,153 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "8e9325a0-7c1e-44d9-b865-02389fbf91ce",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "system-patterns"
+    ],
+    "lastModified": "2025-03-24T05:30:00.000Z",
+    "createdAt": "2025-03-24T04:47:12.664Z",
+    "version": 3
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "124e571c-3ea7-4115-b549-d788f9c9cd96",
+        "title": "標準出力への出力制御",
+        "context": "MCPサーバーはJSON形式のMCPResponseを標準出力に出力し、これがクライアントによって解析される。console.logなどから標準出力に直接出力されるデバッグ情報はJSON構造を破壊し、クライアント側でのパースエラーを引き起こす",
+        "decision": "標準出力への直接的な出力（console.log等）を避け、代わりに構造化されたロガー（logger.debug, logger.info等）を使用する。これにより、デバッグ情報は別のログストリームに出力され、MCPResponseのJSON構造が保持される",
+        "consequences": {
+          "positive": [
+            "クライアント側でのJSONパースエラーが防止される",
+            "ログ情報が構造化され、より管理しやすくなる",
+            "ログレベルによる出力制御が可能になる"
+          ],
+          "negative": [
+            "開発中のデバッグが若干複雑になる可能性がある",
+            "既存コードのリファクタリングが必要"
+          ]
+        },
+        "status": "adopted",
+        "date": "2025-03-24T05:30:00.000Z",
+        "alternatives": [
+          {
+            "option": "console.logの出力をデバッグ環境でのみ有効にする",
+            "reason": "NODE_ENV=development の場合のみconsole.logを許可する方式も考えられるが、環境間の一貫性を保つためには避けるべき"
+          },
+          {
+            "option": "標準出力とエラー出力を分離してデバッグ情報はエラー出力に出す",
+            "reason": "エラー出力（stderr）にデバッグ情報を出力する方法もあるが、ログの種類による適切な出力先の使い分けのほうが望ましい"
+          }
+        ]
+      },
+      {
+        "id": "a5b6c7d8-e9f0-1a2b-3c4d-5e6f7a8b9c0d",
+        "title": "ESLintによるconsole.log使用の制限",
+        "context": "コードベース内でconsole.logが使用されることで標準出力の整合性が損なわれ、JSONパースエラーが発生している。このような問題を将来的に防止するため、コード品質管理ツールでの強制が必要",
+        "decision": "ESLintルールを導入して、console.logなどのメソッド使用を制限し、代わりにloggerの使用を推奨する",
+        "consequences": {
+          "positive": [
+            "標準出力の整合性が維持される",
+            "一貫したロギングパターンが強制される",
+            "開発者のロギングに関する意識が向上する"
+          ],
+          "negative": [
+            "既存コードの大規模な修正が必要になる可能性がある",
+            "学習曲線と導入コストがかかる"
+          ]
+        },
+        "status": "proposed",
+        "date": "2025-03-24T05:30:00.000Z",
+        "alternatives": [
+          {
+            "option": "ドキュメントとコードレビューでの対応",
+            "reason": "ツールによる強制がない場合、人為的ミスが発生する可能性が高い"
+          },
+          {
+            "option": "コミット前のフックで検出",
+            "reason": "ESLintとの統合が必要であり、直接ESLintルールを導入するほうが効率的"
+          }
+        ]
+      }
+    ],
+    "implementationPatterns": [
+      {
+        "id": "a7f92c10-5e71-4b8a-9312-761df4d5ecf9",
+        "title": "ロギングパターン",
+        "description": "アプリケーション全体で一貫したロギングパターンを適用する",
+        "components": [
+          {
+            "name": "JsonLogger",
+            "path": "src/infrastructure/logger/JsonLogger.ts",
+            "responsibility": "JSON形式でログを出力するロガー実装。ログレベルによって出力先（stdout/stderr）を振り分ける"
+          },
+          {
+            "name": "Logger",
+            "path": "src/shared/utils/logger/index.ts",
+            "responsibility": "アプリケーション全体で使用されるロガーの実装。JsonLogTransformerを使って標準出力にJSON形式で出力する"
+          },
+          {
+            "name": "MCPResponsePresenter",
+            "path": "src/interface/presenters/MCPResponsePresenter.ts",
+            "responsibility": "アプリケーション出力を標準化されたMCPレスポンス形式に変換するプレゼンター"
+          }
+        ],
+        "usageGuidelines": [
+          "直接console.logを使用せず、常にlogger.debug/info/warn/errorを使用する",
+          "デバッグ情報はlogger.debugに出力し、本番環境ではこのレベルのログは抑制される",
+          "エラー情報はlogger.errorに出力し、常にstderrに書き込まれる",
+          "ロガーは適切なコンテキスト情報を含めて使用する"
+        ],
+        "codeExamples": [
+          {
+            "description": "推奨されるロギングパターン",
+            "code": "logger.debug('Search request:', { tags, matchAllTags });\nlogger.info(`Processing ${count} documents`);\nlogger.error('Failed to process request', { error: err.message });"
+          },
+          {
+            "description": "避けるべきパターン",
+            "code": "console.log('Debug info:', data);\nconsole.error('Error occurred:', err);"
+          }
+        ]
+      },
+      {
+        "id": "b8e9d0f1-23a4-56b7-89c0-d1e2f3a4b5c6",
+        "title": "コンソールロギング置換パターン",
+        "description": "既存のconsole.log呼び出しをlogger.debugに置き換えるパターン",
+        "components": [
+          {
+            "name": "Logger",
+            "path": "src/shared/utils/logger/index.ts",
+            "responsibility": "構造化されたロギングを提供するロガー実装"
+          }
+        ],
+        "usageGuidelines": [
+          "console.log/warn/errorの代わりにlogger.debug/warn/errorを使用する",
+          "メッセージとコンテキストデータを分離する（第2引数にオブジェクトとして渡す）",
+          "冗長なデバッグプレフィックス ([DEBUG] など) は不要、ロガーが自動的に適用する",
+          "プリミティブ値だけでなくオブジェクトの場合も、直接logger.debugに渡すことができる"
+        ],
+        "codeExamples": [
+          {
+            "description": "置換前（避けるべき）",
+            "code": "console.log(`[DEBUG] Finding document at path: ${filePath}`);"
+          },
+          {
+            "description": "置換後（推奨）",
+            "code": "logger.debug('Finding document at path:', { filePath });"
+          },
+          {
+            "description": "オブジェクトログ置換前",
+            "code": "console.log('[DEBUG] Comparing tags:', { thisTag: this._value, otherTag: other._value });"
+          },
+          {
+            "description": "オブジェクトログ置換後",
+            "code": "logger.debug('Comparing tags:', { thisTag: this._value, otherTag: other._value });"
+          }
+        ]
+      }
+    ]
+  }
+}

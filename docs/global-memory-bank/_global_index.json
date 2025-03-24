@@ -1,8 +1,8 @@
 {
   "schema": "tag_index_v1",
   "metadata": {
-    "updatedAt": "2025-03-21T19:32:50.338Z",
-    "documentCount": 70,
+    "updatedAt": "2025-03-24T13:48:29.059Z",
+    "documentCount": 84,
     "fullRebuild": true,
     "context": "global"
   },
@@ -22,6 +22,7 @@
       "07-infrastructure/README.json",
       "08-i18n/README.json",
       "09-refactoring/README.json",
+      "core/user-guide.json",
       "meta/README.json",
       "meta/consolidated-memory-bank-meta.json",
       "meta/document-type-standards.json",
@@ -39,27 +40,36 @@
       "06-releases/README.json",
       "07-infrastructure/README.json",
       "08-i18n/README.json",
+      "08-i18n/template-system-usage.json",
       "09-refactoring/README.json",
+      "core/navigation.json",
+      "core/user-guide.json",
       "meta/README.json",
       "meta/consolidated-memory-bank-meta.json",
       "meta/global-memory-bank-navigation.json",
       "meta/global-memory-bank-reference.json",
-      "tags/README.json"
+      "tags/README.json",
+      "template-system-usage.json"
     ],
     "best-practices": [
-      "01-project/coding-standards.json"
+      "01-project/coding-standards.json",
+      "core/coding-standards.json"
     ],
     "typescript": [
-      "01-project/coding-standards.json"
+      "01-project/coding-standards.json",
+      "core/coding-standards.json"
     ],
     "clean-code": [
-      "01-project/coding-standards.json"
+      "01-project/coding-standards.json",
+      "core/coding-standards.json"
     ],
     "domain": [
-      "01-project/domain-models.json"
+      "01-project/domain-models.json",
+      "core/domain-models.json"
     ],
     "models": [
-      "01-project/domain-models.json"
+      "01-project/domain-models.json",
+      "core/domain-models.json"
     ],
     "architecture": [
       "01-project/domain-models.json",
@@ -71,7 +81,10 @@
       "02-architecture/json-based-architecture-details.json",
       "02-architecture/json-based-architecture.json",
       "05-testing/e2e-to-integration-test-approach.json",
-      "06-releases/v2-design-decisions.json"
+      "06-releases/v2-design-decisions.json",
+      "core/architecture.json",
+      "core/domain-models.json",
+      "template-system.json"
     ],
     "json": [
       "01-project/domain-models.json",
@@ -83,19 +96,24 @@
       "04-guides/migration-guide.json",
       "04-guides/migration-policy.json",
       "06-releases/v2-implementation-plan.json",
-      "08-i18n/template-system-json-i18n-design.json"
+      "08-i18n/template-system-json-i18n-design.json",
+      "core/domain-models.json"
     ],
     "document-model": [
-      "01-project/domain-models.json"
+      "01-project/domain-models.json",
+      "core/domain-models.json"
     ],
     "glossary": [
-      "01-project/glossary.json"
+      "01-project/glossary.json",
+      "core/glossary.json"
     ],
     "terminology": [
-      "01-project/glossary.json"
+      "01-project/glossary.json",
+      "core/glossary.json"
     ],
     "definitions": [
-      "01-project/glossary.json"
+      "01-project/glossary.json",
+      "core/glossary.json"
     ],
     "overview": [
       "01-project/project-overview.json"
@@ -116,11 +134,13 @@
       "08-i18n/template-system-json-i18n-design.json"
     ],
     "tech-stack": [
-      "01-project/tech-stack.json"
+      "01-project/tech-stack.json",
+      "core/tech-stack.json"
     ],
     "infrastructure": [
       "01-project/tech-stack.json",
-      "07-infrastructure/README.json"
+      "07-infrastructure/README.json",
+      "core/tech-stack.json"
     ],
     "design": [
       "02-architecture/README.json",
@@ -183,6 +203,7 @@
       "02-architecture/global-memory-bank-cleanup-strategy.json",
       "02-architecture/global-memory-bank-organized-analysis.json",
       "09-refactoring/analysis/global-memory-bank-analysis-raw.json",
+      "core/navigation.json",
       "meta/README.json",
       "meta/consolidated-memory-bank-meta.json",
       "meta/document-type-standards.json",
@@ -296,13 +317,15 @@
     "release": [
       "06-releases/README.json",
       "06-releases/consolidated-v2-release.json",
-      "06-releases/release-v2.0.0.json"
+      "06-releases/release-v2.0.0.json",
+      "06-releases/v2.1.0-release-plan.json"
     ],
     "version": [
       "06-releases/README.json"
     ],
     "planning": [
-      "06-releases/consolidated-v2-release.json"
+      "06-releases/consolidated-v2-release.json",
+      "06-releases/v2.1.0-release-plan.json"
     ],
     "changelog": [
       "06-releases/consolidated-v2-release.json",
@@ -311,6 +334,12 @@
     ],
     "pr": [
       "06-releases/release-v2.0.0.json"
+    ],
+    "v2-1-0": [
+      "06-releases/v2.1.0-release-plan.json"
+    ],
+    "json-migration": [
+      "06-releases/v2.1.0-release-plan.json"
     ],
     "operations": [
       "07-infrastructure/README.json"
@@ -323,14 +352,24 @@
     ],
     "i18n": [
       "08-i18n/README.json",
-      "08-i18n/template-system-json-i18n-design.json"
+      "08-i18n/template-system-json-i18n-design.json",
+      "08-i18n/template-system-usage.json",
+      "08-i18n/template-system.json",
+      "template-system-usage.json",
+      "template-system.json"
     ],
     "l10n": [
       "08-i18n/README.json",
       "08-i18n/template-system-json-i18n-design.json"
     ],
     "template": [
-      "08-i18n/template-system-json-i18n-design.json"
+      "08-i18n/template-system-json-i18n-design.json",
+      "08-i18n/template-system-usage.json",
+      "08-i18n/template-system.json"
+    ],
+    "internationalization": [
+      "08-i18n/template-system-usage.json",
+      "08-i18n/template-system.json"
     ],
     "tech-debt": [
       "09-refactoring/README.json",
@@ -351,15 +390,32 @@
     "test": [
       "auto-initialization-test.json"
     ],
+    "system-design": [
+      "core/architecture.json"
+    ],
+    "core": [
+      "core/architecture.json",
+      "core/coding-standards.json",
+      "core/domain-models.json",
+      "core/glossary.json",
+      "core/navigation.json",
+      "core/tech-stack.json",
+      "core/user-guide.json"
+    ],
+    "standards": [
+      "core/coding-standards.json",
+      "meta/document-type-standards.json"
+    ],
+    "navigation": [
+      "core/navigation.json",
+      "meta/consolidated-memory-bank-meta.json",
+      "meta/global-memory-bank-navigation.json"
+    ],
     "initialization": [
       "initialization-behavior.json"
     ],
     "behavior": [
       "initialization-behavior.json"
-    ],
-    "navigation": [
-      "meta/consolidated-memory-bank-meta.json",
-      "meta/global-memory-bank-navigation.json"
     ],
     "tag": [
       "meta/consolidated-memory-bank-meta.json",
@@ -368,8 +424,12 @@
       "tags/tag_categorization.json",
       "tags/tag_index_update_plan.json"
     ],
-    "standards": [
-      "meta/document-type-standards.json"
+    "templates": [
+      "template-system-usage.json",
+      "template-system.json"
+    ],
+    "usage": [
+      "template-system-usage.json"
     ]
   }
 }

@@ -1,0 +1,111 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "active-context-feature-branch-controller-test",
+    "title": "Active Context - feature/branch-controller-test",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context",
+      "bug-fix",
+      "controller",
+      "dependency-injection",
+      "read-context"
+    ],
+    "lastModified": "2025-03-23T11:35:00.000Z",
+    "createdAt": "2025-03-23T11:35:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "current_status": "バグ修正完了・テスト済み",
+    "active_decisions": [
+      {
+        "id": "DEC-1",
+        "title": "DIコンテナからコントローラー取得時のawait追加",
+        "description": "Application.initialize()メソッドでDIコンテナからコントローラーを取得する際にawaitを追加し、Promiseを確実に解決するようにしました。",
+        "status": "完了",
+        "outcomes": [
+          "すべてのコントローラーが正しく取得できるようになりました",
+          "read-contextコマンドが動作するようになりました",
+          "テスト実行でこの修正が有効であることを確認しました"
+        ]
+      },
+      {
+        "id": "DEC-2",
+        "title": "DIコンテナの設計変更なしでの修正",
+        "description": "DIコンテナ自体の設計を変更するのではなく、DIコンテナの使用側(Application)でawaitを追加する形で修正しました。これにより、変更範囲を最小限に抑えることができました。",
+        "status": "完了",
+        "outcomes": [
+          "変更範囲が最小限で済みました",
+          "既存のDI設計に大きな変更なく修正できました",
+          "一箇所の修正で全てのコントローラー取得バグが解決しました"
+        ]
+      }
+    ],
+    "active_considerations": [
+      {
+        "id": "CON-1",
+        "title": "Promise解決の明示的なエラーハンドリング",
+        "description": "DIコンテナからのPromise解決時にエラーハンドリングをより明示的にすることで、デバッグ容易性を向上させることが検討できます。",
+        "status": "検討中"
+      },
+      {
+        "id": "CON-2",
+        "title": "DIコンテナの非同期Factory登録方法の改善",
+        "description": "DIコンテナに登録するFactoryの非同期処理とその解決方法をより明確にするAPIに改善することが検討できます。",
+        "status": "検討中"
+      }
+    ],
+    "latest_changes": [
+      {
+        "id": "CHG-1",
+        "title": "Application.initialize()メソッドの修正",
+        "description": "DIコンテナからコントローラーを取得する際にawaitを追加し、Promiseを確実に解決するようにしました。",
+        "file": "src/main/index.ts",
+        "line_numbers": "39-44",
+        "status": "完了"
+      },
+      {
+        "id": "CHG-2",
+        "title": "デバッグスクリプトの作成",
+        "description": "問題を診断するためのデバッグスクリプトを作成し、DIコンテナからコントローラーを取得する際の問題を特定しました。",
+        "file": "tmp-test/debug.js",
+        "status": "完了"
+      },
+      {
+        "id": "CHG-3",
+        "title": "修正検証スクリプトの作成",
+        "description": "修正案を検証するためのテストスクリプトを作成し、修正の有効性を確認しました。",
+        "file": "tmp-test/fix-app.js",
+        "status": "完了"
+      }
+    ],
+    "next_steps": [
+      {
+        "id": "NEXT-1",
+        "title": "Unit Testの追加",
+        "description": "Application.initialize()メソッドのPromise解決テストを追加します。",
+        "assignee": "チーム",
+        "priority": "高",
+        "status": "未着手"
+      },
+      {
+        "id": "NEXT-2",
+        "title": "他のPromise解決漏れのチェック",
+        "description": "DIコンテナの使用箇所をすべて確認し、他にPromise解決漏れがないか確認します。",
+        "assignee": "チーム",
+        "priority": "中",
+        "status": "未着手"
+      },
+      {
+        "id": "NEXT-3",
+        "title": "リリースノートの更新",
+        "description": "このバグ修正についてリリースノートを更新します。",
+        "assignee": "チーム",
+        "priority": "低",
+        "status": "未着手"
+      }
+    ],
+    "blockers": []
+  }
+}

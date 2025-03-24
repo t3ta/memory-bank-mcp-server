@@ -1,0 +1,156 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "tags-index",
+    "title": "タグインデックス",
+    "documentType": "generic",
+    "path": "tags/index.json",
+    "tags": [
+      "index",
+      "meta"
+    ],
+    "lastModified": "2025-03-21T15:43:21.492Z",
+    "createdAt": "2025-03-21T15:43:21.492Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "タグ一覧",
+        "content": "タグとドキュメントの関連付け"
+      }
+    ],
+    "tagMap": {
+      "architecture": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "architecture.json",
+            "title": "architecture.json"
+          },
+          {
+            "path": "domain-models.json",
+            "title": "domain-models.json"
+          }
+        ]
+      },
+      "system-design": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "architecture.json",
+            "title": "architecture.json"
+          }
+        ]
+      },
+      "standards": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "coding-standards.json",
+            "title": "coding-standards.json"
+          }
+        ]
+      },
+      "best-practices": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "coding-standards.json",
+            "title": "coding-standards.json"
+          }
+        ]
+      },
+      "domain": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "domain-models.json",
+            "title": "domain-models.json"
+          }
+        ]
+      },
+      "models": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "domain-models.json",
+            "title": "domain-models.json"
+          }
+        ]
+      },
+      "glossary": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "glossary.json",
+            "title": "glossary.json"
+          }
+        ]
+      },
+      "terminology": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "glossary.json",
+            "title": "glossary.json"
+          }
+        ]
+      },
+      "index": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "tags/index.json",
+            "title": "tags/index.json"
+          }
+        ]
+      },
+      "meta": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "tags/index.json",
+            "title": "tags/index.json"
+          }
+        ]
+      },
+      "tech-stack": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "tech-stack.json",
+            "title": "tech-stack.json"
+          }
+        ]
+      },
+      "infrastructure": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "tech-stack.json",
+            "title": "tech-stack.json"
+          }
+        ]
+      },
+      "guide": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "user-guide.json",
+            "title": "user-guide.json"
+          }
+        ]
+      },
+      "documentation": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "user-guide.json",
+            "title": "user-guide.json"
+          }
+        ]
+      }
+    }
+  }
+}

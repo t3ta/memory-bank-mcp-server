@@ -1,0 +1,80 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "workspace-feature-summary",
+    "title": "ワークスペースオプション機能の実装まとめ",
+    "documentType": "summary",
+    "path": "summary.json",
+    "tags": [
+      "summary",
+      "implementation"
+    ],
+    "lastModified": "2025-03-24T11:10:18.287Z",
+    "createdAt": "2025-03-24T11:10:18.287Z",
+    "version": 1
+  },
+  "content": {
+    "overview": "複数のプロジェクトで同じMemory Bank MCPサーバーを使用できるよう、コマンドからワークスペースディレクトリを指定できる機能を追加しました。",
+    "implemented_features": [
+      {
+        "feature": "コマンドラインオプションの追加",
+        "description": "サーバー起動時にワークスペースディレクトリを指定するための`--workspace`（または`-w`）オプションを追加しました。"
+      },
+      {
+        "feature": "ツールパラメータの追加",
+        "description": "各MCPツール（read_context, read_branch_memory_bank など）でワークスペースとドキュメントディレクトリを指定できるようにパラメータを追加しました。"
+      },
+      {
+        "feature": "パス解決ヘルパー関数",
+        "description": "ワークスペースとドキュメントディレクトリを優先順位に基づいて解決するヘルパー関数を実装しました。"
+      },
+      {
+        "feature": "動的アプリケーション作成",
+        "description": "ツール呼び出し時にワークスペースが指定された場合、そのパスに対応する新しいアプリケーションインスタンスを動的に作成する機能を実装しました。"
+      }
+    ],
+    "architecture": {
+      "priority_rules": [
+        "1. ツール呼び出し時のパラメータ（最優先）",
+        "2. サーバー起動時のコマンドラインオプション",
+        "3. 環境変数（WORKSPACE_ROOT, MEMORY_BANK_ROOT）",
+        "4. デフォルト値（カレントディレクトリと./docs）"
+      ],
+      "implementation_pattern": "指定されたワークスペースとドキュメントディレクトリに対して新しいアプリケーションインスタンスを作成し、そのインスタンスを使ってコントローラーにアクセスするパターンを採用しています。"
+    },
+    "test_summary": {
+      "test_cases": [
+        "サーバー起動時にworkspaceだけ指定した場合",
+        "サーバー起動時にdocsだけ指定した場合",
+        "サーバー起動時に両方指定した場合",
+        "ツール呼び出し時にworkspaceだけ指定した場合",
+        "ツール呼び出し時にdocsだけ指定した場合",
+        "ツール呼び出し時に両方指定した場合",
+        "ツール呼び出し時に何も指定しない場合",
+        "優先順位のテスト - ツールパラメータ vs サーバー設定",
+        "相対パスと絶対パスの処理",
+        "既存の機能との互換性確認"
+      ]
+    },
+    "usage_example": {
+      "server_start": [
+        "# プロジェクトAのコンテキストでサーバーを起動",
+        "node dist/index.js --workspace /path/to/projectA",
+        "",
+        "# プロジェクトBのコンテキストでサーバーを起動",
+        "node dist/index.js --workspace /path/to/projectB",
+        "",
+        "# 特定のディレクトリをワークスペースと指定し、カスタムドキュメントディレクトリを指定",
+        "node dist/index.js --workspace /path/to/project --docs /custom/docs/location"
+      ],
+      "tool_usage": [
+        "# 現在のサーバーのコンテキストとは異なるプロジェクトからの読み取り",
+        "read_context(branch: \"feature/my-branch\", workspace: \"/path/to/other/project\")",
+        "",
+        "# 特定のブランチドキュメントを特定のワークスペースから読み取り",
+        "read_branch_memory_bank(branch: \"feature/new-feature\", path: \"progress.json\", workspace: \"/path/to/project\")"
+      ]
+    },
+    "conclusion": "この実装により、同じサーバーインスタンスを使用しながら複数のプロジェクトのメモリバンクにアクセスできるようになります。ツール呼び出し時にワークスペースを指定することで、サーバー起動時の設定を上書きすることも可能です。"
+  }
+}

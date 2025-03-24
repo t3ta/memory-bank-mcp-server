@@ -1,6 +1,7 @@
 import { DocumentId } from './DocumentId.js';
 import { DocumentPath } from './DocumentPath.js';
 import { Tag } from './Tag.js';
+import { DocumentVersionInfo } from './DocumentVersionInfo.js';
 import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
 
 // Schema imports - these define validation and structure
@@ -36,9 +37,8 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
     private readonly _documentType: DocumentType,
     private readonly _tags: Tag[],
     private readonly _content: T,
-    private readonly _lastModified: Date,
-    private readonly _createdAt: Date,
-    private readonly _version: number
+    private readonly _branch?: string,
+    private readonly _versionInfo: DocumentVersionInfo = new DocumentVersionInfo({ version: 1 })
   ) { }
 
   /**
@@ -118,6 +118,16 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
     const lastModified = new Date(metadata.lastModified);
     const createdAt = new Date(metadata.createdAt);
 
+    // Create version info
+    const versionInfo = new DocumentVersionInfo({
+      version: metadata.version || 1,
+      lastModified: lastModified,
+      modifiedBy: 'system',
+    });
+
+    // Check for branch field in metadata
+    const branch = (metadata as any).branch;
+
     return new JsonDocument(
       id,
       path,
@@ -125,9 +135,8 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
       documentType,
       tags,
       baseDocument.content,
-      lastModified,
-      createdAt,
-      metadata.version
+      branch,
+      versionInfo
     );
   }
 
@@ -143,9 +152,8 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
     documentType,
     tags = [],
     content,
-    lastModified = new Date(),
-    createdAt = new Date(),
-    version = 1,
+    branch,
+    versionInfo,
   }: {
     id?: DocumentId;
     path: DocumentPath;
@@ -153,9 +161,8 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
     documentType: DocumentType;
     tags?: Tag[];
     content: T;
-    lastModified?: Date;
-    createdAt?: Date;
-    version?: number;
+    branch?: string;
+    versionInfo?: DocumentVersionInfo;
   }): JsonDocument<T> {
     // Validate content based on document type
     try {
@@ -193,9 +200,8 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
       documentType,
       [...tags], // Defensive copy
       content,
-      new Date(lastModified),
-      new Date(createdAt),
-      version
+      branch,
+      versionInfo
     );
   }
 
@@ -249,24 +255,31 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
   }
 
   /**
-   * Get the last modified date
+   * Get the branch name
    */
-  public get lastModified(): Date {
-    return new Date(this._lastModified);
+  public get branch(): string | undefined {
+    return this._branch;
   }
 
   /**
-   * Get the creation date
+   * Get the version info
    */
-  public get createdAt(): Date {
-    return new Date(this._createdAt);
+  public get versionInfo(): DocumentVersionInfo {
+    return this._versionInfo;
+  }
+
+  /**
+   * Get the last modified date
+   */
+  public get lastModified(): Date {
+    return this._versionInfo.lastModified;
   }
 
   /**
    * Get the document version
    */
   public get version(): number {
-    return this._version;
+    return this._versionInfo.version;
   }
 
   /**
@@ -288,6 +301,8 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
       return this;
     }
 
+    const updatedVersionInfo = this._versionInfo.nextVersion();
+
     return new JsonDocument<T>(
       this._id,
       path,
@@ -295,9 +310,8 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
       this._documentType,
       this._tags,
       this._content,
-      new Date(), // Update lastModified
-      this._createdAt,
-      this._version + 1 // Increment version
+      this._branch,
+      updatedVersionInfo
     );
   }
 
@@ -311,6 +325,8 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
       return this;
     }
 
+    const updatedVersionInfo = this._versionInfo.nextVersion();
+
     return new JsonDocument<T>(
       this._id,
       this._path,
@@ -318,9 +334,8 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
       this._documentType,
       this._tags,
       this._content,
-      new Date(), // Update lastModified
-      this._createdAt,
-      this._version + 1 // Increment version
+      this._branch,
+      updatedVersionInfo
     );
   }
 
@@ -359,6 +374,8 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
       );
     }
 
+    const updatedVersionInfo = this._versionInfo.nextVersion();
+
     return new JsonDocument<U>(
       this._id,
       this._path,
@@ -366,9 +383,8 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
       this._documentType,
       this._tags,
       content,
-      new Date(), // Update lastModified
-      this._createdAt,
-      this._version + 1 // Increment version
+      this._branch,
+      updatedVersionInfo
     );
   }
 
@@ -382,6 +398,8 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
       return this;
     }
 
+    const updatedVersionInfo = this._versionInfo.nextVersion();
+
     return new JsonDocument<T>(
       this._id,
       this._path,
@@ -389,9 +407,8 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
       this._documentType,
       [...this._tags, tag],
       this._content,
-      new Date(), // Update lastModified
-      this._createdAt,
-      this._version + 1 // Increment version
+      this._branch,
+      updatedVersionInfo
     );
   }
 
@@ -405,6 +422,8 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
       return this;
     }
 
+    const updatedVersionInfo = this._versionInfo.nextVersion();
+
     return new JsonDocument<T>(
       this._id,
       this._path,
@@ -412,9 +431,8 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
       this._documentType,
       this._tags.filter((t) => !t.equals(tag)),
       this._content,
-      new Date(), // Update lastModified
-      this._createdAt,
-      this._version + 1 // Increment version
+      this._branch,
+      updatedVersionInfo
     );
   }
 
@@ -424,6 +442,8 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
    * @returns New JsonDocument instance
    */
   public updateTags(tags: Tag[]): JsonDocument<T> {
+    const updatedVersionInfo = this._versionInfo.nextVersion();
+
     return new JsonDocument<T>(
       this._id,
       this._path,
@@ -431,9 +451,8 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
       this._documentType,
       [...tags], // Defensive copy
       this._content,
-      new Date(), // Update lastModified
-      this._createdAt,
-      this._version + 1 // Increment version
+      this._branch,
+      updatedVersionInfo
     );
   }
 
@@ -442,18 +461,31 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
    * @returns Document as a serializable object
    */
   public toObject(): BaseJsonDocumentV2 {
+    const metadata: Record<string, any> = {
+      id: this._id.value,
+      title: this._title,
+      documentType: this._documentType,
+      path: this._path.value,
+      tags: this._tags.map((tag) => tag.value),
+      lastModified: this._versionInfo.lastModified,
+      version: this._versionInfo.version,
+    };
+
+    // Add createdAt (if we have one available)
+    if ('createdAt' in this) {
+      metadata.createdAt = (this as any)._createdAt || new Date();
+    } else {
+      metadata.createdAt = new Date();
+    }
+
+    // Add branch if it exists
+    if (this._branch) {
+      metadata.branch = this._branch;
+    }
+
     return {
       schema: SCHEMA_VERSION,
-      metadata: {
-        id: this._id.value,
-        title: this._title,
-        documentType: this._documentType,
-        path: this._path.value,
-        tags: this._tags.map((tag) => tag.value),
-        lastModified: this._lastModified,
-        createdAt: this._createdAt,
-        version: this._version,
-      },
+      metadata,
       content: this._content,
     };
   }

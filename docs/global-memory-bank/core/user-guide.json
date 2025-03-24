@@ -1,0 +1,57 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "core-user-guide",
+    "title": "ユーザーガイド基本情報",
+    "documentType": "core",
+    "path": "core/user-guide.json",
+    "tags": [
+      "guide",
+      "documentation",
+      "core"
+    ],
+    "lastModified": "2025-03-22T02:35:40.000Z",
+    "createdAt": "2025-03-21T08:40:50.132Z",
+    "version": 2
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "概要",
+        "content": "このドキュメントは、Memory Bank MCPサーバーの基本的な使用方法を説明するユーザーガイドです。詳細な情報は `04-guides/user-guide.json` を参照してください。"
+      },
+      {
+        "title": "Memory Bank MCPサーバーとは",
+        "content": "Memory Bank MCPサーバーは、開発チームがプロジェクトの知識と情報を効率的に管理・共有するためのメモリ拡張ツールです。主な機能として、以下を提供します：\n\n1. **ブランチ別メモリバンク**: 各機能ブランチに関連する情報を整理して保存\n2. **グローバルメモリバンク**: プロジェクト全体の共通知識を管理\n3. **JSON構造化ドキュメント**: 一貫した形式で情報を整理\n4. **タグシステム**: 関連情報の効率的な検索と参照"
+      },
+      {
+        "title": "インストールと初期設定",
+        "content": "### インストール\n```bash\n# リポジトリをクローン\ngit clone https://github.com/example/memory-bank-mcp-server.git\ncd memory-bank-mcp-server\n\n# 依存関係のインストール\nyarn install\n\n# 開発サーバーの起動\nyarn dev\n```\n\n### 環境設定\n`.env`ファイルを作成し、以下の項目を設定します：\n\n```env\nPORT=3000\nMEMORY_BANK_ROOT=./docs\nLOG_LEVEL=info\n```\n\n詳細なインストール手順と環境設定については、プロジェクトのREADME.mdを参照してください。"
+      },
+      {
+        "title": "基本的な使い方",
+        "content": "### メモリバンクの読み取り\n\n```bash\n# グローバルメモリバンクの読み取り\nyarn cli read-global-memory\n\n# ブランチメモリバンクの読み取り\nyarn cli read-branch-memory --branch feature/my-feature\n\n# すべてのコンテキストを一度に読み取り\nyarn cli read-context --branch feature/my-feature --language ja\n```\n\n### メモリバンクの書き込み\n\n```bash\n# グローバルメモリバンクへの書き込み\nyarn cli write-global-memory --path path/to/document.json --content '{ ... }'\n\n# ブランチメモリバンクへの書き込み\nyarn cli write-branch-memory --branch feature/my-feature --path document.json --content '{ ... }'\n```\n\n注意: メモリバンクファイルは直接編集せず、必ずこれらのコマンドを使用してください。"
+      },
+      {
+        "title": "ブランチメモリバンクのコアファイル",
+        "content": "各ブランチメモリバンクには、以下の4つのコアファイルが必要です：\n\n1. **branchContext.json** - ブランチの目的、ユーザーストーリー、要件\n2. **activeContext.json** - 現在の作業内容、直近の変更、アクティブな決定事項\n3. **systemPatterns.json** - 技術的決定事項、関連するファイル構造\n4. **progress.json** - 現在の進捗状況、未実装の機能、既知の問題\n\nこれらのファイルは、各ブランチディレクトリのルートに配置する必要があります。"
+      },
+      {
+        "title": "グローバルメモリバンクの構造",
+        "content": "グローバルメモリバンクは、以下のディレクトリ構造に基づいて整理されています：\n\n```\ndocs/global-memory-bank/\n├── core/                   # 基本情報（このディレクトリ）\n├── 01-project/             # プロジェクト関連の詳細情報\n├── 02-architecture/        # アーキテクチャ関連の詳細情報\n├── 03-implementation/      # 実装関連の詳細情報\n├── 04-guides/              # 詳細なガイドとマニュアル\n├── 05-testing/             # テスト関連の情報\n├── 06-releases/            # リリース情報\n├── 07-infrastructure/      # インフラ関連の情報\n├── 08-i18n/                # 国際化関連の情報\n├── 09-refactoring/         # リファクタリング関連の情報\n├── meta/                   # メタデータと管理情報\n└── tags/                   # タグシステム情報\n```\n\nまずはcoreディレクトリのファイルから参照し、詳細が必要な場合に各カテゴリディレクトリを参照することをお勧めします。"
+      },
+      {
+        "title": "タグシステムの使い方",
+        "content": "タグは、ドキュメントを分類し検索するための重要な手段です。タグを効果的に使用するために以下のルールに従ってください：\n\n- タグは小文字のアルファベット、数字、ハイフンのみを使用（大文字、スペース、アンダースコア、ドットは使用不可）\n- 例: `architecture`、`design-patterns`、`v1-beta`（OK）\n- 例: `Design`、`user_guide`、`v2.0`（NG）\n\nタグを検索するには：\n\n```bash\n# タグで検索する\nyarn cli search-by-tag --tag architecture\n\n# 複数タグで検索\nyarn cli search-by-tag --tag architecture --tag design\n```\n\nタグの一覧と関連ドキュメントは、`tags/index.json`ファイルで確認できます。"
+      },
+      {
+        "title": "トラブルシューティング",
+        "content": "### 一般的な問題\n\n1. **コマンドが見つからない場合**:\n   - パスが正しく設定されていることを確認\n   - yarn installを再実行\n\n2. **ファイルが見つからない場合**:\n   - パスが正しいことを確認（相対パスはMemory Bank rootからの相対パス）\n   - ブランチ名が正しく指定されているか確認\n\n3. **JSON構文エラー**:\n   - 有効なJSON形式かどうかをJSONLintなどで確認\n   - 引用符や中括弧、角括弧が適切に閉じられているか確認\n\n詳細なトラブルシューティングについては、`07-infrastructure/ci-cd/memory-bank-errors.json`を参照してください。"
+      },
+      {
+        "title": "関連ドキュメント",
+        "content": "- [詳細なユーザーガイド](../04-guides/user-guide.json)\n- [マイグレーションガイド](../04-guides/migration-guide.json)\n- [CLIコマンドリファレンス](../03-implementation/cli-commands.json)\n- [エラー対応ガイド](../07-infrastructure/ci-cd/memory-bank-errors.json)"
+      }
+    ]
+  }
+}

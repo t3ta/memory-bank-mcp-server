@@ -1,0 +1,92 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "753a57ff-99bb-43e0-9444-9ea6047517c0",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": ["progress", "read-context", "bugfix"],
+    "lastModified": "2025-03-24T07:49:29.000Z",
+    "createdAt": "2025-03-24T07:31:38.506Z",
+    "version": 2
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "9061068b-224a-4a15-a498-d3d17658df52",
+        "description": "FileSystemBranchMemoryBankRepositoryでBranchInfo.safeNameを使用するように修正",
+        "implementedAt": "2025-03-24T07:49:29.000Z"
+      },
+      {
+        "id": "f1b4f108-7db1-4a5a-9cba-a7bd3b4077c5",
+        "description": "エラー処理とログ出力の強化",
+        "implementedAt": "2025-03-24T07:49:29.000Z"
+      },
+      {
+        "id": "68175c71-f3b6-43c7-a3cb-6ed84c6d99a4",
+        "description": "DomainErrorCodesの拡張（INVALID_DOCUMENT_FORMAT, JSON_PARSE_ERROR）",
+        "implementedAt": "2025-03-24T07:49:29.000Z"
+      },
+      {
+        "id": "b2c3d4e5-f6g7-8h9i-j0k1-l2m3n4o5p6q7",
+        "description": "JSONの検証処理の追加",
+        "implementedAt": "2025-03-24T07:49:29.000Z"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "93ce13f5-16f3-4b9a-bfbb-63795bb86196",
+        "description": "テストケースの追加",
+        "priority": "medium"
+      },
+      {
+        "id": "ae22333e-ea41-4801-8862-9af3a5f5afd6",
+        "description": "他のリポジトリ実装の確認",
+        "priority": "low"
+      }
+    ],
+    "status": "実装完了、テスト待ち",
+    "completionPercentage": 90,
+    "knownIssues": [
+      {
+        "id": "d422393c-5f25-4792-9f67-36e5ffe32837",
+        "description": "テンプレート処理の問題が完全に解決されたか確認が必要",
+        "severity": "low"
+      }
+    ],
+    "implementationDetails": [
+      {
+        "id": "r5s6t7u8-v9w0-x1y2-z3a4-b5c6d7e8f9g0",
+        "title": "ブランチ名の安全な処理",
+        "description": "FileSystemBranchMemoryBankRepositoryの全メソッドでbranchInfo.nameの代わりにbranchInfo.safeNameを使用するように修正しました。これにより、ブランチ名に含まれるスラッシュ(/)がファイルシステムのパスとして正しく処理されるようになりました。",
+        "files": [
+          "src/infrastructure/repositories/FileSystemBranchMemoryBankRepository.ts"
+        ]
+      },
+      {
+        "id": "h1i2j3k4-l5m6-n7o8-p9q0-r1s2t3u4v5w6",
+        "title": "エラー処理の強化",
+        "description": "エラー発生時により詳細な情報をログに出力するように改善しました。エラーオブジェクトの名前、メッセージ、スタックトレース、エラーコードなどを記録し、問題の特定を容易にしました。",
+        "files": [
+          "src/infrastructure/repositories/FileSystemBranchMemoryBankRepository.ts"
+        ]
+      },
+      {
+        "id": "x7y8z9a0-b1c2-d3e4-f5g6-h7i8j9k0l1m2",
+        "title": "DomainErrorCodesの拡張",
+        "description": "DomainErrorCodesにINVALID_DOCUMENT_FORMATとJSON_PARSE_ERRORを追加し、より具体的なエラーメッセージを提供できるようにしました。",
+        "files": [
+          "src/shared/errors/DomainError.ts"
+        ]
+      },
+      {
+        "id": "n3o4p5q6-r7s8-t9u0-v1w2-x3y4z5a6b7c8",
+        "title": "JSONの検証処理",
+        "description": "ドキュメント保存前にJSONの検証処理を追加し、無効なJSONを早期に検出できるようにしました。これにより、データの整合性が向上し、エラーメッセージがより具体的になりました。",
+        "files": [
+          "src/infrastructure/repositories/FileSystemBranchMemoryBankRepository.ts"
+        ]
+      }
+    ]
+  }
+}

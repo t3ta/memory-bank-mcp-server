@@ -1,0 +1,330 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "c5e3d2a1-f9c7-4b85-ae23-18d9b45f76c0",
+    "title": "言語テンプレートシステムリファクタリング詳細計画",
+    "documentType": "technical_plan",
+    "path": "language-template-refactoring-plan.json",
+    "tags": [
+      "refactoring",
+      "design",
+      "i18n",
+      "templates"
+    ],
+    "lastModified": "2025-03-22T07:15:22.466Z",
+    "createdAt": "2025-03-22T07:15:22.466Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "title": "言語テンプレートシステムリファクタリング計画",
+      "description": "現在の言語テンプレートシステムの問題点を解決し、より拡張性と保守性の高いアーキテクチャに刷新するためのリファクタリング計画",
+      "goals": [
+        "責任の明確な分離によるクリーンアーキテクチャの実現",
+        "テンプレート形式の処理を柔軟に拡張できる設計への改善",
+        "国際化機能の独立性と拡張性の向上",
+        "テストカバレッジの拡大とバグの削減",
+        "ユーザビリティとデバッグのしやすさの向上"
+      ]
+    },
+    "currentArchitecture": {
+      "description": "現在の言語テンプレートシステムの構成",
+      "components": [
+        {
+          "name": "JsonTemplateLoader",
+          "path": "src/infrastructure/templates/JsonTemplateLoader.ts",
+          "responsibility": "JSONとMarkdown形式のテンプレート読み込みとレンダリングの橋渡し",
+          "issues": [
+            "JSONとMarkdownの処理が混在している",
+            "レガシーな実装と新しい実装が混在している",
+            "単一責任の原則に違反している"
+          ]
+        },
+        {
+          "name": "TemplateRenderer",
+          "path": "src/infrastructure/templates/TemplateRenderer.ts",
+          "responsibility": "テンプレートのマークダウンへの変換",
+          "issues": [
+            "レンダリングロジックが複雑で拡張しにくい",
+            "テンプレート形式に依存した実装",
+            "国際化処理との結合度が高い"
+          ]
+        },
+        {
+          "name": "I18nProvider",
+          "path": "src/infrastructure/i18n/I18nProvider.ts",
+          "responsibility": "多言語サポートと翻訳機能の提供",
+          "issues": [
+            "翻訳ファイルの管理が煩雑",
+            "言語追加時の拡張性に制限がある",
+            "テンプレートシステムとの依存関係が強い"
+          ]
+        },
+        {
+          "name": "テンプレートスキーマ",
+          "path": "src/schemas/v2/template-schema.ts",
+          "responsibility": "テンプレート構造の定義と検証",
+          "issues": [
+            "バリデーションが不十分",
+            "エラーメッセージが不明確",
+            "スキーマの拡張性に制限がある"
+          ]
+        }
+      ]
+    },
+    "newArchitecture": {
+      "description": "リファクタリング後の新しいアーキテクチャ",
+      "layers": [
+        {
+          "name": "ドメイン層",
+          "components": [
+            {
+              "name": "Template",
+              "path": "src/domain/templates/Template.ts",
+              "description": "テンプレートのドメインモデル（値オブジェクト）",
+              "responsibility": "テンプレートの構造とビジネスルールを定義"
+            },
+            {
+              "name": "Section",
+              "path": "src/domain/templates/Section.ts",
+              "description": "テンプレートのセクションを表すドメインモデル",
+              "responsibility": "セクションの構造と操作を定義"
+            },
+            {
+              "name": "ITemplateRepository",
+              "path": "src/domain/templates/ITemplateRepository.ts",
+              "description": "テンプレートリポジトリのインターフェース",
+              "responsibility": "テンプレートの永続化と取得の抽象化"
+            },
+            {
+              "name": "Translation",
+              "path": "src/domain/i18n/Translation.ts",
+              "description": "翻訳のドメインモデル",
+              "responsibility": "翻訳キーと翻訳テキストの関連付け"
+            },
+            {
+              "name": "Language",
+              "path": "src/domain/i18n/Language.ts",
+              "description": "言語のドメインモデル",
+              "responsibility": "サポートされる言語の定義と検証"
+            },
+            {
+              "name": "II18nRepository",
+              "path": "src/domain/i18n/II18nRepository.ts",
+              "description": "国際化リポジトリのインターフェース",
+              "responsibility": "翻訳データの永続化と取得の抽象化"
+            }
+          ]
+        },
+        {
+          "name": "アプリケーション層",
+          "components": [
+            {
+              "name": "TemplateService",
+              "path": "src/application/templates/TemplateService.ts",
+              "description": "テンプレート操作のアプリケーションサービス",
+              "responsibility": "テンプレートのビジネスロジックを実装"
+            },
+            {
+              "name": "TemplateRenderer",
+              "path": "src/application/templates/TemplateRenderer.ts",
+              "description": "テンプレートレンダリングのアプリケーションサービス",
+              "responsibility": "テンプレートの異なる形式への変換"
+            },
+            {
+              "name": "I18nService",
+              "path": "src/application/i18n/I18nService.ts",
+              "description": "国際化のアプリケーションサービス",
+              "responsibility": "翻訳と言語操作のビジネスロジックを実装"
+            }
+          ]
+        },
+        {
+          "name": "インフラストラクチャ層",
+          "components": [
+            {
+              "name": "FileSystemTemplateRepository",
+              "path": "src/infrastructure/templates/FileSystemTemplateRepository.ts",
+              "description": "ファイルシステムベースのテンプレートリポジトリ実装",
+              "responsibility": "ファイルシステムからのテンプレート読み込みと保存"
+            },
+            {
+              "name": "TemplateFormatStrategy",
+              "path": "src/infrastructure/templates/strategies/TemplateFormatStrategy.ts",
+              "description": "テンプレート形式の戦略インターフェース",
+              "responsibility": "異なるテンプレート形式の処理を抽象化"
+            },
+            {
+              "name": "JsonTemplateStrategy",
+              "path": "src/infrastructure/templates/strategies/JsonTemplateStrategy.ts",
+              "description": "JSON形式のテンプレート処理戦略",
+              "responsibility": "JSON形式のテンプレートの読み込みと変換"
+            },
+            {
+              "name": "MarkdownTemplateStrategy",
+              "path": "src/infrastructure/templates/strategies/MarkdownTemplateStrategy.ts",
+              "description": "Markdown形式のテンプレート処理戦略（レガシーサポート）",
+              "responsibility": "Markdown形式のテンプレートの読み込みと変換"
+            },
+            {
+              "name": "FileSystemI18nRepository",
+              "path": "src/infrastructure/i18n/FileSystemI18nRepository.ts",
+              "description": "ファイルシステムベースの国際化リポジトリ実装",
+              "responsibility": "ファイルシステムからの翻訳データ読み込みと保存"
+            },
+            {
+              "name": "TranslationFactory",
+              "path": "src/infrastructure/i18n/TranslationFactory.ts",
+              "description": "翻訳ファクトリー",
+              "responsibility": "言語ごとの翻訳リソースの生成"
+            }
+          ]
+        }
+      ]
+    },
+    "implementationPhases": [
+      {
+        "phase": 1,
+        "title": "ドメインモデルの実装",
+        "tasks": [
+          "テンプレートと関連エンティティのドメインモデルを定義",
+          "国際化のドメインモデルを定義",
+          "リポジトリインターフェースを定義"
+        ],
+        "estimatedEffort": "中",
+        "dependencies": []
+      },
+      {
+        "phase": 2,
+        "title": "アプリケーションサービスの実装",
+        "tasks": [
+          "TemplateServiceの実装",
+          "I18nServiceの実装",
+          "新しいTemplateRendererの実装"
+        ],
+        "estimatedEffort": "中",
+        "dependencies": [
+          1
+        ]
+      },
+      {
+        "phase": 3,
+        "title": "インフラストラクチャ層の実装",
+        "tasks": [
+          "テンプレート形式の戦略クラスの実装",
+          "ファイルシステムベースのリポジトリ実装",
+          "TranslationFactoryの実装"
+        ],
+        "estimatedEffort": "大",
+        "dependencies": [
+          2
+        ]
+      },
+      {
+        "phase": 4,
+        "title": "テストとリファクタリング",
+        "tasks": [
+          "単体テストの追加",
+          "統合テストの追加",
+          "コードレビューとリファクタリング"
+        ],
+        "estimatedEffort": "中",
+        "dependencies": [
+          3
+        ]
+      },
+      {
+        "phase": 5,
+        "title": "ドキュメントと移行",
+        "tasks": [
+          "新しいアーキテクチャのドキュメント作成",
+          "既存のテンプレートの移行",
+          "最終テストと検証"
+        ],
+        "estimatedEffort": "小",
+        "dependencies": [
+          4
+        ]
+      }
+    ],
+    "designPatterns": [
+      {
+        "name": "戦略パターン（Strategy Pattern）",
+        "context": "テンプレート形式ごとに異なる処理ロジックを柔軟に切り替えるため",
+        "implementation": "TemplateFormatStrategyインターフェースと具体的な実装クラス（JsonTemplateStrategy, MarkdownTemplateStrategy）"
+      },
+      {
+        "name": "ファクトリーパターン（Factory Pattern）",
+        "context": "言語ごとの翻訳リソースを動的に生成するため",
+        "implementation": "TranslationFactoryクラスによる言語依存のリソース生成"
+      },
+      {
+        "name": "リポジトリパターン（Repository Pattern）",
+        "context": "データの永続化と取得を抽象化し、ドメインモデルとストレージの分離を図るため",
+        "implementation": "ITemplateRepositoryとII18nRepositoryインターフェースとその実装"
+      },
+      {
+        "name": "アダプタパターン（Adapter Pattern）",
+        "context": "レガシーなコードと新しいコードの間の互換性を確保するため",
+        "implementation": "レガシーAPIをラップする適応クラスの作成"
+      }
+    ],
+    "testingStrategy": {
+      "unitTesting": {
+        "approach": "モックを活用した単体テスト",
+        "frameworks": [
+          "Jest"
+        ],
+        "keyAreas": [
+          "ドメインモデルのビジネスロジック",
+          "アプリケーションサービスのユースケース",
+          "戦略パターンの個々の実装"
+        ]
+      },
+      "integrationTesting": {
+        "approach": "複数コンポーネントを連携させた統合テスト",
+        "frameworks": [
+          "Jest"
+        ],
+        "keyAreas": [
+          "ファイルシステムとの連携",
+          "テンプレート処理の全体フロー",
+          "国際化の全体フロー"
+        ]
+      },
+      "coverageGoals": {
+        "unitTests": "85%以上",
+        "integrationTests": "70%以上",
+        "totalCoverage": "80%以上"
+      }
+    },
+    "migrationStrategy": {
+      "approach": "段階的なマイグレーション",
+      "steps": [
+        "新しいアーキテクチャでの基本実装を完了",
+        "レガシーコードと新しいコードの共存期間を設ける",
+        "アダプタを使用して既存のAPIをサポート",
+        "テンプレートの移行を計画的に実施",
+        "完全移行後にレガシーコードを削除"
+      ],
+      "backwardsCompatibility": {
+        "duration": "6ヶ月間",
+        "approach": "アダプタパターンを使用してレガシーAPIをサポート"
+      }
+    },
+    "risks": [
+      {
+        "description": "リファクタリングによる既存機能の互換性問題",
+        "mitigation": "詳細なテストケースの作成と段階的なリリース"
+      },
+      {
+        "description": "複雑な依存関係による予期せぬ副作用",
+        "mitigation": "依存関係の明確な文書化と綿密なコードレビュー"
+      },
+      {
+        "description": "リファクタリング期間中のリソース競合",
+        "mitigation": "事前の計画と段階的な実装アプローチ"
+      }
+    ]
+  }
+}

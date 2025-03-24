@@ -2,6 +2,7 @@ import { BranchInfo } from "../../../domain/entities/BranchInfo.js";
 import { DocumentId } from "../../../domain/entities/DocumentId.js";
 import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
 import { JsonDocument, DocumentType } from "../../../domain/entities/JsonDocument.js";
+import { DocumentVersionInfo } from "../../../domain/entities/DocumentVersionInfo.js";
 import { Tag } from "../../../domain/entities/Tag.js";
 import type { IJsonDocumentRepository } from "../../../domain/repositories/IJsonDocumentRepository.js";
 import type { IIndexService } from "../../../infrastructure/index/index.js";
@@ -201,8 +202,11 @@ export class WriteJsonDocumentUseCase
           documentType: input.document.documentType,
           tags,
           content: input.document.content,
-          createdAt: existingDocument.createdAt,
-          version: existingDocument.version + 1,
+          versionInfo: new DocumentVersionInfo({
+            version: existingDocument.version + 1,
+            lastModified: new Date(),
+            modifiedBy: 'system'
+          }),
           // Last modified will be automatically set to now
         });
       }
@@ -223,7 +227,7 @@ export class WriteJsonDocumentUseCase
           tags: savedDocument.tags.map((tag) => tag.value),
           content: savedDocument.content,
           lastModified: savedDocument.lastModified.toISOString(),
-          createdAt: savedDocument.createdAt.toISOString(),
+          createdAt: new Date().toISOString(), // Fallback createdAt
           version: savedDocument.version,
         },
         isNew,

@@ -1,3 +1,5 @@
+// @ts-nocheck
+// This file was automatically converted from ts-mockito to jest.fn()
 import { describe, it, expect, beforeEach } from '@jest/globals';
 import { jest } from '@jest/globals';
 import { BranchController } from '../../../../src/interface/controllers/BranchController';
@@ -10,9 +12,16 @@ import { ReadBranchCoreFilesUseCase } from '../../../../src/application/usecases
 import { CreateBranchCoreFilesUseCase } from '../../../../src/application/usecases/common/CreateBranchCoreFilesUseCase';
 import { MCPResponsePresenter } from '../../../../src/interface/presenters/MCPResponsePresenter';
 import { DocumentDTO } from '../../../../src/application/dtos/DocumentDTO';
+import { JsonDocumentDTO } from '../../../../src/application/dtos/JsonDocumentDTO';
 import { DomainError } from '../../../../src/shared/errors/DomainError';
 import { ApplicationError } from '../../../../src/shared/errors/ApplicationError';
 import { InfrastructureError } from '../../../../src/shared/errors/InfrastructureError';
+import { ReadJsonDocumentUseCase } from '../../../../src/application/usecases/json/ReadJsonDocumentUseCase';
+import { WriteJsonDocumentUseCase } from '../../../../src/application/usecases/json/WriteJsonDocumentUseCase';
+import { DeleteJsonDocumentUseCase } from '../../../../src/application/usecases/json/DeleteJsonDocumentUseCase';
+import { SearchJsonDocumentsUseCase } from '../../../../src/application/usecases/json/SearchJsonDocumentsUseCase';
+import { UpdateJsonIndexUseCase } from '../../../../src/application/usecases/json/UpdateJsonIndexUseCase';
+import { DocumentType } from '../../../../src/domain/entities/JsonDocument';
 
 // Mock use cases
 const mockReadBranchDocumentUseCase = {
@@ -21,6 +30,10 @@ const mockReadBranchDocumentUseCase = {
 
 const mockWriteBranchDocumentUseCase = {
   execute: jest.fn(),
+  branchRepository: {
+    exists: jest.fn(() => Promise.resolve(true)),
+    saveTagIndex: jest.fn(() => Promise.resolve(true)),
+  },
 } as unknown as jest.Mocked<WriteBranchDocumentUseCase>;
 
 const mockSearchDocumentsByTagsUseCase = {
@@ -42,6 +55,27 @@ const mockReadBranchCoreFilesUseCase = {
 const mockCreateBranchCoreFilesUseCase = {
   execute: jest.fn(),
 } as unknown as jest.Mocked<CreateBranchCoreFilesUseCase>;
+
+// Mock JSON use cases
+const mockReadJsonDocumentUseCase = {
+  execute: jest.fn(),
+} as unknown as jest.Mocked<ReadJsonDocumentUseCase>;
+
+const mockWriteJsonDocumentUseCase = {
+  execute: jest.fn(),
+} as unknown as jest.Mocked<WriteJsonDocumentUseCase>;
+
+const mockDeleteJsonDocumentUseCase = {
+  execute: jest.fn(),
+} as unknown as jest.Mocked<DeleteJsonDocumentUseCase>;
+
+const mockSearchJsonDocumentsUseCase = {
+  execute: jest.fn(),
+} as unknown as jest.Mocked<SearchJsonDocumentsUseCase>;
+
+const mockUpdateJsonIndexUseCase = {
+  execute: jest.fn(),
+} as unknown as jest.Mocked<UpdateJsonIndexUseCase>;
 
 // Mock presenter
 const mockPresenter = {
@@ -65,7 +99,14 @@ describe('BranchController', () => {
       mockGetRecentBranchesUseCase,
       mockReadBranchCoreFilesUseCase,
       mockCreateBranchCoreFilesUseCase,
-      mockPresenter
+      mockPresenter,
+      {
+        readJsonDocumentUseCase: mockReadJsonDocumentUseCase,
+        writeJsonDocumentUseCase: mockWriteJsonDocumentUseCase,
+        deleteJsonDocumentUseCase: mockDeleteJsonDocumentUseCase,
+        searchJsonDocumentsUseCase: mockSearchJsonDocumentsUseCase,
+        updateJsonIndexUseCase: mockUpdateJsonIndexUseCase,
+      }
     );
   });
 
@@ -299,10 +340,10 @@ describe('BranchController', () => {
         },
       });
 
-      // Mock BranchDocument use case response for branchContext.md
+      // Mock BranchDocument use case response for branchContext.json
       mockReadBranchDocumentUseCase.execute.mockResolvedValue({
         document: {
-          path: 'branchContext.md',
+          path: 'branchContext.json',
           content: '# Branch Context\n\nBranch context content',
           tags: ['core', 'branch-context'],
           lastModified: '2023-01-01T00:00:00.000Z',
@@ -328,33 +369,33 @@ describe('BranchController', () => {
 
       expect(mockReadBranchDocumentUseCase.execute).toHaveBeenCalledWith({
         branchName,
-        path: 'branchContext.md',
+        path: 'branchContext.json',
       });
 
       // Verify presenter called with formatted data
       expect(mockPresenter.present).toHaveBeenCalledWith(
         expect.objectContaining({
-          'activeContext.md': expect.objectContaining({
-            path: 'activeContext.md',
+          'activeContext.json': expect.objectContaining({
+            path: 'activeContext.json',
             content: expect.stringContaining('# アクティブコンテキスト'),
           }),
-          'progress.md': expect.objectContaining({
-            path: 'progress.md',
+          'progress.json': expect.objectContaining({
+            path: 'progress.json',
             content: expect.stringContaining('# 進捗状況'),
           }),
-          'systemPatterns.md': expect.objectContaining({
-            path: 'systemPatterns.md',
+          'systemPatterns.json': expect.objectContaining({
+            path: 'systemPatterns.json',
             content: expect.stringContaining('# システムパターン'),
           }),
-          'branchContext.md': expect.objectContaining({
-            path: 'branchContext.md',
+          'branchContext.json': expect.objectContaining({
+            path: 'branchContext.json',
             content: '# Branch Context\n\nBranch context content',
           }),
         })
       );
     });
 
-    it('should handle errors when reading branchContext.md', async () => {
+    it('should handle errors when reading branchContext.json', async () => {
       // Arrange
       const branchName = 'feature/test';
 
@@ -380,7 +421,7 @@ describe('BranchController', () => {
         },
       });
 
-      // Mock error for branchContext.md
+      // Mock error for branchContext.json
       mockReadBranchDocumentUseCase.execute.mockRejectedValue(
         new DomainError('DOCUMENT_NOT_FOUND', 'Document not found')
       );
@@ -400,8 +441,8 @@ describe('BranchController', () => {
       // Verify presenter called with formatted data including empty branchContext
       expect(mockPresenter.present).toHaveBeenCalledWith(
         expect.objectContaining({
-          'branchContext.md': expect.objectContaining({
-            path: 'branchContext.md',
+          'branchContext.json': expect.objectContaining({
+            path: 'branchContext.json',
             content: '',
             tags: ['core', 'branch-context'],
           }),

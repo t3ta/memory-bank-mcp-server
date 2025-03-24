@@ -4,8 +4,9 @@ import { JsonToMarkdownConverter } from "../../../shared/utils/json-to-markdown/
 import { DomainError, DomainErrorCodes } from "../../../shared/errors/DomainError.js";
 import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
 import { JsonDocument } from "../../../domain/entities/JsonDocument.js";
-
-
+import { logger } from "../../../shared/utils/logger.js";
+import { ITemplateLoader } from "../../../infrastructure/templates/interfaces/ITemplateLoader.js";
+import { Language, getSafeLanguage, isValidLanguage } from "../../../schemas/v2/i18n-schema.js";
 
 export type RulesResult = {
   content: string;
@@ -23,10 +24,12 @@ export class ReadRulesUseCase {
    * コンストラクタ
    * @param rulesDir ルールディレクトリパス
    * @param jsonToMarkdownConverter JSON to Markdown コンバーター
+   * @param templateLoader テンプレートローダー（オプション）
    */
   constructor(
     rulesDir: string,
-    private readonly jsonToMarkdownConverter?: JsonToMarkdownConverter
+    private readonly jsonToMarkdownConverter?: JsonToMarkdownConverter,
+    private readonly templateLoader?: ITemplateLoader
   ) {
     this.rulesDir = rulesDir;
   }
@@ -47,43 +50,70 @@ export class ReadRulesUseCase {
     }
 
     try {
+      // テンプレートローダーが提供されている場合はそれを使用
+      if (this.templateLoader) {
+        try {
+          logger.debug(`Using template loader to get rules for language: ${language}`);
+
+          // 言語コードを安全に変換
+          const safeLanguage = getSafeLanguage(language);
+
+          const content = await this.templateLoader.getMarkdownTemplate(
+            'rules',
+            safeLanguage
+          );
+
+          return {
+            content,
+            language
+          };
+        } catch (templateError) {
+          logger.warn(`Failed to load rules using template loader: ${templateError instanceof Error ? templateError.message : 'Unknown error'}`);
+          logger.debug('Falling back to direct file loading');
+          // テンプレートローダーでの読み込みに失敗した場合は、従来の方法にフォールバック
+        }
+      }
+
+      // 従来の方法でJSONファイルを直接読み込む
       // JSONファイルのパス - 複数のパスを試す
       const possiblePaths = [
-        // 新しいパス (templates/json/rules-{lang}.json)
+        // 新しい単一テンプレートパス
+        path.join(this.rulesDir, 'templates', 'json', 'rules.json'),
+        // 新しいパス (templates/json に替わって domain/templates が使われるようになった)
+        path.join(this.rulesDir, 'domain', 'templates', `rules-${language}.json`),
+        // 以前のパス (旧システムとの互換性のため)
         path.join(this.rulesDir, 'templates', 'json', `rules-${language}.json`),
-        // 第二候補 (templates/rules-{lang}.json)
-        path.join(this.rulesDir, 'templates', `rules-${language}.json`),
         // フォールバック
         path.join(this.rulesDir, `rules-${language}.json`)
       ];
-      
+
       let jsonContent = '';
       let jsonFilePath = '';
-      
+
       // 存在するパスを探す
       for (const p of possiblePaths) {
         try {
           jsonContent = await fs.readFile(p, 'utf-8');
           jsonFilePath = p;
-          console.log(`Rules JSON file found at: ${jsonFilePath}`);
+          logger.debug('Rules JSON file found', { path: jsonFilePath });
           break;
         } catch (err) {
           // このパスでは見つからなかった、次を試す
           continue;
         }
       }
-      
+
       if (!jsonContent) {
         throw new Error(`Rules file not found for language: ${language}`);
       }
-      
+
       const jsonData = JSON.parse(jsonContent);
-      
+
       // JSONからマークダウンに変換する場合
       let content = '';
       if (this.jsonToMarkdownConverter) {
         // コンバーターが提供されていれば使用 - JsonDocumentを作成してから変換
-        const docPath = DocumentPath.create('rules.json');
+        const docPath = DocumentPath.create('rules-template.json');
         const jsonDoc = JsonDocument.fromObject(jsonData, docPath);
         content = this.jsonToMarkdownConverter.convert(jsonDoc);
       } else {

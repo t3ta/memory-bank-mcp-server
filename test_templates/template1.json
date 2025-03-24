@@ -1,0 +1,30 @@
+{
+  "id": "template1",
+  "type": "type1",
+  "names": {
+    "en": "Template 1"
+  },
+  "sections": [
+    {
+      "id": "section1",
+      "titles": {
+        "en": "Section 1"
+      },
+      "contents": {
+        "en": "Content 1"
+      },
+      "isOptional": false
+    },
+    {
+      "id": "section2",
+      "titles": {
+        "en": "Section 2"
+      },
+      "contents": {
+        "en": "Content 2"
+      },
+      "isOptional": true
+    }
+  ],
+  "lastModified": "2025-03-24T03:09:57.685Z"
+}

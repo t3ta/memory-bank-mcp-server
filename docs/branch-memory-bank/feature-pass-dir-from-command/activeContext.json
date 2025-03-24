@@ -1,0 +1,129 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "be6808e4-e8b7-48ed-a314-248f5d26eefd",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context"
+    ],
+    "lastModified": "2025-03-24T11:00:18.286Z",
+    "createdAt": "2025-03-24T09:21:18.286Z",
+    "version": 5
+  },
+  "content": {
+    "currentWork": "MCPサーバーが複数のプロジェクトで使用できるよう、コマンドからワークスペースを渡せる機能の実装",
+    "recentChanges": [
+      {
+        "date": "2025-03-24T11:00:18.286Z",
+        "description": "実装担当をみらいに変更"
+      },
+      {
+        "date": "2025-03-24T10:55:18.286Z",
+        "description": "テストケース一覧を作成し、test-cases.jsonに保存"
+      },
+      {
+        "date": "2025-03-24T10:10:18.286Z",
+        "description": "MCPサーバーのユースケースでもワークスペースオプションを受け取れるように設計を見直し"
+      },
+      {
+        "date": "2025-03-24T09:50:18.286Z",
+        "description": "基本設計を完了: コマンドラインオプションに--workspaceを追加し、アプリケーション作成時に渡す"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "677d0370-a140-48e6-87c3-c0e3f0d435e6",
+        "description": "コマンドラインパーサーに--workspaceオプション（エイリアス-w）を追加する"
+      },
+      {
+        "id": "672827e5-b9f8-4751-9402-4e27398f0fe3",
+        "description": "ConfigProviderの既存実装を活用し、workspaceRootの設定を適切に処理する"
+      },
+      {
+        "id": "b6a2fed6-c248-4d14-aeb1-c88620148a26",
+        "description": "既存の--docsオプションとの後方互換性を維持する"
+      },
+      {
+        "id": "9c35f4e7-2a60-4b91-b8f2-d7e9c2d81538",
+        "description": "MCPサーバーの各ツール（read_context, write_branch_memory_bank等）でもワークスペースパラメータを受け取れるようにする"
+      },
+      {
+        "id": "5d8c7a1e-ff63-42da-9c3b-f4a1e78b9d56",
+        "description": "ツール呼び出し時にworkspaceとdocsを受け取った場合はそちらを優先し、CLIと同様の優先順位ルールを適用する"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "681bf47d-d4d4-4c5d-9534-6465990b981f",
+        "description": "ワークスペースとドキュメントディレクトリの相対パス指定の扱い",
+        "status": "addressed"
+      },
+      {
+        "id": "e4b5b31d-c85e-43ba-92c2-d1db7fcde377",
+        "description": "ワークスペースが変更された場合のドキュメントディレクトリのデフォルト値の扱い",
+        "status": "addressed"
+      },
+      {
+        "id": "4e4eccf5-f0b1-4370-b24a-d1e296abc432",
+        "description": "現在のコードではworkspaceRootが使われている場所の確認が必要",
+        "status": "in-progress"
+      },
+      {
+        "id": "ff32a78d-e521-4c86-b7bd-c12a9e61f8c5",
+        "description": "MCPサーバーのツールがユースケースにワークスペースパラメータを適切に渡す方法",
+        "status": "addressed"
+      },
+      {
+        "id": "c73ef2d9-a8bc-4fa1-9eab-2f75d8b9ca7e",
+        "description": "テスト戦略と必要なテストケースの整理",
+        "status": "addressed"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "57e48585-4462-4999-84dd-8a3790d238e7",
+        "description": "src/index.tsにworkspaceオプションを追加する",
+        "priority": "high"
+      },
+      {
+        "id": "2992fdb3-49ee-4a2e-a52a-62abbcf6ee00",
+        "description": "createApplication関数にworkspaceオプションを明示的に渡す",
+        "priority": "high"
+      },
+      {
+        "id": "bf1f7362-99ab-47e9-9a07-c918a027c75a",
+        "description": "MCPサーバーのツール定義にworkspaceパラメータを追加する",
+        "priority": "high"
+      },
+      {
+        "id": "d5e4fc09-2b63-47f8-9c21-a3ef0d78e5c2",
+        "description": "ツールハンドラでworkspaceとdocsパラメータを処理する実装を追加",
+        "priority": "high"
+      },
+      {
+        "id": "3a7ec5f8-6b2d-4cb1-a89e-e70a4dc27f15",
+        "description": "test-cases.jsonに基づいたテストケースを実装する",
+        "priority": "medium"
+      }
+    ],
+    "references": [
+      {
+        "id": "test-cases",
+        "path": "test-cases.json",
+        "description": "ワークスペースオプション機能に関するテストケース一覧"
+      },
+      {
+        "id": "implementation-plan",
+        "path": "implementation-plan.json",
+        "description": "実装計画の詳細"
+      },
+      {
+        "id": "systemPatterns",
+        "path": "systemPatterns.json",
+        "description": "設計決定と実装パターン"
+      }
+    ]
+  }
+}

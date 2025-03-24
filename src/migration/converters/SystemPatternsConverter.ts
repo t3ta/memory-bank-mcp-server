@@ -5,6 +5,7 @@
  */
 import { DocumentId } from "../../domain/entities/DocumentId.js";
 import type { DocumentPath } from "../../domain/entities/DocumentPath.js";
+import { DocumentVersionInfo } from "../../domain/entities/DocumentVersionInfo.js";
 import { JsonDocument } from "../../domain/entities/JsonDocument.js";
 import { Tag } from "../../domain/entities/Tag.js";
 import { v4 as uuidv4 } from "uuid";
@@ -58,8 +59,11 @@ export class SystemPatternsConverter implements BaseConverter {
       documentType: 'system_patterns',
       tags,
       content,
-      lastModified: new Date(),
-      createdAt: new Date(),
+      versionInfo: new DocumentVersionInfo({
+        version: 1,
+        lastModified: new Date(),
+        modifiedBy: 'migration'
+      })
     });
   }
 }

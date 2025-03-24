@@ -1,0 +1,244 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "test-cases",
+    "title": "ワークスペースオプション機能のテストケース",
+    "documentType": "test",
+    "path": "test-cases.json",
+    "tags": [
+      "test",
+      "testing",
+      "workspace-option"
+    ],
+    "lastModified": "2025-03-24T10:50:18.287Z",
+    "createdAt": "2025-03-24T10:50:18.287Z",
+    "version": 1
+  },
+  "content": {
+    "overview": "ワークスペースとドキュメントディレクトリのパス指定機能に関するテストケース一覧",
+    "testCategories": [
+      {
+        "name": "基本シナリオ",
+        "description": "サーバー起動時のオプション指定に関する基本的なテスト",
+        "testCases": [
+          {
+            "id": "basic-1",
+            "name": "サーバー起動時にworkspaceのみ指定",
+            "description": "ワークスペースのみを指定した場合、ドキュメントディレクトリはそのワークスペース内のdocsになるべき",
+            "setup": "mockCommandLineArgs({ workspace: '/test/workspace' })",
+            "verification": [
+              "expect(app.getConfig().workspaceRoot).toBe('/test/workspace')",
+              "expect(app.getConfig().memoryBankRoot).toBe('/test/workspace/docs')"
+            ]
+          },
+          {
+            "id": "basic-2",
+            "name": "サーバー起動時にdocsのみ指定",
+            "description": "ドキュメントディレクトリのみを指定した場合、ワークスペースはカレントディレクトリになるべき",
+            "setup": "mockCommandLineArgs({ docs: '/test/docs' })",
+            "verification": [
+              "expect(app.getConfig().workspaceRoot).toBe(process.cwd())",
+              "expect(app.getConfig().memoryBankRoot).toBe('/test/docs')"
+            ]
+          },
+          {
+            "id": "basic-3",
+            "name": "サーバー起動時に両方指定",
+            "description": "両方を指定した場合、指定した値が使用されるべき",
+            "setup": "mockCommandLineArgs({ workspace: '/test/workspace', docs: '/test/docs' })",
+            "verification": [
+              "expect(app.getConfig().workspaceRoot).toBe('/test/workspace')",
+              "expect(app.getConfig().memoryBankRoot).toBe('/test/docs')"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "MCPツール呼び出し",
+        "description": "MCPツール呼び出し時のパラメータ指定に関するテスト",
+        "testCases": [
+          {
+            "id": "tool-1",
+            "name": "ツール呼び出し時にworkspaceのみ指定",
+            "description": "ツール呼び出し時にワークスペースのみを指定した場合、そのワークスペースが使用されるべき",
+            "setup": [
+              "mockCommandLineArgs({ workspace: '/server/workspace' })",
+              "const app = await createApplication(mockConfig)"
+            ],
+            "action": "const result = await callTool('read_branch_memory_bank', { workspace: '/tool/workspace', path: 'test.json' })",
+            "verification": [
+              "expect(result.usedWorkspace).toBe('/tool/workspace')",
+              "expect(result.usedDocs).toBe('/tool/workspace/docs')"
+            ]
+          },
+          {
+            "id": "tool-2",
+            "name": "ツール呼び出し時にdocsのみ指定",
+            "description": "ツール呼び出し時にドキュメントディレクトリのみを指定した場合、サーバーのワークスペースが使用されるべき",
+            "setup": [
+              "mockCommandLineArgs({ workspace: '/server/workspace' })",
+              "const app = await createApplication(mockConfig)"
+            ],
+            "action": "const result = await callTool('read_branch_memory_bank', { docs: '/tool/docs', path: 'test.json' })",
+            "verification": [
+              "expect(result.usedWorkspace).toBe('/server/workspace')",
+              "expect(result.usedDocs).toBe('/tool/docs')"
+            ]
+          },
+          {
+            "id": "tool-3",
+            "name": "ツール呼び出し時に両方指定",
+            "description": "ツール呼び出し時に両方を指定した場合、ツールのパラメータが使用されるべき",
+            "setup": [
+              "mockCommandLineArgs({ workspace: '/server/workspace', docs: '/server/docs' })",
+              "const app = await createApplication(mockConfig)"
+            ],
+            "action": "const result = await callTool('read_branch_memory_bank', { workspace: '/tool/workspace', docs: '/tool/docs', path: 'test.json' })",
+            "verification": [
+              "expect(result.usedWorkspace).toBe('/tool/workspace')",
+              "expect(result.usedDocs).toBe('/tool/docs')"
+            ]
+          },
+          {
+            "id": "tool-4",
+            "name": "ツール呼び出し時に何も指定しない",
+            "description": "ツール呼び出し時にパスを指定しない場合、サーバーの設定が使用されるべき",
+            "setup": [
+              "mockCommandLineArgs({ workspace: '/server/workspace', docs: '/server/docs' })",
+              "const app = await createApplication(mockConfig)"
+            ],
+            "action": "const result = await callTool('read_branch_memory_bank', { path: 'test.json' })",
+            "verification": [
+              "expect(result.usedWorkspace).toBe('/server/workspace')",
+              "expect(result.usedDocs).toBe('/server/docs')"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "優先順位の検証",
+        "description": "様々なソースからのパス指定の優先順位に関するテスト",
+        "testCases": [
+          {
+            "id": "priority-1",
+            "name": "ツールパラメータがサーバー設定より優先される",
+            "description": "ツールパラメータで指定した値がサーバー起動時の設定より優先されるべき",
+            "setup": [
+              "mockCommandLineArgs({ workspace: '/server/workspace', docs: '/server/docs' })",
+              "const app = await createApplication(mockConfig)"
+            ],
+            "action": "const result = await callTool('read_branch_memory_bank', { workspace: '/tool/workspace', path: 'test.json' })",
+            "verification": [
+              "expect(result.usedWorkspace).toBe('/tool/workspace')"
+            ]
+          },
+          {
+            "id": "priority-2",
+            "name": "サーバー設定が環境変数より優先される",
+            "description": "サーバー起動時の設定が環境変数より優先されるべき",
+            "setup": [
+              "process.env.WORKSPACE_ROOT = '/env/workspace'",
+              "mockCommandLineArgs({ workspace: '/server/workspace' })",
+              "const app = await createApplication(mockConfig)"
+            ],
+            "verification": [
+              "expect(app.getConfig().workspaceRoot).toBe('/server/workspace')"
+            ]
+          },
+          {
+            "id": "priority-3",
+            "name": "環境変数がデフォルト値より優先される",
+            "description": "環境変数の設定がデフォルト値より優先されるべき",
+            "setup": [
+              "process.env.WORKSPACE_ROOT = '/env/workspace'",
+              "process.env.MEMORY_BANK_ROOT = '/env/docs'",
+              "mockCommandLineArgs({})",
+              "const app = await createApplication(mockConfig)"
+            ],
+            "verification": [
+              "expect(app.getConfig().workspaceRoot).toBe('/env/workspace')",
+              "expect(app.getConfig().memoryBankRoot).toBe('/env/docs')"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "パスの解決",
+        "description": "相対パスや無効なパスの処理に関するテスト",
+        "testCases": [
+          {
+            "id": "path-1",
+            "name": "相対パスが正しく絶対パスに解決される",
+            "description": "相対パス指定が適切に絶対パスに変換されるべき",
+            "setup": [
+              "const currentDir = process.cwd()",
+              "mockCommandLineArgs({ workspace: './relative/path' })"
+            ],
+            "action": "const app = await createApplication(mockConfig)",
+            "verification": [
+              "expect(app.getConfig().workspaceRoot).toBe(path.resolve(currentDir, './relative/path'))"
+            ]
+          },
+          {
+            "id": "path-2",
+            "name": "存在しないディレクトリの自動作成",
+            "description": "指定したパスが存在しない場合、自動作成されるべき",
+            "setup": [
+              "const testPath = '/tmp/test-workspace-' + Date.now()",
+              "mockCommandLineArgs({ workspace: testPath })"
+            ],
+            "action": "const app = await createApplication(mockConfig)",
+            "verification": [
+              "expect(fs.existsSync(testPath)).toBe(true)",
+              "expect(app.getConfig().workspaceRoot).toBe(testPath)"
+            ]
+          },
+          {
+            "id": "path-3",
+            "name": "無効なパスを指定した場合のエラーハンドリング",
+            "description": "無効なパス形式を指定した場合、適切なエラーが発生するべき",
+            "setup": "mockCommandLineArgs({ workspace: '\\invalid:path' })",
+            "action": "const promise = createApplication(mockConfig)",
+            "verification": [
+              "await expect(promise).rejects.toThrow()"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "互換性テスト",
+        "description": "既存コードとの互換性に関するテスト",
+        "testCases": [
+          {
+            "id": "compat-1",
+            "name": "既存のドキュメントアクセスが正常に動作",
+            "description": "新機能追加後も既存のドキュメントアクセス方法が引き続き動作するべき",
+            "setup": [
+              "mockCommandLineArgs({ docs: './legacy-docs' })",
+              "const app = await createApplication(mockConfig)"
+            ],
+            "action": "const result = await callLegacyDocumentAccess(app, 'test.json')",
+            "verification": [
+              "expect(result.success).toBe(true)",
+              "expect(result.path).toContain('legacy-docs')"
+            ]
+          },
+          {
+            "id": "compat-2",
+            "name": "既存のAPIが影響を受けない",
+            "description": "ワークスペースパラメータを持たない既存APIも正常に動作するべき",
+            "setup": [
+              "mockCommandLineArgs({ workspace: '/test/workspace', docs: '/test/docs' })",
+              "const app = await createApplication(mockConfig)"
+            ],
+            "action": "const result = await app.getLegacyController().readDocument('test.json')",
+            "verification": [
+              "expect(result.success).toBe(true)",
+              "expect(result.config.memoryBankRoot).toBe('/test/docs')"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

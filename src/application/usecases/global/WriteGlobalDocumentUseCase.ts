@@ -4,6 +4,7 @@ import { Tag } from "../../../domain/entities/Tag.js";
 import type { IGlobalMemoryBankRepository } from "../../../domain/repositories/IGlobalMemoryBankRepository.js";
 import { ApplicationError, ApplicationErrorCodes } from "../../../shared/errors/ApplicationError.js";
 import { DomainError } from "../../../shared/errors/DomainError.js";
+import { logger } from "../../../shared/utils/logger.js";
 import type { DocumentDTO } from "../../dtos/DocumentDTO.js";
 import type { WriteDocumentDTO } from "../../dtos/WriteDocumentDTO.js";
 import type { IUseCase } from "../../interfaces/IUseCase.js";
@@ -83,10 +84,32 @@ export class WriteGlobalDocumentUseCase
 
       // Create domain objects
       const documentPath = DocumentPath.create(input.document.path);
-      const tags = (input.document.tags ?? []).map((tag) => Tag.create(tag));
+
+      // Extract tags from document content if it's JSON
+      let tags: Tag[] = [];
+      if (documentPath.value.endsWith('.json')) {
+        try {
+          const parsed = JSON.parse(input.document.content);
+          if (parsed.metadata?.tags) {
+            logger.debug('Found tags in metadata:', { tags: parsed.metadata.tags });
+            tags = parsed.metadata.tags.map((tag: string) => {
+              logger.debug('Creating tag:', { tag });
+              return Tag.create(tag);
+            });
+          }
+        } catch (error) {
+          logger.error('Failed to parse document content as JSON:', { error, path: documentPath.value });
+        }
+      }
+
+      // Fallback to provided tags if no tags were found in metadata
+      if (tags.length === 0) {
+        logger.debug('Using provided tags:', { tags: input.document.tags });
+        tags = (input.document.tags ?? []).map((tag) => Tag.create(tag));
+      }
 
       // Check if markdown writes are disabled
-      if (this.disableMarkdownWrites && documentPath.isMarkdown) {
+      if (this.disableMarkdownWrites && documentPath.value.toLowerCase().endsWith('.md')) {
         const jsonPath = documentPath.value.replace(/\.md$/, '.json');
         throw new ApplicationError(
           ApplicationErrorCodes.OPERATION_NOT_ALLOWED,

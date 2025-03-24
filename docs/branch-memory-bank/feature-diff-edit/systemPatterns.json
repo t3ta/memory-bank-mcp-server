@@ -1,0 +1,289 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "18978310-6b8f-4ea4-9bcc-56e359712dd4",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "system-patterns",
+      "json-patch",
+      "design-patterns"
+    ],
+    "lastModified": "2025-03-24T19:25:00.000Z",
+    "createdAt": "2025-03-24T09:55:09.525Z",
+    "version": 3
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "6554529b-81e6-484e-bd59-6da94920ef92",
+        "title": "JSON Patch (RFC 6902)の採用",
+        "context": "メモリバンクのJSONドキュメントに対する部分的な更新機能が必要。更新操作の標準化と互換性の確保が重要。",
+        "decision": "RFC 6902で定義されているJSON Patchを採用し、add/remove/replace/move/copy/testの全操作をサポートする。",
+        "consequences": {
+          "positive": [
+            "標準化された操作セットによる一貫性の確保",
+            "将来の拡張性の確保",
+            "他のツールとの互換性",
+            "明確な仕様に基づく実装の容易さ"
+          ],
+          "negative": [
+            "初期実装の複雑さの増加",
+            "全操作の完全なテストカバレッジの必要性"
+          ]
+        },
+        "status": "accepted",
+        "date": "2025-03-24T11:29:00.000Z",
+        "alternatives": [
+          "カスタム更新操作の定義",
+          "シンプルな置換操作のみのサポート"
+        ]
+      },
+      {
+        "id": "d3c8e1a4-f5b6-47e9-92d1-13c6e2f89a3b",
+        "title": "ValueObjectパターンを活用した実装アプローチ",
+        "context": "JSON Patchの異なるコンポーネント（パス、操作など）を表現するための最適な設計パターンが必要。",
+        "decision": "JsonPath、JsonPatchOperationなどをValueObjectとして実装し、不変性と自己完結性を確保する。",
+        "consequences": {
+          "positive": [
+            "明確な責任分担と単一責任の原則に沿った実装",
+            "堅牢なバリデーションとエラーハンドリング",
+            "テスト容易性の向上",
+            "ドメイン言語としての表現力の向上"
+          ],
+          "negative": [
+            "コード量の増加",
+            "初期実装コストの増大"
+          ]
+        },
+        "status": "accepted",
+        "date": "2025-03-24T16:35:00.000Z",
+        "alternatives": [
+          "単純なオブジェクトリテラルの使用",
+          "サービスベースのアプローチ"
+        ]
+      },
+      {
+        "id": "87f2e9c6-1a3b-4d5e-8f7c-9a0b1c2d3e4f",
+        "title": "エラーハンドリング戦略",
+        "context": "JSON Patch操作は複数のエラーを発生させる可能性があり、明確なエラー報告と処理が必要。",
+        "decision": "専用のエラークラス階層を作成し、詳細なエラーコードとメッセージを提供する。操作失敗時はアトミックな動作を確保。",
+        "consequences": {
+          "positive": [
+            "明確なエラーメッセージによるデバッグと問題解決の容易化",
+            "一貫したエラー処理パターン",
+            "クライアントへの有用なフィードバック"
+          ],
+          "negative": [
+            "エラー処理コードの追加が必要",
+            "エラーケースのテストカバレッジの確保が必要"
+          ]
+        },
+        "status": "accepted",
+        "date": "2025-03-24T16:35:00.000Z",
+        "alternatives": [
+          "一般的なエラーメッセージの使用",
+          "例外を使わないアプローチ"
+        ]
+      },
+      {
+        "id": "2a3b4c5d-6e7f-8g9h-0i1j-2k3l4m5n6o7p",
+        "title": "fast-json-patchライブラリの採用",
+        "context": "JSON Patch実装の効率性と信頼性を確保するため、既存の実装の活用を検討。",
+        "decision": "fast-json-patchライブラリを採用し、アダプターパターンを使用して統合する。",
+        "consequences": {
+          "positive": [
+            "実装コストの大幅削減",
+            "広く使われているライブラリによる信頼性の確保",
+            "性能最適化の恩恵を受けられる",
+            "メンテナンスコストの軽減"
+          ],
+          "negative": [
+            "外部依存関係の追加",
+            "カスタマイズの自由度の制限",
+            "ライブラリのバージョン管理が必要"
+          ]
+        },
+        "status": "accepted",
+        "date": "2025-03-24T19:25:00.000Z",
+        "alternatives": [
+          "完全にカスタム実装を行う",
+          "他のJSON Patchライブラリの検討"
+        ]
+      }
+    ],
+    "implementationPatterns": [
+      {
+        "id": "json-patch-implementation",
+        "name": "JSON Patch実装パターン（fast-json-patchベース）",
+        "description": "fast-json-patchライブラリを活用したRFC 6902準拠のJSON Patch実装",
+        "components": [
+          {
+            "name": "JsonPath",
+            "type": "ValueObject",
+            "responsibility": "JSONパスの解析と検証",
+            "details": {
+              "properties": [
+                {
+                  "name": "path",
+                  "type": "string",
+                  "description": "パス文字列（例: '/a/b/c'）"
+                },
+                {
+                  "name": "segments",
+                  "type": "string[]",
+                  "description": "パスセグメントの配列"
+                }
+              ],
+              "methods": [
+                {
+                  "name": "parse",
+                  "signature": "static parse(path: string): JsonPath",
+                  "description": "パス文字列を解析してJsonPathオブジェクトを生成"
+                },
+                {
+                  "name": "validate",
+                  "signature": "validate(): void",
+                  "description": "パスの妥当性を検証"
+                },
+                {
+                  "name": "toFastJsonPatchPath",
+                  "signature": "toFastJsonPatchPath(): string",
+                  "description": "fast-json-patch形式のパス文字列に変換"
+                }
+              ]
+            }
+          },
+          {
+            "name": "JsonPatchOperation",
+            "type": "ValueObject",
+            "responsibility": "パッチ操作の表現とバリデーション",
+            "details": {
+              "properties": [
+                {
+                  "name": "op",
+                  "type": "string",
+                  "description": "操作タイプ（add/remove/replace/move/copy/test）"
+                },
+                {
+                  "name": "path",
+                  "type": "JsonPath",
+                  "description": "対象のパス"
+                },
+                {
+                  "name": "value",
+                  "type": "any",
+                  "description": "操作に使用する値（操作タイプによって必須または任意）"
+                },
+                {
+                  "name": "from",
+                  "type": "JsonPath",
+                  "description": "移動・コピー元のパス（move/copy操作時に使用）"
+                }
+              ],
+              "methods": [
+                {
+                  "name": "create",
+                  "signature": "static create(op: string, path: string, value?: any, from?: string): JsonPatchOperation",
+                  "description": "パッチ操作オブジェクトを生成"
+                },
+                {
+                  "name": "validate",
+                  "signature": "validate(): void",
+                  "description": "操作の妥当性を検証"
+                },
+                {
+                  "name": "toFastJsonPatchOperation",
+                  "signature": "toFastJsonPatchOperation(): any",
+                  "description": "fast-json-patch形式の操作オブジェクトに変換"
+                }
+              ]
+            }
+          },
+          {
+            "name": "FastJsonPatchAdapter",
+            "type": "Adapter",
+            "responsibility": "fast-json-patchライブラリとの連携",
+            "details": {
+              "methods": [
+                {
+                  "name": "applyPatch",
+                  "signature": "applyPatch(document: any, operations: JsonPatchOperation[]): any",
+                  "description": "fast-json-patchを使用してパッチを適用"
+                },
+                {
+                  "name": "validate",
+                  "signature": "validate(document: any, operations: JsonPatchOperation[]): boolean",
+                  "description": "fast-json-patchを使用してパッチ操作の妥当性を検証"
+                },
+                {
+                  "name": "compare",
+                  "signature": "compare(document1: any, document2: any): JsonPatchOperation[]",
+                  "description": "2つのドキュメント間の差分をパッチ操作として取得"
+                }
+              ]
+            }
+          },
+          {
+            "name": "JsonPatchService",
+            "type": "Interface",
+            "responsibility": "パッチ操作適用のインターフェース定義",
+            "details": {
+              "methods": [
+                {
+                  "name": "apply",
+                  "signature": "apply(document: any, operations: JsonPatchOperation[]): any",
+                  "description": "ドキュメントにパッチ操作を適用"
+                },
+                {
+                  "name": "validate",
+                  "signature": "validate(document: any, operations: JsonPatchOperation[]): boolean",
+                  "description": "パッチ操作の妥当性を検証"
+                },
+                {
+                  "name": "generatePatch",
+                  "signature": "generatePatch(source: any, target: any): JsonPatchOperation[]",
+                  "description": "2つのドキュメント間のパッチ操作を生成"
+                }
+              ]
+            }
+          },
+          {
+            "name": "JsonPatchUseCase",
+            "type": "UseCase",
+            "responsibility": "ユースケースレベルでの操作のハンドリング",
+            "details": {
+              "methods": [
+                {
+                  "name": "execute",
+                  "signature": "execute(documentId: string, operations: JsonPatchOperation[]): Document",
+                  "description": "特定のドキュメントに対してパッチ操作を実行"
+                }
+              ],
+              "dependencies": [
+                "JsonPatchService",
+                "DocumentRepository"
+              ]
+            }
+          }
+        ],
+        "workflow": [
+          "1. JsonPathによるパス解析と検証",
+          "2. JsonPatchOperationによる操作のバリデーション",
+          "3. FastJsonPatchAdapterを通じて操作をfast-json-patchライブラリ形式に変換",
+          "4. ライブラリによる操作の適用",
+          "5. 結果の検証と返却"
+        ],
+        "dependencies": [
+          {
+            "name": "fast-json-patch",
+            "version": "^3.1.0",
+            "license": "MIT",
+            "repository": "https://github.com/Starcounter-Jack/JSON-Patch"
+          }
+        ]
+      }
+    ]
+  }
+}

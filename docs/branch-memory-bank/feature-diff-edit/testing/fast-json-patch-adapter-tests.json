@@ -1,0 +1,376 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+    "title": "FastJsonPatchAdapter クラスのテストケース",
+    "documentType": "test_specification",
+    "path": "testing/fast-json-patch-adapter-tests.json",
+    "tags": [
+      "json-patch",
+      "testing",
+      "tdd",
+      "adapter-pattern",
+      "fast-json-patch"
+    ],
+    "lastModified": "2025-03-24T19:40:00.000Z",
+    "createdAt": "2025-03-24T19:40:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "description": "fast-json-patchライブラリと統合するためのアダプタークラスのテストケース仕様",
+    "classUnderTest": "FastJsonPatchAdapter",
+    "responsibility": "ドメインモデル（JsonPath、JsonPatchOperation）とfast-json-patchライブラリ間の変換と連携",
+    "testCategories": [
+      {
+        "name": "アダプター基本機能",
+        "description": "FastJsonPatchAdapterの基本的な初期化と機能テスト",
+        "testCases": [
+          {
+            "id": "fjpa-basic-01",
+            "name": "アダプターが正しく初期化される",
+            "assertions": [
+              "new FastJsonPatchAdapter()はエラーなく実行される",
+              "インスタンスはapplyPatch()、validate()、compareDocuments()などのメソッドを持つ"
+            ]
+          },
+          {
+            "id": "fjpa-basic-02",
+            "name": "アダプターがJsonPatchServiceインターフェースを実装している",
+            "assertions": [
+              "FastJsonPatchAdapterのインスタンスがJsonPatchServiceのインスタンスである",
+              "必要なすべてのメソッドが実装されている"
+            ]
+          },
+          {
+            "id": "fjpa-basic-03",
+            "name": "ライブラリを適切にインポートして利用している",
+            "assertions": [
+              "fast-json-patchのメソッドにアクセスできる",
+              "ライブラリのバージョン互換性が確認できる"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "操作変換機能",
+        "description": "ドメイン操作からfast-json-patch形式への変換に関するテスト",
+        "testCases": [
+          {
+            "id": "fjpa-convert-01",
+            "name": "JsonPatchOperationからfast-json-patch操作への変換が正しく行われる",
+            "setup": [
+              "const adapter = new FastJsonPatchAdapter()",
+              "const operation = JsonPatchOperation.create('add', '/a', 1)"
+            ],
+            "assertions": [
+              "adapter.convertOperation(operation)は{ op: 'add', path: '/a', value: 1 }を返す"
+            ]
+          },
+          {
+            "id": "fjpa-convert-02",
+            "name": "複数の操作の変換が正しく行われる",
+            "setup": [
+              "const adapter = new FastJsonPatchAdapter()",
+              "const operations = [",
+              "  JsonPatchOperation.create('add', '/a', 1),",
+              "  JsonPatchOperation.create('remove', '/b')",
+              "]"
+            ],
+            "assertions": [
+              "adapter.convertOperations(operations)は[{ op: 'add', path: '/a', value: 1 }, { op: 'remove', path: '/b' }]を返す"
+            ]
+          },
+          {
+            "id": "fjpa-convert-03",
+            "name": "from属性を持つ操作の変換が正しく行われる",
+            "setup": [
+              "const adapter = new FastJsonPatchAdapter()",
+              "const operation = JsonPatchOperation.create('move', '/b', undefined, '/a')"
+            ],
+            "assertions": [
+              "adapter.convertOperation(operation)は{ op: 'move', path: '/b', from: '/a' }を返す"
+            ]
+          },
+          {
+            "id": "fjpa-convert-04",
+            "name": "fast-json-patchの操作からJsonPatchOperationへの変換が正しく行われる",
+            "setup": [
+              "const adapter = new FastJsonPatchAdapter()",
+              "const fjpOperation = { op: 'add', path: '/a', value: 1 }"
+            ],
+            "assertions": [
+              "adapter.convertFromLibraryOperation(fjpOperation)はop='add'、path='/a'、value=1のJsonPatchOperationを返す"
+            ]
+          },
+          {
+            "id": "fjpa-convert-05",
+            "name": "複雑な値を持つ操作の変換が正しく行われる",
+            "setup": [
+              "const adapter = new FastJsonPatchAdapter()",
+              "const operation = JsonPatchOperation.create('add', '/a', { b: [1, 2, { c: 3 }] })"
+            ],
+            "assertions": [
+              "adapter.convertOperation(operation)は{ op: 'add', path: '/a', value: { b: [1, 2, { c: 3 }] } }を返す"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "パッチ適用機能",
+        "description": "fast-json-patchを使用したパッチ適用のテスト",
+        "testCases": [
+          {
+            "id": "fjpa-apply-01",
+            "name": "基本的なパッチ適用が正しく機能する",
+            "setup": [
+              "const adapter = new FastJsonPatchAdapter()",
+              "const doc = { a: 1 }",
+              "const operations = [JsonPatchOperation.create('add', '/b', 2)]"
+            ],
+            "assertions": [
+              "adapter.applyPatch(doc, operations)は{ a: 1, b: 2 }を返す"
+            ]
+          },
+          {
+            "id": "fjpa-apply-02",
+            "name": "複数の操作の適用が正しく機能する",
+            "setup": [
+              "const adapter = new FastJsonPatchAdapter()",
+              "const doc = { a: 1 }",
+              "const operations = [",
+              "  JsonPatchOperation.create('add', '/b', 2),",
+              "  JsonPatchOperation.create('remove', '/a')",
+              "]"
+            ],
+            "assertions": [
+              "adapter.applyPatch(doc, operations)は{ b: 2 }を返す"
+            ]
+          },
+          {
+            "id": "fjpa-apply-03",
+            "name": "元のドキュメントが変更されないことを確認",
+            "setup": [
+              "const adapter = new FastJsonPatchAdapter()",
+              "const doc = { a: 1 }",
+              "const operations = [JsonPatchOperation.create('add', '/b', 2)]"
+            ],
+            "assertions": [
+              "adapter.applyPatch(doc, operations)を呼び出した後、docは{ a: 1 }のままで変更されていない"
+            ]
+          },
+          {
+            "id": "fjpa-apply-04",
+            "name": "エラーが発生する操作のハンドリング",
+            "setup": [
+              "const adapter = new FastJsonPatchAdapter()",
+              "const doc = { a: 1 }",
+              "const operations = [JsonPatchOperation.create('remove', '/b')]"
+            ],
+            "assertions": [
+              "adapter.applyPatch(doc, operations)を呼び出すと例外が発生する",
+              "例外はPathNotFoundErrorなどのドメイン固有の例外に変換される"
+            ]
+          },
+          {
+            "id": "fjpa-apply-05",
+            "name": "ライブラリのオプション設定が正しく機能する",
+            "setup": [
+              "const adapter = new FastJsonPatchAdapter({ mutateDocument: false, validateOperation: true })",
+              "const doc = { a: 1 }",
+              "const operations = [JsonPatchOperation.create('add', '/b', 2)]"
+            ],
+            "assertions": [
+              "adapter.applyPatch(doc, operations)は{ a: 1, b: 2 }を返す",
+              "docは変更されていない"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "バリデーション機能",
+        "description": "fast-json-patchを使用した操作バリデーションのテスト",
+        "testCases": [
+          {
+            "id": "fjpa-validate-01",
+            "name": "有効な操作のバリデーションが成功する",
+            "setup": [
+              "const adapter = new FastJsonPatchAdapter()",
+              "const doc = { a: 1 }",
+              "const operations = [JsonPatchOperation.create('add', '/b', 2)]"
+            ],
+            "assertions": [
+              "adapter.validate(doc, operations)はtrueを返す"
+            ]
+          },
+          {
+            "id": "fjpa-validate-02",
+            "name": "無効な操作のバリデーションが失敗する",
+            "setup": [
+              "const adapter = new FastJsonPatchAdapter()",
+              "const doc = { a: 1 }",
+              "const operations = [JsonPatchOperation.create('remove', '/b')]"
+            ],
+            "assertions": [
+              "adapter.validate(doc, operations)はfalseを返す",
+              "またはエラー情報を含むオブジェクトを返す"
+            ]
+          },
+          {
+            "id": "fjpa-validate-03",
+            "name": "バリデーションエラー情報の取得",
+            "setup": [
+              "const adapter = new FastJsonPatchAdapter()",
+              "const doc = { a: 1 }",
+              "const operations = [JsonPatchOperation.create('remove', '/b')]"
+            ],
+            "assertions": [
+              "adapter.validateWithErrors(doc, operations)は操作の問題点を示すエラー情報を返す"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ドキュメント比較機能",
+        "description": "fast-json-patchを使用したドキュメント比較とパッチ生成のテスト",
+        "testCases": [
+          {
+            "id": "fjpa-compare-01",
+            "name": "2つのドキュメント間の差分をパッチ操作として取得する",
+            "setup": [
+              "const adapter = new FastJsonPatchAdapter()",
+              "const doc1 = { a: 1 }",
+              "const doc2 = { a: 1, b: 2 }"
+            ],
+            "assertions": [
+              "adapter.compareDocuments(doc1, doc2)はadd操作を含むJsonPatchOperation配列を返す"
+            ]
+          },
+          {
+            "id": "fjpa-compare-02",
+            "name": "複数の差分を持つドキュメントの比較",
+            "setup": [
+              "const adapter = new FastJsonPatchAdapter()",
+              "const doc1 = { a: 1, b: 2, c: 3 }",
+              "const doc2 = { a: 99, d: 4 }"
+            ],
+            "assertions": [
+              "adapter.compareDocuments(doc1, doc2)は複数のJsonPatchOperation（replace, remove, add）を返す"
+            ]
+          },
+          {
+            "id": "fjpa-compare-03",
+            "name": "生成されたパッチを適用すると元のドキュメントが変換される",
+            "setup": [
+              "const adapter = new FastJsonPatchAdapter()",
+              "const doc1 = { a: 1, b: 2 }",
+              "const doc2 = { a: 1, c: 3 }"
+            ],
+            "assertions": [
+              "const operations = adapter.compareDocuments(doc1, doc2)",
+              "adapter.applyPatch(doc1, operations)はdoc2と同等のオブジェクトを返す"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "エラー処理",
+        "description": "fast-json-patchのエラーをドメイン固有のエラーに変換する機能のテスト",
+        "testCases": [
+          {
+            "id": "fjpa-error-01",
+            "name": "パス不在エラーが適切なドメインエラーに変換される",
+            "setup": [
+              "const adapter = new FastJsonPatchAdapter()",
+              "const doc = { a: 1 }",
+              "const operations = [JsonPatchOperation.create('remove', '/b')]"
+            ],
+            "assertions": [
+              "adapter.applyPatch(doc, operations)を呼び出すと例外が発生する",
+              "例外はPathNotFoundError型である"
+            ]
+          },
+          {
+            "id": "fjpa-error-02",
+            "name": "テスト失敗エラーが適切なドメインエラーに変換される",
+            "setup": [
+              "const adapter = new FastJsonPatchAdapter()",
+              "const doc = { a: 1 }",
+              "const operations = [JsonPatchOperation.create('test', '/a', 2)]"
+            ],
+            "assertions": [
+              "adapter.applyPatch(doc, operations)を呼び出すと例外が発生する",
+              "例外はTestFailedError型である"
+            ]
+          },
+          {
+            "id": "fjpa-error-03",
+            "name": "不正な操作エラーが適切なドメインエラーに変換される",
+            "setup": [
+              "const adapter = new FastJsonPatchAdapter()",
+              "const invalidOp = { op: 'invalid', path: '/a' }"
+            ],
+            "assertions": [
+              "adapter.convertFromLibraryOperation(invalidOp)を呼び出すと例外が発生する",
+              "例外はInvalidOperationError型である"
+            ]
+          },
+          {
+            "id": "fjpa-error-04",
+            "name": "エラーコンテキスト情報が保持される",
+            "setup": [
+              "const adapter = new FastJsonPatchAdapter()",
+              "const doc = { a: 1 }",
+              "const operations = [JsonPatchOperation.create('test', '/a', 2)]"
+            ],
+            "assertions": [
+              "adapter.applyPatch(doc, operations)を呼び出すと例外が発生する",
+              "例外はエラーの発生した操作やパスなどのコンテキスト情報を含む"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "JsonPatchServiceインターフェース互換性",
+        "description": "JsonPatchServiceインターフェースとの互換性テスト",
+        "testCases": [
+          {
+            "id": "fjpa-compat-01",
+            "name": "apply()メソッドがインターフェース仕様に準拠している",
+            "setup": [
+              "const service: JsonPatchService = new FastJsonPatchAdapter()",
+              "const doc = { a: 1 }",
+              "const operations = [JsonPatchOperation.create('add', '/b', 2)]"
+            ],
+            "assertions": [
+              "service.apply(doc, operations)は{ a: 1, b: 2 }を返す"
+            ]
+          },
+          {
+            "id": "fjpa-compat-02",
+            "name": "validate()メソッドがインターフェース仕様に準拠している",
+            "setup": [
+              "const service: JsonPatchService = new FastJsonPatchAdapter()",
+              "const doc = { a: 1 }",
+              "const operations = [JsonPatchOperation.create('add', '/b', 2)]"
+            ],
+            "assertions": [
+              "service.validate(doc, operations)はtrueを返す"
+            ]
+          },
+          {
+            "id": "fjpa-compat-03",
+            "name": "generatePatch()メソッドがインターフェース仕様に準拠している",
+            "setup": [
+              "const service: JsonPatchService = new FastJsonPatchAdapter()",
+              "const doc1 = { a: 1 }",
+              "const doc2 = { a: 1, b: 2 }"
+            ],
+            "assertions": [
+              "service.generatePatch(doc1, doc2)はJsonPatchOperation配列を返す"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

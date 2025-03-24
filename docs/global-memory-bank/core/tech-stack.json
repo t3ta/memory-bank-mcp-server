@@ -1,0 +1,57 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "core-tech-stack",
+    "title": "技術スタック",
+    "documentType": "core",
+    "path": "core/tech-stack.json",
+    "tags": [
+      "tech-stack",
+      "infrastructure",
+      "core"
+    ],
+    "lastModified": "2025-03-22T02:30:20.000Z",
+    "createdAt": "2025-03-21T08:40:50.132Z",
+    "version": 2
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "概要",
+        "content": "このドキュメントでは、Memory Bank MCPサーバーで使用されている主要な技術スタックについて説明します。詳細な情報は `01-project/tech-stack.json` を参照してください。"
+      },
+      {
+        "title": "コア技術",
+        "content": "- **言語**: TypeScript\n- **ランタイム**: Node.js (LTS)\n- **パッケージマネージャ**: yarn\n- **バンドラー**: webpack\n- **トランスパイラ**: tsc (TypeScript Compiler)\n- **モジュールシステム**: ESM (ECMAScript Modules)"
+      },
+      {
+        "title": "バックエンド技術",
+        "content": "- **フレームワーク**: Express.js\n- **テスト**: Jest, Supertest\n- **データベース**: ファイルシステムベース (JSON)\n- **認証**: JWT (JSON Web Tokens)\n- **ロギング**: Winston\n- **API文書**: OpenAPI (Swagger)\n- **バリデーション**: Joi, Zod"
+      },
+      {
+        "title": "フロントエンド技術",
+        "content": "- **ライブラリ**: React\n- **状態管理**: Redux Toolkit\n- **スタイリング**: Tailwind CSS\n- **UI/UXフレームワーク**: Shadcn UI\n- **クライアントAPI**: Axios\n- **フォーム**: React Hook Form\n- **テスト**: React Testing Library, Cypress"
+      },
+      {
+        "title": "インフラストラクチャ",
+        "content": "- **バージョン管理**: Git\n- **CI/CD**: GitHub Actions\n- **コンテナ化**: Docker\n- **デプロイ**: Docker Compose / Kubernetes\n- **モニタリング**: Prometheus + Grafana\n- **クラウド**: AWS (Amazon Web Services)\n- **セキュリティスキャン**: Snyk, OWASP"
+      },
+      {
+        "title": "開発ツール",
+        "content": "- **IDE**: VS Code (推奨)\n- **リンター**: ESLint\n- **フォーマッター**: Prettier\n- **コミット規約**: Conventional Commits\n- **ドキュメント**: JSDoc + TypeDoc\n- **プレコミットフック**: Husky\n- **依存性管理**: Renovate"
+      },
+      {
+        "title": "アーキテクチャ関連",
+        "content": "- **設計手法**: クリーンアーキテクチャ\n- **パターン**: リポジトリパターン、ファクトリーパターン\n- **依存性注入**: InversifyJS\n- **エラーハンドリング**: 例外ベースのエラー処理\n- **非同期処理**: async/await パターン"
+      },
+      {
+        "title": "バージョン情報",
+        "content": "- **Node.js**: 18.x LTS以上\n- **TypeScript**: 5.0以上\n- **Express**: 4.18.x\n- **Jest**: 29.x\n- **React**: 18.x\n\n詳細なバージョン情報とアップデート履歴については、package.jsonとyarn.lockファイルを参照してください。"
+      },
+      {
+        "title": "関連ドキュメント",
+        "content": "- [詳細な技術スタック](../01-project/tech-stack.json)\n- [インフラストラクチャ情報](../07-infrastructure/README.json)"
+      }
+    ]
+  }
+}

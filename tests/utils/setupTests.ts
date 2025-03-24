@@ -1,3 +1,5 @@
+// @ts-nocheck
+// This file was automatically converted from ts-mockito to jest.fn()
 // FileSystemRetryUtils モックも追加
 jest.mock('../../src/infrastructure/repositories/file-system/FileSystemRetryUtils.js', () => ({
   withFileSystemRetry: (operationName, fn) => fn(),
@@ -11,7 +13,7 @@ jest.mock('../../src/infrastructure/repositories/file-system/FileSystemRetryUtil
 
 // ESM-specific setup
 import { jest } from '@jest/globals';
-import { reset } from 'ts-mockito';
+// ts-mockito import removed;
 
 // Logger モックをグローバルに定義
 jest.mock('../../src/shared/utils/logger.js', () => ({
@@ -20,7 +22,15 @@ jest.mock('../../src/shared/utils/logger.js', () => ({
     debug: jest.fn(),
     warn: jest.fn(),
     error: jest.fn(),
+    setLevel: jest.fn(),
   },
+  createConsoleLogger: jest.fn().mockReturnValue({
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+    setLevel: jest.fn(),
+  }),
 }), { virtual: true });
 
 // Silence console logs during tests
@@ -41,9 +51,8 @@ process.env.TZ = 'UTC';
 
 // In ESM mode, we need to use beforeEach from Jest globals explicitly
 beforeEach(() => {
-  // Clear mocks and reset ts-mockito
+  // Clear mocks (ts-mockito reset removed)
   jest.clearAllMocks();
-  reset(); // ts-mockitoのモックをキレイにリセットするんだから！
 
   // Add any other setup logic here
 });

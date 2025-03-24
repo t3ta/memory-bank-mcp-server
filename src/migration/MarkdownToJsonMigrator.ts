@@ -162,7 +162,7 @@ export class MarkdownToJsonMigrator {
           const relativePath = path.relative(directory, file);
           const documentPath = DocumentPath.create(relativePath);
 
-          // Manually check if file is markdown (not using isMarkdown method to avoid console.log)
+          // Manually check if file is markdown (not using isMarkdown method to keep the code clean)
           const isMarkdownFile = documentPath.extension.toLowerCase() === 'md';
 
           // Skip non-markdown files

@@ -1,5 +1,7 @@
 import type { Argv } from "yargs";
 import { MigrateCommand } from "./MigrateCommand.js";
+import { TemplatesMigrateCommand } from "./TemplatesMigrateCommand.js";
+import { GenerateMarkdownCommand } from "./GenerateMarkdownCommand.js";
 
 /**
  * Register all migration-related commands with yargs
@@ -7,5 +9,8 @@ import { MigrateCommand } from "./MigrateCommand.js";
  * @returns Configured yargs instance with migration commands registered
  */
 export function registerMigrationCommands(yargs: Argv): Argv {
-  return yargs.command(MigrateCommand);
+  return yargs
+    .command(MigrateCommand)
+    .command(TemplatesMigrateCommand)
+    .command(GenerateMarkdownCommand);
 }

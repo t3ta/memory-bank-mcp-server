@@ -3,7 +3,8 @@
  */
 export class DIContainer {
   private readonly services: Map<string, any> = new Map();
-  private readonly factories: Map<string, () => any> = new Map();
+  private readonly factories: Map<string, (() => any) | (() => Promise<any>)> = new Map();
+  private readonly asyncFactories: Set<string> = new Set();
 
   /**
    * Register a service instance
@@ -19,16 +20,21 @@ export class DIContainer {
    * @param name Service name
    * @param factory Factory function
    */
-  registerFactory<T>(name: string, factory: () => T): void {
+  registerFactory<T>(name: string, factory: () => T): void;
+  registerFactory<T>(name: string, factory: () => Promise<T>): void;
+  registerFactory<T>(name: string, factory: (() => T) | (() => Promise<T>)): void {
     this.factories.set(name, factory);
+    if (factory.constructor.name === 'AsyncFunction') {
+      this.asyncFactories.add(name);
+    }
   }
 
   /**
    * Get a service by name
    * @param name Service name
-   * @returns Service instance
+   * @returns Service instance or Promise of service instance
    */
-  get<T>(name: string): T {
+  get<T>(name: string): T | Promise<T> {
     // Check if service is already created
     if (this.services.has(name)) {
       return this.services.get(name) as T;
@@ -37,11 +43,19 @@ export class DIContainer {
     // Check if factory exists
     if (this.factories.has(name)) {
       const factory = this.factories.get(name)!;
+
+      // Handle async factory
+      if (this.asyncFactories.has(name)) {
+        return (async () => {
+          const instance = await factory();
+          this.services.set(name, instance);
+          return instance as T;
+        })();
+      }
+
+      // Handle sync factory
       const instance = factory();
-
-      // Cache the instance
       this.services.set(name, instance);
-
       return instance as T;
     }
 

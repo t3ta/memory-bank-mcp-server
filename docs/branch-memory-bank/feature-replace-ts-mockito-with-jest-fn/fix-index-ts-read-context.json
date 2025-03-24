@@ -1,0 +1,44 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "fix-index-ts-read-context-20250324",
+    "title": "src/index.tsのread_contextケース修正",
+    "documentType": "technical_note",
+    "path": "fix-index-ts-read-context.json",
+    "tags": [
+      "bugfix",
+      "json",
+      "mcp-server"
+    ],
+    "lastModified": "2025-03-24T15:35:00.000Z",
+    "createdAt": "2025-03-24T15:35:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "summary": "src/index.tsファイル内のread_contextケースの実装を修正し、より明示的な構造でレスポンスを返すようにしました。これによりMCPプロトコルとの互換性が向上し、標準出力のJSON形式が正確に保たれるようになります。",
+    "problem": {
+      "description": "read_contextケースでは、response.dataオブジェクトをJSON.stringify()で文字列化して返していましたが、このデータ構造が必ずしも最適な形式になっていない可能性がありました。これにより標準出力に不正なJSON形式のデータが混入し、MCPプロトコルが破損する問題が発生していました。",
+      "impact": "MCPサーバーがクライアントと通信できなくなり、「Unexpected token 'D'」などのエラーが発生していました。"
+    },
+    "solution": {
+      "approach": "response.dataから明示的に必要なプロパティ（rules, branchMemory, globalMemory）を抽出し、新しいformattedResponseオブジェクトを構築する方法に変更しました。",
+      "code": {
+        "before": "return {\n  content: [\n    {\n      type: 'text',\n      text: JSON.stringify(response.data, null, 2),\n    },\n  ],\n};",
+        "after": "// Format the response data properly for MCP protocol\n// We need to ensure it's valid JSON for the client to parse\nconst formattedResponse = {\n  rules: response.data.rules,\n  branchMemory: response.data.branchMemory,\n  globalMemory: response.data.globalMemory\n};\n\nreturn {\n  content: [\n    {\n      type: 'text',\n      text: JSON.stringify(formattedResponse, null, 2),\n    },\n  ],\n};"
+      },
+      "rationale": "明示的にオブジェクト構造を定義することで、返されるJSONの形式を制御し、不正なデータが混入するリスクを減らします。また、コードがより自己文書化され、将来の開発者が簡単に理解できるようになります。"
+    },
+    "testing": {
+      "approach": "サーバーを起動して、read_context呼び出しが適切に動作することを確認します。特に標準出力に不正なJSONが混入しないことを確認します。",
+      "criteria": [
+        "read_context呼び出しが成功する",
+        "クライアントが正しく応答を解析できる",
+        "エラーログにJSON関連のエラーが表示されない"
+      ]
+    },
+    "relatedChanges": {
+      "otherCases": "同様の問題が他のケースにも存在する可能性があるため、全体的なレビューを推奨します。特に複雑なオブジェクト構造を返すケースがあれば注意が必要です。",
+      "logging": "ログ出力設定の見直しも検討する価値があります。デバッグログが標準出力に混入する可能性があるため、本番環境では適切なログレベルに設定する必要があります。"
+    }
+  }
+}

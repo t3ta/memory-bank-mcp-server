@@ -1,0 +1,130 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "json-patch-implementation-plan",
+    "title": "JSON Patchメモリバンク関数の実装計画",
+    "documentType": "design",
+    "path": "json-patch-implementation-plan.json",
+    "tags": [
+      "json-patch",
+      "design",
+      "memory-bank",
+      "implementation",
+      "plan"
+    ],
+    "lastModified": "2025-03-24T22:25:00.000Z",
+    "createdAt": "2025-03-24T22:25:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "summary": "write_branch_memory_bank と write_global_memory_bank 関数にJSON Patch機能を追加する計画",
+    "preparatoryWork": [
+      {
+        "step": "新しいDIコンテナ設定を確認",
+        "description": "JsonPatchUseCaseが適切にDIコンテナに登録されているか確認する",
+        "details": "createApplication関数やinversify.config.tsを確認して、必要なDI設定があるか確認"
+      },
+      {
+        "step": "ApplicationインターフェースにPatchサポートがあるか確認",
+        "description": "ApplicationクラスがJsonPatchUseCaseにアクセスできる方法を確認",
+        "details": "getJsonPatchUseCase()メソッドの有無、または他の方法でUseCaseにアクセスする方法"
+      }
+    ],
+    "implementationSteps": [
+      {
+        "step": 1,
+        "file": "/Users/t3ta/workspace/memory-bank-mcp-server/src/index.ts",
+        "changes": [
+          {
+            "component": "AVAILABLE_TOOLS - write_branch_memory_bank",
+            "description": "inputSchemaにpatches配列プロパティを追加",
+            "details": "patchesは操作の配列として定義し、各操作はRFC 6902に準拠したプロパティ（op, path, value, from）を持つ"
+          },
+          {
+            "component": "AVAILABLE_TOOLS - write_global_memory_bank",
+            "description": "同様にinputSchemaにpatches配列プロパティを追加",
+            "details": "write_branch_memory_bankと同じプロパティ構造"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "file": "/Users/t3ta/workspace/memory-bank-mcp-server/src/index.ts",
+        "changes": [
+          {
+            "component": "write_branch_memory_bank ハンドラー関数",
+            "description": "patches配列パラメータを取得・検証する処理を追加",
+            "details": [
+              "パラメータのpatchesをチェック",
+              "contentとpatchesが両方ある場合のエラー処理",
+              "patchesがある場合の分岐ロジック"
+            ]
+          },
+          {
+            "component": "write_branch_memory_bank パッチ適用ロジック",
+            "description": "既存ドキュメントを取得してパッチを適用するロジック",
+            "details": [
+              "patchesをJsonPatchOperation[]に変換",
+              "既存ドキュメントの読み取り処理",
+              "JsonPatchUseCaseを使用したパッチの適用",
+              "結果の保存と返却"
+            ]
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "file": "/Users/t3ta/workspace/memory-bank-mcp-server/src/index.ts",
+        "changes": [
+          {
+            "component": "write_global_memory_bank ハンドラー関数",
+            "description": "write_branch_memory_bankと同様のパッチ適用ロジックを追加",
+            "details": [
+              "ブランチの有無以外はwrite_branch_memory_bankと基本的に同じ処理",
+              "globalApp.getGlobalController()を使用した処理"
+            ]
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "file": "/Users/t3ta/workspace/memory-bank-mcp-server/src/index.ts",
+        "changes": [
+          {
+            "component": "エラーハンドリングの強化",
+            "description": "パッチ処理特有のエラー処理を追加",
+            "details": [
+              "DomainErrorのエラーコードに応じたエラーメッセージの生成",
+              "操作のどこで失敗したかをわかりやすく示す情報の追加"
+            ]
+          }
+        ]
+      }
+    ],
+    "DISetup": {
+      "description": "DIコンテナの設定が必要な場合の対応",
+      "options": [
+        {
+          "scenario": "JsonPatchUseCaseが既にDIコンテナに登録済み",
+          "action": "既存のDI設定を使用",
+          "access": "app.getJsonPatchUseCase() または類似メソッドで取得"
+        },
+        {
+          "scenario": "JsonPatchUseCaseがDIコンテナに未登録",
+          "action": "その場でインスタンス化する必要がある",
+          "implementation": [
+            "必要なリポジトリをapp.getXXXRepository()で取得",
+            "FastJsonPatchAdapterを新規作成",
+            "JsonPatchUseCaseを手動で初期化"
+          ]
+        }
+      ]
+    },
+    "technicalNotes": [
+      "index.tsファイルには既に多くのコードがあるため、コードの可読性を維持する必要がある",
+      "実装時には既存のwrire_branch_memory_bank/write_global_memory_bank関数のフローを維持しつつ、パッチ処理を統合する",
+      "エラーハンドリングとロギングを強化して、問題の診断が容易になるようにする",
+      "パッチ操作のバリデーションはJSONスキーマだけでなく、ランタイムでも行う必要がある"
+    ]
+  }
+}

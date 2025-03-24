@@ -1,0 +1,30 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "system-patterns",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "core",
+      "system-patterns"
+    ],
+    "lastModified": "2025-03-22T09:18:15.000Z",
+    "createdAt": "2025-03-22T08:36:19.040Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "id": "technicalDecisions",
+        "title": "技術的決定事項",
+        "content": "# 新テンプレートシステムのアーキテクチャ\n\n## ドメインモデル設計\n\n### コンテキスト\nテンプレートシステムの改善とマークダウンからJSONへの移行に伴い、明確なドメインモデルが必要。\n\n### 決定事項\n以下のドメインモデルを採用する：\n\n1. **Language**: 言語を表現するバリューオブジェクト\n   - `code`: 言語コード（'en', 'ja', 'zh'）\n\n2. **Translation**: 翻訳テキストを表現するバリューオブジェクト\n   - `language`: 言語\n   - `key`: 翻訳キー\n   - `text`: 翻訳テキスト\n\n3. **Section**: テンプレートのセクションを表現するバリューオブジェクト\n   - `id`: セクションID\n   - `titleMap`: 言語コードとタイトルのマップ\n   - `contentMap`: 言語コードとコンテンツのマップ\n   - `isOptional`: セクションが省略可能かどうか\n\n4. **Template**: テンプレート全体を表現するエンティティ\n   - `id`: テンプレートID\n   - `type`: テンプレートタイプ\n   - `nameMap`: 言語コードと名前のマップ\n   - `sections`: セクションの配列\n\n### 影響\n- ドメインモデルが明確になり、型安全性が向上\n- 多言語対応が容易になる\n- テンプレートの構造が統一され、操作がシンプルになる\n\n## リポジトリパターン\n\n### コンテキスト\nドメインモデルへのアクセスとデータの永続化を管理する必要がある。\n\n### 決定事項\nリポジトリパターンを採用し、以下のインターフェースを導入：\n\n1. **II18nRepository**: 翻訳の管理\n   - `getTranslation(key, language)`: 特定のキーと言語の翻訳を取得\n   - `getTranslationsForKey(key)`: キーに対するすべての言語の翻訳を取得\n   - `getTranslationsForLanguage(language)`: 言語に対するすべての翻訳を取得\n   - `saveTranslation(translation)`: 翻訳を保存\n   - `hasTranslation(key, language)`: 翻訳が存在するか確認\n   - `getAllKeys()`: すべての翻訳キーを取得\n   - `getSupportedLanguages()`: サポートされている言語を取得\n\n2. **ITemplateRepository**: テンプレートの管理\n   - `getTemplate(id)`: IDによるテンプレート取得\n   - `getTemplateAsMarkdown(id, language, variables)`: テンプレートをマークダウンとして取得（後方互換性用）\n   - `getTemplatesByType(type)`: タイプによるテンプレート一覧取得\n   - `saveTemplate(template)`: テンプレートの保存\n   - `templateExists(id)`: テンプレートの存在確認\n   - `getAllTemplateIds()`: すべてのテンプレートIDを取得\n   - `getAllTemplateTypes()`: すべてのテンプレートタイプを取得\n\n### 影響\n- ドメインとインフラの関心事が分離される\n- テスト容易性が向上する\n- 実装の詳細が抽象化され、将来的な変更が容易になる\n\n## ファイルストレージ実装\n\n### コンテキスト\nリポジトリの実装方法を決定する必要がある。\n\n### 決定事項\nJSON形式のファイルを使用した実装を採用：\n\n1. **FileI18nRepository**: JSONファイルを使用した翻訳リポジトリ\n   - 各言語ごとに1つのJSONファイル\n   - キャッシュ機構を導入してパフォーマンスを最適化\n\n2. **FileTemplateRepository**: JSONファイルを使用したテンプレートリポジトリ\n   - テンプレートごとに1つのJSONファイル\n   - キャッシュ機構を導入してパフォーマンスを最適化\n\n### 影響\n- 単純なファイルベースのストレージで実装が容易\n- JSONの構造化データにより型安全性が向上\n- メモリキャッシュによるパフォーマンス最適化"
+      },
+      {
+        "id": "directoryStructure",
+        "title": "ディレクトリ構造",
+        "content": "# プロジェクト構造\n\n```\n/src\n  /domain\n    /i18n\n      - Language.ts       # 言語バリューオブジェクト\n      - Translation.ts    # 翻訳バリューオブジェクト\n      - II18nRepository.ts # 翻訳リポジトリインターフェース\n    /templates\n      - Template.ts       # テンプレートエンティティ\n      - Section.ts        # セクションバリューオブジェクト\n      - ITemplateRepository.ts # テンプレートリポジトリインターフェース\n      /defaults           # デフォルトテンプレート定義\n  \n  /application\n    /i18n\n      - I18nService.ts    # 翻訳サービス\n  \n  /infrastructure\n    /i18n\n      - FileI18nRepository.ts # ファイルベース翻訳リポジトリ実装\n    /templates\n      - FileTemplateRepository.ts # ファイルベーステンプレートリポジトリ実装\n  \n  /migration\n    - MarkdownMigrationService.ts # マークダウンからJSONへの移行サービス\n  \n  /cli\n    /commands\n      - migrate-templates.ts # 移行コマンド実装\n\n  /shared\n    /utils\n      /json-to-markdown     # JSON→Markdown変換（後方互換性用）\n        - JsonToMarkdownConverter.ts # 変換ユーティリティ\n        ...\n```\n\n# ファイル構造\n\n## 翻訳ファイル (JSON)\n```json\n{\n  \"language\": \"en\",\n  \"translations\": {\n    \"template.title.rules\": \"Memory Bank Rules\",\n    \"template.section.global_memory_bank\": \"Global Memory Bank\",\n    ...\n  },\n  \"lastModified\": \"2025-03-22T00:00:00Z\"\n}\n```\n\n## テンプレートファイル (JSON)\n```json\n{\n  \"id\": \"rules\",\n  \"type\": \"system\",\n  \"names\": {\n    \"en\": \"Memory Bank Rules\",\n    \"ja\": \"メモリーバンクのルール\"\n  },\n  \"sections\": [\n    {\n      \"id\": \"globalMemoryBank\",\n      \"titles\": {\n        \"en\": \"Global Memory Bank\",\n        \"ja\": \"グローバルメモリーバンク\"\n      },\n      \"contents\": {\n        \"en\": \"Project-wide common knowledge is managed as a 'Global Memory Bank'...\",\n        \"ja\": \"プロジェクト全体に関わる共通知識を「グローバルメモリーバンク」として管理します...\"\n      },\n      \"isOptional\": false\n    },\n    ...\n  ],\n  \"lastModified\": \"2025-03-22T00:00:00Z\"\n}\n```"
+      }
+    ]
+  }
+}

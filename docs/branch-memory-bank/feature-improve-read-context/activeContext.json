@@ -1,0 +1,17 @@
+{
+  "schema": "memory_document_v1",
+  "metadata": {
+    "title": "activeContext.json",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [],
+    "lastModified": "2025-03-23T17:34:10.612Z"
+  },
+  "content": {
+    "currentWork": "{\\n  \\\"schema\\\": \\\"memory_document_v2\\\",\\n  \\\"metadata\\\": {\\n    \\\"id\\\": \\\"active-context-uuid\\\",\\n    \\\"title\\\": \\\"アクティブコンテキスト\\\",\\n    \\\"documentType\\\": \\\"active_context\\\",\\n    \\\"path\\\": \\\"activeContext.json\\\",\\n    \\\"tags\\\": [\\n      \\\"core\\\",\\n      \\\"active-context\\\"\\n    ],\\n    \\\"lastModified\\\": \\\"2025-03-24T03:00:38.000Z\\\",\\n    \\\"createdAt\\\": \\\"2025-03-23T17:29:56.690Z\\\",\\n    \\\"version\\\": 1\\n  },\\n  \\\"content\\\": {\\n    \\\"currentWork\\\": \\\"read_context機能の改善に取り組んでいます。具体的には、エラーハンドリングの改善、デバッグログの充実、非存在ブランチの自動初期化、includeオプションの廃止、.mdファイル処理の修正などを実装します。\\\",\\n    \\\"recentChanges\\\": \\\"現時点では初期調査フェーズであり、コードの修正はまだ行っていません。read_contextに関連するファイル構造と現在の実装を把握しました。\\\",\\n    \\\"activeDecisions\\\": [\\n      {\\n        \\\"id\\\": \\\"1\\\",\\n        \\\"description\\\": \\\"ReadContextUseCaseにブランチの自動初期化機能を実装する\\\"\\n      },\\n      {\\n        \\\"id\\\": \\\"2\\\",\\n        \\\"description\\\": \\\"各層で適切なログレベルとメッセージを使用してデバッグ情報を充実させる\\\"\\n      },\\n      {\\n        \\\"id\\\": \\\"3\\\",\\n        \\\"description\\\": \\\"エラーハンドリングを改善し、より明確なエラーメッセージとエラーコードを提供する\\\"\\n      },\\n      {\\n        \\\"id\\\": \\\"4\\\",\\n        \\\"description\\\": \\\"includeRules、includeBranchMemory、includeGlobalMemoryのオプションを廃止し、常に全ての情報を返すようにする\\\"\\n      },\\n      {\\n        \\\"id\\\": \\\"5\\\",\\n        \\\"description\\\": \\\".mdファイルの処理を確認し、JSONベースの処理に統一する\\\"\\n      }\\n    ],\\n    \\\"considerations\\\": [\\n      {\\n        \\\"id\\\": \\\"1\\\",\\n        \\\"description\\\": \\\"デバッグログはどのレベルで出力するべきか（全てのケースでdebugレベルか、特定の状況ではinfoやwarnを使うべきか）\\\"\\n      },\\n      {\\n        \\\"id\\\": \\\"2\\\",\\n        \\\"description\\\": \\\"非存在ブランチの自動初期化をオプション化するか、常に自動初期化するか\\\"\\n      },\\n      {\\n        \\\"id\\\": \\\"3\\\",\\n        \\\"description\\\": \\\"現在のread_context実装の互換性を保ちつつ、どこまで改善するか\\\"\\n      },\\n      {\\n        \\\"id\\\": \\\"4\\\",\\n        \\\"description\\\": \\\"includeオプションを廃止した場合、既存のクライアントへの影響をどう最小化するか\\\"\\n      },\\n      {\\n        \\\"id\\\": \\\"5\\\",\\n        \\\"description\\\": \\\"テンプレートのレンダリング処理をどこで行うべきか（Controller層か、UseCase層か）\\\"\\n      }\\n    ],\\n    \\\"nextSteps\\\": [\\n      {\\n        \\\"id\\\": \\\"1\\\",\\n        \\\"description\\\": \\\"ReadContextUseCaseを修正してincludeオプションを無視し、常に全ての情報を返すようにする\\\"\\n      },\\n      {\\n        \\\"id\\\": \\\"2\\\",\\n        \\\"description\\\": \\\"ブランチの自動初期化機能をReadContextUseCaseに実装する\\\"\\n      },\\n      {\\n        \\\"id\\\": \\\"3\\\",\\n        \\\"description\\\": \\\"ContextControllerのエラーハンドリングを改善する\\\"\\n      },\\n      {\\n        \\\"id\\\": \\\"4\\\",\\n        \\\"description\\\": \\\"index.tsのread_context実装とCLIコマンドからincludeオプションのコードを削除/無視するように修正する\\\"\\n      },\\n      {\\n        \\\"id\\\": \\\"5\\\",\\n        \\\"description\\\": \\\".mdファイル処理をJSONに統一する修正を行う\\\"\\n      }\\n    ]\\n  }\\n}",
+    "recentChanges": [],
+    "activeDecisions": [],
+    "considerations": [],
+    "nextSteps": []
+  }
+}

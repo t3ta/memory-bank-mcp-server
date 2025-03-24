@@ -1,0 +1,59 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "global-memory-bank-core-structure-plan",
+    "title": "グローバルメモリバンクのコア構造再編計画",
+    "documentType": "plan",
+    "path": "global-memory-bank-core-structure-plan.json",
+    "tags": [
+      "plan",
+      "refactoring",
+      "memory-bank",
+      "organization",
+      "core"
+    ],
+    "lastModified": "2025-03-22T01:20:00.000Z",
+    "createdAt": "2025-03-22T01:20:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "概要",
+        "content": "現在のグローバルメモリバンクの再編成において、コアファイルを特別扱いするための追加的な構造変更を提案します。カテゴリ別ディレクトリ（01-project, 02-architectureなど）が作成されていますが、最も重要で基本的な情報を含むコアドキュメントを別の専用ディレクトリにまとめることで、アクセス性と管理性を向上させます。"
+      },
+      {
+        "title": "課題の背景",
+        "content": "1. **コアファイルの埋もれ**: 重要な基本情報がカテゴリディレクトリに分散し、アクセスが困難\n2. **読み込み非効率**: `read_context`が全ファイルを読み込むため、パフォーマンスとリソース使用の問題\n3. **新規参入障壁**: 新しいチームメンバーが基本情報を素早く把握することが困難\n4. **冗長なファイル**: 移行期には元のファイルと移動先のファイルが重複して存在"
+      },
+      {
+        "title": "提案する新構造",
+        "content": "```\ndocs/global-memory-bank/\n├── core/                     # コアファイル専用ディレクトリ\n│   ├── architecture.json     # システムアーキテクチャ基本情報\n│   ├── coding-standards.json # コーディング規約\n│   ├── domain-models.json    # ドメインモデル\n│   ├── glossary.json         # 用語集\n│   ├── navigation.json       # ナビゲーション情報\n│   ├── tech-stack.json       # 技術スタック\n│   └── user-guide.json       # ユーザーガイド\n├── 01-project/               # プロジェクト詳細情報\n├── 02-architecture/          # アーキテクチャ詳細情報\n├── 03-implementation/        # 実装詳細情報\n└── ... 他のカテゴリディレクトリ\n```\n\nコアディレクトリには、システムの基本理解に必要な7つの主要ドキュメントをまとめます。詳細な情報や実装に特化したドキュメントは引き続き各カテゴリディレクトリに配置します。"
+      },
+      {
+        "title": "メリット",
+        "content": "1. **アクセス性向上**: 最も重要な情報に素早くアクセス可能\n2. **効率的な読み込み**: `read_context`でコアファイルのみを読み込むオプションが提供可能\n3. **新規参入者への配慮**: 「ここを見れば基本が分かる」という明確な入口\n4. **整理の容易さ**: 重要度に基づいた明確な分類基準\n5. **検索性の向上**: コアファイルとカテゴリファイルの区別が明確"
+      },
+      {
+        "title": "実装ステップ",
+        "content": "1. **コアディレクトリの作成**\n   - `docs/global-memory-bank/core/`ディレクトリを作成\n\n2. **コアファイルの特定と移動**\n   - 7つの基本ドキュメントをコアディレクトリに移動\n   - 必要に応じて内容を更新\n\n3. **`read_context`コマンドの拡張**\n   - `--core-only`オプションの追加\n   - デフォルト動作の検討（全読み込みかコアのみか）\n\n4. **ナビゲーション情報の更新**\n   - カテゴリと詳細情報へのリファレンスを追加\n   - コアファイルとカテゴリファイルの関係性を明記\n\n5. **冗長ファイルの削除**\n   - カテゴリディレクトリとルートに残っている重複ファイルを整理"
+      },
+      {
+        "title": "read_contextコマンドの改善案",
+        "content": "```typescript\n// ReadContextUseCase.tsの修正案\n\n// リクエストにcoreOnlyオプションを追加\nexport type ContextRequest = {\n  branch: string;\n  language: string;\n  includeRules?: boolean;\n  includeBranchMemory?: boolean;\n  includeGlobalMemory?: boolean;\n  coreOnly?: boolean; // 追加: コアファイルのみ読み込むオプション\n};\n\n// readGlobalMemory()メソッドの修正\nprivate async readGlobalMemory(coreOnly: boolean = false): Promise<Record<string, string>> {\n  // coreOnlyフラグに基づいてパスをフィルタリング\n  let paths = await this.globalRepository.listDocuments();\n  \n  if (coreOnly) {\n    // コアディレクトリのパスのみにフィルタリング\n    paths = paths.filter(p => p.value.startsWith('core/'));\n  }\n  \n  const result: Record<string, string> = {};\n  \n  for (const path of paths) {\n    const document = await this.globalRepository.getDocument(path);\n    if (document) {\n      result[path.value] = document.content;\n    }\n  }\n  \n  return result;\n}\n```\n\nCLIコマンドにも`--core-only`オプションを追加します。"
+      },
+      {
+        "title": "ブランチメモリバンクへの適用",
+        "content": "同様の原則をブランチメモリバンクにも適用することが可能です。ブランチメモリバンクにはすでに`branchContext.json`、`activeContext.json`、`systemPatterns.json`、`progress.json`という4つのコアファイルが定義されています。\n\nブランチメモリバンクについては、現状のフラット構造を維持しつつ、`read_context`コマンドがデフォルトではこれらのコアファイルのみを読み込み、`--all`フラグが指定された場合にのみすべてのファイルを読み込むという変更も検討できます。"
+      },
+      {
+        "title": "検討事項と懸念点",
+        "content": "1. **既存参照の更新**: ファイル移動に伴う参照の更新が必要\n2. **後方互換性**: 既存のスクリプトやツールへの影響\n3. **コアファイル定義の曖昧さ**: 何がコアかの判断基準の明確化\n4. **実装優先度**: 現在の再編成プロジェクトとの兼ね合い\n\nこれらの懸念点は、段階的な導入と十分なテストによって軽減できます。"
+      },
+      {
+        "title": "次のステップ",
+        "content": "1. チームでの提案レビュー\n2. パイロット実装（小規模テスト）\n3. `read_context`コマンドの修正\n4. ドキュメント更新\n5. 完全実装とテスト\n\nこの計画は現在の再編成プロジェクトの最終フェーズとして実施するか、次の改善フェーズとして計画することができます。"
+      }
+    ]
+  }
+}
