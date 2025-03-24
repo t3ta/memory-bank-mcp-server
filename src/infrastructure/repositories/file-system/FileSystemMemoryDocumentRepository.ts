@@ -34,7 +34,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
   async findByPath(path: DocumentPath): Promise<MemoryDocument | null> {
     try {
       const filePath = this.resolvePath(path.value);
-      console.log(`[DEBUG] Finding document at path: ${filePath}`);
+      logger.debug(`[DEBUG] Finding document at path: ${filePath}`);
 
       // Check if file exists
       const exists = await this.fileSystemService.fileExists(filePath);
@@ -43,39 +43,39 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
         // Try alternate format (.md <-> .json)
         const alternatePath = path.toAlternateFormat();
         const alternateFilePath = this.resolvePath(alternatePath.value);
-        console.log(`[DEBUG] File not found at ${filePath}, trying alternate format: ${alternateFilePath}`);
+        logger.debug(`[DEBUG] File not found at ${filePath}, trying alternate format: ${alternateFilePath}`);
 
-        console.log(`File not found at ${filePath}, trying alternate format: ${alternateFilePath}`);
+        logger.debug(`File not found at ${filePath}, trying alternate format: ${alternateFilePath}`);
 
         const alternateExists = await this.fileSystemService.fileExists(alternateFilePath);
 
         if (!alternateExists) {
-          console.log(`Alternate format not found either: ${alternateFilePath}`);
+          logger.debug(`Alternate format not found either: ${alternateFilePath}`);
           return null;
         }
 
-        console.log(`Found document in alternate format: ${alternateFilePath}`);
+        logger.debug(`Found document in alternate format: ${alternateFilePath}`);
         // Recursively call findByPath with the alternate path
         return this.findByPath(alternatePath);
       }
 
       // Read file content
       const content = await this.fileSystemService.readFile(filePath);
-      console.log(`[DEBUG] File content read from ${filePath}`);
+      logger.debug(`[DEBUG] File content read from ${filePath}`);
 
       // Handle JSON files differently
       if (path.isJSON) {
         try {
           // Parse JSON content
           const jsonObj = JSON.parse(content);
-          console.log(`[DEBUG] JSON parsed for ${filePath}, schema:`, jsonObj.schema);
+          logger.debug('JSON parsed for file:', { filePath, schema: jsonObj.schema });
 
           // Check if it's a schema-compliant document or regular JSON
           if (jsonObj.schema === 'memory_document_v1' && jsonObj.metadata && jsonObj.content) {
-            console.log(`[DEBUG] Schema-compliant document found at ${filePath}, metadata:`, jsonObj.metadata);
+            logger.debug('Schema-compliant document found:', { filePath, metadata: jsonObj.metadata });
             // It's a schema-compliant document - convert using fromJSON
             const doc = MemoryDocument.fromJSON(jsonObj, path);
-            console.log(`[DEBUG] Created document from JSON with tags:`, doc.tags.map(t => t.value));
+            logger.debug('Created document from JSON with tags:', { tags: doc.tags.map(t => t.value) });
             return doc;
           } else {
             // It's a regular JSON - create a MemoryDocument with the raw content
@@ -185,7 +185,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
       // List all files
       const files = await this.fileSystemService.listFiles(this.basePath);
 
-      console.log(`[DEBUG] Found ${files.length} files in ${this.basePath}`);
+      logger.debug(`[DEBUG] Found ${files.length} files in ${this.basePath}`);
 
       // Convert to document paths
       const documents: MemoryDocument[] = [];
@@ -200,7 +200,7 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
             continue;
           }
 
-          console.log(`[DEBUG] Processing file: ${relativePath}`);
+          logger.debug(`[DEBUG] Processing file: ${relativePath}`);
 
           // Create document path
           const documentPath = DocumentPath.create(relativePath);
@@ -211,24 +211,24 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
           if (document) {
             const docTags = document.tags.map(t => t.value);
             const searchTags = tags.map(t => t.value);
-            console.log(`[DEBUG] Document ${relativePath} has tags:`, docTags);
-            console.log(`[DEBUG] Searching for tags:`, searchTags);
+            logger.debug('Document tags:', { relativePath, docTags });
+            logger.debug('Searching for tags:', { searchTags });
 
             // Check if document has any of the tags
             const hasAnyTags = tags.some((tag) => {
               const hasTag = document.hasTag(tag);
-              console.log(`[DEBUG] Checking tag "${tag.value}" against document ${relativePath}: ${hasTag}`);
+              logger.debug(`[DEBUG] Checking tag "${tag.value}" against document ${relativePath}: ${hasTag}`);
               return hasTag;
             });
 
             if (hasAnyTags) {
-              console.log(`[DEBUG] Adding document ${relativePath} to results`);
+              logger.debug(`[DEBUG] Adding document ${relativePath} to results`);
               documents.push(document);
             } else {
-              console.log(`[DEBUG] Document ${relativePath} does not match any search tags`);
+              logger.debug(`[DEBUG] Document ${relativePath} does not match any search tags`);
             }
           } else {
-            console.log(`[DEBUG] No document found for ${relativePath}`);
+            logger.debug(`[DEBUG] No document found for ${relativePath}`);
           }
         } catch (error) {
           // Skip files that can't be read or don't match path format

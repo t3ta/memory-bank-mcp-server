@@ -2,6 +2,7 @@ import { DocumentPath } from './DocumentPath.js';
 import { Tag } from './Tag.js';
 import { BaseJsonDocument } from '../../schemas/json-document.js';
 import { DomainError } from '../../shared/errors/DomainError.js';
+import { logger } from '../../shared/utils/logger.js';
 
 /**
  * Props for MemoryDocument entity
@@ -74,13 +75,13 @@ export class MemoryDocument {
    * @returns boolean indicating if document has tag
    */
   public hasTag(tag: Tag): boolean {
-    console.log('[DEBUG] Checking tag:', {
+    logger.debug('Checking tag:', {
       documentTags: this.props.tags.map(t => t.value),
       searchTag: tag.value
     });
     const hasTag = this.props.tags.some((t) => {
       const matches = t.equals(tag);
-      console.log(`[DEBUG] Tag comparison: ${t.value} equals ${tag.value} = ${matches}`);
+      logger.debug('Tag comparison:', { tag1: t.value, tag2: tag.value, matches });
       return matches;
     });
     return hasTag;
@@ -200,7 +201,7 @@ export class MemoryDocument {
       try {
         return JSON.parse(this.props.content) as BaseJsonDocument;
       } catch (error) {
-        console.error('Failed to parse JSON document:', error);
+        logger.error('Failed to parse JSON document:', { error, path: this.props.path.value });
       }
     }
 
@@ -264,7 +265,7 @@ export class MemoryDocument {
    * @returns Markdown formatted string
    */
   public static fromJSON(jsonDoc: BaseJsonDocument, path: DocumentPath): MemoryDocument {
-    console.log('[DEBUG] Creating MemoryDocument from JSON:', {
+    logger.debug('Creating MemoryDocument from JSON:', {
       path: path.value,
       metadata: jsonDoc.metadata
     });
@@ -274,7 +275,7 @@ export class MemoryDocument {
       // First try to create the tag as is
       try {
         const tagObj = Tag.create(tag);
-        console.log(`[DEBUG] Created tag: ${tagObj.value} from ${tag}`);
+        logger.debug('Created tag:', { tag: tagObj.value, source: tag });
         return tagObj;
       } catch (e: unknown) {
         // If creation fails, sanitize the tag
@@ -282,9 +283,9 @@ export class MemoryDocument {
           // Make lowercase and replace invalid characters with hyphens
           const sanitizedTagStr = tag.toLowerCase().replace(/[^a-z0-9-]/g, '-');
           // Log the sanitization for debugging
-          console.warn(`[DEBUG] Sanitized tag '${tag}' to '${sanitizedTagStr}'`);
+          logger.warn(`Sanitized tag '${tag}' to '${sanitizedTagStr}'`);
           const tagObj = Tag.create(sanitizedTagStr);
-          console.log(`[DEBUG] Created sanitized tag: ${tagObj.value}`);
+          logger.debug('Created sanitized tag:', { tag: tagObj.value });
           return tagObj;
         }
         throw e; // Re-throw if it's not a format error
@@ -298,7 +299,7 @@ export class MemoryDocument {
       lastModified: new Date(jsonDoc.metadata.lastModified),
     });
 
-    console.log('[DEBUG] Created MemoryDocument with tags:', doc.tags.map(t => t.value));
+    logger.debug('Created MemoryDocument with tags:', { tags: doc.tags.map(t => t.value) });
     return doc;
   }
 

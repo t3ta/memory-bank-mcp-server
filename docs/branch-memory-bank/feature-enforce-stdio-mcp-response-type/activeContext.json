@@ -1,0 +1,72 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "b5f32609-bb97-46bd-9a1c-9fca033913ad",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context"
+    ],
+    "lastModified": "2025-03-24T05:00:00.000Z",
+    "createdAt": "2025-03-24T04:47:12.663Z",
+    "version": 2
+  },
+  "content": {
+    "currentWork": "標準出力からMCPResponseのJSON以外が出力される問題の調査と解決策の特定",
+    "recentChanges": [
+      {
+        "date": "2025-03-24T05:00:00.000Z",
+        "description": "問題となるコード(GlobalController.ts)を特定: console.logが不適切に使用されている"
+      },
+      {
+        "date": "2025-03-24T05:00:00.000Z",
+        "description": "問題の根本原因を分析: console.logからの出力がJSON構造を破壊している"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "e4e5465c-5ed8-4f5f-9c7c-00341718191f",
+        "description": "console.logをlogger.debugに置き換えることで標準出力の整合性を維持する"
+      },
+      {
+        "id": "eb3c34d3-dd44-485b-8b09-9840a2f0a888",
+        "description": "プロジェクト全体でconsole.logの使用を削減し、構造化ロガーの使用を促進する"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "f65a213e-b22f-4284-abad-834a0436e60f",
+        "description": "他のコントローラーや重要なコンポーネントでも同様のconsole.log使用がないか確認する",
+        "status": "open"
+      },
+      {
+        "id": "e32bce03-d565-44ef-88ca-8bd0a2d221d3",
+        "description": "console.logの使用を検出するESLintルールの追加を検討する",
+        "status": "open"
+      },
+      {
+        "id": "f1d7d3cc-37ec-4490-9360-2967e6be31ad",
+        "description": "デバッグ目的の出力と実際のレスポンス出力を分離するロギングアーキテクチャの改善",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "fd44c876-2982-4aed-bea9-f5cda534b123",
+        "description": "GlobalController.tsのconsole.logをlogger.debugに置き換える",
+        "priority": "high"
+      },
+      {
+        "id": "521f146a-e388-40b7-821b-b55ab21ae993",
+        "description": "他のコントローラーやコンポーネントのコードを確認し、同様の問題がないか調査する",
+        "priority": "medium"
+      },
+      {
+        "id": "2e5bc291-f17b-4ac9-99b0-d8575202fe75",
+        "description": "修正後にテストを実行し、MCPResponseが正しく処理されることを確認する",
+        "priority": "high"
+      }
+    ]
+  }
+}

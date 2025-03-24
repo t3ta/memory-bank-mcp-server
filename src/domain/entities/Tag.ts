@@ -1,4 +1,5 @@
 import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
+import { logger } from '../../shared/utils/logger.js';
 
 /**
  * Value object representing a document tag
@@ -42,7 +43,7 @@ export class Tag {
    * @returns boolean indicating equality
    */
   public equals(other: Tag): boolean {
-    console.log('[DEBUG] Comparing tags:', {
+    logger.debug('Comparing tags:', {
       thisTag: this._value,
       otherTag: other._value,
       isEqual: this._value === other._value
