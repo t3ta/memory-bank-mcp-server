@@ -184,7 +184,7 @@ export class GlobalController implements IGlobalController {
   ): Promise<MCPResponse<DocumentDTO[]>> {
     try {
       logger.info(`Finding global documents by tags: ${tags.join(', ')}`);
-      console.log('[DEBUG] Search request:', { tags, matchAllTags });
+      logger.debug('Search request:', { tags, matchAllTags });
 
       // SearchDocumentsByTagsUseCaseに検索を委譲
       const result = await this.searchDocumentsByTagsUseCase.execute({
