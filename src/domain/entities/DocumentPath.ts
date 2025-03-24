@@ -88,8 +88,7 @@ export class DocumentPath {
    */
   public get isMarkdown(): boolean {
     const ext = this.extension.toLowerCase();
-    // Always return false as Markdown support is removed in v2.1.0
-    return false;
+    return ext === 'md';
   }
 
   /**
@@ -172,11 +171,14 @@ export class DocumentPath {
    */
   public toAlternateFormat(): DocumentPath {
     if (this.isJSON) {
-      // No longer convert JSON to Markdown as Markdown support is removed in v2.1.0
-      return this;
-    } else {
-      // Always convert to JSON for other file types
+      // Convert JSON to Markdown
+      return this.withExtension('md');
+    } else if (this.isMarkdown) {
+      // Convert Markdown to JSON
       return this.withExtension('json');
+    } else {
+      // Return same path for other file types
+      return this;
     }
   }
 }

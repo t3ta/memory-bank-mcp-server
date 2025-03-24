@@ -1,0 +1,57 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "template-system",
+    "title": "テンプレートシステム",
+    "documentType": "reference",
+    "path": "08-i18n/template-system.json",
+    "tags": [
+      "template",
+      "i18n",
+      "internationalization"
+    ],
+    "lastModified": "2025-03-24T08:20:27.000Z",
+    "createdAt": "2025-03-24T08:20:27.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "概要",
+        "content": "このドキュメントは、Memory Bank MCPサーバーで使用されるテンプレートシステムについて説明します。テンプレートシステムは、多言語対応のコンテンツを提供するために使用されます。"
+      },
+      {
+        "title": "テンプレートシステムの目的",
+        "content": "テンプレートシステムの主な目的は、以下の通りです：\n\n1. コンテンツと表示の分離\n2. 多言語対応（国際化）\n3. 一貫したフォーマットの提供\n4. メンテナンス性の向上"
+      },
+      {
+        "title": "テンプレートの種類",
+        "content": "現在、以下のテンプレートが実装されています：\n\n1. ルールテンプレート（rules.json）- メモリバンクの使用ルールと構造に関する情報\n2. その他のシステムテンプレート（今後追加予定）"
+      },
+      {
+        "title": "テンプレートの構造",
+        "content": "テンプレートは以下の構造を持ちます：\n\n- id: テンプレートの一意の識別子\n- type: テンプレートのタイプ（system, user, etc.）\n- version: テンプレートのバージョン\n- titleKey: タイトルの翻訳キー\n- descriptionKey: 説明の翻訳キー\n- sections: テンプレートのセクション配列\n  - id: セクションの一意の識別子（キャメルケース）\n  - titleKey: セクションタイトルの翻訳キー\n  - contentKey: セクションコンテンツの翻訳キー\n  - isOptional: セクションが省略可能かどうか\n- createdAt: 作成日時\n- updatedAt: 更新日時"
+      },
+      {
+        "title": "翻訳キーの命名規則",
+        "content": "翻訳キーは以下の命名規則に従います：\n\n- テンプレートタイトル: template.title.[template_id]\n- テンプレート説明: template.description.[template_id]\n- セクションタイトル: template.section.[section_id]\n- セクションコンテンツ: template.content.[section_id]\n\n例：\n- template.title.rules\n- template.description.rules\n- template.section.global_memory_bank\n- template.content.global_memory_bank"
+      },
+      {
+        "title": "セクションIDの命名規則",
+        "content": "セクションIDはキャメルケースで定義します。これは、テンプレートローダーがセクションを正しく認識するために重要です。\n\n例：\n- globalMemoryBank\n- purposeOfGlobalMemoryBank\n- globalMemoryBankStructure\n- tagSystem\n\n翻訳キーはスネークケースを使用します：\n- template.section.global_memory_bank\n- template.section.purpose_of_global_memory_bank\n- template.section.global_memory_bank_structure\n- template.section.tag_system"
+      },
+      {
+        "title": "テンプレートの処理フロー",
+        "content": "テンプレートの処理フローは以下の通りです：\n\n1. テンプレートファイル（rules.json）の読み込み\n2. 指定された言語の翻訳ファイル（ja.json, en.json, zh.json など）の読み込み\n3. テンプレート内の翻訳キーを対応する翻訳で置換\n4. 翻訳されたテンプレートの返却"
+      },
+      {
+        "title": "テンプレートの拡張",
+        "content": "新しいテンプレートやセクションを追加する場合は、以下の手順に従います：\n\n1. テンプレートファイル（rules.json など）を作成または更新する\n2. 各言語ファイル（ja.json, en.json, zh.json など）に対応する翻訳キーと翻訳を追加する\n3. 必要に応じて、テンプレートローダーやレンダラーを更新する"
+      },
+      {
+        "title": "関連ファイル",
+        "content": "- テンプレートファイル: docs/templates/json/rules.json\n- 日本語翻訳: src/infrastructure/i18n/translations/ja.json\n- 英語翻訳: src/infrastructure/i18n/translations/en.json\n- 中国語翻訳: src/infrastructure/i18n/translations/zh.json\n- テンプレートローダー: src/infrastructure/templates/FileTemplateRepository.ts\n- テンプレートレンダラー: src/infrastructure/templates/TemplateRenderer.ts\n- ルール読み込みユースケース: src/application/usecases/common/ReadRulesUseCase.ts"
+      }
+    ]
+  }
+}

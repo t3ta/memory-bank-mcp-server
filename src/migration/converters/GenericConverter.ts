@@ -10,6 +10,7 @@ import { parseMarkdownForMigration } from '../utils/MarkdownParser.js';
 import { JsonDocument } from '../../domain/entities/JsonDocument.js';
 import { DocumentPath } from '../../domain/entities/DocumentPath.js';
 import { DocumentId } from '../../domain/entities/DocumentId.js';
+import { DocumentVersionInfo } from '../../domain/entities/DocumentVersionInfo.js';
 import { Tag } from '../../domain/entities/Tag.js';
 
 /**
@@ -52,8 +53,11 @@ export class GenericConverter implements BaseConverter {
       documentType: 'generic',
       tags,
       content: contentObj,
-      lastModified: new Date(),
-      createdAt: new Date(),
+      versionInfo: new DocumentVersionInfo({
+        version: 1,
+        lastModified: new Date(),
+        modifiedBy: 'migration'
+      })
     });
   }
 

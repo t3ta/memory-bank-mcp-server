@@ -1,0 +1,88 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "b5f32609-bb97-46bd-9a1c-9fca033913ad",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context"
+    ],
+    "lastModified": "2025-03-24T07:40:00.000Z",
+    "createdAt": "2025-03-24T04:47:12.663Z",
+    "version": 4
+  },
+  "content": {
+    "currentWork": "残タスクの確認とcliディレクトリ内のconsole.log修正検討",
+    "recentChanges": [
+      {
+        "date": "2025-03-24T05:00:00.000Z",
+        "description": "問題となるコード(GlobalController.ts)を特定: console.logが不適切に使用されている"
+      },
+      {
+        "date": "2025-03-24T05:00:00.000Z",
+        "description": "問題の根本原因を分析: console.logからの出力がJSON構造を破壊している"
+      },
+      {
+        "date": "2025-03-24T07:25:00.000Z",
+        "description": "CoreFilesController.tsのconsole.logをlogger.debugに置き換え、構造化ロギングに対応"
+      },
+      {
+        "date": "2025-03-24T07:30:00.000Z",
+        "description": "SimpleBranchMemoryBankRepository.tsの修正: テンプレート文字列バグと残りのconsole.log置き換え対応"
+      },
+      {
+        "date": "2025-03-24T07:40:00.000Z",
+        "description": "残タスクの確認: cliディレクトリ内にconsole.logの使用が残っているが、CLIツールは標準出力にJSONレスポンスを返す必要があるため修正不要と判断"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "e4e5465c-5ed8-4f5f-9c7c-00341718191f",
+        "description": "console.logをlogger.debugに置き換えることで標準出力の整合性を維持する"
+      },
+      {
+        "id": "eb3c34d3-dd44-485b-8b09-9840a2f0a888",
+        "description": "プロジェクト全体でconsole.logの使用を削減し、構造化ロガーの使用を促進する"
+      },
+      {
+        "id": "f2a3b4c5-d6e7-8f9a-0b1c-2d3e4f5a6b7c",
+        "description": "cliディレクトリのファイルはコマンドラインツールとして標準出力に結果を表示する必要があるため、console.logの使用を許可する"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "f65a213e-b22f-4284-abad-834a0436e60f",
+        "description": "他のコントローラーや重要なコンポーネントでも同様のconsole.log使用がないか確認する",
+        "status": "resolved"
+      },
+      {
+        "id": "e32bce03-d565-44ef-88ca-8bd0a2d221d3",
+        "description": "console.logの使用を検出するESLintルールの追加を検討する",
+        "status": "open"
+      },
+      {
+        "id": "f1d7d3cc-37ec-4490-9360-2967e6be31ad",
+        "description": "デバッグ目的の出力と実際のレスポンス出力を分離するロギングアーキテクチャの改善",
+        "status": "resolved"
+      },
+      {
+        "id": "c8d9e0f1-a2b3-4c5d-6e7f-8a9b0c1d2e3f",
+        "description": "cliディレクトリ内のスクリプトはコマンドライン出力用途なのでconsole.logをlogger.debugに置き換えるべきか検討",
+        "status": "resolved"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "3c7fe8b5-d8e6-480d-9f6c-7acdb9e42f5d",
+        "description": "全ての修正をコミットし、標準出力のJSON整合性をテストで確認する",
+        "priority": "high"
+      },
+      {
+        "id": "c19944c6-9fe2-4b98-8df3-f99d9f985383",
+        "description": "ESLintルールの導入検討 - console.*の使用を禁止し、適切な例外ケース（cliディレクトリなど）を設定する",
+        "priority": "low"
+      }
+    ]
+  }
+}

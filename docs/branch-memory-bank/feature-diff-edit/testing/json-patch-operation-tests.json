@@ -1,0 +1,891 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "3e5d8c2a-9f16-4b87-a3e0-76c5482d1f90",
+    "title": "JsonPatchOperation クラスのテストケース",
+    "documentType": "test_specification",
+    "path": "testing/json-patch-operation-tests.json",
+    "tags": [
+      "json-patch",
+      "testing",
+      "tdd",
+      "json-patch-operation"
+    ],
+    "lastModified": "2025-03-24T18:45:00.000Z",
+    "createdAt": "2025-03-24T18:35:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "description": "RFC 6902で定義されるJSON Patch操作を表現するクラスのテストケース仕様",
+    "classUnderTest": "JsonPatchOperation",
+    "responsibility": "JSON Patch操作（add/remove/replace/move/copy/test）の表現とバリデーション",
+    "testCategories": [
+      {
+        "name": "操作の生成と基本検証",
+        "description": "各種パッチ操作オブジェクトの生成と基本的な検証に関するテスト",
+        "testCases": [
+          {
+            "id": "jpo-create-01",
+            "name": "静的create()メソッドでadd操作が正しく生成される",
+            "input": {
+              "op": "add",
+              "path": "/a",
+              "value": 1
+            },
+            "assertions": [
+              "JsonPatchOperation.create('add', '/a', 1) はop='add'のインスタンスを返す",
+              "返されたインスタンスのpath.toString()が'/a'である",
+              "返されたインスタンスのvalueが1である"
+            ]
+          },
+          {
+            "id": "jpo-create-02",
+            "name": "静的create()メソッドでremove操作が正しく生成される",
+            "input": {
+              "op": "remove",
+              "path": "/a"
+            },
+            "assertions": [
+              "JsonPatchOperation.create('remove', '/a') はop='remove'のインスタンスを返す",
+              "返されたインスタンスのpath.toString()が'/a'である"
+            ]
+          },
+          {
+            "id": "jpo-create-03",
+            "name": "静的create()メソッドでreplace操作が正しく生成される",
+            "input": {
+              "op": "replace",
+              "path": "/a",
+              "value": 1
+            },
+            "assertions": [
+              "JsonPatchOperation.create('replace', '/a', 1) はop='replace'のインスタンスを返す",
+              "返されたインスタンスのpath.toString()が'/a'である",
+              "返されたインスタンスのvalueが1である"
+            ]
+          },
+          {
+            "id": "jpo-create-04",
+            "name": "静的create()メソッドでmove操作が正しく生成される",
+            "input": {
+              "op": "move",
+              "from": "/a",
+              "path": "/b"
+            },
+            "assertions": [
+              "JsonPatchOperation.create('move', '/b', undefined, '/a') はop='move'のインスタンスを返す",
+              "返されたインスタンスのpath.toString()が'/b'である",
+              "返されたインスタンスのfrom.toString()が'/a'である"
+            ]
+          },
+          {
+            "id": "jpo-create-05",
+            "name": "静的create()メソッドでcopy操作が正しく生成される",
+            "input": {
+              "op": "copy",
+              "from": "/a",
+              "path": "/b"
+            },
+            "assertions": [
+              "JsonPatchOperation.create('copy', '/b', undefined, '/a') はop='copy'のインスタンスを返す",
+              "返されたインスタンスのpath.toString()が'/b'である",
+              "返されたインスタンスのfrom.toString()が'/a'である"
+            ]
+          },
+          {
+            "id": "jpo-create-06",
+            "name": "静的create()メソッドでtest操作が正しく生成される",
+            "input": {
+              "op": "test",
+              "path": "/a",
+              "value": 1
+            },
+            "assertions": [
+              "JsonPatchOperation.create('test', '/a', 1) はop='test'のインスタンスを返す",
+              "返されたインスタンスのpath.toString()が'/a'である",
+              "返されたインスタンスのvalueが1である"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "操作バリデーション",
+        "description": "必須パラメータや操作固有の制約のバリデーションに関するテスト",
+        "testCases": [
+          {
+            "id": "jpo-valid-01",
+            "name": "add操作でvalue無しの場合エラーが発生する",
+            "assertions": [
+              "JsonPatchOperation.create('add', '/a')を呼び出すと例外が発生する",
+              "エラーメッセージに'value'が必須であることが含まれる"
+            ]
+          },
+          {
+            "id": "jpo-valid-02",
+            "name": "replace操作でvalue無しの場合エラーが発生する",
+            "assertions": [
+              "JsonPatchOperation.create('replace', '/a')を呼び出すと例外が発生する",
+              "エラーメッセージに'value'が必須であることが含まれる"
+            ]
+          },
+          {
+            "id": "jpo-valid-03",
+            "name": "test操作でvalue無しの場合エラーが発生する",
+            "assertions": [
+              "JsonPatchOperation.create('test', '/a')を呼び出すと例外が発生する",
+              "エラーメッセージに'value'が必須であることが含まれる"
+            ]
+          },
+          {
+            "id": "jpo-valid-04",
+            "name": "move操作でfrom無しの場合エラーが発生する",
+            "assertions": [
+              "JsonPatchOperation.create('move', '/a')を呼び出すと例外が発生する",
+              "エラーメッセージに'from'が必須であることが含まれる"
+            ]
+          },
+          {
+            "id": "jpo-valid-05",
+            "name": "copy操作でfrom無しの場合エラーが発生する",
+            "assertions": [
+              "JsonPatchOperation.create('copy', '/a')を呼び出すと例外が発生する",
+              "エラーメッセージに'from'が必須であることが含まれる"
+            ]
+          },
+          {
+            "id": "jpo-valid-06",
+            "name": "無効な操作タイプの場合エラーが発生する",
+            "assertions": [
+              "JsonPatchOperation.create('invalid', '/a')を呼び出すと例外が発生する",
+              "エラーメッセージに操作タイプが不正であることが含まれる"
+            ]
+          },
+          {
+            "id": "jpo-valid-07",
+            "name": "move操作で自分自身への移動が検出される",
+            "assertions": [
+              "JsonPatchOperation.create('move', '/a', undefined, '/a').validate()を呼び出すと、警告またはエラーが発生する"
+            ]
+          },
+          {
+            "id": "jpo-valid-08",
+            "name": "move操作で子孫への移動が検出される",
+            "assertions": [
+              "JsonPatchOperation.create('move', '/a/b', undefined, '/a').validate()を呼び出すと例外が発生する",
+              "エラーメッセージに自分自身の子孫への移動が不正であることが含まれる"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "add操作",
+        "description": "add操作の振る舞いに関するテスト",
+        "testCases": [
+          {
+            "id": "jpo-add-01",
+            "name": "プロパティの追加がオブジェクトに反映される",
+            "input": {
+              "op": "add",
+              "path": "/a",
+              "value": 1
+            },
+            "document": {},
+            "expected": {
+              "a": 1
+            }
+          },
+          {
+            "id": "jpo-add-02",
+            "name": "ネストされたプロパティの追加がオブジェクトに反映される",
+            "input": {
+              "op": "add",
+              "path": "/a/b",
+              "value": 1
+            },
+            "document": {
+              "a": {}
+            },
+            "expected": {
+              "a": {
+                "b": 1
+              }
+            }
+          },
+          {
+            "id": "jpo-add-03",
+            "name": "配列要素の末尾追加がオブジェクトに反映される",
+            "input": {
+              "op": "add",
+              "path": "/a/-",
+              "value": 3
+            },
+            "document": {
+              "a": [
+                1,
+                2
+              ]
+            },
+            "expected": {
+              "a": [
+                1,
+                2,
+                3
+              ]
+            }
+          },
+          {
+            "id": "jpo-add-04",
+            "name": "配列要素の中間追加がオブジェクトに反映される",
+            "input": {
+              "op": "add",
+              "path": "/a/1",
+              "value": 99
+            },
+            "document": {
+              "a": [
+                1,
+                2,
+                3
+              ]
+            },
+            "expected": {
+              "a": [
+                1,
+                99,
+                2,
+                3
+              ]
+            }
+          },
+          {
+            "id": "jpo-add-05",
+            "name": "既存値の上書きがオブジェクトに反映される",
+            "input": {
+              "op": "add",
+              "path": "/a",
+              "value": 99
+            },
+            "document": {
+              "a": 1
+            },
+            "expected": {
+              "a": 99
+            }
+          },
+          {
+            "id": "jpo-add-06",
+            "name": "中間パスが存在しない場合エラーが発生する",
+            "input": {
+              "op": "add",
+              "path": "/a/b/c",
+              "value": 1
+            },
+            "document": {},
+            "expectedError": "InvalidPathError"
+          },
+          {
+            "id": "jpo-add-07",
+            "name": "配列インデックスが範囲外の場合エラーが発生する",
+            "input": {
+              "op": "add",
+              "path": "/a/3",
+              "value": 4
+            },
+            "document": {
+              "a": [
+                1,
+                2
+              ]
+            },
+            "expectedError": "InvalidIndexError"
+          }
+        ]
+      },
+      {
+        "name": "remove操作",
+        "description": "remove操作の振る舞いに関するテスト",
+        "testCases": [
+          {
+            "id": "jpo-remove-01",
+            "name": "プロパティの削除がオブジェクトに反映される",
+            "input": {
+              "op": "remove",
+              "path": "/a"
+            },
+            "document": {
+              "a": 1,
+              "b": 2
+            },
+            "expected": {
+              "b": 2
+            }
+          },
+          {
+            "id": "jpo-remove-02",
+            "name": "ネストされたプロパティの削除がオブジェクトに反映される",
+            "input": {
+              "op": "remove",
+              "path": "/a/b"
+            },
+            "document": {
+              "a": {
+                "b": 1,
+                "c": 2
+              }
+            },
+            "expected": {
+              "a": {
+                "c": 2
+              }
+            }
+          },
+          {
+            "id": "jpo-remove-03",
+            "name": "配列要素の削除がオブジェクトに反映される",
+            "input": {
+              "op": "remove",
+              "path": "/a/1"
+            },
+            "document": {
+              "a": [
+                1,
+                2,
+                3
+              ]
+            },
+            "expected": {
+              "a": [
+                1,
+                3
+              ]
+            }
+          },
+          {
+            "id": "jpo-remove-04",
+            "name": "存在しないパスの削除でエラーが発生する",
+            "input": {
+              "op": "remove",
+              "path": "/c"
+            },
+            "document": {
+              "a": 1
+            },
+            "expectedError": "PathNotFoundError"
+          },
+          {
+            "id": "jpo-remove-05",
+            "name": "ルートの削除でエラーが発生する",
+            "input": {
+              "op": "remove",
+              "path": "/"
+            },
+            "document": {
+              "a": 1
+            },
+            "expectedError": "InvalidPathError"
+          }
+        ]
+      },
+      {
+        "name": "replace操作",
+        "description": "replace操作の振る舞いに関するテスト",
+        "testCases": [
+          {
+            "id": "jpo-replace-01",
+            "name": "プロパティの置換がオブジェクトに反映される",
+            "input": {
+              "op": "replace",
+              "path": "/a",
+              "value": 99
+            },
+            "document": {
+              "a": 1
+            },
+            "expected": {
+              "a": 99
+            }
+          },
+          {
+            "id": "jpo-replace-02",
+            "name": "ネストされたプロパティの置換がオブジェクトに反映される",
+            "input": {
+              "op": "replace",
+              "path": "/a/b",
+              "value": 99
+            },
+            "document": {
+              "a": {
+                "b": 1
+              }
+            },
+            "expected": {
+              "a": {
+                "b": 99
+              }
+            }
+          },
+          {
+            "id": "jpo-replace-03",
+            "name": "配列要素の置換がオブジェクトに反映される",
+            "input": {
+              "op": "replace",
+              "path": "/a/1",
+              "value": 99
+            },
+            "document": {
+              "a": [
+                1,
+                2,
+                3
+              ]
+            },
+            "expected": {
+              "a": [
+                1,
+                99,
+                3
+              ]
+            }
+          },
+          {
+            "id": "jpo-replace-04",
+            "name": "存在しないパスの置換でエラーが発生する",
+            "input": {
+              "op": "replace",
+              "path": "/c",
+              "value": 99
+            },
+            "document": {
+              "a": 1
+            },
+            "expectedError": "PathNotFoundError"
+          },
+          {
+            "id": "jpo-replace-05",
+            "name": "オブジェクト全体の置換が正しく動作する",
+            "input": {
+              "op": "replace",
+              "path": "/",
+              "value": {
+                "b": 2
+              }
+            },
+            "document": {
+              "a": 1
+            },
+            "expected": {
+              "b": 2
+            }
+          }
+        ]
+      },
+      {
+        "name": "move操作",
+        "description": "move操作の振る舞いに関するテスト",
+        "testCases": [
+          {
+            "id": "jpo-move-01",
+            "name": "プロパティの移動がオブジェクトに反映される",
+            "input": {
+              "op": "move",
+              "from": "/a",
+              "path": "/b"
+            },
+            "document": {
+              "a": 1
+            },
+            "expected": {
+              "b": 1
+            }
+          },
+          {
+            "id": "jpo-move-02",
+            "name": "既存プロパティへの上書き移動がオブジェクトに反映される",
+            "input": {
+              "op": "move",
+              "from": "/a",
+              "path": "/b"
+            },
+            "document": {
+              "a": 1,
+              "b": 2
+            },
+            "expected": {
+              "b": 1
+            }
+          },
+          {
+            "id": "jpo-move-03",
+            "name": "ネストされたプロパティの移動がオブジェクトに反映される",
+            "input": {
+              "op": "move",
+              "from": "/a/b",
+              "path": "/c"
+            },
+            "document": {
+              "a": {
+                "b": 1
+              }
+            },
+            "expected": {
+              "a": {},
+              "c": 1
+            }
+          },
+          {
+            "id": "jpo-move-04",
+            "name": "配列要素の移動がオブジェクトに反映される",
+            "input": {
+              "op": "move",
+              "from": "/a/0",
+              "path": "/a/1"
+            },
+            "document": {
+              "a": [
+                1,
+                2,
+                3
+              ]
+            },
+            "expected": {
+              "a": [
+                2,
+                1,
+                3
+              ]
+            }
+          },
+          {
+            "id": "jpo-move-05",
+            "name": "存在しないパスからの移動でエラーが発生する",
+            "input": {
+              "op": "move",
+              "from": "/c",
+              "path": "/b"
+            },
+            "document": {
+              "a": 1
+            },
+            "expectedError": "PathNotFoundError"
+          },
+          {
+            "id": "jpo-move-06",
+            "name": "自分自身への移動では変更が発生しない",
+            "input": {
+              "op": "move",
+              "from": "/a",
+              "path": "/a"
+            },
+            "document": {
+              "a": 1
+            },
+            "expected": {
+              "a": 1
+            }
+          },
+          {
+            "id": "jpo-move-07",
+            "name": "自分の子孫への移動でエラーが発生する",
+            "input": {
+              "op": "move",
+              "from": "/a",
+              "path": "/a/b"
+            },
+            "document": {
+              "a": {
+                "c": 1
+              }
+            },
+            "expectedError": "InvalidPathError"
+          }
+        ]
+      },
+      {
+        "name": "copy操作",
+        "description": "copy操作の振る舞いに関するテスト",
+        "testCases": [
+          {
+            "id": "jpo-copy-01",
+            "name": "プロパティのコピーがオブジェクトに反映される",
+            "input": {
+              "op": "copy",
+              "from": "/a",
+              "path": "/b"
+            },
+            "document": {
+              "a": 1
+            },
+            "expected": {
+              "a": 1,
+              "b": 1
+            }
+          },
+          {
+            "id": "jpo-copy-02",
+            "name": "既存プロパティへの上書きコピーがオブジェクトに反映される",
+            "input": {
+              "op": "copy",
+              "from": "/a",
+              "path": "/b"
+            },
+            "document": {
+              "a": 1,
+              "b": 2
+            },
+            "expected": {
+              "a": 1,
+              "b": 1
+            }
+          },
+          {
+            "id": "jpo-copy-03",
+            "name": "ネスト構造のコピーがオブジェクトに反映される",
+            "input": {
+              "op": "copy",
+              "from": "/a",
+              "path": "/b"
+            },
+            "document": {
+              "a": {
+                "c": 1
+              }
+            },
+            "expected": {
+              "a": {
+                "c": 1
+              },
+              "b": {
+                "c": 1
+              }
+            }
+          },
+          {
+            "id": "jpo-copy-04",
+            "name": "配列要素のコピーがオブジェクトに反映される",
+            "input": {
+              "op": "copy",
+              "from": "/a/0",
+              "path": "/a/-"
+            },
+            "document": {
+              "a": [
+                1,
+                2
+              ]
+            },
+            "expected": {
+              "a": [
+                1,
+                2,
+                1
+              ]
+            }
+          },
+          {
+            "id": "jpo-copy-05",
+            "name": "存在しないパスからのコピーでエラーが発生する",
+            "input": {
+              "op": "copy",
+              "from": "/c",
+              "path": "/b"
+            },
+            "document": {
+              "a": 1
+            },
+            "expectedError": "PathNotFoundError"
+          },
+          {
+            "id": "jpo-copy-06",
+            "name": "自分自身の子へのコピーが正しく動作する",
+            "input": {
+              "op": "copy",
+              "from": "/a",
+              "path": "/a/b"
+            },
+            "document": {
+              "a": {}
+            },
+            "expected": {
+              "a": {
+                "b": {}
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "test操作",
+        "description": "test操作の振る舞いに関するテスト",
+        "testCases": [
+          {
+            "id": "jpo-test-01",
+            "name": "一致する値のテストが成功する",
+            "input": {
+              "op": "test",
+              "path": "/a",
+              "value": 1
+            },
+            "document": {
+              "a": 1
+            },
+            "expected": {
+              "a": 1
+            }
+          },
+          {
+            "id": "jpo-test-02",
+            "name": "一致しない値のテストでエラーが発生する",
+            "input": {
+              "op": "test",
+              "path": "/a",
+              "value": 2
+            },
+            "document": {
+              "a": 1
+            },
+            "expectedError": "TestFailedError"
+          },
+          {
+            "id": "jpo-test-03",
+            "name": "複雑なオブジェクトのテストが成功する",
+            "input": {
+              "op": "test",
+              "path": "/a",
+              "value": {
+                "b": 1
+              }
+            },
+            "document": {
+              "a": {
+                "b": 1
+              }
+            },
+            "expected": {
+              "a": {
+                "b": 1
+              }
+            }
+          },
+          {
+            "id": "jpo-test-04",
+            "name": "存在しないパスのテストでエラーが発生する",
+            "input": {
+              "op": "test",
+              "path": "/b",
+              "value": 1
+            },
+            "document": {
+              "a": 1
+            },
+            "expectedError": "PathNotFoundError"
+          },
+          {
+            "id": "jpo-test-05",
+            "name": "深くネストされたパスのテストが成功する",
+            "input": {
+              "op": "test",
+              "path": "/a/b/c",
+              "value": 1
+            },
+            "document": {
+              "a": {
+                "b": {
+                  "c": 1
+                }
+              }
+            },
+            "expected": {
+              "a": {
+                "b": {
+                  "c": 1
+                }
+              }
+            }
+          },
+          {
+            "id": "jpo-test-06",
+            "name": "配列要素のテストが成功する",
+            "input": {
+              "op": "test",
+              "path": "/a/1",
+              "value": 2
+            },
+            "document": {
+              "a": [
+                1,
+                2,
+                3
+              ]
+            },
+            "expected": {
+              "a": [
+                1,
+                2,
+                3
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "シリアライズとデシリアライズ",
+        "description": "操作オブジェクトのJSONシリアライズとデシリアライズに関するテスト",
+        "testCases": [
+          {
+            "id": "jpo-serial-01",
+            "name": "add操作が正しくJSONシリアライズされる",
+            "setup": "const op = JsonPatchOperation.create('add', '/a', 1)",
+            "assertions": [
+              "op.toJSON()は { op: 'add', path: '/a', value: 1 } を返す"
+            ]
+          },
+          {
+            "id": "jpo-serial-02",
+            "name": "remove操作が正しくJSONシリアライズされる",
+            "setup": "const op = JsonPatchOperation.create('remove', '/a')",
+            "assertions": [
+              "op.toJSON()は { op: 'remove', path: '/a' } を返す"
+            ]
+          },
+          {
+            "id": "jpo-serial-03",
+            "name": "move操作が正しくJSONシリアライズされる",
+            "setup": "const op = JsonPatchOperation.create('move', '/b', undefined, '/a')",
+            "assertions": [
+              "op.toJSON()は { op: 'move', path: '/b', from: '/a' } を返す"
+            ]
+          },
+          {
+            "id": "jpo-serial-04",
+            "name": "複雑な値を持つ操作が正しくシリアライズされる",
+            "setup": "const op = JsonPatchOperation.create('add', '/a', { b: [1, 2, { c: 3 }] })",
+            "assertions": [
+              "op.toJSON()は { op: 'add', path: '/a', value: { b: [1, 2, { c: 3 }] } } を返す"
+            ]
+          },
+          {
+            "id": "jpo-serial-05",
+            "name": "JSON文字列からパッチ操作が正しく復元される",
+            "setup": "const json = '{\"op\":\"add\",\"path\":\"/a\",\"value\":1}'",
+            "assertions": [
+              "JsonPatchOperation.fromJSON(json)はop='add'のインスタンスを返す",
+              "復元されたインスタンスのpath.toString()が'/a'である",
+              "復元されたインスタンスのvalueが1である"
+            ]
+          },
+          {
+            "id": "jpo-serial-06",
+            "name": "複数のパッチ操作が正しく配列形式でシリアライズされる",
+            "setup": [
+              "const op1 = JsonPatchOperation.create('add', '/a', 1)",
+              "const op2 = JsonPatchOperation.create('remove', '/b')"
+            ],
+            "assertions": [
+              "[op1, op2].map(op => op.toJSON())は [{ op: 'add', path: '/a', value: 1 }, { op: 'remove', path: '/b' }] を返す"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

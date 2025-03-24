@@ -1,8 +1,39 @@
-# Memory Bank MCP Server 2.1.0
+# Memory Bank MCP Server 2.2.0
 
-A Memory Bank implementation for managing project documentation and context across sessions. This server helps Claude maintain consistent project knowledge through global and branch-specific memory banks. Version 2.1.0 introduces JSON-only document storage, removing Markdown support completely for better structure and validation.
+A Memory Bank implementation for managing project documentation and context across sessions. This server helps Claude maintain consistent project knowledge through global and branch-specific memory banks. Version 2.2.0 enhances JSON Patch support and adds workspace options along with numerous improvements.
 
 This project is inspired by [Cline Memory Bank](https://github.com/nickbaumann98/cline_docs/blob/main/prompting/custom%20instructions%20library/cline-memory-bank.md) from the [nickbaumann98/cline_docs](https://github.com/nickbaumann98/cline_docs) repository, which provides an excellent foundation for managing Claude's memory in software projects.
+
+## What's New in 2.2.0
+
+### Enhanced JSON Patch Implementation
+
+Version 2.2.0 enhances the JSON Patch implementation with:
+
+- **Updated Implementation**: Improved JSON Patch adapter and operation handling
+- **Better Error Codes**: Enhanced error reporting for patch operations
+- **Comprehensive Documentation**: Added detailed templates and examples
+- **Event Handling**: Improved document event handling with patch operations
+
+### CLI Workspace Option Enhancement
+
+- **Direct Root Directory Specification**: Command line now supports specifying the project root directory directly
+- **Flexible Project Management**: Work with different projects more seamlessly
+
+### Template System Integration
+
+- **Template Loading Support**: ReadRulesUseCase now supports template loading
+- **Improved Error Handling**: Better error codes and handling throughout the system
+
+### Testing Improvements
+
+- **Test Framework Migration**: Replaced ts-mockito with jest.fn() for better testing
+- **Simplified Testing Setup**: Removed E2E test setup for more streamlined testing
+
+### Logging Enhancements
+
+- **Logger Replacement**: Replaced console.log with logger across all files (except CLI)
+- **Logging Adjustments**: Improved handling of empty code changes
 
 ## Usage
 
@@ -55,30 +86,12 @@ memory-bank --help
 
 #### Options
 
-- **--docs, -d**: Path to docs directory (default: './docs')
+- **--workspace, -w**: Path to workspace directory (default: current directory)
+- **--docs, -d**: Path to docs directory (default: './docs' or '{workspace}/docs')
 - **--verbose, -v**: Run with verbose logging (default: false)
 - **--language, -l**: Language for templates ('en', 'ja' or 'zh', default: 'en')
 - **--file, -f**: Read content from file (for write commands)
 - **--format**: Output format for read-core-files ('json' or 'pretty', default: 'pretty')
-
-## What's New in 2.1.0
-
-### Complete Migration to JSON
-
-Memory Bank 2.1.0 completes the migration to JSON-based documents:
-
-- **Markdown support has been completely removed**
-- All documents must use JSON format
-- Improved validation and structure through JSON schemas
-- Better programmatic access and data consistency
-
-### Migration Tools
-
-To help users transition from Markdown to JSON:
-
-- The `migrate` command converts existing Markdown files to JSON
-- Automatic backup of original files before conversion
-- Schema validation ensures proper format
 
 ## What's New in 2.0
 
@@ -111,17 +124,6 @@ JSON documents follow this structure:
   }
 }
 ```
-
-### Markdown to JSON Migration
-
-Memory Bank 2.0 introduced built-in migration tools:
-
-- Automatic migration on server startup
-- Original file backups before conversion
-- Schema validation for generated JSON files
-- Manual migration commands
-
-**Note**: As of version 2.1.0, Markdown support has been completely removed. All documents must use JSON format.
 
 ### Enhanced API
 
@@ -165,7 +167,7 @@ docs/global-memory-bank/
   └── tags/                  # Information organization
 ```
 
-> Note: As of version 2.1.0, only .json format is supported.
+> Note: Only .json format is supported.
 
 ### Branch Memory Bank
 
@@ -186,7 +188,7 @@ docs/branch-memory-bank/feature-login/
   └── progress.json        # Implementation status
 ```
 
-> Note: As of version 2.1.0, only .json format is supported.
+> Note: Only .json format is supported.
 
 ## API
 
@@ -196,25 +198,38 @@ docs/branch-memory-bank/feature-login/
   - Write a document to the current branch's memory bank
   - Input:
     - `path` (string): Document path
-    - `content` (string): Document content
-    - `branch` (string): Branch name
+    - `content` (string, optional): Document content (full replacement)
+    - `patches` (array, optional): JSON Patch operations to apply (cannot be used with content)
+    - `branch` (string, required): Branch name
+    - `workspace` (string, optional): Path to workspace directory
+    - `docs` (string, optional): Path to docs directory
   - Creates directories as needed
   - Initializes with templates if content is empty
+  - Supports partial updates with JSON Patch
+  - Can work with different workspace/docs locations than the server default
 
 - **read_branch_memory_bank**
   - Read a document from the current branch's memory bank
   - Input:
     - `path` (string): Document path
-    - `branch` (string): Branch name
+    - `branch` (string, required): Branch name
+    - `workspace` (string, optional): Path to workspace directory
+    - `docs` (string, optional): Path to docs directory
   - Returns document content and metadata
+  - Can work with different workspace/docs locations than the server default
 
 - **write_global_memory_bank**
   - Write a document to the global memory bank
   - Input:
     - `path` (string): Document path
-    - `content` (string): Document content
+    - `content` (string, optional): Document content (full replacement)
+    - `patches` (array, optional): JSON Patch operations to apply (cannot be used with content)
+    - `workspace` (string, optional): Path to workspace directory
+    - `docs` (string, optional): Path to docs directory
   - Creates directories as needed
   - Updates tags index automatically
+  - Supports partial updates with JSON Patch
+  - Can work with different workspace/docs locations than the server default
 
 - **read_global_memory_bank**
   - Read a document from the global memory bank
@@ -231,26 +246,6 @@ docs/branch-memory-bank/feature-login/
     - `includeBranchMemory` (boolean): Whether to include branch memory bank (default: true)
     - `includeGlobalMemory` (boolean): Whether to include global memory bank (default: true)
   - Returns combined context information from requested sources
-
-- **read_branch_core_files**
-  - Read all core files from the branch memory bank
-  - Input:
-    - `branch` (string): Branch name
-  - Returns content and metadata for:
-    - branchContext.md/json
-    - activeContext.md/json
-    - systemPatterns.md/json
-    - progress.md/json
-
-- **read_global_core_files**
-  - Read all core files from the global memory bank
-  - Returns content and metadata for:
-    - architecture.md/json
-    - coding-standards.md/json
-    - domain-models.md/json
-    - glossary.md/json
-    - tech-stack.md/json
-    - user-guide.md/json
 
 - **read_rules**
   - Read the memory bank rules in specified language
@@ -299,8 +294,39 @@ Add one of these configurations to your claude_desktop_config.json:
 
 Configuration options:
 
+- `WORKSPACE_ROOT`: Root directory for the project workspace (default: current directory)
 - `MEMORY_BANK_ROOT`: Root directory for memory bank storage (default: `docs` in workspace)
 - `MEMORY_BANK_LANGUAGE`: Default language for templates ("en", "ja", or "zh", default: "en")
+
+#### Working with Multiple Projects
+
+You can specify the workspace directory when starting the server:
+
+```json
+{
+  "mcpServers": {
+    "memory-bank": {
+      "command": "npx",
+      "args": ["-y", "memory-bank-mcp-server", "--workspace", "/path/to/project"],
+      "env": {
+        "MEMORY_BANK_LANGUAGE": "ja"
+      }
+    }
+  }
+}
+```
+
+Alternatively, with the `read_context` and other MCP tools, you can work with different projects in the same session:
+
+```
+read_context(branch: "feature/my-branch", workspace: "/path/to/other/project")
+```
+
+Path resolution follows this priority order:
+1. Tool parameters (highest priority)
+2. Command-line options
+3. Environment variables
+4. Default values (current directory and ./docs)
 
 ### System Prompt
 
@@ -326,6 +352,7 @@ Follow these steps for each interaction:
      c) Making technical decisions
      d) Discovering new patterns
    - Update global memory bank for project-wide changes
+   - Use JSON Patch for targeted updates when appropriate
 
 4. Memory Bank Maintenance:
    - Keep documentation organized and up-to-date

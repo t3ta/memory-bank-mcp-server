@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "3d058578-ac02-4387-aca5-5ebb351bf04c",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-24T09:39:18.284Z",
+    "createdAt": "2025-03-24T09:21:18.284Z",
+    "version": 2
+  },
+  "content": {
+    "branchName": "feature/pass-dir-from-command",
+    "purpose": "コマンドからワークスペースディレクトリを渡せるようにする機能の追加",
+    "createdAt": "2025-03-24T09:21:18.284Z",
+    "userStories": [
+      {
+        "id": "8c30a17e-d8ba-4a81-8ebf-e414e7480b46",
+        "description": "複数のプロジェクトで同じサーバーを使いたいユーザーが、コマンドラインからワークスペースを指定できる",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "c9432b4a-9380-41c2-8226-b5e599198eaa",
+        "description": "既存の--docsオプションとの後方互換性を維持",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "8c306709-be22-4e6c-b2e4-6b8737d228ce",
+        "description": "環境変数WORKSPACE_ROOTを使った指定もサポート",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": "ConfigProviderクラスにはWorkspaceConfig.workspaceRootのプロパティがすでに存在しているため、これを活用する。コマンドラインパーサーと実際のApplication作成部分の連携を適切に行う必要がある。"
+  }
+}

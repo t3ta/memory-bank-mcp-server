@@ -4,6 +4,7 @@ import { logger } from '../shared/utils/logger.js';
 import { IGlobalController } from '../interface/controllers/interfaces/IGlobalController.js';
 import { IBranchController } from '../interface/controllers/interfaces/IBranchController.js';
 import { IContextController } from '../interface/controllers/interfaces/IContextController.js';
+import { ITemplateController } from '../interface/controllers/interfaces/ITemplateController.js';
 import { CliOptions } from '../infrastructure/config/WorkspaceConfig.js';
 import { Constants } from './config/constants.js';
 
@@ -11,11 +12,13 @@ import { Constants } from './config/constants.js';
  * Application main class
  * Initializes and manages the application lifecycle
  */
-class Application {
-  private readonly options: CliOptions;
+export class Application {
+  private options: CliOptions;
+  private container: any;
   private globalController?: IGlobalController;
   private branchController?: IBranchController;
   private contextController?: IContextController;
+  private templateController?: ITemplateController;
 
   /**
    * Constructor
@@ -34,13 +37,13 @@ class Application {
       logger.info('Initializing application..');
 
       // Setup DI container
-      const container = await setupContainer(this.options);
+      this.container = await setupContainer(this.options);
 
-      // Get controllers
-      // Cast the result instead of using generic parameters
-      this.globalController = container.get('globalController') as IGlobalController;
-      this.branchController = container.get('branchController') as IBranchController;
-      this.contextController = container.get('contextController') as IContextController;
+      // Await promises from DI container to get actual controller instances
+      this.globalController = await this.container.get('globalController') as IGlobalController;
+      this.branchController = await this.container.get('branchController') as IBranchController;
+      this.contextController = await this.container.get('contextController') as IContextController;
+      this.templateController = await this.container.get('templateController') as ITemplateController;
 
       logger.info('Application initialized successfully');
     } catch (error) {
@@ -84,6 +87,18 @@ class Application {
 
     return this.contextController;
   }
+
+  /**
+   * Get template controller
+   * @returns Template controller
+   */
+  getTemplateController(): ITemplateController {
+    if (!this.templateController) {
+      throw new Error('Application not initialized. Call initialize() first.');
+    }
+
+    return this.templateController;
+  }
 }
 
 // Export as ESM
@@ -92,5 +107,3 @@ export async function createApplication(options?: CliOptions): Promise<Applicati
   await app.initialize();
   return app;
 }
-
-export { Application };

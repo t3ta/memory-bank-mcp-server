@@ -1,0 +1,267 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "system-patterns-feature-branch-controller-test",
+    "title": "System Patterns - feature/branch-controller-test",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "system-patterns",
+      "dependency-injection",
+      "async",
+      "promise",
+      "controller",
+      "design-pattern"
+    ],
+    "lastModified": "2025-03-23T11:40:00.000Z",
+    "createdAt": "2025-03-23T11:40:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "patterns": [
+      {
+        "id": "PAT-1",
+        "name": "依存性注入（DI）パターン",
+        "description": "コンポーネント間の依存関係を外部から注入することで、疎結合なシステム設計を実現しています。このプロジェクトでは、DIコンテナを使用してコントローラーやサービスの依存関係を管理しています。",
+        "implementation": "DIContainerクラスを使用して依存関係の登録と解決を行っています。setupContainer関数でアプリケーションの起動時に依存関係を登録しています。",
+        "benefits": [
+          "テスト容易性の向上",
+          "疎結合な設計",
+          "柔軟な依存関係の入れ替え"
+        ],
+        "challenges": [
+          "DIコンテナの非同期処理の扱いが複雑になる場合がある",
+          "DIの設定ミスがランタイムエラーになる可能性がある"
+        ],
+        "relatedFiles": [
+          "src/main/di/DIContainer.ts",
+          "src/main/di/providers.ts",
+          "src/main/index.ts"
+        ]
+      },
+      {
+        "id": "PAT-2",
+        "name": "プロミス解決パターン",
+        "description": "非同期処理の結果を表すPromiseオブジェクトを適切に解決(await)することで、非同期コードの扱いを簡潔にしています。DIコンテナから非同期に取得したコントローラーもこの方法で解決する必要があります。",
+        "implementation": "Application.initialize()メソッド内でDIコンテナからコントローラーを取得する際にawaitキーワードを使用して、Promiseを解決しています。",
+        "benefits": [
+          "非同期コードの同期的な記述",
+          "エラーハンドリングの簡素化",
+          "コードの可読性向上"
+        ],
+        "challenges": [
+          "awaitの抜け漏れによるPromise未解決バグ",
+          "エラーハンドリングの必要性",
+          "非同期処理の連鎖によるパフォーマンス低下の可能性"
+        ],
+        "relatedFiles": [
+          "src/main/index.ts"
+        ]
+      },
+      {
+        "id": "PAT-3",
+        "name": "コントローラーパターン",
+        "description": "ビジネスロジックとユーザーインターフェース間の橋渡しをするコントローラーパターンを採用しています。MCPサーバーやCLIからの要求をコントローラーが受け取り、適切なユースケースやサービスに委譲しています。",
+        "implementation": "InterfaceレイヤーにContextController、BranchController、GlobalController、TemplateControllerなどのコントローラークラスを用意し、各機能に対応しています。",
+        "benefits": [
+          "関心事の分離",
+          "ビジネスロジックの再利用性向上",
+          "テスト容易性の向上"
+        ],
+        "challenges": [
+          "コントローラーの肥大化",
+          "コントローラー間の責任境界の曖昧さ"
+        ],
+        "relatedFiles": [
+          "src/interface/controllers/ContextController.ts",
+          "src/interface/controllers/BranchController.ts",
+          "src/interface/controllers/GlobalController.ts",
+          "src/interface/controllers/TemplateController.ts"
+        ]
+      },
+      {
+        "id": "PAT-4",
+        "name": "レイヤードアーキテクチャ",
+        "description": "アプリケーションをドメイン、アプリケーション、インターフェース、インフラストラクチャの4つのレイヤーに分け、責任を明確に分離しています。",
+        "implementation": "src/domain, src/application, src/interface, src/infrastructureという4つの主要ディレクトリ構造によって実装されています。",
+        "benefits": [
+          "関心事の分離",
+          "コードの可読性向上",
+          "変更影響範囲の限定",
+          "テスト容易性の向上"
+        ],
+        "challenges": [
+          "レイヤー間の依存方向の管理",
+          "適切な責任配分"
+        ],
+        "relatedFiles": [
+          "src/domain/**/*.ts",
+          "src/application/**/*.ts",
+          "src/interface/**/*.ts",
+          "src/infrastructure/**/*.ts"
+        ]
+      },
+      {
+        "id": "PAT-5",
+        "name": "リポジトリパターン",
+        "description": "データアクセスを抽象化し、データソースの詳細を隠蔽するリポジトリパターンを採用しています。",
+        "implementation": "IJsonDocumentRepositoryなどのインターフェースと、FileSystemJsonDocumentRepositoryなどの実装クラスを用意しています。",
+        "benefits": [
+          "データアクセスの抽象化",
+          "データソースの変更容易性",
+          "テスト容易性の向上"
+        ],
+        "challenges": [
+          "リポジトリインターフェースの設計",
+          "非同期処理の扱い"
+        ],
+        "relatedFiles": [
+          "src/domain/repositories/IJsonDocumentRepository.ts",
+          "src/infrastructure/repositories/file-system/FileSystemJsonDocumentRepository.ts"
+        ]
+      }
+    ],
+    "key_technologies": [
+      {
+        "id": "TECH-1",
+        "name": "TypeScript",
+        "description": "静的型付けによる開発効率と安全性の向上を実現するJavaScriptのスーパーセット言語です。",
+        "version": "5.8.2",
+        "usage": "プロジェクト全体の実装言語として使用しています。",
+        "benefits": [
+          "静的型チェックによるバグの早期発見",
+          "コード補完によるDX向上",
+          "リファクタリングの容易さ"
+        ]
+      },
+      {
+        "id": "TECH-2",
+        "name": "Node.js",
+        "description": "JavaScriptのランタイム環境で、サーバーサイドJavaScriptの実行環境です。",
+        "version": "23.8.0",
+        "usage": "MCPサーバーの実行環境として使用しています。",
+        "benefits": [
+          "非同期I/Oによる高いパフォーマンス",
+          "豊富なエコシステム",
+          "フロントエンドとバックエンドでの言語統一"
+        ]
+      },
+      {
+        "id": "TECH-3",
+        "name": "ESM (ECMAScript Modules)",
+        "description": "JavaScript公式のモジュールシステムです。",
+        "version": "ES2022",
+        "usage": "プロジェクト全体のモジュール管理に使用しています。",
+        "benefits": [
+          "標準化されたモジュールシステム",
+          "ツリーシェイキングのサポート",
+          "非同期モジュール読み込み"
+        ]
+      },
+      {
+        "id": "TECH-4",
+        "name": "Clean Architecture",
+        "description": "ビジネスロジックを中心に据え、外部依存を最小限に抑えるアーキテクチャアプローチです。",
+        "usage": "プロジェクト全体のアーキテクチャとして採用しています。",
+        "benefits": [
+          "テスト容易性",
+          "変更に強い設計",
+          "ビジネスロジックの明確な分離"
+        ]
+      }
+    ],
+    "file_structure": {
+      "description": "このバグ修正に関連する主要なファイル構造を示します。",
+      "structure": [
+        {
+          "path": "src/main/index.ts",
+          "description": "アプリケーションのエントリーポイントとDIコンテナの初期化を行うファイルです。ここにbugfixを適用しました。",
+          "importance": "高"
+        },
+        {
+          "path": "src/main/di/providers.ts",
+          "description": "DIコンテナへの依存関係の登録を行うファイルです。各コントローラーの登録が含まれています。",
+          "importance": "高"
+        },
+        {
+          "path": "src/main/di/DIContainer.ts",
+          "description": "DIコンテナの実装を提供するファイルです。",
+          "importance": "中"
+        },
+        {
+          "path": "src/interface/controllers/ContextController.ts",
+          "description": "コンテキスト情報を扱うコントローラークラスの実装です。readContext機能を提供します。",
+          "importance": "高"
+        },
+        {
+          "path": "src/cli/commands/context/read-context.ts",
+          "description": "read-contextコマンドの実装です。このコマンドが今回のバグで問題を起こしていました。",
+          "importance": "高"
+        },
+        {
+          "path": "tmp-test/debug.js",
+          "description": "バグを診断するために作成したデバッグスクリプトです。",
+          "importance": "低"
+        },
+        {
+          "path": "tmp-test/fix-app.js",
+          "description": "修正を検証するために作成したテストスクリプトです。",
+          "importance": "低"
+        }
+      ]
+    },
+    "communications": {
+      "description": "このバグ修正に関連するコンポーネント間の通信フローを示します。",
+      "flow": [
+        {
+          "from": "CLI (yarn cli read-context)",
+          "to": "ReadContextCommand",
+          "description": "CLIからread-contextコマンドが実行されると、ReadContextCommandが起動します。",
+          "type": "同期"
+        },
+        {
+          "from": "ReadContextCommand",
+          "to": "Application",
+          "description": "ReadContextCommandがApplicationインスタンスを作成し、初期化します。",
+          "type": "非同期"
+        },
+        {
+          "from": "Application",
+          "to": "DIContainer",
+          "description": "ApplicationがDIContainerを初期化し、コントローラーを取得します。このとき、Promiseの解決が必要です。",
+          "type": "非同期"
+        },
+        {
+          "from": "Application",
+          "to": "ContextController",
+          "description": "解決されたContextControllerインスタンスにアクセスします。",
+          "type": "同期"
+        },
+        {
+          "from": "ContextController",
+          "to": "ReadContextUseCase",
+          "description": "ContextControllerがReadContextUseCaseを呼び出します。",
+          "type": "非同期"
+        },
+        {
+          "from": "ReadContextUseCase",
+          "to": "リポジトリ群",
+          "description": "UseCaseが必要なリポジトリにアクセスしてデータを取得します。",
+          "type": "非同期"
+        },
+        {
+          "from": "ContextController",
+          "to": "ReadContextCommand",
+          "description": "取得したコンテキスト情報がコントローラーからコマンドに返されます。",
+          "type": "非同期"
+        },
+        {
+          "from": "ReadContextCommand",
+          "to": "CLI出力",
+          "description": "コマンドが取得したコンテキスト情報を出力します。",
+          "type": "同期"
+        }
+      ]
+    }
+  }
+}

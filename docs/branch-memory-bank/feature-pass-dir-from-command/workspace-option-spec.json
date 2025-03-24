@@ -1,0 +1,91 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "workspace-option-spec",
+    "title": "ワークスペースオプションの追加仕様",
+    "documentType": "specification",
+    "path": "workspace-option-spec.json",
+    "tags": [
+      "specification",
+      "design",
+      "cli"
+    ],
+    "lastModified": "2025-03-24T09:42:20.284Z",
+    "createdAt": "2025-03-24T09:42:20.284Z",
+    "version": 1
+  },
+  "content": {
+    "title": "ワークスペースオプションの追加仕様",
+    "description": "複数のプロジェクトで同じサーバーを使用するためのワークスペースオプション追加機能",
+    "background": {
+      "current": "現在はコマンドライン引数の--docsで「ドキュメントディレクトリ」を指定する仕組みになっている",
+      "issue": "複数のプロジェクトで同じメモリバンクサーバーを使用したいユースケースがある",
+      "solution": "コマンドライン引数からワークスペースを指定できるようにする"
+    },
+    "requirements": {
+      "functional": [
+        {
+          "id": "F1",
+          "description": "コマンドライン引数で--workspaceオプションを追加し、プロジェクトのルートディレクトリを指定できるようにする"
+        },
+        {
+          "id": "F2",
+          "description": "既存の--docsオプションとの互換性を維持する"
+        },
+        {
+          "id": "F3",
+          "description": "環境変数WORKSPACE_ROOTでもワークスペースディレクトリを指定できるようにする"
+        },
+        {
+          "id": "F4",
+          "description": "ワークスペースとドキュメントディレクトリの組み合わせでプロジェクト固有のメモリバンクを実現する"
+        }
+      ],
+      "non_functional": [
+        {
+          "id": "NF1",
+          "description": "既存のユーザーの変更なしに使用できる後方互換性を確保する"
+        },
+        {
+          "id": "NF2",
+          "description": "ドキュメントやコードで新機能の使用方法を明示する"
+        }
+      ]
+    },
+    "design": {
+      "changes": [
+        {
+          "component": "command_line_parser",
+          "description": "コマンドライン引数処理部分を更新し、--workspaceオプションを追加"
+        },
+        {
+          "component": "config_provider",
+          "description": "ConfigProviderで既にworkspaceRootの実装があるため、これをより明示的に活用する"
+        },
+        {
+          "component": "application_factory",
+          "description": "アプリケーション作成時にワークスペースオプションを確実に渡す"
+        }
+      ],
+      "implementation_steps": [
+        {
+          "step": 1,
+          "description": "src/index.tsのコマンドライン引数パーサーに--workspaceオプションを追加する"
+        },
+        {
+          "step": 2,
+          "description": "アプリケーション作成時にworkspaceオプションを明示的に渡す"
+        },
+        {
+          "step": 3,
+          "description": "READMEやヘルプメッセージに新しいオプションの説明を追加する"
+        }
+      ]
+    },
+    "impact_analysis": {
+      "backward_compatibility": "既存のユーザーは--docsオプションを引き続き使用できる",
+      "migration_path": "不要（既存機能に影響なし）",
+      "testing": "両方のオプションを使用したケースのテストが必要"
+    }
+  }
+}

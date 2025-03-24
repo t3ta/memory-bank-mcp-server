@@ -1,0 +1,155 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "f36da637-fbd4-4038-9b31-ec6a4d2b3a19",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": ["system-patterns", "read-context", "bugfix"],
+    "lastModified": "2025-03-24T07:51:20.000Z",
+    "createdAt": "2025-03-24T07:31:38.506Z",
+    "version": 3
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "c9a69a96-0bd1-4119-ae89-e9393d62aaa2",
+        "title": "ブランチ名の安全な処理",
+        "context": "ブランチ名に含まれるスラッシュ(/)がファイルシステムのパスとして解釈されるため、安全な形式に変換する必要がある",
+        "decision": "BranchInfo.safeNameメソッドを使用して、ブランチ名のスラッシュ(/)をハイフン(-)に変換する",
+        "consequences": {
+          "positive": [
+            "ファイルシステムでの安全な操作が可能になる",
+            "ブランチ名の変換ロジックが一箇所に集約される",
+            "read_contextコマンドが正しく動作するようになる"
+          ],
+          "negative": [
+            "変換されたブランチ名と元のブランチ名の対応関係を把握する必要がある"
+          ]
+        },
+        "status": "accepted",
+        "date": "2025-03-24T07:51:20.000Z",
+        "alternatives": [
+          "ブランチ名にスラッシュを使用しない命名規則を採用する",
+          "ファイルシステムの階層構造を使用してブランチを表現する"
+        ]
+      },
+      {
+        "id": "d8b7e5f4-c3a2-4b1d-9e0f-8a7b6c5d4e3f",
+        "title": "エラー処理とログ出力の強化",
+        "context": "エラーが発生した際に原因の特定が困難だった",
+        "decision": "詳細なログ出力を追加し、エラー情報をより詳細に記録する",
+        "consequences": {
+          "positive": [
+            "問題の特定が容易になる",
+            "デバッグ作業が効率化される",
+            "エラーの早期検出が可能になる"
+          ],
+          "negative": [
+            "ログ出力が増えることでパフォーマンスに若干の影響がある可能性がある"
+          ]
+        },
+        "status": "accepted",
+        "date": "2025-03-24T07:51:20.000Z",
+        "alternatives": [
+          "エラー発生時にデバッグモードを有効にする",
+          "エラー情報を外部サービスに送信する"
+        ]
+      },
+      {
+        "id": "a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890",
+        "title": "JSONの検証処理の追加",
+        "context": "無効なJSONが保存されようとした際にエラーメッセージが不明確だった",
+        "decision": "保存前にJSONの検証処理を追加し、無効なJSONを早期に検出する",
+        "consequences": {
+          "positive": [
+            "無効なJSONが保存されるのを防止できる",
+            "エラーメッセージがより具体的になる",
+            "データの整合性が向上する"
+          ],
+          "negative": [
+            "保存処理に追加のステップが必要になる"
+          ]
+        },
+        "status": "accepted",
+        "date": "2025-03-24T07:51:20.000Z",
+        "alternatives": [
+          "保存後に検証を行う",
+          "スキーマベースの検証を導入する"
+        ]
+      },
+      {
+        "id": "b2c3d4e5-f6g7-8h9i-j0k1-l2m3n4o5p6q7",
+        "title": "テンプレート処理の改善",
+        "context": "read_contextコマンドでrulesが含まれない問題があった",
+        "decision": "ReadRulesUseCaseのパス検索ロジックを確認し、テンプレートファイルが正しく見つかるようにする",
+        "consequences": {
+          "positive": [
+            "ルール情報が正しく読み込まれるようになる",
+            "複数のパスを試すことで柔軟性が向上する",
+            "ContextControllerでのエラー処理が改善される"
+          ],
+          "negative": [
+            "複数のパスを試すことでパフォーマンスが若干低下する可能性がある"
+          ]
+        },
+        "status": "accepted",
+        "date": "2025-03-24T07:51:20.000Z",
+        "alternatives": [
+          "テンプレートファイルのパスを固定する",
+          "テンプレート処理を完全に再設計する"
+        ]
+      }
+    ],
+    "implementationPatterns": [
+      {
+        "id": "e1f2g3h4-i5j6-7890-e1f2-g3h4i5j67890",
+        "name": "ブランチ名の安全な変換",
+        "description": "ブランチ名に含まれるスラッシュ(/)をハイフン(-)に変換する",
+        "codeExample": "// BranchInfo.ts\npublic get safeName(): string {\n  return this._name.replace(/\\//g, '-');\n}\n\n// FileSystemBranchMemoryBankRepository.ts\nconst safeBranchName = branchInfo.safeName;\nconst branchPath = path.join(this.branchMemoryBankPath, safeBranchName);",
+        "relatedFiles": [
+          "src/domain/entities/BranchInfo.ts",
+          "src/infrastructure/repositories/FileSystemBranchMemoryBankRepository.ts"
+        ]
+      },
+      {
+        "id": "k1l2m3n4-o5p6-7890-k1l2-m3n4o5p67890",
+        "name": "詳細なエラーログ",
+        "description": "エラー情報をより詳細に記録するためのログ出力パターン",
+        "codeExample": "logger.error('Failed to save document:', {\n  error: {\n    name: error instanceof Error ? error.name : 'Unknown',\n    message: error instanceof Error ? error.message : 'Unknown error',\n    stack: error instanceof Error ? error.stack : undefined,\n    code: error instanceof DomainError ? error.code : undefined\n  },\n  document: {\n    path: document.path.value,\n    contentLength: document.content.length,\n    isJSON: document.path.value.endsWith('.json')\n  },\n  branch: {\n    name: branchInfo.name,\n    safeName: safeBranchName,\n    path: branchPath\n  },\n  filesystem: {\n    targetPath: filePath\n  }\n});",
+        "relatedFiles": [
+          "src/infrastructure/repositories/FileSystemBranchMemoryBankRepository.ts",
+          "src/shared/utils/logger.ts"
+        ]
+      },
+      {
+        "id": "q1r2s3t4-u5v6-7890-q1r2-s3t4u5v67890",
+        "name": "JSON検証パターン",
+        "description": "保存前にJSONの検証を行うパターン",
+        "codeExample": "// JSONの検証\ntry {\n  const parsedContent = JSON.parse(document.content);\n  logger.debug('Document content validated as JSON:', {\n    schema: parsedContent.schema,\n    documentType: parsedContent.metadata?.documentType\n  });\n} catch (err) {\n  logger.error('Invalid JSON content:', {\n    error: err instanceof Error ? err.message : 'Unknown error',\n    content: document.content.substring(0, 100) + '...' // 先頭100文字のみログ出力\n  });\n  throw new DomainError(\n    DomainErrorCodes.INVALID_DOCUMENT_FORMAT,\n    'Document content is not valid JSON'\n  );\n}",
+        "relatedFiles": [
+          "src/infrastructure/repositories/FileSystemBranchMemoryBankRepository.ts",
+          "src/shared/errors/DomainError.ts"
+        ]
+      },
+      {
+        "id": "s5t6u7v8-w9x0-y1z2-a3b4-c5d6e7f8g9h0",
+        "name": "複数パス検索パターン",
+        "description": "複数の可能性のあるパスを順番に試すパターン",
+        "codeExample": "// 複数のパスを試す\nconst possiblePaths = [\n  // 新しいパス\n  path.join(this.rulesDir, 'domain', 'templates', `rules-${language}.json`),\n  // 以前のパス (旧システムとの互換性のため)\n  path.join(this.rulesDir, 'templates', `rules-${language}.json`),\n  // フォールバック\n  path.join(this.rulesDir, `rules-${language}.json`)\n];\n\nlet jsonContent = '';\nlet jsonFilePath = '';\n\n// 存在するパスを探す\nfor (const p of possiblePaths) {\n  try {\n    jsonContent = await fs.readFile(p, 'utf-8');\n    jsonFilePath = p;\n    logger.debug('Rules JSON file found', { path: jsonFilePath });\n    break;\n  } catch (err) {\n    // このパスでは見つからなかった、次を試す\n    continue;\n  }\n}",
+        "relatedFiles": [
+          "src/application/usecases/common/ReadRulesUseCase.ts"
+        ]
+      },
+      {
+        "id": "i7j8k9l0-m1n2-o3p4-q5r6-s7t8u9v0w1x2",
+        "name": "エラー耐性パターン",
+        "description": "一部の処理が失敗しても全体の処理を継続するパターン",
+        "codeExample": "// ルールを取得（別のユースケースを使用）\ntry {\n  logger.debug(`Requesting rules for language: ${request.language}`);\n  contextResult.rules = await this.readRulesUseCase.execute(request.language);\n  logger.debug(`Rules retrieved successfully for language: ${request.language}`);\n} catch (error) {\n  logger.error(`Failed to read rules for language ${request.language}:`, error);\n  // ルールの読み込み失敗は致命的ではないので、その他のコンテキスト情報は返す\n}",
+        "relatedFiles": [
+          "src/interface/controllers/ContextController.ts"
+        ]
+      }
+    ]
+  }
+}

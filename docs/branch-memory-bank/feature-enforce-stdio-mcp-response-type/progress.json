@@ -1,0 +1,135 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "837e727f-ed10-4259-895e-3211f48fbb08",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress"
+    ],
+    "lastModified": "2025-03-24T07:40:00.000Z",
+    "createdAt": "2025-03-24T04:47:12.665Z",
+    "version": 9
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "6a5e8d39-3e5a-4563-9ea3-9fdc243aa83c",
+        "description": "GlobalController.tsのconsole.logをlogger.debugに置き換え",
+        "implementedAt": "2025-03-24T05:10:00.000Z"
+      },
+      {
+        "id": "ba4039bd-6ed0-4a67-b98c-7ea9dd46cf14",
+        "description": "src/infrastructure/repositories/file-system/FileSystemMemoryDocumentRepository.tsのconsole.logをlogger.debugに置き換え",
+        "implementedAt": "2025-03-24T06:00:00.000Z"
+      },
+      {
+        "id": "c9b1d2e5-f678-4a34-9b56-e0df1a2c3b4e",
+        "description": "src/domain/entities/Tag.tsのconsole.logをlogger.debugに置き換え",
+        "implementedAt": "2025-03-24T06:00:00.000Z"
+      },
+      {
+        "id": "a7b8c9d0-1234-5678-9abc-def0123456",
+        "description": "src/domain/entities/MemoryDocument.tsのconsole.logをlogger.debugに置き換え",
+        "implementedAt": "2025-03-24T06:00:00.000Z"
+      },
+      {
+        "id": "d4e5f6a1-b2c3-4d5e-6f7a-8b9c0d1e2f3a",
+        "description": "src/application/usecases/common/SearchDocumentsByTagsUseCase.tsのconsole.logをlogger.debugに置き換え",
+        "implementedAt": "2025-03-24T06:25:00.000Z"
+      },
+      {
+        "id": "e5f6a7b1-c2d3-4e5f-6a7b-8c9d0e1f2a3b",
+        "description": "src/application/usecases/global/WriteGlobalDocumentUseCase.tsのconsole.logをlogger.debugに置き換え",
+        "implementedAt": "2025-03-24T06:25:00.000Z"
+      },
+      {
+        "id": "f6a7b8c1-d2e3-4f5a-6b7c-8d9e0f1a2b3c",
+        "description": "src/infrastructure/repositories/FileSystemBranchMemoryBankRepository.tsのconsole.logをlogger.debugに置き換え",
+        "implementedAt": "2025-03-24T06:30:00.000Z"
+      },
+      {
+        "id": "a7b8c9d1-e2f3-4a5b-6c7d-8e9f0a1b2c3d",
+        "description": "src/infrastructure/repositories/simple/SimpleBranchMemoryBankRepository.tsのconsole.logをlogger.debugに置き換え（シェルスクリプトで自動置換）",
+        "implementedAt": "2025-03-24T06:30:00.000Z"
+      },
+      {
+        "id": "b8c9d0e1-f2a3-4b5c-6d7e-8f9a0b1c2d3e",
+        "description": "src/infrastructure/repositories/simple/SimpleGlobalMemoryBankRepository.tsのconsole.logをlogger.debugに置き換え",
+        "implementedAt": "2025-03-24T07:00:00.000Z"
+      },
+      {
+        "id": "d0e1f2a3-b4c5-6d7e-8f9a-0b1c2d3e4f5a",
+        "description": "src/migration/関連ファイル（MigrationReport, MarkdownMigrationService, MarkdownToJsonMigrator）のconsole.logをlogger.debugに置き換え",
+        "implementedAt": "2025-03-24T07:15:00.000Z"
+      },
+      {
+        "id": "a1b2c3d4-e5f6-7g8h-9i0j-1k2l3m4n5o6p",
+        "description": "src/application/usecases/common/ReadRulesUseCase.tsのconsole.logをlogger.debugに置き換え",
+        "implementedAt": "2025-03-24T07:05:00.000Z"
+      },
+      {
+        "id": "c9d0e1f2-a3b4-5c6d-7e8f-9a0b1c2d3e4f",
+        "description": "src/interface/controllers/CoreFilesController.tsのconsole.logをlogger.debugに置き換え",
+        "implementedAt": "2025-03-24T07:25:00.000Z"
+      },
+      {
+        "id": "a1b2c3d4-e5f6-7g8h-9i0j-1k2l3m4n5o6p",
+        "description": "src/infrastructure/repositories/simple/SimpleBranchMemoryBankRepository.tsの文字列テンプレート記法バグの修正とconsole.logをlogger.debugに置き換え",
+        "implementedAt": "2025-03-24T07:30:00.000Z"
+      },
+      {
+        "id": "b2c3d4e5-f6g7-8h9i-0j1k-2l3m4n5o6p7q",
+        "description": "cliディレクトリ内のconsole.log使用の調査と非対応の判断（CLIツールは標準出力に結果を表示する必要があるため）",
+        "implementedAt": "2025-03-24T07:40:00.000Z"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "c19944c6-9fe2-4b98-8df3-f99d9f985383",
+        "description": "ESLintルールの導入検討 - console.*の使用を禁止し、適切な例外ケース（cliディレクトリなど）を設定する",
+        "priority": "low"
+      },
+      {
+        "id": "3c7fe8b5-d8e6-480d-9f6c-7acdb9e42f5d",
+        "description": "変更によるテスト実施と検証",
+        "priority": "high"
+      }
+    ],
+    "status": "すべての必要な修正が完了。cliディレクトリのconsole.log使用は標準出力へ結果を表示するための合理的な使用のため変更不要と判断。ESLintルールによる今後のコード品質担保は保留タスク。",
+    "completionPercentage": 98,
+    "knownIssues": [
+      {
+        "id": "7ceba6df-17a1-4b76-bf9f-fb0ca08356ff",
+        "description": "src/interface/controllers/GlobalController.tsのfindDocumentsByTagsメソッドにconsole.logが使用されていた問題",
+        "severity": "high",
+        "status": "resolved"
+      },
+      {
+        "id": "8bcf22a4-256f-4aa2-a56b-d700dee0f814",
+        "description": "FileSystemMemoryDocumentRepository.ts内にconsole.log使用箇所が多数ある",
+        "severity": "high",
+        "status": "resolved"
+      },
+      {
+        "id": "9e4a3d6f-7bc2-1e8f-5a9d-3b7c4d8e9f0a",
+        "description": "Tag.tsとMemoryDocument.ts内にconsole.log使用箇所がある",
+        "severity": "high",
+        "status": "resolved"
+      },
+      {
+        "id": "1a2b3c4d-5e6f-7g8h-9i0j-1k2l3m4n5o6p",
+        "description": "SimpleBranchMemoryBankRepository.tsで文字列テンプレートが正しく使われていないバグ（${変数}がそのまま出力される）",
+        "severity": "high",
+        "status": "resolved"
+      },
+      {
+        "id": "2b3c4d5e-6f7g-8h9i-0j1k-2l3m4n5o6p7q",
+        "description": "cliディレクトリ内のファイルでconsole.logが使用されているが、CLIツールとしての標準出力使用は正当",
+        "severity": "low",
+        "status": "wontfix"
+      }
+    ]
+  }
+}

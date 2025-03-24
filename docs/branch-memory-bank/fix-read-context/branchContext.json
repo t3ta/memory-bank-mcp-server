@@ -1,0 +1,45 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "5980f438-10bf-446c-bf7e-e6a61676e26d",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": ["branch-context", "read-context", "bugfix"],
+    "lastModified": "2025-03-24T07:48:09.000Z",
+    "createdAt": "2025-03-24T07:31:38.504Z",
+    "version": 2
+  },
+  "content": {
+    "branchName": "fix/read-context",
+    "purpose": "read_contextコマンドとブランチ名処理の問題を修正する",
+    "createdAt": "2025-03-24T07:31:38.504Z",
+    "userStories": [
+      {
+        "id": "94455ccd-8750-42e0-b738-c1dc587ec532",
+        "description": "ブランチ名に含まれるスラッシュ(/)がファイルシステムで正しく処理されるようにする",
+        "completed": true,
+        "priority": 1
+      },
+      {
+        "id": "bd08b57a-4429-4242-a79d-6ca870dab65c",
+        "description": "FileSystemBranchMemoryBankRepositoryでBranchInfo.safeNameを使用するように修正",
+        "completed": true,
+        "priority": 1
+      },
+      {
+        "id": "98ed09f2-afaa-4f36-8f02-ed5974fd9894",
+        "description": "エラー処理とログ出力を強化して問題の特定を容易にする",
+        "completed": true,
+        "priority": 2
+      },
+      {
+        "id": "a7c31e5f-9b2d-4e8a-b5c6-d8f3e7a9c0b1",
+        "description": "テンプレート処理の問題を解決し、ルールなどのテンプレートが適切に処理されるようにする",
+        "completed": true,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": "このブランチでは、read_contextコマンドが正しく動作しない問題を修正しました。主な問題はブランチ名の処理にありました。ブランチ名に含まれるスラッシュ(/)がファイルシステムのパスとして解釈されるため、BranchInfo.safeNameを使用して「/」を「-」に変換する必要がありました。また、エラー処理とログ出力を強化して、問題の特定と解決を容易にしました。"
+  }
+}

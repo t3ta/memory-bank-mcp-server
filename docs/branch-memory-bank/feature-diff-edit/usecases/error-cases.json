@@ -1,0 +1,217 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "diff-edit-usecases-errors",
+    "title": "JSONパッチ - エラーケース",
+    "documentType": "usecases",
+    "path": "usecases/error-cases.json",
+    "tags": [
+      "json-patch",
+      "usecases",
+      "rfc6902",
+      "document-editing",
+      "error-handling"
+    ],
+    "lastModified": "2025-03-24T22:10:00.000Z",
+    "createdAt": "2025-03-24T22:10:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": "JSON Patch操作における可能性のあるエラーケースとその取り扱いについて説明します。適切なエラーハンドリングは、開発者体験と安全なドキュメント操作のために不可欠です。",
+    "errorCases": [
+      {
+        "errorCode": "DOCUMENT_NOT_FOUND",
+        "description": "指定されたドキュメントが存在しない",
+        "causes": [
+          "ドキュメントIDまたはパスの誤り",
+          "ドキュメントの削除",
+          "ブランチ指定の誤り"
+        ],
+        "recovery": "正しいドキュメントIDを指定するか、先にドキュメントを作成してください",
+        "httpStatus": 404
+      },
+      {
+        "errorCode": "INVALID_JSON_PATH",
+        "description": "JSONパスの構文が不正",
+        "causes": [
+          "RFC 6901に準拠していないパス形式",
+          "スラッシュ（/）で始まっていないパス",
+          "不正なエスケープシーケンス（~の後に0または1以外の文字）"
+        ],
+        "examples": [
+          "path/without/leading/slash",
+          "/invalid~escape",
+          "not-a-path"
+        ],
+        "recovery": "RFC 6901に準拠したパス形式を使用してください",
+        "httpStatus": 400
+      },
+      {
+        "errorCode": "PATH_NOT_FOUND",
+        "description": "指定されたパスがドキュメント内に存在しない",
+        "causes": [
+          "存在しないプロパティへのアクセス",
+          "removeまたはreplaceで存在しないパスを指定",
+          "中間のパスセグメントが存在しない"
+        ],
+        "examples": [
+          "/metadata/nonexistentProperty",
+          "/content/items/99"
+        ],
+        "recovery": "既存のパスを指定するか、add操作で新しいパスを作成してください",
+        "httpStatus": 400
+      },
+      {
+        "errorCode": "INVALID_OPERATION",
+        "description": "指定された操作が不正または未サポート",
+        "causes": [
+          "RFC 6902で定義されていない操作タイプ",
+          "必須パラメータの欠如（add/replace操作でのvalue、move/copyでのfrom）"
+        ],
+        "examples": [
+          {
+            "op": "append",
+            "path": "/items",
+            "value": {}
+          },
+          {
+            "op": "add",
+            "path": "/items/-"
+          }
+        ],
+        "recovery": "add、remove、replace、move、copy、testのいずれかを使用してください",
+        "httpStatus": 400
+      },
+      {
+        "errorCode": "TEST_FAILED",
+        "description": "テスト条件が満たされなかった",
+        "causes": [
+          "test操作で指定された値とドキュメントの値が一致しない",
+          "条件付き更新の前提条件が満たされていない"
+        ],
+        "examples": [
+          {
+            "op": "test",
+            "path": "/metadata/version",
+            "value": 3
+          }
+        ],
+        "recovery": "現在のドキュメント状態を確認し、正しいテスト条件を設定してください",
+        "httpStatus": 409
+      },
+      {
+        "errorCode": "INVALID_INDEX",
+        "description": "配列インデックスが範囲外",
+        "causes": [
+          "配列の長さを超えるインデックスを指定",
+          "負のインデックス"
+        ],
+        "examples": [
+          "/items/99",
+          "/items/-1"
+        ],
+        "recovery": "有効な配列のインデックスを指定するか、'-'を使用して末尾に追加してください",
+        "httpStatus": 400
+      },
+      {
+        "errorCode": "INVALID_TARGET_TYPE",
+        "description": "操作対象の型が不適切",
+        "causes": [
+          "配列操作を非配列プロパティに適用",
+          "オブジェクト操作を非オブジェクトプロパティに適用"
+        ],
+        "examples": [
+          "/metadata/title/-",
+          "/items/0/name/property"
+        ],
+        "recovery": "操作に適したデータ型を持つパスを指定してください",
+        "httpStatus": 400
+      },
+      {
+        "errorCode": "INVALID_MOVE_OPERATION",
+        "description": "不正な移動操作",
+        "causes": [
+          "ノードを自分自身の子孫に移動しようとした",
+          "存在しない要素の移動"
+        ],
+        "examples": [
+          {
+            "op": "move",
+            "from": "/a",
+            "path": "/a/b"
+          }
+        ],
+        "recovery": "移動元と移動先のパスが親子関係にならないようにしてください",
+        "httpStatus": 400
+      },
+      {
+        "errorCode": "REQUIRED_FIELD_REMOVAL",
+        "description": "必須フィールドの削除が試みられた",
+        "causes": [
+          "スキーマで必須とされているフィールドの削除操作"
+        ],
+        "examples": [
+          "/metadata/id",
+          "/schema"
+        ],
+        "recovery": "必須フィールドは削除できません。代わりに更新してください",
+        "httpStatus": 400
+      },
+      {
+        "errorCode": "CONFLICT",
+        "description": "競合する更新操作",
+        "causes": [
+          "同時編集による競合",
+          "バージョン不一致"
+        ],
+        "recovery": "最新バージョンを取得し直してから再試行してください",
+        "httpStatus": 409
+      },
+      {
+        "errorCode": "PERMISSION_DENIED",
+        "description": "操作に必要な権限がない",
+        "causes": [
+          "読み取り専用ドキュメントへの書き込み",
+          "保護されたフィールドへの操作"
+        ],
+        "recovery": "適切な権限を持つユーザーで操作するか、許可された操作のみを行ってください",
+        "httpStatus": 403
+      }
+    ],
+    "errorHandlingBestPractices": {
+      "clientSide": [
+        "エラーコードに基づいて適切なエラーメッセージを表示",
+        "回復可能なエラー（CONFLICT、PATH_NOT_FOUND）では、修正手段をユーザーに提案",
+        "テスト操作を使用して競合を事前に検出",
+        "大規模な変更の前にドキュメントの検証を行う"
+      ],
+      "serverSide": [
+        "詳細なエラー情報（エラーコード、メッセージ、発生位置）を返却",
+        "バッチ操作では可能な限り多くのエラーを一度に検出して報告",
+        "エラーログに十分なコンテキスト情報を含める",
+        "異常なエラーパターンを検出してモニタリング"
+      ]
+    },
+    "errorResponseFormat": {
+      "description": "APIからのエラーレスポンスは、以下の統一されたフォーマットを持ちます：",
+      "example": {
+        "success": false,
+        "error": {
+          "code": "ERROR_CODE",
+          "message": "人間が読めるエラーメッセージ",
+          "details": {
+            "path": "/affected/path",
+            "operationIndex": 2,
+            "operation": {
+              "op": "failed-operation-type",
+              "path": "/affected/path"
+            },
+            "expected": "期待値（該当する場合）",
+            "actual": "実際の値（該当する場合）"
+          },
+          "recommendation": "エラー回復のための推奨アクション"
+        }
+      }
+    }
+  }
+}

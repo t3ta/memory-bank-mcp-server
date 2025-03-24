@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "4f7e8d28-5b21-406b-8541-a7259d60ce88",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-21T15:40:15.858Z",
+    "createdAt": "2025-03-21T15:40:15.858Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "feature/re-organize-global-memory-bank",
+    "purpose": "このブランチの目的を記述してください",
+    "createdAt": "2025-03-21T15:40:15.858Z",
+    "userStories": [
+      {
+        "id": "8922348c-c116-4a62-9f83-7b603dfcba99",
+        "description": "解決する課題1",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "5dc2a0c7-43d3-4caf-a0b7-08490d95df1d",
+        "description": "解決する課題2",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "2ef8f6ed-81bd-412a-a119-7bf029a80f80",
+        "description": "解決する課題3",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": ""
+  }
+}

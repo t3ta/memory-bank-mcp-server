@@ -1,0 +1,35 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "996319c5-1e02-4bbb-9ce5-a8a6d653b89e",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-24T05:00:00.000Z",
+    "createdAt": "2025-03-24T04:47:12.662Z",
+    "version": 2
+  },
+  "content": {
+    "branchName": "feature/enforce-stdio-mcp-response-type",
+    "purpose": "標準出力からMCPResponseのJSON以外が出力されることを防止し、JSON出力の整合性を確保する",
+    "createdAt": "2025-03-24T04:47:12.662Z",
+    "userStories": [
+      {
+        "id": "919695f7-ffa8-4483-9fc1-daeee6d35609",
+        "description": "開発者として、標準出力に出力されるのはMCPResponse形式のJSONのみに限定したい。これによりJSON解析時のパースエラーを防止する",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "fdfd8c73-f6bb-4427-b983-a95b31f33551",
+        "description": "開発者として、コード内のconsole.logの使用を制限し、代わりに構造化されたロガーの使用を強制したい",
+        "completed": false,
+        "priority": 2
+      }
+    ],
+    "additionalNotes": "現在の問題点：\n- src/interface/controllers/GlobalController.tsの187行目にconsole.logが使われており、JSONではない出力が標準出力に出力されている\n- 標準出力にJSON以外が出力されるとMCPResponseとしてのJSONパース時にエラーが発生する\n\n解決方法：\n- console.logの使用をやめ、代わりにlogger.debugなどの構造化されたロガーを使用する\n- 必要に応じて、コード内の他のconsole.log使用箇所も同様に修正する\n- 標準出力へのJSONフォーマット以外の出力を禁止するポリシーを徹底する"
+  }
+}

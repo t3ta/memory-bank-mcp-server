@@ -1,0 +1,45 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "7b3c8c91-e0cd-4f1a-b7ec-5f89234567ae",
+    "title": "作業メモ",
+    "documentType": "progress_note",
+    "path": "progressNote.json",
+    "tags": [
+      "progress-note",
+      "log"
+    ],
+    "lastModified": "2025-03-24T06:35:00.000Z",
+    "createdAt": "2025-03-24T05:05:00.000Z",
+    "version": 5
+  },
+  "content": {
+    "notes": [
+      {
+        "date": "2025-03-24T05:05:00.000Z",
+        "author": "Claude",
+        "note": "問題箇所を特定しました: src/interface/controllers/GlobalController.ts の187行目に不適切なconsole.logが使用されており、標準出力にJSONではない出力が混入しています。このconsole.logをlogger.debugに置き換えることで問題を解決できます。"
+      },
+      {
+        "date": "2025-03-24T05:30:00.000Z",
+        "author": "Claude",
+        "note": "追加の問題箇所を特定しました。以下のファイルにconsole.logの使用が見られます：\n1. src/infrastructure/repositories/file-system/FileSystemMemoryDocumentRepository.ts - 多数のデバッグログ\n2. src/domain/entities/Tag.ts - equals()メソッド内のデバッグログ\n3. src/domain/entities/MemoryDocument.ts - hasTagメソッドと複数箇所\n\nこれらすべてをlogger.debugに置き換える必要があります。これにより標準出力が汚染されるのを防ぎ、MCPレスポンスのJSONパース時のエラーを防止できます。"
+      },
+      {
+        "date": "2025-03-24T06:00:00.000Z",
+        "author": "Claude",
+        "note": "すべての問題箇所の修正が完了しました：\n\n1. FileSystemMemoryDocumentRepository.ts: \n   - 8箇所以上のconsole.logをlogger.debugに置き換え\n   - デバッグメッセージの形式を改善（テンプレート文字列から構造化オブジェクトに）\n\n2. Tag.ts:\n   - equals()メソッド内のデバッグログを修正\n   - loggerをimport\n\n3. MemoryDocument.ts:\n   - hasTagメソッド、toJSON、fromJSONなど複数箇所のconsole.logを修正\n   - console.errorをlogger.errorに置き換え\n   - console.warnをlogger.warnに置き換え\n\n使用パターンとして、「メッセージ文字列, { 関連オブジェクト }」の形式を統一して使用。標準出力のJSONパース時のエラーは今後発生しなくなるはずです。"
+      },
+      {
+        "date": "2025-03-24T06:30:00.000Z",
+        "author": "みらい",
+        "note": "さらに複数のファイルの修正を進めました：\n\n1. SearchDocumentsByTagsUseCase.ts：\n   - loggerのインポートを追加\n   - すべてのconsole.logをlogger.debugに変換\n   - console.errorをlogger.errorに変換\n   - デバッグ情報をオブジェクト形式に統一\n\n2. WriteGlobalDocumentUseCase.ts：\n   - 同様にloggerを使用するように修正\n\n3. FileSystemBranchMemoryBankRepository.ts：\n   - getDocumentメソッドとsaveDocumentメソッドの全てのコンソール出力をloggerに変換\n\n4. SimpleBranchMemoryBankRepository.ts：\n   - シェルスクリプトを使用して一括で置換を実施\n   - パターン: `console.log(\\`...\\`);` → `logger.debug('...', {...});`\n\n各ファイルで一貫したパターンに修正：メッセージはシンプルな文字列に、変数はオブジェクトのプロパティとして分離することで、構造化されたログ出力を実現。これによりJSONの整合性を保持しつつ、デバッグ情報も維持できます。"
+      },
+      {
+        "date": "2025-03-24T06:35:00.000Z",
+        "author": "みらい",
+        "note": "残りの修正対象を整理しました：\n\n1. src/infrastructure/repositories/simple/SimpleGlobalMemoryBankRepository.ts\n2. src/interface/controllers/CoreFilesController.ts\n3. src/migration/関連ファイル\n\nこれらのファイルでもconsole.logをlogger.debugに置き換える作業を継続します。これまでと同様に、下記の変換パターンを適用します：\n\n- 基本パターン: console.log(...) → logger.debug(...)  \n- テンプレート文字列: console.log(`...${var}...`) → logger.debug('...', { var })  \n- オブジェクト出力: console.log('...', obj) → logger.debug('...', { obj })\n- エラー出力: console.error(...) → logger.error(...)\n- 警告出力: console.warn(...) → logger.warn(...)\n\nこの修正により、標準出力に純粋なJSONフォーマット以外の出力が混入することを防止し、MCPResponseの処理時のエラーを防ぎます。"
+      }
+    ]
+  }
+}

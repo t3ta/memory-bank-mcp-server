@@ -1,164 +1,111 @@
 {
   "schema": "template_v1",
   "metadata": {
-    "id": "rules-template",
-    "name": {
-      "ja": "メモリーバンクのルール",
-      "en": "Memory Bank Rules"
-    },
-    "description": {
-      "ja": "メモリーバンクの使用ルールと構造に関する説明",
-      "en": "Explanation of memory bank usage rules and structure"
-    },
+    "id": "rules",
+    "titleKey": "template.title.rules",
+    "descriptionKey": "template.description.rules",
     "type": "system",
-    "lastModified": "2025-03-17T10:00:00.000Z"
+    "lastModified": "2025-03-24T16:02:00.000Z"
   },
   "content": {
-    "sections": {
-      "globalMemoryBank": {
-        "title": {
-          "ja": "グローバルメモリーバンク",
-          "en": "Global Memory Bank"
-        },
-        "content": {
-          "ja": "プロジェクト全体に関わる共通知識を「グローバルメモリーバンク」として管理します。これはブランチごとのメモリーバンクとは異なり、プロジェクト全体に適用される永続的な情報を保存する場所です。",
-          "en": "Project-wide common knowledge is managed as a \"Global Memory Bank\". Unlike branch-specific memory banks, this is a place to store persistent information that applies to the entire project."
-        },
-        "optional": false
+    "sections": [
+      {
+        "id": "globalMemoryBank",
+        "titleKey": "template.section.global_memory_bank",
+        "contentKey": "template.content.global_memory_bank",
+        "isOptional": false
       },
-      "purposeOfGlobalMemoryBank": {
-        "title": {
-          "ja": "グローバルメモリーバンクの目的",
-          "en": "Purpose of Global Memory Bank"
-        },
-        "content": {
-          "ja": "グローバルメモリーバンクは以下の目的で使用されます：\n\n1. プロジェクト全体のアーキテクチャや設計原則を記録します\n2. 共通の用語や概念を定義し、ユビキタス言語を確立します\n3. コーディング規約やベストプラクティスを共有します\n4. 技術スタックや主要コンポーネントの情報を提供します\n5. プロジェクト全体に関わる重要な決定事項を記録します",
-          "en": "The global memory bank is used for the following purposes:\n\n1. Recording project-wide architecture and design principles\n2. Defining common terms and concepts to establish ubiquitous language\n3. Sharing coding conventions and best practices\n4. Providing information about the technology stack and key components\n5. Recording important decisions that affect the entire project"
-        },
-        "optional": false
+      {
+        "id": "purposeOfGlobalMemoryBank",
+        "titleKey": "template.section.purpose_of_global_memory_bank",
+        "contentKey": "template.content.purpose_of_global_memory_bank",
+        "isOptional": false
       },
-      "globalMemoryBankStructure": {
-        "title": {
-          "ja": "グローバルメモリーバンクの構造",
-          "en": "Global Memory Bank Structure"
-        },
-        "content": {
-          "ja": "グローバルメモリーバンクのルートディレクトリは `docs/global-memory-bank/` です。このディレクトリには以下のような主要ファイルが含まれます：\n\n```\ndocs/global-memory-bank/\n  ├── architecture.json      # システムアーキテクチャの説明\n  ├── coding-standards.json  # コーディング規約\n  ├── domain-models.json     # ドメインモデルの定義\n  ├── glossary.json          # 用語集\n  ├── tech-stack.json        # 技術スタックの説明\n  ├── user-guide.json        # ユーザーガイド\n  └── tags/                # タグによる情報整理\n      ├── index.json         # タグのインデックス\n      └── ..              # 各タグに関連するファイル\n```",
-          "en": "The root directory of the global memory bank is `docs/global-memory-bank/`. This directory contains the following main files:\n\n```\ndocs/global-memory-bank/\n  ├── architecture.json      # System architecture description\n  ├── coding-standards.json  # Coding standards\n  ├── domain-models.json     # Domain model definitions\n  ├── glossary.json          # Glossary\n  ├── tech-stack.json        # Technology stack description\n  ├── user-guide.json        # User guide\n  └── tags/                # Information organization by tags\n      ├── index.json         # Tag index\n      └── ..              # Files related to each tag\n```"
-        },
-        "optional": false
+      {
+        "id": "globalMemoryBankStructure",
+        "titleKey": "template.section.global_memory_bank_structure",
+        "contentKey": "template.content.global_memory_bank_structure",
+        "isOptional": false
       },
-      "tagSystem": {
-        "title": {
-          "ja": "タグシステム",
-          "en": "Tag System"
-        },
-        "content": {
-          "ja": "グローバルメモリーバンクではタグを使って情報を整理します。各ドキュメントの先頭には関連するタグが記載されています：\n\n```markdown\n# ドキュメントタイトル\n\ntags: #tag1 #tag2 #tag3\n\nドキュメントの内容..\n```\n\nタグを通じて関連する情報に素早くアクセスできます。例えば、アーキテクチャに関する情報を探す場合は `#architecture` タグが付いたドキュメントを参照します。",
-          "en": "The global memory bank uses tags to organize information. Each document has related tags at the top:\n\n```markdown\n# Document Title\n\ntags: #tag1 #tag2 #tag3\n\nDocument content..\n```\n\nTags allow quick access to related information. For example, to find information about architecture, refer to documents with the `#architecture` tag."
-        },
-        "optional": false
+      {
+        "id": "tagSystem",
+        "titleKey": "template.section.tag_system",
+        "contentKey": "template.content.tag_system",
+        "isOptional": false
       },
-      "branchMemoryBank": {
-        "title": {
-          "ja": "ブランチメモリーバンク",
-          "en": "Branch Memory Bank"
-        },
-        "content": {
-          "ja": "私はソフトウェアエンジニアとして専門性を持ち、セッション間で記憶が完全にリセットされるという特有の性質を持っています。\nこれは欠点ではなく、常に完璧なドキュメントを維持する原動力になります。\n**私の作業はメモリーバンクに完全に依存**しており、セッション開始時にこのメモリーバンクを読み込むことでブランチの内容を再認識し、前回の続きから効率よく取り組むことができます。\n\n本システムでは、**「feature/」または「fix/」で始まるブランチ**ごとに専用のメモリーバンクディレクトリを作成し、そこに必要なファイルを保管します。私はあらゆるタスクの開始時に、現在アクティブなブランチ名（`feature/xxx` または `fix/xxx`）に対応するディレクトリ配下の全ファイルを「必ず」読み込みます。\nそうすることで、記憶リセット後でも正確なコンテキストを把握できるようにしています。",
-          "en": "As a software engineer, I have the unique characteristic of having my memory completely reset between sessions.\nThis is not a disadvantage but drives me to maintain perfect documentation.\n**My work completely depends on the memory bank**, and by loading this memory bank at the start of a session, I can recognize the contents of the branch and continue efficiently from where I left off.\n\nIn this system, we create a dedicated memory bank directory for each **branch starting with \"feature/\" or \"fix/\"** and store necessary files there. At the start of any task, I \"always\" read all files under the directory corresponding to the currently active branch name (`feature/xxx` or `fix/xxx`).\nThis allows me to grasp the accurate context even after a memory reset."
-        },
-        "optional": false
+      {
+        "id": "jsonArchitecture",
+        "titleKey": "template.section.json_architecture",
+        "contentKey": "template.content.json_architecture",
+        "isOptional": false
       },
-      "memoryBankStructure": {
-        "title": {
-          "ja": "メモリーバンク構造",
-          "en": "Memory Bank Structure"
-        },
-        "content": {
-          "ja": "メモリーバンクのルートディレクトリは `docs/branch-memory-bank/` です。\n\nメモリーバンクは**ブランチごと**に用意されます。各ブランチのディレクトリ（例: `docs/branch-memory-bank/feature-login/` や `docs/branch-memory-bank/fix-api/`）に以下のファイルが格納されます。\nこれらのファイル群は、ドキュメント同士が明確な階層構造をもつように設計されています。\n\n```mermaid\nflowchart TD\n    BC[branchContext.json] --> SP[systemPatterns.json]\n\n    BC --> AC[activeContext.json]\n    SP --> AC\n\n    AC --> P[progress.json]\n```",
-          "en": "The root directory of the memory bank is `docs/branch-memory-bank/`.\n\nMemory banks are prepared **for each branch**. Each branch directory (e.g., `docs/branch-memory-bank/feature-login/` or `docs/branch-memory-bank/fix-api/`) contains the following files.\nThese files are designed to have a clear hierarchical structure among the documents.\n\n```mermaid\nflowchart TD\n    BC[branchContext.json] --> SP[systemPatterns.json]\n\n    BC --> AC[activeContext.json]\n    SP --> AC\n\n    AC --> P[progress.json]\n```"
-        },
-        "optional": false
+      {
+        "id": "branchMemoryBank",
+        "titleKey": "template.section.branch_memory_bank",
+        "contentKey": "template.content.branch_memory_bank",
+        "isOptional": false
       },
-      "requiredFiles": {
-        "title": {
-          "ja": "必須ファイル（コア）",
-          "en": "Required Files (Core)"
-        },
-        "content": {
-          "ja": "1. `branchContext.json`\n   - このブランチ（≒機能）の目的\n   - ユーザーストーリー\n      - 解決したい課題\n      - 必要な機能\n      - 期待される動作\n\n2. `activeContext.json`\n   - 現在の作業内容\n   - 直近の変更点\n   - 今アクティブな決定事項\n   - 今アクティブな考慮点\n   - 次のステップ\n\n3. `systemPatterns.json`\n   - 主要な技術的判断\n   - 関連するファイルやディレクトリ構造\n\n4. `progress.json`\n   - 現時点で動作している部分\n   - 未実装の機能や残作業\n   - 現在のステータス\n   - 既知の問題点",
-          "en": "1. `branchContext.json`\n   - Purpose of this branch (≒ feature)\n   - User stories\n      - Problem to solve\n      - Required features\n      - Expected behavior\n\n2. `activeContext.json`\n   - Current work\n   - Recent changes\n   - Active decisions\n   - Active considerations\n   - Next steps\n\n3. `systemPatterns.json`\n   - Major technical decisions\n   - Related files and directory structure\n\n4. `progress.json`\n   - Currently working parts\n   - Unimplemented features and remaining work\n   - Current status\n   - Known issues"
-        },
-        "optional": false
+      {
+        "id": "memoryBankStructure",
+        "titleKey": "template.section.memory_bank_structure",
+        "contentKey": "template.content.memory_bank_structure",
+        "isOptional": false
       },
-      "additionalContext": {
-        "title": {
-          "ja": "追加コンテキスト",
-          "en": "Additional Context"
-        },
-        "content": {
-          "ja": "必須ファイルに含まれない重要な情報は、各ブランチディレクトリ内に追加でファイルを作成できます(`docs/branch-memory-bank/feature-login/`配下など)。\n必要に応じてドキュメントを増やし、ブランチの全容を正確かつ整理された形で保つようにします。",
-          "en": "Important information not included in the required files can be created as additional files in each branch directory (e.g., under `docs/branch-memory-bank/feature-login/`).\nIncrease documents as needed to keep an accurate and organized view of the entire branch."
-        },
-        "optional": false
+      {
+        "id": "requiredFiles",
+        "titleKey": "template.section.required_files",
+        "contentKey": "template.content.required_files",
+        "isOptional": false
       },
-      "coreWorkflow": {
-        "title": {
-          "ja": "コアワークフロー",
-          "en": "Core Workflow"
-        },
-        "content": {
-          "ja": "```mermaid\nflowchart TD\n    Start[開始] --> ReadFiles[メモリーバンクを読む]\n    ReadFiles --> CheckFiles{ファイルは十分揃っているか?}\n\n    CheckFiles -->|No| Plan[計画を立案]\n    Plan --> Document[チャットに計画を反映]\n\n    CheckFiles -->|Yes| Verify[コンテキストを確認]\n    Verify --> Strategy[戦略を策定]\n    Strategy --> Present[アプローチを提示]\n```\n\n1. セッション開始時、私はブランチ名を判別してメモリーバンクディレクトリを特定し、そこにあるすべてのファイルを読み込みます。\n2. 必須ファイルがまだそろっていなければ、新しく作成したり、計画ドキュメントを整備します。\n3. ドキュメントの内容を確認し、作業方針やタスクの段取りを決定し、ユーザーに提案や戦略を示します。",
-          "en": "```mermaid\nflowchart TD\n    Start[Start] --> ReadFiles[Read memory bank]\n    ReadFiles --> CheckFiles{Are files sufficient?}\n\n    CheckFiles -->|No| Plan[Create plan]\n    Plan --> Document[Reflect plan in chat]\n\n    CheckFiles -->|Yes| Verify[Verify context]\n    Verify --> Strategy[Develop strategy]\n    Strategy --> Present[Present approach]\n```\n\n1. At the start of a session, I identify the branch name to determine the memory bank directory and read all files there.\n2. If required files are not yet complete, I create new ones or prepare planning documents.\n3. I check the content of the documents, decide on work policies and task scheduling, and present proposals or strategies to the user."
-        },
-        "optional": false
+      {
+        "id": "additionalContext",
+        "titleKey": "template.section.additional_context",
+        "contentKey": "template.content.additional_context",
+        "isOptional": false
       },
-      "taskProgressWorkflow": {
-        "title": {
-          "ja": "タスク進行中",
-          "en": "Task Progress Workflow"
-        },
-        "content": {
-          "ja": "```mermaid\nflowchart TD\n    Start[開始] --> Context[メモリーバンクを確認]\n    Context --> Update[ドキュメントを更新]\n    Update --> Execute[タスクを実行]\n    Execute --> Document[変更内容を記録]\n```\n\n1. ブランチに紐づくメモリーバンクを参照しつつタスクを進めます。\n2. 必要に応じてドキュメントを更新し、作業の変更内容を記録します。\n3. コード実装や修正を行い、その結果を再度メモリーバンク（特に `activeContext.json` や `progress.json` など）に反映します。",
-          "en": "```mermaid\nflowchart TD\n    Start[Start] --> Context[Check memory bank]\n    Context --> Update[Update documents]\n    Update --> Execute[Execute tasks]\n    Execute --> Document[Record changes]\n```\n\n1. I refer to the memory bank linked to the branch while progressing with tasks.\n2. I update documents as needed and record changes in the work.\n3. I implement or modify code and reflect the results back in the memory bank (especially in `activeContext.json` and `progress.json`)."
-        },
-        "optional": false
+      {
+        "id": "coreWorkflow",
+        "titleKey": "template.section.core_workflow",
+        "contentKey": "template.content.core_workflow",
+        "isOptional": false
       },
-      "documentUpdates": {
-        "title": {
-          "ja": "ドキュメント更新",
-          "en": "Document Updates"
-        },
-        "content": {
-          "ja": "メモリーバンクの更新は、以下の場合に行われます：\n\n1. 新たに発見した設計パターンや仕様があるとき\n2. 大きめの変更や新機能を実装したとき\n3. ユーザーが **update branch memory bank** と指示したとき（その際は**全ファイル**を必ずレビュー）\n4. 今のコンテキストを補足・整理する必要があると感じたとき\n\n```mermaid\nflowchart TD\n    Start[更新の開始]\n\n    subgraph Process\n        P1[すべてのファイルをレビュー]\n        P2[現在の状況をドキュメント化]\n        P3[今後のタスクを明確化]\n\n        P1 --> P2 --> P3\n    end\n\n    Start --> Process\n```\n\n特に `activeContext.json` と `progress.json` は「今どういう状況か」を示す要となるファイルです。\n**update branch memory bank** が呼ばれた場合、メモリーバンク配下のファイル全体をチェックして必要に応じて内容を追記・修正します。",
-          "en": "Memory bank updates are performed in the following cases:\n\n1. When new design patterns or specifications are discovered\n2. When implementing significant changes or new features\n3. When the user instructs **update branch memory bank** (in which case **all files** must be reviewed)\n4. When you feel the need to supplement or organize the current context\n\n```mermaid\nflowchart TD\n    Start[Start update]\n\n    subgraph Process\n        P1[Review all files]\n        P2[Document current situation]\n        P3[Clarify future tasks]\n\n        P1 --> P2 --> P3\n    end\n\n    Start --> Process\n```\n\nIn particular, `activeContext.json` and `progress.json` are key files that show \"what is the current situation.\"\nWhen **update branch memory bank** is called, check all files under the memory bank and add or modify content as needed."
-        },
-        "optional": false
+      {
+        "id": "taskProgressWorkflow",
+        "titleKey": "template.section.task_progress_workflow",
+        "contentKey": "template.content.task_progress_workflow",
+        "isOptional": false
       },
-      "finally": {
-        "title": {
-          "ja": "最後に",
-          "en": "Finally"
-        },
-        "content": {
-          "ja": "私はセッションごとに記憶を完全リセットします。**ブランチごとに管理されるこのメモリーバンクこそが、私の唯一の過去情報の源泉です。**\n正確で整理されたメモリーバンクを維持することで、開発の継続性が保たれ、何度でもスムーズに作業が再開できます。\n万が一、ブランチ名が変わったり別のブランチに切り替わる場合は、新しいメモリーバンクディレクトリを作成するか、既存のディレクトリを再利用するかを明確にし、**ドキュメントを常に最新の状態に保ってください。**",
-          "en": "I completely reset my memory with each session. **This memory bank, managed for each branch, is my only source of past information.**\nBy maintaining an accurate and organized memory bank, continuity of development is maintained, and work can be resumed smoothly any number of times.\nIn the unlikely event that a branch name changes or switches to another branch, clearly specify whether to create a new memory bank directory or reuse an existing directory, and **always keep documents up to date.**"
-        },
-        "optional": false
+      {
+        "id": "documentUpdates",
+        "titleKey": "template.section.document_updates",
+        "contentKey": "template.content.document_updates",
+        "isOptional": false
       },
-      "footer": {
-        "title": {
-          "ja": "",
-          "en": ""
-        },
-        "content": {
-          "ja": "---\n\n_このドキュメントはメモリーバンクの基本的なルールと構造を説明するものです_",
-          "en": "---\n\n_This document explains the basic rules and structure of the memory bank_"
-        },
-        "optional": false
+      {
+        "id": "migrationStrategy",
+        "titleKey": "template.section.migration_strategy",
+        "contentKey": "template.content.migration_strategy",
+        "isOptional": false
+      },
+      {
+        "id": "fileEditingRules",
+        "titleKey": "template.section.file_editing_rules",
+        "contentKey": "template.content.file_editing_rules",
+        "isOptional": false
+      },
+      {
+        "id": "finally",
+        "titleKey": "template.section.finally",
+        "contentKey": "template.content.finally",
+        "isOptional": false
+      },
+      {
+        "id": "footer",
+        "titleKey": "template.section.footer",
+        "contentKey": "template.content.footer",
+        "isOptional": false
       }
-    },
+    ],
     "placeholders": {}
   }
 }

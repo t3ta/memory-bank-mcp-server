@@ -1,0 +1,157 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "json-patch-memory-bank-approach",
+    "title": "JSON Patchメモリバンク関数の実装アプローチ",
+    "documentType": "design",
+    "path": "json-patch-memory-bank-approach.json",
+    "tags": [
+      "json-patch",
+      "design",
+      "memory-bank",
+      "implementation"
+    ],
+    "lastModified": "2025-03-24T22:15:00.000Z",
+    "createdAt": "2025-03-24T22:15:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "targetFunctions": [
+      "write_branch_memory_bank",
+      "write_global_memory_bank"
+    ],
+    "functionalRequirements": [
+      "既存のコンテンツの全上書きだけでなく、部分的な更新もサポートする",
+      "RFC 6902準拠のJSON Patch操作を利用可能にする",
+      "add/remove/replace/move/copy/test操作をすべてサポートする"
+    ],
+    "implementation": {
+      "schemaChanges": {
+        "description": "AVAILABLE_TOOLSのinputSchemaを拡張して、patches配列パラメータを追加",
+        "modifiedTools": [
+          {
+            "name": "write_branch_memory_bank",
+            "additionalProperty": {
+              "name": "patches",
+              "type": "array",
+              "description": "Optional JSON Patch operations to apply (RFC 6902)",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "op": {
+                    "type": "string",
+                    "enum": [
+                      "add",
+                      "remove",
+                      "replace",
+                      "move",
+                      "copy",
+                      "test"
+                    ],
+                    "description": "Operation type"
+                  },
+                  "path": {
+                    "type": "string",
+                    "description": "JSON Pointer path (e.g. /metadata/title)"
+                  },
+                  "value": {
+                    "description": "Value for add, replace, test operations"
+                  },
+                  "from": {
+                    "type": "string",
+                    "description": "Source path for move, copy operations"
+                  }
+                },
+                "required": [
+                  "op",
+                  "path"
+                ]
+              }
+            }
+          },
+          {
+            "name": "write_global_memory_bank",
+            "additionalProperty": {
+              "name": "patches",
+              "type": "array",
+              "description": "Optional JSON Patch operations to apply (RFC 6902)",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "op": {
+                    "type": "string",
+                    "enum": [
+                      "add",
+                      "remove",
+                      "replace",
+                      "move",
+                      "copy",
+                      "test"
+                    ],
+                    "description": "Operation type"
+                  },
+                  "path": {
+                    "type": "string",
+                    "description": "JSON Pointer path (e.g. /metadata/title)"
+                  },
+                  "value": {
+                    "description": "Value for add, replace, test operations"
+                  },
+                  "from": {
+                    "type": "string",
+                    "description": "Source path for move, copy operations"
+                  }
+                },
+                "required": [
+                  "op",
+                  "path"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "logicChanges": {
+        "description": "既存と新規のドキュメントに対するパッチ適用ロジックの追加",
+        "steps": [
+          "引数からpatches配列を取得",
+          "contentとpatchesが両方提供された場合はエラー",
+          "patchesのみの場合は既存ドキュメントを読み込み",
+          "JsonPatchOperationインスタンスに変換",
+          "JsonPatchUseCaseを使用してパッチを適用",
+          "更新されたドキュメントを保存"
+        ],
+        "conditionHandling": [
+          "新規ドキュメント + patches: エラー（先にドキュメント作成が必要）",
+          "既存ドキュメント + content: 完全上書き（既存ロジック）",
+          "既存ドキュメント + patches: パッチ適用",
+          "既存ドキュメント + content + patches: エラー（contentかpatchesどちらかのみ許可）"
+        ],
+        "errorHandling": [
+          "既存ドキュメントが存在しない場合はDocumentNotFoundError",
+          "パッチ操作の検証に失敗した場合はInvalidJsonPatchOperationError",
+          "パッチ適用中に発生するエラー（例：存在しないパスへの操作）に対するエラーメッセージ"
+        ]
+      },
+      "dependencyRequirements": [
+        "JsonPatchOperation",
+        "JsonPatchService",
+        "FastJsonPatchAdapter",
+        "JsonPatchUseCase",
+        "ReadJsonDocumentUseCase",
+        "WriteJsonDocumentUseCase"
+      ],
+      "testCases": [
+        "既存ドキュメントへの単一パッチ操作（add, remove, replace）",
+        "複数のパッチ操作のバッチ適用",
+        "エラーケース（不正なJSONパス、不正な操作タイプ）",
+        "アトミック性の検証（一部のoperationがエラーの場合、全体が失敗する）"
+      ]
+    },
+    "notes": [
+      "この実装ではCLIコマンドは後回しとし、まずは基盤となるAPIを提供する",
+      "contentとpatchesの両方が提供された場合はエラーとし、別々の操作として扱うようにする",
+      "既存ドキュメントが存在しない場合にpatchesを適用することはできないため、明示的なエラーとする"
+    ]
+  }
+}

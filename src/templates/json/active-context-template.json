@@ -2,92 +2,56 @@
   "schema": "template_v1",
   "metadata": {
     "id": "active-context-template",
-    "name": {
-      "ja": "アクティブコンテキストテンプレート",
-      "en": "Active Context Template"
-    },
-    "description": {
-      "ja": "現在の作業状況や最近の変更点を記録するためのテンプレート",
-      "en": "Template for documenting current work status and recent changes"
-    },
+    "titleKey": "template.title.active_context",
+    "descriptionKey": "template.description.active_context",
     "type": "branch-memory",
-    "lastModified": "2025-03-17T10:00:00.000Z"
+    "lastModified": "2025-03-24T16:00:00.000Z"
   },
   "content": {
-    "sections": {
-      "currentWork": {
-        "title": {
-          "ja": "現在の作業内容",
-          "en": "Current Work"
-        },
-        "content": {
-          "ja": "<!-- 現在進めている具体的な作業内容を記述 -->\n{{CURRENT_WORK}}",
-          "en": "<!-- Describe the specific work currently in progress -->\n{{CURRENT_WORK}}"
-        },
-        "optional": false
+    "sections": [
+      {
+        "id": "currentWork",
+        "titleKey": "template.section.current_work",
+        "contentKey": "template.content.current_work",
+        "isOptional": false
       },
-      "recentChanges": {
-        "title": {
-          "ja": "直近の変更点",
-          "en": "Recent Changes"
-        },
-        "content": {
-          "ja": "<!-- 最近実装した変更や追加機能について記述 -->\n{{RECENT_CHANGES}}",
-          "en": "<!-- Describe recent implementations or feature additions -->\n{{RECENT_CHANGES}}"
-        },
-        "optional": true
+      {
+        "id": "recentChanges",
+        "titleKey": "template.section.recent_changes",
+        "contentKey": "template.content.recent_changes",
+        "isOptional": true
       },
-      "activeDecisions": {
-        "title": {
-          "ja": "今アクティブな決定事項",
-          "en": "Active Decisions"
-        },
-        "content": {
-          "ja": "<!-- 最近行われた重要な技術的決定事項を記述 -->\n{{ACTIVE_DECISIONS}}",
-          "en": "<!-- Describe important technical decisions recently made -->\n{{ACTIVE_DECISIONS}}"
-        },
-        "optional": true
+      {
+        "id": "activeDecisions",
+        "titleKey": "template.section.active_decisions",
+        "contentKey": "template.content.active_decisions",
+        "isOptional": true
       },
-      "considerations": {
-        "title": {
-          "ja": "検討事項",
-          "en": "Considerations"
-        },
-        "content": {
-          "ja": "<!-- 現在検討中の課題や疑問点を記述 -->\n{{CONSIDERATIONS}}",
-          "en": "<!-- Describe issues or questions currently under consideration -->\n{{CONSIDERATIONS}}"
-        },
-        "optional": true
+      {
+        "id": "considerations",
+        "titleKey": "template.section.considerations",
+        "contentKey": "template.content.considerations",
+        "isOptional": true
       },
-      "nextSteps": {
-        "title": {
-          "ja": "次のステップ",
-          "en": "Next Steps"
-        },
-        "content": {
-          "ja": "<!-- 次に着手予定のタスクや優先順位を記述 -->\n{{NEXT_STEPS}}",
-          "en": "<!-- Describe the next tasks to tackle or priorities -->\n{{NEXT_STEPS}}"
-        },
-        "optional": false
+      {
+        "id": "nextSteps",
+        "titleKey": "template.section.next_steps",
+        "contentKey": "template.content.next_steps",
+        "isOptional": false
       },
-      "footer": {
-        "title": {
-          "ja": "",
-          "en": ""
-        },
-        "content": {
-          "ja": "---\n\n_このドキュメントはブランチメモリーバンクの一部です_",
-          "en": "---\n\n_This document is part of the branch memory bank_"
-        },
-        "optional": false
+      {
+        "id": "footer",
+        "titleKey": "template.section.footer",
+        "contentKey": "template.content.footer",
+        "isOptional": false
       }
-    },
+    ],
     "placeholders": {
-      "CURRENT_WORK": "現在の作業内容のプレースホルダー",
-      "RECENT_CHANGES": "直近の変更点のプレースホルダー",
-      "ACTIVE_DECISIONS": "アクティブな決定事項のプレースホルダー",
-      "CONSIDERATIONS": "検討事項のプレースホルダー",
-      "NEXT_STEPS": "次のステップのプレースホルダー"
+      "CURRENT_WORK": "template.placeholder.current_work",
+      "RECENT_CHANGES": "template.placeholder.recent_changes",
+      "ACTIVE_DECISIONS": "template.placeholder.active_decisions",
+      "CONSIDERATIONS": "template.placeholder.considerations",
+      "NEXT_STEPS": "template.placeholder.next_steps"
     }
   }
 }

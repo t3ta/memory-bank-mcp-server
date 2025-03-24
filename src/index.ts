@@ -11,6 +11,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { Server as MCPServer } from '@modelcontextprotocol/sdk/server/index.js';
 import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { Server } from 'node:http';
+import { Language, isValidLanguage } from './schemas/v2/i18n-schema.js';
 
 // Helper function to render template with translations
 function renderTemplate(template: any, translations: any): string {
@@ -54,6 +55,11 @@ function renderTemplate(template: any, translations: any): string {
 
 // Parse command line arguments
 const argv = yargs(hideBin(process.argv))
+  .option('workspace', {
+    alias: 'w',
+    type: 'string',
+    description: 'Path to workspace directory'
+  })
   .option('docs', {
     alias: 'd',
     type: 'string',
@@ -67,10 +73,22 @@ const argv = yargs(hideBin(process.argv))
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Helper function to resolve workspace and docs paths
+export function resolveWorkspaceAndDocs(toolWorkspace?: string, toolDocs?: string) {
+  // 1. Tool parameters (highest priority)
+  // 2. Command line arguments
+  // 3. Environment variables
+  // 4. Default values
+  const workspace = toolWorkspace || argv.workspace || process.env.WORKSPACE_ROOT || process.cwd();
+  const docs = toolDocs || argv.docs || process.env.MEMORY_BANK_ROOT ||
+    (typeof workspace === 'string' ? path.join(workspace, 'docs') : './docs');
+
+  return { workspace, docs };
+}
+
 // New application instance
 let app: Application | null = null;
 const AVAILABLE_TOOLS = [
-  // create_pull_request tool definition removed
   {
     name: 'list_tools',
     description: 'List all available tools',
@@ -87,12 +105,46 @@ const AVAILABLE_TOOLS = [
       properties: {
         path: { type: 'string' },
         content: { type: 'string' },
+        patches: {
+          type: 'array',
+          description: 'JSON Patch operations to apply (RFC 6902)',
+          items: {
+            type: 'object',
+            properties: {
+              op: {
+                type: 'string',
+                enum: ['add', 'remove', 'replace', 'move', 'copy', 'test'],
+                description: 'Operation type'
+              },
+              path: {
+                type: 'string',
+                description: 'JSON Pointer path (e.g. /metadata/title)'
+              },
+              value: {
+                description: 'Value for add, replace, test operations'
+              },
+              from: {
+                type: 'string',
+                description: 'Source path for move, copy operations'
+              }
+            },
+            required: ['op', 'path']
+          }
+        },
         branch: {
           type: 'string',
           description: 'Branch name',
         },
+        workspace: {
+          type: 'string',
+          description: 'Path to workspace directory',
+        },
+        docs: {
+          type: 'string',
+          description: 'Path to docs directory',
+        },
       },
-      required: ['path'],
+      required: ['path', 'branch'],
     },
   },
   {
@@ -106,8 +158,16 @@ const AVAILABLE_TOOLS = [
           type: 'string',
           description: 'Branch name',
         },
+        workspace: {
+          type: 'string',
+          description: 'Path to workspace directory',
+        },
+        docs: {
+          type: 'string',
+          description: 'Path to docs directory',
+        },
       },
-      required: ['path'],
+      required: ['path', 'branch'],
     },
   },
   {
@@ -118,6 +178,40 @@ const AVAILABLE_TOOLS = [
       properties: {
         path: { type: 'string' },
         content: { type: 'string' },
+        patches: {
+          type: 'array',
+          description: 'JSON Patch operations to apply (RFC 6902)',
+          items: {
+            type: 'object',
+            properties: {
+              op: {
+                type: 'string',
+                enum: ['add', 'remove', 'replace', 'move', 'copy', 'test'],
+                description: 'Operation type'
+              },
+              path: {
+                type: 'string',
+                description: 'JSON Pointer path (e.g. /metadata/title)'
+              },
+              value: {
+                description: 'Value for add, replace, test operations'
+              },
+              from: {
+                type: 'string',
+                description: 'Source path for move, copy operations'
+              }
+            },
+            required: ['op', 'path']
+          }
+        },
+        workspace: {
+          type: 'string',
+          description: 'Path to workspace directory',
+        },
+        docs: {
+          type: 'string',
+          description: 'Path to docs directory',
+        },
       },
       required: ['path'],
     },
@@ -129,6 +223,14 @@ const AVAILABLE_TOOLS = [
       type: 'object',
       properties: {
         path: { type: 'string' },
+        workspace: {
+          type: 'string',
+          description: 'Path to workspace directory',
+        },
+        docs: {
+          type: 'string',
+          description: 'Path to docs directory',
+        },
       },
       required: ['path'],
     },
@@ -144,25 +246,19 @@ const AVAILABLE_TOOLS = [
           enum: ['en', 'ja', 'zh'],
           description: 'Language code (en, ja, or zh)',
         },
+        workspace: {
+          type: 'string',
+          description: 'Path to workspace directory',
+        },
+        docs: {
+          type: 'string',
+          description: 'Path to docs directory',
+        },
       },
       required: ['language'],
     },
   },
-  {
-    name: 'get_recent_branches',
-    description: 'Get recently updated branch memory banks',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        limit: {
-          type: 'number',
-          description: 'Maximum number of branches to return (default: 10, max: 100)',
-          minimum: 1,
-          maximum: 100,
-        },
-      },
-    },
-  },
+  // get_recent_branches tools removed
   {
     name: 'read_context',
     description:
@@ -191,8 +287,48 @@ const AVAILABLE_TOOLS = [
           type: 'boolean',
           description: 'Whether to include global memory bank (default: true)',
         },
+        workspace: {
+          type: 'string',
+          description: 'Path to workspace directory',
+        },
+        docs: {
+          type: 'string',
+          description: 'Path to docs directory',
+        },
       },
+      required: ['branch'],
     },
+  },
+  {
+    name: 'get_template',
+    description: 'Get a template by ID and language',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        id: {
+          type: 'string',
+          description: 'Template ID to retrieve'
+        },
+        language: {
+          type: 'string',
+          enum: ['en', 'ja', 'zh'],
+          description: 'Language code (en, ja, or zh)'
+        },
+        variables: {
+          type: 'object',
+          description: 'Optional variables for template substitution'
+        },
+        workspace: {
+          type: 'string',
+          description: 'Path to workspace directory'
+        },
+        docs: {
+          type: 'string',
+          description: 'Path to docs directory'
+        }
+      },
+      required: ['id', 'language']
+    }
   },
 ];
 
@@ -244,13 +380,22 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
     case 'write_branch_memory_bank': {
       const path = params.path as string;
       const content = params.content as string | undefined;
+      const patches = params.patches as any[] | undefined;
       const branch = params.branch as string;
+      const workspace = params.workspace as string | undefined;
+      const docs = params.docs as string | undefined;
 
-      if (!path) {
-        throw new Error('Invalid arguments for write_branch_memory_bank');
+      if (!path || !branch) {
+        throw new Error('Invalid arguments for write_branch_memory_bank: path and branch are required');
       }
 
-      if (!content) {
+      // Content and patches cannot be provided at the same time
+      if (content && patches) {
+        throw new Error('Content and patches cannot be provided at the same time');
+      }
+
+      // Initialize a new branch without content
+      if (!content && !patches) {
         return { content: [{ type: 'text', text: 'Branch memory bank initialized successfully' }] };
       }
 
@@ -258,27 +403,129 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         throw new Error('Application not initialized');
       }
 
-      // ドキュメントの書き込みを試行し、結果を確認
-      const response = await app.getBranchController().writeDocument(branch, path, content);
-      if (!response.success) {
-        throw new Error((response as any).error?.message || 'Failed to write document');
+      // Resolve workspace and docs directories
+      const paths = resolveWorkspaceAndDocs(workspace, docs);
+
+      // Create a new application instance if needed
+      let branchApp = app;
+      if (workspace || docs) {
+        logger.debug(`Creating new application instance with workspace: ${paths.workspace}, docs: ${paths.docs}`);
+        branchApp = await createApplication({
+          workspace: paths.workspace,
+          memoryRoot: paths.docs,
+          language: 'ja',
+          verbose: false,
+        });
       }
 
-      return { content: [{ type: 'text', text: 'Document written successfully' }] };
+      // Case 1: Content provided - use normal write operation
+      if (content) {
+        logger.debug(`Writing branch memory bank (branch: ${branch}, path: ${path}, workspace: ${paths.workspace})`);
+        const response = await branchApp.getBranchController().writeDocument(branch, path, content);
+        if (!response.success) {
+          throw new Error((response as any).error?.message || 'Failed to write document');
+        }
+        return { content: [{ type: 'text', text: 'Document written successfully' }] };
+      }
+
+      // Case 2: Patches provided - apply JSON Patch operations
+      if (patches) {
+        logger.debug(`Applying patches to branch memory bank (branch: ${branch}, path: ${path}, workspace: ${paths.workspace})`);
+        
+        try {
+          // Import necessary classes
+          const { JsonPatchOperation } = await import('./domain/jsonpatch/JsonPatchOperation.js');
+          const { FastJsonPatchAdapter } = await import('./domain/jsonpatch/FastJsonPatchAdapter.js');
+
+          // Create adapter for patch application
+          const patchService = new FastJsonPatchAdapter();
+
+          // First, read the document
+          const readResult = await branchApp.getBranchController().readDocument(branch, path);
+          if (!readResult.success) {
+            throw new Error(`Document not found: ${path} in branch ${branch}. Create the document first before applying patches.`);
+          }
+
+          const document = readResult.data?.content;
+          if (!document) {
+            throw new Error(`Document is empty or invalid: ${path} in branch ${branch}`);
+          }
+
+          // Parse document content to JSON if it's a string
+          const docContent = typeof document === 'string' ? JSON.parse(document) : document;
+
+          // Convert patch operations to domain model
+          const patchOperations = patches.map(patch => {
+            return JsonPatchOperation.create(
+              patch.op,
+              patch.path,
+              patch.value,
+              patch.from
+            );
+          });
+
+          // Apply patches
+          logger.debug(`Applying ${patchOperations.length} JSON Patch operations`);
+          
+          // Execute validation
+          const isValid = patchService.validate(docContent, patchOperations);
+          if (!isValid) {
+            throw new Error('Invalid JSON Patch operations');
+          }
+
+          // Apply patches
+          const updatedContent = patchService.apply(docContent, patchOperations);
+          
+          // Save the updated document
+          const jsonString = JSON.stringify(updatedContent, null, 2);
+          const writeResult = await branchApp.getBranchController().writeDocument(branch, path, jsonString);
+          
+          if (!writeResult.success) {
+            throw new Error((writeResult as any).error?.message || 'Failed to save patched document');
+          }
+          
+          return { content: [{ type: 'text', text: 'Document patched successfully' }] };
+        } catch (error) {
+          logger.error('Error applying JSON Patch:', error);
+          throw error instanceof Error ? error : new Error(String(error));
+        }
+      }
+      
+      // Should never reach here
+      throw new Error('Invalid state: neither content nor patches were provided');
     }
 
     case 'read_branch_memory_bank': {
       const path = params.path as string;
       const branch = params.branch as string;
+      const workspace = params.workspace as string | undefined;
+      const docs = params.docs as string | undefined;
 
-      if (!path) {
-        throw new Error('Invalid arguments for read_branch_memory_bank');
+      if (!path || !branch) {
+        throw new Error('Invalid arguments for read_branch_memory_bank: path and branch are required');
       }
 
       if (!app) {
         throw new Error('Application not initialized');
       }
-      const response = await app.getBranchController().readDocument(branch, path);
+
+      // Resolve workspace and docs directories
+      const paths = resolveWorkspaceAndDocs(workspace, docs);
+      logger.debug(`Reading branch memory bank (branch: ${branch}, path: ${path}, workspace: ${paths.workspace})`);
+
+      // Create a new application instance if needed
+      let branchApp = app;
+      if (workspace || docs) {
+        logger.debug(`Creating new application instance with workspace: ${paths.workspace}, docs: ${paths.docs}`);
+        branchApp = await createApplication({
+          workspace: paths.workspace,
+          memoryRoot: paths.docs,
+          language: 'ja',
+          verbose: false,
+        });
+      }
+
+      const response = await branchApp.getBranchController().readDocument(branch, path);
       if (!response.success) {
         throw new Error((response as any).error.message);
       }
@@ -300,7 +547,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 
       try {
         // Load template structure
-        const templatePath = path.join(dirname, 'templates', 'json', 'rules.json');
+        const templatePath = path.join(dirname, 'templates', 'json', 'rules-template.json');
         const templateContent = await fs.readFile(templatePath, 'utf-8');
         const template = JSON.parse(templateContent);
 
@@ -353,12 +600,21 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
     case 'write_global_memory_bank': {
       const path = params.path as string;
       const content = params.content as string | undefined;
+      const patches = params.patches as any[] | undefined;
+      const workspace = params.workspace as string | undefined;
+      const docs = params.docs as string | undefined;
 
       if (!path) {
         throw new Error('Invalid arguments for write_global_memory_bank');
       }
 
-      if (!content) {
+      // Content and patches cannot be provided at the same time
+      if (content && patches) {
+        throw new Error('Content and patches cannot be provided at the same time');
+      }
+
+      // Initialize a new document without content
+      if (!content && !patches) {
         return { content: [{ type: 'text', text: 'Global memory bank initialized successfully' }] };
       }
 
@@ -366,17 +622,102 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         throw new Error('Application not initialized');
       }
 
-      // ドキュメントの書き込みを試行し、結果を確認
-      const response = await app.getGlobalController().writeDocument(path, content);
-      if (!response.success) {
-        throw new Error((response as any).error?.message || 'Failed to write document');
+      // Resolve workspace and docs directories
+      const paths = resolveWorkspaceAndDocs(workspace, docs);
+
+      // Create a new application instance if needed
+      let globalApp = app;
+      if (workspace || docs) {
+        logger.debug(`Creating new application instance with workspace: ${paths.workspace}, docs: ${paths.docs}`);
+        globalApp = await createApplication({
+          workspace: paths.workspace,
+          memoryRoot: paths.docs,
+          language: 'ja',
+          verbose: false,
+        });
       }
 
-      return { content: [{ type: 'text', text: 'Document written successfully' }] };
+      // Case 1: Content provided - use normal write operation
+      if (content) {
+        logger.debug(`Writing global memory bank (path: ${path}, workspace: ${paths.workspace})`);
+        const response = await globalApp.getGlobalController().writeDocument(path, content);
+        if (!response.success) {
+          throw new Error((response as any).error?.message || 'Failed to write document');
+        }
+        return { content: [{ type: 'text', text: 'Document written successfully' }] };
+      }
+
+      // Case 2: Patches provided - apply JSON Patch operations
+      if (patches) {
+        logger.debug(`Applying patches to global memory bank (path: ${path}, workspace: ${paths.workspace})`);
+        
+        try {
+          // Import necessary classes
+          const { JsonPatchOperation } = await import('./domain/jsonpatch/JsonPatchOperation.js');
+          const { FastJsonPatchAdapter } = await import('./domain/jsonpatch/FastJsonPatchAdapter.js');
+
+          // Create adapter for patch application
+          const patchService = new FastJsonPatchAdapter();
+
+          // First, read the document
+          const readResult = await globalApp.getGlobalController().readDocument(path);
+          if (!readResult.success) {
+            throw new Error(`Document not found: ${path}. Create the document first before applying patches.`);
+          }
+
+          const document = readResult.data?.content;
+          if (!document) {
+            throw new Error(`Document is empty or invalid: ${path}`);
+          }
+
+          // Parse document content to JSON if it's a string
+          const docContent = typeof document === 'string' ? JSON.parse(document) : document;
+
+          // Convert patch operations to domain model
+          const patchOperations = patches.map(patch => {
+            return JsonPatchOperation.create(
+              patch.op,
+              patch.path,
+              patch.value,
+              patch.from
+            );
+          });
+
+          // Apply patches
+          logger.debug(`Applying ${patchOperations.length} JSON Patch operations`);
+          
+          // Execute validation
+          const isValid = patchService.validate(docContent, patchOperations);
+          if (!isValid) {
+            throw new Error('Invalid JSON Patch operations');
+          }
+
+          // Apply patches
+          const updatedContent = patchService.apply(docContent, patchOperations);
+          
+          // Save the updated document
+          const jsonString = JSON.stringify(updatedContent, null, 2);
+          const writeResult = await globalApp.getGlobalController().writeDocument(path, jsonString);
+          
+          if (!writeResult.success) {
+            throw new Error((writeResult as any).error?.message || 'Failed to save patched document');
+          }
+          
+          return { content: [{ type: 'text', text: 'Document patched successfully' }] };
+        } catch (error) {
+          logger.error('Error applying JSON Patch:', error);
+          throw error instanceof Error ? error : new Error(String(error));
+        }
+      }
+      
+      // Should never reach here
+      throw new Error('Invalid state: neither content nor patches were provided');
     }
 
     case 'read_global_memory_bank': {
       const path = params.path as string;
+      const workspace = params.workspace as string | undefined;
+      const docs = params.docs as string | undefined;
 
       if (!path) {
         throw new Error('Invalid arguments for read_global_memory_bank');
@@ -385,7 +726,24 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
       if (!app) {
         throw new Error('Application not initialized');
       }
-      const response = await app.getGlobalController().readDocument(path);
+
+      // Resolve workspace and docs directories
+      const paths = resolveWorkspaceAndDocs(workspace, docs);
+      logger.debug(`Reading global memory bank (path: ${path}, workspace: ${paths.workspace})`);
+
+      // Create a new application instance if needed
+      let globalApp = app;
+      if (workspace || docs) {
+        logger.debug(`Creating new application instance with workspace: ${paths.workspace}, docs: ${paths.docs}`);
+        globalApp = await createApplication({
+          workspace: paths.workspace,
+          memoryRoot: paths.docs,
+          language: 'ja',
+          verbose: false,
+        });
+      }
+
+      const response = await globalApp.getGlobalController().readDocument(path);
       if (!response.success) {
         throw new Error((response as any).error.message);
       }
@@ -396,133 +754,125 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
       };
     }
 
-    case 'get_recent_branches': {
-      const limit = params.limit as number | undefined;
-
-      if (!app) {
-        throw new Error('Application not initialized');
-      }
-      const response = await app.getBranchController().getRecentBranches(limit);
-      if (!response.success) {
-        throw new Error((response as any).error.message);
-      }
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(response.success ? response.data : {}, null, 2),
-          },
-        ],
-      };
-    }
-
     case 'read_context': {
-      const branch = params.branch as string | undefined;
+      const branch = (params.branch as string | undefined) || '_current_';
       const language = (params.language as string) || 'ja';
-      const includeRules = params.includeRules !== false; // デフォルトはtrue
-      const includeBranchMemory = params.includeBranchMemory !== false; // デフォルトはtrue
-      const includeGlobalMemory = params.includeGlobalMemory !== false; // デフォルトはtrue
+      const workspace = params.workspace as string | undefined;
+      const docs = params.docs as string | undefined;
+      // Include options are always true now, but kept for backwards compatibility
+      const includeRules = true;
+      const includeBranchMemory = true;
+      const includeGlobalMemory = true;
 
-      logger.info(`Reading context (branch: ${branch || 'none'}, language: ${language})`);
+      // Resolve workspace and docs directories
+      const paths = resolveWorkspaceAndDocs(workspace, docs);
 
-      // ブランチメモリバンクを含める場合は、ブランチ名が必須
-      if (includeBranchMemory && !branch) {
-        throw new Error('Branch name is required when includeBranchMemory is true');
+      logger.info(`Reading context (branch: ${branch || 'none'}, language: ${language}, workspace: ${paths.workspace})`)
+
+      // オプションが指定されていても無視される（オプション自体が廃止されたため）
+      logger.debug('All context components are always included regardless of include options.');
+
+      // Branch name is required
+      if (!branch) {
+        throw new Error('Branch name is required for read_context');
       }
 
       if (!app) {
         throw new Error('Application not initialized');
       }
 
-      // 結果を格納するオブジェクト
-      const result: Record<string, any> = {};
+      try {
+        // Use ContextController to get all context info at once
+        logger.debug('Requesting context from ContextController');
 
-      // ルールを取得
-      if (includeRules) {
-        logger.debug('Including rules in context');
-        if (!['en', 'ja', 'zh'].includes(language)) {
-          throw new Error('Invalid language for rules');
+        // Create a new application instance with the specified workspace and docs if different from the default
+        let contextApp = app;
+        if (workspace || docs) {
+          logger.debug(`Creating new application instance with workspace: ${paths.workspace}, docs: ${paths.docs}`);
+          contextApp = await createApplication({
+            workspace: paths.workspace,
+            memoryRoot: paths.docs,
+            language: isValidLanguage(language) ? language : 'en',
+            verbose: false,
+          });
         }
 
-        try {
-          const dirname = __dirname;
+        const response = await contextApp.getContextController().readContext({
+          branch,
+          language
+        });
 
-          // Load template structure
-          const templatePath = path.join(dirname, 'templates', 'json', 'rules.json');
-          const templateContent = await fs.readFile(templatePath, 'utf-8');
-          const template = JSON.parse(templateContent);
-
-          // Load language translations
-          const translationsPath = path.join(
-            dirname,
-            'infrastructure',
-            'i18n',
-            'translations',
-            `${language}.json`
-          );
-          const translationsContent = await fs.readFile(translationsPath, 'utf-8');
-          const translations = JSON.parse(translationsContent);
-
-          // Render template with translations
-          const renderedContent = renderTemplate(template, translations);
-
-          result.rules = { content: renderedContent };
-        } catch (error) {
-          logger.error('Error reading rules:', error);
-
-          // Fall back to legacy files if available
-          try {
-            // Try JSON format first
-            const dirname = __dirname;
-            const jsonFilePath = path.join(dirname, 'templates', 'json', `rules-${language}.json`);
-            const content = await fs.readFile(jsonFilePath, 'utf-8');
-            result.rules = { content };
-          } catch (jsonError) {
-            // Fall back to markdown file
-            try {
-              const dirname = __dirname;
-              const mdFilePath = path.join(dirname, 'templates', `rules-${language}.md`);
-              const content = await fs.readFile(mdFilePath, 'utf-8');
-              result.rules = { content };
-            } catch (mdError) {
-              throw new Error(`Failed to read rules in ${language}: ${(error as Error).message}`);
-            }
-          }
+        if (!response.success) {
+          throw new Error(response.error || 'Failed to read context');
         }
+
+        // Make sure we return properly formatted data for MCP
+        // The response.data is already an object, no need to stringify and then parse again
+        // Format the response data properly for MCP protocol
+        // We need to ensure it's valid JSON for the client to parse
+        const formattedResponse = {
+          rules: response.data.rules,
+          branchMemory: response.data.branchMemory,
+          globalMemory: response.data.globalMemory
+        };
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(formattedResponse, null, 2),
+            },
+          ],
+        };
+      } catch (error) {
+        logger.error('Error reading context:', error);
+        throw error;
       }
-
-      // ブランチメモリバンクを取得
-      if (includeBranchMemory && branch) {
-        logger.debug(`Including branch memory bank for branch: ${branch}`);
-        const branchResponse = await app.getBranchController().readCoreFiles(branch);
-        if (!branchResponse.success) {
-          throw new Error((branchResponse as any).error.message);
-        }
-        result.branchMemory = branchResponse.data;
-      }
-
-      // グローバルメモリバンクを取得
-      if (includeGlobalMemory) {
-        logger.debug('Including global memory bank in context');
-        const globalResponse = await app.getGlobalController().readCoreFiles();
-        if (!globalResponse.success) {
-          throw new Error((globalResponse as any).error.message);
-        }
-        result.globalMemory = globalResponse.data;
-      }
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
     }
 
-    // create_pull_request case removed
+    case 'get_template': {
+      const id = params.id as string;
+      const language = params.language as string;
+      const variables = params.variables as Record<string, string> | undefined;
+      const workspace = params.workspace as string | undefined;
+      const docs = params.docs as string | undefined;
+
+      if (!id || !language) {
+        throw new Error('Invalid arguments for get_template');
+      }
+
+      if (!['en', 'ja', 'zh'].includes(language)) {
+        throw new Error(`Invalid language code: ${language}`);
+      }
+
+      if (!app) {
+        throw new Error('Application not initialized');
+      }
+
+      // Resolve workspace and docs directories
+      const paths = resolveWorkspaceAndDocs(workspace, docs);
+      logger.debug(`Getting template (id: ${id}, language: ${language}, workspace: ${paths.workspace})`);
+
+      // Create a new application instance if needed
+      let templateApp = app;
+      if (workspace || docs) {
+        logger.debug(`Creating new application instance with workspace: ${paths.workspace}, docs: ${paths.docs}`);
+        templateApp = await createApplication({
+          workspace: paths.workspace,
+          memoryRoot: paths.docs,
+          language: isValidLanguage(language) ? language : 'en',
+          verbose: false,
+        });
+      }
+
+      // Currently returns template in Markdown format
+      const response = await templateApp.getTemplateController().getTemplateAsMarkdown(id, isValidLanguage(language) ? language : 'en', variables);
+
+      return {
+        content: [{ type: 'text', text: response }],
+        _meta: { lastModified: new Date().toISOString() }
+      };
+    }
 
     default:
       throw new Error(`Unknown tool: ${name}`);
@@ -586,6 +936,7 @@ async function main() {
   logger.debug('Initializing application..');
   // Initialize a new application
   app = await createApplication({
+    workspace: argv.workspace as string,
     memoryRoot: argv.docs as string,
     language: 'ja',
     verbose: false,

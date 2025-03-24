@@ -1,0 +1,59 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "core-coding-standards",
+    "title": "コーディング規約",
+    "documentType": "core",
+    "path": "core/coding-standards.json",
+    "tags": [
+      "standards",
+      "best-practices",
+      "typescript",
+      "clean-code",
+      "core"
+    ],
+    "lastModified": "2025-03-22T02:15:30.000Z",
+    "createdAt": "2025-03-21T08:40:50.132Z",
+    "version": 2
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "概要",
+        "content": "このドキュメントでは、Memory Bank MCPサーバーの開発における基本的なコーディング規約を定義します。詳細な情報は `01-project/coding-standards.json` を参照してください。"
+      },
+      {
+        "title": "基本原則",
+        "content": "1. **読みやすさを優先**: コードは書く時間より読む時間の方が長いため、読みやすさを最優先します\n2. **DRY原則**: Don't Repeat Yourself - 重複コードを避けます\n3. **KISS原則**: Keep It Simple, Stupid - シンプルなコードを心がけます\n4. **単一責任の原則**: 各クラスや関数は単一の責任を持つようにします\n5. **テスト駆動開発**: 可能な限りテストファーストで開発を行います"
+      },
+      {
+        "title": "命名規則",
+        "content": "- **クラス名**: PascalCase（例: MemoryBankRepository）\n- **変数名**: camelCase（例: memoryBankContent）\n- **定数**: UPPER_SNAKE_CASE（例: MAX_FILE_SIZE）\n- **インターフェース**: 接頭辞「I」は使用せず、名詞または形容詞+名詞（例: Repository, ReadableStream）\n- **ファイル名**: ケバブケース（例: memory-bank-repository.ts）\n- **プライベートメンバー**: アンダースコア始まり（例: _privateVariable）"
+      },
+      {
+        "title": "TypeScript特有の規約",
+        "content": "- **型安全性を確保**: anyの使用を避け、unknown + 型ガードを使用\n- **型エイリアスの活用**: 意味のある型名を定義（例: UserId = string）\n- **関数型の明示**: パラメータと戻り値の型を必ず指定\n- **nullとundefinedの扱い**: strictNullChecksモードを有効にし、常に明示的に処理\n- **インターフェースの優先**: 型エイリアスよりもインターフェースを優先して使用\n- **読み取り専用プロパティ**: 変更不要なプロパティには readonly を使用"
+      },
+      {
+        "title": "コードスタイル",
+        "content": "- **インデント**: スペース2つ\n- **行の長さ**: 最大100文字\n- **セミコロン**: 必須\n- **引用符**: シングルクォート（'）を使用\n- **中括弧**: 同じ行に開始\n- **コメント**: 「なぜそうするのか」を説明し、自明なコードにはコメントを避ける\n- **TODO/FIXME**: 理由とチケット番号を含める（例: // TODO(#123): この実装は一時的なものです）"
+      },
+      {
+        "title": "クリーンコード実践",
+        "content": "1. **小さな関数**: 一つの関数は20行以内に収める\n2. **パラメータの少なさ**: 3つ以下のパラメータを目指す\n3. **早期リターン**: 深いネストを避けるため、条件不一致は早めにリターン\n4. **副作用の最小化**: 純粋関数を優先し、副作用は明示的に\n5. **デフォルト値の利用**: オプショナルパラメータよりもデフォルト値を使用\n6. **不変性の重視**: 可能な限り変数の再代入を避ける"
+      },
+      {
+        "title": "ファイル構成",
+        "content": "- **ファイルサイズ**: 1ファイルは500行を超えないようにする\n- **モジュール区分**: ドメイン機能ごとにディレクトリを分ける\n- **レイヤー区分**: 「アダプター」「ユースケース」「ドメインモデル」などのレイヤーを明確に分ける\n- **インポート順**: 1) 標準ライブラリ 2) サードパーティライブラリ 3) 内部モジュール"
+      },
+      {
+        "title": "テスト規約",
+        "content": "- **テストファイル命名**: [対象ファイル名].test.ts\n- **テスト記述スタイル**: 「given-when-then」または「arrange-act-assert」パターン\n- **テスト名**: 「[テスト対象の状況]の場合_[実行する操作]すると_[期待される結果]」形式\n- **テストカバレッジ**: コアドメインロジックは100%のカバレッジを目指す"
+      },
+      {
+        "title": "関連ドキュメント",
+        "content": "- [詳細なコーディング規約](../01-project/coding-standards.json)\n- [TypeScript特有の規約](../01-project/typescript-specific-standards.json)\n- [テスト戦略](../05-testing/consolidated-test-strategy.json)"
+      }
+    ]
+  }
+}

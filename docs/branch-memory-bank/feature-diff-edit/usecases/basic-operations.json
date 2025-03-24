@@ -1,0 +1,182 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "diff-edit-usecases-basic",
+    "title": "JSONパッチ - 基本操作ユースケース",
+    "documentType": "usecases",
+    "path": "usecases/basic-operations.json",
+    "tags": [
+      "json-patch",
+      "usecases",
+      "rfc6902",
+      "document-editing"
+    ],
+    "lastModified": "2025-03-24T21:45:00.000Z",
+    "createdAt": "2025-03-24T21:45:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "usecases": [
+      {
+        "id": "UC-1",
+        "title": "JSONドキュメントの特定フィールドを更新する",
+        "description": "ドキュメント全体を置き換えるのではなく、特定のフィールドのみを更新することで、競合の可能性を減らし、効率的な更新を可能にします。",
+        "actors": [
+          "開発者",
+          "APIクライアント"
+        ],
+        "preconditions": [
+          "対象のJSONドキュメントが存在していること",
+          "ユーザーが対象ドキュメントへの書き込み権限を持っていること"
+        ],
+        "mainFlow": [
+          "1. ユーザーが対象ドキュメントのIDとパス、および新しい値を指定",
+          "2. システムが対象ドキュメントを取得",
+          "3. 指定されたパスの検証",
+          "4. 更新操作（add/replace）を構築",
+          "5. 操作の適用前にドキュメントのバリデーション",
+          "6. 操作の適用",
+          "7. 更新されたドキュメントの保存",
+          "8. 結果の返却"
+        ],
+        "alternativeFlows": [
+          {
+            "id": "UC-1-A1",
+            "title": "ドキュメントが存在しない場合",
+            "steps": [
+              "2a. システムがドキュメントを見つけられない",
+              "2b. エラーメッセージを返却して処理を終了"
+            ]
+          },
+          {
+            "id": "UC-1-A2",
+            "title": "指定されたパスが不正な場合",
+            "steps": [
+              "3a. パス文字列の構文が不正",
+              "3b. InvalidJsonPathErrorを返却"
+            ]
+          },
+          {
+            "id": "UC-1-A3",
+            "title": "更新操作が無効な場合",
+            "steps": [
+              "5a. バリデーションに失敗する（例：存在しないパスへのreplaceなど）",
+              "5b. 具体的なエラー（PathNotFoundErrorなど）を返却"
+            ]
+          }
+        ],
+        "postconditions": [
+          "指定されたフィールドが更新されている",
+          "ドキュメントの他の部分は変更されていない",
+          "更新履歴が記録されている"
+        ],
+        "examples": [
+          {
+            "description": "ドキュメント内のタイトルのみを更新するケース",
+            "request": {
+              "documentId": "system-patterns-123",
+              "operation": "replace",
+              "path": "/metadata/title",
+              "value": "更新されたタイトル"
+            },
+            "response": {
+              "success": true,
+              "document": {
+                "metadata": {
+                  "title": "更新されたタイトル",
+                  "...": "（他のフィールドは変更なし）"
+                },
+                "content": {
+                  "...": "（変更なし）"
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "UC-2",
+        "title": "JSONドキュメントから特定の項目を削除する",
+        "description": "ドキュメント内の特定のフィールドや配列要素を削除します。",
+        "actors": [
+          "開発者",
+          "APIクライアント"
+        ],
+        "preconditions": [
+          "対象のJSONドキュメントが存在していること",
+          "ユーザーが対象ドキュメントへの書き込み権限を持っていること",
+          "削除対象のパスが存在していること"
+        ],
+        "mainFlow": [
+          "1. ユーザーが対象ドキュメントのIDと削除するパスを指定",
+          "2. システムが対象ドキュメントを取得",
+          "3. 指定されたパスの検証",
+          "4. 削除操作（remove）を構築",
+          "5. 操作の適用前にドキュメントのバリデーション",
+          "6. 操作の適用",
+          "7. 更新されたドキュメントの保存",
+          "8. 結果の返却"
+        ],
+        "alternativeFlows": [
+          {
+            "id": "UC-2-A1",
+            "title": "削除対象のパスが存在しない場合",
+            "steps": [
+              "5a. 存在しないパスの削除を試みたことを検出",
+              "5b. PathNotFoundErrorを返却"
+            ]
+          },
+          {
+            "id": "UC-2-A2",
+            "title": "必須フィールドの削除が試みられた場合",
+            "steps": [
+              "5a. 削除しようとしているフィールドが必須フィールドであることを検出",
+              "5b. RequiredFieldRemovalErrorを返却"
+            ]
+          }
+        ],
+        "postconditions": [
+          "指定されたフィールドが削除されている",
+          "ドキュメントの他の部分は変更されていない",
+          "更新履歴が記録されている"
+        ],
+        "examples": [
+          {
+            "description": "ドキュメント内の不要なタグを削除するケース",
+            "request": {
+              "documentId": "system-patterns-123",
+              "operation": "remove",
+              "path": "/metadata/tags/2"
+            },
+            "response": {
+              "success": true,
+              "document": {
+                "metadata": {
+                  "tags": [
+                    "tag1",
+                    "tag2"
+                  ],
+                  "...": "（他のフィールドは変更なし）"
+                },
+                "content": {
+                  "...": "（変更なし）"
+                }
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "implementationNotes": {
+      "keyPoints": [
+        "基本操作（add/remove/replace）はfast-json-patchライブラリでネイティブにサポートされている",
+        "特に注意が必要なエラーケースは、存在しないパスへの操作と必須フィールドの削除",
+        "実装ではドキュメントの整合性を常に保証するバリデーションレイヤーが必要"
+      ],
+      "securityConsiderations": [
+        "権限チェックは操作の検証前に必ず行うこと",
+        "特定のフィールド（例：/metadata/id）への更新を制限するロジックを実装する"
+      ]
+    }
+  }
+}

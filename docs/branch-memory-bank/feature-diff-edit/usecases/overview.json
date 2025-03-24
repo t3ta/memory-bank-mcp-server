@@ -1,0 +1,91 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "diff-edit-usecases-overview",
+    "title": "JSONドキュメント部分編集機能の概要",
+    "documentType": "usecases",
+    "path": "usecases/overview.json",
+    "tags": [
+      "json-patch",
+      "usecases",
+      "rfc6902",
+      "document-editing",
+      "overview"
+    ],
+    "lastModified": "2025-03-24T21:40:00.000Z",
+    "createdAt": "2025-03-24T21:40:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": "fast-json-patchライブラリを活用したJSONドキュメント部分編集機能（RFC 6902準拠）のユースケース定義です。この機能を通じて、メモリバンク内のJSONドキュメントに対して原子的かつ検証可能な部分更新を行えるようになります。",
+    "usecaseList": [
+      {
+        "id": "UC-1",
+        "title": "JSONドキュメントの特定フィールドを更新する",
+        "path": "usecases/basic-operations.json"
+      },
+      {
+        "id": "UC-2",
+        "title": "JSONドキュメントから特定の項目を削除する",
+        "path": "usecases/basic-operations.json"
+      },
+      {
+        "id": "UC-3",
+        "title": "配列操作（要素の追加・移動・コピー）の実行",
+        "path": "usecases/array-operations.json"
+      },
+      {
+        "id": "UC-4",
+        "title": "ドキュメント状態の比較とパッチ生成",
+        "path": "usecases/comparison-operations.json"
+      },
+      {
+        "id": "UC-5",
+        "title": "複数のパッチ操作をアトミックに適用",
+        "path": "usecases/batch-operations.json"
+      },
+      {
+        "id": "UC-6",
+        "title": "条件付きパッチ操作の実行",
+        "path": "usecases/conditional-operations.json"
+      }
+    ],
+    "additionalUseCases": [
+      {
+        "id": "AUC-1",
+        "title": "ドキュメント間の項目コピー",
+        "description": "ドキュメントAからドキュメントBへ特定の項目をコピーします。",
+        "notes": "複数ドキュメントをまたいだ操作であるため、完全な原子性は保証されません。"
+      },
+      {
+        "id": "AUC-2",
+        "title": "スキーマバージョン管理",
+        "description": "パッチ操作を利用してドキュメントスキーマを段階的に更新します。",
+        "notes": "例えば、memory_document_v1からv2へのマイグレーションなど。"
+      },
+      {
+        "id": "AUC-3",
+        "title": "ドキュメントマージ戦略",
+        "description": "ブランチマージ時に、コンフリクト解決のための部分的なマージをサポートします。",
+        "notes": "gitのマージコンフリクト解決に類似した機能を提供します。"
+      }
+    ],
+    "benefits": [
+      "競合の少ない効率的なドキュメント更新",
+      "特定フィールドのみの更新による帯域幅とリソースの節約",
+      "複雑な配列操作のシンプルな実行",
+      "変更の原子性と一貫性の保証",
+      "条件付き更新によるバージョン管理の強化"
+    ],
+    "relatedDocuments": [
+      {
+        "title": "エラーケース一覧",
+        "path": "usecases/error-cases.json"
+      },
+      {
+        "title": "インターフェース定義",
+        "path": "usecases/interfaces.json"
+      }
+    ]
+  }
+}

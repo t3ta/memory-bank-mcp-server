@@ -1,0 +1,107 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "release-v2.2.0-notes",
+    "title": "リリースノート v2.2.0",
+    "documentType": "release_notes",
+    "path": "releaseNotes.json",
+    "tags": [
+      "release",
+      "v2.2.0",
+      "json-patch",
+      "documentation"
+    ],
+    "lastModified": "2025-03-24T14:00:00.000Z",
+    "createdAt": "2025-03-24T14:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "releaseVersion": "v2.2.0",
+    "releaseDate": "2025-03-24",
+    "summary": "JSON Patchサポート、workspaceオプション、テンプレートシステムの統合など多数の機能強化を含むリリース",
+    "mainFeatures": [
+      {
+        "title": "JSON Patchのサポート",
+        "description": "JSONドキュメントに対して部分的な更新を行うためのJSON Patch（RFC 6902）サポートを追加しました。これにより、ドキュメント全体ではなく、特定の部分のみを更新することが可能になります。",
+        "relatedCommits": [
+          "662352c",
+          "db5e688",
+          "693493d",
+          "c088bf1"
+        ]
+      },
+      {
+        "title": "workspaceオプションの追加",
+        "description": "コマンドラインにworkspaceオプションを追加し、プロジェクトのルートディレクトリを指定可能になりました。これにより、異なるプロジェクトディレクトリでの作業が容易になります。",
+        "relatedCommits": [
+          "6745bd5"
+        ]
+      },
+      {
+        "title": "テンプレートシステムの強化",
+        "description": "ReadRulesUseCaseにテンプレート読み込みのサポートを追加し、テンプレートシステムをアプリケーションに統合しました。",
+        "relatedCommits": [
+          "542bc4b",
+          "cb7f303"
+        ]
+      }
+    ],
+    "improvements": [
+      {
+        "category": "テスト",
+        "items": [
+          "ts-mockitoをjest.fn()に置き換え",
+          "テスト環境の最適化"
+        ]
+      },
+      {
+        "category": "ロギング",
+        "items": [
+          "console.logをloggerに置き換え（cli/ディレクトリを除く）",
+          "ロギングシステムの改善"
+        ]
+      },
+      {
+        "category": "エラー処理",
+        "items": [
+          "コアファイル操作のエラー処理を強化",
+          "JSONドキュメント処理におけるエラー処理の改善"
+        ]
+      }
+    ],
+    "bugFixes": [
+      {
+        "description": "ReadContextUseCaseが常にフィルタリングされたコアファイルを返すように修正",
+        "relatedCommit": "ad7f470"
+      },
+      {
+        "description": "空のコード変更に対処するための適切なロギング調整",
+        "relatedCommit": "52b0604"
+      },
+      {
+        "description": "read_context応答データをMCPプロトコル準拠のために適切にフォーマット",
+        "relatedCommit": "79a05de"
+      },
+      {
+        "description": "read_contextハンドラーの壊れたケース構造を修正",
+        "relatedCommit": "8e9743a"
+      }
+    ],
+    "refactoring": [
+      {
+        "description": "E2Eテストのセットアップと構成ファイルを削除し、テスト構造を合理化",
+        "relatedCommit": "95c4a03"
+      },
+      {
+        "description": "Jest設定を更新し、サービスの登録にテンプレートコントローラーを追加",
+        "relatedCommit": "cb7f303"
+      }
+    ],
+    "knownIssues": [],
+    "additionalNotes": "このリリースでは、v2.1.0でMarkdownのサポートが非推奨となり、JSONフォーマットのみをサポートするようになりました。すべてのドキュメントはJSONフォーマットで作成・管理してください。",
+    "contributors": [
+      "t3ta",
+      "Takahito Mita"
+    ]
+  }
+}

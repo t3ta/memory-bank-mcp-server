@@ -7,6 +7,15 @@ export default {
   rootDir: '.',
   roots: ['<rootDir>/src/', '<rootDir>/tests/'],
   testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
+  testPathIgnorePatterns: [
+    // Still need fixes for these tests
+    // 'unit/infrastructure/repositories/file-system/FileSystemTagIndexRepositoryImpl.test.ts', // 一時的にコメントアウト
+    // 'unit/infrastructure/storage/FileSystemService.test.ts', // 一時的にコメントを外す
+    // 'unit/infrastructure/templates/FileTemplateRepository.test.ts', // 修正済み
+    // 'unit/interface/controllers/BranchController.test.ts', // 修正済み
+    // 'unit/migration/MarkdownMigrationService.test.ts', // 修正済み
+    '.*ts-mockito-backup.*', // バックアップディレクトリを除外
+  ],
   transform: {
     '^.+\\.tsx?$': ['ts-jest', {
       useESM: true,
@@ -17,7 +26,8 @@ export default {
     '^(\\.{1,2}/.*)\\.js$': '$1',
     '^@modelcontextprotocol/sdk(.*)$': '<rootDir>/node_modules/@modelcontextprotocol/sdk/dist/esm$1',
     '^src/(.*)$': '<rootDir>/src/$1',
-    '(.+)\\.js': '$1'
+    '(.+)\\.js': '$1',
+    '^../../../../src/(.*)$': '<rootDir>/src/$1'
   },
   modulePaths: ['<rootDir>', '<rootDir>/src'],
   moduleDirectories: ['node_modules', 'src'],
@@ -26,7 +36,7 @@ export default {
   testTimeout: 60000,
   moduleFileExtensions: ['ts', 'js', 'json'],
   extensionsToTreatAsEsm: ['.ts'],
-  collectCoverage: true,
+  collectCoverage: false,
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/index.ts',

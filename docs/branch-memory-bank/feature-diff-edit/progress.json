@@ -1,0 +1,164 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "7d7ebaa3-e7bd-405a-8010-9a4be3c6392b",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress"
+    ],
+    "lastModified": "2025-03-24T19:30:00.000Z",
+    "createdAt": "2025-03-24T09:55:09.526Z",
+    "version": 3
+  },
+  "content": {
+    "workingFeatures": [],
+    "pendingImplementation": [
+      {
+        "id": "8e7d6c5b-4a3f-2e1d-0c9b-8a7b6c5d4e3f",
+        "description": "fast-json-patchライブラリの導入とテスト",
+        "priority": "high",
+        "tasks": [
+          "パッケージのインストール",
+          "基本機能の検証",
+          "バージョン互換性の確認"
+        ]
+      },
+      {
+        "id": "c4e62e62-58d2-4f90-bb02-f746ddb05bdd",
+        "description": "JsonPathクラス - JSONパスの解析と検証",
+        "priority": "high",
+        "tasks": [
+          "パスセグメントの解析ロジック",
+          "パスバリデーション",
+          "fast-json-patchとの互換性層"
+        ]
+      },
+      {
+        "id": "e131edb6-7692-44c2-b2ce-3e0d51db1ebb",
+        "description": "JsonPatchOperationクラス - パッチ操作の表現とバリデーション",
+        "priority": "high",
+        "tasks": [
+          "各操作タイプのモデル化",
+          "操作バリデーション",
+          "fast-json-patch形式への変換機能"
+        ]
+      },
+      {
+        "id": "1f2e3d4c-5b6a-7f8e-9d0c-1b2a3c4d5e6f",
+        "description": "FastJsonPatchAdapter - fast-json-patchとの連携アダプター",
+        "priority": "high",
+        "tasks": [
+          "アダプターの基本構造設計",
+          "fast-json-patchとのインターフェース連携",
+          "エラー変換ロジック"
+        ]
+      },
+      {
+        "id": "3b9c8d7e-6f5a-4e3d-b2c1-9a0f8e7d6c5b",
+        "description": "JsonPatchService - パッチ操作のインターフェース",
+        "priority": "medium",
+        "tasks": [
+          "サービスインターフェースの設計",
+          "FastJsonPatchAdapterとの連携"
+        ]
+      },
+      {
+        "id": "5a4b3c2d-1e2f-3g4h-5i6j-7k8l9m0n1o2p",
+        "description": "JsonPatchUseCase - ユースケースレイヤーの実装",
+        "priority": "medium",
+        "tasks": [
+          "ドキュメント取得ロジック",
+          "操作適用フロー",
+          "結果の検証と永続化",
+          "トランザクション処理"
+        ]
+      },
+      {
+        "id": "9z8y7x6w-5v4u-3t2s-1r0q-9p8o7n6m5l4k",
+        "description": "CLI/APIインターフェース - コマンドラインとAPIインターフェース",
+        "priority": "low",
+        "tasks": [
+          "CLIコマンドの定義",
+          "APIエンドポイントの設計",
+          "入力検証",
+          "出力フォーマット"
+        ]
+      }
+    ],
+    "status": "設計フェーズ更新完了。実装アプローチをfast-json-patchライブラリの活用方針に変更。",
+    "completionPercentage": 15,
+    "knownIssues": [
+      {
+        "id": "5bd52946-2ad1-4af3-b275-04bee7cc8f74",
+        "description": "fast-json-patchライブラリの学習コストが発生する",
+        "severity": "low"
+      },
+      {
+        "id": "7d4cd1e6-5149-44d6-98ae-3f101538c6d0",
+        "description": "ライブラリの新しい依存関係の追加によるバージョン互換性の問題が発生する可能性",
+        "severity": "medium"
+      },
+      {
+        "id": "1c2d3e4f-5g6h-7i8j-9k0l-1m2n3o4p5q6r",
+        "description": "ドメインロジックとライブラリの橋渡しが複雑になる可能性",
+        "severity": "medium"
+      }
+    ],
+    "nextMilestones": [
+      {
+        "id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+        "name": "ライブラリ統合とValueObjects実装",
+        "description": "fast-json-patchライブラリの導入とValueObjectの実装",
+        "targetDate": "2025-03-27",
+        "criteria": [
+          "fast-json-patchライブラリのインストールと基本テスト",
+          "JsonPathとJsonPatchOperationの実装",
+          "FastJsonPatchAdapterの基本実装"
+        ]
+      },
+      {
+        "id": "q7r8s9t0-u1v2-w3x4-y5z6-a7b8c9d0e1f2",
+        "name": "サービスとユースケース実装",
+        "description": "JsonPatchServiceとユースケースレイヤーの実装",
+        "targetDate": "2025-03-30",
+        "criteria": [
+          "JsonPatchServiceインターフェースの実装",
+          "ユースケースの実装",
+          "総合テストの実施"
+        ]
+      },
+      {
+        "id": "g3h4i5j6-k7l8-m9n0-o1p2-q3r4s5t6u7v8",
+        "name": "インターフェース実装とドキュメント化",
+        "description": "CLIコマンドとAPIエンドポイントの実装および文書化",
+        "targetDate": "2025-04-02",
+        "criteria": [
+          "CLIコマンドの実装",
+          "APIエンドポイントの実装",
+          "使用方法のドキュメント化"
+        ]
+      }
+    ],
+    "implementationStrategy": {
+      "libraryIntegration": {
+        "package": "fast-json-patch",
+        "version": "^3.1.0",
+        "installCommand": "yarn add fast-json-patch",
+        "importCode": "import * as jsonpatch from 'fast-json-patch';",
+        "notes": "このライブラリはRFC 6902に完全準拠しており、広く使われています。TypeScriptの型定義も含まれています。"
+      },
+      "adaptationPattern": {
+        "approach": "アダプターパターン",
+        "description": "ドメインモデル（JsonPath、JsonPatchOperation）とライブラリの間にアダプターレイヤー（FastJsonPatchAdapter）を設けることで、ドメインロジックとライブラリの分離を実現します。",
+        "benefits": [
+          "ドメインモデルの純粋さを保持",
+          "テスト容易性の確保",
+          "将来的なライブラリ置換の柔軟性",
+          "ドメイン特有のバリデーションとエラー処理の追加"
+        ]
+      }
+    }
+  }
+}

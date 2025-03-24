@@ -1,0 +1,16 @@
+{
+  "schema": "memory_document_v1",
+  "metadata": {
+    "title": "progress.json",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "lastModified": "2025-03-23T17:34:25.115Z"
+  },
+  "content": {
+    "status": "{\\n  \\\"schema\\\": \\\"memory_document_v2\\\",\\n  \\\"metadata\\\": {\\n    \\\"id\\\": \\\"progress-uuid\\\",\\n    \\\"title\\\": \\\"進捗状況\\\",\\n    \\\"documentType\\\": \\\"progress\\\",\\n    \\\"path\\\": \\\"progress.json\\\",\\n    \\\"tags\\\": [\\n      \\\"core\\\",\\n      \\\"progress\\\"\\n    ],\\n    \\\"lastModified\\\": \\\"2025-03-24T03:02:15.000Z\\\",\\n    \\\"createdAt\\\": \\\"2025-03-23T17:29:56.690Z\\\",\\n    \\\"version\\\": 1\\n  },\\n  \\\"content\\\": {\\n    \\\"workingFeatures\\\": [\\n      {\\n        \\\"id\\\": \\\"1\\\",\\n        \\\"description\\\": \\\"基本的なread_context機能（現在実装済み）\\\"\\n      }\\n    ],\\n    \\\"unimplementedFeatures\\\": [\\n      {\\n        \\\"id\\\": \\\"1\\\",\\n        \\\"description\\\": \\\"改善されたデバッグログ機能\\\"\\n      },\\n      {\\n        \\\"id\\\": \\\"2\\\",\\n        \\\"description\\\": \\\"ブランチの自動初期化機能\\\"\\n      },\\n      {\\n        \\\"id\\\": \\\"3\\\",\\n        \\\"description\\\": \\\"より詳細なエラーハンドリングとエラーメッセージ\\\"\\n      },\\n      {\\n        \\\"id\\\": \\\"4\\\",\\n        \\\"description\\\": \\\"includeオプションの廃止（常に全ての情報を返す）\\\"\\n      },\\n      {\\n        \\\"id\\\": \\\"5\\\",\\n        \\\"description\\\": \\\".mdファイル処理のJSON化（統一）\\\"\\n      }\\n    ],\\n    \\\"currentStatus\\\": \\\"初期調査フェーズを完了し、改善が必要な箇所を特定しました。これからコード修正の詳細設計に着手します。\\\",\\n    \\\"knownIssues\\\": [\\n      {\\n        \\\"id\\\": \\\"1\\\",\\n        \\\"description\\\": \\\"現在のread_contextでは存在しないブランチにアクセスするとエラーになり、クライアント側で対処が必要\\\"\\n      },\\n      {\\n        \\\"id\\\": \\\"2\\\",\\n        \\\"description\\\": \\\"デバッグ情報が不足しているため、問題が発生した際の原因特定が困難\\\"\\n      },\\n      {\\n        \\\"id\\\": \\\"3\\\",\\n        \\\"description\\\": \\\"エラーメッセージが汎用的で具体的な問題を把握しづらい\\\"\\n      },\\n      {\\n        \\\"id\\\": \\\"4\\\",\\n        \\\"description\\\": \\\"include*オプションが存在するが実質的に不要なため、コードが複雑になっている\\\"\\n      },\\n      {\\n        \\\"id\\\": \\\"5\\\",\\n        \\\"description\\\": \\\".mdファイルと.jsonファイルの両方が処理されているため、一貫性がない\\\"\\n      }\\n    ]\\n  }\\n}",
+    "workingFeatures": [],
+    "pendingImplementation": [],
+    "knownIssues": []
+  }
+}

@@ -7,6 +7,7 @@ import type { Tag } from "../../../domain/entities/Tag.js";
 import type { IBranchMemoryBankRepository, RecentBranch } from "../../../domain/repositories/IBranchMemoryBankRepository.js";
 import type { TagIndex } from "../../../schemas/tag-index/tag-index-schema.js";
 import { DomainError, DomainErrorCodes } from "../../../shared/errors/DomainError.js";
+import { logger } from "../../../shared/utils/logger.js";
 
 
 /**
@@ -21,7 +22,7 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
    */
   constructor(rootPath: string) {
     this.branchMemoryBankPath = path.join(rootPath, 'branch-memory-bank');
-    console.log(`SimpleBranchMemoryBankRepository initialized with path: ${this.branchMemoryBankPath}`);
+    logger.debug('Repository initialized:', { path: this.branchMemoryBankPath });
   }
 
   /**
@@ -32,12 +33,12 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
   async exists(branchName: string): Promise<boolean> {
     try {
       const branchPath = path.join(this.branchMemoryBankPath, branchName);
-      console.log(`Checking if branch exists: ${branchPath}`);
+      logger.debug('Checking if branch exists:', { path: branchPath });
       await fs.access(branchPath);
-      console.log(`Branch exists: ${branchPath}`);
+      logger.debug('Branch exists:', { path: branchPath });
       return true;
     } catch (error) {
-      console.log(`Branch does not exist: ${branchName}`);
+      logger.debug('Branch does not exist:', { branch: branchName });
       return false;
     }
   }
@@ -49,13 +50,13 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
    */
   async initialize(branchInfo: BranchInfo): Promise<void> {
     const branchPath = path.join(this.branchMemoryBankPath, branchInfo.name);
-    console.log(`Initializing branch: ${branchPath}`);
+    logger.debug('Initializing branch:', { path: branchPath });
 
     try {
       await fs.mkdir(branchPath, { recursive: true });
-      console.log(`Branch initialized: ${branchPath}`);
+      logger.debug('Branch initialized:', { path: branchPath });
     } catch (error) {
-      console.error(`Failed to initialize branch: ${branchPath}`, error);
+      logger.error('Failed to initialize branch:', { path: branchPath, error });
       throw new DomainError(
         DomainErrorCodes.REPOSITORY_ERROR,
         `Failed to initialize branch memory bank: ${(error as Error).message}`
@@ -71,11 +72,11 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
    */
   async getDocument(branchInfo: BranchInfo, documentPath: DocumentPath): Promise<MemoryDocument | null> {
     const filePath = path.join(this.branchMemoryBankPath, branchInfo.name, documentPath.value);
-    console.log(`Getting document: ${filePath}`);
+    logger.debug("Getting document:", { path: filePath });
 
     try {
       const content = await fs.readFile(filePath, 'utf-8');
-      console.log(`Document found: ${filePath}`);
+      logger.debug("Document found:", { path: filePath });
       return MemoryDocument.create({
         path: documentPath,
         content,
@@ -83,7 +84,7 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
         lastModified: new Date()
       });
     } catch (error) {
-      console.log(`Document not found: ${filePath}`);
+      logger.debug("Document not found:", { path: filePath });
       return null;
     }
   }
@@ -97,14 +98,14 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
   async saveDocument(branchInfo: BranchInfo, document: MemoryDocument): Promise<void> {
     const branchPath = path.join(this.branchMemoryBankPath, branchInfo.name);
     const filePath = path.join(branchPath, document.path.value);
-    console.log(`Saving document: ${filePath}`);
+    logger.debug("Saving document:", { path: filePath });
 
     try {
       await fs.mkdir(branchPath, { recursive: true });
       await fs.writeFile(filePath, document.content, 'utf-8');
-      console.log(`Document saved: ${filePath}`);
+      logger.debug("Document saved:", { path: filePath });
     } catch (error) {
-      console.error(`Failed to save document: ${filePath}`, error);
+      logger.error("Failed to save document", { path: filePath, error });
       throw new DomainError(
         DomainErrorCodes.REPOSITORY_ERROR,
         `Failed to save document: ${(error as Error).message}`
@@ -120,14 +121,14 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
    */
   async deleteDocument(branchInfo: BranchInfo, documentPath: DocumentPath): Promise<boolean> {
     const filePath = path.join(this.branchMemoryBankPath, branchInfo.name, documentPath.value);
-    console.log(`Deleting document: ${filePath}`);
+    logger.debug("Deleting document:", { path: filePath });
 
     try {
       await fs.unlink(filePath);
-      console.log(`Document deleted: ${filePath}`);
+      logger.debug("Document deleted:", { path: filePath });
       return true;
     } catch (error) {
-      console.log(`Document deletion failed: ${filePath}`);
+      logger.debug("Document deletion failed:", { path: filePath });
       return false;
     }
   }
@@ -139,16 +140,16 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
    */
   async listDocuments(branchInfo: BranchInfo): Promise<DocumentPath[]> {
     const branchPath = path.join(this.branchMemoryBankPath, branchInfo.name);
-    console.log(`Listing documents in: ${branchPath}`);
+    logger.debug("Listing documents in:", { path: branchPath });
 
     try {
       const files = await fs.readdir(branchPath);
-      console.log(`Documents found: ${files.join(', ')}`);
+      logger.debug("Documents found:", { files: files.join(', ') });
       return files
         .filter(file => !file.startsWith('.') && !file.startsWith('_'))
         .map(file => DocumentPath.create(file));
     } catch (error) {
-      console.log(`Failed to list documents: ${branchPath}`, error);
+      logger.debug("Failed to list documents:", { path: branchPath, error });
       return [];
     }
   }
@@ -161,7 +162,7 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
    */
   async findDocumentsByTags(branchInfo: BranchInfo, tags: Tag[]): Promise<MemoryDocument[]> {
     // Simplified implementation for tests
-    console.log(`Finding documents by tags: ${tags.map(t => t.value).join(', ')}`);
+    logger.debug("Finding documents by tags:", { tags: tags.map(t => t.value).join(', ') });
     const documents: MemoryDocument[] = [];
     const paths = await this.listDocuments(branchInfo);
 
@@ -173,7 +174,7 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
     }
 
     // For testing, we'll just return all documents regardless of tags
-    console.log(`Found ${documents.length} documents`);
+    logger.debug("Found documents:", { count: documents.length });
     return documents;
   }
 
@@ -183,10 +184,10 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
    * @returns Promise resolving to array of recent branches
    */
   async getRecentBranches(limit?: number): Promise<RecentBranch[]> {
-    console.log(`Getting recent branches (limit: ${limit})`);
+    logger.debug("Getting recent branches:", { limit });
     try {
       const entries = await fs.readdir(this.branchMemoryBankPath);
-      console.log(`Found branches: ${entries.join(', ')}`);
+      logger.debug("Found branches:", { branches: entries.join(', ') });
       const branches: RecentBranch[] = [];
 
       for (const entry of entries) {
@@ -201,7 +202,7 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
           });
         } catch (error) {
           // Skip invalid branches
-          console.log(`Skipping invalid branch: ${entry}`);
+          logger.debug("Skipping invalid branch:", { branch: entry });
         }
       }
 
@@ -210,10 +211,10 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
 
       // Limit the results
       const limited = branches.slice(0, limit || 10);
-      console.log(`Returning ${limited.length} recent branches`);
+      logger.debug('Returning recent branches:', { count: limited.length });
       return limited;
     } catch (error) {
-      console.log(`Failed to get recent branches`, error);
+      logger.error('Failed to get recent branches:', { error });
       return [];
     }
   }
@@ -224,9 +225,9 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
    * @returns Promise resolving to boolean indicating if structure is valid
    */
   async validateStructure(branchInfo: BranchInfo): Promise<boolean> {
-    console.log(`Validating structure for branch: ${branchInfo.name}`);
+    logger.debug("Validating structure for branch:", { branch: branchInfo.name });
     const result = await this.exists(branchInfo.name);
-    console.log(`Structure validation result: ${result}`);
+    logger.debug("Structure validation result:", { result });
     return result;
   }
 
@@ -238,13 +239,13 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
    */
   async saveTagIndex(branchInfo: BranchInfo, tagIndex: TagIndex): Promise<void> {
     const indexPath = path.join(this.branchMemoryBankPath, branchInfo.name, '_index.json');
-    console.log(`Saving tag index: ${indexPath}`);
+    logger.debug("Saving tag index:", { path: indexPath });
 
     try {
       await fs.writeFile(indexPath, JSON.stringify(tagIndex, null, 2), 'utf-8');
-      console.log(`Tag index saved: ${indexPath}`);
+      logger.debug("Tag index saved:", { path: indexPath });
     } catch (error) {
-      console.error(`Failed to save tag index: ${indexPath}`, error);
+      logger.error("Failed to save tag index:", { path: indexPath, error });
       throw new DomainError(
         DomainErrorCodes.REPOSITORY_ERROR,
         `Failed to save tag index: ${(error as Error).message}`
@@ -259,14 +260,14 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
    */
   async getTagIndex(branchInfo: BranchInfo): Promise<TagIndex | null> {
     const indexPath = path.join(this.branchMemoryBankPath, branchInfo.name, '_index.json');
-    console.log(`Getting tag index: ${indexPath}`);
+    logger.debug("Getting tag index:", { path: indexPath });
 
     try {
       const content = await fs.readFile(indexPath, 'utf-8');
-      console.log(`Tag index found: ${indexPath}`);
+      logger.debug("Tag index found:", { path: indexPath });
       return JSON.parse(content) as TagIndex;
     } catch (error) {
-      console.log(`Tag index not found: ${indexPath}`);
+      logger.debug("Tag index not found:", { path: indexPath });
       return null;
     }
   }
@@ -284,7 +285,7 @@ export class SimpleBranchMemoryBankRepository implements IBranchMemoryBankReposi
     _matchAll?: boolean
   ): Promise<DocumentPath[]> {
     // Simplified implementation for tests
-    console.log(`Finding document paths by tags using index: ${tags.map(t => t.value).join(', ')}`);
+    logger.debug("Finding document paths by tags using index:", { tags: tags.map(t => t.value).join(', ') });
     const docs = await this.findDocumentsByTags(branchInfo, tags);
     return docs.map(doc => doc.path);
   }

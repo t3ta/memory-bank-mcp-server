@@ -1,0 +1,47 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "6b82d1a5-7fe2-4c8a-a2e0-03e7f3e3f3e3",
+    "title": "主要ファイル情報",
+    "documentType": "core_file",
+    "path": "core-file.json",
+    "tags": [
+      "core",
+      "file-info"
+    ],
+    "lastModified": "2025-03-24T13:15:50.796Z",
+    "createdAt": "2025-03-24T13:15:50.796Z",
+    "version": 1
+  },
+  "content": {
+    "description": "ts-mockitoからjest.fnへの移行に関連する主要ファイル",
+    "files": [
+      {
+        "path": "tests/unit/migration/MarkdownMigrationService.test.ts",
+        "status": "error",
+        "notes": "vi の参照をjestに変更済みだが、モックの型に関するエラーが出ている"
+      },
+      {
+        "path": "tests/unit/infrastructure/templates/FileTemplateRepository.test.ts",
+        "status": "error",
+        "notes": "vi の参照をjestに変更済みだが、モックの型に関するエラーが出ている"
+      },
+      {
+        "path": "tests/unit/infrastructure/storage/FileSystemService.test.ts",
+        "status": "error",
+        "notes": "モック関数の代入部分にas anyを追加して型エラーを回避した"
+      },
+      {
+        "path": "tests/unit/infrastructure/storage/FileSystemServiceExtended.test.ts",
+        "status": "unknown",
+        "notes": "まだチェックしていない"
+      },
+      {
+        "path": "tests/unit/interface/controllers/BranchController.test.ts",
+        "status": "error",
+        "notes": "mockResolvedValueの型エラーがある"
+      }
+    ],
+    "approach": "Jest.fnでモックを作成する際に、TypeScriptの型推論が正しく働かないため、適切な型アノテーションを追加してエラーを解消する。特に Promise<T> を返す関数のモックで問題が発生している。"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "progress",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "core",
+      "progress"
+    ],
+    "lastModified": "2025-03-22T09:15:45.000Z",
+    "createdAt": "2025-03-22T08:36:19.040Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "id": "workingFeatures",
+        "title": "動作している機能",
+        "content": "1. ドメインモデル\n   - Language: 言語コードとバリデーション\n   - Translation: 翻訳キーと値の管理\n   - Template: テンプレート構造（セクション管理含む）\n   - Section: テンプレート内のセクション管理\n\n2. インフラストラクチャ\n   - FileI18nRepository: JSONファイルベースの翻訳リポジトリ\n   - FileTemplateRepository: JSONファイルベースのテンプレートリポジトリ\n\n3. アプリケーション\n   - I18nService: 翻訳サービス\n\n4. CLI\n   - migrate-templatesコマンド: Markdown→JSON変換\n   - generate-markdownコマンド: JSON→Markdown変換"
+      },
+      {
+        "id": "unimplementedFeatures",
+        "title": "未実装の機能",
+        "content": "1. マイグレーション\n   - 既存ファイルの一括変換機能\n   - マイグレーション進行状況のリポート\n\n2. 動的テンプレート\n   - ネストされたプレースホルダーのサポート\n   - 条件付きセクションの表示\n\n3. テスト\n   - マイグレーション機能の単体テスト\n   - 各リポジトリの統合テスト\n\n4. ドキュメンテーション\n   - 新テンプレートシステムのユーザーガイド\n   - マイグレーションガイド"
+      },
+      {
+        "id": "currentState",
+        "title": "現在の状態",
+        "content": "- コアドメインモデルとインフラ層の実装を完了\n- 現在はMarkdownからJSONへのマイグレーション機能を開発中\n- 古いMarkdownパーサー関連のファイルは削除済み\n- JsonToMarkdownConverterクラスにdeprecatedメッセージを追加\n- まだ全体的なテストカバレッジが不十分\n- 既存のテンプレートは引き続きMarkdown形式で利用可能だが、徐々にJSONに移行予定"
+      },
+      {
+        "id": "knownIssues",
+        "title": "既知の問題",
+        "content": "1. マイグレーション中のコンテンツ損失リスク\n   - 複雑なMarkdown構造（ネストされたリストなど）がJSONに変換される際に形式が崩れる可能性\n\n2. パフォーマンス\n   - リポジトリのキャッシュ機構の最適化が必要\n\n3. 後方互換性\n   - 一部の古い機能がJSON形式では完全に再現できない場合がある\n\n4. ファイルサイズの増加\n   - JSON形式はMarkdownよりも冗長になるため、特に大きなテンプレートではファイルサイズが増加する"
+      }
+    ]
+  }
+}

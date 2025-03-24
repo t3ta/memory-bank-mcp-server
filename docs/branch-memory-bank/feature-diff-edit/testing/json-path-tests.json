@@ -1,0 +1,304 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "f7a3e9c8-5b2d-4961-8d47-12e3f6a7b890",
+    "title": "JsonPath クラスのテストケース",
+    "documentType": "test_specification",
+    "path": "testing/json-path-tests.json",
+    "tags": [
+      "json-patch",
+      "testing",
+      "tdd",
+      "json-path"
+    ],
+    "lastModified": "2025-03-24T18:30:00.000Z",
+    "createdAt": "2025-03-24T18:30:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "description": "JSONドキュメント内の位置を指定するJsonPathクラスのテストケース仕様",
+    "classUnderTest": "JsonPath",
+    "responsibility": "JSONパスの解析と検証、パス操作の提供",
+    "testCategories": [
+      {
+        "name": "基本パス解析",
+        "description": "様々なパターンのJSONパスの解析に関するテスト",
+        "testCases": [
+          {
+            "id": "jp-basic-01",
+            "name": "ルートパスが正しく解析される",
+            "input": "/",
+            "expectedSegments": [
+              ""
+            ],
+            "assertions": [
+              "path プロパティが '/' である",
+              "segments プロパティが [''] である",
+              "isRoot() が true を返す"
+            ]
+          },
+          {
+            "id": "jp-basic-02",
+            "name": "単一階層パスが正しく解析される",
+            "input": "/prop",
+            "expectedSegments": [
+              "prop"
+            ],
+            "assertions": [
+              "path プロパティが '/prop' である",
+              "segments プロパティが ['prop'] である",
+              "isRoot() が false を返す"
+            ]
+          },
+          {
+            "id": "jp-basic-03",
+            "name": "複数階層パスが正しく解析される",
+            "input": "/a/b/c",
+            "expectedSegments": [
+              "a",
+              "b",
+              "c"
+            ],
+            "assertions": [
+              "path プロパティが '/a/b/c' である",
+              "segments プロパティが ['a', 'b', 'c'] である",
+              "isRoot() が false を返す"
+            ]
+          },
+          {
+            "id": "jp-basic-04",
+            "name": "配列インデックスを含むパスが正しく解析される",
+            "input": "/a/0/b",
+            "expectedSegments": [
+              "a",
+              "0",
+              "b"
+            ],
+            "assertions": [
+              "path プロパティが '/a/0/b' である",
+              "segments プロパティが ['a', '0', 'b'] である"
+            ]
+          },
+          {
+            "id": "jp-basic-05",
+            "name": "配列末尾指定が正しく解析される",
+            "input": "/a/-",
+            "expectedSegments": [
+              "a",
+              "-"
+            ],
+            "assertions": [
+              "path プロパティが '/a/-' である",
+              "segments プロパティが ['a', '-'] である"
+            ]
+          },
+          {
+            "id": "jp-basic-06",
+            "name": "特殊文字エスケープが正しく解析される",
+            "input": "/a~0b/c~1d",
+            "expectedSegments": [
+              "a~b",
+              "c/d"
+            ],
+            "assertions": [
+              "path プロパティが '/a~0b/c~1d' である",
+              "segments プロパティが ['a~b', 'c/d'] である",
+              "元のパス文字列に変換すると '/a~0b/c~1d' になる"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "異常系パス解析",
+        "description": "無効なパス形式に対するエラー処理のテスト",
+        "testCases": [
+          {
+            "id": "jp-error-01",
+            "name": "空文字列パスでエラーが発生する",
+            "input": "",
+            "expectedError": "InvalidJsonPathError",
+            "assertions": [
+              "JsonPath.parse('') を呼び出すと例外が発生する",
+              "エラーメッセージにパスが空であることが含まれる"
+            ]
+          },
+          {
+            "id": "jp-error-02",
+            "name": "スラッシュで始まらないパスでエラーが発生する",
+            "input": "a/b/c",
+            "expectedError": "InvalidJsonPathError",
+            "assertions": [
+              "JsonPath.parse('a/b/c') を呼び出すと例外が発生する",
+              "エラーメッセージにパスがスラッシュで始まっていないことが含まれる"
+            ]
+          },
+          {
+            "id": "jp-error-03",
+            "name": "不正なエスケープシーケンスでエラーが発生する",
+            "input": "/a~2b",
+            "expectedError": "InvalidJsonPathError",
+            "assertions": [
+              "JsonPath.parse('/a~2b') を呼び出すと例外が発生する",
+              "エラーメッセージに不正なエスケープシーケンスであることが含まれる"
+            ]
+          },
+          {
+            "id": "jp-error-04",
+            "name": "末尾のチルダでエラーが発生する",
+            "input": "/a/b~",
+            "expectedError": "InvalidJsonPathError",
+            "assertions": [
+              "JsonPath.parse('/a/b~') を呼び出すと例外が発生する",
+              "エラーメッセージに不完全なエスケープシーケンスであることが含まれる"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "パス操作",
+        "description": "JsonPathオブジェクトのメソッドによるパス操作のテスト",
+        "testCases": [
+          {
+            "id": "jp-op-01",
+            "name": "parent()メソッドが正しく親パスを返す",
+            "setup": "const path = JsonPath.parse('/a/b/c')",
+            "assertions": [
+              "path.parent() が '/a/b' を表すJsonPathオブジェクトを返す",
+              "path.parent().toString() が '/a/b' である"
+            ]
+          },
+          {
+            "id": "jp-op-02",
+            "name": "ルートパスの親パス取得でエラーが発生する",
+            "setup": "const path = JsonPath.parse('/')",
+            "assertions": [
+              "path.parent() を呼び出すと例外が発生する",
+              "またはnullが返される（実装による）"
+            ]
+          },
+          {
+            "id": "jp-op-03",
+            "name": "lastSegment()メソッドが最後のセグメントを返す",
+            "setup": "const path = JsonPath.parse('/a/b/c')",
+            "assertions": [
+              "path.lastSegment() が 'c' を返す"
+            ]
+          },
+          {
+            "id": "jp-op-04",
+            "name": "isRoot()メソッドがルートパスを正しく判定する",
+            "assertions": [
+              "JsonPath.parse('/').isRoot() は true を返す",
+              "JsonPath.parse('/a').isRoot() は false を返す"
+            ]
+          },
+          {
+            "id": "jp-op-05",
+            "name": "child()メソッドが新しい子パスを生成する",
+            "setup": "const path = JsonPath.parse('/a/b')",
+            "assertions": [
+              "path.child('c') が '/a/b/c' を表すJsonPathオブジェクトを返す",
+              "path.child('c').toString() が '/a/b/c' である"
+            ]
+          },
+          {
+            "id": "jp-op-06",
+            "name": "equals()メソッドがパスの等価性を判断する",
+            "assertions": [
+              "JsonPath.parse('/a/b').equals(JsonPath.parse('/a/b')) は true を返す",
+              "JsonPath.parse('/a/b').equals(JsonPath.parse('/a/c')) は false を返す",
+              "JsonPath.parse('/a~0b').equals(JsonPath.parse('/a~0b')) は true を返す"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "インスタンス生成",
+        "description": "JsonPathオブジェクトの様々な生成方法のテスト",
+        "testCases": [
+          {
+            "id": "jp-create-01",
+            "name": "静的parse()メソッドでインスタンスが正しく生成される",
+            "assertions": [
+              "JsonPath.parse('/a/b') はJsonPathのインスタンスを返す",
+              "返されたインスタンスのpath プロパティが '/a/b' である"
+            ]
+          },
+          {
+            "id": "jp-create-02",
+            "name": "コンストラクタでインスタンスが正しく生成される",
+            "assertions": [
+              "new JsonPath('/a/b') はJsonPathのインスタンスを返す",
+              "または、このアプローチが実装で許可されていない場合は適切なエラーが発生する"
+            ]
+          },
+          {
+            "id": "jp-create-03",
+            "name": "静的root()メソッドでルートパスが生成される",
+            "assertions": [
+              "JsonPath.root() はパスが '/' のJsonPathインスタンスを返す",
+              "JsonPath.root().isRoot() は true を返す"
+            ]
+          },
+          {
+            "id": "jp-create-04",
+            "name": "静的fromSegments()メソッドでパスが生成される",
+            "assertions": [
+              "JsonPath.fromSegments(['a', 'b', 'c']) はパスが '/a/b/c' のJsonPathインスタンスを返す"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ユーティリティ機能",
+        "description": "パスのエスケープや特殊処理に関するユーティリティ機能のテスト",
+        "testCases": [
+          {
+            "id": "jp-util-01",
+            "name": "静的escapeSegment()メソッドが文字列を正しくエスケープする",
+            "assertions": [
+              "JsonPath.escapeSegment('a~b') が 'a~0b' を返す",
+              "JsonPath.escapeSegment('c/d') が 'c~1d' を返す",
+              "JsonPath.escapeSegment('e') が 'e' を返す"
+            ]
+          },
+          {
+            "id": "jp-util-02",
+            "name": "静的unescapeSegment()メソッドがエスケープを正しく解除する",
+            "assertions": [
+              "JsonPath.unescapeSegment('a~0b') が 'a~b' を返す",
+              "JsonPath.unescapeSegment('c~1d') が 'c/d' を返す",
+              "JsonPath.unescapeSegment('e') が 'e' を返す"
+            ]
+          },
+          {
+            "id": "jp-util-03",
+            "name": "toString()メソッドが正しいパス文字列を返す",
+            "setup": "const segments = ['a~b', 'c/d', 'e']",
+            "assertions": [
+              "JsonPath.fromSegments(segments).toString() が '/a~0b/c~1d/e' を返す"
+            ]
+          },
+          {
+            "id": "jp-util-04",
+            "name": "isArrayElement()メソッドが配列要素かどうかを判定する",
+            "assertions": [
+              "JsonPath.parse('/a/0').isArrayElement() は true を返す",
+              "JsonPath.parse('/a/-').isArrayElement() は true を返す",
+              "JsonPath.parse('/a/b').isArrayElement() は false を返す"
+            ]
+          },
+          {
+            "id": "jp-util-05",
+            "name": "isArrayAppend()メソッドが配列末尾追加かどうかを判定する",
+            "assertions": [
+              "JsonPath.parse('/a/-').isArrayAppend() は true を返す",
+              "JsonPath.parse('/a/0').isArrayAppend() は false を返す",
+              "JsonPath.parse('/a/b').isArrayAppend() は false を返す"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

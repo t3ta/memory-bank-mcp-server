@@ -120,16 +120,21 @@ describe('CoreFilesController Integration Tests', () => {
     expect(coreFiles?.systemPatterns).toBeDefined();
   });
 
-  it('should return error when branch does not exist', async () => {
+  it('should auto-initialize when branch does not exist', async () => {
     // Non-existent branch
     const nonExistentBranch = 'feature/non-existent-branch';
 
     // Read core files
     const readResult = await controller.readCoreFiles(nonExistentBranch);
 
-    // Verify failure result
-    expect(readResult.success).toBe(false);
-    expect(readResult.error).toBeDefined();
+    // Verify success result (branch should be auto-initialized)
+    expect(readResult.success).toBe(true);
+    expect(readResult.error).toBeUndefined();
+    expect(readResult.data).toBeDefined();
+    
+    // Verify branch was created
+    const branchPath = path.join(branchDir, nonExistentBranch);
+    expect(await fileExistsAsync(branchPath)).toBe(true);
   });
 
   it('should partially read core files when some files are missing', async () => {
@@ -180,6 +185,23 @@ describe('CoreFilesController Integration Tests', () => {
     if (coreFiles?.systemPatterns) {
       expect(coreFiles.systemPatterns.technicalDecisions).toEqual([]);
     }
+  });
+  
+  it('should handle error when creating core files with invalid data', async () => {
+    // Test with invalid branch name (null should cause error)
+    const invalidBranch = null as unknown as string;
+    
+    // Create core files with invalid data
+    const createResult = await controller.createCoreFiles(invalidBranch, {
+      branchContext: 'Some content',
+      activeContext: { currentWork: 'Some work' },
+      systemPatterns: { technicalDecisions: [] },
+      progress: { status: 'Some progress' }
+    });
+
+    // Verify failure result
+    expect(createResult.success).toBe(false);
+    expect(createResult.error).toBeDefined();
   });
   
   // TODO: Future enhancement tests

@@ -1,0 +1,54 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "core-navigation",
+    "title": "グローバルメモリバンクナビゲーション",
+    "documentType": "core",
+    "path": "core/navigation.json",
+    "tags": [
+      "navigation",
+      "meta",
+      "core",
+      "guide"
+    ],
+    "lastModified": "2025-03-22T02:40:20.000Z",
+    "createdAt": "2025-03-22T02:40:20.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "概要",
+        "content": "このドキュメントは、グローバルメモリバンクの全体構造を把握し、必要な情報に素早くアクセスするためのナビゲーションガイドです。コアドキュメントから詳細なカテゴリ別ドキュメントへの橋渡しとなります。"
+      },
+      {
+        "title": "コアドキュメント",
+        "content": "以下の7つのコアドキュメントは、システムの基本的な理解に必要な最も重要な情報を含んでいます：\n\n1. [**システムアーキテクチャ基本情報**](architecture.json) - システム設計の概要\n2. [**コーディング規約**](coding-standards.json) - 開発における基本的なコード規約\n3. [**ドメインモデル基本情報**](domain-models.json) - 主要なデータモデルと関連性\n4. [**用語集**](glossary.json) - 専門用語と略語の定義\n5. [**ナビゲーション情報**](navigation.json) - 本文書（全体のナビゲーション）\n6. [**技術スタック**](tech-stack.json) - 使用されている主要技術\n7. [**ユーザーガイド基本情報**](user-guide.json) - システムの基本的な使用方法\n\nこれらのドキュメントをまず最初に読むことで、システム全体の概要を把握できます。"
+      },
+      {
+        "title": "カテゴリ別ディレクトリ",
+        "content": "詳細情報は以下のカテゴリ別ディレクトリに整理されています：\n\n1. [**01-project/**](../01-project/) - プロジェクト全般\n   - [README.json](../01-project/README.json) - カテゴリ概要\n   - [project-overview.json](../01-project/project-overview.json) - プロジェクト概要\n   - [コアドキュメントの詳細版](../01-project/) - 各コアドキュメントの詳細情報\n\n2. [**02-architecture/**](../02-architecture/) - アーキテクチャ詳細\n   - [README.json](../02-architecture/README.json) - カテゴリ概要\n   - [architecture-decisions.json](../02-architecture/architecture-decisions.json) - 設計決定事項\n   - [consolidated-architecture.json](../02-architecture/consolidated-architecture.json) - 統合アーキテクチャ情報\n\n3. [**03-implementation/**](../03-implementation/) - 実装詳細\n   - [README.json](../03-implementation/README.json) - カテゴリ概要\n   - [cli-commands.json](../03-implementation/cli-commands.json) - CLIコマンドリファレンス\n   - [read-context-command-implementation.json](../03-implementation/read-context-command-implementation.json) - 主要コマンドの実装詳細\n\n4. [**04-guides/**](../04-guides/) - ユーザーガイド\n   - [README.json](../04-guides/README.json) - カテゴリ概要\n   - [user-guide.json](../04-guides/user-guide.json) - 詳細なユーザーガイド\n   - [migration-guide.json](../04-guides/migration-guide.json) - マイグレーションガイド\n\n5. [**05-testing/**](../05-testing/) - テスト関連\n   - [README.json](../05-testing/README.json) - カテゴリ概要\n   - [consolidated-test-strategy.json](../05-testing/consolidated-test-strategy.json) - テスト戦略\n\n6. [**06-releases/**](../06-releases/) - リリース情報\n   - [README.json](../06-releases/README.json) - カテゴリ概要\n   - [release-v2.0.0.json](../06-releases/release-v2.0.0.json) - V2.0.0リリース情報\n\n7. [**07-infrastructure/**](../07-infrastructure/) - インフラ関連\n   - [README.json](../07-infrastructure/README.json) - カテゴリ概要\n   - [ci-cd/memory-bank-errors.json](../07-infrastructure/ci-cd/memory-bank-errors.json) - エラー対応ガイド\n\n8. [**08-i18n/**](../08-i18n/) - 国際化関連\n   - [README.json](../08-i18n/README.json) - カテゴリ概要\n   - [template-system-json-i18n-design.json](../08-i18n/template-system-json-i18n-design.json) - 国際化設計\n\n9. [**09-refactoring/**](../09-refactoring/) - リファクタリング関連\n   - [README.json](../09-refactoring/README.json) - カテゴリ概要\n   - [json-global-design-issues.json](../09-refactoring/json-global-design-issues.json) - 設計課題"
+      },
+      {
+        "title": "特殊ディレクトリ",
+        "content": "1. [**meta/**](../meta/) - メタデータと管理情報\n   - [README.json](../meta/README.json) - カテゴリ概要\n   - [document-type-standards.json](../meta/document-type-standards.json) - ドキュメントタイプの標準\n   - [global-memory-bank-reference.json](../meta/global-memory-bank-reference.json) - メモリバンクリファレンス\n\n2. [**tags/**](../tags/) - タグシステム情報\n   - [README.json](../tags/README.json) - カテゴリ概要\n   - [index.json](../tags/index.json) - タグインデックス\n   - [tag_categorization.json](../tags/tag_categorization.json) - タグカテゴリ"
+      },
+      {
+        "title": "利用シナリオ別ナビゲーション",
+        "content": "### 新しいチームメンバー\n1. [コアドキュメント](#コアドキュメント) → 全体概要の把握\n2. [用語集](glossary.json) → 専門用語の理解\n3. [ユーザーガイド基本情報](user-guide.json) → システムの使い方\n4. [プロジェクト概要](../01-project/project-overview.json) → プロジェクトの理解\n\n### 開発者\n1. [システムアーキテクチャ基本情報](architecture.json) → 設計の把握\n2. [コーディング規約](coding-standards.json) → 開発ルールの理解\n3. [ドメインモデル基本情報](domain-models.json) → データモデルの理解\n4. [実装詳細](../03-implementation/) → 詳細な実装情報\n\n### QA・テスター\n1. [ユーザーガイド基本情報](user-guide.json) → 機能理解\n2. [テスト戦略](../05-testing/consolidated-test-strategy.json) → テスト手法の把握\n3. [エラー対応ガイド](../07-infrastructure/ci-cd/memory-bank-errors.json) → エラー処理\n\n### プロジェクトマネージャー\n1. [プロジェクト概要](../01-project/project-overview.json) → 全体像の把握\n2. [リリース情報](../06-releases/) → スケジュールと進捗\n3. [ナビゲーション情報](navigation.json) → ドキュメント構造の理解"
+      },
+      {
+        "title": "トピック別ナビゲーション",
+        "content": "### アーキテクチャ関連\n- [システムアーキテクチャ基本情報](architecture.json)\n- [設計決定事項](../02-architecture/architecture-decisions.json)\n- [統合アーキテクチャ情報](../02-architecture/consolidated-architecture.json)\n\n### 開発関連\n- [コーディング規約](coding-standards.json)\n- [技術スタック](tech-stack.json)\n- [CLIコマンドリファレンス](../03-implementation/cli-commands.json)\n\n### ドキュメント関連\n- [ドメインモデル基本情報](domain-models.json)\n- [ドキュメントタイプの標準](../meta/document-type-standards.json)\n- [タグカテゴリ](../tags/tag_categorization.json)\n\n### 運用関連\n- [ユーザーガイド基本情報](user-guide.json)\n- [エラー対応ガイド](../07-infrastructure/ci-cd/memory-bank-errors.json)\n- [マイグレーションガイド](../04-guides/migration-guide.json)"
+      },
+      {
+        "title": "タグによるナビゲーション",
+        "content": "最も関連性の高いタグを使用して情報を検索できます：\n\n- `architecture` - アーキテクチャ関連\n- `best-practices` - ベストプラクティス\n- `core` - コアドキュメント\n- `design` - 設計関連\n- `documentation` - ドキュメント関連\n- `domain` - ドメインモデル関連\n- `guide` - ガイド・マニュアル\n- `implementation` - 実装関連\n- `meta` - メタ情報\n- `refactoring` - リファクタリング関連\n- `tag` - タグシステム関連\n- `testing` - テスト関連\n- `v2` - V2.0リリース関連\n\n完全なタグリストは [タグインデックス](../tags/index.json) を参照してください。"
+      },
+      {
+        "title": "ナビゲーションのベストプラクティス",
+        "content": "1. **コアファーストアプローチ**: まずコアディレクトリのドキュメントから読み始め、必要に応じて詳細情報に進む\n2. **README活用**: 各カテゴリディレクトリのREADME.jsonファイルは、そのカテゴリの概要と内容を説明\n3. **タグ検索の活用**: 関連するトピックをタグで検索し、横断的な情報にアクセス\n4. **プロジェクト階層の理解**: 01～09の番号付きディレクトリは、論理的な順序を表している\n5. **リファレンスリンクの追跡**: 各ドキュメントには関連ドキュメントへのリンクが含まれている"
+      }
+    ]
+  }
+}

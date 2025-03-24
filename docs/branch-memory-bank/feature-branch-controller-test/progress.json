@@ -1,0 +1,137 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "progress-feature-branch-controller-test",
+    "title": "Progress - feature/branch-controller-test",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress",
+      "bug-fix",
+      "controller",
+      "dependency-injection",
+      "read-context"
+    ],
+    "lastModified": "2025-03-23T11:45:00.000Z",
+    "createdAt": "2025-03-23T11:45:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "status_summary": "バグの修正が完了し、read-contextコマンドが正常に動作することを確認しました。",
+    "progress_percentage": 95,
+    "completed_items": [
+      {
+        "id": "TASK-1",
+        "title": "バグの特定と原因分析",
+        "description": "read-contextコマンドが動作しない問題について、原因をデバッグし特定しました。DIコンテナからコントローラーを取得する際にPromiseが解決されていない問題であることを確認しました。",
+        "completed_at": "2025-03-23T10:30:00.000Z",
+        "status": "完了"
+      },
+      {
+        "id": "TASK-2",
+        "title": "デバッグスクリプトの作成",
+        "description": "問題を診断するためのデバッグスクリプトを作成し、実行しました。コントローラーがPromiseとして取得されていることを確認しました。",
+        "completed_at": "2025-03-23T10:45:00.000Z",
+        "status": "完了"
+      },
+      {
+        "id": "TASK-3",
+        "title": "修正方法の検討",
+        "description": "DIコンテナからのPromise解決を行うために、Applicationクラスのinitialize()メソッドを修正する方針を決定しました。",
+        "completed_at": "2025-03-23T11:00:00.000Z",
+        "status": "完了"
+      },
+      {
+        "id": "TASK-4",
+        "title": "修正実装",
+        "description": "Application.initialize()メソッドにてDIコンテナからコントローラーを取得する際にawaitを追加しました。",
+        "completed_at": "2025-03-23T11:15:00.000Z",
+        "status": "完了"
+      },
+      {
+        "id": "TASK-5",
+        "title": "修正検証",
+        "description": "修正を検証するためのテストスクリプトを作成し、修正の有効性を確認しました。修正後はPromiseが解決され、コントローラーのメソッドにアクセスできることを確認しました。",
+        "completed_at": "2025-03-23T11:20:00.000Z",
+        "status": "完了"
+      },
+      {
+        "id": "TASK-6",
+        "title": "read-contextコマンドの動作確認",
+        "description": "修正後にread-contextコマンドを実行し、正常に動作することを確認しました。",
+        "completed_at": "2025-03-23T11:25:00.000Z",
+        "status": "完了"
+      },
+      {
+        "id": "TASK-7",
+        "title": "メモリバンク更新",
+        "description": "ブランチのメモリバンクを更新し、バグ修正の内容と進捗を記録しました。",
+        "completed_at": "2025-03-23T11:45:00.000Z",
+        "status": "完了"
+      }
+    ],
+    "in_progress_items": [],
+    "pending_items": [
+      {
+        "id": "TASK-8",
+        "title": "ユニットテストの追加",
+        "description": "Application.initialize()メソッドのPromise解決テストを追加します。",
+        "status": "未着手",
+        "estimated_completion": "2025-03-24T17:00:00.000Z"
+      },
+      {
+        "id": "TASK-9",
+        "title": "PRの作成とレビュー依頼",
+        "description": "修正内容をコミットし、PRを作成してレビューを依頼します。",
+        "status": "未着手",
+        "estimated_completion": "2025-03-24T12:00:00.000Z"
+      }
+    ],
+    "issues": [
+      {
+        "id": "ISSUE-1",
+        "title": "同様のバグが他の場所にも存在する可能性",
+        "description": "DIコンテナからのPromise解決漏れは他の場所でも発生している可能性があります。プロジェクト全体でDIコンテナの使用箇所を確認する必要があります。",
+        "priority": "中",
+        "status": "未対応",
+        "estimated_fix_date": "2025-03-25T17:00:00.000Z"
+      },
+      {
+        "id": "ISSUE-2",
+        "title": "DIコンテナの非同期Factory登録方法の改善",
+        "description": "現在のDIコンテナは非同期Factoryを登録できますが、その使用方法が明示的ではありません。非同期Factoryの登録と解決を明確にするAPIの改善が必要かもしれません。",
+        "priority": "低",
+        "status": "検討中",
+        "estimated_fix_date": null
+      }
+    ],
+    "milestones": [
+      {
+        "id": "MILE-1",
+        "title": "バグ修正完了",
+        "description": "Application.initialize()メソッドの修正とread-contextコマンドの動作確認が完了しました。",
+        "completed_at": "2025-03-23T11:25:00.000Z",
+        "status": "達成"
+      },
+      {
+        "id": "MILE-2",
+        "title": "PRマージ",
+        "description": "修正内容をPRとしてマージし、mainブランチに反映します。",
+        "estimated_completion": "2025-03-24T17:00:00.000Z",
+        "status": "未達成"
+      }
+    ],
+    "metrics": {
+      "files_changed": 1,
+      "lines_added": 4,
+      "lines_removed": 1,
+      "tests_added": 0,
+      "bugs_fixed": 1
+    },
+    "notes": [
+      "このバグ修正は小さな変更ですが、重要な機能の復旧に繋がりました。",
+      "DIコンテナの非同期処理の扱いについて、今後チームで議論する必要があるかもしれません。",
+      "このようなバグを発見するための静的解析ツールの導入も検討してみる価値があります。"
+    ]
+  }
+}

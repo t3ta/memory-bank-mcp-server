@@ -1,0 +1,126 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "implementation-plan",
+    "title": "実装計画",
+    "documentType": "plan",
+    "path": "implementation-plan.json",
+    "tags": [
+      "plan",
+      "implementation"
+    ],
+    "lastModified": "2025-03-24T10:35:18.287Z",
+    "createdAt": "2025-03-24T09:58:18.287Z",
+    "version": 2
+  },
+  "content": {
+    "overview": "サーバー起動時とMCPツール呼び出し時の両方でワークスペースディレクトリを指定できるようにする機能の実装計画",
+    "implementation_steps": [
+      {
+        "id": "step1",
+        "title": "コマンドラインパーサーの更新",
+        "description": "src/index.tsのyargsを使用したコマンドライン引数パーサーに--workspaceオプションを追加する",
+        "code_changes": [
+          {
+            "file": "src/index.ts",
+            "changes": [
+              {
+                "type": "add",
+                "description": "workspaceオプションの追加",
+                "code": "  .option('workspace', {\n    alias: 'w',\n    type: 'string',\n    description: 'Path to workspace directory'\n  })"
+              }
+            ]
+          }
+        ],
+        "status": "pending"
+      },
+      {
+        "id": "step2",
+        "title": "アプリケーション作成時のワークスペースオプション渡し",
+        "description": "createApplication関数呼び出し時に明示的にworkspaceオプションを渡す",
+        "code_changes": [
+          {
+            "file": "src/index.ts",
+            "changes": [
+              {
+                "type": "update",
+                "description": "アプリケーション作成時にworkspaceオプションを渡す",
+                "current": "  app = await createApplication({\n    memoryRoot: argv.docs as string,\n    language: 'ja',\n    verbose: false,\n  });",
+                "new": "  app = await createApplication({\n    workspace: argv.workspace as string,\n    memoryRoot: argv.docs as string,\n    language: 'ja',\n    verbose: false,\n  });"
+              }
+            ]
+          }
+        ],
+        "status": "pending"
+      },
+      {
+        "id": "step3",
+        "title": "MCPツール定義の更新",
+        "description": "各MCPツール定義にworkspaceパラメータを追加する",
+        "code_changes": [
+          {
+            "file": "src/index.ts",
+            "changes": [
+              {
+                "type": "update",
+                "description": "各MCPツール定義のinputSchema更新",
+                "explanation": "例えば、read_branch_memory_bankなどのツール定義にworkspaceパラメータを追加する"
+              }
+            ]
+          }
+        ],
+        "status": "pending"
+      },
+      {
+        "id": "step4",
+        "title": "MCPツールハンドラの更新",
+        "description": "各ツールのハンドラ関数でworkspaceパラメータを処理するように更新する",
+        "code_changes": [
+          {
+            "file": "src/index.ts",
+            "changes": [
+              {
+                "type": "update",
+                "description": "各ツールのハンドラでworkspaceパラメータを取得し、適切に処理する",
+                "explanation": "例えば、read_branch_memory_bank, read_context などの各ハンドラ内で、workspace パラメータを取得し、優先順位に従って処理する"
+              }
+            ]
+          }
+        ],
+        "status": "pending"
+      },
+      {
+        "id": "step5",
+        "title": "優先順位ルールの実装",
+        "description": "ワークスペースとドキュメントディレクトリの優先順位ルールを実装する",
+        "code_changes": [
+          {
+            "file": "src/index.ts",
+            "changes": [
+              {
+                "type": "add",
+                "description": "優先順位に基づいてワークスペースとドキュメントディレクトリを解決するヘルパー関数",
+                "code": "// ワークスペースとドキュメントパスを優先順位に基づいて解決するヘルパー関数\nfunction resolveWorkspaceAndDocs(toolWorkspace?: string, toolDocs?: string) {\n  // 1. ツールから渡されたパラメータを最優先\n  // 2. サーバー起動時のオプション\n  // 3. 環境変数\n  // 4. デフォルト値\n  const workspace = toolWorkspace || argv.workspace || process.env.WORKSPACE_ROOT || process.cwd();\n  const docs = toolDocs || argv.docs || process.env.MEMORY_BANK_ROOT || path.join(workspace, 'docs');\n  \n  return { workspace, docs };\n}"
+              }
+            ]
+          }
+        ],
+        "status": "pending"
+      },
+      {
+        "id": "step6",
+        "title": "テストケースの追加",
+        "description": "workspaceオプションの挙動を確認するテストを追加する",
+        "code_changes": [],
+        "status": "pending"
+      },
+      {
+        "id": "step7",
+        "title": "ドキュメントの更新",
+        "description": "READMEなどのドキュメントを更新して新しいオプションの説明を追加する",
+        "code_changes": [],
+        "status": "pending"
+      }
+    ]
+  }
+}

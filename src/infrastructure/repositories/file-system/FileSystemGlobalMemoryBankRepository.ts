@@ -17,10 +17,10 @@ import { FileSystemMemoryDocumentRepository } from './FileSystemMemoryDocumentRe
  * File system implementation of global memory bank repository
  */
 export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRepository {
-  private readonly documentRepository: FileSystemMemoryDocumentRepository;
-  private readonly globalMemoryPath: string;
+  private documentRepository!: FileSystemMemoryDocumentRepository;
+  private globalMemoryPath!: string;
   private language: Language = 'en';
-  
+
   /**
    * Get default templates based on current language
    */
@@ -142,17 +142,17 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
       ja: this.getJapaneseTemplates(),
       zh: this.getChineseTemplates()
     };
-    
+
     // Check if template exists for this language
     if (templates[language] && templates[language][type]) {
       return templates[language][type];
     }
-    
+
     // Fall back to English template if not found
     if (templates.en[type]) {
       return templates.en[type];
     }
-    
+
     // No template found, return empty string (shouldn't happen)
     return '';
   }
@@ -165,15 +165,23 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
   constructor(
     private readonly fileSystemService: IFileSystemService,
     private readonly configProvider: IConfigProvider
-  ) {
-    this.globalMemoryPath = this.configProvider.getGlobalMemoryPath();
-    this.documentRepository = new FileSystemMemoryDocumentRepository(
-      this.globalMemoryPath,
-      this.fileSystemService
-    );
-    
+  ) {}
+
+  /**
+   * Setup repository with configuration
+   * This should be called before using the repository
+   */
+  private async setup(): Promise<void> {
+    if (!this.globalMemoryPath) {
+      this.globalMemoryPath = await this.configProvider.getGlobalMemoryPath();
+      this.documentRepository = new FileSystemMemoryDocumentRepository(
+        this.globalMemoryPath,
+        this.fileSystemService
+      );
+    }
+
     // Set language from config
-    this.language = this.configProvider.getLanguage();
+    this.language = await this.configProvider.getLanguage();
   }
 
   /**
@@ -183,6 +191,9 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
   async initialize(): Promise<void> {
     try {
       logger.debug('Initializing global memory bank');
+
+      // Setup repository configuration
+      await this.setup();
 
       // Ensure the directory exists
       await this.fileSystemService.createDirectory(this.globalMemoryPath);

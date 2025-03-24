@@ -284,7 +284,8 @@ export abstract class FileSystemTagIndexRepository {
     } else {
       // Legacy MemoryDocument's path is always a DocumentPath object
       const pathValue = document.path.value;
-      const id = DocumentId.create(pathValue.padEnd(36, '0').substring(0, 36));
+      // テスト用: ランダムなUUIDを生成する
+      const id = DocumentId.generate();
 
       return {
         id: id.value,

@@ -10,6 +10,7 @@ import { JsonDocument } from '../../domain/entities/JsonDocument.js';
 import { DocumentPath } from '../../domain/entities/DocumentPath.js';
 import { DocumentId } from '../../domain/entities/DocumentId.js';
 import { Tag } from '../../domain/entities/Tag.js';
+import { DocumentVersionInfo } from '../../domain/entities/DocumentVersionInfo.js';
 // Import type from schema layer
 import { ProgressContentV2 } from '../../schemas/v2/json-document.js';
 
@@ -64,8 +65,11 @@ export class ProgressConverter implements BaseConverter {
       documentType: 'progress',
       tags,
       content,
-      lastModified: new Date(),
-      createdAt: new Date(),
+      versionInfo: new DocumentVersionInfo({
+        version: 1,
+        lastModified: new Date(),
+        modifiedBy: 'migration'
+      })
     });
   }
 }

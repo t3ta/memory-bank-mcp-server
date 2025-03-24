@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "b1f09faa-e56a-4536-8dce-f86a00e7ed51",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-22T05:09:47.466Z",
+    "createdAt": "2025-03-22T05:09:47.466Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "feature/refactor-language-template-system",
+    "purpose": "言語テンプレートシステムのリファクタリングを行い、より効率的かつメンテナンス性の高い実装にする",
+    "createdAt": "2025-03-22T05:09:47.466Z",
+    "userStories": [
+      {
+        "id": "9c9dda1f-3ada-4263-8753-2872278ba0e5",
+        "description": "現在の言語テンプレートシステムには冗長な部分や整理されていない実装があり、拡張性とメンテナンス性に課題がある",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "c341ad09-0259-445e-9340-a657f049ae71",
+        "description": "JSONとMarkdownの混在による複雑さを解消し、一貫性のあるJSONベースのテンプレートシステムに統一する必要がある",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "76d06685-d2aa-46cd-8a0a-f10f23f695e4",
+        "description": "さらなる多言語対応や新しいテンプレートタイプの追加が容易になるような柔軟なアーキテクチャが必要",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": "このリファクタリングは、既存の機能を維持しながら内部実装を改善することに焦点を当てる。移行期間中は両方のフォーマット（JSONとMarkdown）をサポートしつつ、最終的にはJSONフォーマットに完全移行する計画。"
+  }
+}

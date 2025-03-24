@@ -1,0 +1,154 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "diff-edit-usecases-comparison",
+    "title": "JSONパッチ - 比較操作ユースケース",
+    "documentType": "usecases",
+    "path": "usecases/comparison-operations.json",
+    "tags": [
+      "json-patch",
+      "usecases",
+      "rfc6902",
+      "document-editing",
+      "document-comparison"
+    ],
+    "lastModified": "2025-03-24T21:55:00.000Z",
+    "createdAt": "2025-03-24T21:55:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "usecases": [
+      {
+        "id": "UC-4",
+        "title": "ドキュメント状態の比較とパッチ生成",
+        "description": "二つのドキュメント状態（たとえば古いバージョンと新しいバージョン）を比較し、それらの差分をJSONパッチ操作として生成します。",
+        "actors": [
+          "開発者",
+          "システムプロセス"
+        ],
+        "preconditions": [
+          "比較する二つのJSONドキュメントが存在すること"
+        ],
+        "mainFlow": [
+          "1. ユーザーが比較元と比較先のドキュメントを指定",
+          "2. システムが両ドキュメントを取得",
+          "3. ドキュメント間の差分を解析",
+          "4. JSON Patch操作のセットを生成",
+          "5. 生成されたパッチ操作のバリデーション",
+          "6. 結果の返却"
+        ],
+        "alternativeFlows": [
+          {
+            "id": "UC-4-A1",
+            "title": "ドキュメントが存在しない場合",
+            "steps": [
+              "2a. 指定されたドキュメントの一方または両方が存在しない",
+              "2b. DocumentNotFoundErrorを返却"
+            ]
+          },
+          {
+            "id": "UC-4-A2",
+            "title": "比較不能な構造の場合",
+            "steps": [
+              "3a. ドキュメントの構造が根本的に異なり比較できない",
+              "3b. IncomparableDocumentsErrorを返却または空のパッチセットを返却"
+            ]
+          }
+        ],
+        "postconditions": [
+          "比較元から比較先へ変換するためのJSONパッチ操作セットが生成されている",
+          "生成されたパッチ操作が検証済みである"
+        ],
+        "examples": [
+          {
+            "description": "ドキュメントバージョン間の差分を取得するケース",
+            "request": {
+              "sourceDocumentId": "system-patterns-v1",
+              "targetDocumentId": "system-patterns-v2"
+            },
+            "response": {
+              "success": true,
+              "patch": [
+                {
+                  "op": "replace",
+                  "path": "/metadata/version",
+                  "value": 2
+                },
+                {
+                  "op": "replace",
+                  "path": "/metadata/lastModified",
+                  "value": "2025-03-24T20:30:00.000Z"
+                },
+                {
+                  "op": "add",
+                  "path": "/content/technicalDecisions/-",
+                  "value": {
+                    "id": "new-decision",
+                    "...": "新しい決定内容"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "description": "ブランチ間のドキュメント差分を取得するケース",
+            "request": {
+              "sourcePath": "progress.json",
+              "sourceBranch": "feature/old",
+              "targetPath": "progress.json",
+              "targetBranch": "feature/new"
+            },
+            "response": {
+              "success": true,
+              "patch": [
+                {
+                  "op": "replace",
+                  "path": "/content/completionPercentage",
+                  "value": 75
+                },
+                {
+                  "op": "remove",
+                  "path": "/content/pendingImplementation/0"
+                },
+                {
+                  "op": "add",
+                  "path": "/content/workingFeatures/-",
+                  "value": {
+                    "id": "feature-1",
+                    "status": "完了"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "implementationNotes": {
+      "keyPoints": [
+        "fast-json-patchライブラリの `compare()` 関数を使用してパッチを生成",
+        "比較アルゴリズムの挙動を理解し、生成されるパッチの特性を把握する",
+        "配列内での位置が変わった場合は 'remove + add' のペアではなく 'move' を生成するように最適化"
+      ],
+      "comparisonAlgorithm": {
+        "description": "fast-json-patchの比較アルゴリズムはオブジェクトの等価性に基づき、最小限のパッチ操作セットを生成します。",
+        "characteristics": [
+          "プロパティ名を基準にオブジェクトを比較",
+          "配列は位置（インデックス）で比較され、内容が同じでも位置が異なれば変更とみなす",
+          "ネストされたオブジェクトや配列も再帰的に比較",
+          "複雑なオブジェクトでは必ずしも最小のパッチセットが生成されるわけではない"
+        ]
+      },
+      "optimizations": [
+        "大規模なドキュメントの場合、比較に時間がかかる可能性があるため、非同期処理が必要",
+        "差分計算の負荷を軽減するために、変更が予想される部分だけを比較する絞り込み手法も検討可能"
+      ],
+      "usecases": [
+        "ドキュメントの変更履歴の生成",
+        "バージョン間の差分表示",
+        "ドキュメントの同期機能",
+        "ブランチ間のドキュメントマージ支援"
+      ]
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "4f3cea7c-8b3a-4bea-bd34-cf3f45d75d72",
+    "title": "作業コンテキスト",
+    "documentType": "work_context",
+    "path": "workContext.json",
+    "tags": [
+      "work-context"
+    ],
+    "lastModified": "2025-03-24T07:25:41.328Z",
+    "createdAt": "2025-03-24T07:25:41.328Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "fix/pass-failed-and-skipped-tests",
+    "purpose": "失敗しているテストとスキップされているテストを修正する",
+    "failingTests": [
+      {
+        "path": "unit/application/usecases/common/ReadBranchCoreFilesUseCase.test.ts",
+        "issues": [
+          "`systemPatterns?.technicalDecisions`が`undefined`になっており、空の配列`[]`であるべき",
+          "`activeContext?.recentChanges`が`[\"## アクティブな決定事項\"]`になっており、空の配列`[]`であるべき",
+          "`systemPatterns?.technicalDecisions`の長さが1だが、2であるべき",
+          "タイトルは正しく取得されるが、コンテキスト、決定事項、結果が取得できていない",
+          "`systemPatterns`が初期化されていない箇所がある"
+        ]
+      },
+      {
+        "path": "unit/infrastructure/templates/FileTemplateRepository.test.ts",
+        "issues": []
+      },
+      {
+        "path": "unit/interface/controllers/BranchController.test.ts",
+        "issues": []
+      },
+      {
+        "path": "unit/migration/MarkdownMigrationService.test.ts",
+        "issues": []
+      }
+    ],
+    "skippedTests": [
+      {
+        "path": "unit/interface/controllers/BranchController.test.ts",
+        "reason": "jest.config.tsのtestPathIgnorePatternsで除外されている"
+      }
+    ],
+    "fixApproach": {
+      "ReadBranchCoreFilesUseCase": {
+        "issues": [
+          "systemPatternsの処理メソッドが正しく技術的決定事項を抽出できていない",
+          "ドキュメントが見つからない場合のシステムパターン初期化処理が不足している",
+          "空のセクションが適切にパースできていない"
+        ],
+        "solutions": [
+          "parseSystemPatternsメソッドを修正して、技術的決定事項を正しく抽出する",
+          "各ドキュメント取得処理で、取得できなかった場合の初期化ロジックを確認・修正する",
+          "parseActiveContextメソッドの正規表現パターンを修正し、空セクションを適切に処理できるようにする"
+        ]
+      }
+    }
+  }
+}
