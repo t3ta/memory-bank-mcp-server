@@ -404,8 +404,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
       };
     }
 
-    // 'get_recent_branches' handler removed
-
     case 'read_context': {
       const branch = (params.branch as string | undefined) || '_current_';
       const language = (params.language as string) || 'ja';
@@ -457,39 +455,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         logger.error('Error reading context:', error);
         throw error;
       }
-    }
-          }
-        }
-      }
-
-      // ブランチメモリバンクを取得
-      if (includeBranchMemory && branch) {
-        logger.debug(`Including branch memory bank for branch: ${branch}`);
-        const branchResponse = await app.getBranchController().readCoreFiles(branch);
-        if (!branchResponse.success) {
-          throw new Error((branchResponse as any).error.message);
-        }
-        result.branchMemory = branchResponse.data;
-      }
-
-      // グローバルメモリバンクを取得
-      if (includeGlobalMemory) {
-        logger.debug('Including global memory bank in context');
-        const globalResponse = await app.getGlobalController().readCoreFiles();
-        if (!globalResponse.success) {
-          throw new Error((globalResponse as any).error.message);
-        }
-        result.globalMemory = globalResponse.data;
-      }
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      };
     }
 
     case 'get_template': {
