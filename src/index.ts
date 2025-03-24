@@ -443,11 +443,21 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
           throw new Error(response.error || 'Failed to read context');
         }
 
+        // Make sure we return properly formatted data for MCP
+        // The response.data is already an object, no need to stringify and then parse again
+        // Format the response data properly for MCP protocol
+        // We need to ensure it's valid JSON for the client to parse
+        const formattedResponse = {
+          rules: response.data.rules,
+          branchMemory: response.data.branchMemory,
+          globalMemory: response.data.globalMemory
+        };
+        
         return {
           content: [
             {
               type: 'text',
-              text: JSON.stringify(response.data, null, 2),
+              text: JSON.stringify(formattedResponse, null, 2),
             },
           ],
         };
