@@ -1,0 +1,206 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "diff-edit-usecases-array",
+    "title": "JSONパッチ - 配列操作ユースケース",
+    "documentType": "usecases",
+    "path": "usecases/array-operations.json",
+    "tags": [
+      "json-patch",
+      "usecases",
+      "rfc6902",
+      "document-editing",
+      "array-operations"
+    ],
+    "lastModified": "2025-03-24T21:50:00.000Z",
+    "createdAt": "2025-03-24T21:50:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "usecases": [
+      {
+        "id": "UC-3",
+        "title": "配列操作（要素の追加・移動・コピー）の実行",
+        "description": "配列内の要素に対する特殊操作（追加、移動、コピー）を実行します。",
+        "actors": [
+          "開発者",
+          "APIクライアント"
+        ],
+        "preconditions": [
+          "対象のJSONドキュメントが存在していること",
+          "対象のパスに配列が存在していること"
+        ],
+        "mainFlow": [
+          "1. ユーザーが対象ドキュメントのID、操作タイプ、パス、および必要に応じて値またはfromパスを指定",
+          "2. システムが対象ドキュメントを取得",
+          "3. 指定されたパスと操作タイプの検証",
+          "4. 配列操作（add/move/copy）を構築",
+          "5. 操作の適用前にドキュメントのバリデーション",
+          "6. 操作の適用",
+          "7. 更新されたドキュメントの保存",
+          "8. 結果の返却"
+        ],
+        "alternativeFlows": [
+          {
+            "id": "UC-3-A1",
+            "title": "配列が存在しない場合",
+            "steps": [
+              "3a. 指定されたパスに配列が存在しないことを検出",
+              "3b. InvalidTargetTypeErrorを返却"
+            ]
+          },
+          {
+            "id": "UC-3-A2",
+            "title": "無効なインデックスが指定された場合",
+            "steps": [
+              "5a. 配列の範囲外のインデックスが指定されたことを検出",
+              "5b. InvalidIndexErrorを返却"
+            ]
+          },
+          {
+            "id": "UC-3-A3",
+            "title": "自己参照的移動が試みられた場合",
+            "steps": [
+              "5a. 移動元と移動先が同一、または移動元が移動先の親である場合を検出",
+              "5b. InvalidMoveOperationErrorを返却"
+            ]
+          }
+        ],
+        "postconditions": [
+          "指定された配列操作が実行されている",
+          "ドキュメントの整合性が保たれている",
+          "更新履歴が記録されている"
+        ],
+        "examples": [
+          {
+            "description": "配列の末尾に新しい要素を追加するケース",
+            "request": {
+              "documentId": "active-context-123",
+              "operation": "add",
+              "path": "/content/nextSteps/-",
+              "value": {
+                "id": "new-step",
+                "description": "新しいステップ",
+                "priority": "high"
+              }
+            },
+            "response": {
+              "success": true,
+              "document": {
+                "content": {
+                  "nextSteps": [
+                    {
+                      "...": "既存の要素"
+                    },
+                    {
+                      "id": "new-step",
+                      "description": "新しいステップ",
+                      "priority": "high"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "description": "配列内の要素を移動するケース",
+            "request": {
+              "documentId": "active-context-123",
+              "operation": "move",
+              "from": "/content/nextSteps/2",
+              "path": "/content/nextSteps/0"
+            },
+            "response": {
+              "success": true,
+              "document": {
+                "content": {
+                  "nextSteps": [
+                    {
+                      "id": "moved-step",
+                      "...": "移動された要素"
+                    },
+                    {
+                      "...": "既存の要素 1"
+                    },
+                    {
+                      "...": "既存の要素 2"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "description": "配列要素をコピーするケース",
+            "request": {
+              "documentId": "active-context-123",
+              "operation": "copy",
+              "from": "/content/nextSteps/0",
+              "path": "/content/completedSteps/-"
+            },
+            "response": {
+              "success": true,
+              "document": {
+                "content": {
+                  "nextSteps": [
+                    {
+                      "id": "copy-source",
+                      "...": "コピー元の要素"
+                    },
+                    "..."
+                  ],
+                  "completedSteps": [
+                    "...",
+                    {
+                      "id": "copy-source",
+                      "...": "コピーされた要素"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "implementationNotes": {
+      "keyPoints": [
+        "RFC 6902では、配列の末尾への追加は特殊パス '-' を使用する（例：/array/-）",
+        "移動操作（move）は内部的には「コピーして元を削除」の2ステップで実装されることが多い",
+        "自分自身の子への移動は禁止されている（無限再帰防止のため）"
+      ],
+      "arrayOperations": [
+        {
+          "operation": "add",
+          "syntax": "{ op: 'add', path: '/path/to/array/index', value: newValue }",
+          "description": "指定位置に要素を挿入（既存要素は後方にシフト）。'-'を使用すると配列の末尾に追加。"
+        },
+        {
+          "operation": "remove",
+          "syntax": "{ op: 'remove', path: '/path/to/array/index' }",
+          "description": "指定位置の要素を削除（後方の要素は前方にシフト）"
+        },
+        {
+          "operation": "replace",
+          "syntax": "{ op: 'replace', path: '/path/to/array/index', value: newValue }",
+          "description": "指定位置の要素を新しい値で置換"
+        },
+        {
+          "operation": "move",
+          "syntax": "{ op: 'move', from: '/path/source', path: '/path/destination' }",
+          "description": "ある位置から別の位置へ要素を移動"
+        },
+        {
+          "operation": "copy",
+          "syntax": "{ op: 'copy', from: '/path/source', path: '/path/destination' }",
+          "description": "ある位置から別の位置へ要素をコピー"
+        }
+      ],
+      "bestPractices": [
+        "配列操作では特にインデックスの範囲チェックを徹底すること",
+        "複数の配列操作を行う場合、インデックスがシフトする点に注意（最初から末尾方向へ操作するのが安全）",
+        "末尾への追加（-）は最も安全な配列操作方法"
+      ]
+    }
+  }
+}

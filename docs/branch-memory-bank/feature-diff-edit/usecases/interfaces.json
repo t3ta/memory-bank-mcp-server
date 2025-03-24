@@ -1,0 +1,297 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "diff-edit-usecases-interfaces",
+    "title": "JSONパッチ - インターフェース定義",
+    "documentType": "usecases",
+    "path": "usecases/interfaces.json",
+    "tags": [
+      "json-patch",
+      "usecases",
+      "rfc6902",
+      "document-editing",
+      "interfaces",
+      "api",
+      "cli"
+    ],
+    "lastModified": "2025-03-24T22:15:00.000Z",
+    "createdAt": "2025-03-24T22:15:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": "JSONパッチ機能のCLIとAPIインターフェースの詳細な定義を示します。これにより、開発者とクライアントがJSONパッチ機能を効果的に活用できます。",
+    "cli": {
+      "description": "この機能を利用するためのCLIインターフェース",
+      "commands": [
+        {
+          "name": "patch-document",
+          "description": "メモリバンク内のドキュメントにJSONパッチを適用",
+          "options": [
+            "--global | -g : グローバルメモリバンクを対象にする",
+            "--branch <branch-name> | -b <branch-name> : 特定のブランチメモリバンクを対象にする",
+            "--path <document-path> | -p <document-path> : 対象ドキュメントのパス",
+            "--operation <json-patch> | -o <json-patch> : 適用するJSONパッチ操作（JSON形式）",
+            "--operations-file <file-path> | -f <file-path> : 複数のパッチ操作を含むJSONファイル",
+            "--test | -t : テストモードで実行（実際の変更を行わない）"
+          ],
+          "examples": [
+            "yarn cli patch-document -g -p core/glossary.json -o '{\"op\":\"replace\",\"path\":\"/metadata/title\",\"value\":\"更新された用語集\"}'",
+            "yarn cli patch-document -b feature/my-feature -p progress.json -f ./patch-operations.json"
+          ],
+          "outputFormat": {
+            "success": {
+              "description": "パッチが正常に適用された場合",
+              "format": "JSON形式で更新されたドキュメント全体を表示、またはテストモードの場合は適用結果の予測"
+            },
+            "error": {
+              "description": "パッチ適用に失敗した場合",
+              "format": "エラーコード、メッセージ、失敗した操作の詳細情報"
+            }
+          }
+        },
+        {
+          "name": "compare-documents",
+          "description": "二つのドキュメントを比較し、JSONパッチを生成",
+          "options": [
+            "--source <source-path> | -s <source-path> : 比較元ドキュメントのパス",
+            "--target <target-path> | -t <target-path> : 比較先ドキュメントのパス",
+            "--output <output-path> | -o <output-path> : 生成されたパッチを保存するパス",
+            "--source-branch <branch-name> : 比較元ドキュメントのブランチ（省略時はグローバル）",
+            "--target-branch <branch-name> : 比較先ドキュメントのブランチ（省略時はグローバル）"
+          ],
+          "examples": [
+            "yarn cli compare-documents -s core/glossary.json -t 01-project/glossary.json -o ./glossary-diff.json",
+            "yarn cli compare-documents -s progress.json --source-branch feature/old -t progress.json --target-branch feature/new"
+          ],
+          "outputFormat": {
+            "success": {
+              "description": "比較が正常に行われた場合",
+              "format": "生成されたJSON Patch操作の配列を表示（-oオプション指定時はファイルに保存）"
+            },
+            "error": {
+              "description": "比較に失敗した場合",
+              "format": "エラーコード、メッセージ、原因となった問題の詳細情報"
+            }
+          }
+        }
+      ],
+      "usageGuide": {
+        "patchOperationsFile": {
+          "description": "複数の操作を含むJSONファイルのフォーマット",
+          "example": [
+            {
+              "op": "replace",
+              "path": "/metadata/title",
+              "value": "更新されたタイトル"
+            },
+            {
+              "op": "add",
+              "path": "/metadata/tags/-",
+              "value": "new-tag"
+            }
+          ]
+        },
+        "jsonPathFormat": "RFC 6901に準拠したパス形式を使用してください。例: /metadata/title, /content/items/0/name",
+        "operationTypes": "add, remove, replace, move, copy, testのいずれかを使用します。各操作はRFC 6902で定義された構文に従います。"
+      }
+    },
+    "api": {
+      "description": "この機能を利用するためのAPIエンドポイント",
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/v1/documents/:documentPath/patch",
+          "description": "ドキュメントにJSONパッチを適用",
+          "parameters": {
+            "documentPath": "対象ドキュメントのパス（URLエンコード）",
+            "branch": "対象ブランチ名（クエリパラメータ、省略時はグローバル）",
+            "operations": "JSONパッチ操作の配列（リクエストボディ）"
+          },
+          "request": {
+            "body": {
+              "operations": [
+                {
+                  "op": "replace",
+                  "path": "/metadata/title",
+                  "value": "新しいタイトル"
+                },
+                {
+                  "op": "add",
+                  "path": "/metadata/tags/-",
+                  "value": "new-tag"
+                }
+              ]
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "パッチが正常に適用された",
+              "body": {
+                "success": true,
+                "document": "更新されたドキュメント全体"
+              }
+            },
+            "400": {
+              "description": "無効なリクエスト",
+              "body": {
+                "success": false,
+                "error": {
+                  "code": "INVALID_OPERATION",
+                  "message": "操作タイプ 'invalid' は未サポートです"
+                }
+              }
+            },
+            "404": {
+              "description": "ドキュメントが見つからない",
+              "body": {
+                "success": false,
+                "error": {
+                  "code": "DOCUMENT_NOT_FOUND",
+                  "message": "指定されたドキュメント 'core/unknown.json' が見つかりません"
+                }
+              }
+            },
+            "409": {
+              "description": "パッチ適用時の競合",
+              "body": {
+                "success": false,
+                "error": {
+                  "code": "CONFLICT",
+                  "message": "ドキュメントが他のユーザーによって変更されています"
+                }
+              }
+            }
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/documents/compare",
+          "description": "二つのドキュメントを比較し、JSONパッチを生成",
+          "parameters": {
+            "sourcePath": "比較元ドキュメントのパス（リクエストボディ）",
+            "targetPath": "比較先ドキュメントのパス（リクエストボディ）",
+            "sourceBranch": "比較元ブランチ名（リクエストボディ、省略時はグローバル）",
+            "targetBranch": "比較先ブランチ名（リクエストボディ、省略時はグローバル）"
+          },
+          "request": {
+            "body": {
+              "sourcePath": "progress.json",
+              "targetPath": "progress.json",
+              "sourceBranch": "feature/old",
+              "targetBranch": "feature/new"
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "パッチが正常に生成された",
+              "body": {
+                "success": true,
+                "patch": [
+                  {
+                    "op": "replace",
+                    "path": "/metadata/version",
+                    "value": 2
+                  },
+                  {
+                    "op": "add",
+                    "path": "/content/nextSteps/-",
+                    "value": {
+                      "id": "new-step"
+                    }
+                  }
+                ]
+              }
+            },
+            "400": {
+              "description": "無効なリクエスト",
+              "body": {
+                "success": false,
+                "error": {
+                  "code": "INVALID_REQUEST",
+                  "message": "sourcePath および targetPath パラメータは必須です"
+                }
+              }
+            },
+            "404": {
+              "description": "ドキュメントが見つからない",
+              "body": {
+                "success": false,
+                "error": {
+                  "code": "DOCUMENT_NOT_FOUND",
+                  "message": "指定されたドキュメント 'progress.json' が見つかりません"
+                }
+              }
+            }
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/documents/:documentPath/test-patch",
+          "description": "パッチ操作をテストモードで実行（実際の変更は行わない）",
+          "parameters": {
+            "documentPath": "対象ドキュメントのパス（URLエンコード）",
+            "branch": "対象ブランチ名（クエリパラメータ、省略時はグローバル）",
+            "operations": "JSONパッチ操作の配列（リクエストボディ）"
+          },
+          "request": {
+            "body": {
+              "operations": [
+                {
+                  "op": "test",
+                  "path": "/metadata/version",
+                  "value": 3
+                },
+                {
+                  "op": "replace",
+                  "path": "/metadata/version",
+                  "value": 4
+                }
+              ]
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "パッチのテストが成功",
+              "body": {
+                "success": true,
+                "simulatedDocument": "パッチが適用された場合のドキュメント（実際には変更されない）"
+              }
+            },
+            "400": {
+              "description": "無効なパッチ操作",
+              "body": {
+                "success": false,
+                "error": {
+                  "code": "INVALID_OPERATION",
+                  "message": "テスト操作が失敗しました",
+                  "details": {
+                    "operationIndex": 0,
+                    "expectedValue": 3,
+                    "actualValue": 2
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "securityConsiderations": {
+        "authentication": "すべてのAPIエンドポイントは認証トークンが必要です。ヘッダーに「Authorization: Bearer <token>」を含めてください。",
+        "authorization": "ドキュメントへのアクセス権はドキュメント所有者とメンバーに限定されています。",
+        "rateLimit": "1分間に最大60リクエストまで許可されています。それ以上のリクエストは429エラーが返されます。"
+      },
+      "bestPractices": {
+        "errorHandling": [
+          "すべてのリクエストで発生し得るエラーを適切に処理してください",
+          "409（競合）エラーの場合は、最新のドキュメントを再取得してから再試行することをお勧めします",
+          "重要な更新の前にtest操作を使用して条件をチェックしてください"
+        ],
+        "batchSize": "一度に送信するパッチ操作は50件以下に抑えることをお勧めします。大量の操作が必要な場合は複数のリクエストに分割してください。",
+        "idempotency": "べき等性を確保するために、リクエストヘッダーに「Idempotency-Key: <unique-id>」を含めることをお勧めします。ネットワークエラーなどでリクエストが重複した場合に安全に再試行できます。"
+      },
+      "sdkExample": {
+        "typescript": "```typescript\n// JSON Patchクライアントの使用例\nimport { MemoryBankClient } from '@memory-bank/client';\n\nconst client = new MemoryBankClient({ token: 'your-auth-token' });\n\n// ドキュメントにパッチを適用する\nasync function updateDocument() {\n  try {\n    const result = await client.patchDocument({\n      documentPath: 'core/glossary.json',\n      branch: 'feature/my-feature', // 省略時はグローバル\n      operations: [\n        { op: 'replace', path: '/metadata/title', value: '更新されたタイトル' },\n        { op: 'add', path: '/metadata/tags/-', value: 'new-tag' }\n      ]\n    });\n    \n    console.log('更新成功:', result.document);\n  } catch (error) {\n    console.error('更新失敗:', error.code, error.message);\n  }\n}\n```"
+      }
+    }
+  }
+}

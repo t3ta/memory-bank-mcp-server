@@ -105,6 +105,32 @@ const AVAILABLE_TOOLS = [
       properties: {
         path: { type: 'string' },
         content: { type: 'string' },
+        patches: {
+          type: 'array',
+          description: 'JSON Patch operations to apply (RFC 6902)',
+          items: {
+            type: 'object',
+            properties: {
+              op: {
+                type: 'string',
+                enum: ['add', 'remove', 'replace', 'move', 'copy', 'test'],
+                description: 'Operation type'
+              },
+              path: {
+                type: 'string',
+                description: 'JSON Pointer path (e.g. /metadata/title)'
+              },
+              value: {
+                description: 'Value for add, replace, test operations'
+              },
+              from: {
+                type: 'string',
+                description: 'Source path for move, copy operations'
+              }
+            },
+            required: ['op', 'path']
+          }
+        },
         branch: {
           type: 'string',
           description: 'Branch name',
@@ -152,6 +178,32 @@ const AVAILABLE_TOOLS = [
       properties: {
         path: { type: 'string' },
         content: { type: 'string' },
+        patches: {
+          type: 'array',
+          description: 'JSON Patch operations to apply (RFC 6902)',
+          items: {
+            type: 'object',
+            properties: {
+              op: {
+                type: 'string',
+                enum: ['add', 'remove', 'replace', 'move', 'copy', 'test'],
+                description: 'Operation type'
+              },
+              path: {
+                type: 'string',
+                description: 'JSON Pointer path (e.g. /metadata/title)'
+              },
+              value: {
+                description: 'Value for add, replace, test operations'
+              },
+              from: {
+                type: 'string',
+                description: 'Source path for move, copy operations'
+              }
+            },
+            required: ['op', 'path']
+          }
+        },
         workspace: {
           type: 'string',
           description: 'Path to workspace directory',
@@ -328,6 +380,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
     case 'write_branch_memory_bank': {
       const path = params.path as string;
       const content = params.content as string | undefined;
+      const patches = params.patches as any[] | undefined;
       const branch = params.branch as string;
       const workspace = params.workspace as string | undefined;
       const docs = params.docs as string | undefined;
@@ -336,7 +389,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         throw new Error('Invalid arguments for write_branch_memory_bank: path and branch are required');
       }
 
-      if (!content) {
+      // Content and patches cannot be provided at the same time
+      if (content && patches) {
+        throw new Error('Content and patches cannot be provided at the same time');
+      }
+
+      // Initialize a new branch without content
+      if (!content && !patches) {
         return { content: [{ type: 'text', text: 'Branch memory bank initialized successfully' }] };
       }
 
@@ -346,7 +405,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 
       // Resolve workspace and docs directories
       const paths = resolveWorkspaceAndDocs(workspace, docs);
-      logger.debug(`Writing branch memory bank (branch: ${branch}, path: ${path}, workspace: ${paths.workspace})`);
 
       // Create a new application instance if needed
       let branchApp = app;
@@ -360,13 +418,81 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         });
       }
 
-      // Try to write the document and check the result
-      const response = await branchApp.getBranchController().writeDocument(branch, path, content);
-      if (!response.success) {
-        throw new Error((response as any).error?.message || 'Failed to write document');
+      // Case 1: Content provided - use normal write operation
+      if (content) {
+        logger.debug(`Writing branch memory bank (branch: ${branch}, path: ${path}, workspace: ${paths.workspace})`);
+        const response = await branchApp.getBranchController().writeDocument(branch, path, content);
+        if (!response.success) {
+          throw new Error((response as any).error?.message || 'Failed to write document');
+        }
+        return { content: [{ type: 'text', text: 'Document written successfully' }] };
       }
 
-      return { content: [{ type: 'text', text: 'Document written successfully' }] };
+      // Case 2: Patches provided - apply JSON Patch operations
+      if (patches) {
+        logger.debug(`Applying patches to branch memory bank (branch: ${branch}, path: ${path}, workspace: ${paths.workspace})`);
+        
+        try {
+          // Import necessary classes
+          const { JsonPatchOperation } = await import('./domain/jsonpatch/JsonPatchOperation.js');
+          const { FastJsonPatchAdapter } = await import('./domain/jsonpatch/FastJsonPatchAdapter.js');
+
+          // Create adapter for patch application
+          const patchService = new FastJsonPatchAdapter();
+
+          // First, read the document
+          const readResult = await branchApp.getBranchController().readDocument(branch, path);
+          if (!readResult.success) {
+            throw new Error(`Document not found: ${path} in branch ${branch}. Create the document first before applying patches.`);
+          }
+
+          const document = readResult.data?.content;
+          if (!document) {
+            throw new Error(`Document is empty or invalid: ${path} in branch ${branch}`);
+          }
+
+          // Parse document content to JSON if it's a string
+          const docContent = typeof document === 'string' ? JSON.parse(document) : document;
+
+          // Convert patch operations to domain model
+          const patchOperations = patches.map(patch => {
+            return JsonPatchOperation.create(
+              patch.op,
+              patch.path,
+              patch.value,
+              patch.from
+            );
+          });
+
+          // Apply patches
+          logger.debug(`Applying ${patchOperations.length} JSON Patch operations`);
+          
+          // Execute validation
+          const isValid = patchService.validate(docContent, patchOperations);
+          if (!isValid) {
+            throw new Error('Invalid JSON Patch operations');
+          }
+
+          // Apply patches
+          const updatedContent = patchService.apply(docContent, patchOperations);
+          
+          // Save the updated document
+          const jsonString = JSON.stringify(updatedContent, null, 2);
+          const writeResult = await branchApp.getBranchController().writeDocument(branch, path, jsonString);
+          
+          if (!writeResult.success) {
+            throw new Error((writeResult as any).error?.message || 'Failed to save patched document');
+          }
+          
+          return { content: [{ type: 'text', text: 'Document patched successfully' }] };
+        } catch (error) {
+          logger.error('Error applying JSON Patch:', error);
+          throw error instanceof Error ? error : new Error(String(error));
+        }
+      }
+      
+      // Should never reach here
+      throw new Error('Invalid state: neither content nor patches were provided');
     }
 
     case 'read_branch_memory_bank': {
@@ -474,6 +600,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
     case 'write_global_memory_bank': {
       const path = params.path as string;
       const content = params.content as string | undefined;
+      const patches = params.patches as any[] | undefined;
       const workspace = params.workspace as string | undefined;
       const docs = params.docs as string | undefined;
 
@@ -481,7 +608,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         throw new Error('Invalid arguments for write_global_memory_bank');
       }
 
-      if (!content) {
+      // Content and patches cannot be provided at the same time
+      if (content && patches) {
+        throw new Error('Content and patches cannot be provided at the same time');
+      }
+
+      // Initialize a new document without content
+      if (!content && !patches) {
         return { content: [{ type: 'text', text: 'Global memory bank initialized successfully' }] };
       }
 
@@ -491,7 +624,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 
       // Resolve workspace and docs directories
       const paths = resolveWorkspaceAndDocs(workspace, docs);
-      logger.debug(`Writing global memory bank (path: ${path}, workspace: ${paths.workspace})`);
 
       // Create a new application instance if needed
       let globalApp = app;
@@ -505,13 +637,81 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         });
       }
 
-      // Try to write the document and check the result
-      const response = await globalApp.getGlobalController().writeDocument(path, content);
-      if (!response.success) {
-        throw new Error((response as any).error?.message || 'Failed to write document');
+      // Case 1: Content provided - use normal write operation
+      if (content) {
+        logger.debug(`Writing global memory bank (path: ${path}, workspace: ${paths.workspace})`);
+        const response = await globalApp.getGlobalController().writeDocument(path, content);
+        if (!response.success) {
+          throw new Error((response as any).error?.message || 'Failed to write document');
+        }
+        return { content: [{ type: 'text', text: 'Document written successfully' }] };
       }
 
-      return { content: [{ type: 'text', text: 'Document written successfully' }] };
+      // Case 2: Patches provided - apply JSON Patch operations
+      if (patches) {
+        logger.debug(`Applying patches to global memory bank (path: ${path}, workspace: ${paths.workspace})`);
+        
+        try {
+          // Import necessary classes
+          const { JsonPatchOperation } = await import('./domain/jsonpatch/JsonPatchOperation.js');
+          const { FastJsonPatchAdapter } = await import('./domain/jsonpatch/FastJsonPatchAdapter.js');
+
+          // Create adapter for patch application
+          const patchService = new FastJsonPatchAdapter();
+
+          // First, read the document
+          const readResult = await globalApp.getGlobalController().readDocument(path);
+          if (!readResult.success) {
+            throw new Error(`Document not found: ${path}. Create the document first before applying patches.`);
+          }
+
+          const document = readResult.data?.content;
+          if (!document) {
+            throw new Error(`Document is empty or invalid: ${path}`);
+          }
+
+          // Parse document content to JSON if it's a string
+          const docContent = typeof document === 'string' ? JSON.parse(document) : document;
+
+          // Convert patch operations to domain model
+          const patchOperations = patches.map(patch => {
+            return JsonPatchOperation.create(
+              patch.op,
+              patch.path,
+              patch.value,
+              patch.from
+            );
+          });
+
+          // Apply patches
+          logger.debug(`Applying ${patchOperations.length} JSON Patch operations`);
+          
+          // Execute validation
+          const isValid = patchService.validate(docContent, patchOperations);
+          if (!isValid) {
+            throw new Error('Invalid JSON Patch operations');
+          }
+
+          // Apply patches
+          const updatedContent = patchService.apply(docContent, patchOperations);
+          
+          // Save the updated document
+          const jsonString = JSON.stringify(updatedContent, null, 2);
+          const writeResult = await globalApp.getGlobalController().writeDocument(path, jsonString);
+          
+          if (!writeResult.success) {
+            throw new Error((writeResult as any).error?.message || 'Failed to save patched document');
+          }
+          
+          return { content: [{ type: 'text', text: 'Document patched successfully' }] };
+        } catch (error) {
+          logger.error('Error applying JSON Patch:', error);
+          throw error instanceof Error ? error : new Error(String(error));
+        }
+      }
+      
+      // Should never reach here
+      throw new Error('Invalid state: neither content nor patches were provided');
     }
 
     case 'read_global_memory_bank': {
