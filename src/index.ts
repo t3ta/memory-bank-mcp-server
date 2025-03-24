@@ -11,6 +11,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { Server as MCPServer } from '@modelcontextprotocol/sdk/server/index.js';
 import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { Server } from 'node:http';
+import { Language, isValidLanguage } from './schemas/v2/i18n-schema.js';
 
 // Helper function to render template with translations
 function renderTemplate(template: any, translations: any): string {
@@ -54,6 +55,11 @@ function renderTemplate(template: any, translations: any): string {
 
 // Parse command line arguments
 const argv = yargs(hideBin(process.argv))
+  .option('workspace', {
+    alias: 'w',
+    type: 'string',
+    description: 'Path to workspace directory'
+  })
   .option('docs', {
     alias: 'd',
     type: 'string',
@@ -66,6 +72,19 @@ const argv = yargs(hideBin(process.argv))
 // Get directory paths with ESM support
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Helper function to resolve workspace and docs paths
+export function resolveWorkspaceAndDocs(toolWorkspace?: string, toolDocs?: string) {
+  // 1. Tool parameters (highest priority)
+  // 2. Command line arguments
+  // 3. Environment variables
+  // 4. Default values
+  const workspace = toolWorkspace || argv.workspace || process.env.WORKSPACE_ROOT || process.cwd();
+  const docs = toolDocs || argv.docs || process.env.MEMORY_BANK_ROOT ||
+    (typeof workspace === 'string' ? path.join(workspace, 'docs') : './docs');
+
+  return { workspace, docs };
+}
 
 // New application instance
 let app: Application | null = null;
@@ -90,8 +109,16 @@ const AVAILABLE_TOOLS = [
           type: 'string',
           description: 'Branch name',
         },
+        workspace: {
+          type: 'string',
+          description: 'Path to workspace directory',
+        },
+        docs: {
+          type: 'string',
+          description: 'Path to docs directory',
+        },
       },
-      required: ['path'],
+      required: ['path', 'branch'],
     },
   },
   {
@@ -105,8 +132,16 @@ const AVAILABLE_TOOLS = [
           type: 'string',
           description: 'Branch name',
         },
+        workspace: {
+          type: 'string',
+          description: 'Path to workspace directory',
+        },
+        docs: {
+          type: 'string',
+          description: 'Path to docs directory',
+        },
       },
-      required: ['path'],
+      required: ['path', 'branch'],
     },
   },
   {
@@ -117,6 +152,14 @@ const AVAILABLE_TOOLS = [
       properties: {
         path: { type: 'string' },
         content: { type: 'string' },
+        workspace: {
+          type: 'string',
+          description: 'Path to workspace directory',
+        },
+        docs: {
+          type: 'string',
+          description: 'Path to docs directory',
+        },
       },
       required: ['path'],
     },
@@ -128,6 +171,14 @@ const AVAILABLE_TOOLS = [
       type: 'object',
       properties: {
         path: { type: 'string' },
+        workspace: {
+          type: 'string',
+          description: 'Path to workspace directory',
+        },
+        docs: {
+          type: 'string',
+          description: 'Path to docs directory',
+        },
       },
       required: ['path'],
     },
@@ -142,6 +193,14 @@ const AVAILABLE_TOOLS = [
           type: 'string',
           enum: ['en', 'ja', 'zh'],
           description: 'Language code (en, ja, or zh)',
+        },
+        workspace: {
+          type: 'string',
+          description: 'Path to workspace directory',
+        },
+        docs: {
+          type: 'string',
+          description: 'Path to docs directory',
         },
       },
       required: ['language'],
@@ -176,7 +235,16 @@ const AVAILABLE_TOOLS = [
           type: 'boolean',
           description: 'Whether to include global memory bank (default: true)',
         },
+        workspace: {
+          type: 'string',
+          description: 'Path to workspace directory',
+        },
+        docs: {
+          type: 'string',
+          description: 'Path to docs directory',
+        },
       },
+      required: ['branch'],
     },
   },
   {
@@ -197,6 +265,14 @@ const AVAILABLE_TOOLS = [
         variables: {
           type: 'object',
           description: 'Optional variables for template substitution'
+        },
+        workspace: {
+          type: 'string',
+          description: 'Path to workspace directory'
+        },
+        docs: {
+          type: 'string',
+          description: 'Path to docs directory'
         }
       },
       required: ['id', 'language']
@@ -253,9 +329,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
       const path = params.path as string;
       const content = params.content as string | undefined;
       const branch = params.branch as string;
+      const workspace = params.workspace as string | undefined;
+      const docs = params.docs as string | undefined;
 
-      if (!path) {
-        throw new Error('Invalid arguments for write_branch_memory_bank');
+      if (!path || !branch) {
+        throw new Error('Invalid arguments for write_branch_memory_bank: path and branch are required');
       }
 
       if (!content) {
@@ -266,8 +344,24 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         throw new Error('Application not initialized');
       }
 
+      // Resolve workspace and docs directories
+      const paths = resolveWorkspaceAndDocs(workspace, docs);
+      logger.debug(`Writing branch memory bank (branch: ${branch}, path: ${path}, workspace: ${paths.workspace})`);
+
+      // Create a new application instance if needed
+      let branchApp = app;
+      if (workspace || docs) {
+        logger.debug(`Creating new application instance with workspace: ${paths.workspace}, docs: ${paths.docs}`);
+        branchApp = await createApplication({
+          workspace: paths.workspace,
+          memoryRoot: paths.docs,
+          language: 'ja',
+          verbose: false,
+        });
+      }
+
       // Try to write the document and check the result
-      const response = await app.getBranchController().writeDocument(branch, path, content);
+      const response = await branchApp.getBranchController().writeDocument(branch, path, content);
       if (!response.success) {
         throw new Error((response as any).error?.message || 'Failed to write document');
       }
@@ -278,15 +372,34 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
     case 'read_branch_memory_bank': {
       const path = params.path as string;
       const branch = params.branch as string;
+      const workspace = params.workspace as string | undefined;
+      const docs = params.docs as string | undefined;
 
-      if (!path) {
-        throw new Error('Invalid arguments for read_branch_memory_bank');
+      if (!path || !branch) {
+        throw new Error('Invalid arguments for read_branch_memory_bank: path and branch are required');
       }
 
       if (!app) {
         throw new Error('Application not initialized');
       }
-      const response = await app.getBranchController().readDocument(branch, path);
+
+      // Resolve workspace and docs directories
+      const paths = resolveWorkspaceAndDocs(workspace, docs);
+      logger.debug(`Reading branch memory bank (branch: ${branch}, path: ${path}, workspace: ${paths.workspace})`);
+
+      // Create a new application instance if needed
+      let branchApp = app;
+      if (workspace || docs) {
+        logger.debug(`Creating new application instance with workspace: ${paths.workspace}, docs: ${paths.docs}`);
+        branchApp = await createApplication({
+          workspace: paths.workspace,
+          memoryRoot: paths.docs,
+          language: 'ja',
+          verbose: false,
+        });
+      }
+
+      const response = await branchApp.getBranchController().readDocument(branch, path);
       if (!response.success) {
         throw new Error((response as any).error.message);
       }
@@ -361,6 +474,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
     case 'write_global_memory_bank': {
       const path = params.path as string;
       const content = params.content as string | undefined;
+      const workspace = params.workspace as string | undefined;
+      const docs = params.docs as string | undefined;
 
       if (!path) {
         throw new Error('Invalid arguments for write_global_memory_bank');
@@ -374,8 +489,24 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         throw new Error('Application not initialized');
       }
 
+      // Resolve workspace and docs directories
+      const paths = resolveWorkspaceAndDocs(workspace, docs);
+      logger.debug(`Writing global memory bank (path: ${path}, workspace: ${paths.workspace})`);
+
+      // Create a new application instance if needed
+      let globalApp = app;
+      if (workspace || docs) {
+        logger.debug(`Creating new application instance with workspace: ${paths.workspace}, docs: ${paths.docs}`);
+        globalApp = await createApplication({
+          workspace: paths.workspace,
+          memoryRoot: paths.docs,
+          language: 'ja',
+          verbose: false,
+        });
+      }
+
       // Try to write the document and check the result
-      const response = await app.getGlobalController().writeDocument(path, content);
+      const response = await globalApp.getGlobalController().writeDocument(path, content);
       if (!response.success) {
         throw new Error((response as any).error?.message || 'Failed to write document');
       }
@@ -385,6 +516,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 
     case 'read_global_memory_bank': {
       const path = params.path as string;
+      const workspace = params.workspace as string | undefined;
+      const docs = params.docs as string | undefined;
 
       if (!path) {
         throw new Error('Invalid arguments for read_global_memory_bank');
@@ -393,7 +526,24 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
       if (!app) {
         throw new Error('Application not initialized');
       }
-      const response = await app.getGlobalController().readDocument(path);
+
+      // Resolve workspace and docs directories
+      const paths = resolveWorkspaceAndDocs(workspace, docs);
+      logger.debug(`Reading global memory bank (path: ${path}, workspace: ${paths.workspace})`);
+
+      // Create a new application instance if needed
+      let globalApp = app;
+      if (workspace || docs) {
+        logger.debug(`Creating new application instance with workspace: ${paths.workspace}, docs: ${paths.docs}`);
+        globalApp = await createApplication({
+          workspace: paths.workspace,
+          memoryRoot: paths.docs,
+          language: 'ja',
+          verbose: false,
+        });
+      }
+
+      const response = await globalApp.getGlobalController().readDocument(path);
       if (!response.success) {
         throw new Error((response as any).error.message);
       }
@@ -407,12 +557,17 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
     case 'read_context': {
       const branch = (params.branch as string | undefined) || '_current_';
       const language = (params.language as string) || 'ja';
+      const workspace = params.workspace as string | undefined;
+      const docs = params.docs as string | undefined;
       // Include options are always true now, but kept for backwards compatibility
       const includeRules = true;
       const includeBranchMemory = true;
       const includeGlobalMemory = true;
 
-      logger.info(`Reading context (branch: ${branch || 'none'}, language: ${language})`);
+      // Resolve workspace and docs directories
+      const paths = resolveWorkspaceAndDocs(workspace, docs);
+
+      logger.info(`Reading context (branch: ${branch || 'none'}, language: ${language}, workspace: ${paths.workspace})`)
 
       // オプションが指定されていても無視される（オプション自体が廃止されたため）
       logger.debug('All context components are always included regardless of include options.');
@@ -429,7 +584,20 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
       try {
         // Use ContextController to get all context info at once
         logger.debug('Requesting context from ContextController');
-        const response = await app.getContextController().readContext({
+
+        // Create a new application instance with the specified workspace and docs if different from the default
+        let contextApp = app;
+        if (workspace || docs) {
+          logger.debug(`Creating new application instance with workspace: ${paths.workspace}, docs: ${paths.docs}`);
+          contextApp = await createApplication({
+            workspace: paths.workspace,
+            memoryRoot: paths.docs,
+            language: isValidLanguage(language) ? language : 'en',
+            verbose: false,
+          });
+        }
+
+        const response = await contextApp.getContextController().readContext({
           branch,
           language
         });
@@ -466,6 +634,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
       const id = params.id as string;
       const language = params.language as string;
       const variables = params.variables as Record<string, string> | undefined;
+      const workspace = params.workspace as string | undefined;
+      const docs = params.docs as string | undefined;
 
       if (!id || !language) {
         throw new Error('Invalid arguments for get_template');
@@ -479,8 +649,24 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         throw new Error('Application not initialized');
       }
 
+      // Resolve workspace and docs directories
+      const paths = resolveWorkspaceAndDocs(workspace, docs);
+      logger.debug(`Getting template (id: ${id}, language: ${language}, workspace: ${paths.workspace})`);
+
+      // Create a new application instance if needed
+      let templateApp = app;
+      if (workspace || docs) {
+        logger.debug(`Creating new application instance with workspace: ${paths.workspace}, docs: ${paths.docs}`);
+        templateApp = await createApplication({
+          workspace: paths.workspace,
+          memoryRoot: paths.docs,
+          language: isValidLanguage(language) ? language : 'en',
+          verbose: false,
+        });
+      }
+
       // Currently returns template in Markdown format
-      const response = await app.getTemplateController().getTemplateAsMarkdown(id, language as any, variables);
+      const response = await templateApp.getTemplateController().getTemplateAsMarkdown(id, isValidLanguage(language) ? language : 'en', variables);
 
       return {
         content: [{ type: 'text', text: response }],
@@ -550,6 +736,7 @@ async function main() {
   logger.debug('Initializing application..');
   // Initialize a new application
   app = await createApplication({
+    workspace: argv.workspace as string,
     memoryRoot: argv.docs as string,
     language: 'ja',
     verbose: false,

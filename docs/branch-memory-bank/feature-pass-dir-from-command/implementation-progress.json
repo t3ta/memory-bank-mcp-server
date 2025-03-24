@@ -1,0 +1,38 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "implementation-progress",
+    "title": "実装の進捗状況と次のステップ",
+    "documentType": "progress",
+    "path": "implementation-progress.json",
+    "tags": [
+      "progress",
+      "implementation"
+    ],
+    "lastModified": "2025-03-24T12:35:18.287Z",
+    "createdAt": "2025-03-24T12:35:18.287Z",
+    "version": 1
+  },
+  "content": {
+    "current_status": "ワークスペースオプション機能の実装はすでに完了していますが、テストとドキュメントが不足しています。",
+    "next_steps": [
+      {
+        "id": "step1",
+        "title": "テストケースの実装",
+        "description": "test-cases.jsonに基づき、workspaceオプション機能のテストケースを追加します。以下のカテゴリのテストを実装します：\n1. 基本シナリオ（サーバー起動時のオプション指定）\n2. MCPツール呼び出し（ツール呼び出し時のパラメータ指定）\n3. 優先順位の検証（様々なソースからのパス指定の優先順位）\n4. パスの解決（相対パスや無効なパスの処理）\n5. 互換性テスト（既存コードとの互換性）",
+        "status": "pending"
+      },
+      {
+        "id": "step2",
+        "title": "ドキュメント更新",
+        "description": "以下のドキュメントを更新して新しいオプションの説明を追加します：\n1. READMEの更新\n2. ヘルプテキストの更新",
+        "status": "pending"
+      }
+    ],
+    "test_strategy": {
+      "unit_tests": "ConfigProvider, ApplicationFactoryなど、ワークスペースオプションの処理を担当するクラスに対するユニットテスト",
+      "integration_tests": "インデックスファイルでのオプション解析とアプリケーション起動フローの統合テスト",
+      "test_setup": "モックされた環境変数、コマンドライン引数、ファイルシステムを使用してテスト"
+    }
+  }
+}

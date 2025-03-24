@@ -1,0 +1,93 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "test-context-controller-analysis",
+    "title": "context-controller.test.tsの分析と更新計画",
+    "documentType": "analysis",
+    "path": "test-context-controller-analysis.json",
+    "tags": [
+      "testing",
+      "analysis",
+      "context-controller"
+    ],
+    "lastModified": "2025-03-24T13:30:00.000Z",
+    "createdAt": "2025-03-24T13:30:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": "ContextControllerのテストファイルと実装を比較した結果、テストファイルは以前の実装に基づいており、ワークスペースオプション機能を含む最新の変更に対応していません。以下に問題点と更新計画を示します。",
+    "current_test_issues": [
+      {
+        "id": "issue-1",
+        "description": "ワークスペースとドキュメントディレクトリのパラメータに関するテストが不足しています",
+        "impact": "新機能であるワークスペースオプションのテストカバレッジがありません"
+      },
+      {
+        "id": "issue-2",
+        "description": "includeRules, includeBranchMemory, includeGlobalMemoryフラグに関するテストが古い実装に基づいています",
+        "impact": "これらのフラグは現在の実装では常にtrueとして扱われるため、テストはこの新しい動作を反映していません"
+      },
+      {
+        "id": "issue-3",
+        "description": "ReadContextUseCaseのモックが古い仕様に基づいています",
+        "impact": "ユースケースのモックが現在の実装と一致していないため、テストが不正確です"
+      },
+      {
+        "id": "issue-4",
+        "description": "test.skipされているいくつかのテストケースが実装されていません",
+        "impact": "テストカバレッジが不完全です"
+      }
+    ],
+    "update_plan": [
+      {
+        "id": "update-1",
+        "description": "ワークスペースとドキュメントディレクトリのパラメータをテストするケースを追加",
+        "details": "ワークスペースのみ指定、ドキュメントディレクトリのみ指定、両方指定の各ケースを追加"
+      },
+      {
+        "id": "update-2",
+        "description": "includeフラグに関するテストケースとモックを最新の実装に合わせて更新",
+        "details": "includeフラグが指定されても常に全ての情報が取得されることを明確に示すテスト"
+      },
+      {
+        "id": "update-3",
+        "description": "ReadContextUseCaseのモックを現在の実装に合わせて更新",
+        "details": "execute関数の実装をシンプル化し、現在の仕様に合わせる"
+      },
+      {
+        "id": "update-4",
+        "description": "test.skipされているテストケースを実装",
+        "details": "empty rules content、repository connection errors、concurrent requests、large documents/file sizesのテストを実装"
+      }
+    ],
+    "test_modifications": [
+      {
+        "case": "rules_operations",
+        "current": "基本的なRulesの読み取りとエラー処理をテスト",
+        "proposed_changes": "エラー処理などのテストケースを追加"
+      },
+      {
+        "case": "context_operations",
+        "current": "基本的なコンテキスト操作と各フラグのテスト",
+        "proposed_changes": "ワークスペースとドキュメントディレクトリのパラメータを追加したテストケースに更新し、includeフラグの動作を明確にコメント"
+      },
+      {
+        "case": "error_handling",
+        "current": "test.skipのみで未実装",
+        "proposed_changes": "テストケースを実装して、エラー処理を検証"
+      },
+      {
+        "case": "performance",
+        "current": "test.skipのみで未実装",
+        "proposed_changes": "パフォーマンス関連のテストケースを実装"
+      }
+    ],
+    "implementation_considerations": [
+      "テストコードに@ts-nocheck注釈があり、全体的な型安全性は低い可能性があります",
+      "テストコードで使われているジェネリックなモックパターンを維持するべきです",
+      "テスト実行時の環境変数の影響を考慮する必要があります",
+      "test-mockitoからjest.fnへの自動変換に起因する問題がある可能性があります"
+    ],
+    "conclusion": "context-controller.test.tsは、機能仕様上ではワークスペースパラメータを受け取り、includeフラグが常にtrueとして扱われる現在の実装に合わせて更新する必要があります。既存のテストケースはその機能の一部をテストしていますが、ワークスペースディレクトリ機能を明示的にテストするケースを追加し、すべてのフラグが常にtrueとして扱われることを確認するケースを更新または追加する必要があります。"
+  }
+}

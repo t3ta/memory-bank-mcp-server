@@ -1,0 +1,91 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "50cbdc7e-98d6-46de-b0b2-36d4896aed65",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "system-patterns"
+    ],
+    "lastModified": "2025-03-24T10:25:18.286Z",
+    "createdAt": "2025-03-24T09:21:18.286Z",
+    "version": 3
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "6c4a2c42-4cbd-461a-88b4-3a3bbfd409db",
+        "title": "コマンドラインオプションとMCPツールでのワークスペース指定方法",
+        "context": "複数のプロジェクトで同じサーバーを使用するために、ワークスペースディレクトリを明示的に指定できるようにする必要がある。サーバー起動時とツール呼び出し時の両方でワークスペースを指定できるようにする。",
+        "decision": "1. サーバー起動時に--workspaceオプションを追加\n2. MCPツールのパラメータにもworkspaceを追加\n3. ツール呼び出し時にworkspace/docsパラメータが指定された場合はそちらを優先\n4. 優先順位とデフォルト値の処理はCLIと一貫性を持たせる",
+        "consequences": {
+          "positive": [
+            "複数プロジェクト間でサーバーを共有できるようになる",
+            "サーバー起動時とツール呼び出し時の両方で柔軟にワークスペースを指定できる",
+            "既存のワークフローに影響を与えない",
+            "環境変数との連携も維持される"
+          ],
+          "negative": [
+            "workspaceRootとmemoryRootの関係性が複雑になるケースがある可能性",
+            "ツール呼び出し時とサーバー起動時で異なるワークスペースを指定可能になるため混乱を招く可能性"
+          ]
+        },
+        "status": "proposed",
+        "date": "2025-03-24T10:25:18.286Z",
+        "alternatives": [
+          {
+            "option": "サーバー起動時のみワークスペース指定",
+            "description": "MCPツールではワークスペースを受け取らず、サーバー起動時の設定のみを使用する",
+            "reasons_rejected": "ツール単位での柔軟性が失われ、ひとつのサーバーで複数プロジェクトを同時に扱えなくなる"
+          },
+          {
+            "option": "プロジェクト識別子の追加",
+            "description": "ワークスペースパスの代わりにプロジェクト識別子を使用する方法も検討したが、パス指定の方がより直接的でわかりやすい",
+            "reasons_rejected": "識別子からパスへのマッピングが必要になり、余分な複雑さを生む"
+          }
+        ]
+      },
+      {
+        "id": "87f2a31d-bcd9-4e72-a190-124e7a82fe46",
+        "title": "ワークスペースとドキュメントディレクトリの優先順位ルール",
+        "context": "サーバー起動時とツール呼び出し時の両方でワークスペースとドキュメントディレクトリを指定できるため、優先順位を明確にする必要がある",
+        "decision": "以下の優先順位でパスを解決する：\n1. ツール呼び出し時に指定されたworkspaceとdocs（最優先）\n2. サーバー起動時に指定されたworkspaceとdocs\n3. 環境変数WORKSPACE_ROOTとMEMORY_BANK_ROOT\n4. デフォルト値（カレントディレクトリとその下のdocsディレクトリ）",
+        "consequences": {
+          "positive": [
+            "明確な優先順位により予測可能な動作を実現",
+            "柔軟な設定オプションを維持しながら一貫性を確保"
+          ],
+          "negative": [
+            "複数の設定方法があるため、初心者には少し複雑に感じる可能性がある"
+          ]
+        },
+        "status": "proposed",
+        "date": "2025-03-24T10:25:18.286Z",
+        "alternatives": []
+      }
+    ],
+    "implementationPatterns": [
+      {
+        "name": "コマンドラインオプションパターン",
+        "description": "yargs利用してオプションを追加し、適切なエイリアスとデフォルト値を設定する",
+        "example": "option('workspace', { alias: 'w', type: 'string', description: 'Path to workspace directory' })"
+      },
+      {
+        "name": "MCPツールパラメータ拡張パターン",
+        "description": "既存のMCPツール定義にworkspaceパラメータを追加し、オプショナルとして定義する",
+        "example": "inputSchema: { type: 'object', properties: { workspace: { type: 'string', description: 'Path to workspace directory' }, ... } }"
+      },
+      {
+        "name": "設定優先順位パターン",
+        "description": "複数の設定ソース（ツールパラメータ、CLIオプション、環境変数、デフォルト値）からの値を統一された優先順位で解決する",
+        "example": "const workspace = toolParams.workspace || serverOptions.workspace || process.env.WORKSPACE_ROOT || process.cwd();"
+      },
+      {
+        "name": "設定クラス委譲パターン",
+        "description": "解決されたパラメータをConfigProviderに委譲し、アプリケーション全体でこの設定を使えるようにする",
+        "example": "const app = await createApplication({ workspace: resolvedWorkspace, memoryRoot: resolvedDocs });"
+      }
+    ]
+  }
+}

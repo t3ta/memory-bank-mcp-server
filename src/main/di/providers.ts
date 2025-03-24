@@ -131,9 +131,31 @@ export async function registerInfrastructureServices(
     // Set up template directory path
     const templateDir = path.join(config.memoryBankRoot, 'templates', 'json');
 
+    // Get I18nService for translations
+    let i18nService;
+    try {
+      // Try to get I18nService if it's already registered
+      const { I18nService } = await import('../../application/i18n/I18nService.js');
+      const i18nRepository = await container.get<II18nRepository>('i18nRepository');
+      i18nService = new I18nService(i18nRepository);
+
+      // Load all translations
+      await i18nService.loadAllTranslations();
+    } catch (error) {
+      console.warn('Failed to get I18nService for template translations:', error);
+      i18nService = null;
+    }
+
     // Import and instantiate the FileTemplateRepository
     const { FileTemplateRepository } = await import('../../infrastructure/templates/FileTemplateRepository.js');
-    const templateRepository = new FileTemplateRepository(templateDir);
+
+    // Create repository with I18nService if available
+    const templateRepository = new FileTemplateRepository(
+      templateDir,
+      i18nService ? {
+        translate: (key: string, language: string) => i18nService.translate(key, language)
+      } : undefined
+    );
 
     // Initialize the repository
     await templateRepository.initialize().catch(error => {

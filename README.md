@@ -55,7 +55,8 @@ memory-bank --help
 
 #### Options
 
-- **--docs, -d**: Path to docs directory (default: './docs')
+- **--workspace, -w**: Path to workspace directory (default: current directory)
+- **--docs, -d**: Path to docs directory (default: './docs' or '{workspace}/docs')
 - **--verbose, -v**: Run with verbose logging (default: false)
 - **--language, -l**: Language for templates ('en', 'ja' or 'zh', default: 'en')
 - **--file, -f**: Read content from file (for write commands)
@@ -79,6 +80,15 @@ To help users transition from Markdown to JSON:
 - The `migrate` command converts existing Markdown files to JSON
 - Automatic backup of original files before conversion
 - Schema validation ensures proper format
+
+### Multiple Workspace Support
+
+Memory Bank 2.1.0 introduces the ability to work with multiple project workspaces:
+
+- New `--workspace` / `-w` command-line option for specifying project workspace directory
+- MCP tools now accept `workspace` and `docs` parameters to work with different projects
+- Priority-based path resolution (tool parameter > CLI option > environment variable > default)
+- Enhanced flexibility for managing multiple projects with a single server instance
 
 ## What's New in 2.0
 
@@ -197,24 +207,33 @@ docs/branch-memory-bank/feature-login/
   - Input:
     - `path` (string): Document path
     - `content` (string): Document content
-    - `branch` (string): Branch name
+    - `branch` (string, required): Branch name
+    - `workspace` (string, optional): Path to workspace directory
+    - `docs` (string, optional): Path to docs directory
   - Creates directories as needed
   - Initializes with templates if content is empty
+  - Can work with different workspace/docs locations than the server default
 
 - **read_branch_memory_bank**
   - Read a document from the current branch's memory bank
   - Input:
     - `path` (string): Document path
-    - `branch` (string): Branch name
+    - `branch` (string, required): Branch name
+    - `workspace` (string, optional): Path to workspace directory
+    - `docs` (string, optional): Path to docs directory
   - Returns document content and metadata
+  - Can work with different workspace/docs locations than the server default
 
 - **write_global_memory_bank**
   - Write a document to the global memory bank
   - Input:
     - `path` (string): Document path
     - `content` (string): Document content
+    - `workspace` (string, optional): Path to workspace directory
+    - `docs` (string, optional): Path to docs directory
   - Creates directories as needed
   - Updates tags index automatically
+  - Can work with different workspace/docs locations than the server default
 
 - **read_global_memory_bank**
   - Read a document from the global memory bank
@@ -299,8 +318,39 @@ Add one of these configurations to your claude_desktop_config.json:
 
 Configuration options:
 
+- `WORKSPACE_ROOT`: Root directory for the project workspace (default: current directory)
 - `MEMORY_BANK_ROOT`: Root directory for memory bank storage (default: `docs` in workspace)
 - `MEMORY_BANK_LANGUAGE`: Default language for templates ("en", "ja", or "zh", default: "en")
+
+#### Working with Multiple Projects
+
+You can specify the workspace directory when starting the server:
+
+```json
+{
+  "mcpServers": {
+    "memory-bank": {
+      "command": "npx",
+      "args": ["-y", "memory-bank-mcp-server", "--workspace", "/path/to/project"],
+      "env": {
+        "MEMORY_BANK_LANGUAGE": "ja"
+      }
+    }
+  }
+}
+```
+
+Alternatively, with the `read_context` and other MCP tools, you can work with different projects in the same session:
+
+```
+read_context(branch: "feature/my-branch", workspace: "/path/to/other/project")
+```
+
+Path resolution follows this priority order:
+1. Tool parameters (highest priority)
+2. Command-line options
+3. Environment variables
+4. Default values (current directory and ./docs)
 
 ### System Prompt
 
