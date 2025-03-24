@@ -67,20 +67,14 @@ export class ContextController implements IContextController {
       
       // 全ての情報を一度に読み込む（includeオプション無視して常に全て読み込む）
       try {
-        // 警告ログを追加（includeオプションが指定されていた場合）
-        if (request.includeRules === false || request.includeBranchMemory === false || request.includeGlobalMemory === false) {
-          logger.warn('Include options are deprecated. All context components are always included.');
-        }
+        // 過去のリクエストとの互換性のために記録しておく（オプション自体は実質廃止済み）
+        logger.debug('All context components are always included regardless of include options.');
           
         // 全てのコンテキスト情報を一度に取得
         logger.debug(`Requesting all context information in one call`);
         const allData = await this.readContextUseCase.execute({
           branch: request.branch,
-          language: request.language,
-          // includeオプションは残すが、内部的には無視される
-          includeRules: true,
-          includeBranchMemory: true,
-          includeGlobalMemory: true
+          language: request.language
         });
         
         // ブランチメモリとグローバルメモリを設定

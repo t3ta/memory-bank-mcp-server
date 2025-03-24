@@ -414,10 +414,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 
       logger.info(`Reading context (branch: ${branch || 'none'}, language: ${language})`);
       
-      // Warn if include options were specified as false (they'll be ignored)
-      if (params.includeRules === false || params.includeBranchMemory === false || params.includeGlobalMemory === false) {
-        logger.warn('Include options are deprecated and ignored. All context components are always included.');
-      }
+      // オプションが指定されていても無視される（オプション自体が廃止されたため）
+      logger.debug('All context components are always included regardless of include options.');
 
       // Branch name is required
       if (!branch) {
@@ -433,10 +431,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         logger.debug('Requesting context from ContextController');
         const response = await app.getContextController().readContext({
           branch,
-          language,
-          includeRules,
-          includeBranchMemory,
-          includeGlobalMemory
+          language
         });
 
         if (!response.success) {
