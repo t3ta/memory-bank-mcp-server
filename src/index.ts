@@ -308,7 +308,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 
       try {
         // Load template structure
-        const templatePath = path.join(dirname, 'templates', 'json', 'rules.json');
+        const templatePath = path.join(dirname, 'templates', 'json', 'rules-template.json');
         const templateContent = await fs.readFile(templatePath, 'utf-8');
         const template = JSON.parse(templateContent);
 
@@ -409,11 +409,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
       const language = (params.language as string) || 'ja';
       // Include options are always true now, but kept for backwards compatibility
       const includeRules = true;
-      const includeBranchMemory = true; 
+      const includeBranchMemory = true;
       const includeGlobalMemory = true;
 
       logger.info(`Reading context (branch: ${branch || 'none'}, language: ${language})`);
-      
+
       // オプションが指定されていても無視される（オプション自体が廃止されたため）
       logger.debug('All context components are always included regardless of include options.');
 
@@ -447,7 +447,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
           branchMemory: response.data.branchMemory,
           globalMemory: response.data.globalMemory
         };
-        
+
         return {
           content: [
             {

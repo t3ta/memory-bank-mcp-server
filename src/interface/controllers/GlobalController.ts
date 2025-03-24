@@ -31,6 +31,7 @@ export class GlobalController implements IGlobalController {
   private readonly deleteJsonDocumentUseCase?: DeleteJsonDocumentUseCase;
   private readonly searchJsonDocumentsUseCase?: SearchJsonDocumentsUseCase;
   private readonly updateJsonIndexUseCase?: UpdateJsonIndexUseCase;
+  private readonly templateController?: any; // Template controller for accessing templates
 
   constructor(
     private readonly readGlobalDocumentUseCase: ReadGlobalDocumentUseCase,
@@ -45,6 +46,7 @@ export class GlobalController implements IGlobalController {
       deleteJsonDocumentUseCase?: DeleteJsonDocumentUseCase;
       searchJsonDocumentsUseCase?: SearchJsonDocumentsUseCase;
       updateJsonIndexUseCase?: UpdateJsonIndexUseCase;
+      templateController?: any; // Template controller for accessing templates
     }
   ) {
     // Set optional dependencies
@@ -54,6 +56,7 @@ export class GlobalController implements IGlobalController {
     this.deleteJsonDocumentUseCase = options?.deleteJsonDocumentUseCase;
     this.searchJsonDocumentsUseCase = options?.searchJsonDocumentsUseCase;
     this.updateJsonIndexUseCase = options?.updateJsonIndexUseCase;
+    this.templateController = options?.templateController;
   }
 
   /**
@@ -106,30 +109,47 @@ export class GlobalController implements IGlobalController {
     try {
       logger.info('Reading global core files');
 
-      // Define core files to read
+      // Define core files to read using templates
       const coreFiles = [
-        'architecture.md',
-        'coding-standards.md',
-        'domain-models.md',
-        'glossary.md',
-        'tech-stack.md',
-        'user-guide.md',
+        'architecture-template.json',
+        'coding-standards-template.json',
+        'domain-models-template.json',
+        'glossary-template.json',
+        'tech-stack-template.json',
+        'user-guide-template.json',
       ];
 
-      // Read each core file
+      // Check if template controller is available
+      if (!this.templateController) {
+        throw new ApplicationError('UNEXPECTED_ERROR', 'Template controller not available');
+      }
+
+      // Read each core file using templates
       const result: Record<string, DocumentDTO> = {};
 
-      for (const filePath of coreFiles) {
+      for (const templateId of coreFiles) {
         try {
-          const response = await this.readGlobalDocumentUseCase.execute({ path: filePath });
-          result[filePath] = response.document;
+          // Get the template in Markdown format
+          const templateContent = await this.templateController.getTemplateAsMarkdown(templateId, 'en');
+
+          // Convert template ID to document path (e.g., architecture-template.json -> architecture.json)
+          const documentPath = templateId.replace('-template', '');
+
+          // Create document from template
+          result[documentPath] = {
+            path: documentPath,
+            content: templateContent,
+            tags: ['global', 'core', documentPath.replace('.json', '')],
+            lastModified: new Date().toISOString(),
+          };
         } catch (error) {
           // Log error but continue with other files
-          logger.error(`Error reading global core file ${filePath}:`, error);
+          logger.error(`Error reading global core file template ${templateId}:`, error);
 
           // Add empty placeholder for missing file
-          result[filePath] = {
-            path: filePath,
+          const documentPath = templateId.replace('-template', '');
+          result[documentPath] = {
+            path: documentPath,
             content: '',
             tags: [],
             lastModified: new Date().toISOString(),

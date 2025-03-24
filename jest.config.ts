@@ -11,9 +11,9 @@ export default {
     // Still need fixes for these tests
     // 'unit/infrastructure/repositories/file-system/FileSystemTagIndexRepositoryImpl.test.ts', // 一時的にコメントアウト
     // 'unit/infrastructure/storage/FileSystemService.test.ts', // 一時的にコメントを外す
-    // 'unit/infrastructure/templates/FileTemplateRepository.test.ts',
-    'unit/interface/controllers/BranchController.test.ts',
-    // 'unit/migration/MarkdownMigrationService.test.ts',
+    // 'unit/infrastructure/templates/FileTemplateRepository.test.ts', // 修正済み
+    // 'unit/interface/controllers/BranchController.test.ts', // 修正済み
+    // 'unit/migration/MarkdownMigrationService.test.ts', // 修正済み
     '.*ts-mockito-backup.*', // バックアップディレクトリを除外
   ],
   transform: {

@@ -57,10 +57,10 @@ export class ReadRulesUseCase {
         // フォールバック
         path.join(this.rulesDir, `rules-${language}.json`)
       ];
-      
+
       let jsonContent = '';
       let jsonFilePath = '';
-      
+
       // 存在するパスを探す
       for (const p of possiblePaths) {
         try {
@@ -73,18 +73,18 @@ export class ReadRulesUseCase {
           continue;
         }
       }
-      
+
       if (!jsonContent) {
         throw new Error(`Rules file not found for language: ${language}`);
       }
-      
+
       const jsonData = JSON.parse(jsonContent);
-      
+
       // JSONからマークダウンに変換する場合
       let content = '';
       if (this.jsonToMarkdownConverter) {
         // コンバーターが提供されていれば使用 - JsonDocumentを作成してから変換
-        const docPath = DocumentPath.create('rules.json');
+        const docPath = DocumentPath.create('rules-template.json');
         const jsonDoc = JsonDocument.fromObject(jsonData, docPath);
         content = this.jsonToMarkdownConverter.convert(jsonDoc);
       } else {

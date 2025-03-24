@@ -481,6 +481,7 @@ export async function registerInterfaceServices(container: DIContainer): Promise
     const deleteJsonDocumentUseCase = await container.get<DeleteJsonDocumentUseCase>('deleteJsonDocumentUseCase');
     const searchJsonDocumentsUseCase = await container.get<SearchJsonDocumentsUseCase>('searchJsonDocumentsUseCase');
     const updateJsonIndexUseCase = await container.get<UpdateJsonIndexUseCase>('updateJsonIndexUseCase');
+    const templateController = await container.get<any>('templateController');
 
     return new GlobalController(
       readGlobalDocumentUseCase,
@@ -495,6 +496,7 @@ export async function registerInterfaceServices(container: DIContainer): Promise
         deleteJsonDocumentUseCase,
         searchJsonDocumentsUseCase,
         updateJsonIndexUseCase,
+        templateController, // Add template controller
       } // Pass optional dependencies
     );
   });

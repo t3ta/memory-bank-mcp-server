@@ -340,10 +340,10 @@ describe('BranchController', () => {
         },
       });
 
-      // Mock BranchDocument use case response for branchContext.md
+      // Mock BranchDocument use case response for branchContext.json
       mockReadBranchDocumentUseCase.execute.mockResolvedValue({
         document: {
-          path: 'branchContext.md',
+          path: 'branchContext.json',
           content: '# Branch Context\n\nBranch context content',
           tags: ['core', 'branch-context'],
           lastModified: '2023-01-01T00:00:00.000Z',
@@ -369,33 +369,33 @@ describe('BranchController', () => {
 
       expect(mockReadBranchDocumentUseCase.execute).toHaveBeenCalledWith({
         branchName,
-        path: 'branchContext.md',
+        path: 'branchContext.json',
       });
 
       // Verify presenter called with formatted data
       expect(mockPresenter.present).toHaveBeenCalledWith(
         expect.objectContaining({
-          'activeContext.md': expect.objectContaining({
-            path: 'activeContext.md',
+          'activeContext.json': expect.objectContaining({
+            path: 'activeContext.json',
             content: expect.stringContaining('# アクティブコンテキスト'),
           }),
-          'progress.md': expect.objectContaining({
-            path: 'progress.md',
+          'progress.json': expect.objectContaining({
+            path: 'progress.json',
             content: expect.stringContaining('# 進捗状況'),
           }),
-          'systemPatterns.md': expect.objectContaining({
-            path: 'systemPatterns.md',
+          'systemPatterns.json': expect.objectContaining({
+            path: 'systemPatterns.json',
             content: expect.stringContaining('# システムパターン'),
           }),
-          'branchContext.md': expect.objectContaining({
-            path: 'branchContext.md',
+          'branchContext.json': expect.objectContaining({
+            path: 'branchContext.json',
             content: '# Branch Context\n\nBranch context content',
           }),
         })
       );
     });
 
-    it('should handle errors when reading branchContext.md', async () => {
+    it('should handle errors when reading branchContext.json', async () => {
       // Arrange
       const branchName = 'feature/test';
 
@@ -421,7 +421,7 @@ describe('BranchController', () => {
         },
       });
 
-      // Mock error for branchContext.md
+      // Mock error for branchContext.json
       mockReadBranchDocumentUseCase.execute.mockRejectedValue(
         new DomainError('DOCUMENT_NOT_FOUND', 'Document not found')
       );
@@ -441,8 +441,8 @@ describe('BranchController', () => {
       // Verify presenter called with formatted data including empty branchContext
       expect(mockPresenter.present).toHaveBeenCalledWith(
         expect.objectContaining({
-          'branchContext.md': expect.objectContaining({
-            path: 'branchContext.md',
+          'branchContext.json': expect.objectContaining({
+            path: 'branchContext.json',
             content: '',
             tags: ['core', 'branch-context'],
           }),

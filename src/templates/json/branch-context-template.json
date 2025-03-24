@@ -2,92 +2,56 @@
   "schema": "template_v1",
   "metadata": {
     "id": "branch-context-template",
-    "name": {
-      "ja": "ブランチコンテキストテンプレート",
-      "en": "Branch Context Template"
-    },
-    "description": {
-      "ja": "ブランチの目的や背景情報を記録するためのテンプレート",
-      "en": "Template for documenting the purpose and background of a branch"
-    },
+    "titleKey": "template.title.branch_context",
+    "descriptionKey": "template.description.branch_context",
     "type": "branch-memory",
-    "lastModified": "2025-03-17T10:00:00.000Z"
+    "lastModified": "2025-03-24T16:01:00.000Z"
   },
   "content": {
-    "sections": {
-      "purpose": {
-        "title": {
-          "ja": "このブランチの目的",
-          "en": "Purpose of this Branch"
-        },
-        "content": {
-          "ja": "<!-- ブランチの目的を簡潔に記述してください -->",
-          "en": "<!-- Describe the purpose of this branch concisely -->"
-        },
-        "optional": false
+    "sections": [
+      {
+        "id": "purpose",
+        "titleKey": "template.section.purpose",
+        "contentKey": "template.content.purpose",
+        "isOptional": false
       },
-      "background": {
-        "title": {
-          "ja": "背景",
-          "en": "Background"
-        },
-        "content": {
-          "ja": "<!-- このブランチが作成された背景や理由を説明してください -->",
-          "en": "<!-- Explain the background or reasons why this branch was created -->"
-        },
-        "optional": true
+      {
+        "id": "background",
+        "titleKey": "template.section.background",
+        "contentKey": "template.content.background",
+        "isOptional": true
       },
-      "userStories": {
-        "title": {
-          "ja": "ユーザーストーリー",
-          "en": "User Stories"
-        },
-        "content": {
-          "ja": "### 解決したい課題\n\n<!-- 解決したい問題を記述 -->\n{{PROBLEM}}\n\n### 必要な機能\n\n<!-- 必要な機能を記述 -->\n{{FEATURES}}\n\n### 期待される動作\n\n<!-- 期待される動作を記述 -->\n{{BEHAVIOR}}",
-          "en": "### Problem to Solve\n\n<!-- Describe the problem to solve -->\n{{PROBLEM}}\n\n### Required Features\n\n<!-- Describe required features -->\n{{FEATURES}}\n\n### Expected Behavior\n\n<!-- Describe expected behavior -->\n{{BEHAVIOR}}"
-        },
-        "optional": false
+      {
+        "id": "userStories",
+        "titleKey": "template.section.user_stories",
+        "contentKey": "template.content.user_stories",
+        "isOptional": false
       },
-      "relatedIssues": {
-        "title": {
-          "ja": "関連する課題",
-          "en": "Related Issues"
-        },
-        "content": {
-          "ja": "<!-- 関連するGitHub Issue、JIRA チケットなどを記述 -->\n{{ISSUES}}",
-          "en": "<!-- List related GitHub Issues, JIRA tickets, etc. -->\n{{ISSUES}}"
-        },
-        "optional": true
+      {
+        "id": "relatedIssues",
+        "titleKey": "template.section.related_issues",
+        "contentKey": "template.content.related_issues",
+        "isOptional": true
       },
-      "technicalConsiderations": {
-        "title": {
-          "ja": "技術的検討事項",
-          "en": "Technical Considerations"
-        },
-        "content": {
-          "ja": "<!-- 実装にあたっての技術的検討事項を記述 -->\n{{TECH_CONSIDERATIONS}}",
-          "en": "<!-- Describe technical considerations for implementation -->\n{{TECH_CONSIDERATIONS}}"
-        },
-        "optional": true
+      {
+        "id": "technicalConsiderations",
+        "titleKey": "template.section.technical_considerations",
+        "contentKey": "template.content.technical_considerations",
+        "isOptional": true
       },
-      "footer": {
-        "title": {
-          "ja": "",
-          "en": ""
-        },
-        "content": {
-          "ja": "---\n\n_このドキュメントはブランチメモリーバンクの一部です_",
-          "en": "---\n\n_This document is part of the branch memory bank_"
-        },
-        "optional": false
+      {
+        "id": "footer",
+        "titleKey": "template.section.footer",
+        "contentKey": "template.content.footer",
+        "isOptional": false
       }
-    },
+    ],
     "placeholders": {
-      "PROBLEM": "解決したい課題のプレースホルダー",
-      "FEATURES": "必要な機能のプレースホルダー",
-      "BEHAVIOR": "期待される動作のプレースホルダー",
-      "ISSUES": "関連する課題のプレースホルダー",
-      "TECH_CONSIDERATIONS": "技術的検討事項のプレースホルダー"
+      "PROBLEM": "template.placeholder.problem",
+      "FEATURES": "template.placeholder.features",
+      "BEHAVIOR": "template.placeholder.behavior",
+      "ISSUES": "template.placeholder.issues",
+      "TECH_CONSIDERATIONS": "template.placeholder.tech_considerations"
     }
   }
 }

@@ -2,92 +2,56 @@
   "schema": "template_v1",
   "metadata": {
     "id": "progress-template",
-    "name": {
-      "ja": "進捗状況テンプレート",
-      "en": "Progress Template"
-    },
-    "description": {
-      "ja": "機能の実装状況や残作業を記録するためのテンプレート",
-      "en": "Template for documenting feature implementation status and remaining work"
-    },
+    "titleKey": "template.title.progress",
+    "descriptionKey": "template.description.progress",
     "type": "branch-memory",
-    "lastModified": "2025-03-17T10:00:00.000Z"
+    "lastModified": "2025-03-24T16:01:00.000Z"
   },
   "content": {
-    "sections": {
-      "workingFeatures": {
-        "title": {
-          "ja": "現時点で動作している部分",
-          "en": "Currently Working Features"
-        },
-        "content": {
-          "ja": "<!-- 実装済みで正常に動作している機能を記述 -->\n{{WORKING_FEATURES}}",
-          "en": "<!-- Describe implemented features that are working correctly -->\n{{WORKING_FEATURES}}"
-        },
-        "optional": false
+    "sections": [
+      {
+        "id": "workingFeatures",
+        "titleKey": "template.section.working_features",
+        "contentKey": "template.content.working_features",
+        "isOptional": false
       },
-      "unimplementedFeatures": {
-        "title": {
-          "ja": "未実装の機能や残作業",
-          "en": "Unimplemented Features and Remaining Work"
-        },
-        "content": {
-          "ja": "<!-- まだ実装していない機能や残りのタスクを記述 -->\n{{UNIMPLEMENTED_FEATURES}}",
-          "en": "<!-- Describe features not yet implemented or remaining tasks -->\n{{UNIMPLEMENTED_FEATURES}}"
-        },
-        "optional": false
+      {
+        "id": "unimplementedFeatures",
+        "titleKey": "template.section.unimplemented_features",
+        "contentKey": "template.content.unimplemented_features",
+        "isOptional": false
       },
-      "currentStatus": {
-        "title": {
-          "ja": "現在の状態",
-          "en": "Current Status"
-        },
-        "content": {
-          "ja": "<!-- 開発の現状や全体的な進捗度を記述 -->\n{{CURRENT_STATUS}}",
-          "en": "<!-- Describe the current state of development and overall progress -->\n{{CURRENT_STATUS}}"
-        },
-        "optional": false
+      {
+        "id": "currentStatus",
+        "titleKey": "template.section.current_status",
+        "contentKey": "template.content.current_status",
+        "isOptional": false
       },
-      "knownIssues": {
-        "title": {
-          "ja": "既知の問題",
-          "en": "Known Issues"
-        },
-        "content": {
-          "ja": "<!-- 既知のバグや問題点を記述 -->\n{{KNOWN_ISSUES}}",
-          "en": "<!-- Describe known bugs or problems -->\n{{KNOWN_ISSUES}}"
-        },
-        "optional": true
+      {
+        "id": "knownIssues",
+        "titleKey": "template.section.known_issues",
+        "contentKey": "template.content.known_issues",
+        "isOptional": true
       },
-      "completionCriteria": {
-        "title": {
-          "ja": "完了基準",
-          "en": "Completion Criteria"
-        },
-        "content": {
-          "ja": "<!-- このブランチが完了したと見なすための基準を記述 -->\n{{COMPLETION_CRITERIA}}",
-          "en": "<!-- Describe the criteria for considering this branch complete -->\n{{COMPLETION_CRITERIA}}"
-        },
-        "optional": true
+      {
+        "id": "completionCriteria",
+        "titleKey": "template.section.completion_criteria",
+        "contentKey": "template.content.completion_criteria",
+        "isOptional": true
       },
-      "footer": {
-        "title": {
-          "ja": "",
-          "en": ""
-        },
-        "content": {
-          "ja": "---\n\n_このドキュメントはブランチメモリーバンクの一部です_",
-          "en": "---\n\n_This document is part of the branch memory bank_"
-        },
-        "optional": false
+      {
+        "id": "footer",
+        "titleKey": "template.section.footer",
+        "contentKey": "template.content.footer",
+        "isOptional": false
       }
-    },
+    ],
     "placeholders": {
-      "WORKING_FEATURES": "動作している機能のプレースホルダー",
-      "UNIMPLEMENTED_FEATURES": "未実装の機能のプレースホルダー",
-      "CURRENT_STATUS": "現在の状態のプレースホルダー",
-      "KNOWN_ISSUES": "既知の問題のプレースホルダー",
-      "COMPLETION_CRITERIA": "完了基準のプレースホルダー"
+      "WORKING_FEATURES": "template.placeholder.working_features",
+      "UNIMPLEMENTED_FEATURES": "template.placeholder.unimplemented_features",
+      "CURRENT_STATUS": "template.placeholder.current_status",
+      "KNOWN_ISSUES": "template.placeholder.known_issues",
+      "COMPLETION_CRITERIA": "template.placeholder.completion_criteria"
     }
   }
 }
