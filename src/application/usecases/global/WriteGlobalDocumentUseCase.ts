@@ -4,6 +4,7 @@ import { Tag } from "../../../domain/entities/Tag.js";
 import type { IGlobalMemoryBankRepository } from "../../../domain/repositories/IGlobalMemoryBankRepository.js";
 import { ApplicationError, ApplicationErrorCodes } from "../../../shared/errors/ApplicationError.js";
 import { DomainError } from "../../../shared/errors/DomainError.js";
+import { logger } from "../../../shared/utils/logger.js";
 import type { DocumentDTO } from "../../dtos/DocumentDTO.js";
 import type { WriteDocumentDTO } from "../../dtos/WriteDocumentDTO.js";
 import type { IUseCase } from "../../interfaces/IUseCase.js";
@@ -90,20 +91,20 @@ export class WriteGlobalDocumentUseCase
         try {
           const parsed = JSON.parse(input.document.content);
           if (parsed.metadata?.tags) {
-            console.log('[DEBUG] Found tags in metadata:', parsed.metadata.tags);
+            logger.debug('Found tags in metadata:', { tags: parsed.metadata.tags });
             tags = parsed.metadata.tags.map((tag: string) => {
-              console.log(`[DEBUG] Creating tag: "${tag}"`);
+              logger.debug('Creating tag:', { tag });
               return Tag.create(tag);
             });
           }
         } catch (error) {
-          console.error('[DEBUG] Failed to parse document content as JSON:', error);
+          logger.error('Failed to parse document content as JSON:', { error, path: documentPath.value });
         }
       }
 
       // Fallback to provided tags if no tags were found in metadata
       if (tags.length === 0) {
-        console.log('[DEBUG] Using provided tags:', input.document.tags);
+        logger.debug('Using provided tags:', { tags: input.document.tags });
         tags = (input.document.tags ?? []).map((tag) => Tag.create(tag));
       }
 

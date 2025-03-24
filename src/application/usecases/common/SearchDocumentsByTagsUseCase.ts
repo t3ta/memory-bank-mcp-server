@@ -4,6 +4,7 @@ import type { IBranchMemoryBankRepository } from "../../../domain/repositories/I
 import type { IGlobalMemoryBankRepository } from "../../../domain/repositories/IGlobalMemoryBankRepository.js";
 import { ApplicationError, ApplicationErrorCodes } from "../../../shared/errors/ApplicationError.js";
 import { DomainError, DomainErrorCodes } from "../../../shared/errors/DomainError.js";
+import { logger } from "../../../shared/utils/logger.js";
 import type { DocumentDTO } from "../../dtos/DocumentDTO.js";
 import type { IUseCase } from "../../interfaces/IUseCase.js";
 
@@ -94,19 +95,19 @@ export class SearchDocumentsByTagsUseCase
       }
 
       // Convert tag strings to Tag domain objects
-      console.log('[DEBUG] Converting search tags:', input.tags);
+      logger.debug('Converting search tags:', { tags: input.tags });
       const tags = input.tags.map((tag) => {
         try {
-          console.log(`[DEBUG] Creating tag: "${tag}"`);
+          logger.debug('Creating tag:', { tag });
           const tagObj = Tag.create(tag);
-          console.log(`[DEBUG] Created tag object: ${tagObj.value}`);
+          logger.debug('Created tag object:', { tag: tagObj.value });
           return tagObj;
         } catch (error) {
-          console.error(`[DEBUG] Failed to create tag "${tag}":`, error);
+          logger.error('Failed to create tag:', { tag, error });
           throw error;
         }
       });
-      console.log('[DEBUG] All tags converted:', tags.map(t => t.value));
+      logger.debug('All tags converted:', { tags: tags.map(t => t.value) });
 
       // Set default values
       const matchAllTags = input.matchAllTags ?? false;
@@ -130,12 +131,12 @@ export class SearchDocumentsByTagsUseCase
         const branchInfo = BranchInfo.create(input.branchName);
         documents = await this.branchRepository.findDocumentsByTags(branchInfo, tags);
       } else {
-        console.log('[DEBUG] Searching in global memory bank with tags:', tags.map(t => t.value));
+        logger.debug('Searching in global memory bank:', { tags: tags.map(t => t.value) });
         documents = await this.globalRepository.findDocumentsByTags(tags);
-        console.log('[DEBUG] Found documents:', documents.map(d => d.path.value));
+        logger.debug('Found documents:', { documents: documents.map(d => d.path.value) });
       }
 
-      console.log('[DEBUG] Before filtering:', {
+      logger.debug('Before filtering:', {
         totalDocuments: documents.length,
         matchAllTags,
         searchTags: tags.map(t => t.value)
@@ -147,7 +148,7 @@ export class SearchDocumentsByTagsUseCase
           // Check if document contains all the search tags
           const hasAllTags = tags.every((searchTag) => {
             const hasTag = doc.tags.some((docTag) => docTag.equals(searchTag));
-            console.log('[DEBUG] Document tag check:', {
+            logger.debug('Document tag check:', {
               document: doc.path.value,
               searchTag: searchTag.value,
               documentTags: doc.tags.map(t => t.value),
@@ -155,12 +156,12 @@ export class SearchDocumentsByTagsUseCase
             });
             return hasTag;
           });
-          console.log(`[DEBUG] Document ${doc.path.value} matches all tags: ${hasAllTags}`);
+          logger.debug('Document tag match result:', { document: doc.path.value, hasAllTags });
           return hasAllTags;
         });
       }
 
-      console.log('[DEBUG] After filtering:', {
+      logger.debug('After filtering:', {
         matchingDocuments: documents.length,
         documents: documents.map(d => ({
           path: d.path.value,

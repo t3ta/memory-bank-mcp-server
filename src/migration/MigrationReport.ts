@@ -4,6 +4,8 @@
  * Records and displays migration progress and results.
  */
 
+import { logger } from "../shared/utils/logger.js";
+
 /**
  * Migration entry status
  */
@@ -174,22 +176,22 @@ export class MigrationReport {
   printSummary(): void {
     const summary = this.getSummary();
     
-    console.log('\n=============== Migration Summary ===============');
-    console.log(`Total templates attempted: ${summary.totalAttempted}`);
-    console.log(`Successful migrations: ${summary.successful}`);
-    console.log(`Skipped migrations: ${summary.skipped}`);
-    console.log(`Failed migrations: ${summary.failed}`);
+    logger.info('=============== Migration Summary ===============');
+    logger.info('Total templates attempted:', { count: summary.totalAttempted });
+    logger.info('Successful migrations:', { count: summary.successful });
+    logger.info('Skipped migrations:', { count: summary.skipped });
+    logger.info('Failed migrations:', { count: summary.failed });
     
     if (summary.failed > 0) {
-      console.log('\nFailed templates:');
+      logger.info('Failed templates:');
       const failedEntries = this.getEntriesByStatus(MigrationStatus.FAILED);
       failedEntries.forEach(entry => {
-        console.log(`  - ${entry.id}: ${entry.error}`);
+        logger.info(`- ${entry.id}:`, { error: entry.error });
       });
     }
     
-    console.log(`\nDuration: ${summary.duration / 1000} seconds`);
-    console.log('===============================================\n');
+    logger.info('Duration:', { seconds: summary.duration / 1000 });
+    logger.info('===============================================');
   }
 
   /**

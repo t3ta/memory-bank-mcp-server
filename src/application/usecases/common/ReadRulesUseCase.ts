@@ -4,6 +4,7 @@ import { JsonToMarkdownConverter } from "../../../shared/utils/json-to-markdown/
 import { DomainError, DomainErrorCodes } from "../../../shared/errors/DomainError.js";
 import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
 import { JsonDocument } from "../../../domain/entities/JsonDocument.js";
+import { logger } from "../../../shared/utils/logger.js";
 
 
 
@@ -65,7 +66,7 @@ export class ReadRulesUseCase {
         try {
           jsonContent = await fs.readFile(p, 'utf-8');
           jsonFilePath = p;
-          console.log(`Rules JSON file found at: ${jsonFilePath}`);
+          logger.debug('Rules JSON file found', { path: jsonFilePath });
           break;
         } catch (err) {
           // このパスでは見つからなかった、次を試す

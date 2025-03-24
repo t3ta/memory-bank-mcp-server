@@ -7,6 +7,7 @@ import type { Tag } from "../../domain/entities/Tag.js";
 import type { IBranchMemoryBankRepository, RecentBranch } from "../../domain/repositories/IBranchMemoryBankRepository.js";
 import type { TagIndex } from "../../schemas/tag-index/tag-index-schema.js";
 import { DomainError, DomainErrorCodes } from "../../shared/errors/DomainError.js";
+import { logger } from "../../shared/utils/logger.js";
 
 
 /**
@@ -65,19 +66,19 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
   async getDocument(branchInfo: BranchInfo, documentPath: DocumentPath): Promise<MemoryDocument | null> {
     const filePath = path.join(this.branchMemoryBankPath, branchInfo.name, documentPath.value);
 
-    console.log(`Trying to read file: ${filePath}`);
+    logger.debug('Trying to read file:', { filePath });
 
     // .md ファイルを要求されている場合の特別処理 (.json が優先)
     if (documentPath.value.endsWith('.md')) {
       const jsonPath = documentPath.value.replace('.md', '.json');
       const jsonFilePath = path.join(this.branchMemoryBankPath, branchInfo.name, jsonPath);
 
-      console.log(`Also trying JSON variant: ${jsonFilePath}`);
+      logger.debug('Also trying JSON variant:', { jsonFilePath });
 
       try {
         // まず.jsonファイルを試す
         const content = await fs.readFile(jsonFilePath, 'utf-8');
-        console.log(`Successfully read JSON file: ${jsonFilePath}`);
+        logger.debug('Successfully read JSON file:', { path: jsonFilePath });
         return MemoryDocument.create({
           path: documentPath, // md のパスを維持
           content,
@@ -86,10 +87,10 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
         });
       } catch {
         // .jsonがなければ.mdを試す
-        console.log(`JSON file not found, trying MD: ${filePath}`);
+        logger.debug('JSON file not found, trying MD:', { path: filePath });
         try {
           const content = await fs.readFile(filePath, 'utf-8');
-          console.log(`Successfully read MD file: ${filePath}`);
+          logger.debug('Successfully read MD file:', { path: filePath });
           return MemoryDocument.create({
             path: documentPath,
             content,
@@ -97,7 +98,10 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
             lastModified: new Date()
           });
         } catch (err) {
-          console.log(`MD file not found either: ${filePath}, Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+          logger.debug('MD file not found either:', { 
+            path: filePath, 
+            error: err instanceof Error ? err.message : 'Unknown error' 
+          });
           return null;
         }
       }
@@ -127,20 +131,20 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
     const branchPath = path.join(this.branchMemoryBankPath, branchInfo.name);
     const filePath = path.join(branchPath, document.path.value);
 
-    console.log(`Saving document to: ${filePath}`);
+    logger.debug('Saving document to:', { filePath });
 
     try {
       await fs.mkdir(branchPath, { recursive: true });
       await fs.writeFile(filePath, document.content, 'utf-8');
-      console.log(`Successfully wrote to: ${filePath}`);
+      logger.debug('Successfully wrote to:', { path: filePath });
 
       // テスト対応: .jsonファイルを作成したら、同じ内容で.mdファイルも作成
       if (document.path.value.endsWith('.json')) {
         const mdPath = document.path.value.replace('.json', '.md');
         const mdFilePath = path.join(branchPath, mdPath);
-        console.log(`Also creating MD version at: ${mdFilePath}`);
+        logger.debug('Also creating MD version at:', { path: mdFilePath });
         await fs.writeFile(mdFilePath, document.content, 'utf-8');
-        console.log(`Successfully wrote MD version to: ${mdFilePath}`);
+        logger.debug('Successfully wrote MD version to:', { path: mdFilePath });
       }
 
       // branchContextの場合の特別対応 (CreateUseCaseにはないので手動対応)
@@ -152,14 +156,18 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
         if (!await this.fileExists(path.join(branchPath, 'branchContext.md'))) {
           const branchContext = `# テストブランチコンテキスト\n\n## 目的\n\nテスト用ブランチです。`;
           const branchContextPath = path.join(branchPath, 'branchContext.md');
-          console.log(`Creating default branchContext.md at: ${branchContextPath}`);
+          logger.debug('Creating default branchContext.md at:', { path: branchContextPath });
           await fs.writeFile(branchContextPath, branchContext, 'utf-8');
-          console.log(`Successfully wrote default branchContext.md to: ${branchContextPath}`);
+          logger.debug('Successfully wrote default branchContext.md to:', { path: branchContextPath });
         }
       }
 
     } catch (error) {
-      console.error(`Error saving document: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      logger.error('Error saving document:', { 
+        error: error instanceof Error ? error.message : 'Unknown error',
+        branch: branchInfo.name,
+        path: document.path.value
+      });
       throw new DomainError(
         DomainErrorCodes.REPOSITORY_ERROR,
         `Failed to save document: ${error instanceof Error ? error.message : 'Unknown error'}`

@@ -12,6 +12,7 @@ import { Template } from '../domain/templates/Template.js';
 import { Section } from '../domain/templates/Section.js';
 import { Language, LanguageCode } from '../domain/i18n/Language.js';
 import { MigrationReport, MigrationStatus } from './MigrationReport.js';
+import { logger } from '../shared/utils/logger.js';
 
 /**
  * Options for migration
@@ -79,7 +80,7 @@ export class MarkdownMigrationService {
 
       // Get all Markdown files
       const files = await this.getMarkdownFiles();
-      console.log(`Found ${files.length} Markdown files`);
+      logger.info('Found Markdown files', { count: files.length });
 
       // Migrate each file
       const migratedIds: string[] = [];
@@ -97,7 +98,7 @@ export class MarkdownMigrationService {
             file, 
             error instanceof Error ? error : String(error)
           );
-          console.error(`Failed to migrate template: ${file}`, error);
+          logger.error('Failed to migrate template', { file, error: error instanceof Error ? error.message : String(error) });
         }
       }
 
@@ -107,7 +108,7 @@ export class MarkdownMigrationService {
 
       return this.report;
     } catch (error) {
-      console.error('Failed to migrate templates', error);
+      logger.error('Failed to migrate templates', { error: error instanceof Error ? error.message : String(error) });
       this.report.complete();
       throw new Error(`Migration failed: ${error instanceof Error ? error.message : String(error)}`);
     }
@@ -200,7 +201,7 @@ export class MarkdownMigrationService {
       // Skip if template already exists (unless force is true)
       const exists = await this.templateRepository.templateExists(templateId);
       if (exists && !options.force) {
-        console.log(`Template ${templateId} already exists, skipping`);
+        logger.debug('Template already exists, skipping', { templateId });
         this.report.addSkipped(templateId, filePath, 'Template already exists');
         return null;
       }
@@ -228,7 +229,7 @@ export class MarkdownMigrationService {
         throw error;
       }
       
-      console.log(`Migrated template: ${templateId}`);
+      logger.info('Migrated template', { templateId });
       
       // Get JSON destination path (for report)
       const destinationPath = path.join(

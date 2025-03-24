@@ -3,6 +3,7 @@ import { CreateBranchCoreFilesUseCase } from '../../application/usecases/common/
 import { CoreFilesDTO } from '../../application/dtos/CoreFilesDTO.js';
 import { DomainError } from '../../shared/errors/DomainError.js';
 import { ApplicationError } from '../../shared/errors/ApplicationError.js';
+import { logger } from '../../shared/utils/logger.js';
 
 /**
  * Response interface for core files operations
@@ -44,19 +45,19 @@ export class CoreFilesController {
    * @returns Promise resolving to core files response
    */
   async readCoreFiles(branchName: string): Promise<CoreFilesResponse<CoreFilesDTO>> {
-    console.log(`CoreFilesController: Reading core files for branch: ${branchName}`);
+    logger.debug('Reading core files for branch', { branchName });
     try {
       const result = await this.readCoreFilesUseCase.execute({
         branchName
       });
 
-      console.log(`CoreFilesController: Successfully read core files. Data:`, JSON.stringify(result.files, null, 2));
+      logger.debug('Successfully read core files', { files: result.files });
       return {
         success: true,
         data: result.files
       };
     } catch (error) {
-      console.error(`CoreFilesController: Error reading core files:`, error);
+      logger.error('Error reading core files', { error, branchName });
       if (error instanceof DomainError || error instanceof ApplicationError) {
         return {
           success: false,

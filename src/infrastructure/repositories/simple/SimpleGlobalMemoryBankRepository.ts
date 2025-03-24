@@ -7,6 +7,7 @@ import type { IGlobalMemoryBankRepository } from "../../../domain/repositories/I
 // No need to import MemoryDocument from schemas since we already have it
 import type { TagIndex } from "../../../schemas/tag-index/tag-index-schema.js";
 import { InfrastructureError, InfrastructureErrorCodes } from "../../../shared/errors/InfrastructureError.js";
+import { logger } from "../../../shared/utils/logger.js";
 
 
 /**
@@ -21,7 +22,7 @@ export class SimpleGlobalMemoryBankRepository implements IGlobalMemoryBankReposi
    */
   constructor(rootPath: string) {
     this.globalMemoryPath = path.join(rootPath, 'global-memory-bank');
-    console.log(`SimpleGlobalMemoryBankRepository initialized with path: ${this.globalMemoryPath}`);
+    logger.debug('SimpleGlobalMemoryBankRepository initialized', { path: this.globalMemoryPath });
   }
 
   /**
@@ -29,12 +30,12 @@ export class SimpleGlobalMemoryBankRepository implements IGlobalMemoryBankReposi
    * @returns Promise resolving when initialization is complete
    */
   async initialize(): Promise<void> {
-    console.log(`Initializing global memory bank: ${this.globalMemoryPath}`);
+    logger.debug('Initializing global memory bank', { path: this.globalMemoryPath });
     try {
       await fs.mkdir(this.globalMemoryPath, { recursive: true });
-      console.log(`Global memory bank initialized: ${this.globalMemoryPath}`);
+      logger.debug('Global memory bank initialized', { path: this.globalMemoryPath });
     } catch (error) {
-      console.error(`Failed to initialize global memory bank: ${this.globalMemoryPath}`, error);
+      logger.error('Failed to initialize global memory bank', { path: this.globalMemoryPath, error });
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
         `Failed to initialize global memory bank: ${(error as Error).message}`,
@@ -50,11 +51,11 @@ export class SimpleGlobalMemoryBankRepository implements IGlobalMemoryBankReposi
    */
   async getDocument(documentPath: DocumentPath): Promise<MemoryDocument | null> {
     const filePath = path.join(this.globalMemoryPath, documentPath.value);
-    console.log(`Getting global document: ${filePath}`);
+    logger.debug('Getting global document', { path: filePath });
 
     try {
       const content = await fs.readFile(filePath, 'utf-8');
-      console.log(`Global document found: ${filePath}`);
+      logger.debug('Global document found', { path: filePath });
       return MemoryDocument.create({
         path: documentPath,
         content,
@@ -62,7 +63,7 @@ export class SimpleGlobalMemoryBankRepository implements IGlobalMemoryBankReposi
         lastModified: new Date()
       });
     } catch (error) {
-      console.log(`Global document not found: ${filePath}`);
+      logger.debug('Global document not found', { path: filePath });
       return null;
     }
   }
@@ -75,14 +76,14 @@ export class SimpleGlobalMemoryBankRepository implements IGlobalMemoryBankReposi
   async saveDocument(document: MemoryDocument): Promise<void> {
     const filePath = path.join(this.globalMemoryPath, document.path.value);
     const dirPath = path.dirname(filePath);
-    console.log(`Saving global document: ${filePath}`);
+    logger.debug('Saving global document', { path: filePath });
 
     try {
       await fs.mkdir(dirPath, { recursive: true });
       await fs.writeFile(filePath, document.content, 'utf-8');
-      console.log(`Global document saved: ${filePath}`);
+      logger.debug('Global document saved', { path: filePath });
     } catch (error) {
-      console.error(`Failed to save global document: ${filePath}`, error);
+      logger.error('Failed to save global document', { path: filePath, error });
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_WRITE_ERROR,
         `Failed to save document to global memory bank: ${document.path.value}`,
@@ -98,14 +99,14 @@ export class SimpleGlobalMemoryBankRepository implements IGlobalMemoryBankReposi
    */
   async deleteDocument(documentPath: DocumentPath): Promise<boolean> {
     const filePath = path.join(this.globalMemoryPath, documentPath.value);
-    console.log(`Deleting global document: ${filePath}`);
+    logger.debug('Deleting global document', { path: filePath });
 
     try {
       await fs.unlink(filePath);
-      console.log(`Global document deleted: ${filePath}`);
+      logger.debug('Global document deleted', { path: filePath });
       return true;
     } catch (error) {
-      console.log(`Global document deletion failed: ${filePath}`);
+      logger.debug('Global document deletion failed', { path: filePath });
       return false;
     }
   }
@@ -115,16 +116,16 @@ export class SimpleGlobalMemoryBankRepository implements IGlobalMemoryBankReposi
    * @returns Promise resolving to array of document paths
    */
   async listDocuments(): Promise<DocumentPath[]> {
-    console.log(`Listing global documents in: ${this.globalMemoryPath}`);
+    logger.debug('Listing global documents', { path: this.globalMemoryPath });
 
     try {
       const files = await fs.readdir(this.globalMemoryPath);
-      console.log(`Global documents found: ${files.join(', ')}`);
+      logger.debug('Global documents found', { files: files.join(', ') });
       return files
         .filter(file => !file.startsWith('.') && !file.startsWith('_'))
         .map(file => DocumentPath.create(file));
     } catch (error) {
-      console.log(`Failed to list global documents: ${this.globalMemoryPath}`, error);
+      logger.debug('Failed to list global documents', { path: this.globalMemoryPath, error });
       return [];
     }
   }
@@ -136,7 +137,7 @@ export class SimpleGlobalMemoryBankRepository implements IGlobalMemoryBankReposi
    */
   async findDocumentsByTags(tags: Tag[]): Promise<MemoryDocument[]> {
     // Simplified implementation for tests
-    console.log(`Finding global documents by tags: ${tags.map(t => t.value).join(', ')}`);
+    logger.debug('Finding global documents by tags', { tags: tags.map(t => t.value).join(', ') });
     const documents: MemoryDocument[] = [];
     const paths = await this.listDocuments();
 
@@ -148,7 +149,7 @@ export class SimpleGlobalMemoryBankRepository implements IGlobalMemoryBankReposi
     }
 
     // For testing, we'll just return all documents regardless of tags
-    console.log(`Found ${documents.length} global documents`);
+    logger.debug('Found global documents', { count: documents.length });
     return documents;
   }
 
@@ -159,13 +160,13 @@ export class SimpleGlobalMemoryBankRepository implements IGlobalMemoryBankReposi
    */
   async saveTagIndex(tagIndex: TagIndex): Promise<void> {
     const indexPath = path.join(this.globalMemoryPath, '_index.json');
-    console.log(`Saving global tag index: ${indexPath}`);
+    logger.debug('Saving global tag index', { path: indexPath });
 
     try {
       await fs.writeFile(indexPath, JSON.stringify(tagIndex, null, 2), 'utf-8');
-      console.log(`Global tag index saved: ${indexPath}`);
+      logger.debug('Global tag index saved', { path: indexPath });
     } catch (error) {
-      console.error(`Failed to save global tag index: ${indexPath}`, error);
+      logger.error('Failed to save global tag index', { path: indexPath, error });
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_WRITE_ERROR,
         `Failed to save global tag index: ${(error as Error).message}`,
@@ -180,14 +181,14 @@ export class SimpleGlobalMemoryBankRepository implements IGlobalMemoryBankReposi
    */
   async getTagIndex(): Promise<TagIndex | null> {
     const indexPath = path.join(this.globalMemoryPath, '_index.json');
-    console.log(`Getting global tag index: ${indexPath}`);
+    logger.debug('Getting global tag index', { path: indexPath });
 
     try {
       const content = await fs.readFile(indexPath, 'utf-8');
-      console.log(`Global tag index found: ${indexPath}`);
+      logger.debug('Global tag index found', { path: indexPath });
       return JSON.parse(content) as TagIndex;
     } catch (error) {
-      console.log(`Global tag index not found: ${indexPath}`);
+      logger.debug('Global tag index not found', { path: indexPath });
       return null;
     }
   }
@@ -203,7 +204,7 @@ export class SimpleGlobalMemoryBankRepository implements IGlobalMemoryBankReposi
     _matchAll?: boolean
   ): Promise<DocumentPath[]> {
     // Simplified implementation for tests
-    console.log(`Finding global document paths by tags using index: ${tags.map(t => t.value).join(', ')}`);
+    logger.debug('Finding global document paths by tags using index', { tags: tags.map(t => t.value).join(', ') });
     const docs = await this.findDocumentsByTags(tags);
     return docs.map(doc => doc.path);
   }
@@ -213,13 +214,13 @@ export class SimpleGlobalMemoryBankRepository implements IGlobalMemoryBankReposi
    * @returns Promise resolving to boolean indicating if structure is valid
    */
   async validateStructure(): Promise<boolean> {
-    console.log(`Validating global memory bank structure: ${this.globalMemoryPath}`);
+    logger.debug('Validating global memory bank structure', { path: this.globalMemoryPath });
     try {
       await fs.access(this.globalMemoryPath);
-      console.log(`Global memory bank structure is valid: ${this.globalMemoryPath}`);
+      logger.debug('Global memory bank structure is valid', { path: this.globalMemoryPath });
       return true;
     } catch (error) {
-      console.log(`Global memory bank structure is invalid: ${this.globalMemoryPath}`);
+      logger.debug('Global memory bank structure is invalid', { path: this.globalMemoryPath });
       return false;
     }
   }
@@ -231,7 +232,7 @@ export class SimpleGlobalMemoryBankRepository implements IGlobalMemoryBankReposi
    */
   async updateTagsIndex(skipSaveDocument?: boolean): Promise<void> {
     // Simplified implementation for tests
-    console.log(`Updating global tags index (skipSaveDocument: ${skipSaveDocument})`);
+    logger.debug('Updating global tags index', { skipSaveDocument });
     return Promise.resolve();
   }
 
@@ -241,7 +242,7 @@ export class SimpleGlobalMemoryBankRepository implements IGlobalMemoryBankReposi
    */
   async generateAndSaveTagIndex(): Promise<void> {
     // Simplified implementation for tests
-    console.log(`Generating and saving global tag index`);
+    logger.debug('Generating and saving global tag index');
     return Promise.resolve();
   }
 
@@ -251,7 +252,7 @@ export class SimpleGlobalMemoryBankRepository implements IGlobalMemoryBankReposi
    */
   async updateLegacyTagsIndex(): Promise<void> {
     // Simplified implementation for tests
-    console.log(`Updating legacy global tags index`);
+    logger.debug('Updating legacy global tags index');
     return Promise.resolve();
   }
 }
