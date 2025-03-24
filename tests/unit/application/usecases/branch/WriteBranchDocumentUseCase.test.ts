@@ -73,9 +73,9 @@ describe('WriteBranchDocumentUseCase', () => {
     expect(result.document.lastModified).toBe(testLastModified.toISOString());
 
     // Verify repository calls
-    verify(mockBranchRepo.exists(testBranchName)).once();
-    verify(mockBranchRepo.getDocument(branchInfo, docPath)).once();
-    verify(mockBranchRepo.saveDocument(expect.expect.anything(), expect.expect.anything())).once();
+    expect(mockBranchRepo.exists).toHaveBeenCalledWith(testBranchName);
+    expect(mockBranchRepo.getDocument).toHaveBeenCalledWith(branchInfo, docPath);
+    expect(mockBranchRepo.saveDocument).toHaveBeenCalled();
   });
 
   it('should initialize the branch if it does not exist', async () => {
@@ -99,7 +99,7 @@ describe('WriteBranchDocumentUseCase', () => {
     });
 
     // Assert
-    verify(mockBranchRepo.initialize(branchInfo)).once();
+    expect(mockBranchRepo.initialize).toHaveBeenCalledWith(branchInfo);
   });
 
   it('should update an existing document', async () => {
@@ -115,9 +115,12 @@ describe('WriteBranchDocumentUseCase', () => {
     });
 
     mockBranchRepo.exists = jest.fn().mockResolvedValue(true);
-    when(mockBranchRepo.getDocument(branchInfo, docPath)).thenResolve(
-      existingDocument
-    );
+    mockBranchRepo.getDocument = jest.fn().mockImplementation((branch, path) => {
+      if (branch.equals(branchInfo) && path.equals(docPath)) {
+        return Promise.resolve(existingDocument);
+      }
+      return Promise.resolve(null);
+    });
     mockBranchRepo.saveDocument = jest.fn().mockResolvedValue();
 
     // Act
@@ -137,7 +140,7 @@ describe('WriteBranchDocumentUseCase', () => {
     expect(result.document.tags).toEqual(testDocumentTags);
 
     // Verify saveDocument was called
-    verify(mockBranchRepo.saveDocument(expect.expect.anything(), expect.expect.anything())).once();
+    expect(mockBranchRepo.saveDocument).toHaveBeenCalled();
   });
 
   it('should update content while preserving tags if tags are not provided', async () => {
@@ -154,9 +157,12 @@ describe('WriteBranchDocumentUseCase', () => {
     });
 
     mockBranchRepo.exists = jest.fn().mockResolvedValue(true);
-    when(mockBranchRepo.getDocument(branchInfo, docPath)).thenResolve(
-      existingDocument
-    );
+    mockBranchRepo.getDocument = jest.fn().mockImplementation((branch, path) => {
+      if (branch.equals(branchInfo) && path.equals(docPath)) {
+        return Promise.resolve(existingDocument);
+      }
+      return Promise.resolve(null);
+    });
     mockBranchRepo.saveDocument = jest.fn().mockResolvedValue();
 
     // Act
@@ -176,7 +182,7 @@ describe('WriteBranchDocumentUseCase', () => {
     expect(result.document.tags).toEqual(existingTags.map((tag) => tag.value));
 
     // Verify saveDocument was called
-    verify(mockBranchRepo.saveDocument(expect.expect.anything(), expect.expect.anything())).once();
+    expect(mockBranchRepo.saveDocument).toHaveBeenCalled();
   });
 
   it('should throw ApplicationError when branch name is empty', async () => {

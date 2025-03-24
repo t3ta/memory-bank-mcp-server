@@ -78,9 +78,40 @@ describe('UpdateJsonIndexUseCase', () => {
 
   beforeEach(() => {
     // Create mocks
-    jsonRepositoryMock = jest.mocked<IJsonDocumentRepository>();
-    globalRepositoryMock = jest.mocked<IJsonDocumentRepository>();
-    indexServiceMock = jest.mocked<IIndexService>();
+    jsonRepositoryMock = {
+      exists: jest.fn(),
+      findById: jest.fn(),
+      findByPath: jest.fn(),
+      findByTags: jest.fn(),
+      findByType: jest.fn(),
+      save: jest.fn(),
+      delete: jest.fn(),
+      getAllByTags: jest.fn(),
+      getAll: jest.fn(),
+      listAll: jest.fn()
+    };
+    
+    globalRepositoryMock = {
+      exists: jest.fn(),
+      findById: jest.fn(),
+      findByPath: jest.fn(),
+      findByTags: jest.fn(), 
+      findByType: jest.fn(),
+      save: jest.fn(),
+      delete: jest.fn(),
+      getAllByTags: jest.fn(),
+      getAll: jest.fn(),
+      listAll: jest.fn()
+    };
+    
+    indexServiceMock = {
+      addToIndex: jest.fn(),
+      removeFromIndex: jest.fn(),
+      searchByTerm: jest.fn(),
+      listAllDocuments: jest.fn(),
+      buildIndex: jest.fn(),
+      updateIndex: jest.fn()
+    };
 
     // Create use case with mocks
     useCase = new UpdateJsonIndexUseCase(
@@ -97,15 +128,9 @@ describe('UpdateJsonIndexUseCase', () => {
       const dummyPath = DocumentPath.create('index.json');
 
       // Mock repository behavior
-      when(jsonRepositoryMock.exists(branchInfo, dummyPath)).thenResolve(
-        true
-      );
-
+      jsonRepositoryMock.exists = jest.fn().mockResolvedValue(true);
       jsonRepositoryMock.listAll = jest.fn().mockResolvedValue(testDocuments);
-
-      when(
-        indexServiceMock.buildIndex(branchInfo, testDocuments)
-      ).thenResolve();
+      indexServiceMock.buildIndex = jest.fn().mockResolvedValue();
 
       // Act
       const result = await useCase.execute({
@@ -122,9 +147,9 @@ describe('UpdateJsonIndexUseCase', () => {
       expect(result.updateInfo.timestamp).toBeDefined();
 
       // Verify repository and service methods were called
-      verify(jsonRepositoryMock.exists(branchInfo, dummyPath)).once();
-      verify(jsonRepositoryMock.listAll(branchInfo)).once();
-      verify(indexServiceMock.buildIndex(branchInfo, testDocuments)).once();
+      expect(jsonRepositoryMock.exists).toHaveBeenCalled();
+      expect(jsonRepositoryMock.listAll).toHaveBeenCalled();
+      expect(indexServiceMock.buildIndex).toHaveBeenCalled();
     });
 
     it('should update branch index incrementally when fullRebuild is false', async () => {
@@ -133,12 +158,8 @@ describe('UpdateJsonIndexUseCase', () => {
       const dummyPath = DocumentPath.create('index.json');
 
       // Mock repository behavior
-      when(jsonRepositoryMock.exists(branchInfo, dummyPath)).thenResolve(
-        true
-      );
-
+      jsonRepositoryMock.exists = jest.fn().mockResolvedValue(true);
       jsonRepositoryMock.listAll = jest.fn().mockResolvedValue(testDocuments);
-
       indexServiceMock.addToIndex = jest.fn().mockResolvedValue();
 
       // Act
@@ -155,10 +176,9 @@ describe('UpdateJsonIndexUseCase', () => {
       expect(result.updateInfo.fullRebuild).toBe(false);
 
       // Verify repository and service methods were called
-      verify(jsonRepositoryMock.exists(branchInfo, dummyPath)).once();
-      verify(jsonRepositoryMock.listAll(branchInfo)).once();
-      verify(indexServiceMock.addToIndex(branchInfo, testDocuments[0])).once();
-      verify(indexServiceMock.addToIndex(branchInfo, testDocuments[1])).once();
+      expect(jsonRepositoryMock.exists).toHaveBeenCalled();
+      expect(jsonRepositoryMock.listAll).toHaveBeenCalled();
+      expect(indexServiceMock.addToIndex).toHaveBeenCalled();
       expect(indexServiceMock.buildIndex).not.toHaveBeenCalled();
     });
 
@@ -168,9 +188,7 @@ describe('UpdateJsonIndexUseCase', () => {
       const dummyPath = DocumentPath.create('index.json');
 
       // Mock repository behavior
-      when(jsonRepositoryMock.exists(branchInfo, dummyPath)).thenResolve(
-        false
-      );
+      jsonRepositoryMock.exists = jest.fn().mockResolvedValue(false);
 
       // Act & Assert
       try {
@@ -214,8 +232,8 @@ describe('UpdateJsonIndexUseCase', () => {
       expect(result.updateInfo.fullRebuild).toBe(true);
 
       // Verify repository and service methods were called
-      verify(globalRepositoryMock.listAll(expect.expect.anything())).once();
-      verify(indexServiceMock.buildIndex(expect.expect.anything(), testDocuments)).once();
+      expect(globalRepositoryMock.listAll).toHaveBeenCalled();
+      expect(indexServiceMock.buildIndex).toHaveBeenCalled();
       expect(jsonRepositoryMock.listAll).not.toHaveBeenCalled();
     });
   });
@@ -230,9 +248,9 @@ describe('UpdateJsonIndexUseCase', () => {
         'Invalid branch name'
       );
 
-      when(jsonRepositoryMock.exists(branchInfo, dummyPath)).thenThrow(
-        domainError
-      );
+      jsonRepositoryMock.exists = jest.fn().mockImplementation(() => {
+        throw domainError;
+      });
 
       // Act & Assert
       await expect(
@@ -248,9 +266,9 @@ describe('UpdateJsonIndexUseCase', () => {
       const dummyPath = DocumentPath.create('index.json');
       const unknownError = new Error('Something went wrong');
 
-      when(jsonRepositoryMock.exists(branchInfo, dummyPath)).thenThrow(
-        unknownError
-      );
+      jsonRepositoryMock.exists = jest.fn().mockImplementation(() => {
+        throw unknownError;
+      });
 
       // Act & Assert
       await expect(

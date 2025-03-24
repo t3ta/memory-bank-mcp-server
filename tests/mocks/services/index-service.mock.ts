@@ -1,6 +1,6 @@
 // @ts-nocheck
 // This file was automatically converted from ts-mockito to jest.fn()
-// ts-mockito import removed;
+import { jest } from '@jest/globals';
 import { IIndexService } from '../../../src/infrastructure/index/interfaces/IIndexService';
 import { BranchInfo } from '../../../src/domain/entities/BranchInfo';
 import { DocumentId } from '../../../src/domain/entities/DocumentId';
@@ -39,29 +39,29 @@ export function createMockIndexService(
   mock: IIndexService;
   instance: IIndexService;
 } {
-  const mockService = jest.mocked<IIndexService>();
-
-  // デフォルトの振る舞いを設定
-  mockService.initializeIndex = jest.fn().mockResolvedValue();
-  mockService.buildIndex = jest.fn().mockResolvedValue();
-  mockService.addToIndex = jest.fn().mockResolvedValue();
-  mockService.removeFromIndex = jest.fn().mockResolvedValue();
-  mockService.findById = jest.fn().mockResolvedValue(null);
-  mockService.findByPath = jest.fn().mockResolvedValue(null);
-  mockService.findByTags = jest.fn().mockResolvedValue([]);
-  mockService.findByType = jest.fn().mockResolvedValue([]);
-  mockService.listAll = jest.fn().mockResolvedValue([]);
-  mockService.saveIndex = jest.fn().mockResolvedValue();
-  mockService.loadIndex = jest.fn().mockResolvedValue();
+  // jestのモックオブジェクトを作成
+  const mock = {
+    initializeIndex: jest.fn().mockResolvedValue(),
+    buildIndex: jest.fn().mockResolvedValue(),
+    addToIndex: jest.fn().mockResolvedValue(),
+    removeFromIndex: jest.fn().mockResolvedValue(),
+    findById: jest.fn().mockResolvedValue(null),
+    findByPath: jest.fn().mockResolvedValue(null),
+    findByTags: jest.fn().mockResolvedValue([]),
+    findByType: jest.fn().mockResolvedValue([]),
+    listAll: jest.fn().mockResolvedValue([]),
+    saveIndex: jest.fn().mockResolvedValue(),
+    loadIndex: jest.fn().mockResolvedValue()
+  };
 
   // カスタマイズ関数があれば実行
   if (customizations) {
-    customizations(mockService);
+    customizations(mock);
   }
 
   // 実際のインスタンスを返す
   return {
-    mock: mockService,
-    instance: mockService
+    mock: mock,
+    instance: mock as unknown as IIndexService
   };
 }

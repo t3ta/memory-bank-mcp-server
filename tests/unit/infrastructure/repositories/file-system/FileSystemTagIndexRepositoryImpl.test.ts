@@ -5,7 +5,6 @@
  */
 
 import { jest } from '@jest/globals';
-// ts-mockito import removed;
 import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo';
 import { DocumentId } from '../../../../../src/domain/entities/DocumentId';
 import { DocumentPath } from '../../../../../src/domain/entities/DocumentPath';
@@ -23,9 +22,9 @@ import { BranchTagIndex, GlobalTagIndex, TAG_INDEX_VERSION } from '../../../../.
 
 describe('FileSystemTagIndexRepositoryImpl', () => {
   // テスト用のモックを作成
-  const mockFileSystem = jest.mocked<IFileSystemService>();
-  const mockBranchRepository = jest.mocked<IBranchMemoryBankRepository>();
-  const mockGlobalRepository = jest.mocked<IGlobalMemoryBankRepository>();
+  let mockFileSystem: IFileSystemService;
+  let mockBranchRepository: IBranchMemoryBankRepository;
+  let mockGlobalRepository: IGlobalMemoryBankRepository;
 
   // テスト用の定数
   const BRANCH_ROOT = '/test/branches';
@@ -37,9 +36,35 @@ describe('FileSystemTagIndexRepositoryImpl', () => {
   let repository: FileSystemTagIndexRepositoryImpl;
 
   beforeEach(() => {
-    reset(mockFileSystem);
-    reset(mockBranchRepository);
-    reset(mockGlobalRepository);
+    // Clear all mocks before each test
+    jest.clearAllMocks();
+
+    // Create mocks
+    mockFileSystem = {
+      fileExists: jest.fn(),
+      readFile: jest.fn(),
+      writeFile: jest.fn(),
+      createDirectory: jest.fn(),
+      deleteFile: jest.fn(),
+      listFiles: jest.fn(),
+      ensureDirectoryExists: jest.fn()
+    };
+    
+    mockBranchRepository = {
+      getDocument: jest.fn(),
+      saveDocument: jest.fn(),
+      listDocuments: jest.fn(),
+      deleteDocument: jest.fn(),
+      exists: jest.fn()
+    };
+    
+    mockGlobalRepository = {
+      getDocument: jest.fn(),
+      saveDocument: jest.fn(),
+      listDocuments: jest.fn(),
+      deleteDocument: jest.fn(),
+      exists: jest.fn()
+    };
 
     repository = new FileSystemTagIndexRepositoryImpl(
       mockFileSystem,
@@ -86,7 +111,7 @@ describe('FileSystemTagIndexRepositoryImpl', () => {
       await (repository as any).readBranchIndex(BRANCH_INFO);
 
       // Reset mock to verify it's not called again
-      reset(mockFileSystem);
+      jest.clearAllMocks();
       mockFileSystem.fileExists = jest.fn().mockResolvedValue(true);
 
       // Act: Read the index again
@@ -135,7 +160,8 @@ describe('FileSystemTagIndexRepositoryImpl', () => {
       // Assert
       expect(result).toBeDefined();
       expect(result?.schema).toBe(TAG_INDEX_VERSION);
-      verify(mockFileSystem.readFile(indexPath)).once();
+      expect(mockFileSystem.readFile).toHaveBeenCalledWith(indexPath);
+      expect(mockFileSystem.readFile).toHaveBeenCalledTimes(1);
     });
 
     it('should return null if index file does not exist', async () => {
@@ -193,7 +219,8 @@ describe('FileSystemTagIndexRepositoryImpl', () => {
       expect(result.documentCount).toBe(2);
       expect(result.tags).toHaveLength(3);
       expect(result.tags.sort()).toEqual(['tag1', 'tag2', 'tag3'].sort());
-      verify(mockFileSystem.writeFile(indexPath, expect.expect.anything())).once();
+      expect(mockFileSystem.writeFile).toHaveBeenCalledWith(indexPath, expect.any(String));
+      expect(mockFileSystem.writeFile).toHaveBeenCalledTimes(1);
     });
 
     it('should handle empty document list', async () => {
@@ -213,7 +240,8 @@ describe('FileSystemTagIndexRepositoryImpl', () => {
       expect(result).toBeDefined();
       expect(result.documentCount).toBe(0);
       expect(result.tags).toHaveLength(0);
-      verify(mockFileSystem.writeFile(indexPath, expect.expect.anything())).once();
+      expect(mockFileSystem.writeFile).toHaveBeenCalledWith(indexPath, expect.any(String));
+      expect(mockFileSystem.writeFile).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -466,7 +494,8 @@ describe('FileSystemTagIndexRepositoryImpl', () => {
       expect(result.documentCount).toBe(2);
       expect(result.tags).toHaveLength(3);
       expect(result.tags.sort()).toEqual(['global-tag1', 'global-tag2', 'global-tag3'].sort());
-      verify(mockFileSystem.writeFile(indexPath, expect.expect.anything())).once();
+      expect(mockFileSystem.writeFile).toHaveBeenCalledWith(indexPath, expect.any(String));
+      expect(mockFileSystem.writeFile).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -545,7 +574,8 @@ describe('FileSystemTagIndexRepositoryImpl', () => {
       await repository.updateBranchTagIndex(BRANCH_INFO);
 
       // Assert: Verify file was written
-      verify(mockFileSystem.writeFile(indexPath, expect.expect.anything())).once();
+      expect(mockFileSystem.writeFile).toHaveBeenCalledWith(indexPath, expect.any(String));
+      expect(mockFileSystem.writeFile).toHaveBeenCalledTimes(1);
 
       // We need to capture the written content to verify the update
       // This is a bit complex with ts-mockito, so we'll just verify basic aspects

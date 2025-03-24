@@ -1,6 +1,6 @@
 // @ts-nocheck
 // This file was automatically converted from ts-mockito to jest.fn()
-// ts-mockito import removed;
+import { jest } from '@jest/globals';
 import { 
   IBranchMemoryBankRepository,
   RecentBranch
@@ -34,30 +34,30 @@ export function createMockBranchMemoryBankRepository(
   mock: IBranchMemoryBankRepository;
   instance: IBranchMemoryBankRepository;
 } {
-  const mockRepo = jest.mocked<IBranchMemoryBankRepository>();
-
-  // デフォルトの振る舞いを設定
-  mockRepo.exists = jest.fn().mockResolvedValue(true);
-  mockRepo.initialize = jest.fn().mockResolvedValue();
-  mockRepo.getDocument = jest.fn().mockResolvedValue(null);
-  mockRepo.saveDocument = jest.fn().mockResolvedValue();
-  mockRepo.deleteDocument = jest.fn().mockResolvedValue(true);
-  mockRepo.listDocuments = jest.fn().mockResolvedValue([]);
-  mockRepo.findDocumentsByTags = jest.fn().mockResolvedValue([]);
-  mockRepo.getRecentBranches = jest.fn().mockResolvedValue([]);
-  mockRepo.validateStructure = jest.fn().mockResolvedValue(true);
-  mockRepo.saveTagIndex = jest.fn().mockResolvedValue();
-  mockRepo.getTagIndex = jest.fn().mockResolvedValue(null);
-  mockRepo.findDocumentPathsByTagsUsingIndex = jest.fn().mockResolvedValue([]);
+  // jestのモックオブジェクトを作成
+  const mock = {
+    exists: jest.fn().mockResolvedValue(true),
+    initialize: jest.fn().mockResolvedValue(),
+    getDocument: jest.fn().mockResolvedValue(null),
+    saveDocument: jest.fn().mockResolvedValue(),
+    deleteDocument: jest.fn().mockResolvedValue(true),
+    listDocuments: jest.fn().mockResolvedValue([]),
+    findDocumentsByTags: jest.fn().mockResolvedValue([]),
+    getRecentBranches: jest.fn().mockResolvedValue([]),
+    validateStructure: jest.fn().mockResolvedValue(true),
+    saveTagIndex: jest.fn().mockResolvedValue(),
+    getTagIndex: jest.fn().mockResolvedValue(null),
+    findDocumentPathsByTagsUsingIndex: jest.fn().mockResolvedValue([])
+  };
 
   // カスタマイズ関数があれば実行
   if (customizations) {
-    customizations(mockRepo);
+    customizations(mock);
   }
 
   // 実際のインスタンスを返す
   return {
-    mock: mockRepo,
-    instance: mockRepo
+    mock: mock,
+    instance: mock as unknown as IBranchMemoryBankRepository
   };
 }

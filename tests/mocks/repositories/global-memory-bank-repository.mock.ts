@@ -1,6 +1,6 @@
 // @ts-nocheck
 // This file was automatically converted from ts-mockito to jest.fn()
-// ts-mockito import removed;
+import { jest } from '@jest/globals';
 import { IGlobalMemoryBankRepository } from '../../../src/domain/repositories/IGlobalMemoryBankRepository';
 import { DocumentPath } from '../../../src/domain/entities/DocumentPath';
 import { MemoryDocument } from '../../../src/domain/entities/MemoryDocument';
@@ -31,29 +31,29 @@ export function createMockGlobalMemoryBankRepository(
   mock: IGlobalMemoryBankRepository;
   instance: IGlobalMemoryBankRepository;
 } {
-  const mockRepo = jest.mocked<IGlobalMemoryBankRepository>();
-
-  // デフォルトの振る舞いを設定
-  mockRepo.initialize = jest.fn().mockResolvedValue();
-  mockRepo.getDocument = jest.fn().mockResolvedValue(null);
-  mockRepo.saveDocument = jest.fn().mockResolvedValue();
-  mockRepo.deleteDocument = jest.fn().mockResolvedValue(true);
-  mockRepo.listDocuments = jest.fn().mockResolvedValue([]);
-  mockRepo.findDocumentsByTags = jest.fn().mockResolvedValue([]);
-  mockRepo.updateTagsIndex = jest.fn().mockResolvedValue();
-  mockRepo.saveTagIndex = jest.fn().mockResolvedValue();
-  mockRepo.getTagIndex = jest.fn().mockResolvedValue(null);
-  mockRepo.findDocumentPathsByTagsUsingIndex = jest.fn().mockResolvedValue([]);
-  mockRepo.validateStructure = jest.fn().mockResolvedValue(true);
+  // jestのモックオブジェクトを作成
+  const mock = {
+    initialize: jest.fn().mockResolvedValue(),
+    getDocument: jest.fn().mockResolvedValue(null),
+    saveDocument: jest.fn().mockResolvedValue(),
+    deleteDocument: jest.fn().mockResolvedValue(true),
+    listDocuments: jest.fn().mockResolvedValue([]),
+    findDocumentsByTags: jest.fn().mockResolvedValue([]),
+    updateTagsIndex: jest.fn().mockResolvedValue(),
+    saveTagIndex: jest.fn().mockResolvedValue(),
+    getTagIndex: jest.fn().mockResolvedValue(null),
+    findDocumentPathsByTagsUsingIndex: jest.fn().mockResolvedValue([]),
+    validateStructure: jest.fn().mockResolvedValue(true)
+  };
 
   // カスタマイズ関数があれば実行
   if (customizations) {
-    customizations(mockRepo);
+    customizations(mock);
   }
 
   // 実際のインスタンスを返す
   return {
-    mock: mockRepo,
-    instance: mockRepo
+    mock: mock,
+    instance: mock as unknown as IGlobalMemoryBankRepository
   };
 }

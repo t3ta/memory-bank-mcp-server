@@ -1,33 +1,76 @@
 {
   "schema": "memory_document_v2",
   "metadata": {
-    "id": "d3a84e5c-68eb-4910-9032-b400b6a2dab9",
+    "id": "progress-2025-03-24",
     "title": "進捗状況",
     "documentType": "progress",
     "path": "progress.json",
     "tags": [
+      "core",
       "progress"
     ],
-    "lastModified": "2025-03-24T13:45:50.796Z",
-    "createdAt": "2025-03-23T18:04:50.796Z",
+    "lastModified": "2025-03-24T15:40:00.000Z",
+    "createdAt": "2025-03-24T11:45:00.000Z",
     "version": 1
   },
   "content": {
-    "completedFeatures": [
-      "ts-mockitoからjest.fnへのモック置き換え",
-      "MarkdownMigrationService.test.tsの型エラー解消",
-      "FileTemplateRepository.test.tsの型エラー解消",
-      "FileSystemService.test.tsのプロパティ代入エラー解消（as anyによる修正）"
+    "currentStatus": {
+      "summary": "FileTemplateRepository.test.tsのts-mockitoからjest.fnへの移行作業中およびsrc/index.tsのバグ修正完了",
+      "details": "TypeScriptとJestのモック設定の互換性問題が発生しており、修正中。また、src/index.tsのread_contextケースのJSONフォーマット問題を修正した。"
+    },
+    "workingFeatures": [
+      {
+        "name": "jest.mock('fs/promises')を使用したモック設定",
+        "status": "修正中",
+        "notes": "モジュール全体をモック化するアプローチに変更"
+      },
+      {
+        "name": "read_contextケースのJSONフォーマット修正",
+        "status": "完了",
+        "notes": "明示的なオブジェクト構造を定義してレスポンス形式を制御するように修正"
+      }
     ],
-    "pendingFeatures": [
-      "BranchController.test.tsの修正",
-      "テスト実行エラーの解消（モック関数の呼び出し検証失敗）",
-      "jest.config.ts からの除外設定解除"
+    "unimplementedFeatures": [
+      {
+        "name": "型の完全な互換性の確保",
+        "status": "未実装",
+        "notes": "@ts-nocheck指示子を一時的に使用して回避中"
+      }
     ],
-    "currentStatus": "進行中 - テスト修正フェーズ",
+    "currentState": {
+      "phase": "デバッグ",
+      "blockers": [
+        "Jestモックの型定義と互換性の問題"
+      ],
+      "insights": [
+        "ts-mockitoとjest.fnではモック作成方法が根本的に異なる",
+        "jest.mockでモジュール全体をモック化した後、Jest.Mocked<T>型を適用する方法が有効",
+        "mockReturnValueをmockResolvedValueOnceに変更することで可読性を向上",
+        "不要なキャスト(as jest.Mock)を削除することで型チェックエラーを減らせる",
+        "明示的なオブジェクト構造の定義はMCPプロトコルの信頼性向上に貢献する"
+      ]
+    },
     "knownIssues": [
-      "jest.config.tsの除外設定でまだ一部テストがスキップされている",
-      "実行時のエラー: 「expect(statMock).toHaveBeenCalledWith(dirPath)」のような呼び出し検証エラー"
+      {
+        "description": "モック関数の設定方法の違いによるエラー",
+        "status": "修正中",
+        "solution": "jest.Mocked<typeof fs>を使用した型付けとモック関数の直接呼び出し"
+      },
+      {
+        "description": "テストコードの重複",
+        "status": "解決済み",
+        "solution": "重複したテストケースを削除"
+      },
+      {
+        "description": "Promise.resolve()の冗長な使用",
+        "status": "修正中",
+        "solution": "mockResolvedValueOnceなどの簡潔なAPI使用に変更"
+      },
+      {
+        "description": "標準出力のJSON形式問題",
+        "status": "解決済み",
+        "solution": "明示的なレスポンスオブジェクト構造の定義と適切なJSON形式化"
+      }
     ]
   }
 }

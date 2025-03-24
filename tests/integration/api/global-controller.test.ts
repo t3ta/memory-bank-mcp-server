@@ -154,7 +154,7 @@ describe('GlobalController Integration Tests', () => {
     const { mock: mockJsonDocRepo, instance: jsonDocRepo } = createMockJsonDocumentRepository();
 
     // Customize delete behavior to actually delete files from the file system
-    when(mockJsonDocRepo.delete(expect.expect.anything(), expect.expect.anything())).thenCall(async (_, docPath) => {
+    mockJsonDocRepo.delete = jest.fn().mockImplementation(async (_, docPath) => {
       // Actually delete the file from the file system
       if (docPath instanceof DocumentPath) {
         const filePath = path.join(globalDir, docPath.value);

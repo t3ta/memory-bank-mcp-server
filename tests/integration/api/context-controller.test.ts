@@ -1,5 +1,6 @@
 // @ts-nocheck
 // This file was automatically converted from ts-mockito to jest.fn()
+import { jest, describe, it, expect, beforeEach } from '@jest/globals';
 import { ContextController } from '../../../src/interface/controllers/ContextController.js';
 import { ReadContextUseCase } from '../../../src/application/usecases/common/ReadContextUseCase.js';
 import { ReadRulesUseCase } from '../../../src/application/usecases/common/ReadRulesUseCase.js';
@@ -49,95 +50,108 @@ describe('ContextController Integration Tests with Mocks', () => {
   // Setup mock for rules directory
   let mockRulesDir: string;
 
-  describe('Rules Operations', () => {
-
+  // Setup common test context
   beforeEach(() => {
     // Set up mocks for each test
     mockRulesDir = '/path/to/rules';
 
     // Create repository mocks
-    branchRepositoryMock = createMockBranchMemoryBankRepository(mockRepo => {
-      // Mock exists method
-      mockRepo.exists = jest.fn().mockResolvedValue(true);
-      mockRepo.exists = jest.fn().mockResolvedValue(false);
-
-      // Mock listDocuments method for test branch
-      when(mockRepo.listDocuments(BranchInfo.create(testBranch))).thenResolve(
-        Object.keys(branchDocuments).map(key => DocumentPath.create(key))
-      );
-
-      // Mock getDocument method for test branch
-      for (const [path, content] of Object.entries(branchDocuments)) {
-        when(mockRepo.getDocument(
-          BranchInfo.create(testBranch),
-          DocumentPath.create(path)
-        )).thenResolve(
-          MemoryDocument.create({
-            path: DocumentPath.create(path),
-            content,
-            tags: [],
-            lastModified: new Date()
-          })
-        );
+    branchRepositoryMock = createMockBranchMemoryBankRepository();
+    
+    // Mock exists method
+    branchRepositoryMock.mock.exists = jest.fn().mockImplementation((branchInfo) => {
+      return Promise.resolve(branchInfo.equals(BranchInfo.create(testBranch)));
+    });
+    
+    // Mock listDocuments method for test branch
+    branchRepositoryMock.mock.listDocuments = jest.fn().mockImplementation((branchInfo) => {
+      if (branchInfo.equals(BranchInfo.create(testBranch))) {
+        return Promise.resolve(Object.keys(branchDocuments).map(key => DocumentPath.create(key)));
       }
+      return Promise.resolve([]);
+    });
+    
+    // Mock getDocument method for test branch
+    branchRepositoryMock.mock.getDocument = jest.fn().mockImplementation((branchInfo, documentPath) => {
+      if (branchInfo.equals(BranchInfo.create(testBranch))) {
+        const pathStr = documentPath.toString();
+        if (branchDocuments[pathStr]) {
+          return Promise.resolve(
+            MemoryDocument.create({
+              path: documentPath,
+              content: branchDocuments[pathStr],
+              tags: [],
+              lastModified: new Date()
+            })
+          );
+        }
+      }
+      return Promise.resolve(null);
     });
 
-    globalRepositoryMock = createMockGlobalMemoryBankRepository(mockRepo => {
-      // Mock listDocuments method
-      when(mockRepo.listDocuments()).thenResolve(
-        Object.keys(globalDocuments).map(key => DocumentPath.create(key))
-      );
-
-      // Mock getDocument method
-      for (const [path, content] of Object.entries(globalDocuments)) {
-        when(mockRepo.getDocument(DocumentPath.create(path))).thenResolve(
+    globalRepositoryMock = createMockGlobalMemoryBankRepository();
+    
+    // Mock listDocuments method
+    globalRepositoryMock.mock.listDocuments = jest.fn().mockImplementation(() => {
+      return Promise.resolve(Object.keys(globalDocuments).map(key => DocumentPath.create(key)));
+    });
+    
+    // Mock getDocument method
+    globalRepositoryMock.mock.getDocument = jest.fn().mockImplementation((documentPath) => {
+      const pathStr = documentPath.toString();
+      if (globalDocuments[pathStr]) {
+        return Promise.resolve(
           MemoryDocument.create({
-            path: DocumentPath.create(path),
-            content,
+            path: documentPath,
+            content: globalDocuments[pathStr],
             tags: [],
             lastModified: new Date()
           })
         );
       }
+      return Promise.resolve(null);
     });
 
     // Create ReadRulesUseCase mock
-    const mockReadRulesUseCase = jest.mocked<ReadRulesUseCase>();
-    when(mockReadRulesUseCase.execute('en')).thenResolve({
-      content: mockEnRulesContent,
-      language: 'en'
-    });
-    when(mockReadRulesUseCase.execute('ja')).thenResolve({
-      content: mockJaRulesContent,
-      language: 'ja'
-    });
-    when(mockReadRulesUseCase.execute('fr')).thenThrow(
-      new DomainError(DomainErrorCodes.VALIDATION_ERROR, 'Unsupported language code: fr')
-    );
+    readRulesUseCase = {
+      execute: jest.fn().mockImplementation((language) => {
+        if (language === 'en') {
+          return Promise.resolve({
+            content: mockEnRulesContent,
+            language: 'en'
+          });
+        } else if (language === 'ja') {
+          return Promise.resolve({
+            content: mockJaRulesContent,
+            language: 'ja'
+          });
+        } else if (language === 'fr') {
+          throw new DomainError(DomainErrorCodes.VALIDATION_ERROR, 'Unsupported language code: fr');
+        }
+        return Promise.resolve({
+          content: '',
+          language: language
+        });
+      })
+    } as unknown as ReadRulesUseCase;
 
     // Mock ReadContextUseCase instead of creating a real one
-    const mockReadContextUseCase = jest.mocked<ReadContextUseCase>();
-
-    // Since we now always load all data regardless of include flags,
-    // just make it return branch and global memory for valid branches
-    when(mockReadContextUseCase.execute(expect.expect.anything())).thenCall((request) => {
-      if (request.branch === testBranch) {
-        return Promise.resolve({
-          branchMemory: branchDocuments,
-          globalMemory: globalDocuments
-        });
-      } else if (request.branch === nonExistentBranch) {
-        throw new DomainError(
-          DomainErrorCodes.BRANCH_INITIALIZATION_FAILED,
-          `Failed to auto-initialize branch: ${nonExistentBranch}`
-        );
-      }
-      return Promise.resolve({});
-    });
-
-    readContextUseCase = mockReadContextUseCase;
-
-    readRulesUseCase = mockReadRulesUseCase;
+    readContextUseCase = {
+      execute: jest.fn().mockImplementation((request) => {
+        if (request.branch === testBranch) {
+          return Promise.resolve({
+            branchMemory: branchDocuments,
+            globalMemory: globalDocuments
+          });
+        } else if (request.branch === nonExistentBranch) {
+          throw new DomainError(
+            DomainErrorCodes.BRANCH_INITIALIZATION_FAILED,
+            `Failed to auto-initialize branch: ${nonExistentBranch}`
+          );
+        }
+        return Promise.resolve({});
+      })
+    } as unknown as ReadContextUseCase;
 
     // Initialize controller with mocked use cases
     controller = new ContextController(
@@ -145,6 +159,8 @@ describe('ContextController Integration Tests with Mocks', () => {
       readRulesUseCase
     );
   });
+  
+  describe('Rules Operations', () => {
 
     it('Should be able to read rules', async () => {
       // Read English rules

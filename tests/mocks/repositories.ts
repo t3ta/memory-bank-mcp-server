@@ -1,6 +1,6 @@
 // @ts-nocheck
 // This file was automatically converted from ts-mockito to jest.fn()
-// ts-mockito import removed;
+import { jest } from '@jest/globals';
 import {
   IBranchMemoryBankRepository,
   RecentBranch,
@@ -165,7 +165,15 @@ export class MockJsonDocumentRepository implements IJsonDocumentRepository {
  * @returns The mock and its instance
  */
 export const createMockBranchRepository = () => {
-  const mockRepo = mock(MockBranchRepository);
+  // Create a base object that matches the interface
+  const mockRepo = new MockBranchRepository();
+
+  // Replace all methods with jest mocks
+  for (const methodName of Object.getOwnPropertyNames(MockBranchRepository.prototype)) {
+    if (methodName !== 'constructor') {
+      mockRepo[methodName] = jest.fn();
+    }
+  }
 
   // Set default behavior (as needed)
   mockRepo.exists = jest.fn().mockResolvedValue(true);
@@ -181,7 +189,15 @@ export const createMockBranchRepository = () => {
  * @returns The mock and its instance
  */
 export const createMockGlobalRepository = () => {
-  const mockRepo = mock(MockGlobalRepository);
+  // Create a base object that matches the interface
+  const mockRepo = new MockGlobalRepository();
+
+  // Replace all methods with jest mocks
+  for (const methodName of Object.getOwnPropertyNames(MockGlobalRepository.prototype)) {
+    if (methodName !== 'constructor') {
+      mockRepo[methodName] = jest.fn();
+    }
+  }
 
   // Set default behavior (as needed)
 
@@ -196,7 +212,15 @@ export const createMockGlobalRepository = () => {
  * @returns The mock and its instance
  */
 export const createMockJsonDocumentRepository = () => {
-  const mockRepo = mock(MockJsonDocumentRepository);
+  // Create a base object that matches the interface
+  const mockRepo = new MockJsonDocumentRepository();
+
+  // Replace all methods with jest mocks
+  for (const methodName of Object.getOwnPropertyNames(MockJsonDocumentRepository.prototype)) {
+    if (methodName !== 'constructor') {
+      mockRepo[methodName] = jest.fn();
+    }
+  }
 
   // Set default behavior (as needed)
   mockRepo.exists = jest.fn().mockResolvedValue(true);

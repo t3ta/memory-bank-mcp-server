@@ -1,36 +1,65 @@
 {
   "schema": "memory_document_v2",
   "metadata": {
-    "id": "2c768df4-b74e-4ea8-9f3e-9a6e34c19c27",
+    "id": "e81c4f2a-5b3a-4d99-9c71-8f74e8c54321",
     "title": "アクティブコンテキスト",
     "documentType": "active_context",
     "path": "activeContext.json",
     "tags": [
+      "core",
       "active-context"
     ],
-    "lastModified": "2025-03-24T13:45:50.796Z",
-    "createdAt": "2025-03-23T18:04:50.796Z",
+    "lastModified": "2025-03-24T15:30:00.000Z",
+    "createdAt": "2025-03-24T14:21:45.000Z",
     "version": 1
   },
   "content": {
-    "currentWork": "ts-mockitoからjest.fnへの置き換え作業が完了し、現在はテストが通るように実装を修正している段階。いくつかの型エラーは解消されたが、まだ一部のテストファイルがJestの除外リストに含まれている。",
+    "currentTask": "src/index.tsファイルの修復",
     "recentChanges": [
-      "ts-mockitoの代わりにjest.fnを使用するようにモックを置き換えた",
-      "モックの型エラーを `as unknown as` 型キャストで解決した",
-      "jest.fn().mockResolvedValue() を jest.fn(() => Promise.resolve()) に変更して型エラーを解消した"
+      {
+        "id": "f5a7b2c3-d4e6-7f8a-9b0c-1d2e3f4a5b6c",
+        "description": "src/index.tsファイルで構文エラーを発見",
+        "timestamp": "2025-03-24T14:21:45.000Z",
+        "details": "read_contextケースの閉じ括弧と中括弧が正しく配置されておらず、コードの構造が壊れている"
+      },
+      {
+        "id": "a8c9d0e1-f2g3-h4i5-j6k7-l8m9n0o1p2q3",
+        "description": "src/index.tsファイルのread_contextケースを修正",
+        "timestamp": "2025-03-24T15:30:00.000Z",
+        "details": "response.dataの返却処理を改善し、より明示的な構造でフォーマットするように修正した。formattedResponseオブジェクトを導入して、明確にルール、ブランチメモリ、グローバルメモリを構造化した"
+      }
     ],
     "activeDecisions": [
-      "モック関数の型問題は `as unknown as` 型キャストで回避する",
-      "モック関数の返り値は Promise.resolve() を使う関数として直接定義する"
+      {
+        "id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+        "description": "JSON形式の出力を確保するために明示的なレスポンス形式を定義する",
+        "rationale": "MCPプロトコルにおいて標準出力は常に正しいJSON形式である必要があり、オブジェクトの形式を明確にすることでエラーを防止できる",
+        "status": "approved"
+      }
     ],
     "considerations": [
-      "BranchController.test.ts はまだJestの除外リストに含まれている",
-      "一部のテストはモック呼び出しの確認に失敗している（実行エラー）"
+      {
+        "id": "c5d6e7f8-9a0b-1c2d-3e4f-5a6b7c8d9e0f",
+        "topic": "ログ出力の改善",
+        "details": "不適切なデバッグログが標準出力に紛れる可能性があるため、ログレベルの設定を見直すべきかもしれない"
+      },
+      {
+        "id": "r3s4t5u6-7v8w-9x0y-z1a2-b3c4d5e6f7g8",
+        "topic": "エラーハンドリングの強化",
+        "details": "同様の問題が他のケースにも存在する可能性があるため、全体的なレスポンス形式の統一性をチェックする必要がある"
+      }
     ],
     "nextSteps": [
-      "1. BranchController.test.ts の修正を行う",
-      "2. その他修正が必要なテストの対応を進める",
-      "3. jest.config.ts から修正済みテストファイルの除外設定を削除する"
+      {
+        "id": "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+        "description": "修正後にサーバーが正常に起動するか確認する",
+        "priority": "high"
+      },
+      {
+        "id": "h8i9j0k1-l2m3-n4o5-p6q7-r8s9t0u1v2w3",
+        "description": "他のツールケースでも同様の問題がないかレビューする",
+        "priority": "medium"
+      }
     ]
   }
 }

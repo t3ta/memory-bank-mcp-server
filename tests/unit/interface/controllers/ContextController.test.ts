@@ -5,22 +5,25 @@ import { ContextController } from "../../../../src/interface/controllers/Context
 import { ReadContextUseCase } from "../../../../src/application/usecases/common/ReadContextUseCase";
 import { ReadRulesUseCase } from "../../../../src/application/usecases/common/ReadRulesUseCase";
 import { DomainError, DomainErrorCodes } from "../../../../src/shared/errors/DomainError";
-// ts-mockito import removed;
 
 describe("ContextController", () => {
   // Mock instances
-  let readContextUseCaseMock: ReadContextUseCase;
-  let readRulesUseCaseMock: ReadRulesUseCase;
-  let controller: ContextController;
+  let readContextUseCaseMock;
+  let readRulesUseCaseMock;
+  let controller;
 
   beforeEach(() => {
     // Reset mocks
     jest.clearAllMocks();
-    reset();
 
-    // Create mocked instances using ts-mockito
-    readContextUseCaseMock = mock(ReadContextUseCase);
-    readRulesUseCaseMock = mock(ReadRulesUseCase);
+    // Create mocked instances using jest
+    readContextUseCaseMock = {
+      execute: jest.fn()
+    };
+    
+    readRulesUseCaseMock = {
+      execute: jest.fn()
+    };
     
     // Create controller with mocked dependencies
     controller = new ContextController(
@@ -37,7 +40,7 @@ describe("ContextController", () => {
         language: "en"
       };
       
-      readRulesUseCaseMock.execute = jest.fn().mockResolvedValue(mockRulesResult);
+      readRulesUseCaseMock.execute.mockResolvedValue(mockRulesResult);
 
       // Act
       const result = await controller.readRules("en");
@@ -54,7 +57,7 @@ describe("ContextController", () => {
         "Rules file not found"
       );
       
-      when(readRulesUseCaseMock.execute("invalid-language")).thenReject(mockError);
+      readRulesUseCaseMock.execute.mockRejectedValue(mockError);
 
       // Act
       const result = await controller.readRules("invalid-language");
@@ -92,10 +95,8 @@ describe("ContextController", () => {
       };
 
       // Setup mocks
-      readRulesUseCaseMock.execute = jest.fn().mockResolvedValue(mockRulesResult);
-      
-      // Need to setup mock based on different params
-      when(readContextUseCaseMock.execute(expect.expect.anything())).thenResolve({
+      readRulesUseCaseMock.execute.mockResolvedValue(mockRulesResult);
+      readContextUseCaseMock.execute.mockResolvedValue({
         branchMemory: mockBranchMemory,
         globalMemory: mockGlobalMemory
       });
@@ -127,7 +128,7 @@ describe("ContextController", () => {
         "Branch not found: feature/non-existent"
       );
 
-      when(readContextUseCaseMock.execute(expect.expect.anything())).thenReject(mockError);
+      readContextUseCaseMock.execute.mockRejectedValue(mockError);
 
       // Act
       const result = await controller.readContext(mockRequest);
@@ -152,10 +153,10 @@ describe("ContextController", () => {
       };
 
       // Rules fails but other components succeed
-      when(readRulesUseCaseMock.execute("en")).thenReject(new Error("Rules error"));
+      readRulesUseCaseMock.execute.mockRejectedValue(new Error("Rules error"));
       
       // Always return branch memory only
-      when(readContextUseCaseMock.execute(expect.expect.anything())).thenResolve({
+      readContextUseCaseMock.execute.mockResolvedValue({
         branchMemory: mockBranchMemory
       });
 

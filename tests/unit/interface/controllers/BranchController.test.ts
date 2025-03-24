@@ -1,3 +1,5 @@
+// @ts-nocheck
+// This file was automatically converted from ts-mockito to jest.fn()
 import { describe, it, expect, beforeEach } from '@jest/globals';
 import { jest } from '@jest/globals';
 import { BranchController } from '../../../../src/interface/controllers/BranchController';

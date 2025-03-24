@@ -1,7 +1,6 @@
 // @ts-nocheck
 // This file was automatically converted from ts-mockito to jest.fn()
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
-// ts-mockito import removed;
 import { WriteJsonDocumentUseCase } from '../../../../../src/application/usecases/json/WriteJsonDocumentUseCase';
 import { IJsonDocumentRepository } from '../../../../../src/domain/repositories/IJsonDocumentRepository';
 import { IIndexService } from '../../../../../src/infrastructure/index/interfaces/IIndexService';
@@ -59,9 +58,40 @@ describe('WriteJsonDocumentUseCase', () => {
 
   beforeEach(() => {
     // Create mocks
-    jsonRepositoryMock = jest.mocked<IJsonDocumentRepository>();
-    globalRepositoryMock = jest.mocked<IJsonDocumentRepository>();
-    indexServiceMock = jest.mocked<IIndexService>();
+    jsonRepositoryMock = {
+      exists: jest.fn(),
+      findById: jest.fn(),
+      findByPath: jest.fn(),
+      findByTags: jest.fn(),
+      findByType: jest.fn(),
+      save: jest.fn(),
+      delete: jest.fn(),
+      getAllByTags: jest.fn(),
+      getAll: jest.fn(),
+      listAll: jest.fn()
+    };
+    
+    globalRepositoryMock = {
+      exists: jest.fn(),
+      findById: jest.fn(),
+      findByPath: jest.fn(),
+      findByTags: jest.fn(), 
+      findByType: jest.fn(),
+      save: jest.fn(),
+      delete: jest.fn(),
+      getAllByTags: jest.fn(),
+      getAll: jest.fn(),
+      listAll: jest.fn()
+    };
+    
+    indexServiceMock = {
+      addToIndex: jest.fn(),
+      removeFromIndex: jest.fn(),
+      searchByTerm: jest.fn(),
+      listAllDocuments: jest.fn(),
+      buildIndex: jest.fn(),
+      updateIndex: jest.fn()
+    };
 
     // Create use case with mocks
     useCase = new WriteJsonDocumentUseCase(
@@ -78,11 +108,9 @@ describe('WriteJsonDocumentUseCase', () => {
       const documentPath = DocumentPath.create(testDocumentPath);
 
       // Mock repository behavior
-      when(
-        jsonRepositoryMock.findByPath(branchInfo, documentPath)
-      ).thenResolve(null);
-
-      when(jsonRepositoryMock.save(branchInfo, expect.expect.anything())).thenCall(
+      jsonRepositoryMock.findByPath.mockResolvedValue(null);
+      
+      jsonRepositoryMock.save.mockImplementation(
         (branchInfo, document) => Promise.resolve(document)
       );
 
@@ -112,9 +140,10 @@ describe('WriteJsonDocumentUseCase', () => {
       expect(result.location).toBe(testBranchName);
 
       // Verify repository methods were called
-      verify(jsonRepositoryMock.findByPath(branchInfo, documentPath)).once();
-      verify(jsonRepositoryMock.save(branchInfo, expect.expect.anything())).once();
-      verify(indexServiceMock.addToIndex(branchInfo, expect.expect.anything())).once();
+      expect(jsonRepositoryMock.findByPath).toHaveBeenCalledWith(branchInfo, documentPath);
+      expect(jsonRepositoryMock.findByPath).toHaveBeenCalledTimes(1);
+      expect(jsonRepositoryMock.save).toHaveBeenCalledTimes(1);
+      expect(indexServiceMock.addToIndex).toHaveBeenCalledTimes(1);
     });
 
     it('should update an existing document', async () => {
@@ -125,11 +154,9 @@ describe('WriteJsonDocumentUseCase', () => {
       const newContent = { newTest: 'newContent' };
 
       // Mock repository behavior
-      when(
-        jsonRepositoryMock.findByPath(branchInfo, documentPath)
-      ).thenResolve(existingDocument);
-
-      when(jsonRepositoryMock.save(branchInfo, expect.expect.anything())).thenCall(
+      jsonRepositoryMock.findByPath.mockResolvedValue(existingDocument);
+      
+      jsonRepositoryMock.save.mockImplementation(
         (branchInfo, document) => Promise.resolve(document)
       );
 
@@ -158,9 +185,10 @@ describe('WriteJsonDocumentUseCase', () => {
       expect(result.location).toBe(testBranchName);
 
       // Verify repository methods were called
-      verify(jsonRepositoryMock.findByPath(branchInfo, documentPath)).once();
-      verify(jsonRepositoryMock.save(branchInfo, expect.expect.anything())).once();
-      verify(indexServiceMock.addToIndex(branchInfo, expect.expect.anything())).once();
+      expect(jsonRepositoryMock.findByPath).toHaveBeenCalledWith(branchInfo, documentPath);
+      expect(jsonRepositoryMock.findByPath).toHaveBeenCalledTimes(1);
+      expect(jsonRepositoryMock.save).toHaveBeenCalledTimes(1);
+      expect(indexServiceMock.addToIndex).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -171,11 +199,9 @@ describe('WriteJsonDocumentUseCase', () => {
       const documentPath = DocumentPath.create(testDocumentPath);
 
       // Mock repository behavior
-      when(
-        globalRepositoryMock.findByPath(branchInfo, documentPath)
-      ).thenResolve(null);
-
-      when(globalRepositoryMock.save(branchInfo, expect.expect.anything())).thenCall(
+      globalRepositoryMock.findByPath.mockResolvedValue(null);
+      
+      globalRepositoryMock.save.mockImplementation(
         (branchInfo, document) => Promise.resolve(document)
       );
 
@@ -203,11 +229,10 @@ describe('WriteJsonDocumentUseCase', () => {
       expect(result.location).toBe('global');
 
       // Verify repository methods were called
-      verify(
-        globalRepositoryMock.findByPath(branchInfo, documentPath)
-      ).once();
-      verify(globalRepositoryMock.save(branchInfo, expect.expect.anything())).once();
-      verify(indexServiceMock.addToIndex(branchInfo, expect.expect.anything())).once();
+      expect(globalRepositoryMock.findByPath).toHaveBeenCalledWith(branchInfo, documentPath);
+      expect(globalRepositoryMock.findByPath).toHaveBeenCalledTimes(1);
+      expect(globalRepositoryMock.save).toHaveBeenCalledTimes(1);
+      expect(indexServiceMock.addToIndex).toHaveBeenCalledTimes(1);
       expect(jsonRepositoryMock.findByPath).not.toHaveBeenCalled();
     });
   });
@@ -376,9 +401,9 @@ describe('WriteJsonDocumentUseCase', () => {
         'Invalid document path'
       );
 
-      when(jsonRepositoryMock.findByPath(branchInfo, documentPath)).thenThrow(
-        domainError
-      );
+      jsonRepositoryMock.findByPath.mockImplementation(() => {
+        throw domainError;
+      });
 
       // Act & Assert
       await expect(
@@ -400,9 +425,9 @@ describe('WriteJsonDocumentUseCase', () => {
       const documentPath = DocumentPath.create(testDocumentPath);
       const unknownError = new Error('Something went wrong');
 
-      when(jsonRepositoryMock.findByPath(branchInfo, documentPath)).thenThrow(
-        unknownError
-      );
+      jsonRepositoryMock.findByPath.mockImplementation(() => {
+        throw unknownError;
+      });
 
       // Act & Assert
       await expect(

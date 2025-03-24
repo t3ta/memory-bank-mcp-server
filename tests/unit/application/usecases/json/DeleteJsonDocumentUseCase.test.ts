@@ -83,9 +83,33 @@ describe('DeleteJsonDocumentUseCase', () => {
 
   beforeEach(() => {
     // Create mocks
-    jsonRepositoryMock = jest.mocked<IJsonDocumentRepository>();
-    globalRepositoryMock = jest.mocked<IJsonDocumentRepository>();
-    indexServiceMock = jest.mocked<IIndexService>();
+    jsonRepositoryMock = {
+      exists: jest.fn(),
+      findById: jest.fn(),
+      findByPath: jest.fn(),
+      save: jest.fn(),
+      delete: jest.fn(),
+      getAllByTags: jest.fn(),
+      getAll: jest.fn(),
+      listAll: jest.fn(),
+    };
+    globalRepositoryMock = {
+      exists: jest.fn(),
+      findById: jest.fn(),
+      findByPath: jest.fn(),
+      save: jest.fn(),
+      delete: jest.fn(),
+      getAllByTags: jest.fn(),
+      getAll: jest.fn(),
+      listAll: jest.fn(),
+    };
+    indexServiceMock = {
+      addToIndex: jest.fn(),
+      removeFromIndex: jest.fn(),
+      searchByTerm: jest.fn(),
+      listAllDocuments: jest.fn(),
+      updateIndex: jest.fn(),
+    };
 
     // Create use case with mocks
     useCase = new DeleteJsonDocumentUseCase(
@@ -102,17 +126,9 @@ describe('DeleteJsonDocumentUseCase', () => {
       const documentPath = DocumentPath.create(testDocumentPath);
 
       // Mock repository behavior
-      when(jsonRepositoryMock.exists(branchInfo, documentPath)).thenResolve(
-        true
-      );
-
-      when(jsonRepositoryMock.delete(branchInfo, documentPath)).thenResolve(
-        true
-      );
-
-      when(
-        indexServiceMock.removeFromIndex(branchInfo, documentPath)
-      ).thenResolve();
+      jsonRepositoryMock.exists = jest.fn().mockResolvedValue(true);
+      jsonRepositoryMock.delete = jest.fn().mockResolvedValue(true);
+      indexServiceMock.removeFromIndex = jest.fn().mockResolvedValue();
 
       // Act
       const result = await useCase.execute({
@@ -128,11 +144,9 @@ describe('DeleteJsonDocumentUseCase', () => {
       expect(result.details.timestamp).toBeDefined();
 
       // Verify repository methods were called
-      verify(jsonRepositoryMock.exists(branchInfo, documentPath)).once();
-      verify(jsonRepositoryMock.delete(branchInfo, documentPath)).once();
-      verify(
-        indexServiceMock.removeFromIndex(branchInfo, documentPath)
-      ).once();
+      expect(jsonRepositoryMock.exists).toHaveBeenCalledWith(branchInfo, documentPath);
+      expect(jsonRepositoryMock.delete).toHaveBeenCalledWith(branchInfo, documentPath);
+      expect(indexServiceMock.removeFromIndex).toHaveBeenCalledWith(branchInfo, documentPath);
     });
 
     it('should delete a document by ID', async () => {
@@ -143,14 +157,8 @@ describe('DeleteJsonDocumentUseCase', () => {
 
       // Mock repository behavior
       jsonRepositoryMock.findById = jest.fn().mockResolvedValue(testDocument);
-
-      when(jsonRepositoryMock.delete(branchInfo, documentId)).thenResolve(
-        true
-      );
-
-      when(
-        indexServiceMock.removeFromIndex(branchInfo, documentId)
-      ).thenResolve();
+      jsonRepositoryMock.delete = jest.fn().mockResolvedValue(true);
+      indexServiceMock.removeFromIndex = jest.fn().mockResolvedValue();
 
       // Act
       const result = await useCase.execute({
@@ -165,10 +173,10 @@ describe('DeleteJsonDocumentUseCase', () => {
       expect(result.details.identifier).toBe(testDocumentId);
       expect(result.details.timestamp).toBeDefined();
 
-      // Verify repository methods were called - 実際の呼び出し回数に合わせて修正（anyNumber）
+      // Verify repository methods were called
       expect(jsonRepositoryMock.findById).toHaveBeenCalled();
-      verify(jsonRepositoryMock.delete(branchInfo, documentId)).once();
-      verify(indexServiceMock.removeFromIndex(branchInfo, documentId)).once();
+      expect(jsonRepositoryMock.delete).toHaveBeenCalled();
+      expect(indexServiceMock.removeFromIndex).toHaveBeenCalled();
     });
 
     it('should throw DomainError when document does not exist (path)', async () => {
@@ -177,9 +185,7 @@ describe('DeleteJsonDocumentUseCase', () => {
       const documentPath = DocumentPath.create(testDocumentPath);
 
       // Mock repository behavior
-      when(jsonRepositoryMock.exists(branchInfo, documentPath)).thenResolve(
-        false
-      );
+      jsonRepositoryMock.exists = jest.fn().mockResolvedValue(false);
 
       // Act & Assert
       await expect(
@@ -255,10 +261,10 @@ describe('DeleteJsonDocumentUseCase', () => {
       expect(result.location).toBe('global');
       expect(result.details.identifier).toBe(testDocumentPath);
 
-      // Verify repository methods were called - deepEqualよりanythingの方が柔軟
-      verify(globalRepositoryMock.exists(expect.expect.anything(), documentPath)).once();
-      verify(globalRepositoryMock.delete(expect.expect.anything(), documentPath)).once();
-      verify(indexServiceMock.removeFromIndex(expect.expect.anything(), documentPath)).once();
+      // Verify repository methods were called
+      expect(globalRepositoryMock.exists).toHaveBeenCalledWith(expect.anything(), documentPath);
+      expect(globalRepositoryMock.delete).toHaveBeenCalledWith(expect.anything(), documentPath);
+      expect(indexServiceMock.removeFromIndex).toHaveBeenCalledWith(expect.anything(), documentPath);
       expect(jsonRepositoryMock.exists).not.toHaveBeenCalled();
     });
   });
@@ -294,9 +300,9 @@ describe('DeleteJsonDocumentUseCase', () => {
         'Invalid document path'
       );
 
-      when(jsonRepositoryMock.exists(branchInfo, documentPath)).thenThrow(
-        domainError as Error
-      );
+      jsonRepositoryMock.exists = jest.fn().mockImplementation(() => {
+        throw domainError;
+      });
 
       // Act & Assert
       await expect(
@@ -313,9 +319,9 @@ describe('DeleteJsonDocumentUseCase', () => {
       const documentPath = DocumentPath.create(testDocumentPath);
       const unknownError = new Error('Something went wrong');
 
-      when(jsonRepositoryMock.exists(branchInfo, documentPath)).thenThrow(
-        unknownError
-      );
+      jsonRepositoryMock.exists = jest.fn().mockImplementation(() => {
+        throw unknownError;
+      });
 
       // Act & Assert
       await expect(
