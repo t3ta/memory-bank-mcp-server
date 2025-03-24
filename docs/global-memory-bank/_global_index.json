@@ -1,8 +1,8 @@
 {
   "schema": "tag_index_v1",
   "metadata": {
-    "updatedAt": "2025-03-24T13:34:20.000Z",
-    "documentCount": 80,
+    "updatedAt": "2025-03-24T08:06:13.599Z",
+    "documentCount": 81,
     "fullRebuild": true,
     "context": "global"
   },
@@ -27,14 +27,14 @@
       "meta/consolidated-memory-bank-meta.json",
       "meta/document-type-standards.json",
       "meta/global-memory-bank-reference.json",
-      "tags/README.json",
-      "user-guide.json"
+      "tags/README.json"
     ],
     "guide": [
       "01-project/README.json",
       "02-architecture/README.json",
       "03-implementation/README.json",
       "04-guides/README.json",
+      "04-guides/migration-guide.json",
       "04-guides/user-guide.json",
       "05-testing/README.json",
       "06-releases/README.json",
@@ -48,11 +48,10 @@
       "meta/global-memory-bank-navigation.json",
       "meta/global-memory-bank-reference.json",
       "tags/README.json",
-      "user-guide.json"
+      "template-system-usage.json"
     ],
     "best-practices": [
       "01-project/coding-standards.json",
-      "coding-standards.json",
       "core/coding-standards.json"
     ],
     "typescript": [
@@ -65,13 +64,11 @@
     ],
     "domain": [
       "01-project/domain-models.json",
-      "core/domain-models.json",
-      "domain-models.json"
+      "core/domain-models.json"
     ],
     "models": [
       "01-project/domain-models.json",
-      "core/domain-models.json",
-      "domain-models.json"
+      "core/domain-models.json"
     ],
     "architecture": [
       "01-project/domain-models.json",
@@ -84,10 +81,9 @@
       "02-architecture/json-based-architecture.json",
       "05-testing/e2e-to-integration-test-approach.json",
       "06-releases/v2-design-decisions.json",
-      "architecture.json",
       "core/architecture.json",
       "core/domain-models.json",
-      "domain-models.json"
+      "template-system.json"
     ],
     "json": [
       "01-project/domain-models.json",
@@ -96,6 +92,7 @@
       "02-architecture/consolidated-architecture.json",
       "02-architecture/json-based-architecture-details.json",
       "02-architecture/json-based-architecture.json",
+      "04-guides/migration-guide.json",
       "04-guides/migration-policy.json",
       "06-releases/v2-implementation-plan.json",
       "08-i18n/template-system-json-i18n-design.json",
@@ -107,13 +104,11 @@
     ],
     "glossary": [
       "01-project/glossary.json",
-      "core/glossary.json",
-      "glossary.json"
+      "core/glossary.json"
     ],
     "terminology": [
       "01-project/glossary.json",
-      "core/glossary.json",
-      "glossary.json"
+      "core/glossary.json"
     ],
     "definitions": [
       "01-project/glossary.json",
@@ -139,14 +134,12 @@
     ],
     "tech-stack": [
       "01-project/tech-stack.json",
-      "core/tech-stack.json",
-      "tech-stack.json"
+      "core/tech-stack.json"
     ],
     "infrastructure": [
       "01-project/tech-stack.json",
       "07-infrastructure/README.json",
-      "core/tech-stack.json",
-      "tech-stack.json"
+      "core/tech-stack.json"
     ],
     "design": [
       "02-architecture/README.json",
@@ -182,6 +175,9 @@
       "07-infrastructure/ci-cd/memory-bank-errors.json",
       "09-refactoring/analysis/global-memory-bank-analysis-raw.json",
       "09-refactoring/json-global-design-issues.json",
+      "auto-initialization-fix.json",
+      "auto-initialization-test.json",
+      "initialization-behavior.json",
       "meta/consolidated-memory-bank-meta.json",
       "meta/global-memory-bank-index-analysis.json",
       "meta/global-memory-bank-indexing-mechanism.json",
@@ -261,9 +257,11 @@
       "03-implementation/read-context-command-implementation.json"
     ],
     "migration": [
+      "04-guides/migration-guide.json",
       "04-guides/migration-policy.json"
     ],
     "markdown": [
+      "04-guides/migration-guide.json",
       "04-guides/migration-policy.json"
     ],
     "policy": [
@@ -318,13 +316,15 @@
     "release": [
       "06-releases/README.json",
       "06-releases/consolidated-v2-release.json",
-      "06-releases/release-v2.0.0.json"
+      "06-releases/release-v2.0.0.json",
+      "06-releases/v2.1.0-release-plan.json"
     ],
     "version": [
       "06-releases/README.json"
     ],
     "planning": [
-      "06-releases/consolidated-v2-release.json"
+      "06-releases/consolidated-v2-release.json",
+      "06-releases/v2.1.0-release-plan.json"
     ],
     "changelog": [
       "06-releases/consolidated-v2-release.json",
@@ -333,6 +333,12 @@
     ],
     "pr": [
       "06-releases/release-v2.0.0.json"
+    ],
+    "v2-1-0": [
+      "06-releases/v2.1.0-release-plan.json"
+    ],
+    "json-migration": [
+      "06-releases/v2.1.0-release-plan.json"
     ],
     "operations": [
       "07-infrastructure/README.json"
@@ -345,7 +351,9 @@
     ],
     "i18n": [
       "08-i18n/README.json",
-      "08-i18n/template-system-json-i18n-design.json"
+      "08-i18n/template-system-json-i18n-design.json",
+      "template-system-usage.json",
+      "template-system.json"
     ],
     "l10n": [
       "08-i18n/README.json",
@@ -363,14 +371,18 @@
     "raw-data": [
       "09-refactoring/analysis/global-memory-bank-analysis-raw.json"
     ],
-    "system-design": [
-      "architecture.json",
-      "core/architecture.json"
+    "fix": [
+      "auto-initialization-fix.json"
     ],
-    "standards": [
-      "coding-standards.json",
-      "core/coding-standards.json",
-      "meta/document-type-standards.json"
+    "auto-initialization": [
+      "auto-initialization-fix.json",
+      "auto-initialization-test.json"
+    ],
+    "test": [
+      "auto-initialization-test.json"
+    ],
+    "system-design": [
+      "core/architecture.json"
     ],
     "core": [
       "core/architecture.json",
@@ -381,10 +393,20 @@
       "core/tech-stack.json",
       "core/user-guide.json"
     ],
+    "standards": [
+      "core/coding-standards.json",
+      "meta/document-type-standards.json"
+    ],
     "navigation": [
       "core/navigation.json",
       "meta/consolidated-memory-bank-meta.json",
       "meta/global-memory-bank-navigation.json"
+    ],
+    "initialization": [
+      "initialization-behavior.json"
+    ],
+    "behavior": [
+      "initialization-behavior.json"
     ],
     "tag": [
       "meta/consolidated-memory-bank-meta.json",
@@ -392,6 +414,13 @@
       "tags/README.json",
       "tags/tag_categorization.json",
       "tags/tag_index_update_plan.json"
+    ],
+    "templates": [
+      "template-system-usage.json",
+      "template-system.json"
+    ],
+    "usage": [
+      "template-system-usage.json"
     ]
   }
 }

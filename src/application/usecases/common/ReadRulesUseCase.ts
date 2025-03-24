@@ -5,8 +5,8 @@ import { DomainError, DomainErrorCodes } from "../../../shared/errors/DomainErro
 import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
 import { JsonDocument } from "../../../domain/entities/JsonDocument.js";
 import { logger } from "../../../shared/utils/logger.js";
-
-
+import { ITemplateLoader } from "../../../infrastructure/templates/interfaces/ITemplateLoader.js";
+import { Language, getSafeLanguage, isValidLanguage } from "../../../schemas/v2/i18n-schema.js";
 
 export type RulesResult = {
   content: string;
@@ -24,10 +24,12 @@ export class ReadRulesUseCase {
    * コンストラクタ
    * @param rulesDir ルールディレクトリパス
    * @param jsonToMarkdownConverter JSON to Markdown コンバーター
+   * @param templateLoader テンプレートローダー（オプション）
    */
   constructor(
     rulesDir: string,
-    private readonly jsonToMarkdownConverter?: JsonToMarkdownConverter
+    private readonly jsonToMarkdownConverter?: JsonToMarkdownConverter,
+    private readonly templateLoader?: ITemplateLoader
   ) {
     this.rulesDir = rulesDir;
   }
@@ -48,12 +50,39 @@ export class ReadRulesUseCase {
     }
 
     try {
+      // テンプレートローダーが提供されている場合はそれを使用
+      if (this.templateLoader) {
+        try {
+          logger.debug(`Using template loader to get rules for language: ${language}`);
+
+          // 言語コードを安全に変換
+          const safeLanguage = getSafeLanguage(language);
+
+          const content = await this.templateLoader.getMarkdownTemplate(
+            'rules',
+            safeLanguage
+          );
+
+          return {
+            content,
+            language
+          };
+        } catch (templateError) {
+          logger.warn(`Failed to load rules using template loader: ${templateError instanceof Error ? templateError.message : 'Unknown error'}`);
+          logger.debug('Falling back to direct file loading');
+          // テンプレートローダーでの読み込みに失敗した場合は、従来の方法にフォールバック
+        }
+      }
+
+      // 従来の方法でJSONファイルを直接読み込む
       // JSONファイルのパス - 複数のパスを試す
       const possiblePaths = [
+        // 新しい単一テンプレートパス
+        path.join(this.rulesDir, 'templates', 'json', 'rules.json'),
         // 新しいパス (templates/json に替わって domain/templates が使われるようになった)
         path.join(this.rulesDir, 'domain', 'templates', `rules-${language}.json`),
         // 以前のパス (旧システムとの互換性のため)
-        path.join(this.rulesDir, 'templates', `rules-${language}.json`),
+        path.join(this.rulesDir, 'templates', 'json', `rules-${language}.json`),
         // フォールバック
         path.join(this.rulesDir, `rules-${language}.json`)
       ];

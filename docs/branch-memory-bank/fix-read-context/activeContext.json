@@ -1,0 +1,78 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "ecc140f3-6d91-4299-89ff-3c1a36561d2c",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": ["active-context", "read-context", "bugfix"],
+    "lastModified": "2025-03-24T07:50:52.000Z",
+    "createdAt": "2025-03-24T07:31:38.505Z",
+    "version": 3
+  },
+  "content": {
+    "currentWork": "read_contextコマンドとブランチ名処理の問題を修正",
+    "recentChanges": [
+      {
+        "date": "2025-03-24T07:50:52.000Z",
+        "description": "FileSystemBranchMemoryBankRepositoryでBranchInfo.safeNameを使用するように修正"
+      },
+      {
+        "date": "2025-03-24T07:50:52.000Z",
+        "description": "エラー処理とログ出力を強化して問題の特定を容易に"
+      },
+      {
+        "date": "2025-03-24T07:50:52.000Z",
+        "description": "ReadRulesUseCaseのパス検索ロジックを確認し、テンプレート処理の問題を解決"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "582b6b7f-bc84-4a8c-8c9e-0f2c427dc900",
+        "description": "すべてのリポジトリメソッドでBranchInfo.nameの代わりにBranchInfo.safeNameを使用する"
+      },
+      {
+        "id": "e53c646e-92e4-48b6-981a-40075deb07c7",
+        "description": "JSONの検証処理を追加し、無効なJSONを早期に検出する"
+      },
+      {
+        "id": "4bb606ec-1062-4d6a-9f0f-f895ecc26f47",
+        "description": "ReadRulesUseCaseのパス検索ロジックを確認し、テンプレートファイルが正しく見つかるようにする"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "87201c6d-b4bc-4745-8b1c-ef2a4b8c8fc9",
+        "description": "他のリポジトリ実装でも同様の問題がないか確認する",
+        "status": "resolved"
+      },
+      {
+        "id": "f821872d-c71e-40c5-8759-f11f54e9f484",
+        "description": "テンプレート処理の問題も関連している可能性がある",
+        "status": "resolved"
+      },
+      {
+        "id": "8c8cb7fd-52d8-4b1e-959f-1188d855336b",
+        "description": "ContextControllerでのルール読み込みエラー処理を改善する必要があるか",
+        "status": "resolved"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "9f4dd10d-6597-4b7c-84d5-5ab2d09a06d2",
+        "description": "変更をコミットする",
+        "priority": "high"
+      },
+      {
+        "id": "f2162525-3a4f-4d16-a6d4-090795a91b04",
+        "description": "テストを追加して修正を検証する",
+        "priority": "medium"
+      },
+      {
+        "id": "a386178b-4f47-490c-a727-e4f0cc945183",
+        "description": "PRを作成して変更をマージする",
+        "priority": "medium"
+      }
+    ]
+  }
+}

@@ -9,13 +9,8 @@
       "index",
       "meta"
     ],
-<<<<<<< HEAD
-    "lastModified": "2025-03-24T04:02:10.467Z",
-    "createdAt": "2025-03-24T04:02:10.467Z",
-=======
-    "lastModified": "2025-03-21T16:40:23.104Z",
-    "createdAt": "2025-03-21T16:40:23.104Z",
->>>>>>> feature/re-organize-global-memory-bank
+    "lastModified": "2025-03-24T08:18:17.666Z",
+    "createdAt": "2025-03-24T08:18:17.666Z",
     "version": 1
   },
   "content": {
@@ -40,7 +35,7 @@
         ]
       },
       "documentation": {
-        "count": 17,
+        "count": 16,
         "documents": [
           {
             "path": "01-project/README.json",
@@ -109,11 +104,7 @@
         ]
       },
       "guide": {
-<<<<<<< HEAD
-        "count": 17,
-=======
-        "count": 18,
->>>>>>> feature/re-organize-global-memory-bank
+        "count": 19,
         "documents": [
           {
             "path": "01-project/README.json",
@@ -194,26 +185,15 @@
         ]
       },
       "best-practices": {
-<<<<<<< HEAD
-        "count": 1,
-=======
-        "count": 3,
->>>>>>> feature/re-organize-global-memory-bank
+        "count": 2,
         "documents": [
           {
             "path": "01-project/coding-standards.json",
             "title": "01-project/coding-standards.json"
-<<<<<<< HEAD
-=======
-          },
-          {
-            "path": "coding-standards.json",
-            "title": "coding-standards.json"
           },
           {
             "path": "core/coding-standards.json",
             "title": "core/coding-standards.json"
->>>>>>> feature/re-organize-global-memory-bank
           }
         ]
       },
@@ -244,59 +224,33 @@
         ]
       },
       "domain": {
-<<<<<<< HEAD
-        "count": 1,
-=======
-        "count": 3,
->>>>>>> feature/re-organize-global-memory-bank
+        "count": 2,
         "documents": [
           {
             "path": "01-project/domain-models.json",
             "title": "01-project/domain-models.json"
-<<<<<<< HEAD
-=======
           },
           {
             "path": "core/domain-models.json",
             "title": "core/domain-models.json"
-          },
-          {
-            "path": "domain-models.json",
-            "title": "domain-models.json"
->>>>>>> feature/re-organize-global-memory-bank
           }
         ]
       },
       "models": {
-<<<<<<< HEAD
-        "count": 1,
-=======
-        "count": 3,
->>>>>>> feature/re-organize-global-memory-bank
+        "count": 2,
         "documents": [
           {
             "path": "01-project/domain-models.json",
             "title": "01-project/domain-models.json"
-<<<<<<< HEAD
-=======
           },
           {
             "path": "core/domain-models.json",
             "title": "core/domain-models.json"
-          },
-          {
-            "path": "domain-models.json",
-            "title": "domain-models.json"
->>>>>>> feature/re-organize-global-memory-bank
           }
         ]
       },
       "architecture": {
-<<<<<<< HEAD
-        "count": 11,
-=======
-        "count": 14,
->>>>>>> feature/re-organize-global-memory-bank
+        "count": 13,
         "documents": [
           {
             "path": "01-project/domain-models.json",
@@ -339,14 +293,6 @@
             "title": "06-releases/v2-design-decisions.json"
           },
           {
-<<<<<<< HEAD
-            "path": "template-system.json",
-            "title": "template-system.json"
-=======
-            "path": "architecture.json",
-            "title": "architecture.json"
-          },
-          {
             "path": "core/architecture.json",
             "title": "core/architecture.json"
           },
@@ -355,14 +301,13 @@
             "title": "core/domain-models.json"
           },
           {
-            "path": "domain-models.json",
-            "title": "domain-models.json"
->>>>>>> feature/re-organize-global-memory-bank
+            "path": "template-system.json",
+            "title": "template-system.json"
           }
         ]
       },
       "json": {
-        "count": 10,
+        "count": 11,
         "documents": [
           {
             "path": "01-project/domain-models.json",
@@ -424,50 +369,28 @@
         ]
       },
       "glossary": {
-<<<<<<< HEAD
-        "count": 1,
-=======
-        "count": 3,
->>>>>>> feature/re-organize-global-memory-bank
+        "count": 2,
         "documents": [
           {
             "path": "01-project/glossary.json",
             "title": "01-project/glossary.json"
-<<<<<<< HEAD
-=======
           },
           {
             "path": "core/glossary.json",
             "title": "core/glossary.json"
-          },
-          {
-            "path": "glossary.json",
-            "title": "glossary.json"
->>>>>>> feature/re-organize-global-memory-bank
           }
         ]
       },
       "terminology": {
-<<<<<<< HEAD
-        "count": 1,
-=======
-        "count": 3,
->>>>>>> feature/re-organize-global-memory-bank
+        "count": 2,
         "documents": [
           {
             "path": "01-project/glossary.json",
             "title": "01-project/glossary.json"
-<<<<<<< HEAD
-=======
           },
           {
             "path": "core/glossary.json",
             "title": "core/glossary.json"
-          },
-          {
-            "path": "glossary.json",
-            "title": "glossary.json"
->>>>>>> feature/re-organize-global-memory-bank
           }
         ]
       },
@@ -551,35 +474,20 @@
         ]
       },
       "tech-stack": {
-<<<<<<< HEAD
-        "count": 1,
-=======
-        "count": 3,
->>>>>>> feature/re-organize-global-memory-bank
+        "count": 2,
         "documents": [
           {
             "path": "01-project/tech-stack.json",
             "title": "01-project/tech-stack.json"
-<<<<<<< HEAD
-=======
           },
           {
             "path": "core/tech-stack.json",
             "title": "core/tech-stack.json"
-          },
-          {
-            "path": "tech-stack.json",
-            "title": "tech-stack.json"
->>>>>>> feature/re-organize-global-memory-bank
           }
         ]
       },
       "infrastructure": {
-<<<<<<< HEAD
-        "count": 2,
-=======
-        "count": 4,
->>>>>>> feature/re-organize-global-memory-bank
+        "count": 3,
         "documents": [
           {
             "path": "01-project/tech-stack.json",
@@ -588,17 +496,10 @@
           {
             "path": "07-infrastructure/README.json",
             "title": "07-infrastructure/README.json"
-<<<<<<< HEAD
-=======
           },
           {
             "path": "core/tech-stack.json",
             "title": "core/tech-stack.json"
-          },
-          {
-            "path": "tech-stack.json",
-            "title": "tech-stack.json"
->>>>>>> feature/re-organize-global-memory-bank
           }
         ]
       },
@@ -702,11 +603,7 @@
         ]
       },
       "memory-bank": {
-<<<<<<< HEAD
         "count": 19,
-=======
-        "count": 16,
->>>>>>> feature/re-organize-global-memory-bank
         "documents": [
           {
             "path": "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
@@ -816,11 +713,7 @@
         ]
       },
       "meta": {
-<<<<<<< HEAD
-        "count": 15,
-=======
         "count": 16,
->>>>>>> feature/re-organize-global-memory-bank
         "documents": [
           {
             "path": "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
@@ -839,13 +732,10 @@
             "title": "09-refactoring/analysis/global-memory-bank-analysis-raw.json"
           },
           {
-<<<<<<< HEAD
-=======
             "path": "core/navigation.json",
             "title": "core/navigation.json"
           },
           {
->>>>>>> feature/re-organize-global-memory-bank
             "path": "meta/README.json",
             "title": "meta/README.json"
           },
@@ -1415,7 +1305,6 @@
           }
         ]
       },
-<<<<<<< HEAD
       "fix": {
         "count": 1,
         "documents": [
@@ -1447,54 +1336,12 @@
           }
         ]
       },
-      "initialization": {
-        "count": 1,
-        "documents": [
-          {
-            "path": "initialization-behavior.json",
-            "title": "initialization-behavior.json"
-          }
-        ]
-      },
-      "behavior": {
-        "count": 1,
-        "documents": [
-          {
-            "path": "initialization-behavior.json",
-            "title": "initialization-behavior.json"
-          }
-        ]
-      },
-      "navigation": {
-=======
       "system-design": {
->>>>>>> feature/re-organize-global-memory-bank
-        "count": 2,
+        "count": 1,
         "documents": [
-          {
-            "path": "architecture.json",
-            "title": "architecture.json"
-          },
           {
             "path": "core/architecture.json",
             "title": "core/architecture.json"
-          }
-        ]
-      },
-      "standards": {
-        "count": 3,
-        "documents": [
-          {
-            "path": "coding-standards.json",
-            "title": "coding-standards.json"
-          },
-          {
-            "path": "core/coding-standards.json",
-            "title": "core/coding-standards.json"
-          },
-          {
-            "path": "meta/document-type-standards.json",
-            "title": "meta/document-type-standards.json"
           }
         ]
       },
@@ -1531,6 +1378,19 @@
           }
         ]
       },
+      "standards": {
+        "count": 2,
+        "documents": [
+          {
+            "path": "core/coding-standards.json",
+            "title": "core/coding-standards.json"
+          },
+          {
+            "path": "meta/document-type-standards.json",
+            "title": "meta/document-type-standards.json"
+          }
+        ]
+      },
       "navigation": {
         "count": 3,
         "documents": [
@@ -1545,6 +1405,24 @@
           {
             "path": "meta/global-memory-bank-navigation.json",
             "title": "meta/global-memory-bank-navigation.json"
+          }
+        ]
+      },
+      "initialization": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "initialization-behavior.json",
+            "title": "initialization-behavior.json"
+          }
+        ]
+      },
+      "behavior": {
+        "count": 1,
+        "documents": [
+          {
+            "path": "initialization-behavior.json",
+            "title": "initialization-behavior.json"
           }
         ]
       },
@@ -1570,15 +1448,6 @@
           {
             "path": "tags/tag_index_update_plan.json",
             "title": "tags/tag_index_update_plan.json"
-          }
-        ]
-      },
-      "standards": {
-        "count": 1,
-        "documents": [
-          {
-            "path": "meta/document-type-standards.json",
-            "title": "meta/document-type-standards.json"
           }
         ]
       },
