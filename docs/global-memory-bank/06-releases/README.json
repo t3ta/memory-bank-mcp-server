@@ -11,9 +11,9 @@
       "documentation",
       "guide"
     ],
-    "lastModified": "2025-03-21T13:20:00.000Z",
+    "lastModified": "2025-03-24T14:15:00.000Z",
     "createdAt": "2025-03-21T13:20:00.000Z",
-    "version": 1
+    "version": 2
   },
   "content": {
     "sections": [
@@ -27,7 +27,7 @@
       },
       {
         "title": "Key Documents",
-        "content": "- **consolidated-v2-release.json**: Comprehensive document about Version 2.0\n- **release-v2.0.0.json**: Specific release notes for Version 2.0.0\n- **v2-implementation-plan.json**: Implementation plan for Version 2\n\nAdditional documents include:\n- Release schedules\n- Version roadmaps\n- Migration guides between versions"
+        "content": "- **consolidated-v2-release.json**: Comprehensive document about Version 2.0\n- **release-v2.0.0.json**: Specific release notes for Version 2.0.0\n- **release-v2.2.0.json**: Specific release notes for Version 2.2.0\n- **v2-implementation-plan.json**: Implementation plan for Version 2\n\nAdditional documents include:\n- Release schedules\n- Version roadmaps\n- Migration guides between versions"
       },
       {
         "title": "Related Tags",
