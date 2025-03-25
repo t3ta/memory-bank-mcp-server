@@ -133,164 +133,14 @@ function getMergedApplicationOptions(appInstance: Application | null, docs?: str
   };
 }
 
+// Import tool definitions from the new modules
+import { getToolDefinitions } from './tools/index.js';
+
 // New application instance
 let app: Application | null = null;
-const AVAILABLE_TOOLS = [
-  {
-    name: 'list_tools',
-    description: 'List all available tools',
-    inputSchema: {
-      type: 'object',
-      properties: {},
-    },
-  },
-  {
-    name: 'write_branch_memory_bank',
-    description: "Write a document to the current branch's memory bank",
-    inputSchema: {
-      type: 'object',
-      properties: {
-        path: { type: 'string' },
-        content: { type: 'string' },
-        patches: {
-          type: 'array',
-          description: 'JSON Patch operations to apply (RFC 6902)',
-          items: {
-            type: 'object',
-            properties: {
-              op: {
-                type: 'string',
-                enum: ['add', 'remove', 'replace', 'move', 'copy', 'test'],
-                description: 'Operation type'
-              },
-              path: {
-                type: 'string',
-                description: 'JSON Pointer path (e.g. /metadata/title)'
-              },
-              value: {
-                description: 'Value for add, replace, test operations'
-              },
-              from: {
-                type: 'string',
-                description: 'Source path for move, copy operations'
-              }
-            },
-            required: ['op', 'path']
-          }
-        },
-        branch: {
-          type: 'string',
-          description: 'Branch name',
-        },
-        docs: {
-          type: 'string',
-          description: 'Path to docs directory',
-        },
-      },
-      required: ['path', 'branch', 'docs'],
-    },
-  },
-  {
-    name: 'read_branch_memory_bank',
-    description: "Read a document from the current branch's memory bank",
-    inputSchema: {
-      type: 'object',
-      properties: {
-        path: { type: 'string' },
-        branch: {
-          type: 'string',
-          description: 'Branch name',
-        },
-        docs: {
-          type: 'string',
-          description: 'Path to docs directory',
-        },
-      },
-      required: ['path', 'branch', 'docs'],
-    },
-  },
-  {
-    name: 'write_global_memory_bank',
-    description: 'Write a document to the global memory bank',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        path: { type: 'string' },
-        content: { type: 'string' },
-        patches: {
-          type: 'array',
-          description: 'JSON Patch operations to apply (RFC 6902)',
-          items: {
-            type: 'object',
-            properties: {
-              op: {
-                type: 'string',
-                enum: ['add', 'remove', 'replace', 'move', 'copy', 'test'],
-                description: 'Operation type'
-              },
-              path: {
-                type: 'string',
-                description: 'JSON Pointer path (e.g. /metadata/title)'
-              },
-              value: {
-                description: 'Value for add, replace, test operations'
-              },
-              from: {
-                type: 'string',
-                description: 'Source path for move, copy operations'
-              }
-            },
-            required: ['op', 'path']
-          }
-        },
-        docs: {
-          type: 'string',
-          description: 'Path to docs directory',
-        },
-      },
-      required: ['docs'],
-    },
-  },
-  {
-    name: 'read_global_memory_bank',
-    description: 'Read a document from the global memory bank',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        path: { type: 'string' },
-        docs: {
-          type: 'string',
-          description: 'Path to docs directory',
-        },
-      },
-      required: ['path', 'docs'],
-    },
-  },
-  {
-    name: 'read_context',
-    description:
-      'Read all context information (rules, branch memory bank, global memory bank) at once',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        branch: {
-          type: 'string',
-          description: 'Branch name',
-        },
-        language: {
-          type: 'string',
-          enum: ['en', 'ja', 'zh'],
-          description: 'Language code (en, ja, or zh)',
-        },
-        docs: {
-          type: 'string',
-          description: 'Path to docs directory',
-        },
-      },
-      required: ['branch', 'docs', 'language'],
-    },
-  },
-];
+
+// Use the improved tool definitions from the tools module
+const AVAILABLE_TOOLS = getToolDefinitions();
 
 // Create a server
 const server = new MCPServer(
@@ -349,6 +199,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         throw new Error('Invalid arguments for write_branch_memory_bank: path and branch are required');
       }
 
+      // Make sure branch name includes namespace prefix
+      if (!branch.includes('/')) {
+        throw new Error('Branch name must include a namespace prefix with slash (e.g. "feature/my-branch")');
+      }
+
       // Content and patches cannot be provided at the same time
       if (content && patches) {
         throw new Error('Content and patches cannot be provided at the same time');
@@ -388,67 +243,18 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         return { content: [{ type: 'text', text: 'Document written successfully' }] };
       }
 
-      // Case 2: Patches provided - apply JSON Patch operations
+      // Case 2: Patches provided - use our improved JSON Patch handler
       if (patches) {
-        logger.debug(`Applying patches to branch memory bank (branch: ${branch}, path: ${path}, docsRoot: ${docsRoot})`);
-
-        try {
-          // Import necessary classes
-          const { JsonPatchOperation } = await import('./domain/jsonpatch/JsonPatchOperation.js');
-          const { FastJsonPatchAdapter } = await import('./domain/jsonpatch/FastJsonPatchAdapter.js');
-
-          // Create adapter for patch application
-          const patchService = new FastJsonPatchAdapter();
-
-          // First, read the document
-          const readResult = await branchApp.getBranchController().readDocument(branch, path);
-          if (!readResult.success) {
-            throw new Error(`Document not found: ${path} in branch ${branch}. Create the document first before applying patches.`);
-          }
-
-          const document = readResult.data?.content;
-          if (!document) {
-            throw new Error(`Document is empty or invalid: ${path} in branch ${branch}`);
-          }
-
-          // Parse document content to JSON if it's a string
-          const docContent = typeof document === 'string' ? JSON.parse(document) : document;
-
-          // Convert patch operations to domain model
-          const patchOperations = patches.map(patch => {
-            return JsonPatchOperation.create(
-              patch.op,
-              patch.path,
-              patch.value,
-              patch.from
-            );
-          });
-
-          // Apply patches
-          logger.debug(`Applying ${patchOperations.length} JSON Patch operations`);
-
-          // Execute validation
-          const isValid = patchService.validate(docContent, patchOperations);
-          if (!isValid) {
-            throw new Error('Invalid JSON Patch operations');
-          }
-
-          // Apply patches
-          const updatedContent = patchService.apply(docContent, patchOperations);
-
-          // Save the updated document
-          const jsonString = JSON.stringify(updatedContent, null, 2);
-          const writeResult = await branchApp.getBranchController().writeDocument(branch, path, jsonString);
-
-          if (!writeResult.success) {
-            throw new Error((writeResult as any).error?.message || 'Failed to save patched document');
-          }
-
-          return { content: [{ type: 'text', text: 'Document patched successfully' }] };
-        } catch (error) {
-          logger.error('Error applying JSON Patch:', error);
-          throw error instanceof Error ? error : new Error(String(error));
-        }
+        const { processJsonPatch } = await import('./tools/handlers.js');
+        
+        return processJsonPatch(
+          app,
+          patches,
+          async (docPath) => branchApp.getBranchController().readDocument(branch, docPath),
+          async (docPath, content) => branchApp.getBranchController().writeDocument(branch, docPath, content),
+          path,
+          `branch memory bank (branch: ${branch})`
+        );
       }
 
       // Should never reach here
@@ -465,35 +271,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         throw new Error('Invalid arguments for read_branch_memory_bank: path and branch are required');
       }
 
-      if (!app) {
-        throw new Error('Application not initialized');
+      // Make sure branch name includes namespace prefix
+      if (!branch.includes('/')) {
+        throw new Error('Branch name must include a namespace prefix with slash (e.g. "feature/my-branch")');
       }
 
-      // Resolve docs root
-      const docsRoot = docs || resolveDocsRoot();
-      logger.debug(`Reading branch memory bank (branch: ${branch}, path: ${path}, docsRoot: ${docsRoot})`);
-
-      // Create a new application instance if needed
-      let branchApp = app;
-      if (workspace || docs) {
-        logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
-
-        // マージされた設定オプションを取得
-        const appOptions = getMergedApplicationOptions(app, docsRoot, 'ja');
-
-        logger.debug(`Using merged application options: ${JSON.stringify(appOptions)}`);
-        branchApp = await createApplication(appOptions);
-      }
-
-      const response = await branchApp.getBranchController().readDocument(branch, path);
-      if (!response.success) {
-        throw new Error((response as any).error.message);
-      }
-
-      return {
-        content: [{ type: 'text', text: response.data?.content || '' }],
-        _meta: { lastModified: response.data?.lastModified || new Date().toISOString() },
-      };
+      // Use our improved read handler
+      const { readBranchDocument } = await import('./tools/handlers.js');
+      return readBranchDocument(app, path, branch, docs);
     }
 
     case 'read_rules': {
@@ -607,67 +392,18 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         return { content: [{ type: 'text', text: 'Document written successfully' }] };
       }
 
-      // Case 2: Patches provided - apply JSON Patch operations
+      // Case 2: Patches provided - use our improved JSON Patch handler
       if (patches) {
-        logger.debug(`Applying patches to global memory bank (path: ${path}, docsRoot: ${docsRoot})`);
-
-        try {
-          // Import necessary classes
-          const { JsonPatchOperation } = await import('./domain/jsonpatch/JsonPatchOperation.js');
-          const { FastJsonPatchAdapter } = await import('./domain/jsonpatch/FastJsonPatchAdapter.js');
-
-          // Create adapter for patch application
-          const patchService = new FastJsonPatchAdapter();
-
-          // First, read the document
-          const readResult = await globalApp.getGlobalController().readDocument(path);
-          if (!readResult.success) {
-            throw new Error(`Document not found: ${path}. Create the document first before applying patches.`);
-          }
-
-          const document = readResult.data?.content;
-          if (!document) {
-            throw new Error(`Document is empty or invalid: ${path}`);
-          }
-
-          // Parse document content to JSON if it's a string
-          const docContent = typeof document === 'string' ? JSON.parse(document) : document;
-
-          // Convert patch operations to domain model
-          const patchOperations = patches.map(patch => {
-            return JsonPatchOperation.create(
-              patch.op,
-              patch.path,
-              patch.value,
-              patch.from
-            );
-          });
-
-          // Apply patches
-          logger.debug(`Applying ${patchOperations.length} JSON Patch operations`);
-
-          // Execute validation
-          const isValid = patchService.validate(docContent, patchOperations);
-          if (!isValid) {
-            throw new Error('Invalid JSON Patch operations');
-          }
-
-          // Apply patches
-          const updatedContent = patchService.apply(docContent, patchOperations);
-
-          // Save the updated document
-          const jsonString = JSON.stringify(updatedContent, null, 2);
-          const writeResult = await globalApp.getGlobalController().writeDocument(path, jsonString);
-
-          if (!writeResult.success) {
-            throw new Error((writeResult as any).error?.message || 'Failed to save patched document');
-          }
-
-          return { content: [{ type: 'text', text: 'Document patched successfully' }] };
-        } catch (error) {
-          logger.error('Error applying JSON Patch:', error);
-          throw error instanceof Error ? error : new Error(String(error));
-        }
+        const { processJsonPatch } = await import('./tools/handlers.js');
+        
+        return processJsonPatch(
+          app,
+          patches,
+          async (docPath) => globalApp.getGlobalController().readDocument(docPath),
+          async (docPath, content) => globalApp.getGlobalController().writeDocument(docPath, content),
+          path,
+          `global memory bank`
+        );
       }
 
       // Should never reach here
@@ -683,35 +419,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         throw new Error('Invalid arguments for read_global_memory_bank');
       }
 
-      if (!app) {
-        throw new Error('Application not initialized');
-      }
-
-      // Resolve docs root
-      const docsRoot = docs || resolveDocsRoot();
-      logger.debug(`Reading global memory bank (path: ${path}, docsRoot: ${docsRoot})`);
-
-      // Create a new application instance if needed
-      let globalApp = app;
-      if (workspace || docs) {
-        logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
-
-        // マージされた設定オプションを取得
-        const appOptions = getMergedApplicationOptions(app, docsRoot, 'ja');
-
-        logger.debug(`Using merged application options: ${JSON.stringify(appOptions)}`);
-        globalApp = await createApplication(appOptions);
-      }
-
-      const response = await globalApp.getGlobalController().readDocument(path);
-      if (!response.success) {
-        throw new Error((response as any).error.message);
-      }
-
-      return {
-        content: [{ type: 'text', text: response.data?.content || '' }],
-        _meta: { lastModified: response.data?.lastModified || new Date().toISOString() },
-      };
+      // Use our improved read handler
+      const { readGlobalDocument } = await import('./tools/handlers.js');
+      return readGlobalDocument(app, path, docs);
     }
 
     case 'read_context': {

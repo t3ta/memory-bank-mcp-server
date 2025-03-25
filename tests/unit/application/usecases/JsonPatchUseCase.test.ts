@@ -1,3 +1,17 @@
+// FastJsonPatchAdapterクラスをモックする
+// 実装でfast-json-patchを使っている部分を回避する
+jest.mock('../../../../src/domain/jsonpatch/FastJsonPatchAdapter', () => {
+  return {
+    FastJsonPatchAdapter: jest.fn().mockImplementation(() => {
+      return {
+        apply: jest.fn(),
+        validate: jest.fn(),
+        generatePatch: jest.fn()
+      };
+    })
+  };
+});
+
 import { JsonPatchUseCase } from '../../../../src/application/usecases/json/JsonPatchUseCase.js';
 import { JsonPatchOperation } from '../../../../src/domain/jsonpatch/JsonPatchOperation.js';
 import { JsonPatchService } from '../../../../src/domain/jsonpatch/JsonPatchService.js';
