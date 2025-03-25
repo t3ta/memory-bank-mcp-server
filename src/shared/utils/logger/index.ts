@@ -136,20 +136,3 @@ export class Logger {
     this.log(LogLevel.ERROR, message, context);
   }
 }
-
-/**
- * ロガーファクトリ
- */
-export class LoggerFactory {
-  private static loggers: Map<string, Logger> = new Map();
-
-  /**
-   * ロガーインスタンスの取得または作成
-   */
-  static getLogger(source: string): Logger {
-    if (!this.loggers.has(source)) {
-      this.loggers.set(source, new Logger(source));
-    }
-    return this.loggers.get(source)!;
-  }
-}

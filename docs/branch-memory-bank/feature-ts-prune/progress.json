@@ -1,0 +1,60 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "d979d005-82b3-4748-884c-5fe94d98d74e",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress"
+    ],
+    "lastModified": "2025-03-26T03:20:00.000Z",
+    "createdAt": "2025-03-25T18:08:59.196Z",
+    "version": 2
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "a0e742b3-fa70-47e4-baf1-08f8edd04bf9",
+        "description": "ts-pruneを実行し、未使用コードのリストを生成",
+        "implementedAt": "2025-03-26T03:15:00.000Z"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "d70b5c97-f670-45bd-9eeb-3bfb498aee51",
+        "description": "shared/utils関連の未使用コードの削除",
+        "priority": "high"
+      },
+      {
+        "id": "4d8a863d-20e0-4d8b-939d-d2edea18079e",
+        "description": "FileSystemTagIndexRepository関連の未使用コードの削除",
+        "priority": "medium"
+      },
+      {
+        "id": "c99cf810-33af-48f4-97eb-17d5c15f14ea",
+        "description": "application/usecases/common関連の未使用コードの削除",
+        "priority": "medium"
+      },
+      {
+        "id": "e8bf6a92-1233-4c55-8910-7c65fdb32ab1",
+        "description": "json-to-markdown関連の未使用コードの削除",
+        "priority": "low"
+      }
+    ],
+    "status": "ts-pruneを実行し、削除すべき未使用コードを特定しました。現在、削除する順序とグループ化を計画中です。",
+    "completionPercentage": 25,
+    "knownIssues": [
+      {
+        "id": "8abdfee7-f6fe-49ea-88d0-eb3364979220",
+        "description": "未使用タグ付けされたコードの中には、テスト時やランタイム時に間接的に使用されている可能性がある",
+        "severity": "medium"
+      },
+      {
+        "id": "b9954393-b99a-4d03-ad6f-c5cf6070663c",
+        "description": "エクスポートされているが、モジュール内でのみ使用されているコードはts-pruneで検出される",
+        "severity": "low"
+      }
+    ]
+  }
+}
