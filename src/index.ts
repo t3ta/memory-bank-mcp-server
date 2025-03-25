@@ -450,20 +450,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         throw new Error('Application not initialized');
       }
 
-      // Resolve workspace and docs directories
-      const paths = resolveWorkspaceAndDocs(workspace, docs);
-
-      // デバッグログはリリース時には削除
-      // logger.info(`DEBUG [write_branch_memory_bank]: パラメータ値 - workspace: "${workspace}", docs: "${docs}"`);
-      // logger.info(`DEBUG [write_branch_memory_bank]: resolveWorkspaceAndDocs結果 - workspace: "${paths.workspace}", docs: "${paths.docs}"`);
+      // Resolve docs root
+      const docsRoot = docs || resolveDocsRoot();
 
       // Create a new application instance if needed
       let branchApp = app;
       if (workspace || docs) {
-        logger.debug(`Creating new application instance with workspace: ${paths.workspace}, docs: ${paths.docs}`);
+        logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
 
         // マージされた設定オプションを取得
-        const appOptions = getMergedApplicationOptions(app, workspace, docs);
+        const appOptions = getMergedApplicationOptions(app, docsRoot, 'ja');
 
         logger.debug(`Using merged application options: ${JSON.stringify(appOptions)}`);
         branchApp = await createApplication(appOptions);
@@ -471,7 +467,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 
       // Case 1: Content provided - use normal write operation
       if (content) {
-        logger.debug(`Writing branch memory bank (branch: ${branch}, path: ${path}, workspace: ${paths.workspace})`);
+        logger.debug(`Writing branch memory bank (branch: ${branch}, path: ${path}, docsRoot: ${docsRoot})`);
         const response = await branchApp.getBranchController().writeDocument(branch, path, content);
         if (!response.success) {
           throw new Error((response as any).error?.message || 'Failed to write document');
@@ -481,7 +477,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 
       // Case 2: Patches provided - apply JSON Patch operations
       if (patches) {
-        logger.debug(`Applying patches to branch memory bank (branch: ${branch}, path: ${path}, workspace: ${paths.workspace})`);
+        logger.debug(`Applying patches to branch memory bank (branch: ${branch}, path: ${path}, docsRoot: ${docsRoot})`);
 
         try {
           // Import necessary classes
@@ -560,17 +556,17 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         throw new Error('Application not initialized');
       }
 
-      // Resolve workspace and docs directories
-      const paths = resolveWorkspaceAndDocs(workspace, docs);
-      logger.debug(`Reading branch memory bank (branch: ${branch}, path: ${path}, workspace: ${paths.workspace})`);
+      // Resolve docs root
+      const docsRoot = docs || resolveDocsRoot();
+      logger.debug(`Reading branch memory bank (branch: ${branch}, path: ${path}, docsRoot: ${docsRoot})`);
 
       // Create a new application instance if needed
       let branchApp = app;
       if (workspace || docs) {
-        logger.debug(`Creating new application instance with workspace: ${paths.workspace}, docs: ${paths.docs}`);
+        logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
 
         // マージされた設定オプションを取得
-        const appOptions = getMergedApplicationOptions(app, workspace, docs);
+        const appOptions = getMergedApplicationOptions(app, docsRoot, 'ja');
 
         logger.debug(`Using merged application options: ${JSON.stringify(appOptions)}`);
         branchApp = await createApplication(appOptions);
@@ -673,16 +669,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         throw new Error('Application not initialized');
       }
 
-      // Resolve workspace and docs directories
-      const paths = resolveWorkspaceAndDocs(workspace, docs);
+      // Resolve docs root
+      const docsRoot = docs || resolveDocsRoot();
 
       // Create a new application instance if needed
       let globalApp = app;
       if (workspace || docs) {
-        logger.debug(`Creating new application instance with workspace: ${paths.workspace}, docs: ${paths.docs}`);
+        logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
 
         // マージされた設定オプションを取得
-        const appOptions = getMergedApplicationOptions(app, workspace, docs);
+        const appOptions = getMergedApplicationOptions(app, docsRoot, 'ja');
 
         logger.debug(`Using merged application options: ${JSON.stringify(appOptions)}`);
         globalApp = await createApplication(appOptions);
@@ -690,7 +686,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 
       // Case 1: Content provided - use normal write operation
       if (content) {
-        logger.debug(`Writing global memory bank (path: ${path}, workspace: ${paths.workspace})`);
+        logger.debug(`Writing global memory bank (path: ${path}, docsRoot: ${docsRoot})`);
         const response = await globalApp.getGlobalController().writeDocument(path, content);
         if (!response.success) {
           throw new Error((response as any).error?.message || 'Failed to write document');
@@ -700,7 +696,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 
       // Case 2: Patches provided - apply JSON Patch operations
       if (patches) {
-        logger.debug(`Applying patches to global memory bank (path: ${path}, workspace: ${paths.workspace})`);
+        logger.debug(`Applying patches to global memory bank (path: ${path}, docsRoot: ${docsRoot})`);
 
         try {
           // Import necessary classes
@@ -778,17 +774,17 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         throw new Error('Application not initialized');
       }
 
-      // Resolve workspace and docs directories
-      const paths = resolveWorkspaceAndDocs(workspace, docs);
-      logger.debug(`Reading global memory bank (path: ${path}, workspace: ${paths.workspace})`);
+      // Resolve docs root
+      const docsRoot = docs || resolveDocsRoot();
+      logger.debug(`Reading global memory bank (path: ${path}, docsRoot: ${docsRoot})`);
 
       // Create a new application instance if needed
       let globalApp = app;
       if (workspace || docs) {
-        logger.debug(`Creating new application instance with workspace: ${paths.workspace}, docs: ${paths.docs}`);
+        logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
 
         // マージされた設定オプションを取得
-        const appOptions = getMergedApplicationOptions(app, workspace, docs);
+        const appOptions = getMergedApplicationOptions(app, docsRoot, 'ja');
 
         logger.debug(`Using merged application options: ${JSON.stringify(appOptions)}`);
         globalApp = await createApplication(appOptions);
