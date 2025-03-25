@@ -28,7 +28,7 @@ export const GLOBAL_CORE_FILES = [
  */
 export interface WorkspaceConfig {
   workspaceRoot: string;
-  memoryBankRoot: string;
+  docsRoot: string;
   verbose: boolean;
   language: Language;
 }
@@ -38,7 +38,7 @@ export interface WorkspaceConfig {
  */
 export interface CliOptions {
   workspace?: string;
-  memoryRoot?: string;
+  docsRoot?: string;
   verbose?: boolean;
   language?: Language;
 }

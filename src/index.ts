@@ -12,6 +12,7 @@ import { Server as MCPServer } from '@modelcontextprotocol/sdk/server/index.js';
 import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { Server } from 'node:http';
 import { Language, isValidLanguage } from './schemas/v2/i18n-schema.js';
+import type { CliOptions } from './shared/types/index.js';
 
 // Helper function to render template with translations
 function renderTemplate(template: any, translations: any): string {
@@ -55,16 +56,18 @@ function renderTemplate(template: any, translations: any): string {
 
 // Parse command line arguments
 const argv = yargs(hideBin(process.argv))
-  .option('workspace', {
-    alias: 'w',
-    type: 'string',
-    description: 'Path to workspace directory'
-  })
   .option('docs', {
     alias: 'd',
     type: 'string',
-    description: 'Path to docs directory',
+    description: 'Path to docs directory (memory bank root)',
     default: './docs',
+  })
+  .option('workspace', {
+    alias: 'w',
+    type: 'string',
+    description: 'Path to workspace directory (deprecated, use docs instead)',
+    deprecated: true,
+    hidden: true
   })
   .help()
   .parseSync();
@@ -73,17 +76,61 @@ const argv = yargs(hideBin(process.argv))
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Helper function to resolve workspace and docs paths
-export function resolveWorkspaceAndDocs(toolWorkspace?: string, toolDocs?: string) {
-  // 1. Tool parameters (highest priority)
+// Helper function to resolve docs root path
+export function resolveDocsRoot(toolDocs?: string) {
+  // 1. Tool parameter (highest priority)
   // 2. Command line arguments
   // 3. Environment variables
-  // 4. Default values
-  const workspace = toolWorkspace || argv.workspace || process.env.WORKSPACE_ROOT || process.cwd();
-  const docs = toolDocs || argv.docs || process.env.MEMORY_BANK_ROOT ||
-    (typeof workspace === 'string' ? path.join(workspace, 'docs') : './docs');
+  // 4. Default value
+  if (toolDocs) {
+    return toolDocs;
+  }
 
-  return { workspace, docs };
+  if (argv.docs) {
+    return argv.docs as string;
+  }
+
+  if (process.env.MEMORY_BANK_ROOT) {
+    return process.env.MEMORY_BANK_ROOT;
+  }
+
+  if (process.env.DOCS_ROOT) {
+    return process.env.DOCS_ROOT;
+  }
+
+  // For backward compatibility, check workspace if it exists
+  if (argv.workspace) {
+    logger.warn('workspace parameter is deprecated and will be removed in a future release. Use docs parameter instead.');
+    return path.join(argv.workspace as string, 'docs');
+  }
+
+  return './docs';
+}
+
+// Helper function to get merged application options
+function getMergedApplicationOptions(appInstance: Application | null, docs?: string, language: Language = 'ja'): CliOptions {
+  if (!appInstance) {
+    // 初期アプリケーションでは通常の処理
+    return {
+      docsRoot: docs || resolveDocsRoot(),
+      language,
+      verbose: false
+    };
+  }
+
+  // 既存のアプリケーションのオプションを取得
+  const originalOptions = appInstance.options || {};
+
+  // 解決されたパス
+  const docsRoot = docs ? docs : resolveDocsRoot();
+
+  // 明示的に指定された値のみを上書き
+  return {
+    ...originalOptions,
+    ...(docs ? { docsRoot } : {}),
+    language: originalOptions.language || language,
+    verbose: originalOptions.verbose || false
+  };
 }
 
 // New application instance
@@ -135,16 +182,12 @@ const AVAILABLE_TOOLS = [
           type: 'string',
           description: 'Branch name',
         },
-        workspace: {
-          type: 'string',
-          description: 'Path to workspace directory',
-        },
         docs: {
           type: 'string',
           description: 'Path to docs directory',
         },
       },
-      required: ['path', 'branch'],
+      required: ['path', 'branch', 'docs'],
     },
   },
   {
@@ -158,16 +201,12 @@ const AVAILABLE_TOOLS = [
           type: 'string',
           description: 'Branch name',
         },
-        workspace: {
-          type: 'string',
-          description: 'Path to workspace directory',
-        },
         docs: {
           type: 'string',
           description: 'Path to docs directory',
         },
       },
-      required: ['path', 'branch'],
+      required: ['path', 'branch', 'docs'],
     },
   },
   {
@@ -204,16 +243,12 @@ const AVAILABLE_TOOLS = [
             required: ['op', 'path']
           }
         },
-        workspace: {
-          type: 'string',
-          description: 'Path to workspace directory',
-        },
         docs: {
           type: 'string',
           description: 'Path to docs directory',
         },
       },
-      required: ['path'],
+      required: ['docs'],
     },
   },
   {
@@ -223,42 +258,14 @@ const AVAILABLE_TOOLS = [
       type: 'object',
       properties: {
         path: { type: 'string' },
-        workspace: {
-          type: 'string',
-          description: 'Path to workspace directory',
-        },
         docs: {
           type: 'string',
           description: 'Path to docs directory',
         },
       },
-      required: ['path'],
+      required: ['path', 'docs'],
     },
   },
-  {
-    name: 'read_rules',
-    description: 'Read the memory bank rules in specified language',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        language: {
-          type: 'string',
-          enum: ['en', 'ja', 'zh'],
-          description: 'Language code (en, ja, or zh)',
-        },
-        workspace: {
-          type: 'string',
-          description: 'Path to workspace directory',
-        },
-        docs: {
-          type: 'string',
-          description: 'Path to docs directory',
-        },
-      },
-      required: ['language'],
-    },
-  },
-  // get_recent_branches tools removed
   {
     name: 'read_context',
     description:
@@ -268,67 +275,20 @@ const AVAILABLE_TOOLS = [
       properties: {
         branch: {
           type: 'string',
-          description: 'Branch name (required if includeBranchMemory is true)',
+          description: 'Branch name',
         },
         language: {
           type: 'string',
           enum: ['en', 'ja', 'zh'],
           description: 'Language code (en, ja, or zh)',
         },
-        includeRules: {
-          type: 'boolean',
-          description: 'Whether to include rules (default: true)',
-        },
-        includeBranchMemory: {
-          type: 'boolean',
-          description: 'Whether to include branch memory bank (default: true)',
-        },
-        includeGlobalMemory: {
-          type: 'boolean',
-          description: 'Whether to include global memory bank (default: true)',
-        },
-        workspace: {
-          type: 'string',
-          description: 'Path to workspace directory',
-        },
         docs: {
           type: 'string',
           description: 'Path to docs directory',
         },
       },
-      required: ['branch'],
+      required: ['branch', 'docs', 'language'],
     },
-  },
-  {
-    name: 'get_template',
-    description: 'Get a template by ID and language',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        id: {
-          type: 'string',
-          description: 'Template ID to retrieve'
-        },
-        language: {
-          type: 'string',
-          enum: ['en', 'ja', 'zh'],
-          description: 'Language code (en, ja, or zh)'
-        },
-        variables: {
-          type: 'object',
-          description: 'Optional variables for template substitution'
-        },
-        workspace: {
-          type: 'string',
-          description: 'Path to workspace directory'
-        },
-        docs: {
-          type: 'string',
-          description: 'Path to docs directory'
-        }
-      },
-      required: ['id', 'language']
-    }
   },
 ];
 
@@ -336,7 +296,7 @@ const AVAILABLE_TOOLS = [
 const server = new MCPServer(
   {
     name: 'memory-bank-mcp-server',
-    version: '2.0.0',
+    version: '2.2.1',
   },
   {
     capabilities: {
@@ -403,32 +363,24 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         throw new Error('Application not initialized');
       }
 
-      // Resolve workspace and docs directories
-      const paths = resolveWorkspaceAndDocs(workspace, docs);
-      
-      // デバッグログはリリース時には削除
-      // logger.info(`DEBUG [write_branch_memory_bank]: パラメータ値 - workspace: "${workspace}", docs: "${docs}"`);
-      // logger.info(`DEBUG [write_branch_memory_bank]: resolveWorkspaceAndDocs結果 - workspace: "${paths.workspace}", docs: "${paths.docs}"`);
+      // Resolve docs root
+      const docsRoot = docs || resolveDocsRoot();
 
       // Create a new application instance if needed
       let branchApp = app;
       if (workspace || docs) {
-        logger.debug(`Creating new application instance with workspace: ${paths.workspace}, docs: ${paths.docs}`);
-        
-        const appOptions = {
-          workspace: paths.workspace,
-          memoryRoot: paths.docs,
-          language: 'ja' as Language,
-          verbose: false,
-        };
-        
-        // logger.info(`DEBUG [write_branch_memory_bank]: createApplication引数 - ${JSON.stringify(appOptions)}`);
+        logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
+
+        // マージされた設定オプションを取得
+        const appOptions = getMergedApplicationOptions(app, docsRoot, 'ja');
+
+        logger.debug(`Using merged application options: ${JSON.stringify(appOptions)}`);
         branchApp = await createApplication(appOptions);
       }
 
       // Case 1: Content provided - use normal write operation
       if (content) {
-        logger.debug(`Writing branch memory bank (branch: ${branch}, path: ${path}, workspace: ${paths.workspace})`);
+        logger.debug(`Writing branch memory bank (branch: ${branch}, path: ${path}, docsRoot: ${docsRoot})`);
         const response = await branchApp.getBranchController().writeDocument(branch, path, content);
         if (!response.success) {
           throw new Error((response as any).error?.message || 'Failed to write document');
@@ -438,8 +390,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 
       // Case 2: Patches provided - apply JSON Patch operations
       if (patches) {
-        logger.debug(`Applying patches to branch memory bank (branch: ${branch}, path: ${path}, workspace: ${paths.workspace})`);
-        
+        logger.debug(`Applying patches to branch memory bank (branch: ${branch}, path: ${path}, docsRoot: ${docsRoot})`);
+
         try {
           // Import necessary classes
           const { JsonPatchOperation } = await import('./domain/jsonpatch/JsonPatchOperation.js');
@@ -474,7 +426,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 
           // Apply patches
           logger.debug(`Applying ${patchOperations.length} JSON Patch operations`);
-          
+
           // Execute validation
           const isValid = patchService.validate(docContent, patchOperations);
           if (!isValid) {
@@ -483,22 +435,22 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 
           // Apply patches
           const updatedContent = patchService.apply(docContent, patchOperations);
-          
+
           // Save the updated document
           const jsonString = JSON.stringify(updatedContent, null, 2);
           const writeResult = await branchApp.getBranchController().writeDocument(branch, path, jsonString);
-          
+
           if (!writeResult.success) {
             throw new Error((writeResult as any).error?.message || 'Failed to save patched document');
           }
-          
+
           return { content: [{ type: 'text', text: 'Document patched successfully' }] };
         } catch (error) {
           logger.error('Error applying JSON Patch:', error);
           throw error instanceof Error ? error : new Error(String(error));
         }
       }
-      
+
       // Should never reach here
       throw new Error('Invalid state: neither content nor patches were provided');
     }
@@ -517,20 +469,20 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         throw new Error('Application not initialized');
       }
 
-      // Resolve workspace and docs directories
-      const paths = resolveWorkspaceAndDocs(workspace, docs);
-      logger.debug(`Reading branch memory bank (branch: ${branch}, path: ${path}, workspace: ${paths.workspace})`);
+      // Resolve docs root
+      const docsRoot = docs || resolveDocsRoot();
+      logger.debug(`Reading branch memory bank (branch: ${branch}, path: ${path}, docsRoot: ${docsRoot})`);
 
       // Create a new application instance if needed
       let branchApp = app;
       if (workspace || docs) {
-        logger.debug(`Creating new application instance with workspace: ${paths.workspace}, docs: ${paths.docs}`);
-        branchApp = await createApplication({
-          workspace: paths.workspace,
-          memoryRoot: paths.docs,
-          language: 'ja',
-          verbose: false,
-        });
+        logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
+
+        // マージされた設定オプションを取得
+        const appOptions = getMergedApplicationOptions(app, docsRoot, 'ja');
+
+        logger.debug(`Using merged application options: ${JSON.stringify(appOptions)}`);
+        branchApp = await createApplication(appOptions);
       }
 
       const response = await branchApp.getBranchController().readDocument(branch, path);
@@ -630,24 +582,24 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         throw new Error('Application not initialized');
       }
 
-      // Resolve workspace and docs directories
-      const paths = resolveWorkspaceAndDocs(workspace, docs);
+      // Resolve docs root
+      const docsRoot = docs || resolveDocsRoot();
 
       // Create a new application instance if needed
       let globalApp = app;
       if (workspace || docs) {
-        logger.debug(`Creating new application instance with workspace: ${paths.workspace}, docs: ${paths.docs}`);
-        globalApp = await createApplication({
-          workspace: paths.workspace,
-          memoryRoot: paths.docs,
-          language: 'ja',
-          verbose: false,
-        });
+        logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
+
+        // マージされた設定オプションを取得
+        const appOptions = getMergedApplicationOptions(app, docsRoot, 'ja');
+
+        logger.debug(`Using merged application options: ${JSON.stringify(appOptions)}`);
+        globalApp = await createApplication(appOptions);
       }
 
       // Case 1: Content provided - use normal write operation
       if (content) {
-        logger.debug(`Writing global memory bank (path: ${path}, workspace: ${paths.workspace})`);
+        logger.debug(`Writing global memory bank (path: ${path}, docsRoot: ${docsRoot})`);
         const response = await globalApp.getGlobalController().writeDocument(path, content);
         if (!response.success) {
           throw new Error((response as any).error?.message || 'Failed to write document');
@@ -657,8 +609,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 
       // Case 2: Patches provided - apply JSON Patch operations
       if (patches) {
-        logger.debug(`Applying patches to global memory bank (path: ${path}, workspace: ${paths.workspace})`);
-        
+        logger.debug(`Applying patches to global memory bank (path: ${path}, docsRoot: ${docsRoot})`);
+
         try {
           // Import necessary classes
           const { JsonPatchOperation } = await import('./domain/jsonpatch/JsonPatchOperation.js');
@@ -693,7 +645,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 
           // Apply patches
           logger.debug(`Applying ${patchOperations.length} JSON Patch operations`);
-          
+
           // Execute validation
           const isValid = patchService.validate(docContent, patchOperations);
           if (!isValid) {
@@ -702,22 +654,22 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 
           // Apply patches
           const updatedContent = patchService.apply(docContent, patchOperations);
-          
+
           // Save the updated document
           const jsonString = JSON.stringify(updatedContent, null, 2);
           const writeResult = await globalApp.getGlobalController().writeDocument(path, jsonString);
-          
+
           if (!writeResult.success) {
             throw new Error((writeResult as any).error?.message || 'Failed to save patched document');
           }
-          
+
           return { content: [{ type: 'text', text: 'Document patched successfully' }] };
         } catch (error) {
           logger.error('Error applying JSON Patch:', error);
           throw error instanceof Error ? error : new Error(String(error));
         }
       }
-      
+
       // Should never reach here
       throw new Error('Invalid state: neither content nor patches were provided');
     }
@@ -735,20 +687,20 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         throw new Error('Application not initialized');
       }
 
-      // Resolve workspace and docs directories
-      const paths = resolveWorkspaceAndDocs(workspace, docs);
-      logger.debug(`Reading global memory bank (path: ${path}, workspace: ${paths.workspace})`);
+      // Resolve docs root
+      const docsRoot = docs || resolveDocsRoot();
+      logger.debug(`Reading global memory bank (path: ${path}, docsRoot: ${docsRoot})`);
 
       // Create a new application instance if needed
       let globalApp = app;
       if (workspace || docs) {
-        logger.debug(`Creating new application instance with workspace: ${paths.workspace}, docs: ${paths.docs}`);
-        globalApp = await createApplication({
-          workspace: paths.workspace,
-          memoryRoot: paths.docs,
-          language: 'ja',
-          verbose: false,
-        });
+        logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
+
+        // マージされた設定オプションを取得
+        const appOptions = getMergedApplicationOptions(app, docsRoot, 'ja');
+
+        logger.debug(`Using merged application options: ${JSON.stringify(appOptions)}`);
+        globalApp = await createApplication(appOptions);
       }
 
       const response = await globalApp.getGlobalController().readDocument(path);
@@ -772,10 +724,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
       const includeBranchMemory = true;
       const includeGlobalMemory = true;
 
-      // Resolve workspace and docs directories
-      const paths = resolveWorkspaceAndDocs(workspace, docs);
+      // Resolve docs root
+      const docsRoot = docs || resolveDocsRoot(workspace ? docs : undefined);
 
-      logger.info(`Reading context (branch: ${branch || 'none'}, language: ${language}, workspace: ${paths.workspace})`)
+      logger.info(`Reading context (branch: ${branch || 'none'}, language: ${language}, docsRoot: ${docsRoot})`)
 
       // オプションが指定されていても無視される（オプション自体が廃止されたため）
       logger.debug('All context components are always included regardless of include options.');
@@ -793,16 +745,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         // Use ContextController to get all context info at once
         logger.debug('Requesting context from ContextController');
 
-        // Create a new application instance with the specified workspace and docs if different from the default
+        // Create a new application instance with the specified docsRoot if different from the default
         let contextApp = app;
         if (workspace || docs) {
-          logger.debug(`Creating new application instance with workspace: ${paths.workspace}, docs: ${paths.docs}`);
-          contextApp = await createApplication({
-            workspace: paths.workspace,
-            memoryRoot: paths.docs,
-            language: isValidLanguage(language) ? language : 'en',
-            verbose: false,
-          });
+          logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
+
+          // マージされた設定オプションを取得
+          const appOptions = getMergedApplicationOptions(app, docsRoot, isValidLanguage(language) ? language : 'en');
+
+          logger.debug(`Using merged application options: ${JSON.stringify(appOptions)}`);
+          contextApp = await createApplication(appOptions);
         }
 
         const response = await contextApp.getContextController().readContext({
@@ -857,17 +809,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         throw new Error('Application not initialized');
       }
 
-      // Resolve workspace and docs directories
-      const paths = resolveWorkspaceAndDocs(workspace, docs);
-      logger.debug(`Getting template (id: ${id}, language: ${language}, workspace: ${paths.workspace})`);
+      // Resolve docs root
+      const docsRoot = docs || resolveDocsRoot(workspace ? docs : undefined);
+      logger.debug(`Getting template (id: ${id}, language: ${language}, docsRoot: ${docsRoot})`);
 
       // Create a new application instance if needed
       let templateApp = app;
       if (workspace || docs) {
-        logger.debug(`Creating new application instance with workspace: ${paths.workspace}, docs: ${paths.docs}`);
+        logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
         templateApp = await createApplication({
-          workspace: paths.workspace,
-          memoryRoot: paths.docs,
+          docsRoot,
           language: isValidLanguage(language) ? language : 'en',
           verbose: false,
         });
@@ -944,8 +895,7 @@ async function main() {
   logger.debug('Initializing application..');
   // Initialize a new application
   app = await createApplication({
-    workspace: argv.workspace as string,
-    memoryRoot: argv.docs as string,
+    docsRoot: resolveDocsRoot(),
     language: 'ja',
     verbose: false,
   });

@@ -295,7 +295,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
     private readonly configProvider: IConfigProvider
   ) {
     this.branchMemoryBankPath = path.join(
-      this.configProvider.getConfig().memoryBankRoot,
+      this.configProvider.getConfig().docsRoot,
       'branch-memory-bank'
     );
   }

@@ -1,0 +1,79 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "b5c8f3a1-d724-49e5-8930-f8a12e9b3d67",
+    "title": "リリースノート v2.2.1",
+    "documentType": "release_notes",
+    "path": "releaseNotes.json",
+    "tags": [
+      "release-notes",
+      "v2.2.1"
+    ],
+    "lastModified": "2025-03-25T08:25:00.000Z",
+    "createdAt": "2025-03-25T08:25:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "version": "2.2.1",
+    "releaseDate": "2025-03-25",
+    "summary": "このマイナーリリースでは、JSONドキュメント処理の改善とワークスペースオプションの強化を行い、より良いプロジェクト間の切り替え体験を提供します。",
+    "features": [
+      {
+        "title": "JSONエスケープ処理の修正",
+        "description": "content.textフィールドの自動パース機能を追加し、二重エスケープの問題を解決しました。",
+        "prNumber": 19
+      },
+      {
+        "title": "ワークスペースオプション強化",
+        "description": "CLI全体でワークスペースオプションを統一し、異なるプロジェクト間の切り替えを容易にしました。",
+        "prNumber": 18
+      },
+      {
+        "title": "Gemini対応テストスタブ",
+        "description": "shitauke-cliを利用してGeminiモデルにタスクを委譲するための初期テスト実装を追加しました。",
+        "prNumber": null
+      }
+    ],
+    "bugFixes": [
+      {
+        "title": "JSONドキュメントの二重エスケープ問題",
+        "description": "JSONドキュメント内のcontent.textフィールドが二重にエスケープされる問題を修正しました。",
+        "prNumber": 19
+      }
+    ],
+    "performance": [
+      {
+        "title": "コード品質改善",
+        "description": "全体的なコードスタイルの一貫性を向上させ、小さなパフォーマンス最適化を行いました。",
+        "prNumber": null
+      }
+    ],
+    "documentation": [
+      {
+        "title": "READMEの更新",
+        "description": "v2.2.1の新機能と改善点についてドキュメントを更新しました。",
+        "prNumber": null
+      },
+      {
+        "title": "Geminiサポートの仕様追加",
+        "description": "shitauke-cliを使用したGemini統合の初期ドキュメントを追加しました。",
+        "prNumber": null
+      }
+    ],
+    "knownIssues": [
+      "多言語テンプレートの一部が未翻訳のままです。",
+      "古いMarkdown形式のドキュメントが完全に移行されていません。",
+      "GeminiサポートはTest Stubのみの実装で、本格対応は次のマイナーバージョンで行われる予定です。"
+    ],
+    "contributors": [
+      {
+        "name": "t3ta",
+        "contributions": [
+          "コード",
+          "ドキュメント",
+          "テスト"
+        ]
+      }
+    ]
+  }
+}

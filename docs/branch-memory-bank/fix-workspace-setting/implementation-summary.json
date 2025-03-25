@@ -1,0 +1,89 @@
+{
+  "schema": "memory_document_v1",
+  "metadata": {
+    "title": "実装サマリー",
+    "documentType": "implementation_summary",
+    "path": "implementation-summary.json",
+    "tags": [
+      "implementation",
+      "refactoring"
+    ],
+    "lastModified": "2025-03-25T12:40:00.000Z"
+  },
+  "content": {
+    "title": "workspace パラメータの廃止と docsRoot への一本化",
+    "description": "設定パラメータを簡素化し、パス解決ロジックをシンプルにするために、workspace パラメータを廃止し、docsRoot パラメータのみを使用するように変更を行いました。",
+    "changedFiles": [
+      {
+        "path": "/src/infrastructure/config/WorkspaceConfig.ts",
+        "description": "インターフェース定義を変更。workspaceRoot/workspace を廃止し、memoryBankRoot/memoryRoot を docsRoot に変更しました。"
+      },
+      {
+        "path": "/src/infrastructure/config/ConfigProvider.ts",
+        "description": "パス解決ロジックを変更。resolveWorkspaceRoot と resolveMemoryBankRoot を resolveDocsRoot に統合しました。"
+      },
+      {
+        "path": "/src/index.ts",
+        "description": "コマンドライン引数の workspace を非推奨に設定。resolveWorkspaceAndDocs を resolveDocsRoot に変更。getMergedApplicationOptions のシンプル化。すべての API ハンドラでの設定適用ロジックを修正しました。"
+      },
+      {
+        "path": "/src/main/index.ts",
+        "description": "createApplication 関数でのオプション変換と後方互換性の確保を実装しました。"
+      }
+    ],
+    "designDecisions": [
+      {
+        "id": "dd-001",
+        "title": "パラメータの一本化",
+        "description": "workspaceとdocsという2つのパラメータは混乱の原因になっていたため、docsRootに一本化することで設定をシンプルにしました。",
+        "rationale": "1つのパラメータにすることで、設定の優先順位やパス解決ロジックが明確になり、ユーザーの混乱を防ぎます。"
+      },
+      {
+        "id": "dd-002",
+        "title": "後方互換性の確保",
+        "description": "既存のworkspaceパラメータは非推奨としてマークし、一定期間は引き続きサポートします。createApplication関数内で新しい形式に変換するロジックを追加しました。",
+        "rationale": "既存のコードが動かなくなることを防ぎつつ、新しい設計に徐々に移行できるようにします。"
+      },
+      {
+        "id": "dd-003",
+        "title": "設定優先順位の明確化",
+        "description": "設定の適用順序を「ツールパラメータ > コマンドライン引数 > 環境変数 > デフォルト値」と明確にしました。",
+        "rationale": "設定の優先順位が明確になることで、デバッグしやすくなり、予測可能な動作を実現できます。"
+      },
+      {
+        "id": "dd-004",
+        "title": "言語パラメータの追加",
+        "description": "getMergedApplicationOptions 関数の引数に language パラメータを明示的に追加し、各 API ハンドラでデフォルト値として 'ja' を設定しました。",
+        "rationale": "言語設定も適切に扱うことで、国際化対応の基盤を整えます。"
+      }
+    ],
+    "pendingTasks": [
+      {
+        "id": "pt-002",
+        "description": "テストケースの追加・修正",
+        "priority": "medium"
+      }
+    ],
+    "completedTasks": [
+      {
+        "id": "ct-001",
+        "description": "残りのAPIハンドラ (write_branch_memory_bank, read_branch_memory_bank, write_global_memory_bank, read_global_memory_bank) での同様の修正",
+        "completedAt": "2025-03-25T12:30:00.000Z"
+      }
+    ],
+    "learningNotes": [
+      {
+        "title": "シンプルな設計の重要性",
+        "content": "複数のパラメータが同じような目的を持つ場合、ユーザーの混乱を招きやすいです。可能な限りシンプルな設計を目指すことが重要です。"
+      },
+      {
+        "title": "後方互換性の確保方法",
+        "content": "非推奨にする場合でも、一定期間は既存の機能をサポートし、警告ログを出すなどして移行を促すことが重要です。"
+      },
+      {
+        "title": "統一的なパラメータ処理",
+        "content": "似たような処理を行う関数やAPIハンドラでは、パラメータ処理を統一することで一貫性を保ち、バグを減らせます。今回はすべてのAPIハンドラで同じパス解決ロジックを使うようにしました。"
+      }
+    ]
+  }
+}

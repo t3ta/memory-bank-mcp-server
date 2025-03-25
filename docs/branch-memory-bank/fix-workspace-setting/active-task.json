@@ -1,0 +1,56 @@
+{
+  "schema": "memory_document_v1",
+  "metadata": {
+    "title": "アクティブタスク",
+    "documentType": "active_task",
+    "path": "active-task.json",
+    "tags": [
+      "task",
+      "workspace-setting"
+    ],
+    "lastModified": "2025-03-25T12:35:00.000Z"
+  },
+  "content": {
+    "title": "残りのAPIハンドラのパス解決ロジック修正",
+    "description": "workspaceパラメータを廃止し、docsRootパラメータに一本化する修正の一環として、残りの4つのAPIハンドラ（write_branch_memory_bank, read_branch_memory_bank, write_global_memory_bank, read_global_memory_bank）でのパス解決ロジックを修正します。",
+    "currentStatus": "完了",
+    "steps": [
+      {
+        "id": "step1",
+        "description": "各APIハンドラでの resolveWorkspaceAndDocs の呼び出しを resolveDocsRoot に変更",
+        "status": "completed"
+      },
+      {
+        "id": "step2",
+        "description": "getMergedApplicationOptions 関数の引数を修正（workspace, docs => docsRoot, language）",
+        "status": "completed"
+      },
+      {
+        "id": "step3",
+        "description": "ログメッセージを更新して workspace に言及している部分を docsRoot に変更",
+        "status": "completed"
+      },
+      {
+        "id": "step4",
+        "description": "パス情報を参照している箇所を修正（paths.workspace, paths.docs => docsRoot）",
+        "status": "completed"
+      }
+    ],
+    "reference": {
+      "existingImplementation": {
+        "read_context": "const docsRoot = docs || resolveDocsRoot(workspace ? docs : undefined);",
+        "get_template": "const docsRoot = docs || resolveDocsRoot(workspace ? docs : undefined);"
+      },
+      "problems": [
+        "resolveWorkspaceAndDocs 関数を使用している",
+        "paths.workspace, paths.docs のようにオブジェクトとして扱っている",
+        "getMergedApplicationOptions の引数として workspace と docs を渡している"
+      ],
+      "solution": [
+        "resolveDocsRoot 関数で直接パスを解決するように変更",
+        "パス参照はすべて docsRoot 単一の変数を使用するように修正",
+        "getMergedApplicationOptions の引数に language パラメータを追加"
+      ]
+    }
+  }
+}
