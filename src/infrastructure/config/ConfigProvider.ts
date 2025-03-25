@@ -125,7 +125,11 @@ export class ConfigProvider implements IConfigProvider {
    */
   private async resolveWorkspaceRoot(options?: CliOptions): Promise<string> {
     try {
-      // Priority: CLI arg > env var > current dir
+      // Priority: 
+      // 1. Options directly passed to this function (highest priority)
+      // 2. CLI args via process.argv
+      // 3. Environment variables
+      // 4. Current working directory (lowest priority)
       if (options?.workspace) {
         return await this.validatePath(options.workspace);
       }
@@ -155,7 +159,11 @@ export class ConfigProvider implements IConfigProvider {
     workspaceRoot?: string
   ): Promise<string> {
     try {
-      // Priority: CLI arg > env var > default (workspace/docs)
+      // Priority:
+      // 1. Options directly passed to this function (highest priority)
+      // 2. CLI args via process.argv
+      // 3. Environment variables
+      // 4. Default path (workspace/docs) (lowest priority)
       if (options?.memoryRoot) {
         return await this.validatePath(options.memoryRoot);
       }
@@ -182,7 +190,12 @@ export class ConfigProvider implements IConfigProvider {
    */
   private async resolveLanguage(options?: CliOptions): Promise<Language> {
     try {
-      // Priority: CLI arg > env var > package.json config > default (en)
+      // Priority:
+      // 1. Options directly passed to this function (highest priority)
+      // 2. CLI args via process.argv
+      // 3. Environment variables
+      // 4. package.json config
+      // 5. Default value (en) (lowest priority)
       if (options?.language) {
         return this.validateLanguage(options.language);
       }

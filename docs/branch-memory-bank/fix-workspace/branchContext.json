@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "eb10426f-5687-4da2-8374-0ca7d4961cb8",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-25T00:38:10.123Z",
+    "createdAt": "2025-03-25T00:27:30.414Z",
+    "version": 2
+  },
+  "content": {
+    "branchName": "fix/workspace",
+    "purpose": "write_branch_memory_bankおよびread_branch_memory_bankなどのメモリバンク関連APIでworkspaceパラメータが効いていない問題を修正する",
+    "createdAt": "2025-03-25T00:27:30.414Z",
+    "userStories": [
+      {
+        "id": "31ab7a8c-45fa-41c2-bd5d-fe8601de7ec0",
+        "description": "write_branch_memory_bankでworkspaceパラメータが必須になっていないが、指定した場合も効いていない問題を修正する",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "67a4a8cd-cf85-4da4-bad3-a688c592ccff",
+        "description": "read_branch_memory_bankでworkspaceパラメータが必須になっていないが、指定した場合も効いていない問題を修正する",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "b5588f88-7265-424e-8e88-6cae8b9ed792",
+        "description": "その他のメモリバンク関連APIでworkspaceパラメータが適切に処理されていない箇所があれば修正する",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": "Gemini 委譲ルールおよび最優先ルールを参照して進める"
+  }
+}

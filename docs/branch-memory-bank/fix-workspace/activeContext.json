@@ -1,0 +1,80 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "66d4d8cd-4fdf-48b6-9f81-f43f6d91eb18",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context"
+    ],
+    "lastModified": "2025-03-25T00:55:15.789Z",
+    "createdAt": "2025-03-25T00:27:30.414Z",
+    "version": 3
+  },
+  "content": {
+    "currentWork": "write_branch_memory_bank等のメモリバンク関連APIでworkspaceパラメータが効いていない問題の調査と修正",
+    "recentChanges": [
+      {
+        "date": "2025-03-25T00:55:15.789Z",
+        "description": "問題の根本原因を特定：各APIハンドラ内で新しいアプリケーションインスタンス作成時に、resolveWorkspaceAndDocsの結果が正しく使われていない"
+      },
+      {
+        "date": "2025-03-25T00:39:05.456Z",
+        "description": "fix/workspaceブランチを作成し、問題の調査を開始"
+      },
+      {
+        "date": "2025-03-25T00:38:10.123Z",
+        "description": "branchContextを更新し、修正対象と目的を明確化"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "2b3084d7-70d0-4b03-bb8e-b68625060420",
+        "description": "workspaceパラメータの扱いを修正するが、後方互換性を保持する"
+      },
+      {
+        "id": "fcb2cae9-6a76-4da4-a378-5aa6b5e62bf2",
+        "description": "APIの一貫性を保つため、全メモリバンク関連APIでworkspaceパラメータの扱いを統一する"
+      },
+      {
+        "id": "d5f3c7e1-9b42-4a18-8c5d-e94d12a81a03",
+        "description": "すべてのAPIハンドラー内で新しいアプリケーションインスタンス作成時にworkspaceとdocsパラメータが正しく使われるよう修正する"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "4ba131ee-4505-4aca-829b-593b4e489c9c",
+        "description": "workspaceパラメータはオプションのままとし、APIの後方互換性を保持する",
+        "status": "resolved"
+      },
+      {
+        "id": "8983d5d7-948c-4580-bb39-89cf6385e92a",
+        "description": "APIリクエストからresolveWorkspaceAndDocsを経て新しいアプリケーションインスタンス作成までの流れが一貫していない",
+        "status": "resolved"
+      },
+      {
+        "id": "9d1d77ea-3a5e-424a-81c0-1924daba8bc7",
+        "description": "テストでworkspaceパラメータの扱いをどう検証するか",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "e658b0c4-ff0e-4a27-ab2e-cb4c19b62153",
+        "description": "index.tsの各APIハンドラー（write_branch_memory_bank、read_branch_memory_bankなど）で、新しいアプリケーションインスタンス作成時にworkspaceとdocsパラメータが正しく渡されるよう修正する",
+        "priority": "high"
+      },
+      {
+        "id": "1289f456-3d7a-40e5-9aca-5f22e8c923f5",
+        "description": "修正後にすべてのAPIのインスタンス作成ロジックが一貫していることを確認する",
+        "priority": "medium"
+      },
+      {
+        "id": "55ae5788-edde-4839-9c6e-4ff704c6d9c3",
+        "description": "テストを追加して、workspaceパラメータが正しく処理されることを確認する",
+        "priority": "medium"
+      }
+    ]
+  }
+}

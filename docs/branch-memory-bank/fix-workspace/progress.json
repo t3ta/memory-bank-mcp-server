@@ -1,0 +1,59 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "5cd5c997-8197-4b2e-9239-485f15ed4063",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress"
+    ],
+    "lastModified": "2025-03-25T01:02:45.789Z",
+    "createdAt": "2025-03-25T00:27:30.415Z",
+    "version": 3
+  },
+  "content": {
+    "workingFeatures": [],
+    "pendingImplementation": [
+      {
+        "id": "39106673-9fb6-4743-9eeb-c3c440ca3e69",
+        "description": "write_branch_memory_bankでworkspaceパラメータが正しく扱われるように修正",
+        "priority": "high"
+      },
+      {
+        "id": "eeef6b02-7e3a-4b8f-9087-dd28f4fe7b74",
+        "description": "read_branch_memory_bankでworkspaceパラメータが正しく扱われるように修正",
+        "priority": "high"
+      },
+      {
+        "id": "c8d32bfe-a5b7-4f7e-8d81-76ea7b9eee56",
+        "description": "write_global_memory_bank、read_global_memory_bank、read_context、get_templateでworkspaceパラメータの処理を修正",
+        "priority": "medium"
+      },
+      {
+        "id": "8562ac34-9d1f-4ce8-b1a1-53d9ef7a81e7",
+        "description": "修正に関するテストを追加または更新",
+        "priority": "medium"
+      }
+    ],
+    "status": "解析フェーズ完了: 問題の根本原因を特定しました。各APIハンドラ内で新しいアプリケーションインスタンスを作成する際に、resolveWorkspaceAndDocsの結果が正しく使われていません。実装コードとしては現在どちらも正しく使われているように見えますが、実際には正しく機能していないため、より詳細な検証が必要です。",
+    "completionPercentage": 40,
+    "knownIssues": [
+      {
+        "id": "90b0c7f1-8e51-4cde-9a2a-662c00ae41f0",
+        "description": "各APIハンドラ内でresolveWorkspaceAndDocsの結果が新しいアプリケーションインスタンス作成時に正しく使われていない可能性がある",
+        "severity": "high"
+      },
+      {
+        "id": "6625b526-a7aa-4b21-bd9b-99ad2b72d270",
+        "description": "現時点のコードでは問題が明確でないが、実際には正しく機能していないため、デバッグを通じてさらなる調査が必要",
+        "severity": "medium"
+      },
+      {
+        "id": "d3c7e8f2-6a12-4b91-b5cd-e901fa438d21",
+        "description": "複数のAPIで同じ問題が存在する可能性があり、すべてのAPIで同様のパターンで修正する必要がある",
+        "severity": "medium"
+      }
+    ]
+  }
+}

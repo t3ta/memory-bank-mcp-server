@@ -13,7 +13,8 @@ import { Constants } from './config/constants.js';
  * Initializes and manages the application lifecycle
  */
 export class Application {
-  private options: CliOptions;
+  // Debug用にoptions可視性を変更
+  public options: CliOptions;
   private container: any;
   private globalController?: IGlobalController;
   private branchController?: IBranchController;
@@ -103,6 +104,8 @@ export class Application {
 
 // Export as ESM
 export async function createApplication(options?: CliOptions): Promise<Application> {
+  // デバッグログはリリース時には削除
+  // logger.info(`DEBUG: createApplication関数呼び出し - options: ${JSON.stringify(options || {})}`);
   const app = new Application(options);
   await app.initialize();
   return app;
