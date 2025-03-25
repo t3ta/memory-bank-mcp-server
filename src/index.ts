@@ -296,7 +296,7 @@ const AVAILABLE_TOOLS = [
 const server = new MCPServer(
   {
     name: 'memory-bank-mcp-server',
-    version: '2.2.1',
+    version: '2.2.2',
   },
   {
     capabilities: {

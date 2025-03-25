@@ -1,10 +1,17 @@
-# Memory Bank MCP Server 2.2.1
+# Memory Bank MCP Server 2.2.2
 
-A Memory Bank implementation for managing project documentation and context across sessions. This server helps Claude maintain consistent project knowledge through global and branch-specific memory banks. Version 2.2.1 enhances JSON Patch support and adds workspace options along with numerous improvements.
+A Memory Bank implementation for managing project documentation and context
+across sessions. This server helps Claude maintain consistent project knowledge
+through global and branch-specific memory banks. Version 2.2.2 enhances JSON
+Patch support and adds workspace options along with numerous improvements.
 
-This project is inspired by [Cline Memory Bank](https://github.com/nickbaumann98/cline_docs/blob/main/prompting/custom%20instructions%20library/cline-memory-bank.md) from the [nickbaumann98/cline_docs](https://github.com/nickbaumann98/cline_docs) repository, which provides an excellent foundation for managing Claude's memory in software projects.
+This project is inspired by
+[Cline Memory Bank](https://github.com/nickbaumann98/cline_docs/blob/main/prompting/custom%20instructions%20library/cline-memory-bank.md)
+from the [nickbaumann98/cline_docs](https://github.com/nickbaumann98/cline_docs)
+repository, which provides an excellent foundation for managing Claude's memory
+in software projects.
 
-## What's New in 2.2.1
+## What's New in 2.2.2
 
 ### Enhanced JSON Patch Implementation
 
@@ -15,22 +22,27 @@ This project is inspired by [Cline Memory Bank](https://github.com/nickbaumann98
 
 ### CLI Workspace Option Enhancement
 
-- **Direct Root Directory Specification**: Command line now supports specifying the project root directory directly
+- **Direct Root Directory Specification**: Command line now supports specifying
+  the project root directory directly
 - **Flexible Project Management**: Work with different projects more seamlessly
 
 ### Template System Integration
 
 - **Template Loading Support**: ReadRulesUseCase now supports template loading
-- **Improved Error Handling**: Better error codes and handling throughout the system
+- **Improved Error Handling**: Better error codes and handling throughout the
+  system
 
 ### Testing Improvements
 
-- **Test Framework Migration**: Replaced ts-mockito with jest.fn() for better testing
-- **Simplified Testing Setup**: Removed E2E test setup for more streamlined testing
+- **Test Framework Migration**: Replaced ts-mockito with jest.fn() for better
+  testing
+- **Simplified Testing Setup**: Removed E2E test setup for more streamlined
+  testing
 
 ### Logging Enhancements
 
-- **Logger Replacement**: Replaced console.log with logger across all files (except CLI)
+- **Logger Replacement**: Replaced console.log with logger across all files
+  (except CLI)
 - **Logging Adjustments**: Improved handling of empty code changes
 
 ## Usage
@@ -38,11 +50,13 @@ This project is inspired by [Cline Memory Bank](https://github.com/nickbaumann98
 ### MCP Server
 
 #### NPX (Recommended)
+
 ```bash
 npx memory-bank-mcp-server
 ```
 
 With options:
+
 ```bash
 npx memory-bank-mcp-server --language ja --verbose
 ```
@@ -50,6 +64,7 @@ npx memory-bank-mcp-server --language ja --verbose
 #### Installation (Optional)
 
 If you prefer to install globally:
+
 ```bash
 npm install -g memory-bank-mcp-server
 memory-bank-mcp-server --help
@@ -57,9 +72,11 @@ memory-bank-mcp-server --help
 
 ### CLI Tool
 
-The package also includes a CLI tool for direct memory bank operations from your terminal.
+The package also includes a CLI tool for direct memory bank operations from your
+terminal.
 
 #### NPX Usage
+
 ```bash
 npx memory-bank read-global architecture.md
 npx memory-bank write-global tech-stack.md -f ./tech-stack.md
@@ -68,6 +85,7 @@ npx memory-bank recent-branches
 ```
 
 #### Installation
+
 ```bash
 npm install -g memory-bank-mcp-server
 memory-bank --help
@@ -76,9 +94,11 @@ memory-bank --help
 #### Available Commands
 
 - **read-global** `<path>`: Read a document from the global memory bank
-- **write-global** `<path> [content]`: Write a document to the global memory bank
+- **write-global** `<path> [content]`: Write a document to the global memory
+  bank
 - **read-branch** `<branch> <path>`: Read a document from a branch memory bank
-- **write-branch** `<branch> <path> [content]`: Write a document to a branch memory bank
+- **write-branch** `<branch> <path> [content]`: Write a document to a branch
+  memory bank
 - **read-core-files** `<branch>`: Read all core files from a branch memory bank
 - **recent-branches** `[limit]`: Get recent branches
 
@@ -88,13 +108,15 @@ memory-bank --help
 - **--verbose, -v**: Run with verbose logging (default: false)
 - **--language, -l**: Language for templates ('en', 'ja' or 'zh', default: 'en')
 - **--file, -f**: Read content from file (for write commands)
-- **--format**: Output format for read-core-files ('json' or 'pretty', default: 'pretty')
+- **--format**: Output format for read-core-files ('json' or 'pretty', default:
+  'pretty')
 
 ## What's New in 2.0
 
 ### JSON-based Document Structure
 
-Memory Bank 2.0 introduces a new JSON-based architecture for all documents, providing:
+Memory Bank 2.0 introduces a new JSON-based architecture for all documents,
+providing:
 
 - Better structure and validation through schema-based documents
 - Enhanced programmatic accessibility
@@ -142,7 +164,8 @@ The codebase has been refactored to follow clean architecture principles:
 
 ### Global Memory Bank
 
-The Global Memory Bank manages project-wide knowledge that persists across all branches:
+The Global Memory Bank manages project-wide knowledge that persists across all
+branches:
 
 - Architecture documentation
 - Coding standards
@@ -192,11 +215,13 @@ docs/branch-memory-bank/feature-login/
 ### Tools
 
 - **write_branch_memory_bank**
+
   - Write a document to the current branch's memory bank
   - Input:
     - `path` (string): Document path
     - `content` (string, optional): Document content (full replacement)
-    - `patches` (array, optional): JSON Patch operations to apply (cannot be used with content)
+    - `patches` (array, optional): JSON Patch operations to apply (cannot be
+      used with content)
     - `branch` (string, required): Branch name
     - `docs` (string, optional): Path to docs directory
   - Creates directories as needed
@@ -205,6 +230,7 @@ docs/branch-memory-bank/feature-login/
   - Can work with different workspace/docs locations than the server default
 
 - **read_branch_memory_bank**
+
   - Read a document from the current branch's memory bank
   - Input:
     - `path` (string): Document path
@@ -214,11 +240,13 @@ docs/branch-memory-bank/feature-login/
   - Can work with different workspace/docs locations than the server default
 
 - **write_global_memory_bank**
+
   - Write a document to the global memory bank
   - Input:
     - `path` (string): Document path
     - `content` (string, optional): Document content (full replacement)
-    - `patches` (array, optional): JSON Patch operations to apply (cannot be used with content)
+    - `patches` (array, optional): JSON Patch operations to apply (cannot be
+      used with content)
     - `docs` (string, optional): Path to docs directory
   - Creates directories as needed
   - Updates tags index automatically
@@ -226,6 +254,7 @@ docs/branch-memory-bank/feature-login/
   - Can work with different workspace/docs locations than the server default
 
 - **read_global_memory_bank**
+
   - Read a document from the global memory bank
   - Input:
     - `path` (string): Document path
@@ -233,13 +262,17 @@ docs/branch-memory-bank/feature-login/
   - Returns document content and metadata
 
 - **read_context**
-  - Read all context information (rules, branch memory bank, global memory bank) at once
+
+  - Read all context information (rules, branch memory bank, global memory bank)
+    at once
   - Input:
     - `branch` (string): Branch name (required)
     - `language` (string): Language code ('en', 'ja', or 'zh', default: 'ja')
     - `docs` (string, optional): Path to docs directory
-  - Returns combined context information (rules, branch memory, and global memory)
-  - Note: As of version 2.2.1, all context components (rules, branch memory, global memory) are always included
+  - Returns combined context information (rules, branch memory, and global
+    memory)
+  - Note: As of version 2.2.2, all context components (rules, branch memory,
+    global memory) are always included
 
 - **read_rules**
   - Read the memory bank rules in specified language
@@ -254,6 +287,7 @@ docs/branch-memory-bank/feature-login/
 Add one of these configurations to your claude_desktop_config.json:
 
 ### NPX (Recommended)
+
 ```json
 {
   "mcpServers": {
@@ -270,6 +304,7 @@ Add one of these configurations to your claude_desktop_config.json:
 ```
 
 ### Global Installation
+
 ```json
 {
   "mcpServers": {
@@ -284,12 +319,14 @@ Add one of these configurations to your claude_desktop_config.json:
 }
 ```
 
-
 Configuration options:
 
-- `WORKSPACE_ROOT`: Root directory for the project workspace (default: current directory)
-- `MEMORY_BANK_ROOT`: Root directory for memory bank storage (default: `docs` in workspace)
-- `MEMORY_BANK_LANGUAGE`: Default language for templates ("en", "ja", or "zh", default: "en")
+- `WORKSPACE_ROOT`: Root directory for the project workspace (default: current
+  directory)
+- `MEMORY_BANK_ROOT`: Root directory for memory bank storage (default: `docs` in
+  workspace)
+- `MEMORY_BANK_LANGUAGE`: Default language for templates ("en", "ja", or "zh",
+  default: "en")
 
 #### Working with Multiple Projects
 
@@ -309,13 +346,15 @@ You can specify the docs directory when starting the server:
 }
 ```
 
-Alternatively, with the `read_context` and other MCP tools, you can work with different projects in the same session:
+Alternatively, with the `read_context` and other MCP tools, you can work with
+different projects in the same session:
 
 ```
 read_context(branch: "feature/my-branch", docs: "/path/to/other/docs")
 ```
 
 Path resolution follows this priority order:
+
 1. Tool parameters (highest priority)
 2. Command-line options
 3. Environment variables
@@ -383,14 +422,17 @@ This project uses GitHub Actions for continuous integration and deployment:
 ### Automated Testing
 
 Tests are automatically run on:
+
 - Pull requests to `develop` and `master` branches
 - Direct pushes to `develop` and `master` branches
 
-The test workflow runs against multiple Node.js versions (16.x, 18.x, 20.x) to ensure compatibility.
+The test workflow runs against multiple Node.js versions (16.x, 18.x, 20.x) to
+ensure compatibility.
 
 ### Automated Release
 
 When code is merged to the `master` branch:
+
 1. Tests are run to verify the build
 2. A git tag is created based on the version in package.json
 3. A GitHub Release is created with release notes
@@ -399,6 +441,7 @@ When code is merged to the `master` branch:
 ### Manual Version Bumping
 
 To bump the version before a release:
+
 1. Go to the Actions tab in GitHub
 2. Select the "Version Bump" workflow
 3. Click "Run workflow"
@@ -409,4 +452,5 @@ This will create a commit with the updated version number in package.json.
 
 ## License
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the MIT License. See the LICENSE file for
+details.
