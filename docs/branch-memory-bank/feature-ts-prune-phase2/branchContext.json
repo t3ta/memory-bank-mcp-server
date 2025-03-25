@@ -1,0 +1,47 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "6d1e4df7-52e5-49fb-84b6-dff3ae051f24",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-26T05:00:00.000Z",
+    "createdAt": "2025-03-26T05:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "feature/ts-prune-phase2",
+    "purpose": "phase1に続き、ts-pruneで特定された未使用コードをさらに削除し、コードベースを完全にクリーンアップする",
+    "createdAt": "2025-03-26T05:00:00.000Z",
+    "userStories": [
+      {
+        "id": "e0841839-9f28-43cd-8bb5-51c3a74a7f50",
+        "description": "shared/utils関連の未使用コードを削除する",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "e3668562-6e90-407c-84c7-58e48ee16bc5",
+        "description": "application/usecases/common関連の未使用コードを削除する",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "2fe09e4e-ccdb-4671-bc6a-9bfd6213eb4a",
+        "description": "repositories関連の未使用コードを削除する",
+        "completed": false,
+        "priority": 3
+      },
+      {
+        "id": "4fa59b36-8c12-4e2a-b5b7-9e2d71b0a912",
+        "description": "json-to-markdown関連の未使用コードを削除する",
+        "completed": false,
+        "priority": 4
+      }
+    ],
+    "additionalNotes": "ts-prune-phase1では主にCLI関連のコードを削除しましたが、phase2ではそれ以外の未使用コードも徹底的に削除します。これにより、コードベースがさらにスリム化され、メンテナンス性が向上します。"
+  }
+}
