@@ -85,25 +85,25 @@ export function resolveDocsRoot(toolDocs?: string) {
   if (toolDocs) {
     return toolDocs;
   }
-  
+
   if (argv.docs) {
     return argv.docs as string;
   }
-  
+
   if (process.env.MEMORY_BANK_ROOT) {
     return process.env.MEMORY_BANK_ROOT;
   }
-  
+
   if (process.env.DOCS_ROOT) {
     return process.env.DOCS_ROOT;
   }
-  
+
   // For backward compatibility, check workspace if it exists
   if (argv.workspace) {
     logger.warn('workspace parameter is deprecated and will be removed in a future release. Use docs parameter instead.');
     return path.join(argv.workspace as string, 'docs');
   }
-  
+
   return './docs';
 }
 
@@ -182,16 +182,12 @@ const AVAILABLE_TOOLS = [
           type: 'string',
           description: 'Branch name',
         },
-        workspace: {
-          type: 'string',
-          description: 'Path to workspace directory',
-        },
         docs: {
           type: 'string',
           description: 'Path to docs directory',
         },
       },
-      required: ['path', 'branch'],
+      required: ['path', 'branch', 'docs'],
     },
   },
   {
@@ -205,16 +201,12 @@ const AVAILABLE_TOOLS = [
           type: 'string',
           description: 'Branch name',
         },
-        workspace: {
-          type: 'string',
-          description: 'Path to workspace directory',
-        },
         docs: {
           type: 'string',
           description: 'Path to docs directory',
         },
       },
-      required: ['path', 'branch'],
+      required: ['path', 'branch', 'docs'],
     },
   },
   {
@@ -251,16 +243,12 @@ const AVAILABLE_TOOLS = [
             required: ['op', 'path']
           }
         },
-        workspace: {
-          type: 'string',
-          description: 'Path to workspace directory',
-        },
         docs: {
           type: 'string',
           description: 'Path to docs directory',
         },
       },
-      required: ['path'],
+      required: ['docs'],
     },
   },
   {
@@ -270,42 +258,14 @@ const AVAILABLE_TOOLS = [
       type: 'object',
       properties: {
         path: { type: 'string' },
-        workspace: {
-          type: 'string',
-          description: 'Path to workspace directory',
-        },
         docs: {
           type: 'string',
           description: 'Path to docs directory',
         },
       },
-      required: ['path'],
+      required: ['path', 'docs'],
     },
   },
-  {
-    name: 'read_rules',
-    description: 'Read the memory bank rules in specified language',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        language: {
-          type: 'string',
-          enum: ['en', 'ja', 'zh'],
-          description: 'Language code (en, ja, or zh)',
-        },
-        workspace: {
-          type: 'string',
-          description: 'Path to workspace directory',
-        },
-        docs: {
-          type: 'string',
-          description: 'Path to docs directory',
-        },
-      },
-      required: ['language'],
-    },
-  },
-  // get_recent_branches tools removed
   {
     name: 'read_context',
     description:
@@ -315,67 +275,20 @@ const AVAILABLE_TOOLS = [
       properties: {
         branch: {
           type: 'string',
-          description: 'Branch name (required if includeBranchMemory is true)',
+          description: 'Branch name',
         },
         language: {
           type: 'string',
           enum: ['en', 'ja', 'zh'],
           description: 'Language code (en, ja, or zh)',
         },
-        includeRules: {
-          type: 'boolean',
-          description: 'Whether to include rules (default: true)',
-        },
-        includeBranchMemory: {
-          type: 'boolean',
-          description: 'Whether to include branch memory bank (default: true)',
-        },
-        includeGlobalMemory: {
-          type: 'boolean',
-          description: 'Whether to include global memory bank (default: true)',
-        },
-        workspace: {
-          type: 'string',
-          description: 'Path to workspace directory',
-        },
         docs: {
           type: 'string',
           description: 'Path to docs directory',
         },
       },
-      required: ['branch'],
+      required: ['branch', 'docs', 'language'],
     },
-  },
-  {
-    name: 'get_template',
-    description: 'Get a template by ID and language',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        id: {
-          type: 'string',
-          description: 'Template ID to retrieve'
-        },
-        language: {
-          type: 'string',
-          enum: ['en', 'ja', 'zh'],
-          description: 'Language code (en, ja, or zh)'
-        },
-        variables: {
-          type: 'object',
-          description: 'Optional variables for template substitution'
-        },
-        workspace: {
-          type: 'string',
-          description: 'Path to workspace directory'
-        },
-        docs: {
-          type: 'string',
-          description: 'Path to docs directory'
-        }
-      },
-      required: ['id', 'language']
-    }
   },
 ];
 
@@ -383,7 +296,7 @@ const AVAILABLE_TOOLS = [
 const server = new MCPServer(
   {
     name: 'memory-bank-mcp-server',
-    version: '2.0.0',
+    version: '2.2.1',
   },
   {
     capabilities: {
