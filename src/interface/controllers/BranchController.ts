@@ -89,7 +89,45 @@ export class BranchController implements IBranchController {
         path,
       });
 
-      return this.presenter.present(result.document);
+      // 自動JSONパース処理の追加
+      // jsonファイルかつcontent.textフィールドが存在する場合、JSONとしてパースを試みる
+      const document = result.document;
+      if (document && path.endsWith('.json') && document.content) {
+        try {
+          // 文字列をJSONとしてパース
+          const jsonDoc = JSON.parse(document.content);
+          
+          // memory_document_v1またはmemory_document_v2スキーマを持つドキュメントで、
+          // content.textフィールドがある場合は自動的にパースを試みる
+          if (
+            (jsonDoc.schema === 'memory_document_v1' || jsonDoc.schema === 'memory_document_v2') && 
+            jsonDoc.content && 
+            typeof jsonDoc.content === 'object' && 
+            'text' in jsonDoc.content && 
+            typeof jsonDoc.content.text === 'string'
+          ) {
+            logger.debug(`Attempting to auto-parse content.text field in JSON document: ${path}`);
+            
+            try {
+              // content.textをJSONとしてパース
+              const parsedText = JSON.parse(jsonDoc.content.text);
+              // パースに成功したら、元のJSONオブジェクトのcontent.textをパース済みのオブジェクトに置き換え
+              jsonDoc.content.text = parsedText;
+              // 置き換えたJSONオブジェクトを文字列化して元のdocumentに設定
+              document.content = JSON.stringify(jsonDoc, null, 2);
+              logger.debug(`Successfully auto-parsed content.text in JSON document: ${path}`);
+            } catch (parseError) {
+              // パースに失敗した場合は元のまま（パースしない）
+              logger.debug(`Failed to auto-parse content.text in JSON document ${path}, it's probably not a valid JSON string`);
+            }
+          }
+        } catch (error) {
+          // JSONとしてパースできなかった場合は何もしない
+          logger.debug(`Document ${path} is not a valid JSON`);
+        }
+      }
+
+      return this.presenter.present(document);
     } catch (error) {
       return this.handleError(error);
     }

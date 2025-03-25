@@ -1,0 +1,13 @@
+{
+  "schema": "memory_document_v1",
+  "metadata": {
+    "title": "testDoc.json",
+    "documentType": "generic",
+    "path": "testDoc.json",
+    "tags": [],
+    "lastModified": "2025-03-25T01:09:17.345Z"
+  },
+  "content": {
+    "text": "{\\n  \\\"schema\\\": \\\"memory_document_v2\\\",\\n  \\\"metadata\\\": {\\n    \\\"id\\\": \\\"test-doc-12345\\\",\\n    \\\"title\\\": \\\"テストドキュメント\\\",\\n    \\\"documentType\\\": \\\"test_document\\\",\\n    \\\"path\\\": \\\"testDoc.json\\\",\\n    \\\"tags\\\": [\\n      \\\"test\\\",\\n      \\\"workspace-test\\\"\\n    ],\\n    \\\"lastModified\\\": \\\"2025-03-25T05:30:00.000Z\\\",\\n    \\\"createdAt\\\": \\\"2025-03-25T05:30:00.000Z\\\",\\n    \\\"version\\\": 1\\n  },\\n  \\\"content\\\": {\\n    \\\"message\\\": \\\"これはworkspace指定のテストだよ！\\\",\\n    \\\"currentWorkspace\\\": \\\"/Users/t3ta/workspace/umitron-www-navy\\\",\\n    \\\"branch\\\": \\\"feature/test\\\",\\n    \\\"timestamp\\\": \\\"2025-03-25T05:30:00.000Z\\\",\\n    \\\"note\\\": \\\"workspace指定が正常に機能すること確認するテスト！\\\"\\n  }\\n}"
+  }
+}

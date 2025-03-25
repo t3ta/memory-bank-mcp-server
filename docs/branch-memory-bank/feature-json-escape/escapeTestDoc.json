@@ -1,0 +1,13 @@
+{
+  "schema": "memory_document_v1",
+  "metadata": {
+    "title": "escapeTestDoc.json",
+    "documentType": "generic",
+    "path": "escapeTestDoc.json",
+    "tags": [],
+    "lastModified": "2025-03-25T01:10:36.757Z"
+  },
+  "content": {
+    "text": "{\\n  \\\"schema\\\": \\\"memory_document_v2\\\",\\n  \\\"metadata\\\": {\\n    \\\"id\\\": \\\"escape-test-12345\\\",\\n    \\\"title\\\": \\\"エスケープテスト\\\",\\n    \\\"documentType\\\": \\\"test_document\\\",\\n    \\\"path\\\": \\\"escapeTestDoc.json\\\",\\n    \\\"tags\\\": [\\n      \\\"test\\\",\\n      \\\"escape-test\\\"\\n    ],\\n    \\\"lastModified\\\": \\\"2025-03-25T05:30:00.000Z\\\",\\n    \\\"createdAt\\\": \\\"2025-03-25T05:30:00.000Z\\\",\\n    \\\"version\\\": 1\\n  },\\n  \\\"content\\\": {\\n    \\\"message\\\": \\\"これはJSONエスケープのテストだよ！\\\",\\n    \\\"currentWorkspace\\\": \\\"/Users/t3ta/workspace/umitron-www-navy\\\",\\n    \\\"branch\\\": \\\"feature/test\\\",\\n    \\\"objects\\\": [\\n      {\\n        \\\"id\\\": 1,\\n        \\\"name\\\": \\\"オブジェクト1\\\"\\n      },\\n      {\\n        \\\"id\\\": 2,\\n        \\\"name\\\": \\\"オブジェクト2\\\"\\n      }\\n    ],\\n    \\\"notes\\\": \\\"JSONパーシングのエスケープ問題を解決したいね！\\\"\\n  }\\n}"
+  }
+}
