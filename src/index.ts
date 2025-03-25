@@ -405,17 +405,25 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 
       // Resolve workspace and docs directories
       const paths = resolveWorkspaceAndDocs(workspace, docs);
+      
+      // デバッグログはリリース時には削除
+      // logger.info(`DEBUG [write_branch_memory_bank]: パラメータ値 - workspace: "${workspace}", docs: "${docs}"`);
+      // logger.info(`DEBUG [write_branch_memory_bank]: resolveWorkspaceAndDocs結果 - workspace: "${paths.workspace}", docs: "${paths.docs}"`);
 
       // Create a new application instance if needed
       let branchApp = app;
       if (workspace || docs) {
         logger.debug(`Creating new application instance with workspace: ${paths.workspace}, docs: ${paths.docs}`);
-        branchApp = await createApplication({
+        
+        const appOptions = {
           workspace: paths.workspace,
           memoryRoot: paths.docs,
-          language: 'ja',
+          language: 'ja' as Language,
           verbose: false,
-        });
+        };
+        
+        // logger.info(`DEBUG [write_branch_memory_bank]: createApplication引数 - ${JSON.stringify(appOptions)}`);
+        branchApp = await createApplication(appOptions);
       }
 
       // Case 1: Content provided - use normal write operation

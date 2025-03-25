@@ -1,0 +1,78 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "aace4920-ff28-4d39-8f1c-4801d5a7add6",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "system-patterns"
+    ],
+    "lastModified": "2025-03-25T00:58:25.123Z",
+    "createdAt": "2025-03-25T00:27:30.415Z",
+    "version": 3
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "fa131113-53a2-49d1-882d-a1f49626f782",
+        "title": "workspaceパラメータの修正アプローチ",
+        "context": "write_branch_memory_bankなどのメモリバンク関連APIにおいて、workspaceパラメータが必須になっておらず、指定した場合も効いていない問題がある。これにより、ユーザーがworkspaceパラメータを指定しても、実際のパスが正しく反映されない。",
+        "decision": "問題の根本原因は、各APIハンドラ内で新しいアプリケーションインスタンスを作成する際に、resolveWorkspaceAndDocsの結果が正しく利用されていないことにある。以下の修正を実施する：\n\n1. すべてのAPIハンドラ内の条件文 `if (workspace || docs)` の後に新しいアプリケーションインスタンスを作成する際、正しく `paths.workspace` と `paths.docs` を渡す\n2. 一貫性を保つために、すべてのAPIハンドラ（write_branch_memory_bank, read_branch_memory_bank, write_global_memory_bank, read_global_memory_bank, read_context, get_template）で同じパターンを適用する\n3. APIの後方互換性を維持するために、workspaceパラメータはオプションのままとする",
+        "consequences": {
+          "positive": [
+            "ユーザーが期待通りにworkspaceパラメータを使用できるようになる",
+            "APIの一貫性が向上する",
+            "異なるワークスペースでの操作が正確になる"
+          ],
+          "negative": [
+            "既存のコードに依存している部分に影響を与える可能性があるが、後方互換性を維持することで最小限に抑える"
+          ]
+        },
+        "status": "proposed",
+        "date": "2025-03-25T00:58:25.123Z",
+        "alternatives": [
+          "workspaceパラメータを削除し、環境変数やCLIパラメータのみに依存する方法もあるが、APIの柔軟性が低下するため採用しない",
+          "すべてのAPIでworkspaceパラメータを必須にする方法もあるが、後方互換性が失われるため採用しない"
+        ]
+      }
+    ],
+    "implementationPatterns": [
+      {
+        "id": "b9c7e324-5f46-4a2d-9a68-8d7a9c36e4df",
+        "name": "resolveWorkspaceAndDocsの利用パターン",
+        "description": "resolveWorkspaceAndDocs関数は、以下の優先順位でworkspaceとdocsのパスを解決する:\n1. ツールパラメータ（最優先）\n2. コマンドライン引数\n3. 環境変数\n4. デフォルト値（最低優先）\n\nこの関数は、新しいアプリケーションインスタンスを作成する前に呼び出され、正しいパスを設定する必要がある。",
+        "examples": [
+          "const paths = resolveWorkspaceAndDocs(workspace, docs);\nconst appInstance = await createApplication({ workspace: paths.workspace, memoryRoot: paths.docs, ... });"
+        ],
+        "relatedFiles": [
+          "/Users/t3ta/workspace/memory-bank-mcp-server/src/index.ts",
+          "/Users/t3ta/workspace/memory-bank-mcp-server/tests/unit/application/resolveWorkspaceAndDocs.test.ts"
+        ]
+      },
+      {
+        "id": "73e51b9c-8f2a-4e3a-9901-95c76df39e21",
+        "name": "アプリケーションインスタンス作成パターン（修正版）",
+        "description": "メモリバンク関連APIは、workspaceやdocsパラメータが指定された場合、新しいアプリケーションインスタンスを作成して使用する。この際、resolveWorkspaceAndDocsで解決したパスを使用する必要がある。",
+        "examples": [
+          "// 修正前（問題のコード）:\nif (workspace || docs) {\n  logger.debug(`Creating new application instance with workspace: ${paths.workspace}, docs: ${paths.docs}`);\n  branchApp = await createApplication({\n    workspace: paths.workspace,\n    memoryRoot: paths.docs,\n    language: 'ja',\n    verbose: false,\n  });\n}",
+          "// 修正後（正しい実装）:\nif (workspace || docs) {\n  logger.debug(`Creating new application instance with workspace: ${paths.workspace}, docs: ${paths.docs}`);\n  branchApp = await createApplication({\n    workspace: paths.workspace,\n    memoryRoot: paths.docs,\n    language: 'ja',\n    verbose: false,\n  });\n}"
+        ],
+        "relatedFiles": [
+          "/Users/t3ta/workspace/memory-bank-mcp-server/src/index.ts"
+        ]
+      },
+      {
+        "id": "0d8e12f9-4c3a-4725-9b1c-3a6a5e81d24e",
+        "name": "設定プロバイダーパターン",
+        "description": "ConfigProviderクラスは、ワークスペースとメモリバンクのルートパスを解決し、アプリケーション全体の設定を管理する。resolveWorkspaceRootとresolveMemoryBankRoot関数は、CLIオプション、環境変数、デフォルト値の優先順位に従ってパスを解決する。",
+        "examples": [
+          "// ConfigProvider.ts内の実装\nprivate async resolveWorkspaceRoot(options?: CliOptions): Promise<string> {\n  try {\n    // Priority: CLI arg > env var > current dir\n    if (options?.workspace) {\n      return await this.validatePath(options.workspace);\n    }\n\n    if (process.env.WORKSPACE_ROOT) {\n      return await this.validatePath(process.env.WORKSPACE_ROOT);\n    }\n\n    return process.cwd();\n  } catch (error) {\n    // エラーハンドリング\n  }\n}"
+        ],
+        "relatedFiles": [
+          "/Users/t3ta/workspace/memory-bank-mcp-server/src/infrastructure/config/ConfigProvider.ts"
+        ]
+      }
+    ]
+  }
+}
