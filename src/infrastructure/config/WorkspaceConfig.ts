@@ -6,14 +6,9 @@ import type { Language } from "../../schemas/v2/i18n-schema.js";
  */
 export interface WorkspaceConfig {
   /**
-   * Workspace root directory
-   */
-  workspaceRoot: string;
-
-  /**
    * Memory bank root directory
    */
-  memoryBankRoot: string;
+  docsRoot: string;
 
   /**
    * Verbose logging flag
@@ -31,14 +26,9 @@ export interface WorkspaceConfig {
  */
 export interface CliOptions {
   /**
-   * Workspace root directory
-   */
-  workspace?: string;
-
-  /**
    * Memory bank root directory
    */
-  memoryRoot?: string;
+  docsRoot?: string;
 
   /**
    * Verbose logging flag

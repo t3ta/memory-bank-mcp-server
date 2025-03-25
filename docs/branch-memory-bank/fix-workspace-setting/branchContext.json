@@ -1,0 +1,15 @@
+{
+  "schema": "memory_document_v1",
+  "metadata": {
+    "title": "branchContext.json",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [],
+    "lastModified": "2025-03-25T02:36:31.381Z"
+  },
+  "content": {
+    "purpose": "{\\n  \\\"schema\\\": \\\"memory_document_v2\\\",\\n  \\\"metadata\\\": {\\n    \\\"id\\\": \\\"b78dd73d-f33f-4aa3-bf8c-66dee21185d8\\\",\\n    \\\"title\\\": \\\"ブランチコンテキスト\\\",\\n    \\\"documentType\\\": \\\"branch_context\\\",\\n    \\\"path\\\": \\\"branchContext.json\\\",\\n    \\\"tags\\\": [\\n      \\\"branch-context\\\"\\n    ],\\n    \\\"lastModified\\\": \\\"2025-03-25T02:55:31.825Z\\\",\\n    \\\"createdAt\\\": \\\"2025-03-25T02:35:33.395Z\\\",\\n    \\\"version\\\": 1\\n  },\\n  \\\"content\\\": {\\n    \\\"branchName\\\": \\\"fix/workspace-setting\\\",\\n    \\\"purpose\\\": \\\"workspaceとdocs（memoryRoot）のパラメータ指定が正しく機能するように修正する。サーバー起動時の設定と各APIリクエスト時の設定が競合しているように見える。\\\",\\n    \\\"createdAt\\\": \\\"2025-03-25T02:35:33.395Z\\\",\\n    \\\"userStories\\\": [\\n      {\\n        \\\"id\\\": \\\"31b5fc13-63c1-495a-9dea-5b0980af172f\\\",\\n        \\\"description\\\": \\\"read_branch_memory_bank, write_branch_memory_bankなどのAPIで、workspaceとdocsを指定した場合に、正しくパスが解決される\\\",\\n        \\\"completed\\\": false,\\n        \\\"priority\\\": 1\\n      },\\n      {\\n        \\\"id\\\": \\\"b7a35002-426d-4246-a4ad-3da940185592\\\",\\n        \\\"description\\\": \\\"サーバー起動時に設定したworkspaceとdocsの値が、APIリクエスト時に指定されたworkspaceとdocsによって上書きされる\\\",\\n        \\\"completed\\\": false,\\n        \\\"priority\\\": 2\\n      },\\n      {\\n        \\\"id\\\": \\\"64ce5410-66ab-48d6-971b-cc020ca6054d\\\",\\n        \\\"description\\\": \\\"workspaceとdocsのパラメータを指定しない場合は、サーバー起動時の設定が使用される\\\",\\n        \\\"completed\\\": false,\\n        \\\"priority\\\": 3\\n      }\\n    ],\\n    \\\"additionalNotes\\\": \\\"現在の実装では、createApplication関数を呼び出して新しいアプリケーションインスタンスを作成する際に、サーバー起動時の設定が反映されていない可能性がある。\\\"\\n  }\\n}",
+    "createdAt": "2025-03-25T02:36:31.387Z",
+    "userStories": []
+  }
+}

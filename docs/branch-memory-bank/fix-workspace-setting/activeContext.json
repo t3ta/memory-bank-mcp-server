@@ -1,0 +1,60 @@
+{
+  "schema": "memory_document_v1",
+  "metadata": {
+    "title": "activeContext.json",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [],
+    "lastModified": "2025-03-25T03:47:30.462Z"
+  },
+  "content": {
+    "currentWork": "workspace/docsの設定動作不具合の修正とリファクタリング",
+    "recentChanges": [],
+    "activeDecisions": [
+      {
+        "id": "af3cb219-7e5e-4b1a-9b37-f628bcf4d9e3",
+        "description": "workspaceパラメータを廃止し、docsRootのみのシンプルな設計に変更する",
+        "createdAt": "2025-03-25T03:47:30.462Z"
+      },
+      {
+        "id": "be2d48f5-c9a7-4eb0-8d7a-7f2c4d61c9a8",
+        "description": "後方互換性は考慮せず、不要なコードは削除する",
+        "createdAt": "2025-03-25T03:47:30.462Z"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "626499fe-e14e-4ba9-998b-368df4b20fee",
+        "description": "各APIハンドラでの実装が重複している部分をリファクタリングする可能性",
+        "status": "open"
+      },
+      {
+        "id": "b7ec0e0f-35ff-45af-a5b3-6656e0dd37dc",
+        "description": "パラメータの優先順位を明確にするためのコメントドキュメンテーションの追加",
+        "status": "open"
+      },
+      {
+        "id": "cd4971ba-d467-4550-a2d6-e6fcc207d0d3",
+        "description": "モジュールレベルでappオブジェクトを共有しているため、並行リクエスト時の影響を検討",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "32462358-b63e-4972-9c7a-1ce4d8f3798d",
+        "description": "workspaceパラメータを廃止し、docsRootパラメータのみを使用するようにリファクタリングする",
+        "priority": "high"
+      },
+      {
+        "id": "c4f6bc8a-3edd-4b39-8783-067e562d2444",
+        "description": "関連するコードを整理し、シンプルな設計にする",
+        "priority": "high"
+      },
+      {
+        "id": "eedde7cd-ad5f-416e-9a4b-1f6884aabd4c",
+        "description": "テストコードを作成して、正しく動作することを確認する",
+        "priority": "medium"
+      }
+    ]
+  }
+}

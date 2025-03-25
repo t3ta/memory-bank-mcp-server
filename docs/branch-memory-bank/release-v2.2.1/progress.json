@@ -1,0 +1,70 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "9a7ab02d-38fa-45b3-94dc-66c2d04f835f",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress"
+    ],
+    "lastModified": "2025-03-25T08:17:00.000Z",
+    "createdAt": "2025-03-25T02:28:40.169Z",
+    "version": 2
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "2af85fc1-f280-4c8c-be8b-963e412ecb92",
+        "description": "JSONエスケープの問題修正完了",
+        "implementedAt": "2025-03-25T03:30:00.000Z"
+      },
+      {
+        "id": "14faf21b-ebb4-4932-b89b-7a3cc4017fbd",
+        "description": "ワークスペースオプション対応の完了",
+        "implementedAt": "2025-03-24T18:45:00.000Z"
+      },
+      {
+        "id": "e135cf96-91c8-4c19-8093-bd5161844c7b",
+        "description": "コード品質改善とリファクタリング",
+        "implementedAt": "2025-03-24T15:20:00.000Z"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "95b842e8-235f-43e9-af59-8239fcff6858",
+        "description": "package.jsonのバージョン番号更新",
+        "priority": "high"
+      },
+      {
+        "id": "63d4a2f7-721d-462c-ac84-9c298e823ecd",
+        "description": "READMEの更新",
+        "priority": "high"
+      },
+      {
+        "id": "82a4e4e2-bbe0-41a8-81a2-8a8eed4f355f",
+        "description": "shitauke-cliとのインテグレーション検討",
+        "priority": "medium"
+      }
+    ],
+    "status": "開発完了、リリース準備中。主な機能改善とバグ修正済み。現在はリリース前の最終確認とドキュメントアップデートを進行中。",
+    "completionPercentage": 75,
+    "knownIssues": [
+      {
+        "id": "71df4c45-47d4-4407-8a73-988161b1b3c8",
+        "description": "GeminiサポートがまだTest Stubのみ",
+        "severity": "medium"
+      },
+      {
+        "id": "6dd231e5-6b7c-4c80-9da2-9f1bd4fca856",
+        "description": "多言語テンプレートの一部が未翻訳",
+        "severity": "low"
+      },
+      {
+        "id": "2af28ff0-40ef-44a6-b091-61273c763ba5",
+        "description": "古いMarkdown形式のドキュメントが完全に移行されていない",
+        "severity": "low"
+      }
+    ]
+  }
+}
