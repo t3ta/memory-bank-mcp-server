@@ -26,19 +26,15 @@ export class ConfigProvider implements IConfigProvider {
     try {
       if (this.config) return this.config;
 
-      // Resolve workspace root
-      const workspaceRoot = await this.resolveWorkspaceRoot(options);
-
-      // Resolve memory bank root
-      const memoryBankRoot = await this.resolveMemoryBankRoot(options, workspaceRoot);
+      // Resolve docs root
+      const docsRoot = await this.resolveDocsRoot(options);
 
       // Resolve language
       const language = await this.resolveLanguage(options);
 
       // Create config
       this.config = {
-        workspaceRoot,
-        memoryBankRoot,
+        docsRoot,
         verbose: options?.verbose ?? false,
         language,
       };
@@ -81,7 +77,7 @@ export class ConfigProvider implements IConfigProvider {
    */
   getGlobalMemoryPath(): string {
     const config = this.getConfig();
-    return path.join(config.memoryBankRoot, 'global-memory-bank');
+    return path.join(config.docsRoot, 'global-memory-bank');
   }
 
   /**
@@ -96,7 +92,7 @@ export class ConfigProvider implements IConfigProvider {
       // Validate branch name
       const branchInfo = BranchInfo.create(branchName);
 
-      return path.join(config.memoryBankRoot, 'branch-memory-bank', branchInfo.safeName);
+      return path.join(config.docsRoot, 'branch-memory-bank', branchInfo.safeName);
     } catch (error) {
       if (error instanceof DomainError) {
         throw error;
@@ -119,57 +115,33 @@ export class ConfigProvider implements IConfigProvider {
   }
 
   /**
-   * Resolve workspace root directory
+   * Resolve docs root directory
    * @param options CLI options
-   * @returns Promise resolving to workspace root path
+   * @returns Promise resolving to docs root path
    */
-  private async resolveWorkspaceRoot(options?: CliOptions): Promise<string> {
+  private async resolveDocsRoot(options?: CliOptions): Promise<string> {
     try {
-      // Priority: CLI arg > env var > current dir
-      if (options?.workspace) {
-        return await this.validatePath(options.workspace);
-      }
-
-      if (process.env.WORKSPACE_ROOT) {
-        return await this.validatePath(process.env.WORKSPACE_ROOT);
-      }
-
-      return process.cwd();
-    } catch (error) {
-      throw new InfrastructureError(
-        InfrastructureErrorCodes.CONFIGURATION_ERROR,
-        `Invalid workspace root: ${(error as Error).message}`,
-        { originalError: error }
-      );
-    }
-  }
-
-  /**
-   * Resolve memory bank root directory
-   * @param options CLI options
-   * @param workspaceRoot Workspace root directory
-   * @returns Promise resolving to memory bank root path
-   */
-  private async resolveMemoryBankRoot(
-    options?: CliOptions,
-    workspaceRoot?: string
-  ): Promise<string> {
-    try {
-      // Priority: CLI arg > env var > default (workspace/docs)
-      if (options?.memoryRoot) {
-        return await this.validatePath(options.memoryRoot);
+      // Priority:
+      // 1. Options directly passed to this function (highest priority)
+      // 2. Environment variables
+      // 3. Default path (./docs) (lowest priority)
+      if (options?.docsRoot) {
+        return await this.validatePath(options.docsRoot);
       }
 
       if (process.env.MEMORY_BANK_ROOT) {
         return await this.validatePath(process.env.MEMORY_BANK_ROOT);
       }
 
-      const root = workspaceRoot || process.cwd();
-      return path.resolve(root, 'docs');
+      if (process.env.DOCS_ROOT) {
+        return await this.validatePath(process.env.DOCS_ROOT);
+      }
+
+      return await this.validatePath('./docs');
     } catch (error) {
       throw new InfrastructureError(
         InfrastructureErrorCodes.CONFIGURATION_ERROR,
-        `Invalid memory bank root: ${(error as Error).message}`,
+        `Invalid docs root: ${(error as Error).message}`,
         { originalError: error }
       );
     }
@@ -182,7 +154,11 @@ export class ConfigProvider implements IConfigProvider {
    */
   private async resolveLanguage(options?: CliOptions): Promise<Language> {
     try {
-      // Priority: CLI arg > env var > package.json config > default (en)
+      // Priority:
+      // 1. Options directly passed to this function (highest priority)
+      // 2. Environment variables
+      // 3. package.json config
+      // 4. Default value (en) (lowest priority)
       if (options?.language) {
         return this.validateLanguage(options.language);
       }
@@ -269,7 +245,7 @@ export class ConfigProvider implements IConfigProvider {
 
       const dirs = [
         this.getGlobalMemoryPath(),
-        path.join(config.memoryBankRoot, 'branch-memory-bank'),
+        path.join(config.docsRoot, 'branch-memory-bank'),
       ];
 
       for (const dir of dirs) {

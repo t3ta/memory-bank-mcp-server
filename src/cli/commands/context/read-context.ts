@@ -73,7 +73,7 @@ export class ReadContextCommand extends CommandBase {
   async handler(argv: any): Promise<void> {
     try {
       const app = await createApplication({
-        memoryRoot: argv.docs as string,
+        docsRoot: argv.docs as string,
         language: argv.language as 'en' | 'ja' | 'zh',
         verbose: argv.verbose,
       });

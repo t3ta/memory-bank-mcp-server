@@ -1,0 +1,58 @@
+{
+  "schema": "memory_document_v1",
+  "metadata": {
+    "title": "systemPatterns.json",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [],
+    "lastModified": "2025-03-25T03:48:30.417Z"
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "e4a71b2d-8564-4c4f-b01a-1cb3ee4c1e1f",
+        "title": "docsRootパラメータへの一本化",
+        "description": "現状のworkspaceとdocsの2つのパラメータを廃止し、docsRootの1つのパラメータに統合する。これにより設定の複雑さが軽減され、ユーザーの混乱も防げる。",
+        "status": "approved",
+        "createdAt": "2025-03-25T03:33:12.417Z",
+        "updatedAt": "2025-03-25T03:48:30.417Z",
+        "relatedFiles": [
+          {
+            "path": "/src/index.ts",
+            "description": "APIハンドラの設定解決ロジックの修正"
+          },
+          {
+            "path": "/src/infrastructure/config/WorkspaceConfig.ts",
+            "description": "設定インターフェースの修正"
+          },
+          {
+            "path": "/src/infrastructure/config/ConfigProvider.ts",
+            "description": "設定解決ロジックの修正"
+          },
+          {
+            "path": "/src/main/index.ts",
+            "description": "Application作成ロジックの修正"
+          }
+        ]
+      },
+      {
+        "id": "72e9c3b1-d5a7-4f8a-bda4-5a22f8de2c91",
+        "title": "シンプルなパス解決",
+        "description": "絶対パスはそのまま使用し、相対パスの場合はカレントディレクトリからの相対パスとして解決する。workspaceパラメータを基準とした相対パス解決は廃止する。",
+        "status": "approved",
+        "createdAt": "2025-03-25T03:48:30.417Z",
+        "updatedAt": "2025-03-25T03:48:30.417Z",
+        "relatedFiles": [
+          {
+            "path": "/src/index.ts",
+            "description": "resolveWorkspaceAndDocs関数をresolveDocsRoot関数に変更"
+          },
+          {
+            "path": "/src/infrastructure/config/ConfigProvider.ts",
+            "description": "パス解決ロジックの修正"
+          }
+        ]
+      }
+    ]
+  }
+}

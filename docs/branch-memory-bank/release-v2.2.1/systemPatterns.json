@@ -1,0 +1,116 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "4deacb3b-36f2-40f5-a432-26187bd78679",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "system-patterns"
+    ],
+    "lastModified": "2025-03-25T08:18:00.000Z",
+    "createdAt": "2025-03-25T02:28:40.169Z",
+    "version": 2
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "363dfe51-a350-4c62-9532-6c0328f7b50f",
+        "title": "JSONエスケープ処理の修正",
+        "context": "JSONドキュメント内のテキストコンテンツが二重にエスケープされる問題が報告された。特に、content.textフィールドで問題が発生している。",
+        "decision": "JSONドキュメント内のcontent.textフィールドに対して自動パースを実装。 saveDocument時に文字列チェックを行い、既にJSONエスケープされた文字列を検出した場合は自動的にパースして正規のJSONとして保存する。",
+        "consequences": {
+          "positive": [
+            "既存のドキュメントに対して後方互換性を維持しながら修正できる",
+            "ユーザーエクスペリエンスが向上し、エスケープに関する混乱を減らせる",
+            "クリーンなJSONデータ構造が保証される"
+          ],
+          "negative": [
+            "特殊なケースでは処理が複雑になる可能性がある",
+            "パース処理の追加によるわずかなパフォーマンス影響"
+          ]
+        },
+        "status": "implemented",
+        "date": "2025-03-25T03:30:00.000Z",
+        "alternatives": [
+          "ユーザー側でエスケープを管理してもらう - ユーザー体験が低下するため却下",
+          "全てのフィールドでエスケープ処理を行う - 過剰対応となるため却下"
+        ]
+      },
+      {
+        "id": "4857d912-f3a9-432e-b901-c619f8a23def",
+        "title": "ワークスペースオプション強化",
+        "context": "CLI内でワークスペースパスの取り扱いが不統一で、異なるプロジェクトでの利用が困難だった。",
+        "decision": "CLIコマンド全体でワークスペースオプションを統一し、環境変数、CLIフラグ、APIオプションの優先順位を明確化。また、プロジェクトルートディレクトリの直接指定をサポート。",
+        "consequences": {
+          "positive": [
+            "複数プロジェクト間の切り替えが容易になる",
+            "統一したインターフェースによる使いやすさの向上",
+            "環境設定の柔軟性が高まる"
+          ],
+          "negative": [
+            "既存のスクリプトでパスの取り扱いが変わる可能性がある"
+          ]
+        },
+        "status": "implemented",
+        "date": "2025-03-24T18:45:00.000Z",
+        "alternatives": [
+          "常に現在のディレクトリをワークスペースとする - 柔軟性に欠けるため却下",
+          "設定ファイルでのみワークスペースを管理する - オーバーヘッドが大きいため却下"
+        ]
+      },
+      {
+        "id": "679c21ef-d821-48a5-a3f7-e526d9b81458",
+        "title": "Geminiサポートの追加検討",
+        "context": "AIによるタスク委譲の効率化のため、GeminiモデルとのAPI連携が要望されている。",
+        "decision": "shitauke-cliとの統合を通じてGeminiへのタスク委譲をサポート。まずはテスト用スタブを実装し、本格対応は次のマイナーバージョンで行う。",
+        "consequences": {
+          "positive": [
+            "異なるAIモデル間でのタスク振り分けが可能になる",
+            "コスト効率の良いAI利用が実現できる",
+            "特定タスクに最適なモデル選択が可能になる"
+          ],
+          "negative": [
+            "実装の複雑さが増す",
+            "依存関係が増える",
+            "APIの変更リスク"
+          ]
+        },
+        "status": "proposed",
+        "date": "2025-03-25T05:15:00.000Z",
+        "alternatives": [
+          "独自のGemini API実装を開発する - 重複開発となるため却下",
+          "サポートしない - ユーザーニーズに応えられないため却下"
+        ]
+      }
+    ],
+    "implementationPatterns": [
+      {
+        "id": "b2a3c4d5-e6f7-48a9-b0c1-d2e3f4a5b6c7",
+        "title": "JSON自動パースパターン",
+        "description": "特定のフィールドが文字列として保存されている場合に、自動的にJSONとしてパースする仕組み。特にcontent.textフィールドを対象としている。",
+        "usedIn": [
+          "src/domain/services/DocumentService.ts",
+          "src/infrastructure/repositories/FileSystemDocumentRepository.ts"
+        ],
+        "examples": [
+          "if (isJsonString(content.text)) { content.text = JSON.parse(content.text); }",
+          "function isJsonString(str) { try { const json = JSON.parse(str); return typeof json === 'object'; } catch (e) { return false; } }"
+        ]
+      },
+      {
+        "id": "7890abcd-ef12-4345-6789-0123456789ab",
+        "title": "ワークスペース優先順位解決パターン",
+        "description": "プロジェクトワークスペースのパス解決を、パラメータ > コマンドラインオプション > 環境変数 > デフォルト値 の優先順位で行う一貫したパターン。",
+        "usedIn": [
+          "src/application/usecases/BaseUseCase.ts",
+          "src/cli/command-base.ts"
+        ],
+        "examples": [
+          "const workspacePath = options.workspace || process.env.WORKSPACE_ROOT || process.cwd();",
+          "const docsPath = options.docs || process.env.MEMORY_BANK_ROOT || path.join(workspacePath, 'docs');"
+        ]
+      }
+    ]
+  }
+}

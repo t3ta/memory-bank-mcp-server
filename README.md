@@ -1,14 +1,12 @@
-# Memory Bank MCP Server 2.2.0
+# Memory Bank MCP Server 2.2.1
 
-A Memory Bank implementation for managing project documentation and context across sessions. This server helps Claude maintain consistent project knowledge through global and branch-specific memory banks. Version 2.2.0 enhances JSON Patch support and adds workspace options along with numerous improvements.
+A Memory Bank implementation for managing project documentation and context across sessions. This server helps Claude maintain consistent project knowledge through global and branch-specific memory banks. Version 2.2.1 enhances JSON Patch support and adds workspace options along with numerous improvements.
 
 This project is inspired by [Cline Memory Bank](https://github.com/nickbaumann98/cline_docs/blob/main/prompting/custom%20instructions%20library/cline-memory-bank.md) from the [nickbaumann98/cline_docs](https://github.com/nickbaumann98/cline_docs) repository, which provides an excellent foundation for managing Claude's memory in software projects.
 
-## What's New in 2.2.0
+## What's New in 2.2.1
 
 ### Enhanced JSON Patch Implementation
-
-Version 2.2.0 enhances the JSON Patch implementation with:
 
 - **Updated Implementation**: Improved JSON Patch adapter and operation handling
 - **Better Error Codes**: Enhanced error reporting for patch operations
@@ -86,8 +84,7 @@ memory-bank --help
 
 #### Options
 
-- **--workspace, -w**: Path to workspace directory (default: current directory)
-- **--docs, -d**: Path to docs directory (default: './docs' or '{workspace}/docs')
+- **--docs, -d**: Path to docs directory (default: './docs')
 - **--verbose, -v**: Run with verbose logging (default: false)
 - **--language, -l**: Language for templates ('en', 'ja' or 'zh', default: 'en')
 - **--file, -f**: Read content from file (for write commands)
@@ -161,10 +158,10 @@ docs/global-memory-bank/
   ├── architecture.json      # System architecture
   ├── coding-standards.json  # Coding conventions
   ├── domain-models.json     # Domain model definitions
-  ├── glossary.json          # Terminology
-  ├── tech-stack.json        # Technology stack
-  ├── user-guide.json        # User guide
-  └── tags/                  # Information organization
+  ├── glossary.json         # Terminology
+  ├── tech-stack.json       # Technology stack
+  ├── user-guide.json       # User guide
+  └── tags/                 # Information organization
 ```
 
 > Note: Only .json format is supported.
@@ -201,7 +198,6 @@ docs/branch-memory-bank/feature-login/
     - `content` (string, optional): Document content (full replacement)
     - `patches` (array, optional): JSON Patch operations to apply (cannot be used with content)
     - `branch` (string, required): Branch name
-    - `workspace` (string, optional): Path to workspace directory
     - `docs` (string, optional): Path to docs directory
   - Creates directories as needed
   - Initializes with templates if content is empty
@@ -213,7 +209,6 @@ docs/branch-memory-bank/feature-login/
   - Input:
     - `path` (string): Document path
     - `branch` (string, required): Branch name
-    - `workspace` (string, optional): Path to workspace directory
     - `docs` (string, optional): Path to docs directory
   - Returns document content and metadata
   - Can work with different workspace/docs locations than the server default
@@ -224,7 +219,6 @@ docs/branch-memory-bank/feature-login/
     - `path` (string): Document path
     - `content` (string, optional): Document content (full replacement)
     - `patches` (array, optional): JSON Patch operations to apply (cannot be used with content)
-    - `workspace` (string, optional): Path to workspace directory
     - `docs` (string, optional): Path to docs directory
   - Creates directories as needed
   - Updates tags index automatically
@@ -235,24 +229,23 @@ docs/branch-memory-bank/feature-login/
   - Read a document from the global memory bank
   - Input:
     - `path` (string): Document path
+    - `docs` (string, optional): Path to docs directory
   - Returns document content and metadata
 
 - **read_context**
   - Read all context information (rules, branch memory bank, global memory bank) at once
   - Input:
-    - `branch` (string): Branch name (required if includeBranchMemory is true)
+    - `branch` (string): Branch name (required)
     - `language` (string): Language code ('en', 'ja', or 'zh', default: 'ja')
-    - `includeRules` (boolean): Whether to include rules (default: true)
-    - `includeBranchMemory` (boolean): Whether to include branch memory bank (default: true)
-    - `includeGlobalMemory` (boolean): Whether to include global memory bank (default: true)
-  - Returns combined context information from requested sources
+    - `docs` (string, optional): Path to docs directory
+  - Returns combined context information (rules, branch memory, and global memory)
+  - Note: As of version 2.2.1, all context components (rules, branch memory, global memory) are always included
 
 - **read_rules**
   - Read the memory bank rules in specified language
   - Input:
     - `language` (string): Language code ("en", "ja", or "zh")
   - Returns rules documentation
-
 
 ## Usage with Claude Desktop
 
@@ -300,14 +293,14 @@ Configuration options:
 
 #### Working with Multiple Projects
 
-You can specify the workspace directory when starting the server:
+You can specify the docs directory when starting the server:
 
 ```json
 {
   "mcpServers": {
     "memory-bank": {
       "command": "npx",
-      "args": ["-y", "memory-bank-mcp-server", "--workspace", "/path/to/project"],
+      "args": ["-y", "memory-bank-mcp-server", "--docs", "/path/to/docs"],
       "env": {
         "MEMORY_BANK_LANGUAGE": "ja"
       }
@@ -319,7 +312,7 @@ You can specify the workspace directory when starting the server:
 Alternatively, with the `read_context` and other MCP tools, you can work with different projects in the same session:
 
 ```
-read_context(branch: "feature/my-branch", workspace: "/path/to/other/project")
+read_context(branch: "feature/my-branch", docs: "/path/to/other/docs")
 ```
 
 Path resolution follows this priority order:

@@ -1,0 +1,13 @@
+{
+  "schema": "memory_document_v1",
+  "metadata": {
+    "title": "debugSteps.json",
+    "documentType": "generic",
+    "path": "debugSteps.json",
+    "tags": [],
+    "lastModified": "2025-03-25T00:37:54.143Z"
+  },
+  "content": {
+    "text": "{\\n  \\\"schema\\\": \\\"memory_document_v2\\\",\\n  \\\"metadata\\\": {\\n    \\\"id\\\": \\\"6c91df8a-2e37-4a58-a8c7-b4c53da9e781\\\",\\n    \\\"title\\\": \\\"デバッグステップ実施状況\\\",\\n    \\\"documentType\\\": \\\"debug_status\\\",\\n    \\\"path\\\": \\\"debugSteps.json\\\",\\n    \\\"tags\\\": [\\n      \\\"debug\\\",\\n      \\\"workspace\\\",\\n      \\\"progress\\\"\\n    ],\\n    \\\"lastModified\\\": \\\"2025-03-25T01:55:10.456Z\\\",\\n    \\\"createdAt\\\": \\\"2025-03-25T01:55:10.456Z\\\",\\n    \\\"version\\\": 1\\n  },\\n  \\\"content\\\": {\\n    \\\"completedSteps\\\": [\\n      {\\n        \\\"id\\\": \\\"step-1-1\\\",\\n        \\\"title\\\": \\\"デバッグ基本環境の設定\\\",\\n        \\\"description\\\": \\\"デバッグテストの基本ファイルを作成し、Application.optionsをpublicに変更し、createApplicationにログ出力を追加した\\\",\\n        \\\"completedAt\\\": \\\"2025-03-25T01:55:00.000Z\\\",\\n        \\\"status\\\": \\\"completed\\\"\\n      }\\n    ],\\n    \\\"currentSteps\\\": [\\n      {\\n        \\\"id\\\": \\\"step-2-1\\\",\\n        \\\"title\\\": \\\"APIハンドラへのログ追加\\\",\\n        \\\"description\\\": \\\"index.ts内の各APIハンドラにログ出力を追加し、resolveWorkspaceAndDocsの結果と実際に作成されたアプリケーションインスタンスの設定を確認する\\\",\\n        \\\"startedAt\\\": \\\"2025-03-25T01:55:05.000Z\\\",\\n        \\\"status\\\": \\\"in-progress\\\"\\n      }\\n    ],\\n    \\\"pendingSteps\\\": [\\n      {\\n        \\\"id\\\": \\\"step-3-1\\\",\\n        \\\"title\\\": \\\"テスト実行とログ検証\\\",\\n        \\\"description\\\": \\\"デバッグ用テストを実行し、ログ出力から問題の原因を特定する\\\",\\n        \\\"priority\\\": \\\"high\\\"\\n      },\\n      {\\n        \\\"id\\\": \\\"step-4-1\\\",\\n        \\\"title\\\": \\\"修正実装\\\",\\n        \\\"description\\\": \\\"特定した問題に対する修正を実装する\\\",\\n        \\\"priority\\\": \\\"high\\\"\\n      },\\n      {\\n        \\\"id\\\": \\\"step-5-1\\\",\\n        \\\"title\\\": \\\"修正の検証\\\",\\n        \\\"description\\\": \\\"修正後にテストを再実行し、問題が解決されたことを確認する\\\",\\n        \\\"priority\\\": \\\"high\\\"\\n      }\\n    ],\\n    \\\"notes\\\": [\\n      {\\n        \\\"timestamp\\\": \\\"2025-03-25T01:55:10.456Z\\\",\\n        \\\"content\\\": \\\"デバッグ環境の準備が完了。次はindex.ts内の各APIハンドラにログ出力を追加し、workspaceとdocsパラメータが正しく受け渡されているか確認する。\\\"\\n      }\\n    ]\\n  }\\n}"
+  }
+}

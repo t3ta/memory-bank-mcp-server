@@ -13,7 +13,8 @@ import { Constants } from './config/constants.js';
  * Initializes and manages the application lifecycle
  */
 export class Application {
-  private options: CliOptions;
+  // Debug用にoptions可視性を変更
+  public options: CliOptions;
   private container: any;
   private globalController?: IGlobalController;
   private branchController?: IBranchController;
@@ -103,7 +104,37 @@ export class Application {
 
 // Export as ESM
 export async function createApplication(options?: CliOptions): Promise<Application> {
-  const app = new Application(options);
+  // デバッグログはリリース時には削除
+  // logger.info(`DEBUG: createApplication関数呼び出し - options: ${JSON.stringify(options || {})}`);
+  
+  // Convert legacy options format to new format if needed
+  const newOptions: CliOptions = {};
+  
+  if (options) {
+    // If legacy 'memoryRoot' property exists, use it for docsRoot
+    if ('memoryRoot' in options) {
+      newOptions.docsRoot = (options as any).memoryRoot;
+    }
+    
+    // If legacy 'workspace' property exists but docsRoot not set yet, 
+    // only log a warning - workspace property is no longer used
+    if ('workspace' in options && !newOptions.docsRoot) {
+      logger.warn(
+        'workspace parameter is deprecated and will be ignored. Use docsRoot parameter instead.'
+      );
+    }
+    
+    // Copy the new docsRoot if it exists
+    if (options.docsRoot) {
+      newOptions.docsRoot = options.docsRoot;
+    }
+    
+    // Copy other properties
+    if (options.verbose !== undefined) newOptions.verbose = options.verbose;
+    if (options.language) newOptions.language = options.language;
+  }
+  
+  const app = new Application(newOptions);
   await app.initialize();
   return app;
 }
