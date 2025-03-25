@@ -98,7 +98,7 @@ export async function registerInfrastructureServices(
     const branchRepository = await container.get<FileSystemBranchMemoryBankRepository>('branchMemoryBankRepository');
     // Get the branch memory bank root directory without using getBranchMemoryPath
     const config = await configProvider.getConfig();
-    const branchMemoryBankRoot = path.join(config.memoryBankRoot, 'branch-memory-bank');
+    const branchMemoryBankRoot = path.join(config.docsRoot, 'branch-memory-bank');
     const globalMemoryBankPath = await configProvider.getGlobalMemoryPath();
 
     return new FileSystemTagIndexRepositoryV1Bridge(
@@ -117,7 +117,7 @@ export async function registerInfrastructureServices(
     const config = await configProvider.getConfig();
 
     // Set up index root path
-    const indexRoot = path.join(config.memoryBankRoot, 'indices');
+    const indexRoot = path.join(config.docsRoot, 'indices');
 
     return new IndexService(fileSystemService, indexRoot);
   });
@@ -129,7 +129,7 @@ export async function registerInfrastructureServices(
     const config = await configProvider.getConfig();
 
     // Set up template directory path
-    const templateDir = path.join(config.memoryBankRoot, 'templates', 'json');
+    const templateDir = path.join(config.docsRoot, 'templates', 'json');
 
     // Get I18nService for translations
     let i18nService;
@@ -172,7 +172,7 @@ export async function registerInfrastructureServices(
     const config = await configProvider.getConfig();
 
     // Set up translations directory path
-    const translationsDir = path.join(config.memoryBankRoot, 'translations');
+    const translationsDir = path.join(config.docsRoot, 'translations');
 
     // Import and instantiate the FileI18nRepository
     const { FileI18nRepository } = await import('../../infrastructure/i18n/FileI18nRepository.js');
@@ -194,7 +194,7 @@ export async function registerInfrastructureServices(
     const config = await configProvider.getConfig();
 
     // Branch JSON document root path
-    const branchJsonRoot = path.join(config.memoryBankRoot, 'branch-json');
+    const branchJsonRoot = path.join(config.docsRoot, 'branch-json');
 
     return new FileSystemJsonDocumentRepository(fileSystemService, indexService, branchJsonRoot);
   });
@@ -206,7 +206,7 @@ export async function registerInfrastructureServices(
     const config = await configProvider.getConfig();
 
     // Global JSON document root path
-    const globalJsonRoot = path.join(config.memoryBankRoot, 'global-json');
+    const globalJsonRoot = path.join(config.docsRoot, 'global-json');
 
     return new FileSystemJsonDocumentRepository(fileSystemService, indexService, globalJsonRoot);
   });
@@ -260,7 +260,7 @@ export async function registerApplicationServices(container: DIContainer): Promi
   container.registerFactory('readRulesUseCase', async () => {
     const configProvider = await container.get<IConfigProvider>('configProvider');
     const config = await configProvider.getConfig();
-    const rulesDir = config.memoryBankRoot;
+    const rulesDir = config.docsRoot;
 
     // 同期的に新しいReadRulesUseCaseを作成 - コンバーターなしで
     return new ReadRulesUseCase(rulesDir);
@@ -407,8 +407,8 @@ export async function registerApplicationServices(container: DIContainer): Promi
     const config = await configProvider.getConfig();
 
     // Set up markdown and backup directory paths
-    const markdownDir = path.join(config.memoryBankRoot, 'templates', 'markdown');
-    const backupDir = path.join(config.memoryBankRoot, 'templates', 'backup');
+    const markdownDir = path.join(config.docsRoot, 'templates', 'markdown');
+    const backupDir = path.join(config.docsRoot, 'templates', 'backup');
 
     // Import and instantiate the MarkdownMigrationService
     const { MarkdownMigrationService } = await import('../../migration/MarkdownMigrationService.js');

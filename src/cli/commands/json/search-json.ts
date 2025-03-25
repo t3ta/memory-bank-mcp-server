@@ -77,7 +77,7 @@ export class SearchJsonCommand extends CommandBase {
 
       // Initialize application
       const app = await createApplication({
-        memoryRoot: argv.docs as string,
+        docsRoot: argv.docs as string,
         verbose: argv.verbose,
       });
 
