@@ -46,29 +46,6 @@ export const extractTags = (content: string): string[] => {
     .map((tag) => tag.substring(1));
 };
 
-/**
- * Add tags to document content
- * @param content Document content
- * @param tags Array of tags
- * @returns Updated content with tags
- */
-export const addTagsToContent = (content: string, tags: string[]): string => {
-  if (tags.length === 0) return content;
-
-  const tagLine = `tags: ${tags.map((t) => `#${t}`).join(' ')}\n\n`;
-
-  // If content already has tags, replace them
-  if (content.includes('tags:')) {
-    return content.replace(/tags:.*\n\n/, tagLine);
-  }
-
-  // Add tags after the title (first line)
-  const lines = content.split('\n');
-  const firstLine = lines[0];
-  const rest = lines.slice(1).join('\n');
-
-  return `${firstLine}\n\n${tagLine}${rest}`;
-};
 
 /**
  * Extract a section from markdown content
