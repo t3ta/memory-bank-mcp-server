@@ -1,5 +1,7 @@
-// ロガーは後方互換性のために残します
-export { logger } from './logger.js';
+// These exports have been replaced by json-to-markdown and are kept
+// temporarily for backward compatibility
+// TODO: Remove after migration is complete
+export * from './logger.js';
 
 // Date utilities
 
