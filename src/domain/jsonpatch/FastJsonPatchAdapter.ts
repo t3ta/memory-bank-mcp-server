@@ -1,7 +1,7 @@
-// ESモジュールとして正しくインポート
-import jsonpatchModule from 'fast-json-patch';
-// ESMとCJSの互換性対応
-const jsonpatch = jsonpatchModule.default || jsonpatchModule;
+// ESモジュールとして明示的にインポート - より厳格なESM方式
+import * as jsonpatchNs from 'fast-json-patch';
+// 全ての環境で動作するようにデフォルトエクスポートを確実に取得
+const jsonpatch = (jsonpatchNs.default === undefined) ? jsonpatchNs : jsonpatchNs.default;
 import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
 import { JsonPatchOperation } from './JsonPatchOperation.js';
 import { JsonPatchService } from './JsonPatchService.js';

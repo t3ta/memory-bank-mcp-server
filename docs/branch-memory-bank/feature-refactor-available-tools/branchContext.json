@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "631c493b-87ce-4b02-9f13-614236154be2",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-25T17:38:03.352Z",
+    "createdAt": "2025-03-25T17:38:03.352Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "feature/refactor-available-tools",
+    "purpose": "このブランチの目的を記述してください",
+    "createdAt": "2025-03-25T17:38:03.352Z",
+    "userStories": [
+      {
+        "id": "e888b748-78b3-417b-b6f8-448f59f75234",
+        "description": "解決する課題1",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "8278d5ba-6e7d-4cb2-ac08-eed43def477f",
+        "description": "解決する課題2",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "904f8b49-7d2b-4e3e-9845-046011979c51",
+        "description": "解決する課題3",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": ""
+  }
+}
