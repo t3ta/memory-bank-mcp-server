@@ -1,0 +1,59 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "8abbc608-f8d0-40a9-9d82-4d0f1002ef78",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "system-patterns"
+    ],
+    "lastModified": "2025-03-26T04:20:00.000Z",
+    "createdAt": "2025-03-26T04:20:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "3495e7c3-9851-49ec-b31a-84adcf87ebc8",
+        "title": "CLI機能の完全削除",
+        "context": "プロジェクトにはCLI機能が実装されていますが、コアのサーバー機能に集中するためにこれを削除します。",
+        "decision": "プロジェクトからCLI関連のコード、設定、依存関係を完全に削除します。具体的には：\n1. src/cli ディレクトリ全体の削除\n2. package.jsonからCLI関連のエントリー削除\n3. ビルドスクリプトからCLI関連の処理削除\n4. CLI関連のテストケース削除\n5. yargs依存関係の削除（他で使われていない場合）",
+        "consequences": {
+          "positive": [
+            "コードベースがスリム化される",
+            "メンテナンスが容易になる",
+            "プロジェクトの焦点がサーバー機能に絞られる",
+            "ビルド時間が短縮される可能性がある"
+          ],
+          "negative": [
+            "CLIを通じた機能が使えなくなる",
+            "既存のCLIユーザーは影響を受ける"
+          ]
+        },
+        "status": "approved",
+        "date": "2025-03-26T04:20:00.000Z",
+        "alternatives": [
+          "CLI機能を残したまま、コードの改善を行う - リソースの分散が続く",
+          "CLI機能を別パッケージとして分離する - 工数がかかる割に利点が少ない"
+        ]
+      }
+    ],
+    "implementationPatterns": [
+      {
+        "id": "b87ac13e-6f54-4c1d-a9e7-7fe2a6d1e90c",
+        "title": "パッケージからのCLI機能削除パターン",
+        "description": "アプリケーションからCLI機能を削除する一般的なパターンです。依存関係のあるファイルを特定し、それらを順番に削除していきます。特にパッケージエントリーの削除は初期に行い、ソースコードの削除はその後に行います。",
+        "examples": [
+          "package.jsonのbinセクションからCLIエントリを削除",
+          "srcディレクトリからCLI関連のコードを削除"
+        ],
+        "relatedFiles": [
+          "package.json",
+          "src/cli/**/*",
+          "src/shared/utils/logger/cli.ts"
+        ]
+      }
+    ]
+  }
+}
