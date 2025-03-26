@@ -1,0 +1,37 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "e43f66ed-ef92-4758-85f7-aa7b9e5ce07a",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "system-patterns"
+    ],
+    "lastModified": "2025-03-26T03:13:35.463Z",
+    "createdAt": "2025-03-26T03:13:35.463Z",
+    "version": 1
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "4e05a288-03f5-4529-8e4c-7da5ad4e614c",
+        "title": "決定事項のタイトル",
+        "context": "決定の背景や理由",
+        "decision": "具体的な決定内容",
+        "consequences": {
+          "positive": [
+            "影響1",
+            "影響2",
+            "影響3"
+          ],
+          "negative": []
+        },
+        "status": "proposed",
+        "date": "2025-03-26T03:13:35.463Z",
+        "alternatives": []
+      }
+    ],
+    "implementationPatterns": []
+  }
+}

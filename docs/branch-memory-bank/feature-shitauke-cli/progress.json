@@ -1,0 +1,70 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "f37f57e8-5e49-4e0a-8535-28fe79834eba",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress"
+    ],
+    "lastModified": "2025-03-26T03:13:35.463Z",
+    "createdAt": "2025-03-26T03:13:35.463Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "65d86daa-cc7e-4620-b010-3cf3534af9b0",
+        "description": "機能1",
+        "implementedAt": "2025-03-26T03:13:35.463Z"
+      },
+      {
+        "id": "b6122953-99fb-4f9e-bf92-8fe00fa95379",
+        "description": "機能2",
+        "implementedAt": "2025-03-26T03:13:35.463Z"
+      },
+      {
+        "id": "1b9bf33a-b3d0-4c83-847b-8d28aa4876ef",
+        "description": "機能3",
+        "implementedAt": "2025-03-26T03:13:35.463Z"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "9f10003f-4b65-489d-8f7b-ea4bc95aa5a6",
+        "description": "未実装の機能1",
+        "priority": "high"
+      },
+      {
+        "id": "43574a2a-dd50-4630-adca-c21f5b5ce405",
+        "description": "未実装の機能2",
+        "priority": "medium"
+      },
+      {
+        "id": "49be2485-09b8-40f5-80c6-41c564aa56aa",
+        "description": "未実装の機能3",
+        "priority": "low"
+      }
+    ],
+    "status": "現在の実装状態の説明",
+    "completionPercentage": 0,
+    "knownIssues": [
+      {
+        "id": "8ed384d4-21cf-4128-83ae-00a597efff87",
+        "description": "問題1",
+        "severity": "high"
+      },
+      {
+        "id": "fb5e0ac1-6098-41cf-92b1-4ef047cd8be3",
+        "description": "問題2",
+        "severity": "medium"
+      },
+      {
+        "id": "3ac0adf5-3bd9-42b3-bcdc-6ea1fc5ec8bb",
+        "description": "問題3",
+        "severity": "low"
+      }
+    ]
+  }
+}
