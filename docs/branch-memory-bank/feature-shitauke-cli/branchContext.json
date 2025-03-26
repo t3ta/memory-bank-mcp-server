@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "c3e4ca80-90a8-43ce-9e6f-ce72979291b8",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-26T03:13:35.462Z",
+    "createdAt": "2025-03-26T03:13:35.462Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "feature/shitauke-cli",
+    "purpose": "このブランチの目的を記述してください",
+    "createdAt": "2025-03-26T03:13:35.462Z",
+    "userStories": [
+      {
+        "id": "01b775bb-8712-4c3c-8c0d-0d8c5bad90bb",
+        "description": "解決する課題1",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "49dbccdc-5395-41fc-b270-a688fb6e4639",
+        "description": "解決する課題2",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "ae177542-8d25-451f-985a-713ae9dd0f2a",
+        "description": "解決する課題3",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": ""
+  }
+}

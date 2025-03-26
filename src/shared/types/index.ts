@@ -94,34 +94,3 @@ export interface ToolResponse {
   [key: string]: unknown;
 }
 
-/**
- * Generic use case interface
- */
-export interface IUseCase<TInput, TOutput> {
-  execute(input: TInput): Promise<TOutput>;
-}
-
-/**
- * Interface for section editing options
- */
-export interface SectionEditOptions {
-  mode: 'replace' | 'append' | 'prepend';
-  startLine?: number;
-  endLine?: number;
-}
-
-/**
- * Interface for document section
- */
-export interface DocumentSection {
-  header: string;
-  content: string | string[];
-  append?: boolean;
-}
-
-/**
- * Interface for document sections object
- */
-export interface DocumentSections {
-  [key: string]: DocumentSection;
-}
