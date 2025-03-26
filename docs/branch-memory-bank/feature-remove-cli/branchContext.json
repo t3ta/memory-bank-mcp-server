@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "6d1e4df7-52e5-49fb-84b6-dff3ae051f24",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-26T04:20:00.000Z",
+    "createdAt": "2025-03-26T04:20:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "feature/remove-cli",
+    "purpose": "プロジェクトからCLI機能を完全に削除し、コアのサーバー機能に集中できるようにする",
+    "createdAt": "2025-03-26T04:20:00.000Z",
+    "userStories": [
+      {
+        "id": "e0841839-9f28-43cd-8bb5-51c3a74a7f50",
+        "description": "プロジェクトからCLI関連のコードを完全に削除する",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "e3668562-6e90-407c-84c7-58e48ee16bc5",
+        "description": "package.jsonからCLI関連の設定を削除する",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "2fe09e4e-ccdb-4671-bc6a-9bfd6213eb4a",
+        "description": "残りのコードでCLIへの依存がある場合は修正する",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": "CLI機能はプロジェクトのコア機能ではなく、あまり使われていないため削除することで、コードベースをよりスリムにし、メンテナンスを容易にします。"
+  }
+}
