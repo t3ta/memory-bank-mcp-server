@@ -92,8 +92,3 @@ export class CLIOutput {
     this.logger.info('Section start', { title });
   }
 }
-
-/**
- * CLIOutput のシングルトンインスタンス
- */
-export const cli = new CLIOutput();
