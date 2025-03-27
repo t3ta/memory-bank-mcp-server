@@ -13,9 +13,9 @@ This project is inspired by [Cline Memory Bank](https://github.com/nickbaumann98
 - **Comprehensive Documentation**: Added detailed templates and examples
 - **Event Handling**: Improved document event handling with patch operations
 
-### CLI Workspace Option Enhancement
+### API Enhancements
 
-- **Direct Root Directory Specification**: Command line now supports specifying the project root directory directly
+- **Direct Root Directory Specification**: API now supports specifying the project root directory directly
 - **Flexible Project Management**: Work with different projects more seamlessly
 
 ### Template System Integration
@@ -30,7 +30,7 @@ This project is inspired by [Cline Memory Bank](https://github.com/nickbaumann98
 
 ### Logging Enhancements
 
-- **Logger Replacement**: Replaced console.log with logger across all files (except CLI)
+- **Logger Replacement**: Replaced console.log with logger across all files
 - **Logging Adjustments**: Improved handling of empty code changes
 
 ## Usage
@@ -55,40 +55,31 @@ npm install -g memory-bank-mcp-server
 memory-bank-mcp-server --help
 ```
 
-### CLI Tool
+### HTTP API
 
-The package also includes a CLI tool for direct memory bank operations from your terminal.
+The Memory Bank MCP Server exposes a RESTful HTTP API for interacting with memory banks.
 
-#### NPX Usage
-```bash
-npx memory-bank read-global architecture.md
-npx memory-bank write-global tech-stack.md -f ./tech-stack.md
-npx memory-bank read-branch feature/login activeContext.md
-npx memory-bank recent-branches
+#### API Base URL
+```
+http://localhost:3000/api
 ```
 
-#### Installation
-```bash
-npm install -g memory-bank-mcp-server
-memory-bank --help
-```
+#### Key Endpoints
 
-#### Available Commands
+- **GET /api/global-memory/:path**: Read a document from the global memory bank
+- **POST /api/global-memory/:path**: Write/update a document in the global memory bank
+- **GET /api/branch-memory/:branch/:path**: Read a document from a branch memory bank
+- **POST /api/branch-memory/:branch/:path**: Write/update a document in a branch memory bank
+- **GET /api/context/:branch**: Get all context for a specific branch
+- **GET /api/tags/documents**: Search for documents by tags
 
-- **read-global** `<path>`: Read a document from the global memory bank
-- **write-global** `<path> [content]`: Write a document to the global memory bank
-- **read-branch** `<branch> <path>`: Read a document from a branch memory bank
-- **write-branch** `<branch> <path> [content]`: Write a document to a branch memory bank
-- **read-core-files** `<branch>`: Read all core files from a branch memory bank
-- **recent-branches** `[limit]`: Get recent branches
-
-#### Options
+#### Server Options
 
 - **--docs, -d**: Path to docs directory (default: './docs')
 - **--verbose, -v**: Run with verbose logging (default: false)
 - **--language, -l**: Language for templates ('en', 'ja' or 'zh', default: 'en')
-- **--file, -f**: Read content from file (for write commands)
-- **--format**: Output format for read-core-files ('json' or 'pretty', default: 'pretty')
+
+For complete API documentation, see [API Reference](docs/03-implementation/api-reference.json).
 
 ## What's New in 2.0
 

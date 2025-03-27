@@ -30,7 +30,7 @@
       },
       {
         "title": "基本的な使い方",
-        "content": "### メモリバンクの読み取り\n\n```bash\n# グローバルメモリバンクの読み取り\nyarn cli read-global-memory\n\n# ブランチメモリバンクの読み取り\nyarn cli read-branch-memory --branch feature/my-feature\n\n# すべてのコンテキストを一度に読み取り\nyarn cli read-context --branch feature/my-feature --language ja\n```\n\n### メモリバンクの書き込み\n\n```bash\n# グローバルメモリバンクへの書き込み\nyarn cli write-global-memory --path path/to/document.json --content '{ ... }'\n\n# ブランチメモリバンクへの書き込み\nyarn cli write-branch-memory --branch feature/my-feature --path document.json --content '{ ... }'\n```\n\n注意: メモリバンクファイルは直接編集せず、必ずこれらのコマンドを使用してください。"
+        "content": "### メモリバンクの操作\n\nMemory Bank MCPサーバーでは、RESTful APIを通じてメモリバンクの読み取りと書き込みを行います。\n\n```\n# APIエンドポイント例\nGET /api/global-memory/:path      # グローバルメモリバンクの読み取り\nGET /api/branch-memory/:branch/:path  # ブランチメモリバンクの読み取り\nGET /api/context/:branch        # コンテキスト全体の読み取り\n\nPOST /api/global-memory/:path    # グローバルメモリバンクへの書き込み\nPOST /api/branch-memory/:branch/:path  # ブランチメモリバンクへの書き込み\n```\n\n注意: メモリバンクファイルは直接編集せず、必ずAPIを通じて操作してください。"
       },
       {
         "title": "ブランチメモリバンクのコアファイル",
@@ -42,7 +42,7 @@
       },
       {
         "title": "タグシステムの使い方",
-        "content": "タグは、ドキュメントを分類し検索するための重要な手段です。タグを効果的に使用するために以下のルールに従ってください：\n\n- タグは小文字のアルファベット、数字、ハイフンのみを使用（大文字、スペース、アンダースコア、ドットは使用不可）\n- 例: `architecture`、`design-patterns`、`v1-beta`（OK）\n- 例: `Design`、`user_guide`、`v2.0`（NG）\n\nタグを検索するには：\n\n```bash\n# タグで検索する\nyarn cli search-by-tag --tag architecture\n\n# 複数タグで検索\nyarn cli search-by-tag --tag architecture --tag design\n```\n\nタグの一覧と関連ドキュメントは、`tags/index.json`ファイルで確認できます。"
+        "content": "タグは、ドキュメントを分類し検索するための重要な手段です。タグを効果的に使用するために以下のルールに従ってください：\n\n- タグは小文字のアルファベット、数字、ハイフンのみを使用（大文字、スペース、アンダースコア、ドットは使用不可）\n- 例: `architecture`、`design-patterns`、`v1-beta`（OK）\n- 例: `Design`、`user_guide`、`v2.0`（NG）\n\nタグによる検索はAPIエンドポイントを通じて利用できます：\n\n```\nGET /api/tags/documents?tags=architecture,design\n```\n\nタグの一覧と関連ドキュメントは、`tags/index.json`ファイルで確認できます。"
       },
       {
         "title": "トラブルシューティング",
@@ -50,7 +50,7 @@
       },
       {
         "title": "関連ドキュメント",
-        "content": "- [詳細なユーザーガイド](../04-guides/user-guide.json)\n- [マイグレーションガイド](../04-guides/migration-guide.json)\n- [CLIコマンドリファレンス](../03-implementation/cli-commands.json)\n- [エラー対応ガイド](../07-infrastructure/ci-cd/memory-bank-errors.json)"
+        "content": "- [詳細なユーザーガイド](../04-guides/user-guide.json)\n- [マイグレーションガイド](../04-guides/migration-guide.json)\n- [エラー対応ガイド](../07-infrastructure/ci-cd/memory-bank-errors.json)"
       }
     ]
   }

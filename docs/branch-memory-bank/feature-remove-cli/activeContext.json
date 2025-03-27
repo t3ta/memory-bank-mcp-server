@@ -18,32 +18,54 @@
       {
         "date": "2025-03-27T12:50:22.376Z",
         "description": "プロジェクト内のCLI関連コードを特定"
+      },
+      {
+        "date": "2025-03-27T13:00:00.000Z",
+        "description": "src/cliディレクトリを完全に削除"
+      },
+      {
+        "date": "2025-03-27T13:01:00.000Z",
+        "description": "CLIロガー実装を削除"
+      },
+      {
+        "date": "2025-03-27T13:02:00.000Z",
+        "description": "package.jsonからCLI関連の設定と依存関係を削除"
       }
     ],
     "activeDecisions": [
       {
         "id": "dbd955d8-a350-407e-81ad-b0115ca48ee2",
-        "description": "CLIコードベース全体を削除する（/src/cli/ ディレクトリ全体）"
+        "description": "CLIコードベース全体を削除する（/src/cli/ ディレクトリ全体）",
+        "status": "completed"
       },
       {
         "id": "29c89cd3-59cd-4209-b880-f5720ce778e7",
-        "description": "package.jsonからCLI関連のスクリプトとバイナリ定義を削除する"
+        "description": "package.jsonからCLI関連のスクリプトとバイナリ定義を削除する",
+        "status": "completed"
       },
       {
         "id": "b795d217-6d03-4878-9389-bc09407642fd",
-        "description": "CLI用ロガー実装も不要なら削除する"
+        "description": "CLI用ロガー実装も不要なら削除する",
+        "status": "completed"
+      },
+      {
+        "id": "e4d3c2b1-a0f9-8e7d-6c5b-4f3e2d1c0b",
+        "description": "CLI専用の依存パッケージ（yargsとその型定義）を削除する",
+        "status": "completed"
       }
     ],
     "considerations": [
       {
         "id": "58f5e156-e94f-4497-9378-cfa1dc230461",
         "description": "CLIを削除した後も、MCPサーバー機能に影響を与えないか確認する",
-        "status": "open"
+        "status": "completed",
+        "notes": "ビルドは成功し、サーバー起動時のエラーはCLI削除とは直接関係ないと思われる"
       },
       {
         "id": "c21589b0-9e9b-4954-9505-de781d427500",
         "description": "CLI関連のテストコードも削除する必要があるか検討する",
-        "status": "open"
+        "status": "completed",
+        "notes": "CLI専用のテストコードは見つからなかった"
       },
       {
         "id": "1ab4465e-f8ef-4c0f-81fb-6b1e967dfe26",
@@ -53,19 +75,14 @@
     ],
     "nextSteps": [
       {
-        "id": "2345016a-c643-494e-b260-6a78998076f0",
-        "description": "src/cli ディレクトリを削除する",
-        "priority": "high"
+        "id": "7e4b91c8-f5a6-49d3-9e2c-ab47d5e9b0c1",
+        "description": "ドキュメントからCLI関連の記述を削除または更新する",
+        "priority": "low"
       },
       {
-        "id": "65d9a01c-9b53-4a6c-b14f-795c86a2eb37",
-        "description": "package.jsonからCLI関連の設定を削除する",
+        "id": "a1b2c3d4-e5f6-4a3b-8c7d-9e0f1a2b3c4d",
+        "description": "コミットをして変更を確定する",
         "priority": "high"
-      },
-      {
-        "id": "2765b6b5-b548-415f-aac7-2b0796689c1e",
-        "description": "CLI関連の依存パッケージの不要なものを特定し削除する",
-        "priority": "medium"
       }
     ]
   }

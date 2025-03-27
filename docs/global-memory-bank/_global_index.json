@@ -1,8 +1,8 @@
 {
   "schema": "tag_index_v1",
   "metadata": {
-    "updatedAt": "2025-03-24T13:48:29.059Z",
-    "documentCount": 84,
+    "updatedAt": "2025-03-27T12:43:37.803Z",
+    "documentCount": 85,
     "fullRebuild": true,
     "context": "global"
   },
@@ -234,16 +234,20 @@
       "06-releases/consolidated-v2-release.json",
       "06-releases/v2-implementation-plan.json"
     ],
-    "cli": [
-      "03-implementation/cli-commands.json",
-      "05-testing/e2e-test-implementation.json"
+    "api": [
+      "03-implementation/api-reference.json"
     ],
     "reference": [
+      "03-implementation/api-reference.json",
       "03-implementation/cli-commands.json",
       "meta/consolidated-memory-bank-meta.json",
       "meta/document-type-standards.json",
       "meta/global-memory-bank-reference.json",
       "tags/tag_categorization.json"
+    ],
+    "cli": [
+      "03-implementation/cli-commands.json",
+      "05-testing/e2e-test-implementation.json"
     ],
     "mcp": [
       "03-implementation/read-context-command-design.json",

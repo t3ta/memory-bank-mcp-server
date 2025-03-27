@@ -1,0 +1,40 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "0C2AD4D7-24A4-4C2D-94DA-9B95884BF69E",
+    "title": "API リファレンス",
+    "documentType": "generic",
+    "path": "api-reference.json",
+    "tags": [
+      "api",
+      "reference"
+    ],
+    "lastModified": "2025-03-27T13:30:00.000Z",
+    "createdAt": "2025-03-27T13:30:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "概要": "Memory Bank MCPサーバーは、RESTful APIを通じてメモリバンクを操作するためのインターフェースを提供します。このドキュメントでは、利用可能なAPIエンドポイントとその使用方法について説明します。",
+    "基本API構成": "Memory Bank MCPサーバーのAPIは以下のベースパスから始まります：\n\n```\nhttp://localhost:3000/api\n```\n\nデフォルトでは、サーバーはローカルホストのポート3000で動作します。環境変数でポートを変更することができます。",
+    "認証": "現在、APIには簡易的な認証メカニズムが実装されています。将来的にはより強固な認証方式が導入される予定です。",
+    "リクエスト形式": "APIリクエストは主にJSONフォーマットを使用します。POSTリクエストのボディはJSONでエンコードする必要があります。",
+    "レスポンス形式": "すべてのAPIレスポンスは一貫したJSON形式で返されます：\n\n```json\n{\n  \"success\": true,\n  \"data\": { ... },\n  \"error\": null\n}\n```\n\nエラーが発生した場合は以下の形式になります：\n\n```json\n{\n  \"success\": false,\n  \"data\": null,\n  \"error\": {\n    \"code\": \"ERROR_CODE\",\n    \"message\": \"エラーメッセージ\"\n  }\n}\n```",
+    "主要エンドポイント": "",
+    "グローバルメモリバンク操作": "",
+    "GET /api/global-memory/:path": "グローバルメモリバンクからドキュメントを取得します。\n\nパラメータ：\n- `path`: 取得するドキュメントのパス（URLエンコード）\n\nクエリパラメータ：\n- `format`: レスポンス形式（json, 省略時はjson）\n- `contentOnly`: trueの場合、コンテンツのみを返します\n\n例：\n```\nGET /api/global-memory/core%2Farchitecture.json\n```",
+    "POST /api/global-memory/:path": "グローバルメモリバンクにドキュメントを書き込みます。\n\nパラメータ：\n- `path`: 書き込むドキュメントのパス（URLエンコード）\n\nボディ（いずれか一方）：\n- 完全なドキュメント：\n```json\n{\n  \"content\": \"ドキュメント全体の内容\"\n}\n```\n\n- JSONパッチ操作（RFC 6902）：\n```json\n{\n  \"patches\": [\n    { \"op\": \"replace\", \"path\": \"/content/sections/0/title\", \"value\": \"新しいタイトル\" }\n  ]\n}\n```\n\n例：\n```\nPOST /api/global-memory/core%2Farchitecture.json\n```",
+    "ブランチメモリバンク操作": "",
+    "GET /api/branch-memory/:branch/:path": "ブランチメモリバンクからドキュメントを取得します。\n\nパラメータ：\n- `branch`: ブランチ名（URLエンコード）\n- `path`: 取得するドキュメントのパス（URLエンコード）\n\nクエリパラメータ：\n- `format`: レスポンス形式（json, 省略時はjson）\n- `contentOnly`: trueの場合、コンテンツのみを返します\n\n例：\n```\nGET /api/branch-memory/feature%2Fmy-feature/activeContext.json\n```",
+    "POST /api/branch-memory/:branch/:path": "ブランチメモリバンクにドキュメントを書き込みます。\n\nパラメータ：\n- `branch`: ブランチ名（URLエンコード）\n- `path`: 書き込むドキュメントのパス（URLエンコード）\n\nボディ（いずれか一方）：\n- 完全なドキュメント：\n```json\n{\n  \"content\": \"ドキュメント全体の内容\"\n}\n```\n\n- JSONパッチ操作（RFC 6902）：\n```json\n{\n  \"patches\": [\n    { \"op\": \"replace\", \"path\": \"/content/sections/0/title\", \"value\": \"新しいタイトル\" }\n  ]\n}\n```\n\n例：\n```\nPOST /api/branch-memory/feature%2Fmy-feature/activeContext.json\n```",
+    "コンテキスト操作": "",
+    "GET /api/context/:branch": "特定のブランチのコンテキスト全体（すべての情報）を取得します。\n\nパラメータ：\n- `branch`: ブランチ名（URLエンコード）\n\nクエリパラメータ：\n- `language`: レスポンスの言語（en, ja, 省略時はen）\n\n例：\n```\nGET /api/context/feature%2Fmy-feature?language=ja\n```\n\nレスポンス：\n```json\n{\n  \"success\": true,\n  \"data\": {\n    \"branchMemory\": { ... },\n    \"globalMemory\": { ... }\n  },\n  \"error\": null\n}\n```",
+    "GET /api/rules": "プロジェクトルールを取得します。\n\nクエリパラメータ：\n- `language`: レスポンスの言語（en, ja, 省略時はen）\n\n例：\n```\nGET /api/rules?language=ja\n```",
+    "タグ操作": "",
+    "GET /api/tags": "利用可能なすべてのタグを取得します。\n\n例：\n```\nGET /api/tags\n```\n\nレスポンス：\n```json\n{\n  \"success\": true,\n  \"data\": [\n    { \"name\": \"architecture\", \"count\": 5 },\n    { \"name\": \"design\", \"count\": 3 }\n  ],\n  \"error\": null\n}\n```",
+    "GET /api/tags/documents": "指定したタグを持つドキュメントを検索します。\n\nクエリパラメータ：\n- `tags`: カンマ区切りのタグリスト\n\n例：\n```\nGET /api/tags/documents?tags=architecture,design\n```\n\nレスポンス：\n```json\n{\n  \"success\": true,\n  \"data\": [\n    { \"path\": \"core/architecture.json\", \"title\": \"システムアーキテクチャ\" },\n    { \"path\": \"02-architecture/design-decisions.json\", \"title\": \"設計決定事項\" }\n  ],\n  \"error\": null\n}\n```",
+    "エラーコード": "一般的なエラーコード：\n\n| コード | 説明 |\n|------------|------|\n| `NOT_FOUND` | リクエストされたリソースが見つかりません |\n| `VALIDATION_ERROR` | リクエストパラメータが無効です |\n| `PERMISSION_DENIED` | 操作を実行する権限がありません |\n| `INTERNAL_ERROR` | 内部サーバーエラーが発生しました |\n| `INVALID_JSON` | 無効なJSON形式です |",
+    "API使用例": "",
+    "ドキュメント取得例": "```javascript\nfetch('http://localhost:3000/api/global-memory/core%2Farchitecture.json')\n  .then(response => response.json())\n  .then(data => {\n    console.log(data);\n  });\n```",
+    "ドキュメント更新例": "```javascript\nfetch('http://localhost:3000/api/branch-memory/feature%2Fmy-feature/progress.json', {\n  method: 'POST',\n  headers: {\n    'Content-Type': 'application/json'\n  },\n  body: JSON.stringify({\n    patches: [\n      { op: 'replace', path: '/content/completionPercentage', value: 75 }\n    ]\n  })\n})\n.then(response => response.json())\n.then(data => {\n  console.log(data);\n});\n```"
+  }
+}
