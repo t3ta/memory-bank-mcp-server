@@ -1,0 +1,61 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "8abbc608-f8d0-40a9-9d82-4d0f1002ef78",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "system-patterns"
+    ],
+    "lastModified": "2025-03-26T03:20:00.000Z",
+    "createdAt": "2025-03-25T18:08:59.195Z",
+    "version": 2
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "3495e7c3-9851-49ec-b31a-84adcf87ebc8",
+        "title": "未使用コード削除の基準とアプローチ",
+        "context": "ts-pruneツールが検出した未使用のTypeScriptエクスポートを削除する必要があります。しかし、単純に未使用とされるコードでも、テストやランタイム時に間接的に使用されている可能性があるため、安全な削除が必要です。",
+        "decision": "削除するコードは以下の基準で選定します：\n1. ts-pruneで「used in module」と表示されていないもの\n2. コメントが「TODO: Remove after migration」などの削除予定マークがあるもの\n3. 関連するモジュールごとにグループ化して削除\n4. 削除前後でビルドとテストを実行して問題ないことを確認",
+        "consequences": {
+          "positive": [
+            "コードベースがスリム化される",
+            "メンテナンスが容易になる",
+            "不要なコードによる混乱が減少する",
+            "ビルド時間の短縮"
+          ],
+          "negative": [
+            "いくつかのコードが将来必要になる可能性がある",
+            "間接的に使用されているコードを誤って削除するリスク"
+          ]
+        },
+        "status": "approved",
+        "date": "2025-03-26T03:20:00.000Z",
+        "alternatives": [
+          "未使用コードをそのまま残す - メンテナンス負担が続く",
+          "すべての未使用コードを一度に削除する - リスクが高い",
+          "未使用コードにDEPRECATEDマークを付けて残す - 混乱を招く可能性がある"
+        ]
+      }
+    ],
+    "implementationPatterns": [
+      {
+        "id": "b87ac13e-6f54-4c1d-a9e7-7fe2a6d1e90c",
+        "title": "ts-pruneを使った未使用コード検出パターン",
+        "description": "ts-pruneツールを使用して未使用のエクスポートを検出し、それらを整理してグループ化します。削除する際は、関連するモジュールごとに行い、変更の影響範囲を最小限に抑えます。",
+        "examples": [
+          "src/shared/utils/index.ts:31 - createConsoleLogger - 未使用のロガー関数",
+          "src/application/usecases/common/index.ts:3 - UpdateTagIndexUseCaseV2 - ユースケースクラス"
+        ],
+        "relatedFiles": [
+          "src/shared/utils/index.ts",
+          "src/shared/utils/json-to-markdown/index.ts",
+          "src/infrastructure/repositories/file-system/FileSystemTagIndexRepositoryGetters.ts",
+          "src/application/usecases/common/index.ts"
+        ]
+      }
+    ]
+  }
+}

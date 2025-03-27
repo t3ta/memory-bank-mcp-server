@@ -1,0 +1,166 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "ts-prune-phase2-workplan",
+    "title": "ts-prune-phase2 作業計画",
+    "documentType": "plan",
+    "path": "workplan.json",
+    "tags": [
+      "plan",
+      "ts-prune",
+      "cleanup",
+      "refactoring"
+    ],
+    "lastModified": "2025-03-26T05:20:00.000Z",
+    "createdAt": "2025-03-26T05:20:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": "ts-prune で特定された未使用コードをさらに削除し、コードベースを完全にクリーンアップする作業計画です。優先度順に対応します。",
+    "tasks": [
+      {
+        "id": "task-1",
+        "title": "shared/utils関連の未使用コード削除",
+        "priority": "高",
+        "targets": [
+          {
+            "path": "src/shared/utils/json-to-markdown/index.ts",
+            "symbols": [
+              "JsonToMarkdownOptions",
+              "MarkdownBuilder",
+              "IDocumentTypeConverter",
+              "BaseDocumentTypeConverter",
+              "BranchContextConverter",
+              "ActiveContextConverter",
+              "ProgressConverter",
+              "SystemPatternsConverter",
+              "GenericConverter"
+            ]
+          },
+          {
+            "path": "src/shared/types/index.ts",
+            "symbols": [
+              "IUseCase",
+              "SectionEditOptions",
+              "DocumentSections"
+            ],
+            "notes": "DocumentSectionは'used in module'となっているので要確認"
+          }
+        ],
+        "action": "上記ファイルの未使用シンボルを削除し、関連するファイルも存在する場合は削除します。'used in module'のものは慎重に扱います。"
+      },
+      {
+        "id": "task-2",
+        "title": "application/usecases/common関連の未使用コード削除",
+        "priority": "中",
+        "targets": [
+          {
+            "path": "src/application/usecases/common/index.ts",
+            "symbols": [
+              "UpdateTagIndexUseCaseV2",
+              "SearchDocumentsByTagsInput",
+              "SearchDocumentsByTagsOutput",
+              "SearchDocumentsByTagsUseCase",
+              "UpdateTagIndexInput",
+              "UpdateTagIndexOutput",
+              "UpdateTagIndexUseCase",
+              "GetRecentBranchesInput",
+              "GetRecentBranchesOutput",
+              "GetRecentBranchesUseCase",
+              "ReadBranchCoreFilesUseCase",
+              "CreateBranchCoreFilesInput",
+              "CreateBranchCoreFilesOutput",
+              "CreateBranchCoreFilesUseCase",
+              "ContextRequest",
+              "ContextResult",
+              "ReadContextUseCase",
+              "RulesResult",
+              "ReadRulesUseCase"
+            ]
+          },
+          {
+            "path": "src/application/usecases/common/UpdateTagIndexUseCaseV2.ts",
+            "symbols": [],
+            "notes": "UpdateTagIndexInput と UpdateTagIndexOutput は 'used in module' となっているが、ファイル自体が使われていない可能性があるので確認"
+          }
+        ],
+        "action": "上記ファイルの未使用シンボルを削除し、関連するファイルも存在する場合は削除します。index.tsに多数のエクスポートがあるので、参照関係を確認して慎重に削除します。"
+      },
+      {
+        "id": "task-3",
+        "title": "repositories関連の未使用コード削除",
+        "priority": "中",
+        "targets": [
+          {
+            "path": "src/infrastructure/repositories/file-system/FileSystemTagIndexRepositoryModifiers.ts",
+            "symbols": [
+              "FileSystemTagIndexRepositoryModifiers"
+            ]
+          },
+          {
+            "path": "src/infrastructure/repositories/file-system/index.ts",
+            "symbols": [
+              "FileSystemTagIndexRepository",
+              "FileSystemTagIndexRepositoryV1Bridge"
+            ],
+            "notes": "FileSystemTagIndexRepositoryImpl は 'used in module' となっています"
+          },
+          {
+            "path": "src/infrastructure/repositories/simple/SimpleBranchMemoryBankRepository.ts",
+            "symbols": [
+              "SimpleBranchMemoryBankRepository"
+            ]
+          },
+          {
+            "path": "src/infrastructure/repositories/simple/SimpleGlobalMemoryBankRepository.ts",
+            "symbols": [
+              "SimpleGlobalMemoryBankRepository"
+            ]
+          }
+        ],
+        "action": "上記ファイルの未使用シンボルを削除し、関連するファイルも存在する場合は削除します。リポジトリ関連は重要な部分なので、慎重に確認して削除します。"
+      },
+      {
+        "id": "task-4",
+        "title": "json-to-markdown関連の未使用コード削除",
+        "priority": "低",
+        "targets": [
+          {
+            "path": "src/shared/utils/json-to-markdown/index.ts",
+            "symbols": [
+              "JsonToMarkdownOptions",
+              "MarkdownBuilder",
+              "IDocumentTypeConverter",
+              "BaseDocumentTypeConverter",
+              "BranchContextConverter",
+              "ActiveContextConverter",
+              "ProgressConverter",
+              "SystemPatternsConverter",
+              "GenericConverter"
+            ]
+          },
+          {
+            "path": "src/shared/utils/json-to-markdown/",
+            "notes": "ディレクトリ全体が不要な可能性があるので確認"
+          }
+        ],
+        "action": "未使用のjson-to-markdown関連コードを削除します。ディレクトリ全体が不要な場合はディレクトリごと削除します。"
+      }
+    ],
+    "approach": {
+      "steps": [
+        "各ファイルを調査し、未使用コードを特定",
+        "コードの参照関係を確認して削除の影響を評価",
+        "未使用コードを削除し、テストを実行して問題ないか確認",
+        "変更をコミット"
+      ],
+      "considerations": [
+        "'used in module' と表示されているコードは慎重に扱う",
+        "削除によって他の部分に影響が出ないか十分に確認する",
+        "テストが壊れないように注意する",
+        "コードの削除後はビルドとテストを実行して問題ないことを確認する"
+      ]
+    },
+    "status": "計画中"
+  }
+}

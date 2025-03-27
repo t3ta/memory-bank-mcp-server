@@ -5,4 +5,3 @@ export * from './GetRecentBranchesUseCase.js';
 export * from './ReadBranchCoreFilesUseCase.js';
 export * from './CreateBranchCoreFilesUseCase.js';
 export * from './ReadContextUseCase.js';
-export * from './ReadRulesUseCase.js';

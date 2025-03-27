@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "d8578f2d-69ab-430c-a935-d1b54fcba33a",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-25T16:42:10.143Z",
+    "createdAt": "2025-03-25T16:42:10.143Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "fix/json-patch",
+    "purpose": "このブランチの目的を記述してください",
+    "createdAt": "2025-03-25T16:42:10.143Z",
+    "userStories": [
+      {
+        "id": "38133dbc-9bb1-4b4e-accf-8172f7fc06d4",
+        "description": "解決する課題1",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "93b14442-811d-4c0d-bce7-51b76e194f90",
+        "description": "解決する課題2",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "118308b5-9a1c-4e7a-a909-2a1aed0c5e7b",
+        "description": "解決する課題3",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": ""
+  }
+}

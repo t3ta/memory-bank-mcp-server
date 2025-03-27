@@ -1,12 +1,9 @@
 import fs from "fs/promises";
 import path from "path";
-import { JsonToMarkdownConverter } from "../../../shared/utils/json-to-markdown/index.js";
 import { DomainError, DomainErrorCodes } from "../../../shared/errors/DomainError.js";
-import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
-import { JsonDocument } from "../../../domain/entities/JsonDocument.js";
 import { logger } from "../../../shared/utils/logger.js";
 import { ITemplateLoader } from "../../../infrastructure/templates/interfaces/ITemplateLoader.js";
-import { Language, getSafeLanguage, isValidLanguage } from "../../../schemas/v2/i18n-schema.js";
+import { getSafeLanguage } from "../../../schemas/v2/i18n-schema.js";
 
 export type RulesResult = {
   content: string;
@@ -23,12 +20,10 @@ export class ReadRulesUseCase {
   /**
    * コンストラクタ
    * @param rulesDir ルールディレクトリパス
-   * @param jsonToMarkdownConverter JSON to Markdown コンバーター
    * @param templateLoader テンプレートローダー（オプション）
    */
   constructor(
     rulesDir: string,
-    private readonly jsonToMarkdownConverter?: JsonToMarkdownConverter,
     private readonly templateLoader?: ITemplateLoader
   ) {
     this.rulesDir = rulesDir;
@@ -109,17 +104,9 @@ export class ReadRulesUseCase {
 
       const jsonData = JSON.parse(jsonContent);
 
-      // JSONからマークダウンに変換する場合
-      let content = '';
-      if (this.jsonToMarkdownConverter) {
-        // コンバーターが提供されていれば使用 - JsonDocumentを作成してから変換
-        const docPath = DocumentPath.create('rules-template.json');
-        const jsonDoc = JsonDocument.fromObject(jsonData, docPath);
-        content = this.jsonToMarkdownConverter.convert(jsonDoc);
-      } else {
-        // コンバーターがない場合は生のJSON文字列を使用
-        content = JSON.stringify(jsonData, null, 2);
-      }
+      // JSONからMarkdownに変換する必要はなく、そのままJSON文字列を返す
+      // (markdownサポートが削除されたため)
+      const content = JSON.stringify(jsonData, null, 2);
 
       return {
         content,

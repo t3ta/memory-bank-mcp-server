@@ -1,0 +1,50 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "problem-analysis",
+    "title": "JsonPatchUseCase.test.tsのエラー分析",
+    "documentType": "analysis",
+    "path": "problem-analysis.json",
+    "tags": [
+      "error-analysis",
+      "test-failure",
+      "json-patch"
+    ],
+    "lastModified": "2025-03-26T00:00:00.000Z",
+    "createdAt": "2025-03-26T00:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "problem": {
+      "description": "JsonPatchUseCase.test.tsテストファイルが実行できない",
+      "errorMessage": "Must use import to load ES Module: /Users/t3ta/workspace/memory-bank-mcp-server/node_modules/fast-json-patch/index.ts",
+      "affectedFiles": [
+        "/Users/t3ta/workspace/memory-bank-mcp-server/src/domain/jsonpatch/FastJsonPatchAdapter.ts"
+      ]
+    },
+    "analysis": {
+      "rootCause": "Jest設定とfast-json-patchモジュールのインポート方法の不整合",
+      "details": [
+        "プロジェクトはESモジュール形式('type': 'module')を使用している",
+        "fast-json-patchはESモジュールとしてエクスポートされている",
+        "現在のFastJsonPatchAdapter.tsのインポート方法では正しく処理できていない",
+        "Jest設定のtransformIgnorePatternsにfast-json-patchが含まれていない"
+      ]
+    },
+    "solution": {
+      "options": [
+        {
+          "id": "fix-import",
+          "description": "FastJsonPatchAdapter.tsのインポート方法を修正",
+          "details": "ESモジュールに対応した適切なインポート構文を使用する"
+        },
+        {
+          "id": "fix-jest-config",
+          "description": "jest.config.tsのtransformIgnorePatternsを修正",
+          "details": "fast-json-patchパッケージを変換除外リストに追加する"
+        }
+      ],
+      "recommendedApproach": "両方の修正を行う。まずインポート方法を修正し、必要に応じてJest設定も更新する"
+    }
+  }
+}

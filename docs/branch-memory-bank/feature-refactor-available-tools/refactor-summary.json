@@ -1,0 +1,54 @@
+{
+  "metadata": {
+    "title": "AVAILABLE_TOOLSリファクタリング実施内容",
+    "description": "src/index.tsのAVAILABLE_TOOLSをわかりやすくするためのリファクタリング実施内容",
+    "author": "みらい",
+    "createdAt": "2025-03-26",
+    "completedAt": "2025-03-26"
+  },
+  "content": {
+    "implementedChanges": [
+      "1. ツール定義を別ファイルに分離",
+      "2. 共通のスキーマ定義を再利用可能な関数として実装",
+      "3. JSON Patch処理に関する安全対策を強化",
+      "4. 各種ハンドラのリファクタリングと共通処理の抽出"
+    ],
+    "newFiles": [
+      {
+        "path": "/src/tools/definitions.ts",
+        "purpose": "各ツールの定義と共通プロパティの提供"
+      },
+      {
+        "path": "/src/tools/patch-utils.ts",
+        "purpose": "JSON Patch操作の安全性向上とバリデーション機能"
+      },
+      {
+        "path": "/src/tools/handlers.ts",
+        "purpose": "共通ハンドラー関数の提供"
+      },
+      {
+        "path": "/src/tools/index.ts",
+        "purpose": "外部へのインターフェース提供"
+      }
+    ],
+    "modifiedFiles": [
+      {
+        "path": "/src/index.ts",
+        "changes": [
+          "AVAILABLE_TOOLSの定義をgetToolDefinitions()関数の呼び出しに置き換え",
+          "各ツールハンドラーを新しいモジュールを使って簡略化",
+          "JSON Patch処理時のバリデーションを強化",
+          "ブランチ名のバリデーションを追加"
+        ]
+      }
+    ],
+    "benefits": [
+      "コードの可読性が大幅に向上",
+      "重複コードの削減（DRY原則の適用）",
+      "新しいツール追加が容易に",
+      "JSON Patchの罠を回避するセーフガード",
+      "拡張性と保守性の向上"
+    ],
+    "testStatus": "ビルド実行済み、動作確認は別途必要"
+  }
+}
