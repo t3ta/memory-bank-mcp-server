@@ -1,0 +1,161 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "implementation-plan-workspace-removal",
+    "title": "workspaceオプション撤廃の実装計画",
+    "documentType": "plan",
+    "path": "implementation_plan.json",
+    "tags": [
+      "implementation",
+      "plan",
+      "workspace-removal"
+    ],
+    "lastModified": "2025-03-27T13:45:48.270Z",
+    "createdAt": "2025-03-27T13:45:48.270Z",
+    "version": 1
+  },
+  "content": {
+    "overview": "この計画は、workspaceオプションを完全に削除し、docsオプションのみを使用するようにシステムを統一するための実装ステップを定義します。CLIオプションからも完全に削除します。",
+    "phases": [
+      {
+        "id": "phase-1",
+        "title": "型定義とインターフェースの修正",
+        "steps": [
+          {
+            "id": "step-1-1",
+            "description": "src/infrastructure/config/WorkspaceConfig.tsの修正",
+            "details": "WorkspaceConfig型からworkspaceRootプロパティを削除し、docsRootに統一",
+            "estimatedComplexity": "low"
+          },
+          {
+            "id": "step-1-2",
+            "description": "src/shared/types/index.tsの修正",
+            "details": "CliOptions型からworkspaceプロパティを削除、WorkspaceConfig型も同様に修正",
+            "estimatedComplexity": "low"
+          },
+          {
+            "id": "step-1-3",
+            "description": "src/infrastructure/config/interfaces/IConfigProvider.tsの確認",
+            "details": "インターフェースに影響がないことを確認",
+            "estimatedComplexity": "low"
+          }
+        ]
+      },
+      {
+        "id": "phase-2",
+        "title": "パス解決ロジックの修正",
+        "steps": [
+          {
+            "id": "step-2-1",
+            "description": "src/index.tsのresolveDocsRoot関数の完全リファクタリング",
+            "details": "workspaceに関連する部分を完全に削除し、docsオプションのみに依存する新しい実装に変更",
+            "estimatedComplexity": "medium"
+          },
+          {
+            "id": "step-2-2",
+            "description": "resolveWorkspaceAndDocs関数の削除",
+            "details": "この関数を使用しているコードを特定し、代わりにresolveDocsRootを使用するように修正",
+            "estimatedComplexity": "high"
+          },
+          {
+            "id": "step-2-3",
+            "description": "getMergedApplicationOptions関数の修正",
+            "details": "workspace関連のロジックを削除し、docsRootのみに依存するように修正",
+            "estimatedComplexity": "medium"
+          }
+        ]
+      },
+      {
+        "id": "phase-3",
+        "title": "CLIオプション定義の完全削除",
+        "steps": [
+          {
+            "id": "step-3-1",
+            "description": "src/index.tsのyargsオプション定義から'workspace'を完全に削除",
+            "details": "workspaceオプションを完全に削除し、CLIで使えないようにする",
+            "estimatedComplexity": "low"
+          },
+          {
+            "id": "step-3-2",
+            "description": "workspace関連の環境変数参照を削除",
+            "details": "process.env.WORKSPACE_ROOTへの参照を全て削除",
+            "estimatedComplexity": "low"
+          },
+          {
+            "id": "step-3-3",
+            "description": "CliOptions型からworkspace関連のプロパティを完全に削除",
+            "details": "型定義から完全に削除し、型エラーが発生する場所を特定して修正",
+            "estimatedComplexity": "medium"
+          },
+          {
+            "id": "step-3-4",
+            "description": "コマンドラインオプション処理ロジックの単純化",
+            "details": "workspaceが無くなったことで不要になったコード分岐を削除",
+            "estimatedComplexity": "medium"
+          }
+        ]
+      },
+      {
+        "id": "phase-4",
+        "title": "テストコードの修正",
+        "steps": [
+          {
+            "id": "step-4-1",
+            "description": "tests/integration/application/WorkspaceOptionFeature.test.tsの削除",
+            "details": "不要になったworkspaceオプションのテストファイルを完全に削除",
+            "estimatedComplexity": "low"
+          },
+          {
+            "id": "step-4-2",
+            "description": "tests/unit/application/resolveWorkspaceAndDocs.test.tsの削除",
+            "details": "不要になったresolveWorkspaceAndDocs関数のテストファイルを完全に削除",
+            "estimatedComplexity": "low"
+          },
+          {
+            "id": "step-4-3",
+            "description": "他のテストファイルでのworkspace関連のテストケースを修正",
+            "details": "各テストファイルでworkspaceに依存するテストケースを特定し、docsオプションのみを使用するように修正",
+            "estimatedComplexity": "high"
+          }
+        ]
+      },
+      {
+        "id": "phase-5",
+        "title": "ドキュメントとログメッセージの更新",
+        "steps": [
+          {
+            "id": "step-5-1",
+            "description": "ドキュメントの更新",
+            "details": "workspaceオプションに関する記述を削除し、docsオプションのみを使用するように更新",
+            "estimatedComplexity": "medium"
+          },
+          {
+            "id": "step-5-2",
+            "description": "デバッグ/ログメッセージの更新",
+            "details": "workspaceに関連するログメッセージを削除または修正",
+            "estimatedComplexity": "low"
+          },
+          {
+            "id": "step-5-3",
+            "description": "移行と互換性に関する注意書きの追加",
+            "details": "ユーザーに対して、workspaceオプションが削除されたことを通知し、docsオプションへの移行方法を説明",
+            "estimatedComplexity": "low"
+          }
+        ]
+      }
+    ],
+    "estimatedTimeToComplete": "1-2日",
+    "risks": [
+      {
+        "id": "risk-1",
+        "description": "workspaceオプションを使用しているスクリプトやツールの互換性が失われる",
+        "mitigation": "十分な告知期間を設け、ドキュメントでdocsオプションへの移行方法を詳細に説明する"
+      },
+      {
+        "id": "risk-2",
+        "description": "テストケースの修正漏れにより、テストカバレッジが低下する可能性",
+        "mitigation": "テスト実行結果を慎重に確認し、カバレッジレポートを活用して修正漏れを検出する"
+      }
+    ]
+  }
+}

@@ -23,11 +23,6 @@ export const Constants = {
   DEFAULT_HOST: 'localhost',
 
   /**
-   * Default workspace root
-   */
-  DEFAULT_WORKSPACE_ROOT: process.cwd(),
-
-  /**
    * Default memory bank root directory
    */
   DEFAULT_MEMORY_BANK_ROOT: 'docs',

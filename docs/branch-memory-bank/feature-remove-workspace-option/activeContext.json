@@ -1,0 +1,105 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "0441e980-36f7-4713-b42e-fe8c6463f5d8",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context"
+    ],
+    "lastModified": "2025-03-27T14:30:00.000Z",
+    "createdAt": "2025-03-27T12:56:48.270Z",
+    "version": 2
+  },
+  "content": {
+    "currentWork": "workspaceオプションの完全削除とテスト確認",
+    "recentChanges": [
+      {
+        "date": "2025-03-27T14:15:00.000Z",
+        "description": "WorkspaceConfig型からworkspaceRootプロパティの削除完了"
+      },
+      {
+        "date": "2025-03-27T14:20:00.000Z",
+        "description": "resolveWorkspaceAndDocs関数の削除完了"
+      },
+      {
+        "date": "2025-03-27T14:25:00.000Z",
+        "description": "workspaceパラメータ関連コードの削除完了"
+      },
+      {
+        "date": "2025-03-27T14:28:00.000Z",
+        "description": "関連するテストコードの修正完了"
+      },
+      {
+        "date": "2025-03-27T13:40:48.270Z",
+        "description": "workspaceオプション関連のコード調査完了"
+      },
+      {
+        "date": "2025-03-27T13:35:48.270Z",
+        "description": "修正が必要なファイルとパターンの特定"
+      },
+      {
+        "date": "2025-03-27T13:30:48.270Z",
+        "description": "deprecatedマークされたworkspaceオプションの現状確認"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "2ab8301f-bd58-4c41-a930-691d95dd684c",
+        "description": "workspaceオプションを完全に削除する"
+      },
+      {
+        "id": "f1b1f0c3-f446-403a-9502-6a333ffbb0ed",
+        "description": "docsオプションのみを使用するようにコードを統一する"
+      },
+      {
+        "id": "baad029d-3f29-4f13-930a-ba0ed2e04c7c",
+        "description": "パス解決ロジックをシンプル化する"
+      },
+      {
+        "id": "ea1f2g3h-4i5j-6k7l-8m9n-0o1p2q3r4s5t",
+        "description": "E2Eテストを含むテストを実行して動作確認を行う"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "7cbe92e3-d5c7-40a6-bc33-dfa1d8e6a2de",
+        "description": "下位互換性への影響の最小化",
+        "status": "done"
+      },
+      {
+        "id": "08f21b92-5ae6-4f7f-9ad0-ee56463210f7",
+        "description": "テストコードの詳細な修正方法",
+        "status": "done"
+      },
+      {
+        "id": "9f26cad1-b00e-4e73-b7dd-5d765ea3b185",
+        "description": "ログメッセージの適切な追加・修正",
+        "status": "done"
+      },
+      {
+        "id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+        "description": "最終テストでの動作確認方法",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "b1c2d3e4-f5g6-h7i8-j9k0-l1m2n3o4p5q6",
+        "description": "全テストケースの実行と確認",
+        "priority": "high"
+      },
+      {
+        "id": "c2d3e4f5-g6h7-i8j9-k0l1-m2n3o4p5q6r7",
+        "description": "E2Eテストの実行と確認",
+        "priority": "high"
+      },
+      {
+        "id": "d3e4f5g6-h7i8-j9k0-l1m2-n3o4p5q6r7s8",
+        "description": "変更内容のレビューとコミット準備",
+        "priority": "medium"
+      }
+    ]
+  }
+}

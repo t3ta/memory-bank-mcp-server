@@ -27,7 +27,6 @@ export const GLOBAL_CORE_FILES = [
  * Configuration options for setting up the memory bank
  */
 export interface WorkspaceConfig {
-  workspaceRoot: string;
   docsRoot: string;
   verbose: boolean;
   language: Language;
@@ -37,7 +36,6 @@ export interface WorkspaceConfig {
  * Command line options for the server
  */
 export interface CliOptions {
-  workspace?: string;
   docsRoot?: string;
   verbose?: boolean;
   language?: Language;

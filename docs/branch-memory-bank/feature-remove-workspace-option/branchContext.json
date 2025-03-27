@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "e9bb9d74-13a5-45da-88aa-b358880ba653",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-27T13:35:48.270Z",
+    "createdAt": "2025-03-27T12:56:48.270Z",
+    "version": 2
+  },
+  "content": {
+    "branchName": "feature/remove-workspace-option",
+    "purpose": "workspaceオプションを完全に削除し、シンプルで一貫性のある設定システムを実現する",
+    "createdAt": "2025-03-27T12:56:48.270Z",
+    "userStories": [
+      {
+        "id": "2eb6e671-53a3-4ff2-9f33-deb4e5806eca",
+        "description": "開発者として、docsオプションのみを使用して設定を行いたい",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "877ef885-f482-4b94-ad63-39831f346c7c",
+        "description": "管理者として、コードベースをシンプルに保ちたい",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "f3bfce3c-dff7-43a5-9f74-d67c277fcce6",
+        "description": "新規開発者として、設定システムを簡単に理解できるようにしたい",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": "この変更は後方互換性を破壊する可能性があるが、workspaceオプションはすでにdeprecatedマークがされているため、影響は最小限と考えられる。また、ほとんどのユーザーはdocsオプションを使用していると思われる。"
+  }
+}
