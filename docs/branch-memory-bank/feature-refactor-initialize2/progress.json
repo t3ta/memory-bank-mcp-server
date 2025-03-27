@@ -1,0 +1,80 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "6648cada-1e3b-46d2-90f8-fdaaaa87a914",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress"
+    ],
+    "lastModified": "2025-03-27T12:03:45.497Z",
+    "createdAt": "2025-03-27T12:03:45.497Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "ac85d09b-e6f8-4cc3-9133-1496461c4f4a",
+        "description": "ブランチメモリバンクの基本的な初期化機能",
+        "implementedAt": "2025-03-27T12:03:45.497Z"
+      },
+      {
+        "id": "5ec02ad1-2c24-42b4-b595-b8cb21c561fd",
+        "description": "ReadContextUseCaseによる自動初期化機能",
+        "implementedAt": "2025-03-27T12:03:45.497Z"
+      },
+      {
+        "id": "565305cd-a738-486a-8401-72e79220e52e",
+        "description": "コアファイルのテンプレート生成機能",
+        "implementedAt": "2025-03-27T12:03:45.497Z"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "f4f59555-d401-46b0-be88-d323927d2a3d",
+        "description": "タグの一貫性を保証するための改善",
+        "priority": "high"
+      },
+      {
+        "id": "1ac03aa3-d5b7-4342-b92f-ea848ed81490",
+        "description": "初期化処理のエラーハンドリング強化",
+        "priority": "high"
+      },
+      {
+        "id": "2d38c5e1-d469-4fa4-a173-2dc4a56f6206",
+        "description": "テンプレートと初期化ロジックの整合性確保",
+        "priority": "medium"
+      }
+    ],
+    "status": "調査完了・設計フェーズ：初期化処理の課題を特定し、包括的なリファクタリング計画を立案した。次は実装フェーズで、必要な修正を順番に進めていく。",
+    "completionPercentage": 30,
+    "knownIssues": [
+      {
+        "id": "09f35aba-a908-49ef-ae3e-d46229114867",
+        "description": "FileSystemBranchMemoryBankRepositoryでのコアファイル生成時にタグが正しく設定されない問題",
+        "severity": "high"
+      },
+      {
+        "id": "b7c78989-6f4a-4934-8b53-9d43b529f258",
+        "description": "ReadContextUseCaseでの初期化エラー時の処理が不十分で、エラーメッセージが不明確",
+        "severity": "medium"
+      },
+      {
+        "id": "21f83e24-94d4-46e2-bac2-b5604330f48d",
+        "description": "コアファイルのテンプレートが各クラスで重複定義されており、非一貫性のリスクがある",
+        "severity": "medium"
+      },
+      {
+        "id": "9c74d32e-18bf-4e8a-b11a-45f2a5c8e0d9",
+        "description": "グローバルメモリバンクの初期化処理がReadContextUseCaseで呼び出されていない問題",
+        "severity": "high"
+      },
+      {
+        "id": "be7f3a15-48c4-4e6a-bc0f-d9a7e22e4a69",
+        "severity": "medium",
+        "description": "状態管理のためにコマンドレベルとモードレベルの選択肢があったが、コマンドレベルの分割を采用することに決定"
+      }
+    ]
+  }
+}

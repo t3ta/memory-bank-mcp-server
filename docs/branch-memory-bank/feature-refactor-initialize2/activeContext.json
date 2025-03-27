@@ -1,0 +1,97 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "4b41075a-1963-4169-82f5-e32f54d5f39d",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context"
+    ],
+    "lastModified": "2025-03-27T12:03:45.496Z",
+    "createdAt": "2025-03-27T12:03:45.496Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "読み込みコンテキストの初期化処理をリファクタリングします",
+    "recentChanges": [
+      {
+        "date": "2025-03-27T12:03:45.496Z",
+        "description": "初期調査: ReadContextUseCase と関連ファイルを確認"
+      },
+      {
+        "date": "2025-03-27T12:03:45.496Z",
+        "description": "ブランチメモリバンクの初期化処理と自動初期化機能の動作を確認"
+      },
+      {
+        "date": "2025-03-27T12:03:45.496Z",
+        "description": "問題点を特定: コアファイルのタグが不整合、エラーハンドリングの問題"
+      },
+      {
+        "date": "2025-03-27T15:30:00.000Z",
+        "description": "グローバルメモリバンクの初期化問題を発見：ReadContextUseCaseでブランチメモリバンクのみ初期化され、グローバルメモリバンクの初期化が呼ばれていない"
+      },
+      {
+        "date": "2025-03-27T16:30:00.000Z",
+        "description": "コマンドレベルとモードレベルの選択肢を検討し、コマンドレベルで分割する方式を採用することに決定"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "cd236d69-60d6-4d3c-ad36-99fca6f90bb7",
+        "description": "初期化処理におけるタグの一貫性を改善する"
+      },
+      {
+        "id": "8d652dc9-5830-4ff0-aec7-8e1f89496754",
+        "description": "read_context時の初期化処理のエラーハンドリングを強化する"
+      },
+      {
+        "id": "27840367-2375-48e7-9137-26969c8174b6",
+        "description": "コアファイルのデフォルトテンプレートとクラス間の整合性を確保する"
+      },
+      {
+        "id": "4a7b32e8-c5d1-45e9-a912-b874cfa7e3a5",
+        "description": "ReadContextUseCaseでグローバルメモリバンクの初期化も行う"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "9a82382e-96b1-4fc2-94fc-41fc2b271e66",
+        "description": "初期化処理のユニットテストの拡充",
+        "status": "open"
+      },
+      {
+        "id": "2ea70118-95f6-4486-862c-316e6b952b2c",
+        "description": "タグ付けのベストプラクティスの文書化と統一",
+        "status": "open"
+      },
+      {
+        "id": "4660d3e9-ca41-408b-87d3-b2eba681fb6f",
+        "description": "ファイルシステムリポジトリの初期化処理の効率化",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "746f59ee-9777-4135-a48c-fa460b289bd7",
+        "description": "問題点の詳細な分析と修正計画の作成",
+        "priority": "high"
+      },
+      {
+        "id": "f87cd8e1-a983-4ecc-b4dc-d0fa32353f3a",
+        "description": "FileSystemBranchMemoryBankRepositoryの初期化処理の改善",
+        "priority": "high"
+      },
+      {
+        "id": "d7ea11a3-6692-4b4c-862d-5cfd233089e8",
+        "description": "ReadContextUseCaseの初期化エラーハンドリングの改善",
+        "priority": "medium"
+      },
+      {
+        "id": "8fb3c2e4-9d7a-4f71-a2c6-e0f13c6a09e8",
+        "description": "リファクタリング計画にしたがって実装を進める",
+        "priority": "high"
+      }
+    ]
+  }
+}

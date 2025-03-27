@@ -1,0 +1,364 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "7e21f83d-c5a4-4e1c-9a7f-6b421cb3f8d9",
+    "title": "リファクタリング計画：初期化処理の改善",
+    "documentType": "refactoring_plan",
+    "path": "refactoring-plan.json",
+    "tags": [
+      "refactoring",
+      "plan",
+      "initialization"
+    ],
+    "lastModified": "2025-03-27T15:40:00.000Z",
+    "createdAt": "2025-03-27T15:40:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": "このリファクタリング計画は、ブランチメモリバンクとグローバルメモリバンクの初期化処理、またReadContextUseCaseの改善を目的としています。主な焦点は、タグの一貫性確保、エラーハンドリングの改善、テンプレート定義の整合性、プレースホルダーの改善、そしてグローバルメモリバンクの初期化です。",
+    "identifiedIssues": [
+      {
+        "id": "issue-1",
+        "title": "初期化時のタグ不整合",
+        "description": "FileSystemBranchMemoryBankRepositoryで生成されるコアファイルには'core'タグが含まれていない場合がある。具体的には、defaultTemplatesのJSONオブジェクト内でタグが定義されるときに、機能固有のタグ（例：'active-context'）しか設定されていない。",
+        "impact": "タグベースの検索が期待通りに動作しない。コアファイルであるべきドキュメントが検索から漏れる可能性がある。",
+        "fileLocations": [
+          "/Users/t3ta/workspace/memory-bank-mcp-server/src/infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.ts"
+        ]
+      },
+      {
+        "id": "issue-2",
+        "title": "初期化エラーハンドリングの不足",
+        "description": "ReadContextUseCaseでブランチの自動初期化が失敗した場合のエラーハンドリングが不十分で、エラーの根本原因が不明瞭になっている。",
+        "impact": "デバッグが困難になり、開発者体験が低下する。エラーの解決に時間がかかる。",
+        "fileLocations": [
+          "/Users/t3ta/workspace/memory-bank-mcp-server/src/application/usecases/common/ReadContextUseCase.ts"
+        ]
+      },
+      {
+        "id": "issue-3",
+        "title": "テンプレート定義の重複と非一貫性",
+        "description": "コアファイルのテンプレートが複数のクラスで重複して定義されており、一方が変更された場合に不整合が発生するリスクがある。",
+        "impact": "コードの保守が困難になり、バグの発生リスクが高まる。",
+        "fileLocations": [
+          "/Users/t3ta/workspace/memory-bank-mcp-server/src/infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.ts",
+          "/Users/t3ta/workspace/memory-bank-mcp-server/src/application/usecases/common/CreateBranchCoreFilesUseCase.ts"
+        ]
+      },
+      {
+        "id": "issue-4",
+        "title": "プレースホルダーがわかりにくい問題",
+        "description": "初期テンプレートに含まれるプレースホルダーが「変更点1」「機能1」「問題1」のように抽象的で、ユーザーが何を入力すべきか理解しにくい。",
+        "impact": "ユーザービリティが低下し、メモリバンクの実用性が損なわれる。プレースホルダーがそのまま残されるケースが増える。",
+        "fileLocations": [
+          "/Users/t3ta/workspace/memory-bank-mcp-server/src/infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.ts"
+        ]
+      },
+      {
+        "id": "issue-5",
+        "title": "グローバルメモリバンク初期化の欠如",
+        "description": "ReadContextUseCaseでブランチメモリバンクは自動初期化されるが、グローバルメモリバンクは初期化されていない。",
+        "impact": "グローバルメモリバンクが存在しない場合や、core/ディレクトリが未初期化の場合にReadContextUseCaseが実行されると、グローバルメモリバンクからの情報取得に失敗する可能性がある。",
+        "fileLocations": [
+          "/Users/t3ta/workspace/memory-bank-mcp-server/src/application/usecases/common/ReadContextUseCase.ts",
+          "/Users/t3ta/workspace/memory-bank-mcp-server/src/infrastructure/repositories/file-system/FileSystemGlobalMemoryBankRepository.ts"
+        ]
+      },
+      {
+        "id": "issue-6",
+        "title": "テンプレート判定ロジック不足",
+        "description": "既存ファイルがある場合、それがデフォルトテンプレートのままなのか変更済みなのか判断するロジックがない。",
+        "impact": "ユーザーが変更したファイルが意図せず上書きされる可能性がある。または、デフォルトのままのファイルが更新されない可能性がある。",
+        "fileLocations": [
+          "/Users/t3ta/workspace/memory-bank-mcp-server/src/infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.ts",
+          "/Users/t3ta/workspace/memory-bank-mcp-server/src/infrastructure/repositories/file-system/FileSystemGlobalMemoryBankRepository.ts"
+        ]
+      },
+      {
+        "id": "issue-7",
+        "title": "コアファイル操作専用メソッドの不足",
+        "description": "現在は一般的なread_/write_メソッドしかなく、コアファイルの作成と削除に特化した操作が実装されていない。",
+        "impact": "コアファイルが誤って削除されるリスクがある。また、新規作成時にテンプレートの適用を手動で行う必要がある。",
+        "fileLocations": [
+          "/Users/t3ta/workspace/memory-bank-mcp-server/src/domain/repositories/IBranchMemoryBankRepository.ts",
+          "/Users/t3ta/workspace/memory-bank-mcp-server/src/domain/repositories/IGlobalMemoryBankRepository.ts"
+        ]
+      }
+    ],
+    "changesRequired": [
+      {
+        "id": "change-1",
+        "title": "FileSystemBranchMemoryBankRepositoryのタグ設定修正",
+        "description": "defaultTemplatesで生成される各コアファイルのJSONテンプレートを修正し、tagsプロパティに'core'タグと機能固有タグの両方を含めるようにする。",
+        "implementation": "各JSONテンプレート内のtags配列を更新し、['core', '機能固有タグ']のように必ず'core'タグを含める。",
+        "files": [
+          {
+            "path": "/Users/t3ta/workspace/memory-bank-mcp-server/src/infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.ts",
+            "changes": [
+              {
+                "type": "update",
+                "description": "defaultTemplatesのJSONオブジェクト内のtags配列を更新",
+                "details": "各テンプレート内のtagsプロパティを['core', '特定タグ']形式に変更"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "change-2",
+        "title": "ReadContextUseCaseのエラーハンドリング改善",
+        "description": "初期化エラー時に、より詳細なエラー情報を提供し、ログ出力を強化する。",
+        "implementation": "try-catchブロックを改善し、エラーオブジェクトの詳細情報を含めたエラーメッセージを生成する。また、エラーのスタックトレースを適切にログに記録する。",
+        "files": [
+          {
+            "path": "/Users/t3ta/workspace/memory-bank-mcp-server/src/application/usecases/common/ReadContextUseCase.ts",
+            "changes": [
+              {
+                "type": "update",
+                "description": "ブランチ初期化失敗時のエラーハンドリングを改善",
+                "details": "エラーメッセージをより具体的にし、エラーオブジェクトの情報を適切に含める"
+              },
+              {
+                "type": "update",
+                "description": "ログ出力を強化",
+                "details": "エラー発生時に詳細なログ情報を出力するように改善"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "change-3",
+        "title": "テンプレート定義の統一または整合性確保",
+        "description": "テンプレート定義の整合性を確保するために、参照を一元化するか、定期的な検証メカニズムを導入する。",
+        "implementation": "長期的な解決策としては共通のテンプレートプロバイダーを導入することが望ましいが、短期的には重複定義を明示的に文書化し、一貫性を保つためのコメント／注意事項を追加する。",
+        "files": [
+          {
+            "path": "/Users/t3ta/workspace/memory-bank-mcp-server/src/infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.ts",
+            "changes": [
+              {
+                "type": "update",
+                "description": "テンプレート定義に注釈を追加",
+                "details": "重複定義があること、変更時の注意点を明記したコメントを追加"
+              }
+            ]
+          },
+          {
+            "path": "/Users/t3ta/workspace/memory-bank-mcp-server/src/application/usecases/common/CreateBranchCoreFilesUseCase.ts",
+            "changes": [
+              {
+                "type": "update",
+                "description": "テンプレート生成メソッドに注釈を追加",
+                "details": "他の場所にも同様のロジックがあることを明記したコメントを追加"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "change-4",
+        "title": "プレースホルダーの改善",
+        "description": "テンプレート内のプレースホルダーをより具体的で説明的なものに変更し、ユーザーが何を入力すべきかわかりやすくする。",
+        "implementation": "「変更点1」→「このブランチで変更した内容を記述してください」のように、各プレースホルダーをより具体的な説明文に置き換える。",
+        "files": [
+          {
+            "path": "/Users/t3ta/workspace/memory-bank-mcp-server/src/infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.ts",
+            "changes": [
+              {
+                "type": "update",
+                "description": "defaultTemplatesのプレースホルダーテキストを改善",
+                "details": "より具体的で説明的なプレースホルダーテキストに変更"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "change-5",
+        "title": "グローバルメモリバンク初期化の追加",
+        "description": "ReadContextUseCaseでグローバルメモリバンクも初期化されるように修正する。",
+        "implementation": "ReadContextUseCase.execute()メソッド内でブランチメモリバンクの初期化に加えて、グローバルメモリバンクの初期化も行うようにロジックを追加する。",
+        "files": [
+          {
+            "path": "/Users/t3ta/workspace/memory-bank-mcp-server/src/application/usecases/common/ReadContextUseCase.ts",
+            "changes": [
+              {
+                "type": "update",
+                "description": "グローバルメモリバンク初期化ロジックの追加",
+                "details": "グローバルメモリバンクの存在確認と初期化を行うコードを追加"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "change-6",
+        "title": "グローバルメモリバンクのテンプレート拡充",
+        "description": "FileSystemGlobalMemoryBankRepositoryのデフォルトテンプレートを拡充し、core/ディレクトリに必要な基本ファイルを確実に作成するようにする。",
+        "implementation": "getEnglishTemplates()などのメソッドを拡張し、core/ディレクトリのコアファイル（architecture.json、domain-models.json、coding-standards.jsonなど）のテンプレートを追加する。",
+        "files": [
+          {
+            "path": "/Users/t3ta/workspace/memory-bank-mcp-server/src/infrastructure/repositories/file-system/FileSystemGlobalMemoryBankRepository.ts",
+            "changes": [
+              {
+                "type": "update",
+                "description": "デフォルトテンプレートの拡充",
+                "details": "core/ディレクトリに必要な基本ファイルのテンプレートを追加"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "change-7",
+        "title": "テンプレート更新判定ロジックの追加",
+        "description": "既存ファイルがデフォルトテンプレートのままか、変更済みかを判断する仕組みを追加する。",
+        "implementation": "ファイルにマーカーコメントを追加するか、ハッシュ値を計算して比較するロジックを実装し、デフォルトテンプレートと判断された場合のみ更新する。",
+        "files": [
+          {
+            "path": "/Users/t3ta/workspace/memory-bank-mcp-server/src/infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.ts",
+            "changes": [
+              {
+                "type": "update",
+                "description": "initialize()メソッド内にテンプレート更新判定ロジックを追加",
+                "details": "既存ファイルがデフォルトテンプレートと一致するか確認し、一致する場合のみ更新するロジックを実装"
+              }
+            ]
+          },
+          {
+            "path": "/Users/t3ta/workspace/memory-bank-mcp-server/src/infrastructure/repositories/file-system/FileSystemGlobalMemoryBankRepository.ts",
+            "changes": [
+              {
+                "type": "update",
+                "description": "ensureDefaultStructure()メソッド内にテンプレート更新判定ロジックを追加",
+                "details": "既存ファイルがデフォルトテンプレートと一致するか確認し、一致する場合のみ更新するロジックを実装"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "change-8",
+        "title": "コアファイル操作専用メソッドの実装",
+        "description": "create_core_fileとdelete_core_fileメソッドを追加し、コアファイルの作成と削除に特化した操作を提供する。",
+        "implementation": "IBranchMemoryBankRepositoryとIGlobalMemoryBankRepositoryに新しいメソッドを追加し、その実装を各リポジトリクラスに提供する。delete_core_fileにはコアファイルプロテクション機能を実装する。",
+        "files": [
+          {
+            "path": "/Users/t3ta/workspace/memory-bank-mcp-server/src/domain/repositories/IBranchMemoryBankRepository.ts",
+            "changes": [
+              {
+                "type": "update",
+                "description": "create_core_fileとdelete_core_fileメソッドを追加",
+                "details": "コアファイルの作成と保護付き削除を行うメソッドをインターフェースに追加"
+              }
+            ]
+          },
+          {
+            "path": "/Users/t3ta/workspace/memory-bank-mcp-server/src/domain/repositories/IGlobalMemoryBankRepository.ts",
+            "changes": [
+              {
+                "type": "update",
+                "description": "create_core_fileとdelete_core_fileメソッドを追加",
+                "details": "コアファイルの作成と保護付き削除を行うメソッドをインターフェースに追加"
+              }
+            ]
+          },
+          {
+            "path": "/Users/t3ta/workspace/memory-bank-mcp-server/src/infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.ts",
+            "changes": [
+              {
+                "type": "update",
+                "description": "create_core_fileとdelete_core_fileメソッドの実装を追加",
+                "details": "コアファイルテンプレートを使用した作成と、コアファイルチェック付きの削除処理を実装"
+              }
+            ]
+          },
+          {
+            "path": "/Users/t3ta/workspace/memory-bank-mcp-server/src/infrastructure/repositories/file-system/FileSystemGlobalMemoryBankRepository.ts",
+            "changes": [
+              {
+                "type": "update",
+                "description": "create_core_fileとdelete_core_fileメソッドの実装を追加",
+                "details": "コアファイルテンプレートを使用した作成と、コアファイルチェック付きの削除処理を実装"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "testingStrategy": {
+      "unitTests": [
+        {
+          "description": "FileSystemBranchMemoryBankRepositoryの初期化処理で生成されるコアファイルに正しいタグが含まれているか検証するテスト",
+          "implementation": "initialize()メソッドを呼び出した後、生成されたJSONファイルをパースし、tags配列に'core'タグと機能固有タグが含まれているか確認する"
+        },
+        {
+          "description": "ReadContextUseCaseがグローバルメモリバンクを正しく初期化するかのテスト",
+          "implementation": "globalRepositoryのmockを使用し、execute()メソッド呼び出し後にinitialize()が呼ばれることを確認する"
+        },
+        {
+          "description": "プレースホルダーテキストが期待通り変更されているかのテスト",
+          "implementation": "テンプレートから生成されたJSONファイルをパースし、プレースホルダーテキストが具体的な説明文に変更されているか確認する"
+        },
+        {
+          "description": "テンプレート更新判定ロジックが正しく動作するかのテスト",
+          "implementation": "デフォルトテンプレートのファイルと変更されたファイルを準備し、更新判定ロジックが正しく判断できるか検証する"
+        }
+      ],
+      "integrationTests": [
+        {
+          "description": "実際の環境でReadContextUseCaseがブランチとグローバルメモリバンクを正しく初期化するかのテスト",
+          "implementation": "テスト用の一時ディレクトリを作成し、実際のファイルシステムを使用してReadContextUseCaseを実行し、すべての必要なファイルが正しく生成されるか確認する"
+        },
+        {
+          "description": "初期化エラー時のエラーハンドリングが期待通りに動作するかのテスト",
+          "implementation": "ReadContextUseCaseの実行中にエラーが発生するようにモックを設定し、エラーメッセージとログ出力が改善されたフォーマットで表示されるか確認する"
+        }
+      ],
+      "manualTests": [
+        {
+          "description": "実際のCLIコマンドを使用して新しいブランチでread_contextを実行し、両方のメモリバンクが初期化されることを確認する",
+          "implementation": "新しいブランチを作成し、read_contextコマンドを実行して、ブランチとグローバルメモリバンクの両方が初期化されることを確認する"
+        },
+        {
+          "description": "改善されたプレースホルダーのユーザビリティテスト",
+          "implementation": "新しいブランチを初期化し、生成されたテンプレートファイルを確認して、プレースホルダーがわかりやすくなっているか評価する"
+        }
+      ]
+    },
+    "implementationPriority": [
+      {
+        "id": "change-5",
+        "reason": "グローバルメモリバンク初期化の欠如は基本的な機能に影響する重大な問題であるため、最優先で対応する必要がある"
+      },
+      {
+        "id": "change-1",
+        "reason": "タグの不整合は検索機能に直接影響するため、優先度が高い"
+      },
+      {
+        "id": "change-6",
+        "reason": "グローバルメモリバンクのテンプレート拡充はchange-5の対応と密接に関連しているため、同時に対応することが効率的"
+      },
+      {
+        "id": "change-2",
+        "reason": "エラーハンドリングの改善はデバッグ性向上に重要"
+      },
+      {
+        "id": "change-4",
+        "reason": "プレースホルダーの改善はユーザビリティ向上に直結"
+      },
+      {
+        "id": "change-7",
+        "reason": "テンプレート更新判定ロジックはデータ保全に関わる重要な改善"
+      },
+      {
+        "id": "change-3",
+        "reason": "テンプレート定義の統一は長期的な保守性向上のために必要だが、短期的な影響は少ないため優先度を下げる"
+      },
+      {
+        "id": "change-8",
+        "reason": "コアファイルの保護はデータ保全に直結する重要な機能であり、早期に実装する必要がある"
+      }
+    ]
+  }
+}

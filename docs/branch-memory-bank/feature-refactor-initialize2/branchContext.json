@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "484a1a92-446d-451b-87af-223378bc1ce7",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-27T12:03:45.496Z",
+    "createdAt": "2025-03-27T12:03:45.496Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "feature/refactor-initialize2",
+    "purpose": "ReadContextUseCase とブランチメモリバンクの初期化処理をリファクタリングして、初期化処理における非一貫性とエラーハンドリングの問題を解決する",
+    "createdAt": "2025-03-27T12:03:45.496Z",
+    "userStories": [
+      {
+        "id": "91537722-11f3-4845-87ae-9c1118dcee30",
+        "description": "read_context実行時に初期化されるブランチメモリバンクのタグが正しく設定されていない問題を解決する",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "02ecd760-7494-4236-b388-2d2ba894bff3",
+        "description": "read_context時のブランチ初期化処理のエラーハンドリングを改善し、より明確なエラーメッセージを提供する",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "592d254b-fb06-43ea-b9c7-1e6303ed1d45",
+        "description": "各クラス間で共有されているテンプレートと初期化ロジックの整合性を確保する",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": "このリファクタリングでは主にファイルシステムレポジトリとReadContextUseCaseの協調動作に焦点を当て、初期化処理の信頼性を向上させる。タグの一貫性問題は特に重要で、'core'タグと特定機能タグ（例：'active-context'）の両方が適切に設定されるようにする必要がある。"
+  }
+}

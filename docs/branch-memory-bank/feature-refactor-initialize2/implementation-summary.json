@@ -1,0 +1,147 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "9e5a1c37-d8f9-4b2c-a56e-f87dc3e82a10",
+    "title": "実装サマリー：初期化処理リファクタリング",
+    "documentType": "implementation_summary",
+    "path": "implementation-summary.json",
+    "tags": [
+      "implementation",
+      "summary",
+      "refactoring"
+    ],
+    "lastModified": "2025-03-27T16:40:00.000Z",
+    "createdAt": "2025-03-27T16:40:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": "このドキュメントは、feature/refactor-initialize2ブランチで行う初期化処理のリファクタリング実装の概要をまとめたものです。主な改善点と実装方針を示します。",
+    "discoveredIssues": [
+      {
+        "id": "issue-1",
+        "title": "タグの不整合問題",
+        "description": "コアファイル生成時に'core'タグが付与されない場合があり、タグベースの検索が期待通りに動作しない",
+        "severity": "high"
+      },
+      {
+        "id": "issue-2",
+        "title": "エラーハンドリング不足",
+        "description": "初期化失敗時のエラーメッセージが不十分で根本原因の特定が困難",
+        "severity": "medium"
+      },
+      {
+        "id": "issue-3",
+        "title": "テンプレート定義の重複",
+        "description": "コアファイルのテンプレートが複数のクラスで重複定義され、非一貫性のリスクがある",
+        "severity": "medium"
+      },
+      {
+        "id": "issue-4",
+        "title": "プレースホルダーのわかりにくさ",
+        "description": "「変更点1」「機能1」のような抽象的なプレースホルダーがあり、ユーザビリティが低い",
+        "severity": "low"
+      },
+      {
+        "id": "issue-5",
+        "title": "グローバルメモリバンク初期化の欠如",
+        "description": "ReadContextUseCaseでブランチメモリバンクのみ初期化され、グローバルメモリバンクは初期化されていない",
+        "severity": "high"
+      },
+      {
+        "id": "issue-6",
+        "title": "テンプレート更新判定ロジック不足",
+        "description": "既存ファイルがデフォルトテンプレートのままか変更済みか判断するロジックがない",
+        "severity": "medium"
+      },
+      {
+        "id": "issue-7",
+        "title": "コアファイル操作専用メソッドの不足",
+        "description": "コアファイルの作成と削除に特化した操作が実装されておらず、誤削除のリスクがある",
+        "severity": "high"
+      }
+    ],
+    "implementationPlan": {
+      "phase1": {
+        "title": "最重要課題の対応",
+        "tasks": [
+          "グローバルメモリバンク初期化機能の追加",
+          "タグ不整合の修正",
+          "コアファイル専用操作（create_core_file/delete_core_file）の実装"
+        ],
+        "estimatedTime": "3-4日"
+      },
+      "phase2": {
+        "title": "機能強化と改善",
+        "tasks": [
+          "エラーハンドリングの改善",
+          "プレースホルダーの改善",
+          "テンプレート更新判定ロジックの追加"
+        ],
+        "estimatedTime": "2-3日"
+      },
+      "phase3": {
+        "title": "長期的な改善",
+        "tasks": [
+          "テンプレート定義の整合性確保（注釈追加と将来的な一元管理への準備）",
+          "テストケースの拡充"
+        ],
+        "estimatedTime": "1-2日"
+      }
+    },
+    "implementationDecisions": [
+      {
+        "title": "コアファイル操作の実装方式",
+        "options": [
+          "モードベース：特定のモードに切り替えて操作",
+          "コマンドベース：専用コマンドを用意"
+        ],
+        "decision": "コマンドベースの実装を採用",
+        "reason": "意図がより明確になり、危険操作（コアファイル削除など）に対する意識的な実行を促す。また、使用頻度を考えるとモード切り替えのコストが見合わない。"
+      },
+      {
+        "title": "テンプレート更新判定方法",
+        "options": [
+          "ハッシュベース：元のテンプレートのハッシュを計算して比較",
+          "マーカーベース：ファイルにマーカーコメントを埋め込む",
+          "メタデータベース：外部にデフォルト状態を記録"
+        ],
+        "decision": "ハッシュベースの判定を採用",
+        "reason": "非侵入的で、ファイル自体を変更せずに判定できる。また、実装も比較的シンプル。"
+      }
+    ],
+    "techDebt": [
+      {
+        "title": "テンプレート一元管理",
+        "description": "長期的には、テンプレート定義を一元管理する専用のプロバイダーを導入すべき",
+        "impact": "現状の重複定義は短期的にはコメントで対応するが、将来的な保守性向上のためには一元管理が望ましい"
+      },
+      {
+        "title": "削除プロテクションの粒度",
+        "description": "現状の設計では「コアファイルかどうか」の二値判定だが、より細かい保護レベルの設定も検討すべき",
+        "impact": "将来的にファイルごとの重要度に応じた保護レベルを設定できる拡張性を持たせるべき"
+      }
+    ],
+    "cliCommands": {
+      "newCommands": [
+        {
+          "name": "create-core-file",
+          "description": "コアファイルをテンプレートから作成",
+          "syntax": "create-core-file <filename> [--custom-content <content>]",
+          "examples": [
+            "create-core-file activeContext.json",
+            "create-core-file systemPatterns.json --custom-content '{...}'"
+          ]
+        },
+        {
+          "name": "delete-core-file",
+          "description": "コアファイルを削除（保護機能付き）",
+          "syntax": "delete-core-file <filename> [--force]",
+          "examples": [
+            "delete-core-file oldConfig.json",
+            "delete-core-file systemPatterns.json --force"
+          ]
+        }
+      ]
+    }
+  }
+}
