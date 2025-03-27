@@ -1,14 +1,17 @@
 /**
- * Memory Bank スキーマパッケージ
+ * @memory-bank/schemas
  * 
- * このパッケージはMemory Bankプロジェクトで使用されるスキーマ定義を提供します。
+ * Schema definitions for Memory Bank system
+ * 
+ * This is the main entry point for the schemas package.
+ * It exports all schema definitions, utilities, and types.
  */
 
-// コモンスキーマのエクスポート
+// Re-export common schemas
 export * from './common/index.js';
 
-// V2スキーマのエクスポート
-export * from './v2/index.js';
-
-// 型定義のエクスポート
+// Re-export types
 export * from './types/index.js';
+
+// TODO: Will re-export v2 schemas in the next phase
+// export * from './v2/index.js';

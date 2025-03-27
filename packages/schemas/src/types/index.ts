@@ -1,7 +1,21 @@
 /**
- * 型定義
+ * Common Type Definitions
+ * 
+ * This file contains shared type definitions used across the schema package.
  */
 
-// 将来的にはここに型定義をインポートしてエクスポート
-// 例: export * from './document.js';
-// export * from './metadata.js';
+/**
+ * Type for validation error handling
+ */
+export type ValidationErrorType = {
+  path?: string[];
+  message: string;
+};
+
+/**
+ * Type for validation result
+ */
+export type ValidationResult = {
+  success: boolean;
+  errors?: ValidationErrorType[];
+};

@@ -1,59 +1,90 @@
 # @memory-bank/schemas
 
-このパッケージは、Memory Bankプロジェクトで使用されるスキーマ定義を提供します。JSONデータの検証や型チェックに使用できます。
+Schema definitions for Memory Bank system. This package provides schemas for JSON data validation and type checking.
 
-## インストール
+## Installation
 
 ```bash
 npm install @memory-bank/schemas
-# または
+# or
 yarn add @memory-bank/schemas
 ```
 
-## 使用方法
+## Usage
 
 ```typescript
-import { DocumentMetadataV2Schema } from '@memory-bank/schemas';
+import { TagSchema, FlexibleDateSchema } from '@memory-bank/schemas';
 
-// スキーマを使用してデータを検証
-const result = DocumentMetadataV2Schema.safeParse(data);
-if (result.success) {
-  // 検証成功
-  const validatedData = result.data;
+// Validate data using schemas
+const tagResult = TagSchema.safeParse('example-tag');
+if (tagResult.success) {
+  // Validation succeeded
+  const validTag = tagResult.data;
   // ...
 } else {
-  // 検証失敗
-  console.error(result.error);
+  // Validation failed
+  console.error(tagResult.error);
+}
+
+// Parse dates flexibly
+const dateResult = FlexibleDateSchema.safeParse('2025-03-27T12:00:00Z');
+if (dateResult.success) {
+  const parsedDate = dateResult.data; // Instance of Date
+  console.log(parsedDate.toISOString());
 }
 ```
 
-## 主要なスキーマ
+## Main Schemas
 
-- `DocumentMetadataV2Schema` - ドキュメントのメタデータスキーマ
-- `TagSchema` - タグのスキーマ
-- `FlexibleDateSchema` - 柔軟な日付形式のスキーマ
-- `MemoryDocumentV2Schema` - Memory Bank ドキュメント全体のスキーマ
+The package currently includes:
 
-## 型定義
+- `TagSchema` - Schema for tags (lowercase alphanumeric with hyphens)
+- `FlexibleDateSchema` - Schema for flexible date formats (accepts Date objects or strings)
 
-このパッケージは、TypeScriptの型定義も提供します：
+Coming soon:
+- Document schemas (v2)
+- Metadata schemas
+- Tag index schemas
+
+## TypeScript Types
+
+This package also provides TypeScript type definitions:
 
 ```typescript
-import { Document, Metadata, Tag } from '@memory-bank/schemas';
+import { ValidationErrorType, ValidationResult } from '@memory-bank/schemas';
 
-// 型を使用
-const metadata: Metadata = {
-  id: 'document-id',
-  title: 'Document Title',
-  documentType: 'generic',
-  path: 'path/to/document.json',
-  tags: ['tag1', 'tag2'],
-  lastModified: new Date().toISOString(),
-  createdAt: new Date().toISOString(),
-  version: 1
+// Use types
+const validationResult: ValidationResult = {
+  success: true
+};
+
+// Or for errors
+const validationError: ValidationResult = {
+  success: false,
+  errors: [
+    { 
+      message: 'Invalid tag format',
+      path: ['tags', '0']
+    }
+  ]
 };
 ```
 
-## ライセンス
+## Development
+
+To build the package locally:
+
+```bash
+yarn install
+yarn build
+```
+
+To run tests:
+
+```bash
+yarn test
+```
+
+## License
 
 MIT

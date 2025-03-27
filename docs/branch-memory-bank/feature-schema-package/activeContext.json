@@ -30,6 +30,10 @@
       {
         "date": "2025-03-27T15:50:00.000Z",
         "description": "フェーズ2完了: schemasパッケージの基本設定ファイルの作成"
+      },
+      {
+        "date": "2025-03-27T16:00:00.000Z",
+        "description": "フェーズ3完了: schemasパッケージに基本スキーマコードの移行"
       }
     ],
     "activeDecisions": [
@@ -88,6 +92,11 @@
         "id": "a7b8c9d0-e1f2-3g4h-5i6j-7k8l9m0n1o2",
         "description": "依存関係を調整し、ローカル開発環境でテストする",
         "priority": "medium"
+      },
+      {
+        "id": "4b8c9d0-e1f2-3g4h-5i6j-7k8l9m0n1o2",
+        "description": "v2スキーマ関連のコードをschemasパッケージに移行する",
+        "priority": "high"
       }
     ]
   }

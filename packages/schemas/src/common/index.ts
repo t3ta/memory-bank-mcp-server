@@ -1,6 +1,7 @@
 /**
- * 共通スキーマと汎用ユーティリティ
+ * Common Schema Exports
+ * 
+ * This file re-exports all common schema definitions to provide a clean import experience.
  */
 
-// 将来的にはここに共通スキーマをインポートしてエクスポート
-// 例: export * from './schemas.js';
+export * from './schemas.js';

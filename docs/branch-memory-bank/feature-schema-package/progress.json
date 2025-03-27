@@ -28,6 +28,11 @@
         "id": "5f2c1d8b-3a7e-4965-8b92-1c30ef47a9d2",
         "description": "packages/schemas/ディレクトリの基本ファイル作成",
         "completedAt": "2025-03-27T15:50:00.000Z"
+      },
+      {
+        "id": "3a2b1c0-d9e8f-7g6h-5i4j-3k2l1m0n9o8p",
+        "description": "共通スキーマ（TagSchema, FlexibleDateSchema）の移行",
+        "completedAt": "2025-03-27T16:20:00.000Z"
       }
     ],
     "pendingImplementation": [
@@ -57,8 +62,8 @@
         "description": "使用されていないコードの特定と削除"
       }
     ],
-    "status": "実装フェーズ2完了 - schemasパッケージの基本設定ファイルの作成が完了、基本的なディレクトリ構造も整備",
-    "completionPercentage": 35,
+    "status": "実装フェーズ3完了 - schemasパッケージに基本スキーマコードの移行が完了。型定義とユーティリティ関数も含め移行済み",
+    "completionPercentage": 45,
     "knownIssues": [],
     "monoRepoStructure": {
       "repositoryName": "memory-bank",
