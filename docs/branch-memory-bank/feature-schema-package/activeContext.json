@@ -8,12 +8,12 @@
     "tags": [
       "active-context"
     ],
-    "lastModified": "2025-03-27T13:37:18.387Z",
+    "lastModified": "2025-03-27T17:30:00.000Z",
     "createdAt": "2025-03-27T13:26:18.387Z",
     "version": 2
   },
   "content": {
-    "currentWork": "モノレポ化とスキーマの外部パッケージ化の設計",
+    "currentWork": "フェーズ5 スキーマテストの完成と次フェーズの準備",
     "recentChanges": [
       {
         "date": "2025-03-27T13:55:18.387Z",
@@ -38,6 +38,10 @@
       {
         "date": "2025-03-27T16:40:00.000Z",
         "description": "フェーズ4完了: v2スキーマコード（json-document, tag-index）のschemasパッケージへの移行"
+      },
+      {
+        "date": "2025-03-27T17:30:00.000Z",
+        "description": "フェーズ5完了: スキーマ用テストを移行と拡張"
       }
     ],
     "activeDecisions": [
@@ -78,34 +82,24 @@
     ],
     "nextSteps": [
       {
-        "id": "f486df1e-9a85-4f91-b7ba-fc2413e11162",
-        "description": "Yarn Workspacesを使ったモノレポの基本構造を作成する",
-        "priority": "high"
+        "id": "6e5d4c3-b2a1-9z8y-7x6w-5v4u3t2s1r0",
+        "priority": "high",
+        "description": "フェーズ6：mcpパッケージの基本設定に移行する"
       },
       {
-        "id": "758e0171-29bf-49d7-8721-becf3bd813c4",
-        "description": "packages/schemas/ディレクトリと基本設定ファイルを作成する",
-        "priority": "high"
+        "id": "761234a-45b6-7c89-d012-3e456f789gh",
+        "priority": "high",
+        "description": "packages/mcp/ディレクトリの作成と基本ファイルの設定"
       },
       {
-        "id": "be822508-6ec1-42dc-89d8-cef9f7716d84",
-        "description": "既存スキーマコードをパッケージに移行する",
-        "priority": "medium"
+        "id": "890abcd-ef12-3456-7890-abcdef123456",
+        "priority": "medium",
+        "description": "schemasパッケージへの依存関係の設定"
       },
       {
         "id": "a7b8c9d0-e1f2-3g4h-5i6j-7k8l9m0n1o2",
-        "description": "依存関係を調整し、ローカル開発環境でテストする",
-        "priority": "medium"
-      },
-      {
-        "id": "4b8c9d0-e1f2-3g4h-5i6j-7k8l9m0n1o2",
-        "description": "v2スキーマ関連のコードをschemasパッケージに移行する",
-        "priority": "high"
-      },
-      {
-        "id": "6e5d4c3-b2a1-9z8y-7x6w-5v4u3t2s1r0",
-        "description": "スキーマテストを充実させるフェーズ5に移行する",
-        "priority": "high"
+        "priority": "medium",
+        "description": "ローカル開発環境でのテストと確認"
       }
     ]
   }
