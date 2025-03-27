@@ -8,8 +8,10 @@
 
 export * from './domain/index.js';
 export * from './application/index.js';
-export * from './infrastructure/index.js';
+// export * from './infrastructure/index.js'; // Will be enabled once implemented
 export * from './interface/index.js';
 export * from './main/index.js';
 export * from './tools/index.js';
+export * from './shared/index.js';
 export * from './types.js';
+

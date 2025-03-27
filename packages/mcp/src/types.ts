@@ -62,11 +62,12 @@ export type WorkspaceConfig = {
   language: string;
 };
 
-export type CliOptions = {
-  docsRoot?: string;
-  language?: string;
-  verbose?: boolean;
-};
+// Remove CliOptions from here as it's defined in main/index.ts
+// export type CliOptions = {
+//   docsRoot?: string;
+//   language?: string;
+//   verbose?: boolean;
+// };
 
 export type SectionEdit = {
   header: string;
