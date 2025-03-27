@@ -122,6 +122,11 @@
         "id": "c5d6e7f8-9a0b-1c2d-3e4f-5g6h7i8j9k0l",
         "description": "既存のコードをMCPパッケージに機能ブロック単位で移動する作業は慎重に行う必要がある。一度にすべてを移動するのではなく、段階的に移行するアプローチを取る",
         "status": "active"
+      },
+      {
+        "id": "b2c3d4e5-f6g7-h8i9-j0k1-l2m3n4o5p6q7",
+        "status": "active",
+        "description": "パッケージ移行の過程で、非推奨のマークダウン関連コード、重複するロガー実装、旧バージョンのスキーマを削除し、コードをクリーンアップすることも考慮する"
       }
     ],
     "nextSteps": [
@@ -144,6 +149,13 @@
         "id": "next-4",
         "priority": "medium",
         "description": "すべての移行完了後に最終テストとドキュメント更新を行う"
+      }
+    ],
+    "references": [
+      {
+        "file": "code-cleanup-targets.json",
+        "description": "不要コード削除とクリーンアップ候補のリスト",
+        "created_at": "2025-03-28"
       }
     ]
   }
