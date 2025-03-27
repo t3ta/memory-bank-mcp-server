@@ -6,7 +6,8 @@ import { JsonDocument } from "../../../domain/entities/JsonDocument.js";
 import { MemoryDocument } from "../../../domain/entities/MemoryDocument.js";
 import type { IBranchMemoryBankRepository } from "../../../domain/repositories/IBranchMemoryBankRepository.js";
 import type { IGlobalMemoryBankRepository } from "../../../domain/repositories/IGlobalMemoryBankRepository.js";
-import { type BranchTagIndex, BranchTagIndexSchema, type GlobalTagIndex, GlobalTagIndexSchema, type DocumentReference, TAG_INDEX_VERSION } from "../../../schemas/v2/tag-index.js";
+import { type BranchTagIndex, BranchTagIndexSchema, type GlobalTagIndex, GlobalTagIndexSchema, type DocumentReference, TAG_INDEX_VERSION } from "@memory-bank/schemas";
+
 import { InfrastructureError, InfrastructureErrorCodes } from "../../../shared/errors/InfrastructureError.js";
 import { logger } from "../../../shared/utils/logger.js";
 import type { IFileSystemService } from "../../storage/interfaces/IFileSystemService.js";

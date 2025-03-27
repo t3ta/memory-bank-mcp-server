@@ -2,7 +2,7 @@ import { validateJsonPatch, sanitizeJsonPatch, JsonPatchOperation } from './patc
 import { Application, createApplication } from '../main/index.js';
 import { logger } from '../shared/utils/index.js';
 import { resolveDocsRoot } from '../index.js';
-import { Language } from '../schemas/v2/i18n-schema.js';
+import { Language } from '@memory-bank/schemas';
 import type { CliOptions } from '../shared/types/index.js';
 
 // ローカルでアプリケーションオプションをマージする関数（循環参照を避けるため）

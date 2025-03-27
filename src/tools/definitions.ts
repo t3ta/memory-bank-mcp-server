@@ -1,4 +1,5 @@
-import { Language } from '../schemas/v2/i18n-schema.js';
+import { Language } from '@memory-bank/schemas';
+
 import { createEnhancedPatchProperties } from './patch-utils.js';
 
 /**

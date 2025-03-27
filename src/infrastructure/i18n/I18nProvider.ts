@@ -9,7 +9,7 @@ import {
   TranslationKey,
   isValidLanguage,
   TranslationFile,
-} from '../../schemas/v2/i18n-schema.js';
+} from '@memory-bank/schemas';
 import { II18nProvider } from './interfaces/II18nProvider.js';
 
 /**

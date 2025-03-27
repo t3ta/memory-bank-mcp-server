@@ -1,6 +1,6 @@
 import path from "path";
 import type { BranchInfo } from "../../../domain/entities/BranchInfo.js";
-import type { TagIndex } from "../../../schemas/tag-index/tag-index-schema.js";
+import type { TagIndex } from "@memory-bank/schemas";
 import type { FileSystemService } from "../../storage/FileSystemService.js";
 import type { FileSystemBranchMemoryBankRepository } from "./FileSystemBranchMemoryBankRepository.js";
 import type { FileSystemGlobalMemoryBankRepository } from "./FileSystemGlobalMemoryBankRepository.js";

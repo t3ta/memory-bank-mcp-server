@@ -2,8 +2,7 @@
  * Template Loader Interface
  * Defines the contract for loading and processing templates
  */
-import { Language } from '../../../schemas/v2/i18n-schema.js';
-import { BaseTemplate, JsonTemplate } from '../../../schemas/v2/template-schema.js';
+import { Language, BaseTemplate, JsonTemplate } from '@memory-bank/schemas';
 
 /**
  * Interface for template loading and rendering functionality

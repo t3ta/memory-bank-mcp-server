@@ -8,5 +8,6 @@
 // Re-export everything from the json-document file
 export * from './json-document.js';
 export * from './tag-index.js';
+export * from './i18n-schema.js';
 
 // We'll add additional schema exports here in future iterations

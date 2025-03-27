@@ -15,7 +15,7 @@ import {
   DocumentReference,
   DocumentIndex,
   INDEX_SCHEMA_VERSION,
-} from '../../schemas/v2/index-schema.js';
+} from '@memory-bank/schemas';
 
 /**
  * Implementation of the document index service

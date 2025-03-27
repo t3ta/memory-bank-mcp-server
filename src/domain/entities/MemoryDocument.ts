@@ -1,6 +1,6 @@
 import { DocumentPath } from './DocumentPath.js';
 import { Tag } from './Tag.js';
-import { BaseJsonDocument } from '../../schemas/json-document.js';
+import { BaseJsonDocument } from '@memory-bank/schemas';
 import { DomainError } from '../../shared/errors/DomainError.js';
 import { logger } from '../../shared/utils/logger.js';
 

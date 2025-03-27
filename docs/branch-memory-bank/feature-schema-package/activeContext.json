@@ -8,13 +8,29 @@
     "tags": [
       "active-context"
     ],
-    "lastModified": "2025-03-27T18:00:00.000Z",
+    "lastModified": "2025-03-28T00:10:00.000Z",
     "createdAt": "2025-03-27T13:26:18.387Z",
-    "version": 2
+    "version": 3
   },
   "content": {
-    "currentWork": "フェーズ6 mcpパッケージの基本設定の作成と次フェーズの準備",
+    "currentWork": "フェーズ7-8 スキーマインポートの修正とMCPパッケージの構築",
     "recentChanges": [
+      {
+        "date": "2025-03-28T01:10:00.000Z",
+        "description": "MCPパッケージのtsconfig.jsonを修正し、スキーマパッケージを認識できるように設定"
+      },
+      {
+        "date": "2025-03-28T01:15:00.000Z",
+        "description": "Yarn Workspacesの依存関係をシンボリックリンクで修正"
+      },
+      {
+        "date": "2025-03-28T01:20:00.000Z",
+        "description": "MCPパッケージに型定義と基本ファイルを作成"
+      },
+      {
+        "date": "2025-03-28T01:25:00.000Z",
+        "description": "モノレポ構造のビルドを成功させ、基本構成が整う"
+      },
       {
         "date": "2025-03-27T13:55:18.387Z",
         "description": "モノレポ構造の設計検討"
@@ -46,6 +62,14 @@
       {
         "date": "2025-03-27T18:00:00.000Z",
         "description": "フェーズ6完了: mcpパッケージの基本設定ファイル（package.json, tsconfig.json, README.md）の作成"
+      },
+      {
+        "date": "2025-03-27T18:30:00.000Z",
+        "description": "多数のスキーマインポートを@memory-bank/schemasパッケージからのインポートに修正"
+      },
+      {
+        "date": "2025-03-28T00:10:00.000Z",
+        "description": "現状分析: まだいくつかのファイルでスキーマインポートの修正が必要。また、MCPパッケージのsrcディレクトリが空のまま"
       }
     ],
     "activeDecisions": [
@@ -65,45 +89,40 @@
     "considerations": [
       {
         "id": "8334e146-4dca-47e4-bc3f-415574f6b991",
-        "description": "Yarn Workspacesを使ったモノレポ構造の実装方法",
-        "status": "open"
-      },
-      {
-        "id": "9d33dd40-3fef-4658-bb39-c7d55c466ab4",
-        "description": "パッケージのpublishおよびバージョン管理方法",
-        "status": "open"
+        "description": "次の作業は、既存のコードからのスキーマインポートを修正し、機能単位でコードをMCPパッケージに移行すること",
+        "status": "active"
       },
       {
         "id": "96fa3b72-f978-45c7-921b-0d37dd5ad27b",
-        "description": "既存コードの移行手順と影響調査",
-        "status": "open"
+        "description": "スキーマインポート修正には次の2種類あり: 1) src/schemas/ → @memory-bank/schemas, 2) src/schemas/v2/ → @memory-bank/schemas/v2",
+        "status": "active"
       },
       {
         "id": "37e9a826-5f1c-42d7-b080-9a321c654f87",
         "description": "VSCode拡張の開発準備",
-        "status": "open"
+        "status": "pending"
       }
     ],
     "nextSteps": [
       {
-        "id": "phase7-1",
+        "id": "next-1",
         "priority": "high",
-        "description": "フェーズ7：スキーマインポートの修正とMCPコード調整に移行する"
+        "description": "既存のsrc/ディレクトリのコードを機能ブロック単位でMCPパッケージに移行する"
       },
       {
-        "id": "phase7-2",
+        "id": "next-2",
         "priority": "high",
-        "description": "MCPコード内のスキーマインポートパスの特定"
+        "description": "src/index.tsの修正で新しいMCPパッケージを使うようにする"
       },
       {
-        "id": "phase7-3",
-        "priority": "high",
-        "description": "インポートパスの修正（src/schemas→@memory-bank/schemas）"
-      },
-      {
-        "id": "phase7-4",
+        "id": "next-3",
         "priority": "medium",
-        "description": "修正によって生じる型エラーの修正"
+        "description": "既存コードをMCPパッケージのsrcディレクトリに移動する"
+      },
+      {
+        "id": "next-4",
+        "priority": "medium",
+        "description": "MCPパッケージのビルドが成功するように設定を修正する"
       }
     ]
   }

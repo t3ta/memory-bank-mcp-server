@@ -4,7 +4,8 @@ import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
 import type { Tag } from "../../../domain/entities/Tag.js";
 import { MemoryDocument } from "../../../domain/entities/MemoryDocument.js";
 import type { IBranchMemoryBankRepository, RecentBranch } from "../../../domain/repositories/IBranchMemoryBankRepository.js";
-import type { TagIndex } from "../../../schemas/tag-index/tag-index-schema.js";
+import type { TagIndex } from "@memory-bank/schemas";
+
 import { DomainError } from "../../../shared/errors/DomainError.js";
 import { InfrastructureError, InfrastructureErrorCodes } from "../../../shared/errors/InfrastructureError.js";
 import { extractSectionContent } from "../../../shared/utils/index.js";

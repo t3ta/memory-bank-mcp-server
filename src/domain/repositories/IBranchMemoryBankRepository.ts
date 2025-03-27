@@ -1,4 +1,5 @@
-import type { TagIndex } from "../../schemas/tag-index/tag-index-schema.js";
+import type { TagIndex } from "@memory-bank/schemas";
+
 import type { BranchInfo } from "../entities/BranchInfo.js";
 import type { DocumentPath } from "../entities/DocumentPath.js";
 import type { MemoryDocument } from "../entities/MemoryDocument.js";

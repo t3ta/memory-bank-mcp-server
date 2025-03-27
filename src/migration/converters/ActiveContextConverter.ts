@@ -12,7 +12,8 @@ import { DocumentId } from '../../domain/entities/DocumentId.js';
 import { DocumentVersionInfo } from '../../domain/entities/DocumentVersionInfo.js';
 import { Tag } from '../../domain/entities/Tag.js';
 // Import type from schema layer
-import { ActiveContextContentV2 } from '../../schemas/v2/json-document.js';
+import { ActiveContextContentV2 } from '@memory-bank/schemas';
+
 
 /**
  * Converter for active context documents

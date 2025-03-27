@@ -1,10 +1,10 @@
 import path from 'node:path';
-import type { Language } from '../../../schemas/v2/i18n-schema.js';
+import type { Language, TagIndex } from '@memory-bank/schemas';
+
 import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
 import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
 import { Tag } from '../../../domain/entities/Tag.js';
 import type { IGlobalMemoryBankRepository } from '../../../domain/repositories/IGlobalMemoryBankRepository.js';
-import type { TagIndex } from '../../../schemas/tag-index/tag-index-schema.js';
 import { DomainError } from '../../../shared/errors/DomainError.js';
 import { InfrastructureError, InfrastructureErrorCodes } from '../../../shared/errors/InfrastructureError.js';
 import { logger } from '../../../shared/utils/logger.js';

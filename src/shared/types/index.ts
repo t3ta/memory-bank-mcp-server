@@ -1,5 +1,6 @@
-import type { Language } from "../../schemas/v2/i18n-schema.js";
-export { Language } from "../../schemas/v2/i18n-schema.js";
+import type { Language } from "@memory-bank/schemas";
+export { Language } from "@memory-bank/schemas";
+
 
 /**
  * Core files required for branch memory bank

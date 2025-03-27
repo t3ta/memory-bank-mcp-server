@@ -8,8 +8,7 @@ import {
   InfrastructureError,
   InfrastructureErrorCodes,
 } from '../../shared/errors/InfrastructureError.js';
-import { DomainError } from '../../shared/errors/DomainError.js';
-import type { Language } from '../../schemas/v2/i18n-schema.js';
+import type { Language } from '@memory-bank/schemas';
 
 /**
  * Implementation of configuration provider

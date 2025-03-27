@@ -3,7 +3,8 @@ import path from "path";
 import { DomainError, DomainErrorCodes } from "../../../shared/errors/DomainError.js";
 import { logger } from "../../../shared/utils/logger.js";
 import { ITemplateLoader } from "../../../infrastructure/templates/interfaces/ITemplateLoader.js";
-import { getSafeLanguage } from "../../../schemas/v2/i18n-schema.js";
+import { getSafeLanguage } from "@memory-bank/schemas";
+
 
 export type RulesResult = {
   content: string;

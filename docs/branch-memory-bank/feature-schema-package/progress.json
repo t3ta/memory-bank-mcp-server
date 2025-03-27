@@ -8,9 +8,9 @@
     "tags": [
       "progress"
     ],
-    "lastModified": "2025-03-27T18:00:00.000Z",
+    "lastModified": "2025-03-28T00:15:00.000Z",
     "createdAt": "2025-03-27T13:26:18.387Z",
-    "version": 2
+    "version": 3
   },
   "content": {
     "workingFeatures": [
@@ -48,18 +48,53 @@
         "id": "6d0e1f2-g3h4-i5j6-k7l8-m9n0o1p2q3r4",
         "description": "mcpパッケージの基本設定（package.json, tsconfig.json, README.md）の作成",
         "completedAt": "2025-03-27T18:00:00.000Z"
+      },
+      {
+        "id": "7d0e1f2-g3h4-i5j6-k7l8-m9n0o1p2q3r5",
+        "completedAt": "2025-03-27T18:30:00.000Z",
+        "description": "一部のスキーマインポートを@memory-bank/schemasパッケージの参照に変更"
+      },
+      {
+        "id": "9a1b2c3-d4e5-f6g7-h8i9-j0k1l2m3n4o5",
+        "description": "MCPパッケージのディレクトリ構造とエントリポイントの作成",
+        "completedAt": "2025-03-28T01:10:00.000Z"
+      },
+      {
+        "id": "3g4h5i6-j7k8-l9m0-n1o2-p3q4r5s6t7u8",
+        "description": "MCPパッケージの基本型定義の作成",
+        "completedAt": "2025-03-28T01:15:00.000Z"
+      },
+      {
+        "id": "5k6l7m8-n9o0-p1q2-r3s4-t5u6v7w8x9y0",
+        "description": "ビルド環境の設定とシンボリックリンクの修正",
+        "completedAt": "2025-03-28T01:20:00.000Z"
       }
     ],
     "pendingImplementation": [
       {
+        "id": "8e1f2g3-h4i5-j6k7-l8m9-n0o1p2q3r4s5",
+        "priority": "high",
+        "description": "残りのスキーマインポートを@memory-bank/schemasパッケージの参照に変更"
+      },
+      {
+        "id": "9f2g3h4-i5j6-k7l8-m9n0-o1p2q3r4s5t6",
+        "priority": "high",
+        "description": "MCPパッケージのsrcディレクトリ構造の作成"
+      },
+      {
+        "id": "0g3h4i5-j6k7-l8m9-n0o1-p2q3r4s5t6u7",
+        "priority": "high",
+        "description": "既存のメインコードをMCPパッケージに移動"
+      },
+      {
+        "id": "1h4i5j6-k7l8-m9n0-o1p2-q3r4s5t6u7v8",
+        "priority": "medium",
+        "description": "パッケージ全体のビルドスクリプトの調整"
+      },
+      {
         "id": "890abcd-ef12-3456-7890-abcdef123456",
         "priority": "low",
         "description": "追加テストケースの拡充"
-      },
-      {
-        "id": "8d7c6b5a-4e3d-2c1b-0a9f-8e7d6c5b4a3f",
-        "description": "メインプロジェクトの依存関係調整",
-        "priority": "medium"
       },
       {
         "id": "3f2e1d0c-9b8a-7e6d-5c4b-3a2b1c0d9e8f",
@@ -77,9 +112,22 @@
         "description": "使用されていないコードの特定と削除"
       }
     ],
-    "status": "実装フェーズ6完了 - mcpパッケージの基本設定が完了。package.json、tsconfig.json、README.mdが作成され、schemasパッケージへの依存関係も設定されました。次はフェーズ7：スキーマインポートの修正とMCPコード調整へ進みます。",
-    "completionPercentage": 75,
-    "knownIssues": [],
+    "status": "実装フェーズ7-8進行中 - スキーマインポートの修正に関しては大幅に進捗。schemasパッケージとmcpパッケージが正常にビルドできるようになり、モノレポ構造の基盤が整った。MCPパッケージには最小限の実装を追加し、型定義も整備した。残りの作業は、既存のインポートをさらに修正し、段階的に既存コードをMCPパッケージに移行すること。",
+    "completionPercentage": 85,
+    "knownIssues": [
+      {
+        "id": "issue-1",
+        "description": "src/schemas/index.tsファイルがまだ残っていて、いくつかのファイルがそこから型やスキーマをインポートしている",
+        "priority": "high",
+        "status": "active"
+      },
+      {
+        "id": "issue-2",
+        "description": "MCPパッケージのsrcディレクトリが空のため、ビルドに失敗している",
+        "priority": "high",
+        "status": "active"
+      }
+    ],
     "monoRepoStructure": {
       "repositoryName": "memory-bank",
       "rootPackageJson": {
@@ -89,9 +137,9 @@
         ]
       },
       "packagesDirectory": [
-        "packages/schemas/ - スキーマ定義",
-        "packages/mcp/ - MCPエンジン（現サーバー）",
-        "packages/vscode-extension/ - 将来的なVSCode拡張"
+        "packages/schemas/ - スキーマ定義（完了）",
+        "packages/mcp/ - MCPエンジン（設定のみ完了、srcディレクトリの移行が必要）",
+        "packages/vscode-extension/ - 将来的なVSCode拡張（未実装）"
       ]
     },
     "references": [
@@ -104,6 +152,11 @@
         "file": "schema-test-plan.json",
         "description": "スキーマテスト計画",
         "created_at": "2025-03-27"
+      },
+      {
+        "file": "work-plan.json",
+        "description": "次の作業計画の詳細",
+        "created_at": "2025-03-28"
       }
     ]
   }

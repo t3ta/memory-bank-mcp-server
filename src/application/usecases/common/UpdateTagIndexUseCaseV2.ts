@@ -9,7 +9,7 @@ import {
 } from '../../../shared/errors/ApplicationError.js';
 import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
 import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
-import { TagIndex } from '../../../schemas/tag-index/tag-index-schema.js';
+import { TagIndex } from '@memory-bank/schemas';
 import { logger } from '../../../shared/utils/logger.js';
 
 /**

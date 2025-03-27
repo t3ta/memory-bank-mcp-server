@@ -11,8 +11,8 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { Server as MCPServer } from '@modelcontextprotocol/sdk/server/index.js';
 import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { Server } from 'node:http';
-import { Language, isValidLanguage } from './schemas/v2/i18n-schema.js';
-import type { CliOptions } from './shared/types/index.js';
+import { Language, isValidLanguage } from '@memory-bank/schemas';
+import type { CliOptions } from '@memory-bank/schemas';
 
 // Helper function to render template with translations
 function renderTemplate(template: any, translations: any): string {

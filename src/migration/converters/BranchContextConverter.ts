@@ -12,7 +12,8 @@ import { DocumentId } from '../../domain/entities/DocumentId.js';
 import { Tag } from '../../domain/entities/Tag.js';
 import { DocumentVersionInfo } from '../../domain/entities/DocumentVersionInfo.js';
 // Import type from schema layer
-import { BranchContextContentV2 } from '../../schemas/v2/json-document.js';
+import { BranchContextContentV2 } from '@memory-bank/schemas';
+
 
 /**
  * Converter for branch context documents

@@ -13,7 +13,7 @@ import {
   ActiveContextJsonV2Schema,
   ProgressJsonV2Schema,
   SystemPatternsJsonV2Schema,
-} from '../../schemas/v2/json-document.js';
+} from '@memory-bank/schemas';
 
 /**
  * Type discriminator for document types

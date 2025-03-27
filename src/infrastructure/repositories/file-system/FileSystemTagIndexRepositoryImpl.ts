@@ -5,11 +5,13 @@ import { Tag } from "../../../domain/entities/Tag.js";
 import type { TagIndexOptions, TagIndexUpdateResult } from "../../../domain/repositories/ITagIndexRepository.js";
 import { MemoryDocument } from "../../../domain/entities/MemoryDocument.js";
 import { JsonDocument } from "../../../domain/entities/JsonDocument.js";
-import type { DocumentReference } from "../../../schemas/v2/tag-index.js";
+import type { DocumentReference } from "@memory-bank/schemas";
+
 import { InfrastructureError, InfrastructureErrorCodes } from "../../../shared/errors/InfrastructureError.js";
 import { logger } from "../../../shared/utils/logger.js";
 import { FileSystemTagIndexRepository } from "./FileSystemTagIndexRepositoryBase.js";
-import { TAG_INDEX_VERSION } from "../../../schemas/v2/tag-index.js";
+import { TAG_INDEX_VERSION } from "@memory-bank/schemas";
+
 
 // 並列処理の設定
 const CONCURRENCY_LIMIT = 5; // 同時に処理するドキュメント数の上限

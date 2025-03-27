@@ -2,8 +2,7 @@
  * Template Renderer
  * Converts JSON templates to markdown format
  */
-import { BaseTemplate, TemplateSection, JsonTemplate } from '../../schemas/v2/template-schema.js';
-import { Language } from '../../schemas/v2/i18n-schema.js';
+import { BaseTemplate, TemplateSection, JsonTemplate, Language } from '@memory-bank/schemas';
 import { II18nProvider } from '../i18n/interfaces/II18nProvider.js';
 
 /**

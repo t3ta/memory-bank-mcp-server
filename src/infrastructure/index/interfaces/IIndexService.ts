@@ -4,7 +4,7 @@ import type { DocumentPath } from "../../../domain/entities/DocumentPath.js";
 import type { Tag } from "../../../domain/entities/Tag.js";
 import type { JsonDocument } from "../../../domain/entities/JsonDocument.js";
 import type { DocumentType } from "../../../domain/entities/JsonDocument.js";
-import type { DocumentReference } from "../../../schemas/v2/index-schema.js";
+import type { DocumentReference } from "@memory-bank/schemas";
 
 
 /**
