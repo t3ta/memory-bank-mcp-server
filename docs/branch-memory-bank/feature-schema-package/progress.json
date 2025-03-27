@@ -8,7 +8,7 @@
     "tags": [
       "progress"
     ],
-    "lastModified": "2025-03-27T17:30:00.000Z",
+    "lastModified": "2025-03-27T18:00:00.000Z",
     "createdAt": "2025-03-27T13:26:18.387Z",
     "version": 2
   },
@@ -43,6 +43,11 @@
         "id": "5c9d0e1-f2g3-4h5i-6j7k-8l9m0n1o2p3",
         "description": "スキーマテストの移行と追加（フェーズ5）",
         "completedAt": "2025-03-27T17:30:00.000Z"
+      },
+      {
+        "id": "6d0e1f2-g3h4-i5j6-k7l8-m9n0o1p2q3r4",
+        "description": "mcpパッケージの基本設定（package.json, tsconfig.json, README.md）の作成",
+        "completedAt": "2025-03-27T18:00:00.000Z"
       }
     ],
     "pendingImplementation": [
@@ -72,8 +77,8 @@
         "description": "使用されていないコードの特定と削除"
       }
     ],
-    "status": "実装フェーズ5完了 - スキーマテストの移行と追加完了。テストカバレッジは良好で、全テストが正常に実行される。次はフェーズ6：mcpパッケージの基本設定へ移行。",
-    "completionPercentage": 70,
+    "status": "実装フェーズ6完了 - mcpパッケージの基本設定が完了。package.json、tsconfig.json、README.mdが作成され、schemasパッケージへの依存関係も設定されました。次はフェーズ7：スキーマインポートの修正とMCPコード調整へ進みます。",
+    "completionPercentage": 75,
     "knownIssues": [],
     "monoRepoStructure": {
       "repositoryName": "memory-bank",

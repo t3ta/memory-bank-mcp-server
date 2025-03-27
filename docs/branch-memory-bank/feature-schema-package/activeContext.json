@@ -8,12 +8,12 @@
     "tags": [
       "active-context"
     ],
-    "lastModified": "2025-03-27T17:30:00.000Z",
+    "lastModified": "2025-03-27T18:00:00.000Z",
     "createdAt": "2025-03-27T13:26:18.387Z",
     "version": 2
   },
   "content": {
-    "currentWork": "フェーズ5 スキーマテストの完成と次フェーズの準備",
+    "currentWork": "フェーズ6 mcpパッケージの基本設定の作成と次フェーズの準備",
     "recentChanges": [
       {
         "date": "2025-03-27T13:55:18.387Z",
@@ -42,6 +42,10 @@
       {
         "date": "2025-03-27T17:30:00.000Z",
         "description": "フェーズ5完了: スキーマ用テストを移行と拡張"
+      },
+      {
+        "date": "2025-03-27T18:00:00.000Z",
+        "description": "フェーズ6完了: mcpパッケージの基本設定ファイル（package.json, tsconfig.json, README.md）の作成"
       }
     ],
     "activeDecisions": [
@@ -82,24 +86,24 @@
     ],
     "nextSteps": [
       {
-        "id": "6e5d4c3-b2a1-9z8y-7x6w-5v4u3t2s1r0",
+        "id": "phase7-1",
         "priority": "high",
-        "description": "フェーズ6：mcpパッケージの基本設定に移行する"
+        "description": "フェーズ7：スキーマインポートの修正とMCPコード調整に移行する"
       },
       {
-        "id": "761234a-45b6-7c89-d012-3e456f789gh",
+        "id": "phase7-2",
         "priority": "high",
-        "description": "packages/mcp/ディレクトリの作成と基本ファイルの設定"
+        "description": "MCPコード内のスキーマインポートパスの特定"
       },
       {
-        "id": "890abcd-ef12-3456-7890-abcdef123456",
-        "priority": "medium",
-        "description": "schemasパッケージへの依存関係の設定"
+        "id": "phase7-3",
+        "priority": "high",
+        "description": "インポートパスの修正（src/schemas→@memory-bank/schemas）"
       },
       {
-        "id": "a7b8c9d0-e1f2-3g4h-5i6j-7k8l9m0n1o2",
+        "id": "phase7-4",
         "priority": "medium",
-        "description": "ローカル開発環境でのテストと確認"
+        "description": "修正によって生じる型エラーの修正"
       }
     ]
   }
