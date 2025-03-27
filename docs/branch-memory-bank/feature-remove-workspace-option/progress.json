@@ -1,0 +1,60 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "b628cbdb-b6e3-4d8c-84b4-e4c6c03552cc",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress"
+    ],
+    "lastModified": "2025-03-27T13:25:48.270Z",
+    "createdAt": "2025-03-27T12:56:48.270Z",
+    "version": 2
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "6d161527-46f5-4251-b0d3-c9e037633251",
+        "description": "workspaceオプション撤廃に向けた調査完了",
+        "implementedAt": "2025-03-27T13:25:48.270Z"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "4474283f-f57b-481d-959e-08245f1708d2",
+        "description": "WorkspaceConfig型からworkspaceRootプロパティを削除",
+        "priority": "high"
+      },
+      {
+        "id": "efe4e1de-b3bf-450d-8e30-7f096a268af4",
+        "description": "resolveWorkspaceAndDocs関数の削除と依存部分の修正",
+        "priority": "high"
+      },
+      {
+        "id": "efe4e1de-b3bf-450d-8e30-7f096a268af5",
+        "description": "workspaceパラメータに関するコード・変数の削除",
+        "priority": "high"
+      },
+      {
+        "id": "982e304b-bb14-46f0-a874-a46c54ea8336",
+        "description": "テストコードの修正",
+        "priority": "medium"
+      }
+    ],
+    "status": "workspaceオプション撤廃に向けた調査を完了しました。このオプションは元々docsオプションと並行して存在していましたが、現在はdeprecated状態になっています。メインのインデックスファイルやテストファイルから関連コードを特定し、安全に削除するための計画を立てる必要があります。",
+    "completionPercentage": 15,
+    "knownIssues": [
+      {
+        "id": "a921d6ba-1426-403a-9b36-367ba072c8c6",
+        "description": "テストファイルの一部がすでにskipされている状態であり、修正が必要",
+        "severity": "medium"
+      },
+      {
+        "id": "94e4ba50-8a54-4d21-a9c6-637ce661d94f",
+        "description": "workspaceとdocsの両方がある場合の挙動が複雑であり、注意が必要",
+        "severity": "medium"
+      }
+    ]
+  }
+}
