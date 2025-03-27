@@ -83,6 +83,11 @@
         "id": "9c0d1e2f-3g4h-5i6j-7k8l-9m0n1o2p3q4r",
         "completedAt": "2025-03-28T02:30:00.000Z",
         "description": "ドメインエンティティとユーティリティの一部をMCPパッケージに移行（BaseError, DomainError, DocumentPath, Tag, BranchInfo, logger）"
+      },
+      {
+        "id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+        "description": "MCPパッケージのインターフェース層の一部実装（GlobalController、関連型定義）",
+        "completedAt": "2025-03-28T04:45:00.000Z"
       }
     ],
     "pendingImplementation": [
@@ -117,8 +122,8 @@
         "description": "使用されていないコードの特定と削除"
       }
     ],
-    "status": "実装フェーズ7-8ほぼ完了 - 残りのスキーマインポートを@memory-bank/schemasに修正し、MCPパッケージのsrcディレクトリにプレースホルダーの基本実装を作成した。今後の作業としては、既存のメインコードをMCPパッケージに完全に移行し、ドキュメント更新などの仕上げを行う必要がある。これまでの作業で、モノレポ構造とパッケージ分割の基本構造は完成し、ビルドも成功している。",
-    "completionPercentage": 90,
+    "status": "フェーズ10実装中 - MCPパッケージのインターフェース層（コントローラー実装）の移行を開始。GlobalControllerの基本実装が完了し、次にBranchControllerなどの残りのコントローラー実装を進める。インポートパスの修正も並行して行い、パッケージ間の依存関係を解決している。これまでの作業でスキーマパッケージの移行は完了し、MCPパッケージのコア部分も移行済み。",
+    "completionPercentage": 92,
     "knownIssues": [
       {
         "id": "issue-1",

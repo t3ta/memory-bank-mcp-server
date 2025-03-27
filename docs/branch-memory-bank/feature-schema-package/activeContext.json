@@ -13,7 +13,7 @@
     "version": 3
   },
   "content": {
-    "currentWork": "フェーズ9完了 MCPパッケージのインターフェース層とツール定義を移行し、ビルド成功",
+    "currentWork": "フェーズ10実装中 - MCPパッケージのコントローラー実装（GlobalControllerの移行完了）",
     "recentChanges": [
       {
         "date": "2025-03-28T03:45:00.000Z",
@@ -98,6 +98,22 @@
       {
         "date": "2025-03-28T00:10:00.000Z",
         "description": "現状分析: まだいくつかのファイルでスキーマインポートの修正が必要。また、MCPパッケージのsrcディレクトリが空のまま"
+      },
+      {
+        "date": "2025-03-28T04:50:00.000Z",
+        "description": "MCPパッケージにMCPResponsePresenterのインターフェース定義を追加"
+      },
+      {
+        "date": "2025-03-28T04:40:00.000Z",
+        "description": "MCPパッケージにGlobalControllerの実装を移行（非推奨エラー型をDomainErrorに統一）"
+      },
+      {
+        "date": "2025-03-28T04:30:00.000Z",
+        "description": "MCPパッケージに必要なDTO（DocumentDTO, JsonDocumentDTO）が移行済みであることを確認"
+      },
+      {
+        "date": "2025-03-28T04:20:00.000Z",
+        "description": "MCPパッケージにインターフェース層の実装移行開始"
       }
     ],
     "activeDecisions": [

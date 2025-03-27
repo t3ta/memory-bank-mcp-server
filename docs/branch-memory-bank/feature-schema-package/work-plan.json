@@ -17,7 +17,7 @@
   "content": {
     "overview": {
       "description": "スキーマパッケージ化とモノレポ化を完了させるための残りの作業計画",
-      "currentStatus": "フェーズ7進行中、残りのスキーマインポート修正とMCPパッケージのsrcディレクトリセットアップが必要"
+      "currentStatus": "フェーズ10実装中 - コントローラー実装の移行が進行中、GlobalControllerの移行完了"
     },
     "prioritizedTasks": [
       {
@@ -204,6 +204,59 @@
         "テスト環境の整備",
         "既存のsrc/index.tsを新しいパッケージを使うように修正"
       ]
-    }
+    },
+    "inProgressTasks": [
+      {
+        "id": "task-controller-1",
+        "title": "コントローラーの移行",
+        "description": "コントローラー実装をMCPパッケージに移行する",
+        "steps": [
+          "1. GlobalControllerの移行（完了）",
+          "2. BranchControllerの移行（未完了）",
+          "3. ContextControllerの移行（未完了）",
+          "4. TemplateControllerの移行（未完了）",
+          "5. MCPResponsePresenter実装クラスの移行（未完了）"
+        ],
+        "progress": 20,
+        "priority": "high",
+        "dependencies": []
+      }
+    ],
+    "nextTasks": [
+      {
+        "id": "next-task-1",
+        "title": "BranchControllerの移行",
+        "description": "BranchController実装をMCPパッケージに移行する",
+        "steps": [
+          "1. 必要な依存型がすべて提供されているか確認",
+          "2. BaseError、DomainErrorの参照を修正",
+          "3. 各種インポートパスを修正",
+          "4. 各種エラークラスの使用を統一"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "next-task-2",
+        "title": "ContextControllerの移行",
+        "description": "ContextController実装をMCPパッケージに移行する",
+        "steps": [
+          "1. 必要な依存型がすべて提供されているか確認",
+          "2. インポートパスを修正",
+          "3. エラーハンドリングを統一"
+        ],
+        "priority": "medium"
+      },
+      {
+        "id": "next-task-3",
+        "title": "MCPResponsePresenter実装クラスの移行",
+        "description": "MCPResponsePresenter実装クラスを移行する",
+        "steps": [
+          "1. MCPResponsePresenterの実装クラスをコピー",
+          "2. インポートパスを修正",
+          "3. コントローラークラスが使えるようにする"
+        ],
+        "priority": "high"
+      }
+    ]
   }
 }
