@@ -1,0 +1,296 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "e4d3c2b1-a0f9-4e8d-9c7b-6a5b4d3c2b1a",
+    "title": "モノレポ移行計画",
+    "documentType": "plan",
+    "path": "monorepo-migration-plan.json",
+    "tags": [
+      "migration",
+      "monorepo",
+      "schema-package"
+    ],
+    "lastModified": "2025-03-27T14:05:18.387Z",
+    "createdAt": "2025-03-27T14:05:18.387Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "description": "既存のmemory-bank-mcp-serverリポジトリをモノレポ構造に移行し、スキーマを独立したパッケージとして切り出す計画",
+      "goals": [
+        "プロジェクト全体をモノレポ構造に再編成し、拡張性を向上させる",
+        "スキーマ定義を独立したパッケージとして管理し、再利用性を高める",
+        "VSCode拡張などの将来的な開発に備えた基盤を整える",
+        "各コンポーネント間の依存関係を明確にする"
+      ],
+      "timeline": "2025年3月27日〜4月中旬"
+    },
+    "migrationPhases": [
+      {
+        "phase": "フェーズ1: 基本構造の作成",
+        "description": "モノレポの基本構造を作成し、Yarn Workspacesを設定する",
+        "tasks": [
+          {
+            "id": "task-1-1",
+            "description": "packages/ディレクトリの作成",
+            "status": "pending"
+          },
+          {
+            "id": "task-1-2",
+            "description": "ルートpackage.jsonにworkspaces設定を追加",
+            "status": "pending"
+          },
+          {
+            "id": "task-1-3",
+            "description": "共通の開発ツール設定（ESLint, Prettier, etc.）をルートに配置",
+            "status": "pending"
+          }
+        ],
+        "artifacts": [
+          "packages/ディレクトリ",
+          "更新されたルートpackage.json",
+          ".eslintrc, .prettierrc などの共通設定"
+        ]
+      },
+      {
+        "phase": "フェーズ2: スキーマパッケージの作成",
+        "description": "schemas/ディレクトリを作成し、既存のスキーマコードを移行する",
+        "tasks": [
+          {
+            "id": "task-2-1",
+            "description": "packages/schemas/ディレクトリの作成と基本ファイル（package.json, tsconfig.json）の設定",
+            "status": "pending"
+          },
+          {
+            "id": "task-2-2",
+            "description": "src/schemas/common.tsの移行",
+            "status": "pending"
+          },
+          {
+            "id": "task-2-3",
+            "description": "src/schemas/v2/ディレクトリの移行",
+            "status": "pending"
+          },
+          {
+            "id": "task-2-4",
+            "description": "依存型定義の調整（内部型の移行または外部依存への変更）",
+            "status": "pending"
+          },
+          {
+            "id": "task-2-5",
+            "description": "テストの作成または移行",
+            "status": "pending"
+          }
+        ],
+        "artifacts": [
+          "packages/schemas/package.json",
+          "packages/schemas/tsconfig.json",
+          "packages/schemas/src/*",
+          "packages/schemas/tests/*"
+        ]
+      },
+      {
+        "phase": "フェーズ3: MCPパッケージへの移行",
+        "description": "既存のMCP Server（現プロジェクト）をmcp/ディレクトリに移行する",
+        "tasks": [
+          {
+            "id": "task-3-1",
+            "description": "packages/mcp/ディレクトリの作成",
+            "status": "pending"
+          },
+          {
+            "id": "task-3-2",
+            "description": "既存コードのpackages/mcp/への移動",
+            "status": "pending"
+          },
+          {
+            "id": "task-3-3",
+            "description": "package.jsonの調整（schemas依存関係の追加）",
+            "status": "pending"
+          },
+          {
+            "id": "task-3-4",
+            "description": "ビルド設定の調整",
+            "status": "pending"
+          }
+        ],
+        "artifacts": [
+          "packages/mcp/package.json",
+          "packages/mcp/src/*",
+          "packages/mcp/tests/*"
+        ]
+      },
+      {
+        "phase": "フェーズ4: 統合とテスト",
+        "description": "モノレポ構造全体の統合とテスト",
+        "tasks": [
+          {
+            "id": "task-4-1",
+            "description": "ローカル開発環境での動作確認",
+            "status": "pending"
+          },
+          {
+            "id": "task-4-2",
+            "description": "CI/CDパイプラインの調整",
+            "status": "pending"
+          },
+          {
+            "id": "task-4-3",
+            "description": "ドキュメントの更新",
+            "status": "pending"
+          }
+        ],
+        "artifacts": [
+          "更新されたCIワークフロー設定",
+          "更新されたドキュメント"
+        ]
+      }
+    ],
+    "packageStructure": {
+      "schemas": {
+        "packageJson": {
+          "name": "@memory-bank/schemas",
+          "version": "1.0.0",
+          "main": "dist/index.js",
+          "types": "dist/index.d.ts",
+          "scripts": {
+            "build": "tsc",
+            "test": "jest",
+            "lint": "eslint src --ext .ts"
+          },
+          "dependencies": {
+            "zod": "^3.22.4"
+          },
+          "devDependencies": {
+            "typescript": "^5.8.2",
+            "jest": "^29.7.0",
+            "ts-jest": "^29.1.0"
+          },
+          "files": [
+            "dist",
+            "LICENSE",
+            "README.md"
+          ],
+          "publishConfig": {
+            "access": "public"
+          }
+        },
+        "directory": {
+          "src": [
+            "index.ts",
+            "common/index.ts",
+            "common/schemas.ts",
+            "v2/index.ts",
+            "v2/json-document.ts",
+            "v2/tag-index.ts",
+            "types/index.ts"
+          ],
+          "tests": [
+            "common/schemas.test.ts",
+            "v2/json-document.test.ts",
+            "v2/tag-index.test.ts"
+          ]
+        }
+      },
+      "mcp": {
+        "packageJson": {
+          "name": "@memory-bank/mcp",
+          "version": "2.2.1",
+          "main": "dist/index.js",
+          "dependencies": {
+            "@memory-bank/schemas": "workspace:*"
+          }
+        }
+      },
+      "root": {
+        "packageJson": {
+          "name": "memory-bank",
+          "private": true,
+          "workspaces": [
+            "packages/*"
+          ],
+          "scripts": {
+            "build": "yarn workspaces run build",
+            "test": "yarn workspaces run test",
+            "lint": "yarn workspaces run lint"
+          }
+        }
+      }
+    },
+    "considerations": [
+      {
+        "topic": "リポジトリ名の変更",
+        "description": "リポジトリ名を 'memory-bank-mcp-server' から 'memory-bank' に変更することを検討するが、既存のワークフローや参照への影響を確認する必要がある。必要であれば段階的に移行し、リダイレクトを設定する。"
+      },
+      {
+        "topic": "パッケージのバージョニング",
+        "description": "各パッケージに適切な初期バージョンを設定する。MCPパッケージは既存のバージョンを引き継ぎ、schemasパッケージは1.0.0から開始する。"
+      },
+      {
+        "topic": "ビルドとテストの最適化",
+        "description": "モノレポでの効率的なビルドとテスト実行のために、変更があったパッケージのみビルド/テストする仕組みを検討する。必要に応じてTurborepoなどのツールの導入を検討する。"
+      },
+      {
+        "topic": "パッケージ公開戦略",
+        "description": "パッケージを公開する場合は、適切なアクセス設定とバージョン管理を行う。@memory-bankスコープを使用するため、npmレジストリでの組織設定や公開権限を確認する。"
+      }
+    ],
+    "risks": [
+      {
+        "risk": "既存機能の互換性維持",
+        "mitigation": "包括的なテストカバレッジを確保し、各フェーズ後に回帰テストを実施する。"
+      },
+      {
+        "risk": "開発ワークフローの変更による混乱",
+        "mitigation": "明確なドキュメントを作成し、チームメンバーへの説明会を実施する。"
+      },
+      {
+        "risk": "モノレポ構造の複雑化",
+        "mitigation": "初期段階ではシンプルな構造を維持し、必要に応じて段階的に拡張する。"
+      }
+    ],
+    "codeCleanup": {
+      "description": "スキーマパッケージ化とモノレポ移行のタイミングで不要なコードを整理する",
+      "areas": [
+        {
+          "area": "使用されていないスキーマ定義",
+          "approach": "他のファイルから参照されていないスキーマ定義を特定し、移行時に除外する",
+          "tools": [
+            "ts-pruneを使用して未使用コードを特定",
+            "依存関係グラフの分析"
+          ]
+        },
+        {
+          "area": "重複コード",
+          "approach": "類似機能を提供するメソッドや関数を統合し、コードの再利用性を高める",
+          "tools": [
+            "コードカバレッジツール",
+            "手動コードレビュー"
+          ]
+        },
+        {
+          "area": "古いバージョンのコード",
+          "approach": "既に新しい代替品がある古いバージョンのコードを削除し、整理する",
+          "tools": [
+            "コードのバージョン履歴の確認",
+            "テストのカバレッジ確認で使用されているか検証"
+          ]
+        },
+        {
+          "area": "テスト整備",
+          "approach": "テストがないコードにテストを追加し、移行後の正常動作を確保する",
+          "tools": [
+            "テストカバレッジレポート",
+            "Jestのファイルパターンでテストの有無を確認"
+          ]
+        }
+      ],
+      "benefits": [
+        "コードベースのスリム化",
+        "保守性の向上",
+        "今後の拡張をしやすくする",
+        "新しい開発者がプロジェクトを理解しやすくなる"
+      ]
+    }
+  }
+}

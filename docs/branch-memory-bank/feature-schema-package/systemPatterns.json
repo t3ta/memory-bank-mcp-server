@@ -1,0 +1,112 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "72dd48f4-a1b0-49ee-bd50-4eef5606cb4e",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "system-patterns"
+    ],
+    "lastModified": "2025-03-27T13:39:18.387Z",
+    "createdAt": "2025-03-27T13:26:18.387Z",
+    "version": 2
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "723c9367-85a5-4f5d-a7bf-801ea49d9c36",
+        "date": "2025-03-27T13:58:18.387Z",
+        "title": "モノレポ化とスキーマの外部パッケージ化",
+        "status": "proposed",
+        "context": "現在、スキーマ定義はメインプロジェクト内に含まれているため、スキーマ変更がメインプロジェクト全体に影響する。また、VSCode拡張などの関連ツールを開発する際にスキーマを再利用することが困難。",
+        "decision": "リポジトリ全体をモノレポ構造に変更し、スキーマ関連のコードを独立したnpmパッケージとして切り出す。リポジトリ名を'memory-bank'に変更し、パッケージ名を'@memory-bank/schemas'、'@memory-bank/mcp'などとする。",
+        "alternatives": [
+          {
+            "pros": [
+              "シンプルな構造を維持できる",
+              "追加のパッケージ管理が不要"
+            ],
+            "cons": [
+              "スキーマの再利用が困難",
+              "VSCode拡張などの開発が複雑になる"
+            ],
+            "option": "現状維持"
+          },
+          {
+            "pros": [
+              "スキーマを完全に独立したリポジトリとして管理",
+              "パッケージとしての独立性が高い"
+            ],
+            "cons": [
+              "複数リポジトリの同期が必要",
+              "開発フローが複雑化"
+            ],
+            "option": "完全に別リポジトリとして分離"
+          }
+        ],
+        "consequences": {
+          "positive": [
+            "スキーマを独立したパッケージとして管理できる",
+            "VSCode拡張などの開発が容易になる",
+            "リポジトリ構造が整理され、拡張性が向上する",
+            "モノレポツールの恩恵が受けられる"
+          ],
+          "negative": [
+            "初期セットアップの手間が増える",
+            "パッケージ間の依存関係管理が必要",
+            "ビルドプロセスが若干複雑になる"
+          ]
+        }
+      }
+    ],
+    "implementationPatterns": [
+      {
+        "id": "a8f9c2d1-e3b5-4f6a-b7c8-d9e0f1g2h3i4",
+        "name": "モノレポ構造",
+        "details": [
+          "memory-bank/ - ルートディレクトリ",
+          "packages/ - 全パッケージを含むディレクトリ",
+          "packages/schemas/ - スキーマパッケージ",
+          "packages/mcp/ - MCPエンジン（現在のmcp-server）",
+          "packages/vscode-extension/ - 将来的なVSCode拡張"
+        ],
+        "description": "リポジトリ全体をモノレポ構造とし、各コンポーネントをpackagesディレクトリ下に配置する。"
+      },
+      {
+        "id": "j5k6l7m8-n9o0-p1q2-r3s4-t5u6v7w8x9y0",
+        "name": "スキーマパッケージ構造",
+        "details": [
+          "src/index.ts - メインエントリポイント",
+          "src/common/ - 共通ユーティリティとヘルパー関数",
+          "src/v2/ - バージョン2スキーマ定義",
+          "src/types/ - 型定義",
+          "package.json - パッケージ設定",
+          "tsconfig.json - TypeScript設定"
+        ],
+        "description": "schemasパッケージの内部構造。現在のsrc/schemas/ディレクトリの構造をベースに、独立したパッケージとして再構成する。"
+      },
+      {
+        "id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+        "name": "Yarn Workspaces設定",
+        "details": [
+          "ルートpackage.jsonにworkspacesフィールドを追加",
+          "各パッケージの相互依存関係をworkspace:プロトコルで定義",
+          "ルートに共通のツール設定（ESLint, Prettierなど）を配置"
+        ],
+        "description": "Yarn Workspacesを使ってモノレポを管理し、ローカル開発時の依存関係解決をより簡単にする。"
+      },
+      {
+        "id": "q1r2s3t4-u5v6-w7x8-y9z0-a1b2c3d4e5f6",
+        "name": "パッケージ公開戦略",
+        "details": [
+          "パッケージ名: @memory-bank/schemas",
+          "セマンティックバージョニングの采用",
+          "npm公開時の設定（publishConfig.access: 'public'）",
+          "filesフィールドで公開ファイルを制限"
+        ],
+        "description": "スキーマパッケージをnpmレジストリに公開するための戦略。セマンティックバージョニングを采用し、スコープ付きパッケージ名を使用する。"
+      }
+    ]
+  }
+}

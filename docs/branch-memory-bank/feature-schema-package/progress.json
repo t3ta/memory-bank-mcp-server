@@ -1,0 +1,77 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "51b20ba1-c5c0-473b-a8ad-33f292bfccbe",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress"
+    ],
+    "lastModified": "2025-03-27T13:40:18.387Z",
+    "createdAt": "2025-03-27T13:26:18.387Z",
+    "version": 2
+  },
+  "content": {
+    "workingFeatures": [],
+    "pendingImplementation": [
+      {
+        "id": "dc871fe3-6a21-4b59-af36-98c45d2e0bf1",
+        "description": "モノレポ構造（packages/ディレクトリ）のセットアップ",
+        "priority": "high"
+      },
+      {
+        "id": "7e9ba612-4f83-49c0-b540-3a2d7f8e9101",
+        "description": "Yarn Workspacesの設定",
+        "priority": "high"
+      },
+      {
+        "id": "5f2c1d8b-3a7e-4965-8b92-1c30ef47a9d2",
+        "description": "packages/schemas/ディレクトリの基本ファイル作成",
+        "priority": "high"
+      },
+      {
+        "id": "2a9d3c8e-1b7f-4d6e-9c5a-4d3e2f1a0b9c",
+        "description": "スキーマコードの移行",
+        "priority": "medium"
+      },
+      {
+        "id": "8d7c6b5a-4e3d-2c1b-0a9f-8e7d6c5b4a3f",
+        "description": "メインプロジェクトの依存関係調整",
+        "priority": "medium"
+      },
+      {
+        "id": "3f2e1d0c-9b8a-7e6d-5c4b-3a2b1c0d9e8f",
+        "description": "ドキュメント更新",
+        "priority": "medium"
+      },
+      {
+        "id": "a9b8c7d6-e5f4-3g2h-1i0j-9k8l7m6n5o4",
+        "description": "パッケージのpublish設定調整",
+        "priority": "low"
+      },
+      {
+        "id": "b1c2d3e4-f5g6-h7i8-j9k0-l1m2n3o4p5q6",
+        "priority": "medium",
+        "description": "使用されていないコードの特定と削除"
+      }
+    ],
+    "status": "設計フェーズ - モノレポ化とスキーマの外部パッケージ化の基本設計を決定済み",
+    "completionPercentage": 15,
+    "knownIssues": [],
+    "monoRepoStructure": {
+      "repositoryName": "memory-bank",
+      "rootPackageJson": {
+        "private": true,
+        "workspaces": [
+          "packages/*"
+        ]
+      },
+      "packagesDirectory": [
+        "packages/schemas/ - スキーマ定義",
+        "packages/mcp/ - MCPエンジン（現サーバー）",
+        "packages/vscode-extension/ - 将来的なVSCode拡張"
+      ]
+    }
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "94c9b19e-95ad-4cc6-a6c6-99fb2da73760",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context"
+    ],
+    "lastModified": "2025-03-27T13:37:18.387Z",
+    "createdAt": "2025-03-27T13:26:18.387Z",
+    "version": 2
+  },
+  "content": {
+    "currentWork": "モノレポ化とスキーマの外部パッケージ化の設計",
+    "recentChanges": [
+      {
+        "date": "2025-03-27T13:55:18.387Z",
+        "description": "モノレポ構造の設計検討"
+      },
+      {
+        "date": "2025-03-27T13:55:18.387Z",
+        "description": "リポジトリ名とパッケージ名の検討"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "724a6e2a-e23c-4aa7-9b8f-97a72c815344",
+        "description": "スキーマ関連のコードを独立したパッケージに切り出す"
+      },
+      {
+        "id": "89a7b654-c321-4def-9876-543210fedcba",
+        "description": "リポジトリ全体を'memory-bank'としてモノレポ化する"
+      },
+      {
+        "id": "45f6e7d8-9c0b-1a2b-3c4d-5e6f7a8b9c0d",
+        "description": "パッケージ名を'@memory-bank/schemas'、'@memory-bank/mcp'などとする"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "8334e146-4dca-47e4-bc3f-415574f6b991",
+        "description": "Yarn Workspacesを使ったモノレポ構造の実装方法",
+        "status": "open"
+      },
+      {
+        "id": "9d33dd40-3fef-4658-bb39-c7d55c466ab4",
+        "description": "パッケージのpublishおよびバージョン管理方法",
+        "status": "open"
+      },
+      {
+        "id": "96fa3b72-f978-45c7-921b-0d37dd5ad27b",
+        "description": "既存コードの移行手順と影響調査",
+        "status": "open"
+      },
+      {
+        "id": "37e9a826-5f1c-42d7-b080-9a321c654f87",
+        "description": "VSCode拡張の開発準備",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "f486df1e-9a85-4f91-b7ba-fc2413e11162",
+        "description": "Yarn Workspacesを使ったモノレポの基本構造を作成する",
+        "priority": "high"
+      },
+      {
+        "id": "758e0171-29bf-49d7-8721-becf3bd813c4",
+        "description": "packages/schemas/ディレクトリと基本設定ファイルを作成する",
+        "priority": "high"
+      },
+      {
+        "id": "be822508-6ec1-42dc-89d8-cef9f7716d84",
+        "description": "既存スキーマコードをパッケージに移行する",
+        "priority": "medium"
+      },
+      {
+        "id": "a7b8c9d0-e1f2-3g4h-5i6j-7k8l9m0n1o2",
+        "description": "依存関係を調整し、ローカル開発環境でテストする",
+        "priority": "medium"
+      }
+    ]
+  }
+}
