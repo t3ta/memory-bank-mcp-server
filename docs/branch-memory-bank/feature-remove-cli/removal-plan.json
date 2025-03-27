@@ -1,0 +1,104 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "a7c4d8f6-9e5b-4c3d-8a2f-1e9d7b3c5a4f",
+    "title": "CLI削除実装計画",
+    "documentType": "implementation_plan",
+    "path": "removal-plan.json",
+    "tags": [
+      "implementation-plan",
+      "cli-removal"
+    ],
+    "lastModified": "2025-03-27T12:50:22.376Z",
+    "createdAt": "2025-03-27T12:50:22.376Z",
+    "version": 1
+  },
+  "content": {
+    "overview": "このドキュメントは、Memory Bank MCPサーバーからCLI機能を削除するための詳細な実装計画を提供します。",
+    "targetFiles": {
+      "directories": [
+        {
+          "path": "/src/cli",
+          "description": "CLIのメインコードを含むディレクトリ全体",
+          "action": "完全削除"
+        }
+      ],
+      "files": [
+        {
+          "path": "/src/shared/utils/logger/cli.ts",
+          "description": "CLI専用のロガー実装",
+          "action": "削除"
+        },
+        {
+          "path": "/package.json",
+          "description": "パッケージ設定ファイル",
+          "action": "修正 - bin定義とスクリプト削除"
+        }
+      ],
+      "tests": [
+        {
+          "path": "/tests",
+          "description": "CLI関連のテストコード",
+          "action": "特定して削除"
+        }
+      ],
+      "dependencies": [
+        {
+          "name": "chalk",
+          "description": "CLIの出力色付けパッケージ",
+          "action": "必要ならメイン機能でも使用されているか確認"
+        },
+        {
+          "name": "yargs",
+          "description": "CLIコマンドラインパーサ",
+          "action": "CLI以外で使われていないか確認後削除検討"
+        }
+      ]
+    },
+    "implementationSteps": [
+      {
+        "id": "step1",
+        "name": "package.jsonからCLI設定を削除",
+        "tasks": [
+          "binセクションからCLI関連エントリを削除",
+          "scriptsセクションからCLI関連コマンドを削除"
+        ]
+      },
+      {
+        "id": "step2",
+        "name": "ソースコード削除",
+        "tasks": [
+          "/src/cli ディレクトリを完全に削除",
+          "/src/shared/utils/logger/cli.ts を削除"
+        ]
+      },
+      {
+        "id": "step3",
+        "name": "依存関係のクリーンアップ",
+        "tasks": [
+          "CLI専用の依存パッケージがあれば削除",
+          "package.jsonの依存関係を更新"
+        ]
+      },
+      {
+        "id": "step4",
+        "name": "テストコード更新",
+        "tasks": [
+          "CLI関連のテストを特定して削除",
+          "テスト実行を確認して問題がないことを確認"
+        ]
+      },
+      {
+        "id": "step5",
+        "name": "動作確認",
+        "tasks": [
+          "MCPサーバー機能に影響がないことを確認",
+          "ビルドが正常に完了することを確認"
+        ]
+      }
+    ],
+    "priority": "高",
+    "estimatedTimeRequired": "2-3時間",
+    "notes": "CLI機能の削除は、コードベースをシンプルにし、保守性を向上させる重要なステップです。ただし、他の部分への影響を最小限に抑えるために、慎重に進める必要があります。"
+  }
+}

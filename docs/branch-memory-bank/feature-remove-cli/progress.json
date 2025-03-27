@@ -1,0 +1,59 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "2d8c48bf-23bc-45ed-b784-2095e75c6e33",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress"
+    ],
+    "lastModified": "2025-03-27T12:50:22.377Z",
+    "createdAt": "2025-03-27T12:25:22.377Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [],
+    "pendingImplementation": [
+      {
+        "id": "39847a68-c6d5-4b9c-b08d-96f52c2ae3a1",
+        "description": "src/cli ディレクトリの完全削除",
+        "priority": "high"
+      },
+      {
+        "id": "bea74c7d-6acf-42d8-97b7-1be2abf87d53",
+        "description": "package.jsonからCLI関連設定の削除",
+        "priority": "high"
+      },
+      {
+        "id": "1e8e24d-e86c-4678-a4e7-fe75824231cb",
+        "description": "CLI用ロガー実装の削除",
+        "priority": "medium"
+      },
+      {
+        "id": "d1c58ef3-7d02-4a47-84c5-95e60f8b3d12",
+        "description": "CLI関連のテストコードの削除",
+        "priority": "medium"
+      },
+      {
+        "id": "7e4b91c8-f5a6-49d3-9e2c-ab47d5e9b0c1",
+        "description": "CLI関連ドキュメントの更新",
+        "priority": "low"
+      }
+    ],
+    "status": "分析フェーズを完了し、削除対象のコードとファイルを特定。これから実装フェーズに移行します。",
+    "completionPercentage": 15,
+    "knownIssues": [
+      {
+        "id": "a9674f35-85e8-4d12-a4b5-f73ab9c2e0a3",
+        "description": "他の部分に依存関係が存在する可能性がある。慎重な削除が必要",
+        "severity": "medium"
+      },
+      {
+        "id": "c1b2e2e9-a90d-4236-af8f-e0de83cb75a5",
+        "description": "CLI削除後のMCPサーバー機能のテストが必要",
+        "severity": "medium"
+      }
+    ]
+  }
+}

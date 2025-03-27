@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "42dc383d-7e27-43ee-8b1e-db32df5e2058",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-27T12:50:22.376Z",
+    "createdAt": "2025-03-27T12:25:22.376Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "feature/remove-cli",
+    "purpose": "CLIコマンドを完全に削除し、MCPサーバー機能のみを残す",
+    "createdAt": "2025-03-27T12:25:22.376Z",
+    "userStories": [
+      {
+        "id": "9a4bf8dc-2cd5-4dcb-9f50-08f5ef606fae",
+        "description": "MCPサーバー機能のみを使用し、CLIが不要になった",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "276b1ecf-362e-480d-95e0-efe88eb805db",
+        "description": "パッケージサイズを小さくし、依存関係を減らしたい",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "b88da03d-8854-4d3d-9775-98d2f2965de6",
+        "description": "コードベースをシンプルにし、メンテナンスしやすくしたい",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": "CLIコマンドは現在MCPサーバー機能として代替実装されているため、完全に削除することが可能。"
+  }
+}

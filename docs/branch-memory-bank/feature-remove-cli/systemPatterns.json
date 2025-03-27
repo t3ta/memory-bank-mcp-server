@@ -1,0 +1,54 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "20d1030c-ceed-4319-bdba-64f663356726",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "system-patterns"
+    ],
+    "lastModified": "2025-03-27T12:50:22.376Z",
+    "createdAt": "2025-03-27T12:25:22.376Z",
+    "version": 1
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "dad98b8f-2258-4321-97e6-69609cbfc31d",
+        "title": "CLI機能の削除",
+        "context": "現在、MCPサーバーとCLIの二つの機能がありますが、CLIはもはや使用されておらず、MCPサーバー経由の機能で十分カバーされています。",
+        "decision": "CLIに関連するコード、設定、テストを全て削除します。",
+        "consequences": {
+          "positive": [
+            "コードベースが整理され、保守性が向上します",
+            "パッケージサイズが小さくなります",
+            "依存関係が減少します",
+            "ドキュメントがシンプルになります"
+          ],
+          "negative": [
+            "ターミナルからの直接のCLI操作ができなくなります（すでに使われていないので影響は限定的）"
+          ]
+        },
+        "status": "proposed",
+        "date": "2025-03-27T12:50:22.376Z",
+        "alternatives": [
+          "CLIを残しつつ、機能を縮小する方法もありましたが、メンテナンスの手間を考慮すると完全削除が最適と判断しました"
+        ]
+      }
+    ],
+    "implementationPatterns": [
+      {
+        "id": "f3b5c91f-7a4e-4e2d-9b5a-7c3d8e2e1a3b",
+        "name": "CLI削除の主要ポイント",
+        "description": "削除対象となる主要なコンポーネントは以下の通りです：",
+        "details": [
+          "/src/cli/ ディレクトリ全体 - CLIのメインコード",
+          "package.jsonのbinセクションとCLI関連スクリプト",
+          "/src/shared/utils/logger/cli.ts - CLI専用ロガー",
+          "その他プロジェクト内で外部からのCLI操作を前提としているコード"
+        ]
+      }
+    ]
+  }
+}
