@@ -62,12 +62,11 @@ export type WorkspaceConfig = {
   language: string;
 };
 
-// Remove CliOptions from here as it's defined in main/index.ts
-// export type CliOptions = {
-//   docsRoot?: string;
-//   language?: string;
-//   verbose?: boolean;
-// };
+// Importing CliOptions from schemas package
+import type { CliOptions } from '@memory-bank/schemas';
+
+// Re-export for convenience
+export type { CliOptions };
 
 export type SectionEdit = {
   header: string;

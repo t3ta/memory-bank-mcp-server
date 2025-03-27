@@ -12,17 +12,17 @@
       "di",
       "api-routing"
     ],
-    "lastModified": "2025-03-28T12:00:00.000Z",
+    "lastModified": "2025-03-28T14:30:00.000Z",
     "createdAt": "2025-03-28T12:00:00.000Z",
     "version": 1
   },
   "content": {
     "overview": {
       "description": "インターフェースレイヤーのコントローラー実装が完了したため、次のステップとしてDIコンテナとAPIルーティングの設定を行い、さらに単体テストの作成を進める計画",
-      "currentStatus": "すべてのコントローラー（BranchController、JsonBranchController、ContextController、TemplateController）の実装完了",
+      "currentStatus": "すべてのコントローラーの実装、DIコンテナとAPIルーティングの設定の実装完了",
       "packageStatus": {
         "schemas": "✅ 実装・ビルド完了",
-        "mcp": "⚠️ コントローラー実装済み、DIとAPIルーティングが未完成"
+        "mcp": "✅ コントローラー実装済み、DIとAPIルーティングの実装完了"
       }
     },
     "prioritizedTasks": [
@@ -38,7 +38,8 @@
         ],
         "estimatedTime": "90分",
         "priority": "high",
-        "dependencies": []
+        "dependencies": [],
+        "status": "completed"
       },
       {
         "id": "task-2",
@@ -54,7 +55,8 @@
         "priority": "high",
         "dependencies": [
           "task-1"
-        ]
+        ],
+        "status": "completed"
       },
       {
         "id": "task-3",
@@ -107,18 +109,32 @@
         ]
       }
     ],
+    "completedTasks": [
+      {
+        "id": "task-1",
+        "title": "DIコンテナの設定",
+        "description": "DIコンテナの実装を完了しました",
+        "completion_date": "2025-03-28T14:00:00.000Z"
+      },
+      {
+        "id": "task-2",
+        "title": "APIルーティングの更新",
+        "description": "MCPサーバー用のルーティング設定を実装しました",
+        "completion_date": "2025-03-28T14:30:00.000Z"
+      }
+    ],
     "technicalDecisions": [
       {
         "id": "decision-1",
         "title": "DIコンテナ実装方針",
-        "description": "DIコンテナはInversifyJSを継続使用し、ビジネスロジックとインフラストラクチャの分離を維持",
-        "rationale": "既存コードではInversifyJSが使用されており、移行コストを最小限にするため同じライブラリを使用する"
+        "description": "独自の簡易DIコンテナを実装し、InversifyJSからの依存を解消",
+        "rationale": "依存ライブラリを減らし、シンプルな独自DIコンテナを実装することでメンテナンス性を向上"
       },
       {
         "id": "decision-2",
         "title": "APIルーティング実装方針",
-        "description": "Express.jsのルーティングを使用し、コントローラーとの明確な分離を維持する",
-        "rationale": "コントローラーはビジネスロジックの実行に集中し、ルーティングはHTTPリクエスト処理に専念させる責務分離を継続"
+        "description": "MCPサーバーのリクエストハンドラーとしてルーティングを実装し、コントローラーとの明確な分離を維持",
+        "rationale": "標準的なWebフレームワークではなくMCPプロトコルベースのサーバーを使用していることに合わせた実装方針"
       },
       {
         "id": "decision-3",
@@ -128,6 +144,18 @@
       }
     ],
     "codeReferences": [
+      {
+        "path": "/Users/t3ta/workspace/memory-bank-mcp-server/packages/mcp/src/main/di/DIContainer.ts",
+        "description": "DIコンテナの実装コード"
+      },
+      {
+        "path": "/Users/t3ta/workspace/memory-bank-mcp-server/packages/mcp/src/main/di/providers.ts",
+        "description": "サービスの登録とプロバイダー設定"
+      },
+      {
+        "path": "/Users/t3ta/workspace/memory-bank-mcp-server/packages/mcp/src/main/routes.ts",
+        "description": "MCPサーバーのAPIルーティング設定"
+      },
       {
         "path": "/Users/t3ta/workspace/memory-bank-mcp-server/packages/mcp/src/interface/controllers/BranchController.ts",
         "description": "BranchControllerの実装コード"
@@ -139,20 +167,12 @@
       {
         "path": "/Users/t3ta/workspace/memory-bank-mcp-server/src/index.ts",
         "description": "更新が必要なメインエントリポイント"
-      },
-      {
-        "path": "/Users/t3ta/workspace/memory-bank-mcp-server/src/inversify.config.ts",
-        "description": "参照すべき既存のDIコンテナ設定"
-      },
-      {
-        "path": "/Users/t3ta/workspace/memory-bank-mcp-server/src/routes",
-        "description": "参照すべき既存のAPIルーティング設定"
       }
     ],
     "risksAndMitigations": [
       {
         "risk": "DIコンテナの設定ミスによる依存解決エラー",
-        "probability": "medium",
+        "probability": "low",
         "impact": "high",
         "mitigation": "設定を小さな単位でテストしながら進め、依存関係をきちんと追跡する"
       },
