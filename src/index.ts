@@ -62,13 +62,6 @@ const argv = yargs(hideBin(process.argv))
     description: 'Path to docs directory (memory bank root)',
     default: './docs',
   })
-  .option('workspace', {
-    alias: 'w',
-    type: 'string',
-    description: 'Path to workspace directory (deprecated, use docs instead)',
-    deprecated: true,
-    hidden: true
-  })
   .help()
   .parseSync();
 
@@ -96,12 +89,6 @@ export function resolveDocsRoot(toolDocs?: string) {
 
   if (process.env.DOCS_ROOT) {
     return process.env.DOCS_ROOT;
-  }
-
-  // For backward compatibility, check workspace if it exists
-  if (argv.workspace) {
-    logger.warn('workspace parameter is deprecated and will be removed in a future release. Use docs parameter instead.');
-    return path.join(argv.workspace as string, 'docs');
   }
 
   return './docs';
@@ -192,7 +179,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
       const content = params.content as string | undefined;
       const patches = params.patches as any[] | undefined;
       const branch = params.branch as string;
-      const workspace = params.workspace as string | undefined;
       const docs = params.docs as string | undefined;
 
       if (!path || !branch) {
@@ -223,7 +209,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 
       // Create a new application instance if needed
       let branchApp = app;
-      if (workspace || docs) {
+      if (docs) {
         logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
 
         // マージされた設定オプションを取得
@@ -264,7 +250,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
     case 'read_branch_memory_bank': {
       const path = params.path as string;
       const branch = params.branch as string;
-      const workspace = params.workspace as string | undefined;
       const docs = params.docs as string | undefined;
 
       if (!path || !branch) {
@@ -346,7 +331,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
       const path = params.path as string;
       const content = params.content as string | undefined;
       const patches = params.patches as any[] | undefined;
-      const workspace = params.workspace as string | undefined;
       const docs = params.docs as string | undefined;
 
       if (!path) {
@@ -372,7 +356,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 
       // Create a new application instance if needed
       let globalApp = app;
-      if (workspace || docs) {
+      if (docs) {
         logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
 
         // マージされた設定オプションを取得
@@ -412,7 +396,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 
     case 'read_global_memory_bank': {
       const path = params.path as string;
-      const workspace = params.workspace as string | undefined;
       const docs = params.docs as string | undefined;
 
       if (!path) {
@@ -427,7 +410,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
     case 'read_context': {
       const branch = (params.branch as string | undefined) || '_current_';
       const language = (params.language as string) || 'ja';
-      const workspace = params.workspace as string | undefined;
       const docs = params.docs as string | undefined;
       // Include options are always true now, but kept for backwards compatibility
       const includeRules = true;
@@ -435,7 +417,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
       const includeGlobalMemory = true;
 
       // Resolve docs root
-      const docsRoot = docs || resolveDocsRoot(workspace ? docs : undefined);
+      const docsRoot = docs || resolveDocsRoot();
 
       logger.info(`Reading context (branch: ${branch || 'none'}, language: ${language}, docsRoot: ${docsRoot})`)
 
@@ -457,7 +439,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 
         // Create a new application instance with the specified docsRoot if different from the default
         let contextApp = app;
-        if (workspace || docs) {
+        if (docs) {
           logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
 
           // マージされた設定オプションを取得
@@ -504,7 +486,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
       const id = params.id as string;
       const language = params.language as string;
       const variables = params.variables as Record<string, string> | undefined;
-      const workspace = params.workspace as string | undefined;
       const docs = params.docs as string | undefined;
 
       if (!id || !language) {
@@ -520,12 +501,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
       }
 
       // Resolve docs root
-      const docsRoot = docs || resolveDocsRoot(workspace ? docs : undefined);
+      const docsRoot = docs || resolveDocsRoot();
       logger.debug(`Getting template (id: ${id}, language: ${language}, docsRoot: ${docsRoot})`);
 
       // Create a new application instance if needed
       let templateApp = app;
-      if (workspace || docs) {
+      if (docs) {
         logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
         templateApp = await createApplication({
           docsRoot,

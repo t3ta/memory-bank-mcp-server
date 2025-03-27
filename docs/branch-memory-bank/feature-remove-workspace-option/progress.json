@@ -8,7 +8,7 @@
     "tags": [
       "progress"
     ],
-    "lastModified": "2025-03-27T13:25:48.270Z",
+    "lastModified": "2025-03-27T14:30:00.000Z",
     "createdAt": "2025-03-27T12:56:48.270Z",
     "version": 2
   },
@@ -18,32 +18,37 @@
         "id": "6d161527-46f5-4251-b0d3-c9e037633251",
         "description": "workspaceオプション撤廃に向けた調査完了",
         "implementedAt": "2025-03-27T13:25:48.270Z"
+      },
+      {
+        "id": "8d745f6a-9c12-4e8c-b723-f9a7d4d5e6c7",
+        "description": "WorkspaceConfig型からworkspaceRootプロパティを削除",
+        "implementedAt": "2025-03-27T14:15:00.000Z"
+      },
+      {
+        "id": "a45b9c23-d67e-4f8a-9b2c-1a3b4c5d6e7f",
+        "description": "resolveWorkspaceAndDocs関数の削除と依存部分の修正",
+        "implementedAt": "2025-03-27T14:20:00.000Z"
+      },
+      {
+        "id": "b56c7d89-e01f-4a2b-8c3d-2a3b4c5d6e7f",
+        "description": "workspaceパラメータに関するコード・変数の削除",
+        "implementedAt": "2025-03-27T14:25:00.000Z"
+      },
+      {
+        "id": "c67d8e90-f12g-5h3i-9j4k-3a4b5c6d7e8f",
+        "description": "テストコードの修正",
+        "implementedAt": "2025-03-27T14:28:00.000Z"
       }
     ],
     "pendingImplementation": [
       {
-        "id": "4474283f-f57b-481d-959e-08245f1708d2",
-        "description": "WorkspaceConfig型からworkspaceRootプロパティを削除",
+        "id": "d78e9f01-g23h-6i4j-0k5l-4a5b6c7d8e9f",
+        "description": "最終的なテストの実行と動作確認",
         "priority": "high"
-      },
-      {
-        "id": "efe4e1de-b3bf-450d-8e30-7f096a268af4",
-        "description": "resolveWorkspaceAndDocs関数の削除と依存部分の修正",
-        "priority": "high"
-      },
-      {
-        "id": "efe4e1de-b3bf-450d-8e30-7f096a268af5",
-        "description": "workspaceパラメータに関するコード・変数の削除",
-        "priority": "high"
-      },
-      {
-        "id": "982e304b-bb14-46f0-a874-a46c54ea8336",
-        "description": "テストコードの修正",
-        "priority": "medium"
       }
     ],
-    "status": "workspaceオプション撤廃に向けた調査を完了しました。このオプションは元々docsオプションと並行して存在していましたが、現在はdeprecated状態になっています。メインのインデックスファイルやテストファイルから関連コードを特定し、安全に削除するための計画を立てる必要があります。",
-    "completionPercentage": 15,
+    "status": "workspaceオプションの撤廃に向けたコード修正をほぼ完了しました。WorkspaceConfig型からworkspaceRootプロパティを削除し、関連するパラメータや関数（resolveWorkspaceAndDocs）を削除しました。テストコードも大幅に修正し、workspace関連のテストは削除しました。最終的なテストと確認を行った後、コミットする準備が整っています。",
+    "completionPercentage": 90,
     "knownIssues": [
       {
         "id": "a921d6ba-1426-403a-9b36-367ba072c8c6",
