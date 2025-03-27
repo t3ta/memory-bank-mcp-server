@@ -1,7 +1,12 @@
 /**
- * V2スキーマ定義
+ * Schema v2 - Index
+ *
+ * This file re-exports all types and schemas from the v2 schemas,
+ * providing a single import point for consumers.
  */
 
-// 将来的にはここにV2スキーマをインポートしてエクスポート
-// 例: export * from './json-document.js';
-// export * from './tag-index.js';
+// Re-export everything from the json-document file
+export * from './json-document.js';
+export * from './tag-index.js';
+
+// We'll add additional schema exports here in future iterations

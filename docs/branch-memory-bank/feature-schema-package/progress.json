@@ -33,6 +33,11 @@
         "id": "3a2b1c0-d9e8f-7g6h-5i4j-3k2l1m0n9o8p",
         "description": "共通スキーマ（TagSchema, FlexibleDateSchema）の移行",
         "completedAt": "2025-03-27T16:20:00.000Z"
+      },
+      {
+        "id": "4b8c9d0-e1f2-3g4h-5i6j-7k8l9m0n1o2",
+        "completedAt": "2025-03-27T16:40:00.000Z",
+        "description": "v2スキーマコード（json-document, tag-index）のschemasパッケージへの移行"
       }
     ],
     "pendingImplementation": [
@@ -60,10 +65,15 @@
         "id": "b1c2d3e4-f5g6-h7i8-j9k0-l1m2n3o4p5q6",
         "priority": "medium",
         "description": "使用されていないコードの特定と削除"
+      },
+      {
+        "id": "5c9d0e1-f2g3-4h5i-6j7k-8l9m0n1o2p3",
+        "priority": "medium",
+        "description": "スキーマ用のテストを移行または追加する"
       }
     ],
-    "status": "実装フェーズ3完了 - schemasパッケージに基本スキーマコードの移行が完了。型定義とユーティリティ関数も含め移行済み",
-    "completionPercentage": 45,
+    "status": "実装フェーズ4完了 - v2スキーマコード（json-document, tag-index）のschemasパッケージへの移行が完了。テストは基本部分のみ現在実装済み。",
+    "completionPercentage": 60,
     "knownIssues": [],
     "monoRepoStructure": {
       "repositoryName": "memory-bank",
