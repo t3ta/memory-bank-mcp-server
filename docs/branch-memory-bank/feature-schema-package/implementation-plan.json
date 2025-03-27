@@ -1,0 +1,181 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "controller-implementation-complete-plan",
+    "title": "コントローラー実装完了後の計画",
+    "documentType": "plan",
+    "path": "implementation-plan.json",
+    "tags": [
+      "plan",
+      "implementation",
+      "controller",
+      "di",
+      "api-routing"
+    ],
+    "lastModified": "2025-03-28T12:00:00.000Z",
+    "createdAt": "2025-03-28T12:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "description": "インターフェースレイヤーのコントローラー実装が完了したため、次のステップとしてDIコンテナとAPIルーティングの設定を行い、さらに単体テストの作成を進める計画",
+      "currentStatus": "すべてのコントローラー（BranchController、JsonBranchController、ContextController、TemplateController）の実装完了",
+      "packageStatus": {
+        "schemas": "✅ 実装・ビルド完了",
+        "mcp": "⚠️ コントローラー実装済み、DIとAPIルーティングが未完成"
+      }
+    },
+    "prioritizedTasks": [
+      {
+        "id": "task-1",
+        "title": "DIコンテナの設定",
+        "description": "InversifyJSを使用したDIコンテナの設定を移行または新規作成する",
+        "steps": [
+          "1. 既存のDIコンテナ設定を確認",
+          "2. packages/mcp/src/main/ にDIコンテナ設定を実装",
+          "3. すべてのコントローラーとその依存関係を登録",
+          "4. DIコンテナの初期化処理を設定"
+        ],
+        "estimatedTime": "90分",
+        "priority": "high",
+        "dependencies": []
+      },
+      {
+        "id": "task-2",
+        "title": "APIルーティングの更新",
+        "description": "APIルーティングを更新して新しいコントローラーを使用するよう変更",
+        "steps": [
+          "1. 既存のAPIルーティング設定を確認",
+          "2. packages/mcp/src/main/ にAPIルーティング設定を実装",
+          "3. 各エンドポイントと新しいコントローラーのメソッドをマッピング",
+          "4. エラーハンドリングの設定を更新"
+        ],
+        "estimatedTime": "60分",
+        "priority": "high",
+        "dependencies": [
+          "task-1"
+        ]
+      },
+      {
+        "id": "task-3",
+        "title": "コントローラーの単体テスト作成",
+        "description": "各コントローラーに対する単体テストを作成",
+        "steps": [
+          "1. テスト環境のセットアップ（Jest設定の確認）",
+          "2. BranchControllerのテスト作成",
+          "3. JsonBranchControllerのテスト作成",
+          "4. ContextControllerとTemplateControllerのテスト作成",
+          "5. モックの作成と依存関係の適切な取り扱い"
+        ],
+        "estimatedTime": "120分",
+        "priority": "medium",
+        "dependencies": []
+      },
+      {
+        "id": "task-4",
+        "title": "メインエントリポイントの更新",
+        "description": "src/index.tsを新しいMCPパッケージベースに更新",
+        "steps": [
+          "1. 既存のsrc/index.tsの機能を確認",
+          "2. packages/mcp/src/main/index.tsでエクスポートされている機能を確認",
+          "3. ルートディレクトリのsrc/index.tsを更新して新しいパッケージを参照するよう変更",
+          "4. 必要に応じて型定義やエクスポートを調整"
+        ],
+        "estimatedTime": "30分",
+        "priority": "medium",
+        "dependencies": [
+          "task-1",
+          "task-2"
+        ]
+      },
+      {
+        "id": "task-5",
+        "title": "統合テストと動作確認",
+        "description": "統合テストを実行し、全体の動作を確認",
+        "steps": [
+          "1. 開発サーバーの起動テスト",
+          "2. 基本的なAPIエンドポイントの動作確認",
+          "3. エラーケースのテスト",
+          "4. 実際のブランチメモリバンクとグローバルメモリバンクの操作テスト"
+        ],
+        "estimatedTime": "60分",
+        "priority": "low",
+        "dependencies": [
+          "task-1",
+          "task-2",
+          "task-4"
+        ]
+      }
+    ],
+    "technicalDecisions": [
+      {
+        "id": "decision-1",
+        "title": "DIコンテナ実装方針",
+        "description": "DIコンテナはInversifyJSを継続使用し、ビジネスロジックとインフラストラクチャの分離を維持",
+        "rationale": "既存コードではInversifyJSが使用されており、移行コストを最小限にするため同じライブラリを使用する"
+      },
+      {
+        "id": "decision-2",
+        "title": "APIルーティング実装方針",
+        "description": "Express.jsのルーティングを使用し、コントローラーとの明確な分離を維持する",
+        "rationale": "コントローラーはビジネスロジックの実行に集中し、ルーティングはHTTPリクエスト処理に専念させる責務分離を継続"
+      },
+      {
+        "id": "decision-3",
+        "title": "テスト実装方針",
+        "description": "Jestを使用し、モックを活用してコントローラーの単体テストを作成",
+        "rationale": "外部依存を適切にモック化し、コントローラーロジックのみを検証する"
+      }
+    ],
+    "codeReferences": [
+      {
+        "path": "/Users/t3ta/workspace/memory-bank-mcp-server/packages/mcp/src/interface/controllers/BranchController.ts",
+        "description": "BranchControllerの実装コード"
+      },
+      {
+        "path": "/Users/t3ta/workspace/memory-bank-mcp-server/packages/mcp/src/interface/controllers/json/JsonBranchController.ts",
+        "description": "JsonBranchControllerの実装コード"
+      },
+      {
+        "path": "/Users/t3ta/workspace/memory-bank-mcp-server/src/index.ts",
+        "description": "更新が必要なメインエントリポイント"
+      },
+      {
+        "path": "/Users/t3ta/workspace/memory-bank-mcp-server/src/inversify.config.ts",
+        "description": "参照すべき既存のDIコンテナ設定"
+      },
+      {
+        "path": "/Users/t3ta/workspace/memory-bank-mcp-server/src/routes",
+        "description": "参照すべき既存のAPIルーティング設定"
+      }
+    ],
+    "risksAndMitigations": [
+      {
+        "risk": "DIコンテナの設定ミスによる依存解決エラー",
+        "probability": "medium",
+        "impact": "high",
+        "mitigation": "設定を小さな単位でテストしながら進め、依存関係をきちんと追跡する"
+      },
+      {
+        "risk": "APIルーティングの変更によるインターフェース互換性の問題",
+        "probability": "low",
+        "impact": "high",
+        "mitigation": "既存のAPIインターフェースを維持し、内部実装のみを変更する"
+      },
+      {
+        "risk": "モジュール間の循環参照問題",
+        "probability": "medium",
+        "impact": "medium",
+        "mitigation": "明確な依存関係グラフを維持し、インターフェースを通じた依存関係の逆転を適切に活用"
+      }
+    ],
+    "completionCriteria": [
+      "DIコンテナが正しく設定され、すべてのコントローラーとその依存関係が登録されている",
+      "すべてのAPIルーティングが新しいコントローラーを使用するよう更新されている",
+      "各コントローラーに対する単体テストが作成され、実行できる",
+      "メインエントリポイントが新しいMCPパッケージを参照するよう更新されている",
+      "開発サーバーが起動し、基本的なAPIエンドポイントが正常に動作する"
+    ],
+    "estimatedTimeTotal": "6時間 (すべてのタスクの合計時間)"
+  }
+}

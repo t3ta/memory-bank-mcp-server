@@ -13,8 +13,12 @@
     "version": 3
   },
   "content": {
-    "currentWork": "フェーズ10実装中 - MCPパッケージのコントローラー実装（すべてのコントローラークラスの移行完了）",
+    "currentWork": "フェーズ11実装準備中 - DIコンテナとAPIルーティングの設定（コントローラー実装は完了）",
     "recentChanges": [
+      {
+        "date": "2025-03-28T12:00:00.000Z",
+        "description": "コントローラー実装完了後の次のステップとなるDIコンテナ設定とAPIルーティング更新の計画を策定"
+      },
       {
         "date": "2025-03-28T11:30:00.000Z",
         "description": "MCPパッケージに残りのコントローラー（JsonBranchController, ContextController, TemplateController）を実装し、インターフェースレイヤーを完成"
@@ -148,6 +152,16 @@
     ],
     "considerations": [
       {
+        "id": "q9r8s7t6-u5v4-w3x2-y1z0-a9b8c7d6e5f4",
+        "description": "APIルーティングは既存のインターフェースを維持しつつ、内部実装のみを新しいコントローラーに差し替える形で実装する",
+        "status": "active"
+      },
+      {
+        "id": "a3b4c5d6-e7f8-9g0h-i1j2-k3l4m5n6o7p8",
+        "description": "DIコンテナ設定は既存の設計を参考にしつつ、新しいパッケージ構造に合わせて適切に調整する必要がある",
+        "status": "active"
+      },
+      {
         "id": "f8e7d6c5-b4a3-2100-9f8e-7d6c5b4a3210",
         "description": "次はDIコンテナの設定とAPIルーティングの更新が必要。インターフェースレイヤーのコントローラーを適切に登録する必要がある",
         "status": "active"
@@ -207,8 +221,8 @@
     ],
     "references": [
       {
-        "file": "code-cleanup-targets.json",
-        "description": "不要コード削除とクリーンアップ候補のリスト",
+        "file": "implementation-plan.json",
+        "description": "コントローラー実装完了後の計画（DIコンテナ、APIルーティング、テスト等）",
         "created_at": "2025-03-28"
       }
     ]

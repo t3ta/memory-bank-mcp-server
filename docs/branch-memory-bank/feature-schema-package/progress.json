@@ -3,7 +3,7 @@
   "currentTask": "Implementing Controllers in MCPパッケージ",
   "status": "completed",
   "details": {
-    "description": "実装済みのBranchControllerに加えて、JsonBranchController、ContextController、TemplateControllerを追加実装した",
+    "description": "インターフェースレイヤーのすべてのコントローラー実装（BranchController、JsonBranchController、ContextController、TemplateController）が完了。次はDIコンテナとAPIルーティングの設定が必要。",
     "features": [
       "Reading and writing documents to branch memory bank",
       "Managing core files (progress.json, activeContext.json, branchContext.json, systemPattern.json)",
@@ -22,10 +22,10 @@
     }
   },
   "nextSteps": [
+    "DIコンテナの設定（依存関係の設定）",
+    "APIルーティングの更新（新しいコントローラーを使用するよう変更）",
     "各コントローラーの単体テストを作成",
-    "DIコンテナのセットアップ",
-    "メインエントリポイントからの接続",
-    "APIルーティングの更新"
+    "src/index.tsを新しいMCPパッケージベースに更新"
   ],
   "completedControllers": [
     {
