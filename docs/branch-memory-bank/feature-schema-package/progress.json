@@ -56,8 +56,8 @@
         "description": "使用されていないコードの特定と削除"
       }
     ],
-    "status": "設計フェーズ - モノレポ化とスキーマの外部パッケージ化の基本設計を決定済み",
-    "completionPercentage": 15,
+    "status": "設計フェーズ - モノレポ化とスキーマの外部パッケージ化の基本設計を決定済み。1チャット1フェーズの実装計画を作成完了。",
+    "completionPercentage": 20,
     "knownIssues": [],
     "monoRepoStructure": {
       "repositoryName": "memory-bank",
@@ -72,6 +72,13 @@
         "packages/mcp/ - MCPエンジン（現サーバー）",
         "packages/vscode-extension/ - 将来的なVSCode拡張"
       ]
-    }
+    },
+    "references": [
+      {
+        "file": "phased-implementation-plan.json",
+        "description": "1チャット1フェーズで進める実装計画",
+        "created_at": "2025-03-27"
+      }
+    ]
   }
 }
