@@ -16,6 +16,10 @@
     "currentWork": "フェーズ7-8完了 スキーマインポートの修正とMCPパッケージの基本構造構築",
     "recentChanges": [
       {
+        "date": "2025-03-28T02:30:00.000Z",
+        "description": "ドメインエンティティクラス（DocumentPath, Tag, BranchInfo）とサポートクラス（BaseError, DomainError, logger）をMCPパッケージに移行し、ビルド成功"
+      },
+      {
         "date": "2025-03-28T01:50:00.000Z",
         "description": "残りのスキーマインポート（FileSystemBranchMemoryBankRepository, II18nProvider）を@memory-bank/schemas参照に修正"
       },
@@ -92,6 +96,10 @@
       {
         "id": "45f6e7d8-9c0b-1a2b-3c4d-5e6f7a8b9c0d",
         "description": "パッケージ名を'@memory-bank/schemas'、'@memory-bank/mcp'などとする"
+      },
+      {
+        "id": "56781234-5678-1234-5678-123456781234",
+        "description": "パッケージ移行は機能ブロック単位で行い、段階的にテストするアプローチを取ることに決定"
       }
     ],
     "considerations": [

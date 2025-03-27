@@ -78,6 +78,11 @@
         "id": "8n2o3p4-q5r6-s7t8-u9v0-w1x2y3z4a5b6",
         "description": "MCPパッケージのsrcディレクトリの基本構造とプレースホルダーコードの作成",
         "completedAt": "2025-03-28T02:00:00.000Z"
+      },
+      {
+        "id": "9c0d1e2f-3g4h-5i6j-7k8l-9m0n1o2p3q4r",
+        "completedAt": "2025-03-28T02:30:00.000Z",
+        "description": "ドメインエンティティとユーティリティの一部をMCPパッケージに移行（BaseError, DomainError, DocumentPath, Tag, BranchInfo, logger）"
       }
     ],
     "pendingImplementation": [
