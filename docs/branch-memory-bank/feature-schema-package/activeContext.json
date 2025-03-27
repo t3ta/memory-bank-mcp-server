@@ -8,13 +8,25 @@
     "tags": [
       "active-context"
     ],
-    "lastModified": "2025-03-28T00:10:00.000Z",
+    "lastModified": "2025-03-28T11:30:00.000Z",
     "createdAt": "2025-03-27T13:26:18.387Z",
     "version": 3
   },
   "content": {
-    "currentWork": "フェーズ10実装中 - MCPパッケージのコントローラー実装（GlobalControllerの移行完了）",
+    "currentWork": "フェーズ10実装中 - MCPパッケージのコントローラー実装（すべてのコントローラークラスの移行完了）",
     "recentChanges": [
+      {
+        "date": "2025-03-28T11:30:00.000Z",
+        "description": "MCPパッケージに残りのコントローラー（JsonBranchController, ContextController, TemplateController）を実装し、インターフェースレイヤーを完成"
+      },
+      {
+        "date": "2025-03-28T11:15:00.000Z",
+        "description": "コントローラー間の依存関係を整理し、インデックスファイルを適切に設定"
+      },
+      {
+        "date": "2025-03-28T11:00:00.000Z",
+        "description": "BranchControllerの実装を確認し、いくつかの改善点を特定"
+      },
       {
         "date": "2025-03-28T03:45:00.000Z",
         "description": "ビルドエラーを修正し、MCPパッケージとschemaパッケージの両方がビルド可能になった"
@@ -135,6 +147,16 @@
       }
     ],
     "considerations": [
+      {
+        "id": "f8e7d6c5-b4a3-2100-9f8e-7d6c5b4a3210",
+        "description": "次はDIコンテナの設定とAPIルーティングの更新が必要。インターフェースレイヤーのコントローラーを適切に登録する必要がある",
+        "status": "active"
+      },
+      {
+        "id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+        "description": "単体テストも作成し、コントローラーが期待通りに動作することを確認する必要がある",
+        "status": "active"
+      },
       {
         "id": "8334e146-4dca-47e4-bc3f-415574f6b991",
         "description": "次の作業は、既存のコードからのスキーマインポートを修正し、機能単位でコードをMCPパッケージに移行すること",
