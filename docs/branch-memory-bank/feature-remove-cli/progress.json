@@ -88,6 +88,11 @@
         "id": "a9b8c7d6-e5f4-3g2h-1i0j-9k8l7m6n5o4",
         "date": "2025-03-27T13:50:00.000Z",
         "description": "READMEをCLI関連の記述からAPI中心の内容に更新"
+      },
+      {
+        "id": "d5e6f7g8-h9i0-j1k2-l3m4-n5o6p7q8r9s0",
+        "date": "2025-03-27T14:00:00.000Z",
+        "description": "CLI关連の名称残りを変更（CliOptionsSchema→ServerOptionsSchemaなど）"
       }
     ]
   }

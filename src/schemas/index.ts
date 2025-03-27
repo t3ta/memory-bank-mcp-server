@@ -104,7 +104,7 @@ export const WorkspaceConfigSchema = z.object({
   language: LanguageSchema,
 });
 
-export const CliOptionsSchema = z.object({
+export const ServerOptionsSchema = z.object({
   workspace: PathSchema.optional(),
   memoryRoot: PathSchema.optional(),
   verbose: z.boolean().optional(),
@@ -200,7 +200,7 @@ export type ReadMemoryBankArgs = z.infer<typeof ReadMemoryBankArgsSchema>;
 export type WriteMemoryBankArgs = z.infer<typeof WriteMemoryBankArgsSchema>;
 export type WriteBranchCoreFilesArgs = z.infer<typeof WriteBranchCoreFilesArgsSchema>;
 export type WorkspaceConfig = z.infer<typeof WorkspaceConfigSchema>;
-export type CliOptions = z.infer<typeof CliOptionsSchema>;
+export type ServerOptions = z.infer<typeof ServerOptionsSchema>;
 export type SectionEdit = z.infer<typeof SectionEditSchema>;
 export type DocumentSections = z.infer<typeof DocumentSectionsSchema>;
 export type RecentBranch = z.infer<typeof RecentBranchSchema>;

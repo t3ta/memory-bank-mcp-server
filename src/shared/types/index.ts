@@ -34,9 +34,9 @@ export interface WorkspaceConfig {
 }
 
 /**
- * Command line options for the server
+ * Server options for the server
  */
-export interface CliOptions {
+export interface ServerOptions {
   workspace?: string;
   docsRoot?: string;
   verbose?: boolean;

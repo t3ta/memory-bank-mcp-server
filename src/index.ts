@@ -12,7 +12,7 @@ import { Server as MCPServer } from '@modelcontextprotocol/sdk/server/index.js';
 import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { Server } from 'node:http';
 import { Language, isValidLanguage } from './schemas/v2/i18n-schema.js';
-import type { CliOptions } from './shared/types/index.js';
+import type { ServerOptions } from './shared/types/index.js';
 
 // Helper function to render template with translations
 function renderTemplate(template: any, translations: any): string {
@@ -108,7 +108,7 @@ export function resolveDocsRoot(toolDocs?: string) {
 }
 
 // Helper function to get merged application options
-function getMergedApplicationOptions(appInstance: Application | null, docs?: string, language: Language = 'ja'): CliOptions {
+function getMergedApplicationOptions(appInstance: Application | null, docs?: string, language: Language = 'ja'): ServerOptions {
   if (!appInstance) {
     // 初期アプリケーションでは通常の処理
     return {
