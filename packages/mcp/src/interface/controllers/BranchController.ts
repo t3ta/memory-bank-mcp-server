@@ -1,3 +1,4 @@
+import type { CoreFilesDTO } from "../../application/dtos/CoreFilesDTO.js";
 import type { DocumentDTO } from "../../application/dtos/DocumentDTO.js";
 import type { JsonDocumentDTO } from "../../application/dtos/JsonDocumentDTO.js";
 import type { UpdateTagIndexUseCaseV2 } from "../../application/usecases/common/UpdateTagIndexUseCaseV2.js";
@@ -7,6 +8,8 @@ import type {
   SearchDocumentsByTagsUseCase,
   UpdateTagIndexUseCase,
   GetRecentBranchesUseCase,
+  ReadBranchCoreFilesUseCase,
+  CreateBranchCoreFilesUseCase,
   ReadJsonDocumentUseCase,
   WriteJsonDocumentUseCase,
   DeleteJsonDocumentUseCase,
@@ -14,10 +17,11 @@ import type {
   UpdateJsonIndexUseCase,
 } from "../../application/usecases/index.js";
 import { DocumentType } from "../../domain/entities/JsonDocument.js";
-import { BaseError } from "../../shared/errors/BaseError.js";
+import { ApplicationError } from "../../shared/errors/ApplicationError.js";
 import { DomainError } from "../../shared/errors/DomainError.js";
+import { InfrastructureError } from "../../shared/errors/InfrastructureError.js";
 import { logger } from "../../shared/utils/logger.js";
-import type { MCPResponsePresenter } from "../presenters/types/MCPResponsePresenter.js";
+import type { MCPResponsePresenter } from "../presenters/MCPResponsePresenter.js";
 import type { MCPResponse } from "../presenters/types/MCPResponse.js";
 import type { IBranchController } from "./interfaces/IBranchController.js";
 
@@ -27,7 +31,7 @@ import type { IBranchController } from "./interfaces/IBranchController.js";
  */
 export class BranchController implements IBranchController {
   readonly _type = 'controller' as const;
-  
+
   // Optional dependencies
   private readonly updateTagIndexUseCaseV2?: UpdateTagIndexUseCaseV2;
   private readonly readJsonDocumentUseCase?: ReadJsonDocumentUseCase;
@@ -35,13 +39,15 @@ export class BranchController implements IBranchController {
   private readonly deleteJsonDocumentUseCase?: DeleteJsonDocumentUseCase;
   private readonly searchJsonDocumentsUseCase?: SearchJsonDocumentsUseCase;
   private readonly updateJsonIndexUseCase?: UpdateJsonIndexUseCase;
-  
+
   constructor(
     private readonly readBranchDocumentUseCase: ReadBranchDocumentUseCase,
     private readonly writeBranchDocumentUseCase: WriteBranchDocumentUseCase,
     private readonly searchDocumentsByTagsUseCase: SearchDocumentsByTagsUseCase,
     private readonly updateTagIndexUseCase: UpdateTagIndexUseCase,
     private readonly getRecentBranchesUseCase: GetRecentBranchesUseCase,
+    private readonly readBranchCoreFilesUseCase: ReadBranchCoreFilesUseCase,
+    private readonly createBranchCoreFilesUseCase: CreateBranchCoreFilesUseCase,
     private readonly presenter: MCPResponsePresenter,
     options?: {
       updateTagIndexUseCaseV2?: UpdateTagIndexUseCaseV2;
@@ -71,12 +77,50 @@ export class BranchController implements IBranchController {
     try {
       logger.info(`Reading document from branch ${branchName}: ${path}`);
 
-      const result = await this.readBranchDocumentUseCase.execute({ 
+      const result = await this.readBranchDocumentUseCase.execute({
         branchName,
-        path 
+        path
       });
 
-      return this.presenter.present(result.document);
+      // 自動JSONパース処理の追加
+      // jsonファイルかつcontent.textフィールドが存在する場合、JSONとしてパースを試みる
+      const document = result.document;
+      if (document && path.endsWith('.json') && document.content) {
+        try {
+          // 文字列をJSONとしてパース
+          const jsonDoc = JSON.parse(document.content);
+
+          // memory_document_v1またはmemory_document_v2スキーマを持つドキュメントで、
+          // content.textフィールドがある場合は自動的にパースを試みる
+          if (
+            (jsonDoc.schema === 'memory_document_v1' || jsonDoc.schema === 'memory_document_v2') &&
+            jsonDoc.content &&
+            typeof jsonDoc.content === 'object' &&
+            'text' in jsonDoc.content &&
+            typeof jsonDoc.content.text === 'string'
+          ) {
+            logger.debug(`Attempting to auto-parse content.text field in JSON document: ${path}`);
+
+            try {
+              // content.textをJSONとしてパース
+              const parsedText = JSON.parse(jsonDoc.content.text);
+              // パースに成功したら、元のJSONオブジェクトのcontent.textをパース済みのオブジェクトに置き換え
+              jsonDoc.content.text = parsedText;
+              // 置き換えたJSONオブジェクトを文字列化して元のdocumentに設定
+              document.content = JSON.stringify(jsonDoc, null, 2);
+              logger.debug(`Successfully auto-parsed content.text in JSON document: ${path}`);
+            } catch (parseError) {
+              // パースに失敗した場合は元のまま（パースしない）
+              logger.debug(`Failed to auto-parse content.text in JSON document ${path}, it's probably not a valid JSON string`);
+            }
+          }
+        } catch (error) {
+          // JSONとしてパースできなかった場合は何もしない
+          logger.debug(`Document ${path} is not a valid JSON`);
+        }
+      }
+
+      return this.presenter.present(document);
     } catch (error) {
       return this.handleError(error);
     }
@@ -123,40 +167,120 @@ export class BranchController implements IBranchController {
     try {
       logger.info(`Reading core files from branch ${branchName}`);
 
-      // Define core files to read
-      const coreFilePaths = [
-        'progress.json',
-        'activeContext.json',
-        'branchContext.json',
-        'systemPattern.json',
-      ];
+      // Use the new ReadBranchCoreFilesUseCase
+      const result = await this.readBranchCoreFilesUseCase.execute({
+        branchName,
+      });
 
-      const result: Record<string, DocumentDTO> = {};
+      // Format response to maintain backward compatibility
+      const formattedResult: Record<string, DocumentDTO> = {};
 
-      // Read each core file
-      for (const path of coreFilePaths) {
+      // Determine which file extension to use (.json preferred)
+      let useJsonExtension = true;
+
+      // Check for existence of files to determine extension preference
+      try {
+        // Try to find a branchContext file to check which extension is available
+        // Check json first
+        await this.readBranchDocumentUseCase.execute({
+          branchName,
+          path: 'branchContext.json',
+        });
+        useJsonExtension = true;
+        logger.debug(`Using .json extension for files in branch ${branchName}`);
+      } catch (jsonError) {
         try {
-          const readResult = await this.readBranchDocumentUseCase.execute({
+          // Try md if json failed
+          await this.readBranchDocumentUseCase.execute({
             branchName,
-            path,
+            path: 'branchContext.md',
           });
-          
-          result[path] = readResult.document;
-        } catch (error) {
-          // Log error but continue with other files
-          logger.error(`Error reading core file ${path} from branch ${branchName}:`, error);
-          
-          // Add empty placeholder for missing file
-          result[path] = {
-            path,
-            content: '',
-            tags: [],
-            lastModified: new Date().toISOString(),
-          };
+          useJsonExtension = false;
+          logger.debug(`Using .md extension for files in branch ${branchName}`);
+        } catch (mdError) {
+          // If both fail, default to json (forward compatible)
+          useJsonExtension = true;
+          logger.debug(`No core files found, defaulting to .json extension for branch ${branchName}`);
         }
       }
 
-      return this.presenter.present(result);
+      // File extension to use based on availability
+      const extension = useJsonExtension ? '.json' : '.md';
+
+      // If activeContext exists in the result
+      if (result.files.activeContext) {
+        const fileName = `activeContext${extension}`;
+        formattedResult[fileName] = {
+          path: fileName,
+          content: this.generateActiveContextContent(result.files.activeContext),
+          tags: ['core', 'active-context'],
+          lastModified: new Date().toISOString(),
+        };
+      }
+
+      // If progress exists in the result
+      if (result.files.progress) {
+        const fileName = `progress${extension}`;
+        formattedResult[fileName] = {
+          path: fileName,
+          content: this.generateProgressContent(result.files.progress),
+          tags: ['core', 'progress'],
+          lastModified: new Date().toISOString(),
+        };
+      }
+
+      // If systemPatterns exists in the result
+      if (result.files.systemPatterns) {
+        const fileName = `systemPatterns${extension}`;
+        formattedResult[fileName] = {
+          path: fileName,
+          content: this.generateSystemPatternsContent(result.files.systemPatterns),
+          tags: ['core', 'system-patterns'],
+          lastModified: new Date().toISOString(),
+        };
+      }
+
+      // For branchContext, try both extensions (.json first, then .md as fallback)
+      try {
+        const branchFileName = `branchContext${extension}`;
+        let branchContextResult;
+
+        try {
+          branchContextResult = await this.readBranchDocumentUseCase.execute({
+            branchName,
+            path: branchFileName,
+          });
+        } catch (primaryError) {
+          logger.warn(`Could not find ${branchFileName}, trying fallback extension`);
+          // If first extension fails, try the other one
+          const fallbackExtension = useJsonExtension ? '.md' : '.json';
+          const fallbackFileName = `branchContext${fallbackExtension}`;
+
+          branchContextResult = await this.readBranchDocumentUseCase.execute({
+            branchName,
+            path: fallbackFileName,
+          });
+
+          // If fallback worked, use that extension for this file
+          formattedResult[fallbackFileName] = branchContextResult.document;
+          return this.presenter.present(formattedResult);
+        }
+
+        formattedResult[branchFileName] = branchContextResult.document;
+      } catch (error) {
+        logger.error(`Error reading branchContext file from branch ${branchName}:`, error);
+
+        // Add empty placeholder for missing file
+        const fallbackFileName = `branchContext${extension}`;
+        formattedResult[fallbackFileName] = {
+          path: fallbackFileName,
+          content: '',
+          tags: ['core', 'branch-context'],
+          lastModified: new Date().toISOString(),
+        };
+      }
+
+      return this.presenter.present(formattedResult);
     } catch (error) {
       return this.handleError(error);
     }
@@ -172,19 +296,63 @@ export class BranchController implements IBranchController {
     try {
       logger.info(`Writing core files to branch ${branchName}`);
 
-      // Process each file in the record
-      for (const [path, content] of Object.entries(files)) {
+      // Validate input
+      if (!files || typeof files !== 'object') {
+        // Assuming DomainError constructor takes code as string
+        throw new DomainError(
+          'VALIDATION_ERROR',
+          'Files must be provided as an object'
+        );
+      }
+
+      // Handle branchContext.md separately since it's not part of the CoreFilesDTO
+      if (files['branchContext.md']) {
+        const content = this.extractContent(files['branchContext.md']);
+
         await this.writeBranchDocumentUseCase.execute({
           branchName,
           document: {
-            path,
-            content: typeof content === 'string' ? content : JSON.stringify(content, null, 2),
-            tags: ['core'],
+            path: 'branchContext.md',
+            content,
+            tags: ['core', 'branch-context'],
           },
+        });
+
+        // Remove from files to avoid processing it again
+        delete files['branchContext.md'];
+      }
+
+      // Prepare CoreFilesDTO from the remaining files
+      const coreFiles: CoreFilesDTO = {};
+
+      // Process activeContext.md
+      if (files['activeContext.md']) {
+        const content = this.extractContent(files['activeContext.md']);
+        coreFiles.activeContext = this.parseActiveContextContent(content);
+      }
+
+      // Process progress.md
+      if (files['progress.md']) {
+        const content = this.extractContent(files['progress.md']);
+        coreFiles.progress = this.parseProgressContent(content);
+      }
+
+      // Process systemPatterns.md
+      if (files['systemPatterns.md']) {
+        const content = this.extractContent(files['systemPatterns.md']);
+        coreFiles.systemPatterns = this.parseSystemPatternsContent(content);
+      }
+
+      // Use the new CreateBranchCoreFilesUseCase
+      let result: any;
+      if (Object.keys(coreFiles).length > 0) {
+        result = await this.createBranchCoreFilesUseCase.execute({
+          branchName,
+          files: coreFiles,
         });
       }
 
-      return this.presenter.present({ success: true });
+      return this.presenter.present(result || { success: true });
     } catch (error) {
       return this.handleError(error);
     }
@@ -471,6 +639,313 @@ export class BranchController implements IBranchController {
   }
 
   /**
+   * Extract content from various input formats
+   * @param input Input content (string or object with content property)
+   * @returns Extracted content string
+   */
+  private extractContent(input: any): string {
+    if (typeof input === 'string') {
+      return input;
+    } else if (input && typeof input === 'object' && 'content' in input) {
+      return input.content as string;
+    }
+
+    // Assuming DomainError constructor takes code as string
+    throw new DomainError('VALIDATION_ERROR', 'Invalid content format');
+  }
+
+  /**
+   * Parse activeContext content from markdown
+   * @param content Markdown content
+   * @returns ActiveContextDTO
+   */
+  private parseActiveContextContent(content: string): any {
+    // Simple parsing, in real implementation this would use the same parser as in ReadBranchCoreFilesUseCase
+    const result: any = {
+      currentWork: '',
+      recentChanges: [],
+      activeDecisions: [],
+      considerations: [],
+      nextSteps: [],
+    };
+
+    // Extract current work
+    const currentWorkMatch = content.match(/## 現在の作業内容\n\n(.*?)(?:\n##|$)/s);
+    if (currentWorkMatch && currentWorkMatch[1].trim()) {
+      result.currentWork = currentWorkMatch[1].trim();
+    }
+
+    // Extract recent changes
+    const recentChangesMatch = content.match(/## 最近の変更点\n\n(.*?)(?:\n##|$)/s);
+    if (recentChangesMatch && recentChangesMatch[1].trim()) {
+      result.recentChanges = recentChangesMatch[1]
+        .trim()
+        .split('\n')
+        .filter((line) => line.startsWith('- '))
+        .map((line) => line.substring(2).trim());
+    }
+
+    // Extract active decisions
+    const activeDecisionsMatch = content.match(/## アクティブな決定事項\n\n(.*?)(?:\n##|$)/s);
+    if (activeDecisionsMatch && activeDecisionsMatch[1].trim()) {
+      result.activeDecisions = activeDecisionsMatch[1]
+        .trim()
+        .split('\n')
+        .filter((line) => line.startsWith('- '))
+        .map((line) => line.substring(2).trim());
+    }
+
+    // Extract considerations
+    const considerationsMatch = content.match(/## 検討事項\n\n(.*?)(?:\n##|$)/s);
+    if (considerationsMatch && considerationsMatch[1].trim()) {
+      result.considerations = considerationsMatch[1]
+        .trim()
+        .split('\n')
+        .filter((line) => line.startsWith('- '))
+        .map((line) => line.substring(2).trim());
+    }
+
+    // Extract next steps
+    const nextStepsMatch = content.match(/## 次のステップ\n\n(.*?)(?:\n##|$)/s);
+    if (nextStepsMatch && nextStepsMatch[1].trim()) {
+      result.nextSteps = nextStepsMatch[1]
+        .trim()
+        .split('\n')
+        .filter((line) => line.startsWith('- '))
+        .map((line) => line.substring(2).trim());
+    }
+
+    return result;
+  }
+
+  /**
+   * Parse progress content from markdown
+   * @param content Markdown content
+   * @returns ProgressDTO
+   */
+  private parseProgressContent(content: string): any {
+    // Simple parsing, in real implementation this would use the same parser as in ReadBranchCoreFilesUseCase
+    const result: any = {
+      workingFeatures: [],
+      pendingImplementation: [],
+      status: '',
+      knownIssues: [],
+    };
+
+    // Extract working features
+    const workingFeaturesMatch = content.match(/## 動作している機能\n\n(.*?)(?:\n##|$)/s);
+    if (workingFeaturesMatch && workingFeaturesMatch[1].trim()) {
+      result.workingFeatures = workingFeaturesMatch[1]
+        .trim()
+        .split('\n')
+        .filter((line) => line.startsWith('- '))
+        .map((line) => line.substring(2).trim());
+    }
+
+    // Extract pending implementation
+    const pendingImplementationMatch = content.match(/## 未実装の機能\n\n(.*?)(?:\n##|$)/s);
+    if (pendingImplementationMatch && pendingImplementationMatch[1].trim()) {
+      result.pendingImplementation = pendingImplementationMatch[1]
+        .trim()
+        .split('\n')
+        .filter((line) => line.startsWith('- '))
+        .map((line) => line.substring(2).trim());
+    }
+
+    // Extract status
+    const statusMatch = content.match(/## 現在の状態\n\n(.*?)(?:\n##|$)/s);
+    if (statusMatch && statusMatch[1].trim()) {
+      result.status = statusMatch[1].trim();
+    }
+
+    // Extract known issues
+    const knownIssuesMatch = content.match(/## 既知の問題\n\n(.*?)(?:\n##|$)/s);
+    if (knownIssuesMatch && knownIssuesMatch[1].trim()) {
+      result.knownIssues = knownIssuesMatch[1]
+        .trim()
+        .split('\n')
+        .filter((line) => line.startsWith('- '))
+        .map((line) => line.substring(2).trim());
+    }
+
+    return result;
+  }
+
+  /**
+   * Parse system patterns content from markdown
+   * @param content Markdown content
+   * @returns SystemPatternsDTO
+   */
+  private parseSystemPatternsContent(content: string): any {
+    // Simple parsing, in real implementation this would use the same parser as in ReadBranchCoreFilesUseCase
+    const result: any = {
+      technicalDecisions: [],
+    };
+
+    // Find all technical decisions sections
+    const decisions = content.match(
+      /### (.+?)\n\n#### コンテキスト\n\n(.*?)\n\n#### 決定事項\n\n(.*?)\n\n#### 影響\n\n(.*?)(?=\n###|\n##|$)/gs
+    );
+
+    if (decisions) {
+      result.technicalDecisions = decisions.map((decision) => {
+        // Extract parts of each decision
+        const titleMatch = decision.match(/### (.+?)\n/);
+        const contextMatch = decision.match(/#### コンテキスト\n\n(.*?)\n\n/s);
+        const decisionMatch = decision.match(/#### 決定事項\n\n(.*?)\n\n/s);
+        const consequencesMatch = decision.match(/#### 影響\n\n(.*?)(?=\n###|\n##|$)/s);
+
+        // Parse consequences list
+        const consequences = consequencesMatch
+          ? consequencesMatch[1]
+            .trim()
+            .split('\n')
+            .filter((line) => line.startsWith('- '))
+            .map((line) => line.substring(2).trim())
+          : [];
+
+        return {
+          title: titleMatch ? titleMatch[1].trim() : '',
+          context: contextMatch ? contextMatch[1].trim() : '',
+          decision: decisionMatch ? decisionMatch[1].trim() : '',
+          consequences,
+        };
+      });
+    }
+
+    return result;
+  }
+
+  /**
+   * Generate markdown content from ActiveContextDTO
+   * @param activeContext ActiveContextDTO
+   * @returns Markdown content
+   */
+  private generateActiveContextContent(activeContext: any): string {
+    let markdown = '# アクティブコンテキスト\n\n';
+
+    // Current Work
+    markdown += '## 現在の作業内容\n\n';
+    if (activeContext.currentWork) {
+      markdown += `${activeContext.currentWork}\n`;
+    }
+
+    // Recent Changes
+    markdown += '## 最近の変更点\n\n';
+    if (activeContext.recentChanges && activeContext.recentChanges.length > 0) {
+      activeContext.recentChanges.forEach((change: string) => {
+        markdown += `- ${change}\n`;
+      });
+    }
+
+    // Active Decisions
+    markdown += '## アクティブな決定事項\n\n';
+    if (activeContext.activeDecisions && activeContext.activeDecisions.length > 0) {
+      activeContext.activeDecisions.forEach((decision: string) => {
+        markdown += `- ${decision}\n`;
+      });
+    }
+
+    // Considerations
+    markdown += '## 検討事項\n\n';
+    if (activeContext.considerations && activeContext.considerations.length > 0) {
+      activeContext.considerations.forEach((consideration: string) => {
+        markdown += `- ${consideration}\n`;
+      });
+    }
+
+    // Next Steps
+    markdown += '## 次のステップ\n\n';
+    if (activeContext.nextSteps && activeContext.nextSteps.length > 0) {
+      activeContext.nextSteps.forEach((step: string) => {
+        markdown += `- ${step}\n`;
+      });
+    }
+
+    return markdown;
+  }
+
+  /**
+   * Generate markdown content from ProgressDTO
+   * @param progress ProgressDTO
+   * @returns Markdown content
+   */
+  private generateProgressContent(progress: any): string {
+    let markdown = '# 進捗状況\n\n';
+
+    // Working Features
+    markdown += '## 動作している機能\n\n';
+    if (progress.workingFeatures && progress.workingFeatures.length > 0) {
+      progress.workingFeatures.forEach((feature: string) => {
+        markdown += `- ${feature}\n`;
+      });
+    }
+
+    // Pending Implementation
+    markdown += '## 未実装の機能\n\n';
+    if (progress.pendingImplementation && progress.pendingImplementation.length > 0) {
+      progress.pendingImplementation.forEach((item: string) => {
+        markdown += `- ${item}\n`;
+      });
+    }
+
+    // Current Status
+    markdown += '## 現在の状態\n\n';
+    if (progress.status) {
+      markdown += `${progress.status}\n`;
+    }
+
+    // Known Issues
+    markdown += '## 既知の問題\n\n';
+    if (progress.knownIssues && progress.knownIssues.length > 0) {
+      progress.knownIssues.forEach((issue: string) => {
+        markdown += `- ${issue}\n`;
+      });
+    }
+
+    return markdown;
+  }
+
+  /**
+   * Generate markdown content from SystemPatternsDTO
+   * @param systemPatterns SystemPatternsDTO
+   * @returns Markdown content
+   */
+  private generateSystemPatternsContent(systemPatterns: any): string {
+    let markdown = '# システムパターン\n\n';
+
+    // Technical Decisions
+    markdown += '## 技術的決定事項\n\n';
+
+    if (systemPatterns.technicalDecisions && systemPatterns.technicalDecisions.length > 0) {
+      systemPatterns.technicalDecisions.forEach((decision: any) => {
+        // Decision title
+        markdown += `### ${decision.title}\n\n`;
+
+        // Context
+        markdown += '#### コンテキスト\n\n';
+        markdown += `${decision.context}\n\n`;
+
+        // Decision
+        markdown += '#### 決定事項\n\n';
+        markdown += `${decision.decision}\n\n`;
+
+        // Consequences
+        markdown += '#### 影響\n\n';
+        if (decision.consequences && decision.consequences.length > 0) {
+          decision.consequences.forEach((consequence: string) => {
+            markdown += `- ${consequence}\n`;
+          });
+        }
+
+        markdown += '\n';
+      });
+    }
+
+    return markdown;
+  }
+
+  /**
    * Handle errors in controller methods
    * @param error Error to handle
    * @returns Formatted error response
@@ -484,13 +959,15 @@ export class BranchController implements IBranchController {
       stack: error instanceof Error ? error.stack : undefined
     });
 
-    if (error instanceof BaseError || error instanceof DomainError) {
+    // Remove BaseError check, assume DomainError covers ApplicationError and InfrastructureError if needed, or adjust based on actual hierarchy
+    if (error instanceof DomainError || error instanceof ApplicationError || error instanceof InfrastructureError) {
       return this.presenter.presentError(error);
     }
 
-    // Unknown error
+    // Unknown error - Wrap in a standard error type if possible, e.g., ApplicationError or DomainError
+    // Using DomainError as per previous context
     return this.presenter.presentError(
-      new DomainError(
+      new DomainError( // Assuming DomainError can represent unexpected errors
         'UNEXPECTED_ERROR',
         error instanceof Error ? error.message : 'An unexpected error occurred',
         { originalError: error }

@@ -36,6 +36,11 @@
         "task": "BranchControllerのスケルトン作成",
         "details": "基本的なクラス構造は作成したが、メソッドの実装で問題が発生",
         "status": "一部完了"
+      },
+      {
+        "task": "BranchController ロジックの移植",
+        "details": "`packages/mcp/src/interface/controllers/BranchController.ts` に元のロジックを移植。不足メソッド追加、エラー処理修正済み（インポートエラーは未解決）",
+        "status": "完了"
       }
     ],
     "pendingTasks": [
@@ -65,8 +70,13 @@
         "issue": "既存ファイルの削除と再作成の難しさ",
         "details": "既存ファイルを一度削除して再作成するアプローチがうまくいかなかった",
         "status": "対応中"
+      },
+      {
+        "issue": "BranchController 移行中にインポートエラーとメソッド不足エラーが発生",
+        "details": "インポートパスのずれ、generate/parse系メソッドの不足、エラークラスの不整合が原因",
+        "status": "対応中"
       }
     ],
-    "nextActions": "次回は、より小さな単位での編集アプローチを取り、1メソッドずつ慎重に実装していく。各メソッド追加後は必ずView機能で構造を確認する。"
+    "nextActions": "BranchControllerの移植完了。インポートエラーはファイル移行後に対応予定。"
   }
 }
