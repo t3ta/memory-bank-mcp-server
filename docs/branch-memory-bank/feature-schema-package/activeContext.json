@@ -13,8 +13,16 @@
     "version": 3
   },
   "content": {
-    "currentWork": "フェーズ7-8 スキーマインポートの修正とMCPパッケージの構築",
+    "currentWork": "フェーズ7-8完了 スキーマインポートの修正とMCPパッケージの基本構造構築",
     "recentChanges": [
+      {
+        "date": "2025-03-28T01:50:00.000Z",
+        "description": "残りのスキーマインポート（FileSystemBranchMemoryBankRepository, II18nProvider）を@memory-bank/schemas参照に修正"
+      },
+      {
+        "date": "2025-03-28T02:00:00.000Z",
+        "description": "MCPパッケージのsrcディレクトリにプレースホルダー実装を作成し、ビルドが成功するようにした"
+      },
       {
         "date": "2025-03-28T01:10:00.000Z",
         "description": "MCPパッケージのtsconfig.jsonを修正し、スキーマパッケージを認識できるように設定"
@@ -101,18 +109,23 @@
         "id": "37e9a826-5f1c-42d7-b080-9a321c654f87",
         "description": "VSCode拡張の開発準備",
         "status": "pending"
+      },
+      {
+        "id": "c5d6e7f8-9a0b-1c2d-3e4f-5g6h7i8j9k0l",
+        "description": "既存のコードをMCPパッケージに機能ブロック単位で移動する作業は慎重に行う必要がある。一度にすべてを移動するのではなく、段階的に移行するアプローチを取る",
+        "status": "active"
       }
     ],
     "nextSteps": [
       {
         "id": "next-1",
         "priority": "high",
-        "description": "既存のsrc/ディレクトリのコードを機能ブロック単位でMCPパッケージに移行する"
+        "description": "既存のコードをMCPパッケージに機能ブロック単位で移行する（ドメイン、アプリケーション、インフラストラクチャ、インターフェースの順）"
       },
       {
         "id": "next-2",
         "priority": "high",
-        "description": "src/index.tsの修正で新しいMCPパッケージを使うようにする"
+        "description": "既存のsrc/index.tsを新しいMCPパッケージベースに書き換える"
       },
       {
         "id": "next-3",
@@ -122,7 +135,7 @@
       {
         "id": "next-4",
         "priority": "medium",
-        "description": "MCPパッケージのビルドが成功するように設定を修正する"
+        "description": "すべての移行完了後に最終テストとドキュメント更新を行う"
       }
     ]
   }

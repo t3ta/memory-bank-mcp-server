@@ -68,19 +68,19 @@
         "id": "5k6l7m8-n9o0-p1q2-r3s4-t5u6v7w8x9y0",
         "description": "ビルド環境の設定とシンボリックリンクの修正",
         "completedAt": "2025-03-28T01:20:00.000Z"
+      },
+      {
+        "id": "7m1n8o9-p0q1-r2s3-t4u5-v6w7x8y9z0a1",
+        "description": "残りのスキーマインポートを@memory-bank/schemasパッケージの参照に変更（FileSystemBranchMemoryBankRepository, II18nProvider）",
+        "completedAt": "2025-03-28T01:50:00.000Z"
+      },
+      {
+        "id": "8n2o3p4-q5r6-s7t8-u9v0-w1x2y3z4a5b6",
+        "description": "MCPパッケージのsrcディレクトリの基本構造とプレースホルダーコードの作成",
+        "completedAt": "2025-03-28T02:00:00.000Z"
       }
     ],
     "pendingImplementation": [
-      {
-        "id": "8e1f2g3-h4i5-j6k7-l8m9-n0o1p2q3r4s5",
-        "priority": "high",
-        "description": "残りのスキーマインポートを@memory-bank/schemasパッケージの参照に変更"
-      },
-      {
-        "id": "9f2g3h4-i5j6-k7l8-m9n0-o1p2q3r4s5t6",
-        "priority": "high",
-        "description": "MCPパッケージのsrcディレクトリ構造の作成"
-      },
       {
         "id": "0g3h4i5-j6k7-l8m9-n0o1-p2q3r4s5t6u7",
         "priority": "high",
@@ -112,20 +112,20 @@
         "description": "使用されていないコードの特定と削除"
       }
     ],
-    "status": "実装フェーズ7-8進行中 - スキーマインポートの修正に関しては大幅に進捗。schemasパッケージとmcpパッケージが正常にビルドできるようになり、モノレポ構造の基盤が整った。MCPパッケージには最小限の実装を追加し、型定義も整備した。残りの作業は、既存のインポートをさらに修正し、段階的に既存コードをMCPパッケージに移行すること。",
-    "completionPercentage": 85,
+    "status": "実装フェーズ7-8ほぼ完了 - 残りのスキーマインポートを@memory-bank/schemasに修正し、MCPパッケージのsrcディレクトリにプレースホルダーの基本実装を作成した。今後の作業としては、既存のメインコードをMCPパッケージに完全に移行し、ドキュメント更新などの仕上げを行う必要がある。これまでの作業で、モノレポ構造とパッケージ分割の基本構造は完成し、ビルドも成功している。",
+    "completionPercentage": 90,
     "knownIssues": [
       {
         "id": "issue-1",
         "description": "src/schemas/index.tsファイルがまだ残っていて、いくつかのファイルがそこから型やスキーマをインポートしている",
         "priority": "high",
-        "status": "active"
+        "status": "resolved"
       },
       {
         "id": "issue-2",
         "description": "MCPパッケージのsrcディレクトリが空のため、ビルドに失敗している",
         "priority": "high",
-        "status": "active"
+        "status": "resolved"
       }
     ],
     "monoRepoStructure": {
