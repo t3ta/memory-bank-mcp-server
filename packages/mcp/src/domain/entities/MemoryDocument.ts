@@ -167,13 +167,6 @@ export class MemoryDocument {
   }
 
   /**
-   * Check if the document is a markdown file
-   */
-  public get isMarkdown(): boolean {
-    return this.props.path.isMarkdown;
-  }
-
-  /**
    * Check if the document is a JSON file
    */
   public get isJSON(): boolean {

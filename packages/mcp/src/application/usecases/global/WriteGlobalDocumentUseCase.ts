@@ -35,25 +35,14 @@ export interface WriteGlobalDocumentOutput {
  */
 export class WriteGlobalDocumentUseCase
   implements IUseCase<WriteGlobalDocumentInput, WriteGlobalDocumentOutput> {
-  // Flag to disable Markdown writing
-  private readonly disableMarkdownWrites: boolean;
 
   /**
    * Constructor
    * @param globalRepository Global memory bank repository
-   * @param options Options for the use case
    */
   constructor(
-    private readonly globalRepository: IGlobalMemoryBankRepository,
-    options?: {
-      /**
-       * Whether to disable Markdown writes
-       * @default false
-       */
-      disableMarkdownWrites?: boolean;
-    }
+    private readonly globalRepository: IGlobalMemoryBankRepository
   ) {
-    this.disableMarkdownWrites = options?.disableMarkdownWrites ?? false;
   }
 
   /**
@@ -108,14 +97,6 @@ export class WriteGlobalDocumentUseCase
         tags = (input.document.tags ?? []).map((tag) => Tag.create(tag));
       }
 
-      // Check if markdown writes are disabled
-      if (this.disableMarkdownWrites && documentPath.value.toLowerCase().endsWith('.md')) {
-        const jsonPath = documentPath.value.replace(/\.md$/, '.json');
-        throw new ApplicationError(
-          ApplicationErrorCodes.OPERATION_NOT_ALLOWED,
-          `Writing to Markdown files is disabled. Please use JSON format instead: ${jsonPath}`
-        );
-      }
 
       // Initialize global memory bank if needed
       await this.globalRepository.initialize();

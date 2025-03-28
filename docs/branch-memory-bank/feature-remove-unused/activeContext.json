@@ -13,8 +13,12 @@
     "version": 2
   },
   "content": {
-    "currentWork": "テンプレート関連コード削除計画に基づき、DocumentPath.tsのマークダウン関連メソッド（isMarkdownとtoAlternateFormat）の削除を実装中。これは、マークダウン機能が完全に廃止され、JSONベースのアーキテクチャに移行するための第一ステップです。",
+    "currentWork": "マークダウン関連コードの削除作業中。DocumentPath.tsのisMarkdownとtoAlternateFormatメソッドは既に削除済みだが、MemoryDocument.tsのisMarkdownメソッド（200-202行目）がDocumentPath.tsのisMarkdownメソッドを参照しており、ビルドエラーの可能性があるため、このメソッドの削除が必要。また、WriteBranchDocumentUseCase.tsのマークダウン拡張子チェックコードは既に削除されているが、disableMarkdownWrites変数が残っている。",
     "recentChanges": [
+      {
+        "date": "2025-03-28T20:10:00.000Z",
+        "description": "DocumentPath.tsのマークダウン関連メソッド（isMarkdownとtoAlternateFormat）は既に削除されていることを確認。MemoryDocument.tsでまだisMarkdownメソッドが参照されており、この削除が必要。"
+      },
       {
         "date": "2025-03-28T19:40:00.000Z",
         "description": "テンプレート関連コード削除の実装計画を作成し、DocumentPath.tsとWriteBranchDocumentUseCase.tsの修正から着手"

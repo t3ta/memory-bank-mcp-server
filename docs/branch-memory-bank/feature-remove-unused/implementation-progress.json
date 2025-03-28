@@ -33,11 +33,13 @@
           },
           {
             "description": "isMarkdownメソッドの削除",
-            "status": "pending"
+            "status": "completed",
+            "notes": "DocumentPath.tsを確認したところ、isMarkdownメソッドは既に削除されていました。"
           },
           {
             "description": "toAlternateFormatメソッドの削除",
-            "status": "pending"
+            "status": "completed",
+            "notes": "DocumentPath.tsを確認したところ、toAlternateFormatメソッドは既に削除されていました。"
           },
           {
             "description": "ビルドエラーの確認",
@@ -159,7 +161,15 @@
         ]
       }
     ],
-    "issues": [],
-    "nextSteps": "DocumentPath.tsのマークダウン関連メソッドの削除を完了し、ビルドエラーがないことを確認した後、ステップ2に進みます。"
+    "issues": [
+      {
+        "id": "memory-document-markdown-reference",
+        "description": "MemoryDocument.tsの200-202行目でDocumentPath.tsのisMarkdownメソッド（既に削除済み）を参照しているため、ビルドエラーが発生する可能性があります。",
+        "discoveredAt": "2025-03-28T20:10:00.000Z",
+        "severity": "high",
+        "status": "open"
+      }
+    ],
+    "nextSteps": "MemoryDocument.tsのisMarkdownメソッドを削除し、ビルドエラーを解消します。その後、ステップ2（WriteBranchDocumentUseCase.tsのマークダウン拡張子チェック無効化）に進みます。WriteBranchDocumentUseCase.ts自体もマークダウン拡張子チェックは既に削除されていますが、disableMarkdownWrites変数が残っています。"
   }
 }

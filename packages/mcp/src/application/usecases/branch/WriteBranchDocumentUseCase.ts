@@ -42,25 +42,14 @@ export interface WriteBranchDocumentOutput {
  */
 export class WriteBranchDocumentUseCase
   implements IUseCase<WriteBranchDocumentInput, WriteBranchDocumentOutput> {
-  // Flag to disable Markdown writing
-  private readonly disableMarkdownWrites: boolean;
 
   /**
    * Constructor
    * @param branchRepository Branch memory bank repository
-   * @param options Options for the use case
    */
   constructor(
-    private readonly branchRepository: IBranchMemoryBankRepository,
-    options?: {
-      /**
-       * Whether to disable Markdown writes
-       * @default false
-       */
-      disableMarkdownWrites?: boolean;
-    }
+    private readonly branchRepository: IBranchMemoryBankRepository
   ) {
-    this.disableMarkdownWrites = options?.disableMarkdownWrites ?? false;
   }
 
   /**
