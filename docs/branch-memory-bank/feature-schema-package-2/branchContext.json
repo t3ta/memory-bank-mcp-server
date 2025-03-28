@@ -1,0 +1,47 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "b1c05afe-e581-41aa-a170-4006158f1161",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-28T20:15:00.000Z",
+    "createdAt": "2025-03-28T11:01:55.754Z",
+    "version": 2
+  },
+  "content": {
+    "branchName": "feature/schema-package-2",
+    "purpose": "モノレポ化とスキーマパッケージ抽出の第2フェーズ。テンプレート削除で気づいたアーキテクチャ不整合の解消とさらなるモノレポ準備を行う。",
+    "createdAt": "2025-03-28T11:01:55.754Z",
+    "userStories": [
+      {
+        "id": "5328789a-c5a4-4f24-9c2a-26f4bc42b21c",
+        "description": "アーキテクチャの責任境界を明確化してレイヤー間の依存方向を正しくしたい",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "3c86bf6f-2bf8-4253-8aab-9ca84d3f8cd0",
+        "description": "インターフェース設計を一貫させ、命名規則を統一したい",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "23f3c43c-ccd7-450e-b756-3828de2f8b3c",
+        "description": "ロギングやエラーハンドリングなどの横断的関心事を整理したい",
+        "completed": false,
+        "priority": 3
+      },
+      {
+        "id": "f8e7d6c5-b4a3-2910-8f7e-6d5c4b3a2910",
+        "description": "残っているビルドエラーを解消してモノレポ移行を加速させたい",
+        "completed": false,
+        "priority": 4
+      }
+    ],
+    "additionalNotes": "feature/schema-packageブランチで明らかになったアーキテクチャ上の問題点（レイヤー間の依存方向の不整合、インターフェース設計の一貫性なさ、横断的関心事の分散など）の解決に焦点を当てる。テンプレート関連コードの削除作業で見えてきた課題をベースに、モノレポ化とスキーマパッケージ抽出のための基盤をさらに整える。"
+  }
+}

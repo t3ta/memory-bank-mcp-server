@@ -1,0 +1,96 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "91008518-f142-41b0-8292-0287f06bc891",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context"
+    ],
+    "lastModified": "2025-03-28T20:15:00.000Z",
+    "createdAt": "2025-03-28T11:01:55.755Z",
+    "version": 2
+  },
+  "content": {
+    "currentWork": "モノレポ完全移行に向けたアーキテクチャ整理中。テンプレート関連のコード削除作業から明らかになった課題（レイヤー間の責任境界のあいまいさ、依存方向の不整合、インターフェース設計の一貫性なさ、横断的関心事の分散）について整理し、修正方針を策定している。",
+    "recentChanges": [
+      {
+        "date": "2025-03-28T20:15:00.000Z",
+        "description": "モノレポ完全移行に向けた課題整理とアーキテクチャ改善計画の策定"
+      },
+      {
+        "date": "2025-03-28T20:00:00.000Z",
+        "description": "前ブランチ(feature/schema-package)でのテンプレート関連コード削除作業のレビューと反省"
+      },
+      {
+        "date": "2025-03-28T19:35:00.000Z",
+        "description": "テンプレート関連コードの削除が完了、GlobalControllerとproviders.tsの修正も完了"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "arch-decision-1",
+        "description": "レイヤー間の依存方向を正しく（内側に向かって）するために、ドメインモデルを中心とした設計に修正する"
+      },
+      {
+        "id": "arch-decision-2",
+        "description": "インターフェース命名規則を'Ixxx'形式に統一し、一貫性を確保する"
+      },
+      {
+        "id": "arch-decision-3",
+        "description": "ロギング実装を一本化し、shared/utils/loggerを標準として採用する"
+      },
+      {
+        "id": "arch-decision-4",
+        "description": "エラーハンドリングパターンを統一し、全体で一貫した例外処理方法を採用する"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "consideration-1",
+        "description": "ファイルシステムリポジトリの肥大化問題をどのように解決するか（分割すべきか、そのままにすべきか）",
+        "status": "open"
+      },
+      {
+        "id": "consideration-2",
+        "description": "モノレポ構造での最適なディレクトリ構成とパッケージ間依存関係のあり方",
+        "status": "open"
+      },
+      {
+        "id": "consideration-3",
+        "description": "ビルドエラー解消を優先すべきか、アーキテクチャ改善を優先すべきか",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "step-1",
+        "description": "レイヤー間の責任境界を明確化する具体的な実装計画の立案",
+        "priority": "high"
+      },
+      {
+        "id": "step-2",
+        "description": "FileSystemBranchMemoryBankRepositoryの肥大化解消計画の立案",
+        "priority": "high"
+      },
+      {
+        "id": "step-3",
+        "description": "IndexService.tsのエラー（39個）解消に向けた分析と対策立案",
+        "priority": "medium"
+      },
+      {
+        "id": "step-4",
+        "description": "FileSystemGlobalMemoryBankRepositoryのエラー（8個）解消計画立案",
+        "priority": "medium"
+      }
+    ],
+    "references": [
+      {
+        "file": "architecture-refactor-plan.json",
+        "description": "アーキテクチャリファクタリング詳細計画",
+        "created_at": "2025-03-28"
+      }
+    ]
+  }
+}

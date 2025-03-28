@@ -1,0 +1,122 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "c9859467-725a-4467-ad02-11c9a184d94e",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress"
+    ],
+    "lastModified": "2025-03-28T20:15:00.000Z",
+    "createdAt": "2025-03-28T11:01:55.756Z",
+    "version": 2
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "wf-template-removal",
+        "description": "テンプレート関連コードの削除（前ブランチで完了）",
+        "implementedAt": "2025-03-28T20:00:00.000Z"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "pi-layer-boundary",
+        "description": "レイヤー間の責任境界明確化",
+        "priority": "high"
+      },
+      {
+        "id": "pi-interface-unification",
+        "description": "インターフェース設計の一貫性確保",
+        "priority": "high"
+      },
+      {
+        "id": "pi-cross-cutting",
+        "description": "横断的関心事（ロギング、エラーハンドリング）の統合",
+        "priority": "medium"
+      },
+      {
+        "id": "pi-repo-split",
+        "description": "肥大化リポジトリの分割と責務の明確化",
+        "priority": "medium"
+      },
+      {
+        "id": "pi-build-errors",
+        "description": "残りのビルドエラー（特にIndexService.ts）の解消",
+        "priority": "medium"
+      }
+    ],
+    "status": "計画策定中",
+    "completionPercentage": 5,
+    "knownIssues": [
+      {
+        "id": "ki-layering",
+        "description": "レイヤー間の依存方向が一部逆転している（外側レイヤーへの依存）",
+        "severity": "high"
+      },
+      {
+        "id": "ki-interface-inconsistency",
+        "description": "インターフェース命名規則と設計が一貫していない",
+        "severity": "medium"
+      },
+      {
+        "id": "ki-logging-duplication",
+        "description": "複数のロギング実装が混在している",
+        "severity": "medium"
+      },
+      {
+        "id": "ki-error-inconsistency",
+        "description": "エラーハンドリングパターンが統一されていない",
+        "severity": "medium"
+      },
+      {
+        "id": "ki-build-errors",
+        "description": "残りのビルドエラー（82個）が未解消",
+        "severity": "high"
+      },
+      {
+        "id": "ki-repo-bloat",
+        "description": "FileSystemBranchMemoryBankRepositoryなどリポジトリが肥大化し、単一責任の原則に違反",
+        "severity": "high"
+      }
+    ],
+    "completedTasks": [
+      {
+        "id": "ct-template-removal",
+        "title": "テンプレート関連コードの削除完了",
+        "description": "GlobalControllerとproviders.tsからテンプレート関連依存の完全削除を実施。",
+        "completedAt": "2025-03-28T20:00:00.000Z"
+      },
+      {
+        "id": "ct-arch-analysis",
+        "title": "アーキテクチャ課題の分析",
+        "description": "テンプレート削除から見えてきたアーキテクチャ上の不整合点を分析し、主要な課題を特定。",
+        "completedAt": "2025-03-28T20:15:00.000Z"
+      }
+    ],
+    "upcomingMilestones": [
+      {
+        "id": "um-layer-fix",
+        "title": "レイヤー間の依存方向修正完了",
+        "description": "クリーンアーキテクチャの原則に従い、依存方向を内側に向ける修正を完了",
+        "dueDate": "2025-03-30",
+        "status": "planned"
+      },
+      {
+        "id": "um-build-error-fix",
+        "title": "ビルドエラー解消",
+        "description": "残っている82個のビルドエラーを解消し、ビルド成功を達成",
+        "dueDate": "2025-03-31",
+        "status": "planned"
+      },
+      {
+        "id": "um-interface-unified",
+        "title": "インターフェース設計の統一",
+        "description": "すべてのインターフェースが一貫した命名規則と設計に従うよう修正",
+        "dueDate": "2025-04-01",
+        "status": "planned"
+      }
+    ]
+  }
+}

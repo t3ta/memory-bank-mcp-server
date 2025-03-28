@@ -1,0 +1,190 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "a3a5a851-7ba3-4a31-ad23-8c6344c704e3",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "system-patterns"
+    ],
+    "lastModified": "2025-03-28T20:15:00.000Z",
+    "createdAt": "2025-03-28T11:01:55.756Z",
+    "version": 2
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "td-layer-boundary",
+        "title": "レイヤー境界の明確化",
+        "context": "現状、ドメインレイヤーとアプリケーションレイヤーの責任境界があいまいになっており、インデックス管理などで複数のレイヤーにまたがる実装が混在している。また、依存方向も内側に向いていないケースが存在する。",
+        "decision": "1. 厳格なレイヤー境界を確立する\n2. 依存は内側（ドメインレイヤー）にのみ向かうようにする\n3. レイヤー間の通信は明示的なインターフェースのみを介す",
+        "consequences": {
+          "positive": [
+            "責務がより明確になる",
+            "テスト容易性が向上する",
+            "機能拡張が容易になる",
+            "コードの再利用性が高まる"
+          ],
+          "negative": [
+            "実装作業量が増加する",
+            "短期的にはコード量が増える",
+            "リファクタリングに時間を要する"
+          ]
+        },
+        "status": "approved",
+        "date": "2025-03-28T20:15:00.000Z",
+        "alternatives": [
+          {
+            "title": "現状維持",
+            "description": "既存のレイヤー間境界のままとする",
+            "tradeoffs": "実装は少ないが、長期的な技術的負債が累積する"
+          },
+          {
+            "title": "部分的リファクタリング",
+            "description": "主要な問題のみを対象とした部分的なリファクタリング",
+            "tradeoffs": "迅速だが、一貫性のない設計になる恐れがある"
+          }
+        ]
+      },
+      {
+        "id": "td-interface-naming",
+        "title": "インターフェース設計の一貫性確保",
+        "context": "現在のコードベースではインターフェース命名規則が混在しており、一部は'Ixxx'形式、一部は'xxxRepositoryImpl'形式、さらに別の部分ではインターフェースなしの直接実装となっている。",
+        "decision": "1. すべてのインターフェース名を'Ixxx'形式に統一する\n2. メソッドシグネチャを一貫させる（特に非同期処理の扱い）\n3. インターフェースはドメインレイヤーに配置する",
+        "consequences": {
+          "positive": [
+            "コードの一貫性が向上する",
+            "可読性が改善される",
+            "新規開発者の学習コストが減少する"
+          ],
+          "negative": [
+            "多くのファイルで名前変更が必要",
+            "リネームによる一時的な不整合リスク"
+          ]
+        },
+        "status": "proposed",
+        "date": "2025-03-28T20:15:00.000Z",
+        "alternatives": [
+          {
+            "title": "混在を許容",
+            "description": "既存の命名規則の混在を許容し、新規コードに対してのみ規則を適用",
+            "tradeoffs": "移行工数は少ないが長期的な一貫性が損なわれる"
+          }
+        ]
+      },
+      {
+        "id": "td-cross-cutting",
+        "title": "横断的関心事の統合",
+        "context": "ロギング実装やエラーハンドリングなどの横断的関心事が複数の場所に散らばり、実装も不統一になっている。",
+        "decision": "1. ロギング実装を一本化（shared/utils/loggerを標準に）\n2. 一貫したエラーハンドリングパターンの適用\n3. 共通の横断的関心事を担うユーティリティの整理",
+        "consequences": {
+          "positive": [
+            "コード全体の一貫性向上",
+            "デバッグ容易性の改善",
+            "エラー発生時の追跡が容易になる"
+          ],
+          "negative": [
+            "既存コードの広範囲な修正が必要",
+            "短期的な移行コストが高い"
+          ]
+        },
+        "status": "proposed",
+        "date": "2025-03-28T20:15:00.000Z",
+        "alternatives": [
+          {
+            "title": "段階的移行",
+            "description": "新規コードと修正が必要なコードのみに新しいパターンを適用",
+            "tradeoffs": "混在状態が長期化するが移行リスクが低減"
+          }
+        ]
+      },
+      {
+        "id": "td-repo-split",
+        "title": "肥大化リポジトリの分割",
+        "context": "FileSystemBranchMemoryBankRepositoryなど一部のリポジトリが肥大化しており、単一責任の原則に反している。",
+        "decision": "1. 責務ごとにリポジトリを分割（読み取り/書き込み/インデックス管理等）\n2. コンポジションパターンの適用による統合\n3. 狭いインターフェースの設計",
+        "consequences": {
+          "positive": [
+            "テスト容易性の向上",
+            "コードの凝集度向上",
+            "拡張性の改善"
+          ],
+          "negative": [
+            "クラス数の増加",
+            "設計の複雑化",
+            "リファクタリングの難易度"
+          ]
+        },
+        "status": "under_discussion",
+        "date": "2025-03-28T20:15:00.000Z",
+        "alternatives": [
+          {
+            "title": "内部メソッド整理のみ",
+            "description": "分割せずに内部メソッドの整理と責務の明確化のみを行う",
+            "tradeoffs": "大規模な変更を避けられるが、根本的な問題解決にはならない"
+          },
+          {
+            "title": "ファサードパターンの適用",
+            "description": "リポジトリ自体は分割せず、ファサードを通じたアクセス制御",
+            "tradeoffs": "移行が容易だが単一責任原則の違反は解消されない"
+          }
+        ]
+      }
+    ],
+    "implementationPatterns": [
+      {
+        "id": "impl-pattern-1",
+        "name": "クリーンアーキテクチャの依存方向",
+        "description": "依存は常に内側（ドメインレイヤー）に向かう。外側のレイヤーは内側のレイヤーに依存するが、内側のレイヤーは外側のレイヤーに依存しない。",
+        "examples": [
+          {
+            "name": "リポジトリインターフェース",
+            "code": "// ドメインレイヤーに配置\nexport interface IMemoryBankRepository {\n  readDocument(path: string): Promise<Document>;\n  writeDocument(document: Document): Promise<void>;\n}\n\n// インフラレイヤーに実装\nexport class FileSystemMemoryBankRepository implements IMemoryBankRepository {\n  // 実装...\n}"
+          },
+          {
+            "name": "ユースケース",
+            "code": "export class ReadDocumentUseCase {\n  constructor(private repository: IMemoryBankRepository) {}\n  \n  execute(params: {path: string}): Promise<Document> {\n    return this.repository.readDocument(params.path);\n  }\n}"
+          }
+        ],
+        "context": "クリーンアーキテクチャでは、依存方向を内側に向けることで、コアビジネスルールを技術的実装から切り離し、テスト容易性と保守性を高める。"
+      },
+      {
+        "id": "impl-pattern-2",
+        "name": "リポジトリの責務分割",
+        "description": "大きなリポジトリを責務ごとに分割し、インターフェースの分離原則(ISP)を適用する。",
+        "examples": [
+          {
+            "name": "読み取り専用リポジトリ",
+            "code": "export interface IReadOnlyMemoryBankRepository {\n  readDocument(path: string): Promise<Document>;\n  listDocuments(): Promise<string[]>;\n}"
+          },
+          {
+            "name": "書き込み専用リポジトリ",
+            "code": "export interface IWriteOnlyMemoryBankRepository {\n  writeDocument(document: Document): Promise<void>;\n  deleteDocument(path: string): Promise<void>;\n}"
+          },
+          {
+            "name": "インデックスリポジトリ",
+            "code": "export interface ITagIndexRepository {\n  updateTagIndex(document: Document): Promise<void>;\n  searchByTag(tag: string): Promise<Document[]>;\n}"
+          }
+        ],
+        "context": "大きなインターフェースを複数の小さなインターフェースに分割することで、クライアントは必要なメソッドだけを使用でき、実装もシンプルになる。"
+      },
+      {
+        "id": "impl-pattern-3",
+        "name": "エラーハンドリングパターン",
+        "description": "一貫したエラーハンドリングパターンの適用により、障害管理を改善する。",
+        "examples": [
+          {
+            "name": "ドメインエラー",
+            "code": "export class DomainError extends Error {\n  constructor(\n    public readonly code: string,\n    message: string,\n    public readonly details?: any\n  ) {\n    super(message);\n    this.name = 'DomainError';\n  }\n}"
+          },
+          {
+            "name": "ユースケースでのエラーハンドリング",
+            "code": "execute(params: {path: string}): Promise<Document> {\n  try {\n    // 実行ロジック\n  } catch (error) {\n    if (error instanceof DomainError) {\n      throw error; // ドメインエラーはそのまま再スロー\n    }\n    \n    // 未知のエラーはラップして詳細を保持\n    throw new DomainError(\n      'UNEXPECTED_ERROR',\n      'An unexpected error occurred',\n      { originalError: error }\n    );\n  }\n}"
+          }
+        ],
+        "context": "エラーハンドリングを標準化することで、エラーの発生元から処理までの追跡が容易になり、システム全体の堅牢性が向上する。"
+      }
+    ]
+  }
+}
