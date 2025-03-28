@@ -29,6 +29,7 @@ export const DomainErrorCodes = {
   INVALID_TAG: 'INVALID_TAG',
   REPOSITORY_ERROR: 'REPOSITORY_ERROR',
   JSON_PARSE_ERROR: 'JSON_PARSE_ERROR',
+  INITIALIZATION_ERROR: 'INITIALIZATION_ERROR', // New error code for initialization failures
 
   // JSON Patch 関連のエラーコード
   INVALID_JSON_PATH: 'INVALID_JSON_PATH',

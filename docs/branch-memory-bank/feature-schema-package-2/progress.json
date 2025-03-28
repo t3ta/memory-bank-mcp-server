@@ -8,9 +8,9 @@
     "tags": [
       "progress"
     ],
-    "lastModified": "2025-03-29T09:20:00.000Z",
+    "lastModified": "2025-03-29T10:30:00.000Z",
     "createdAt": "2025-03-28T11:01:55.756Z",
-    "version": 3
+    "version": 4
   },
   "content": {
     "workingFeatures": [
@@ -23,6 +23,11 @@
         "id": "wf-refactor-plan",
         "description": "アーキテクチャリファクタリング計画策定",
         "implementedAt": "2025-03-29T09:15:00.000Z"
+      },
+      {
+        "id": "wf-domain-dependency-inversion",
+        "description": "ドメインエンティティの依存関係を内側に向ける修正",
+        "implementedAt": "2025-03-29T10:30:00.000Z"
       }
     ],
     "pendingImplementation": [
@@ -52,8 +57,8 @@
         "priority": "medium"
       }
     ],
-    "status": "詳細計画策定完了、実装準備中",
-    "completionPercentage": 10,
+    "status": "フェーズ1の実装中：JsonDocumentエンティティのリファクタリング完了",
+    "completionPercentage": 20,
     "knownIssues": [
       {
         "id": "ki-layering",
@@ -104,6 +109,12 @@
         "title": "アーキテクチャリファクタリング詳細計画策定",
         "description": "4つのフェーズから成るリファクタリング計画を策定し、具体的なタスクとデリバラブルを定義。",
         "completedAt": "2025-03-29T09:15:00.000Z"
+      },
+      {
+        "id": "ct-jsondocument-refactor",
+        "title": "JsonDocumentエンティティのリファクタリング",
+        "description": "外部ライブラリ依存を取り除き、DIパターンを使って実装を完全に分離。IDocumentValidatorインターフェースとZodDocumentValidator実装を追加し、依存方向を正しく（内側に向けて）修正。",
+        "completedAt": "2025-03-29T10:30:00.000Z"
       }
     ],
     "upcomingMilestones": [

@@ -3,17 +3,29 @@ import { DocumentPath } from './DocumentPath.js';
 import { Tag } from './Tag.js';
 import { DocumentVersionInfo } from './DocumentVersionInfo.js';
 import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
+import { IDocumentValidator } from '../validation/IDocumentValidator.js';
 
-// Schema imports - these define validation and structure
-import {
-  SCHEMA_VERSION,
-  BaseJsonDocumentV2Schema,
-  BaseJsonDocumentV2,
-  BranchContextJsonV2Schema,
-  ActiveContextJsonV2Schema,
-  ProgressJsonV2Schema,
-  SystemPatternsJsonV2Schema,
-} from '@memory-bank/schemas';
+// Define the schema version for our own reference
+export const SCHEMA_VERSION = 'memory_document_v2';
+
+// Define the document structure without external dependencies
+export interface BaseJsonDocumentV2 {
+  schema: string;
+  metadata: DocumentMetadataV2;
+  content: Record<string, unknown>;
+}
+
+export interface DocumentMetadataV2 {
+  id: string;
+  title: string;
+  documentType: string;
+  path: string;
+  tags: string[];
+  lastModified: string | Date;
+  createdAt: string | Date;
+  version: number;
+  [key: string]: unknown; // Allow for additional metadata fields
+}
 
 /**
  * Type discriminator for document types
@@ -30,6 +42,31 @@ export type DocumentType =
  * It uses the v2 schema with typed content based on document type
  */
 export class JsonDocument<T extends Record<string, unknown> = Record<string, unknown>> {
+  // Static validator instance that will be injected 
+  private static validator: IDocumentValidator;
+
+  /**
+   * Set the document validator to use for validation
+   * This is injected from outside to avoid domain depending on infrastructure
+   * @param validator Document validator to use
+   */
+  public static setValidator(validator: IDocumentValidator): void {
+    JsonDocument.validator = validator;
+  }
+
+  /**
+   * Get the current validator (throws if not set)
+   */
+  private static getValidator(): IDocumentValidator {
+    if (!JsonDocument.validator) {
+      throw new DomainError(
+        DomainErrorCodes.INITIALIZATION_ERROR,
+        'Document validator not set. Call JsonDocument.setValidator() before using JsonDocument.'
+      );
+    }
+    return JsonDocument.validator;
+  }
+
   private constructor(
     private readonly _id: DocumentId,
     private readonly _path: DocumentPath,
@@ -72,10 +109,14 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
    * @throws DomainError if validation fails
    */
   public static fromObject(jsonData: unknown, path: DocumentPath): JsonDocument {
-    // First validate against base schema
+    // Use the validator to validate the document
     try {
-      BaseJsonDocumentV2Schema.parse(jsonData);
+      // Validate the complete document structure
+      JsonDocument.getValidator().validateDocument(jsonData);
     } catch (error) {
+      if (error instanceof DomainError) {
+        throw error;
+      }
       throw new DomainError(
         DomainErrorCodes.VALIDATION_ERROR,
         `Invalid JSON document structure: ${(error as Error).message}`
@@ -85,32 +126,6 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
     const baseDocument = jsonData as BaseJsonDocumentV2;
     const metadata = baseDocument.metadata;
     const documentType = metadata.documentType as DocumentType;
-
-    // Then validate against specific document type schema
-    try {
-      switch (documentType) {
-        case 'branch_context':
-          BranchContextJsonV2Schema.parse(jsonData);
-          break;
-        case 'active_context':
-          ActiveContextJsonV2Schema.parse(jsonData);
-          break;
-        case 'progress':
-          ProgressJsonV2Schema.parse(jsonData);
-          break;
-        case 'system_patterns':
-          SystemPatternsJsonV2Schema.parse(jsonData);
-          break;
-        default:
-          BaseJsonDocumentV2Schema.parse(jsonData);
-          break;
-      }
-    } catch (error) {
-      throw new DomainError(
-        DomainErrorCodes.VALIDATION_ERROR,
-        `Invalid ${documentType} document: ${(error as Error).message}`
-      );
-    }
 
     // Create domain objects
     const id = DocumentId.create(metadata.id);
@@ -164,29 +179,13 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
     branch?: string;
     versionInfo?: DocumentVersionInfo;
   }): JsonDocument<T> {
-    // Validate content based on document type
+    // Validate content based on document type using the validator
     try {
-      switch (documentType) {
-        case 'branch_context':
-          BranchContextJsonV2Schema.shape.content.parse(content);
-          break;
-        case 'active_context':
-          ActiveContextJsonV2Schema.shape.content.parse(content);
-          break;
-        case 'progress':
-          ProgressJsonV2Schema.shape.content.parse(content);
-          break;
-        case 'system_patterns':
-          SystemPatternsJsonV2Schema.shape.content.parse(content);
-          break;
-        default:
-          // For generic types, ensure content is not empty
-          if (Object.keys(content).length === 0) {
-            throw new Error('Content cannot be empty');
-          }
-          break;
-      }
+      JsonDocument.getValidator().validateContent(documentType, content);
     } catch (error) {
+      if (error instanceof DomainError) {
+        throw error;
+      }
       throw new DomainError(
         DomainErrorCodes.VALIDATION_ERROR,
         `Invalid content for ${documentType} document: ${(error as Error).message}`
@@ -345,29 +344,13 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
    * @returns New JsonDocument instance
    */
   public updateContent<U extends Record<string, unknown>>(content: U): JsonDocument<U> {
-    // Validate content based on document type
+    // Validate content using validator
     try {
-      switch (this._documentType) {
-        case 'branch_context':
-          BranchContextJsonV2Schema.shape.content.parse(content);
-          break;
-        case 'active_context':
-          ActiveContextJsonV2Schema.shape.content.parse(content);
-          break;
-        case 'progress':
-          ProgressJsonV2Schema.shape.content.parse(content);
-          break;
-        case 'system_patterns':
-          SystemPatternsJsonV2Schema.shape.content.parse(content);
-          break;
-        default:
-          // For generic types, ensure content is not empty
-          if (Object.keys(content).length === 0) {
-            throw new Error('Content cannot be empty');
-          }
-          break;
-      }
+      JsonDocument.getValidator().validateContent(this._documentType, content);
     } catch (error) {
+      if (error instanceof DomainError) {
+        throw error;
+      }
       throw new DomainError(
         DomainErrorCodes.VALIDATION_ERROR,
         `Invalid content for ${this._documentType} document: ${(error as Error).message}`
