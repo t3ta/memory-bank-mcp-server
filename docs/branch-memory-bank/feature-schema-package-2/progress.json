@@ -63,6 +63,11 @@
         "id": "wf-repo-refactoring-plan",
         "description": "MemoryBankRepositoryリファクタリング計画策定",
         "implementedAt": "2025-03-29T13:45:00.000Z"
+      },
+      {
+        "id": "wf-document-logger-di",
+        "description": "依存関係逆転パターンを用いたロギングシステムの修正",
+        "implementedAt": "2025-03-29T14:15:00.000Z"
       }
     ],
     "pendingImplementation": [
@@ -90,10 +95,15 @@
         "id": "pi-build-errors",
         "description": "残りのビルドエラー（特にIndexService.ts）の解消",
         "priority": "medium"
+      },
+      {
+        "id": "pi-template-cleanup",
+        "description": "テンプレート関連コードの削除",
+        "priority": "high"
       }
     ],
-    "status": "ドメインレイヤーレビュー完了、TagIndexリポジトリ設計パターン分析完了、MemoryBankRepositoryリファクタリング計画策定完了。現在はフェーズ1の実装に必要な情報収集と詳細分析を完了し、オーナーとのレビュー準備が整った状態。",
-    "completionPercentage": 55,
+    "status": "ドメインレイヤーレビュー完了、TagIndexリポジトリ設計パターン分析完了、MemoryBankRepositoryリファクタリング計画策定完了、ドメインエンティティのロギング依存を取り除く作業進行中。",
+    "completionPercentage": 65,
     "knownIssues": [
       {
         "id": "ki-layering",
@@ -203,6 +213,18 @@
         "title": "MemoryBankRepositoryリファクタリング計画の策定",
         "completedAt": "2025-03-29T13:45:00.000Z",
         "description": "FileSystemBranchMemoryBankRepositoryとFileSystemGlobalMemoryBankRepositoryの肥大化問題を解決するためのリファクタリング計画を作成。責任別に分割された軽量なコンポーネント群を設計し、コンポジションパターンを用いて組み合わせるアプローチを詳細化。"
+      },
+      {
+        "id": "ct-document-logger-di",
+        "title": "ロギング機能に依存関係逆転パターンを適用",
+        "completedAt": "2025-03-29T14:15:00.000Z",
+        "description": "MemoryDocumentから共有loggerへの直接依存を解消するため、ドメイン層にIDocumentLoggerインターフェースを作成し、インフラ層にDocumentLoggerAdapterを実装。これによりドメインエンティティが外部実装に依存せずにロギング機能を使用可能に。"
+      },
+      {
+        "id": "ct-markdown-cleanup",
+        "title": "テンプレート関連コードとMarkdown関連メソッドの削除",
+        "description": "DocumentPath.tsからisMarkdown()メソッドとtoAlternateFormat()メソッドを削除。WriteBranchDocumentUseCase.tsのバグも修正（branchInfoの二重定義、existingDocumentのif条件文、未使用変数）。GlobalControllerとproviders.tsはすでに対応済みだった。",
+        "completedAt": "2025-03-28T12:30:00.000Z"
       }
     ],
     "upcomingMilestones": [
@@ -233,6 +255,11 @@
         "file": "repo-refactoring-plan.json",
         "description": "MemoryBankRepositoryリファクタリングの詳細計画",
         "created_at": "2025-03-29T13:45:00.000Z"
+      },
+      {
+        "file": "cleanup-plan.json",
+        "description": "テンプレート関連コードの削除計画",
+        "created_at": "2025-03-28"
       }
     ]
   }

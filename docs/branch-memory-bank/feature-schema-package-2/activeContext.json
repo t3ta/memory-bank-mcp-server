@@ -13,8 +13,16 @@
     "version": 5
   },
   "content": {
-    "currentWork": "MemoryBankRepositoryリファクタリング計画を策定完了。FileSystemBranchMemoryBankRepository（871行）とFileSystemGlobalMemoryBankRepository（875行）の軽量化を目的とした分割戦略を詳細に設計。ファイルシステム操作、ドキュメント管理、タグ操作、ブランチ管理、キャッシュ管理、テンプレート処理などの責任を個別のコンポーネントに分割し、コンポジションパターンによって組み合わせるアプローチを提案。実装フェーズも整理し、次は実装に向けてオーナーとレビューを行う予定。",
+    "currentWork": "テンプレート関連コードの削除作業が完了！DocumentPath.tsからisMarkdown()とtoAlternateFormat()を削除し、WriteBranchDocumentUseCase.tsのバグ（branchInfo二重定義、existingDocumentのif条件分岐欠如、未使用変数）も修正した。GlobalControllerとproviders.tsはすでにテンプレート関連コードが削除済みだった。ビルド時に他のエラーも存在するが、今回の対応範囲外なので別タスクとして対応予定。",
     "recentChanges": [
+      {
+        "date": "2025-03-28T12:30:00.000Z",
+        "description": "テンプレート関連コードの削除完了。DocumentPath.tsからMarkdown関連メソッド削除、WriteBranchDocumentUseCase.tsのバグ修正。GlobalControllerとproviders.tsは既に修正済みだった。"
+      },
+      {
+        "date": "2025-03-29T14:15:00.000Z",
+        "description": "依存関係逆転パターンをロギングに適用。IDocumentLoggerインターフェースをドメイン層に作成し、MemoryDocumentクラスから共有loggerへの直接依存を除去。インフラ層にはDocumentLoggerAdapterを実装し、依存関係が正しく内側に向くようにした。"
+      },
       {
         "date": "2025-03-29T13:45:00.000Z",
         "description": "MemoryBankRepositoryリファクタリングの詳細計画をrepo-refactoring-plan.jsonにまとめた。機能種別に分割された軽量なクラス群を設計し、コンポジションパターンで組み合わせる提案を追加。各コンポーネントの詳細設計と実装フェーズを整理。"

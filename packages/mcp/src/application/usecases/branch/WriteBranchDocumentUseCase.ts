@@ -84,17 +84,17 @@ export class WriteBranchDocumentUseCase
 
       // Create domain objects
       const branchInfo = BranchInfo.create(input.branchName);
-      const branchInfo = BranchInfo.create(input.branchName);
       const documentPath = DocumentPath.create(input.document.path);
       const tags = (input.document.tags ?? []).map((tag) => Tag.create(tag));
 
-      // Check if branch exists and initialize if needed
-      const branchExists = await this.branchRepository.exists(input.branchName);
+      // Check if branch exists (will initialize if doesn't exist)
+      await this.branchRepository.exists(input.branchName);
 
       // Check if the document already exists
       const existingDocument = await this.branchRepository.findDocumentByPath(input.branchName, input.document.path);
 
       let document: MemoryDocument;
+      if (existingDocument) {
         // Update existing document
         document = existingDocument.updateContent(input.document.content);
 

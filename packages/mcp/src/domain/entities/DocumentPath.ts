@@ -80,6 +80,8 @@ export class DocumentPath {
     const filename = this.filename;
     const lastDotIndex = filename.lastIndexOf('.');
     return lastDotIndex === -1 ? '' : filename.substring(lastDotIndex + 1);
+  }
+
   /**
    * Check if this document is a JSON file
    */
@@ -87,9 +89,15 @@ export class DocumentPath {
     return this.extension.toLowerCase() === 'json';
   }
 
+
   /**
    * Checks if two DocumentPath instances are equal
+   * @param other Other DocumentPath instance to compare with
+   * @returns true if both paths have the same value
    */
+  public equals(other: DocumentPath): boolean {
+    return this._value === other._value;
+  }
 
   /**
    * Convert to string
@@ -143,4 +151,5 @@ export class DocumentPath {
 
     return DocumentPath.create(newPath);
   }
+  
 }

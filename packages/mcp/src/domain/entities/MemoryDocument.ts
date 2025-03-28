@@ -1,8 +1,40 @@
 import { DocumentPath } from './DocumentPath.js';
 import { Tag } from './Tag.js';
-import { JsonDocumentV2 } from '@memory-bank/schemas';
 import { DomainError } from '../../shared/errors/DomainError.js';
-import { logger } from '../../shared/utils/logger.js';
+import { IDocumentLogger } from '../logger/IDocumentLogger.js';
+import { JsonDocumentV2 } from '@memory-bank/schemas';
+
+/**
+ * Static logger instance for MemoryDocument
+ * This is set from outside to avoid domain entities depending directly on infrastructure
+ */
+let documentLogger: IDocumentLogger | null = null;
+
+/**
+ * Set the logger instance for MemoryDocument
+ * This allows dependency injection from outside the domain
+ * @param logger Logger implementation to use
+ */
+export function setDocumentLogger(logger: IDocumentLogger): void {
+  documentLogger = logger;
+}
+
+/**
+ * Get the current logger or use a no-op logger if not set
+ * @returns The current logger or a no-op logger
+ */
+function getLogger(): IDocumentLogger {
+  if (!documentLogger) {
+    // Return a no-op logger if not set
+    return {
+      debug: () => {},
+      info: () => {},
+      warn: () => {},
+      error: () => {}
+    };
+  }
+  return documentLogger;
+}
 
 /**
  * Props for MemoryDocument entity
@@ -75,13 +107,13 @@ export class MemoryDocument {
    * @returns boolean indicating if document has tag
    */
   public hasTag(tag: Tag): boolean {
-    logger.debug('Checking tag:', {
+    getLogger().debug('Checking tag:', {
       documentTags: this.props.tags.map(t => t.value),
       searchTag: tag.value
     });
     const hasTag = this.props.tags.some((t) => {
       const matches = t.equals(tag);
-      logger.debug('Tag comparison:', { tag1: t.value, tag2: tag.value, matches });
+      getLogger().debug('Tag comparison:', { tag1: t.value, tag2: tag.value, matches });
       return matches;
     });
     return hasTag;
@@ -194,7 +226,7 @@ export class MemoryDocument {
       try {
         return JSON.parse(this.props.content) as JsonDocumentV2;
       } catch (error) {
-        logger.error('Failed to parse JSON document:', { error, path: this.props.path.value });
+        getLogger().error('Failed to parse JSON document:', { error, path: this.props.path.value });
       }
     }
 
@@ -240,16 +272,19 @@ export class MemoryDocument {
     }
 
     return {
-      schema: 'memory_document_v1',
+      schema: 'memory_document_v2',
       metadata: {
         title,
         documentType,
         path: this.props.path.value,
         tags: this.props.tags.map((tag) => tag.value),
         lastModified: this.props.lastModified,
+        createdAt: new Date(),
+        version: 1,
+        id: crypto.randomUUID()
       },
       content,
-    };
+    } as JsonDocumentV2;
   }
 
   /**
@@ -258,17 +293,21 @@ export class MemoryDocument {
    * @returns Markdown formatted string
    */
   public static fromJSON(jsonDoc: JsonDocumentV2, path: DocumentPath): MemoryDocument {
-    logger.debug('Creating MemoryDocument from JSON:', {
+    getLogger().debug('Creating MemoryDocument from JSON:', {
       path: path.value,
-      metadata: jsonDoc.metadata
+      schema: jsonDoc.schema
     });
 
+    // Version 2 schema has metadata nested
+    const metadata = jsonDoc.metadata;
+    const lastModified = metadata.lastModified;
+
     // Sanitize tags before creating Tag objects
-    const sanitizedTags = (jsonDoc.metadata.tags || []).map((tag: string) => {
+    const sanitizedTags = (metadata.tags || []).map((tag: string) => {
       // First try to create the tag as is
       try {
         const tagObj = Tag.create(tag);
-        logger.debug('Created tag:', { tag: tagObj.value, source: tag });
+        getLogger().debug('Created tag:', { tag: tagObj.value, source: tag });
         return tagObj;
       } catch (e: unknown) {
         // If creation fails, sanitize the tag
@@ -276,9 +315,9 @@ export class MemoryDocument {
           // Make lowercase and replace invalid characters with hyphens
           const sanitizedTagStr = tag.toLowerCase().replace(/[^a-z0-9-]/g, '-');
           // Log the sanitization for debugging
-          logger.warn(`Sanitized tag '${tag}' to '${sanitizedTagStr}'`);
+          getLogger().warn(`Sanitized tag '${tag}' to '${sanitizedTagStr}'`);
           const tagObj = Tag.create(sanitizedTagStr);
-          logger.debug('Created sanitized tag:', { tag: tagObj.value });
+          getLogger().debug('Created sanitized tag:', { tag: tagObj.value });
           return tagObj;
         }
         throw e; // Re-throw if it's not a format error
@@ -289,10 +328,10 @@ export class MemoryDocument {
       path,
       content: JSON.stringify(jsonDoc, null, 2),
       tags: sanitizedTags,
-      lastModified: new Date(jsonDoc.metadata.lastModified),
+      lastModified: new Date(lastModified),
     });
 
-    logger.debug('Created MemoryDocument with tags:', { tags: doc.tags.map(t => t.value) });
+    getLogger().debug('Created MemoryDocument with tags:', { tags: doc.tags.map(t => t.value) });
     return doc;
   }
 
