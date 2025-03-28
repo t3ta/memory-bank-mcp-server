@@ -1,27 +1,31 @@
-import { ILogger } from '../../domain/logger/ILogger.js';
-import { LogLevel, LoggerOptions } from '../../domain/logger/types.js';
-import { JsonLogger } from './JsonLogger.js';
+import { Logger, LogLevel, LogContext, createConsoleLogger } from '../../shared/utils/logger.js';
 
 /**
  * ロガーの種類を定義する列挙型
+ * @deprecated 将来的にshared/utils/logger.tsに完全移行予定
  */
 export enum LoggerType {
-  JSON = 'json'
+  JSON = 'json',
+  CONSOLE = 'console'
 }
 
 /**
  * ロガーの設定に使用するオプション
+ * @deprecated 将来的にshared/utils/logger.tsに完全移行予定
  */
-export interface LoggerFactoryOptions extends LoggerOptions {
+export interface LoggerFactoryOptions {
   type: LoggerType;
+  minLevel?: LogLevel;
+  defaultContext?: LogContext;
 }
 
 /**
  * ロガーインスタンスを生成・管理するファクトリクラス
+ * @deprecated 将来的にshared/utils/logger.tsに完全移行予定
  */
 export class LoggerFactory {
   private static instance: LoggerFactory;
-  private loggers: Map<string, ILogger> = new Map();
+  private loggers: Map<string, Logger> = new Map();
 
   private constructor() {}
 
@@ -39,23 +43,17 @@ export class LoggerFactory {
    * ロガーを生成
    * @param options ロガーの設定オプション
    */
-  public createLogger(options: LoggerFactoryOptions): ILogger {
-    const { type, ...loggerOptions } = options;
-    let logger: ILogger;
+  public createLogger(options: LoggerFactoryOptions): Logger {
+    const { type, minLevel = 'info', defaultContext } = options;
+    let logger: Logger;
 
-    switch (type) {
-      case LoggerType.JSON:
-        logger = new JsonLogger();
-        break;
-      default:
-        throw new Error(`Unsupported logger type: ${type}`);
+    // 全てのタイプで共通のcreateConsoleLoggerを使用
+    logger = createConsoleLogger(minLevel);
+
+    // コンテキストがあれば設定
+    if (defaultContext && logger.withContext) {
+      logger = logger.withContext(defaultContext);
     }
-
-    // ロガーの設定を適用
-    logger.configure({
-      minLevel: loggerOptions.minLevel || LogLevel.INFO,
-      defaultContext: loggerOptions.defaultContext || {}
-    });
 
     return logger;
   }
@@ -65,7 +63,7 @@ export class LoggerFactory {
    * @param name ロガー名
    * @param options ロガーの設定オプション
    */
-  public getLogger(name: string, options: LoggerFactoryOptions): ILogger {
+  public getLogger(name: string, options: LoggerFactoryOptions): Logger {
     if (this.loggers.has(name)) {
       return this.loggers.get(name)!;
     }
@@ -76,12 +74,12 @@ export class LoggerFactory {
   }
 
   /**
-   * デフォルトのJSONロガーを取得
+   * デフォルトのロガーを取得
    */
-  public static getDefaultLogger(): ILogger {
+  public static getDefaultLogger(): Logger {
     return LoggerFactory.getInstance().getLogger('default', {
-      type: LoggerType.JSON,
-      minLevel: LogLevel.INFO
+      type: LoggerType.CONSOLE,
+      minLevel: 'info'
     });
   }
 
@@ -96,5 +94,6 @@ export class LoggerFactory {
 
 /**
  * デフォルトのロガーインスタンスを提供
+ * @deprecated 将来的にshared/utils/logger.tsの直接使用を推奨
  */
 export const defaultLogger = LoggerFactory.getDefaultLogger();

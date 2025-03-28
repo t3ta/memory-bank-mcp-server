@@ -193,11 +193,14 @@ export class MemoryDocument {
   }
 
   /**
-   * Convert document to JSON format
-   * @returns JSON document object
+  /**
+   * Check if the document is a markdown file
+   * @deprecated Markdown support is deprecated in v2.1.0
    */
-  public toJSON(): BaseJsonDocument {
-    if (this.isJSON) {
+  public get isMarkdown(): boolean {
+    // Markdown is no longer supported, always return false
+    return false;
+  }
       try {
         return JSON.parse(this.props.content) as BaseJsonDocument;
       } catch (error) {

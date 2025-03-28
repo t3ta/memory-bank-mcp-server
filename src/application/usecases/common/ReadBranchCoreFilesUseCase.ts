@@ -3,7 +3,7 @@ import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
 import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
 import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
 import { ApplicationError, ApplicationErrorCodes } from '../../../shared/errors/ApplicationError.js';
-import type { ILogger } from '../../../domain/logger/ILogger.js';
+import { Logger, LogLevel, createConsoleLogger } from '../../../shared/utils/logger.js';
 import { LoggerFactory, LoggerType } from '../../../infrastructure/logger/LoggerFactory.js';
 import type { IUseCase } from '../../interfaces/IUseCase.js';
 import type {
@@ -23,7 +23,7 @@ interface ReadBranchCoreFilesOutput {
 }
 
 export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesInput, ReadBranchCoreFilesOutput> {
-  private readonly logger: ILogger;
+  private readonly logger: Logger;
 
   private readonly ACTIVE_CONTEXT_PATHS = ['activeContext.md', 'activeContext.json'];
   private readonly PROGRESS_PATHS = ['progress.md', 'progress.json'];
@@ -32,8 +32,7 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
 
   constructor(private readonly branchRepository?: IBranchMemoryBankRepository) {
     this.logger = LoggerFactory.getInstance().getLogger('ReadBranchCoreFilesUseCase', {
-      type: LoggerType.JSON,
-      defaultContext: { useCase: 'ReadBranchCoreFiles' }
+      type: LoggerType.CONSOLE,
     });
   }
 
