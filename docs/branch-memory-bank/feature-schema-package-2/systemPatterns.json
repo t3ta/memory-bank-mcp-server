@@ -8,9 +8,9 @@
     "tags": [
       "system-patterns"
     ],
-    "lastModified": "2025-03-28T20:15:00.000Z",
+    "lastModified": "2025-03-29T13:15:00.000Z",
     "createdAt": "2025-03-28T11:01:55.756Z",
-    "version": 2
+    "version": 3
   },
   "content": {
     "technicalDecisions": [
@@ -196,6 +196,18 @@
           }
         ],
         "context": "ファイルを編集する際は、全体を Replace することは避け、部分的な Edit を繰り返すことで、意図しない変更やバグの混入を防ぐ。また、変更前後の確認を徹底することで、エラーを早期に発見できる。"
+      },
+      {
+        "id": "impl-pattern-5",
+        "name": "依存関係逆転パターンの適切な適用",
+        "description": "ドメインレイヤーが外部実装に依存しないように、インターフェイスを利用して依存関係を逆転させるパターン。",
+        "context": "クリーンアーキテクチャでは、外側（インフラストラクチャ）から内側（ドメイン）への依存を確保し、内側（ドメイン）が外側（インフラストラクチャ）に依存しないようにすることが重要。",
+        "examples": [
+          {
+            "name": "IDocumentValidatorインターフェース",
+            "code": "// ドメイン層に定義されたインターフェース\nexport interface IDocumentValidator {\n  validateContent(documentType: string, content: Record<string, unknown>): boolean;\n  validateDocument(document: unknown): boolean;\n  validateMetadata(metadata: Record<string, unknown>): boolean;\n}\n\n// JsonDocumentがバリデーションを利用\npublic static setValidator(validator: IDocumentValidator): void {\n  JsonDocument.validator = validator;\n}\n\n// インフラ層で実装\nclass ZodDocumentValidator implements IDocumentValidator {\n  // Zodを使った実装...\n}"
+          }
+        ]
       }
     ]
   }

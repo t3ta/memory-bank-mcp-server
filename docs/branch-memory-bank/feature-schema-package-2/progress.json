@@ -48,6 +48,11 @@
         "id": "wf-providers-cleanup",
         "description": "providers.tsのテンプレート関連コード削除",
         "implementedAt": "2025-03-29T12:30:00.000Z"
+      },
+      {
+        "id": "wf-repo-interface-reviewed",
+        "description": "ドメインレイヤーのリポジトリインターフェースレビュー完了",
+        "implementedAt": "2025-03-29T13:15:00.000Z"
       }
     ],
     "pendingImplementation": [
@@ -77,8 +82,8 @@
         "priority": "medium"
       }
     ],
-    "status": "フェーズ1の実装中：ドメインエンティティのリファクタリングを進行中。DocumentPath、MemoryDocumentが依存関係逆転パターンを適用して外部ライブラリ依存を取り除いた状態に。",
-    "completionPercentage": 40,
+    "status": "ドメインレイヤーのリポジトリインターフェースレビューが完了。外部依存が少なく、良い設計になっていることを確認。次は実装クラスのチェックと必要な依存関係リファクタリングに進む。ドメインエンティティは以前にリファクタリング済み。",
+    "completionPercentage": 45,
     "knownIssues": [
       {
         "id": "ki-layering",
@@ -165,6 +170,12 @@
         "title": "providers.tsのテンプレート関連コード削除完了",
         "description": "テンプレート関連コード削除計画に従い、providers.tsからtemplateRepositoryとtemplateServiceなどの登録を完全に削除。markdownMigrationServiceにはモック実装を提供して互換性を保持。",
         "completedAt": "2025-03-29T12:30:00.000Z"
+      },
+      {
+        "id": "ct-repo-interface-review",
+        "title": "ドメインレイヤーのリポジトリインターフェースレビュー",
+        "completedAt": "2025-03-29T13:15:00.000Z",
+        "description": "ドメインレイヤーのリポジトリインターフェース（IBranchMemoryBankRepository、IGlobalMemoryBankRepository、ITagIndexRepository、IJsonDocumentRepository、IMemoryDocumentRepository）をレビュー。予想よりもクリーンな設計になっており、外部依存がほとんど見つからない。代わりに、IDocumentValidatorのようなインターフェースを使ってドメインと外部実装が分帯されていることを確認。"
       }
     ],
     "upcomingMilestones": [

@@ -13,8 +13,16 @@
     "version": 5
   },
   "content": {
-    "currentWork": "テンプレート関連コードの削除作業が予想以上にスムーズに完了。DocumentPath.tsからMarkdown関連の非推奨メソッドを削除、WriteBranchDocumentUseCase.tsのエラー修正、GlobalControllerのreadCoreFilesメソッドをシンプル化、そしてproviders.tsからtemplateRepository関連コードを削除。次はフェーズ1（ドメインレイヤーの再設計と依存方向修正）のリポジトリインターフェースの純粹化に移る予定。",
+    "currentWork": "ドメインレイヤーのリポジトリインターフェースレビューを完了し、予想よりも良い状態であることが判明。ドメインエンティティ（JsonDocument、MemoryDocumentなど）は既に依存関係逆転パターンが適用されており、リポジトリインターフェースも技術的依存が最小限に押さえられている。外部依存は@memory-bank/schemasの型定義のみで、これは自然な形で許容される。次はFileSystemTagIndexRepositoryV1BridgeやFileSystemBranchMemoryBankRepositoryなどの実装クラスをチェックし、必要に応じてリファクタリングを行う予定。",
     "recentChanges": [
+      {
+        "date": "2025-03-29T13:15:00.000Z",
+        "description": "ドメインレイヤーのリポジトリインターフェースレビュー完了。インターフェース設計がクリーンで、依存関係逆転パターンが適切に適用されていることを確認。IDocumentValidatorのようなインターフェースを使って外部実装からドメインロジックを分離。"
+      },
+      {
+        "date": "2025-03-29T13:00:00.000Z",
+        "description": "ドメインレイヤーのリポジトリインターフェース（IBranchMemoryBankRepository、IGlobalMemoryBankRepository、ITagIndexRepository、IJsonDocumentRepository）をレビュー。予想よりもクリーンな設計になっており、外部依存は@memory-bank/schemasパッケージからインポートしている型定義のみ。今後は実装クラスの技術的依存に焦点を当てる。"
+      },
       {
         "date": "2025-03-29T12:30:00.000Z",
         "description": "テンプレート関連コードの削除作業完了。DocumentPath.tsからisMarkdown()メソッドとtoAlternateFormat()メソッドを削除。WriteBranchDocumentUseCase.tsのバグ修正。GlobalControllerからtemplateController依存を除去し、readCoreFilesメソッドをシンプル化。providers.tsからテンプレート関連の登録を削除。"
