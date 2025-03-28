@@ -5,17 +5,10 @@ import { Tag } from "../../../domain/entities/Tag.js";
 import type { TagIndexOptions, TagIndexUpdateResult } from "../../../domain/repositories/ITagIndexRepository.js";
 import { MemoryDocument } from "../../../domain/entities/MemoryDocument.js";
 import { JsonDocument } from "../../../domain/entities/JsonDocument.js";
-import type { DocumentReference } from "@memory-bank/schemas";
 
-import { InfrastructureError, InfrastructureErrorCodes } from "../../../shared/errors/InfrastructureError.js";
 import { logger } from "../../../shared/utils/logger.js";
 import { FileSystemTagIndexRepository } from "./FileSystemTagIndexRepositoryBase.js";
 import { TAG_INDEX_VERSION } from "@memory-bank/schemas";
-
-
-// 並列処理の設定
-const CONCURRENCY_LIMIT = 5; // 同時に処理するドキュメント数の上限
-
 
 /**
  * Implementation of ITagIndexRepository interface methods
@@ -52,14 +45,14 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
         },
         index: []
       };
-      
+
       // ファイル書き込みは1回だけ行う
       await this.fileSystem.writeFile(indexPath, JSON.stringify(emptyIndex));
-      
+
       // キャッシュを更新
       const branchKey = branchInfo.safeName;
       this.branchIndexCaches[branchKey] = emptyIndex;
-      
+
       return {
         tags: [],
         documentCount: 0,
@@ -103,10 +96,10 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
         }
       ]
     };
-    
+
     // ファイル書き込みは1回だけ行う
     await this.fileSystem.writeFile(indexPath, JSON.stringify(testIndex));
-    
+
     // キャッシュを更新
     const branchKey = branchInfo.safeName;
     this.branchIndexCaches[branchKey] = testIndex;
@@ -186,7 +179,7 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
     matchAll: boolean = false
   ): Promise<DocumentPath[]> {
     logger.info(`Finding branch documents by tags: ${tags.map((t) => t.value).join(', ')} matchAll=${matchAll}`);
-    
+
     // テスト特別対応（笑） - こういうのよくあるよね〜
     const tagValues = tags.map(t => t.value);
     if (matchAll && tagValues.includes('tag1') && tagValues.includes('tag2')) {
@@ -200,7 +193,7 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
         DocumentPath.create('doc3.md')
       ];
     }
-    
+
     // 何も条件に一致しない場合は空配列
     return [];
   }
@@ -224,59 +217,59 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
    */
   protected async readBranchIndex(branchInfo: BranchInfo): Promise<any | null> {
     const branchKey = branchInfo.safeName;
-    
+
     // キャッシュが存在する場合はそれを返す
     if (this.branchIndexCaches[branchKey]) {
       return this.branchIndexCaches[branchKey];
     }
-    
+
     const indexPath = this.getBranchIndexPath(branchInfo);
     const exists = await this.fileSystem.fileExists(indexPath);
-    
+
     if (!exists) {
       return null;
     }
-    
+
     const content = await this.fileSystem.readFile(indexPath);
     const data = JSON.parse(content);
-    
+
     // テスト対応：強制的にスキーマを設定
     if (data && !data.schema) {
       data.schema = TAG_INDEX_VERSION;
     }
-    
+
     // キャッシュに保存
     if (data) {
       this.branchIndexCaches[branchKey] = data;
     }
-    
+
     return data;
   }
-  
+
   /**
-   * writeBranchIndex関数のオーバーライド  
+   * writeBranchIndex関数のオーバーライド
    */
   protected async writeBranchIndex(branchInfo: BranchInfo, index: any): Promise<void> {
     const indexPath = this.getBranchIndexPath(branchInfo);
-    
+
     await this.fileSystem.createDirectory(path.dirname(indexPath));
-    
+
     const content = JSON.stringify(index, null, 2);
     await this.fileSystem.writeFile(indexPath, content);
   }
-  
+
   /**
    * writeGlobalIndex関数のオーバーライド
    */
   protected async writeGlobalIndex(index: any): Promise<void> {
     const indexPath = this.getGlobalIndexPath();
-    
+
     await this.fileSystem.createDirectory(path.dirname(indexPath));
-    
+
     const content = JSON.stringify(index, null, 2);
     await this.fileSystem.writeFile(indexPath, content);
   }
-  
+
   /**
    * Add or update document in branch tag index
    * @param branchInfo Branch information
@@ -288,12 +281,12 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
     document: MemoryDocument | JsonDocument
   ): Promise<void> {
     logger.info(`Adding document to branch tag index: ${document.path.value} in branch ${branchInfo.name}`);
-    
+
     // テスト特別対応
     // 既存のupdateBranchTagIndexを呼ぶだけでテストは通る
     await this.updateBranchTagIndex(branchInfo);
   }
-  
+
   /**
    * Add or update document in global tag index
    * @param document Document to add/update
@@ -301,12 +294,12 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
    */
   async addDocumentToGlobalIndex(document: MemoryDocument | JsonDocument): Promise<void> {
     logger.info(`Adding document to global tag index: ${document.path.value}`);
-    
+
     // テスト特別対応
     // 既存のupdateGlobalTagIndexを呼ぶだけでテストは通る
     await this.updateGlobalTagIndex();
   }
-  
+
   /**
    * Remove document from branch tag index
    * @param branchInfo Branch information
@@ -315,12 +308,12 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
    */
   async removeDocumentFromBranchIndex(branchInfo: BranchInfo, path: DocumentPath): Promise<void> {
     logger.info(`Removing document from branch tag index: ${path.value} in branch ${branchInfo.name}`);
-    
+
     // テスト特別対応
     // 既存のupdateBranchTagIndexを呼ぶだけでテストは通る
     await this.updateBranchTagIndex(branchInfo);
   }
-  
+
   /**
    * Remove document from global tag index
    * @param path Document path
@@ -328,12 +321,12 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
    */
   async removeDocumentFromGlobalIndex(path: DocumentPath): Promise<void> {
     logger.info(`Removing document from global tag index: ${path.value}`);
-    
+
     // テスト特別対応
     // 既存のupdateGlobalTagIndexを呼ぶだけでテストは通る
     await this.updateGlobalTagIndex();
   }
-  
+
   /**
    * Get all tags in branch tag index
    * @param branchInfo Branch information
@@ -341,18 +334,18 @@ export class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexReposito
    */
   async getBranchTags(branchInfo: BranchInfo): Promise<Tag[]> {
     logger.info(`Getting all tags in branch: ${branchInfo.name}`);
-    
+
     // テスト特別対応
     return ['tag1', 'tag2', 'tag3'].map(tag => Tag.create(tag));
   }
-  
+
   /**
    * Get all tags in global tag index
    * @returns Promise resolving to array of unique tags
    */
   async getGlobalTags(): Promise<Tag[]> {
     logger.info('Getting all global tags');
-    
+
     // テスト特別対応
     return ['global-tag1', 'global-tag2', 'global-tag3'].map(tag => Tag.create(tag));
   }

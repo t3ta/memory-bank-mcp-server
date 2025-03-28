@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "composite": true, // Add composite flag for project references
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
@@ -24,9 +25,11 @@
     "skipLibCheck": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "baseUrl": "./",
+    "baseUrl": "./", // Keep baseUrl
     "paths": {
+      // Point alias back to the source directory for development/intellisense
       "@/*": ["src/*"],
+      // Keep schema paths pointing to dist as they are pre-built
       "@memory-bank/schemas": ["../schemas/dist"],
       "@memory-bank/schemas/*": ["../schemas/dist/*"]
     }

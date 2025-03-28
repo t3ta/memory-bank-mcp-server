@@ -1,0 +1,104 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "package-structure-analyzer-design",
+    "title": "パッケージ構造解析ツールの設計",
+    "documentType": "design",
+    "path": "package-structure-analyzer-design.json",
+    "tags": [
+      "ts-morph",
+      "mermaid",
+      "structure",
+      "visualization"
+    ],
+    "lastModified": "2025-03-28T18:30:00.000Z",
+    "createdAt": "2025-03-28T18:30:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "description": "ts-morphを使用して、packagesディレクトリ内の構造を解析し、mermaidダイアグラムとして視覚化するツールの設計",
+      "goals": [
+        "TypeScriptプロジェクトの構造を自動的に解析する",
+        "クラス、インターフェース、関数などの関係を把握しやすくする",
+        "mermaidダイアグラムとして出力することで、視覚的な理解を促進する"
+      ]
+    },
+    "components": [
+      {
+        "name": "ProjectAnalyzer",
+        "description": "ts-morphを使用して、プロジェクト全体を解析するコンポーネント",
+        "responsibilities": [
+          "プロジェクトのソースファイルを読み込む",
+          "TypeScriptのクラス、インターフェース、関数などの構造を解析する",
+          "依存関係を抽出する"
+        ]
+      },
+      {
+        "name": "MermaidGenerator",
+        "description": "解析結果をmermaidダイアグラムに変換するコンポーネント",
+        "responsibilities": [
+          "解析結果を適切なmermaid構文に変換する",
+          "クラス図、パッケージ図、依存関係図などを生成する",
+          "必要に応じて図の複雑さを調整する機能を提供する"
+        ]
+      },
+      {
+        "name": "ConfigManager",
+        "description": "ツールの動作設定を管理するコンポーネント",
+        "responsibilities": [
+          "解析対象や除外対象のパターンを管理する",
+          "出力オプション（詳細レベル、表示するリレーションシップなど）を管理する",
+          "コマンドライン引数やコンフィグファイルからの設定読み込みをサポートする"
+        ]
+      }
+    ],
+    "implementationApproach": {
+      "analysisStrategy": {
+        "description": "プロジェクト解析の戦略",
+        "steps": [
+          "対象ディレクトリのTypeScriptプロジェクトを読み込む",
+          "各ファイルの構造（クラス、インターフェース、関数、変数など）を抽出する",
+          "依存関係（継承、実装、インポート関係など）を解析する",
+          "解析結果を構造化データとして整理する"
+        ]
+      },
+      "diagramGenerationStrategy": {
+        "description": "ダイアグラム生成の戦略",
+        "steps": [
+          "解析結果からmermaid構文を生成する",
+          "複雑さを管理するため、必要に応じて複数のダイアグラムに分割する",
+          "各エンティティの表示内容（メンバー、メソッド、アクセス修飾子など）をカスタマイズできるようにする"
+        ]
+      }
+    },
+    "featureSet": {
+      "basic": [
+        "パッケージ構造の可視化（ディレクトリとファイル）",
+        "クラス・インターフェース関係の可視化（継承・実装）",
+        "簡易的な依存関係の表示"
+      ],
+      "advanced": [
+        "メソッドや属性の詳細表示",
+        "カスタマイズ可能なフィルタリング（特定のパターンに一致するもののみ表示）",
+        "複数の視点からの図の生成（パッケージ図、クラス図、依存関係図など）"
+      ]
+    },
+    "initialImplementation": {
+      "scope": "まずは基本的な機能セットに集中し、packages内のディレクトリ構造とファイル関係をmermaidで表示できるようにする",
+      "outputFormat": "mermaid図をテキストファイルに出力し、必要に応じてGUIから参照できるようにする",
+      "limitations": [
+        "初期実装では複雑な依存関係の解析は行わない",
+        "大規模プロジェクトでは図が複雑になりすぎる可能性がある",
+        "カスタマイズオプションは限定的にする"
+      ]
+    },
+    "extensions": {
+      "possibleEnhancements": [
+        "インタラクティブな図の表示（ズーム、フィルタリングなど）",
+        "コードベースの変更検出と図の自動更新",
+        "複数のプロジェクト間の関係の可視化"
+      ]
+    }
+  }
+}

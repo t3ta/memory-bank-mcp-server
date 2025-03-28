@@ -1,4 +1,7 @@
-import type { ContextRequest, ContextResult, ReadContextUseCase, ReadRulesUseCase, RulesResult } from "../../application/usecases/types.js";
+// インポート修正：型だけtypes.jsから、クラスは各々のファイルから
+import type { ContextRequest, ContextResult, RulesResult } from "../../application/usecases/types.js";
+import { ReadContextUseCase } from "../../application/usecases/common/ReadContextUseCase.js";
+import { ReadRulesUseCase } from "../../application/usecases/common/ReadRulesUseCase.js";
 import { ApplicationError } from "../../shared/errors/ApplicationError.js";
 import { DomainError } from "../../shared/errors/DomainError.js";
 import { InfrastructureError } from "../../shared/errors/InfrastructureError.js";

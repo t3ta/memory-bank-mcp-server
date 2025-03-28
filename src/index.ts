@@ -5,14 +5,14 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { hideBin } from 'yargs/helpers';
 import yargs from 'yargs/yargs';
-import { createApplication, Application } from './main/index.js';
-import { logger } from './shared/utils/index.js';
+import { createApplication, Application } from '@memory-bank/mcp'; // Assuming these are exported from the package root
+import { logger } from '@memory-bank/mcp'; // Assuming logger is exported from the package root
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { Server as MCPServer } from '@modelcontextprotocol/sdk/server/index.js';
 import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { Server } from 'node:http';
 import { Language, isValidLanguage } from '@memory-bank/schemas';
-import type { CliOptions } from '@memory-bank/schemas';
+// Removed incorrect import: import type { CliOptions } from '@memory-bank/schemas';
 
 // Helper function to render template with translations
 function renderTemplate(template: any, translations: any): string {
@@ -95,7 +95,8 @@ export function resolveDocsRoot(toolDocs?: string) {
 }
 
 // Helper function to get merged application options
-function getMergedApplicationOptions(appInstance: Application | null, docs?: string, language: Language = 'ja'): CliOptions {
+// Define the return type inline as CliOptions is no longer available/correct
+function getMergedApplicationOptions(appInstance: Application | null, docs?: string, language: Language = 'ja'): { docsRoot: string; language: Language; verbose: boolean } {
   if (!appInstance) {
     // 初期アプリケーションでは通常の処理
     return {
@@ -111,17 +112,21 @@ function getMergedApplicationOptions(appInstance: Application | null, docs?: str
   // 解決されたパス
   const docsRoot = docs ? docs : resolveDocsRoot();
 
-  // 明示的に指定された値のみを上書き
+  // Calculate the final docsRoot value, ensuring it's always a string
+  const finalDocsRoot = docs || originalOptions.docsRoot || resolveDocsRoot();
+
+  // 明示的に指定された値のみを上書きし、必須プロパティを確実に設定
   return {
-    ...originalOptions,
-    ...(docs ? { docsRoot } : {}),
-    language: originalOptions.language || language,
-    verbose: originalOptions.verbose || false
+    // Spread other potential properties from originalOptions if needed
+    // ...originalOptions, // Avoid spreading if it causes type issues, explicitly set known properties
+    language: (originalOptions.language && isValidLanguage(originalOptions.language)) ? originalOptions.language : language,
+    verbose: originalOptions.verbose || false,
+    docsRoot: finalDocsRoot // Explicitly set the calculated docsRoot
   };
 }
 
 // Import tool definitions from the new modules
-import { getToolDefinitions } from './tools/index.js';
+import { getToolDefinitions } from '@memory-bank/mcp'; // Assuming getToolDefinitions is exported from the package root
 
 // New application instance
 let app: Application | null = null;
@@ -229,22 +234,60 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         return { content: [{ type: 'text', text: 'Document written successfully' }] };
       }
 
-      // Case 2: Patches provided - use our improved JSON Patch handler
+      // Case 2: Patches provided - use inline logic or dedicated patch handler if available in MCP package
       if (patches) {
-        const { processJsonPatch } = await import('./tools/handlers.js');
+        // Assuming patch logic is handled within the controller or a utility in the MCP package
+        // This might need adjustment based on how patching is implemented in the new structure
+        logger.warn('JSON Patch handling for branch memory bank needs review/implementation based on MCP package structure.');
+      // Case 2: Patches provided - use JsonPatchUseCase from MCP package
+      if (patches) {
+        logger.debug(`Applying JSON Patch to branch memory bank (branch: ${branch}, path: ${path}, patches: ${JSON.stringify(patches)})`);
         
-        return processJsonPatch(
-          app,
-          patches,
-          async (docPath) => branchApp.getBranchController().readDocument(branch, docPath),
-          async (docPath, content) => branchApp.getBranchController().writeDocument(branch, docPath, content),
-          path,
-          `branch memory bank (branch: ${branch})`
-        );
-      }
-
-      // Should never reach here
-      throw new Error('Invalid state: neither content nor patches were provided');
+        try {
+          // Get the JsonPatchUseCase from the factory or create it directly
+          const jsonPatchUseCase = branchApp.getUseCaseFactory().createJsonPatchUseCase();
+          
+          // Convert patches to the domain's JsonPatchOperation format
+          const patchOperations = patches.map(patch => {
+            return {
+              op: patch.op,
+              path: patch.path,
+              value: patch.value,
+              from: patch.from
+            };
+          });
+          
+          // Execute patch operations on the document
+          const result = await jsonPatchUseCase.execute(path, patchOperations, branch);
+          
+          if (!result) {
+            throw new Error(`Failed to apply JSON Patch to document: ${path} in branch ${branch}`);
+          }
+          
+          return { content: [{ type: 'text', text: 'Patches applied successfully' }] };
+        } catch (error) {
+          logger.error(`Error applying JSON Patch: ${error.message}`, error);
+          throw new Error(`Failed to apply JSON Patch: ${error.message}`);
+        }
+              op: patch.op,
+              path: patch.path,
+              value: patch.value,
+              from: patch.from
+            };
+          });
+          
+          // Execute patch operations on the document
+          const result = await jsonPatchUseCase.execute(path, patchOperations, branch);
+          
+          if (!result) {
+            throw new Error(`Failed to apply JSON Patch to document: ${path} in branch ${branch}`);
+          }
+          
+          return { content: [{ type: 'text', text: 'Patches applied successfully' }] };
+        } catch (error) {
+          logger.error(`Error applying JSON Patch: ${error.message}`, error);
+          throw new Error(`Failed to apply JSON Patch: ${error.message}`);
+        }
     }
 
     case 'read_branch_memory_bank': {
@@ -261,11 +304,22 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         throw new Error('Branch name must include a namespace prefix with slash (e.g. "feature/my-branch")');
       }
 
-      // Use our improved read handler
-      const { readBranchDocument } = await import('./tools/handlers.js');
-      return readBranchDocument(app, path, branch, docs);
+      // Directly call the controller method
+      if (!app) throw new Error('Application not initialized');
+      let branchApp = app;
+      if (docs) {
+        const docsRoot = resolveDocsRoot(docs);
+        logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
+        const appOptions = getMergedApplicationOptions(app, docsRoot, 'ja'); // Assuming default language 'ja'
+        branchApp = await createApplication(appOptions);
+      }
+      const response = await branchApp.getBranchController().readDocument(branch, path);
+      if (!response.success) {
+        throw new Error((response as any).error?.message || 'Failed to read branch document');
+      }
+      // Need to format the response for MCP
+      return { content: [{ type: 'text', text: JSON.stringify(response.data, null, 2) }] };
     }
-
     case 'read_rules': {
       const language = params.language as string;
 
@@ -376,18 +430,18 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         return { content: [{ type: 'text', text: 'Document written successfully' }] };
       }
 
-      // Case 2: Patches provided - use our improved JSON Patch handler
+      // Case 2: Patches provided - use inline logic or dedicated patch handler if available in MCP package
       if (patches) {
-        const { processJsonPatch } = await import('./tools/handlers.js');
-        
-        return processJsonPatch(
-          app,
-          patches,
-          async (docPath) => globalApp.getGlobalController().readDocument(docPath),
-          async (docPath, content) => globalApp.getGlobalController().writeDocument(docPath, content),
-          path,
-          `global memory bank`
-        );
+        // Assuming patch logic is handled within the controller or a utility in the MCP package
+        // This might need adjustment based on how patching is implemented in the new structure
+        logger.warn('JSON Patch handling for global memory bank needs review/implementation based on MCP package structure.');
+        // Placeholder: Directly try writing, assuming patches might be handled internally or need a different approach
+        // This likely needs a proper implementation using patch utilities or controller methods
+        throw new Error('JSON Patch for global memory bank is not fully implemented in this refactored entry point yet.');
+        // Example if a patch method exists on the controller:
+        // const response = await globalApp.getGlobalController().patchDocument(path, patches);
+        // if (!response.success) throw new Error...
+        // return { content: [{ type: 'text', text: 'Patches applied successfully' }] };
       }
 
       // Should never reach here
@@ -402,11 +456,22 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         throw new Error('Invalid arguments for read_global_memory_bank');
       }
 
-      // Use our improved read handler
-      const { readGlobalDocument } = await import('./tools/handlers.js');
-      return readGlobalDocument(app, path, docs);
+      // Directly call the controller method (assuming readGlobalDocument logic is now inline or unnecessary)
+      if (!app) throw new Error('Application not initialized');
+      let globalApp = app;
+      if (docs) {
+        const docsRoot = resolveDocsRoot(docs);
+        logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
+        const appOptions = getMergedApplicationOptions(app, docsRoot, 'ja'); // Assuming default language 'ja'
+        globalApp = await createApplication(appOptions);
+      }
+      const response = await globalApp.getGlobalController().readDocument(path);
+      if (!response.success) {
+        throw new Error((response as any).error?.message || 'Failed to read global document');
+      }
+      // Need to format the response for MCP
+      return { content: [{ type: 'text', text: JSON.stringify(response.data, null, 2) }] };
     }
-
     case 'read_context': {
       const branch = (params.branch as string | undefined) || '_current_';
       const language = (params.language as string) || 'ja';

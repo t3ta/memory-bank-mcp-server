@@ -1,0 +1,159 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "test-strategy-document",
+    "title": "モノレポ構造のテスト戦略",
+    "documentType": "generic",
+    "path": "test-strategy.json",
+    "tags": [
+      "test",
+      "strategy",
+      "monorepo"
+    ],
+    "lastModified": "2025-03-28T16:30:00.000Z",
+    "createdAt": "2025-03-28T16:30:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "description": "モノレポ構造でのテスト配置と実行の戦略を定義します。パッケージごとにテストを分離し、依存関係を明確にすることで、テストの実行効率と保守性を向上させます。",
+      "goals": [
+        "パッケージごとに独立したテスト環境を構築",
+        "テストの実行効率と保守性を向上",
+        "モノレポ全体のテストカバレッジを維持・向上",
+        "パッケージ間の依存関係を明確化"
+      ]
+    },
+    "testPlacement": {
+      "strategy": "パッケージ内配置",
+      "description": "各パッケージ内にテストを配置することで、パッケージとテストの関係を明確にし、依存関係も単純化します。",
+      "examples": [
+        "/packages/mcp/tests/unit/interface/controllers/BranchController.test.ts",
+        "/packages/schemas/tests/v2/json-document.test.ts"
+      ],
+      "advantages": [
+        "パッケージに近いところにテストを配置できる",
+        "依存関係がシンプルになる",
+        "テストの実行が高速になる",
+        "パッケージの独立性が向上する"
+      ]
+    },
+    "jestConfiguration": {
+      "strategy": "パッケージごとの設定",
+      "description": "各パッケージにJestの設定ファイルを用意し、パッケージ固有の設定を行います。",
+      "examples": {
+        "mcpPackage": {
+          "rootDir": "./",
+          "testEnvironment": "node",
+          "moduleNameMapper": {
+            "^@memory-bank/(.*)$": "<rootDir>/../$1/src"
+          },
+          "transform": {
+            "^.+\\.tsx?$": "ts-jest"
+          },
+          "testMatch": [
+            "<rootDir>/tests/**/*.test.ts"
+          ]
+        }
+      },
+      "considerations": [
+        "モジュールパスの解決（moduleNameMapper）",
+        "テスト環境（testEnvironment）",
+        "変換ルール（transform）",
+        "カバレッジ設定（collectCoverageFrom）"
+      ]
+    },
+    "testCommands": {
+      "packageLevel": {
+        "description": "各パッケージレベルでのテスト実行コマンド",
+        "examples": {
+          "test": "jest",
+          "test:watch": "jest --watch",
+          "test:coverage": "jest --coverage"
+        }
+      },
+      "rootLevel": {
+        "description": "ルートレベルでのテスト実行コマンド",
+        "examples": {
+          "test": "yarn workspaces run test",
+          "test:schemas": "yarn workspace @memory-bank/schemas test",
+          "test:mcp": "yarn workspace @memory-bank/mcp test"
+        }
+      }
+    },
+    "migrationStrategy": {
+      "description": "既存テストから新構造へのマイグレーション戦略",
+      "phases": [
+        {
+          "phase": "1. 並行配置",
+          "description": "既存のテストを残しながら、新しい構造でテストを書き始める",
+          "timeline": "初期フェーズ（1-2週間）"
+        },
+        {
+          "phase": "2. 優先マイグレーション",
+          "description": "重要なテストから優先的に新構造に移行する",
+          "timeline": "中期フェーズ（2-3週間）"
+        },
+        {
+          "phase": "3. 完全移行",
+          "description": "すべてのテストを新構造に移行し、古いテストを削除する",
+          "timeline": "最終フェーズ（1-2週間）"
+        }
+      ],
+      "priorities": [
+        "コントローラーなどの重要なインターフェース層のテスト",
+        "ドメインのコアロジックのテスト",
+        "リポジトリなどのインフラ層のテスト",
+        "アプリケーション層のユースケーステスト"
+      ]
+    },
+    "coverageGoals": {
+      "@memory-bank/schemas": "90%以上の全体カバレッジ",
+      "@memory-bank/mcp": {
+        "interface層": "90%以上",
+        "application層": "85%以上",
+        "domain層": "90%以上",
+        "infrastructure層": "80%以上",
+        "overall": "85%以上"
+      }
+    },
+    "continuousIntegration": {
+      "strategy": "パイプラインの最適化",
+      "description": "CIパイプラインをモノレポ構造に最適化し、変更があったパッケージのみテストを実行することでCIの効率を向上させます。",
+      "recommendations": [
+        "changesetなどを活用して変更があったパッケージを検出",
+        "パッケージごとにキャッシュを活用",
+        "テスト実行の並列化",
+        "テストの依存関係グラフの最適化"
+      ]
+    },
+    "completionCriteria": [
+      "すべてのコントローラーの単体テストが新構造で作成されている",
+      "テストカバレッジが目標値を達成している",
+      "CIパイプラインがモノレポ構造に最適化されている",
+      "既存のテストがすべて新構造に移行されている"
+    ],
+    "nextSteps": [
+      {
+        "step": "Jestの設定ファイルをパッケージごとに作成",
+        "priority": "high"
+      },
+      {
+        "step": "BranchControllerのテストコードをパッケージ内に配置",
+        "priority": "completed"
+      },
+      {
+        "step": "残りのコントローラーの単体テストを作成",
+        "priority": "high"
+      },
+      {
+        "step": "テストカバレッジレポートの設定と確認",
+        "priority": "medium"
+      },
+      {
+        "step": "CIパイプラインの設定更新",
+        "priority": "medium"
+      }
+    ]
+  }
+}

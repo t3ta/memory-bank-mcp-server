@@ -1,0 +1,128 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "markdown-cleanup-report",
+    "title": "マークダウン遺物削除作業完了レポート",
+    "documentType": "report",
+    "path": "markdown-cleanup-report.json",
+    "tags": [
+      "report",
+      "cleanup",
+      "markdown",
+      "refactoring"
+    ],
+    "lastModified": "2025-03-28T15:35:00.000Z",
+    "createdAt": "2025-03-28T15:35:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "summary": "BranchControllerからマークダウン時代の遺物を完全に削除し、JSONベースの実装に簡素化する作業を完了しました。",
+    "executedSteps": [
+      {
+        "id": "step-1",
+        "description": "readCoreFilesメソッドの簡素化",
+        "actions": [
+          "拡張子のコメントを更新（JSON固定を明示）",
+          "拡張子選択に関するログメッセージを削除",
+          "各ファイル名の変数を直接文字列リテラルに変更（動的生成からハードコードへ）"
+        ],
+        "status": "完了"
+      },
+      {
+        "id": "step-2",
+        "description": "不要なコメント削除",
+        "actions": [
+          "「extension is always '.json' now」のようなマークダウン時代を思わせるコメントを削除"
+        ],
+        "status": "完了"
+      },
+      {
+        "id": "step-3",
+        "description": "不要な変数の削除",
+        "actions": [
+          "extension変数を完全に削除し、ハードコードした文字列に置き換え"
+        ],
+        "status": "完了"
+      },
+      {
+        "id": "bonus",
+        "description": "ビルドエラーの修正（予定外の作業）",
+        "actions": [
+          "ESモジュール形式のインポートパスに.js拡張子を追加"
+        ],
+        "status": "完了（BranchController.tsのみ）"
+      }
+    ],
+    "codeChanges": [
+      {
+        "file": "/Users/t3ta/workspace/memory-bank-mcp-server/packages/mcp/src/interface/controllers/BranchController.ts",
+        "changes": [
+          {
+            "type": "コメント更新",
+            "before": "// Assume .json extension for all core files",
+            "after": "// All core files are using .json format"
+          },
+          {
+            "type": "変数削除",
+            "before": "const extension = '.json';",
+            "after": "// 削除（不要になったため）"
+          },
+          {
+            "type": "ログ削除",
+            "before": "logger.debug(`Using .json extension for core files in branch ${branchName}`);",
+            "after": "// 削除（不要になったため）"
+          },
+          {
+            "type": "ファイル名変更（activeContext）",
+            "before": "const fileName = `activeContext${extension}`;",
+            "after": "const fileName = 'activeContext.json';"
+          },
+          {
+            "type": "ファイル名変更（progress）",
+            "before": "const fileName = `progress${extension}`;",
+            "after": "const fileName = 'progress.json';"
+          },
+          {
+            "type": "ファイル名変更（systemPatterns）",
+            "before": "const fileName = `systemPatterns${extension}`;",
+            "after": "const fileName = 'systemPatterns.json';"
+          },
+          {
+            "type": "ファイル名変更（branchContext）",
+            "before": "const branchFileName = `branchContext${extension}`; // extension is always '.json' now",
+            "after": "const branchFileName = 'branchContext.json';"
+          },
+          {
+            "type": "インポートパス修正",
+            "description": "相対パスでのインポート時に.js拡張子を追加（7箇所）"
+          }
+        ]
+      }
+    ],
+    "testResults": {
+      "buildTest": "BranchController.tsのパスに関するエラーは解消されましたが、他のファイルにも同様の問題が残っています。ただし今回の作業範囲（マークダウン関連遺物の削除）は完了済みです。",
+      "functionalTest": "未実施（ビルドの問題は残っているため）"
+    },
+    "nextSteps": [
+      {
+        "id": "next-1",
+        "description": "他のファイルのインポートパス問題を修正する（BranchController.tsは修正済）",
+        "priority": "高"
+      },
+      {
+        "id": "next-2",
+        "description": "ビルドが成功したら、マークダウン遺物削除の効果を検証",
+        "priority": "中"
+      },
+      {
+        "id": "next-3",
+        "description": "次のタスク（コントローラー単体テスト作成）に進む",
+        "priority": "中",
+        "dependencies": [
+          "next-1"
+        ]
+      }
+    ],
+    "conclusion": "マークダウン時代の遺物を完全に削除し、コードをJSON専用の実装に簡素化することに成功しました。この変更により、コードの可読性と保守性が向上し、非推奨の機能に関連するエラーリスクが減少しました。また、偶然見つかったモジュールインポートパスの問題もBranchController.tsについては修正しています。"
+  }
+}

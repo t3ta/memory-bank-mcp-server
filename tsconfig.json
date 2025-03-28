@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "node16",
-    "moduleResolution": "node16",
+    "module": "NodeNext", // Changed to NodeNext for consistency
+    "moduleResolution": "NodeNext", // Changed to NodeNext for consistency
     "esModuleInterop": true,
     "strict": false,
     "noImplicitAny": false,
@@ -21,8 +21,19 @@
     "noFallthroughCasesInSwitch": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@memory-bank/mcp": ["packages/mcp/src"],
+      "@memory-bank/mcp/*": ["packages/mcp/src/*"],
+      "@memory-bank/schemas": ["packages/schemas/src"],
+      "@memory-bank/schemas/*": ["packages/schemas/src/*"]
+    }
   },
+  "references": [
+    { "path": "./packages/mcp" },
+    { "path": "./packages/schemas" }
+  ],
   "include": [
     "src/**/*"
   ],
@@ -30,6 +41,8 @@
     "node_modules",
     "dist",
     "**/__tests__/**",
-    "**/*.test.ts"
+    "**/*.test.ts",
+    "packages/**/dist",
+    "packages/**/node_modules"
   ]
 }

@@ -1,14 +1,18 @@
+import { ApplicationError } from "../../shared/errors/ApplicationError.js";
 import { BaseError } from "../../shared/errors/BaseError.js";
 import { DomainError } from "../../shared/errors/DomainError.js";
+import { InfrastructureError } from "../../shared/errors/InfrastructureError.js";
 import { logger } from "../../shared/utils/logger.js";
-import { MCPResponsePresenter as IMCPResponsePresenter } from "./types/MCPResponsePresenter.js";
+import type { IPresenter } from "./interfaces/IPresenter.js";
+import type { IResponsePresenter } from "./interfaces/IResponsePresenter.js";
 import type { MCPResponse, MCPSuccessResponse, MCPErrorResponse } from "./types/MCPResponse.js";
 
 /**
  * Presenter for MCP server responses
  * Transforms application output into standardized MCP response format
  */
-export class MCPResponsePresenter implements IMCPResponsePresenter {
+export class MCPResponsePresenter
+  implements IPresenter<MCPResponse, MCPResponse>, IResponsePresenter {
   /**
    * Present success response
    * @param data Data to present
@@ -56,9 +60,12 @@ export class MCPResponsePresenter implements IMCPResponsePresenter {
     if (error instanceof DomainError) {
       // Domain errors are client errors (4xx)
       errorResponse.error.code = `DOMAIN_ERROR.${error.code}`;
-    } else if (error instanceof BaseError) {
-      // Other BaseError types (unified error handling)
-      errorResponse.error.code = `ERROR.${error.code}`;
+    } else if (error instanceof ApplicationError) {
+      // Application errors could be client or server errors
+      errorResponse.error.code = `APP_ERROR.${error.code}`;
+    } else if (error instanceof InfrastructureError) {
+      // Infrastructure errors are server errors (5xx)
+      errorResponse.error.code = `INFRA_ERROR.${error.code}`;
     }
 
     return errorResponse;

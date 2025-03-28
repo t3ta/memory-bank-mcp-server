@@ -4,8 +4,17 @@ import { IBranchController } from '../interface/controllers/interfaces/IBranchCo
 import { IContextController } from '../interface/controllers/interfaces/IContextController.js';
 import { ITemplateController } from '../interface/controllers/interfaces/ITemplateController.js';
 import { Constants } from './config/constants.js';
-import type { CliOptions } from '@memory-bank/schemas';
+// Removed incorrect import: import type { CliOptions } from '@memory-bank/schemas';
 import { logger } from '../shared/utils/logger.js';
+import type { Language } from '@memory-bank/schemas/index.js';
+
+// Define a minimal options interface needed by the Application
+interface MinimalAppOptions {
+  docsRoot?: string;
+  language?: Language;
+  verbose?: boolean;
+  // Add other properties if setupContainer needs them
+}
 
 /**
  * Application main class
@@ -13,7 +22,7 @@ import { logger } from '../shared/utils/logger.js';
  */
 export class Application {
   // Debug用にoptions可視性を変更
-  public options: CliOptions;
+  public options: MinimalAppOptions; // Use the minimal options type
   private container: any;
   private globalController?: IGlobalController;
   private branchController?: IBranchController;
@@ -22,9 +31,9 @@ export class Application {
 
   /**
    * Constructor
-   * @param options CLI options
+   * @param options Minimal application options
    */
-  constructor(options?: CliOptions) {
+  constructor(options?: MinimalAppOptions) { // Use the minimal options type
     this.options = options || {};
     logger.info(`Starting ${Constants.APP_NAME} v${Constants.VERSION}`);
   }

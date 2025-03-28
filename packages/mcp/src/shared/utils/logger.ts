@@ -76,5 +76,4 @@ export function createConsoleLogger(level: LogLevel = 'info'): Logger {
   };
 }
 
-// Export a default logger with 'warn' level for development
 export const logger = createConsoleLogger('warn');

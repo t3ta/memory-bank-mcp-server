@@ -1,6 +1,6 @@
 /**
  * Common Type Definitions
- * 
+ *
  * This file contains shared type definitions used across the MCP package.
  * Most of these types are defined within this package as they aren't part
  * of the schemas package yet.
@@ -8,6 +8,7 @@
 
 // Import what's available from schemas package
 import type { ValidationResult, ValidationErrorType } from '@memory-bank/schemas';
+// import type { CliOptions } from './infrastructure/config/WorkspaceConfig.js'; // Removed unused import
 
 // Export common types
 export {
@@ -16,12 +17,13 @@ export {
 };
 
 // Our own type definitions (not yet moved to schemas package)
-export type MemoryDocument = {
-  path: string;
-  content: string;
-  tags: string[];
-  lastModified: Date;
-};
+// Removed duplicate MemoryDocument type definition (use class from domain/entities)
+// export type MemoryDocument = {
+//   path: string;
+//   content: string;
+//   tags: string[];
+//   lastModified: Date;
+// };
 
 export type ToolContent = {
   type: string;
@@ -61,12 +63,6 @@ export type WorkspaceConfig = {
   verbose: boolean;
   language: string;
 };
-
-// Importing CliOptions from schemas package
-import type { CliOptions } from '@memory-bank/schemas';
-
-// Re-export for convenience
-export type { CliOptions };
 
 export type SectionEdit = {
   header: string;

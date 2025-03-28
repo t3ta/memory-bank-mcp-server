@@ -23,7 +23,7 @@ import { InfrastructureError } from "../../shared/errors/InfrastructureError.js"
 import { logger } from "../../shared/utils/logger.js";
 import type { MCPResponsePresenter } from "../presenters/MCPResponsePresenter.js";
 import type { MCPResponse } from "../presenters/types/MCPResponse.js";
-import type { IBranchController } from "./interfaces/IBranchController.js";
+import type { IBranchController } from "./interfaces/IBranchController.js"; // Added .js extension
 
 /**
  * Controller for branch memory bank operations
@@ -175,109 +175,61 @@ export class BranchController implements IBranchController {
       // Format response to maintain backward compatibility
       const formattedResult: Record<string, DocumentDTO> = {};
 
-      // Determine which file extension to use (.json preferred)
-      let useJsonExtension = true;
+      // All core files are using .json format
 
-      // Check for existence of files to determine extension preference
-      try {
-        // Try to find a branchContext file to check which extension is available
-        // Check json first
-        await this.readBranchDocumentUseCase.execute({
-          branchName,
-          path: 'branchContext.json',
-        });
-        useJsonExtension = true;
-        logger.debug(`Using .json extension for files in branch ${branchName}`);
-      } catch (jsonError) {
-        try {
-          // Try md if json failed
-          await this.readBranchDocumentUseCase.execute({
-            branchName,
-            path: 'branchContext.md',
-          });
-          useJsonExtension = false;
-          logger.debug(`Using .md extension for files in branch ${branchName}`);
-        } catch (mdError) {
-          // If both fail, default to json (forward compatible)
-          useJsonExtension = true;
-          logger.debug(`No core files found, defaulting to .json extension for branch ${branchName}`);
-        }
-      }
-
-      // File extension to use based on availability
-      const extension = useJsonExtension ? '.json' : '.md';
+      // Map results from ReadBranchCoreFilesUseCase to DocumentDTO format
+      // Content should be the stringified JSON object from the use case result
 
       // If activeContext exists in the result
       if (result.files.activeContext) {
-        const fileName = `activeContext${extension}`;
+        const fileName = 'activeContext.json';
         formattedResult[fileName] = {
           path: fileName,
-          content: this.generateActiveContextContent(result.files.activeContext),
+          // Stringify the JSON object received from the use case
+          content: JSON.stringify(result.files.activeContext, null, 2),
           tags: ['core', 'active-context'],
-          lastModified: new Date().toISOString(),
+          lastModified: new Date().toISOString(), // Consider using actual lastModified if available
         };
       }
 
       // If progress exists in the result
       if (result.files.progress) {
-        const fileName = `progress${extension}`;
+        const fileName = 'progress.json';
         formattedResult[fileName] = {
           path: fileName,
-          content: this.generateProgressContent(result.files.progress),
+          // Stringify the JSON object received from the use case
+          content: JSON.stringify(result.files.progress, null, 2),
           tags: ['core', 'progress'],
-          lastModified: new Date().toISOString(),
+          lastModified: new Date().toISOString(), // Consider using actual lastModified if available
         };
       }
 
       // If systemPatterns exists in the result
       if (result.files.systemPatterns) {
-        const fileName = `systemPatterns${extension}`;
+        const fileName = 'systemPatterns.json';
         formattedResult[fileName] = {
           path: fileName,
-          content: this.generateSystemPatternsContent(result.files.systemPatterns),
+          // Stringify the JSON object received from the use case
+          content: JSON.stringify(result.files.systemPatterns, null, 2),
           tags: ['core', 'system-patterns'],
-          lastModified: new Date().toISOString(),
+          lastModified: new Date().toISOString(), // Consider using actual lastModified if available
         };
       }
 
-      // For branchContext, try both extensions (.json first, then .md as fallback)
+      // Read branchContext.json
+      const branchFileName = 'branchContext.json';
       try {
-        const branchFileName = `branchContext${extension}`;
-        let branchContextResult;
-
-        try {
-          branchContextResult = await this.readBranchDocumentUseCase.execute({
-            branchName,
-            path: branchFileName,
-          });
-        } catch (primaryError) {
-          logger.warn(`Could not find ${branchFileName}, trying fallback extension`);
-          // If first extension fails, try the other one
-          const fallbackExtension = useJsonExtension ? '.md' : '.json';
-          const fallbackFileName = `branchContext${fallbackExtension}`;
-
-          branchContextResult = await this.readBranchDocumentUseCase.execute({
-            branchName,
-            path: fallbackFileName,
-          });
-
-          // If fallback worked, use that extension for this file
-          formattedResult[fallbackFileName] = branchContextResult.document;
-          return this.presenter.present(formattedResult);
-        }
-
+        const branchContextResult = await this.readBranchDocumentUseCase.execute({
+          branchName,
+          path: branchFileName,
+        });
         formattedResult[branchFileName] = branchContextResult.document;
       } catch (error) {
-        logger.error(`Error reading branchContext file from branch ${branchName}:`, error);
-
-        // Add empty placeholder for missing file
-        const fallbackFileName = `branchContext${extension}`;
-        formattedResult[fallbackFileName] = {
-          path: fallbackFileName,
-          content: '',
-          tags: ['core', 'branch-context'],
-          lastModified: new Date().toISOString(),
-        };
+        // Log error if branchContext.json cannot be read, but don't throw.
+        // The use case might handle creation or it might be optional depending on context.
+        logger.warn(`Could not read ${branchFileName} for branch ${branchName}:`, error);
+        // Optionally add a placeholder if needed by the caller, but often it's better to return only existing files.
+        // formattedResult[branchFileName] = { path: branchFileName, content: '', tags: ['core', 'branch-context'], lastModified: new Date().toISOString() };
       }
 
       return this.presenter.present(formattedResult);
@@ -305,42 +257,25 @@ export class BranchController implements IBranchController {
         );
       }
 
-      // Handle branchContext.md separately since it's not part of the CoreFilesDTO
-      if (files['branchContext.md']) {
-        const content = this.extractContent(files['branchContext.md']);
-
-        await this.writeBranchDocumentUseCase.execute({
-          branchName,
-          document: {
-            path: 'branchContext.md',
-            content,
-            tags: ['core', 'branch-context'],
-          },
-        });
-
-        // Remove from files to avoid processing it again
-        delete files['branchContext.md'];
-      }
-
-      // Prepare CoreFilesDTO from the remaining files
+      // Prepare CoreFilesDTO from the input files (assuming they are already JSON objects or strings)
       const coreFiles: CoreFilesDTO = {};
 
-      // Process activeContext.md
-      if (files['activeContext.md']) {
-        const content = this.extractContent(files['activeContext.md']);
-        coreFiles.activeContext = this.parseActiveContextContent(content);
+      // Process activeContext.json (assuming input is already a JSON object)
+      if (files['activeContext.json']) {
+        // Directly assign the object, assuming CreateBranchCoreFilesUseCase expects an object
+        coreFiles.activeContext = files['activeContext.json'];
       }
 
-      // Process progress.md
-      if (files['progress.md']) {
-        const content = this.extractContent(files['progress.md']);
-        coreFiles.progress = this.parseProgressContent(content);
+      // Process progress.json (assuming input is already a JSON object)
+      if (files['progress.json']) {
+        // Directly assign the object
+        coreFiles.progress = files['progress.json'];
       }
 
-      // Process systemPatterns.md
-      if (files['systemPatterns.md']) {
-        const content = this.extractContent(files['systemPatterns.md']);
-        coreFiles.systemPatterns = this.parseSystemPatternsContent(content);
+      // Process systemPatterns.json (assuming input is already a JSON object)
+      if (files['systemPatterns.json']) {
+        // Directly assign the object
+        coreFiles.systemPatterns = files['systemPatterns.json'];
       }
 
       // Use the new CreateBranchCoreFilesUseCase
@@ -599,9 +534,12 @@ export class BranchController implements IBranchController {
         );
       }
 
+      // Note: SearchJsonDocumentsUseCase doesn't support direct text queries
+      // We need to modify the implementation to support text search
+      // For now, just search by document type
       const result = await this.searchJsonDocumentsUseCase.execute({
         branchName,
-        query,
+        documentType: '*' as DocumentType, // Use wildcard type to get all documents
       });
 
       return this.presenter.present(result.documents);
@@ -638,312 +576,14 @@ export class BranchController implements IBranchController {
     }
   }
 
-  /**
-   * Extract content from various input formats
-   * @param input Input content (string or object with content property)
-   * @returns Extracted content string
-   */
-  private extractContent(input: any): string {
-    if (typeof input === 'string') {
-      return input;
-    } else if (input && typeof input === 'object' && 'content' in input) {
-      return input.content as string;
-    }
-
-    // Assuming DomainError constructor takes code as string
-    throw new DomainError('VALIDATION_ERROR', 'Invalid content format');
-  }
-
-  /**
-   * Parse activeContext content from markdown
-   * @param content Markdown content
-   * @returns ActiveContextDTO
-   */
-  private parseActiveContextContent(content: string): any {
-    // Simple parsing, in real implementation this would use the same parser as in ReadBranchCoreFilesUseCase
-    const result: any = {
-      currentWork: '',
-      recentChanges: [],
-      activeDecisions: [],
-      considerations: [],
-      nextSteps: [],
-    };
-
-    // Extract current work
-    const currentWorkMatch = content.match(/## 現在の作業内容\n\n(.*?)(?:\n##|$)/s);
-    if (currentWorkMatch && currentWorkMatch[1].trim()) {
-      result.currentWork = currentWorkMatch[1].trim();
-    }
-
-    // Extract recent changes
-    const recentChangesMatch = content.match(/## 最近の変更点\n\n(.*?)(?:\n##|$)/s);
-    if (recentChangesMatch && recentChangesMatch[1].trim()) {
-      result.recentChanges = recentChangesMatch[1]
-        .trim()
-        .split('\n')
-        .filter((line) => line.startsWith('- '))
-        .map((line) => line.substring(2).trim());
-    }
-
-    // Extract active decisions
-    const activeDecisionsMatch = content.match(/## アクティブな決定事項\n\n(.*?)(?:\n##|$)/s);
-    if (activeDecisionsMatch && activeDecisionsMatch[1].trim()) {
-      result.activeDecisions = activeDecisionsMatch[1]
-        .trim()
-        .split('\n')
-        .filter((line) => line.startsWith('- '))
-        .map((line) => line.substring(2).trim());
-    }
-
-    // Extract considerations
-    const considerationsMatch = content.match(/## 検討事項\n\n(.*?)(?:\n##|$)/s);
-    if (considerationsMatch && considerationsMatch[1].trim()) {
-      result.considerations = considerationsMatch[1]
-        .trim()
-        .split('\n')
-        .filter((line) => line.startsWith('- '))
-        .map((line) => line.substring(2).trim());
-    }
-
-    // Extract next steps
-    const nextStepsMatch = content.match(/## 次のステップ\n\n(.*?)(?:\n##|$)/s);
-    if (nextStepsMatch && nextStepsMatch[1].trim()) {
-      result.nextSteps = nextStepsMatch[1]
-        .trim()
-        .split('\n')
-        .filter((line) => line.startsWith('- '))
-        .map((line) => line.substring(2).trim());
-    }
-
-    return result;
-  }
-
-  /**
-   * Parse progress content from markdown
-   * @param content Markdown content
-   * @returns ProgressDTO
-   */
-  private parseProgressContent(content: string): any {
-    // Simple parsing, in real implementation this would use the same parser as in ReadBranchCoreFilesUseCase
-    const result: any = {
-      workingFeatures: [],
-      pendingImplementation: [],
-      status: '',
-      knownIssues: [],
-    };
-
-    // Extract working features
-    const workingFeaturesMatch = content.match(/## 動作している機能\n\n(.*?)(?:\n##|$)/s);
-    if (workingFeaturesMatch && workingFeaturesMatch[1].trim()) {
-      result.workingFeatures = workingFeaturesMatch[1]
-        .trim()
-        .split('\n')
-        .filter((line) => line.startsWith('- '))
-        .map((line) => line.substring(2).trim());
-    }
-
-    // Extract pending implementation
-    const pendingImplementationMatch = content.match(/## 未実装の機能\n\n(.*?)(?:\n##|$)/s);
-    if (pendingImplementationMatch && pendingImplementationMatch[1].trim()) {
-      result.pendingImplementation = pendingImplementationMatch[1]
-        .trim()
-        .split('\n')
-        .filter((line) => line.startsWith('- '))
-        .map((line) => line.substring(2).trim());
-    }
-
-    // Extract status
-    const statusMatch = content.match(/## 現在の状態\n\n(.*?)(?:\n##|$)/s);
-    if (statusMatch && statusMatch[1].trim()) {
-      result.status = statusMatch[1].trim();
-    }
-
-    // Extract known issues
-    const knownIssuesMatch = content.match(/## 既知の問題\n\n(.*?)(?:\n##|$)/s);
-    if (knownIssuesMatch && knownIssuesMatch[1].trim()) {
-      result.knownIssues = knownIssuesMatch[1]
-        .trim()
-        .split('\n')
-        .filter((line) => line.startsWith('- '))
-        .map((line) => line.substring(2).trim());
-    }
-
-    return result;
-  }
-
-  /**
-   * Parse system patterns content from markdown
-   * @param content Markdown content
-   * @returns SystemPatternsDTO
-   */
-  private parseSystemPatternsContent(content: string): any {
-    // Simple parsing, in real implementation this would use the same parser as in ReadBranchCoreFilesUseCase
-    const result: any = {
-      technicalDecisions: [],
-    };
-
-    // Find all technical decisions sections
-    const decisions = content.match(
-      /### (.+?)\n\n#### コンテキスト\n\n(.*?)\n\n#### 決定事項\n\n(.*?)\n\n#### 影響\n\n(.*?)(?=\n###|\n##|$)/gs
-    );
-
-    if (decisions) {
-      result.technicalDecisions = decisions.map((decision) => {
-        // Extract parts of each decision
-        const titleMatch = decision.match(/### (.+?)\n/);
-        const contextMatch = decision.match(/#### コンテキスト\n\n(.*?)\n\n/s);
-        const decisionMatch = decision.match(/#### 決定事項\n\n(.*?)\n\n/s);
-        const consequencesMatch = decision.match(/#### 影響\n\n(.*?)(?=\n###|\n##|$)/s);
-
-        // Parse consequences list
-        const consequences = consequencesMatch
-          ? consequencesMatch[1]
-            .trim()
-            .split('\n')
-            .filter((line) => line.startsWith('- '))
-            .map((line) => line.substring(2).trim())
-          : [];
-
-        return {
-          title: titleMatch ? titleMatch[1].trim() : '',
-          context: contextMatch ? contextMatch[1].trim() : '',
-          decision: decisionMatch ? decisionMatch[1].trim() : '',
-          consequences,
-        };
-      });
-    }
-
-    return result;
-  }
-
-  /**
-   * Generate markdown content from ActiveContextDTO
-   * @param activeContext ActiveContextDTO
-   * @returns Markdown content
-   */
-  private generateActiveContextContent(activeContext: any): string {
-    let markdown = '# アクティブコンテキスト\n\n';
-
-    // Current Work
-    markdown += '## 現在の作業内容\n\n';
-    if (activeContext.currentWork) {
-      markdown += `${activeContext.currentWork}\n`;
-    }
-
-    // Recent Changes
-    markdown += '## 最近の変更点\n\n';
-    if (activeContext.recentChanges && activeContext.recentChanges.length > 0) {
-      activeContext.recentChanges.forEach((change: string) => {
-        markdown += `- ${change}\n`;
-      });
-    }
-
-    // Active Decisions
-    markdown += '## アクティブな決定事項\n\n';
-    if (activeContext.activeDecisions && activeContext.activeDecisions.length > 0) {
-      activeContext.activeDecisions.forEach((decision: string) => {
-        markdown += `- ${decision}\n`;
-      });
-    }
-
-    // Considerations
-    markdown += '## 検討事項\n\n';
-    if (activeContext.considerations && activeContext.considerations.length > 0) {
-      activeContext.considerations.forEach((consideration: string) => {
-        markdown += `- ${consideration}\n`;
-      });
-    }
-
-    // Next Steps
-    markdown += '## 次のステップ\n\n';
-    if (activeContext.nextSteps && activeContext.nextSteps.length > 0) {
-      activeContext.nextSteps.forEach((step: string) => {
-        markdown += `- ${step}\n`;
-      });
-    }
-
-    return markdown;
-  }
-
-  /**
-   * Generate markdown content from ProgressDTO
-   * @param progress ProgressDTO
-   * @returns Markdown content
-   */
-  private generateProgressContent(progress: any): string {
-    let markdown = '# 進捗状況\n\n';
-
-    // Working Features
-    markdown += '## 動作している機能\n\n';
-    if (progress.workingFeatures && progress.workingFeatures.length > 0) {
-      progress.workingFeatures.forEach((feature: string) => {
-        markdown += `- ${feature}\n`;
-      });
-    }
-
-    // Pending Implementation
-    markdown += '## 未実装の機能\n\n';
-    if (progress.pendingImplementation && progress.pendingImplementation.length > 0) {
-      progress.pendingImplementation.forEach((item: string) => {
-        markdown += `- ${item}\n`;
-      });
-    }
-
-    // Current Status
-    markdown += '## 現在の状態\n\n';
-    if (progress.status) {
-      markdown += `${progress.status}\n`;
-    }
-
-    // Known Issues
-    markdown += '## 既知の問題\n\n';
-    if (progress.knownIssues && progress.knownIssues.length > 0) {
-      progress.knownIssues.forEach((issue: string) => {
-        markdown += `- ${issue}\n`;
-      });
-    }
-
-    return markdown;
-  }
-
-  /**
-   * Generate markdown content from SystemPatternsDTO
-   * @param systemPatterns SystemPatternsDTO
-   * @returns Markdown content
-   */
-  private generateSystemPatternsContent(systemPatterns: any): string {
-    let markdown = '# システムパターン\n\n';
-
-    // Technical Decisions
-    markdown += '## 技術的決定事項\n\n';
-
-    if (systemPatterns.technicalDecisions && systemPatterns.technicalDecisions.length > 0) {
-      systemPatterns.technicalDecisions.forEach((decision: any) => {
-        // Decision title
-        markdown += `### ${decision.title}\n\n`;
-
-        // Context
-        markdown += '#### コンテキスト\n\n';
-        markdown += `${decision.context}\n\n`;
-
-        // Decision
-        markdown += '#### 決定事項\n\n';
-        markdown += `${decision.decision}\n\n`;
-
-        // Consequences
-        markdown += '#### 影響\n\n';
-        if (decision.consequences && decision.consequences.length > 0) {
-          decision.consequences.forEach((consequence: string) => {
-            markdown += `- ${consequence}\n`;
-          });
-        }
-
-        markdown += '\n';
-      });
-    }
-
-    return markdown;
-  }
+  // Removed unused private methods:
+  // - extractContent
+  // - parseActiveContextContent
+  // - parseProgressContent
+  // - parseSystemPatternsContent
+  // - generateActiveContextContent
+  // - generateProgressContent
+  // - generateSystemPatternsContent
 
   /**
    * Handle errors in controller methods

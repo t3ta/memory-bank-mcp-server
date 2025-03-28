@@ -1,0 +1,226 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "package-structure-analyzer-implementation",
+    "title": "パッケージ構造解析ツールの実装計画",
+    "documentType": "implementation",
+    "path": "package-structure-analyzer-implementation.json",
+    "tags": [
+      "ts-morph",
+      "mermaid",
+      "structure",
+      "implementation"
+    ],
+    "lastModified": "2025-03-28T18:45:00.000Z",
+    "createdAt": "2025-03-28T18:45:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "description": "ts-morphを使用したパッケージ構造解析ツールの実装詳細とステップ",
+      "scope": "基本的な構造解析と可視化を行うツールの実装"
+    },
+    "implementation": {
+      "mainComponents": [
+        {
+          "name": "PackageAnalyzer",
+          "purpose": "プロジェクト構造の解析",
+          "implementation": {
+            "methods": [
+              {
+                "name": "analyzeProject",
+                "description": "プロジェクト全体を解析し、構造情報を取得する",
+                "parameters": "projectPath: string",
+                "returns": "ProjectStructure（構造化された解析結果）"
+              },
+              {
+                "name": "analyzeDirectory",
+                "description": "指定されたディレクトリ内の構造を解析する",
+                "parameters": "directory: Directory, options: AnalyzeOptions",
+                "returns": "DirectoryStructure（ディレクトリの構造情報）"
+              },
+              {
+                "name": "analyzeSourceFile",
+                "description": "ソースファイルを解析し、含まれる要素を特定する",
+                "parameters": "sourceFile: SourceFile, options: AnalyzeOptions",
+                "returns": "FileStructure（ファイルの構造情報）"
+              }
+            ]
+          }
+        },
+        {
+          "name": "MermaidGenerator",
+          "purpose": "解析結果からmermaid図を生成",
+          "implementation": {
+            "methods": [
+              {
+                "name": "generateClassDiagram",
+                "description": "クラス図を生成する",
+                "parameters": "structure: ProjectStructure, options: DiagramOptions",
+                "returns": "string（mermaid構文）"
+              },
+              {
+                "name": "generateDirectoryDiagram",
+                "description": "ディレクトリ構造図を生成する",
+                "parameters": "structure: ProjectStructure, options: DiagramOptions",
+                "returns": "string（mermaid構文）"
+              },
+              {
+                "name": "generateDependencyDiagram",
+                "description": "依存関係図を生成する",
+                "parameters": "structure: ProjectStructure, options: DiagramOptions",
+                "returns": "string（mermaid構文）"
+              }
+            ]
+          }
+        }
+      ],
+      "dataStructures": [
+        {
+          "name": "ProjectStructure",
+          "description": "プロジェクト全体の構造情報を保持するインターフェース",
+          "properties": [
+            "rootDirectories: DirectoryStructure[]",
+            "packagePaths: Map<string, string>",
+            "configuration: ProjectConfig"
+          ]
+        },
+        {
+          "name": "DirectoryStructure",
+          "description": "ディレクトリの構造情報を保持するインターフェース",
+          "properties": [
+            "name: string",
+            "path: string",
+            "files: FileStructure[]",
+            "subdirectories: DirectoryStructure[]",
+            "isPackage: boolean"
+          ]
+        },
+        {
+          "name": "FileStructure",
+          "description": "ファイルの構造情報を保持するインターフェース",
+          "properties": [
+            "name: string",
+            "path: string",
+            "classes: ClassInfo[]",
+            "interfaces: InterfaceInfo[]",
+            "functions: FunctionInfo[]",
+            "imports: ImportInfo[]"
+          ]
+        },
+        {
+          "name": "ClassInfo",
+          "description": "クラスの情報を保持するインターフェース",
+          "properties": [
+            "name: string",
+            "isExported: boolean",
+            "methods: MethodInfo[]",
+            "properties: PropertyInfo[]",
+            "extends?: string",
+            "implements?: string[]"
+          ]
+        },
+        {
+          "name": "InterfaceInfo",
+          "description": "インターフェースの情報を保持するインターフェース",
+          "properties": [
+            "name: string",
+            "isExported: boolean",
+            "methods: MethodInfo[]",
+            "properties: PropertyInfo[]",
+            "extends?: string[]"
+          ]
+        }
+      ]
+    },
+    "implementationSteps": [
+      {
+        "phase": "初期設定",
+        "steps": [
+          "必要なパッケージが正しくインストールされているか確認（ts-morphなど）",
+          "基本的なディレクトリ構造とファイルを作成",
+          "tsconfig.jsonの設定を確認"
+        ]
+      },
+      {
+        "phase": "基本解析機能の実装",
+        "steps": [
+          "PackageAnalyzerクラスを実装",
+          "プロジェクト構造を解析するための基本メソッドを実装",
+          "ディレクトリとファイルの構造をモデル化"
+        ]
+      },
+      {
+        "phase": "Mermaid生成機能の実装",
+        "steps": [
+          "MermaidGeneratorクラスを実装",
+          "基本的なディレクトリ構造図の生成機能を実装",
+          "クラス図の生成機能を実装"
+        ]
+      },
+      {
+        "phase": "ツールの統合",
+        "steps": [
+          "コマンドライン引数の処理を実装",
+          "設定ファイルの読み込み機能を実装",
+          "出力オプションの実装"
+        ]
+      },
+      {
+        "phase": "テストと改良",
+        "steps": [
+          "実際のプロジェクト構造での動作テスト",
+          "出力結果の調整と改良",
+          "エラーハンドリングの強化"
+        ]
+      }
+    ],
+    "filesToCreate": [
+      {
+        "path": "tools/package-analyzer.ts",
+        "description": "プロジェクト構造解析のコアロジック"
+      },
+      {
+        "path": "tools/mermaid-generator.ts",
+        "description": "mermaid図生成のロジック"
+      },
+      {
+        "path": "tools/types.ts",
+        "description": "共通のインターフェースと型定義"
+      },
+      {
+        "path": "tools/config.ts",
+        "description": "設定管理とオプション処理"
+      },
+      {
+        "path": "tools/index.ts",
+        "description": "メインエントリポイント"
+      }
+    ],
+    "executionPlan": {
+      "phases": [
+        {
+          "name": "Phase 1: 基本実装",
+          "description": "基本的な構造解析とmermaid生成機能の実装",
+          "estimatedTime": "2-3時間",
+          "deliverables": [
+            "基本的なパッケージ構造の解析機能",
+            "シンプルなmermaidダイアグラム生成機能",
+            "基本的なコマンドラインインターフェース"
+          ]
+        },
+        {
+          "name": "Phase 2: 改良と拡張",
+          "description": "基本機能を改良し、より詳細な解析と視覚化機能を追加",
+          "estimatedTime": "2-3時間",
+          "deliverables": [
+            "詳細なクラス情報の解析機能",
+            "依存関係の可視化機能",
+            "高度なフィルタリングオプション"
+          ]
+        }
+      ],
+      "initialFocus": "まずはPhase 1に集中し、基本的な構造解析とmermaid生成機能を実装する。動作確認後、必要に応じてPhase 2の機能を追加していく。"
+    }
+  }
+}

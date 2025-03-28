@@ -3,7 +3,7 @@ import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprot
 import { Application } from './Application.js';
 import { logger } from '../shared/utils/logger.js';
 import { Language, isValidLanguage } from '@memory-bank/schemas';
-import type { CliOptions } from './index.js';
+import type { CliOptions } from '@/infrastructure/config/WorkspaceConfig.js';
 
 // Import tool definitions (we'll simulate this for now)
 const AVAILABLE_TOOLS = [
@@ -424,9 +424,9 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
 
           // Format the response data properly for MCP protocol
           const formattedResponse = {
-            rules: response.data.rules,
-            branchMemory: response.data.branchMemory,
-            globalMemory: response.data.globalMemory
+            rules: response.data?.rules,
+            branchMemory: response.data?.branchMemory,
+            globalMemory: response.data?.globalMemory
           };
 
           return {

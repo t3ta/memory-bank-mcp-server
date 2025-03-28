@@ -78,7 +78,6 @@ export class DIContainer {
   remove(name: string): void {
     this.services.delete(name);
     this.factories.delete(name);
-    this.asyncFactories.delete(name);
   }
 
   /**
@@ -87,6 +86,5 @@ export class DIContainer {
   clear(): void {
     this.services.clear();
     this.factories.clear();
-    this.asyncFactories.clear();
   }
 }
