@@ -21,7 +21,10 @@ export class GlobalController implements IGlobalController {
    * Constructor
    * @param readGlobalDocumentUseCase Use case for reading global documents
    * @param writeGlobalDocumentUseCase Use case for writing global documents
+   * @param searchDocumentsByTagsUseCase Use case for searching documents by tags
+   * @param updateTagIndexUseCase Use case for updating tag index
    * @param presenter Response presenter
+   * @param options Optional dependencies like JSON document use cases and V2 tag index
    */
   // Optional dependencies
   private readonly updateTagIndexUseCaseV2?: UpdateTagIndexUseCaseV2;
@@ -99,7 +102,7 @@ export class GlobalController implements IGlobalController {
 
   /**
    * Read core files from global memory bank
-   * @returns Promise resolving to MCP response with core files content
+   * @returns Promise resolving to MCP response with core files
    */
   async readCoreFiles(): Promise<MCPResponse<Record<string, DocumentDTO>>> {
     try {
@@ -124,10 +127,10 @@ export class GlobalController implements IGlobalController {
           const docResult = await this.readGlobalDocumentUseCase.execute({ path: documentPath });
           
           if (docResult && docResult.document) {
-            result[documentPath] = docResult.document;
+            result[documentPath.replace('.json', '')] = docResult.document;
           } else {
             // Add empty placeholder for missing file
-            result[documentPath] = {
+            result[documentPath.replace('.json', '')] = {
               path: documentPath,
               content: '',
               tags: ['global', 'core', documentPath.replace('.json', '')],
@@ -139,7 +142,7 @@ export class GlobalController implements IGlobalController {
           logger.error(`Error reading global core file ${documentPath}:`, error);
 
           // Add empty placeholder for missing file
-          result[documentPath] = {
+          result[documentPath.replace('.json', '')] = {
             path: documentPath,
             content: '',
             tags: ['global', 'core', documentPath.replace('.json', '')],

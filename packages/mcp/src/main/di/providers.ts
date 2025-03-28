@@ -7,12 +7,8 @@ import { IIndexService } from '@/infrastructure/index/interfaces/IIndexService.j
 import { FileSystemJsonDocumentRepository } from '@/infrastructure/repositories/file-system/FileSystemJsonDocumentRepository.js';
 import { IJsonDocumentRepository } from '@/domain/repositories/IJsonDocumentRepository.js';
 import { II18nRepository } from '@/domain/i18n/II18nRepository.js';
-
-// Domain layer
-
 import { ReadRulesUseCase } from '@/application/usecases/common/ReadRulesUseCase.js';
 import { ReadContextUseCase } from '@/application/usecases/common/ReadContextUseCase.js';
-import { WriteGlobalDocumentUseCase } from '@/application/usecases/global/WriteGlobalDocumentUseCase.js';
 import { ReadBranchDocumentUseCase } from '@/application/usecases/branch/ReadBranchDocumentUseCase.js';
 import { WriteBranchDocumentUseCase } from '@/application/usecases/branch/WriteBranchDocumentUseCase.js';
 import { SearchDocumentsByTagsUseCase } from '@/application/usecases/common/SearchDocumentsByTagsUseCase.js';
@@ -174,24 +170,30 @@ export async function registerApplicationServices(container: DIContainer): Promi
 
     return new ReadGlobalDocumentUseCase(globalRepository);
   });
+  
+  // Register mockup for markdown migration service
+  container.registerFactory('markdownMigrationService', async () => {
+    // Create a mock template repository since we're removing the actual implementation
+    const mockTemplateRepository = {
+      getTemplate: async () => null,
+      getTemplateAsMarkdown: async () => '',
+      getTemplatesByType: async () => [],
+      saveTemplate: async () => false,
+      templateExists: async () => false,
+      getAllTemplateIds: async () => [],
+      getAllTemplateTypes: async () => []
+    };
+    
+    const configProvider = await container.get<IConfigProvider>('configProvider');
+    const config = configProvider.getConfig();
 
-  container.registerFactory('writeGlobalDocumentUseCase', async () => {
-    // Use explicit type assertion for proper type safety
-    const globalRepository = await container.get<FileSystemGlobalMemoryBankRepository>(
-      'globalMemoryBankRepository'
-    );
+    // Set up markdown and backup directory paths
+    const markdownDir = path.join(config.docsRoot, 'templates', 'markdown');
+    const backupDir = path.join(config.docsRoot, 'templates', 'backup');
 
-    // Use factory to get properly configured WriteGlobalDocumentUseCase with migration settings
-    return UseCaseFactory.createWriteGlobalDocumentUseCase(globalRepository);
-  });
-
-  container.registerFactory('readBranchDocumentUseCase', () => {
-    // Use explicit type assertion for proper type safety
-    const branchRepository = container.get(
-      'branchMemoryBankRepository'
-    ) as FileSystemBranchMemoryBankRepository;
-
-    return new ReadBranchDocumentUseCase(branchRepository);
+    // Import and instantiate the MarkdownMigrationService
+    const { MarkdownMigrationService } = await import('../../migration/MarkdownMigrationService.js');
+    return new MarkdownMigrationService(mockTemplateRepository, markdownDir, backupDir);
   });
 
   container.registerFactory('writeBranchDocumentUseCase', () => {
@@ -332,37 +334,13 @@ export async function registerApplicationServices(container: DIContainer): Promi
     return new CreateBranchCoreFilesUseCase(branchRepository);
   });
 
-  // Register template and i18n services
+  // Register i18n service
   container.registerFactory('i18nService', async () => {
     const i18nRepository = container.get('i18nRepository') as II18nRepository;
 
     // Import and instantiate the I18nService
-    const { I18nService } = await import('@/application/i18n/I18nService.js'); // Corrected path
+    const { I18nService } = await import('@/application/i18n/I18nService.js');
     return new I18nService(i18nRepository);
-  });
-
-  container.registerFactory('markdownMigrationService', async () => {
-    // Create a mock template repository since we're removing the actual implementation
-    const mockTemplateRepository = {
-      getTemplate: async () => null,
-      getTemplateAsMarkdown: async () => '',
-      getTemplatesByType: async () => [],
-      saveTemplate: async () => false,
-      templateExists: async () => false,
-      getAllTemplateIds: async () => [],
-      getAllTemplateTypes: async () => []
-    };
-
-    const configProvider = await container.get<IConfigProvider>('configProvider');
-    const config = configProvider.getConfig(); // Removed await
-
-    // Set up markdown and backup directory paths
-    const markdownDir = path.join(config.docsRoot, 'templates', 'markdown');
-    const backupDir = path.join(config.docsRoot, 'templates', 'backup');
-
-    // Import and instantiate the MarkdownMigrationService
-    const { MarkdownMigrationService } = await import('../../migration/MarkdownMigrationService.js');
-    return new MarkdownMigrationService(mockTemplateRepository, markdownDir, backupDir);
   });
 }
 
@@ -375,6 +353,7 @@ export async function registerInterfaceServices(container: DIContainer): Promise
   container.register('mcpResponsePresenter', new MCPResponsePresenter());
   container.register('jsonResponsePresenter', new JsonResponsePresenter());
 
+  // Register ContextController
   container.registerFactory('contextController', async () => {
     const readContextUseCase = await container.get<ReadContextUseCase>('readContextUseCase');
     const readRulesUseCase = await container.get<ReadRulesUseCase>('readRulesUseCase');
@@ -382,7 +361,7 @@ export async function registerInterfaceServices(container: DIContainer): Promise
     return new ContextController(readContextUseCase, readRulesUseCase);
   });
 
-  // Register JSON controllers
+  // Register JsonBranchController
   container.registerFactory('jsonBranchController', async () => {
     // Get required use cases
     const readJsonDocumentUseCase = await container.get<ReadJsonDocumentUseCase>('readJsonDocumentUseCase');
@@ -390,11 +369,7 @@ export async function registerInterfaceServices(container: DIContainer): Promise
     const deleteJsonDocumentUseCase = await container.get<DeleteJsonDocumentUseCase>('deleteJsonDocumentUseCase');
     const searchJsonDocumentsUseCase = await container.get<SearchJsonDocumentsUseCase>('searchJsonDocumentsUseCase');
     const updateJsonIndexUseCase = await container.get<UpdateJsonIndexUseCase>('updateJsonIndexUseCase');
-    const getRecentBranchesUseCase = await container.get<GetRecentBranchesUseCase>(
-      'getRecentBranchesUseCase'
-    );
-
-    // Get presenter
+    const getRecentBranchesUseCase = await container.get<GetRecentBranchesUseCase>('getRecentBranchesUseCase');
     const presenter = await container.get<JsonResponsePresenter>('jsonResponsePresenter');
 
     return new JsonBranchController(
@@ -408,25 +383,16 @@ export async function registerInterfaceServices(container: DIContainer): Promise
     );
   });
 
-  // Register controllers
+  // Register GlobalController
   container.registerFactory('globalController', async () => {
-    // Use explicit type assertion for proper type safety
-    const readGlobalDocumentUseCase = await container.get<ReadGlobalDocumentUseCase>(
-      'readGlobalDocumentUseCase'
-    );
-    const writeGlobalDocumentUseCase = await container.get<WriteGlobalDocumentUseCase>(
-      'writeGlobalDocumentUseCase'
-    );
-    const searchDocumentsByTagsUseCase = await container.get<SearchDocumentsByTagsUseCase>(
-      'searchDocumentsByTagsUseCase'
-    );
+    const readGlobalDocumentUseCase = await container.get<ReadGlobalDocumentUseCase>('readGlobalDocumentUseCase');
+    const writeGlobalDocumentUseCase = await container.get('writeGlobalDocumentUseCase');
+    const searchDocumentsByTagsUseCase = await container.get<SearchDocumentsByTagsUseCase>('searchDocumentsByTagsUseCase');
     const updateTagIndexUseCase = await container.get<UpdateTagIndexUseCase>('updateTagIndexUseCase');
     const presenter = await container.get<MCPResponsePresenter>('mcpResponsePresenter');
-
+    
     // Get optional use cases
-    const updateTagIndexUseCaseV2 = await container.get<UpdateTagIndexUseCaseV2>(
-      'updateTagIndexUseCaseV2'
-    );
+    const updateTagIndexUseCaseV2 = await container.get<UpdateTagIndexUseCaseV2>('updateTagIndexUseCaseV2');
     const readJsonDocumentUseCase = await container.get<ReadJsonDocumentUseCase>('readJsonDocumentUseCase');
     const writeJsonDocumentUseCase = await container.get<WriteJsonDocumentUseCase>('writeJsonDocumentUseCase');
     const deleteJsonDocumentUseCase = await container.get<DeleteJsonDocumentUseCase>('deleteJsonDocumentUseCase');
@@ -450,6 +416,7 @@ export async function registerInterfaceServices(container: DIContainer): Promise
     );
   });
 
+  // Register BranchController
   container.registerFactory('branchController', () => {
     // Use explicit type assertion for proper type safety
     const readBranchDocumentUseCase = container.get(
@@ -502,7 +469,6 @@ export async function registerInterfaceServices(container: DIContainer): Promise
       } // Pass optional dependencies
     );
   });
-
 }
 
 /**

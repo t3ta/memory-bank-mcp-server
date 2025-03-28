@@ -17,7 +17,7 @@
     "currentTask": "ビルドエラー修正完了、テスト実行前",
     "status": "pending_test",
     "details": {
-      "description": "src/ から packages/mcp/src/ へのファイル移動後、ビルドエラーをすべて修正完了。Jestの構文エラーはテストコード側の修正で回避。",
+      "description": "GlobalControllerのreadCoreFilesメソッドをJSON直接読み込み版に修正。テンプレートコントローラーの依存削除も進行中。",
       "features": [
         "JSON専用に簡素化されたBranchController",
         "拡張子がすべて.jsonに統一",
@@ -37,6 +37,13 @@
       }
     },
     "nextSteps": [
+      {
+        "id": "complete-template-removal",
+        "title": "テンプレート関連の削除を完了させる",
+        "description": "残ったモック（Template型）を作成し、すべてのビルドエラーを解消して、テンプレート関連のコード削除を完全に完了させる",
+        "priority": "high",
+        "status": "pending"
+      },
       {
         "id": "controller-test-1",
         "title": "他のコントローラーのテスト作成",
@@ -71,6 +78,30 @@
       }
     ],
     "completedTasks": [
+      {
+        "id": "template-code-fixes-complete",
+        "title": "GlobalControllerとproviders.tsのテンプレート関連コード修正完了",
+        "description": "GlobalController.tsの重複コードを修正し、providers.tsからのテンプレート依存も適切に削除。ただし、他のファイルにはまだエラーが残っている状態",
+        "completion_date": "2025-03-28T20:00:00.000Z"
+      },
+      {
+        "id": "template-code-cleanup",
+        "title": "テンプレート関連コードの物理削除",
+        "description": "ITemplateRepository.tsおよびTemplateService.tsの物理削除、providers.tsのインポート記述修正、GlobalControllerの構文エラー修正を実施。",
+        "completion_date": "2025-03-28T19:35:00.000Z"
+      },
+      {
+        "id": "global-controller-update",
+        "title": "GlobalControllerのreadCoreFilesメソッドを修正",
+        "description": "GlobalControllerのreadCoreFilesメソッドを、JSON直接読み込み版に修正。テンプレートコントローラーの依存削除作業も進行中。",
+        "completion_date": "2025-03-28T19:10:00.000Z"
+      },
+      {
+        "id": "template-removal-plan",
+        "title": "テンプレート関連コード削除計画の策定",
+        "description": "GlobalControllerとproviders.tsからテンプレート関連のコードを削除し、JSON専用の実装に簡素化する計画を策定",
+        "completion_date": "2025-03-28T17:55:00.000Z"
+      },
       {
         "id": "markdown-cleanup",
         "title": "マークダウン遺物のクリーンアップ",

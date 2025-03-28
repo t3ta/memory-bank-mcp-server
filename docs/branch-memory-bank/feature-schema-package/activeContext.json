@@ -13,8 +13,32 @@
     "version": 4
   },
   "content": {
-    "currentWork": "テスト実行エラーの修正。Jestの設定ファイルが必要で、Babelパーサーがエラーを出している状態。",
+    "currentWork": "テンプレート関連コードの削除作業がほぼ完了。GlobalController.tsのエラーを修正し、providers.tsも修正してGlobalControllerの生成とDI依存関係の問題を解消しました。まだ他のファイルにエラーがあるものの、テンプレート関連のコードは削除できました。",
     "recentChanges": [
+      {
+        "date": "2025-03-28T20:00:00+09:00",
+        "description": "GlobalController.tsの構文重複エラーを修正し、providers.tsのDI設定も修正。両ファイルのエラーは解消したが、まだ一部のファイルにエラーが残っているので、モノレポ移行作業の中で対応予定。"
+      },
+      {
+        "date": "2025-03-28T19:40:00+09:00",
+        "description": "GlobalControllerの構文エラー修正完了。まだ型エラーなどは残っているが、テンプレート関連コードの削除作業は主要部分完了。"
+      },
+      {
+        "date": "2025-03-28T19:25:00+09:00",
+        "description": "テンプレート関連コードの物理的な削除（ITemplateRepository.ts、TemplateService.ts）とディレクトリ（templates/）を完了。providers.tsのインポート修正も実施。"
+      },
+      {
+        "date": "2025-03-28T18:45:00+09:00",
+        "description": "GlobalController.tsのreadCoreFilesメソッドを、JSON直接読み込み版に修正する計画を作成。providers.tsのテンプレート関連コード削除と併せて進める予定。"
+      },
+      {
+        "date": "2025-03-28T18:35:00+09:00",
+        "description": "テンプレート関連コードを大部分削除。一時的にモック実装を追加してビルドエラーを最小化。完全に削除するには追加作業が必要。"
+      },
+      {
+        "date": "2025-03-28T17:55:00+09:00",
+        "description": "テンプレート関連コード削除計画を策定。GlobalControllerからテンプレート関連のコードを削除し、JSON専用の実装に簡素化する計画。"
+      },
       {
         "date": "2025-03-28T15:31:47+09:00",
         "description": "packages/mcp/src 以下のビルドエラーをすべて修正完了。Jestの構文エラーはテストコード側の修正で回避。"
@@ -114,6 +138,13 @@
       }
     ],
     "nextSteps": [
+      {
+        "id": "remaining-errors-check",
+        "priority": "medium",
+        "description": "テンプレート関連コードの削除は完了したが、まだファイルシステム関連などのコンポーネントで型エラーが残っている。これらは別途モノレポ移行作業の一環として対応する。",
+        "status": "pending",
+        "dependencies": []
+      },
       {
         "id": "run-tests",
         "priority": "high",

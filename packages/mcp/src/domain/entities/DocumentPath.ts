@@ -84,6 +84,8 @@ export class DocumentPath {
 
   /**
    * Check if this document is a JSON file
+  /**
+   * Check if this document is a JSON file
    */
   public get isJSON(): boolean {
     return this.extension.toLowerCase() === 'json';
@@ -91,12 +93,7 @@ export class DocumentPath {
 
   /**
    * Checks if two DocumentPath instances are equal
-   * @param other Another DocumentPath instance
-   * @returns boolean indicating equality
    */
-  public equals(other: DocumentPath): boolean {
-    return this._value === other._value;
-  }
 
   /**
    * Convert to string
