@@ -13,30 +13,14 @@ import {
 import { logger } from '../../../shared/utils/logger.js';
 import type { IConfigProvider } from '../../config/index.js';
 import type { IFileSystemService } from '../../storage/interfaces/IFileSystemService.js';
-import { FileSystemMemoryBankRepositoryBase } from '../../../../../src/infrastructure/repositories/file-system/FileSystemMemoryBankRepositoryBase.js';
-import { DocumentOperations } from '../../../../../src/infrastructure/repositories/file-system/DocumentOperations.js';
-import { TagOperations } from '../../../../../src/infrastructure/repositories/file-system/TagOperations.js';
-import { PathOperations } from '../../../../../src/infrastructure/repositories/file-system/PathOperations.js';
-import { BulkOperations } from '../../../../../src/infrastructure/repositories/file-system/BulkOperations.js';
+import { FileSystemMemoryDocumentRepository } from './FileSystemMemoryDocumentRepository.js';
 
 /**
  * File system implementation of global memory bank repository
- * Using component-based approach with responsibility segregation
  */
-export class FileSystemGlobalMemoryBankRepository 
-  extends FileSystemMemoryBankRepositoryBase 
-  implements IGlobalMemoryBankRepository {
-  
-  // Component instances for specific operations
-  private readonly documentOps: DocumentOperations;
-  private readonly tagOps: TagOperations;
-  private readonly pathOps: PathOperations;
-  private readonly bulkOps: BulkOperations;
-  
-  // Path to the global memory bank root
+export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRepository {
+  private documentRepository!: FileSystemMemoryDocumentRepository;
   private globalMemoryPath!: string;
-  
-  // Current language setting
   private language: Language = 'en';
 
   /**
@@ -45,36 +29,9 @@ export class FileSystemGlobalMemoryBankRepository
    * @param configProvider Configuration provider
    */
   constructor(
-    fileSystemService: IFileSystemService,
+    private readonly fileSystemService: IFileSystemService,
     private readonly configProvider: IConfigProvider
-  ) {
-    super(fileSystemService, configProvider);
-    
-    // Initialize operation components (but delay path setup until setup())
-    this.documentOps = new DocumentOperations(
-      '', // Will be set in setup()
-      fileSystemService,
-      configProvider
-    );
-    
-    this.tagOps = new TagOperations(
-      '', // Will be set in setup()
-      fileSystemService,
-      configProvider
-    );
-    
-    this.pathOps = new PathOperations(
-      '', // Will be set in setup()
-      fileSystemService,
-      configProvider
-    );
-    
-    this.bulkOps = new BulkOperations(
-      '', // Will be set in setup()
-      fileSystemService,
-      configProvider
-    );
-  }
+  ) {}
 
   /**
    * Setup repository with configuration
@@ -83,12 +40,10 @@ export class FileSystemGlobalMemoryBankRepository
   private async setup(): Promise<void> {
     if (!this.globalMemoryPath) {
       this.globalMemoryPath = await this.configProvider.getGlobalMemoryPath();
-      
-      // Update paths in operation components
-      (this.documentOps as any).basePath = this.globalMemoryPath;
-      (this.tagOps as any).basePath = this.globalMemoryPath;
-      (this.pathOps as any).basePath = this.globalMemoryPath;
-      (this.bulkOps as any).basePath = this.globalMemoryPath;
+      this.documentRepository = new FileSystemMemoryDocumentRepository(
+        this.globalMemoryPath,
+        this.fileSystemService
+      );
     }
 
     // Set language from config
@@ -96,34 +51,41 @@ export class FileSystemGlobalMemoryBankRepository
   }
 
   /**
-   * Ensure default structure exists
+   * Initialize global memory bank
+   * @returns Promise resolving when initialization is complete
    */
-  private async ensureDefaultStructure(): Promise<void> {
+  async initialize(): Promise<void> {
     try {
-      logger.debug('Ensuring global memory bank default structure');
+      logger.debug('Initializing global memory bank');
 
-      for (const [relativePath, content] of Object.entries(this.defaultStructure)) {
-        const fullPath = path.join(this.globalMemoryPath, relativePath);
+      // Setup repository configuration
+      await this.setup();
 
-        // Create directory if needed
-        const dirPath = path.dirname(fullPath);
-        await this.pathOps.createDirectory(dirPath);
+      // Ensure the directory exists
+      await this.fileSystemService.createDirectory(this.globalMemoryPath);
+      await this.fileSystemService.createDirectory(path.join(this.globalMemoryPath, 'tags'));
 
-        // Check if file exists
-        const fileExists = await super.fileExists(fullPath);
+      // Check if files exist, create default structure if needed
+      await this.ensureDefaultStructure();
 
-        if (!fileExists) {
-          // Create file with default content
-          await super.writeFile(fullPath, content);
-          logger.debug(`Created default file: ${relativePath}`);
-        }
+      // Create tag index if needed
+      try {
+        await this.generateAndSaveTagIndex();
+      } catch (tagIndexError) {
+        // Log error but don't fail initialization
+        logger.error('Failed to update tags index, but continuing initialization:', tagIndexError);
+        logger.warn('Some documents may have invalid tags. Consider running a repair script.');
       }
 
-      logger.debug('Global memory bank default structure ensured');
+      logger.debug('Global memory bank initialized');
     } catch (error) {
+      if (error instanceof DomainError || error instanceof InfrastructureError) {
+        throw error;
+      }
+
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
-        `Failed to ensure default structure: ${(error as Error).message}`,
+        `Failed to initialize global memory bank: ${(error as Error).message}`,
         { originalError: error }
       );
     }
@@ -136,12 +98,13 @@ export class FileSystemGlobalMemoryBankRepository
    */
   async getDocument(path: DocumentPath): Promise<MemoryDocument | null> {
     try {
-      // Ensure setup is completed
-      await this.setup();
-      
-      return await this.documentOps.getDocument(path);
+      return await this.documentRepository.findByPath(path);
     } catch (error) {
-      if (error instanceof DomainError || error instanceof InfrastructureError) {
+      if (error instanceof DomainError) {
+        throw error;
+      }
+
+      if (error instanceof InfrastructureError) {
         throw error;
       }
 
@@ -160,20 +123,19 @@ export class FileSystemGlobalMemoryBankRepository
    */
   async saveDocument(document: MemoryDocument): Promise<void> {
     try {
-      // Ensure setup is completed
-      await this.setup();
-      
-      await this.documentOps.saveDocument(document);
+      await this.documentRepository.save(document);
 
-      // Update tags index if document is not a tag index
-      if (document.path.value !== 'tags/index.md' && 
-          document.path.value !== 'tags/index.json' &&
-          document.path.value !== '_global_index.json') {
+      // Update tags index if document is JSON (isMarkdown removed as part of template cleanup)
+      if (document.isJSON && document.path.value !== 'tags/index.md' && document.path.value !== 'tags/index.json') {
         // Generate and save the tag index
-        await this.refreshTagIndex();
+        await this.generateAndSaveTagIndex();
       }
     } catch (error) {
-      if (error instanceof DomainError || error instanceof InfrastructureError) {
+      if (error instanceof DomainError) {
+        throw error;
+      }
+
+      if (error instanceof InfrastructureError) {
         throw error;
       }
 
@@ -192,28 +154,27 @@ export class FileSystemGlobalMemoryBankRepository
    */
   async deleteDocument(path: DocumentPath): Promise<boolean> {
     try {
-      // Ensure setup is completed
-      await this.setup();
-      
       // 事前にファイルの存在を確認
       const document = await this.getDocument(path);
       if (!document) {
         return false;
       }
 
-      const result = await this.documentOps.deleteDocument(path);
+      const result = await this.documentRepository.delete(path);
 
       // Update tags index if document was deleted
-      if (result && path.value !== 'tags/index.md' && 
-          path.value !== 'tags/index.json' &&
-          path.value !== '_global_index.json') {
+      if (result && path.value !== 'tags/index.md' && path.value !== 'tags/index.json') {
         // Generate and save the tag index
-        await this.refreshTagIndex();
+        await this.generateAndSaveTagIndex();
       }
 
       return result;
     } catch (error) {
-      if (error instanceof DomainError || error instanceof InfrastructureError) {
+      if (error instanceof DomainError) {
+        throw error;
+      }
+
+      if (error instanceof InfrastructureError) {
         throw error;
       }
 
@@ -231,12 +192,13 @@ export class FileSystemGlobalMemoryBankRepository
    */
   async listDocuments(): Promise<DocumentPath[]> {
     try {
-      // Ensure setup is completed
-      await this.setup();
-      
-      return await this.documentOps.listDocuments();
+      return await this.documentRepository.list();
     } catch (error) {
-      if (error instanceof DomainError || error instanceof InfrastructureError) {
+      if (error instanceof DomainError) {
+        throw error;
+      }
+
+      if (error instanceof InfrastructureError) {
         throw error;
       }
 
@@ -255,23 +217,13 @@ export class FileSystemGlobalMemoryBankRepository
    */
   async findDocumentsByTags(tags: Tag[]): Promise<MemoryDocument[]> {
     try {
-      // Ensure setup is completed
-      await this.setup();
-      
-      // Try to use the tag index if available
-      const paths = await this.findDocumentPathsByTagsUsingIndex(tags, false);
-      const documents: MemoryDocument[] = [];
-      
-      for (const path of paths) {
-        const doc = await this.getDocument(path);
-        if (doc) {
-          documents.push(doc);
-        }
-      }
-      
-      return documents;
+      return await this.documentRepository.findByTags(tags);
     } catch (error) {
-      if (error instanceof DomainError || error instanceof InfrastructureError) {
+      if (error instanceof DomainError) {
+        throw error;
+      }
+
+      if (error instanceof InfrastructureError) {
         throw error;
       }
 
@@ -284,25 +236,135 @@ export class FileSystemGlobalMemoryBankRepository
   }
 
   /**
-   * Refresh all tag indexes (internal helper)
+   * Generate and save tag index from all documents
+   * @returns Promise resolving when done
    */
-  private async refreshTagIndex(): Promise<void> {
+  async generateAndSaveTagIndex(): Promise<void> {
     try {
-      // Ensure setup is completed
-      await this.setup();
+      logger.debug('Generating tag index');
+
+      // Get all documents
+      const allPaths = await this.listDocuments();
+      const documents: MemoryDocument[] = [];
+
+      for (const docPath of allPaths) {
+        // Skip the tags index itself
+        if (docPath.value === 'tags/index.json' || docPath.value === 'tags/index.md') {
+          continue;
+        }
+
+        const doc = await this.getDocument(docPath);
+        if (doc) {
+          documents.push(doc);
+        }
+      }
+
+      // Collect document tags for index
+      const tagMap = new Map<string, string[]>();
+
+      for (const doc of documents) {
+        for (const tag of doc.tags) {
+          const existing = tagMap.get(tag.value);
+
+          if (existing) {
+            existing.push(doc.path.value);
+          } else {
+            tagMap.set(tag.value, [doc.path.value]);
+          }
+        }
+      }
+
+      // Save the tag index with tag structure
+      const tagTitleAndContent = this.getTagIndexTitleAndContent();
+      const tagsDocument = {
+        schema: "memory_document_v2",
+        metadata: {
+          id: "tags-index",
+          title: tagTitleAndContent.title,
+          documentType: "generic",
+          path: "tags/index.json",
+          tags: ["index", "meta"],
+          lastModified: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          version: 1
+        },
+        content: {
+          sections: [
+            {
+              title: "Tags",
+              content: tagTitleAndContent.content
+            }
+          ],
+          tagMap: Object.fromEntries(
+            Array.from(tagMap.entries()).map(([tag, paths]) => {
+              return [tag, {
+                count: paths.length,
+                documents: paths.map(d => {
+                  const doc = documents.find((doc) => doc.path.value === d);
+                  return {
+                    path: d,
+                    title: doc?.title || d
+                  };
+                })
+              }];
+            })
+          )
+        }
+      };
+
+      // Convert to JSON string with pretty formatting
+      const indexContent = JSON.stringify(tagsDocument, null, 2);
+
+      // Create or update tags index
+      const indexPath = DocumentPath.create('tags/index.json');
+      const fullPath = path.join(this.globalMemoryPath, indexPath.value);
+
+      // Ensure directory exists
+      await this.fileSystemService.createDirectory(path.dirname(fullPath));
       
-      // Generate and save the main tag index
-      const tagIndex = await this.tagOps.generateGlobalTagIndex();
-      await this.saveTagIndex(tagIndex as GlobalTagIndex);
-      
-      // Update the legacy index file
-      await this.tagOps.updateLegacyTagsIndex(
-        await this.bulkOps.getAllDocuments(), 
-        this.language
-      );
+      // Write index file
+      await this.fileSystemService.writeFile(fullPath, indexContent);
+
+      logger.debug('Tag index generated and saved');
     } catch (error) {
-      logger.error('Failed to refresh tag indexes:', error);
-      // Don't throw, as this is an internal operation
+      if (error instanceof DomainError) {
+        throw error;
+      }
+
+      if (error instanceof InfrastructureError) {
+        throw error;
+      }
+
+      throw new InfrastructureError(
+        InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
+        `Failed to generate and save tag index: ${(error as Error).message}`,
+        { originalError: error }
+      );
+    }
+  }
+
+  /**
+   * Update tags index in global memory bank
+   * @param skipSaveDocument Optional flag to skip saveDocument to prevent circular references
+   * @returns Promise resolving when done
+   */
+  async updateTagsIndex(skipSaveDocument: boolean = false): Promise<void> {
+    try {
+      await this.generateAndSaveTagIndex();
+    } catch (error) {
+      if (error instanceof DomainError) {
+        throw error;
+      }
+
+      if (error instanceof InfrastructureError) {
+        throw error;
+      }
+
+      throw new InfrastructureError(
+        InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
+        `Failed to update tags index in global memory bank: ${(error as Error).message}`,
+        { originalError: error }
+      );
     }
   }
 
@@ -312,13 +374,10 @@ export class FileSystemGlobalMemoryBankRepository
    */
   async validateStructure(): Promise<boolean> {
     try {
-      // Ensure setup is completed
-      await this.setup();
-      
       logger.debug('Validating global memory bank structure');
 
       // Check if directory exists
-      const dirExists = await this.pathOps.directoryExists(this.globalMemoryPath);
+      const dirExists = await this.fileSystemService.directoryExists(this.globalMemoryPath);
 
       if (!dirExists) {
         return false;
@@ -326,7 +385,7 @@ export class FileSystemGlobalMemoryBankRepository
 
       // Check if tags directory exists
       const tagsDir = path.join(this.globalMemoryPath, 'tags');
-      const tagsDirExists = await this.pathOps.directoryExists(tagsDir);
+      const tagsDirExists = await this.fileSystemService.directoryExists(tagsDir);
 
       if (!tagsDirExists) {
         return false;
@@ -335,7 +394,7 @@ export class FileSystemGlobalMemoryBankRepository
       // Check if required files exist
       for (const filePath of Object.keys(this.defaultStructure)) {
         const fullPath = path.join(this.globalMemoryPath, filePath);
-        const fileExists = await super.fileExists(fullPath);
+        const fileExists = await this.fileSystemService.fileExists(fullPath);
 
         if (!fileExists) {
           return false;
@@ -357,10 +416,17 @@ export class FileSystemGlobalMemoryBankRepository
    */
   async saveTagIndex(tagIndex: GlobalTagIndex): Promise<void> {
     try {
-      // Ensure setup is completed
-      await this.setup();
-      
-      await this.tagOps.saveGlobalTagIndex(tagIndex);
+      logger.debug('Saving global tag index');
+
+      const indexPath = path.join(this.globalMemoryPath, '_global_index.json');
+
+      // Convert to JSON string with pretty formatting
+      const jsonContent = JSON.stringify(tagIndex, null, 2);
+
+      // Write to file
+      await this.fileSystemService.writeFile(indexPath, jsonContent);
+
+      logger.debug('Global tag index saved');
     } catch (error) {
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_WRITE_ERROR,
@@ -376,39 +442,37 @@ export class FileSystemGlobalMemoryBankRepository
    */
   async getTagIndex(): Promise<GlobalTagIndex | null> {
     try {
-      // Ensure setup is completed
-      await this.setup();
-      
-      return await this.tagOps.getGlobalTagIndex() as GlobalTagIndex | null;
+      logger.debug('Getting global tag index');
+
+      const indexPath = path.join(this.globalMemoryPath, '_global_index.json');
+
+      // Check if file exists
+      const exists = await this.fileSystemService.fileExists(indexPath);
+
+      if (!exists) {
+        logger.debug('No global tag index found');
+        return null;
+      }
+
+      // Read file content
+      const content = await this.fileSystemService.readFile(indexPath);
+
+      // Parse JSON
+      const tagIndex = JSON.parse(content) as GlobalTagIndex;
+
+      logger.debug('Global tag index loaded');
+      return tagIndex;
     } catch (error) {
-      throw new InfrastructureError(
-        InfrastructureErrorCodes.FILE_READ_ERROR,
-        `Failed to get global tag index: ${(error as Error).message}`,
-        { originalError: error }
-      );
-    }
-  }
-  
-  /**
-   * Update tags index (for backward compatibility)
-   * @param skipSaveDocument Optional parameter to avoid circular calls
-   * @returns Promise resolving when done
-   */
-  async updateTagsIndex(skipSaveDocument: boolean = false): Promise<void> {
-    try {
-      // Ensure setup is completed
-      await this.setup();
-      
-      // Simply delegate to the internal refreshTagIndex method
-      await this.refreshTagIndex();
-    } catch (error) {
-      if (error instanceof DomainError || error instanceof InfrastructureError) {
-        throw error;
+      if (
+        error instanceof InfrastructureError &&
+        error.code === `INFRA_ERROR.${InfrastructureErrorCodes.FILE_NOT_FOUND}`
+      ) {
+        return null;
       }
 
       throw new InfrastructureError(
-        InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
-        `Failed to update tags index in global memory bank: ${(error as Error).message}`,
+        InfrastructureErrorCodes.FILE_READ_ERROR,
+        `Failed to get global tag index: ${(error as Error).message}`,
         { originalError: error }
       );
     }
@@ -425,57 +489,92 @@ export class FileSystemGlobalMemoryBankRepository
     matchAll: boolean = false
   ): Promise<DocumentPath[]> {
     try {
-      // Ensure setup is completed
-      await this.setup();
+      // Use regular method if no tags
+      if (tags.length === 0) {
+        return [];
+      }
+
+      // Convert tags to values
+      const tagValues = tags.map(tag => tag.value);
       
-      return await this.tagOps.findDocumentPathsByTags(tags, matchAll);
+      // Get all documents
+      const docs = await this.findDocumentsByTags(tags);
+      
+      // Filter based on matchAll flag
+      let result: DocumentPath[];
+      
+      if (matchAll) {
+        // Document must have all tags
+        result = docs
+          .filter(doc => tagValues.every(tag => doc.tags.some(t => t.value === tag)))
+          .map(doc => doc.path);
+      } else {
+        // Document must have at least one tag
+        result = docs.map(doc => doc.path);
+      }
+      
+      return result;
     } catch (error) {
-      // Fall back to regular method if index fails
-      logger.debug(`Tag index search failed, falling back to regular method: ${(error as Error).message}`);
-      
-      const docs = await this.tagOps.findDocumentsByTags(tags, matchAll);
-      return docs.map((doc: MemoryDocument) => doc.path);
+      throw new InfrastructureError(
+        InfrastructureErrorCodes.FILE_READ_ERROR,
+        `Failed to find documents by tags using index: ${(error as Error).message}`,
+        { originalError: error }
+      );
     }
   }
 
   /**
-   * Initialize global memory bank
-   * @returns Promise resolving when initialization is complete
+   * Ensure default structure exists
    */
-  async initialize(): Promise<void> {
+  private async ensureDefaultStructure(): Promise<void> {
     try {
-      logger.debug('Initializing global memory bank');
+      logger.debug('Ensuring global memory bank default structure');
 
-      // Setup repository configuration
-      await this.setup();
+      for (const [relativePath, content] of Object.entries(this.defaultStructure)) {
+        const fullPath = path.join(this.globalMemoryPath, relativePath);
 
-      // Ensure the directory exists
-      await this.pathOps.createDirectory(this.globalMemoryPath);
-      await this.pathOps.createDirectory(path.join(this.globalMemoryPath, 'tags'));
+        // Create directory if needed
+        const dirPath = path.dirname(fullPath);
+        await this.fileSystemService.createDirectory(dirPath);
 
-      // Check if files exist, create default structure if needed
-      await this.ensureDefaultStructure();
+        // Check if file exists
+        const fileExists = await this.fileSystemService.fileExists(fullPath);
 
-      // Create tag index if needed
-      try {
-        await this.refreshTagIndex();
-      } catch (tagIndexError) {
-        // Log error but don't fail initialization
-        logger.error('Failed to update tags index, but continuing initialization:', tagIndexError);
-        logger.warn('Some documents may have invalid tags. Consider running a repair script.');
+        if (!fileExists) {
+          // Create file with default content
+          await this.fileSystemService.writeFile(fullPath, content);
+          logger.debug(`Created default file: ${relativePath}`);
+        }
       }
 
-      logger.debug('Global memory bank initialized');
+      logger.debug('Global memory bank default structure ensured');
     } catch (error) {
-      if (error instanceof DomainError || error instanceof InfrastructureError) {
-        throw error;
-      }
-
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
-        `Failed to initialize global memory bank: ${(error as Error).message}`,
+        `Failed to ensure default structure: ${(error as Error).message}`,
         { originalError: error }
       );
+    }
+  }
+
+  // Get tag index title and content based on language
+  private getTagIndexTitleAndContent(): { title: string; content: string } {
+    switch (this.language) {
+      case 'ja':
+        return {
+          title: "タグインデックス",
+          content: "タグとドキュメントの関連付け"
+        };
+      case 'zh':
+        return {
+          title: "标签索引",
+          content: "标签和文档的映射关系"
+        };
+      default: // 'en'
+        return {
+          title: "Tags Index",
+          content: "Mapping between tags and documents"
+        };
     }
   }
 
