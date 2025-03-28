@@ -18,9 +18,9 @@ import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
 import { Tag } from '../../../domain/entities/Tag.js';
 import type { IGlobalMemoryBankRepository } from '../../../domain/repositories/IGlobalMemoryBankRepository.js';
 import { DomainError } from '../../../shared/errors/DomainError.js';
-import { 
-  InfrastructureError, 
-  InfrastructureErrorCodes 
+import {
+  InfrastructureError,
+  InfrastructureErrorCodes
 } from '../../../shared/errors/InfrastructureError.js';
 import { logger } from '../../../shared/utils/logger.js';
 import type { IConfigProvider } from '../../config/index.js';
@@ -35,19 +35,19 @@ import { BulkOperations } from './BulkOperations.js';
  * File system implementation of global memory bank repository
  * Using component-based approach with responsibility segregation
  */
-export class FileSystemGlobalMemoryBankRepository 
-  extends FileSystemMemoryBankRepositoryBase 
+export class FileSystemGlobalMemoryBankRepository
+  extends FileSystemMemoryBankRepositoryBase
   implements IGlobalMemoryBankRepository {
-  
+
   // Component instances for specific operations
   private readonly documentOps: DocumentOperations;
   private readonly tagOps: TagOperations;
   private readonly pathOps: PathOperations;
   private readonly bulkOps: BulkOperations;
-  
+
   // Path to the global memory bank root
   private globalMemoryPath!: string;
-  
+
   // Current language setting
   private language: Language = 'en';
 
@@ -61,26 +61,26 @@ export class FileSystemGlobalMemoryBankRepository
     protected readonly configProvider: IConfigProvider
   ) {
     super(fileSystemService, configProvider);
-    
+
     // Initialize operation components (but delay path setup until setup())
     this.documentOps = new DocumentOperations(
       '', // Will be set in setup()
       fileSystemService,
       configProvider
     );
-    
+
     this.tagOps = new TagOperations(
       '', // Will be set in setup()
       fileSystemService,
       configProvider
     );
-    
+
     this.pathOps = new PathOperations(
       '', // Will be set in setup()
       fileSystemService,
       configProvider
     );
-    
+
     this.bulkOps = new BulkOperations(
       '', // Will be set in setup()
       fileSystemService,
@@ -131,7 +131,7 @@ export class FileSystemGlobalMemoryBankRepository
     try {
       // Ensure setup is completed
       await this.setup();
-      
+
       return await this.documentOps.getDocument(path);
     } catch (error) {
       if (error instanceof DomainError || error instanceof InfrastructureError) {
@@ -155,11 +155,11 @@ export class FileSystemGlobalMemoryBankRepository
     try {
       // Ensure setup is completed
       await this.setup();
-      
+
       await this.documentOps.saveDocument(document);
 
       // Update tags index if document is not a tag index
-      if (document.path.value !== 'tags/index.md' && 
+      if (document.path.value !== 'tags/index.md' &&
           document.path.value !== 'tags/index.json' &&
           document.path.value !== '_global_index.json') {
         // Generate and save the tag index
@@ -187,7 +187,7 @@ export class FileSystemGlobalMemoryBankRepository
     try {
       // Ensure setup is completed
       await this.setup();
-      
+
       // 事前にファイルの存在を確認
       const document = await this.getDocument(path);
       if (!document) {
@@ -197,7 +197,7 @@ export class FileSystemGlobalMemoryBankRepository
       const result = await this.documentOps.deleteDocument(path);
 
       // Update tags index if document was deleted
-      if (result && path.value !== 'tags/index.md' && 
+      if (result && path.value !== 'tags/index.md' &&
           path.value !== 'tags/index.json' &&
           path.value !== '_global_index.json') {
         // Generate and save the tag index
@@ -226,7 +226,7 @@ export class FileSystemGlobalMemoryBankRepository
     try {
       // Ensure setup is completed
       await this.setup();
-      
+
       return await this.documentOps.listDocuments();
     } catch (error) {
       if (error instanceof DomainError || error instanceof InfrastructureError) {
@@ -250,18 +250,18 @@ export class FileSystemGlobalMemoryBankRepository
     try {
       // Ensure setup is completed
       await this.setup();
-      
+
       // Try to use the tag index if available
       const paths = await this.findDocumentPathsByTagsUsingIndex(tags, false);
       const documents: MemoryDocument[] = [];
-      
+
       for (const path of paths) {
         const doc = await this.getDocument(path);
         if (doc) {
           documents.push(doc);
         }
       }
-      
+
       return documents;
     } catch (error) {
       if (error instanceof DomainError || error instanceof InfrastructureError) {
@@ -283,46 +283,15 @@ export class FileSystemGlobalMemoryBankRepository
     try {
       // Ensure setup is completed
       await this.setup();
-      
+
       // Generate and save the main tag index
       const tagIndex = await this.tagOps.generateGlobalTagIndex();
-      
-      // 処理されたTagIndex型またはGlobalTagIndex型のどちらであるかを確認
-      let globalTagIndex: GlobalTagIndex;
-      
-      if ('schema' in tagIndex && tagIndex.schema === 'tag_index_v1' && Array.isArray(tagIndex.index)) {
-        // すでにGlobalTagIndex形式の場合はそのまま使用
-        globalTagIndex = tagIndex as GlobalTagIndex;
-      } else {
-        // TagIndex形式の場合はGlobalTagIndex形式に変換
-        globalTagIndex = {
-          schema: 'tag_index_v1',
-          metadata: {
-            indexType: 'global',
-            lastUpdated: new Date(),
-            documentCount: tagIndex.metadata.documentCount,
-            tagCount: Object.keys(tagIndex.index).length
-          },
-          index: Object.entries(tagIndex.index).map(([tag, docs]) => ({
-            tag,
-            documents: docs.map((docPath: string) => ({
-              path: docPath,
-              title: docPath.split('/').pop() || docPath,
-              id: docPath,
-              lastModified: new Date()
-            }))
-          }))
-        };
-      }
-      
-      await this.saveTagIndex(globalTagIndex);
-      
-      // Update the legacy index file
-      const language = this.configProvider.getLanguage();
-      await this.tagOps.updateLegacyTagsIndex(
-        await this.bulkOps.getAllDocuments(), 
-        language
-      );
+
+      // L288 で取得した tagIndex は既に GlobalTagIndex 型のはずなので、変換処理は不要
+      // そのまま saveTagIndex に渡す
+      await this.saveTagIndex(tagIndex);
+
+      // 古い形式のインデックス更新処理は削除 (dd-deprecate-legacy-index)
     } catch (error) {
       logger.error('Failed to refresh tag indexes:', error);
       // Don't throw, as this is an internal operation
@@ -337,7 +306,7 @@ export class FileSystemGlobalMemoryBankRepository
     try {
       // Ensure setup is completed
       await this.setup();
-      
+
       logger.debug('Validating global memory bank structure');
 
       // Check if directory exists
@@ -382,23 +351,9 @@ export class FileSystemGlobalMemoryBankRepository
     try {
       // Ensure setup is completed
       await this.setup();
-      
-      // GlobalTagIndexをTagOperationsが扱える形式に変換
-      const internalTagIndex = {
-        schema: tagIndex.schema,
-        metadata: {
-          updatedAt: new Date().toISOString(),
-          documentCount: tagIndex.metadata.documentCount,
-          fullRebuild: true,
-          context: 'global',
-        },
-        index: tagIndex.index.reduce((acc, entry) => {
-          acc[entry.tag] = entry.documents.map((doc: any) => doc.path);
-          return acc;
-        }, {} as Record<string, string[]>)
-      };
-      
-      await this.tagOps.saveGlobalTagIndex(internalTagIndex);
+
+      // TagOperations.saveGlobalTagIndex は GlobalTagIndex をそのまま受け取るので変換不要
+      await this.tagOps.saveGlobalTagIndex(tagIndex);
     } catch (error) {
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_WRITE_ERROR,
@@ -416,35 +371,12 @@ export class FileSystemGlobalMemoryBankRepository
     try {
       // Ensure setup is completed
       await this.setup();
-      
+
       const result = await this.tagOps.getGlobalTagIndex();
-      
-      // TagIndexからGlobalTagIndexへの変換処理
-      if (result && 'index' in result && typeof result.index === 'object' && !Array.isArray(result.index)) {
-        // TagIndex形式からGlobalTagIndex形式への変換
-        const globalTagIndex: GlobalTagIndex = {
-          schema: 'tag_index_v1',
-          metadata: {
-            indexType: 'global',
-            lastUpdated: new Date(),
-            documentCount: result.metadata.documentCount,
-            tagCount: Object.keys(result.index).length
-          },
-          index: Object.entries(result.index).map(([tag, docs]) => ({
-            tag,
-            documents: docs.map((docPath: string) => ({
-              path: docPath,
-              title: docPath.split('/').pop() || docPath,
-              id: docPath,
-              lastModified: new Date()
-            }))
-          }))
-        };
-        return globalTagIndex;
-      }
-      
-      // すでにGlobalTagIndex形式の場合はそのまま返す
-      return result as GlobalTagIndex | null;
+
+      // this.tagOps.getGlobalTagIndex() は既に GlobalTagIndex | null を返すはずなので、
+      // 変換処理は不要。そのまま返す。
+      return result;
     } catch (error) {
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_READ_ERROR,
@@ -463,7 +395,7 @@ export class FileSystemGlobalMemoryBankRepository
     try {
       // Ensure setup is completed
       await this.setup();
-      
+
       // Call refreshTagIndex which now handles this functionality
       await this.refreshTagIndex();
     } catch (error) {
@@ -492,12 +424,12 @@ export class FileSystemGlobalMemoryBankRepository
     try {
       // Ensure setup is completed
       await this.setup();
-      
+
       return await this.tagOps.findDocumentPathsByTagsUsingIndex(tags, undefined, matchAll);
     } catch (error) {
       // Fall back to regular method if index fails
       logger.debug(`Tag index search failed, falling back to regular method: ${(error as Error).message}`);
-      
+
       const docs = await this.tagOps.findDocumentsByTags(tags, matchAll);
       return docs.map(doc => doc.path);
     }
@@ -514,7 +446,7 @@ export class FileSystemGlobalMemoryBankRepository
   private async setup(): Promise<void> {
     if (!this.globalMemoryPath) {
       this.globalMemoryPath = this.configProvider.getGlobalMemoryPath();
-      
+
       // Update paths in operation components
       (this.documentOps as any).basePath = this.globalMemoryPath;
       (this.tagOps as any).basePath = this.globalMemoryPath;

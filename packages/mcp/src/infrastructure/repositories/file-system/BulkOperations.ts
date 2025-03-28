@@ -76,7 +76,7 @@ export class BulkOperations extends FileSystemMemoryBankRepositoryBase {
 
       // タグインデックスを更新
       await this.tagOps.generateAndSaveTagIndex(documents);
-      
+
       this.logDebug(`Successfully saved ${documents.length} documents`);
     } catch (error) {
       if (error instanceof DomainError || error instanceof InfrastructureError) {
@@ -109,15 +109,15 @@ export class BulkOperations extends FileSystemMemoryBankRepositoryBase {
         // 残りのドキュメントを取得してタグインデックスを更新
         const allPaths = await this.documentOps.listDocuments();
         const allDocs = await this.getDocuments(
-          allPaths.filter(p => !paths.some(deletedPath => 
+          allPaths.filter(p => !paths.some(deletedPath =>
             deletedPath.value === p.value || deletedPath.toAlternateFormat().value === p.value
           ))
         );
         const validDocs = allDocs.filter((doc): doc is MemoryDocument => doc !== null);
-        
+
         await this.tagOps.generateAndSaveTagIndex(validDocs);
       }
-      
+
       return results;
     } catch (error) {
       if (error instanceof DomainError || error instanceof InfrastructureError) {
@@ -144,17 +144,17 @@ export class BulkOperations extends FileSystemMemoryBankRepositoryBase {
 
       // まずすべてのドキュメントパスを取得
       const allPaths = await this.documentOps.listDocuments();
-      
+
       // タグインデックスを使用してパスをフィルタリング
       const allDocs = await this.getDocuments(allPaths);
       const validDocs = allDocs.filter((doc): doc is MemoryDocument => doc !== null);
-      
+
       // タグインデックスを使用して検索
       const matchingPaths = await this.tagOps.findDocumentPathsByTagsUsingIndex(tags, validDocs, matchAll);
-      
+
       // 一致するパスのドキュメントを取得
       const matchingDocs = await this.getDocuments(matchingPaths);
-      
+
       // nullでないドキュメントのみを返す
       return matchingDocs.filter((doc): doc is MemoryDocument => doc !== null);
     } catch (error) {
@@ -180,10 +180,10 @@ export class BulkOperations extends FileSystemMemoryBankRepositoryBase {
 
       // すべてのパスを取得
       const allPaths = await this.documentOps.listDocuments();
-      
+
       // すべてのドキュメントを取得
       const allDocs = await this.getDocuments(allPaths);
-      
+
       // nullでないドキュメントのみを返す
       return allDocs.filter((doc): doc is MemoryDocument => doc !== null);
     } catch (error) {
@@ -198,7 +198,7 @@ export class BulkOperations extends FileSystemMemoryBankRepositoryBase {
       );
     }
   }
-  
+
   /**
    * 特定のディレクトリ内のすべてのドキュメントを取得
    * @param directoryPath ディレクトリパス
@@ -210,13 +210,13 @@ export class BulkOperations extends FileSystemMemoryBankRepositoryBase {
 
       // ディレクトリ内のファイルをリスト
       const fileList = await this.pathOps.listFilesInDirectory(directoryPath, ['.json', '.md']);
-      
+
       // ファイルパスをDocumentPathに変換
       const paths = fileList.map(file => DocumentPath.create(file));
-      
+
       // ドキュメントを取得
       const docs = await this.getDocuments(paths);
-      
+
       // nullでないドキュメントのみを返す
       return docs.filter((doc): doc is MemoryDocument => doc !== null);
     } catch (error) {
@@ -231,7 +231,7 @@ export class BulkOperations extends FileSystemMemoryBankRepositoryBase {
       );
     }
   }
-  
+
   /**
    * タグインデックスを再生成
    * @returns 成功したかどうか
@@ -242,21 +242,18 @@ export class BulkOperations extends FileSystemMemoryBankRepositoryBase {
 
       // すべてのドキュメントを取得
       const docs = await this.getAllDocuments();
-      
+
       // タグインデックスを生成して保存
       await this.tagOps.generateAndSaveTagIndex(docs);
-      
-      // レガシーなタグインデックスも更新
-      const language = this.configProvider.getLanguage();
-      await this.tagOps.updateLegacyTagsIndex(docs, language);
-      
+
+
       return true;
     } catch (error) {
       this.logError('Failed to rebuild tag index', error);
       return false;
     }
   }
-  
+
   /**
    * ディレクトリ構造が有効かどうか検証
    * @returns 検証結果（成功した場合はtrue）
@@ -271,7 +268,7 @@ export class BulkOperations extends FileSystemMemoryBankRepositoryBase {
         this.logDebug(`Base directory does not exist: ${this.basePath}`);
         return false;
       }
-      
+
       // tagsディレクトリが存在するか確認
       const tagsDir = path.join(this.basePath, 'tags');
       const tagsDirExists = await this.directoryExists(tagsDir);
@@ -280,7 +277,7 @@ export class BulkOperations extends FileSystemMemoryBankRepositoryBase {
         // タグディレクトリがなければ作成
         await this.createDirectory(tagsDir);
       }
-      
+
       return true;
     } catch (error) {
       this.logError('Error validating structure', error);

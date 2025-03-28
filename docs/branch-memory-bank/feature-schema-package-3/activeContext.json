@@ -13,7 +13,7 @@
     "version": 2
   },
   "content": {
-    "currentWork": "feature/schema-package-3ブランチでの作業進行中。主要なリファクタリング実装は完了し、残りのビルドエラーや細部の修正を確認中。",
+    "currentWork": "タグインデックスの設計見直し方針を決定し、`tag-index-design.json` に記録済み。次はCodeモードに切り替えて、この設計に基づき実装を行う。",
     "recentChanges": [
       {
         "date": "2025-03-29T14:30:00.000Z",
@@ -36,6 +36,10 @@
       {
         "id": "ad-build-errors-categorization",
         "description": "ビルドエラーを種類ごとに分類し、関連する修正をバッチで実施する"
+      },
+      {
+        "id": "ad-deprecate-legacy-tag-index",
+        "description": "古い形式のタグインデックス（tags/index.json, tags/index.md）および関連する updateLegacyTagsIndex メソッドを廃止する"
       }
     ],
     "considerations": [
@@ -47,6 +51,11 @@
       {
         "id": "con-test-strategy",
         "description": "リファクタリング中のテスト戦略（どのテストをいつ実行するか）",
+        "status": "open"
+      },
+      {
+        "id": "con-missing-unit-tests",
+        "description": "TagOperations および FileSystemGlobalMemoryBankRepository に関連するユニットテストが見つからなかった。今回の修正に対するテストは未実施。",
         "status": "open"
       }
     ],
@@ -62,9 +71,14 @@
         "priority": "medium"
       },
       {
-        "id": "ns-cross-cutting-inventory",
-        "description": "横断的関心事（ロギング、エラーハンドリング）の現状調査と統一計画の策定",
-        "priority": "low"
+        "id": "ns-fix-tagoperations-errors",
+        "description": "`TagOperations.ts`に残っている明確なエラー（暗黙的any、`createFromJson`呼び出し）を修正するため、Codeモードに切り替える必要がある",
+        "priority": "high"
+      },
+      {
+        "id": "ns-implement-tag-index-design",
+        "description": "`tag-index-design.json` に基づき、タグインデックス関連コード（型定義、メソッド削除など）を修正するため、Codeモードに切り替える必要がある",
+        "priority": "high"
       }
     ]
   }
