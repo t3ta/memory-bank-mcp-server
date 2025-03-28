@@ -8,9 +8,9 @@
     "tags": [
       "system-patterns"
     ],
-    "lastModified": "2025-03-29T13:15:00.000Z",
+    "lastModified": "2025-03-29T13:30:00.000Z",
     "createdAt": "2025-03-28T11:01:55.756Z",
-    "version": 3
+    "version": 4
   },
   "content": {
     "technicalDecisions": [
@@ -130,6 +130,34 @@
             "tradeoffs": "移行が容易だが単一責任原則の違反は解消されない"
           }
         ]
+      },
+      {
+        "id": "td-filebased-repo-split",
+        "title": "FileSystemベースリポジトリの分割",
+        "date": "2025-03-29T13:30:00.000Z",
+        "context": "FileSystemBranchMemoryBankRepository（871行）とFileSystemGlobalMemoryBankRepository（875行）が非常にサイズが大きく、単一責任の原則に違反している。これに対し、TagIndexリポジトリの実装では既にベースクラス、具体実装、ブリッジ層に分割された軽量な設計が適用されている。",
+        "decision": "MemoryBankRepository実装を機能種別に分割する\\n1. FileSystemMemoryBankRepositoryBase - 共通の基本機能を提供\\n2. FileSystemDocumentOperations - ドキュメント読み書き操作専用\\n3. FileSystemTagOperations - タグ関連操作専用\\n4. FileSystemBranchMemoryBankRepository - 必要な操作のみに軽量化",
+        "status": "proposed",
+        "alternatives": [
+          {
+            "title": "既存の大規模クラスの内部リファクタリング",
+            "description": "クラスを分割せずに内部メソッドを整理し、プライベートメソッドを軽量化する",
+            "tradeoffs": "実装が単純だが、クラスのサイズが大きいままで単一責任の原则違反が解消されない"
+          }
+        ],
+        "consequences": {
+          "positive": [
+            "単一責任の原则への適合",
+            "コードの記述性向上",
+            "クラスごとのテストが容易に",
+            "拡張とメンテナンスがしやすくなる"
+          ],
+          "negative": [
+            "クラス数の増加",
+            "コンポジションパターン実装の複雑化",
+            "初期実装に時間がかかる"
+          ]
+        }
       }
     ],
     "implementationPatterns": [
@@ -208,6 +236,18 @@
             "code": "// ドメイン層に定義されたインターフェース\nexport interface IDocumentValidator {\n  validateContent(documentType: string, content: Record<string, unknown>): boolean;\n  validateDocument(document: unknown): boolean;\n  validateMetadata(metadata: Record<string, unknown>): boolean;\n}\n\n// JsonDocumentがバリデーションを利用\npublic static setValidator(validator: IDocumentValidator): void {\n  JsonDocument.validator = validator;\n}\n\n// インフラ層で実装\nclass ZodDocumentValidator implements IDocumentValidator {\n  // Zodを使った実装...\n}"
           }
         ]
+      },
+      {
+        "id": "impl-pattern-6",
+        "name": "リポジトリの細分化パターン",
+        "context": "FileSystemタグインデックスリポジトリ実装を見ると、ベースクラスから特定実装やブリッジを分離することで、複雑性を管理している。このパターンをFileSystemBranchMemoryBankRepositoryのような大きなクラスにも適用するべき。",
+        "examples": [
+          {
+            "code": "// ベースクラスが共通機能を提供\nexport abstract class FileSystemTagIndexRepository {\n  // 共通実装...\n}\n\n// 具体的実装クラス\nexport class FileSystemTagIndexRepositoryImpl extends FileSystemTagIndexRepository {\n  // ITagIndexRepositoryインターフェースの実装...\n}\n\n// ブリッジクラスが互換性を提供\nexport class FileSystemTagIndexRepositoryV1Bridge {\n  // V1形式との互換性を提供...\n}",
+            "name": "タグインデックスリポジトリの分割"
+          }
+        ],
+        "description": "大きなリポジトリクラスを、機能の種類や抜象化レベルに基づいて複数の小さなクラスに分割するパターン。ベースクラス、具体実装、互換レイヤーなどを分離する。"
       }
     ]
   }
