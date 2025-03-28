@@ -9,7 +9,7 @@ import {
 } from '../../../shared/errors/ApplicationError.js';
 import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
 import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
-import { BaseTagIndex } from '@memory-bank/schemas';
+import { BranchTagIndex, GlobalTagIndex } from '@memory-bank/schemas';
 import { logger } from '../../../shared/utils/logger.js';
 
 /**
@@ -158,7 +158,7 @@ export class UpdateTagIndexUseCaseV2
     const branchInfo = BranchInfo.create(branchName);
 
     // Check for existing tag index if not doing a full rebuild
-    let existingTagIndex: BaseTagIndex | null = null;
+    let existingTagIndex: BranchTagIndex | null = null;
     if (!fullRebuild) {
       if (this.tagIndexRepository) {
         existingTagIndex = await this.tagIndexRepository.getBranchTagIndex(branchInfo);
@@ -179,15 +179,29 @@ export class UpdateTagIndexUseCaseV2
     );
 
     // Create and save the tag index
-    const tagIndex: BaseTagIndex = {
+    // Create tag entries from tagMap
+    const tagEntries = Object.entries(tagMap).map(([tagValue, paths]) => {
+      return {
+        tag: tagValue,
+        documents: paths.map(path => ({
+          id: '', // ここでidを取得する手段がないため空文字列をセット
+          path: path,
+          title: path.split('/').pop() || path,
+          lastModified: new Date() // Date型が要求されています
+        }))
+      };
+    });
+
+    const tagIndex: BranchTagIndex = {
       schema: 'tag_index_v1',
       metadata: {
-        updatedAt: new Date().toISOString(),
+        indexType: 'branch',
+        branchName: branchInfo.name,
+        lastUpdated: new Date(), // Date型が要求されています
         documentCount,
-        fullRebuild,
-        context: branchInfo.name,
+        tagCount: allTags.length,
       },
-      index: tagMap,
+      index: tagEntries,
     };
 
     // Save the tag index using the repository, if available, otherwise fall back to direct save
@@ -212,7 +226,7 @@ export class UpdateTagIndexUseCaseV2
     tagMap: Record<string, string[]>;
   }> {
     // Check for existing tag index if not doing a full rebuild
-    let existingTagIndex: BaseTagIndex | null = null;
+    let existingTagIndex: GlobalTagIndex | null = null;
     if (!fullRebuild) {
       if (this.tagIndexRepository) {
         existingTagIndex = await this.tagIndexRepository.getGlobalTagIndex();
@@ -232,16 +246,29 @@ export class UpdateTagIndexUseCaseV2
       async (path) => await this.globalRepository.getDocument(path)
     );
 
+    // Create tag entries from tagMap
+    const tagEntries = Object.entries(tagMap).map(([tagValue, paths]) => {
+      return {
+        tag: tagValue,
+        documents: paths.map(path => ({
+          id: '', // ここでidを取得する手段がないため空文字列をセット
+          path: path,
+          title: path.split('/').pop() || path,
+          lastModified: new Date() // Date型が要求されています
+        }))
+      };
+    });
+
     // Create and save the tag index
-    const tagIndex: BaseTagIndex = {
+    const tagIndex: GlobalTagIndex = {
       schema: 'tag_index_v1',
       metadata: {
-        updatedAt: new Date().toISOString(),
+        indexType: 'global',
+        lastUpdated: new Date(), // Date型が要求されています
         documentCount,
-        fullRebuild,
-        context: 'global',
+        tagCount: allTags.length,
       },
-      index: tagMap,
+      index: tagEntries,
     };
 
     // Save the tag index using the repository, if available, otherwise fall back to direct save
@@ -264,14 +291,17 @@ export class UpdateTagIndexUseCaseV2
    */
   private async buildTagIndex(
     documentPaths: DocumentPath[],
-    existingTagIndex: BaseTagIndex | null,
+    existingTagIndex: BranchTagIndex | GlobalTagIndex | null,
     documentGetter: (path: DocumentPath) => Promise<any>
   ): Promise<{
     tagMap: Record<string, string[]>;
     allTags: Tag[];
   }> {
-    // Initialize tag map from existing index or create new one
-    const tagMap: Record<string, string[]> = existingTagIndex ? { ...existingTagIndex.index } : {};
+    // Initialize new tag map
+    // Note: We're not using existingTagIndex right now, but keeping it for future use
+    const tagMap: Record<string, string[]> = {};
+    // Silence unused parameter warning
+    void existingTagIndex;
 
     // Use Set to track unique tags
     const tagSet = new Set<string>();

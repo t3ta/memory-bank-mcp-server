@@ -13,9 +13,28 @@ import {
 import { IIndexService } from './interfaces/IIndexService.js';
 import {
   DocumentReference,
-  BranchTagIndex as DocumentIndex, // Use BranchTagIndex and alias it
-  TAG_INDEX_VERSION as INDEX_SCHEMA_VERSION, // Use TAG_INDEX_VERSION and alias it
+  TAG_INDEX_VERSION as INDEX_SCHEMA_VERSION,
 } from '@memory-bank/schemas';
+
+// このファイル内で使う DocumentReference の型定義
+interface InternalDocumentReference {
+  id: string;
+  path: string;
+  documentType: DocumentType; // ← これが必要だった
+  title: string;
+  lastModified: Date; // ★ IIndexService との互換性のために追加
+}
+
+// このファイル内で使う DocumentIndex の型定義
+interface InternalDocumentIndex {
+  schema: string;
+  lastUpdated: Date;
+  branchName: string;
+  idIndex: Record<string, InternalDocumentReference>; // ← InternalDocumentReference を使う
+  pathIndex: Record<string, string>; // path to id mapping
+  typeIndex: Record<string, string[]>; // documentType to id[] mapping
+  tagIndex: Record<string, string[]>; // tag to id[] mapping
+}
 
 /**
  * Implementation of the document index service
@@ -24,7 +43,7 @@ import {
  */
 export class IndexService implements IIndexService {
   // In-memory indices per branch
-  private indices: Map<string, DocumentIndex> = new Map();
+  private indices: Map<string, InternalDocumentIndex> = new Map(); // ★ DocumentIndex -> InternalDocumentIndex
 
   /**
    * Create a new IndexService
@@ -46,13 +65,13 @@ export class IndexService implements IIndexService {
       await this.loadIndex(branchInfo);
     } catch (error) {
       // If loading fails, create a new empty index
-      const newIndex: DocumentIndex = {
+      const newIndex: InternalDocumentIndex = { // ★ DocumentIndex -> InternalDocumentIndex
         schema: INDEX_SCHEMA_VERSION,
         lastUpdated: new Date(),
         branchName: branchInfo.name,
         idIndex: {},
         pathIndex: {},
-        typeIndex: {},
+        typeIndex: {} as Record<string, string[]>,
         tagIndex: {},
       };
 
@@ -70,13 +89,13 @@ export class IndexService implements IIndexService {
    */
   public async buildIndex(branchInfo: BranchInfo, documents: JsonDocument[]): Promise<void> {
     // Create a fresh index
-    const newIndex: DocumentIndex = {
+    const newIndex: InternalDocumentIndex = { // ★ DocumentIndex -> InternalDocumentIndex
       schema: INDEX_SCHEMA_VERSION,
       lastUpdated: new Date(),
       branchName: branchInfo.name,
       idIndex: {},
       pathIndex: {},
-      typeIndex: {},
+      typeIndex: {} as Record<string, string[]>,
       tagIndex: {},
     };
 
@@ -189,7 +208,24 @@ export class IndexService implements IIndexService {
    */
   public async findById(branchInfo: BranchInfo, id: DocumentId): Promise<DocumentReference | null> {
     const index = await this.getOrCreateIndex(branchInfo);
-    return index.idIndex[id.value] || null;
+    const docRef = index.idIndex[id.value];
+    if (!docRef) return null;
+    return this.convertToDocumentReference(docRef);
+  }
+  
+  /**
+   * Convert internal document reference to the schema DocumentReference type
+   * @param internal Internal document reference
+   * @returns Schema-compatible document reference
+   */
+  private convertToDocumentReference(internal: InternalDocumentReference): DocumentReference {
+    // DocumentReferenceの型定義にはdocumentTypeプロパティがないため除外
+    return {
+      id: internal.id,
+      path: internal.path,
+      title: internal.title,
+      lastModified: internal.lastModified
+    };
   }
 
   /**
@@ -209,7 +245,12 @@ export class IndexService implements IIndexService {
       return null;
     }
 
-    return index.idIndex[documentId] || null;
+    const docRef = index.idIndex[documentId];
+    if (!docRef) {
+      return null;
+    }
+
+    return this.convertToDocumentReference(docRef);
   }
 
   /**
@@ -258,7 +299,8 @@ export class IndexService implements IIndexService {
     // Convert document IDs to document references
     return Array.from(matchingIds)
       .map((id) => index.idIndex[id])
-      .filter((ref): ref is DocumentReference => ref !== undefined);
+      .filter((ref): ref is InternalDocumentReference => ref !== undefined)
+      .map((ref) => this.convertToDocumentReference(ref));
   }
 
   /**
@@ -277,8 +319,9 @@ export class IndexService implements IIndexService {
 
     // Convert document IDs to document references
     return documentIds
-      .map((id: string) => index.idIndex[id]) // Add string type
-      .filter((ref: DocumentReference | undefined): ref is DocumentReference => ref !== undefined); // Add type
+      .map((id: string) => index.idIndex[id])
+      .filter((ref: InternalDocumentReference | undefined): ref is InternalDocumentReference => ref !== undefined)
+      .map((ref) => this.convertToDocumentReference(ref));
   }
 
   /**
@@ -288,7 +331,7 @@ export class IndexService implements IIndexService {
    */
   public async listAll(branchInfo: BranchInfo): Promise<DocumentReference[]> {
     const index = await this.getOrCreateIndex(branchInfo);
-    return Object.values(index.idIndex);
+    return Object.values(index.idIndex).map(ref => this.convertToDocumentReference(ref));
   }
 
   /**
@@ -346,7 +389,7 @@ export class IndexService implements IIndexService {
 
       // Read and parse the index file
       const indexJson = await this.fileSystemService.readFile(indexFilePath);
-      const index = JSON.parse(indexJson) as DocumentIndex;
+      const index = JSON.parse(indexJson) as InternalDocumentIndex; // ★ DocumentIndex -> InternalDocumentIndex
 
       // Store the index in memory
       this.indices.set(branchInfo.name, index);
@@ -377,7 +420,7 @@ export class IndexService implements IIndexService {
    * @param branchInfo Branch information
    * @returns Document index
    */
-  private async getOrCreateIndex(branchInfo: BranchInfo): Promise<DocumentIndex> {
+  private async getOrCreateIndex(branchInfo: BranchInfo): Promise<InternalDocumentIndex> { // ★ DocumentIndex -> InternalDocumentIndex
     // Check if index exists in memory
     let index = this.indices.get(branchInfo.name);
     if (!index) {
@@ -393,10 +436,10 @@ export class IndexService implements IIndexService {
           branchName: branchInfo.name,
           idIndex: {},
           pathIndex: {},
-          typeIndex: {},
+          typeIndex: {} as Record<string, string[]>,
           tagIndex: {},
         };
-        this.indices.set(branchInfo.name, index);
+        this.indices.set(branchInfo.name, index!); // ★ Use non-null assertion
       }
     }
 
@@ -416,15 +459,16 @@ export class IndexService implements IIndexService {
    * @param index Document index to update
    * @param document Document to add
    */
-  private addDocumentToIndex(index: DocumentIndex, document: JsonDocument): void {
+  private addDocumentToIndex(index: InternalDocumentIndex, document: JsonDocument): void { // ★ DocumentIndex -> InternalDocumentIndex
     const documentId = document.id.value;
 
     // Create document reference
-    const docRef: DocumentReference = {
+    const docRef: InternalDocumentReference = { // ★ DocumentReference -> InternalDocumentReference
       id: documentId,
       path: document.path.value,
       documentType: document.documentType,
       title: document.title,
+      lastModified: document.lastModified, // ★ lastModified を追加
     };
 
     // Add to ID index

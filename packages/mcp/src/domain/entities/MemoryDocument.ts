@@ -273,17 +273,15 @@ export class MemoryDocument {
 
     return {
       schema: 'memory_document_v2',
-      metadata: {
-        title,
-        documentType,
-        path: this.props.path.value,
-        tags: this.props.tags.map((tag) => tag.value),
-        lastModified: this.props.lastModified,
-        createdAt: new Date(),
-        version: 1,
-        id: crypto.randomUUID()
-      },
-      content,
+      title,
+      documentType,
+      path: this.props.path.value,
+      tags: this.props.tags.map((tag) => tag.value),
+      lastModified: this.props.lastModified,
+      createdAt: new Date(),
+      version: 1,
+      id: crypto.randomUUID(),
+      ...content, // Spread content properties at top level
     } as JsonDocumentV2;
   }
 
@@ -298,12 +296,11 @@ export class MemoryDocument {
       schema: jsonDoc.schema
     });
 
-    // Version 2 schema has metadata nested
-    const metadata = jsonDoc.metadata;
-    const lastModified = metadata.lastModified;
+    // For V2 schema, properties are at the top level
+    const lastModified = jsonDoc.lastModified;
 
     // Sanitize tags before creating Tag objects
-    const sanitizedTags = (metadata.tags || []).map((tag: string) => {
+    const sanitizedTags = (jsonDoc.tags || []).map((tag: string) => {
       // First try to create the tag as is
       try {
         const tagObj = Tag.create(tag);

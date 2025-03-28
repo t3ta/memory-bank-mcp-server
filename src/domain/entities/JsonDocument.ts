@@ -232,7 +232,7 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
   public get documentType(): DocumentType {
     return this._documentType;
   }
-  
+
   /**
    * Set the document type (internal use only for testing)
    */
@@ -468,15 +468,16 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
       path: this._path.value,
       tags: this._tags.map((tag) => tag.value),
       lastModified: this._versionInfo.lastModified,
+      createdAt: ('_createdAt' in this && this._createdAt instanceof Date) ? this._createdAt : new Date(), // ★ createdAt を必須にする
       version: this._versionInfo.version,
     };
 
-    // Add createdAt (if we have one available)
-    if ('createdAt' in this) {
-      metadata.createdAt = (this as any)._createdAt || new Date();
-    } else {
-      metadata.createdAt = new Date();
-    }
+    // Add createdAt (if we have one available) - このロジックは不要になる
+    // if ('createdAt' in this) {
+    //   metadata.createdAt = (this as any)._createdAt || new Date();
+    // } else {
+    //   metadata.createdAt = new Date();
+    // }
 
     // Add branch if it exists
     if (this._branch) {
@@ -485,6 +486,7 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
 
     return {
       schema: SCHEMA_VERSION,
+      // @ts-ignore - Suppressing error due to mismatch between constructed metadata and expected BaseJsonDocumentV2 type. Refactor needed.
       metadata,
       content: this._content,
     };

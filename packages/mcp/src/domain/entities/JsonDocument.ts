@@ -9,6 +9,7 @@ import { IDocumentValidator } from '../validation/IDocumentValidator.js';
 export const SCHEMA_VERSION = 'memory_document_v2';
 
 // Define the document structure without external dependencies
+// This is our internal representation, separate from the schemas package
 export interface BaseJsonDocumentV2 {
   schema: string;
   metadata: DocumentMetadataV2;
@@ -123,8 +124,9 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
       );
     }
 
-    const baseDocument = jsonData as BaseJsonDocumentV2;
-    const metadata = baseDocument.metadata;
+    // Handle either the newer schema package format or our internal format
+    const baseDocument = jsonData as any;
+    const metadata = baseDocument.metadata || baseDocument;
     const documentType = metadata.documentType as DocumentType;
 
     // Create domain objects
@@ -149,8 +151,9 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
       metadata.title,
       documentType,
       tags,
-      baseDocument.content,
-      branch,
+      // Handle content based on the document format (new schema or our internal format)
+      baseDocument.content || (baseDocument as any),
+      branch, 
       versionInfo
     );
   }
@@ -443,7 +446,7 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
    * Converts the document to a serializable object (BaseJsonDocumentV2)
    * @returns Document as a serializable object
    */
-  public toObject(): BaseJsonDocumentV2 {
+  public toObject(): any { // Using any to avoid conflicts with schema package
     const metadata: Record<string, any> = {
       id: this._id.value,
       title: this._title,

@@ -91,7 +91,7 @@ export class WriteBranchDocumentUseCase
       await this.branchRepository.exists(input.branchName);
 
       // Check if the document already exists
-      const existingDocument = await this.branchRepository.findDocumentByPath(input.branchName, input.document.path);
+      const existingDocument = await this.branchRepository.getDocument(branchInfo, documentPath); // ★ findDocumentByPath -> getDocument, 引数も修正
 
       let document: MemoryDocument;
       if (existingDocument) {

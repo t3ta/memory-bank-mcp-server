@@ -44,7 +44,7 @@ export class LoggerFactory {
    * @param options ロガーの設定オプション
    */
   public createLogger(options: LoggerFactoryOptions): Logger {
-    const { type, minLevel = 'info', defaultContext } = options;
+    const { minLevel = 'info', defaultContext } = options; // typeは使用しない
     let logger: Logger;
 
     // 全てのタイプで共通のcreateConsoleLoggerを使用

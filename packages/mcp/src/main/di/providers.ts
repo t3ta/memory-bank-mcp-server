@@ -1,6 +1,7 @@
 import { DIContainer } from './DIContainer.js';
 import { MCPResponsePresenter } from '@/interface/presenters/MCPResponsePresenter.js';
 import { ReadGlobalDocumentUseCase } from '@/application/usecases/global/ReadGlobalDocumentUseCase.js';
+import { WriteGlobalDocumentUseCase } from '@/application/usecases/global/WriteGlobalDocumentUseCase.js'; // ★ インポートを追加
 import path from 'node:path';
 import { IndexService } from '@/infrastructure/index/IndexService.js';
 import { IIndexService } from '@/infrastructure/index/interfaces/IIndexService.js';
@@ -170,7 +171,7 @@ export async function registerApplicationServices(container: DIContainer): Promi
 
     return new ReadGlobalDocumentUseCase(globalRepository);
   });
-  
+
   // Register mockup for markdown migration service
   container.registerFactory('markdownMigrationService', async () => {
     // Create a mock template repository since we're removing the actual implementation
@@ -183,7 +184,7 @@ export async function registerApplicationServices(container: DIContainer): Promi
       getAllTemplateIds: async () => [],
       getAllTemplateTypes: async () => []
     };
-    
+
     const configProvider = await container.get<IConfigProvider>('configProvider');
     const config = configProvider.getConfig();
 
@@ -386,11 +387,11 @@ export async function registerInterfaceServices(container: DIContainer): Promise
   // Register GlobalController
   container.registerFactory('globalController', async () => {
     const readGlobalDocumentUseCase = await container.get<ReadGlobalDocumentUseCase>('readGlobalDocumentUseCase');
-    const writeGlobalDocumentUseCase = await container.get('writeGlobalDocumentUseCase');
+    const writeGlobalDocumentUseCase = await container.get<WriteGlobalDocumentUseCase>('writeGlobalDocumentUseCase'); // ★ 型指定を追加
     const searchDocumentsByTagsUseCase = await container.get<SearchDocumentsByTagsUseCase>('searchDocumentsByTagsUseCase');
     const updateTagIndexUseCase = await container.get<UpdateTagIndexUseCase>('updateTagIndexUseCase');
     const presenter = await container.get<MCPResponsePresenter>('mcpResponsePresenter');
-    
+
     // Get optional use cases
     const updateTagIndexUseCaseV2 = await container.get<UpdateTagIndexUseCaseV2>('updateTagIndexUseCaseV2');
     const readJsonDocumentUseCase = await container.get<ReadJsonDocumentUseCase>('readJsonDocumentUseCase');

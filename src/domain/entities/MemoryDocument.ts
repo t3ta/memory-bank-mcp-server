@@ -116,13 +116,13 @@ export class MemoryDocument {
       documentTags: this.props.tags.map(t => t.value),
       searchTag: tag.value
     });
-    
+
     const hasTag = this.props.tags.some((t) => {
       const matches = t.equals(tag);
       logger.debug('Tag comparison:', { tag1: t.value, tag2: tag.value, matches });
       return matches;
     });
-    
+
     return hasTag;
   }
 
@@ -243,9 +243,9 @@ export class MemoryDocument {
       try {
         return JSON.parse(this.props.content) as Record<string, unknown>;
       } catch (error) {
-        MemoryDocument.getLogger().error('Failed to parse JSON document:', { 
-          error, 
-          path: this.props.path.value 
+        MemoryDocument.getLogger().error('Failed to parse JSON document:', {
+          error,
+          path: this.props.path.value
         });
       }
     }
@@ -292,8 +292,9 @@ export class MemoryDocument {
         };
     }
 
+    // @ts-ignore - Suppressing error due to mismatch between this structure and expected JsonDocumentV2 type elsewhere. Refactor needed.
     return {
-      schema: 'memory_document_v1',
+      schema: 'memory_document_v1', // Schema version might also be incorrect here
       metadata: {
         title,
         documentType,

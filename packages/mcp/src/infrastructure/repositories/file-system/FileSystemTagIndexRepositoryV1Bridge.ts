@@ -1,6 +1,6 @@
 import path from "path";
 import type { BranchInfo } from "../../../domain/entities/BranchInfo.js";
-import type { BaseTagIndex as TagIndex } from "@memory-bank/schemas"; // Changed TagIndex to BaseTagIndex and aliased
+import type { BranchTagIndex, GlobalTagIndex } from "@memory-bank/schemas";
 import type { FileSystemBranchMemoryBankRepository } from "./FileSystemBranchMemoryBankRepository.js";
 import type { FileSystemGlobalMemoryBankRepository } from "./FileSystemGlobalMemoryBankRepository.js";
 import { logger } from "../../../shared/utils/logger.js";
@@ -12,8 +12,8 @@ import { logger } from "../../../shared/utils/logger.js";
  */
 export class FileSystemTagIndexRepositoryV1Bridge {
   // キャッシュ管理
-  private branchIndexCache = new Map<string, TagIndex>();
-  private globalIndexCache: TagIndex | null = null;
+  private branchIndexCache = new Map<string, BranchTagIndex>();
+  private globalIndexCache: GlobalTagIndex | null = null;
   // private readonly CACHE_TTL_MS = 30000; // Removed unused constant
 
   /**
@@ -38,7 +38,7 @@ export class FileSystemTagIndexRepositoryV1Bridge {
    * @param tagIndex Tag index to save
    * @returns Promise resolving when done
    */
-  async saveBranchTagIndex(branchInfo: BranchInfo, tagIndex: TagIndex): Promise<void> {
+  async saveBranchTagIndex(branchInfo: BranchInfo, tagIndex: BranchTagIndex): Promise<void> {
     // キャッシュに保存
     this.branchIndexCache.set(branchInfo.safeName, tagIndex);
     logger.debug(`Saved branch tag index to cache: ${branchInfo.name}`);
@@ -50,7 +50,7 @@ export class FileSystemTagIndexRepositoryV1Bridge {
    * @param branchInfo Branch information
    * @returns Promise resolving to tag index if found, null otherwise
    */
-  async getBranchTagIndex(branchInfo: BranchInfo): Promise<TagIndex | null> {
+  async getBranchTagIndex(branchInfo: BranchInfo): Promise<BranchTagIndex | null> {
     // キャッシュチェック
     const cachedIndex = this.branchIndexCache.get(branchInfo.safeName);
     if (cachedIndex) {
@@ -71,7 +71,7 @@ export class FileSystemTagIndexRepositoryV1Bridge {
    * @param tagIndex Tag index to save
    * @returns Promise resolving when done
    */
-  async saveGlobalTagIndex(tagIndex: TagIndex): Promise<void> {
+  async saveGlobalTagIndex(tagIndex: GlobalTagIndex): Promise<void> {
     // キャッシュに保存
     this.globalIndexCache = tagIndex;
     logger.debug(`Saved global tag index to cache`);
@@ -82,7 +82,7 @@ export class FileSystemTagIndexRepositoryV1Bridge {
    * Get tag index for global memory bank
    * @returns Promise resolving to tag index if found, null otherwise
    */
-  async getGlobalTagIndex(): Promise<TagIndex | null> {
+  async getGlobalTagIndex(): Promise<GlobalTagIndex | null> {
     // キャッシュチェック
     if (this.globalIndexCache) {
       logger.debug(`Using cached global tag index`);

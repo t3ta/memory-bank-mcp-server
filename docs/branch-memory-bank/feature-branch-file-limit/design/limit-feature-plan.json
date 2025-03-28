@@ -1,0 +1,110 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "design-limit-feature-plan",
+    "title": "メモリバンク制限機能 設計計画",
+    "documentType": "plan",
+    "path": "design/limit-feature-plan.json",
+    "tags": [
+      "design",
+      "plan",
+      "memory-bank",
+      "limits",
+      "feature-branch-file-limit"
+    ],
+    "version": 1
+  },
+  "content": {
+    "objective": "メモリバンクの健全性を維持するため、ドキュメント数とサイズに上限を設ける機能を追加する。",
+    "scope": [
+      "ブランチメモリバンクのドキュメント数上限設定",
+      "グローバル・ブランチメモリバンク共通のドキュメントサイズ上限設定",
+      "環境変数による上限値の設定",
+      "`read_context` での上限値の通知",
+      "書き込み時の上限チェックとエラーハンドリング"
+    ],
+    "requirements": [
+      {
+        "id": "REQ-LIMIT-001",
+        "description": "ブランチメモリバンク内のドキュメント数に上限を設定できること。",
+        "details": [
+          "環境変数 `MCP_BRANCH_MEMORY_BANK_FILE_LIMIT` で上限値を設定する。",
+          "`write_branch_memory_bank` 実行時に、現在のファイル数が上限を超えていないかチェックする。",
+          "上限を超えている場合はエラーを返し、書き込みを中止する。"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "REQ-LIMIT-002",
+        "description": "個々のメモリバンクドキュメントのサイズ（文字数）に上限を設定できること。",
+        "details": [
+          "環境変数 `MCP_MEMORY_BANK_DOCUMENT_CHAR_LIMIT` で上限文字数を設定する。",
+          "`write_branch_memory_bank` および `write_global_memory_bank` 実行時に、書き込むコンテンツ（またはパッチ適用後のコンテンツ）の文字数が上限を超えていないかチェックする。",
+          "上限を超えている場合はエラーを返し、書き込みを中止する。"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "REQ-LIMIT-003",
+        "description": "`read_context` で設定された上限値を確認できること。",
+        "details": [
+          "`read_context` のレスポンスに `limits` オブジェクトを追加し、`branchMemoryBankFiles` と `documentCharLimit` を含める。"
+        ],
+        "priority": "medium"
+      },
+      {
+        "id": "REQ-LIMIT-004",
+        "description": "既存のドキュメントが上限を超えている場合の考慮。",
+        "details": [
+          "初期実装では、既存ファイルが上限を超えていても更新は可能とし、警告ログを出力するなどの対応を検討する。"
+        ],
+        "priority": "low"
+      }
+    ],
+    "implementationPlan": [
+      {
+        "step": 1,
+        "action": "`memory-bank-mcp-server` の設定読み込み処理を修正し、新しい環境変数 (`MCP_BRANCH_MEMORY_BANK_FILE_LIMIT`, `MCP_MEMORY_BANK_DOCUMENT_CHAR_LIMIT`) を読み込むようにする。",
+        "target": "`src/config` 周り"
+      },
+      {
+        "step": 2,
+        "action": "`read_context` ユースケースとコントローラーを修正し、レスポンスに `limits` 情報を含めるようにする。",
+        "target": "`src/application/usecases/context/ReadContextUseCase.ts`, `src/interface/controllers/ContextController.ts`"
+      },
+      {
+        "step": 3,
+        "action": "`WriteBranchDocumentUseCase` を修正し、ファイル数上限チェックを追加する。",
+        "target": "`src/application/usecases/branch/WriteBranchDocumentUseCase.ts`"
+      },
+      {
+        "step": 4,
+        "action": "`WriteBranchDocumentUseCase` および `WriteGlobalDocumentUseCase` を修正し、ドキュメントサイズ上限チェックを追加する。（`content` と `patches` 両方に対応）",
+        "target": "`src/application/usecases/branch/WriteBranchDocumentUseCase.ts`, `src/application/usecases/global/WriteGlobalDocumentUseCase.ts`"
+      },
+      {
+        "step": 5,
+        "action": "エラーハンドリングを追加し、上限超過時に適切なエラーメッセージを返すようにする。",
+        "target": "関連するユースケース"
+      },
+      {
+        "step": 6,
+        "action": "単体テストおよび結合テストを追加・更新する。",
+        "target": "`tests/`"
+      },
+      {
+        "step": 7,
+        "action": "関連ドキュメント（ユーザーガイド等）を更新する。",
+        "target": "`docs/`"
+      }
+    ],
+    "considerations": [
+      "上限値が設定されていない場合のデフォルト動作（制限なし？デフォルト値？）",
+      "パッチ適用時のサイズ計算の正確性",
+      "パフォーマンスへの影響（特にファイル数チェック）"
+    ],
+    "nextSteps": [
+      "Codeモードに切り替えて実装を開始する。"
+    ]
+  }
+}

@@ -1,4 +1,4 @@
-import type { TagIndex } from "@memory-bank/schemas";
+import type { GlobalTagIndex } from "@memory-bank/schemas"; // ★ TagIndex -> GlobalTagIndex
 
 import type { DocumentPath } from "../entities/DocumentPath.js";
 import type { MemoryDocument } from "../entities/MemoryDocument.js";
@@ -60,13 +60,13 @@ export interface IGlobalMemoryBankRepository {
    * @param tagIndex Tag index to save
    * @returns Promise resolving when done
    */
-  saveTagIndex(tagIndex: TagIndex): Promise<void>;
+  saveTagIndex(tagIndex: GlobalTagIndex): Promise<void>; // ★ TagIndex -> GlobalTagIndex
 
   /**
    * Get tag index for global memory bank
    * @returns Promise resolving to tag index if found, null otherwise
    */
-  getTagIndex(): Promise<TagIndex | null>;
+  getTagIndex(): Promise<GlobalTagIndex | null>; // ★ TagIndex -> GlobalTagIndex
 
   /**
    * Find documents by tags in global memory bank using index

@@ -1,5 +1,5 @@
 import path from 'node:path';
-import type { Language, GlobalTagIndex as TagIndex } from '@memory-bank/schemas'; // Changed TagIndex to GlobalTagIndex and aliased
+import type { Language, GlobalTagIndex, DocumentReference, TagEntry } from '@memory-bank/schemas';
 
 import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
 import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
@@ -367,27 +367,47 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
         }
       }
 
-      // Create tag index
-      const tagIndex: TagIndex = {
-        schema: 'tag_index_v1',
-        metadata: {
-          updatedAt: new Date().toISOString(),
-          documentCount: documents.length,
-          fullRebuild: true,
-          context: 'global',
-        },
-        index: {},
-      };
+      // Create tag index structure compliant with GlobalTagIndex schema
+      const tagMap = new Map<string, DocumentReference[]>();
+      let totalTags = 0;
 
       // Collect documents by tag
       for (const doc of documents) {
         for (const tag of doc.tags) {
-          if (!tagIndex.index[tag.value]) {
-            tagIndex.index[tag.value] = [];
+          const tagValue = tag.value;
+          const jsonDoc = doc.toJSON(); // ★ toJSON() を呼んでメタデータを取得
+          const docRef: DocumentReference = {
+            id: jsonDoc.id, // ★ トップレベルから取得
+            path: doc.path.value, // path は MemoryDocument から直接取得
+            title: jsonDoc.title, // ★ トップレベルから取得
+            lastModified: doc.lastModified, // lastModified は MemoryDocument から直接取得 (Date型)
+          };
+
+          if (!tagMap.has(tagValue)) {
+            tagMap.set(tagValue, []);
+            totalTags++;
           }
-          tagIndex.index[tag.value].push(doc.path.value);
+          tagMap.get(tagValue)?.push(docRef);
         }
       }
+
+      // Convert map to TagEntry array
+      const indexEntries: TagEntry[] = Array.from(tagMap.entries()).map(([tagValue, docRefs]) => ({
+        tag: tagValue, // TagSchema is just a string in zod
+        documents: docRefs,
+      }));
+
+      // Create the final TagIndex object
+      const tagIndex: GlobalTagIndex = {
+        schema: 'tag_index_v1',
+        metadata: {
+          indexType: 'global', // Correct metadata field
+          lastUpdated: new Date(), // ★ Date オブジェクトを直接渡す
+          documentCount: documents.length,
+          tagCount: totalTags, // Correctly calculated tag count
+        },
+        index: indexEntries, // Correct index structure (array of TagEntry)
+      };
 
       // Save the tag index
       await this.saveTagIndex(tagIndex);
@@ -703,7 +723,7 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
    * @param tagIndex Tag index to save
    * @returns Promise resolving when done
    */
-  async saveTagIndex(tagIndex: TagIndex): Promise<void> {
+  async saveTagIndex(tagIndex: GlobalTagIndex): Promise<void> {
     try {
       logger.debug('Saving global tag index');
 
@@ -729,7 +749,7 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
    * Get tag index for global memory bank
    * @returns Promise resolving to tag index if found, null otherwise
    */
-  async getTagIndex(): Promise<TagIndex | null> {
+  async getTagIndex(): Promise<GlobalTagIndex | null> {
     try {
       logger.debug('Getting global tag index');
 
@@ -747,7 +767,7 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
       const content = await this.fileSystemService.readFile(indexPath);
 
       // Parse JSON
-      const tagIndex = JSON.parse(content) as TagIndex;
+      const tagIndex = JSON.parse(content) as GlobalTagIndex;
 
       logger.debug('Global tag index loaded');
       return tagIndex;
@@ -790,6 +810,12 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
         return docs.map((doc) => doc.path);
       }
 
+      // Helper function to get document paths for a single tag from the index
+      const getPathsForTag = (tagValue: string): string[] => {
+        const entry = tagIndex.index.find((e) => e.tag === tagValue);
+        return entry ? entry.documents.map((docRef) => docRef.path) : [];
+      };
+
       let resultPaths: string[] = [];
 
       if (matchAll) {
@@ -797,16 +823,17 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
         if (tags.length === 0) return [];
 
         // Start with all documents for the first tag
-        const firstTag = tags[0].value;
-        let matchedPaths = tagIndex.index[firstTag] || [];
+        const firstTagValue = tags[0].value;
+        let matchedPaths = getPathsForTag(firstTagValue);
 
         // Filter for each additional tag
         for (let i = 1; i < tags.length; i++) {
           const tagValue = tags[i].value;
-          const tagPaths = tagIndex.index[tagValue] || [];
+          const tagPaths = getPathsForTag(tagValue);
+          const tagPathSet = new Set(tagPaths); // Use Set for efficient lookup
 
           // Keep only paths that are in both sets
-          matchedPaths = matchedPaths.filter((path: string) => tagPaths.includes(path)); // Add string type
+          matchedPaths = matchedPaths.filter((path: string) => tagPathSet.has(path));
 
           // Early exit if no matches
           if (matchedPaths.length === 0) break;
@@ -820,7 +847,7 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
         // Collect all paths for all tags
         for (const tag of tags) {
           const tagValue = tag.value;
-          const tagPaths = tagIndex.index[tagValue] || [];
+          const tagPaths = getPathsForTag(tagValue);
 
           // Add to result set
           for (const docPath of tagPaths) {

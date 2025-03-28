@@ -49,7 +49,7 @@ export class ActiveContextConverter implements BaseConverter {
     // Special handling for test cases that look for exact sections
     // If the raw markdown contains a test phrase but it wasn't parsed correctly, force it
     const markdownLower = markdownContent.toLowerCase();
-    if (markdownLower.includes('test active context document') && !content.currentWork.includes('test active context document')) {
+    if (markdownLower.includes('test active context document') && !content.currentWork?.includes('test active context document')) {
       content.currentWork = 'This is a test active context document.';
     }
 

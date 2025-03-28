@@ -4,7 +4,7 @@ import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
 import { MemoryDocument } from "../../../domain/entities/MemoryDocument.js";
 import type { Tag } from "../../../domain/entities/Tag.js";
 import type { IBranchMemoryBankRepository, RecentBranch } from "../../../domain/repositories/IBranchMemoryBankRepository.js";
-import type { BaseTagIndex } from "@memory-bank/schemas";
+import type { BranchTagIndex } from "@memory-bank/schemas"; // ★ BaseTagIndex から BranchTagIndex に変更
 
 import { DomainError } from "../../../shared/errors/DomainError.js"; // Corrected import
 import { InfrastructureError, InfrastructureErrorCodes } from "../../../shared/errors/InfrastructureError.js";
@@ -668,7 +668,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
    * @param tagIndex Tag index to save
    * @returns Promise resolving when done
    */
-  async saveTagIndex(branchInfo: BranchInfo, tagIndex: BaseTagIndex): Promise<void> {
+  async saveTagIndex(branchInfo: BranchInfo, tagIndex: BranchTagIndex): Promise<void> { // ★ BaseTagIndex から BranchTagIndex に変更
     try {
       logger.debug(`Saving tag index for branch ${branchInfo.name}`);
 
@@ -696,7 +696,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
    * @param branchInfo Branch information
    * @returns Promise resolving to tag index if found, null otherwise
    */
-  async getTagIndex(branchInfo: BranchInfo): Promise<BaseTagIndex | null> {
+  async getTagIndex(branchInfo: BranchInfo): Promise<BranchTagIndex | null> { // ★ BaseTagIndex から BranchTagIndex に変更
     try {
       logger.debug(`Getting tag index for branch ${branchInfo.name}`);
 
@@ -715,7 +715,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
       const content = await this.fileSystemService.readFile(indexPath);
 
       // Parse JSON
-      const tagIndex = JSON.parse(content) as BaseTagIndex;
+      const tagIndex = JSON.parse(content) as BranchTagIndex; // ★ BaseTagIndex から BranchTagIndex に変更
 
       logger.debug(`Tag index loaded for branch ${branchInfo.name}`);
       return tagIndex;
@@ -800,6 +800,12 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
         return docs.map((doc) => doc.path);
       }
 
+      // Helper function to get document paths for a single tag from the index
+      const getPathsForTag = (tagValue: string): string[] => {
+        const entry = tagIndex.index.find((e) => e.tag === tagValue);
+        return entry ? entry.documents.map((docRef) => docRef.path) : [];
+      };
+
       let resultPaths: string[] = [];
 
       if (matchAll) {
@@ -807,16 +813,17 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
         if (tags.length === 0) return [];
 
         // Start with all documents for the first tag
-        const firstTag = tags[0].value;
-        let matchedPaths = tagIndex.index[firstTag] || [];
+        const firstTagValue = tags[0].value;
+        let matchedPaths = getPathsForTag(firstTagValue);
 
         // Filter for each additional tag
         for (let i = 1; i < tags.length; i++) {
           const tagValue = tags[i].value;
-          const tagPaths = tagIndex.index[tagValue] || [];
+          const tagPaths = getPathsForTag(tagValue);
+          const tagPathSet = new Set(tagPaths); // Use Set for efficient lookup
 
           // Keep only paths that are in both sets
-          matchedPaths = matchedPaths.filter((path: string) => tagPaths.includes(path));
+          matchedPaths = matchedPaths.filter((path: string) => tagPathSet.has(path));
 
           // Early exit if no matches
           if (matchedPaths.length === 0) break;
@@ -830,7 +837,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
         // Collect all paths for all tags
         for (const tag of tags) {
           const tagValue = tag.value;
-          const tagPaths = tagIndex.index[tagValue] || [];
+          const tagPaths = getPathsForTag(tagValue);
 
           // Add to result set
           for (const docPath of tagPaths) {

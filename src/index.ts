@@ -234,11 +234,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
         return { content: [{ type: 'text', text: 'Document written successfully' }] };
       }
 
-      // Case 2: Patches provided - use inline logic or dedicated patch handler if available in MCP package
-      if (patches) {
-        // Assuming patch logic is handled within the controller or a utility in the MCP package
-        // This might need adjustment based on how patching is implemented in the new structure
-        logger.warn('JSON Patch handling for branch memory bank needs review/implementation based on MCP package structure.');
       // Case 2: Patches provided - use JsonPatchUseCase from MCP package
       if (patches) {
         logger.debug(`Applying JSON Patch to branch memory bank (branch: ${branch}, path: ${path}, patches: ${JSON.stringify(patches)})`);
@@ -269,25 +264,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
           logger.error(`Error applying JSON Patch: ${error.message}`, error);
           throw new Error(`Failed to apply JSON Patch: ${error.message}`);
         }
-              op: patch.op,
-              path: patch.path,
-              value: patch.value,
-              from: patch.from
-            };
-          });
-          
-          // Execute patch operations on the document
-          const result = await jsonPatchUseCase.execute(path, patchOperations, branch);
-          
-          if (!result) {
-            throw new Error(`Failed to apply JSON Patch to document: ${path} in branch ${branch}`);
-          }
-          
-          return { content: [{ type: 'text', text: 'Patches applied successfully' }] };
-        } catch (error) {
-          logger.error(`Error applying JSON Patch: ${error.message}`, error);
-          throw new Error(`Failed to apply JSON Patch: ${error.message}`);
-        }
+      }
     }
 
     case 'read_branch_memory_bank': {
@@ -589,8 +566,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
       };
     }
 
-    default:
+    default: {
       throw new Error(`Unknown tool: ${name}`);
+    }
   }
 });
 

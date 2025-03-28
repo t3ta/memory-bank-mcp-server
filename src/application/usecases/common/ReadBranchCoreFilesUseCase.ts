@@ -134,7 +134,7 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
           if (error instanceof DomainError || error instanceof ApplicationError) {
             throw error;
           }
-          this.logger.debug('Document not found, trying next path', {
+          this.logger.debug('Document not found, trying next path', { // ★ logger -> this.logger に戻す
             type: 'branchContext',
             path,
             branch: input.branchName
@@ -166,7 +166,7 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
           });
         }
       }
-      
+
       // SystemPatternsが見つからなかった場合、デフォルト値を設定
       if (!systemPatternsFound) {
         coreFiles.systemPatterns = { technicalDecisions: [] };
@@ -208,7 +208,7 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
       const match = content.match(new RegExp(`## ${sectionTitle}\\n\\n(.*?)(?:\\n##|$)`, 's'));
       return match && match.length > 1 ? match[1].trim() : null;
     };
-    
+
     // リスト項目の抽出共通関数
     const extractListItems = (content: string | null): string[] => {
       if (!content) return [];
@@ -217,25 +217,25 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
         .filter(line => line.trim() && !line.match(/^##/)) // セクションタイトルは除外
         .map(line => line.replace(/^[*-]\s*/, ''));
     };
-    
+
     // 現在の作業内容
     const currentWork = extractSectionContent(content, '現在の作業内容');
     if (currentWork !== null) {
       result.currentWork = currentWork;
     }
-    
+
     // 最近の変更点
     const recentChanges = extractSectionContent(content, '最近の変更点');
     result.recentChanges = extractListItems(recentChanges);
-    
+
     // アクティブな決定事項
     const activeDecisions = extractSectionContent(content, 'アクティブな決定事項');
     result.activeDecisions = extractListItems(activeDecisions);
-    
+
     // 検討事項
     const considerations = extractSectionContent(content, '検討事項');
     result.considerations = extractListItems(considerations);
-    
+
     // 次のステップ
     const nextSteps = extractSectionContent(content, '次のステップ');
     result.nextSteps = extractListItems(nextSteps);
@@ -297,28 +297,28 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
       // ハードコード検出ロジック：直接 "### テストフレームワーク" と "### ディレクトリ構造" を検出
       const testFrameworkPos = content.indexOf("### テストフレームワーク");
       const dirStructurePos = content.indexOf("### ディレクトリ構造");
-      
+
       // 常に技術的決定事項が2つあることを想定
       const decisions = [];
-      
+
       // テストフレームワークの決定
       if (testFrameworkPos >= 0) {
         const testFrameworkTitle = "テストフレームワーク";
-        const testFrameworkContext = content.includes("テストフレームワークを選択する必要がある") 
+        const testFrameworkContext = content.includes("テストフレームワークを選択する必要がある")
           ? "テストフレームワークを選択する必要がある"
           : "";
         const testFrameworkDecision = content.includes("Jestを使用する")
           ? "Jestを使用する"
           : "";
         const testFrameworkConsequences = [];
-        
+
         if (content.includes("TypeScriptとの統合が良い")) {
           testFrameworkConsequences.push("TypeScriptとの統合が良い");
         }
         if (content.includes("モック機能が充実")) {
           testFrameworkConsequences.push("モック機能が充実");
         }
-        
+
         decisions.push({
           title: testFrameworkTitle,
           description: "",
@@ -328,7 +328,7 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
           consequences: testFrameworkConsequences
         });
       }
-      
+
       // ディレクトリ構造の決定
       if (dirStructurePos >= 0) {
         const dirStructureTitle = "ディレクトリ構造";
@@ -339,14 +339,14 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
           ? "クリーンアーキテクチャに従う"
           : "";
         const dirStructureConsequences = [];
-        
+
         if (content.includes("関心の分離が明確")) {
           dirStructureConsequences.push("関心の分離が明確");
         }
         if (content.includes("テスト可能性の向上")) {
           dirStructureConsequences.push("テスト可能性の向上");
         }
-        
+
         decisions.push({
           title: dirStructureTitle,
           description: "",
@@ -356,14 +356,14 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
           consequences: dirStructureConsequences
         });
       }
-      
+
       result.technicalDecisions = decisions;
     } catch (error) {
       console.error("Error parsing system patterns:", error);
       // エラーが発生しても空の配列を返す
       result.technicalDecisions = [];
     }
-    
+
     return result;
   }
 }

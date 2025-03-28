@@ -145,4 +145,13 @@ export class DocumentPath {
 
     return DocumentPath.create(newPath);
   }
+
+  /**
+   * Checks if two DocumentPath instances are equal
+   * @param other Another DocumentPath instance
+   * @returns boolean indicating equality
+   */
+  public equals(other: DocumentPath): boolean {
+    return this._value === other._value;
+  }
 }

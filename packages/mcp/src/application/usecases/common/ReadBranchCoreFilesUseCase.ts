@@ -121,7 +121,7 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
         if (error instanceof DomainError || error instanceof ApplicationError) {
           throw error;
         }
-        this.logger.debug('Document not found', {
+        logger.debug('Document not found', { // ★ this.logger -> logger
           type: 'branchContext',
           path: this.BRANCH_CONTEXT_PATH,
           branch: input.branchName
@@ -143,7 +143,7 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
         if (error instanceof DomainError || error instanceof ApplicationError) {
           throw error;
         }
-        this.logger.debug('Document not found', {
+        logger.debug('Document not found', { // ★ this.logger -> logger
           type: 'systemPatterns',
           path: this.SYSTEM_PATTERNS_PATH,
           branch: input.branchName
@@ -162,7 +162,7 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
         throw error;
       }
 
-      this.logger.error('Failed to read core files', {
+      logger.error('Failed to read core files', { // ★ this.logger -> logger
         branch: input.branchName,
         error: error instanceof Error ? error.message : String(error)
       });
