@@ -1,0 +1,111 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "ea5fe5d4-451c-410e-b17a-d1da43116ee6",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context"
+    ],
+    "lastModified": "2025-03-28T13:09:55.146Z",
+    "createdAt": "2025-03-28T13:09:55.146Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "タグインデックス型定義不整合の修正作業。もともとTagIndex型だったものが、@memory-bank/schemasパッケージ導入に伴いBaseTagIndex/BranchTagIndex/GlobalTagIndexに分割された。IBranchMemoryBankRepositoryインターフェースではgetTagIndexメソッドの返り値型がBranchTagIndexに更新されているが、FileSystemBranchMemoryBankRepository実装では自内部呼び出しも存在し、BaseTagIndex型を返していて型不一致が発生している。これを解消するために実装クラスの型定義を更新し、直接BranchTagIndex型を使用するように修正する方針で進める。",
+    "recentChanges": [
+      {
+        "date": "2025-03-29T15:30:00.000Z",
+        "description": "型定義不整合の問題分析と解決策の検討。実装クラスの型定義を更新してインターフェースに合わせる方針を決定。schema-package-type-issues.jsonに詳細を記録。"
+      },
+      {
+        "date": "2025-03-28T13:09:55.146Z",
+        "description": "fix/type-defブランチ作成。ビルドエラーの修正作業を開始。"
+      },
+      {
+        "date": "2025-03-28T13:09:55.146Z",
+        "description": "変更点3"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "5deedb44-fde3-4dcd-b2e4-7619b71bd9f2",
+        "description": "決定事項1"
+      },
+      {
+        "id": "2fcce2de-8ac0-48c3-8801-b9aa8278668e",
+        "description": "決定事項2"
+      },
+      {
+        "id": "f87f1132-62d4-4235-9517-a73eeec1fc53",
+        "description": "決定事項3"
+      },
+      {
+        "id": "4fc2e1a8-9b3d-48a7-b7c4-e5a92d6f1b03",
+        "description": "実装クラスの型定義を更新するアプローチ（solution-2）を採用する"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "856e27f5-f3d6-47b2-b7d6-a18fbd312fce",
+        "description": "検討事項1",
+        "status": "open"
+      },
+      {
+        "id": "dc99a97d-b3fb-4a44-ad55-c5aa497e8882",
+        "description": "検討事項2",
+        "status": "open"
+      },
+      {
+        "id": "cd54ca36-4bcb-451b-af65-5f920783adec",
+        "description": "検討事項3",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "c7d2b497-ee94-47f4-afb7-c82cc99fcd21",
+        "description": "次のステップ1",
+        "priority": "high"
+      },
+      {
+        "id": "e253ebcb-514a-42a0-88a1-e5c1d94400ce",
+        "description": "次のステップ2",
+        "priority": "medium"
+      },
+      {
+        "id": "612ff8d6-af4a-422b-bb70-d1db22de7bb1",
+        "description": "次のステップ3",
+        "priority": "low"
+      },
+      {
+        "id": "task-1",
+        "description": "FileSystemBranchMemoryBankRepositoryの修正実装",
+        "priority": "high"
+      },
+      {
+        "id": "task-2",
+        "description": "FileSystemGlobalMemoryBankRepositoryの修正実装",
+        "priority": "high"
+      },
+      {
+        "id": "task-3",
+        "description": "IndexService.tsの修正",
+        "priority": "medium"
+      },
+      {
+        "id": "task-4",
+        "description": "providers.tsの修正",
+        "priority": "medium"
+      }
+    ],
+    "references": [
+      {
+        "file": "schema-package-type-issues.json",
+        "description": "スキーマパッケージ移行による型定義不整合の問題分析",
+        "created_at": "2025-03-29T15:00:00.000Z"
+      }
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "475022b0-a32f-4cdf-b6b6-02d5c2135e8e",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-28T13:09:55.146Z",
+    "createdAt": "2025-03-28T13:09:55.146Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "fix/type-def",
+    "purpose": "タグインデックス関連の型定義不整合を解消し、ビルドエラーを修正するためのバグフィックス作業。@memory-bank/schemasパッケージの導入によりTagIndex型がBaseTagIndex/BranchTagIndex/GlobalTagIndexに分割されたが、IBranchMemoryBankRepositoryインターフェースとFileSystemBranchMemoryBankRepository実装クラスで一貫した型定義が適用されておらず、77個のビルドエラーが発生している状況を解消する。",
+    "createdAt": "2025-03-28T13:09:55.146Z",
+    "userStories": [
+      {
+        "id": "3c802477-02ff-4409-a3a0-51a70e5abf9d",
+        "description": "FileSystemBranchMemoryBankRepositoryの実装を修正してBranchTagIndex型に対応させたい",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "7b36645d-7295-477a-b70c-3523cff7f662",
+        "description": "FileSystemGlobalMemoryBankRepositoryの実装を修正してGlobalTagIndex型に対応させたい",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "26496253-6e3d-4439-877b-d33217d3e776",
+        "description": "IndexService.tsの型エラーを解消し、新しい型定義に合わせて更新したい",
+        "completed": false,
+        "priority": 3
+      },
+      {
+        "id": "f8e7d6c5-b4a3-2910-8f7e-6d5c4b3a2910",
+        "description": "providers.tsのDI設定を修正し、型不一致によるエラーを解消したい",
+        "completed": false,
+        "priority": 4
+      }
+    ],
+    "additionalNotes": ""
+  }
+}
