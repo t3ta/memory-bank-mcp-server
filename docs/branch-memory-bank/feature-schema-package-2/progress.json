@@ -28,6 +28,26 @@
         "id": "wf-domain-dependency-inversion",
         "description": "ドメインエンティティの依存関係を内側に向ける修正",
         "implementedAt": "2025-03-29T10:30:00.000Z"
+      },
+      {
+        "id": "wf-documentpath-cleanup",
+        "description": "DocumentPath.tsからMarkdown関連メソッドの削除",
+        "implementedAt": "2025-03-29T12:15:00.000Z"
+      },
+      {
+        "id": "wf-writebranch-fix",
+        "description": "WriteBranchDocumentUseCase.tsのエラー修正",
+        "implementedAt": "2025-03-29T12:20:00.000Z"
+      },
+      {
+        "id": "wf-globalcontroller-readcorefiles",
+        "description": "GlobalControllerのreadCoreFilesメソッドをシンプル化",
+        "implementedAt": "2025-03-29T12:25:00.000Z"
+      },
+      {
+        "id": "wf-providers-cleanup",
+        "description": "providers.tsのテンプレート関連コード削除",
+        "implementedAt": "2025-03-29T12:30:00.000Z"
       }
     ],
     "pendingImplementation": [
@@ -58,7 +78,7 @@
       }
     ],
     "status": "フェーズ1の実装中：ドメインエンティティのリファクタリングを進行中。DocumentPath、MemoryDocumentが依存関係逆転パターンを適用して外部ライブラリ依存を取り除いた状態に。",
-    "completionPercentage": 25,
+    "completionPercentage": 40,
     "knownIssues": [
       {
         "id": "ki-layering",
@@ -121,6 +141,30 @@
         "title": "DocumentPathとMemoryDocumentエンティティのリファクタリング",
         "description": "DocumentPathとMemoryDocumentから外部ライブラリ依存を取り除き、依存関係逆転パターンを適用。IDocumentLoggerインターフェースとDocumentLoggerAdapter実装を追加し、依存方向を正しく（内側に向けて）修正。非推奨のMarkdown関連メソッドも更新。",
         "completedAt": "2025-03-29T11:30:00.000Z"
+      },
+      {
+        "id": "ct-documentpath-cleanup",
+        "title": "DocumentPath.tsからMarkdown関連メソッドの削除",
+        "description": "テンプレート関連コード削除計画に従い、DocumentPath.tsクラスから非推奨になったisMarkdown()メソッドとtoAlternateFormat()メソッドを削除。Markdownサポートは2.1.0で廃止されているため、関連コードをクリーンアップ。",
+        "completedAt": "2025-03-29T12:15:00.000Z"
+      },
+      {
+        "id": "ct-writebranch-fix",
+        "title": "WriteBranchDocumentUseCase.tsのエラー修正",
+        "description": "WriteBranchDocumentUseCase.tsで定義されていない変数(existingDocument)を参照しているバグを修正。適切なドキュメント取得処理を追加してexistingDocument変数を正しく初期化。",
+        "completedAt": "2025-03-29T12:20:00.000Z"
+      },
+      {
+        "id": "ct-globalcontroller-readcorefiles",
+        "title": "GlobalControllerのreadCoreFilesメソッドをシンプル化",
+        "description": "テンプレート関連コード削除計画に従い、GlobalControllerのreadCoreFilesメソッドからtemplateController依存を完全に除去。代わりに直接コアファイルを読み込むシンプルな実装に変更。",
+        "completedAt": "2025-03-29T12:25:00.000Z"
+      },
+      {
+        "id": "ct-providers-cleanup",
+        "title": "providers.tsのテンプレート関連コード削除完了",
+        "description": "テンプレート関連コード削除計画に従い、providers.tsからtemplateRepositoryとtemplateServiceなどの登録を完全に削除。markdownMigrationServiceにはモック実装を提供して互換性を保持。",
+        "completedAt": "2025-03-29T12:30:00.000Z"
       }
     ],
     "upcomingMilestones": [

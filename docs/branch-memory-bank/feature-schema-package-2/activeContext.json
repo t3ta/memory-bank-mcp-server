@@ -13,8 +13,12 @@
     "version": 5
   },
   "content": {
-    "currentWork": "フェーズ1（ドメインレイヤーの再設計と依存方向修正）を実装中。ドメインエンティティ（JsonDocument、DocumentPath、MemoryDocument）のリファクタリング完了。依存関係逆転パターンを適用して外部ライブラリ依存を取り除き、ドメイン層が外部に依存しない状態に。インフラ層にロガーとバリデータの実装を配置。次はリポジトリインターフェースの純粹化に着手予定。",
+    "currentWork": "テンプレート関連コードの削除作業が予想以上にスムーズに完了。DocumentPath.tsからMarkdown関連の非推奨メソッドを削除、WriteBranchDocumentUseCase.tsのエラー修正、GlobalControllerのreadCoreFilesメソッドをシンプル化、そしてproviders.tsからtemplateRepository関連コードを削除。次はフェーズ1（ドメインレイヤーの再設計と依存方向修正）のリポジトリインターフェースの純粹化に移る予定。",
     "recentChanges": [
+      {
+        "date": "2025-03-29T12:30:00.000Z",
+        "description": "テンプレート関連コードの削除作業完了。DocumentPath.tsからisMarkdown()メソッドとtoAlternateFormat()メソッドを削除。WriteBranchDocumentUseCase.tsのバグ修正。GlobalControllerからtemplateController依存を除去し、readCoreFilesメソッドをシンプル化。providers.tsからテンプレート関連の登録を削除。"
+      },
       {
         "date": "2025-03-29T11:30:00.000Z",
         "description": "DocumentPathとMemoryDocumentのリファクタリング完了。IDocumentLoggerインターフェースとDocumentLoggerAdapter実装を追加。依存関係逆転の原則に従い、ロギング機能を外部実装から切り離し、ドメイン層の独立性を向上。非推奨のMarkdown関連の古いメソッドもクリーンアップ。"

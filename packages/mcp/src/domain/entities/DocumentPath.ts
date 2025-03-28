@@ -80,10 +80,6 @@ export class DocumentPath {
     const filename = this.filename;
     const lastDotIndex = filename.lastIndexOf('.');
     return lastDotIndex === -1 ? '' : filename.substring(lastDotIndex + 1);
-  }
-
-  /**
-   * Check if this document is a JSON file
   /**
    * Check if this document is a JSON file
    */
@@ -112,10 +108,6 @@ export class DocumentPath {
     return lastDotIndex === -1 ? filename : filename.substring(0, lastDotIndex);
   }
 
-  /**
-   * Infer document type from filename
-   * @returns Inferred document type or 'generic' if cannot determine
-   */
   public inferDocumentType(): DocumentType {
     // Only use basename, filename is not needed
     const lcBasename = this.basename.toLowerCase();
