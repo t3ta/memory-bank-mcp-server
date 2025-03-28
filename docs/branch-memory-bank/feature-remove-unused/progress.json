@@ -1,0 +1,84 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "ac2cec4c-8560-4276-bb31-4a8f61ec04f6",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress"
+    ],
+    "lastModified": "2025-03-28T20:00:00.000Z",
+    "createdAt": "2025-03-28T06:43:56.888Z",
+    "version": 2
+  },
+  "content": {
+    "status": "実装開始 - DocumentPath.tsのマークダウン関連メソッドの削除作業中",
+    "completionPercentage": 20,
+    "workingFeatures": [
+      {
+        "id": "md-cleanup-branch-controller",
+        "description": "BranchControllerのマークダウン関連コード削除（feature/schema-packageブランチで実施済み）",
+        "implementedAt": "2025-03-28T15:35:00.000Z"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "template-cleanup",
+        "priority": "high",
+        "description": "テンプレート関連コードの完全削除（コントローラー参照→DI設定→各コンポーネントの順）"
+      },
+      {
+        "id": "markdown-document-path",
+        "priority": "high",
+        "description": "DocumentPath.tsからisMarkdownとtoAlternateFormatメソッドを削除"
+      },
+      {
+        "id": "logger-unification",
+        "priority": "low",
+        "description": "domain/logger/ILogger と shared/utils/logger の統合"
+      }
+    ],
+    "knownIssues": [
+      {
+        "id": "template-service-reference",
+        "description": "DIコンテナが存在しないTemplateServiceを参照しており、ビルドエラーの原因になっている",
+        "severity": "high"
+      },
+      {
+        "id": "markdown-remnants",
+        "description": "マークダウン関連コードが一部まだ残っており、JSONベースのアーキテクチャと不整合",
+        "severity": "medium"
+      },
+      {
+        "id": "logger-duplication",
+        "description": "複数のロガー実装による重複と整合性の問題",
+        "severity": "low"
+      }
+    ],
+    "references": [
+      {
+        "file": "detailed-removal-plan.json",
+        "description": "テンプレート・マークダウン関連コードの削除手順と依存関係の詳細分析",
+        "created_at": "2025-03-28T19:10:00.000Z"
+      },
+      {
+        "file": "implementation-plan.json",
+        "description": "テンプレート関連コード削除の詳細実装手順と確認ポイント",
+        "created_at": "2025-03-28T19:40:00.000Z"
+      },
+      {
+        "file": "implementation-progress.json",
+        "description": "テンプレート関連コード削除の実装進捗の詳細記録",
+        "created_at": "2025-03-28T20:00:00.000Z"
+      }
+    ],
+    "futureTasks": [
+      {
+        "id": "migration-package",
+        "description": "migrationディレクトリを独立パッケージとして分離する",
+        "priority": "medium"
+      }
+    ]
+  }
+}

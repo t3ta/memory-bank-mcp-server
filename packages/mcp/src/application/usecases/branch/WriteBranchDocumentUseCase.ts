@@ -98,14 +98,6 @@ export class WriteBranchDocumentUseCase
       const documentPath = DocumentPath.create(input.document.path);
       const tags = (input.document.tags ?? []).map((tag) => Tag.create(tag));
 
-      // Check if markdown writes are disabled
-      if (this.disableMarkdownWrites && documentPath.isMarkdown) {
-        const jsonPath = documentPath.value.replace(/\.md$/, '.json');
-        throw new ApplicationError(
-          ApplicationErrorCodes.OPERATION_NOT_ALLOWED,
-          `Writing to Markdown files is disabled. Please use JSON format instead: ${jsonPath}`
-        );
-      }
 
       // Check if branch exists and initialize if needed
       const branchExists = await this.branchRepository.exists(input.branchName);
@@ -136,6 +128,7 @@ export class WriteBranchDocumentUseCase
           lastModified: new Date(),
         });
       }
+
 
       // Save document
       await this.branchRepository.saveDocument(branchInfo, document);

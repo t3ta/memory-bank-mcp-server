@@ -1,0 +1,155 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "7d8e1d9b-892a-4007-b1f5-9ee3016f4598",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "system-patterns"
+    ],
+    "lastModified": "2025-03-28T18:15:00.000Z",
+    "createdAt": "2025-03-28T06:43:56.887Z",
+    "version": 2
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "markdown-removal-decision",
+        "title": "マークダウン関連機能の完全削除",
+        "context": "マークダウン形式はすでに非推奨になっており、JSONベースのアーキテクチャに完全移行している。しかし、コードベース内にはまだマークダウン関連のコードが残っており、不必要な複雑さの原因になっている。",
+        "decision": "マークダウン関連のコードを完全に削除し、JSON形式のみをサポートするシンプルな実装にする。",
+        "consequences": {
+          "positive": [
+            "コードベースの簡素化",
+            "不要なバグの可能性の排除",
+            "開発者の理解しやすさの向上",
+            "未使用コードの排除によるパフォーマンス向上"
+          ],
+          "negative": [
+            "レガシーシステムやマークダウン形式を使っていた既存データとの互換性がなくなる（ただし既に非推奨）"
+          ]
+        },
+        "status": "active",
+        "date": "2025-03-28T18:15:00.000Z",
+        "alternatives": [
+          {
+            "title": "レガシーサポートとして残す",
+            "reasoning": "後方互換性のために残す選択肢もあったが、すでに非推奨になっており、利用も少ないため削除を選択"
+          }
+        ]
+      },
+      {
+        "id": "template-handling-decision",
+        "title": "テンプレート関連コードの取り扱い",
+        "context": "テンプレート機能の実装が中途半端な状態で、参照はあるが実装がない状況になっている。特にFileTemplateRepositoryやDIコンテナの参照がエラーの原因になっている。",
+        "decision": "テンプレート関連のコードは、参照を全て削除し、将来的に必要になった場合に改めて実装する。",
+        "consequences": {
+          "positive": [
+            "ビルドエラーの解消",
+            "コードベースの簡素化",
+            "不要な複雑さの排除"
+          ],
+          "negative": [
+            "テンプレート機能を使用していた場合は代替手段が必要",
+            "将来的に再実装する場合はコストがかかる"
+          ]
+        },
+        "status": "active",
+        "date": "2025-03-28T18:15:00.000Z",
+        "alternatives": [
+          {
+            "title": "スケルトン実装を作成",
+            "reasoning": "エラーを解消するためにスケルトン実装を残す選択肢もあったが、不要な機能の実装維持は技術的負債になるため完全削除を選択"
+          }
+        ]
+      },
+      {
+        "id": "logger-unification-decision",
+        "title": "ロガー実装の統一",
+        "context": "domain/logger/ILoggerとshared/utils/loggerという2つの異なるロガー実装があり、整合性の問題やコード重複の原因になっている。",
+        "decision": "shared/utils/loggerをスタンダードとして採用し、domain/logger/ILoggerを廃止する。",
+        "consequences": {
+          "positive": [
+            "ロギング機能の一貫性の確保",
+            "コード重複の排除",
+            "メンテナンスの簡素化"
+          ],
+          "negative": [
+            "domainレイヤーがinfrastructureに依存することになる可能性（適切な抽象化が必要）"
+          ]
+        },
+        "status": "active",
+        "date": "2025-03-28T18:15:00.000Z",
+        "alternatives": [
+          {
+            "title": "両方のロガーを維持",
+            "reasoning": "レイヤー間の依存関係の分離のために両方維持する選択肢もあったが、重複コードの排除を優先"
+          }
+        ]
+      }
+    ],
+    "implementationPatterns": [
+      {
+        "id": "deletion-pattern",
+        "name": "段階的削除パターン",
+        "description": "不要コードの削除は以下のステップで行う：1) 参照関係の特定、2) 単体テストでの確認、3) 最小単位での削除、4) ビルドエラーのチェック、5) 次の削除へ進む",
+        "benefits": [
+          "安全な削除",
+          "影響範囲の最小化",
+          "段階的な検証"
+        ],
+        "liabilities": [
+          "時間がかかる",
+          "複数コミットが必要"
+        ],
+        "implementations": [
+          {
+            "name": "マークダウン関連コード削除",
+            "files": [
+              "BranchController.ts",
+              "DocumentPath.ts",
+              "その他マークダウン関連ファイル"
+            ]
+          },
+          {
+            "name": "テンプレート関連コード削除",
+            "files": [
+              "FileTemplateRepository.ts",
+              "providers.ts",
+              "TemplateService.ts"
+            ]
+          },
+          {
+            "name": "ロガー実装統一",
+            "files": [
+              "domain/logger/*",
+              "適切な抽象化が必要なコード"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "di-update-pattern",
+        "name": "DIコンテナ参照更新パターン",
+        "description": "DIコンテナの更新は以下のステップで行う：1) 削除対象サービスの参照特定、2) 参照箇所の削除または代替実装への変更、3) DIコンテナ設定の更新、4) 動作確認",
+        "benefits": [
+          "適切な依存関係管理",
+          "エラー防止"
+        ],
+        "liabilities": [
+          "広範囲の変更が必要な場合あり"
+        ],
+        "implementations": [
+          {
+            "name": "テンプレート関連DIコンテナ参照削除",
+            "files": [
+              "providers.ts",
+              "使用箇所"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

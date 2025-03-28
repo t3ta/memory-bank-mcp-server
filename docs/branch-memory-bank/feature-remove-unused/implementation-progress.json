@@ -1,0 +1,165 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "implementation-progress",
+    "title": "テンプレート関連コード削除の実装進捗",
+    "documentType": "progress",
+    "path": "implementation-progress.json",
+    "tags": [
+      "implementation",
+      "progress",
+      "template-removal"
+    ],
+    "lastModified": "2025-03-28T20:00:00.000Z",
+    "createdAt": "2025-03-28T20:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "description": "テンプレート関連コード削除計画に基づく実装の進捗状況を記録します。各ステップの完了状況や発見した問題点を追跡します。",
+      "currentStep": "ステップ1: DocumentPath.tsのマークダウン関連メソッド削除を開始"
+    },
+    "steps": [
+      {
+        "step": 1,
+        "title": "DocumentPath.tsのマークダウン関連メソッド削除",
+        "startedAt": "2025-03-28T20:00:00.000Z",
+        "status": "in-progress",
+        "description": "DocumentPath.tsから@deprecatedマークが付いているisMarkdownとtoAlternateFormatメソッドを削除します。",
+        "actions": [
+          {
+            "description": "ファイルの場所を確認",
+            "status": "completed"
+          },
+          {
+            "description": "isMarkdownメソッドの削除",
+            "status": "pending"
+          },
+          {
+            "description": "toAlternateFormatメソッドの削除",
+            "status": "pending"
+          },
+          {
+            "description": "ビルドエラーの確認",
+            "status": "pending"
+          }
+        ],
+        "notes": "この修正は影響範囲が限定的なため、最初のステップとして選択しました。"
+      },
+      {
+        "step": 2,
+        "title": "WriteBranchDocumentUseCase.tsのマークダウン拡張子チェック無効化",
+        "status": "pending",
+        "description": "WriteBranchDocumentUseCase.tsにあるマークダウン拡張子のチェックコードをコメントアウトまたは削除します。",
+        "actions": [
+          {
+            "description": "ファイルの場所を確認",
+            "status": "pending"
+          },
+          {
+            "description": "マークダウン拡張子チェック部分の無効化",
+            "status": "pending"
+          },
+          {
+            "description": "ビルドエラーの確認",
+            "status": "pending"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "title": "GlobalControllerからtemplateController参照削除",
+        "status": "pending",
+        "description": "GlobalControllerからtemplateControllerのフィールド、コンストラクタ引数、代入を削除し、readCoreFilesメソッドの実装を変更します。",
+        "actions": [
+          {
+            "description": "ファイルの場所を確認",
+            "status": "pending"
+          },
+          {
+            "description": "templateControllerフィールド宣言の削除",
+            "status": "pending"
+          },
+          {
+            "description": "コンストラクタのオプション宣言からtemplateControllerの削除",
+            "status": "pending"
+          },
+          {
+            "description": "コンストラクタでのthis.templateController代入の削除",
+            "status": "pending"
+          },
+          {
+            "description": "readCoreFilesメソッドの実装変更",
+            "status": "pending"
+          },
+          {
+            "description": "ビルドエラーと動作確認",
+            "status": "pending"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "title": "DIコンテナからtemplateControllerの登録削除",
+        "status": "pending",
+        "description": "providers.tsからテンプレート関連の登録を削除し、GlobalControllerへの注入を修正します。",
+        "actions": [
+          {
+            "description": "ファイルの場所を確認",
+            "status": "pending"
+          },
+          {
+            "description": "templateRepositoryのインポートの削除",
+            "status": "pending"
+          },
+          {
+            "description": "templateRepositoryの登録の削除",
+            "status": "pending"
+          },
+          {
+            "description": "templateServiceの登録の削除",
+            "status": "pending"
+          },
+          {
+            "description": "templateControllerの登録の削除",
+            "status": "pending"
+          },
+          {
+            "description": "GlobalControllerへの注入部分の修正",
+            "status": "pending"
+          },
+          {
+            "description": "MarkdownMigrationServiceの修正",
+            "status": "pending"
+          },
+          {
+            "description": "ビルドエラーと動作確認",
+            "status": "pending"
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "title": "テンプレート関連ファイルの削除",
+        "status": "pending",
+        "description": "テンプレート関連の全ファイルを削除します。",
+        "actions": [
+          {
+            "description": "削除対象ファイルの確認",
+            "status": "pending"
+          },
+          {
+            "description": "ファイルの削除",
+            "status": "pending"
+          },
+          {
+            "description": "ビルドエラーと動作確認",
+            "status": "pending"
+          }
+        ]
+      }
+    ],
+    "issues": [],
+    "nextSteps": "DocumentPath.tsのマークダウン関連メソッドの削除を完了し、ビルドエラーがないことを確認した後、ステップ2に進みます。"
+  }
+}

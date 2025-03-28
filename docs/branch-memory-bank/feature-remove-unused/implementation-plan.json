@@ -1,0 +1,211 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "implementation-plan",
+    "title": "テンプレート関連コード削除実装計画",
+    "documentType": "plan",
+    "path": "implementation-plan.json",
+    "tags": [
+      "plan",
+      "implementation",
+      "template-removal",
+      "refactoring"
+    ],
+    "lastModified": "2025-03-28T19:40:00.000Z",
+    "createdAt": "2025-03-28T19:40:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "description": "テンプレート関連コード削除計画に基づいた実装手順と確認ポイント。詳細な削除ステップごとに必要な作業を整理し、段階的に実施する計画。",
+      "approach": "最も依存関係の少ない部分から修正を開始し、段階的に上位レイヤーに向かって削除を進める。各ステップでビルドテストを実行して問題がないことを確認する。"
+    },
+    "implementationSteps": [
+      {
+        "step": 1,
+        "title": "DocumentPath.tsのマークダウン関連メソッド削除",
+        "description": "DocumentPath.tsから@deprecatedマークが付いているisMarkdownとtoAlternateFormatメソッドを削除",
+        "files": [
+          "/packages/mcp/src/domain/entities/DocumentPath.ts"
+        ],
+        "codeChanges": [
+          {
+            "type": "delete",
+            "target": "isMarkdownメソッド全体",
+            "startLine": 77,
+            "endLine": 81
+          },
+          {
+            "type": "delete",
+            "target": "toAlternateFormatメソッド全体",
+            "startLine": 137,
+            "endLine": 148
+          }
+        ],
+        "verificationStep": "ビルドエラーがないことを確認",
+        "status": "pending"
+      },
+      {
+        "step": 2,
+        "title": "WriteBranchDocumentUseCase.tsのマークダウン拡張子チェック無効化",
+        "description": "WriteBranchDocumentUseCase.tsにあるマークダウン拡張子のチェックコードをコメントアウトまたは削除",
+        "files": [
+          "/packages/mcp/src/application/usecases/branch/WriteBranchDocumentUseCase.ts"
+        ],
+        "codeChanges": [
+          {
+            "type": "comment-out",
+            "target": "documentPath.isMarkdownのチェック部分全体",
+            "startLine": null,
+            "endLine": null
+          }
+        ],
+        "verificationStep": "ビルドエラーがないことを確認",
+        "status": "pending"
+      },
+      {
+        "step": 3,
+        "title": "GlobalControllerからtemplateController参照削除",
+        "description": "GlobalControllerからtemplateControllerのフィールド、コンストラクタ引数、代入を削除し、readCoreFilesメソッドの実装を変更",
+        "files": [
+          "/packages/mcp/src/interface/controllers/GlobalController.ts"
+        ],
+        "codeChanges": [
+          {
+            "type": "delete",
+            "target": "templateControllerフィールド宣言",
+            "startLine": null,
+            "endLine": null
+          },
+          {
+            "type": "delete",
+            "target": "コンストラクタのオプション宣言からのtemplateController",
+            "startLine": null,
+            "endLine": null
+          },
+          {
+            "type": "delete",
+            "target": "コンストラクタでのthis.templateController = options?.templateController",
+            "startLine": null,
+            "endLine": null
+          },
+          {
+            "type": "replace",
+            "target": "readCoreFilesメソッド全体",
+            "replacement": "新しいJSON直接読み込み版の実装",
+            "startLine": null,
+            "endLine": null
+          }
+        ],
+        "verificationStep": "ビルドエラーがないことと、readCoreFilesメソッドが正しく動作することを確認",
+        "status": "pending"
+      },
+      {
+        "step": 4,
+        "title": "DIコンテナからtemplateControllerの登録削除",
+        "description": "providers.tsからテンプレート関連の登録を削除し、GlobalControllerへの注入を修正",
+        "files": [
+          "/packages/mcp/src/main/di/providers.ts"
+        ],
+        "codeChanges": [
+          {
+            "type": "delete",
+            "target": "templateRepositoryのインポート",
+            "startLine": null,
+            "endLine": null
+          },
+          {
+            "type": "delete",
+            "target": "templateRepositoryの登録",
+            "startLine": null,
+            "endLine": null
+          },
+          {
+            "type": "delete",
+            "target": "templateServiceの登録",
+            "startLine": null,
+            "endLine": null
+          },
+          {
+            "type": "delete",
+            "target": "templateControllerの登録",
+            "startLine": null,
+            "endLine": null
+          },
+          {
+            "type": "modify",
+            "target": "GlobalControllerへの注入部分",
+            "description": "templateControllerを削除",
+            "startLine": null,
+            "endLine": null
+          },
+          {
+            "type": "modify",
+            "target": "MarkdownMigrationServiceの変更",
+            "description": "モックのテンプレートリポジトリを使うように修正",
+            "startLine": null,
+            "endLine": null
+          }
+        ],
+        "verificationStep": "ビルドエラーがないことと、GlobalControllerが正しく動作することを確認",
+        "status": "pending"
+      },
+      {
+        "step": 5,
+        "title": "テンプレート関連ファイルの削除",
+        "description": "テンプレート関連の全ファイルを削除",
+        "files": [
+          "/packages/mcp/src/domain/templates/ITemplateRepository.ts",
+          "/packages/mcp/src/domain/templates/Template.ts",
+          "/packages/mcp/src/domain/templates/Section.ts",
+          "/packages/mcp/src/infrastructure/templates/FileTemplateRepository.ts",
+          "/packages/mcp/src/infrastructure/templates/JsonTemplateLoader.ts",
+          "/packages/mcp/src/infrastructure/templates/TemplateRenderer.ts",
+          "/packages/mcp/src/infrastructure/templates/interfaces/ITemplateLoader.ts",
+          "/packages/mcp/src/application/templates/TemplateService.ts",
+          "/packages/mcp/src/interface/controllers/TemplateController.ts",
+          "/packages/mcp/src/interface/controllers/interfaces/ITemplateController.ts"
+        ],
+        "codeChanges": [
+          {
+            "type": "delete",
+            "target": "ファイル全体",
+            "startLine": null,
+            "endLine": null
+          }
+        ],
+        "verificationStep": "ビルドエラーがないことと、削除後もシステムが正しく動作することを確認",
+        "status": "pending"
+      }
+    ],
+    "testPlan": {
+      "unitTests": [
+        {
+          "description": "DocumentPath.tsの修正後のテスト",
+          "command": "yarn test packages/mcp/tests/unit/domain/entities/DocumentPath.test.ts",
+          "expectedResult": "isMarkdownとtoAlternateFormatのテストケースを除いてすべてのテストが成功すること"
+        },
+        {
+          "description": "GlobalControllerの修正後のテスト",
+          "command": "yarn test packages/mcp/tests/unit/interface/controllers/GlobalController.test.ts",
+          "expectedResult": "readCoreFilesメソッドのテストが成功すること"
+        }
+      ],
+      "integrationTests": [
+        {
+          "description": "readCoreFilesコマンドの動作確認",
+          "command": "yarn cli read-core-files",
+          "expectedResult": "エラーなく実行され、coreファイルが読み込まれること"
+        }
+      ]
+    },
+    "rollbackPlan": {
+      "description": "問題発生時のロールバック手順",
+      "steps": [
+        "git stashで現在の変更を退避",
+        "git checkout -- [問題のあるファイル]で元の状態に復元",
+        "または、git revertで該当コミットを打ち消す"
+      ]
+    }
+  }
+}
