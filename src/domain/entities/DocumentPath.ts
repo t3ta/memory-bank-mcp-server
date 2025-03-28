@@ -83,15 +83,6 @@ export class DocumentPath {
   }
 
   /**
-   * Check if this document is a markdown file
-   * @deprecated Markdown support is deprecated in v2.1.0
-   */
-  public get isMarkdown(): boolean {
-    const ext = this.extension.toLowerCase();
-    return ext === 'md';
-  }
-
-  /**
    * Check if this document is a JSON file
    */
   public get isJSON(): boolean {
@@ -99,17 +90,8 @@ export class DocumentPath {
   }
 
   /**
-   * Checks if two DocumentPath instances are equal
-   * @param other Another DocumentPath instance
-   * @returns boolean indicating equality
-  /**
-   * Check if this document is a markdown file
-   * @deprecated Markdown support is deprecated in v2.1.0
-   */
-  public get isMarkdown(): boolean {
-    // Always return false as markdown is no longer supported
-    return false;
-  }
+   * Convert to string
+   * @returns Raw path value
    */
   public toString(): string {
     return this._value;
@@ -163,14 +145,4 @@ export class DocumentPath {
 
     return DocumentPath.create(newPath);
   }
-
-  /**
-  /**
-   * Create a corresponding JSON path for a markdown path and vice versa
-   * @deprecated Markdown support is deprecated in v2.1.0
-   * @returns New DocumentPath with converted extension
-   */
-  public toAlternateFormat(): DocumentPath {
-    // Always return the current path as markdown is no longer supported
-    return this;
-  }
+}
