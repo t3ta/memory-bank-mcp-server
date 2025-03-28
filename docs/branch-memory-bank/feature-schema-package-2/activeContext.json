@@ -8,13 +8,17 @@
     "tags": [
       "active-context"
     ],
-    "lastModified": "2025-03-29T10:30:00.000Z",
+    "lastModified": "2025-03-29T11:30:00.000Z",
     "createdAt": "2025-03-28T11:01:55.755Z",
-    "version": 4
+    "version": 5
   },
   "content": {
-    "currentWork": "フェーズ1（ドメインレイヤーの再設計と依存方向修正）を実装中。JsonDocumentエンティティをリファクタリングし、依存関係逆転パターンを適用して外部ライブラリ依存を取り除いた。外側レイヤー（インフラ）→内側（ドメイン）への依存方向が正しく修正され、ドメインエンティティが純粋な状態に。次はリポジトリインターフェースの純粋化に着手予定。",
+    "currentWork": "フェーズ1（ドメインレイヤーの再設計と依存方向修正）を実装中。ドメインエンティティ（JsonDocument、DocumentPath、MemoryDocument）のリファクタリング完了。依存関係逆転パターンを適用して外部ライブラリ依存を取り除き、ドメイン層が外部に依存しない状態に。インフラ層にロガーとバリデータの実装を配置。次はリポジトリインターフェースの純粹化に着手予定。",
     "recentChanges": [
+      {
+        "date": "2025-03-29T11:30:00.000Z",
+        "description": "DocumentPathとMemoryDocumentのリファクタリング完了。IDocumentLoggerインターフェースとDocumentLoggerAdapter実装を追加。依存関係逆転の原則に従い、ロギング機能を外部実装から切り離し、ドメイン層の独立性を向上。非推奨のMarkdown関連の古いメソッドもクリーンアップ。"
+      },
       {
         "date": "2025-03-29T10:30:00.000Z",
         "description": "JsonDocumentエンティティのリファクタリング完了。IDocumentValidatorインターフェースとZodDocumentValidator実装に分離し、ディペンデンシーインジェクションパターンを適用。バリデーションロジックとドメインロジックを完全に分離。"
@@ -70,7 +74,7 @@
     "nextSteps": [
       {
         "id": "step-1",
-        "description": "他のドメインエンティティ（MemoryDocument, DocumentPathなど）の依存関係確認と必要に応じたリファクタリング",
+        "description": "ドメインレイヤーのリポジトリインターフェースの純粹化",
         "priority": "high"
       },
       {

@@ -102,14 +102,14 @@ export class DocumentPath {
    * Checks if two DocumentPath instances are equal
    * @param other Another DocumentPath instance
    * @returns boolean indicating equality
-   */
-  public equals(other: DocumentPath): boolean {
-    return this._value === other._value;
-  }
-
   /**
-   * Convert to string
-   * @returns Raw path value
+   * Check if this document is a markdown file
+   * @deprecated Markdown support is deprecated in v2.1.0
+   */
+  public get isMarkdown(): boolean {
+    // Always return false as markdown is no longer supported
+    return false;
+  }
    */
   public toString(): string {
     return this._value;
@@ -165,20 +165,12 @@ export class DocumentPath {
   }
 
   /**
+  /**
    * Create a corresponding JSON path for a markdown path and vice versa
    * @deprecated Markdown support is deprecated in v2.1.0
    * @returns New DocumentPath with converted extension
    */
   public toAlternateFormat(): DocumentPath {
-    if (this.isJSON) {
-      // Convert JSON to Markdown
-      return this.withExtension('md');
-    } else if (this.isMarkdown) {
-      // Convert Markdown to JSON
-      return this.withExtension('json');
-    } else {
-      // Return same path for other file types
-      return this;
-    }
+    // Always return the current path as markdown is no longer supported
+    return this;
   }
-}

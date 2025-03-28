@@ -1,8 +1,7 @@
 import { DocumentPath } from './DocumentPath.js';
 import { Tag } from './Tag.js';
-import { BaseJsonDocument } from '@memory-bank/schemas';
 import { DomainError } from '../../shared/errors/DomainError.js';
-import { logger } from '../../shared/utils/logger.js';
+import { IDocumentLogger } from '../interfaces/IDocumentLogger.js';
 
 /**
  * Props for MemoryDocument entity
@@ -15,13 +14,50 @@ interface MemoryDocumentProps {
 }
 
 /**
+ * Document type enum
+ */
+export type DocumentType =
+  | 'branch_context'
+  | 'active_context'
+  | 'progress'
+  | 'system_patterns'
+  | 'generic';
+
+/**
  * Entity representing a document in the memory bank
  */
 export class MemoryDocument {
   private readonly props: MemoryDocumentProps;
+  private static logger: IDocumentLogger;
 
   private constructor(props: MemoryDocumentProps) {
     this.props = props;
+  }
+
+  /**
+   * Set the logger implementation
+   * This allows for dependency injection of the logger
+   * @param logger Logger implementation
+   */
+  public static setLogger(logger: IDocumentLogger): void {
+    MemoryDocument.logger = logger;
+  }
+
+  /**
+   * Get the current logger
+   * @returns The logger instance or a null logger if none set
+   */
+  private static getLogger(): IDocumentLogger {
+    // If no logger is set, return a null logger that does nothing
+    if (!MemoryDocument.logger) {
+      return {
+        debug: () => {},
+        info: () => {},
+        warn: () => {},
+        error: () => {},
+      };
+    }
+    return MemoryDocument.logger;
   }
 
   /**
@@ -59,7 +95,7 @@ export class MemoryDocument {
    * Get the document tags
    */
   public get tags(): Tag[] {
-    return [...this.props.tags];
+    return [...this.props.tags]; // Return defensive copy
   }
 
   /**
@@ -75,15 +111,18 @@ export class MemoryDocument {
    * @returns boolean indicating if document has tag
    */
   public hasTag(tag: Tag): boolean {
+    const logger = MemoryDocument.getLogger();
     logger.debug('Checking tag:', {
       documentTags: this.props.tags.map(t => t.value),
       searchTag: tag.value
     });
+    
     const hasTag = this.props.tags.some((t) => {
       const matches = t.equals(tag);
       logger.debug('Tag comparison:', { tag1: t.value, tag2: tag.value, matches });
       return matches;
     });
+    
     return hasTag;
   }
 
@@ -168,9 +207,11 @@ export class MemoryDocument {
 
   /**
    * Check if the document is a markdown file
+   * @deprecated Markdown support is deprecated in v2.1.0
    */
   public get isMarkdown(): boolean {
-    return this.props.path.isMarkdown;
+    // Markdown is no longer supported, always return false
+    return false;
   }
 
   /**
@@ -193,21 +234,23 @@ export class MemoryDocument {
   }
 
   /**
-  /**
-   * Check if the document is a markdown file
-   * @deprecated Markdown support is deprecated in v2.1.0
+   * Create a base JSON document structure
+   * This method no longer directly depends on external schema types
    */
-  public get isMarkdown(): boolean {
-    // Markdown is no longer supported, always return false
-    return false;
-  }
+  public toBaseDocument(): Record<string, unknown> {
+    // Try to parse the content as JSON first
+    if (this.isJSON) {
       try {
-        return JSON.parse(this.props.content) as BaseJsonDocument;
+        return JSON.parse(this.props.content) as Record<string, unknown>;
       } catch (error) {
-        logger.error('Failed to parse JSON document:', { error, path: this.props.path.value });
+        MemoryDocument.getLogger().error('Failed to parse JSON document:', { 
+          error, 
+          path: this.props.path.value 
+        });
       }
     }
 
+    // If not JSON or parsing failed, create a default structure
     const documentType = this.determineDocumentType();
     const title = this.title || this.props.path.filename;
 
@@ -263,15 +306,22 @@ export class MemoryDocument {
   }
 
   /**
-   * Convert JSON document to Markdown
-   * @param jsonDoc JSON document to convert
-   * @returns Markdown formatted string
+   * Create a MemoryDocument from a JSON document object
+   * @param jsonDoc JSON document object
+   * @param path Document path
+   * @returns MemoryDocument instance
    */
-  public static fromJSON(jsonDoc: BaseJsonDocument, path: DocumentPath): MemoryDocument {
+  public static fromJsonObject(jsonDoc: Record<string, any>, path: DocumentPath): MemoryDocument {
+    const logger = MemoryDocument.getLogger();
     logger.debug('Creating MemoryDocument from JSON:', {
       path: path.value,
       metadata: jsonDoc.metadata
     });
+
+    // Ensure metadata exists
+    if (!jsonDoc.metadata) {
+      throw new Error('Invalid JSON document: missing metadata');
+    }
 
     // Sanitize tags before creating Tag objects
     const sanitizedTags = (jsonDoc.metadata.tags || []).map((tag: string) => {
@@ -307,10 +357,10 @@ export class MemoryDocument {
   }
 
   /**
-   * Determine the document type based on the path or content
+   * Determine the document type based on the path
    * @returns document type
    */
-  private determineDocumentType(): string {
+  private determineDocumentType(): DocumentType {
     const filename = this.props.path.filename.toLowerCase();
 
     if (filename.includes('branchcontext') || filename.includes('branch-context')) {

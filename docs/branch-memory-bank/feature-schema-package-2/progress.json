@@ -8,9 +8,9 @@
     "tags": [
       "progress"
     ],
-    "lastModified": "2025-03-29T10:30:00.000Z",
+    "lastModified": "2025-03-29T11:30:00.000Z",
     "createdAt": "2025-03-28T11:01:55.756Z",
-    "version": 4
+    "version": 5
   },
   "content": {
     "workingFeatures": [
@@ -57,8 +57,8 @@
         "priority": "medium"
       }
     ],
-    "status": "フェーズ1の実装中：JsonDocumentエンティティのリファクタリング完了",
-    "completionPercentage": 20,
+    "status": "フェーズ1の実装中：ドメインエンティティのリファクタリングを進行中。DocumentPath、MemoryDocumentが依存関係逆転パターンを適用して外部ライブラリ依存を取り除いた状態に。",
+    "completionPercentage": 25,
     "knownIssues": [
       {
         "id": "ki-layering",
@@ -115,6 +115,12 @@
         "title": "JsonDocumentエンティティのリファクタリング",
         "description": "外部ライブラリ依存を取り除き、DIパターンを使って実装を完全に分離。IDocumentValidatorインターフェースとZodDocumentValidator実装を追加し、依存方向を正しく（内側に向けて）修正。",
         "completedAt": "2025-03-29T10:30:00.000Z"
+      },
+      {
+        "id": "ct-documentpath-memorydoc-refactor",
+        "title": "DocumentPathとMemoryDocumentエンティティのリファクタリング",
+        "description": "DocumentPathとMemoryDocumentから外部ライブラリ依存を取り除き、依存関係逆転パターンを適用。IDocumentLoggerインターフェースとDocumentLoggerAdapter実装を追加し、依存方向を正しく（内側に向けて）修正。非推奨のMarkdown関連メソッドも更新。",
+        "completedAt": "2025-03-29T11:30:00.000Z"
       }
     ],
     "upcomingMilestones": [
