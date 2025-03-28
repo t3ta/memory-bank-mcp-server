@@ -95,16 +95,16 @@
         "id": "pi-build-errors",
         "description": "残りのビルドエラー（特にIndexService.ts）の解消",
         "priority": "medium"
-      },
-      {
-        "id": "pi-template-cleanup",
-        "description": "テンプレート関連コードの削除",
-        "priority": "high"
       }
     ],
-    "status": "ドメインレイヤーレビュー完了、TagIndexリポジトリ設計パターン分析完了、MemoryBankRepositoryリファクタリング計画策定完了、ドメインエンティティのロギング依存を取り除く作業進行中。",
-    "completionPercentage": 65,
+    "status": "テンプレート関連コードの削除は完了し、ビルドテストは実行したが77個のエラーが発生。主なエラーはタグインデックス関連の型定義不一致で、IBranchMemoryBankRepositoryとFileSystemBranchMemoryBankRepositoryのgetTagIndexメソッドの返り値型が異なる。モノレポ化とスキーマパッケージ分離に伴う型定義の不整合を解消する必要がある。",
+    "completionPercentage": 70,
     "knownIssues": [
+      {
+        "id": "ki-tag-index-type-mismatch",
+        "description": "IBranchMemoryBankRepositoryインターフェースとFileSystemBranchMemoryBankRepository実装の間でタグインデックス関連メソッドの型定義が不一致",
+        "severity": "high"
+      },
       {
         "id": "ki-layering",
         "description": "レイヤー間の依存方向が一部逆転している（外側レイヤーへの依存）",
@@ -142,6 +142,12 @@
       }
     ],
     "completedTasks": [
+      {
+        "id": "ct-template-cleanup-verification",
+        "title": "テンプレート関連コード削除の確認と完了",
+        "description": "テンプレート関連コードの削除作業が完全に完了していることを確認。DocumentPath.tsからisMarkdownとtoAlternateFormatメソッドの削除、WriteBranchDocumentUseCase.tsのバグ修正、GlobalControllerのtemplateController依存の削除、providers.tsからテンプレート関連登録の削除が見つかられないことを確認。ビルドテストを実行し、他のエラーは残っているが、テンプレート関連の問題は解決済み。",
+        "completedAt": "2025-03-29T14:30:00.000Z"
+      },
       {
         "id": "ct-template-removal",
         "title": "テンプレート関連コードの削除完了",
@@ -260,6 +266,11 @@
         "file": "cleanup-plan.json",
         "description": "テンプレート関連コードの削除計画",
         "created_at": "2025-03-28"
+      },
+      {
+        "file": "schema-package-type-issues.json",
+        "description": "スキーマパッケージ移行による型定義不整合の問題分析",
+        "created_at": "2025-03-29T15:00:00.000Z"
       }
     ]
   }

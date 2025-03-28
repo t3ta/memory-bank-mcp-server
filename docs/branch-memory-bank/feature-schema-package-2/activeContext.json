@@ -13,8 +13,12 @@
     "version": 5
   },
   "content": {
-    "currentWork": "テンプレート関連コードの削除作業が完了！DocumentPath.tsからisMarkdown()とtoAlternateFormat()を削除し、WriteBranchDocumentUseCase.tsのバグ（branchInfo二重定義、existingDocumentのif条件分岐欠如、未使用変数）も修正した。GlobalControllerとproviders.tsはすでにテンプレート関連コードが削除済みだった。ビルド時に他のエラーも存在するが、今回の対応範囲外なので別タスクとして対応予定。",
+    "currentWork": "主要なビルドエラーの分析中。テンプレート関連コードの削除は完了しているが、タグインデックス関連の型定義不一致エラーが大量に発生している。IBranchMemoryBankRepositoryインターフェースではgetTagIndexの返り値型がBranchTagIndex | nullになっているが、FileSystemBranchMemoryBankRepositoryの実装ではBaseTagIndex | nullを返しており型不一致が発生。@memory-bank/schemasパッケージをモノレポ化する過程で発生した型定義の不整合が根本原因と思われる。",
     "recentChanges": [
+      {
+        "date": "2025-03-29T14:30:00.000Z",
+        "description": "テンプレート関連コードの削除作業の確認完了。ビルドテストで77個のエラーがまだ残っているが、テンプレート関連コード削除自体は完了。次のステップとしてアーキテクチャリファクタリングの他のタスクに進む予定。"
+      },
       {
         "date": "2025-03-28T12:30:00.000Z",
         "description": "テンプレート関連コードの削除完了。DocumentPath.tsからMarkdown関連メソッド削除、WriteBranchDocumentUseCase.tsのバグ修正。GlobalControllerとproviders.tsは既に修正済みだった。"
