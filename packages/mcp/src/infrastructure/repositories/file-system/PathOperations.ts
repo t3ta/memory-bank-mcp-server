@@ -4,6 +4,7 @@ import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
 import { InfrastructureError, InfrastructureErrorCodes } from '../../../shared/errors/InfrastructureError.js';
 import { logger } from '../../../shared/utils/logger.js';
 import type { IFileSystemService } from '../../storage/interfaces/IFileSystemService.js';
+import type { IConfigProvider } from '../../config/index.js';
 import { FileSystemMemoryBankRepositoryBase } from './FileSystemMemoryBankRepositoryBase.js';
 
 /**
@@ -14,12 +15,14 @@ export class PathOperations extends FileSystemMemoryBankRepositoryBase {
    * コンストラクタ
    * @param basePath 基本パス
    * @param fileSystemService ファイルシステムサービス
+   * @param configProvider 設定プロバイダー
    */
   constructor(
     private readonly basePath: string,
-    fileSystemService: IFileSystemService
+    fileSystemService: IFileSystemService,
+    protected readonly configProvider: IConfigProvider
   ) {
-    super(fileSystemService);
+    super(fileSystemService, configProvider);
   }
 
   /**
@@ -27,7 +30,8 @@ export class PathOperations extends FileSystemMemoryBankRepositoryBase {
    * @param branchInfo ブランチ情報
    * @returns ブランチの基本パス
    */
-  getBranchBasePath(branchInfo: BranchInfo): string {
+  getBranchBasePath(_branchInfo: BranchInfo): string {
+    // branchInfoパラメータは現在使用していませんが、将来的な拡張性のために残しています
     return this.basePath;
   }
 
@@ -406,6 +410,43 @@ export class PathOperations extends FileSystemMemoryBankRepositoryBase {
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
         `Failed to move file between branches: ${sourceBranchInfo.name}/${sourcePath} to ${destinationBranchInfo.name}/${destinationPath}`,
+        { originalError: error }
+      );
+    }
+  }
+
+  /**
+   * 指定されたディレクトリ内のファイル一覧を取得する
+   * @param directoryPath ディレクトリパス
+   * @param allowedExtensions 許可される拡張子の配列（省略時は全ファイル）
+   * @returns ファイルパスの配列
+   */
+  async listFilesInDirectory(directoryPath: string, allowedExtensions: string[] = []): Promise<string[]> {
+    try {
+      const fullPath = this.resolvePath(directoryPath);
+      
+      // ディレクトリの存在確認
+      const exists = await this.directoryExists(fullPath);
+      if (!exists) {
+        return [];
+      }
+      
+      // ファイル一覧を取得
+      const allFiles = await super.listFiles(fullPath);
+      
+      // 拡張子フィルタリング
+      if (allowedExtensions.length === 0) {
+        return allFiles;
+      }
+      
+      return allFiles.filter(file => {
+        const ext = path.extname(file);
+        return allowedExtensions.includes(ext);
+      });
+    } catch (error) {
+      throw new InfrastructureError(
+        InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
+        `Failed to list files in directory: ${directoryPath}`,
         { originalError: error }
       );
     }

@@ -8,18 +8,20 @@
     "tags": [
       "progress"
     ],
-    "lastModified": "2025-03-29T13:45:00.000Z",
+    "lastModified": "2025-03-29T14:30:00.000Z",
     "createdAt": "2025-03-29T13:45:00.000Z",
-    "version": 1
+    "version": 3
   },
   "content": {
-    "workingFeatures": [],
-    "pendingImplementation": [
+    "workingFeatures": [
       {
-        "id": "pi-repo-split",
-        "description": "肥大化リポジトリの分割と責務の明確化",
-        "priority": "high"
-      },
+        "id": "wf-repo-split",
+        "description": "リポジトリ分割の実装",
+        "status": "completed",
+        "completionDate": "2025-03-29T14:30:00.000Z"
+      }
+    ],
+    "pendingImplementation": [
       {
         "id": "pi-interface-unification",
         "description": "インターフェース設計の一貫性確保と命名規則統一",
@@ -36,8 +38,8 @@
         "priority": "medium"
       }
     ],
-    "status": "feature/schema-package-2からの継続作業。ブランチ開始時点では、テンプレート関連コード削除は完了し、ドメインエンティティの依存方向も正しく修正された。しかし、大きなリポジトリクラス（FileSystemBranchMemoryBankRepositoryとFileSystemGlobalMemoryBankRepository）の分割と残りのビルドエラー解消が未完了。主なビルドエラーはタグインデックス関連の型定義不一致。",
-    "completionPercentage": 0,
+    "status": "リポジトリ分割の実装が完了し、FileSystemGlobalMemoryBankRepository、FileSystemMemoryBankRepositoryBase、DocumentOperations、TagOperations、PathOperations、BulkOperationsの各クラスが実装された。次のステップはインターフェース命名規則の統一と残りのビルドエラーの解消。",
+    "completionPercentage": 25,
     "knownIssues": [
       {
         "id": "ki-tag-index-type-mismatch",
@@ -63,22 +65,16 @@
         "id": "ki-build-errors",
         "description": "残りのビルドエラー（82個）が未解消",
         "severity": "high"
-      },
-      {
-        "id": "ki-repository-bloat",
-        "description": "FileSystemBranchMemoryBankRepository（871行）とFileSystemGlobalMemoryBankRepository（875行）がサイズで肥大化しすぎており、单一責任の原則に違反している",
-        "severity": "high"
       }
     ],
-    "completedTasks": [],
-    "upcomingMilestones": [
+    "completedTasks": [
       {
-        "id": "um-repo-split-completed",
-        "title": "肥大化リポジトリの分割完了",
-        "description": "FileSystemBranchMemoryBankRepositoryとFileSystemGlobalMemoryBankRepositoryを小さなクラスに分割し、単一責任の原則に準拠した設計を完成",
-        "dueDate": "2025-03-31",
-        "status": "planned"
-      },
+        "id": "ct-repo-split",
+        "description": "肥大化リポジトリの分割（FileSystemGlobalMemoryBankRepositoryを責務別のクラスに分割）",
+        "completionDate": "2025-03-29T14:30:00.000Z"
+      }
+    ],
+    "upcomingMilestones": [
       {
         "id": "um-interface-unified",
         "title": "インターフェース設計の統一",
@@ -103,14 +99,9 @@
     ],
     "references": [
       {
-        "file": "repo-refactoring-plan.json",
-        "description": "MemoryBankRepositoryリファクタリングの詳細計画",
-        "created_at": "2025-03-29T13:45:00.000Z"
-      },
-      {
-        "file": "schema-package-type-issues.json",
-        "description": "スキーマパッケージ移行による型定義不整合の問題分析",
-        "created_at": "2025-03-29T15:00:00.000Z"
+        "file": "bulk-operations-implementation-plan.json",
+        "description": "BulkOperationsクラス実装計画（完了済み）",
+        "created_at": "2025-03-29T16:00:00.000Z"
       }
     ]
   }

@@ -247,7 +247,7 @@ export class BulkOperations extends FileSystemMemoryBankRepositoryBase {
       await this.tagOps.generateAndSaveTagIndex(docs);
       
       // レガシーなタグインデックスも更新
-      const language = await this.configProvider.getLanguage();
+      const language = this.configProvider.getLanguage();
       await this.tagOps.updateLegacyTagsIndex(docs, language);
       
       return true;

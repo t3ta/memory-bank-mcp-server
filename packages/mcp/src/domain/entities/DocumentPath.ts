@@ -151,5 +151,27 @@ export class DocumentPath {
 
     return DocumentPath.create(newPath);
   }
+
+  /**
+   * 代替フォーマットのパスを取得する（.md <-> .json変換）
+   * @returns 代替フォーマットのDocumentPath
+   */
+  public toAlternateFormat(): DocumentPath {
+    if (this.extension.toLowerCase() === 'md') {
+      return this.withExtension('json');
+    } else if (this.extension.toLowerCase() === 'json') {
+      return this.withExtension('md');
+    }
+    
+    // 変換対象外の場合は元のパスをクローン
+    return DocumentPath.create(this._value);
+  }
   
+  /**
+   * 現在のDocumentPathのクローンを作成する
+   * @returns 同じパス値を持つ新しいDocumentPath
+   */
+  public clone(): DocumentPath {
+    return DocumentPath.create(this._value);
+  }
 }

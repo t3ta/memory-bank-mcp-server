@@ -1,0 +1,236 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "error-fix-plan",
+    "title": "エラー修正計画",
+    "documentType": "plan",
+    "path": "error-fix-plan.json",
+    "tags": [
+      "error",
+      "fix",
+      "plan",
+      "typescript"
+    ],
+    "lastModified": "2025-03-29T17:55:00.000Z",
+    "createdAt": "2025-03-29T17:55:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "title": "残存するTypeScriptエラーの修正計画",
+      "description": "get_diagnosticsで特定された残りのエラーを修正するための計画です。修正はステップバイステップで進め、各修正後に診断を再実行して効果を確認します。",
+      "goals": [
+        "TagOperations.tsの全エラーを解消する",
+        "BulkOperations.tsの警告を解消する",
+        "全ファイルのTypeScript診断を通過させる"
+      ],
+      "approach": "優先度の高いエラーから順番に対処し、型の厳密化と名前の統一化を図る"
+    },
+    "fixItems": [
+      {
+        "id": "fix-1",
+        "title": "TagIndex importエラーの修正",
+        "file": "packages/mcp/src/infrastructure/repositories/file-system/TagOperations.ts",
+        "line": 2,
+        "diagnosis": "Module '@memory-bank/schemas' has no exported member 'TagIndex'.",
+        "severity": "high",
+        "solution": "既にクラス内でローカルTagIndex型が定義されているので、外部からのインポートを削除する。",
+        "codeChange": {
+          "before": "import { BranchTagIndex, GlobalTagIndex, Language, TagIndex, TAG_INDEX_VERSION } from '@memory-bank/schemas';",
+          "after": "import { BranchTagIndex, GlobalTagIndex, Language, TAG_INDEX_VERSION } from '@memory-bank/schemas';"
+        },
+        "implementationSteps": [
+          "TagOperations.tsファイルのインポート文からTagIndexを削除",
+          "ライン数が変更されないよう注意して置換を行う",
+          "診断を再実行して問題が解決されたか確認"
+        ],
+        "estimatedTime": "5分"
+      },
+      {
+        "id": "fix-2",
+        "title": "MemoryDocument.createFromJsonメソッド不在の修正",
+        "file": "packages/mcp/src/infrastructure/repositories/file-system/TagOperations.ts",
+        "line": 813,
+        "diagnosis": "Property 'createFromJson' does not exist on type 'typeof MemoryDocument'.",
+        "severity": "high",
+        "solution": "存在しないcreateFromJsonメソッドの代わりに、MemoryDocumentクラスの正しいfromJSONメソッドを使用する。",
+        "codeChange": {
+          "before": "const doc = MemoryDocument.createFromJson(content);",
+          "after": "const doc = MemoryDocument.fromJSON(content, DocumentPath.create(indexPath));"
+        },
+        "implementationSteps": [
+          "TagOperations.tsファイルのライン813を編集",
+          "正しいメソッド名と引数を使用するよう変更",
+          "診断を再実行して問題が解決されたか確認"
+        ],
+        "estimatedTime": "5分"
+      },
+      {
+        "id": "fix-3",
+        "title": "暗黙的any型の修正 - 390行目",
+        "file": "packages/mcp/src/infrastructure/repositories/file-system/TagOperations.ts",
+        "line": 390,
+        "diagnosis": "Parameter 'path' implicitly has an 'any' type.",
+        "severity": "medium",
+        "solution": "filter関数のコールバックでパラメータの型を明示的に指定する。",
+        "codeChange": {
+          "before": "matchedPaths = matchedPaths.filter(path => tagPaths.includes(path));",
+          "after": "matchedPaths = matchedPaths.filter((path: string) => tagPaths.includes(path));"
+        },
+        "implementationSteps": [
+          "TagOperations.tsファイルのライン390のfilter関数を編集",
+          "pathパラメータにstring型の注釈を追加",
+          "診断を再実行して問題が解決されたか確認"
+        ],
+        "estimatedTime": "2分"
+      },
+      {
+        "id": "fix-4",
+        "title": "暗黙的any型の修正 - 490行目",
+        "file": "packages/mcp/src/infrastructure/repositories/file-system/TagOperations.ts",
+        "line": 490,
+        "diagnosis": "Parameter 'path' implicitly has an 'any' type.",
+        "severity": "medium",
+        "solution": "filter関数のコールバックでパラメータの型を明示的に指定する。",
+        "codeChange": {
+          "before": "matchedPaths = matchedPaths.filter(path => tagPaths.includes(path));",
+          "after": "matchedPaths = matchedPaths.filter((path: string) => tagPaths.includes(path));"
+        },
+        "implementationSteps": [
+          "TagOperations.tsファイルのライン490のfilter関数を編集",
+          "pathパラメータにstring型の注釈を追加",
+          "診断を再実行して問題が解決されたか確認"
+        ],
+        "estimatedTime": "2分"
+      },
+      {
+        "id": "fix-5",
+        "title": "暗黙的any型の修正 - 567行目",
+        "file": "packages/mcp/src/infrastructure/repositories/file-system/TagOperations.ts",
+        "line": 567,
+        "diagnosis": "Parameter 'path' implicitly has an 'any' type.",
+        "severity": "medium",
+        "solution": "filter関数のコールバックでパラメータの型を明示的に指定する。",
+        "codeChange": {
+          "before": "matchedPaths = matchedPaths.filter(path => tagPaths.includes(path));",
+          "after": "matchedPaths = matchedPaths.filter((path: string) => tagPaths.includes(path));"
+        },
+        "implementationSteps": [
+          "TagOperations.tsファイルのライン567のfilter関数を編集",
+          "pathパラメータにstring型の注釈を追加",
+          "診断を再実行して問題が解決されたか確認"
+        ],
+        "estimatedTime": "2分"
+      },
+      {
+        "id": "fix-6",
+        "title": "未使用パラメータの修正",
+        "file": "packages/mcp/src/infrastructure/repositories/file-system/TagOperations.ts",
+        "line": 55,
+        "diagnosis": "'branchInfo' is declared but its value is never read.",
+        "severity": "low",
+        "solution": "getBranchIndexPathメソッドのbranchInfoパラメータを使用するか、削除する。",
+        "codeChange": {
+          "before": "private getBranchIndexPath(branchInfo: BranchInfo): string {",
+          "after": "private getBranchIndexPath(_branchInfo: BranchInfo): string {"
+        },
+        "implementationSteps": [
+          "使用していないパラメータ名の先頭にアンダースコアを追加して未使用であることを明示",
+          "これはTypeScriptの一般的なコーディング規約に従ったアプローチ",
+          "診断を再実行して問題が解決されたか確認"
+        ],
+        "estimatedTime": "2分",
+        "notes": "パラメータを削除するとメソッドシグネチャが変わり、呼び出し側のコードも修正が必要になるため、未使用パラメータには頭に_を付けるアプローチを選択"
+      },
+      {
+        "id": "fix-7",
+        "title": "不要なawaitの削除",
+        "file": "packages/mcp/src/infrastructure/repositories/file-system/BulkOperations.ts",
+        "line": 250,
+        "diagnosis": "'await' has no effect on the type of this expression.",
+        "severity": "low",
+        "solution": "configProvider.getLanguageメソッドは非同期ではないため、awaitを削除する。",
+        "codeChange": {
+          "before": "const language = await this.configProvider.getLanguage();",
+          "after": "const language = this.configProvider.getLanguage();"
+        },
+        "implementationSteps": [
+          "BulkOperations.tsファイルのライン250を編集",
+          "awaitキーワードを削除",
+          "診断を再実行して問題が解決されたか確認"
+        ],
+        "estimatedTime": "2分"
+      }
+    ],
+    "testPlan": {
+      "approach": "各修正後にTypeScript診断を実行して問題が解決されたことを確認し、最終的にはユニットテストの実行で機能が正しく動作することを検証します。",
+      "steps": [
+        {
+          "phase": "fix-1適用後",
+          "command": "get_diagnostics コマンドでTagOperations.tsを再チェック",
+          "expectedOutcome": "TagIndex importエラーが解消されている"
+        },
+        {
+          "phase": "fix-2適用後",
+          "command": "get_diagnostics コマンドでTagOperations.tsを再チェック",
+          "expectedOutcome": "createFromJsonエラーが解消されている"
+        },
+        {
+          "phase": "fix-3,4,5適用後",
+          "command": "get_diagnostics コマンドでTagOperations.tsを再チェック",
+          "expectedOutcome": "暗黙的any型の警告が解消されている"
+        },
+        {
+          "phase": "fix-6適用後",
+          "command": "get_diagnostics コマンドでTagOperations.tsを再チェック",
+          "expectedOutcome": "未使用パラメータの警告が解消されている"
+        },
+        {
+          "phase": "fix-7適用後",
+          "command": "get_diagnostics コマンドでBulkOperations.tsを再チェック",
+          "expectedOutcome": "不要なawait警告が解消されている"
+        },
+        {
+          "phase": "すべての修正後",
+          "command": "yarn tsc --noEmit",
+          "expectedOutcome": "プロジェクト全体でTypeScriptエラーがないことを確認"
+        },
+        {
+          "phase": "機能検証",
+          "command": "適切なユニットテストの実行",
+          "expectedOutcome": "TagOperationsとBulkOperationsの機能が正しく動作することを確認"
+        }
+      ]
+    },
+    "preventionMeasures": {
+      "description": "将来同様のエラーを防ぐための対策",
+      "measures": [
+        {
+          "id": "prevent-1",
+          "title": "型定義の一貫性確保",
+          "description": "スキーマパッケージとアプリケーションコード間で型定義の一貫性を確保するために、型の変更時には依存コードをすべて確認する習慣をつける",
+          "implementation": "型定義の変更時にはgrep/検索ツールを使って全コードベースで使用箇所を確認する"
+        },
+        {
+          "id": "prevent-2",
+          "title": "ESLintルールの強化",
+          "description": "暗黙的any型の使用を禁止し、未使用パラメータを警告するESLintルールを追加",
+          "implementation": "eslint.config.jsに@typescript-eslint/no-implicit-any と @typescript-eslint/no-unused-vars ルールを追加"
+        },
+        {
+          "id": "prevent-3",
+          "title": "API命名規則の統一",
+          "description": "類似機能を持つメソッドの命名規則を統一し、混乱を防ぐ",
+          "implementation": "factory関連メソッドの命名ガイドラインを作成し、create/fromJSON/ofなどの接頭辞の使い分けを明確化"
+        },
+        {
+          "id": "prevent-4",
+          "title": "CIでのTypeScript検証強化",
+          "description": "プルリクエスト前にTypeScriptエラーを検出するCIステップの追加",
+          "implementation": "GitHub Actionsワークフローにyarn tsc --noEmitコマンドを追加"
+        }
+      ]
+    },
+    "conclusion": "これらの修正を適用することで、残存するTypeScriptエラーを解消し、コードベースの型安全性と一貫性を高めることができます。また、将来同様のエラーを防止するための対策も併せて実施することで、コードの品質を継続的に向上させていくことが重要です。"
+  }
+}

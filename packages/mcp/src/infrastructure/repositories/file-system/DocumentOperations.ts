@@ -5,6 +5,7 @@ import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
 import { InfrastructureError, InfrastructureErrorCodes } from '../../../shared/errors/InfrastructureError.js';
 import { logger } from '../../../shared/utils/logger.js';
 import type { IFileSystemService } from '../../storage/interfaces/IFileSystemService.js';
+import type { IConfigProvider } from '../../config/index.js';
 import { FileSystemMemoryBankRepositoryBase } from './FileSystemMemoryBankRepositoryBase.js';
 import { FileSystemMemoryDocumentRepository } from './FileSystemMemoryDocumentRepository.js';
 
@@ -19,9 +20,10 @@ export class DocumentOperations extends FileSystemMemoryBankRepositoryBase {
    */
   constructor(
     private readonly basePath: string,
-    fileSystemService: IFileSystemService
+    fileSystemService: IFileSystemService,
+    configProvider: IConfigProvider
   ) {
-    super(fileSystemService);
+    super(fileSystemService, configProvider);
   }
 
   /**

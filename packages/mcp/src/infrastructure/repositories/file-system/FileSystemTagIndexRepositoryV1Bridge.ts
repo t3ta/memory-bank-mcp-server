@@ -91,10 +91,11 @@ export class FileSystemTagIndexRepositoryV1Bridge {
 
     const index = await this.globalRepository.getTagIndex();
     if (index) {
-      this.globalIndexCache = index;
+      // GlobalTagIndexに確実に変換
+      this.globalIndexCache = index as GlobalTagIndex;
       logger.debug(`Loaded and cached global tag index`);
     }
-    return index;
+    return index as GlobalTagIndex | null;
   }
 
   /**
