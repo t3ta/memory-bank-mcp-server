@@ -7,10 +7,34 @@
  */
 import fs from 'fs/promises';
 import path from 'path';
-import { ITemplateRepository } from '../domain/templates/ITemplateRepository.js';
-import { Template } from '../domain/templates/Template.js';
-import { Section } from '../domain/templates/Section.js';
 import { Language, LanguageCode } from '../domain/i18n/Language.js';
+
+// Mock interfaces and classes for Template related functionality (removed as part of template cleanup)
+interface ITemplateRepository {
+  getTemplate(id: string): Promise<Template | null>;
+  getTemplateAsMarkdown(id: string, language: Language): Promise<string>;
+  getTemplatesByType(type: string): Promise<Template[]>;
+  saveTemplate(template: Template): Promise<boolean>;
+  templateExists(id: string): Promise<boolean>;
+  getAllTemplateIds(): Promise<string[]>;
+  getAllTemplateTypes(): Promise<string[]>;
+}
+
+class Template {
+  constructor(
+    public id: string,
+    public type: string
+  ) {}
+}
+
+class Section {
+  constructor(
+    public id: string,
+    public titles: Partial<Record<LanguageCode, string>>,
+    public contents: Partial<Record<LanguageCode, string>>,
+    public hidden: boolean
+  ) {}
+}
 import { MigrationReport } from './MigrationReport.js'; // Removed MigrationStatus
 import { logger } from '../shared/utils/logger.js';
 

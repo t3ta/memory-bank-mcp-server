@@ -2,7 +2,7 @@ import { setupContainer } from './di/providers.js';
 import { IGlobalController } from '../interface/controllers/interfaces/IGlobalController.js';
 import { IBranchController } from '../interface/controllers/interfaces/IBranchController.js';
 import { IContextController } from '../interface/controllers/interfaces/IContextController.js';
-import { ITemplateController } from '../interface/controllers/interfaces/ITemplateController.js';
+// Removed import for ITemplateController as part of template cleanup
 import { Constants } from './config/constants.js';
 // Removed incorrect import: import type { CliOptions } from '@memory-bank/schemas';
 import { logger } from '../shared/utils/logger.js';
@@ -27,7 +27,7 @@ export class Application {
   private globalController?: IGlobalController;
   private branchController?: IBranchController;
   private contextController?: IContextController;
-  private templateController?: ITemplateController;
+  // templateController removed as part of template cleanup
 
   /**
    * Constructor
@@ -52,7 +52,7 @@ export class Application {
       this.globalController = await this.container.get('globalController') as IGlobalController;
       this.branchController = await this.container.get('branchController') as IBranchController;
       this.contextController = await this.container.get('contextController') as IContextController;
-      this.templateController = await this.container.get('templateController') as ITemplateController;
+      // templateController initialization removed as part of template cleanup
 
       logger.info('Application initialized successfully');
     } catch (error) {
@@ -97,15 +97,5 @@ export class Application {
     return this.contextController;
   }
 
-  /**
-   * Get template controller
-   * @returns Template controller
-   */
-  getTemplateController(): ITemplateController {
-    if (!this.templateController) {
-      throw new Error('Application not initialized. Call initialize() first.');
-    }
-
-    return this.templateController;
-  }
+  // getTemplateController method removed as part of template cleanup
 }

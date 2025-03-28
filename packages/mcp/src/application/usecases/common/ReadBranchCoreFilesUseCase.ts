@@ -3,8 +3,7 @@ import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
 import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
 import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
 import { ApplicationError, ApplicationErrorCodes } from '../../../shared/errors/ApplicationError.js';
-import type { ILogger } from '../../../domain/logger/ILogger.js';
-import { LoggerFactory, LoggerType } from '../../../infrastructure/logger/LoggerFactory.js';
+import { logger } from '../../../shared/utils/logger.js';
 import type { IUseCase } from '../../interfaces/IUseCase.js';
 import type {
   ActiveContextDTO,
@@ -22,18 +21,13 @@ interface ReadBranchCoreFilesOutput {
 }
 
 export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesInput, ReadBranchCoreFilesOutput> {
-  private readonly logger: ILogger;
-
   private readonly ACTIVE_CONTEXT_PATH = 'activeContext.json';
   private readonly PROGRESS_PATH = 'progress.json';
   private readonly SYSTEM_PATTERNS_PATH = 'systemPatterns.json';
   private readonly BRANCH_CONTEXT_PATH = 'branchContext.json';
 
   constructor(private readonly branchRepository?: IBranchMemoryBankRepository) {
-    this.logger = LoggerFactory.getInstance().getLogger('ReadBranchCoreFilesUseCase', {
-      type: LoggerType.JSON,
-      defaultContext: { useCase: 'ReadBranchCoreFiles' }
-    });
+    // Using shared logger instance
   }
 
   public async execute(input: ReadBranchCoreFilesInput): Promise<ReadBranchCoreFilesOutput> {
@@ -54,14 +48,14 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
       const branchExists = await this.branchRepository.exists(input.branchName);
 
       if (!branchExists) {
-        this.logger.info('Branch not found, attempting auto-initialization', {
+        logger.info('Branch not found, attempting auto-initialization', {
           branch: input.branchName
         });
 
         try {
           await this.branchRepository.initialize(branchInfo);
         } catch (error) {
-          this.logger.error('Failed to auto-initialize branch', {
+          logger.error('Failed to auto-initialize branch', {
             branch: input.branchName,
             error: error instanceof Error ? error.message : String(error)
           });
@@ -86,7 +80,7 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
         if (error instanceof DomainError || error instanceof ApplicationError) {
           throw error;
         }
-        this.logger.debug('Document not found', {
+        logger.debug('Document not found', {
           type: 'activeContext',
           path: this.ACTIVE_CONTEXT_PATH,
           branch: input.branchName
@@ -106,7 +100,7 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
         if (error instanceof DomainError || error instanceof ApplicationError) {
           throw error;
         }
-        this.logger.debug('Document not found', {
+        logger.debug('Document not found', {
           type: 'progress',
           path: this.PROGRESS_PATH,
           branch: input.branchName

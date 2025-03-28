@@ -13,8 +13,13 @@
     "version": 2
   },
   "content": {
-    "currentWork": "マークダウン関連コードの削除作業中。DocumentPath.tsのisMarkdownとtoAlternateFormatメソッドは既に削除済みだが、MemoryDocument.tsのisMarkdownメソッド（200-202行目）がDocumentPath.tsのisMarkdownメソッドを参照しており、ビルドエラーの可能性があるため、このメソッドの削除が必要。また、WriteBranchDocumentUseCase.tsのマークダウン拡張子チェックコードは既に削除されているが、disableMarkdownWrites変数が残っている。",
+    "currentWork": "ロガー実装の統一作業に着手しました。現在、複数のロガー実装（domain/logger/ILogger、infrastructure/logger/、shared/utils/logger/、shared/utils/logger.ts）が混在しています。各実装の使用状況を調査し、shared/utils/logger.tsに統一する詳細計画を立てました。次のステップとして、必要な修正を行います。",
     "recentChanges": [
+      {
+        "date": "2025-03-28T21:00:00.000Z",
+        "description": "全テンプレート関連ファイルを削除し、参照コードも修正。ReadRulesUseCase.ts、FileSystemGlobalMemoryBankRepository.ts、FileSystemMemoryDocumentRepository.tsのマークダウン・テンプレート関連参照を修正してビルドエラーを解消。",
+        "resultIssues": "特に問題なく全作業が完了。ビルドも正常に成功。"
+      },
       {
         "date": "2025-03-28T20:10:00.000Z",
         "description": "DocumentPath.tsのマークダウン関連メソッド（isMarkdownとtoAlternateFormat）は既に削除されていることを確認。MemoryDocument.tsでまだisMarkdownメソッドが参照されており、この削除が必要。"
@@ -71,68 +76,68 @@
       {
         "id": "4f43403d-e22d-41a6-9e60-af8c8f04fe2e",
         "description": "モジュールの参照関係を全て洗い出し、削除によるエラーが発生しないよう注意する",
-        "status": "active"
+        "status": "resolved"
       },
       {
         "id": "247b7c32-6d1f-4203-90df-acb1ce268fe2",
         "description": "DIコンテナの設定もあわせて修正する必要がある",
-        "status": "active"
+        "status": "resolved"
       }
     ],
     "nextSteps": [
       {
         "id": "template-related-first",
-        "description": "GlobalControllerからのTemplateController参照を削除",
+        "status": "completed",
         "priority": "high",
-        "status": "in-progress"
+        "description": "GlobalControllerからのTemplateController参照を削除"
       },
       {
         "id": "markdown-remains",
-        "description": "DIコンテナからのTemplateService/Repositoryの登録を削除",
+        "status": "completed",
         "priority": "high",
-        "status": "pending"
+        "description": "DIコンテナからのTemplateService/Repositoryの登録を削除"
       },
       {
         "id": "di-container-fix",
-        "description": "削除したコードに関連するDIコンテナの参照を修正",
+        "status": "completed",
         "priority": "medium",
-        "status": "pending"
+        "description": "削除したコードに関連するDIコンテナの参照を修正"
       },
       {
         "id": "logger-unification",
-        "description": "複数のロガー実装を統一する",
+        "status": "in-progress",
         "priority": "low",
-        "status": "pending"
+        "description": "複数のロガー実装を統一する"
       },
       {
         "id": "template-controller-removal",
-        "description": "TemplateControllerとそのインターフェースを削除",
+        "status": "completed",
         "priority": "high",
-        "status": "pending"
+        "description": "TemplateControllerとそのインターフェースを削除"
       },
       {
         "id": "template-service-removal",
-        "description": "TemplateServiceクラスを削除",
+        "status": "completed",
         "priority": "high",
-        "status": "pending"
+        "description": "TemplateServiceクラスを削除"
       },
       {
         "id": "template-repository-removal",
-        "description": "FileTemplateRepositoryなどの実装クラスを削除",
+        "status": "completed",
         "priority": "high",
-        "status": "pending"
+        "description": "FileTemplateRepositoryなどの実装クラスを削除"
       },
       {
         "id": "template-domain-removal",
-        "description": "ITemplateRepositoryインターフェースとTemplateクラスなどを削除",
+        "status": "completed",
         "priority": "high",
-        "status": "pending"
+        "description": "ITemplateRepositoryインターフェースとTemplateクラスなどを削除"
       },
       {
         "id": "document-path-markdown-removal",
-        "description": "DocumentPath.tsからisMarkdownとtoAlternateFormatメソッドを削除",
+        "status": "completed",
         "priority": "medium",
-        "status": "in-progress"
+        "description": "DocumentPath.tsからisMarkdownとtoAlternateFormatメソッドを削除"
       }
     ],
     "references": [
@@ -140,6 +145,11 @@
         "file": "implementation-plan.json",
         "description": "テンプレート関連コード削除の詳細な実装ステップと確認ポイント",
         "created_at": "2025-03-28T19:40:00.000Z"
+      },
+      {
+        "file": "logger-migration-plan.json",
+        "description": "ロガー実装統一の詳細計画と手順",
+        "created_at": "2025-03-28T21:15:00.000Z"
       }
     ]
   }

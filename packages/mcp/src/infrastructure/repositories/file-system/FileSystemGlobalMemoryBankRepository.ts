@@ -233,8 +233,8 @@ export class FileSystemGlobalMemoryBankRepository implements IGlobalMemoryBankRe
     try {
       await this.documentRepository.save(document);
 
-      // Update tags index if document is markdown or JSON
-      if ((document.isMarkdown || document.isJSON) && document.path.value !== 'tags/index.md' && document.path.value !== 'tags/index.json') {
+      // Update tags index if document is JSON (isMarkdown removed as part of template cleanup)
+      if (document.isJSON && document.path.value !== 'tags/index.md' && document.path.value !== 'tags/index.json') {
         // Generate and save the tag index
         await this.generateAndSaveTagIndex();
       }

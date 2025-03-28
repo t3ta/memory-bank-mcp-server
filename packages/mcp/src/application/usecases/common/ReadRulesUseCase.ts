@@ -2,7 +2,11 @@ import fs from "fs/promises";
 import path from "path";
 import { DomainError, DomainErrorCodes } from "../../../shared/errors/DomainError.js";
 import { logger } from "../../../shared/utils/logger.js";
-import { ITemplateLoader } from "../../../infrastructure/templates/interfaces/ITemplateLoader.js";
+// ITemplateLoader import removed as part of template cleanup
+// Mock interface for backwards compatibility
+interface ITemplateLoader {
+  getMarkdownTemplate(templateId: string, language: any): Promise<string>;
+}
 import { getSafeLanguage } from "@memory-bank/schemas";
 
 

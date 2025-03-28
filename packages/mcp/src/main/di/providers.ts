@@ -7,7 +7,6 @@ import { IIndexService } from '@/infrastructure/index/interfaces/IIndexService.j
 import { FileSystemJsonDocumentRepository } from '@/infrastructure/repositories/file-system/FileSystemJsonDocumentRepository.js';
 import { IJsonDocumentRepository } from '@/domain/repositories/IJsonDocumentRepository.js';
 import { II18nRepository } from '@/domain/i18n/II18nRepository.js';
-import { ITemplateRepository } from '@/domain/templates/ITemplateRepository.js';
 
 // Domain layer
 
@@ -113,48 +112,6 @@ export async function registerInfrastructureServices(
     return new IndexService(fileSystemService, indexRoot);
   });
 
-  // Register template repository
-  container.registerFactory('templateRepository', async () => {
-    // const fileSystemService = await container.get<IFileSystemService>('fileSystemService'); // Removed unused variable
-    const configProvider = await container.get<IConfigProvider>('configProvider');
-    const config = configProvider.getConfig(); // Already removed await
-
-    // Set up template directory path
-    const templateDir = path.join(config.docsRoot, 'templates', 'json');
-
-    // Get I18nService for translations
-    let i18nService;
-    try {
-      // Try to get I18nService if it's already registered
-      const { I18nService } = await import('@/application/i18n/I18nService.js'); // Path already corrected
-      const i18nRepository = await container.get<II18nRepository>('i18nRepository');
-      i18nService = new I18nService(i18nRepository);
-
-      // Load all translations
-      await i18nService.loadAllTranslations();
-    } catch (error) {
-      console.warn('Failed to get I18nService for template translations:', error);
-      i18nService = null;
-    }
-
-    // Import and instantiate the FileTemplateRepository
-    const { FileTemplateRepository } = await import('../../infrastructure/templates/FileTemplateRepository.js');
-
-    // Create repository with I18nService if available
-    const templateRepository = new FileTemplateRepository(
-      templateDir,
-      i18nService ? {
-        translate: (key: string, language: string) => i18nService.translate(key, language)
-      } : undefined
-    );
-
-    // Initialize the repository
-    await templateRepository.initialize().catch(error => {
-      console.error('Failed to initialize template repository:', error);
-    });
-
-    return templateRepository;
-  });
 
   // Register i18n repository
   container.registerFactory('i18nRepository', async () => {
@@ -384,16 +341,18 @@ export async function registerApplicationServices(container: DIContainer): Promi
     return new I18nService(i18nRepository);
   });
 
-  container.registerFactory('templateService', async () => {
-    const templateRepository = container.get('templateRepository') as ITemplateRepository;
-
-    // Import and instantiate the TemplateService
-    const { TemplateService } = await import('@/application/templates/TemplateService.js'); // Corrected path
-    return new TemplateService(templateRepository);
-  });
-
   container.registerFactory('markdownMigrationService', async () => {
-    const templateRepository = container.get('templateRepository') as ITemplateRepository;
+    // Create a mock template repository since we're removing the actual implementation
+    const mockTemplateRepository = {
+      getTemplate: async () => null,
+      getTemplateAsMarkdown: async () => '',
+      getTemplatesByType: async () => [],
+      saveTemplate: async () => false,
+      templateExists: async () => false,
+      getAllTemplateIds: async () => [],
+      getAllTemplateTypes: async () => []
+    };
+
     const configProvider = await container.get<IConfigProvider>('configProvider');
     const config = configProvider.getConfig(); // Removed await
 
@@ -403,7 +362,7 @@ export async function registerApplicationServices(container: DIContainer): Promi
 
     // Import and instantiate the MarkdownMigrationService
     const { MarkdownMigrationService } = await import('../../migration/MarkdownMigrationService.js');
-    return new MarkdownMigrationService(templateRepository, markdownDir, backupDir);
+    return new MarkdownMigrationService(mockTemplateRepository, markdownDir, backupDir);
   });
 }
 

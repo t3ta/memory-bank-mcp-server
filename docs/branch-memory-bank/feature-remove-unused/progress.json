@@ -13,8 +13,8 @@
     "version": 2
   },
   "content": {
-    "status": "実装開始 - DocumentPath.tsのマークダウン関連メソッドの削除作業中",
-    "completionPercentage": 20,
+    "status": "テンプレート関連コード削除完了 - 次はロガー実装の統一が候補",
+    "completionPercentage": 65,
     "workingFeatures": [
       {
         "id": "md-cleanup-branch-controller",
