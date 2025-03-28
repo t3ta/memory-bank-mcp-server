@@ -1,0 +1,117 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "c9859467-725a-4467-ad02-11c9a184d94f",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress"
+    ],
+    "lastModified": "2025-03-29T13:45:00.000Z",
+    "createdAt": "2025-03-29T13:45:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [],
+    "pendingImplementation": [
+      {
+        "id": "pi-repo-split",
+        "description": "肥大化リポジトリの分割と責務の明確化",
+        "priority": "high"
+      },
+      {
+        "id": "pi-interface-unification",
+        "description": "インターフェース設計の一貫性確保と命名規則統一",
+        "priority": "high"
+      },
+      {
+        "id": "pi-build-errors",
+        "description": "残りのビルドエラー（特にIndexService.ts）の解消",
+        "priority": "high"
+      },
+      {
+        "id": "pi-cross-cutting",
+        "description": "横断的関心事（ロギング、エラーハンドリング）の統合",
+        "priority": "medium"
+      }
+    ],
+    "status": "feature/schema-package-2からの継続作業。ブランチ開始時点では、テンプレート関連コード削除は完了し、ドメインエンティティの依存方向も正しく修正された。しかし、大きなリポジトリクラス（FileSystemBranchMemoryBankRepositoryとFileSystemGlobalMemoryBankRepository）の分割と残りのビルドエラー解消が未完了。主なビルドエラーはタグインデックス関連の型定義不一致。",
+    "completionPercentage": 0,
+    "knownIssues": [
+      {
+        "id": "ki-tag-index-type-mismatch",
+        "description": "IBranchMemoryBankRepositoryインターフェースとFileSystemBranchMemoryBankRepository実装の間でタグインデックス関連メソッドの型定義が不一致",
+        "severity": "high"
+      },
+      {
+        "id": "ki-interface-inconsistency",
+        "description": "インターフェース命名規則と設計が一貫していない",
+        "severity": "high"
+      },
+      {
+        "id": "ki-logging-duplication",
+        "description": "複数のロギング実装が混在している",
+        "severity": "medium"
+      },
+      {
+        "id": "ki-error-inconsistency",
+        "description": "エラーハンドリングパターンが統一されていない",
+        "severity": "medium"
+      },
+      {
+        "id": "ki-build-errors",
+        "description": "残りのビルドエラー（82個）が未解消",
+        "severity": "high"
+      },
+      {
+        "id": "ki-repository-bloat",
+        "description": "FileSystemBranchMemoryBankRepository（871行）とFileSystemGlobalMemoryBankRepository（875行）がサイズで肥大化しすぎており、单一責任の原則に違反している",
+        "severity": "high"
+      }
+    ],
+    "completedTasks": [],
+    "upcomingMilestones": [
+      {
+        "id": "um-repo-split-completed",
+        "title": "肥大化リポジトリの分割完了",
+        "description": "FileSystemBranchMemoryBankRepositoryとFileSystemGlobalMemoryBankRepositoryを小さなクラスに分割し、単一責任の原則に準拠した設計を完成",
+        "dueDate": "2025-03-31",
+        "status": "planned"
+      },
+      {
+        "id": "um-interface-unified",
+        "title": "インターフェース設計の統一",
+        "description": "すべてのインターフェースが一貫した命名規則と設計に従うよう修正",
+        "dueDate": "2025-04-01",
+        "status": "planned"
+      },
+      {
+        "id": "um-build-error-fix",
+        "title": "ビルドエラー解消",
+        "description": "残っている82個のビルドエラーを解消し、ビルド成功を達成",
+        "dueDate": "2025-04-02",
+        "status": "planned"
+      },
+      {
+        "id": "um-cross-cutting-refactor",
+        "title": "横断的関心事の統合",
+        "description": "ロギングとエラーハンドリングの統一を完了",
+        "dueDate": "2025-04-03",
+        "status": "planned"
+      }
+    ],
+    "references": [
+      {
+        "file": "repo-refactoring-plan.json",
+        "description": "MemoryBankRepositoryリファクタリングの詳細計画",
+        "created_at": "2025-03-29T13:45:00.000Z"
+      },
+      {
+        "file": "schema-package-type-issues.json",
+        "description": "スキーマパッケージ移行による型定義不整合の問題分析",
+        "created_at": "2025-03-29T15:00:00.000Z"
+      }
+    ]
+  }
+}

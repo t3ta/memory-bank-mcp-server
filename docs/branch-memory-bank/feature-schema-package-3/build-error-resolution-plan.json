@@ -1,0 +1,289 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "9e4c2f8b-d5a7-4e3f-bcf2-1dc7ed6a5b30",
+    "title": "ビルドエラー解消計画",
+    "documentType": "plan",
+    "path": "build-error-resolution-plan.json",
+    "tags": [
+      "build",
+      "error",
+      "refactoring",
+      "typescript"
+    ],
+    "lastModified": "2025-03-29T14:45:00.000Z",
+    "createdAt": "2025-03-29T14:45:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "title": "残存ビルドエラー解消計画",
+      "description": "feature/schema-package-2から引き継いだ82個のビルドエラーを効率的に解消し、モノレポ化とスキーマパッケージ分離を進めるための計画",
+      "goals": [
+        "すべてのビルドエラーを解消し、安定したビルドを実現する",
+        "タイプミスマッチの根本原因を特定し恒久的に修正する",
+        "ビルドプロセスを改善し、早期エラー検出を可能にする",
+        "将来のビルドエラーを防止するための仕組みを導入する"
+      ],
+      "approach": "エラー種別ごとの分類と系統的解決"
+    },
+    "errorCategories": [
+      {
+        "id": "cat-type-mismatch",
+        "name": "型の不一致エラー",
+        "description": "インターフェースと実装クラス間、または依存関係間での型定義の不一致",
+        "examples": [
+          "IBranchMemoryBankRepositoryとFileSystemBranchMemoryBankRepositoryのgetTagIndexメソッドの返り値型の違い",
+          "タグインデックスに関連する操作の戻り値型の不整合"
+        ],
+        "priority": "high",
+        "estimatedCount": 45
+      },
+      {
+        "id": "cat-missing-impl",
+        "name": "実装漏れエラー",
+        "description": "インターフェースで定義されているメソッドが実装クラスで実装されていない",
+        "examples": [
+          "最近追加されたインターフェースメソッドの実装漏れ",
+          "リファクタリングによる署名変更後の実装未更新"
+        ],
+        "priority": "high",
+        "estimatedCount": 15
+      },
+      {
+        "id": "cat-import-error",
+        "name": "インポートエラー",
+        "description": "モジュールパスの変更やリファクタリングによるインポートの破損",
+        "examples": [
+          "モジュール構造変更後の相対パスの問題",
+          "モノレポ化に伴うパッケージ参照の問題"
+        ],
+        "priority": "medium",
+        "estimatedCount": 12
+      },
+      {
+        "id": "cat-deprecated",
+        "name": "非推奨API使用エラー",
+        "description": "削除または置き換えられたAPIの使用",
+        "examples": [
+          "テンプレート関連の削除されたAPIの参照",
+          "マークダウン関連の非推奨メソッドの使用"
+        ],
+        "priority": "medium",
+        "estimatedCount": 5
+      },
+      {
+        "id": "cat-config",
+        "name": "設定関連エラー",
+        "description": "TypeScript設定やビルド設定の問題",
+        "examples": [
+          "tsconfig.jsonの不適切な設定",
+          "パス解決の問題"
+        ],
+        "priority": "low",
+        "estimatedCount": 5
+      }
+    ],
+    "implementationPhases": [
+      {
+        "id": "phase1",
+        "name": "エラー分析と分類",
+        "description": "すべてのビルドエラーを詳細に分析し、種類ごとに分類",
+        "tasks": [
+          {
+            "id": "task1-1",
+            "description": "完全なビルドを実行し、すべてのエラーを収集",
+            "estimatedEffort": "低",
+            "done": false
+          },
+          {
+            "id": "task1-2",
+            "description": "エラーログを解析して種類ごとに分類",
+            "estimatedEffort": "中",
+            "done": false
+          },
+          {
+            "id": "task1-3",
+            "description": "各エラーを優先度で評価（依存関係や影響範囲に基づく）",
+            "estimatedEffort": "中",
+            "done": false
+          },
+          {
+            "id": "task1-4",
+            "description": "修正計画を作成（エラー種類ごと）",
+            "estimatedEffort": "高",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "phase2",
+        "name": "タグインデックス関連の型不一致解消",
+        "description": "最も数の多いタグインデックス関連の型不一致エラーを優先的に解消",
+        "tasks": [
+          {
+            "id": "task2-1",
+            "description": "タグインデックス関連のインターフェース定義を統一",
+            "estimatedEffort": "高",
+            "done": false
+          },
+          {
+            "id": "task2-2",
+            "description": "IBranchMemoryBankRepositoryのgetTagIndexメソッド返り値型を修正",
+            "estimatedEffort": "中",
+            "done": false
+          },
+          {
+            "id": "task2-3",
+            "description": "FileSystemBranchMemoryBankRepositoryの実装を統一された型定義に合わせる",
+            "estimatedEffort": "高",
+            "done": false
+          },
+          {
+            "id": "task2-4",
+            "description": "タグインデックス関連の単体テストを修正・強化",
+            "estimatedEffort": "中",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "phase3",
+        "name": "実装漏れとインポートエラーの解消",
+        "description": "インターフェース実装漏れとインポートパス問題の解決",
+        "tasks": [
+          {
+            "id": "task3-1",
+            "description": "インターフェース実装漏れを特定し、必要なメソッドを実装",
+            "estimatedEffort": "高",
+            "done": false
+          },
+          {
+            "id": "task3-2",
+            "description": "インポートパスエラーを修正",
+            "estimatedEffort": "中",
+            "done": false
+          },
+          {
+            "id": "task3-3",
+            "description": "非推奨API使用の置き換え",
+            "estimatedEffort": "中",
+            "done": false
+          },
+          {
+            "id": "task3-4",
+            "description": "定期的なビルドテストによる進捗確認",
+            "estimatedEffort": "低",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "phase4",
+        "name": "設定問題と残存エラーの解消",
+        "description": "TypeScript設定の最適化と残りのエラーを解消",
+        "tasks": [
+          {
+            "id": "task4-1",
+            "description": "tsconfig.jsonの最適化",
+            "estimatedEffort": "低",
+            "done": false
+          },
+          {
+            "id": "task4-2",
+            "description": "パス解決の問題を修正",
+            "estimatedEffort": "低",
+            "done": false
+          },
+          {
+            "id": "task4-3",
+            "description": "その他の残存エラーを解消",
+            "estimatedEffort": "中",
+            "done": false
+          },
+          {
+            "id": "task4-4",
+            "description": "最終ビルドテストと確認",
+            "estimatedEffort": "低",
+            "done": false
+          }
+        ]
+      }
+    ],
+    "riskMitigation": [
+      {
+        "risk": "エラー修正によるさらなるエラーの発生",
+        "strategy": "小さなバッチで修正し、各修正後にビルドテストを実行"
+      },
+      {
+        "risk": "修正の範囲が予想より広がる",
+        "strategy": "優先度に基づく段階的アプローチと、必要に応じたスコープの再評価"
+      },
+      {
+        "risk": "根本原因の特定の困難さ",
+        "strategy": "詳細なエラーログの分析とコードの静的解析を活用"
+      },
+      {
+        "risk": "テスト不足による回帰",
+        "strategy": "修正箇所には必ず単体テストを追加または強化"
+      }
+    ],
+    "diagnosticTools": {
+      "staticAnalysis": [
+        {
+          "name": "TypeScript Compiler",
+          "usage": "型チェックとエラー検出"
+        },
+        {
+          "name": "ESLint",
+          "usage": "コード品質と潜在的問題の検出"
+        }
+      ],
+      "buildTools": [
+        {
+          "name": "tsc --noEmit",
+          "usage": "型チェックのみの高速実行"
+        },
+        {
+          "name": "yarn build --verbose",
+          "usage": "詳細なビルドエラー情報の取得"
+        }
+      ],
+      "testTools": [
+        {
+          "name": "Jest",
+          "usage": "単体テストによる機能検証"
+        }
+      ]
+    },
+    "successCriteria": [
+      "すべてのビルドエラーが解消されていること",
+      "yarn buildコマンドが正常に完了すること",
+      "すべての単体テストが成功すること",
+      "タイプチェックが警告なしで通過すること",
+      "インターフェースと実装の間に型の不一致がないこと"
+    ],
+    "futurePreventionMeasures": [
+      {
+        "id": "prevent1",
+        "name": "CI/CDでの早期型チェック",
+        "description": "プルリクエスト時に型チェックを自動実行するCIステップの追加"
+      },
+      {
+        "id": "prevent2",
+        "name": "インターフェース変更時のチェックリスト",
+        "description": "インターフェースを変更する際のチェックリストとレビュープロセスの確立"
+      },
+      {
+        "id": "prevent3",
+        "name": "自動テスト拡充",
+        "description": "型の整合性を確認する専用テストの追加"
+      },
+      {
+        "id": "prevent4",
+        "name": "コード生成ツール",
+        "description": "インターフェースから実装のスケルトンを生成するツールの導入"
+      }
+    ]
+  }
+}

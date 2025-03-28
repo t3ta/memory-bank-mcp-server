@@ -1,0 +1,95 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "6688089b-bd05-4e4b-9474-76743196edbe",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context"
+    ],
+    "lastModified": "2025-03-29T13:45:00.000Z",
+    "createdAt": "2025-03-29T13:45:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "feature/schema-package-3ブランチでの作業計画策定。肥大化リポジトリの分割、インターフェース命名規則の統一、残りのビルドエラー解消のための詳細計画を立てる。",
+    "recentChanges": [
+      {
+        "date": "2025-03-29T13:45:00.000Z",
+        "description": "feature/schema-package-2からの状況を分析し、残タスクを特定"
+      },
+      {
+        "date": "2025-03-29T13:45:00.000Z",
+        "description": "ブランチコンテキスト、進捗状況、システムパターンの初期設定を完了"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "ad-repo-split-first",
+        "description": "肥大化リポジトリの分割を最優先タスクとして取り組む（FileSystemBranchMemoryBankRepositoryから着手）"
+      },
+      {
+        "id": "ad-small-edits",
+        "description": "大きなファイルの変更は小さく分割して実施し、各ステップでテストを行う"
+      },
+      {
+        "id": "ad-interface-naming-rules",
+        "description": "全インターフェースを「I」で始める命名規則に統一し、メソッドシグネチャも一貫させる"
+      },
+      {
+        "id": "ad-build-errors-categorization",
+        "description": "ビルドエラーを種類ごとに分類し、関連する修正をバッチで実施する"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "con-error-handling",
+        "description": "エラーハンドリングパターンの統一をどの程度優先するか検討が必要",
+        "status": "open"
+      },
+      {
+        "id": "con-repo-composition-strategy",
+        "description": "リポジトリ分割後のコンポジションパターン適用方法について最適な戦略を検討",
+        "status": "open"
+      },
+      {
+        "id": "con-build-process",
+        "description": "ビルドプロセス改善の可能性（モノレポ化に向けた準備として）",
+        "status": "open"
+      },
+      {
+        "id": "con-test-strategy",
+        "description": "リファクタリング中のテスト戦略（どのテストをいつ実行するか）",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "ns-repo-split-plan",
+        "description": "FileSystemBranchMemoryBankRepositoryの具体的な分割計画を詳細化する",
+        "priority": "high"
+      },
+      {
+        "id": "ns-repo-prototype",
+        "description": "リポジトリコンポジションパターンのプロトタイプ実装を準備",
+        "priority": "high"
+      },
+      {
+        "id": "ns-build-error-analysis",
+        "description": "残っているビルドエラーを分類し、修正の優先順位付けを行う",
+        "priority": "medium"
+      },
+      {
+        "id": "ns-interface-audit",
+        "description": "全インターフェースの監査を行い、命名規則統一のための変更リストを作成",
+        "priority": "medium"
+      },
+      {
+        "id": "ns-cross-cutting-inventory",
+        "description": "横断的関心事（ロギング、エラーハンドリング）の現状調査と統一計画の策定",
+        "priority": "low"
+      }
+    ]
+  }
+}
