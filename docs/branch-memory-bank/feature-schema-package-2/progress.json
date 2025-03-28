@@ -8,9 +8,9 @@
     "tags": [
       "progress"
     ],
-    "lastModified": "2025-03-28T20:15:00.000Z",
+    "lastModified": "2025-03-29T09:20:00.000Z",
     "createdAt": "2025-03-28T11:01:55.756Z",
-    "version": 2
+    "version": 3
   },
   "content": {
     "workingFeatures": [
@@ -18,6 +18,11 @@
         "id": "wf-template-removal",
         "description": "テンプレート関連コードの削除（前ブランチで完了）",
         "implementedAt": "2025-03-28T20:00:00.000Z"
+      },
+      {
+        "id": "wf-refactor-plan",
+        "description": "アーキテクチャリファクタリング計画策定",
+        "implementedAt": "2025-03-29T09:15:00.000Z"
       }
     ],
     "pendingImplementation": [
@@ -47,8 +52,8 @@
         "priority": "medium"
       }
     ],
-    "status": "計画策定中",
-    "completionPercentage": 5,
+    "status": "詳細計画策定完了、実装準備中",
+    "completionPercentage": 10,
     "knownIssues": [
       {
         "id": "ki-layering",
@@ -93,6 +98,12 @@
         "title": "アーキテクチャ課題の分析",
         "description": "テンプレート削除から見えてきたアーキテクチャ上の不整合点を分析し、主要な課題を特定。",
         "completedAt": "2025-03-28T20:15:00.000Z"
+      },
+      {
+        "id": "ct-detailed-refactor-plan",
+        "title": "アーキテクチャリファクタリング詳細計画策定",
+        "description": "4つのフェーズから成るリファクタリング計画を策定し、具体的なタスクとデリバラブルを定義。",
+        "completedAt": "2025-03-29T09:15:00.000Z"
       }
     ],
     "upcomingMilestones": [
