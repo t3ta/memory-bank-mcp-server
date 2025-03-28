@@ -8,7 +8,6 @@ import { FileSystemJsonDocumentRepository } from '@/infrastructure/repositories/
 import { IJsonDocumentRepository } from '@/domain/repositories/IJsonDocumentRepository.js';
 import { II18nRepository } from '@/domain/i18n/II18nRepository.js';
 import { ITemplateRepository } from '@/domain/templates/ITemplateRepository.js';
-import { TemplateService } from '@/application/templates/TemplateService.js';
 
 // Domain layer
 
@@ -474,7 +473,6 @@ export async function registerInterfaceServices(container: DIContainer): Promise
     const deleteJsonDocumentUseCase = await container.get<DeleteJsonDocumentUseCase>('deleteJsonDocumentUseCase');
     const searchJsonDocumentsUseCase = await container.get<SearchJsonDocumentsUseCase>('searchJsonDocumentsUseCase');
     const updateJsonIndexUseCase = await container.get<UpdateJsonIndexUseCase>('updateJsonIndexUseCase');
-    const templateController = await container.get<any>('templateController');
 
     return new GlobalController(
       readGlobalDocumentUseCase,
@@ -488,8 +486,7 @@ export async function registerInterfaceServices(container: DIContainer): Promise
         writeJsonDocumentUseCase,
         deleteJsonDocumentUseCase,
         searchJsonDocumentsUseCase,
-        updateJsonIndexUseCase,
-        templateController, // Add template controller
+        updateJsonIndexUseCase
       } // Pass optional dependencies
     );
   });
@@ -547,14 +544,6 @@ export async function registerInterfaceServices(container: DIContainer): Promise
     );
   });
 
-  // Register template controller
-  container.registerFactory('templateController', async () => {
-    const templateService = container.get('templateService') as TemplateService;
-
-    // Import and instantiate the TemplateController
-    const { TemplateController } = await import('../../interface/controllers/TemplateController.js');
-    return new TemplateController(templateService);
-  });
 }
 
 /**

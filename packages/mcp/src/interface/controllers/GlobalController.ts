@@ -30,7 +30,6 @@ export class GlobalController implements IGlobalController {
   private readonly deleteJsonDocumentUseCase?: DeleteJsonDocumentUseCase;
   private readonly searchJsonDocumentsUseCase?: SearchJsonDocumentsUseCase;
   private readonly updateJsonIndexUseCase?: UpdateJsonIndexUseCase;
-  private readonly templateController?: any; // Template controller for accessing templates
 
   constructor(
     private readonly readGlobalDocumentUseCase: ReadGlobalDocumentUseCase,
@@ -45,7 +44,6 @@ export class GlobalController implements IGlobalController {
       deleteJsonDocumentUseCase?: DeleteJsonDocumentUseCase;
       searchJsonDocumentsUseCase?: SearchJsonDocumentsUseCase;
       updateJsonIndexUseCase?: UpdateJsonIndexUseCase;
-      templateController?: any; // Template controller for accessing templates
     }
   ) {
     // Set optional dependencies
@@ -55,7 +53,6 @@ export class GlobalController implements IGlobalController {
     this.deleteJsonDocumentUseCase = options?.deleteJsonDocumentUseCase;
     this.searchJsonDocumentsUseCase = options?.searchJsonDocumentsUseCase;
     this.updateJsonIndexUseCase = options?.updateJsonIndexUseCase;
-    this.templateController = options?.templateController;
   }
 
   /**
@@ -108,49 +105,44 @@ export class GlobalController implements IGlobalController {
     try {
       logger.info('Reading global core files');
 
-      // Define core files to read using templates
+      // Define core files to read directly
       const coreFiles = [
-        'architecture-template.json',
-        'coding-standards-template.json',
-        'domain-models-template.json',
-        'glossary-template.json',
-        'tech-stack-template.json',
-        'user-guide-template.json',
+        'architecture.json',
+        'coding-standards.json',
+        'domain-models.json',
+        'glossary.json',
+        'tech-stack.json',
+        'user-guide.json',
       ];
 
-      // Check if template controller is available
-      if (!this.templateController) {
-        throw new DomainError('UNEXPECTED_ERROR', 'Template controller not available');
-      }
-
-      // Read each core file using templates
+      // Read each core file directly
       const result: Record<string, DocumentDTO> = {};
 
-      for (const templateId of coreFiles) {
+      for (const documentPath of coreFiles) {
         try {
-          // Get the template in Markdown format
-          const templateContent = await this.templateController.getTemplateAsMarkdown(templateId, 'en');
-
-          // Convert template ID to document path (e.g., architecture-template.json -> architecture.json)
-          const documentPath = templateId.replace('-template', '');
-
-          // Create document from template
-          result[documentPath] = {
-            path: documentPath,
-            content: templateContent,
-            tags: ['global', 'core', documentPath.replace('.json', '')],
-            lastModified: new Date().toISOString(),
-          };
+          // Try to read the document from the global memory bank
+          const docResult = await this.readGlobalDocumentUseCase.execute({ path: documentPath });
+          
+          if (docResult && docResult.document) {
+            result[documentPath] = docResult.document;
+          } else {
+            // Add empty placeholder for missing file
+            result[documentPath] = {
+              path: documentPath,
+              content: '',
+              tags: ['global', 'core', documentPath.replace('.json', '')],
+              lastModified: new Date().toISOString(),
+            };
+          }
         } catch (error) {
           // Log error but continue with other files
-          logger.error(`Error reading global core file template ${templateId}:`, error);
+          logger.error(`Error reading global core file ${documentPath}:`, error);
 
           // Add empty placeholder for missing file
-          const documentPath = templateId.replace('-template', '');
           result[documentPath] = {
             path: documentPath,
             content: '',
-            tags: [],
+            tags: ['global', 'core', documentPath.replace('.json', '')],
             lastModified: new Date().toISOString(),
           };
         }
