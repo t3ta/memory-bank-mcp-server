@@ -203,7 +203,8 @@ export class FileSystemJsonDocumentRepository implements IJsonDocumentRepository
   ): Promise<JsonDocument[]> {
     try {
       // Use index service to find documents by tags
-      const docRefs = await this.indexService.findByTags(branchInfo, tags, matchAll);
+      // findByTags の呼び出し方を修正
+      const docRefs = await this.indexService.findByTags({ branchInfo, tags, matchAll });
 
       // Load all matching documents
       const documents: JsonDocument[] = [];

@@ -214,7 +214,8 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
         // Case 1: Content provided - use normal write operation
         if (content) {
           logger.debug(`Writing branch memory bank (branch: ${branch}, path: ${path}, docsRoot: ${docsRoot})`);
-          const response = await branchApp.getBranchController().writeDocument(branch, path, content);
+          // writeDocument の呼び出し方を修正
+          const response = await branchApp.getBranchController().writeDocument({ branchName: branch, path, content });
           if (!response.success) {
             throw new Error((response as any).error?.message || 'Failed to write document');
           }
@@ -360,7 +361,8 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
         // Case 1: Content provided - use normal write operation
         if (content) {
           logger.debug(`Writing global memory bank (path: ${path}, docsRoot: ${docsRoot})`);
-          const response = await globalApp.getGlobalController().writeDocument(path, content);
+          // writeDocument の呼び出し方を修正
+          const response = await globalApp.getGlobalController().writeDocument({ path, content });
           if (!response.success) {
             throw new Error((response as any).error?.message || 'Failed to write document');
           }

@@ -419,12 +419,13 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
    * @param _matchAll If true, documents must have all tags (AND), otherwise any tag (OR)
    * @returns Promise resolving to array of document paths
    */
-  async findDocumentPathsByTagsUsingIndex(
-    branchInfo: BranchInfo,
-    tags: Tag[],
-    _matchAll?: boolean
-  ): Promise<DocumentPath[]> {
+  async findDocumentPathsByTagsUsingIndex(params: {
+    branchInfo: BranchInfo;
+    tags: Tag[];
+    matchAll?: boolean;
+  }): Promise<DocumentPath[]> {
     // Simplified implementation for tests
+    const { branchInfo, tags } = params;
     const docs = await this.findDocumentsByTags(branchInfo, tags);
     return docs.map(doc => doc.path);
   }
