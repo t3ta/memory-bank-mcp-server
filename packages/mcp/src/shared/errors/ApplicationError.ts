@@ -137,5 +137,17 @@ export const ApplicationErrors = {
       { useCaseName, ...additionalDetails },
       { cause }
     );
+  },
+
+  /**
+   * Create an unexpected controller error
+   */
+  unexpectedControllerError: (controllerName: string, cause?: Error, additionalDetails?: Record<string, unknown>) => {
+    return new ApplicationError(
+      'UNEXPECTED_CONTROLLER_ERROR', // Assuming UNEXPECTED_CONTROLLER_ERROR is a valid code or needs to be added
+      `An unexpected error occurred in controller '${controllerName}'`,
+      { controllerName, ...additionalDetails },
+      { cause }
+    );
   }
 };

@@ -17,8 +17,8 @@ import type {
   UpdateJsonIndexUseCase,
 } from "../../application/usecases/index.js";
 import { DocumentType } from "../../domain/entities/JsonDocument.js";
-import { ApplicationError } from "../../shared/errors/ApplicationError.js";
-import { DomainError } from "../../shared/errors/DomainError.js";
+import { ApplicationErrors } from "../../shared/errors/ApplicationError.js"; // Import ApplicationErrors
+import { DomainErrors } from "../../shared/errors/DomainError.js"; // Import DomainErrors
 // Removed unused InfrastructureError import
 import { BaseError } from "../../shared/errors/BaseError.js"; // Import BaseError
 import { logger } from "../../shared/utils/logger.js";
@@ -51,7 +51,7 @@ export class BranchController implements IBranchController {
     private readonly readBranchCoreFilesUseCase: ReadBranchCoreFilesUseCase,
     private readonly createBranchCoreFilesUseCase: CreateBranchCoreFilesUseCase,
     private readonly presenter: MCPResponsePresenter,
-    options?: {
+    optionalDependencies?: {
       updateTagIndexUseCaseV2?: UpdateTagIndexUseCaseV2;
       readJsonDocumentUseCase?: ReadJsonDocumentUseCase;
       writeJsonDocumentUseCase?: WriteJsonDocumentUseCase;
@@ -60,69 +60,30 @@ export class BranchController implements IBranchController {
       updateJsonIndexUseCase?: UpdateJsonIndexUseCase;
     }
   ) {
-    // Set optional dependencies
-    this.updateTagIndexUseCaseV2 = options?.updateTagIndexUseCaseV2;
-    this.readJsonDocumentUseCase = options?.readJsonDocumentUseCase;
-    this.writeJsonDocumentUseCase = options?.writeJsonDocumentUseCase;
-    this.deleteJsonDocumentUseCase = options?.deleteJsonDocumentUseCase;
-    this.searchJsonDocumentsUseCase = options?.searchJsonDocumentsUseCase;
-    this.updateJsonIndexUseCase = options?.updateJsonIndexUseCase;
+    this.updateTagIndexUseCaseV2 = optionalDependencies?.updateTagIndexUseCaseV2;
+    this.readJsonDocumentUseCase = optionalDependencies?.readJsonDocumentUseCase;
+    this.writeJsonDocumentUseCase = optionalDependencies?.writeJsonDocumentUseCase;
+    this.deleteJsonDocumentUseCase = optionalDependencies?.deleteJsonDocumentUseCase;
+    this.searchJsonDocumentsUseCase = optionalDependencies?.searchJsonDocumentsUseCase;
+    this.updateJsonIndexUseCase = optionalDependencies?.updateJsonIndexUseCase;
   }
 
   /**
    * Read document from branch memory bank
    * @param branchName Branch name
    * @param path Document path
-   * @returns Promise resolving to MCP response with document
+   * @returns Promise resolving to MCP response with document content
    */
   async readDocument(branchName: string, path: string): Promise<MCPResponse<DocumentDTO>> {
     try {
-      logger.info(`Reading document from branch ${branchName}: ${path}`);
+      this.componentLogger.info(`Reading document from branch ${branchName}: ${path}`); // Use componentLogger
 
       const result = await this.readBranchDocumentUseCase.execute({
         branchName,
-        path
+        path,
       });
 
-      // 自動JSONパース処理の追加
-      // jsonファイルかつcontent.textフィールドが存在する場合、JSONとしてパースを試みる
-      const document = result.document;
-      if (document && path.endsWith('.json') && document.content) {
-        try {
-          // 文字列をJSONとしてパース
-          const jsonDoc = JSON.parse(document.content);
-
-          // memory_document_v1またはmemory_document_v2スキーマを持つドキュメントで、
-          // content.textフィールドがある場合は自動的にパースを試みる
-          if (
-            (jsonDoc.schema === 'memory_document_v1' || jsonDoc.schema === 'memory_document_v2') &&
-            jsonDoc.content &&
-            typeof jsonDoc.content === 'object' &&
-            'text' in jsonDoc.content &&
-            typeof jsonDoc.content.text === 'string'
-          ) {
-            logger.debug(`Attempting to auto-parse content.text field in JSON document: ${path}`);
-
-            try {
-              // content.textをJSONとしてパース
-              const parsedText = JSON.parse(jsonDoc.content.text);
-              // パースに成功したら、元のJSONオブジェクトのcontent.textをパース済みのオブジェクトに置き換え
-              jsonDoc.content.text = parsedText;
-              // 置き換えたJSONオブジェクトを文字列化して元のdocumentに設定
-              document.content = JSON.stringify(jsonDoc, null, 2);
-              logger.debug(`Successfully auto-parsed content.text in JSON document: ${path}`);
-            } catch (parseError) {
-              // パースに失敗した場合は元のまま（パースしない）
-              logger.debug(`Failed to auto-parse content.text in JSON document ${path}, it's probably not a valid JSON string`);
-            }
-          }
-        } catch (error) {
-          // JSONとしてパースできなかった場合は何もしない
-          logger.debug(`Document ${path} is not a valid JSON`);
-        }
-      }
-
-      return this.presenter.presentSuccess(document); // Changed present to presentSuccess
+      return this.presenter.presentSuccess(result.document);
     } catch (error) {
       return this.handleError(error);
     }
@@ -130,33 +91,110 @@ export class BranchController implements IBranchController {
 
   /**
    * Write document to branch memory bank
-   * @param branchName Branch name
-   * @param path Document path
-   * @param content Document content
-   * @param tags Optional tags for the document
+   * @param params Parameters for writing the document
    * @returns Promise resolving to MCP response with the result
    */
-  // パラメータをオブジェクトリテラル型に変更
   async writeDocument(params: {
     branchName: string;
     path: string;
     content: string;
     tags?: string[];
   }): Promise<MCPResponse> {
-    const { branchName, path: docPath, content, tags: tagStrings } = params; // 分割代入、path と tags は内部変数と衝突するため別名に
     try {
-      logger.info(`Writing document to branch ${branchName}: ${docPath}`); // path -> docPath に変更
+      this.componentLogger.info(`Writing document to branch ${params.branchName}: ${params.path}`);
 
-      await this.writeBranchDocumentUseCase.execute({
-        branchName,
+      const result = await this.writeBranchDocumentUseCase.execute({
+        branchName: params.branchName,
         document: {
-          path: docPath, // path -> docPath に変更
-          content,
-          tags: tagStrings || [], // tags -> tagStrings に変更
+          path: params.path,
+          content: params.content,
+          tags: params.tags || [],
         },
       });
 
-      return this.presenter.presentSuccess({ success: true }); // Changed present to presentSuccess
+      return this.presenter.presentSuccess(result); // Changed present to presentSuccess
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  /**
+   * Find documents by tags in branch memory bank
+   * @param params Parameters for finding documents by tags
+   * @param params.branchName Branch name
+   * @param params.tags Tags to search for
+   * @param params.matchAllTags Whether to require all tags to match
+   * @returns Promise resolving to MCP response with matching documents
+   */
+  async findDocumentsByTags(params: {
+    branchName: string;
+    tags: string[];
+    matchAllTags?: boolean;
+  }): Promise<MCPResponse<DocumentDTO[]>> {
+    try {
+      this.componentLogger.info(
+        `Finding documents in branch ${params.branchName} with tags: ${params.tags.join(', ')}${
+          params.matchAllTags ? ' (matching all)' : ''
+        }`
+      );
+
+      const result = await this.searchDocumentsByTagsUseCase.execute({
+        branchName: params.branchName,
+        tags: params.tags,
+        matchAllTags: params.matchAllTags
+      });
+
+      return this.presenter.presentSuccess(result.documents);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  /**
+   * Update tags index in branch memory bank
+   * @param branchName Branch name
+   * @param fullRebuild Whether to perform full rebuild of the index
+   * @returns Promise resolving to MCP response with the result
+   */
+  async updateTagsIndex(branchName: string, fullRebuild?: boolean): Promise<MCPResponse> {
+    try {
+      this.componentLogger.info(`Updating tags index for branch ${branchName} (rebuild: ${fullRebuild ? 'yes' : 'no'})`);
+
+      if (this.updateTagIndexUseCaseV2) {
+        const result = await this.updateTagIndexUseCaseV2.execute({
+          branchName,
+          fullRebuild,
+        });
+
+        return this.presenter.presentSuccess(result);
+      }
+
+      const result = await this.updateTagIndexUseCase.execute({
+        branchName,
+        fullRebuild,
+      });
+
+      return this.presenter.presentSuccess(result);
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  /**
+   * Get recent branches
+   * @param limit Maximum number of branches to return
+   * @returns Promise resolving to MCP response with list of recent branches
+   */
+  async getRecentBranches(limit?: number): Promise<MCPResponse<string[]>> {
+    try {
+      this.componentLogger.info(`Getting recent branches (limit: ${limit || 'none'})`);
+
+      const result = await this.getRecentBranchesUseCase.execute({ limit });
+
+      // Extract branch names from RecentBranchDTO[]
+      const branchNames = result.branches.map(branch => branch.name);
+
+      return this.presenter.presentSuccess(branchNames);
     } catch (error) {
       return this.handleError(error);
     }
@@ -169,74 +207,26 @@ export class BranchController implements IBranchController {
    */
   async readCoreFiles(branchName: string): Promise<MCPResponse<Record<string, DocumentDTO>>> {
     try {
-      logger.info(`Reading core files from branch ${branchName}`);
+      this.componentLogger.info(`Reading core files from branch ${branchName}`);
 
-      // Use the new ReadBranchCoreFilesUseCase
       const result = await this.readBranchCoreFilesUseCase.execute({
-        branchName,
+        branchName
       });
 
-      // Format response to maintain backward compatibility
-      const formattedResult: Record<string, DocumentDTO> = {};
+      // Format files to match the expected DocumentDTO structure
+      const formattedFiles: Record<string, DocumentDTO> = {};
 
-      // All core files are using .json format
-
-      // Map results from ReadBranchCoreFilesUseCase to DocumentDTO format
-      // Content should be the stringified JSON object from the use case result
-
-      // If activeContext exists in the result
-      if (result.files.activeContext) {
-        const fileName = 'activeContext.json';
-        formattedResult[fileName] = {
-          path: fileName,
-          // Stringify the JSON object received from the use case
-          content: JSON.stringify(result.files.activeContext, null, 2),
-          tags: ['core', 'active-context'],
-          lastModified: new Date().toISOString(), // Consider using actual lastModified if available
+      // Convert each core file to DocumentDTO format
+      Object.entries(result.files || {}).forEach(([path, file]) => {
+        formattedFiles[path] = {
+          path,
+          content: file.content,
+          tags: ['core', 'branch-context'],
+          lastModified: file.lastModified || new Date().toISOString()
         };
-      }
+      });
 
-      // If progress exists in the result
-      if (result.files.progress) {
-        const fileName = 'progress.json';
-        formattedResult[fileName] = {
-          path: fileName,
-          // Stringify the JSON object received from the use case
-          content: JSON.stringify(result.files.progress, null, 2),
-          tags: ['core', 'progress'],
-          lastModified: new Date().toISOString(), // Consider using actual lastModified if available
-        };
-      }
-
-      // If systemPatterns exists in the result
-      if (result.files.systemPatterns) {
-        const fileName = 'systemPatterns.json';
-        formattedResult[fileName] = {
-          path: fileName,
-          // Stringify the JSON object received from the use case
-          content: JSON.stringify(result.files.systemPatterns, null, 2),
-          tags: ['core', 'system-patterns'],
-          lastModified: new Date().toISOString(), // Consider using actual lastModified if available
-        };
-      }
-
-      // Read branchContext.json
-      const branchFileName = 'branchContext.json';
-      try {
-        const branchContextResult = await this.readBranchDocumentUseCase.execute({
-          branchName,
-          path: branchFileName,
-        });
-        formattedResult[branchFileName] = branchContextResult.document;
-      } catch (error) {
-        // Log error if branchContext.json cannot be read, but don't throw.
-        // The use case might handle creation or it might be optional depending on context.
-        logger.warn(`Could not read ${branchFileName} for branch ${branchName}:`, error);
-        // Optionally add a placeholder if needed by the caller, but often it's better to return only existing files.
-        // formattedResult[branchFileName] = { path: branchFileName, content: '', tags: ['core', 'branch-context'], lastModified: new Date().toISOString() };
-      }
-
-      return this.presenter.presentSuccess(formattedResult); // Changed present to presentSuccess
+      return this.presenter.presentSuccess(formattedFiles);
     } catch (error) {
       return this.handleError(error);
     }
@@ -250,15 +240,11 @@ export class BranchController implements IBranchController {
    */
   async writeCoreFiles(branchName: string, files: Record<string, any>): Promise<MCPResponse> {
     try {
-      logger.info(`Writing core files to branch ${branchName}`);
+      this.componentLogger.info(`Writing core files to branch ${branchName}`); // Use componentLogger
 
       // Validate input
       if (!files || typeof files !== 'object') {
-        // Assuming DomainError constructor takes code as string
-        throw new DomainError(
-          'VALIDATION_ERROR',
-          'Files must be provided as an object'
-        );
+        throw DomainErrors.validationError('Files must be provided as an object'); // Use factory method
       }
 
       // Prepare CoreFilesDTO from the input files (assuming they are already JSON objects or strings)
@@ -282,111 +268,12 @@ export class BranchController implements IBranchController {
         coreFiles.systemPatterns = files['systemPatterns.json'];
       }
 
-      // Use the new CreateBranchCoreFilesUseCase
-      let result: any;
-      if (Object.keys(coreFiles).length > 0) {
-        result = await this.createBranchCoreFilesUseCase.execute({
-          branchName,
-          files: coreFiles,
-        });
-      }
-
-      return this.presenter.presentSuccess(result || { success: true }); // Changed present to presentSuccess
-    } catch (error) {
-      return this.handleError(error);
-    }
-  }
-
-  /**
-   * Get recent branches
-   * @param limit Maximum number of branches to return
-   * @returns Promise resolving to MCP response with recent branches
-   */
-  async getRecentBranches(limit?: number): Promise<MCPResponse> {
-    try {
-      logger.info(`Getting recent branches (limit: ${limit || 'default'})`);
-
-      const result = await this.getRecentBranchesUseCase.execute({
-        limit: limit || 10, // Default limit if not specified
-      });
-
-      return this.presenter.presentSuccess(result.branches); // Changed present to presentSuccess
-    } catch (error) {
-      return this.handleError(error);
-    }
-  }
-
-  /**
-   * Find documents by tags in branch memory bank
-   * @param branchName Branch name
-   * @param tags Tags to search for
-   * @param matchAllTags Whether to require all tags to match
-   * @returns Promise resolving to MCP response with matching documents
-   */
-  // パラメータをオブジェクトリテラル型に変更
-  async findDocumentsByTags(params: {
-    branchName: string;
-    tags: string[];
-    matchAllTags?: boolean;
-  }): Promise<MCPResponse<DocumentDTO[]>> {
-    const { branchName, tags: tagStrings, matchAllTags = false } = params; // 分割代入、tags は内部変数と衝突するため別名に
-    try {
-      logger.info(`Finding documents by tags in branch ${branchName}: ${tagStrings.join(', ')}`); // tags -> tagStrings に変更
-      logger.debug('Search request:', { branchName, tags: tagStrings, matchAllTags }); // tags -> tagStrings に変更
-
-      // Delegate to SearchDocumentsByTagsUseCase
-      const result = await this.searchDocumentsByTagsUseCase.execute({
+      const result = await this.createBranchCoreFilesUseCase.execute({
         branchName,
-        tags: tagStrings, // tags -> tagStrings に変更
-        matchAllTags,
+        files: coreFiles
       });
 
-      logger.debug('Search result:', {
-        branchName,
-        tags: tagStrings, // tags -> tagStrings に変更
-        matchAllTags,
-        documentsFound: result.documents.length,
-        searchInfo: result.searchInfo
-      });
-
-      return this.presenter.presentSuccess(result.documents); // Changed present to presentSuccess
-    } catch (error) {
-      logger.error('Failed to search documents by tags:', {
-        branchName,
-        tags: tagStrings, // tags -> tagStrings に変更
-        matchAllTags,
-        error: error instanceof Error ? error.message : String(error)
-      });
-      return this.handleError(error);
-    }
-  }
-
-  /**
-   * Update tags index in branch memory bank
-   * @param branchName Branch name
-   * @param fullRebuild Whether to perform full rebuild of the index
-   * @returns Promise resolving to MCP response with the result
-   */
-  async updateTagsIndex(branchName: string, fullRebuild?: boolean): Promise<MCPResponse> {
-    try {
-      logger.info(`Updating tags index for branch ${branchName} (fullRebuild: ${fullRebuild ? 'yes' : 'no'})`);
-
-      // Use V2 if available, otherwise fall back to V1
-      if (this.updateTagIndexUseCaseV2) {
-        logger.info('Using UpdateTagIndexUseCaseV2 for branch tag index update');
-        const result = await this.updateTagIndexUseCaseV2.execute({
-          branchName,
-          fullRebuild: fullRebuild || false,
-        });
-        return this.presenter.presentSuccess(result); // Changed present to presentSuccess
-      } else {
-        logger.info('Using UpdateTagIndexUseCase (V1) for branch tag index update');
-        const result = await this.updateTagIndexUseCase.execute({
-          branchName,
-          fullRebuild: fullRebuild || false,
-        });
-        return this.presenter.presentSuccess(result); // Changed present to presentSuccess
-      }
+      return this.presenter.presentSuccess(result);
     } catch (error) {
       return this.handleError(error);
     }
@@ -403,13 +290,10 @@ export class BranchController implements IBranchController {
     options: { path?: string; id?: string }
   ): Promise<MCPResponse<JsonDocumentDTO>> {
     try {
-      logger.info(`Reading JSON document from branch ${branchName}: ${options.path || options.id}`);
+      this.componentLogger.info(`Reading JSON document from branch ${branchName}: ${options.path || options.id}`); // Use componentLogger
 
       if (!this.readJsonDocumentUseCase) {
-        throw new DomainError(
-          'FEATURE_NOT_AVAILABLE',
-          'JSON document features are not available in this configuration'
-        );
+        throw DomainErrors.featureNotAvailable('readJsonDocument'); // Use factory method
       }
 
       const result = await this.readJsonDocumentUseCase.execute({
@@ -432,13 +316,10 @@ export class BranchController implements IBranchController {
    */
   async writeJsonDocument(branchName: string, document: JsonDocumentDTO): Promise<MCPResponse> {
     try {
-      logger.info(`Writing JSON document to branch ${branchName}: ${document.path || document.id}`);
+      this.componentLogger.info(`Writing JSON document to branch ${branchName}: ${document.path || document.id}`); // Use componentLogger
 
       if (!this.writeJsonDocumentUseCase) {
-        throw new DomainError(
-          'FEATURE_NOT_AVAILABLE',
-          'JSON document features are not available in this configuration'
-        );
+        throw DomainErrors.featureNotAvailable('writeJsonDocument'); // Use factory method
       }
 
       const result = await this.writeJsonDocumentUseCase.execute({
@@ -470,13 +351,10 @@ export class BranchController implements IBranchController {
     options: { path?: string; id?: string }
   ): Promise<MCPResponse> {
     try {
-      logger.info(`Deleting JSON document from branch ${branchName}: ${options.path || options.id}`);
+      this.componentLogger.info(`Deleting JSON document from branch ${branchName}: ${options.path || options.id}`); // Use componentLogger
 
       if (!this.deleteJsonDocumentUseCase) {
-        throw new DomainError(
-          'FEATURE_NOT_AVAILABLE',
-          'JSON document features are not available in this configuration'
-        );
+        throw DomainErrors.featureNotAvailable('deleteJsonDocument'); // Use factory method
       }
 
       const result = await this.deleteJsonDocumentUseCase.execute({
@@ -502,13 +380,10 @@ export class BranchController implements IBranchController {
     options?: { type?: string; tags?: string[] }
   ): Promise<MCPResponse<JsonDocumentDTO[]>> {
     try {
-      logger.info(`Listing JSON documents in branch ${branchName}`);
+      this.componentLogger.info(`Listing JSON documents in branch ${branchName}`); // Use componentLogger
 
       if (!this.searchJsonDocumentsUseCase) {
-        throw new DomainError(
-          'FEATURE_NOT_AVAILABLE',
-          'JSON document features are not available in this configuration'
-        );
+        throw DomainErrors.featureNotAvailable('listJsonDocuments'); // Use factory method
       }
 
       const result = await this.searchJsonDocumentsUseCase.execute({
@@ -531,13 +406,10 @@ export class BranchController implements IBranchController {
    */
   async searchJsonDocuments(branchName: string, query: string): Promise<MCPResponse<JsonDocumentDTO[]>> {
     try {
-      logger.info(`Searching JSON documents in branch ${branchName} with query: ${query}`);
+      this.componentLogger.info(`Searching JSON documents in branch ${branchName} with query: ${query}`); // Use componentLogger
 
       if (!this.searchJsonDocumentsUseCase) {
-        throw new DomainError(
-          'FEATURE_NOT_AVAILABLE',
-          'JSON document features are not available in this configuration'
-        );
+        throw DomainErrors.featureNotAvailable('searchJsonDocuments'); // Use factory method
       }
 
       // Note: SearchJsonDocumentsUseCase doesn't support direct text queries
@@ -562,13 +434,10 @@ export class BranchController implements IBranchController {
    */
   async updateJsonIndex(branchName: string, options?: { force?: boolean }): Promise<MCPResponse> {
     try {
-      logger.info(`Updating JSON index for branch ${branchName} (force: ${options?.force ? 'yes' : 'no'})`);
+      this.componentLogger.info(`Updating JSON index for branch ${branchName} (force: ${options?.force ? 'yes' : 'no'})`); // Use componentLogger
 
       if (!this.updateJsonIndexUseCase) {
-        throw new DomainError(
-          'FEATURE_NOT_AVAILABLE',
-          'JSON document features are not available in this configuration'
-        );
+        throw DomainErrors.featureNotAvailable('updateJsonIndex'); // Use factory method
       }
 
       const result = await this.updateJsonIndexUseCase.execute({
@@ -582,22 +451,13 @@ export class BranchController implements IBranchController {
     }
   }
 
-  // Removed unused private methods:
-  // - extractContent
-  // - parseActiveContextContent
-  // - parseProgressContent
-  // - parseSystemPatternsContent
-  // - generateActiveContextContent
-  // - generateProgressContent
-  // - generateSystemPatternsContent
-
   /**
    * Handle errors in controller methods
    * @param error Error to handle
    * @returns Formatted error response
    */
   private handleError(error: any): MCPResponse {
-    logger.error('Error details:', {
+    this.componentLogger.error('Error details:', { // Use componentLogger
       errorType: error.constructor.name,
       message: error.message,
       code: error.code,
@@ -614,11 +474,11 @@ export class BranchController implements IBranchController {
     this.componentLogger.warn('Handling unknown error type', { errorName: error?.constructor?.name });
     return this.presenter.presentError(
       // Wrap unknown errors in a generic ApplicationError or similar
-      new ApplicationError( // Using ApplicationError for unexpected interface/controller level issues
-        'UNEXPECTED_CONTROLLER_ERROR',
-        error instanceof Error ? error.message : 'An unexpected controller error occurred',
-        { originalError: error }
-      )
+      ApplicationErrors.unexpectedControllerError( // Use factory method
+        'BranchController',
+        error instanceof Error ? error : undefined,
+        { originalError: error, message: error instanceof Error ? error.message : 'An unexpected controller error occurred' }
+      ) // Using ApplicationError for unexpected interface/controller level issues
     );
   }
 }

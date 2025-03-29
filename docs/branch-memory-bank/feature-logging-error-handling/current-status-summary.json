@@ -11,7 +11,7 @@
       "error-handling",
       "status"
     ],
-    "lastModified": "2025-03-30T00:00:00.000Z",
+    "lastModified": "2025-03-30T01:15:00.000Z",
     "createdAt": "2025-03-30T00:00:00.000Z",
     "version": 1
   },
@@ -66,7 +66,9 @@
         "items": [
           "高優先度ファイルの更新（FileSystemBranchMemoryBankRepositoryなど）",
           "インターフェースレイヤーの更新（コントローラー、プレゼンター）",
-          "共通エラーパターンの統一"
+          "共通エラーパターンの統一",
+          "各エラーファクトリーメソッドの追加（InfrastructureErrors.permissionDenied など）",
+          "BranchControllerでの直接logger使用をcomponentLoggerに置き換え"
         ]
       },
       {
@@ -104,6 +106,12 @@
         "description": "ログレベルの使用基準が明確ではなく、不適切なレベルでのロギングが散見される",
         "severity": "low",
         "mitigation": "ログレベル使用ガイドラインを作成予定"
+      },
+      {
+        "id": "ki-missing-factory-methods",
+        "description": "一部のエラータイプに対応するファクトリーメソッドが実装されていない（特に権限エラーなど）",
+        "severity": "medium",
+        "mitigation": "各エラークラスに必要なファクトリーメソッドを追加実装する"
       }
     ],
     "nextSteps": {
@@ -123,6 +131,13 @@
         "全体テストカバレッジの確認"
       ]
     },
-    "conclusion": "feature/logging-error-handlingブランチでは、横断的関心事（ロギングとエラーハンドリング）の統合を行い、一貫性のあるパターンを確立しました。基盤となるコンポーネントの実装は完了しており、今後は設計されたパターンをコードベース全体に適用していくフェーズに入ります。global-adoption-plan.jsonに従って高優先度のファイルから順次実装を進め、テストを確実に実行しながら品質を確保していきます。"
+    "conclusion": "feature/logging-error-handlingブランチでは、横断的関心事（ロギングとエラーハンドリング）の統合を行い、一貫性のあるパターンを確立しました。基盤となるコンポーネントの実装は完了しており、今後は設計されたパターンをコードベース全体に適用していくフェーズに入ります。global-adoption-plan.jsonに従って高優先度のファイルから順次実装を進め、テストを確実に実行しながら品質を確保していきます。",
+    "references": [
+      {
+        "title": "高優先度ファイル実装レビュー",
+        "path": "implementation-review.json",
+        "description": "重要ファイルの詳細なレビューと改善案"
+      }
+    ]
   }
 }

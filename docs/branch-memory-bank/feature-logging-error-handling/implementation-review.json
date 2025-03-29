@@ -1,0 +1,174 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "implementation-review",
+    "title": "高優先度ファイル実装レビュー",
+    "documentType": "review",
+    "path": "implementation-review.json",
+    "tags": [
+      "review",
+      "logging",
+      "error-handling",
+      "implementation",
+      "code-quality"
+    ],
+    "lastModified": "2025-03-30T01:00:00.000Z",
+    "createdAt": "2025-03-30T01:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "title": "ロギング・エラーハンドリング実装レビュー",
+      "description": "global-adoption-planで高優先度に分類されたファイルの実装状況をレビューした結果をまとめたドキュメントです。"
+    },
+    "reviewedFiles": [
+      {
+        "path": "/packages/mcp/src/infrastructure/storage/FileSystemService.ts",
+        "completionPercentage": 95,
+        "goodPractices": [
+          "コンポーネント固有ロガーの導入済み: private readonly componentLogger = logger.withContext({ component: 'FileSystemService' })",
+          "構造化ロギングの活用: this.componentLogger.debug(`Starting ${operation}`, { filePath })",
+          "InfrastructureErrorsファクトリーメソッドの使用: throw InfrastructureErrors.fileNotFound(filePath, { operation })"
+        ],
+        "issuesFound": [
+          {
+            "type": "エラーファクトリー未使用",
+            "severity": "low",
+            "description": "一部でまだエラーコンストラクタを直接使用: throw new InfrastructureError(InfrastructureErrorCodes.FILE_PERMISSION_ERROR, ...)",
+            "location": "複数箇所（特に権限関連エラー）",
+            "solution": "権限エラー用のファクトリーメソッド（例: InfrastructureErrors.permissionDenied）を追加し、それを使用するように変更"
+          }
+        ],
+        "conclusion": "全体的に新しいパターンが適用されているが、権限エラーなどでファクトリーメソッドが使われていない箇所がいくつか残っている。InfrastructureErrorsに適切なファクトリーメソッドを追加し、それらを使用するとよい。"
+      },
+      {
+        "path": "/packages/mcp/src/interface/controllers/BranchController.ts",
+        "completionPercentage": 75,
+        "goodPractices": [
+          "コンポーネント固有ロガーの導入済み: private readonly componentLogger = logger.withContext({ component: 'BranchController' })",
+          "BaseErrorのインスタンスチェックによる適切なエラーハンドリング: if (error instanceof BaseError) { return this.presenter.presentError(error); }"
+        ],
+        "issuesFound": [
+          {
+            "type": "古いロギングパターン",
+            "severity": "medium",
+            "description": "直接loggerを使用している箇所が多数ある: logger.info(`Reading document from branch ${branchName}: ${path}`)",
+            "location": "ほぼすべてのメソッド内",
+            "solution": "直接loggerを使用している箇所をthis.componentLoggerに置き換える"
+          },
+          {
+            "type": "エラーファクトリー未使用",
+            "severity": "medium",
+            "description": "handleErrorメソッド内でApplicationErrorのコンストラクタを直接使用",
+            "location": "handleErrorメソッド",
+            "solution": "ApplicationErrorsファクトリーメソッド（例: ApplicationErrors.unexpectedControllerError）を追加し、それを使用するように変更"
+          },
+          {
+            "type": "DomainErrorコンストラクタ直接使用",
+            "severity": "medium",
+            "description": "DomainErrorのコンストラクタを直接使用している: throw new DomainError('VALIDATION_ERROR', 'Files must be provided as an object')",
+            "location": "writeCoreFiles, readJsonDocument, writeJsonDocument, deleteJsonDocument, listJsonDocumentsなど",
+            "solution": "DomainErrorsファクトリーメソッド（例: DomainErrors.validationError, DomainErrors.featureNotAvailable）を使用するように変更"
+          }
+        ],
+        "conclusion": "コンポーネントロガーは導入されているが、実際には使われておらず直接loggerが使われている。また、エラーファクトリーパターンがほとんど適用されていない。これらを修正することで一貫性のあるパターンにできる。"
+      },
+      {
+        "path": "/packages/mcp/src/infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.ts",
+        "completionPercentage": 85,
+        "goodPractices": [
+          "コンポーネント固有ロガーの導入済み: private readonly componentLogger = logger.withContext({ component: 'FileSystemBranchMemoryBankRepository' })",
+          "構造化ロギングの活用: this.componentLogger.debug(`Starting ${operation}`, { branchName })",
+          "一部でのInfrastructureErrorsファクトリーメソッドの使用: throw InfrastructureErrors.fileReadError(...)"
+        ],
+        "issuesFound": [
+          {
+            "type": "エラーファクトリー未使用",
+            "severity": "medium",
+            "description": "複数箇所でInfrastructureErrorコンストラクタを直接使用: throw new InfrastructureError(InfrastructureErrorCodes.FILE_SYSTEM_ERROR, ...)",
+            "location": "exists, initialize, deleteDocument, getRecentBranchesなど",
+            "solution": "一般的なファイルシステムエラー用のファクトリーメソッド（例: InfrastructureErrors.fileSystemError）を追加し、それを使用するように変更"
+          }
+        ],
+        "conclusion": "コンポーネントロガーの使用と構造化ロギングは適切に実装されている。エラーファクトリーパターンは一部で適用されているが、まだ多くの箇所でコンストラクタ直接使用が残っている。一般的なファイルシステムエラー用のファクトリーメソッドを追加実装すべき。"
+      }
+    ],
+    "overallAssessment": {
+      "strengths": [
+        "コンポーネント固有ロガーはすべてのファイルで導入されている",
+        "構造化ロギングのパターンは概ね適用されている",
+        "エラーファクトリーパターンは部分的に適用されている"
+      ],
+      "weaknesses": [
+        "直接loggerを使用している箇所が残っている（特にBranchController）",
+        "エラーコンストラクタの直接使用が残っている（特にエラータイプが特定の場合）",
+        "エラーファクトリーメソッドが一部のエラータイプでしか実装されていない"
+      ],
+      "improvements": [
+        {
+          "description": "各エラータイプに対応するファクトリーメソッドの追加実装",
+          "priority": "high",
+          "effort": "medium",
+          "files": [
+            "/packages/mcp/src/shared/errors/InfrastructureError.ts",
+            "/packages/mcp/src/shared/errors/DomainError.ts",
+            "/packages/mcp/src/shared/errors/ApplicationError.ts"
+          ]
+        },
+        {
+          "description": "BranchControllerでの直接logger使用をcomponentLoggerに置き換え",
+          "priority": "high",
+          "effort": "medium",
+          "files": [
+            "/packages/mcp/src/interface/controllers/BranchController.ts"
+          ]
+        },
+        {
+          "description": "エラーコンストラクタの直接使用を全てファクトリーメソッドに置き換え",
+          "priority": "medium",
+          "effort": "high",
+          "files": [
+            "/packages/mcp/src/infrastructure/storage/FileSystemService.ts",
+            "/packages/mcp/src/infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.ts",
+            "/packages/mcp/src/interface/controllers/BranchController.ts"
+          ]
+        }
+      ]
+    },
+    "prioritizedActions": [
+      {
+        "action": "InfrastructureErrors.permissionDenied ファクトリーメソッドの追加実装",
+        "reason": "頻繁に使われるエラーパターンだが、ファクトリーが存在しないため直接コンストラクタ使用が多い",
+        "file": "/packages/mcp/src/shared/errors/InfrastructureError.ts",
+        "priority": 1
+      },
+      {
+        "action": "InfrastructureErrors.fileSystemError ファクトリーメソッドの追加実装",
+        "reason": "一般的なファイルシステムエラー用のファクトリーが不足している",
+        "file": "/packages/mcp/src/shared/errors/InfrastructureError.ts",
+        "priority": 2
+      },
+      {
+        "action": "BranchControllerでの直接logger使用をcomponentLoggerに置き換え",
+        "reason": "コンポーネントロガーが導入済みなのに使われていない",
+        "file": "/packages/mcp/src/interface/controllers/BranchController.ts",
+        "priority": 3
+      },
+      {
+        "action": "DomainErrors ファクトリーメソッドの追加と適用",
+        "reason": "ドメインエラーの生成が一貫していない",
+        "file": "/packages/mcp/src/shared/errors/DomainError.ts",
+        "priority": 4
+      },
+      {
+        "action": "ApplicationErrors ファクトリーメソッドの追加と適用",
+        "reason": "コントローラーレベルでのエラーハンドリング改善のため",
+        "file": "/packages/mcp/src/shared/errors/ApplicationError.ts",
+        "priority": 5
+      }
+    ],
+    "nextSteps": {
+      "recommendation": "global-adoption-plan.jsonに基づいて、まず上記の優先アクションを進め、既存の高優先度ファイルでのパターン適用を完成させる。その後、中優先度ファイルへと展開していく。"
+    }
+  }
+}
