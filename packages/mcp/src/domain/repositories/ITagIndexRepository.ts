@@ -74,11 +74,12 @@ export interface ITagIndexRepository {
    * @param matchAll Whether documents must have all tags (AND) or any tag (OR)
    * @returns Promise resolving to array of document paths matching the tags
    */
-  findBranchDocumentsByTags(
-    branchInfo: BranchInfo,
-    tags: Tag[],
-    matchAll?: boolean
-  ): Promise<DocumentPath[]>;
+  // パラメータをオブジェクトリテラル型に変更
+  findBranchDocumentsByTags(params: {
+    branchInfo: BranchInfo;
+    tags: Tag[];
+    matchAll?: boolean;
+  }): Promise<DocumentPath[]>;
 
   /**
    * Find documents by tags in global memory bank

@@ -496,11 +496,13 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
    * @param matchAll すべてのタグにマッチする必要があるか (AND検索)
    * @returns マッチしたドキュメントパスの配列
    */
-  async findBranchDocumentPathsByTags(
-    branchInfo: BranchInfo,
-    tags: Tag[],
-    matchAll: boolean = false
-  ): Promise<DocumentPath[]> {
+  // パラメータをオブジェクトリテラル型に変更
+  async findBranchDocumentPathsByTags(params: {
+    branchInfo: BranchInfo;
+    tags: Tag[];
+    matchAll?: boolean;
+  }): Promise<DocumentPath[]> {
+    const { branchInfo, tags, matchAll = false } = params; // 分割代入で取り出す
     try {
       logger.debug(`Finding documents by tags in branch ${branchInfo.name} using index (matchAll: ${matchAll})`);
 
@@ -510,7 +512,8 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
       if (!tagIndex) {
         // インデックスがなければ通常のメソッドにフォールバック
         logger.debug(`No tag index found for branch ${branchInfo.name}, falling back to regular method`);
-        const documents = await this.findBranchDocumentsByTags(branchInfo, tags, matchAll);
+        // findBranchDocumentsByTags の呼び出し方を修正
+        const documents = await this.findBranchDocumentsByTags({ branchInfo, tags, matchAll });
         return documents.map(doc => doc.path);
       }
 
@@ -610,7 +613,13 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
    * @param matchAll すべてのタグにマッチする必要があるか (AND検索)
    * @returns マッチしたドキュメントの配列
    */
-  async findBranchDocumentsByTags(branchInfo: BranchInfo, tags: Tag[], matchAll: boolean = false): Promise<MemoryDocument[]> {
+  // パラメータをオブジェクトリテラル型に変更
+  async findBranchDocumentsByTags(params: {
+    branchInfo: BranchInfo;
+    tags: Tag[];
+    matchAll?: boolean;
+  }): Promise<MemoryDocument[]> {
+    const { branchInfo, tags, matchAll = false } = params; // 分割代入で取り出す
     try {
       logger.debug(`Finding documents by tags in branch ${branchInfo.name} (no index)`);
 

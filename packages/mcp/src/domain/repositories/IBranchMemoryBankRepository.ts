@@ -110,9 +110,9 @@ export interface IBranchMemoryBankRepository {
    * @param matchAll If true, documents must have all tags (AND), otherwise any tag (OR)
    * @returns Promise resolving to array of document paths
    */
-  findDocumentPathsByTagsUsingIndex(
-    branchInfo: BranchInfo,
-    tags: Tag[],
-    matchAll?: boolean
-  ): Promise<DocumentPath[]>;
+  findDocumentPathsByTagsUsingIndex(params: {
+    branchInfo: BranchInfo;
+    tags: Tag[];
+    matchAll?: boolean;
+  }): Promise<DocumentPath[]>;
 }
