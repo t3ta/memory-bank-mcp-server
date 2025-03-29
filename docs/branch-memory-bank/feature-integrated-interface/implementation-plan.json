@@ -60,13 +60,13 @@
           {
             "id": "domain-parameter-standardization",
             "description": "3つ以上のパラメータを持つメソッドをオブジェクトリテラル型を使用するように修正",
-            "status": "todo",
+            "status": "done",
             "priority": "high"
           },
           {
             "id": "domain-method-documentation",
             "description": "ドメインレイヤーの各インターフェースのTSDocコメントを充実させる",
-            "status": "todo",
+            "status": "done",
             "priority": "medium"
           }
         ]
@@ -83,13 +83,13 @@
           {
             "id": "application-parameter-standardization",
             "description": "3つ以上のパラメータを持つメソッドをオブジェクトリテラル型を使用するように修正",
-            "status": "todo",
+            "status": "done",
             "priority": "high"
           },
           {
             "id": "application-method-documentation",
             "description": "アプリケーションレイヤーの各インターフェースのTSDocコメントを充実させる",
-            "status": "todo",
+            "status": "done",
             "priority": "medium"
           }
         ]
@@ -106,13 +106,13 @@
           {
             "id": "infrastructure-parameter-standardization",
             "description": "3つ以上のパラメータを持つメソッドをオブジェクトリテラル型を使用するように修正",
-            "status": "todo",
+            "status": "done",
             "priority": "medium"
           },
           {
             "id": "infrastructure-method-documentation",
             "description": "インフラストラクチャレイヤーの各インターフェースのTSDocコメントを充実させる",
-            "status": "todo",
+            "status": "done",
             "priority": "medium"
           }
         ]
@@ -129,13 +129,13 @@
           {
             "id": "interface-parameter-standardization",
             "description": "3つ以上のパラメータを持つメソッドをオブジェクトリテラル型を使用するように修正",
-            "status": "todo",
+            "status": "done",
             "priority": "medium"
           },
           {
             "id": "interface-method-documentation",
             "description": "インターフェースレイヤーの各インターフェースのTSDocコメントを充実させる",
-            "status": "todo",
+            "status": "done",
             "priority": "medium"
           }
         ]

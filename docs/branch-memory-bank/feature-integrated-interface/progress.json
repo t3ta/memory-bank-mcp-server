@@ -45,11 +45,6 @@
         "priority": "high"
       },
       {
-        "id": "pi-parameter-design",
-        "description": "パラメータ設計の標準化（オブジェクトリテラルの活用）",
-        "priority": "medium"
-      },
-      {
         "id": "pi-test-adjustment",
         "description": "テストコードの調整（モックとスタブの修正）",
         "priority": "low"
@@ -60,14 +55,9 @@
         "priority": "low"
       }
     ],
-    "status": "ドメインレイヤーのインターフェース修正を開始。IBranchMemoryBankRepositoryの3つ以上のパラメータを持つメソッドをオブジェクトリテラル型に変更完了。他のインターフェースも順次修正予定。",
-    "completionPercentage": 20,
+    "status": "パラメータ設計の標準化（3つ以上のパラメータはオブジェクトリテラル型）が完了。TSDocコメントも一部修正済み。次はTSDocコメントの充実を続けるか、他の作業に進むか検討中。",
+    "completionPercentage": 40,
     "knownIssues": [
-      {
-        "id": "ki-parameter-design",
-        "description": "3つ以上のパラメータを持つメソッドでも、オブジェクトリテラル型を使用していない場合がある",
-        "severity": "medium"
-      },
       {
         "id": "ki-interface-documentation",
         "description": "一部のインターフェースやメソッドでTSDocコメントが不足している",
@@ -94,6 +84,16 @@
         "id": "ct-branch-repository-interface",
         "completedAt": "2025-03-29T21:00:00.000Z",
         "description": "IBranchMemoryBankRepositoryのfindDocumentPathsByTagsUsingIndexメソッドをオブジェクトリテラル型に修正"
+      },
+      {
+        "id": "ct-parameter-standardization",
+        "completedAt": "2025-03-29T10:33:00.000Z",
+        "description": "全レイヤーのインターフェースについて、パラメータ設計の標準化（3つ以上のパラメータはオブジェクトリテラル型）を完了"
+      },
+      {
+        "id": "ct-tsdoc-partial-update",
+        "completedAt": "2025-03-29T10:33:00.000Z",
+        "description": "パラメータ設計変更に伴うTSDocコメントの修正を完了"
       }
     ]
   }
