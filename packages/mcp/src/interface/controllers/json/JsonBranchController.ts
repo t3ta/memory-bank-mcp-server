@@ -23,30 +23,29 @@ import type { IBranchController } from "../interfaces/IBranchController.js";
  */
 export class JsonBranchController
   implements
-    Pick<
-      IBranchController,
-      | "readJsonDocument"
-      | "writeJsonDocument"
-      | "deleteJsonDocument"
-      | "listJsonDocuments"
-      | "searchJsonDocuments"
-      | "updateJsonIndex"
-      | "getRecentBranches"
-    >
-{
- readonly _type = "controller" as const;
- private readonly componentLogger = logger.withContext({ component: 'JsonBranchController' }); // Add component logger
+  Pick<
+    IBranchController,
+    | "readJsonDocument"
+    | "writeJsonDocument"
+    | "deleteJsonDocument"
+    | "listJsonDocuments"
+    | "searchJsonDocuments"
+    | "updateJsonIndex"
+    | "getRecentBranches"
+  > {
+  readonly _type = "controller" as const;
+  private readonly componentLogger = logger.withContext({ component: 'JsonBranchController' }); // Add component logger
 
- /**
-   * Constructor
-   * @param readJsonDocumentUseCase Use case for reading JSON documents
-   * @param writeJsonDocumentUseCase Use case for writing JSON documents
-   * @param deleteJsonDocumentUseCase Use case for deleting JSON documents
-   * @param searchJsonDocumentsUseCase Use case for searching JSON documents
-   * @param updateJsonIndexUseCase Use case for updating JSON index
-   * @param getRecentBranchesUseCase Use case for getting recent branches
-   * @param presenter Response presenter
-   */
+  /**
+    * Constructor
+    * @param readJsonDocumentUseCase Use case for reading JSON documents
+    * @param writeJsonDocumentUseCase Use case for writing JSON documents
+    * @param deleteJsonDocumentUseCase Use case for deleting JSON documents
+    * @param searchJsonDocumentsUseCase Use case for searching JSON documents
+    * @param updateJsonIndexUseCase Use case for updating JSON index
+    * @param getRecentBranchesUseCase Use case for getting recent branches
+    * @param presenter Response presenter
+    */
   constructor(
     private readonly readJsonDocumentUseCase: ReadJsonDocumentUseCase,
     private readonly writeJsonDocumentUseCase: WriteJsonDocumentUseCase,
@@ -55,7 +54,7 @@ export class JsonBranchController
     private readonly updateJsonIndexUseCase: UpdateJsonIndexUseCase,
     private readonly getRecentBranchesUseCase: GetRecentBranchesUseCase,
     private readonly presenter: MCPResponsePresenter
-  ) {}
+  ) { }
 
   /**
    * Read JSON document from branch memory bank

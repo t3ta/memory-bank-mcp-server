@@ -328,7 +328,8 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
         `Failed to ${operation} for branch ${branchName}: ${(error as Error).message}`,
-        { originalError: error, operation, branchName }
+        { originalError: error, operation, branchName }, // Keep original details
+        { cause: error instanceof Error ? error : undefined } // Pass original error as cause
       );
     }
   }
@@ -387,7 +388,8 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
         `Failed to ${operation} for branch ${branchInfo.name}: ${(error as Error).message}`,
-        { originalError: error, operation, branchName: branchInfo.name }
+        { originalError: error, operation, branchName: branchInfo.name }, // Keep original details
+        { cause: error instanceof Error ? error : undefined } // Pass original error as cause
       );
     }
   }
@@ -477,7 +479,8 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
         `Failed to ${operation} for document ${path.value} in branch ${branchInfo.name}: ${(error as Error).message}`,
-        { originalError: error, operation, branchName: branchInfo.name, documentPath: path.value }
+        { originalError: error, operation, branchName: branchInfo.name, documentPath: path.value }, // Keep original details
+        { cause: error instanceof Error ? error : undefined } // Pass original error as cause
       );
     }
   }
@@ -631,7 +634,8 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
         `Failed to ${operation}: ${(error as Error).message}`,
-        { originalError: error, operation, limit }
+        { originalError: error, operation, limit }, // Keep original details
+        { cause: error instanceof Error ? error : undefined } // Pass original error as cause
       );
     }
   }
@@ -925,14 +929,25 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
    * @returns Promise resolving to array of document paths
    */
   async listDocuments(branchInfo: BranchInfo): Promise<DocumentPath[]> {
+    const operation = 'listDocuments';
+    this.componentLogger.debug(`Starting ${operation}`, { branchName: branchInfo.name });
+
     try {
       const documentRepository = this.getRepositoryForBranch(branchInfo);
-      return await documentRepository.list();
+      const documents = await documentRepository.list();
+      this.componentLogger.debug(`${operation} completed`, { branchName: branchInfo.name, count: documents.length });
+      return documents;
     } catch (error: unknown) {
-      throw new InfrastructureError(
-        InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
-        `Failed to list documents: ${(error as Error).message}`,
-        { originalError: error }
+      this.componentLogger.error(`Error during ${operation}`, { branchName: branchInfo.name, error });
+      if (error instanceof DomainError || error instanceof InfrastructureError) {
+        // Re-throw known error types
+        throw error;
+      }
+      // Wrap unknown errors using the factory
+      throw InfrastructureErrors.fileReadError(
+        `Branch: ${branchInfo.name}`,
+        error instanceof Error ? error : undefined,
+        { operation, branchName: branchInfo.name }
       );
     }
   }

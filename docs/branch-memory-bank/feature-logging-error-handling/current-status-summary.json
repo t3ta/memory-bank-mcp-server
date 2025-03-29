@@ -1,0 +1,128 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "current-status-summary",
+    "title": "feature/logging-error-handling作業状況サマリー",
+    "documentType": "summary",
+    "path": "current-status-summary.json",
+    "tags": [
+      "summary",
+      "logging",
+      "error-handling",
+      "status"
+    ],
+    "lastModified": "2025-03-30T00:00:00.000Z",
+    "createdAt": "2025-03-30T00:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "title": "現在の作業状況概要",
+      "description": "feature/logging-error-handlingブランチの作業進捗と次のステップをまとめたドキュメント"
+    },
+    "currentStatus": {
+      "completionPercentage": 90,
+      "phase": "全体適用フェーズ開始",
+      "lastUpdate": "2025-03-29T23:30:00.000Z",
+      "summary": "ロギングとエラーハンドリングのコアコンポーネントの実装は完了しており、これらのパターンをコードベース全体に適用する段階に移行中。基盤となるBaseErrorクラス階層、エラーファクトリメソッド、ロギングシステム（shared/utils/logger）の強化が完了している。サンプルユースケース（ReadBranchDocumentUseCase）での実装例も提供済み。"
+    },
+    "completedWork": [
+      {
+        "category": "ロギング基盤",
+        "items": [
+          "shared/utils/loggerの機能強化 - 構造化ロギングとコンテキスト継承をサポート",
+          "LoggerFactoryの非推奨化と移行ガイダンスの追加",
+          "DocumentLoggerAdapterの改善 - 新機能を活用"
+        ]
+      },
+      {
+        "category": "エラーハンドリング基盤",
+        "items": [
+          "BaseErrorクラスの強化 - 強化されたJSON変換、HTTPステータス対応など",
+          "エラークラス階層の整理 - 各レイヤー固有のエラークラス",
+          "エラーファクトリメソッドの実装 - 標準化されたエラー生成",
+          "ErrorUtilsの実装 - 非同期エラーハンドリングなどの共通パターンを提供"
+        ]
+      },
+      {
+        "category": "サンプル実装",
+        "items": [
+          "ReadBranchDocumentUseCaseでの新パターン適用",
+          "MCPResponsePresenterのエラーレスポンス変換改善"
+        ]
+      },
+      {
+        "category": "ドキュメント",
+        "items": [
+          "implementation-summary.json - 実装サマリーの作成",
+          "global-adoption-plan.json - 全体適用計画の策定"
+        ]
+      }
+    ],
+    "pendingWork": [
+      {
+        "category": "コードベース全体適用",
+        "priority": "high",
+        "items": [
+          "高優先度ファイルの更新（FileSystemBranchMemoryBankRepositoryなど）",
+          "インターフェースレイヤーの更新（コントローラー、プレゼンター）",
+          "共通エラーパターンの統一"
+        ]
+      },
+      {
+        "category": "ドキュメント整備",
+        "priority": "medium",
+        "items": [
+          "エラーコード一覧の作成",
+          "ログレベル使用ガイドラインの策定"
+        ]
+      },
+      {
+        "category": "テスト対応",
+        "priority": "low",
+        "items": [
+          "テスト環境でのロガーモックの更新",
+          "エラー検証方法の変更"
+        ]
+      }
+    ],
+    "knownIssues": [
+      {
+        "id": "ki-logger-factory-usage",
+        "description": "LoggerFactoryは非推奨化したが、まだいくつかの場所で使用されている",
+        "severity": "low",
+        "mitigation": "global-adoption-planに従って段階的に移行"
+      },
+      {
+        "id": "ki-test-update",
+        "description": "テスト環境でのロガーモックが今回の変更で影響を受ける可能性がある",
+        "severity": "medium",
+        "mitigation": "テスト専用のモッキングアプローチを検討"
+      },
+      {
+        "id": "ki-logger-level-inconsistency",
+        "description": "ログレベルの使用基準が明確ではなく、不適切なレベルでのロギングが散見される",
+        "severity": "low",
+        "mitigation": "ログレベル使用ガイドラインを作成予定"
+      }
+    ],
+    "nextSteps": {
+      "immediate": [
+        "CodeQueenモードに切り替えて高優先度ファイルの実装を開始",
+        "global-adoption-plan.jsonに基づいた実装の進行",
+        "各ファイル変更後のテスト実行による品質確保"
+      ],
+      "shortTerm": [
+        "エラーコード一覧ドキュメントの作成",
+        "ログレベル使用ガイドラインの策定",
+        "ミディアム優先度ファイルの更新"
+      ],
+      "longTerm": [
+        "テストコードの更新",
+        "ローグ優先度ファイルの更新",
+        "全体テストカバレッジの確認"
+      ]
+    },
+    "conclusion": "feature/logging-error-handlingブランチでは、横断的関心事（ロギングとエラーハンドリング）の統合を行い、一貫性のあるパターンを確立しました。基盤となるコンポーネントの実装は完了しており、今後は設計されたパターンをコードベース全体に適用していくフェーズに入ります。global-adoption-plan.jsonに従って高優先度のファイルから順次実装を進め、テストを確実に実行しながら品質を確保していきます。"
+  }
+}
