@@ -28,7 +28,7 @@
       },
       {
         "id": "wf-error-factories",
-        "description": "エラーファクトリメソッドの実装",
+        "description": "基本的なエラーファクトリメソッドの実装",
         "status": "completed"
       },
       {
@@ -42,50 +42,109 @@
         "status": "completed"
       },
       {
-        "id": "wf-global-adoption-start",
-        "description": "新しいロギング・エラーハンドリングパターンの全体適用を開始",
+        "id": "wf-high-priority-files",
+        "description": "高優先度ファイルへの新パターン適用",
         "status": "in-progress"
+      },
+      {
+        "id": "wf-missing-factory-methods",
+        "description": "特定のエラータイプ（権限エラーなど）のファクトリーメソッド追加",
+        "status": "pending"
+      },
+      {
+        "id": "wf-branch-controller-logger",
+        "description": "BranchControllerでの直接logger使用をcomponentLoggerに置き換え",
+        "status": "pending"
       }
     ],
     "pendingImplementation": [
       {
         "id": "pi-global-adoption",
         "description": "新しいパターンのコードベース全体への適用",
-        "priority": "high"
+        "priority": "high",
+        "status": "in-progress"
+      },
+      {
+        "id": "pi-domain-errors-factory",
+        "description": "DomainErrorsファクトリーメソッドの追加と適用",
+        "priority": "high",
+        "status": "pending"
+      },
+      {
+        "id": "pi-application-errors-factory",
+        "description": "ApplicationErrorsファクトリーメソッドの追加と適用",
+        "priority": "high",
+        "status": "pending"
+      },
+      {
+        "id": "pi-infrastructure-errors-factory",
+        "description": "InfrastructureErrors.permissionDenied, fileSystemErrorなどのファクトリーメソッド追加",
+        "priority": "high",
+        "status": "pending"
       },
       {
         "id": "pi-error-documentation",
         "description": "エラーコードの整理とドキュメント化",
-        "priority": "medium"
+        "priority": "medium",
+        "status": "pending"
       },
       {
         "id": "pi-log-guidelines",
         "description": "ログレベル使用ガイドラインの策定",
-        "priority": "medium"
+        "priority": "medium",
+        "status": "pending"
+      },
+      {
+        "id": "pi-medium-priority-files",
+        "description": "中優先度ファイル（ユースケースなど）への新パターン適用",
+        "priority": "medium",
+        "status": "pending"
       },
       {
         "id": "pi-tests",
         "description": "ロギングとエラーハンドリングのテスト強化",
-        "priority": "low"
+        "priority": "low",
+        "status": "pending"
+      },
+      {
+        "id": "pi-low-priority-files",
+        "description": "低優先度ファイル（マイグレーションツールなど）への新パターン適用",
+        "priority": "low",
+        "status": "pending"
       }
     ],
     "status": "新しいロギングとエラーハンドリングパターンのコードベース全体への適用準備完了。global-adoption-plan.jsonに基づいて実装開始予定。",
-    "completionPercentage": 90,
+    "completionPercentage": 75,
     "knownIssues": [
       {
         "id": "ki-logger-factory-usage",
         "description": "LoggerFactoryは非推奨化したが、まだいくつかの場所で使用されている",
-        "severity": "low"
+        "severity": "low",
+        "implementationStatus": "partially-addressed"
       },
       {
         "id": "ki-test-update",
         "description": "テスト環境でのロガーモックが今回の変更で影響を受ける可能性がある",
-        "severity": "medium"
+        "severity": "medium",
+        "implementationStatus": "not-started"
       },
       {
         "id": "ki-logger-level-inconsistency",
         "description": "ログレベルの使用基準が明確ではなく、不適切なレベルでのロギングが散見される",
-        "severity": "low"
+        "severity": "low",
+        "implementationStatus": "not-started"
+      },
+      {
+        "id": "ki-missing-factory-methods",
+        "description": "一部のエラータイプに対応するファクトリーメソッドが実装されていない（特に権限エラーなど）",
+        "severity": "medium",
+        "implementationStatus": "not-started"
+      },
+      {
+        "id": "ki-direct-logger-usage",
+        "description": "BranchControllerなどで直接loggerが使用されており、コンポーネント固有ロガーが活用されていない",
+        "severity": "medium",
+        "implementationStatus": "not-started"
       }
     ],
     "completedTasks": [
@@ -132,18 +191,25 @@
     ],
     "upcomingMilestones": [
       {
-        "id": "um-implementation-complete",
-        "title": "初期実装完了",
-        "description": "統一されたロギングとエラーハンドリングパターンの実装",
+        "id": "um-implementation-core",
+        "title": "コア機能実装完了",
+        "description": "基盤となるロギングとエラーハンドリングの仕組みの実装",
         "dueDate": "2025-03-29",
         "status": "completed"
+      },
+      {
+        "id": "um-high-priority-implementation",
+        "title": "高優先度ファイル実装",
+        "description": "高優先度ファイルへの新パターン適用完了",
+        "dueDate": "2025-04-05",
+        "status": "in-progress"
       },
       {
         "id": "um-documentation",
         "title": "ドキュメント整備",
         "description": "エラーコード一覧とロギングガイドラインの作成",
-        "dueDate": "2025-04-05",
-        "status": "planned"
+        "dueDate": "2025-04-10",
+        "status": "pending"
       },
       {
         "id": "um-global-adoption",

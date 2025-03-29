@@ -233,6 +233,107 @@
       "各ファイルの変更後にテスト実行",
       "継続的に進捗を追跡し、必要に応じて計画を調整",
       "ドキュメントの更新と開発者への共有"
-    ]
+    ],
+    "implementationProgress": {
+      "overallProgress": {
+        "completionPercentage": 75,
+        "status": "in-progress",
+        "lastUpdated": "2025-03-30T01:30:00.000Z"
+      },
+      "completedSteps": [
+        "コア機能の実装（BaseError、logger、ErrorUtils）",
+        "サンプルユースケースの実装",
+        "基本的なエラーファクトリメソッドの実装"
+      ],
+      "inProgressSteps": [
+        "高優先度ファイルへの新パターン適用"
+      ],
+      "pendingSteps": [
+        "特定のエラータイプに対応するファクトリーメソッドの追加",
+        "中優先度ファイルへの新パターン適用",
+        "ドキュメント作成",
+        "テスト更新",
+        "低優先度ファイルへの新パターン適用"
+      ],
+      "fileProgress": {
+        "highPriority": [
+          {
+            "path": "/packages/mcp/src/infrastructure/storage/FileSystemService.ts",
+            "completionPercentage": 95,
+            "status": "almost-complete"
+          },
+          {
+            "path": "/packages/mcp/src/interface/controllers/BranchController.ts",
+            "completionPercentage": 75,
+            "status": "in-progress"
+          },
+          {
+            "path": "/packages/mcp/src/infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.ts",
+            "completionPercentage": 85,
+            "status": "in-progress"
+          },
+          {
+            "path": "/packages/mcp/src/interface/controllers/GlobalController.ts",
+            "completionPercentage": 70,
+            "status": "in-progress"
+          },
+          {
+            "path": "/packages/mcp/src/shared/errors/InfrastructureError.ts",
+            "completionPercentage": 80,
+            "status": "in-progress"
+          },
+          {
+            "path": "/packages/mcp/src/shared/errors/DomainError.ts",
+            "completionPercentage": 70,
+            "status": "in-progress"
+          },
+          {
+            "path": "/packages/mcp/src/shared/errors/ApplicationError.ts",
+            "completionPercentage": 70,
+            "status": "in-progress"
+          }
+        ],
+        "mediumPriority": [
+          {
+            "path": "/packages/mcp/src/application/usecases/json/WriteJsonDocumentUseCase.ts",
+            "completionPercentage": 60,
+            "status": "in-progress"
+          },
+          {
+            "path": "/packages/mcp/src/application/usecases/json/ReadJsonDocumentUseCase.ts",
+            "completionPercentage": 60,
+            "status": "in-progress"
+          },
+          {
+            "path": "/packages/mcp/src/application/usecases/common/ReadContextUseCase.ts",
+            "completionPercentage": 95,
+            "status": "almost-complete"
+          },
+          {
+            "path": "/packages/mcp/src/main/routes.ts",
+            "completionPercentage": 50,
+            "status": "in-progress"
+          }
+        ],
+        "lowPriority": [
+          {
+            "path": "/packages/mcp/src/migration/MarkdownToJsonMigrator.ts",
+            "completionPercentage": 30,
+            "status": "not-started"
+          }
+        ]
+      },
+      "criticalPath": [
+        "InfrastructureErrors.permissionDenied ファクトリーメソッドの追加",
+        "InfrastructureErrors.fileSystemError ファクトリーメソッドの追加",
+        "BranchControllerでの直接logger使用をcomponentLoggerに置き換え",
+        "ApplicationErrorsファクトリーメソッドの追加",
+        "DomainErrorsファクトリーメソッドの追加"
+      ],
+      "blockers": [
+        "特定のエラータイプに対応するファクトリーメソッドがないため、エラーコンストラクタを直接使用せざるを得ない状況が残っている",
+        "テスト環境でのロガーモックが今回の変更で影響を受ける可能性があり、テストの更新が必要"
+      ]
+    }
   }
 }
