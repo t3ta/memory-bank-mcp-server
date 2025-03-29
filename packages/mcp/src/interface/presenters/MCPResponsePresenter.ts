@@ -29,10 +29,15 @@ export class MCPResponsePresenter
    * Present error response
    * @param error Error to present
    * @returns Formatted MCP error response
+  /**
+   * Present error response
+   * @param error Error to present
+   * @returns Formatted MCP error response
    */
   presentError(error: Error): MCPErrorResponse {
-    // Log the error
-    logger.error(`Error: ${error.message}`, error);
+    // Log the error with structured context
+    const errorContext = error instanceof BaseError ? error.toJSON() : { error: error.toString(), stack: error.stack };
+    logger.error(`Error: ${error.message}`, errorContext);
 
     // Default error response for unknown errors
     let errorResponse: MCPErrorResponse = {
@@ -44,7 +49,7 @@ export class MCPResponsePresenter
       },
     };
 
-    // Handle known error types
+    // Handle known error types with proper status mapping
     if (error instanceof BaseError) {
       errorResponse = {
         success: false,
@@ -56,15 +61,9 @@ export class MCPResponsePresenter
       };
     }
 
-    // Special handling for different error types
-    if (error instanceof DomainError) {
-      // Domain errors are client errors (4xx)
-      errorResponse.error.code = `DOMAIN_ERROR.${error.code}`;
-    } else if (error instanceof ApplicationError) {
-      // Application errors could be client or server errors
-      errorResponse.error.code = `APP_ERROR.${error.code}`;
-    } else if (error instanceof InfrastructureError) {
-      // Infrastructure errors are server errors (5xx)
+    return errorResponse;
+  }
+
       errorResponse.error.code = `INFRA_ERROR.${error.code}`;
     }
 

@@ -1,38 +1,128 @@
 /**
- * Logger utility
+ * Unified Logger utility
  *
- * Provides a simple logging interface with different log levels
+ * Provides a consistent logging interface with structured context support
+ * This is the recommended logging implementation for all application components
  */
 
 /**
- * Log levels
+ * Log levels with clear hierarchy
  */
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 /**
- * Log context interface
+ * Log level priorities for filtering
+ */
+export const LOG_LEVEL_PRIORITY: Record<LogLevel, number> = {
+  debug: 0,
+  info: 1,
+  warn: 2,
+  error: 3,
+};
+
+/**
+ * Structured log context interface
+ * Provides metadata for log entries
  */
 export interface LogContext {
   [key: string]: unknown;
 }
 
 /**
- * Logger interface
+ * Extended log context with common fields
+ */
+export interface ExtendedLogContext extends LogContext {
+  /**
+   * Component or module name
+   */
+  component?: string;
+  
+  /**
+   * Request ID for tracking
+   */
+  requestId?: string;
+  
+  /**
+   * User ID for tracking
+   */
+  userId?: string;
+  
+  /**
+   * Branch name for branch-specific logs
+   */
+  branch?: string;
+  
+  /**
+   * Document path for document-related logs
+   */
+  documentPath?: string;
+  
+  /**
+   * Error details for error logs
+   */
+  error?: unknown;
+  
+  /**
+   * Timestamp (auto-populated when not provided)
+   */
+  timestamp?: string | Date;
+  
+  /**
+   * Additional custom context fields
+   */
+  [key: string]: unknown;
+}
+
+/**
+ * Unified logger interface
+ * Provides structured logging with context support
  */
 export interface Logger {
+  /**
+   * Log at debug level
+   */
   debug(message: string, ...args: unknown[]): void;
   debug(message: string, context?: LogContext): void;
+  
+  /**
+   * Log at info level
+   */
   info(message: string, ...args: unknown[]): void;
   info(message: string, context?: LogContext): void;
+  
+  /**
+   * Log at warn level
+   */
   warn(message: string, ...args: unknown[]): void;
   warn(message: string, context?: LogContext): void;
+  
+  /**
+   * Log at error level
+   */
   error(message: string, ...args: unknown[]): void;
   error(message: string, context?: LogContext): void;
+  
+  /**
+   * Generic log method with explicit level
+   */
   log(level: LogLevel, message: string, ...args: unknown[]): void;
   log(level: LogLevel, message: string, context?: LogContext): void;
+  
+  /**
+   * Set minimum log level
+   */
   setLevel(level: LogLevel): void;
+  
+  /**
+   * Get current log level
+   */
   getLevel(): LogLevel;
-  withContext?(context: LogContext): Logger;
+  
+  /**
+   * Create a new logger with additional context
+   * All logs from the derived logger will include this context
+   */
+  withContext(context: LogContext): Logger;
 }
 
 /**
@@ -42,14 +132,7 @@ export interface Logger {
  */
 export function createConsoleLogger(level: LogLevel = 'info'): Logger {
   let currentLevel = level;
-
-  // Log level priorities
-  const levelPriority: Record<LogLevel, number> = {
-    debug: 0,
-    info: 1,
-    warn: 2,
-    error: 3,
-  };
+  let defaultContext: LogContext = {};
 
   /**
    * Check if a log level should be displayed
@@ -57,20 +140,37 @@ export function createConsoleLogger(level: LogLevel = 'info'): Logger {
    * @returns Whether the message should be logged
    */
   function shouldLog(msgLevel: LogLevel): boolean {
-    return levelPriority[msgLevel] >= levelPriority[currentLevel];
+    return LOG_LEVEL_PRIORITY[msgLevel] >= LOG_LEVEL_PRIORITY[currentLevel];
   }
   
-  let defaultContext: LogContext = {};
+  /**
+   * Format the log entry with level prefix and timestamp
+   */
+  function formatLogEntry(level: LogLevel, message: string): string {
+    return `[${level.toUpperCase()}] ${message}`;
+  }
+  
+  /**
+   * Prepare context with defaults and auto-populated fields
+   */
+  function prepareContext(context?: LogContext): LogContext {
+    const timestamp = new Date().toISOString();
+    return { 
+      ...defaultContext, 
+      ...context, 
+      timestamp: (context as ExtendedLogContext)?.timestamp || timestamp 
+    };
+  }
 
   const logger: Logger = {
     debug(message: string, ...args: unknown[]): void {
       if (shouldLog('debug')) {
         if (args.length === 1 && typeof args[0] === 'object' && args[0] !== null && !Array.isArray(args[0])) {
           // Handle context object
-          const context = args[0] as LogContext;
-          console.debug(`[DEBUG] ${message}`, { ...defaultContext, ...context });
+          const context = prepareContext(args[0] as LogContext);
+          console.debug(formatLogEntry('debug', message), context);
         } else {
-          console.debug(`[DEBUG] ${message}`, ...args);
+          console.debug(formatLogEntry('debug', message), ...args);
         }
       }
     },
@@ -79,10 +179,10 @@ export function createConsoleLogger(level: LogLevel = 'info'): Logger {
       if (shouldLog('info')) {
         if (args.length === 1 && typeof args[0] === 'object' && args[0] !== null && !Array.isArray(args[0])) {
           // Handle context object
-          const context = args[0] as LogContext;
-          console.info(`[INFO] ${message}`, { ...defaultContext, ...context });
+          const context = prepareContext(args[0] as LogContext);
+          console.info(formatLogEntry('info', message), context);
         } else {
-          console.info(`[INFO] ${message}`, ...args);
+          console.info(formatLogEntry('info', message), ...args);
         }
       }
     },
@@ -91,10 +191,10 @@ export function createConsoleLogger(level: LogLevel = 'info'): Logger {
       if (shouldLog('warn')) {
         if (args.length === 1 && typeof args[0] === 'object' && args[0] !== null && !Array.isArray(args[0])) {
           // Handle context object
-          const context = args[0] as LogContext;
-          console.warn(`[WARN] ${message}`, { ...defaultContext, ...context });
+          const context = prepareContext(args[0] as LogContext);
+          console.warn(formatLogEntry('warn', message), context);
         } else {
-          console.warn(`[WARN] ${message}`, ...args);
+          console.warn(formatLogEntry('warn', message), ...args);
         }
       }
     },
@@ -103,10 +203,10 @@ export function createConsoleLogger(level: LogLevel = 'info'): Logger {
       if (shouldLog('error')) {
         if (args.length === 1 && typeof args[0] === 'object' && args[0] !== null && !Array.isArray(args[0])) {
           // Handle context object
-          const context = args[0] as LogContext;
-          console.error(`[ERROR] ${message}`, { ...defaultContext, ...context });
+          const context = prepareContext(args[0] as LogContext);
+          console.error(formatLogEntry('error', message), context);
         } else {
-          console.error(`[ERROR] ${message}`, ...args);
+          console.error(formatLogEntry('error', message), ...args);
         }
       }
     },
@@ -137,10 +237,19 @@ export function createConsoleLogger(level: LogLevel = 'info'): Logger {
     },
 
     withContext(context: LogContext): Logger {
-      const newLogger = createConsoleLogger(currentLevel);
-      // @ts-ignore - We know that _defaultContext exists on our implementation
-      newLogger._defaultContext = { ...defaultContext, ...context };
-      return newLogger;
+      const childLogger = createConsoleLogger(currentLevel);
+      
+      // Set the child logger's default context as a combination of parent's context and new context
+      const combinedContext = { ...defaultContext, ...context };
+      
+      // Use defineProperty to set private property
+      Object.defineProperty(childLogger, '_defaultContext', {
+        value: combinedContext,
+        writable: true,
+        enumerable: false
+      });
+      
+      return childLogger;
     }
   };
   
@@ -154,4 +263,18 @@ export function createConsoleLogger(level: LogLevel = 'info'): Logger {
   return logger;
 }
 
+/**
+ * Default logger instance configured with warn level
+ * Use this for direct imports across the application
+ * For component-specific logging, create a contextualized logger with withContext
+ * 
+ * Example:
+ * ```
+ * // In a component file:
+ * const componentLogger = logger.withContext({ component: 'UserRepository' });
+ * 
+ * // Later in code:
+ * componentLogger.info('User data retrieved', { userId: 123 });
+ * ```
+ */
 export const logger = createConsoleLogger('warn');
