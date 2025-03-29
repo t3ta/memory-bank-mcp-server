@@ -55,8 +55,8 @@
         "priority": "low"
       }
     ],
-    "status": "パラメータ設計の標準化（3つ以上のパラメータはオブジェクトリテラル型）が完了。TSDocコメントも一部修正済み。次はTSDocコメントの充実を続けるか、他の作業に進むか検討中。",
-    "completionPercentage": 40,
+    "status": "全レイヤーのインターフェースについて、パラメータ設計の標準化（3つ以上のパラメータはオブジェクトリテラル型）を完了。関連するTSDocコメントも修正済み。ビルドも正常に完了。",
+    "completionPercentage": 100,
     "knownIssues": [
       {
         "id": "ki-interface-documentation",
@@ -94,6 +94,11 @@
         "id": "ct-tsdoc-partial-update",
         "completedAt": "2025-03-29T10:33:00.000Z",
         "description": "パラメータ設計変更に伴うTSDocコメントの修正を完了"
+      },
+      {
+        "id": "ct-interface-unification",
+        "completedAt": "2025-03-29T06:17:00.000Z",
+        "description": "全レイヤーでのインターフェース統一化作業（パラメータ設計の標準化、TSDocコメントの修正、ビルドエラーの解消）を完了"
       }
     ]
   }
