@@ -1,42 +1,47 @@
-import { ApplicationError } from "../../shared/errors/ApplicationError.js";
+// Unused imports removed
 import { BaseError } from "../../shared/errors/BaseError.js";
-import { DomainError } from "../../shared/errors/DomainError.js";
-import { InfrastructureError } from "../../shared/errors/InfrastructureError.js";
 import { logger } from "../../shared/utils/logger.js";
-import type { IPresenter } from "./interfaces/IPresenter.js";
-import type { IResponsePresenter } from "./interfaces/IResponsePresenter.js";
-import type { MCPResponse, MCPSuccessResponse, MCPErrorResponse } from "./types/MCPResponse.js";
+// Corrected import path for MCP types
+import type { MCPErrorResponse, MCPResponse } from "./types/MCPResponse.js";
 
 /**
- * Presenter for MCP server responses
- * Transforms application output into standardized MCP response format
+ * Presenter for MCP responses
  */
-export class MCPResponsePresenter
-  implements IPresenter<MCPResponse, MCPResponse>, IResponsePresenter {
+export class MCPResponsePresenter {
   /**
-   * Present success response
-   * @param data Data to present
-   * @returns Formatted MCP success response
+   * Present successful response
+   * @param result Result data
+   * @returns MCP response object
    */
-  present<T>(data: T): MCPSuccessResponse<T> {
+  presentSuccess<T>(result: T): MCPResponse<T> {
     return {
       success: true,
-      data,
+      data: result, // Changed 'result' to 'data'
     };
   }
 
   /**
    * Present error response
-   * @param error Error to present
-   * @returns Formatted MCP error response
-  /**
-   * Present error response
-   * @param error Error to present
-   * @returns Formatted MCP error response
+   * @param error Error object
+   * @returns MCP error response object
    */
   presentError(error: Error): MCPErrorResponse {
-    // Log the error with structured context
-    const errorContext = error instanceof BaseError ? error.toJSON() : { error: error.toString(), stack: error.stack };
+    // Log the error with context
+    const errorContext: Record<string, unknown> = {
+      errorName: error.name,
+      errorMessage: error.message,
+    };
+    if (error instanceof BaseError) {
+      errorContext.errorCode = error.code;
+      errorContext.errorDetails = error.details;
+      if (error.cause) {
+        errorContext.cause = error.cause instanceof Error ? { name: error.cause.name, message: error.cause.message } : error.cause;
+      }
+    }
+    // Add stack in development for easier debugging
+    if (process.env.NODE_ENV === 'development') {
+      errorContext.stack = error.stack;
+    }
     logger.error(`Error: ${error.message}`, errorContext);
 
     // Default error response for unknown errors
@@ -54,19 +59,14 @@ export class MCPResponsePresenter
       errorResponse = {
         success: false,
         error: {
-          code: error.code,
+          code: error.code, // Use the code directly from BaseError
           message: error.message,
           details: error.details,
         },
       };
     }
 
-    return errorResponse;
-  }
-
-      errorResponse.error.code = `INFRA_ERROR.${error.code}`;
-    }
-
+    // BaseError or unknown error handled, return the response
     return errorResponse;
   }
 }

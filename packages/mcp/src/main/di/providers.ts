@@ -371,7 +371,8 @@ export async function registerInterfaceServices(container: DIContainer): Promise
     const searchJsonDocumentsUseCase = await container.get<SearchJsonDocumentsUseCase>('searchJsonDocumentsUseCase');
     const updateJsonIndexUseCase = await container.get<UpdateJsonIndexUseCase>('updateJsonIndexUseCase');
     const getRecentBranchesUseCase = await container.get<GetRecentBranchesUseCase>('getRecentBranchesUseCase');
-    const presenter = await container.get<JsonResponsePresenter>('jsonResponsePresenter');
+    // JsonBranchController expects MCPResponsePresenter, not JsonResponsePresenter
+    const presenter = await container.get<MCPResponsePresenter>('mcpResponsePresenter');
 
     return new JsonBranchController(
       readJsonDocumentUseCase,
@@ -390,7 +391,8 @@ export async function registerInterfaceServices(container: DIContainer): Promise
     const writeGlobalDocumentUseCase = await container.get<WriteGlobalDocumentUseCase>('writeGlobalDocumentUseCase'); // ★ 型指定を追加
     const searchDocumentsByTagsUseCase = await container.get<SearchDocumentsByTagsUseCase>('searchDocumentsByTagsUseCase');
     const updateTagIndexUseCase = await container.get<UpdateTagIndexUseCase>('updateTagIndexUseCase');
-    const presenter = await container.get<MCPResponsePresenter>('mcpResponsePresenter');
+    // Use the interface type for the presenter dependency
+    const presenter = await container.get<import('@/interface/presenters/types/MCPResponsePresenter.js').MCPResponsePresenter>('mcpResponsePresenter');
 
     // Get optional use cases
     const updateTagIndexUseCaseV2 = await container.get<UpdateTagIndexUseCaseV2>('updateTagIndexUseCaseV2');

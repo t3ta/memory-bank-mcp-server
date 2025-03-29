@@ -38,8 +38,8 @@ export interface ReadBranchDocumentOutput {
 export class ReadBranchDocumentUseCase
   implements IUseCase<ReadBranchDocumentInput, ReadBranchDocumentOutput> {
   // Create component-specific logger
-  private readonly useCaseLogger = logger.withContext({ 
-    component: 'ReadBranchDocumentUseCase' 
+  private readonly useCaseLogger = logger.withContext({
+    component: 'ReadBranchDocumentUseCase'
   });
 
   /**
@@ -55,9 +55,9 @@ export class ReadBranchDocumentUseCase
    */
   async execute(input: ReadBranchDocumentInput): Promise<ReadBranchDocumentOutput> {
     // Log the execution with structured context
-    this.useCaseLogger.info('Executing read branch document use case', { 
+    this.useCaseLogger.info('Executing read branch document use case', {
       branchName: input.branchName,
-      documentPath: input.path 
+      documentPath: input.path
     });
 
     // Validate input
@@ -100,16 +100,17 @@ export class ReadBranchDocumentUseCase
 
     // Check if document exists
     if (!document) {
-      this.useCaseLogger.warn('Document not found', { 
+      this.useCaseLogger.warn('Document not found', {
         branchName: input.branchName,
-        documentPath: input.path 
+        documentPath: input.path
       });
       throw DomainErrors.documentNotFound(input.path, { branchName: input.branchName });
     }
 
     this.useCaseLogger.debug('Document retrieved successfully', {
       documentPath: input.path,
-      documentType: document.type
+      // Use the determineDocumentType method to get the type
+      documentType: (document as any).determineDocumentType()
     });
 
     // Transform to DTO

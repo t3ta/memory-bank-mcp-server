@@ -10,8 +10,9 @@ import type {
 import { DocumentType } from "../../../domain/entities/JsonDocument.js";
 import { ApplicationError } from "../../../shared/errors/ApplicationError.js";
 import { DomainError } from "../../../shared/errors/DomainError.js";
-import { InfrastructureError } from "../../../shared/errors/InfrastructureError.js";
-import { logger } from "../../../shared/utils/logger.js";
+// Removed unused InfrastructureError import
+import { BaseError } from "../../../shared/errors/BaseError.js"; // Import BaseError
+import { logger } from "../../../shared/utils/logger.js"; // Import logger
 import type { MCPResponsePresenter } from "../../presenters/MCPResponsePresenter.js";
 import type { MCPResponse } from "../../presenters/types/MCPResponse.js";
 import type { IBranchController } from "../interfaces/IBranchController.js";
@@ -33,9 +34,10 @@ export class JsonBranchController
       | "getRecentBranches"
     >
 {
-  readonly _type = "controller" as const;
+ readonly _type = "controller" as const;
+ private readonly componentLogger = logger.withContext({ component: 'JsonBranchController' }); // Add component logger
 
-  /**
+ /**
    * Constructor
    * @param readJsonDocumentUseCase Use case for reading JSON documents
    * @param writeJsonDocumentUseCase Use case for writing JSON documents
@@ -74,7 +76,7 @@ export class JsonBranchController
         id: options.id,
       });
 
-      return this.presenter.present(result.document);
+      return this.presenter.presentSuccess(result.document); // Changed present to presentSuccess
     } catch (error) {
       return this.handleError(error);
     }
@@ -117,7 +119,7 @@ export class JsonBranchController
         },
       });
 
-      return this.presenter.present(result);
+      return this.presenter.presentSuccess(result); // Changed present to presentSuccess
     } catch (error) {
       return this.handleError(error);
     }
@@ -152,7 +154,7 @@ export class JsonBranchController
         id: options.id,
       });
 
-      return this.presenter.present(result);
+      return this.presenter.presentSuccess(result); // Changed present to presentSuccess
     } catch (error) {
       return this.handleError(error);
     }
@@ -180,7 +182,7 @@ export class JsonBranchController
         tags: options?.tags,
       });
 
-      return this.presenter.present(result.documents);
+      return this.presenter.presentSuccess(result.documents); // Changed present to presentSuccess
     } catch (error) {
       return this.handleError(error);
     }
@@ -208,7 +210,7 @@ export class JsonBranchController
         tags: tags.length > 0 ? tags : undefined,
       });
 
-      return this.presenter.present(result.documents);
+      return this.presenter.presentSuccess(result.documents); // Changed present to presentSuccess
     } catch (error) {
       return this.handleError(error);
     }
@@ -231,7 +233,7 @@ export class JsonBranchController
         fullRebuild: options?.force,
       });
 
-      return this.presenter.present(result);
+      return this.presenter.presentSuccess(result); // Changed present to presentSuccess
     } catch (error) {
       return this.handleError(error);
     }
@@ -246,11 +248,11 @@ export class JsonBranchController
     try {
       logger.info(`Getting recent branches (limit: ${limit || "default"})`);
 
-      const result = await this.getRecentBranchesUseCase.execute({ 
+      const result = await this.getRecentBranchesUseCase.execute({
         limit: limit || 10 // Default limit if not specified
       });
 
-      return this.presenter.present(result.branches);
+      return this.presenter.presentSuccess(result.branches); // Changed present to presentSuccess
     } catch (error) {
       return this.handleError(error);
     }
@@ -262,27 +264,27 @@ export class JsonBranchController
    * @returns Formatted error response
    */
   private handleError(error: any): MCPResponse {
-    logger.error("Error details:", {
-      errorType: error.constructor.name,
-      message: error.message,
-      code: error.code,
-      details: error.details,
+    // Use componentLogger for consistency
+    this.componentLogger.error("Error details:", {
+      errorType: error?.constructor?.name,
+      message: error?.message,
+      code: error?.code, // BaseError and its children should have this
+      details: error?.details, // BaseError and its children might have this
       stack: error instanceof Error ? error.stack : undefined
     });
 
-    if (
-      error instanceof DomainError ||
-      error instanceof ApplicationError ||
-      error instanceof InfrastructureError
-    ) {
+    // Check if it's a BaseError (covers Domain, App, Infra if they inherit)
+    if (error instanceof BaseError) {
       return this.presenter.presentError(error);
     }
 
-    // Unknown error
+    // Handle unknown/native errors
+    this.componentLogger.warn('Handling unknown error type in JsonBranchController', { errorName: error?.constructor?.name });
     return this.presenter.presentError(
-      new DomainError(
-        "UNEXPECTED_ERROR",
-        error instanceof Error ? error.message : "An unexpected error occurred",
+      // Wrap unknown errors in a generic ApplicationError or similar
+      new ApplicationError( // Using ApplicationError for unexpected controller issues
+        'UNEXPECTED_JSON_CONTROLLER_ERROR',
+        error instanceof Error ? error.message : 'An unexpected JSON controller error occurred',
         { originalError: error }
       )
     );

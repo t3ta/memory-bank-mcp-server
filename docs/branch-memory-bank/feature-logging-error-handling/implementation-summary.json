@@ -1,0 +1,186 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "implementation-summary",
+    "title": "ロギングとエラーハンドリング実装サマリー",
+    "documentType": "documentation",
+    "path": "implementation-summary.json",
+    "tags": [
+      "logging",
+      "error-handling",
+      "implementation"
+    ],
+    "lastModified": "2025-03-29T23:00:00.000Z",
+    "createdAt": "2025-03-29T23:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "title": "ロギングとエラーハンドリングの統一実装",
+      "description": "このドキュメントでは、Memory Bank MCPサーバーにおけるロギングとエラーハンドリングの統一的な実装について説明します。"
+    },
+    "loggingImplementation": {
+      "title": "ロギング実装",
+      "components": [
+        {
+          "name": "shared/utils/logger",
+          "path": "/packages/mcp/src/shared/utils/logger.ts",
+          "description": "強化された標準ロガー実装。構造化ロギングと豊富なコンテキストサポートを提供。",
+          "changes": [
+            "LogLevelの明確な定義と優先順位付け",
+            "ExtendedLogContextによる共通フィールドの定義",
+            "入れ子コンテキストのサポート強化",
+            "withContextメソッドの改善",
+            "自動的なタイムスタンプ付与",
+            "フォーマット一貫性の向上"
+          ]
+        },
+        {
+          "name": "LoggerFactory",
+          "path": "/packages/mcp/src/infrastructure/logger/LoggerFactory.ts",
+          "description": "非推奨化されたロガーファクトリ。移行ガイダンスと警告を提供。",
+          "changes": [
+            "明示的な非推奨マーキングと警告メッセージ",
+            "shared/utils/loggerへの移行ガイド",
+            "コンポーネント名のコンテキスト追加"
+          ]
+        },
+        {
+          "name": "DocumentLoggerAdapter",
+          "path": "/packages/mcp/src/infrastructure/logger/DocumentLoggerAdapter.ts",
+          "description": "ドメインレイヤー用ロガーアダプター。強化されたロガー機能を活用。",
+          "changes": [
+            "コンポーネント名によるコンテキスト付与",
+            "明示的な型変換による型安全性の向上"
+          ]
+        }
+      ],
+      "keyFeatures": [
+        "構造化ロギングによる一貫したフォーマット",
+        "コンテキスト継承による階層的ロギング",
+        "コンポーネント別ロガーの容易な作成",
+        "自動的なメタデータ付与",
+        "ログレベルの一貫した適用"
+      ]
+    },
+    "errorHandlingImplementation": {
+      "title": "エラーハンドリング実装",
+      "components": [
+        {
+          "name": "BaseError",
+          "path": "/packages/mcp/src/shared/errors/BaseError.ts",
+          "description": "強化されたエラー基底クラス。全てのカスタムエラーの基礎。",
+          "changes": [
+            "タイムスタンプの自動付与",
+            "元のエラー（cause）のサポート",
+            "JSON変換機能の強化",
+            "HTTP対応のgetHttpStatusCodeメソッド",
+            "型安全な比較のためのisInstanceOfメソッド",
+            "コンテキスト追加のためのwithMessageメソッド"
+          ]
+        },
+        {
+          "name": "各レイヤー別エラー",
+          "description": "各レイヤー固有のエラークラス階層",
+          "changes": [
+            "エラーコード定数の整理と拡充",
+            "レイヤー特有のHTTPステータスコードマッピング",
+            "エラーファクトリー関数の提供",
+            "メソッドオーバーライドによる型安全な拡張"
+          ]
+        },
+        {
+          "name": "ErrorUtils",
+          "path": "/packages/mcp/src/shared/errors/index.ts",
+          "description": "エラーハンドリングの共通パターンを提供するユーティリティ。",
+          "features": [
+            "wrapAsyncによる非同期エラーの一貫したハンドリング",
+            "isErrorOfTypeによる型安全なエラー判定",
+            "getErrorCodeによる一貫したエラーコード取得",
+            "formatForLoggingによるログフォーマット標準化"
+          ]
+        }
+      ],
+      "keyFeatures": [
+        "型安全なエラーハンドリング",
+        "エラーコードの一貫した付与",
+        "エラー変換の簡素化",
+        "詳細な付加情報の保持",
+        "元のエラーコンテキストの保持"
+      ]
+    },
+    "integration": {
+      "title": "ロギングとエラーハンドリングの統合",
+      "examples": [
+        {
+          "name": "ReadBranchDocumentUseCase",
+          "path": "/packages/mcp/src/application/usecases/branch/ReadBranchDocumentUseCase.ts",
+          "description": "新しいロギングとエラーハンドリングパターンを適用した例",
+          "features": [
+            "コンポーネント固有のロガー作成",
+            "構造化ロギングの活用",
+            "エラーファクトリーメソッドの使用",
+            "ErrorUtils.wrapAsyncによる非同期エラーハンドリング",
+            "詳細なコンテキスト情報の付加"
+          ]
+        },
+        {
+          "name": "MCPResponsePresenter",
+          "path": "/packages/mcp/src/interface/presenters/MCPResponsePresenter.ts",
+          "description": "エラーレスポンス変換の改善",
+          "features": [
+            "BaseError.toJSONの活用",
+            "構造化エラーコンテキスト",
+            "一貫したエラーフォーマット"
+          ]
+        }
+      ]
+    },
+    "migrationGuide": {
+      "title": "移行ガイド",
+      "steps": [
+        {
+          "step": 1,
+          "description": "直接ロガー利用への移行",
+          "guide": "LoggerFactoryの代わりにshared/utils/loggerからのloggerエクスポートを使用",
+          "example": "import { logger } from '../../shared/utils/logger.js';"
+        },
+        {
+          "step": 2,
+          "description": "コンポーネント固有ロガーの作成",
+          "guide": "コンポーネント名を持つコンテキスト付きロガーの作成",
+          "example": "const componentLogger = logger.withContext({ component: 'YourComponentName' });"
+        },
+        {
+          "step": 3,
+          "description": "構造化ロギングの活用",
+          "guide": "ログメッセージに構造化されたコンテキストを追加",
+          "example": "logger.info('Document saved', { documentId, branchName });"
+        },
+        {
+          "step": 4,
+          "description": "エラーファクトリーメソッドの利用",
+          "guide": "直接のエラーコンストラクタ呼び出しの代わりにファクトリーメソッドを使用",
+          "example": "throw DomainErrors.documentNotFound(documentId);"
+        },
+        {
+          "step": 5,
+          "description": "非同期エラーハンドリングの改善",
+          "guide": "ErrorUtils.wrapAsyncを使用して非同期エラーを一貫して処理",
+          "example": "return await ErrorUtils.wrapAsync(asyncOperation(), (error) => /* マッピング */);"
+        }
+      ]
+    },
+    "conclusion": {
+      "title": "まとめ",
+      "content": "今回の実装では、Memory Bank MCPサーバーにおけるロギングとエラーハンドリングのパターンを統一し、より堅牢で保守性の高いコードベースへと改善しました。ロギングについては、構造化ロギングとコンテキスト階層化により、デバッグ性と運用性の向上を図り、エラーハンドリングについては、型安全なエラークラス階層と便利なユーティリティ関数により、よりクリーンなエラー処理を実現しています。今後は、これらのパターンをコードベース全体に段階的に適用していくことを推奨します。"
+    },
+    "nextSteps": [
+      "コードベース全体への新しいロギングパターンの適用",
+      "既存のエラーをファクトリーメソッドへ移行",
+      "エラーコード一覧の作成とドキュメント化",
+      "ログレベル使用ガイドラインの策定",
+      "テストへの影響の確認と対応"
+    ]
+  }
+}

@@ -19,7 +19,8 @@ import type {
 import { DocumentType } from "../../domain/entities/JsonDocument.js";
 import { ApplicationError } from "../../shared/errors/ApplicationError.js";
 import { DomainError } from "../../shared/errors/DomainError.js";
-import { InfrastructureError } from "../../shared/errors/InfrastructureError.js";
+// Removed unused InfrastructureError import
+import { BaseError } from "../../shared/errors/BaseError.js"; // Import BaseError
 import { logger } from "../../shared/utils/logger.js";
 import type { MCPResponsePresenter } from "../presenters/MCPResponsePresenter.js";
 import type { MCPResponse } from "../presenters/types/MCPResponse.js";
@@ -31,6 +32,7 @@ import type { IBranchController } from "./interfaces/IBranchController.js"; // A
  */
 export class BranchController implements IBranchController {
   readonly _type = 'controller' as const;
+  private readonly componentLogger = logger.withContext({ component: 'BranchController' }); // Add component logger
 
   // Optional dependencies
   private readonly updateTagIndexUseCaseV2?: UpdateTagIndexUseCaseV2;
@@ -120,7 +122,7 @@ export class BranchController implements IBranchController {
         }
       }
 
-      return this.presenter.present(document);
+      return this.presenter.presentSuccess(document); // Changed present to presentSuccess
     } catch (error) {
       return this.handleError(error);
     }
@@ -154,7 +156,7 @@ export class BranchController implements IBranchController {
         },
       });
 
-      return this.presenter.present({ success: true });
+      return this.presenter.presentSuccess({ success: true }); // Changed present to presentSuccess
     } catch (error) {
       return this.handleError(error);
     }
@@ -234,7 +236,7 @@ export class BranchController implements IBranchController {
         // formattedResult[branchFileName] = { path: branchFileName, content: '', tags: ['core', 'branch-context'], lastModified: new Date().toISOString() };
       }
 
-      return this.presenter.present(formattedResult);
+      return this.presenter.presentSuccess(formattedResult); // Changed present to presentSuccess
     } catch (error) {
       return this.handleError(error);
     }
@@ -289,7 +291,7 @@ export class BranchController implements IBranchController {
         });
       }
 
-      return this.presenter.present(result || { success: true });
+      return this.presenter.presentSuccess(result || { success: true }); // Changed present to presentSuccess
     } catch (error) {
       return this.handleError(error);
     }
@@ -308,7 +310,7 @@ export class BranchController implements IBranchController {
         limit: limit || 10, // Default limit if not specified
       });
 
-      return this.presenter.present(result.branches);
+      return this.presenter.presentSuccess(result.branches); // Changed present to presentSuccess
     } catch (error) {
       return this.handleError(error);
     }
@@ -347,7 +349,7 @@ export class BranchController implements IBranchController {
         searchInfo: result.searchInfo
       });
 
-      return this.presenter.present(result.documents);
+      return this.presenter.presentSuccess(result.documents); // Changed present to presentSuccess
     } catch (error) {
       logger.error('Failed to search documents by tags:', {
         branchName,
@@ -376,14 +378,14 @@ export class BranchController implements IBranchController {
           branchName,
           fullRebuild: fullRebuild || false,
         });
-        return this.presenter.present(result);
+        return this.presenter.presentSuccess(result); // Changed present to presentSuccess
       } else {
         logger.info('Using UpdateTagIndexUseCase (V1) for branch tag index update');
         const result = await this.updateTagIndexUseCase.execute({
           branchName,
           fullRebuild: fullRebuild || false,
         });
-        return this.presenter.present(result);
+        return this.presenter.presentSuccess(result); // Changed present to presentSuccess
       }
     } catch (error) {
       return this.handleError(error);
@@ -416,7 +418,7 @@ export class BranchController implements IBranchController {
         id: options.id,
       });
 
-      return this.presenter.present(result.document);
+      return this.presenter.presentSuccess(result.document); // Changed present to presentSuccess
     } catch (error) {
       return this.handleError(error);
     }
@@ -451,7 +453,7 @@ export class BranchController implements IBranchController {
         },
       });
 
-      return this.presenter.present(result);
+      return this.presenter.presentSuccess(result); // Changed present to presentSuccess
     } catch (error) {
       return this.handleError(error);
     }
@@ -483,7 +485,7 @@ export class BranchController implements IBranchController {
         id: options.id,
       });
 
-      return this.presenter.present(result);
+      return this.presenter.presentSuccess(result); // Changed present to presentSuccess
     } catch (error) {
       return this.handleError(error);
     }
@@ -515,7 +517,7 @@ export class BranchController implements IBranchController {
         tags: options?.tags,
       });
 
-      return this.presenter.present(result.documents);
+      return this.presenter.presentSuccess(result.documents); // Changed present to presentSuccess
     } catch (error) {
       return this.handleError(error);
     }
@@ -546,7 +548,7 @@ export class BranchController implements IBranchController {
         documentType: '*' as DocumentType, // Use wildcard type to get all documents
       });
 
-      return this.presenter.present(result.documents);
+      return this.presenter.presentSuccess(result.documents); // Changed present to presentSuccess
     } catch (error) {
       return this.handleError(error);
     }
@@ -574,7 +576,7 @@ export class BranchController implements IBranchController {
         fullRebuild: options?.force,
       });
 
-      return this.presenter.present(result);
+      return this.presenter.presentSuccess(result); // Changed present to presentSuccess
     } catch (error) {
       return this.handleError(error);
     }
@@ -603,17 +605,18 @@ export class BranchController implements IBranchController {
       stack: error instanceof Error ? error.stack : undefined
     });
 
-    // Remove BaseError check, assume DomainError covers ApplicationError and InfrastructureError if needed, or adjust based on actual hierarchy
-    if (error instanceof DomainError || error instanceof ApplicationError || error instanceof InfrastructureError) {
+    // Check if it's a BaseError (covers Domain, App, Infra if they inherit)
+    if (error instanceof BaseError) {
       return this.presenter.presentError(error);
     }
 
-    // Unknown error - Wrap in a standard error type if possible, e.g., ApplicationError or DomainError
-    // Using DomainError as per previous context
+    // Handle unknown/native errors
+    this.componentLogger.warn('Handling unknown error type', { errorName: error?.constructor?.name });
     return this.presenter.presentError(
-      new DomainError( // Assuming DomainError can represent unexpected errors
-        'UNEXPECTED_ERROR',
-        error instanceof Error ? error.message : 'An unexpected error occurred',
+      // Wrap unknown errors in a generic ApplicationError or similar
+      new ApplicationError( // Using ApplicationError for unexpected interface/controller level issues
+        'UNEXPECTED_CONTROLLER_ERROR',
+        error instanceof Error ? error.message : 'An unexpected controller error occurred',
         { originalError: error }
       )
     );

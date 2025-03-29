@@ -15,7 +15,7 @@ export abstract class BaseError extends Error {
 
   /**
    * Create a new BaseError
-   * 
+   *
    * @param code Unique error code for identification and documentation
    * @param message Human-readable error message
    * @param details Additional error details for debugging and logging
@@ -68,7 +68,7 @@ export abstract class BaseError extends Error {
   /**
    * Returns true if the error is of the specified class
    * Safer than using instanceof when class definitions might be different
-   * 
+   *
    * @param errorClass Error class to check against
    */
   public isInstanceOf(errorClass: string): boolean {
@@ -78,12 +78,12 @@ export abstract class BaseError extends Error {
   /**
    * Create a new error with the same code but a new message
    * Useful for adding context to existing errors
-   * 
+   *
    * @param newMessage New error message
    * @param additionalDetails Additional details to merge with existing details
    */
-  public withMessage(newMessage: string, additionalDetails?: Record<string, unknown>): BaseError {
-    // This is actually implemented via subclasses
-    throw new Error('Cannot call withMessage directly on BaseError, use subclasses instead');
-  }
+  // Make this abstract as it must be implemented by subclasses
+  // Return BaseError instead of this for compatibility with subclass implementations
+  public abstract withMessage(newMessage: string, additionalDetails?: Record<string, unknown>): BaseError;
 }
+// Removed extra closing brace

@@ -1,0 +1,164 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "54021e23-264a-4692-8f78-7a67de43fd2e",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress",
+      "logging",
+      "error-handling"
+    ],
+    "lastModified": "2025-03-29T16:02:00.000Z",
+    "createdAt": "2025-03-29T21:00:00.000Z",
+    "version": 2
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "wf-logging-improvement",
+        "description": "shared/utils/loggerの機能強化",
+        "status": "completed"
+      },
+      {
+        "id": "wf-error-hierarchy",
+        "description": "エラークラス階層の整理と強化",
+        "status": "completed"
+      },
+      {
+        "id": "wf-error-factories",
+        "description": "エラーファクトリメソッドの実装",
+        "status": "completed"
+      },
+      {
+        "id": "wf-error-utils",
+        "description": "エラーユーティリティの実装",
+        "status": "completed"
+      },
+      {
+        "id": "wf-example-use-case",
+        "description": "サンプルユースケースの実装",
+        "status": "completed"
+      },
+      {
+        "id": "wf-global-adoption-start",
+        "description": "新しいロギング・エラーハンドリングパターンの全体適用を開始",
+        "status": "in-progress"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "pi-global-adoption",
+        "description": "新しいパターンのコードベース全体への適用",
+        "priority": "high"
+      },
+      {
+        "id": "pi-error-documentation",
+        "description": "エラーコードの整理とドキュメント化",
+        "priority": "medium"
+      },
+      {
+        "id": "pi-log-guidelines",
+        "description": "ログレベル使用ガイドラインの策定",
+        "priority": "medium"
+      },
+      {
+        "id": "pi-tests",
+        "description": "ロギングとエラーハンドリングのテスト強化",
+        "priority": "low"
+      }
+    ],
+    "status": "新しいロギングとエラーハンドリングパターンのコードベース全体への適用を開始。",
+    "completionPercentage": 90,
+    "knownIssues": [
+      {
+        "id": "ki-logger-factory-usage",
+        "description": "LoggerFactoryは非推奨化したが、まだいくつかの場所で使用されている",
+        "severity": "low"
+      },
+      {
+        "id": "ki-test-update",
+        "description": "テスト環境でのロガーモックが今回の変更で影響を受ける可能性がある",
+        "severity": "medium"
+      },
+      {
+        "id": "ki-logger-level-inconsistency",
+        "description": "ログレベルの使用基準が明確ではなく、不適切なレベルでのロギングが散見される",
+        "severity": "low"
+      }
+    ],
+    "completedTasks": [
+      {
+        "id": "ct-logger-extension",
+        "description": "shared/utils/loggerの機能強化",
+        "completedAt": "2025-03-29T22:00:00.000Z"
+      },
+      {
+        "id": "ct-logger-factory-deprecation",
+        "description": "LoggerFactoryの非推奨化と移行ガイダンスの追加",
+        "completedAt": "2025-03-29T22:15:00.000Z"
+      },
+      {
+        "id": "ct-document-logger-adapter",
+        "description": "DocumentLoggerAdapterの改善",
+        "completedAt": "2025-03-29T22:30:00.000Z"
+      },
+      {
+        "id": "ct-base-error",
+        "description": "BaseErrorクラスの強化",
+        "completedAt": "2025-03-29T22:45:00.000Z"
+      },
+      {
+        "id": "ct-error-hierarchy",
+        "description": "エラークラス階層の整理",
+        "completedAt": "2025-03-29T23:00:00.000Z"
+      },
+      {
+        "id": "ct-error-factories",
+        "description": "エラーファクトリメソッドの実装",
+        "completedAt": "2025-03-29T23:15:00.000Z"
+      },
+      {
+        "id": "ct-error-utils",
+        "description": "エラーユーティリティの実装",
+        "completedAt": "2025-03-29T23:20:00.000Z"
+      },
+      {
+        "id": "ct-sample-use-case",
+        "description": "ReadBranchDocumentUseCaseのパターン適用",
+        "completedAt": "2025-03-29T23:25:00.000Z"
+      }
+    ],
+    "upcomingMilestones": [
+      {
+        "id": "um-implementation-complete",
+        "title": "初期実装完了",
+        "description": "統一されたロギングとエラーハンドリングパターンの実装",
+        "dueDate": "2025-03-29",
+        "status": "completed"
+      },
+      {
+        "id": "um-documentation",
+        "title": "ドキュメント整備",
+        "description": "エラーコード一覧とロギングガイドラインの作成",
+        "dueDate": "2025-04-05",
+        "status": "planned"
+      },
+      {
+        "id": "um-global-adoption",
+        "title": "全体適用",
+        "description": "コードベース全体への新パターン適用",
+        "dueDate": "2025-04-15",
+        "status": "planned"
+      }
+    ],
+    "references": [
+      {
+        "title": "実装サマリー",
+        "path": "implementation-summary.json",
+        "description": "実装の詳細と移行ガイド"
+      }
+    ]
+  }
+}

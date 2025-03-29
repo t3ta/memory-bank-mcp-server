@@ -1,0 +1,238 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "global-adoption-plan",
+    "title": "新しいパターンの全体適用計画",
+    "documentType": "plan",
+    "path": "global-adoption-plan.json",
+    "tags": [
+      "logging",
+      "error-handling",
+      "plan",
+      "implementation"
+    ],
+    "lastModified": "2025-03-30T10:00:00.000Z",
+    "createdAt": "2025-03-30T10:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "title": "新しいロギングとエラーハンドリングパターンの全体適用計画",
+      "description": "統一されたロギングとエラーハンドリングパターンをコードベース全体に適用するための段階的計画。優先順位、アプローチ、チェックリストを含む。"
+    },
+    "prioritization": {
+      "highPriority": [
+        {
+          "category": "インフラストラクチャレイヤー",
+          "components": [
+            "FileSystemBranchMemoryBankRepository",
+            "FileSystemGlobalMemoryBankRepository",
+            "FileSystemService",
+            "インデックス関連のクラス"
+          ],
+          "reason": "頻繁にエラーが発生する可能性がある重要なクラス。エラーハンドリングの改善が最も効果的。"
+        },
+        {
+          "category": "インターフェースレイヤー",
+          "components": [
+            "コントローラー",
+            "プレゼンター",
+            "ミドルウェア"
+          ],
+          "reason": "APIエンドポイントとエラーレスポンス生成箇所。ここでの改善がユーザー体験に直接影響する。"
+        },
+        {
+          "category": "共通エラーパターン",
+          "components": [
+            "try-catch ブロック",
+            "エラー判定と変換ロジック"
+          ],
+          "reason": "エラーファクトリーメソッドへの変更が最も効果的。"
+        }
+      ],
+      "mediumPriority": [
+        {
+          "category": "アプリケーションレイヤー",
+          "components": [
+            "すべてのユースケース",
+            "特に非同期処理を含むユースケース"
+          ],
+          "reason": "ErrorUtils.wrapAsyncパターンの適用が効果的。"
+        },
+        {
+          "category": "ロギング実装",
+          "components": [
+            "LoggerFactoryの使用箇所",
+            "console.log/error使用箇所",
+            "構造化ログを活用すべき箇所"
+          ],
+          "reason": "ロギングの改善は運用性とデバッグ性を向上させる。"
+        }
+      ],
+      "lowPriority": [
+        {
+          "category": "テスト関連コード",
+          "components": [
+            "テストヘルパー",
+            "モック",
+            "テスト自体"
+          ],
+          "reason": "テストコードへの影響は注意深く管理が必要だが、優先度は低め。"
+        },
+        {
+          "category": "あまり使用されないコード",
+          "components": [
+            "マイグレーションツール",
+            "開発用ユーティリティ",
+            "レガシーコード"
+          ],
+          "reason": "改善効果が限定的。"
+        }
+      ]
+    },
+    "approach": {
+      "strategy": "モジュールごとに段階的に適用。1つのモジュールを完全に移行してから次に進む。移行のコミットは小さく保ち、それぞれテスト可能な状態を維持する。",
+      "steps": [
+        {
+          "step": 1,
+          "description": "優先度の高いインフラストラクチャコンポーネントの移行",
+          "details": "FileSystemService、リポジトリ実装など、エラーが頻繁に発生する可能性のあるコンポーネントから開始。"
+        },
+        {
+          "step": 2,
+          "description": "エラーハンドリングパターンの統一",
+          "details": "すべてのtry-catchブロックをエラーファクトリーパターンに更新し、適切なエラー階層と詳細な情報を提供。"
+        },
+        {
+          "step": 3,
+          "description": "ロギングパターンの統一",
+          "details": "LoggerFactoryの使用を削除し、コンポーネント固有のロガーを導入。構造化ロギングを活用。"
+        },
+        {
+          "step": 4,
+          "description": "ユースケースの更新",
+          "details": "ユースケースにErrorUtils.wrapAsyncパターンを適用し、共通のエラーハンドリングを実現。"
+        },
+        {
+          "step": 5,
+          "description": "テストコードの更新",
+          "details": "新しいパターンに対応するようにテストコードを更新。モックや検証ロジックを調整。"
+        }
+      ]
+    },
+    "targetFiles": {
+      "highPriority": [
+        {
+          "path": "/packages/mcp/src/infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.ts",
+          "changes": [
+            "InfrastructureErrorsファクトリーメソッドの使用",
+            "コンポーネント固有ロガーの導入",
+            "構造化ロギングの活用"
+          ]
+        },
+        {
+          "path": "/packages/mcp/src/infrastructure/repositories/file-system/FileSystemGlobalMemoryBankRepository.ts",
+          "changes": [
+            "InfrastructureErrorsファクトリーメソッドの使用",
+            "コンポーネント固有ロガーの導入",
+            "構造化ロギングの活用"
+          ]
+        },
+        {
+          "path": "/packages/mcp/src/infrastructure/storage/FileSystemService.ts",
+          "changes": [
+            "InfrastructureErrorsファクトリーメソッドの使用",
+            "エラーラッピングパターンの適用"
+          ]
+        },
+        {
+          "path": "/packages/mcp/src/interface/controllers/BranchController.ts",
+          "changes": [
+            "ApplicationErrorsファクトリーメソッドの使用",
+            "コンポーネント固有ロガーの導入"
+          ]
+        },
+        {
+          "path": "/packages/mcp/src/interface/controllers/GlobalController.ts",
+          "changes": [
+            "ApplicationErrorsファクトリーメソッドの使用",
+            "コンポーネント固有ロガーの導入"
+          ]
+        }
+      ],
+      "mediumPriority": [
+        {
+          "path": "/packages/mcp/src/application/usecases/json/WriteJsonDocumentUseCase.ts",
+          "changes": [
+            "ErrorUtils.wrapAsyncパターンの適用",
+            "ApplicationErrorsファクトリーメソッドの使用"
+          ]
+        },
+        {
+          "path": "/packages/mcp/src/application/usecases/json/ReadJsonDocumentUseCase.ts",
+          "changes": [
+            "ErrorUtils.wrapAsyncパターンの適用",
+            "ApplicationErrorsファクトリーメソッドの使用"
+          ]
+        },
+        {
+          "path": "/packages/mcp/src/application/usecases/common/ReadContextUseCase.ts",
+          "changes": [
+            "ErrorUtils.wrapAsyncパターンの適用",
+            "ApplicationErrorsファクトリーメソッドの使用"
+          ]
+        },
+        {
+          "path": "/packages/mcp/src/main/routes.ts",
+          "changes": [
+            "エラーハンドリングミドルウェアの強化",
+            "構造化ロギングの導入"
+          ]
+        }
+      ],
+      "lowPriority": [
+        {
+          "path": "/packages/mcp/src/migration/MarkdownToJsonMigrator.ts",
+          "changes": [
+            "SharedUtilsErrorsファクトリーメソッドの使用"
+          ]
+        }
+      ]
+    },
+    "implementation": {
+      "documentationUpdates": [
+        {
+          "document": "エラーコード一覧",
+          "purpose": "すべてのエラーコードとその意味、推奨される対応方法を文書化"
+        },
+        {
+          "document": "ロギングガイドライン",
+          "purpose": "ログレベルの適切な使用とコンテキスト情報の付与に関するガイドライン"
+        }
+      ],
+      "testImpact": [
+        "エラー検証方法の変更が必要",
+        "ロガーモッキングパターンの更新が必要",
+        "エラーファクトリーメソッドを使用したテストの簡略化"
+      ],
+      "regressionRisks": [
+        "エラー変換ロジックの変更によるエラー検出漏れ",
+        "ログレベルやフォーマットの変更による監視ツールへの影響",
+        "BaseErrorの変更による互換性の問題"
+      ]
+    },
+    "successCriteria": [
+      "すべてのエラー生成が新しいファクトリーメソッドを使用している",
+      "ロギングがすべて統一パターンに準拠している",
+      "エラーの階層と詳細情報が一貫している",
+      "テストが成功し、新しいパターンに対応している",
+      "エラーレスポンスがクライアントに適切な情報を提供している"
+    ],
+    "nextSteps": [
+      "高優先度ファイルから実装開始",
+      "各ファイルの変更後にテスト実行",
+      "継続的に進捗を追跡し、必要に応じて計画を調整",
+      "ドキュメントの更新と開発者への共有"
+    ]
+  }
+}

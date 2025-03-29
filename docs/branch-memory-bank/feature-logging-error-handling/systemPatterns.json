@@ -1,0 +1,166 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "6b328cbf-4607-478b-8a93-3e2e9011650b",
+    "title": "システムパターン - ロギングとエラーハンドリング",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "system-patterns",
+      "logging",
+      "error-handling",
+      "cross-cutting"
+    ],
+    "lastModified": "2025-03-29T23:30:00.000Z",
+    "createdAt": "2025-03-29T21:00:00.000Z",
+    "version": 2
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "td-unified-logger",
+        "title": "統一ロギングインターフェースの採用",
+        "context": "現在のコードベースでは、複数のロギング実装（LoggerFactory、shared/utils/logger、IDocumentLogger）が混在しており、一貫性のあるロギングパターンが確立されていない。特にLoggerFactoryは「非推奨」とマークされているが、まだ多くの箇所で使用されている。",
+        "decision": "shared/utils/logger.tsで定義されている標準的なロギングインターフェースと実装を採用し、すべてのロギング機能をこれに統一する。ドメインレイヤーには引き続きIDocumentLoggerを介してロギング機能を提供し、具体的な実装への依存を避ける。LoggerFactoryは段階的に廃止する。",
+        "implementation": "shared/utils/logger.tsの機能を強化し、構造化ロギングとコンテキスト継承をサポート。LoggerFactoryに明示的な非推奨警告と移行ガイダンスを追加。DocumentLoggerAdapterをアップデートして新機能を活用。",
+        "consequences": {
+          "positive": [
+            "ロギングパターンの一貫性が確保され、保守性が向上する",
+            "ドメインレイヤーの純粋性が保たれる",
+            "構造化ロギングが容易になり、運用・監視の効率が向上する",
+            "依存性が明確になり、テストが容易になる"
+          ],
+          "negative": [
+            "既存コードの広範囲にわたる変更が必要",
+            "移行中の一時的な重複や不整合が発生する可能性がある",
+            "テストコードも修正が必要"
+          ]
+        },
+        "status": "implemented",
+        "date": "2025-03-29T23:30:00.000Z"
+      },
+      {
+        "id": "td-error-hierarchy",
+        "title": "階層化されたエラー設計の採用",
+        "context": "エラーハンドリングパターンが統一されておらず、エラークラスの継承関係が明確でない。BaseErrorは存在するが、すべてのエラーがこれを継承しているわけではなく、エラーコードの付与も一貫していない。",
+        "decision": "BaseErrorを基底とする明確なエラークラス階層を確立し、各レイヤー固有のエラー（DomainError、ApplicationError、InfrastructureError、SharedUtilsError）を定義する。すべてのエラーには一意のエラーコードを付与し、ドキュメントとの紐付けを容易にする。",
+        "implementation": "BaseErrorに便利なメソッドを追加（getHttpStatusCode、isInstanceOf、withMessage）。各レイヤー別エラークラスにファクトリメソッドを実装。ErrorUtilsでwrapAsync, isErrorOfType, getErrorCode, formatForLoggingなどの共通ユーティリティを提供。",
+        "consequences": {
+          "positive": [
+            "エラーの型安全性が向上し、適切なエラーハンドリングが促進される",
+            "エラーの原因特定が容易になる",
+            "ドキュメントとの紐付けにより、開発者とユーザーの理解が深まる",
+            "レイヤー間の責任分離が明確になる"
+          ],
+          "negative": [
+            "既存のエラーハンドリングコードの修正が必要",
+            "エラーコードの管理・メンテナンスが必要",
+            "過度に細分化されたエラータイプはかえって複雑さを増す可能性がある"
+          ]
+        },
+        "status": "implemented",
+        "date": "2025-03-29T23:30:00.000Z"
+      },
+      {
+        "id": "td-error-factories",
+        "title": "エラーファクトリメソッドの採用",
+        "context": "エラーインスタンスの生成が一貫していない。同じ種類のエラーが異なる方法で生成され、エラーメッセージやコンテキスト情報がばらつく状況である。",
+        "decision": "各エラータイプに対するファクトリメソッドを定義し、一貫したエラー生成を促進する。これにより、同じシナリオで発生するエラーは常に同じコード、メッセージ形式、コンテキスト構造を持つようになる。",
+        "implementation": "各エラークラスに対応するErrorsオブジェクト（DomainErrors, ApplicationErrorsなど）を作成し、よく使われるエラーパターンのファクトリメソッドを実装。",
+        "consequences": {
+          "positive": [
+            "エラー生成の一貫性向上",
+            "コードの冗長性低減",
+            "エラーメッセージの質と明確さの向上",
+            "コンテキスト情報の構造化"
+          ],
+          "negative": [
+            "新しいエラーパターンが必要になるたびにファクトリメソッドの追加が必要",
+            "メソッド数の増加"
+          ]
+        },
+        "status": "implemented",
+        "date": "2025-03-29T23:30:00.000Z"
+      },
+      {
+        "id": "td-error-utils",
+        "title": "共通エラーユーティリティの採用",
+        "context": "エラーハンドリングの共通パターン（特に非同期コードでのエラー処理）に多くの重複コードがある。また、エラータイプの検査や変換も一貫していない。",
+        "decision": "共通のエラーハンドリングパターンを抽象化したErrorUtilsユーティリティを採用し、特に非同期処理でのエラーハンドリングの一貫性と堅牢性を高める。",
+        "implementation": "shared/errors/index.tsにErrorUtilsオブジェクトを実装し、wrapAsync, isErrorOfType, getErrorCode, formatForLoggingなどのメソッドを提供。",
+        "consequences": {
+          "positive": [
+            "エラーハンドリングコードの重複削減",
+            "非同期エラー処理の一貫性向上",
+            "型安全性の強化",
+            "ロギングとの連携改善"
+          ],
+          "negative": [
+            "抽象化による学習コスト",
+            "一部の特殊なエラーケースでは柔軟性が低下する可能性"
+          ]
+        },
+        "status": "implemented",
+        "date": "2025-03-29T23:30:00.000Z"
+      }
+    ],
+    "implementationPatterns": [
+      {
+        "id": "ip-contextual-logger",
+        "name": "コンテキスト付きロガーパターン",
+        "description": "コンポーネント固有の情報を持つロガーインスタンスを作成し、一貫したコンテキスト情報でログを強化する",
+        "examples": [
+          {
+            "title": "コンポーネント固有ロガーの作成",
+            "code": "// クラス内でのコンポーネント固有ロガーの初期化\nprivate readonly useCaseLogger = logger.withContext({ \n  component: 'ReadBranchDocumentUseCase' \n});"
+          },
+          {
+            "title": "構造化コンテキストでのロギング",
+            "code": "this.useCaseLogger.info('Document retrieved successfully', {\n  documentPath: input.path,\n  documentType: document.type\n});"
+          }
+        ]
+      },
+      {
+        "id": "ip-error-factory-pattern",
+        "name": "エラーファクトリパターン",
+        "description": "標準化されたエラーインスタンスを作成するファクトリメソッドを使用する",
+        "examples": [
+          {
+            "title": "ドメインエラーファクトリの使用",
+            "code": "// 直接のコンストラクタ呼び出し（古いパターン）\nthrow new DomainError(\n  DomainErrorCodes.BRANCH_NOT_FOUND,\n  `Branch \"${input.branchName}\" not found`\n);\n\n// ファクトリメソッド使用（新しいパターン）\nthrow DomainErrors.branchNotFound(input.branchName);"
+          },
+          {
+            "title": "インフラストラクチャエラーファクトリの使用",
+            "code": "throw InfrastructureErrors.fileNotFound(filePath, { \n  operation: 'readDocument' \n});"
+          }
+        ]
+      },
+      {
+        "id": "ip-async-error-wrap",
+        "name": "非同期エラーラッピングパターン",
+        "description": "非同期処理のエラーハンドリングを一貫したパターンでラップする",
+        "examples": [
+          {
+            "title": "ErrorUtils.wrapAsyncの使用",
+            "code": "return await ErrorUtils.wrapAsync(\n  this.executeInternal(input),\n  (error) => ApplicationErrors.executionFailed(\n    'ReadBranchDocumentUseCase',\n    error instanceof Error ? error : undefined,\n    { input }\n  )\n);"
+          },
+          {
+            "title": "内部処理の分離",
+            "code": "async execute(input: SomeInput): Promise<SomeOutput> {\n  // 入力検証などの前処理\n  \n  // エラーラッピングされた内部処理\n  return await ErrorUtils.wrapAsync(\n    this.executeInternal(input),\n    (error) => /* エラーマッピング */\n  );\n}\n\nprivate async executeInternal(input: SomeInput): Promise<SomeOutput> {\n  // 実際の処理ロジック\n}"
+          }
+        ]
+      },
+      {
+        "id": "ip-logger-adapter",
+        "name": "ロガーアダプターパターン",
+        "description": "ドメインレイヤーを具体的なロギング実装から保護するためのアダプターパターン",
+        "examples": [
+          {
+            "title": "コンポーネント名を渡すアダプター",
+            "code": "export class DocumentLoggerAdapter implements IDocumentLogger {\n  private componentLogger;\n  \n  constructor(component?: string) {\n    // コンポーネント固有のロガーを作成\n    this.componentLogger = component ? \n      logger.withContext({ component }) : \n      logger;\n  }\n  \n  // IDocumentLoggerインターフェースの実装\n  debug(message: string, context?: Record<string, unknown>): void {\n    this.componentLogger.debug(message, context as LogContext);\n  }\n  // ...\n}"
+          }
+        ]
+      }
+    ]
+  }
+}

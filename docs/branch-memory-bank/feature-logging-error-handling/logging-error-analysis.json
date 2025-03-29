@@ -1,0 +1,457 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "8f2e9a7b-5d6c-4217-9f3a-acd8b1e54f28",
+    "title": "ロギングとエラーハンドリング - 現状分析",
+    "documentType": "analysis",
+    "path": "logging-error-analysis.json",
+    "tags": [
+      "logging",
+      "error-handling",
+      "analysis",
+      "refactoring"
+    ],
+    "lastModified": "2025-03-29T21:00:00.000Z",
+    "createdAt": "2025-03-29T21:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "title": "ロギングとエラーハンドリングの現状分析",
+      "description": "Memory Bank MCPサーバーにおけるロギングとエラーハンドリングの実装状況を分析し、問題点と改善の方向性を明確にするドキュメント。"
+    },
+    "loggingAnalysis": {
+      "implementations": [
+        {
+          "name": "shared/utils/logger",
+          "path": "/packages/mcp/src/shared/utils/logger.ts",
+          "description": "共通ユーティリティとして提供される標準的なロガー実装。型安全なインターフェースと構造化ロギングのサポートを持つ。",
+          "features": [
+            "異なるログレベル（debug, info, warn, error）のサポート",
+            "構造化ログコンテキスト（LogContext）のサポート",
+            "コンテキストを持つロガーの派生（withContext）",
+            "ログレベルの動的制御"
+          ],
+          "limitations": [
+            "デフォルトでは出力先はコンソールのみ",
+            "ロガーファクトリとの統一が不完全"
+          ],
+          "usage": "共通ユーティリティとして多くの場所で直接使用される"
+        },
+        {
+          "name": "LoggerFactory",
+          "path": "/packages/mcp/src/infrastructure/logger/LoggerFactory.ts",
+          "description": "ロガーインスタンスを生成・管理するファクトリクラス。現在は非推奨としてマークされているが、まだ多くの場所で使用されている。",
+          "features": [
+            "ロガータイプの選択（JSONとコンソール）",
+            "名前付きロガーの管理",
+            "最小ログレベルの設定",
+            "デフォルトコンテキストのサポート"
+          ],
+          "limitations": [
+            "非推奨とマークされており、将来的に廃止予定",
+            "内部的には shared/utils/logger を使用しているが、インターフェースの一部機能が使われていない",
+            "シングルトンパターンの使用によりテスト時の分離が難しい"
+          ],
+          "usage": "一部のレガシーコードと移行中のコードで使用されている"
+        },
+        {
+          "name": "IDocumentLogger",
+          "path": "/packages/mcp/src/domain/logger/IDocumentLogger.ts",
+          "description": "ドメインレイヤーで使用されるロガーインターフェース。ドメインエンティティを外部ロギング実装から保護するための抽象化層。",
+          "features": [
+            "基本的なログレベルのサポート（debug, info, warn, error）",
+            "コンテキストのサポート",
+            "ドメインからのインフラストラクチャ依存性の分離"
+          ],
+          "limitations": [
+            "機能が基本的なもののみに限定されている",
+            "構造化ロギングの高度な機能は提供されていない"
+          ],
+          "usage": "ドメインレイヤーのエンティティとドメインサービスで使用される"
+        },
+        {
+          "name": "DocumentLoggerAdapter",
+          "path": "/packages/mcp/src/infrastructure/logger/DocumentLoggerAdapter.ts",
+          "description": "IDocumentLoggerインターフェースと実際のロガー実装（shared/utils/logger）を接続するアダプター。",
+          "features": [
+            "IDocumentLoggerインターフェースの実装",
+            "shared/utils/loggerへの委譲"
+          ],
+          "limitations": [
+            "シンプルな委譲のみで、追加機能は提供していない"
+          ],
+          "usage": "依存性注入を通じてドメインレイヤーに提供される"
+        }
+      ],
+      "usagePatterns": [
+        {
+          "pattern": "直接ロガー使用",
+          "description": "共有ロガーインスタンス（logger）を直接importして使用する",
+          "examples": [
+            "import { logger } from '../shared/utils/logger.js';\nlogger.info('Some message');"
+          ],
+          "occurrence": "多数",
+          "pros": [
+            "シンプルで直接的"
+          ],
+          "cons": [
+            "依存関係が固定される",
+            "テストが困難になる場合がある"
+          ]
+        },
+        {
+          "pattern": "ロガーファクトリ使用",
+          "description": "LoggerFactoryを通じてロガーを取得して使用する",
+          "examples": [
+            "import { LoggerFactory } from '../infrastructure/logger/LoggerFactory.js';\nconst logger = LoggerFactory.getDefaultLogger();\nlogger.info('Some message');"
+          ],
+          "occurrence": "少数（主に古いコード）",
+          "pros": [
+            "名前付きロガーを使用可能",
+            "区別されたロギングコンテキスト"
+          ],
+          "cons": [
+            "非推奨",
+            "実装が複雑",
+            "依存関係が固定される"
+          ]
+        },
+        {
+          "pattern": "依存性注入",
+          "description": "コンストラクタやメソッドパラメータを通じてロガーを注入して使用する",
+          "examples": [
+            "constructor(private readonly logger: Logger) {}\n\npublic someMethod() {\n  this.logger.info('Some message');\n}"
+          ],
+          "occurrence": "一部",
+          "pros": [
+            "テスト可能性が高い",
+            "疎結合",
+            "柔軟性が高い"
+          ],
+          "cons": [
+            "コード量がやや増える",
+            "依存性注入の仕組みが必要"
+          ]
+        },
+        {
+          "pattern": "コンテキスト付きロギング",
+          "description": "構造化されたコンテキスト情報を含めてロギングする",
+          "examples": [
+            "logger.info('Document saved', { documentId, branchName });"
+          ],
+          "occurrence": "一部（一貫性なし）",
+          "pros": [
+            "構造化されたログデータ",
+            "分析しやすい",
+            "コンテキスト情報が豊富"
+          ],
+          "cons": [
+            "一貫した使用が必要",
+            "過剰なデータ量になる可能性"
+          ]
+        }
+      ],
+      "problems": [
+        {
+          "id": "log-prob-1",
+          "title": "異なるロガー実装の混在",
+          "description": "shared/utils/loggerとLoggerFactoryが混在して使用されており、一貫性がない。",
+          "impact": "high",
+          "solutionHints": [
+            "shared/utils/loggerに統一",
+            "LoggerFactoryを段階的に廃止"
+          ]
+        },
+        {
+          "id": "log-prob-2",
+          "title": "構造化ロギングの不一致",
+          "description": "ログコンテキスト（メタデータ）の使用パターンが一貫しておらず、構造化ロギングの恩恵を十分に受けられていない。",
+          "impact": "medium",
+          "solutionHints": [
+            "標準的なログコンテキスト構造の定義",
+            "自動的コンテキスト付与メカニズムの導入"
+          ]
+        },
+        {
+          "id": "log-prob-3",
+          "title": "ログレベルの使用基準の不明確さ",
+          "description": "debug/info/warn/errorのログレベルをいつ使用すべきかの基準が明確でなく、不適切なレベルでのロギングが散見される。",
+          "impact": "low",
+          "solutionHints": [
+            "ログレベル使用ガイドラインの策定",
+            "コードレビューでの確認強化"
+          ]
+        },
+        {
+          "id": "log-prob-4",
+          "title": "テスト時のロガー置換の難しさ",
+          "description": "直接importされたロガーをテスト時にモックするのが難しく、テストの品質に影響している。",
+          "impact": "medium",
+          "solutionHints": [
+            "依存性注入パターンの採用",
+            "テスト用ロガーファクトリの提供"
+          ]
+        }
+      ]
+    },
+    "errorHandlingAnalysis": {
+      "implementations": [
+        {
+          "name": "BaseError",
+          "path": "/packages/mcp/src/shared/errors/BaseError.ts",
+          "description": "すべてのアプリケーション固有エラーの基底クラス。エラーコードとtoJSON機能を提供する。",
+          "features": [
+            "エラーコードの付与",
+            "詳細情報の添付（details）",
+            "JSON変換機能",
+            "適切なスタックトレース保持"
+          ],
+          "limitations": [
+            "すべてのエラーがこれを継承しているわけではない",
+            "エラーコードの一貫性保証の仕組みがない"
+          ],
+          "usage": "一部のエラーの基底クラスとして使用されている"
+        },
+        {
+          "name": "DomainError",
+          "path": "/packages/mcp/src/shared/errors/DomainError.ts",
+          "description": "ドメインレイヤー固有のエラーの基底クラス。",
+          "features": [
+            "BaseErrorの拡張",
+            "ドメインレイヤーに特化"
+          ],
+          "limitations": [
+            "ドメイン固有エラータイプの階層がやや不明確"
+          ],
+          "usage": "ドメインレイヤーのエラーで使用"
+        },
+        {
+          "name": "ApplicationError",
+          "path": "/packages/mcp/src/shared/errors/ApplicationError.ts",
+          "description": "アプリケーションレイヤー固有のエラーの基底クラス。",
+          "features": [
+            "BaseErrorの拡張",
+            "アプリケーションレイヤーに特化"
+          ],
+          "limitations": [
+            "使用例が少ない"
+          ],
+          "usage": "限定的"
+        },
+        {
+          "name": "InfrastructureError",
+          "path": "/packages/mcp/src/shared/errors/InfrastructureError.ts",
+          "description": "インフラストラクチャレイヤー固有のエラーの基底クラス。",
+          "features": [
+            "BaseErrorの拡張",
+            "インフラストラクチャレイヤーに特化"
+          ],
+          "limitations": [
+            "使用例が少ない"
+          ],
+          "usage": "限定的"
+        },
+        {
+          "name": "SharedUtilsError",
+          "path": "/packages/mcp/src/shared/errors/SharedUtilsError.ts",
+          "description": "共有ユーティリティ固有のエラーの基底クラス。",
+          "features": [
+            "BaseErrorの拡張",
+            "共有ユーティリティに特化"
+          ],
+          "limitations": [
+            "使用例が少ない"
+          ],
+          "usage": "限定的"
+        }
+      ],
+      "usagePatterns": [
+        {
+          "pattern": "標準例外の直接使用",
+          "description": "JavaScriptの標準例外（Error, TypeError など）を直接使用する",
+          "examples": [
+            "throw new Error('Something went wrong');"
+          ],
+          "occurrence": "多数",
+          "pros": [
+            "シンプル",
+            "型情報の利用"
+          ],
+          "cons": [
+            "エラー情報が限定的",
+            "型安全性が低い",
+            "エラーコードがない"
+          ]
+        },
+        {
+          "pattern": "カスタムエラークラスの使用",
+          "description": "アプリケーション固有のエラークラスを使用する",
+          "examples": [
+            "throw new DocumentNotFoundError(documentId);"
+          ],
+          "occurrence": "一部",
+          "pros": [
+            "型安全性が高い",
+            "エラーコードと詳細情報",
+            "セマンティックな処理が可能"
+          ],
+          "cons": [
+            "実装コストが高い",
+            "一貫した使用が必要"
+          ]
+        },
+        {
+          "pattern": "Promise.reject",
+          "description": "非同期関数内でPromise.rejectを使用する",
+          "examples": [
+            "return Promise.reject(new Error('Something went wrong'));"
+          ],
+          "occurrence": "一部",
+          "pros": [
+            "非同期チェーンでの処理に適合"
+          ],
+          "cons": [
+            "awaitを使用する場合は不要な冗長性"
+          ]
+        },
+        {
+          "pattern": "catch & rethrow",
+          "description": "エラーをキャッチして追加情報を付与し再スローする",
+          "examples": [
+            "try {\n  await someOperation();\n} catch (error) {\n  throw new CustomError('Failed to complete operation', { cause: error });\n}"
+          ],
+          "occurrence": "少数",
+          "pros": [
+            "コンテキスト情報の追加",
+            "エラー変換"
+          ],
+          "cons": [
+            "スタックトレース情報が失われる可能性",
+            "適切に実装しないと情報損失"
+          ]
+        }
+      ],
+      "problems": [
+        {
+          "id": "err-prob-1",
+          "title": "エラークラス階層の不完全な活用",
+          "description": "BaseErrorを継承した層別エラークラスが存在するが、実際の使用が限定的で一貫性がない。",
+          "impact": "high",
+          "solutionHints": [
+            "エラークラス階層の活用促進",
+            "エラー種別ごとの具体的なエラークラスの提供"
+          ]
+        },
+        {
+          "id": "err-prob-2",
+          "title": "エラーコードの不統一",
+          "description": "エラーコードの命名規則や構造が統一されておらず、一部のエラーではコードが未設定。",
+          "impact": "medium",
+          "solutionHints": [
+            "エラーコード規約の策定",
+            "エラーコードのドキュメント化"
+          ]
+        },
+        {
+          "id": "err-prob-3",
+          "title": "エラーハンドリングの冗長性",
+          "description": "try-catchブロックが多用され、エラーハンドリングロジックに重複が多い。",
+          "impact": "medium",
+          "solutionHints": [
+            "集中型エラーハンドリング",
+            "エラーハンドリングミドルウェアの強化"
+          ]
+        },
+        {
+          "id": "err-prob-4",
+          "title": "エラー情報の不足",
+          "description": "多くのエラーで十分なコンテキスト情報が含まれておらず、トラブルシューティングが困難。",
+          "impact": "high",
+          "solutionHints": [
+            "構造化エラー情報の標準化",
+            "エラー詳細の自動収集"
+          ]
+        },
+        {
+          "id": "err-prob-5",
+          "title": "エラーのログ記録とAPIレスポンスの不整合",
+          "description": "エラーがログに記録される形式とAPIレスポンスで返される形式に一貫性がない。",
+          "impact": "medium",
+          "solutionHints": [
+            "エラーマッピング機能の統一",
+            "エラーログとレスポンスの連携強化"
+          ]
+        }
+      ]
+    },
+    "integrationPoints": {
+      "loggingErrorRelationship": "ロギングとエラーハンドリングは密接に関連している。エラーが発生した際には適切なログ記録が必要であり、ログレベルとエラーの重大度の対応付けも重要。現状では、これらの連携が不十分で、エラー発生時のロギングパターンが一貫していない。",
+      "apiResponseHandling": "APIエンドポイントでは、エラーを適切なHTTPステータスコードとレスポンス形式に変換する必要がある。現状では統一されたエラーレスポンス形式が確立されておらず、同様のエラーが異なる形式で返される場合がある。",
+      "domainErrorTranslation": "ドメインエラーをインフラストラクチャやインターフェースレイヤーで適切に変換・拡張する仕組みが不十分。ドメインエラーの意味を保持しながら適切な形で伝播させる方法を改善する必要がある。"
+    },
+    "recommendations": {
+      "shortTerm": [
+        {
+          "id": "rec-st-1",
+          "title": "LoggerFactoryの非推奨化の徹底",
+          "description": "LoggerFactoryの使用箇所を特定し、shared/utils/loggerへの移行計画を策定する。LoggerFactoryクラスに非推奨警告を明示的に追加する。",
+          "effort": "medium",
+          "impact": "high"
+        },
+        {
+          "id": "rec-st-2",
+          "title": "ログレベル使用ガイドラインの作成",
+          "description": "debug/info/warn/errorの各ログレベルをいつ使用すべきかの明確なガイドラインを作成し、既存コードの問題箇所を特定する。",
+          "effort": "low",
+          "impact": "medium"
+        },
+        {
+          "id": "rec-st-3",
+          "title": "エラーコード規約の策定",
+          "description": "エラーコードの命名規則、構造、カテゴリ分けを定義し、既存のエラーコードを標準化する。",
+          "effort": "medium",
+          "impact": "high"
+        },
+        {
+          "id": "rec-st-4",
+          "title": "BaseError継承の徹底",
+          "description": "すべてのカスタムエラーがBaseErrorを継承するように修正し、エラー階層を整理する。",
+          "effort": "high",
+          "impact": "high"
+        }
+      ],
+      "longTerm": [
+        {
+          "id": "rec-lt-1",
+          "title": "構造化ロギングの強化",
+          "description": "すべてのログエントリに共通のコンテキストフィールドを自動的に付与する仕組みを実装し、ログの一貫性と分析性を高める。",
+          "effort": "high",
+          "impact": "medium"
+        },
+        {
+          "id": "rec-lt-2",
+          "title": "統合エラーハンドリングの実装",
+          "description": "エラーの捕捉、ログ記録、変換、レスポンス生成を一貫して処理する集中型のエラーハンドリング機構を実装する。",
+          "effort": "high",
+          "impact": "high"
+        },
+        {
+          "id": "rec-lt-3",
+          "title": "エラードキュメント生成システム",
+          "description": "ソースコード内のエラー定義からエラーコードと説明のドキュメントを自動生成する仕組みを実装する。",
+          "effort": "medium",
+          "impact": "medium"
+        },
+        {
+          "id": "rec-lt-4",
+          "title": "ログとエラー分析ツール",
+          "description": "ログとエラー情報を集約し、可視化・分析するためのツールを導入または開発する。",
+          "effort": "high",
+          "impact": "medium"
+        }
+      ]
+    },
+    "conclusion": "ロギングとエラーハンドリングの現状分析から、いくつかの主要な問題点が明らかになった。特に、複数のロギング実装の混在、エラークラス階層の不完全な活用、エラーコードの不統一が顕著である。これらの問題に対処するために、shared/utils/loggerへの統一、BaseError継承の徹底、エラーコード規約の策定などの短期的な改善策を実施することが推奨される。長期的には、構造化ロギングの強化や統合エラーハンドリングの実装などにより、ロギングとエラーハンドリングの品質と一貫性を大幅に向上させることが可能である。"
+  }
+}

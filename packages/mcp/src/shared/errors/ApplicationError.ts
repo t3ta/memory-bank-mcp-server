@@ -7,7 +7,7 @@ import { BaseError } from './BaseError.js';
 export class ApplicationError extends BaseError {
   /**
    * Create a new ApplicationError
-   * 
+   *
    * @param code Error code (without prefix)
    * @param message Human-readable error message
    * @param details Additional error details
@@ -28,7 +28,7 @@ export class ApplicationError extends BaseError {
    */
   public override getHttpStatusCode(): number {
     const codeWithoutPrefix = this.code.replace('APP_ERROR.', '');
-    
+
     // Map specific error codes to HTTP status codes
     switch (codeWithoutPrefix) {
       case ApplicationErrorCodes.INVALID_INPUT:
@@ -49,17 +49,18 @@ export class ApplicationError extends BaseError {
   /**
    * Create a new ApplicationError with the same code but a new message
    * Useful for adding context to existing errors
-   * 
+   *
    * @param newMessage New error message
    * @param additionalDetails Additional details to merge with existing details
    */
-  public override withMessage(newMessage: string, additionalDetails?: Record<string, unknown>): ApplicationError {
-    const combinedDetails = { 
+  // Removed 'override' as BaseError.withMessage is now abstract
+  public withMessage(newMessage: string, additionalDetails?: Record<string, unknown>): ApplicationError {
+    const combinedDetails = {
       ...this.details,
       ...additionalDetails,
-      originalMessage: this.message 
+      originalMessage: this.message
     };
-    
+
     return new ApplicationError(
       this.code.replace('APP_ERROR.', ''),
       newMessage,
@@ -103,7 +104,7 @@ export const ApplicationErrors = {
       additionalDetails
     );
   },
-  
+
   /**
    * Create a not found error
    */
@@ -114,7 +115,7 @@ export const ApplicationErrors = {
       { resourceType: resource, resourceId: id, ...additionalDetails }
     );
   },
-  
+
   /**
    * Create an unauthorized error
    */
@@ -125,7 +126,7 @@ export const ApplicationErrors = {
       additionalDetails
     );
   },
-  
+
   /**
    * Create an execution failed error
    */

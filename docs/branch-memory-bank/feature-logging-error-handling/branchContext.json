@@ -1,0 +1,50 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "ca66b28d-ea55-4bcc-b2d9-c2af53b286b7",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context",
+      "logging",
+      "error-handling",
+      "cross-cutting"
+    ],
+    "lastModified": "2025-03-29T23:30:00.000Z",
+    "createdAt": "2025-03-29T21:00:00.000Z",
+    "version": 2
+  },
+  "content": {
+    "branchName": "feature/logging-error-handling",
+    "purpose": "横断的関心事（ロギングとエラーハンドリング）の統合を行い、一貫性のあるパターンを確立する。ロギングの実装を shared/utils/logger に統一し、LoggerFactory の非推奨化を進める。また、エラーハンドリングパターンを統一し、共通のエラー基底クラスを整備する。",
+    "createdAt": "2025-03-29T21:00:00.000Z",
+    "userStories": [
+      {
+        "id": "us-logging-unification",
+        "description": "複数のロギング実装を shared/utils/logger.ts に統一し、一貫したロギングパターンを確立したい",
+        "completed": true,
+        "priority": 1
+      },
+      {
+        "id": "us-error-handling",
+        "description": "アプリケーション全体でエラーハンドリングパターンを標準化し、拡張性が高く型安全なエラー処理を実現したい",
+        "completed": true,
+        "priority": 2
+      },
+      {
+        "id": "us-domain-isolation",
+        "description": "ドメインレイヤーを外部ライブラリから保護し、適切なアダプターを介してロギングとエラー報告を行いたい",
+        "completed": true,
+        "priority": 3
+      },
+      {
+        "id": "us-structured-logging",
+        "description": "構造化ログを実現し、コンテキスト情報を持つログエントリを容易に生成・分析できるようにしたい",
+        "completed": true,
+        "priority": 4
+      }
+    ],
+    "additionalNotes": "feature/schema-package-3ブランチでは、リポジトリ分割の実装とインターフェース設計の統一化が完了した。feature/logging-error-handlingブランチでは、次のステップとして横断的関心事の統合を行った。ロギングとエラーハンドリングパターンの統一化により、より一貫性のあるコードベースが実現し、デバッグ性と保守性が向上した。"
+  }
+}
