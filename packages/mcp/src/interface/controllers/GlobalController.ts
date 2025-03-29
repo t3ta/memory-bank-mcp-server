@@ -82,15 +82,21 @@ export class GlobalController implements IGlobalController {
    * @param tags Optional tags for the document
    * @returns Promise resolving to MCP response with the result
    */
-  async writeDocument(path: string, content: string, tags?: string[]): Promise<MCPResponse> {
+  // パラメータをオブジェクトリテラル型に変更
+  async writeDocument(params: {
+    path: string;
+    content: string;
+    tags?: string[];
+  }): Promise<MCPResponse> {
+    const { path: docPath, content, tags: tagStrings } = params; // 分割代入、path と tags は内部変数と衝突するため別名に
     try {
-      logger.info(`Writing global document: ${path}`);
+      logger.info(`Writing global document: ${docPath}`); // path -> docPath に変更
 
       await this.writeGlobalDocumentUseCase.execute({
         document: {
-          path,
+          path: docPath, // path -> docPath に変更
           content,
-          tags: tags || [],
+          tags: tagStrings || [], // tags -> tagStrings に変更
         },
       });
 
@@ -125,7 +131,7 @@ export class GlobalController implements IGlobalController {
         try {
           // Try to read the document from the global memory bank
           const docResult = await this.readGlobalDocumentUseCase.execute({ path: documentPath });
-          
+
           if (docResult && docResult.document) {
             result[documentPath.replace('.json', '')] = docResult.document;
           } else {

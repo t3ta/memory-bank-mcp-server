@@ -22,7 +22,12 @@ export interface IGlobalController extends IController {
    * @param tags Optional tags for the document
    * @returns Promise resolving to MCP response with the result
    */
-  writeDocument(path: string, content: string, tags?: string[]): Promise<MCPResponse>;
+  // パラメータをオブジェクトリテラル型に変更
+  writeDocument(params: {
+    path: string;
+    content: string;
+    tags?: string[];
+  }): Promise<MCPResponse>;
 
   /**
    * Read core files from global memory bank

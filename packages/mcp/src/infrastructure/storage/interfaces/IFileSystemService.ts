@@ -16,7 +16,12 @@ export interface IFileSystemService {
    * @param length Number of bytes to read
    * @returns Promise resolving to the chunk content as string
    */
-  readFileChunk?(filePath: string, start: number, length: number): Promise<string>;
+  // パラメータをオブジェクトリテラル型に変更
+  readFileChunk?(params: {
+    filePath: string;
+    start: number;
+    length: number;
+  }): Promise<string>;
 
   /**
    * Write content to file

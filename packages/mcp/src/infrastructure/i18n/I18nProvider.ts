@@ -35,7 +35,14 @@ export class I18nProvider implements II18nProvider {
   /**
    * Implements II18nProvider.translate
    */
-  translate(key: TranslationKey, language: Language, params?: Record<string, string>): string {
+  // パラメータをオブジェクトリテラル型に変更
+  translate(params: {
+    key: TranslationKey;
+    language: Language;
+    params?: Record<string, string>;
+  }): string {
+    const { key, language: langParam, params: substitutionParams } = params; // 分割代入、language は内部変数と衝突するため langParam に
+    let language = langParam; // 内部で language 変数を再代入するため let で宣言
     // Ensure translations are loaded
     if (!this.translations.has(language)) {
       console.warn(
@@ -44,7 +51,8 @@ export class I18nProvider implements II18nProvider {
 
       // If default language translations are not loaded either, return the key
       if (!this.translations.has(this.defaultLanguage)) {
-        return this.processPlaceholders(key, params);
+        // processPlaceholders の第2引数を substitutionParams に修正
+        return this.processPlaceholders(key, substitutionParams);
       }
 
       // Fall back to default language
@@ -64,12 +72,14 @@ export class I18nProvider implements II18nProvider {
       const defaultTranslation = defaultTranslationMap[key];
 
       if (defaultTranslation) {
-        return this.processPlaceholders(defaultTranslation, params);
+        // processPlaceholders の第2引数を substitutionParams に修正
+        return this.processPlaceholders(defaultTranslation, substitutionParams);
       }
     }
 
     // If no translation found, return the key itself
-    return this.processPlaceholders(translation || key, params);
+    // processPlaceholders の第2引数を substitutionParams に修正
+    return this.processPlaceholders(translation || key, substitutionParams);
   }
 
   /**

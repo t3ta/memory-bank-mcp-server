@@ -23,12 +23,13 @@ export interface IBranchController extends IController {
    * @param tags Optional tags for the document
    * @returns Promise resolving to MCP response with the result
    */
-  writeDocument(
-    branchName: string,
-    path: string,
-    content: string,
-    tags?: string[]
-  ): Promise<MCPResponse>;
+  // パラメータをオブジェクトリテラル型に変更
+  writeDocument(params: {
+    branchName: string;
+    path: string;
+    content: string;
+    tags?: string[];
+  }): Promise<MCPResponse>;
 
   /**
    * Read core files from branch memory bank
@@ -59,11 +60,12 @@ export interface IBranchController extends IController {
    * @param matchAllTags Whether to require all tags to match
    * @returns Promise resolving to MCP response with matching documents
    */
-  findDocumentsByTags(
-    branchName: string,
-    tags: string[],
-    matchAllTags?: boolean
-  ): Promise<MCPResponse<DocumentDTO[]>>;
+  // パラメータをオブジェクトリテラル型に変更
+  findDocumentsByTags(params: {
+    branchName: string;
+    tags: string[];
+    matchAllTags?: boolean;
+  }): Promise<MCPResponse<DocumentDTO[]>>;
 
   /**
    * Update tags index in branch memory bank

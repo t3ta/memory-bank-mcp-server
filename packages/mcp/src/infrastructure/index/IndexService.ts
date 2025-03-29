@@ -212,7 +212,7 @@ export class IndexService implements IIndexService {
     if (!docRef) return null;
     return this.convertToDocumentReference(docRef);
   }
-  
+
   /**
    * Convert internal document reference to the schema DocumentReference type
    * @param internal Internal document reference
@@ -260,11 +260,13 @@ export class IndexService implements IIndexService {
    * @param matchAll If true, documents must have all tags; if false, any tag is sufficient
    * @returns Array of matching document references
    */
-  public async findByTags(
-    branchInfo: BranchInfo,
-    tags: Tag[],
-    matchAll: boolean = false
-  ): Promise<DocumentReference[]> {
+  // パラメータをオブジェクトリテラル型に変更
+  public async findByTags(params: {
+    branchInfo: BranchInfo;
+    tags: Tag[];
+    matchAll?: boolean;
+  }): Promise<DocumentReference[]> {
+    const { branchInfo, tags, matchAll = false } = params; // 分割代入で取り出す
     const index = await this.getOrCreateIndex(branchInfo);
 
     if (tags.length === 0) {

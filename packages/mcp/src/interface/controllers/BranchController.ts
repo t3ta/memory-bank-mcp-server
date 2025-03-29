@@ -134,21 +134,23 @@ export class BranchController implements IBranchController {
    * @param tags Optional tags for the document
    * @returns Promise resolving to MCP response with the result
    */
-  async writeDocument(
-    branchName: string,
-    path: string,
-    content: string,
-    tags?: string[]
-  ): Promise<MCPResponse> {
+  // パラメータをオブジェクトリテラル型に変更
+  async writeDocument(params: {
+    branchName: string;
+    path: string;
+    content: string;
+    tags?: string[];
+  }): Promise<MCPResponse> {
+    const { branchName, path: docPath, content, tags: tagStrings } = params; // 分割代入、path と tags は内部変数と衝突するため別名に
     try {
-      logger.info(`Writing document to branch ${branchName}: ${path}`);
+      logger.info(`Writing document to branch ${branchName}: ${docPath}`); // path -> docPath に変更
 
       await this.writeBranchDocumentUseCase.execute({
         branchName,
         document: {
-          path,
+          path: docPath, // path -> docPath に変更
           content,
-          tags: tags || [],
+          tags: tagStrings || [], // tags -> tagStrings に変更
         },
       });
 
@@ -319,25 +321,27 @@ export class BranchController implements IBranchController {
    * @param matchAllTags Whether to require all tags to match
    * @returns Promise resolving to MCP response with matching documents
    */
-  async findDocumentsByTags(
-    branchName: string,
-    tags: string[],
-    matchAllTags?: boolean
-  ): Promise<MCPResponse<DocumentDTO[]>> {
+  // パラメータをオブジェクトリテラル型に変更
+  async findDocumentsByTags(params: {
+    branchName: string;
+    tags: string[];
+    matchAllTags?: boolean;
+  }): Promise<MCPResponse<DocumentDTO[]>> {
+    const { branchName, tags: tagStrings, matchAllTags = false } = params; // 分割代入、tags は内部変数と衝突するため別名に
     try {
-      logger.info(`Finding documents by tags in branch ${branchName}: ${tags.join(', ')}`);
-      logger.debug('Search request:', { branchName, tags, matchAllTags });
+      logger.info(`Finding documents by tags in branch ${branchName}: ${tagStrings.join(', ')}`); // tags -> tagStrings に変更
+      logger.debug('Search request:', { branchName, tags: tagStrings, matchAllTags }); // tags -> tagStrings に変更
 
       // Delegate to SearchDocumentsByTagsUseCase
       const result = await this.searchDocumentsByTagsUseCase.execute({
         branchName,
-        tags,
+        tags: tagStrings, // tags -> tagStrings に変更
         matchAllTags,
       });
 
       logger.debug('Search result:', {
         branchName,
-        tags,
+        tags: tagStrings, // tags -> tagStrings に変更
         matchAllTags,
         documentsFound: result.documents.length,
         searchInfo: result.searchInfo
@@ -347,7 +351,7 @@ export class BranchController implements IBranchController {
     } catch (error) {
       logger.error('Failed to search documents by tags:', {
         branchName,
-        tags,
+        tags: tagStrings, // tags -> tagStrings に変更
         matchAllTags,
         error: error instanceof Error ? error.message : String(error)
       });

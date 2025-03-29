@@ -306,7 +306,14 @@ export class FileSystemService implements IFileSystemService {
    * @param length Number of bytes to read
    * @returns Promise resolving to the chunk content as string
    */
-  async readFileChunk(filePath: string, start: number, length: number): Promise<string> {
+  // パラメータをオブジェクトリテラル型に変更
+  async readFileChunk(params: {
+    filePath: string;
+    start: number;
+    length: number;
+  }): Promise<string> {
+    const { filePath, start } = params; // length を const から分離
+    let length = params.length; // length を let で宣言し直す
     try {
       // Check if file exists first
       if (!(await this.fileExists(filePath))) {

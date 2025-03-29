@@ -69,7 +69,12 @@ export interface IIndexService {
    * @param matchAll If true, documents must have all tags; if false, any tag is sufficient
    * @returns Promise resolving to array of matching document references
    */
-  findByTags(branchInfo: BranchInfo, tags: Tag[], matchAll?: boolean): Promise<DocumentReference[]>;
+  // パラメータをオブジェクトリテラル型に変更
+  findByTags(params: {
+    branchInfo: BranchInfo;
+    tags: Tag[];
+    matchAll?: boolean;
+  }): Promise<DocumentReference[]>;
 
   /**
    * Find document references by document type

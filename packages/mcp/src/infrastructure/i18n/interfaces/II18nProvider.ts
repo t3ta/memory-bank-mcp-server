@@ -18,7 +18,12 @@ export interface II18nProvider {
    * @param params Optional parameters for substitution
    * @returns Translated text
    */
-  translate(key: TranslationKey, language: Language, params?: Record<string, string>): string;
+  // パラメータをオブジェクトリテラル型に変更
+  translate(params: {
+    key: TranslationKey;
+    language: Language;
+    params?: Record<string, string>;
+  }): string;
 
   /**
    * Loads translations for the specified language
