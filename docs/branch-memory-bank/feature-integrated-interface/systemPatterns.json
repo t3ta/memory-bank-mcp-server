@@ -1,0 +1,172 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "system-patterns-integrated-interface",
+    "title": "インターフェース統一化システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "system-patterns",
+      "interface",
+      "design",
+      "typescript"
+    ],
+    "lastModified": "2025-03-29T19:00:00.000Z",
+    "createdAt": "2025-03-29T19:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "td-interface-naming",
+        "title": "インターフェース命名規則の標準化",
+        "context": "現在のプロジェクトでは、インターフェースの命名規則が統一されておらず、「I」プレフィックスの有無や命名スタイルにばらつきがある。これにより、コードの可読性と保守性が低下している。",
+        "decision": "すべてのインターフェースは接頭辞「I」で始めることを標準とする。例えば、`Repository`ではなく`IRepository`、`MemoryBankService`ではなく`IMemoryBankService`とする。既存のインターフェースを含め、すべてのインターフェースをこの規則に合わせてリファクタリングする。",
+        "consequences": {
+          "positive": [
+            "コードの一貫性が向上し、可読性が高まる",
+            "インターフェースと実装クラスが明確に区別できる",
+            "新規開発者が規則を理解しやすくなる",
+            "IDEのコード補完機能が効果的に利用できる"
+          ],
+          "negative": [
+            "広範囲な変更が必要になり、一時的にコードベースが不安定になる可能性がある",
+            "既存のテストや依存関係も修正が必要になる"
+          ]
+        },
+        "status": "approved",
+        "date": "2025-03-29T19:00:00.000Z",
+        "alternatives": [
+          {
+            "title": "「I」プレフィックスなしのインターフェース命名",
+            "description": "「I」プレフィックスを使用せず、名詞または形容詞+名詞の形式でインターフェースを命名する（例：Repository, Readable）",
+            "tradeoffs": "TypeScriptコミュニティの一部で推奨されているが、C#、Javaなどの言語では「I」プレフィックスが一般的。当プロジェクトではインターフェースを明示的に区別する方が有益と判断。"
+          },
+          {
+            "title": "新規コードのみに適用",
+            "description": "既存のコードはそのままにし、新規に追加するインターフェースにのみ新しい命名規則を適用する",
+            "tradeoffs": "変更の量が少なくて済むが、長期的にはコードベースの一貫性が損なわれる"
+          }
+        ]
+      },
+      {
+        "id": "td-async-methods",
+        "title": "非同期メソッドシグネチャの統一",
+        "context": "現在のコードベースでは、非同期処理を行うメソッドの返り値型が統一されておらず、コールバックスタイル、Promise、同期返り値などが混在している。これにより、エラーハンドリングやテストが複雑になっている。",
+        "decision": "すべての非同期メソッドは一貫してPromise<T>を返すように統一する。コールバックスタイルや同期返り値ではなく、Promise型を標準とする。また、async/await構文を積極的に活用する。",
+        "consequences": {
+          "positive": [
+            "一貫したエラーハンドリングパターンが適用できる",
+            "テストがより容易になる",
+            "コードの可読性が向上する",
+            "async/awaitを使った最新の非同期パターンを採用できる"
+          ],
+          "negative": [
+            "既存の非同期APIをすべて修正する必要がある",
+            "呼び出し側のコードも合わせて修正が必要になる"
+          ]
+        },
+        "status": "approved",
+        "date": "2025-03-29T19:00:00.000Z",
+        "alternatives": [
+          {
+            "title": "複数の非同期パターンを許容",
+            "description": "コンテキストに応じて異なる非同期パターンを使い分ける",
+            "tradeoffs": "柔軟性は高まるが、一貫性が低下し、コードの理解と保守が困難になる"
+          }
+        ]
+      },
+      {
+        "id": "td-parameter-design",
+        "title": "メソッドパラメータ設計の標準化",
+        "context": "現在のコードでは、複数のパラメータを持つメソッドが多く、パラメータの追加や変更時に破壊的変更が生じやすい。また、パラメータの意味が分かりにくいケースが存在する。",
+        "decision": "3つ以上のパラメータを持つメソッドは、オブジェクトリテラル型を使用するように標準化する。これにより拡張性が高まり、名前付きパラメータによる可読性の向上も期待できる。",
+        "consequences": {
+          "positive": [
+            "後方互換性を保ちながらパラメータを追加できる",
+            "名前付きパラメータにより可読性が向上する",
+            "オプショナルパラメータの扱いが容易になる",
+            "呼び出し側のコードが自己文書化される"
+          ],
+          "negative": [
+            "単純なメソッド呼び出しが若干冗長になる",
+            "TypeScriptの型情報がより複雑になる可能性がある"
+          ]
+        },
+        "status": "approved",
+        "date": "2025-03-29T19:00:00.000Z",
+        "alternatives": [
+          {
+            "title": "オプショナルパラメータとデフォルト値の使用",
+            "description": "TypeScriptのオプショナルパラメータ構文とデフォルト値を活用する",
+            "tradeoffs": "シンプルなケースでは有効だが、パラメータが多い場合や複雑な場合に限界がある"
+          },
+          {
+            "title": "パラメータのオーバーロード",
+            "description": "同じメソッド名で異なるパラメータを持つメソッドをオーバーロードする",
+            "tradeoffs": "TypeScriptでオーバーロードを使うと型定義が複雑になり、実装も冗長になりがち"
+          }
+        ]
+      },
+      {
+        "id": "td-inner-to-outer",
+        "title": "内側から外側へのレイヤー修正戦略",
+        "context": "インターフェース変更に伴い、多くのコンポーネントが影響を受ける。修正の順序によって、作業効率と影響範囲が大きく変わる可能性がある。",
+        "decision": "クリーンアーキテクチャの原則に従い、内側のレイヤー（ドメインレイヤー）から外側のレイヤー（アプリケーション、インフラ）の順に修正を進める。これにより、依存方向に沿った自然な修正の流れができる。",
+        "consequences": {
+          "positive": [
+            "依存の方向に沿った修正で、影響範囲を予測しやすい",
+            "コンパイラエラーが進捗指標となり、未修正部分を識別しやすい",
+            "段階的なテストと検証が可能になる"
+          ],
+          "negative": [
+            "完全に修正が完了するまで、中間状態ではビルドが通らない可能性がある",
+            "各レイヤーの境界が明確でない部分では適用が難しい場合がある"
+          ]
+        },
+        "status": "approved",
+        "date": "2025-03-29T19:00:00.000Z",
+        "alternatives": [
+          {
+            "title": "ファイル単位の修正",
+            "description": "ファイルごとに完結するように修正し、各修正後に動作確認する",
+            "tradeoffs": "短期的には変更の影響が少なくて済むが、全体の一貫性を確保するのが難しくなる"
+          },
+          {
+            "title": "機能単位の修正",
+            "description": "機能やユースケース単位で関連するインターフェースと実装を一気に修正する",
+            "tradeoffs": "関連するコード間の一貫性は保ちやすいが、変更の範囲が広がりやすく管理が難しくなる"
+          }
+        ]
+      }
+    ],
+    "implementationPatterns": [
+      {
+        "id": "ip-interface-implementation",
+        "name": "インターフェースと実装クラスの関係パターン",
+        "description": "インターフェースと実装クラスの標準的な関係を定義するパターン",
+        "examples": [
+          {
+            "title": "基本形",
+            "code": "// インターフェース定義\ninterface IRepository {\n  findById(id: string): Promise<Entity | null>;\n  save(entity: Entity): Promise<void>;\n}\n\n// 実装クラス\nclass FileSystemRepository implements IRepository {\n  async findById(id: string): Promise<Entity | null> {\n    // 実装...\n  }\n  \n  async save(entity: Entity): Promise<void> {\n    // 実装...\n  }\n}"
+          },
+          {
+            "title": "オブジェクトパラメータ形式",
+            "code": "// インターフェース定義\ninterface IDocumentService {\n  updateDocument(params: {\n    id: string;\n    content: string;\n    metadata?: DocumentMetadata;\n    options?: UpdateOptions;\n  }): Promise<void>;\n}\n\n// 実装クラス\nclass DocumentService implements IDocumentService {\n  async updateDocument(params: {\n    id: string;\n    content: string;\n    metadata?: DocumentMetadata;\n    options?: UpdateOptions;\n  }): Promise<void> {\n    // 実装...\n  }\n}"
+          }
+        ]
+      },
+      {
+        "id": "ip-dependency-injection",
+        "name": "依存性注入パターン",
+        "description": "インターフェースを活用した依存性注入のパターン",
+        "examples": [
+          {
+            "title": "コンストラクタインジェクション",
+            "code": "class MemoryBankService {\n  constructor(\n    private readonly repository: IMemoryBankRepository,\n    private readonly logger: ILogger\n  ) {}\n  \n  async getDocument(id: string): Promise<Document | null> {\n    this.logger.debug(`Fetching document: ${id}`);\n    return this.repository.findById(id);\n  }\n}"
+          }
+        ]
+      }
+    ]
+  }
+}

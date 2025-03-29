@@ -1,0 +1,321 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "interface-design-guidelines",
+    "title": "インターフェース設計ガイドライン",
+    "documentType": "guidelines",
+    "path": "interface-design-guidelines.json",
+    "tags": [
+      "interface",
+      "design",
+      "typescript",
+      "best-practices",
+      "guidelines"
+    ],
+    "lastModified": "2025-03-29T19:00:00.000Z",
+    "createdAt": "2025-03-29T19:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "title": "インターフェース設計ガイドライン",
+      "description": "Memory Bank MCPサーバーにおけるインターフェース設計の標準ガイドライン。命名規則、メソッドシグネチャ、パラメータ設計などの一貫性を確保するための指針を定める。",
+      "goals": [
+        "コードの可読性と保守性の向上",
+        "インターフェースの一貫した設計と実装",
+        "型安全性の強化",
+        "長期的なメンテナンス性の向上"
+      ]
+    },
+    "namingGuidelines": {
+      "interfaceNaming": {
+        "rule": "インターフェース名は接頭辞「I」で始める",
+        "examples": {
+          "correct": [
+            "IMemoryBankRepository",
+            "IDocumentService",
+            "IFileSystem"
+          ],
+          "incorrect": [
+            "MemoryBankRepository (Iプレフィックスがない)",
+            "InterfaceMemoryBank (Interfaceという単語を使っている)",
+            "IRepo (略語を使っている)"
+          ]
+        },
+        "notes": "抽象クラスと区別するために、インターフェースのみがIプレフィックスを使用する。抽象クラスはAbstractまたはBaseプレフィックスを使用する。"
+      },
+      "methodNaming": {
+        "rule": "メソッド名は動詞で始まるcamelCase形式",
+        "prefixes": {
+          "get": "データ取得操作 (例: getDocument, getTagIndex)",
+          "find": "検索操作 (例: findByTag, findDocumentsByPath)",
+          "create": "新規リソース作成 (例: createDocument)",
+          "update": "既存リソース更新 (例: updateDocument)",
+          "delete": "リソース削除 (例: deleteDocument)",
+          "has": "存在確認 (例: hasDocument) - boolean返却",
+          "is": "状態確認 (例: isValid) - boolean返却",
+          "set": "プロパティ設定 (例: setConfig)",
+          "add": "コレクションへの追加 (例: addTag)",
+          "remove": "コレクションからの削除 (例: removeTag)"
+        },
+        "notes": "メソッド名は、その機能を明確に表現し、省略形や曖昧な名前を避ける。名前から機能が推測できるようにする。"
+      },
+      "propertyNaming": {
+        "rule": "プロパティ名はcamelCase形式",
+        "examples": {
+          "correct": [
+            "documentId",
+            "createdAt",
+            "isValid"
+          ],
+          "incorrect": [
+            "DocumentId (PascalCaseになっている)",
+            "created_at (snake_caseになっている)",
+            "is-valid (kebab-caseになっている)"
+          ]
+        },
+        "notes": "読み取り専用プロパティには、必要に応じてreadonlyキーワードを使用する。"
+      }
+    },
+    "methodSignatureGuidelines": {
+      "asyncMethods": {
+        "rule": "非同期メソッドはすべてPromise<T>を返す",
+        "examples": {
+          "correct": [
+            "async getDocument(id: string): Promise<IDocument | null>;",
+            "async saveDocument(document: IDocument): Promise<void>;",
+            "findByTag(tag: string): Promise<IDocument[]>;"
+          ],
+          "incorrect": [
+            "getDocument(id: string, callback: (doc: Document) => void): void;",
+            "async saveDocument(document: Document): Document;",
+            "findByTag(tag: string): Document[];"
+          ]
+        },
+        "notes": "async/await構文を積極的に使用し、コールバックスタイルのAPIは避ける。"
+      },
+      "parameterDesign": {
+        "rule": "3つ以上のパラメータを持つメソッドはオブジェクトリテラル型を使用",
+        "examples": {
+          "correct": [
+            "updateDocument(params: { id: string; content: string; metadata?: DocumentMetadata; }): Promise<void>;",
+            "searchDocuments(params: { tags?: string[]; path?: string; limit?: number; offset?: number; }): Promise<IDocument[]>;"
+          ],
+          "incorrect": [
+            "updateDocument(id: string, content: string, metadata?: DocumentMetadata): Promise<void>;",
+            "searchDocuments(tags?: string[], path?: string, limit?: number, offset?: number): Promise<IDocument[]>;"
+          ]
+        },
+        "exceptions": [
+          "標準的なメソッド (例: find, get) で2つ以下のパラメータの場合",
+          "広く使われる一般的なパターンに準拠する場合"
+        ],
+        "notes": "オブジェクトリテラル型を使用することで、後方互換性を保ちながらパラメータを追加でき、呼び出し側も自己文書化された形で記述できる。"
+      },
+      "returnTypes": {
+        "rule": "明示的な戻り値型を常に指定する",
+        "avoidTypes": [
+          "any型の使用を避ける",
+          "unknown型は型ガードと組み合わせて使用する",
+          "過度に複雑な共用体型を避ける"
+        ],
+        "preferTypes": [
+          "具体的なドメイン型 (例: IDocument)",
+          "Promise<T>で非同期結果を表現",
+          "型エイリアスを活用して複雑な型を簡素化",
+          "読み取り専用型 (例: ReadonlyArray<T>, Readonly<T>)"
+        ],
+        "notes": "不要な型変換を避けるため、インターフェースの戻り値型と実装クラスの戻り値型を一致させる。"
+      },
+      "errorHandling": {
+        "rule": "エラーはPromiseのrejectまたは型付きのエラーオブジェクトで返す",
+        "patterns": {
+          "rejectPattern": "return Promise.reject(new DocumentNotFoundError(id));",
+          "throwPattern": "throw new ValidationError('Invalid document format');",
+          "resultPattern": "return { success: false, error: new DocumentNotFoundError(id) };"
+        },
+        "notes": "エラー処理パターンはドメイン内で一貫させ、特定のエラー型を定義して型安全なエラーハンドリングを実現する。"
+      }
+    },
+    "interfaceDesignPrinciples": {
+      "singleResponsibility": {
+        "rule": "インターフェースは単一の責任を持つように設計する",
+        "explanation": "一つのインターフェースに多くの機能を詰め込むのではなく、役割ごとに分割する。これにより、実装する側は必要な機能だけを実装でき、テストも容易になる。",
+        "examples": {
+          "correct": [
+            "interface IDocumentReader { getDocument(id: string): Promise<IDocument | null>; findDocuments(criteria: SearchCriteria): Promise<IDocument[]>; }",
+            "interface IDocumentWriter { saveDocument(document: IDocument): Promise<void>; deleteDocument(id: string): Promise<boolean>; }"
+          ],
+          "incorrect": [
+            "interface IDocumentRepository { getDocument(id: string): Promise<IDocument | null>; saveDocument(document: IDocument): Promise<void>; validateDocument(document: IDocument): boolean; generateDocumentId(): string; }"
+          ]
+        }
+      },
+      "interfaceSegregation": {
+        "rule": "クライアントに必要のないメソッドを強制しない",
+        "explanation": "ISP (Interface Segregation Principle) に基づき、クライアントが使用しないメソッドに依存させない。大きなインターフェースではなく、小さく特化したインターフェースを複数用意する。",
+        "examples": {
+          "correct": [
+            "interface IReadOnlyRepository<T> { find(id: string): Promise<T | null>; findAll(): Promise<T[]>; }",
+            "interface IWriteOnlyRepository<T> { save(entity: T): Promise<void>; delete(id: string): Promise<boolean>; }",
+            "interface IRepository<T> extends IReadOnlyRepository<T>, IWriteOnlyRepository<T> {}"
+          ]
+        }
+      },
+      "composition": {
+        "rule": "インターフェースの合成を活用する",
+        "explanation": "TypeScriptではインターフェースの継承と合成が可能。これを活用して、共通の機能を持つ基本インターフェースから特化したインターフェースを構築する。",
+        "examples": {
+          "basic": "interface IEntity { id: string; createdAt: Date; updatedAt: Date; }",
+          "composed": "interface IDocument extends IEntity { title: string; content: string; tags: string[]; }"
+        }
+      },
+      "genericInterfaces": {
+        "rule": "再利用可能なパターンにはジェネリックを活用する",
+        "explanation": "似たようなインターフェースを何度も定義するのではなく、ジェネリック型パラメータを使用して汎用的なインターフェースを定義する。",
+        "examples": {
+          "generic": "interface IRepository<T> { find(id: string): Promise<T | null>; findAll(): Promise<T[]>; save(entity: T): Promise<void>; }",
+          "usage": "interface IDocumentRepository extends IRepository<IDocument> { findByTag(tag: string): Promise<IDocument[]>; }"
+        }
+      }
+    },
+    "layerSpecificGuidelines": {
+      "domainLayer": {
+        "description": "ドメインレイヤーは、ビジネスルールとエンティティを含む最も内側のレイヤー。",
+        "interfaces": [
+          "IRepository<T>",
+          "IEntity",
+          "IValueObject",
+          "IDomainService",
+          "IFactory"
+        ],
+        "rules": [
+          "外部技術（データベースなど）への依存を含めない",
+          "純粋なビジネスロジックとドメインの概念のみを扱う",
+          "他のレイヤーに依存しない"
+        ]
+      },
+      "applicationLayer": {
+        "description": "アプリケーションレイヤーは、ユースケースとアプリケーション固有のロジックを含む。",
+        "interfaces": [
+          "IUseCase<TInput, TOutput>",
+          "IApplicationService",
+          "IQueryService",
+          "ICommandHandler"
+        ],
+        "rules": [
+          "ドメインレイヤーのインターフェースに依存してもよい",
+          "外部技術への直接的な依存は避ける",
+          "トランザクション境界やセキュリティの強制などを担当"
+        ]
+      },
+      "infrastructureLayer": {
+        "description": "インフラストラクチャレイヤーは、外部技術との連携を担当する最も外側のレイヤー。",
+        "interfaces": [
+          "IFileSystem",
+          "ILogger",
+          "IConfigProvider",
+          "IHttpClient"
+        ],
+        "rules": [
+          "技術的な詳細を隠蔽するインターフェースを提供",
+          "ドメインとアプリケーションレイヤーが定義したインターフェースを実装",
+          "依存性注入を通じて内側のレイヤーに機能を提供"
+        ]
+      },
+      "interfaceLayer": {
+        "description": "インターフェースレイヤーは、API、UI、外部システムとの連携を担当。",
+        "interfaces": [
+          "IController",
+          "IPresenter",
+          "IViewModel",
+          "IApiRequest",
+          "IApiResponse"
+        ],
+        "rules": [
+          "ユーザーや外部システムとの相互作用を担当",
+          "アプリケーションレイヤーのユースケースを呼び出す",
+          "入出力データの変換と検証を担当"
+        ]
+      }
+    },
+    "migrationStrategy": {
+      "phasedApproach": {
+        "description": "既存のインターフェースを新しいガイドラインに合わせて段階的に移行する戦略。",
+        "phases": [
+          {
+            "phase": "Phase 1: 分析と計画",
+            "tasks": [
+              "既存インターフェースの一覧作成と分類",
+              "影響範囲の調査",
+              "移行計画の策定"
+            ]
+          },
+          {
+            "phase": "Phase 2: ドメインレイヤーの移行",
+            "tasks": [
+              "コアドメインインターフェースの命名規則統一",
+              "メソッドシグネチャの標準化",
+              "ドメインレイヤーのテスト修正"
+            ]
+          },
+          {
+            "phase": "Phase 3: アプリケーションレイヤーの移行",
+            "tasks": [
+              "ユースケースとサービスのインターフェース統一",
+              "依存関係の更新",
+              "アプリケーションレイヤーのテスト修正"
+            ]
+          },
+          {
+            "phase": "Phase 4: インフラレイヤーとインターフェースレイヤーの移行",
+            "tasks": [
+              "外部サービスアダプターの統一",
+              "コントローラーとプレゼンターの修正",
+              "全体テストの実行"
+            ]
+          }
+        ]
+      },
+      "compatibilityStrategy": {
+        "description": "移行中のコードの互換性を確保する戦略。",
+        "approaches": [
+          {
+            "name": "インターフェースブリッジ",
+            "description": "古いインターフェースと新しいインターフェースの間に互換レイヤーを導入する。古いインターフェースを実装し、内部で新しいインターフェースを呼び出す。",
+            "example": "class LegacyRepositoryAdapter implements Repository { // 古いインターフェース実装\n  constructor(private newRepo: IRepository) {}\n  \n  // 古いメソッドを実装し、新しいインターフェースに委譲\n  async findById(id: string) {\n    return this.newRepo.find(id);\n  }\n}"
+          },
+          {
+            "name": "一時的な型エイリアス",
+            "description": "古いインターフェース名と新しいインターフェース名を型エイリアスで関連付ける。",
+            "example": "// 新しいインターフェース\ninterface IRepository<T> { ... }\n\n// 互換性のために古い名前を維持\ntype Repository<T> = IRepository<T>;"
+          }
+        ]
+      }
+    },
+    "bestPractices": {
+      "documentation": {
+        "rule": "インターフェースと各メソッドには必ずTSDocコメントを付ける",
+        "examples": {
+          "interfaceDoc": "/**\n * ドキュメント操作のためのリポジトリインターフェース\n * ドキュメントの読み書き、検索などの基本操作を提供する\n */\ninterface IDocumentRepository { ... }",
+          "methodDoc": "/**\n * 指定されたIDのドキュメントを取得する\n * @param id ドキュメントの一意識別子\n * @returns ドキュメントオブジェクト、存在しない場合はnull\n * @throws DocumentAccessError アクセス権がない場合\n */\ngetDocument(id: string): Promise<IDocument | null>;"
+        }
+      },
+      "consistency": {
+        "rule": "関連するインターフェース間でメソッド名と戻り値型を一貫させる",
+        "examples": {
+          "consistent": "interface IDocumentRepository { getDocument(id: string): Promise<IDocument | null>; }\ninterface IBranchRepository { getBranch(name: string): Promise<IBranch | null>; }",
+          "inconsistent": "interface IDocumentRepository { getDocument(id: string): Promise<IDocument | null>; }\ninterface IBranchRepository { fetchBranch(name: string): Promise<IBranch | undefined>; }"
+        }
+      },
+      "versioning": {
+        "rule": "後方互換性を破る変更には新しいインターフェースバージョンを作成する",
+        "example": "// 元のインターフェース\ninterface IDocumentRepository { ... }\n\n// 互換性を破る変更が必要な場合は新しいバージョンを作成\ninterface IDocumentRepositoryV2 { ... }"
+      },
+      "testability": {
+        "rule": "インターフェースはモック可能な設計にする",
+        "notes": "依存性注入を前提とした設計にし、テスト時にはモックに置き換え可能にする。大きなインターフェースよりも小さく特化したインターフェースの方がモックが容易。"
+      }
+    }
+  }
+}

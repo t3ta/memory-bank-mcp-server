@@ -1,0 +1,189 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "implementation-plan-interface",
+    "title": "インターフェース統一化実装計画",
+    "documentType": "plan",
+    "path": "implementation-plan.json",
+    "tags": [
+      "interface",
+      "refactoring",
+      "design",
+      "plan",
+      "typescript"
+    ],
+    "lastModified": "2025-03-29T20:10:00.000Z",
+    "createdAt": "2025-03-29T20:10:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "title": "インターフェース統一化実装計画",
+      "description": "Memory Bank MCPサーバーのインターフェース設計を統一し、一貫性を確保するための具体的な実装計画。",
+      "goals": [
+        "すべてのインターフェースの命名規則を「I」プレフィックスで統一する",
+        "非同期メソッドのシグネチャをPromise<T>で統一する",
+        "複数パラメータを持つメソッドのパラメータ設計をオブジェクトリテラル型で標準化する",
+        "内側から外側へのレイヤーの順にリファクタリングを進める"
+      ]
+    },
+    "analysis": {
+      "currentState": {
+        "totalInterfaces": 19,
+        "withPrefix": 19,
+        "withoutPrefix": 0,
+        "prefixCompliance": "100%",
+        "asyncMethodsWithPromise": "100%",
+        "parameterDesignCompliance": "約70%"
+      },
+      "strengths": [
+        "すべてのインターフェースが既に「I」プレフィックスで統一されている",
+        "非同期メソッドはすべてPromise<T>を返すように統一されている",
+        "インターフェース階層が適切に分離されている（ドメイン、アプリケーション、インフラ、インターフェース）"
+      ],
+      "issues": [
+        "一部のインターフェースにおいて、メソッドシグネチャの詳細（特にパラメータ数が3未満の場合）が不足している",
+        "パラメータ設計にばらつきがあり、3つ以上のパラメータを持つメソッドでもオブジェクトリテラル型を使用しないケースがある",
+        "インターフェースの責務分離が適切でない場合がある（例：大きすぎるインターフェース）"
+      ]
+    },
+    "implementationSteps": {
+      "phase1": {
+        "title": "ドメインレイヤーインターフェースの標準化",
+        "steps": [
+          {
+            "id": "domain-methods-audit",
+            "description": "ドメインレイヤーの各インターフェースのメソッドシグネチャを監査し、詳細が不足しているものを特定",
+            "status": "todo",
+            "priority": "high"
+          },
+          {
+            "id": "domain-parameter-standardization",
+            "description": "3つ以上のパラメータを持つメソッドをオブジェクトリテラル型を使用するように修正",
+            "status": "todo",
+            "priority": "high"
+          },
+          {
+            "id": "domain-method-documentation",
+            "description": "ドメインレイヤーの各インターフェースのTSDocコメントを充実させる",
+            "status": "todo",
+            "priority": "medium"
+          }
+        ]
+      },
+      "phase2": {
+        "title": "アプリケーションレイヤーインターフェースの標準化",
+        "steps": [
+          {
+            "id": "application-methods-audit",
+            "description": "アプリケーションレイヤーの各インターフェースのメソッドシグネチャを監査し、詳細が不足しているものを特定",
+            "status": "todo",
+            "priority": "high"
+          },
+          {
+            "id": "application-parameter-standardization",
+            "description": "3つ以上のパラメータを持つメソッドをオブジェクトリテラル型を使用するように修正",
+            "status": "todo",
+            "priority": "high"
+          },
+          {
+            "id": "application-method-documentation",
+            "description": "アプリケーションレイヤーの各インターフェースのTSDocコメントを充実させる",
+            "status": "todo",
+            "priority": "medium"
+          }
+        ]
+      },
+      "phase3": {
+        "title": "インフラストラクチャレイヤーインターフェースの標準化",
+        "steps": [
+          {
+            "id": "infrastructure-methods-audit",
+            "description": "インフラストラクチャレイヤーの各インターフェースのメソッドシグネチャを監査し、詳細が不足しているものを特定",
+            "status": "todo",
+            "priority": "medium"
+          },
+          {
+            "id": "infrastructure-parameter-standardization",
+            "description": "3つ以上のパラメータを持つメソッドをオブジェクトリテラル型を使用するように修正",
+            "status": "todo",
+            "priority": "medium"
+          },
+          {
+            "id": "infrastructure-method-documentation",
+            "description": "インフラストラクチャレイヤーの各インターフェースのTSDocコメントを充実させる",
+            "status": "todo",
+            "priority": "medium"
+          }
+        ]
+      },
+      "phase4": {
+        "title": "インターフェースレイヤーの標準化",
+        "steps": [
+          {
+            "id": "interface-methods-audit",
+            "description": "インターフェースレイヤーの各インターフェースのメソッドシグネチャを監査し、詳細が不足しているものを特定",
+            "status": "todo",
+            "priority": "medium"
+          },
+          {
+            "id": "interface-parameter-standardization",
+            "description": "3つ以上のパラメータを持つメソッドをオブジェクトリテラル型を使用するように修正",
+            "status": "todo",
+            "priority": "medium"
+          },
+          {
+            "id": "interface-method-documentation",
+            "description": "インターフェースレイヤーの各インターフェースのTSDocコメントを充実させる",
+            "status": "todo",
+            "priority": "medium"
+          }
+        ]
+      },
+      "phase5": {
+        "title": "テストとドキュメント更新",
+        "steps": [
+          {
+            "id": "update-tests",
+            "description": "変更されたインターフェースに対応するテストを更新",
+            "status": "todo",
+            "priority": "high"
+          },
+          {
+            "id": "update-guidelines",
+            "description": "インターフェース設計ガイドラインを更新し、採用したベストプラクティスを反映",
+            "status": "todo",
+            "priority": "medium"
+          },
+          {
+            "id": "create-examples",
+            "description": "標準化されたインターフェース設計の例を作成",
+            "status": "todo",
+            "priority": "low"
+          }
+        ]
+      }
+    },
+    "technicalDetails": {
+      "methodSignatureStandard": {
+        "rule": "すべての非同期メソッドはPromise<T>を返すこと",
+        "example": "findById(id: string): Promise<Document | null>;",
+        "implementation": "すでに全てのメソッドで実装済み"
+      },
+      "parameterDesignStandard": {
+        "rule": "3つ以上のパラメータを持つメソッドはオブジェクトリテラル型を使用すること",
+        "example": {
+          "before": "findDocuments(query: string, limit: number, offset: number, sortField?: string, sortOrder?: 'asc' | 'desc'): Promise<Document[]>;",
+          "after": "findDocuments(params: { query: string; limit: number; offset: number; sortField?: string; sortOrder?: 'asc' | 'desc' }): Promise<Document[]>;"
+        },
+        "implementation": "パラメータ数が多いメソッドから優先的に修正する"
+      },
+      "documentationStandard": {
+        "rule": "すべてのインターフェースとメソッドにTSDocコメントを付けること",
+        "example": "/**\n * Find a document by its ID\n * @param id Document ID\n * @returns Promise resolving to the document if found, or null if not found\n */\nfindById(id: string): Promise<Document | null>;",
+        "implementation": "ドメインレイヤーから順にドキュメントを追加または充実させる"
+      }
+    },
+    "notes": "インターフェース設計の統一は、主にメソッドシグネチャのパラメータ設計とドキュメントの充実に焦点を当てて進めます。既に「I」プレフィックスとPromise<T>の返り値型は統一されています。"
+  }
+}

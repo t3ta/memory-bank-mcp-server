@@ -1,0 +1,98 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "active-context-integrated-interface",
+    "title": "インターフェース統一化アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context",
+      "interface",
+      "refactoring",
+      "design"
+    ],
+    "lastModified": "2025-03-29T19:00:00.000Z",
+    "createdAt": "2025-03-29T19:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "インターフェース統一化作業の準備段階。まずはインターフェース設計ガイドラインの策定と既存インターフェースのリストアップを行い、その後具体的な修正作業に入る予定。最初にドメインレイヤーのインターフェースを修正し、次にアプリケーションレイヤー、インフラレイヤーの順に進める。",
+    "recentChanges": [
+      {
+        "date": "2025-03-29T19:00:00.000Z",
+        "description": "feature/integrated-interfaceブランチを作成、インターフェース統一化作業を開始"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "ad-i-prefix",
+        "description": "すべてのインターフェース名には「I」プレフィックスを付けることで統一する"
+      },
+      {
+        "id": "ad-promise-return",
+        "description": "非同期メソッドはすべてPromise<T>を返すように統一する"
+      },
+      {
+        "id": "ad-object-params",
+        "description": "3つ以上のパラメータを持つメソッドはオブジェクトリテラル型を使用するように統一する"
+      },
+      {
+        "id": "ad-inner-to-outer",
+        "description": "ドメインレイヤー（内側）から順にインターフェースを修正し、外側のレイヤーに影響が伝わるようにする"
+      },
+      {
+        "id": "ad-small-changes",
+        "description": "変更は小さく分割して行い、各ステップで動作確認とテストを実施する"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "con-backward-compatibility",
+        "description": "インターフェース変更に伴う後方互換性の問題をどう扱うか",
+        "status": "open"
+      },
+      {
+        "id": "con-test-modification",
+        "description": "テストコード、特にモックの修正をどの程度行うべきか",
+        "status": "open"
+      },
+      {
+        "id": "con-implementation-impact",
+        "description": "インターフェース名変更が実装クラスに与える影響範囲の正確な把握",
+        "status": "open"
+      },
+      {
+        "id": "con-dependency-injection",
+        "description": "依存性注入の設定への影響と必要な変更",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "ns-interface-inventory",
+        "description": "コードベース全体のインターフェース一覧を作成し、命名規則違反を特定する",
+        "priority": "high"
+      },
+      {
+        "id": "ns-domain-interfaces",
+        "description": "ドメインレイヤーの主要インターフェース（IMemoryBankRepository等）の修正を行う",
+        "priority": "high"
+      },
+      {
+        "id": "ns-method-signature-analysis",
+        "description": "メソッドシグネチャの一貫性を分析し、修正が必要な箇所を特定する",
+        "priority": "medium"
+      },
+      {
+        "id": "ns-application-interfaces",
+        "description": "アプリケーションレイヤーのインターフェース修正を行う",
+        "priority": "medium"
+      },
+      {
+        "id": "ns-infra-interfaces",
+        "description": "インフラストラクチャレイヤーのインターフェース修正を行う",
+        "priority": "low"
+      }
+    ]
+  }
+}
