@@ -64,9 +64,10 @@ export interface IIndexService {
 
   /**
    * Find document references by tags
-   * @param branchInfo Branch information
-   * @param tags Tags to search for
-   * @param matchAll If true, documents must have all tags; if false, any tag is sufficient
+   * @param params Parameters for finding documents by tags
+   * @param params.branchInfo Branch information
+   * @param params.tags Tags to search for
+   * @param params.matchAll If true, documents must have all tags; if false, any tag is sufficient
    * @returns Promise resolving to array of matching document references
    */
   // パラメータをオブジェクトリテラル型に変更

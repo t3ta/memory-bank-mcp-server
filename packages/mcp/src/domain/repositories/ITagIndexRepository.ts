@@ -69,9 +69,10 @@ export interface ITagIndexRepository {
 
   /**
    * Find documents by tags in branch
-   * @param branchInfo Branch information
-   * @param tags Tags to search for
-   * @param matchAll Whether documents must have all tags (AND) or any tag (OR)
+   * @param params Parameters for finding documents
+   * @param params.branchInfo Branch information
+   * @param params.tags Tags to search for
+   * @param params.matchAll Whether documents must have all tags (AND) or any tag (OR)
    * @returns Promise resolving to array of document paths matching the tags
    */
   // パラメータをオブジェクトリテラル型に変更

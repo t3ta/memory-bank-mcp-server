@@ -13,9 +13,10 @@ export interface II18nProvider {
   /**
    * Translates a key to the specified language with optional parameter substitution
    *
-   * @param key Translation key
-   * @param language Target language
-   * @param params Optional parameters for substitution
+   * @param params Parameters for translation
+   * @param params.key Translation key
+   * @param params.language Target language
+   * @param params.params Optional parameters for substitution
    * @returns Translated text
    */
   // パラメータをオブジェクトリテラル型に変更

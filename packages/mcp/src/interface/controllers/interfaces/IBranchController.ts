@@ -17,10 +17,11 @@ export interface IBranchController extends IController {
 
   /**
    * Write document to branch memory bank
-   * @param branchName Branch name
-   * @param path Document path
-   * @param content Document content
-   * @param tags Optional tags for the document
+   * @param params Parameters for writing the document
+   * @param params.branchName Branch name
+   * @param params.path Document path
+   * @param params.content Document content
+   * @param params.tags Optional tags for the document
    * @returns Promise resolving to MCP response with the result
    */
   // パラメータをオブジェクトリテラル型に変更
@@ -55,9 +56,10 @@ export interface IBranchController extends IController {
 
   /**
    * Find documents by tags in branch memory bank
-   * @param branchName Branch name
-   * @param tags Tags to search for
-   * @param matchAllTags Whether to require all tags to match
+   * @param params Parameters for finding documents by tags
+   * @param params.branchName Branch name
+   * @param params.tags Tags to search for
+   * @param params.matchAllTags Whether to require all tags to match
    * @returns Promise resolving to MCP response with matching documents
    */
   // パラメータをオブジェクトリテラル型に変更

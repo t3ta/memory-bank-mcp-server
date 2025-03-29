@@ -11,9 +11,10 @@ export interface IFileSystemService {
 
   /**
    * Read a chunk of a file
-   * @param filePath File path
-   * @param start Starting position in bytes
-   * @param length Number of bytes to read
+   * @param params Parameters for reading a chunk
+   * @param params.filePath File path
+   * @param params.start Starting position in bytes
+   * @param params.length Number of bytes to read
    * @returns Promise resolving to the chunk content as string
    */
   // パラメータをオブジェクトリテラル型に変更

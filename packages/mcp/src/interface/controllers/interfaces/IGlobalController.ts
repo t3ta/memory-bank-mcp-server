@@ -17,9 +17,10 @@ export interface IGlobalController extends IController {
 
   /**
    * Write document to global memory bank
-   * @param path Document path
-   * @param content Document content
-   * @param tags Optional tags for the document
+   * @param params Parameters for writing the document
+   * @param params.path Document path
+   * @param params.content Document content
+   * @param params.tags Optional tags for the document
    * @returns Promise resolving to MCP response with the result
    */
   // パラメータをオブジェクトリテラル型に変更

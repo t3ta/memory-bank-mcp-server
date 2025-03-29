@@ -105,9 +105,10 @@ export interface IBranchMemoryBankRepository {
 
   /**
    * Find documents by tags in branch using index
-   * @param branchInfo Branch information
-   * @param tags Tags to search for
-   * @param matchAll If true, documents must have all tags (AND), otherwise any tag (OR)
+   * @param params Parameters for finding documents
+   * @param params.branchInfo Branch information
+   * @param params.tags Tags to search for
+   * @param params.matchAll If true, documents must have all tags (AND), otherwise any tag (OR)
    * @returns Promise resolving to array of document paths
    */
   findDocumentPathsByTagsUsingIndex(params: {
