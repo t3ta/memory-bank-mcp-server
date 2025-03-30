@@ -41,3 +41,6 @@ tests/.temp
 
 # Local files
 .local/
+
+# Memory Bank specific files
+docs/global-memory-bank/tags/index.json
