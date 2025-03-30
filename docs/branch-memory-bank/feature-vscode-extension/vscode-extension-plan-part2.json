@@ -1,0 +1,525 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "vscode-extension-plan-part2",
+    "title": "VS Code拡張の実装計画 (Part 2: 機能と実装フェーズ)",
+    "documentType": "implementation_plan",
+    "path": "vscode-extension-plan-part2.json",
+    "tags": [
+      "vscode-extension",
+      "implementation-plan",
+      "memory-bank",
+      "editor-integration",
+      "part2"
+    ],
+    "lastModified": "2025-03-30T12:00:00.000Z",
+    "createdAt": "2025-03-30T12:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "features": [
+      {
+        "id": "feature-explorer",
+        "name": "メモリバンクエクスプローラー",
+        "description": "メモリバンクのコンテンツをツリービューで表示し、ナビゲーション・フィルタリングを提供する",
+        "subFeatures": [
+          {
+            "name": "ドキュメントツリー",
+            "description": "メモリバンクの内容をツリー構造で表示",
+            "details": "ドキュメントをタイプ、タグ、パスでグループ化したツリー表示"
+          },
+          {
+            "name": "検索・フィルタリング",
+            "description": "コンテンツの検索とフィルタリング",
+            "details": "タイトル、ID、タグ、コンテンツなどで検索・フィルタリング"
+          },
+          {
+            "name": "コンテキストメニュー",
+            "description": "右クリックで利用可能な操作メニュー",
+            "details": "新規作成、削除、複製、移動などの操作"
+          },
+          {
+            "name": "ドキュメント情報",
+            "description": "選択したドキュメントのメタデータ表示",
+            "details": "最終更新日、作成者、バージョンなどの情報表示"
+          }
+        ],
+        "priority": "high",
+        "implementationDetails": {
+          "mainClasses": [
+            "MemoryBankExplorer",
+            "DocumentTreeProvider",
+            "DocumentTreeItem"
+          ],
+          "vsCodeIntegration": "TreeView APIを使用して実装",
+          "keyFunctions": [
+            "getTreeItem(element): vscode.TreeItem",
+            "getChildren(element?: DocumentTreeItem): Promise<DocumentTreeItem[]>",
+            "refresh(): void",
+            "filterByTag(tag: string): void",
+            "filterByType(type: string): void",
+            "searchByText(text: string): void"
+          ]
+        }
+      },
+      {
+        "id": "feature-editor",
+        "name": "ドキュメントエディタ",
+        "description": "メモリバンクドキュメントを編集するための高度なJSONエディタ",
+        "subFeatures": [
+          {
+            "name": "スキーマベースの編集",
+            "description": "スキーマに基づいた編集支援",
+            "details": "フィールド補完、型チェック、必須フィールドの警告"
+          },
+          {
+            "name": "リアルタイム検証",
+            "description": "編集中のリアルタイムエラーチェック",
+            "details": "構文エラー、スキーマ違反の即時フィードバック"
+          },
+          {
+            "name": "プレビューモード",
+            "description": "構造化されたプレビュー表示",
+            "details": "JSONを見やすく整形したプレビュー表示"
+          },
+          {
+            "name": "フォームエディタ",
+            "description": "フォームベースの編集インターフェース",
+            "details": "複雑なJSONを直接編集せずにフォームで編集できる機能"
+          }
+        ],
+        "priority": "high",
+        "implementationDetails": {
+          "mainClasses": [
+            "DocumentEditorProvider",
+            "DocumentEditor",
+            "FormEditorPanel"
+          ],
+          "vsCodeIntegration": "CustomEditor APIとWebViewを使用して実装",
+          "keyFunctions": [
+            "resolveCustomEditor(document, webviewPanel): Promise<void>",
+            "saveDocument(document, cancellation): Promise<void>",
+            "updateWebview(document: vscode.TextDocument): void",
+            "validateDocument(document: vscode.TextDocument): ValidationResult[]"
+          ]
+        }
+      },
+      {
+        "id": "feature-diff",
+        "name": "差分比較",
+        "description": "ブランチ間またはバージョン間の差分比較機能",
+        "subFeatures": [
+          {
+            "name": "ブランチ比較",
+            "description": "異なるブランチのメモリバンク比較",
+            "details": "ブランチ間の追加、削除、変更を視覚的に表示"
+          },
+          {
+            "name": "バージョン履歴",
+            "description": "ドキュメントのバージョン履歴表示",
+            "details": "同一ドキュメントの変更履歴と各バージョンの差分"
+          },
+          {
+            "name": "マージプレビュー",
+            "description": "変更のマージプレビュー",
+            "details": "マージ前に結果をプレビューできる機能"
+          }
+        ],
+        "priority": "medium",
+        "implementationDetails": {
+          "mainClasses": [
+            "BranchManager",
+            "DiffProvider",
+            "DiffViewPanel"
+          ],
+          "vsCodeIntegration": "Diff Editor APIとWebViewを使用して実装",
+          "keyFunctions": [
+            "compareBranches(branch1: string, branch2: string): Promise<void>",
+            "compareDocuments(doc1: DocumentInfo, doc2: DocumentInfo): Promise<void>",
+            "generateDiff(original: any, modified: any): DiffResult",
+            "visualizeDiff(diffResult: DiffResult): string"
+          ]
+        }
+      },
+      {
+        "id": "feature-link",
+        "name": "ドキュメント関連性",
+        "description": "ドキュメント間のリンクと参照関係の可視化",
+        "subFeatures": [
+          {
+            "name": "リンク検出",
+            "description": "ドキュメント間の参照を自動検出",
+            "details": "ID参照やパス参照を解析して関連性を特定"
+          },
+          {
+            "name": "グラフ表示",
+            "description": "関連性のグラフ表示",
+            "details": "ドキュメント間の関係をビジュアルグラフで表示"
+          },
+          {
+            "name": "ナビゲーション",
+            "description": "関連ドキュメントへのナビゲーション",
+            "details": "参照元・参照先へのワンクリックジャンプ"
+          }
+        ],
+        "priority": "medium",
+        "implementationDetails": {
+          "mainClasses": [
+            "DocumentLinkProvider",
+            "RelationshipGraphPanel",
+            "ReferenceAnalyzer"
+          ],
+          "vsCodeIntegration": "WebViewとDocumentLink APIを使用して実装",
+          "keyFunctions": [
+            "analyzeReferences(document: DocumentInfo): Promise<ReferenceResult>",
+            "provideDocumentLinks(document: vscode.TextDocument): vscode.DocumentLink[]",
+            "showRelationshipGraph(documentId: string): Promise<void>",
+            "renderGraph(relationships: RelationshipData): string"
+          ]
+        }
+      },
+      {
+        "id": "feature-template",
+        "name": "テンプレート機能",
+        "description": "新規ドキュメント作成のためのテンプレート機能",
+        "subFeatures": [
+          {
+            "name": "テンプレート管理",
+            "description": "カスタムテンプレートの作成と管理",
+            "details": "よく使うドキュメント構造をテンプレートとして保存"
+          },
+          {
+            "name": "スニペット挿入",
+            "description": "一般的なパターンをスニペットとして挿入",
+            "details": "タグ配列、一般的なコンテンツ構造などのスニペット"
+          },
+          {
+            "name": "デフォルト値",
+            "description": "フィールドのデフォルト値設定",
+            "details": "テンプレートごとにデフォルト値を設定可能"
+          }
+        ],
+        "priority": "low",
+        "implementationDetails": {
+          "mainClasses": [
+            "TemplateManager",
+            "TemplateProvider",
+            "NewDocumentWizard"
+          ],
+          "vsCodeIntegration": "QuickPick APIとWebViewを使用して実装",
+          "keyFunctions": [
+            "getTemplates(): Promise<Template[]>",
+            "createTemplateFromDocument(document: DocumentInfo): Promise<void>",
+            "applyTemplate(templateId: string): Promise<DocumentInfo>",
+            "showNewDocumentWizard(): Promise<void>"
+          ]
+        }
+      },
+      {
+        "id": "feature-analytics",
+        "name": "メモリバンク分析",
+        "description": "メモリバンクのコンテンツに関する統計と分析",
+        "subFeatures": [
+          {
+            "name": "使用統計",
+            "description": "メモリバンクの使用状況統計",
+            "details": "ドキュメント数、サイズ、タイプ別分布などの統計"
+          },
+          {
+            "name": "変更頻度",
+            "description": "ドキュメントの更新頻度分析",
+            "details": "どのドキュメントが最も頻繁に更新されているかの分析"
+          },
+          {
+            "name": "健全性チェック",
+            "description": "メモリバンクの健全性チェック",
+            "details": "破損ドキュメント、スキーマ不一致、孤立参照などの検出"
+          }
+        ],
+        "priority": "low",
+        "implementationDetails": {
+          "mainClasses": [
+            "AnalyticsProvider",
+            "AnalyticsDashboard",
+            "HealthChecker"
+          ],
+          "vsCodeIntegration": "WebViewを使用して実装",
+          "keyFunctions": [
+            "collectStatistics(): Promise<MemoryBankStatistics>",
+            "analyzeChangeFrequency(): Promise<ChangeFrequencyData>",
+            "performHealthCheck(): Promise<HealthCheckResult>",
+            "showAnalyticsDashboard(): Promise<void>"
+          ]
+        }
+      }
+    ],
+    "implementation": {
+      "phases": [
+        {
+          "id": "phase-1",
+          "name": "基本機能実装",
+          "description": "基本的なメモリバンク閲覧・編集機能の実装",
+          "duration": "2週間",
+          "tasks": [
+            {
+              "id": "task-1-1",
+              "name": "プロジェクト初期化",
+              "description": "VS Code拡張プロジェクトの初期化とビルド環境の設定",
+              "estimatedEffort": "1日",
+              "dependencies": []
+            },
+            {
+              "id": "task-1-2",
+              "name": "MemoryBankProvider実装",
+              "description": "メモリバンクとのインタラクションを行うプロバイダーの実装",
+              "estimatedEffort": "3日",
+              "dependencies": [
+                "task-1-1"
+              ]
+            },
+            {
+              "id": "task-1-3",
+              "name": "SchemaProvider実装",
+              "description": "packages/schemasと連携してスキーマを提供するプロバイダーの実装",
+              "estimatedEffort": "2日",
+              "dependencies": [
+                "task-1-1"
+              ]
+            },
+            {
+              "id": "task-1-4",
+              "name": "メモリバンクエクスプローラー実装",
+              "description": "メモリバンクのコンテンツをツリービューで表示するエクスプローラーの実装",
+              "estimatedEffort": "3日",
+              "dependencies": [
+                "task-1-2"
+              ]
+            },
+            {
+              "id": "task-1-5",
+              "name": "ドキュメントエディタ（基本機能）",
+              "description": "基本的なドキュメント編集機能の実装",
+              "estimatedEffort": "3日",
+              "dependencies": [
+                "task-1-2",
+                "task-1-3"
+              ]
+            }
+          ],
+          "deliverables": [
+            "メモリバンクエクスプローラー（基本機能）",
+            "シンプルなドキュメントエディタ",
+            "スキーマとの連携"
+          ]
+        },
+        {
+          "id": "phase-2",
+          "name": "高度な編集・検証機能",
+          "description": "エディタ機能の強化とスキーマベースの検証機能の実装",
+          "duration": "2週間",
+          "tasks": [
+            {
+              "id": "task-2-1",
+              "name": "SchemaValidator実装",
+              "description": "スキーマに基づいたドキュメント検証コンポーネントの実装",
+              "estimatedEffort": "3日",
+              "dependencies": [
+                "phase-1"
+              ]
+            },
+            {
+              "id": "task-2-2",
+              "name": "エディタ機能強化",
+              "description": "リアルタイム検証、自動補完、フォーマットなどの機能追加",
+              "estimatedEffort": "4日",
+              "dependencies": [
+                "task-2-1"
+              ]
+            },
+            {
+              "id": "task-2-3",
+              "name": "フォームエディタ実装",
+              "description": "フォームベースの編集インターフェースの実装",
+              "estimatedEffort": "5日",
+              "dependencies": [
+                "task-2-1"
+              ]
+            },
+            {
+              "id": "task-2-4",
+              "name": "エクスプローラー機能強化",
+              "description": "検索・フィルタリング機能の強化とコンテキストメニューの実装",
+              "estimatedEffort": "3日",
+              "dependencies": [
+                "phase-1"
+              ]
+            }
+          ],
+          "deliverables": [
+            "リアルタイム検証機能",
+            "フォームベースエディタ",
+            "検索・フィルタリング機能",
+            "エクスプローラーコンテキストメニュー"
+          ]
+        },
+        {
+          "id": "phase-3",
+          "name": "ドキュメント関連性と差分比較",
+          "description": "ドキュメント間の関連性可視化とブランチ間の差分比較機能の実装",
+          "duration": "2週間",
+          "tasks": [
+            {
+              "id": "task-3-1",
+              "name": "BranchManager実装",
+              "description": "ブランチの管理とブランチ間の比較を行うコンポーネントの実装",
+              "estimatedEffort": "4日",
+              "dependencies": [
+                "phase-2"
+              ]
+            },
+            {
+              "id": "task-3-2",
+              "name": "差分表示機能",
+              "description": "ブランチ間/バージョン間の差分を視覚的に表示する機能の実装",
+              "estimatedEffort": "3日",
+              "dependencies": [
+                "task-3-1"
+              ]
+            },
+            {
+              "id": "task-3-3",
+              "name": "ドキュメント関連性検出",
+              "description": "ドキュメント間のリンクと参照関係を検出する機能の実装",
+              "estimatedEffort": "4日",
+              "dependencies": [
+                "phase-2"
+              ]
+            },
+            {
+              "id": "task-3-4",
+              "name": "関連性グラフ表示",
+              "description": "ドキュメント間の関係をグラフで可視化する機能の実装",
+              "estimatedEffort": "4日",
+              "dependencies": [
+                "task-3-3"
+              ]
+            }
+          ],
+          "deliverables": [
+            "ブランチ間の差分比較機能",
+            "バージョン履歴表示",
+            "ドキュメント関連性グラフ",
+            "関連ドキュメントナビゲーション"
+          ]
+        },
+        {
+          "id": "phase-4",
+          "name": "拡張機能と最適化",
+          "description": "テンプレート機能、分析機能の追加と全体の最適化",
+          "duration": "2週間",
+          "tasks": [
+            {
+              "id": "task-4-1",
+              "name": "テンプレート機能実装",
+              "description": "新規ドキュメント作成のためのテンプレート機能の実装",
+              "estimatedEffort": "3日",
+              "dependencies": [
+                "phase-3"
+              ]
+            },
+            {
+              "id": "task-4-2",
+              "name": "分析機能実装",
+              "description": "メモリバンクの使用状況や健全性を分析する機能の実装",
+              "estimatedEffort": "4日",
+              "dependencies": [
+                "phase-3"
+              ]
+            },
+            {
+              "id": "task-4-3",
+              "name": "パフォーマンス最適化",
+              "description": "拡張機能全体のパフォーマンス最適化",
+              "estimatedEffort": "3日",
+              "dependencies": [
+                "task-4-1",
+                "task-4-2"
+              ]
+            },
+            {
+              "id": "task-4-4",
+              "name": "最終テストと修正",
+              "description": "全機能の統合テストと最終調整",
+              "estimatedEffort": "3日",
+              "dependencies": [
+                "task-4-3"
+              ]
+            }
+          ],
+          "deliverables": [
+            "テンプレート管理機能",
+            "メモリバンク分析ダッシュボード",
+            "最適化された拡張機能",
+            "完全な機能テスト"
+          ]
+        }
+      ]
+    },
+    "testing": {
+      "strategy": "ユニットテスト、統合テスト、E2Eテストの組み合わせ",
+      "frameworks": [
+        {
+          "name": "Jest",
+          "usage": "ユニットテストと統合テスト"
+        },
+        {
+          "name": "VS Code Extension Testing",
+          "usage": "拡張機能の統合テスト"
+        },
+        {
+          "name": "Playwright",
+          "usage": "E2Eテスト（実際のVS Code環境での動作確認）"
+        }
+      ],
+      "testCoverage": {
+        "target": "80%以上のコードカバレッジ",
+        "criticalAreas": [
+          "スキーマ検証ロジック",
+          "ファイル操作",
+          "ドキュメント更新処理"
+        ]
+      },
+      "testPlans": [
+        {
+          "name": "ユニットテスト",
+          "areas": [
+            "SchemaValidator",
+            "MemoryBankProvider",
+            "DocumentEditor",
+            "ユーティリティ関数"
+          ],
+          "description": "各コンポーネントの単体テスト"
+        },
+        {
+          "name": "統合テスト",
+          "areas": [
+            "エディタとスキーマ検証の連携",
+            "エクスプローラーとメモリバンクプロバイダーの連携",
+            "ブランチマネージャーと差分表示の連携"
+          ],
+          "description": "コンポーネント間の連携テスト"
+        },
+        {
+          "name": "E2Eテスト",
+          "areas": [
+            "拡張機能のアクティベーション",
+            "エクスプローラーからのドキュメント操作",
+            "エディタでの編集とリアルタイム検証",
+            "差分比較機能"
+          ],
+          "description": "実際のVS Code環境での動作テスト"
+        }
+      ]
+    }
+  }
+}
