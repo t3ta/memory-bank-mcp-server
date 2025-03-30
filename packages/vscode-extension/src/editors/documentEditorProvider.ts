@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import MarkdownIt from 'markdown-it';
+// Removed unused/incorrect internal type imports for markdown-it
+import hljs from 'highlight.js'; // Import highlight.js
 import { generateMarkdownFromData } from '../markdown/renderers'; // Import the renderer function
 // Unused type imports removed
 // mdMermaid will be imported dynamically later
@@ -10,10 +12,21 @@ const md = new MarkdownIt({
   html: true,
   linkify: true,
   typographer: true,
+  highlight: function (str: string, lang: string): string { // Add types to highlight function args
+    if (lang && hljs.getLanguage(lang)) {
+      try {
+        return '<pre><code class="hljs ' + lang + '">' +
+               hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
+               '</code></pre>';
+      } catch (__) {/* ignore */}
+    }
+    // Use default escaping if language is not found or highlighting fails
+    return '<pre><code class="hljs">' + md.utils.escapeHtml(str) + '</code></pre>';
+  }
 });
 
 // Customize fenced block rendering for Mermaid (Re-adding custom renderer)
-const defaultFenceRenderer = md.renderer.rules.fence || function (tokens, idx, options, env, self) {
+const defaultFenceRenderer = md.renderer.rules.fence || function(tokens: any[], idx: number, options: any, env: any, self: any): string { // Add 'any' types
   // Basic fallback renderer if the default is somehow undefined
   const token = tokens[idx];
   const info = token.info ? token.info.trim() : '';
