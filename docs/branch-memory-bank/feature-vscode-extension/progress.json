@@ -14,61 +14,91 @@
     "version": 2
   },
   "content": {
-    "workingFeatures": [],
-    "pendingImplementation": [
+    "workingFeatures": [
       {
         "id": "feature-explorer",
-        "description": "メモリバンクエクスプローラー (基本機能)",
-        "priority": "high"
+        "description": "メモリバンクエクスプローラー (基本実装済)",
+        "status": "in-progress"
       },
       {
         "id": "feature-editor",
-        "description": "ドキュメントエディタ (基本機能 + スキーマ検証)",
-        "priority": "high"
+        "description": "ドキュメントエディタ (基本実装済、改良中)",
+        "status": "in-progress"
       },
       {
-        "id": "feature-ai-duplicate-detection",
-        "description": "AIによる重複情報検出 (基本機能)",
-        "priority": "high"
-      },
-      {
-        "id": "feature-ai-content-consolidation",
-        "description": "AIによる重複情報統合 (基本機能)",
-        "priority": "medium"
-      },
+        "id": "feature-ai-integration",
+        "description": "Gemini AI連携の基本機能 (APIクライアント、テスト機能)",
+        "status": "in-progress"
+      }
+    ],
+    "pendingImplementation": [
       {
         "id": "feature-diff",
         "description": "差分比較機能",
-        "priority": "medium"
+        "priority": "high"
       },
       {
         "id": "feature-link",
         "description": "ドキュメント関連性可視化",
-        "priority": "medium"
-      },
-      {
-        "id": "feature-ai-consistency-checker",
-        "description": "AIによる整合性チェッカー",
-        "priority": "medium"
-      },
-      {
-        "id": "feature-ai-smart-summarization",
-        "description": "AIによるインテリジェント要約",
-        "priority": "medium"
+        "priority": "high"
       },
       {
         "id": "feature-template",
         "description": "テンプレート機能",
-        "priority": "low"
+        "priority": "medium"
       },
       {
         "id": "feature-analytics",
         "description": "メモリバンク分析機能",
+        "priority": "medium"
+      },
+      {
+        "id": "feature-ai-duplicate-detection",
+        "description": "AIによる重複情報検出 (基本機能)",
         "priority": "low"
+      },
+      {
+        "id": "feature-ai-content-consolidation",
+        "description": "AIによる重複情報統合 (基本機能)",
+        "priority": "low"
+      },
+      {
+        "id": "feature-ai-consistency-checker",
+        "description": "AIによる整合性チェッカー",
+        "priority": "low"
+      },
+      {
+        "id": "feature-ai-smart-summarization",
+        "description": "AIによるインテリジェント要約",
+        "priority": "low"
+      },
+      {
+        "id": "feature-editor-markdown",
+        "description": "JSONをMarkdown形式で表示するエディタ機能",
+        "priority": "high"
       }
     ],
-    "status": "プロジェクトセットアップ完了。基本機能の実装開始。",
-    "completionPercentage": 5,
-    "knownIssues": []
+    "status": "基本機能（エクスプローラー、エディタ）とAI連携の初期実装完了。史上最優先案件としてMarkdownプレビュー機能を実装予定。package.jsonの問題や依存関係の問題解決が当面の課題。",
+    "completionPercentage": 25,
+    "knownIssues": [
+      {
+        "id": "issue-1",
+        "description": "アクティベーションイベントが「onView:memoryBankDocuments」のみ指定されているため、拡張機能の自動起動が機能していない",
+        "status": "open",
+        "solution": "package.jsonのactivationEventsに「onStartupFinished」を追加する"
+      },
+      {
+        "id": "issue-2",
+        "description": "package.jsonに重複した「contributes」セクションがある",
+        "status": "open",
+        "solution": "package.jsonを整理して重複セクションを削除する"
+      },
+      {
+        "id": "issue-3",
+        "description": "workspaceの依存関係でエラーが発生（@memory-bank/schemasの参照問題）",
+        "status": "open",
+        "solution": "モノレポ設定の見直しとworkspace依存関係の修正"
+      }
+    ]
   }
 }

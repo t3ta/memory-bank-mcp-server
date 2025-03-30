@@ -1,0 +1,99 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "vscode-extension-issues",
+    "title": "VS Code拡張機能の問題と解決策",
+    "documentType": "troubleshooting",
+    "path": "vscode-extension-issues.json",
+    "tags": [
+      "vscode-extension",
+      "troubleshooting",
+      "debugging"
+    ],
+    "lastModified": "2025-03-30T15:50:00.000Z",
+    "createdAt": "2025-03-30T15:50:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "currentState": {
+      "description": "VS Code拡張機能プロジェクトが初期化され、基本的なコンポーネントがセットアップされましたが、デバッグモードで起動した際に正常に読み込まれていません。",
+      "implementedComponents": [
+        "基本的なディレクトリ構造とファイル",
+        "extension.tsのエントリーポイント",
+        "MemoryBankProvider（データアクセス）",
+        "SchemaProvider（スキーマ検証）",
+        "MemoryBankExplorerProvider（ツリービュー）",
+        "DocumentEditorProvider（カスタムエディタ）"
+      ],
+      "buildStatus": "ビルドは正常に完了。dist/ディレクトリにJSファイルが生成されています。"
+    },
+    "identifiedIssues": [
+      {
+        "id": "issue-1",
+        "description": "依存関係の問題",
+        "details": "yarn add @types/vscode@^1.77.0 -D コマンドを実行すると、「Couldn't find package @memory-bank/schemas@workspace:1.0.0」というエラーが発生。monorepoの依存関係が正しく設定されていない可能性があります。",
+        "priority": "high",
+        "possibleSolutions": [
+          "package.jsonのworkspace依存関係を正しく設定する",
+          "yarn.lockファイルを削除して依存関係を再インストールする"
+        ]
+      },
+      {
+        "id": "issue-2",
+        "description": "拡張機能のアクティベーションが行われていない",
+        "details": "拡張機能がデバッグモードで起動されても、アクティベーションイベントがトリガーされていない可能性があります。package.jsonのactivationEventsが「onView:memoryBankDocuments」になっていますが、このビューが表示されるまでアクティベーションが発生しません。",
+        "priority": "high",
+        "possibleSolutions": [
+          "activationEventsに「onStartupFinished」を追加して、VS Code起動時に常にアクティベーションされるようにする",
+          "コマンドパレットからMemory Bank関連のコマンドを呼び出せるようにし、そのコマンド実行時にアクティベーションされるようにする"
+        ]
+      },
+      {
+        "id": "issue-3",
+        "description": "VSIXパッケージの作成ができていない",
+        "details": "拡張機能をインストール可能なVSIXパッケージとして作成する工程が完了していないため、.vsixファイルがありません。",
+        "priority": "medium",
+        "possibleSolutions": [
+          "vsce packageコマンドを実行してVSIXパッケージを作成する（vsce CLIのインストールが必要）",
+          "パッケージングに必要なメタデータ（publisher, repository等）を追加する"
+        ]
+      },
+      {
+        "id": "issue-4",
+        "description": "DocumentEditorProviderの実装が不完全",
+        "details": "DocumentEditorProviderがHTMLベースの簡易エディタを使用しており、実際のJSONファイル編集機能が実装されていません。WebViewと文書間のメッセージ通信が実装されていないためです。",
+        "priority": "medium",
+        "possibleSolutions": [
+          "WebViewとVS Code拡張間のメッセージングシステムを実装",
+          "JSONの編集と保存処理を完成させる"
+        ]
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "step-1",
+        "description": "package.jsonのactivationEventsを更新",
+        "details": "「onStartupFinished」を追加して、VS Code起動時に常にアクティベーションされるようにする",
+        "priority": "high"
+      },
+      {
+        "id": "step-2",
+        "description": "monorepo依存関係の修正",
+        "details": "workspaces間の依存関係を正しく設定し、@memory-bank/schemasの参照問題を解決する",
+        "priority": "high"
+      },
+      {
+        "id": "step-3",
+        "description": "DocumentEditorProviderの実装完了",
+        "details": "JSONファイルの編集と保存のメッセージング機能を実装し、基本的なエディタ機能を完成させる",
+        "priority": "medium"
+      },
+      {
+        "id": "step-4",
+        "description": "VSIXパッケージングの設定",
+        "details": "パッケージング用のメタデータを追加し、vsce packageコマンドでVSIXを作成できるようにする",
+        "priority": "medium"
+      }
+    ]
+  }
+}

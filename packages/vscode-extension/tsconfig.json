@@ -10,7 +10,8 @@
     "sourceMap": true,
     "declaration": false,
     "noUnusedLocals": false,
-    "noUnusedParameters": false
+    "noUnusedParameters": false,
+    "jsx": "react-jsx" // Add this line for JSX support
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.ts"]

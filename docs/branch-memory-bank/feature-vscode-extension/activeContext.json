@@ -15,7 +15,23 @@
   },
   "content": {
     "currentWork": "VS Code拡張機能（メモリバンク編集機能＋AI連携による重複情報整理機能）の初期計画と設計",
-    "recentChanges": [],
+    "recentChanges": [
+      {
+        "id": "change-1",
+        "description": "AI関連機能の優先度を下げ、基本機能と既知の問題修正を優先",
+        "date": "2025-03-30T15:00:00.000Z"
+      },
+      {
+        "id": "change-2",
+        "description": "エディタ機能の詳細設計（Markdownスタイルプレビュー機能）を追加",
+        "date": "2025-03-30T16:30:00.000Z"
+      },
+      {
+        "id": "change-3",
+        "description": "Markdownプレビュー機能の優先度を最高に変更し、実装手順を再整理",
+        "date": "2025-03-30T17:00:00.000Z"
+      }
+    ],
     "activeDecisions": [
       {
         "id": "decision-tech-1",
@@ -36,6 +52,14 @@
       {
         "id": "decision-ai-2",
         "description": "Gemini API認証はAPIキー方式を基本とする (vscode-extension-ai-integration)"
+      },
+      {
+        "id": "decision-editor-1",
+        "description": "JSONをMarkdown形式に変換して表示する方式を採用 (editor-markdown-view.json)"
+      },
+      {
+        "id": "decision-editor-2",
+        "description": "markdown-it + mermaidを使用したレンダリング実装 (editor-markdown-view.json)"
       }
     ],
     "considerations": [
@@ -58,52 +82,52 @@
         "id": "consideration-ai-4",
         "description": "AI連携時のプライバシーとセキュリティ確保 (vscode-extension-ai-integration)",
         "status": "open"
+      },
+      {
+        "id": "consideration-core-1",
+        "description": "VS Code拡張機能の安定起動とユーザビリティの向上",
+        "status": "open"
       }
     ],
     "nextSteps": [
       {
+        "id": "next-step-md-1",
+        "description": "エディタのMarkdownプレビュー機能の実装 (editor-markdown-view)",
+        "priority": "high"
+      },
+      {
         "id": "next-step-1",
-        "description": "VS Code拡張プロジェクトのセットアップとビルド環境構築 (task-1-1)",
+        "description": "既知の問題の修正（activationEvents、package.json重複セクション修正） (issue-fix-1)",
         "priority": "high"
       },
       {
         "id": "next-step-2",
-        "description": "`MemoryBankProvider` の基本インターフェース定義とファイル読み書き機能の実装 (task-1-2)",
+        "description": "workspace依存関係の問題解決（@memory-bank/schemasの参照問題） (issue-fix-2)",
         "priority": "high"
       },
       {
         "id": "next-step-3",
-        "description": "`SchemaProvider` を実装し、`packages/schemas` からスキーマをロードする機能を追加 (task-1-3)",
+        "description": "基本機能の改良（エクスプローラーとエディタの機能拡充） (core-feature)",
         "priority": "medium"
       },
       {
         "id": "next-step-4",
-        "description": "VS Code TreeView API を使用した基本的なメモリバンクエクスプローラーのUI実装 (task-1-4)",
+        "description": "差分比較機能の実装 (feature-diff)",
         "priority": "medium"
       },
       {
         "id": "next-step-5",
-        "description": "VS Code CustomEditor API を使用した基本的なJSONドキュメント編集機能の実装 (task-1-5)",
-        "priority": "medium"
-      },
-      {
-        "id": "next-step-6",
-        "description": "Gemini API 接続の基本実装と認証処理の確立 (AI)",
-        "priority": "medium"
-      },
-      {
-        "id": "next-step-7",
-        "description": "AI アシスタントパネルの基本的な WebView UI 実装 (AI)",
-        "priority": "medium"
-      },
-      {
-        "id": "next-step-8",
-        "description": "重複検出アルゴリズムのプロトタイプ開発 (AI)",
+        "description": "ドキュメント関連性可視化機能の実装 (feature-link)",
         "priority": "low"
       },
       {
-        "id": "next-step-9",
-        "description": "テキスト埋め込みサービスの初期実装 (AI)",
+        "id": "next-step-6",
+        "description": "AI機能のテストとビルド整備（既存のGemini API接続を安定化） (ai-testing)",
+        "priority": "low"
+      },
+      {
+        "id": "next-step-7",
+        "description": "AIによる重複検出機能のプロトタイプ開発 (feature-ai-duplicate-detection)",
         "priority": "low"
       }
     ]
