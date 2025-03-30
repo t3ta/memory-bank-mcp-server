@@ -67,8 +67,8 @@
         "priority": "low"
       }
     ],
-    "status": "VS Code拡張機能の初期計画と設計段階。実装準備中。",
-    "completionPercentage": 0,
+    "status": "プロジェクトセットアップ完了。基本機能の実装開始。",
+    "completionPercentage": 5,
     "knownIssues": []
   }
 }
