@@ -127,7 +127,6 @@ export class MarkdownToJsonMigrator {
       deleteOriginals = false,
     } = options;
 
-    // Initialize result
     const result: MigrationResult = {
       success: true,
       stats: {
@@ -139,7 +138,6 @@ export class MarkdownToJsonMigrator {
     };
 
     try {
-      // Create backup if requested
       if (createBackup) {
         this.logger.info('Creating backup of directory: %s', [directory]);
         const backupPath = await this.backupService.createBackup(directory);
@@ -147,31 +145,25 @@ export class MarkdownToJsonMigrator {
         this.logger.info('Backup created at: %s', [backupPath]);
       }
 
-      // Find all markdown files in directory and subdirectories
       const files = await this.findMarkdownFiles(directory);
       this.logger.info('Found %d Markdown files to process: %s', [files.length, files.join(', ')]);
 
-      // Process each file
       for (const file of files) {
         this.logger.info('Processing file: %s', [file]);
         try {
           this.logger.debug('Processing file: %s', [file]);
 
-          // Create document path
           const relativePath = path.relative(directory, file);
           const documentPath = DocumentPath.create(relativePath);
 
-          // Manually check if file is markdown (not using isMarkdown method to keep the code clean)
           const isMarkdownFile = documentPath.extension.toLowerCase() === 'md';
 
-          // Skip non-markdown files
           if (!isMarkdownFile) {
             this.logger.debug('Skipping non-markdown file: %s', [file]);
             result.stats.skippedCount++;
             continue;
           }
 
-          // Check if JSON version already exists
           const jsonPath = this.getJsonPath(file);
           const jsonExists = await this.fileExists(jsonPath);
 
@@ -181,13 +173,11 @@ export class MarkdownToJsonMigrator {
             continue;
           }
 
-          // Migrate file
           const migrationSuccess = await this.migrateFile(file, jsonPath, { validateJson });
 
           if (migrationSuccess) {
             result.stats.successCount++;
 
-            // Delete original if requested
             if (deleteOriginals) {
               await fs.unlink(file);
               this.logger.debug('Deleted original file: %s', [file]);
@@ -209,12 +199,10 @@ export class MarkdownToJsonMigrator {
         }
       }
 
-      // Log summary
       this.logger.info('Migration complete. Success: %d, Failed: %d, Skipped: %d',
         [result.stats.successCount, result.stats.failureCount, result.stats.skippedCount]
       );
 
-      // Set success flag based on failure count
       result.success = result.stats.failureCount === 0;
 
       return result;
@@ -244,11 +232,9 @@ export class MarkdownToJsonMigrator {
     const { validateJson = true } = options;
 
     try {
-      // Read markdown content
       const markdownContent = await fs.readFile(filePath, 'utf-8');
 
-      // Special handling for test cases
-      // This is a temporary workaround for E2E tests
+      // Temporary workaround for E2E tests
       let specialContentHandling = false;
       let forcedDocumentType = undefined;
       let forcedContent = {};
@@ -275,29 +261,21 @@ export class MarkdownToJsonMigrator {
         };
       }
 
-      // Determine output path
       const outputPath = jsonPath || this.getJsonPath(filePath);
 
-      // Convert to JsonDocument
       const documentPath = DocumentPath.create(path.basename(filePath));
       let jsonDocument = await this.convertMarkdownToJson(markdownContent, documentPath);
 
-      // Apply forced content for test cases
       if (specialContentHandling && jsonDocument) {
         this.logger.debug('Applying special test case handling for file: %s', [filePath]);
         if (forcedDocumentType) {
           jsonDocument.documentType = forcedDocumentType as DocumentType;
         }
-        // Force the content - instead of directly accessing private property,
-        // create a new document with updated content
         const updatedContent = { ...jsonDocument.content, ...forcedContent };
-        // Create a new document with updated content
         const newDocument = jsonDocument.updateContent(updatedContent);
-        // Reassign to jsonDocument
         jsonDocument = newDocument;
       }
 
-      // Validate if requested
       if (validateJson) {
         const isValid = this.validator.validateJson(
           jsonDocument.toObject(),
@@ -312,10 +290,7 @@ export class MarkdownToJsonMigrator {
         }
       }
 
-      // Ensure output directory exists
       await this.ensureDirectoryExists(path.dirname(outputPath));
-
-      // Write JSON file
       await fs.writeFile(outputPath, jsonDocument.toString(true), 'utf-8');
       this.logger.debug('Successfully converted %s to %s', [filePath, outputPath]);
 
@@ -336,13 +311,8 @@ export class MarkdownToJsonMigrator {
     markdownContent: string,
     documentPath: DocumentPath
   ): Promise<JsonDocument> {
-    // Detect document type based on content and path
     const documentType = await this.detectDocumentType(markdownContent, documentPath.value);
-
-    // Get appropriate converter
     const converter = this.converterFactory.getConverter(documentType);
-
-    // Convert to JsonDocument
     return converter.convert(markdownContent, documentPath);
   }
 
@@ -355,7 +325,6 @@ export class MarkdownToJsonMigrator {
   private async detectDocumentType(content: string, path: string): Promise<DocumentType> {
     const filename = path.toLowerCase();
 
-    // Detect by filename pattern
     if (filename.includes('branchcontext') || filename.includes('branch-context')) {
       return 'branch_context';
     } else if (filename.includes('activecontext') || filename.includes('active-context')) {
@@ -366,7 +335,6 @@ export class MarkdownToJsonMigrator {
       return 'system_patterns';
     }
 
-    // Fall back to detecting by content
     const firstLine = content.split('\n')[0].trim();
     if (firstLine.startsWith('# ')) {
       const title = firstLine.substring(2).trim().toLowerCase();
@@ -382,7 +350,6 @@ export class MarkdownToJsonMigrator {
       }
     }
 
-    // Default to generic type
     return 'generic';
   }
 
@@ -411,11 +378,9 @@ export class MarkdownToJsonMigrator {
       const fullPath = path.join(directory, entry.name);
 
       if (entry.isDirectory()) {
-        // Recursively process subdirectories
         const subdirFiles = await this.findMarkdownFiles(fullPath);
         result.push(...subdirFiles);
       } else if (entry.isFile() && entry.name.endsWith('.md')) {
-        // Add markdown files
         result.push(fullPath);
       }
     }

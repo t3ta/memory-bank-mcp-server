@@ -37,7 +37,6 @@ export interface ReadBranchDocumentOutput {
  */
 export class ReadBranchDocumentUseCase
   implements IUseCase<ReadBranchDocumentInput, ReadBranchDocumentOutput> {
-  // Create component-specific logger
   private readonly useCaseLogger = logger.withContext({
     component: 'ReadBranchDocumentUseCase'
   });
@@ -54,13 +53,11 @@ export class ReadBranchDocumentUseCase
    * @returns Promise resolving to output data
    */
   async execute(input: ReadBranchDocumentInput): Promise<ReadBranchDocumentOutput> {
-    // Log the execution with structured context
     this.useCaseLogger.info('Executing read branch document use case', {
       branchName: input.branchName,
       documentPath: input.path
     });
 
-    // Validate input
     if (!input.branchName) {
       throw ApplicationErrors.invalidInput('Branch name is required');
     }
@@ -83,11 +80,9 @@ export class ReadBranchDocumentUseCase
    * Internal execution logic wrapped with error handling
    */
   private async executeInternal(input: ReadBranchDocumentInput): Promise<ReadBranchDocumentOutput> {
-    // Create domain objects
     const branchInfo = BranchInfo.create(input.branchName);
     const documentPath = DocumentPath.create(input.path);
 
-    // Check if branch exists
     const branchExists = await this.branchRepository.exists(input.branchName);
 
     if (!branchExists) {
@@ -95,10 +90,8 @@ export class ReadBranchDocumentUseCase
       throw DomainErrors.branchNotFound(input.branchName);
     }
 
-    // Get document from repository
     const document = await this.branchRepository.getDocument(branchInfo, documentPath);
 
-    // Check if document exists
     if (!document) {
       this.useCaseLogger.warn('Document not found', {
         branchName: input.branchName,
@@ -109,11 +102,9 @@ export class ReadBranchDocumentUseCase
 
     this.useCaseLogger.debug('Document retrieved successfully', {
       documentPath: input.path,
-      // Use the determineDocumentType method to get the type
       documentType: (document as any).determineDocumentType()
     });
 
-    // Transform to DTO
     return {
       document: {
         path: document.path.value,

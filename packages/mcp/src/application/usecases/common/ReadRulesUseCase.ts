@@ -2,8 +2,7 @@ import fs from "fs/promises";
 import path from "path";
 import { DomainError, DomainErrorCodes } from "../../../shared/errors/DomainError.js";
 import { logger } from "../../../shared/utils/logger.js";
-// ITemplateLoader import removed as part of template cleanup
-// Mock interface for backwards compatibility
+// Mock interface for backwards compatibility if templateLoader is used
 interface ITemplateLoader {
   getMarkdownTemplate(templateId: string, language: any): Promise<string>;
 }
@@ -16,16 +15,16 @@ export type RulesResult = {
 };
 
 /**
- * ルール読み込みユースケース
+ * Use case for reading rules
  */
 export class ReadRulesUseCase {
   private readonly rulesDir: string;
   private readonly supportedLanguages = ['en', 'ja', 'zh'];
 
   /**
-   * コンストラクタ
-   * @param rulesDir ルールディレクトリパス
-   * @param templateLoader テンプレートローダー（オプション）
+   * Constructor
+   * @param rulesDir Rules directory path
+   * @param templateLoader Template loader (optional)
    */
   constructor(
     rulesDir: string,
@@ -35,13 +34,13 @@ export class ReadRulesUseCase {
   }
 
   /**
-   * 指定された言語のルールを読み込む
-   * @param language 言語コード（'en', 'ja', 'zh'）
-   * @returns ルール内容とメタデータ
-   * @throws 言語がサポートされていない、またはファイルが見つからない場合
+   * Read rules for the specified language
+   * @param language Language code ('en', 'ja', 'zh')
+   * @returns Rules content and metadata
+   * @throws If language is not supported or file is not found
    */
   async execute(language: string): Promise<RulesResult> {
-    // 言語コードのバリデーション
+    // Validate language code
     if (!this.supportedLanguages.includes(language)) {
       throw new DomainError(
         DomainErrorCodes.VALIDATION_ERROR,
@@ -50,12 +49,12 @@ export class ReadRulesUseCase {
     }
 
     try {
-      // テンプレートローダーが提供されている場合はそれを使用
+      // Use template loader if provided
       if (this.templateLoader) {
         try {
           logger.debug(`Using template loader to get rules for language: ${language}`);
 
-          // 言語コードを安全に変換
+          // Safely convert language code
           const safeLanguage = getSafeLanguage(language);
 
           const content = await this.templateLoader.getMarkdownTemplate(
@@ -70,27 +69,27 @@ export class ReadRulesUseCase {
         } catch (templateError) {
           logger.warn(`Failed to load rules using template loader: ${templateError instanceof Error ? templateError.message : 'Unknown error'}`);
           logger.debug('Falling back to direct file loading');
-          // テンプレートローダーでの読み込みに失敗した場合は、従来の方法にフォールバック
+          // Fallback to direct file loading if template loader fails
         }
       }
 
-      // 従来の方法でJSONファイルを直接読み込む
-      // JSONファイルのパス - 複数のパスを試す
+      // Load JSON file directly (fallback or primary method)
+      // Try multiple possible paths for the JSON file
       const possiblePaths = [
-        // 新しい単一テンプレートパス
+        // New single template path
         path.join(this.rulesDir, 'templates', 'json', 'rules.json'),
-        // 新しいパス (templates/json に替わって domain/templates が使われるようになった)
+        // New path (domain/templates replaced templates/json)
         path.join(this.rulesDir, 'domain', 'templates', `rules-${language}.json`),
-        // 以前のパス (旧システムとの互換性のため)
+        // Previous path (for compatibility with older systems)
         path.join(this.rulesDir, 'templates', 'json', `rules-${language}.json`),
-        // フォールバック
+        // Fallback path
         path.join(this.rulesDir, `rules-${language}.json`)
       ];
 
       let jsonContent = '';
       let jsonFilePath = '';
 
-      // 存在するパスを探す
+      // Find the existing path
       for (const p of possiblePaths) {
         try {
           jsonContent = await fs.readFile(p, 'utf-8');
@@ -98,7 +97,7 @@ export class ReadRulesUseCase {
           logger.debug('Rules JSON file found', { path: jsonFilePath });
           break;
         } catch (err) {
-          // このパスでは見つからなかった、次を試す
+          // Not found at this path, try the next one
           continue;
         }
       }
@@ -109,8 +108,8 @@ export class ReadRulesUseCase {
 
       const jsonData = JSON.parse(jsonContent);
 
-      // JSONからMarkdownに変換する必要はなく、そのままJSON文字列を返す
-      // (markdownサポートが削除されたため)
+      // No need to convert JSON to Markdown, return JSON string directly
+      // (Markdown support was removed)
       const content = JSON.stringify(jsonData, null, 2);
 
       return {

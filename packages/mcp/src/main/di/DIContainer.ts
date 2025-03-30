@@ -35,16 +35,13 @@ export class DIContainer {
    * @returns Service instance or Promise of service instance
    */
   get<T>(name: string): T | Promise<T> {
-    // Check if service is already created
     if (this.services.has(name)) {
       return this.services.get(name) as T;
     }
 
-    // Check if factory exists
     if (this.factories.has(name)) {
       const factory = this.factories.get(name)!;
 
-      // Handle async factory
       if (this.asyncFactories.has(name)) {
         return (async () => {
           const instance = await factory();
@@ -53,7 +50,6 @@ export class DIContainer {
         })();
       }
 
-      // Handle sync factory
       const instance = factory();
       this.services.set(name, instance);
       return instance as T;

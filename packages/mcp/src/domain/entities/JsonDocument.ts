@@ -5,11 +5,8 @@ import { DocumentVersionInfo } from './DocumentVersionInfo.js';
 import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
 import { IDocumentValidator } from '../validation/IDocumentValidator.js';
 
-// Define the schema version for our own reference
 export const SCHEMA_VERSION = 'memory_document_v2';
 
-// Define the document structure without external dependencies
-// This is our internal representation, separate from the schemas package
 export interface BaseJsonDocumentV2 {
   schema: string;
   metadata: DocumentMetadataV2;
@@ -25,7 +22,7 @@ export interface DocumentMetadataV2 {
   lastModified: string | Date;
   createdAt: string | Date;
   version: number;
-  [key: string]: unknown; // Allow for additional metadata fields
+  [key: string]: unknown;
 }
 
 /**
@@ -43,7 +40,6 @@ export type DocumentType =
  * It uses the v2 schema with typed content based on document type
  */
 export class JsonDocument<T extends Record<string, unknown> = Record<string, unknown>> {
-  // Static validator instance that will be injected 
   private static validator: IDocumentValidator;
 
   /**
@@ -110,9 +106,7 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
    * @throws DomainError if validation fails
    */
   public static fromObject(jsonData: unknown, path: DocumentPath): JsonDocument {
-    // Use the validator to validate the document
     try {
-      // Validate the complete document structure
       JsonDocument.getValidator().validateDocument(jsonData);
     } catch (error) {
       if (error instanceof DomainError) {
@@ -124,25 +118,20 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
       );
     }
 
-    // Handle either the newer schema package format or our internal format
     const baseDocument = jsonData as any;
     const metadata = baseDocument.metadata || baseDocument;
     const documentType = metadata.documentType as DocumentType;
 
-    // Create domain objects
     const id = DocumentId.create(metadata.id);
-    const tags = metadata.tags.map((tag: string) => Tag.create(tag)); // Add string type
+    const tags = metadata.tags.map((tag: string) => Tag.create(tag));
     const lastModified = new Date(metadata.lastModified);
-    // const createdAt = new Date(metadata.createdAt); // Remove unused variable
 
-    // Create version info
     const versionInfo = new DocumentVersionInfo({
       version: metadata.version || 1,
       lastModified: lastModified,
       modifiedBy: 'system',
     });
 
-    // Check for branch field in metadata
     const branch = (metadata as any).branch;
 
     return new JsonDocument(
@@ -151,9 +140,8 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
       metadata.title,
       documentType,
       tags,
-      // Handle content based on the document format (new schema or our internal format)
       baseDocument.content || (baseDocument as any),
-      branch, 
+      branch,
       versionInfo
     );
   }
@@ -182,7 +170,6 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
     branch?: string;
     versionInfo?: DocumentVersionInfo;
   }): JsonDocument<T> {
-    // Validate content based on document type using the validator
     try {
       JsonDocument.getValidator().validateContent(documentType, content);
     } catch (error) {
@@ -200,7 +187,7 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
       path,
       title,
       documentType,
-      [...tags], // Defensive copy
+      [...tags],
       content,
       branch,
       versionInfo
@@ -246,7 +233,7 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
    * Get the document tags
    */
   public get tags(): Tag[] {
-    return [...this._tags]; // Return defensive copy
+    return [...this._tags];
   }
 
   /**
@@ -347,7 +334,6 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
    * @returns New JsonDocument instance
    */
   public updateContent<U extends Record<string, unknown>>(content: U): JsonDocument<U> {
-    // Validate content using validator
     try {
       JsonDocument.getValidator().validateContent(this._documentType, content);
     } catch (error) {
@@ -435,7 +421,7 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
       this._path,
       this._title,
       this._documentType,
-      [...tags], // Defensive copy
+      [...tags],
       this._content,
       this._branch,
       updatedVersionInfo
@@ -446,7 +432,7 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
    * Converts the document to a serializable object (BaseJsonDocumentV2)
    * @returns Document as a serializable object
    */
-  public toObject(): any { // Using any to avoid conflicts with schema package
+  public toObject(): any {
     const metadata: Record<string, any> = {
       id: this._id.value,
       title: this._title,
@@ -457,14 +443,12 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
       version: this._versionInfo.version,
     };
 
-    // Add createdAt (if we have one available)
     if ('createdAt' in this) {
       metadata.createdAt = (this as any)._createdAt || new Date();
     } else {
       metadata.createdAt = new Date();
     }
 
-    // Add branch if it exists
     if (this._branch) {
       metadata.branch = this._branch;
     }

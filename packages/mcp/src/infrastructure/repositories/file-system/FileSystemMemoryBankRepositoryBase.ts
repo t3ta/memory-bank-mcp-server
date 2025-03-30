@@ -6,13 +6,13 @@ import type { IConfigProvider } from '../../config/index.js';
 import type { IFileSystemService } from '../../storage/interfaces/IFileSystemService.js';
 
 /**
- * 基底クラス: ファイルシステムベースのメモリバンクリポジトリの共通機能を提供
+ * Base class: Provides common functionality for file system based memory bank repositories
  */
 export abstract class FileSystemMemoryBankRepositoryBase {
   /**
    * Constructor
-   * @param fileSystemService ファイルシステムサービス
-   * @param configProvider 設定プロバイダ
+   * @param fileSystemService File system service
+   * @param configProvider Configuration provider
    */
   constructor(
     protected readonly fileSystemService: IFileSystemService,
@@ -20,9 +20,9 @@ export abstract class FileSystemMemoryBankRepositoryBase {
   ) {}
 
   /**
-   * ディレクトリが存在するかチェック
-   * @param dirPath ディレクトリパス
-   * @returns ディレクトリが存在する場合はtrue
+   * Check if directory exists
+   * @param dirPath Directory path
+   * @returns true if directory exists
    */
   protected async directoryExists(dirPath: string): Promise<boolean> {
     try {
@@ -37,9 +37,9 @@ export abstract class FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ファイルが存在するかチェック
-   * @param filePath ファイルパス
-   * @returns ファイルが存在する場合はtrue
+   * Check if file exists
+   * @param filePath File path
+   * @returns true if file exists
    */
   protected async fileExists(filePath: string): Promise<boolean> {
     try {
@@ -54,8 +54,8 @@ export abstract class FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ディレクトリを作成
-   * @param dirPath ディレクトリパス
+   * Create directory
+   * @param dirPath Directory path
    */
   protected async createDirectory(dirPath: string): Promise<void> {
     try {
@@ -70,17 +70,17 @@ export abstract class FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ファイルを書き込む
-   * @param filePath ファイルパス
-   * @param content ファイル内容
+   * Write file
+   * @param filePath File path
+   * @param content File content
    */
   protected async writeFile(filePath: string, content: string): Promise<void> {
     try {
-      // ディレクトリが存在することを確認
+      // Ensure directory exists
       const dirPath = path.dirname(filePath);
       await this.createDirectory(dirPath);
 
-      // ファイルを書き込む
+      // Write file
       await this.fileSystemService.writeFile(filePath, content);
     } catch (error) {
       if (error instanceof DomainError || error instanceof InfrastructureError) {
@@ -96,9 +96,9 @@ export abstract class FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ファイルを読み込む
-   * @param filePath ファイルパス
-   * @returns ファイル内容
+   * Read file
+   * @param filePath File path
+   * @returns File content
    */
   protected async readFile(filePath: string): Promise<string> {
     try {
@@ -117,9 +117,9 @@ export abstract class FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ファイルを削除
-   * @param filePath ファイルパス
-   * @returns 削除に成功したらtrue
+   * Delete file
+   * @param filePath File path
+   * @returns true if deletion was successful
    */
   protected async deleteFile(filePath: string): Promise<boolean> {
     try {
@@ -138,9 +138,9 @@ export abstract class FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ファイルの一覧を取得
-   * @param dirPath ディレクトリパス
-   * @returns ファイルパスの配列
+   * List files
+   * @param dirPath Directory path
+   * @returns Array of file paths
    */
   protected async listFiles(dirPath: string): Promise<string[]> {
     try {
@@ -159,9 +159,9 @@ export abstract class FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ファイルの統計情報を取得
-   * @param filePath ファイルパス
-   * @returns ファイル統計情報
+   * Get file stats
+   * @param filePath File path
+   * @returns File stats information
    */
   protected async getFileStats(filePath: string): Promise<{ lastModified: Date }> {
     try {
@@ -180,8 +180,8 @@ export abstract class FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * UUIDを生成
-   * @returns UUID文字列
+   * Generate UUID
+   * @returns UUID string
    */
   protected generateUUID(): string {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -192,32 +192,32 @@ export abstract class FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * パスが有効かどうかチェック（パストラバーサル対策）
-   * @param requestedPath パス
-   * @param basePath ベースパス
-   * @returns 有効なパスの場合はtrue
+   * Check if path is valid (path traversal protection)
+   * @param requestedPath Path
+   * @param basePath Base path
+   * @returns true if path is valid
    */
   protected isValidPath(requestedPath: string, basePath: string): boolean {
     const normalizedPath = path.normalize(requestedPath);
     const resolvedPath = path.resolve(basePath, normalizedPath);
-    
-    // パスが基底ディレクトリの外にあるかチェック
+
+    // Check if path is outside the base directory
     return resolvedPath.startsWith(path.resolve(basePath));
   }
 
   /**
-   * エラーをログに記録
-   * @param message エラーメッセージ
-   * @param error エラーオブジェクト
+   * Log an error
+   * @param message Error message
+   * @param error Error object
    */
   protected logError(message: string, error: unknown): void {
     logger.error(message, error);
   }
 
   /**
-   * デバッグ情報をログに記録
-   * @param message デバッグメッセージ
-   * @param context コンテキスト（オプション）
+   * Log debug information
+   * @param message Debug message
+   * @param context Optional context
    */
   protected logDebug(message: string, context?: Record<string, unknown>): void {
     if (context) {

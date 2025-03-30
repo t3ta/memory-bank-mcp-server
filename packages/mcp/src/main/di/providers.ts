@@ -50,7 +50,8 @@ export async function registerInfrastructureServices(
   container: DIContainer,
   options?: CliOptions
 ): Promise<void> {
-  container.register<IFileSystemService>('fileSystemService', new FileSystemService());
+  // Register concrete class for FileSystemService
+  container.register<FileSystemService>('fileSystemService', new FileSystemService());
 
   const configProvider = new ConfigProvider();
   container.register<IConfigProvider>('configProvider', configProvider);
@@ -63,8 +64,11 @@ export async function registerInfrastructureServices(
   });
 
   container.registerFactory('branchMemoryBankRepository', async () => {
-    const fileSystemService = await container.get<FileSystemService>('fileSystemService');
-    return new FileSystemBranchMemoryBankRepository(fileSystemService);
+    // Get config provider to resolve root path
+    const configProvider = await container.get<IConfigProvider>('configProvider');
+    const config = configProvider.getConfig();
+    // Pass the root path (docsRoot) to the constructor
+    return new FileSystemBranchMemoryBankRepository(config.docsRoot);
   });
 
   container.registerFactory('tagIndexRepository', async () => {

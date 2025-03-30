@@ -1,7 +1,6 @@
 import path from "path";
 import type { BranchInfo } from "../../../domain/entities/BranchInfo.js";
 import { DocumentId } from "../../../domain/entities/DocumentId.js";
-// import type { DocumentPath } from "../../../domain/entities/DocumentPath.js"; // Removed unused import
 import { JsonDocument } from "../../../domain/entities/JsonDocument.js";
 import { MemoryDocument } from "../../../domain/entities/MemoryDocument.js";
 import type { IBranchMemoryBankRepository } from "../../../domain/repositories/IBranchMemoryBankRepository.js";
@@ -11,8 +10,6 @@ import { type BranchTagIndex, BranchTagIndexSchema, type GlobalTagIndex, GlobalT
 import { InfrastructureError, InfrastructureErrorCodes } from "../../../shared/errors/InfrastructureError.js";
 import { logger } from "../../../shared/utils/logger.js";
 import type { IFileSystemService } from "../../storage/interfaces/IFileSystemService.js";
-// import { DomainError, DomainErrorCodes } from "../../../shared/errors/DomainError.js"; // Removed unused import
-
 
 /**
  * Implementation of ITagIndexRepository for file system storage
@@ -21,10 +18,10 @@ export abstract class FileSystemTagIndexRepository {
   protected static readonly GLOBAL_INDEX_FILENAME = 'tag-index.json';
   protected static readonly BRANCH_INDEX_FILENAME = 'tag-index.json';
 
-  // キャッシュ管理
+  // Cache management
   private branchIndexCache = new Map<string, { index: BranchTagIndex, lastUpdated: Date }>();
   private globalIndexCache: { index: GlobalTagIndex, lastUpdated: Date } | null = null;
-  private readonly CACHE_TTL_MS = 30000; // 30秒キャッシュを保持
+  private readonly CACHE_TTL_MS = 30000; // Cache duration: 30 seconds
 
   /**
    * Create a new FileSystemTagIndexRepository instance
@@ -71,7 +68,7 @@ export abstract class FileSystemTagIndexRepository {
     const branchKey = branchInfo.safeName;
     const now = new Date();
 
-    // キャッシュチェック
+    // Check cache
     const cachedData = this.branchIndexCache.get(branchKey);
     if (cachedData && (now.getTime() - cachedData.lastUpdated.getTime()) < this.CACHE_TTL_MS) {
       logger.debug(`Using cached branch index for ${branchInfo.name}`);
@@ -90,10 +87,9 @@ export abstract class FileSystemTagIndexRepository {
       const content = await this.fileSystem.readFile(indexPath);
       const indexData = JSON.parse(content);
 
-      // Validate index data
       const validatedData = BranchTagIndexSchema.parse(indexData);
 
-      // キャッシュに保存
+      // Save to cache
       this.branchIndexCache.set(branchKey, { index: validatedData, lastUpdated: now });
 
       return validatedData;
@@ -131,7 +127,7 @@ export abstract class FileSystemTagIndexRepository {
   protected async readGlobalIndex(): Promise<GlobalTagIndex | null> {
     const now = new Date();
 
-    // キャッシュチェック
+    // Check cache
     if (this.globalIndexCache && (now.getTime() - this.globalIndexCache.lastUpdated.getTime()) < this.CACHE_TTL_MS) {
       logger.debug('Using cached global index');
       return this.globalIndexCache.index;
@@ -149,10 +145,9 @@ export abstract class FileSystemTagIndexRepository {
       const content = await this.fileSystem.readFile(indexPath);
       const indexData = JSON.parse(content);
 
-      // Validate index data
       const validatedData = GlobalTagIndexSchema.parse(indexData);
 
-      // キャッシュに保存
+      // Save to cache
       this.globalIndexCache = { index: validatedData, lastUpdated: now };
 
       return validatedData;
@@ -194,15 +189,13 @@ export abstract class FileSystemTagIndexRepository {
     const branchKey = branchInfo.safeName;
 
     try {
-      // Ensure directory exists
       const dirPath = path.dirname(indexPath);
       await this.fileSystem.createDirectory(dirPath);
 
-      // Write the file
       const content = JSON.stringify(index, null, 2);
       await this.fileSystem.writeFile(indexPath, content);
 
-      // キャッシュを更新
+      // Update cache
       this.branchIndexCache.set(branchKey, { index, lastUpdated: new Date() });
       logger.debug(`Updated branch index cache for ${branchInfo.name}`);
     } catch (error) {
@@ -224,15 +217,13 @@ export abstract class FileSystemTagIndexRepository {
     const indexPath = this.getGlobalIndexPath();
 
     try {
-      // Ensure directory exists
       const dirPath = path.dirname(indexPath);
       await this.fileSystem.createDirectory(dirPath);
 
-      // Write the file
       const content = JSON.stringify(index, null, 2);
       await this.fileSystem.writeFile(indexPath, content);
 
-      // キャッシュを更新
+      // Update cache
       this.globalIndexCache = { index, lastUpdated: new Date() };
       logger.debug('Updated global index cache');
     } catch (error) {
@@ -246,13 +237,8 @@ export abstract class FileSystemTagIndexRepository {
   }
 
   /**
-   * Create a document reference from a memory document
-   * @param document Memory document
-   * @returns Document reference
-   */
-  /**
-   * キャッシュを無効化する
-   * @param branchInfo ブランチ情報、nullの場合はグローバルキャッシュを無効化
+   * Invalidate the cache
+   * @param branchInfo Branch information, or null to invalidate global cache
    */
   protected invalidateCache(branchInfo: BranchInfo | null = null): void {
     if (branchInfo) {
@@ -266,7 +252,7 @@ export abstract class FileSystemTagIndexRepository {
   }
 
   /**
-   * すべてのキャッシュを無効化する
+   * Invalidate all caches
    */
   protected invalidateAllCaches(): void {
     this.branchIndexCache.clear();
@@ -275,7 +261,6 @@ export abstract class FileSystemTagIndexRepository {
   }
 
   protected createDocumentReference(document: MemoryDocument | JsonDocument): DocumentReference {
-    // Handle different document types
     if (document instanceof JsonDocument) {
       return {
         id: document.id.value,
@@ -284,9 +269,8 @@ export abstract class FileSystemTagIndexRepository {
         lastModified: document.lastModified,
       };
     } else {
-      // Legacy MemoryDocument's path is always a DocumentPath object
       const pathValue = document.path.value;
-      // テスト用: ランダムなUUIDを生成する
+      // For testing: generate a random UUID
       const id = DocumentId.generate();
 
       return {
@@ -334,5 +318,5 @@ export abstract class FileSystemTagIndexRepository {
     };
   }
 
-  // インターフェースのメソッド実装部分は別ファイルに分けます
+  // Interface method implementations are separated into another file
 }

@@ -59,7 +59,6 @@ export class WriteBranchDocumentUseCase
    */
   async execute(input: WriteBranchDocumentInput): Promise<WriteBranchDocumentOutput> {
     try {
-      // Validate input
       if (!input.branchName) {
         throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Branch name is required');
       }
@@ -82,28 +81,21 @@ export class WriteBranchDocumentUseCase
         );
       }
 
-      // Create domain objects
       const branchInfo = BranchInfo.create(input.branchName);
       const documentPath = DocumentPath.create(input.document.path);
       const tags = (input.document.tags ?? []).map((tag) => Tag.create(tag));
 
-      // Check if branch exists (will initialize if doesn't exist)
       await this.branchRepository.exists(input.branchName);
 
-      // Check if the document already exists
-      const existingDocument = await this.branchRepository.getDocument(branchInfo, documentPath); // ★ findDocumentByPath -> getDocument, 引数も修正
+      const existingDocument = await this.branchRepository.getDocument(branchInfo, documentPath);
 
       let document: MemoryDocument;
       if (existingDocument) {
-        // Update existing document
         document = existingDocument.updateContent(input.document.content);
-
-        // Update tags if provided
         if (input.document.tags) {
           document = document.updateTags(tags);
         }
       } else {
-        // Create new document
         document = MemoryDocument.create({
           path: documentPath,
           content: input.document.content,
@@ -112,11 +104,8 @@ export class WriteBranchDocumentUseCase
         });
       }
 
-
-      // Save document
       await this.branchRepository.saveDocument(branchInfo, document);
 
-      // Transform to DTO
       return {
         document: {
           path: document.path.value,
@@ -126,12 +115,10 @@ export class WriteBranchDocumentUseCase
         },
       };
     } catch (error) {
-      // Re-throw domain and application errors
       if (error instanceof DomainError || error instanceof ApplicationError) {
         throw error;
       }
 
-      // Wrap other errors
       throw new ApplicationError(
         ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
         `Failed to write document: ${(error as Error).message}`,

@@ -25,25 +25,20 @@ export class ConfigProvider implements IConfigProvider {
     try {
       if (this.config) return this.config;
 
-      // Resolve docs root
       const docsRoot = await this.resolveDocsRoot(options);
-
-      // Resolve language
       const language = await this.resolveLanguage(options);
 
-      // Create config
       this.config = {
         docsRoot,
         verbose: options?.verbose ?? false,
         language,
       };
 
-      // Ensure required directories exist
       await this.ensureDirectories();
 
       return this.config;
     } catch (error) {
-      if (error instanceof InfrastructureError || error instanceof DomainError) { // Added DomainError check
+      if (error instanceof InfrastructureError || error instanceof DomainError) {
         throw error;
       }
 
@@ -87,13 +82,10 @@ export class ConfigProvider implements IConfigProvider {
   getBranchMemoryPath(branchName: string): string {
     try {
       const config = this.getConfig();
-
-      // Validate branch name
       const branchInfo = BranchInfo.create(branchName);
-
       return path.join(config.docsRoot, 'branch-memory-bank', branchInfo.safeName);
     } catch (error) {
-      if (error instanceof DomainError) { // Added DomainError check
+      if (error instanceof DomainError) {
         throw error;
       }
 
@@ -120,10 +112,6 @@ export class ConfigProvider implements IConfigProvider {
    */
   private async resolveDocsRoot(options?: CliOptions): Promise<string> {
     try {
-      // Priority:
-      // 1. Options directly passed to this function (highest priority)
-      // 2. Environment variables
-      // 3. Default path (./docs) (lowest priority)
       if (options?.docsRoot) {
         return await this.validatePath(options.docsRoot);
       }
@@ -153,11 +141,6 @@ export class ConfigProvider implements IConfigProvider {
    */
   private async resolveLanguage(options?: CliOptions): Promise<Language> {
     try {
-      // Priority:
-      // 1. Options directly passed to this function (highest priority)
-      // 2. Environment variables
-      // 3. package.json config
-      // 4. Default value (en) (lowest priority)
       if (options?.language) {
         return this.validateLanguage(options.language);
       }
@@ -167,7 +150,6 @@ export class ConfigProvider implements IConfigProvider {
       }
 
       try {
-        // Try to read from package.json
         const packageJsonPath = path.join(process.cwd(), 'package.json');
         const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf-8'));
 
@@ -217,7 +199,6 @@ export class ConfigProvider implements IConfigProvider {
 
       const absolutePath = path.resolve(p);
 
-      // Create directory if it doesn't exist
       try {
         await fs.access(absolutePath);
       } catch {
@@ -259,5 +240,4 @@ export class ConfigProvider implements IConfigProvider {
     }
   }
 }
-// Need to import DomainError for catch block
 import { DomainError } from '../../shared/errors/DomainError.js';

@@ -52,7 +52,6 @@ export class WriteGlobalDocumentUseCase
    */
   async execute(input: WriteGlobalDocumentInput): Promise<WriteGlobalDocumentOutput> {
     try {
-      // Validate input
       if (!input.document) {
         throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Document is required');
       }
@@ -71,10 +70,8 @@ export class WriteGlobalDocumentUseCase
         );
       }
 
-      // Create domain objects
       const documentPath = DocumentPath.create(input.document.path);
 
-      // Extract tags from document content if it's JSON
       let tags: Tag[] = [];
       if (documentPath.value.endsWith('.json')) {
         try {
@@ -91,31 +88,24 @@ export class WriteGlobalDocumentUseCase
         }
       }
 
-      // Fallback to provided tags if no tags were found in metadata
       if (tags.length === 0) {
         logger.debug('Using provided tags:', { tags: input.document.tags });
         tags = (input.document.tags ?? []).map((tag) => Tag.create(tag));
       }
 
 
-      // Initialize global memory bank if needed
       await this.globalRepository.initialize();
 
-      // Create or update document
       const existingDocument = await this.globalRepository.getDocument(documentPath);
 
       let document: MemoryDocument;
 
       if (existingDocument) {
-        // Update existing document
         document = existingDocument.updateContent(input.document.content);
-
-        // Update tags if provided
         if (input.document.tags) {
           document = document.updateTags(tags);
         }
       } else {
-        // Create new document
         document = MemoryDocument.create({
           path: documentPath,
           content: input.document.content,
@@ -124,13 +114,9 @@ export class WriteGlobalDocumentUseCase
         });
       }
 
-      // Save document
       await this.globalRepository.saveDocument(document);
-
-      // Update tags index
       await this.globalRepository.updateTagsIndex();
 
-      // Transform to DTO
       return {
         document: {
           path: document.path.value,
@@ -140,12 +126,10 @@ export class WriteGlobalDocumentUseCase
         },
       };
     } catch (error) {
-      // Re-throw domain and application errors
       if (error instanceof DomainError || error instanceof ApplicationError) {
         throw error;
       }
 
-      // Wrap other errors
       throw new ApplicationError(
         ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
         `Failed to write document: ${(error as Error).message}`,

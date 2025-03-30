@@ -6,7 +6,7 @@ export const IO_ERROR = 'IO_ERROR';
  * Utility functions for retrying file system operations
  */
 
-import { InfrastructureError, InfrastructureErrorCodes } from "../../../shared/errors/InfrastructureError.js"; // Removed InfrastructureErrorCode
+import { InfrastructureError, InfrastructureErrorCodes } from "../../../shared/errors/InfrastructureError.js";
 import { logger } from "../../../shared/utils/logger.js";
 
 /**
@@ -50,9 +50,6 @@ export interface RetryOptions {
  * @returns True if the error is retryable, false otherwise
  */
 export function isRetryableError(error: unknown): boolean {
-  // Handle file system busy errors (EBUSY)
-  // Handle temporary unavailable errors (ETIMEDOUT, ECONNRESET, EPIPE)
-  // Handle resource temporarily unavailable (EAGAIN)
   if (error instanceof Error) {
     const errorCode = (error as any).code;
     if (typeof errorCode === 'string') {
@@ -61,7 +58,6 @@ export function isRetryableError(error: unknown): boolean {
     }
   }
 
-  // Handle infrastructure errors with specific codes
   if (error instanceof InfrastructureError) {
     return [
       FILE_SYSTEM_BUSY,
@@ -100,25 +96,20 @@ export async function withRetry<T>(
       lastError = error;
       attempt++;
 
-      // If we've used all retries or the error is not retryable, throw
       if (attempt > maxRetries || !retryableErrorFilter(error)) {
         throw error;
       }
 
-      // Calculate delay with exponential backoff
       const delay = Math.min(baseDelay * Math.pow(backoffFactor, attempt - 1), maxDelay);
 
-      // Log the retry
       logger.warn(
         `Operation failed (attempt ${attempt}/${maxRetries}), retrying in ${delay}ms: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
 
-      // Wait before retrying
       await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
 
-  // This should never happen, but TypeScript requires it
   throw lastError;
 }
 
@@ -139,7 +130,6 @@ export async function withFileSystemRetry<T>(
   } catch (error) {
     logger.error(`File system operation '${operation}' failed after retries: ${error instanceof Error ? error.message : 'Unknown error'}`);
 
-    // Wrap other errors in InfrastructureError
     if (!(error instanceof InfrastructureError)) {
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,

@@ -49,7 +49,6 @@ export class GetRecentBranchesUseCase
    */
   async execute(input: GetRecentBranchesInput): Promise<GetRecentBranchesOutput> {
     try {
-      // Set default limit
       const limit = input.limit ?? 10;
 
       if (limit < 1) {
@@ -59,10 +58,8 @@ export class GetRecentBranchesUseCase
         );
       }
 
-      // Get recent branches from repository
       const recentBranches = await this.branchRepository.getRecentBranches(limit);
 
-      // Transform to DTOs
       const branchDTOs = recentBranches.map((branch) => ({
         name: branch.branchInfo.name,
         lastModified: branch.lastModified.toISOString(),
@@ -77,12 +74,10 @@ export class GetRecentBranchesUseCase
         total: branchDTOs.length,
       };
     } catch (error) {
-      // Re-throw application errors
       if (error instanceof ApplicationError) {
         throw error;
       }
 
-      // Wrap other errors
       throw new ApplicationError(
         ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
         `Failed to get recent branches: ${(error as Error).message}`,

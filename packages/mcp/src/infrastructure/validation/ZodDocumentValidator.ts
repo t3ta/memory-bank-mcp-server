@@ -1,7 +1,6 @@
 import { IDocumentValidator } from '../../domain/validation/IDocumentValidator.js';
 import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
 
-// Since we're in the infrastructure layer, we can import from external libraries
 import {
   SCHEMA_VERSION,
   BaseJsonDocumentV2Schema,
@@ -38,7 +37,6 @@ export class ZodDocumentValidator implements IDocumentValidator {
           SystemPatternsJsonV2Schema.shape.content.parse(content);
           break;
         default:
-          // For generic types, ensure content is not empty
           if (Object.keys(content).length === 0) {
             throw new Error('Content cannot be empty');
           }
@@ -60,10 +58,8 @@ export class ZodDocumentValidator implements IDocumentValidator {
    */
   public validateDocument(document: unknown): boolean {
     try {
-      // First validate against base schema
       BaseJsonDocumentV2Schema.parse(document);
 
-      // Then validate against specific document type schema
       const baseDocument = document as { metadata: { documentType: string } };
       const documentType = baseDocument.metadata.documentType;
 

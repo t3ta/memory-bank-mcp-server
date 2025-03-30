@@ -140,7 +140,6 @@ export class SearchJsonDocumentsUseCase
    */
   async execute(input: SearchJsonDocumentsInput): Promise<SearchJsonDocumentsOutput> {
     try {
-      // Validate input - at least one search criteria must be provided
       if (!input.tags && !input.documentType) {
         throw new ApplicationError(
           ApplicationErrorCodes.INVALID_INPUT,
@@ -148,21 +147,18 @@ export class SearchJsonDocumentsUseCase
         );
       }
 
-      // Determine if searching in branch or global memory bank
       const isGlobal = !input.branchName;
       const repository = isGlobal
         ? this.globalRepository || this.jsonRepository
         : this.jsonRepository;
       const location = isGlobal ? 'global' : input.branchName!;
 
-      // Create branch info
       const branchInfo = isGlobal
-        ? BranchInfo.create('feature/global') // 変更: 'global' -> 'feature/global'
+        ? BranchInfo.create('feature/global') // Changed: 'global' -> 'feature/global'
         : BranchInfo.create(input.branchName!);
 
-      // Check if branch exists for branch searches
       if (!isGlobal) {
-        // 変更: dummy pathを使用
+        // Changed: use dummy path for existence check
         const dummyPath = DocumentPath.create('index.json');
         const branchExists = await this.jsonRepository.exists(branchInfo, dummyPath);
 
@@ -174,25 +170,17 @@ export class SearchJsonDocumentsUseCase
         }
       }
 
-      // Set up search parameters
       const matchAllTags = input.matchAllTags ?? false;
       let documents: any[] = [];
 
-      // Tag-based search
       if (input.tags && input.tags.length > 0) {
-        // Create Tag domain objects
         const tags = input.tags.map((tag) => Tag.create(tag));
-
-        // Find documents by tags
         documents = await repository.findByTags(branchInfo, tags, matchAllTags);
       }
-      // Document type search
       else if (input.documentType) {
-        // Find documents by type
         documents = await repository.findByType(branchInfo, input.documentType);
       }
 
-      // Transform to DTOs
       const documentDTOs = documents.map((doc) => ({
         id: doc.id.value,
         path: doc.path.value,
@@ -205,7 +193,6 @@ export class SearchJsonDocumentsUseCase
         version: doc.version,
       }));
 
-      // Return result
       return {
         documents: documentDTOs,
         searchInfo: {
@@ -217,12 +204,10 @@ export class SearchJsonDocumentsUseCase
         },
       };
     } catch (error) {
-      // Re-throw domain and application errors
       if (error instanceof DomainError || error instanceof ApplicationError) {
         throw error;
       }
 
-      // Wrap other errors
       throw new ApplicationError(
         ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
         `Failed to search JSON documents: ${(error as Error).message}`,

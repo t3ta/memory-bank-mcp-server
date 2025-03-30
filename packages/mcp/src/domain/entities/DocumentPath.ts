@@ -1,6 +1,6 @@
 import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
 
-// DocumentType without importing JsonDocument to avoid circular dependency
+// Define DocumentType locally to avoid circular dependency with JsonDocument
 type DocumentType =
   | 'branch_context'
   | 'active_context'
@@ -28,10 +28,8 @@ export class DocumentPath {
       );
     }
 
-    // Normalize and validate path
     const normalizedPath = value.replace(/\\/g, '/');
 
-    // Check for invalid path patterns
     if (normalizedPath.includes('..')) {
       throw new DomainError(
         DomainErrorCodes.INVALID_DOCUMENT_PATH,
@@ -39,7 +37,6 @@ export class DocumentPath {
       );
     }
 
-    // Check for absolute paths starting with / or drive letter
     if (normalizedPath.startsWith('/') || /^[a-zA-Z]:/.test(normalizedPath)) {
       throw new DomainError(
         DomainErrorCodes.INVALID_DOCUMENT_PATH,
@@ -117,7 +114,6 @@ export class DocumentPath {
   }
 
   public inferDocumentType(): DocumentType {
-    // Only use basename, filename is not needed
     const lcBasename = this.basename.toLowerCase();
 
     if (lcBasename.includes('branchcontext') || lcBasename.includes('branch-context')) {
@@ -153,8 +149,8 @@ export class DocumentPath {
   }
 
   /**
-   * 代替フォーマットのパスを取得する（.md <-> .json変換）
-   * @returns 代替フォーマットのDocumentPath
+   * Get the path in the alternate format (.md <-> .json conversion)
+   * @returns DocumentPath in the alternate format
    */
   public toAlternateFormat(): DocumentPath {
     if (this.extension.toLowerCase() === 'md') {
@@ -162,14 +158,14 @@ export class DocumentPath {
     } else if (this.extension.toLowerCase() === 'json') {
       return this.withExtension('md');
     }
-    
-    // 変換対象外の場合は元のパスをクローン
+
+    // If not a convertible format, clone the original path
     return DocumentPath.create(this._value);
   }
-  
+
   /**
-   * 現在のDocumentPathのクローンを作成する
-   * @returns 同じパス値を持つ新しいDocumentPath
+   * Create a clone of the current DocumentPath
+   * @returns A new DocumentPath with the same path value
    */
   public clone(): DocumentPath {
     return DocumentPath.create(this._value);

@@ -6,7 +6,7 @@
 import { z } from 'zod';
 import { DocumentType } from '../domain/entities/JsonDocument.js';
 import { Logger } from '../shared/utils/logger.js';
-import { // Add opening brace
+import {
   BaseJsonDocumentV2Schema,
   BranchContextJsonV2Schema,
   ActiveContextJsonV2Schema,
@@ -47,10 +47,8 @@ export class MigrationValidator {
    */
   validateJson(jsonData: unknown, documentType: DocumentType): ValidationResult {
     try {
-      // First validate against base schema
       BaseJsonDocumentV2Schema.parse(jsonData);
 
-      // Then validate against specific schema
       let schema: z.ZodType;
 
       switch (documentType) {
@@ -67,7 +65,6 @@ export class MigrationValidator {
           schema = SystemPatternsJsonV2Schema;
           break;
         default:
-          // Default to base schema
           schema = BaseJsonDocumentV2Schema;
           break;
       }

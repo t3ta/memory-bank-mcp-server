@@ -27,10 +27,8 @@ export class SystemPatternsConverter implements BaseConverter {
    * @returns JsonDocument instance
    */
   convert(markdownContent: string, path: DocumentPath): JsonDocument {
-    // Parse markdown
     const parsed = parseMarkdownForMigration(markdownContent, path.value);
 
-    // Convert technical decisions
     const technicalDecisions: TechnicalDecisionContentV2[] = [];
 
     if (Array.isArray(parsed.content.technicalDecisions)) {
@@ -44,15 +42,12 @@ export class SystemPatternsConverter implements BaseConverter {
       });
     }
 
-    // Prepare content
     const content: SystemPatternsContentV2 = {
       technicalDecisions,
     };
 
-    // Create tags
     const tags = parsed.tags.map((tag) => Tag.create(tag));
 
-    // Create JsonDocument
     return JsonDocument.create({
       id: DocumentId.create(uuidv4()),
       path,

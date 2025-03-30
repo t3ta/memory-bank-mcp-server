@@ -1,4 +1,3 @@
-// インポート修正：型だけtypes.jsから、クラスは各々のファイルから
 import type { ContextRequest, ContextResult, RulesResult } from "../../application/usecases/types.js";
 import { ReadContextUseCase } from "../../application/usecases/common/ReadContextUseCase.js";
 import { ReadRulesUseCase } from "../../application/usecases/common/ReadRulesUseCase.js";
@@ -36,7 +35,6 @@ export class ContextController implements IContextController {
     error?: string;
   }> {
     try {
-      // Debug with logger
       logger.info(`Reading rules for language: ${language}`);
       const result = await this.readRulesUseCase.execute(language);
       logger.debug(`Rules retrieved successfully for language: ${language}`);
@@ -60,25 +58,24 @@ export class ContextController implements IContextController {
     data?: ContextResult;
     error?: string;
   }> {
-    // Result object
     const contextResult: ContextResult = {};
 
     try {
       logger.info(`Reading context for branch: ${request.branch}, language: ${request.language}`);
-      
-      // 全ての情報を一度に読み込む（includeオプション無視して常に全て読み込む）
+
+      // Read all information at once (ignore include options, always read everything)
       try {
-        // 過去のリクエストとの互換性のために記録しておく（オプション自体は実質廃止済み）
+        // Log for compatibility with past requests (options themselves are effectively deprecated)
         logger.debug('All context components are always included regardless of include options.');
-          
-        // 全てのコンテキスト情報を一度に取得
+
+        // Get all context information in one call
         logger.debug(`Requesting all context information in one call`);
         const allData = await this.readContextUseCase.execute({
           branch: request.branch,
           language: request.language
         });
-        
-        // ブランチメモリとグローバルメモリを設定
+
+        // Set branch and global memory
         contextResult.branchMemory = allData.branchMemory;
         contextResult.globalMemory = allData.globalMemory;
         logger.debug(`Context data retrieved successfully for branch: ${request.branch}`);
@@ -86,15 +83,15 @@ export class ContextController implements IContextController {
         logger.error(`Failed to read context for branch ${request.branch}:`, error);
         throw error;
       }
-      
-      // ルールを取得（別のユースケースを使用）
+
+      // Get rules (using a separate use case)
       try {
         logger.debug(`Requesting rules for language: ${request.language}`);
         contextResult.rules = await this.readRulesUseCase.execute(request.language);
         logger.debug(`Rules retrieved successfully for language: ${request.language}`);
       } catch (error) {
         logger.error(`Failed to read rules for language ${request.language}:`, error);
-        // ルールの読み込み失敗は致命的ではないので、その他のコンテキスト情報は返す
+        // Failure to read rules is not fatal, return other context information
       }
 
       return {
@@ -121,7 +118,6 @@ export class ContextController implements IContextController {
     let errorCode: string = 'UNKNOWN_ERROR';
 
     if (error instanceof Error) {
-      // Check for our custom error types
       if (
         error instanceof DomainError ||
         error instanceof ApplicationError ||
@@ -129,8 +125,8 @@ export class ContextController implements IContextController {
       ) {
         errorCode = error.code;
         errorMessage = `${errorCode}: ${error.message}`;
-        
-        // エラータイプに応じて適切なログレベルを使用
+
+        // Use appropriate log level based on error type
         if (error instanceof DomainError) {
           logger.warn(`Domain error: ${errorMessage}`);
         } else if (error instanceof ApplicationError) {

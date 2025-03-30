@@ -63,8 +63,6 @@ export interface ValidationError {
 
 /**
  * Types of validation errors
- *
- * Note: This enum is used in the ValidationError interface
  */
 export enum ValidationErrorType {
   _MISSING_FILE = 'MISSING_FILE',

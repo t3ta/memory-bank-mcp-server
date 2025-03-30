@@ -8,10 +8,9 @@ import {
   InfrastructureError,
   InfrastructureErrorCodes,
 } from '../../../shared/errors/InfrastructureError.js';
-import { DomainError } from '../../../shared/errors/DomainError.js'; // Removed DomainErrorCodes
+import { DomainError } from '../../../shared/errors/DomainError.js';
 import { extractTags } from '../../../shared/utils/index.js';
 import { logger } from '../../../shared/utils/logger.js';
-// import { BaseJsonDocument } from '@memory-bank/schemas'; // Removed unused import
 
 /**
  * File system based implementation of memory document repository
@@ -37,38 +36,27 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
       const filePath = this.resolvePath(path.value);
       logger.debug(`[DEBUG] Finding document at path: ${filePath}`);
 
-      // Check if file exists
       const exists = await this.fileSystemService.fileExists(filePath);
 
       if (!exists) {
-        // toAlternateFormat removed as part of template cleanup
         logger.debug(`File not found at ${filePath}`);
         return null;
       }
 
-      // Read file content
       const content = await this.fileSystemService.readFile(filePath);
       logger.debug(`[DEBUG] File content read from ${filePath}`);
 
-      // Handle JSON files differently
       if (path.isJSON) {
         try {
-          // Parse JSON content
           const jsonObj = JSON.parse(content);
           logger.debug('JSON parsed for file:', { filePath, schema: jsonObj.schema });
 
-          // Check if it's a schema-compliant document or regular JSON
           if (jsonObj.schema === 'memory_document_v1' && jsonObj.metadata && jsonObj.content) {
-            logger.debug('Schema-compliant document found:', { filePath, metadata: jsonObj.metadata });
-            // It's a schema-compliant document - convert using fromJSON
             const doc = MemoryDocument.fromJSON(jsonObj, path);
             logger.debug('Created document from JSON with tags:', { tags: doc.tags.map(t => t.value) });
             return doc;
           } else {
-            // It's a regular JSON - create a MemoryDocument with the raw content
             const stats = await this.fileSystemService.getFileStats(filePath);
-
-            // Extract tags if they exist in a metadata field
             let tags: Tag[] = [];
             if (jsonObj.metadata && Array.isArray(jsonObj.metadata.tags)) {
               try {
@@ -77,7 +65,6 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
                 logger.warn(`Ignoring invalid tags in ${path.value}:`, tagError);
               }
             }
-
             return MemoryDocument.create({
               path,
               content,
@@ -86,26 +73,15 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
             });
           }
         } catch (error) {
-          // Check if this is a tag validation error
           if (error instanceof DomainError && error.code === 'DOMAIN_ERROR.INVALID_TAG_FORMAT') {
             logger.error(`Invalid tag format in document ${path.value}:`, error);
-
-            // Try to recover by using sanitized tags
             try {
-              // Parse again and sanitize tags
               const jsonDoc = JSON.parse(content);
-
-              // Sanitize tags if they exist
               if (jsonDoc.metadata && jsonDoc.metadata.tags) {
-                // Replace problematic characters with hyphens
                 jsonDoc.metadata.tags = jsonDoc.metadata.tags.map((tag: string) => {
-                  // Make lowercase and replace invalid characters with hyphens
                   return tag.toLowerCase().replace(/[^a-z0-9-]/g, '-');
                 });
-
                 logger.warn(`Sanitized tags in ${path.value}: ${JSON.stringify(jsonDoc.metadata.tags)}`);
-
-                // Try to create memory document with sanitized tags
                 if (jsonDoc.schema === 'memory_document_v1' && jsonDoc.metadata && jsonDoc.content) {
                   return MemoryDocument.fromJSON(jsonDoc, path);
                 }
@@ -113,8 +89,6 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
             } catch (recoveryError) {
               logger.error(`Failed to recover document ${path.value}:`, recoveryError);
             }
-
-            // If we reach here, recovery failed - log but don't throw
             logger.warn(`Skipping document with invalid tags: ${path.value}`);
             return null;
           }
@@ -127,14 +101,9 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
         }
       }
 
-      // For markdown and other files, continue with normal processing
-      // Extract tags
       const tags = extractTags(content).map((tag) => Tag.create(tag));
-
-      // Get file stats
       const stats = await this.fileSystemService.getFileStats(filePath);
 
-      // Create document
       return MemoryDocument.create({
         path,
         content,
@@ -150,7 +119,6 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
         if (error.code === `INFRA_ERROR.${InfrastructureErrorCodes.FILE_NOT_FOUND}`) {
           return null;
         }
-
         throw error;
       }
 
@@ -169,30 +137,22 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
    */
   async findByTags(tags: Tag[]): Promise<MemoryDocument[]> {
     try {
-      // List all files
       const files = await this.fileSystemService.listFiles(this.basePath);
-
       logger.debug(`[DEBUG] Found ${files.length} files in ${this.basePath}`);
 
-      // Convert to document paths
       const documents: MemoryDocument[] = [];
 
       for (const file of files) {
         try {
-          // Get relative path
           const relativePath = path.relative(this.basePath, file);
 
-          // Skip non-markdown and non-json files
           if (!relativePath.endsWith('.md') && !relativePath.endsWith('.json')) {
             continue;
           }
 
           logger.debug(`[DEBUG] Processing file: ${relativePath}`);
 
-          // Create document path
           const documentPath = DocumentPath.create(relativePath);
-
-          // Read document
           const document = await this.findByPath(documentPath);
 
           if (document) {
@@ -201,7 +161,6 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
             logger.debug('Document tags:', { relativePath, docTags });
             logger.debug('Searching for tags:', { searchTags });
 
-            // Check if document has any of the tags
             const hasAnyTags = tags.some((tag) => {
               const hasTag = document.hasTag(tag);
               logger.debug(`[DEBUG] Checking tag "${tag.value}" against document ${relativePath}: ${hasTag}`);
@@ -218,7 +177,6 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
             logger.debug(`[DEBUG] No document found for ${relativePath}`);
           }
         } catch (error) {
-          // Skip files that can't be read or don't match path format
           logger.error(`Error reading file ${file}:`, error);
         }
       }
@@ -251,39 +209,27 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
     try {
       const filePath = this.resolvePath(document.path.value);
 
-      // Handle JSON files differently
       if (document.isJSON) {
-        // Convert to JSON format
         const jsonDoc = document.toJSON();
         const jsonContent = JSON.stringify(jsonDoc, null, 2);
-
-        // Write JSON file
         await this.fileSystemService.writeFile(filePath, jsonContent);
         return;
       }
 
-      // For markdown files, continue with normal processing
-      // Prepare content with tags
       let content = document.content;
 
-      // Add or update tags if document has any
       if (document.tags.length > 0) {
         const tagLine = `tags: ${document.tags.map((tag) => tag.toHashtag()).join(' ')}\n\n`;
-
-        // If content already has tags, replace them
         if (content.includes('tags:')) {
           content = content.replace(/tags:.*\n\n/, tagLine);
         } else {
-          // Add tags after the title (first line)
           const lines = content.split('\n');
           const firstLine = lines[0];
           const rest = lines.slice(1).join('\n');
-
           content = `${firstLine}\n\n${tagLine}${rest}`;
         }
       }
 
-      // Write file
       await this.fileSystemService.writeFile(filePath, content);
     } catch (error) {
       if (error instanceof DomainError) {
@@ -310,8 +256,6 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
   async delete(path: DocumentPath): Promise<boolean> {
     try {
       const filePath = this.resolvePath(path.value);
-
-      // Delete file
       return await this.fileSystemService.deleteFile(filePath);
     } catch (error) {
       if (error instanceof DomainError) {
@@ -336,24 +280,20 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
    */
   async list(): Promise<DocumentPath[]> {
     try {
-      // List all files
       const files = await this.fileSystemService.listFiles(this.basePath);
       logger.debug(`FileSystemMemoryDocumentRepository.list() found ${files.length} files`);
 
-      // グループ化: 拡張子を除いたベース名でファイルをグループ化
+      // Group files by basename (excluding extension)
       const fileGroups = new Map<string, { md?: string, json?: string }>();
 
       for (const file of files) {
         try {
-          // Get relative path
           const relativePath = path.relative(this.basePath, file);
 
-          // Skip non-markdown and non-json files
           if (!relativePath.endsWith('.md') && !relativePath.endsWith('.json')) {
             continue;
           }
 
-          // Validate the path first
           const parts = relativePath.split(path.sep);
           if (parts.includes('..') || parts.some((part) => part.startsWith('..'))) {
             logger.error('Invalid document path:', {
@@ -363,16 +303,16 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
             continue;
           }
 
-          // ベース名（拡張子なし）とファイル拡張子を取得
+          // Get basename (without extension) and file extension
           const extension = path.extname(relativePath);
-          // ディレクトリパスを保持したベース名を取得
+          // Get basename including directory path
           const dirPath = path.dirname(relativePath);
           const baseName = path.basename(relativePath, extension);
           const baseNameWithDir = path.join(dirPath, baseName);
 
           logger.debug(`Processing file: ${relativePath}, baseNameWithDir: ${baseNameWithDir}, extension: ${extension}`);
 
-          // グループに追加
+          // Add to group
           const group = fileGroups.get(baseNameWithDir) || { md: undefined, json: undefined };
           if (extension === '.md') {
             group.md = relativePath;
@@ -388,13 +328,13 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
         }
       }
 
-      // JSONファイルを優先、なければMDファイルを使用
+      // Prefer JSON file, otherwise use MD file
       const paths: DocumentPath[] = [];
       logger.debug(`Found ${fileGroups.size} unique base files`);
 
       for (const [baseNameWithDir, group] of fileGroups) {
         try {
-          // JSONファイルを優先
+          // Prefer JSON file
           const pathToUse = group.json || group.md;
           if (pathToUse) {
             logger.debug(`Using ${pathToUse} for base ${baseNameWithDir} (JSON: ${!!group.json}, MD: ${!!group.md})`);
@@ -433,10 +373,8 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
    * @returns Full file path
    */
   private resolvePath(documentPath: string): string {
-    // Normalize path
     const normalizedPath = path.normalize(documentPath);
 
-    // Check for path traversal attempts
     if (normalizedPath.startsWith('..')) {
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
@@ -444,7 +382,6 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
       );
     }
 
-    // Resolve full path
     return path.join(this.basePath, normalizedPath);
   }
 }

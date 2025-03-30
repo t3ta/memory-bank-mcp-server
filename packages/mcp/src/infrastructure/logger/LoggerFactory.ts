@@ -1,7 +1,7 @@
 import { Logger, LogLevel, LogContext, createConsoleLogger, logger } from '../../shared/utils/logger.js';
 
 /**
- * ロガーの種類を定義する列挙型
+ * Defines the type of logger
  * @deprecated Use shared/utils/logger.ts instead. This type will be removed in a future release.
  */
 export enum LoggerType {
@@ -10,7 +10,7 @@ export enum LoggerType {
 }
 
 /**
- * ロガーの設定に使用するオプション
+ * Options used for logger configuration
  * @deprecated Use shared/utils/logger.ts instead. This interface will be removed in a future release.
  */
 export interface LoggerFactoryOptions {
@@ -20,9 +20,9 @@ export interface LoggerFactoryOptions {
 }
 
 /**
- * ロガーインスタンスを生成・管理するファクトリクラス
+ * Factory class for creating and managing logger instances
  * @deprecated Use shared/utils/logger.ts instead. This class will be removed in a future release.
- * 
+ *
  * Migration guide:
  * - Instead of LoggerFactory.getDefaultLogger(), use the 'logger' export from shared/utils/logger.ts
  * - Instead of getLogger with a name, use logger.withContext({ component: 'YourComponentName' })
@@ -37,7 +37,7 @@ export class LoggerFactory {
   }
 
   /**
-   * シングルトンインスタンスを取得
+   * Get the singleton instance
    * @deprecated Use shared/utils/logger.ts instead.
    */
   public static getInstance(): LoggerFactory {
@@ -48,20 +48,19 @@ export class LoggerFactory {
   }
 
   /**
-   * ロガーを生成
-   * @param options ロガーの設定オプション
+   * Create a logger
+   * @param options Logger configuration options
    * @deprecated Use createConsoleLogger from shared/utils/logger.ts instead.
    */
   public createLogger(options: LoggerFactoryOptions): Logger {
     console.warn('[DEPRECATED] LoggerFactory.createLogger is deprecated. Use shared/utils/logger.ts instead.');
-    
-    const { minLevel = 'info', defaultContext } = options; // typeは使用しない
+
+    const { minLevel = 'info', defaultContext } = options;
     let newLogger: Logger;
 
-    // 全てのタイプで共通のcreateConsoleLoggerを使用
+    // Use the common createConsoleLogger for all types
     newLogger = createConsoleLogger(minLevel);
 
-    // コンテキストがあれば設定
     if (defaultContext) {
       newLogger = newLogger.withContext(defaultContext);
     }
@@ -70,27 +69,26 @@ export class LoggerFactory {
   }
 
   /**
-   * 名前付きロガーを取得または作成
-   * @param name ロガー名
-   * @param options ロガーの設定オプション
+   * Get or create a named logger
+   * @param name Logger name
+   * @param options Logger configuration options
    * @deprecated Use logger.withContext({ component: name }) from shared/utils/logger.ts instead.
    */
   public getLogger(name: string, options: LoggerFactoryOptions): Logger {
     console.warn('[DEPRECATED] LoggerFactory.getLogger is deprecated. Use logger.withContext({ component: name }) instead.');
-    
+
     if (this.loggers.has(name)) {
       return this.loggers.get(name)!;
     }
 
     const newLogger = this.createLogger(options);
-    // Add component name to logger context
     const loggerWithName = newLogger.withContext({ component: name });
     this.loggers.set(name, loggerWithName);
     return loggerWithName;
   }
 
   /**
-   * デフォルトのロガーを取得
+   * Get the default logger
    * @deprecated Use the 'logger' export from shared/utils/logger.ts instead.
    */
   public static getDefaultLogger(): Logger {
@@ -102,8 +100,8 @@ export class LoggerFactory {
   }
 
   /**
-   * 全てのロガーをクリア
-   * 主にテスト用
+   * Clear all loggers
+   * Mainly for testing purposes
    * @deprecated Use direct imports from shared/utils/logger.ts instead.
    */
   public clear(): void {
@@ -113,15 +111,15 @@ export class LoggerFactory {
 }
 
 /**
- * デフォルトのロガーインスタンスを提供
+ * Provides the default logger instance
  * @deprecated Use the 'logger' export from shared/utils/logger.ts instead.
- * 
+ *
  * Example replacement:
  * ```
  * // Old code:
- * import { defaultLogger } from '../infrastructure/logger/LoggerFactory.js';
- * defaultLogger.info('Some message');
- * 
+ * // import { defaultLogger } from '../infrastructure/logger/LoggerFactory.js';
+ * // defaultLogger.info('Some message');
+ *
  * // New code:
  * import { logger } from '../shared/utils/logger.js';
  * logger.info('Some message');

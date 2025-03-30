@@ -18,7 +18,6 @@ export class JsonResponsePresenter implements IResponsePresenter {
    * @returns Formatted success response
    */
   present<T>(data: T): MCPSuccessResponse<T> {
-    // Add metadata for JSON responses
     return {
       success: true,
       data,
@@ -36,10 +35,8 @@ export class JsonResponsePresenter implements IResponsePresenter {
    * @returns Formatted error response
    */
   presentError(error: Error): MCPErrorResponse {
-    // Log the error
     logger.error(`JSON Error: ${error.message}`, error);
 
-    // Default error response for unknown errors
     let errorResponse: MCPErrorResponse = {
       success: false,
       error: {
@@ -54,7 +51,6 @@ export class JsonResponsePresenter implements IResponsePresenter {
       },
     };
 
-    // Handle known error types
     if (error instanceof BaseError) {
       errorResponse = {
         success: false,
@@ -71,16 +67,11 @@ export class JsonResponsePresenter implements IResponsePresenter {
       };
     }
 
-    // Special handling for different error types
     if (error instanceof DomainError) {
-      // Domain errors are client errors (4xx)
       errorResponse.error.code = `JSON_DOMAIN_ERROR.${error.code}`;
       errorResponse.error.status = 400;
     } else if (error instanceof ApplicationError) {
-      // Application errors could be client or server errors
       errorResponse.error.code = `JSON_APP_ERROR.${error.code}`;
-
-      // Determine status code based on error type
       if (
         error.code === 'VALIDATION_ERROR' ||
         error.code === 'NOT_FOUND' ||
@@ -91,7 +82,6 @@ export class JsonResponsePresenter implements IResponsePresenter {
         errorResponse.error.status = 500;
       }
     } else if (error instanceof InfrastructureError) {
-      // Infrastructure errors are server errors (5xx)
       errorResponse.error.code = `JSON_INFRA_ERROR.${error.code}`;
       errorResponse.error.status = 500;
     }

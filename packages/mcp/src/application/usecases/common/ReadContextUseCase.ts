@@ -40,12 +40,12 @@ export class ReadContextUseCase {
     const { branch } = request;
     const result: ContextResult = {};
 
-    // デバッグログを追加（logger使用）
+    // Add debug log (using logger)
     logger.debug(`ReadContextUseCase.execute: ${JSON.stringify(request, null, 2)}`);
     logger.debug(`Repository details: branchRepository=${this.branchRepository.constructor.name}, globalRepository=${this.globalRepository.constructor.name}`);
 
     try {
-      // ブランチの存在確認
+      // Check branch existence
       logger.info(`Checking branch existence: ${branch}`);
       const branchExists = await this.branchRepository.exists(branch);
       logger.debug(`Branch ${branch} exists: ${branchExists}`);
@@ -65,12 +65,12 @@ export class ReadContextUseCase {
         }
       }
 
-      // ブランチメモリーを読み込む
+      // Read branch memory
       logger.info(`Reading branch memory for: ${branch}`);
       result.branchMemory = await this.readBranchMemory(branch);
       logger.debug(`Branch memory keys: ${Object.keys(result.branchMemory).join(', ')}`);
 
-      // グローバルメモリー（コアファイルのみ）を読み込む
+      // Read global memory (core files only)
       logger.info(`Reading global memory (core files only)`);
       result.globalMemory = await this.readGlobalMemory();
       logger.debug(`Global memory keys: ${Object.keys(result.globalMemory || {}).join(', ')}`);
@@ -107,7 +107,7 @@ export class ReadContextUseCase {
         }
       } catch (error) {
         logger.error(`Error reading branch document ${path.value}: ${error instanceof Error ? error.message : 'Unknown error'}`);
-        // エラーは投げずに処理を続行（単一ドキュメントの失敗が全体の失敗につながらないように）
+        // Continue processing even if a single document fails
       }
     }
 
@@ -121,11 +121,11 @@ export class ReadContextUseCase {
   private async readGlobalMemory(): Promise<Record<string, string>> {
     let paths = await this.globalRepository.listDocuments();
     const result: Record<string, string> = {};
-    
-    // コアファイルのみをフィルタリング
+
+    // Filter for core files only
     logger.debug('Filtering for core files only');
     paths = paths.filter(p => p.value.startsWith('core/'));
-    
+
     logger.debug(`Reading global memory paths: ${paths.map(p => p.value).join(', ')}`);
 
     for (const path of paths) {
@@ -140,7 +140,7 @@ export class ReadContextUseCase {
         }
       } catch (error) {
         logger.error(`Error reading global document ${path.value}: ${error instanceof Error ? error.message : 'Unknown error'}`);
-        // エラーは投げずに処理を続行（単一ドキュメントの失敗が全体の失敗につながらないように）
+        // Continue processing even if a single document fails
       }
     }
 

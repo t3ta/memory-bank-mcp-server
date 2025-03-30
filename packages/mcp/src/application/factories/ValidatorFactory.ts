@@ -11,12 +11,8 @@ export class ValidatorFactory {
    * This method ensures the validator is created and injected into domain entities
    */
   public static setupDocumentValidator(): IDocumentValidator {
-    // Create the Zod-based validator
     const validator = new ZodDocumentValidator();
-    
-    // Inject it into the JsonDocument entity
     JsonDocument.setValidator(validator);
-    
     return validator;
   }
 }

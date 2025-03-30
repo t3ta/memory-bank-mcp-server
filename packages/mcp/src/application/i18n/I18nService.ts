@@ -44,7 +44,6 @@ export class I18nService {
     this.currentLanguage = new Language(languageCode);
   }
 
-  // Cache for translations to avoid repeated repository calls
   private translationCache: Map<string, Map<string, Translation>> = new Map();
   private isTranslationLoaded = false;
 
@@ -54,22 +53,17 @@ export class I18nService {
    * @returns Promise resolving when all translations are loaded
    */
   async loadAllTranslations(): Promise<void> {
-    // Clear the cache
     this.translationCache.clear();
 
-    // Get all supported languages
     const languages = await this.repository.getSupportedLanguages();
 
-    // Load translations for each language
     for (const language of languages) {
       const translations = await this.repository.getTranslationsForLanguage(language);
 
-      // Create language map if it doesn't exist
       if (!this.translationCache.has(language.code)) {
         this.translationCache.set(language.code, new Map());
       }
 
-      // Add translations to cache
       const languageMap = this.translationCache.get(language.code);
       for (const translation of translations) {
         languageMap?.set(translation.key, translation);
@@ -105,7 +99,6 @@ export class I18nService {
    * Implementation of the translate method
    */
   translate(key: string, secondParam?: string | Record<string, string>): string | Promise<string> {
-    // Synchronous version with language code
     if (typeof secondParam === 'string') {
       const languageCode = secondParam;
 
@@ -114,43 +107,34 @@ export class I18nService {
         return `?${key}`;
       }
 
-      // Try to get translation for specified language
       const languageMap = this.translationCache.get(languageCode);
       let translation = languageMap?.get(key);
 
-      // Fall back to English if not found and language isn't English
       if (!translation && languageCode !== 'en') {
         const englishMap = this.translationCache.get('en');
         translation = englishMap?.get(key);
       }
 
-      // If still not found, return the key prefixed with "?"
       if (!translation) {
         return `?${key}`;
       }
 
       return translation.text;
     }
-    // Asynchronous version with optional variables
     else {
       const variables = secondParam as Record<string, string> | undefined;
 
-      // Return a Promise for the async version
       return (async () => {
-        // Try to get translation for current language
         let translation = await this.repository.getTranslation(key, this.currentLanguage);
 
-        // Fall back to English if not found and current language isn't English
         if (!translation && this.currentLanguage.code !== 'en') {
           translation = await this.repository.getTranslation(key, Language.default());
         }
 
-        // If still not found, return the key prefixed with "?"
         if (!translation) {
           return `?${key}`;
         }
 
-        // Replace variables if provided
         if (variables) {
           return translation.withReplacedVariables(variables).text;
         }

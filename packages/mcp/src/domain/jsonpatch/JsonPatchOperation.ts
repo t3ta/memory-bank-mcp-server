@@ -1,12 +1,12 @@
 import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
 import { JsonPath } from './JsonPath.js';
 
-// 操作タイプの定義
+// Definition of operation types
 export type JsonPatchOperationType = 'add' | 'remove' | 'replace' | 'move' | 'copy' | 'test';
 
 /**
- * JSON Patch操作をカプセル化するクラス
- * RFC 6902に準拠したJSON Patch操作の実装
+ * Class encapsulating a JSON Patch operation
+ * Implementation of JSON Patch operations compliant with RFC 6902
  */
 export class JsonPatchOperation {
   private readonly _op: JsonPatchOperationType;
@@ -15,7 +15,7 @@ export class JsonPatchOperation {
   private readonly _from?: JsonPath;
 
   /**
-   * コンストラクタ - 直接使用せず、静的ファクトリメソッドを使用してください
+   * Constructor - Do not use directly, use the static factory method instead
    */
   private constructor(
     op: JsonPatchOperationType,
@@ -30,13 +30,13 @@ export class JsonPatchOperation {
   }
 
   /**
-   * パッチ操作オブジェクトを生成する
-   * @param op 操作タイプ
-   * @param path 対象パス
-   * @param value 設定する値（add/replace/testで必須）
-   * @param from 移動元パス（move/copyで必須）
-   * @returns 新しいJsonPatchOperationインスタンス
-   * @throws DomainError 操作タイプが無効または必須パラメータが欠けている場合
+   * Create a patch operation object
+   * @param op Operation type
+   * @param path Target path
+   * @param value Value to set (required for add/replace/test)
+   * @param from Source path (required for move/copy)
+   * @returns New JsonPatchOperation instance
+   * @throws DomainError if operation type is invalid or required parameters are missing
    */
   static create(
     op: JsonPatchOperationType,
@@ -44,7 +44,7 @@ export class JsonPatchOperation {
     value?: any,
     from?: string
   ): JsonPatchOperation {
-    // 操作タイプの検証
+    // Validate operation type
     const validOps: JsonPatchOperationType[] = ['add', 'remove', 'replace', 'move', 'copy', 'test'];
     if (!validOps.includes(op)) {
       throw new DomainError(
@@ -53,14 +53,14 @@ export class JsonPatchOperation {
       );
     }
 
-    // パスの解析
+    // Parse path
     const jsonPath = JsonPath.parse(path);
 
-    // fromの解析（指定されている場合）
+    // Parse 'from' if specified
     const jsonFrom = from ? JsonPath.parse(from) : undefined;
 
-    // 操作タイプ固有のバリデーション
-    // add, replace, testはvalueが必須
+    // Operation type specific validation
+    // add, replace, test require value
     if (['add', 'replace', 'test'].includes(op) && value === undefined) {
       throw new DomainError(
         DomainErrorCodes.INVALID_JSON_PATCH_OPERATION,
@@ -68,7 +68,7 @@ export class JsonPatchOperation {
       );
     }
 
-    // move, copyはfromが必須
+    // move, copy require from
     if (['move', 'copy'].includes(op) && !from) {
       throw new DomainError(
         DomainErrorCodes.INVALID_JSON_PATCH_OPERATION,
@@ -76,14 +76,14 @@ export class JsonPatchOperation {
       );
     }
 
-    // インスタンス生成
+    // Create instance
     return new JsonPatchOperation(op, jsonPath, value, jsonFrom);
   }
 
   /**
-   * JSON表現からパッチ操作オブジェクトを生成する
-   * @param json JSON文字列または既にパースされたオブジェクト
-   * @returns 新しいJsonPatchOperationインスタンス
+   * Create a patch operation object from a JSON representation
+   * @param json JSON string or already parsed object
+   * @returns New JsonPatchOperation instance
    */
   static fromJSON(json: string | any): JsonPatchOperation {
     const obj = typeof json === 'string' ? JSON.parse(json) : json;
@@ -96,39 +96,39 @@ export class JsonPatchOperation {
   }
 
   /**
-   * 操作タイプを取得
+   * Get the operation type
    */
   get op(): JsonPatchOperationType {
     return this._op;
   }
 
   /**
-   * 対象パスを取得
+   * Get the target path
    */
   get path(): JsonPath {
     return this._path;
   }
 
   /**
-   * 設定値を取得
+   * Get the value
    */
   get value(): any {
     return this._value;
   }
 
   /**
-   * 移動元パスを取得
+   * Get the source path
    */
   get from(): JsonPath | undefined {
     return this._from;
   }
 
   /**
-   * 操作の妥当性を検証する
-   * @throws DomainError 操作が無効な場合
+   * Validate the operation's validity
+   * @throws DomainError if the operation is invalid
    */
   validate(): void {
-    // moveの場合、自身の子孫への移動は不可
+    // For 'move', cannot move to a descendant of the source path
     if (this._op === 'move' && this._from && this._path.toString().startsWith(this._from.toString() + '/')) {
       throw new DomainError(
         DomainErrorCodes.INVALID_JSON_PATCH_OPERATION,
@@ -138,8 +138,8 @@ export class JsonPatchOperation {
   }
 
   /**
-   * JSON表現に変換する
-   * @returns JSON変換可能なオブジェクト
+   * Convert to JSON representation
+   * @returns JSON-serializable object
    */
   toJSON(): any {
     const result: any = {
@@ -159,8 +159,8 @@ export class JsonPatchOperation {
   }
 
   /**
-   * fast-json-patch形式の操作オブジェクトに変換する
-   * @returns fast-json-patch互換のオブジェクト
+   * Convert to fast-json-patch format operation object
+   * @returns fast-json-patch compatible object
    */
   toFastJsonPatchOperation(): any {
     return this.toJSON();

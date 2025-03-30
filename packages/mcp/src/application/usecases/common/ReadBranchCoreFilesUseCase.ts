@@ -16,7 +16,7 @@ interface ReadBranchCoreFilesInput {
   branchName: string;
 }
 
-export interface ReadBranchCoreFilesOutput { // Add export keyword
+export interface ReadBranchCoreFilesOutput {
   files: CoreFilesDTO;
 }
 
@@ -27,7 +27,6 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
   private readonly BRANCH_CONTEXT_PATH = 'branchContext.json';
 
   constructor(private readonly branchRepository?: IBranchMemoryBankRepository) {
-    // Using shared logger instance
   }
 
   public async execute(input: ReadBranchCoreFilesInput): Promise<ReadBranchCoreFilesOutput> {
@@ -67,7 +66,6 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
         }
       }
 
-      // Active Context
       try {
         const doc = await this.branchRepository.getDocument(
           branchInfo,
@@ -87,7 +85,6 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
         });
       }
 
-      // Progress
       try {
         const doc = await this.branchRepository.getDocument(
           branchInfo,
@@ -107,28 +104,25 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
         });
       }
 
-      // Branch Context
       try {
         const doc = await this.branchRepository.getDocument(
           branchInfo,
           DocumentPath.create(this.BRANCH_CONTEXT_PATH)
         );
         if (doc) {
-          // Branch context is expected to be a string, not JSON
           coreFiles.branchContext = doc.content;
         }
       } catch (error) {
         if (error instanceof DomainError || error instanceof ApplicationError) {
           throw error;
         }
-        logger.debug('Document not found', { // ★ this.logger -> logger
+        logger.debug('Document not found', {
           type: 'branchContext',
           path: this.BRANCH_CONTEXT_PATH,
           branch: input.branchName
         });
       }
 
-      // System Patterns
       let systemPatternsFound = false;
       try {
         const doc = await this.branchRepository.getDocument(
@@ -143,14 +137,14 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
         if (error instanceof DomainError || error instanceof ApplicationError) {
           throw error;
         }
-        logger.debug('Document not found', { // ★ this.logger -> logger
+        logger.debug('Document not found', {
           type: 'systemPatterns',
           path: this.SYSTEM_PATTERNS_PATH,
           branch: input.branchName
         });
       }
 
-      // SystemPatternsが見つからなかった場合、デフォルト値を設定
+      // Set default value if SystemPatterns was not found
       if (!systemPatternsFound) {
         coreFiles.systemPatterns = { technicalDecisions: [] };
       }
@@ -162,7 +156,7 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
         throw error;
       }
 
-      logger.error('Failed to read core files', { // ★ this.logger -> logger
+      logger.error('Failed to read core files', {
         branch: input.branchName,
         error: error instanceof Error ? error.message : String(error)
       });

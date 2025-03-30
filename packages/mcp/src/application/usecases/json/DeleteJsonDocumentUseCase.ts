@@ -81,7 +81,6 @@ export class DeleteJsonDocumentUseCase
    */
   async execute(input: DeleteJsonDocumentInput): Promise<DeleteJsonDocumentOutput> {
     try {
-      // Validate input
       if (!input.path && !input.id) {
         throw new ApplicationError(
           ApplicationErrorCodes.INVALID_INPUT,
@@ -89,17 +88,15 @@ export class DeleteJsonDocumentUseCase
         );
       }
 
-      // Determine if deleting from branch or global memory bank
       const isGlobal = !input.branchName;
       const location = isGlobal ? 'global' : input.branchName!;
       const repository = isGlobal
         ? this.globalRepository || this.jsonRepository
         : this.jsonRepository;
 
-      // Create branch info
-      // 注意: グローバルメモリバンクの操作でもBranchInfoを使用しています
-      // TODO: 将来的には設計を見直し、グローバルメモリバンクではBranchInfoに依存しない設計にすべき
-      // 現在はWriteJsonDocumentUseCaseとの整合性のために'feature/global'を使用
+      // Note: Using BranchInfo even for global operations.
+      // TODO: Refactor in the future so global operations do not depend on BranchInfo.
+      // Currently using 'feature/global' for consistency with WriteJsonDocumentUseCase.
       const branchInfo = isGlobal
         ? BranchInfo.create('feature/global')
         : BranchInfo.create(input.branchName!);
@@ -107,12 +104,8 @@ export class DeleteJsonDocumentUseCase
       let success = false;
       const identifier = input.path || input.id || '';
 
-      // Delete document and update index based on provided identifier
       if (input.id) {
-        // Delete by ID
         const documentId = DocumentId.create(input.id);
-
-        // Check if document exists
         const document = await repository.findById(documentId);
         if (!document) {
           throw new DomainError(
@@ -120,17 +113,10 @@ export class DeleteJsonDocumentUseCase
             `Document with ID "${input.id}" not found in ${isGlobal ? 'global memory bank' : `branch "${input.branchName}"`}`
           );
         }
-
-        // Delete document
         success = await repository.delete(branchInfo, documentId);
-
-        // Update index
         await this.indexService.removeFromIndex(branchInfo, documentId);
       } else if (input.path) {
-        // Delete by path
         const documentPath = DocumentPath.create(input.path);
-
-        // Check if document exists
         const documentExists = await repository.exists(branchInfo, documentPath);
         if (!documentExists) {
           throw new DomainError(
@@ -138,15 +124,10 @@ export class DeleteJsonDocumentUseCase
             `Document "${input.path}" not found in ${isGlobal ? 'global memory bank' : `branch "${input.branchName}"`}`
           );
         }
-
-        // Delete document
         success = await repository.delete(branchInfo, documentPath);
-
-        // Update index
         await this.indexService.removeFromIndex(branchInfo, documentPath);
       }
 
-      // Return result
       return {
         success,
         location,
@@ -156,12 +137,10 @@ export class DeleteJsonDocumentUseCase
         },
       };
     } catch (error) {
-      // Re-throw domain and application errors
       if (error instanceof DomainError || error instanceof ApplicationError) {
         throw error;
       }
 
-      // Wrap other errors
       throw new ApplicationError(
         ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
         `Failed to delete JSON document: ${(error as Error).message}`,

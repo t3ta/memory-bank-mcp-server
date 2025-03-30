@@ -32,7 +32,6 @@ export abstract class BaseError extends Error {
     this.timestamp = new Date();
     this.cause = options?.cause;
 
-    // Maintains proper stack trace for where our error was thrown (only available on V8)
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, this.constructor);
     }
@@ -61,7 +60,6 @@ export abstract class BaseError extends Error {
    * Should be overridden by subclasses if needed
    */
   public getHttpStatusCode(): number {
-    // Default to 500 Internal Server Error
     return 500;
   }
 
@@ -82,8 +80,5 @@ export abstract class BaseError extends Error {
    * @param newMessage New error message
    * @param additionalDetails Additional details to merge with existing details
    */
-  // Make this abstract as it must be implemented by subclasses
-  // Return BaseError instead of this for compatibility with subclass implementations
   public abstract withMessage(newMessage: string, additionalDetails?: Record<string, unknown>): BaseError;
 }
-// Removed extra closing brace

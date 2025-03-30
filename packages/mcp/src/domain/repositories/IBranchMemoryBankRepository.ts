@@ -1,6 +1,6 @@
-import type { BranchTagIndex } from "@memory-bank/schemas"; // Changed TagIndex to BranchTagIndex
+import type { BranchTagIndex } from "@memory-bank/schemas";
 
-import type { BranchInfo } from "../entities/BranchInfo.js";
+ import type { BranchInfo } from "../entities/BranchInfo.js";
 import type { DocumentPath } from "../entities/DocumentPath.js";
 import type { MemoryDocument } from "../entities/MemoryDocument.js";
 import type { Tag } from "../entities/Tag.js";
@@ -94,14 +94,14 @@ export interface IBranchMemoryBankRepository {
    * @param tagIndex Tag index to save
    * @returns Promise resolving when done
    */
-  saveTagIndex(branchInfo: BranchInfo, tagIndex: BranchTagIndex): Promise<void>; // Changed TagIndex to BranchTagIndex
+  saveTagIndex(branchInfo: BranchInfo, tagIndex: BranchTagIndex): Promise<void>;
 
   /**
    * Get tag index for branch
    * @param branchInfo Branch information
    * @returns Promise resolving to tag index if found, null otherwise
    */
-  getTagIndex(branchInfo: BranchInfo): Promise<BranchTagIndex | null>; // Changed TagIndex to BranchTagIndex
+  getTagIndex(branchInfo: BranchInfo): Promise<BranchTagIndex | null>;
 
   /**
    * Find documents by tags in branch using index

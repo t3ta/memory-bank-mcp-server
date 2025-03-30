@@ -12,8 +12,8 @@ import { TagOperations } from './TagOperations.js';
 import { PathOperations } from './PathOperations.js';
 
 /**
- * 一括操作を担当するコンポーネント
- * 複数ドキュメントの一括取得・更新・削除などを担当
+ * Component responsible for bulk operations
+ * Handles bulk retrieval, update, deletion of multiple documents
  */
 export class BulkOperations extends FileSystemMemoryBankRepositoryBase {
   private readonly documentOps: DocumentOperations;
@@ -22,9 +22,9 @@ export class BulkOperations extends FileSystemMemoryBankRepositoryBase {
 
   /**
    * Constructor
-   * @param basePath 基底パス
-   * @param fileSystemService ファイルシステムサービス
-   * @param configProvider 設定プロバイダー
+   * @param basePath Base path
+   * @param fileSystemService File system service
+   * @param configProvider Configuration provider
    */
   constructor(
     private readonly basePath: string,
@@ -38,15 +38,15 @@ export class BulkOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * 複数ドキュメントを一括取得
-   * @param paths 取得するドキュメントパスの配列
-   * @returns ドキュメントの配列（存在しないものはnullを含む）
+   * Get multiple documents in bulk
+   * @param paths Array of document paths to retrieve
+   * @returns Array of documents (including null for non-existent ones)
    */
   async getDocuments(paths: DocumentPath[]): Promise<(MemoryDocument | null)[]> {
     try {
       this.logDebug(`Bulk getting ${paths.length} documents`);
 
-      // 各ドキュメントを並行取得
+      // Retrieve each document in parallel
       const promises = paths.map(path => this.documentOps.getDocument(path));
       return await Promise.all(promises);
     } catch (error) {
@@ -63,18 +63,18 @@ export class BulkOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * 複数ドキュメントを一括保存
-   * @param documents 保存するドキュメントの配列
+   * Save multiple documents in bulk
+   * @param documents Array of documents to save
    */
   async saveDocuments(documents: MemoryDocument[]): Promise<void> {
     try {
       this.logDebug(`Bulk saving ${documents.length} documents`);
 
-      // 各ドキュメントを並行保存
+      // Save each document in parallel
       const promises = documents.map(doc => this.documentOps.saveDocument(doc));
       await Promise.all(promises);
 
-      // タグインデックスを更新
+      // Update tag index
       await this.tagOps.generateAndSaveTagIndex(documents);
 
       this.logDebug(`Successfully saved ${documents.length} documents`);
@@ -92,21 +92,21 @@ export class BulkOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * 複数ドキュメントを一括削除
-   * @param paths 削除するドキュメントパスの配列
-   * @returns 成功したかどうかのブール値の配列
+   * Delete multiple documents in bulk
+   * @param paths Array of document paths to delete
+   * @returns Array of booleans indicating success for each deletion
    */
   async deleteDocuments(paths: DocumentPath[]): Promise<boolean[]> {
     try {
       this.logDebug(`Bulk deleting ${paths.length} documents`);
 
-      // 各ドキュメントを並行削除
+      // Delete each document in parallel
       const promises = paths.map(path => this.documentOps.deleteDocument(path));
       const results = await Promise.all(promises);
 
-      // 一部でも削除に成功したらタグインデックスを更新
+      // Update tag index if at least one deletion was successful
       if (results.some(result => result)) {
-        // 残りのドキュメントを取得してタグインデックスを更新
+        // Get remaining documents to update tag index
         const allPaths = await this.documentOps.listDocuments();
         const allDocs = await this.getDocuments(
           allPaths.filter(p => !paths.some(deletedPath =>
@@ -133,29 +133,29 @@ export class BulkOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * タグでドキュメントを検索
-   * @param tags 検索するタグの配列
-   * @param matchAll すべてのタグに一致する必要があるか（AND）、いずれかのタグに一致すればよいか（OR）
-   * @returns 一致するドキュメントの配列
+   * Find documents by tags
+   * @param tags Array of tags to search for
+   * @param matchAll Whether all tags must match (AND) or any tag is sufficient (OR)
+   * @returns Array of matching documents
    */
   async findDocumentsByTags(tags: Tag[], matchAll: boolean = false): Promise<MemoryDocument[]> {
     try {
       this.logDebug(`Finding documents by ${tags.length} tags (matchAll: ${matchAll})`);
 
-      // まずすべてのドキュメントパスを取得
+      // First, get all document paths
       const allPaths = await this.documentOps.listDocuments();
 
-      // タグインデックスを使用してパスをフィルタリング
+      // Filter paths using the tag index
       const allDocs = await this.getDocuments(allPaths);
       const validDocs = allDocs.filter((doc): doc is MemoryDocument => doc !== null);
 
-      // タグインデックスを使用して検索
+      // Search using the tag index
       const matchingPaths = await this.tagOps.findDocumentPathsByTagsUsingIndex(tags, validDocs, matchAll);
 
-      // 一致するパスのドキュメントを取得
+      // Get documents for the matching paths
       const matchingDocs = await this.getDocuments(matchingPaths);
 
-      // nullでないドキュメントのみを返す
+      // Return only non-null documents
       return matchingDocs.filter((doc): doc is MemoryDocument => doc !== null);
     } catch (error) {
       if (error instanceof DomainError || error instanceof InfrastructureError) {
@@ -171,20 +171,20 @@ export class BulkOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * すべてのドキュメントをリスト
-   * @returns すべてのドキュメントの配列
+   * List all documents
+   * @returns Array of all documents
    */
   async getAllDocuments(): Promise<MemoryDocument[]> {
     try {
       this.logDebug('Getting all documents');
 
-      // すべてのパスを取得
+      // Get all paths
       const allPaths = await this.documentOps.listDocuments();
 
-      // すべてのドキュメントを取得
+      // Get all documents
       const allDocs = await this.getDocuments(allPaths);
 
-      // nullでないドキュメントのみを返す
+      // Return only non-null documents
       return allDocs.filter((doc): doc is MemoryDocument => doc !== null);
     } catch (error) {
       if (error instanceof DomainError || error instanceof InfrastructureError) {
@@ -200,24 +200,24 @@ export class BulkOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * 特定のディレクトリ内のすべてのドキュメントを取得
-   * @param directoryPath ディレクトリパス
-   * @returns ディレクトリ内のドキュメントの配列
+   * Get all documents within a specific directory
+   * @param directoryPath Directory path
+   * @returns Array of documents within the directory
    */
   async getDocumentsInDirectory(directoryPath: string): Promise<MemoryDocument[]> {
     try {
       this.logDebug(`Getting documents in directory: ${directoryPath}`);
 
-      // ディレクトリ内のファイルをリスト
+      // List files in the directory
       const fileList = await this.pathOps.listFilesInDirectory(directoryPath, ['.json', '.md']);
 
-      // ファイルパスをDocumentPathに変換
+      // Convert file paths to DocumentPath
       const paths = fileList.map(file => DocumentPath.create(file));
 
-      // ドキュメントを取得
+      // Get the documents
       const docs = await this.getDocuments(paths);
 
-      // nullでないドキュメントのみを返す
+      // Return only non-null documents
       return docs.filter((doc): doc is MemoryDocument => doc !== null);
     } catch (error) {
       if (error instanceof DomainError || error instanceof InfrastructureError) {
@@ -233,19 +233,18 @@ export class BulkOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * タグインデックスを再生成
-   * @returns 成功したかどうか
+   * Regenerate the tag index
+   * @returns true if successful
    */
   async rebuildTagIndex(): Promise<boolean> {
     try {
       this.logDebug('Rebuilding tag index');
 
-      // すべてのドキュメントを取得
+      // Get all documents
       const docs = await this.getAllDocuments();
 
-      // タグインデックスを生成して保存
+      // Generate and save the tag index
       await this.tagOps.generateAndSaveTagIndex(docs);
-
 
       return true;
     } catch (error) {
@@ -255,26 +254,26 @@ export class BulkOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ディレクトリ構造が有効かどうか検証
-   * @returns 検証結果（成功した場合はtrue）
+   * Validate if the directory structure is valid
+   * @returns Validation result (true if successful)
    */
   async validateStructure(): Promise<boolean> {
     try {
       this.logDebug('Validating structure');
 
-      // 基本的なディレクトリが存在するか確認
+      // Check if base directory exists
       const baseDirExists = await this.directoryExists(this.basePath);
       if (!baseDirExists) {
         this.logDebug(`Base directory does not exist: ${this.basePath}`);
         return false;
       }
 
-      // tagsディレクトリが存在するか確認
+      // Check if tags directory exists
       const tagsDir = path.join(this.basePath, 'tags');
       const tagsDirExists = await this.directoryExists(tagsDir);
       if (!tagsDirExists) {
         this.logDebug(`Tags directory does not exist: ${tagsDir}`);
-        // タグディレクトリがなければ作成
+        // Create tags directory if it doesn't exist
         await this.createDirectory(tagsDir);
       }
 

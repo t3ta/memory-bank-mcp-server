@@ -45,10 +45,7 @@ export class FileI18nRepository implements II18nRepository {
    */
   async initialize(): Promise<void> {
     try {
-      // Ensure translations directory exists
       await fs.mkdir(this.basePath, { recursive: true });
-
-      // Load all translations into cache
       await this.loadAllTranslations();
     } catch (error) {
       throw new Error(`Failed to initialize I18n repository: ${(error as Error).message}`);
@@ -93,7 +90,6 @@ export class FileI18nRepository implements II18nRepository {
 
     const translations: Translation[] = [];
 
-    // Check each language for the key
     for (const [langCode, langCache] of this.translationCache.entries()) {
       if (langCache.has(key)) {
         const translationText = langCache.get(key);
@@ -144,17 +140,14 @@ export class FileI18nRepository implements II18nRepository {
 
       const langCode = translation.language.code;
 
-      // Get or create cache for this language
       let langCache = this.translationCache.get(langCode);
       if (!langCache) {
         langCache = new Map<TranslationKey, string>();
         this.translationCache.set(langCode, langCache);
       }
 
-      // Update cache
       langCache.set(translation.key, translation.text);
 
-      // Write to file
       await this.saveTranslationsForLanguage(translation.language);
 
       return true;
@@ -192,7 +185,6 @@ export class FileI18nRepository implements II18nRepository {
 
     const allKeys = new Set<TranslationKey>();
 
-    // Collect all keys from all languages
     for (const langCache of this.translationCache.values()) {
       for (const key of langCache.keys()) {
         allKeys.add(key);
@@ -223,34 +215,27 @@ export class FileI18nRepository implements II18nRepository {
    */
   private async loadAllTranslations(): Promise<void> {
     try {
-      // Clear the cache
       this.translationCache.clear();
 
-      // Check if directory exists
       try {
         await fs.access(this.basePath);
       } catch (error) {
-        // Directory doesn't exist, create it
         await fs.mkdir(this.basePath, { recursive: true });
-        // No files to load
         this.cacheDirty = false;
         return;
       }
 
-      // Get all translation files
       const files = await fs.readdir(this.basePath);
       const translationFiles = files.filter(file =>
         file.endsWith('.json') &&
         Language.supportedLanguages().some(lang => file === `${lang}.json`)
       );
 
-      // Load each file
       for (const file of translationFiles) {
         const langCode = path.basename(file, '.json') as LanguageCode;
         await this.loadTranslationsForLanguage(langCode);
       }
 
-      // Cache is now clean
       this.cacheDirty = false;
     } catch (error) {
       console.error('Failed to load translations', error);
@@ -269,31 +254,24 @@ export class FileI18nRepository implements II18nRepository {
       const filePath = path.join(this.basePath, `${langCode}.json`);
 
       try {
-        // Check if file exists
         await fs.access(filePath);
       } catch (error) {
-        // File doesn't exist, nothing to load
         return;
       }
 
-      // Read and parse the file
       const content = await fs.readFile(filePath, 'utf-8');
       const data = JSON.parse(content) as TranslationFile;
 
-      // Validate data
       if (data.language !== langCode) {
         throw new Error(`Language mismatch in file ${filePath}: expected ${langCode}, got ${data.language}`);
       }
 
-      // Create cache for this language
       const langCache = new Map<TranslationKey, string>();
 
-      // Fill the cache
       for (const [key, text] of Object.entries(data.translations)) {
         langCache.set(key, text);
       }
 
-      // Update main cache
       this.translationCache.set(langCode, langCache);
     } catch (error) {
       console.error(`Failed to load translations for ${langCode}`, error);
@@ -316,7 +294,6 @@ export class FileI18nRepository implements II18nRepository {
         throw new Error(`No translations found for language ${langCode}`);
       }
 
-      // Create translation file data
       const translations: Record<TranslationKey, string> = {};
       for (const [key, text] of langCache.entries()) {
         translations[key] = text;
@@ -328,7 +305,6 @@ export class FileI18nRepository implements II18nRepository {
         lastModified: new Date().toISOString()
       };
 
-      // Write to file
       const filePath = path.join(this.basePath, `${langCode}.json`);
       await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8');
     } catch (error) {

@@ -9,7 +9,6 @@ import fs from 'fs/promises';
 import path from 'path';
 import { Language, LanguageCode } from '../domain/i18n/Language.js';
 
-// Mock interfaces and classes for Template related functionality (removed as part of template cleanup)
 interface ITemplateRepository {
   getTemplate(id: string): Promise<Template | null>;
   getTemplateAsMarkdown(id: string, language: Language): Promise<string>;
@@ -35,7 +34,7 @@ class Section {
     public hidden: boolean
   ) {}
 }
-import { MigrationReport } from './MigrationReport.js'; // Removed MigrationStatus
+import { MigrationReport } from './MigrationReport.js';
 import { logger } from '../shared/utils/logger.js';
 
 /**
@@ -96,17 +95,13 @@ export class MarkdownMigrationService {
    */
   async migrateAllTemplates(options: MigrationOptions = {}): Promise<MigrationReport> {
     try {
-      // Merge options with defaults
       const mergedOptions = { ...DEFAULT_OPTIONS, ...options };
 
-      // Create backup directory if it doesn't exist
       await fs.mkdir(this.backupDir, { recursive: true });
 
-      // Get all Markdown files
       const files = await this.getMarkdownFiles();
       logger.info('Found Markdown files', { count: files.length });
 
-      // Migrate each file
       const migratedIds: string[] = [];
 
       for (const file of files) {
@@ -126,7 +121,6 @@ export class MarkdownMigrationService {
         }
       }
 
-      // Complete the report
       this.report.complete();
       this.report.printSummary();
 
@@ -152,22 +146,18 @@ export class MarkdownMigrationService {
     outputDir: string
   ): Promise<string> {
     try {
-      // Ensure output directory exists
       await fs.mkdir(outputDir, { recursive: true });
 
-      // Get template
       const template = await this.templateRepository.getTemplate(templateId);
       if (!template) {
         throw new Error(`Template not found: ${templateId}`);
       }
 
-      // Generate Markdown
       const markdown = await this.templateRepository.getTemplateAsMarkdown(
         templateId,
         language
       );
 
-      // Write to file
       const filePath = path.join(outputDir, `${templateId}.md`);
       await fs.writeFile(filePath, markdown, 'utf-8');
 
@@ -196,7 +186,6 @@ export class MarkdownMigrationService {
     try {
       const entries = await fs.readdir(this.markdownDir, { withFileTypes: true });
 
-      // Get only files with .md extension
       const files = entries
         .filter(entry => entry.isFile() && entry.name.endsWith('.md'))
         .map(entry => path.join(this.markdownDir, entry.name));
@@ -219,10 +208,8 @@ export class MarkdownMigrationService {
     options: MigrationOptions
   ): Promise<string | null> {
     try {
-      // Get template ID from filename
       const templateId = path.basename(filePath, '.md');
 
-      // Skip if template already exists (unless force is true)
       const exists = await this.templateRepository.templateExists(templateId);
       if (exists && !options.force) {
         logger.debug('Template already exists, skipping', { templateId });
@@ -230,21 +217,17 @@ export class MarkdownMigrationService {
         return null;
       }
 
-      // Read Markdown file
       const markdown = await fs.readFile(filePath, 'utf-8');
 
-      // Backup original file
       const backupPath = path.join(this.backupDir, path.basename(filePath));
       await fs.writeFile(backupPath, markdown, 'utf-8');
 
-      // Parse Markdown and create template
       const template = await this.parseMarkdownToTemplate(
         markdown,
         templateId,
         options.defaultLanguage || 'en'
       );
 
-      // Save template
       const success = await this.templateRepository.saveTemplate(template);
 
       if (!success) {
@@ -255,7 +238,6 @@ export class MarkdownMigrationService {
 
       logger.info('Migrated template', { templateId });
 
-      // Get JSON destination path (for report)
       const destinationPath = path.join(
         this.templateRepository instanceof Object && 'basePath' in this.templateRepository
           ? (this.templateRepository as any).basePath
@@ -287,15 +269,10 @@ export class MarkdownMigrationService {
     defaultLanguage: LanguageCode = 'en'
   ): Promise<Template> {
     try {
-      // Split into lines for processing
       const lines = markdown.split('\n');
 
-      // Removed unused templateName and nameMap definitions
-
-      // Default template type (can be improved)
       const templateType = 'document';
 
-      // Parse sections
       const sections: Section[] = [];
       let currentSection: {
         id: string;
@@ -306,14 +283,11 @@ export class MarkdownMigrationService {
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
 
-        // Handle h2 as section title
         if (line.startsWith('## ')) {
-          // Save previous section if exists
           if (currentSection) {
             sections.push(this.createSection(currentSection, defaultLanguage));
           }
 
-          // Start new section
           const sectionTitle = line.substring(3).trim();
           const sectionId = this.createSectionId(sectionTitle);
 
@@ -323,20 +297,16 @@ export class MarkdownMigrationService {
             content: []
           };
         }
-        // Add content to current section
         else if (currentSection) {
           currentSection.content.push(line);
         }
       }
 
-      // Save last section if exists
       if (currentSection) {
         sections.push(this.createSection(currentSection, defaultLanguage));
       }
 
-      // Create template
-      // Adjusted constructor call due to Template class change
-      return new Template(templateId, templateType /*, nameMap, sections */);
+      return new Template(templateId, templateType);
     } catch (error) {
       throw new Error(`Failed to parse Markdown: ${error instanceof Error ? error.message : String(error)}`);
     }
@@ -354,17 +324,14 @@ export class MarkdownMigrationService {
     sectionData: { id: string; title: string; content: string[] },
     defaultLanguage: LanguageCode = 'en'
   ): Section {
-    // Title map with specified default language
     const titleMap: Partial<Record<LanguageCode, string>> = {
       [defaultLanguage]: sectionData.title
     };
 
-    // Content map with specified default language
     const contentMap: Partial<Record<LanguageCode, string>> = {
       [defaultLanguage]: sectionData.content.join('\n')
     };
 
-    // Create section
     return new Section(sectionData.id, titleMap, contentMap, false);
   }
 
@@ -376,7 +343,6 @@ export class MarkdownMigrationService {
    * @private
    */
   private createSectionId(title: string): string {
-    // Convert to lowercase, replace spaces with camelCase
     return title
       .toLowerCase()
       .replace(/\s+(.)/g, (_, char) => char.toUpperCase())

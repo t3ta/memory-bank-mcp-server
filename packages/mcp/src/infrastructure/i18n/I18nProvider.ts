@@ -7,7 +7,6 @@ import { IFileSystemService } from '../storage/interfaces/IFileSystemService.js'
 import {
   Language,
   TranslationKey,
-  // isValidLanguage, // Removed unused import
   TranslationFile,
 } from '@memory-bank/schemas';
 import { II18nProvider } from './interfaces/II18nProvider.js';
@@ -27,7 +26,6 @@ export class I18nProvider implements II18nProvider {
    * @param fileSystemService Service for file system operations
    */
   constructor(private readonly fileSystemService: IFileSystemService) {
-    // CommonJS compatible path resolution
     const dirname = __dirname; // This might need adjustment in ESM context
     this.translationsPath = path.join(dirname, 'translations');
   }
@@ -35,34 +33,31 @@ export class I18nProvider implements II18nProvider {
   /**
    * Implements II18nProvider.translate
    */
-  // パラメータをオブジェクトリテラル型に変更
+  // Changed parameters to object literal type
   translate(params: {
     key: TranslationKey;
     language: Language;
     params?: Record<string, string>;
   }): string {
-    const { key, language: langParam, params: substitutionParams } = params; // 分割代入、language は内部変数と衝突するため langParam に
-    let language = langParam; // 内部で language 変数を再代入するため let で宣言
-    // Ensure translations are loaded
+    const { key, language: langParam, params: substitutionParams } = params; // Destructure, rename language to langParam to avoid conflict
+    let language = langParam; // Declare language with let for reassignment
+
     if (!this.translations.has(language)) {
       console.warn(
         `Translations not loaded for language ${language}, falling back to ${this.defaultLanguage}`
       );
 
-      // If default language translations are not loaded either, return the key
       if (!this.translations.has(this.defaultLanguage)) {
-        // processPlaceholders の第2引数を substitutionParams に修正
+        // Corrected second argument of processPlaceholders to substitutionParams
         return this.processPlaceholders(key, substitutionParams);
       }
 
-      // Fall back to default language
       language = this.defaultLanguage;
     }
 
     const translationMap = this.translations.get(language)!;
     const translation = translationMap[key];
 
-    // If translation not found, fall back to default language
     if (
       !translation &&
       language !== this.defaultLanguage &&
@@ -72,13 +67,12 @@ export class I18nProvider implements II18nProvider {
       const defaultTranslation = defaultTranslationMap[key];
 
       if (defaultTranslation) {
-        // processPlaceholders の第2引数を substitutionParams に修正
+        // Corrected second argument of processPlaceholders to substitutionParams
         return this.processPlaceholders(defaultTranslation, substitutionParams);
       }
     }
 
-    // If no translation found, return the key itself
-    // processPlaceholders の第2引数を substitutionParams に修正
+    // Corrected second argument of processPlaceholders to substitutionParams
     return this.processPlaceholders(translation || key, substitutionParams);
   }
 
@@ -89,18 +83,15 @@ export class I18nProvider implements II18nProvider {
     try {
       const filePath = path.join(this.translationsPath, `${language}.json`);
 
-      // Check if file exists
       const exists = await this.fileSystemService.fileExists(filePath);
       if (!exists) {
         console.warn(`Translation file not found: ${filePath}`);
         return false;
       }
 
-      // Read and parse the translation file
       const content = await this.fileSystemService.readFile(filePath);
       const translationFile = JSON.parse(content) as TranslationFile;
 
-      // Validate language matches
       if (translationFile.language !== language) {
         console.warn(
           `Language mismatch in translation file: expected ${language}, got ${translationFile.language}`
@@ -108,7 +99,6 @@ export class I18nProvider implements II18nProvider {
         return false;
       }
 
-      // Store translations
       this.translations.set(language, translationFile.translations);
       return true;
     } catch (error) {

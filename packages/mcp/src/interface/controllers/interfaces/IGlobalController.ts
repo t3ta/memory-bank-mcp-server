@@ -23,10 +23,9 @@ export interface IGlobalController extends IController {
    * @param params.tags Optional tags for the document
    * @returns Promise resolving to MCP response with the result
    */
-  // パラメータをオブジェクトリテラル型に変更
   writeDocument(params: {
-    path: string;
-    content: string;
+     path: string;
+     content: string;
     tags?: string[];
   }): Promise<MCPResponse>;
 

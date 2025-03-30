@@ -18,7 +18,6 @@ export class Tag {
       throw new DomainError(DomainErrorCodes.INVALID_TAG_FORMAT, 'Tag cannot be empty');
     }
 
-    // Tags should only contain lowercase letters, numbers, and hyphens
     const tagRegex = /^[a-z0-9-]+$/;
     if (!tagRegex.test(value)) {
       throw new DomainError(

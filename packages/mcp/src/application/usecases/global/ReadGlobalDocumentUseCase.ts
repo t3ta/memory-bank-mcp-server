@@ -44,7 +44,6 @@ export class ReadGlobalDocumentUseCase
    */
   async execute(input: ReadGlobalDocumentInput): Promise<ReadGlobalDocumentOutput> {
     try {
-      // Validate input
       if (!input.path) {
         throw new ApplicationError(
           ApplicationErrorCodes.INVALID_INPUT,
@@ -52,13 +51,10 @@ export class ReadGlobalDocumentUseCase
         );
       }
 
-      // Create domain objects
       const documentPath = DocumentPath.create(input.path);
 
-      // Get document from repository
       const document = await this.globalRepository.getDocument(documentPath);
 
-      // Check if document exists
       if (!document) {
         throw new DomainError(
           DomainErrorCodes.DOCUMENT_NOT_FOUND,
@@ -66,7 +62,6 @@ export class ReadGlobalDocumentUseCase
         );
       }
 
-      // Transform to DTO
       return {
         document: {
           path: document.path.value,
@@ -76,12 +71,10 @@ export class ReadGlobalDocumentUseCase
         },
       };
     } catch (error) {
-      // Re-throw domain and application errors
       if (error instanceof DomainError || error instanceof ApplicationError) {
         throw error;
       }
 
-      // Wrap other errors
       throw new ApplicationError(
         ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
         `Failed to read document: ${(error as Error).message}`,

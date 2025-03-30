@@ -1,8 +1,8 @@
 /**
- * ユースケースファクトリー
+ * Use Case Factory
  *
- * このファイルでは、アプリケーションで使用するユースケースの
- * インスタンスを作成するファクトリーを定義します。
+ * This file defines factories for creating instances of use cases
+ * used in the application.
  */
 
 import { IBranchMemoryBankRepository } from '../domain/repositories/IBranchMemoryBankRepository.js';
@@ -11,14 +11,14 @@ import { WriteBranchDocumentUseCase } from '../application/usecases/branch/Write
 import { WriteGlobalDocumentUseCase } from '../application/usecases/global/WriteGlobalDocumentUseCase.js';
 
 /**
- * ユースケースファクトリー
+ * Use Case Factory
  */
 export class UseCaseFactory {
   /**
-   * WriteBranchDocumentUseCaseを作成
+   * Create WriteBranchDocumentUseCase
    *
-   * @param branchRepository ブランチメモリーバンクリポジトリ
-   * @returns WriteBranchDocumentUseCaseのインスタンス
+   * @param branchRepository Branch memory bank repository
+   * @returns Instance of WriteBranchDocumentUseCase
    */
   static createWriteBranchDocumentUseCase(
     branchRepository: IBranchMemoryBankRepository
@@ -27,10 +27,10 @@ export class UseCaseFactory {
   }
 
   /**
-   * WriteGlobalDocumentUseCaseを作成
+   * Create WriteGlobalDocumentUseCase
    *
-   * @param globalRepository グローバルメモリーバンクリポジトリ
-   * @returns WriteGlobalDocumentUseCaseのインスタンス
+   * @param globalRepository Global memory bank repository
+   * @returns Instance of WriteGlobalDocumentUseCase
    */
   static createWriteGlobalDocumentUseCase(
     globalRepository: IGlobalMemoryBankRepository

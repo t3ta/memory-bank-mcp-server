@@ -10,13 +10,13 @@ import { FileSystemMemoryBankRepositoryBase } from './FileSystemMemoryBankReposi
 import { FileSystemMemoryDocumentRepository } from './FileSystemMemoryDocumentRepository.js';
 
 /**
- * ドキュメント操作に関連する処理を担当するコンポーネント
+ * Component responsible for document-related operations
  */
 export class DocumentOperations extends FileSystemMemoryBankRepositoryBase {
   /**
-   * コンストラクタ
-   * @param basePath 基本パス
-   * @param fileSystemService ファイルシステムサービス
+   * Constructor
+   * @param basePath Base path
+   * @param fileSystemService File system service
    */
   constructor(
     private readonly basePath: string,
@@ -27,17 +27,17 @@ export class DocumentOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ドキュメントリポジトリを取得
-   * @returns ドキュメントリポジトリ
+   * Get the document repository
+   * @returns Document repository
    */
   private getDocumentRepository(): FileSystemMemoryDocumentRepository {
     return new FileSystemMemoryDocumentRepository(this.basePath, this.fileSystemService);
   }
 
   /**
-   * ドキュメントを取得する
-   * @param path ドキュメントパス
-   * @returns 取得したドキュメント、存在しない場合はnull
+   * Get a document
+   * @param path Document path
+   * @returns The retrieved document, or null if not found
    */
   async getDocument(path: DocumentPath): Promise<MemoryDocument | null> {
     try {
@@ -57,10 +57,10 @@ export class DocumentOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ブランチのドキュメントを取得する
-   * @param branchInfo ブランチ情報
-   * @param path ドキュメントパス
-   * @returns 取得したドキュメント、存在しない場合はnull
+   * Get a document from a branch
+   * @param branchInfo Branch information
+   * @param path Document path
+   * @returns The retrieved document, or null if not found
    */
   async getBranchDocument(branchInfo: BranchInfo, path: DocumentPath): Promise<MemoryDocument | null> {
     try {
@@ -80,8 +80,8 @@ export class DocumentOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ドキュメントを保存する
-   * @param document 保存するドキュメント
+   * Save a document
+   * @param document Document to save
    */
   async saveDocument(document: MemoryDocument): Promise<void> {
     try {
@@ -101,9 +101,9 @@ export class DocumentOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ブランチにドキュメントを保存する
-   * @param branchInfo ブランチ情報
-   * @param document 保存するドキュメント
+   * Save a document to a branch
+   * @param branchInfo Branch information
+   * @param document Document to save
    */
   async saveBranchDocument(branchInfo: BranchInfo, document: MemoryDocument): Promise<void> {
     try {
@@ -124,9 +124,9 @@ export class DocumentOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ドキュメントを削除する
-   * @param path 削除するドキュメントのパス
-   * @returns 削除が成功したかどうか
+   * Delete a document
+   * @param path Path of the document to delete
+   * @returns Whether the deletion was successful
    */
   async deleteDocument(path: DocumentPath): Promise<boolean> {
     try {
@@ -146,10 +146,10 @@ export class DocumentOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ブランチのドキュメントを削除する
-   * @param branchInfo ブランチ情報
-   * @param path 削除するドキュメントのパス
-   * @returns 削除が成功したかどうか
+   * Delete a document from a branch
+   * @param branchInfo Branch information
+   * @param path Path of the document to delete
+   * @returns Whether the deletion was successful
    */
   async deleteBranchDocument(branchInfo: BranchInfo, path: DocumentPath): Promise<boolean> {
     try {
@@ -173,8 +173,8 @@ export class DocumentOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * すべてのドキュメントの一覧を取得する
-   * @returns ドキュメントパスの配列
+   * Get a list of all documents
+   * @returns Array of document paths
    */
   async listDocuments(): Promise<DocumentPath[]> {
     try {
@@ -194,9 +194,9 @@ export class DocumentOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ブランチのすべてのドキュメントの一覧を取得する
-   * @param branchInfo ブランチ情報
-   * @returns ドキュメントパスの配列
+   * Get a list of all documents in a branch
+   * @param branchInfo Branch information
+   * @returns Array of document paths
    */
   async listBranchDocuments(branchInfo: BranchInfo): Promise<DocumentPath[]> {
     try {

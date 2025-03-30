@@ -78,16 +78,13 @@ export class UpdateTagIndexUseCase implements IUseCase<UpdateTagIndexInput, Upda
    */
   async execute(input: UpdateTagIndexInput): Promise<UpdateTagIndexOutput> {
     try {
-      // Set default values
       const fullRebuild = input.fullRebuild ?? false;
       const updateLocation = input.branchName ? input.branchName : 'global';
 
       let documentCount = 0;
       let allTags: Tag[] = [];
 
-      // Update tag index in either branch or global memory bank
       if (input.branchName) {
-        // Check if branch exists
         const branchExists = await this.branchRepository.exists(input.branchName);
 
         if (!branchExists) {
@@ -97,14 +94,11 @@ export class UpdateTagIndexUseCase implements IUseCase<UpdateTagIndexInput, Upda
           );
         }
 
-        // Create branch info
         const branchInfo = BranchInfo.create(input.branchName);
 
-        // Get all documents in branch
         const documentPaths = await this.branchRepository.listDocuments(branchInfo);
         documentCount = documentPaths.length;
 
-        // Collect all tags
         const tagSet = new Set<string>();
 
         for (const path of documentPaths) {
@@ -116,14 +110,10 @@ export class UpdateTagIndexUseCase implements IUseCase<UpdateTagIndexInput, Upda
 
         allTags = Array.from(tagSet).map((tag) => Tag.create(tag));
 
-        // In a real implementation, we would update a tag index persistently here
-        // For now, we're just collecting the tags for the response
       } else {
-        // Update global tag index
         const documentPaths = await this.globalRepository.listDocuments();
         documentCount = documentPaths.length;
 
-        // Collect all tags
         const tagSet = new Set<string>();
 
         for (const path of documentPaths) {
@@ -135,8 +125,6 @@ export class UpdateTagIndexUseCase implements IUseCase<UpdateTagIndexInput, Upda
 
         allTags = Array.from(tagSet).map((tag) => Tag.create(tag));
 
-        // In a real implementation, we would update a tag index persistently here
-        // For now, we're just collecting the tags for the response
       }
 
       return {
@@ -149,12 +137,10 @@ export class UpdateTagIndexUseCase implements IUseCase<UpdateTagIndexInput, Upda
         },
       };
     } catch (error) {
-      // Re-throw domain and application errors
       if (error instanceof DomainError || error instanceof ApplicationError) {
         throw error;
       }
 
-      // Wrap other errors
       throw new ApplicationError(
         ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
         `Failed to update tag index: ${(error as Error).message}`,

@@ -21,7 +21,6 @@ export class BranchInfo {
       throw new DomainError(DomainErrorCodes.INVALID_BRANCH_NAME, 'Branch name cannot be empty');
     }
 
-    // Branch name should contain a slash for namespacing
     if (!branchName.includes('/')) {
       throw new DomainError(
         DomainErrorCodes.INVALID_BRANCH_NAME,
@@ -29,15 +28,12 @@ export class BranchInfo {
       );
     }
 
-    // Get branch type and namespace
     const namespacePrefix = branchName.split('/')[0];
 
-    // For backward compatibility
     const type = namespacePrefix === 'feature' ? 'feature' :
       namespacePrefix === 'fix' ? 'fix' :
-        'feature'; // Default to feature for other prefixes
+        'feature';
 
-    // Get display name by removing the prefix
     const displayName = branchName.substring(branchName.indexOf('/') + 1);
 
     if (!displayName) {

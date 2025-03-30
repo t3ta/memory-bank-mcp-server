@@ -86,7 +86,6 @@ export class SearchDocumentsByTagsUseCase
    */
   async execute(input: SearchDocumentsByTagsInput): Promise<SearchDocumentsByTagsOutput> {
     try {
-      // Validate input
       if (!input.tags || input.tags.length === 0) {
         throw new ApplicationError(
           ApplicationErrorCodes.INVALID_INPUT,
@@ -94,7 +93,6 @@ export class SearchDocumentsByTagsUseCase
         );
       }
 
-      // Convert tag strings to Tag domain objects
       logger.debug('Converting search tags:', { tags: input.tags });
       const tags = input.tags.map((tag) => {
         try {
@@ -109,15 +107,12 @@ export class SearchDocumentsByTagsUseCase
       });
       logger.debug('All tags converted:', { tags: tags.map(t => t.value) });
 
-      // Set default values
       const matchAllTags = input.matchAllTags ?? false;
       const searchLocation = input.branchName ? input.branchName : 'global';
 
-      // Perform search in either branch or global memory bank
       let documents = [];
 
       if (input.branchName) {
-        // Check if branch exists
         const branchExists = await this.branchRepository.exists(input.branchName);
 
         if (!branchExists) {
@@ -127,7 +122,6 @@ export class SearchDocumentsByTagsUseCase
           );
         }
 
-        // Create branch info and search in branch
         const branchInfo = BranchInfo.create(input.branchName);
         documents = await this.branchRepository.findDocumentsByTags(branchInfo, tags);
       } else {
@@ -142,10 +136,8 @@ export class SearchDocumentsByTagsUseCase
         searchTags: tags.map(t => t.value)
       });
 
-      // Filter documents if matchAllTags is true
       if (matchAllTags && tags.length > 1) {
         documents = documents.filter((doc) => {
-          // Check if document contains all the search tags
           const hasAllTags = tags.every((searchTag) => {
             const hasTag = doc.tags.some((docTag) => docTag.equals(searchTag));
             logger.debug('Document tag check:', {
@@ -170,7 +162,6 @@ export class SearchDocumentsByTagsUseCase
         }))
       });
 
-      // Transform to DTOs
       const documentDTOs = documents.map((doc) => ({
         path: doc.path.value,
         content: doc.content,
@@ -188,12 +179,10 @@ export class SearchDocumentsByTagsUseCase
         },
       };
     } catch (error) {
-      // Re-throw domain and application errors
       if (error instanceof DomainError || error instanceof ApplicationError) {
         throw error;
       }
 
-      // Wrap other errors
       throw new ApplicationError(
         ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
         `Failed to search documents by tags: ${(error as Error).message}`,

@@ -1,7 +1,7 @@
-// ロガーは後方互換性のために残します
-export { logger } from './logger.js';
+// Removed unused Language import
 
-// Date utilities
+// Logger is kept for backward compatibility
+export { logger } from './logger.js';
 
 /**
  * Parse a date string safely, returning a valid Date object
@@ -23,7 +23,6 @@ export const parseDateSafely = (dateInput: string | Date): Date => {
     return date;
   } catch (error) {
     console.error(`Error parsing date: ${error instanceof Error ? error.message : String(error)}`);
-    // Return current time as default value
     return new Date();
   }
 };
@@ -62,7 +61,6 @@ export const extractSectionContent = (
 
   if (sectionIndex === -1) return undefined;
 
-  // Find the next section or end of file
   let nextSectionIndex = lines.findIndex(
     (line, index) => index > sectionIndex && line.startsWith('##')
   );
@@ -70,7 +68,6 @@ export const extractSectionContent = (
     nextSectionIndex = lines.length;
   }
 
-  // Extract and clean section content
   return lines
     .slice(sectionIndex + 1, nextSectionIndex)
     .filter((line) => line.trim())

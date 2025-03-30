@@ -1,8 +1,8 @@
 /**
- * JSON Patch (RFC 6902) の操作に関するユーティリティと安全対策
+ * Utilities and safety measures for JSON Patch (RFC 6902) operations
  */
 
-// JSON Patch操作の型定義
+// Type definition for JSON Patch operation
 export interface JsonPatchOperation {
   op: 'add' | 'remove' | 'replace' | 'move' | 'copy' | 'test';
   path: string;
@@ -11,7 +11,7 @@ export interface JsonPatchOperation {
 }
 
 /**
- * JSON Patchのプロパティ定義を生成し、明確な警告と検証ルールを含める
+ * Generate JSON Patch property definitions, including clear warnings and validation rules
  */
 export function createEnhancedPatchProperties() {
   return {
@@ -41,15 +41,15 @@ export function createEnhancedPatchProperties() {
         required: ['op', 'path']
       },
       warnings: [
-        "WARNING: パスは必ず '/' で始める必要があります",
-        "WARNING: パス内の '/' は '~1' にエスケープする必要があります",
-        "WARNING: パス内の '~' は '~0' にエスケープする必要があります",
-        "WARNING: 'move'/'copy'操作では 'from' プロパティが必須です",
-        "WARNING: 'add'/'replace'/'test'操作では 'value' プロパティが必須です",
-        "WARNING: 'move'操作でパスに自身のサブツリーは指定できません"
+        "WARNING: Paths MUST start with '/'",
+        "WARNING: '/' within paths MUST be escaped as '~1'",
+        "WARNING: '~' within paths MUST be escaped as '~0'",
+        "WARNING: 'move'/'copy' operations require a 'from' property",
+        "WARNING: 'add'/'replace'/'test' operations require a 'value' property",
+        "WARNING: 'move' operation cannot target a descendant of its source path"
       ]
     },
-    content: { 
+    content: {
       type: 'string',
       description: 'Full document content (cannot be used together with patches)'
     }
@@ -57,45 +57,45 @@ export function createEnhancedPatchProperties() {
 }
 
 /**
- * JSON Patchの厳密な検証を行う関数
- * これをツールハンドラー内で使用して、パッチ適用前にバリデーションを行う
+ * Function to perform strict validation of JSON Patch
+ * Use this within tool handlers to validate before applying patches
  */
 export function validateJsonPatch(operations: JsonPatchOperation[]): { valid: boolean, errors: string[] } {
   const errors: string[] = [];
-  
+
   for (let i = 0; i < operations.length; i++) {
     const op = operations[i];
-    
-    // 基本的な検証
+
+    // Basic validation
     if (!op.path.startsWith('/')) {
-      errors.push(`操作 #${i+1}: パスは'/'で始まる必要があります: ${op.path}`);
+      errors.push(`Operation #${i + 1}: Path must start with '/': ${op.path}`);
     }
-    
-    // 操作別の検証
+
+    // Operation-specific validation
     switch (op.op) {
       case 'add':
       case 'replace':
       case 'test':
         if (op.value === undefined) {
-          errors.push(`操作 #${i+1}: '${op.op}'操作には'value'プロパティが必要です`);
+          errors.push(`Operation #${i + 1}: '${op.op}' operation requires a 'value' property`);
         }
         break;
-        
+
       case 'move':
       case 'copy':
         if (!op.from) {
-          errors.push(`操作 #${i+1}: '${op.op}'操作には'from'プロパティが必要です`);
+          errors.push(`Operation #${i + 1}: '${op.op}' operation requires a 'from' property`);
         } else if (!op.from.startsWith('/')) {
-          errors.push(`操作 #${i+1}: 'from'パスは'/'で始まる必要があります: ${op.from}`);
+          errors.push(`Operation #${i + 1}: 'from' path must start with '/': ${op.from}`);
         }
-        
+
         if (op.op === 'move' && op.path.startsWith(`${op.from}/`)) {
-          errors.push(`操作 #${i+1}: 自分自身のサブツリーに移動することはできません`);
+          errors.push(`Operation #${i + 1}: Cannot move to a path that is a child of the source path`);
         }
         break;
     }
   }
-  
+
   return {
     valid: errors.length === 0,
     errors
@@ -103,24 +103,24 @@ export function validateJsonPatch(operations: JsonPatchOperation[]): { valid: bo
 }
 
 /**
- * JSON Patchを安全に適用するためのヘルパー関数
- * - パスのエスケープを処理
- * - 操作の順序を最適化
- * - 潜在的な問題をチェック
+ * Helper function to safely apply JSON Patch
+ * - Handles path escaping
+ * - Optimizes operation order
+ * - Checks for potential issues
  */
 export function sanitizeJsonPatch(operations: JsonPatchOperation[]): JsonPatchOperation[] {
-  // パスのエスケープを確認
+  // Ensure path escaping
   const sanitized = operations.map(op => ({
     ...op,
     path: ensureLeadingSlash(op.path),
     ...(op.from ? { from: ensureLeadingSlash(op.from) } : {})
   }));
-  
-  // 操作の順序を最適化（削除操作は最後に）
+
+  // Optimize operation order (remove operations last)
   return sortPatchOperations(sanitized);
 }
 
-// ヘルパー関数
+// Helper function
 function ensureLeadingSlash(path: string): string {
   return path.startsWith('/') ? path : `/${path}`;
 }

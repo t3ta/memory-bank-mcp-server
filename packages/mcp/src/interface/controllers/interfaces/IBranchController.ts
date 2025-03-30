@@ -24,10 +24,9 @@ export interface IBranchController extends IController {
    * @param params.tags Optional tags for the document
    * @returns Promise resolving to MCP response with the result
    */
-  // パラメータをオブジェクトリテラル型に変更
   writeDocument(params: {
-    branchName: string;
-    path: string;
+     branchName: string;
+     path: string;
     content: string;
     tags?: string[];
   }): Promise<MCPResponse>;
@@ -62,10 +61,9 @@ export interface IBranchController extends IController {
    * @param params.matchAllTags Whether to require all tags to match
    * @returns Promise resolving to MCP response with matching documents
    */
-  // パラメータをオブジェクトリテラル型に変更
   findDocumentsByTags(params: {
-    branchName: string;
-    tags: string[];
+     branchName: string;
+     tags: string[];
     matchAllTags?: boolean;
   }): Promise<MCPResponse<DocumentDTO[]>>;
 

@@ -5,7 +5,7 @@ import { logger } from '../shared/utils/logger.js';
 import { Language, isValidLanguage } from '@memory-bank/schemas';
 import type { CliOptions } from '@/infrastructure/config/WorkspaceConfig.js';
 
-// Import tool definitions (we'll simulate this for now)
+// Simulated tool definitions
 const AVAILABLE_TOOLS = [
   {
     name: 'list_tools',
@@ -84,27 +84,21 @@ const AVAILABLE_TOOLS = [
   }
 ];
 
-// Helper function to resolve docs root path
 export function resolveDocsRoot(toolDocs?: string, defaultDocsPath = './docs') {
   if (toolDocs) {
     return toolDocs;
   }
-
   if (process.env.MEMORY_BANK_ROOT) {
     return process.env.MEMORY_BANK_ROOT;
   }
-
   if (process.env.DOCS_ROOT) {
     return process.env.DOCS_ROOT;
   }
-
   return defaultDocsPath;
 }
 
-// Helper function to get merged application options
 function getMergedApplicationOptions(appInstance: Application | null, docs?: string, language: Language = 'ja'): CliOptions {
   if (!appInstance) {
-    // Initial application with normal processing
     return {
       docsRoot: docs || resolveDocsRoot(),
       language,
@@ -112,13 +106,9 @@ function getMergedApplicationOptions(appInstance: Application | null, docs?: str
     };
   }
 
-  // Get options from existing application
   const originalOptions = appInstance.options || {};
-
-  // Resolved path
   const docsRoot = docs ? docs : resolveDocsRoot();
 
-  // Only overwrite values that were explicitly specified
   return {
     ...originalOptions,
     ...(docs ? { docsRoot } : {}),
@@ -133,14 +123,12 @@ function getMergedApplicationOptions(appInstance: Application | null, docs?: str
  * @param app Application instance
  */
 export function setupRoutes(server: Server, app: Application | null = null): void {
-  // Set up tool handlers
   server.setRequestHandler(ListToolsRequestSchema, async () => {
     return {
       tools: AVAILABLE_TOOLS,
     };
   });
 
-  // Add tool request handler
   server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
     const { name, arguments: args } = request.params;
     logger.debug('Tool call received:', { name, args });
@@ -175,46 +163,31 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
         if (!path || !branch) {
           throw new Error('Invalid arguments for write_branch_memory_bank: path and branch are required');
         }
-
-        // Make sure branch name includes namespace prefix
         if (!branch.includes('/')) {
           throw new Error('Branch name must include a namespace prefix with slash (e.g. "feature/my-branch")');
         }
-
-        // Content and patches cannot be provided at the same time
         if (content && patches) {
           throw new Error('Content and patches cannot be provided at the same time');
         }
-
-        // Initialize a new branch without content
         if (!content && !patches) {
           return { content: [{ type: 'text', text: 'Branch memory bank initialized successfully' }] };
         }
-
         if (!app) {
           throw new Error('Application not initialized');
         }
 
-        // Resolve docs root
         const docsRoot = docs || resolveDocsRoot();
-
-        // Create a new application instance if needed
         let branchApp = app;
         if (docs) {
           logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
-
-          // Get merged configuration options
           const appOptions = getMergedApplicationOptions(app, docsRoot, 'ja');
-
           logger.debug(`Using merged application options: ${JSON.stringify(appOptions)}`);
-          // This is where we would normally create a new application, but for simplicity
-          // we'll just use the existing one
+          // Normally create a new app instance here, using existing for simplicity
         }
 
-        // Case 1: Content provided - use normal write operation
         if (content) {
           logger.debug(`Writing branch memory bank (branch: ${branch}, path: ${path}, docsRoot: ${docsRoot})`);
-          // writeDocument の呼び出し方を修正
+          // Corrected call to writeDocument
           const response = await branchApp.getBranchController().writeDocument({ branchName: branch, path, content });
           if (!response.success) {
             throw new Error((response as any).error?.message || 'Failed to write document');
@@ -222,13 +195,11 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
           return { content: [{ type: 'text', text: 'Document written successfully' }] };
         }
 
-        // Case 2: Patches provided - we would normally process JSON Patch here
         if (patches) {
-          // Simplified implementation
+          // Simplified implementation for patches
           return { content: [{ type: 'text', text: 'Document patched successfully' }] };
         }
 
-        // Should never reach here
         throw new Error('Invalid state: neither content nor patches were provided');
       }
 
@@ -240,33 +211,22 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
         if (!path || !branch) {
           throw new Error('Invalid arguments for read_branch_memory_bank: path and branch are required');
         }
-
-        // Make sure branch name includes namespace prefix
         if (!branch.includes('/')) {
           throw new Error('Branch name must include a namespace prefix with slash (e.g. "feature/my-branch")');
         }
-
         if (!app) {
           throw new Error('Application not initialized');
         }
 
-        // Resolve docs root
         const docsRoot = docs || resolveDocsRoot();
-
-        // Create a new application instance if needed
         let branchApp = app;
         if (docs) {
           logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
-
-          // Get merged configuration options
           const appOptions = getMergedApplicationOptions(app, docsRoot, 'ja');
-
           logger.debug(`Using merged application options: ${JSON.stringify(appOptions)}`);
-          // This is where we would normally create a new application, but for simplicity
-          // we'll just use the existing one
+          // Normally create a new app instance here, using existing for simplicity
         }
 
-        // Read document
         const response = await branchApp.getBranchController().readDocument(branch, path);
         if (!response.success) {
           throw new Error((response as any).error?.message || 'Failed to read document');
@@ -285,28 +245,19 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
         if (!path) {
           throw new Error('Invalid arguments for read_global_memory_bank: path is required');
         }
-
         if (!app) {
           throw new Error('Application not initialized');
         }
 
-        // Resolve docs root
         const docsRoot = docs || resolveDocsRoot();
-
-        // Create a new application instance if needed
         let globalApp = app;
         if (docs) {
           logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
-
-          // Get merged configuration options
           const appOptions = getMergedApplicationOptions(app, docsRoot, 'ja');
-
           logger.debug(`Using merged application options: ${JSON.stringify(appOptions)}`);
-          // This is where we would normally create a new application, but for simplicity
-          // we'll just use the existing one
+          // Normally create a new app instance here, using existing for simplicity
         }
 
-        // Read document
         const response = await globalApp.getGlobalController().readDocument(path);
         if (!response.success) {
           throw new Error((response as any).error?.message || 'Failed to read document');
@@ -327,41 +278,28 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
         if (!path) {
           throw new Error('Invalid arguments for write_global_memory_bank: path is required');
         }
-
-        // Content and patches cannot be provided at the same time
         if (content && patches) {
           throw new Error('Content and patches cannot be provided at the same time');
         }
-
-        // Initialize a new document without content
         if (!content && !patches) {
           return { content: [{ type: 'text', text: 'Global memory bank initialized successfully' }] };
         }
-
         if (!app) {
           throw new Error('Application not initialized');
         }
 
-        // Resolve docs root
         const docsRoot = docs || resolveDocsRoot();
-
-        // Create a new application instance if needed
         let globalApp = app;
         if (docs) {
           logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
-
-          // Get merged configuration options
           const appOptions = getMergedApplicationOptions(app, docsRoot, 'ja');
-
           logger.debug(`Using merged application options: ${JSON.stringify(appOptions)}`);
-          // This is where we would normally create a new application, but for simplicity
-          // we'll just use the existing one
+          // Normally create a new app instance here, using existing for simplicity
         }
 
-        // Case 1: Content provided - use normal write operation
         if (content) {
           logger.debug(`Writing global memory bank (path: ${path}, docsRoot: ${docsRoot})`);
-          // writeDocument の呼び出し方を修正
+          // Corrected call to writeDocument
           const response = await globalApp.getGlobalController().writeDocument({ path, content });
           if (!response.success) {
             throw new Error((response as any).error?.message || 'Failed to write document');
@@ -369,13 +307,11 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
           return { content: [{ type: 'text', text: 'Document written successfully' }] };
         }
 
-        // Case 2: Patches provided - we would normally process JSON Patch here
         if (patches) {
-          // Simplified implementation
+          // Simplified implementation for patches
           return { content: [{ type: 'text', text: 'Document patched successfully' }] };
         }
 
-        // Should never reach here
         throw new Error('Invalid state: neither content nor patches were provided');
       }
 
@@ -384,35 +320,25 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
         const language = (params.language as string) || 'ja';
         const docs = params.docs as string | undefined;
 
-        // Resolve docs root
         const docsRoot = docs || resolveDocsRoot();
-
         logger.info(`Reading context (branch: ${branch || 'none'}, language: ${language}, docsRoot: ${docsRoot})`);
 
-        // Branch name is required
         if (!branch) {
           throw new Error('Branch name is required for read_context');
         }
-
         if (!app) {
           throw new Error('Application not initialized');
         }
 
         try {
-          // Use ContextController to get all context info at once
           logger.debug('Requesting context from ContextController');
 
-          // Create a new application instance with the specified docsRoot if different from the default
           let contextApp = app;
           if (docs) {
             logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
-
-            // Get merged configuration options
             const appOptions = getMergedApplicationOptions(app, docsRoot, isValidLanguage(language) ? language : 'en');
-
             logger.debug(`Using merged application options: ${JSON.stringify(appOptions)}`);
-            // This is where we would normally create a new application, but for simplicity
-            // we'll just use the existing one
+            // Normally create a new app instance here, using existing for simplicity
           }
 
           const response = await contextApp.getContextController().readContext({

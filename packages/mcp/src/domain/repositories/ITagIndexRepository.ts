@@ -39,6 +39,11 @@ export interface TagIndexUpdateResult {
     fullRebuild: boolean;
 
     /**
+     * Where the update was performed (branch name or 'global')
+     */
+    updateLocation: string;
+
+    /**
      * When the update was performed
      */
     timestamp: string;
@@ -75,10 +80,9 @@ export interface ITagIndexRepository {
    * @param params.matchAll Whether documents must have all tags (AND) or any tag (OR)
    * @returns Promise resolving to array of document paths matching the tags
    */
-  // パラメータをオブジェクトリテラル型に変更
   findBranchDocumentsByTags(params: {
-    branchInfo: BranchInfo;
-    tags: Tag[];
+     branchInfo: BranchInfo;
+     tags: Tag[];
     matchAll?: boolean;
   }): Promise<DocumentPath[]>;
 

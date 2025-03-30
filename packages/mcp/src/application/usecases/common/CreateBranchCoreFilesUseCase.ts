@@ -46,7 +46,6 @@ export interface CreateBranchCoreFilesOutput {
  */
 export class CreateBranchCoreFilesUseCase
   implements IUseCase<CreateBranchCoreFilesInput, CreateBranchCoreFilesOutput> {
-  // Core file paths
   private readonly ACTIVE_CONTEXT_PATH = 'activeContext.json';
   private readonly PROGRESS_PATH = 'progress.json';
   private readonly SYSTEM_PATTERNS_PATH = 'systemPatterns.json';
@@ -65,7 +64,6 @@ export class CreateBranchCoreFilesUseCase
    */
   async execute(input: CreateBranchCoreFilesInput): Promise<CreateBranchCoreFilesOutput> {
     try {
-      // Validate input
       if (!input.branchName) {
         throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Branch name is required');
       }
@@ -77,10 +75,8 @@ export class CreateBranchCoreFilesUseCase
         );
       }
 
-      // Create domain objects
       const branchInfo = BranchInfo.create(input.branchName);
 
-      // Check if branch exists
       const branchExists = await this.branchRepository.exists(input.branchName);
 
       if (!branchExists) {
@@ -92,7 +88,6 @@ export class CreateBranchCoreFilesUseCase
 
       const updatedFiles: string[] = [];
 
-      // Update each core file if provided
       if (input.files.branchContext) {
         const document = MemoryDocument.create({
           path: DocumentPath.create(this.BRANCH_CONTEXT_PATH),
@@ -105,7 +100,6 @@ export class CreateBranchCoreFilesUseCase
         updatedFiles.push(this.BRANCH_CONTEXT_PATH);
       }
 
-      // Update each core file if provided
       if (input.files.activeContext) {
         const content = this.generateActiveContextJSON(input.files.activeContext);
         const document = MemoryDocument.create({
@@ -150,12 +144,10 @@ export class CreateBranchCoreFilesUseCase
         updatedFiles,
       };
     } catch (error) {
-      // Re-throw domain and application errors
       if (error instanceof DomainError || error instanceof ApplicationError) {
         throw error;
       }
 
-      // Wrap other errors
       throw new ApplicationError(
         ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
         `Failed to create/update core files: ${(error as Error).message}`,
@@ -172,12 +164,11 @@ export class CreateBranchCoreFilesUseCase
   private generateActiveContextJSON(activeContext: ActiveContextDTO): string {
     const now = new Date();
 
-    // Create structured JSON document
     const jsonDoc = {
       schema: 'memory_document_v2',
       metadata: {
         id: this.generateUUID(),
-        title: 'アクティブコンテキスト',
+        title: 'Active Context', // Translated from アクティブコンテキスト
         documentType: 'active_context',
         path: this.ACTIVE_CONTEXT_PATH,
         tags: ['core', 'active-context'],
@@ -255,12 +246,11 @@ export class CreateBranchCoreFilesUseCase
   private generateProgressJSON(progress: ProgressDTO): string {
     const now = new Date();
 
-    // Create structured JSON document
     const jsonDoc = {
       schema: 'memory_document_v2',
       metadata: {
         id: this.generateUUID(),
-        title: '進捗状況',
+        title: 'Progress', // Translated from 進捗状況
         documentType: 'progress',
         path: this.PROGRESS_PATH,
         tags: ['core', 'progress'],
@@ -327,12 +317,11 @@ export class CreateBranchCoreFilesUseCase
   private generateSystemPatternsJSON(systemPatterns: SystemPatternsDTO): string {
     const now = new Date();
 
-    // Create structured JSON document
     const jsonDoc = {
       schema: 'memory_document_v2',
       metadata: {
         id: this.generateUUID(),
-        title: 'システムパターン',
+        title: 'System Patterns', // Translated from システムパターン
         documentType: 'system_patterns',
         path: this.SYSTEM_PATTERNS_PATH,
         tags: ['core', 'system-patterns'],
@@ -398,7 +387,6 @@ export class CreateBranchCoreFilesUseCase
   }
 }
 
-// Export the interfaces from CoreFilesDTO for convenience
 import {
   ActiveContextDTO,
   ProgressDTO,

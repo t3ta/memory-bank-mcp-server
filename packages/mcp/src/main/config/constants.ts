@@ -10,7 +10,7 @@ export const Constants = {
   /**
    * Application version
    */
-  VERSION: '1.0.0', // Note: This might need update based on package.json
+  VERSION: '1.0.0',
 
   /**
    * Default port
@@ -35,7 +35,7 @@ export const Constants = {
   /**
    * Supported languages
    */
-  SUPPORTED_LANGUAGES: ['en', 'ja'] as const, // Note: 'zh' might be missing based on other files
+  SUPPORTED_LANGUAGES: ['en', 'ja'] as const,
 
   /**
    * Migration config

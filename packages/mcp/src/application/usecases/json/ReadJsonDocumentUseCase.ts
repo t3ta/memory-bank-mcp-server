@@ -115,7 +115,6 @@ export class ReadJsonDocumentUseCase
    */
   async execute(input: ReadJsonDocumentInput): Promise<ReadJsonDocumentOutput> {
     try {
-      // Validate input
       if (!input.path && !input.id) {
         throw new ApplicationError(
           ApplicationErrorCodes.INVALID_INPUT,
@@ -123,18 +122,15 @@ export class ReadJsonDocumentUseCase
         );
       }
 
-      // Determine if searching in branch or global memory bank
       const isGlobal = !input.branchName;
-      // letに変更: constからletに変えて再代入可能にする
-      let location = isGlobal ? 'global' : input.branchName || 'unknown';
+      let location = isGlobal ? 'global' : input.branchName || 'unknown'; // Changed const to let for reassignment
 
       let document: JsonDocument | null = null;
 
-      // If searching by ID
       if (input.id) {
         const documentId = DocumentId.create(input.id);
 
-        // 修正: グローバル検索の場合はグローバルリポジトリから直接探す
+        // Search global repository directly if global search
         if (isGlobal) {
           if (!this.globalRepository) {
             throw new ApplicationError(
@@ -144,43 +140,36 @@ export class ReadJsonDocumentUseCase
           }
           document = await this.globalRepository.findById(documentId);
         } else {
-          // ブランチ検索の場合は元の実装通り
+          // Original implementation for branch search
           document = await this.jsonRepository.findById(documentId);
 
           if (!document && this.globalRepository) {
-            // If not found in branch, try global repository if available
             document = await this.globalRepository.findById(documentId);
             if (document) {
-              // Update location if found in global
               location = 'global';
             }
           }
         }
       }
-      // If searching by path
       else if (input.path) {
         const documentPath = DocumentPath.create(input.path);
 
         if (isGlobal) {
-          // Global memory bank
           if (!this.globalRepository) {
             throw new ApplicationError(
               ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
               'Global repository not provided for global document lookup'
             );
           }
-
-          // BranchInfo.createの引数を変更
+          // Changed argument for BranchInfo.create
           const globalBranchInfo = BranchInfo.create('feature/global');
           document = await this.globalRepository.findByPath(globalBranchInfo, documentPath);
         } else {
-          // Branch memory bank
           const branchInfo = BranchInfo.create(input.branchName!);
           document = await this.jsonRepository.findByPath(branchInfo, documentPath);
         }
       }
 
-      // Check if document exists
       if (!document) {
         const identifier = input.path || input.id;
         const context = isGlobal ? 'global memory bank' : `branch "${input.branchName}"`;
@@ -190,7 +179,6 @@ export class ReadJsonDocumentUseCase
         );
       }
 
-      // Transform to DTO
       return {
         document: {
           id: document.id.value,
@@ -207,12 +195,10 @@ export class ReadJsonDocumentUseCase
         location,
       };
     } catch (error) {
-      // Re-throw domain and application errors
       if (error instanceof DomainError || error instanceof ApplicationError) {
         throw error;
       }
 
-      // Wrap other errors
       throw new ApplicationError(
         ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
         `Failed to read JSON document: ${(error as Error).message}`,

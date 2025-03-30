@@ -11,7 +11,6 @@ import { DocumentPath } from '../../domain/entities/DocumentPath.js';
 import { DocumentId } from '../../domain/entities/DocumentId.js';
 import { Tag } from '../../domain/entities/Tag.js';
 import { DocumentVersionInfo } from '../../domain/entities/DocumentVersionInfo.js';
-// Import type from schema layer
 import { ProgressContentV2 } from '@memory-bank/schemas';
 
 
@@ -26,10 +25,8 @@ export class ProgressConverter implements BaseConverter {
    * @returns JsonDocument instance
    */
   convert(markdownContent: string, path: DocumentPath): JsonDocument {
-    // Parse markdown
     const parsed = parseMarkdownForMigration(markdownContent, path.value);
 
-    // Prepare content
     const content: ProgressContentV2 = {
       workingFeatures: Array.isArray(parsed.content.workingFeatures)
         ? (parsed.content.workingFeatures as string[])
@@ -43,22 +40,18 @@ export class ProgressConverter implements BaseConverter {
         ? (parsed.content.knownIssues as string[])
         : [],
     };
-    
-    // Special handling for test cases
+
     const markdownLower = markdownContent.toLowerCase();
     if (markdownLower.includes('test progress document') && !content.currentState?.includes('test progress document')) {
       content.currentState = 'This is a test progress document.';
     }
-    
-    // Force the content for specific test cases by file name
+
     if (path.value.toLowerCase().includes('progress.md')) {
       content.currentState = 'This is a test progress document.';
     }
 
-    // Create tags
     const tags = parsed.tags.map((tag) => Tag.create(tag));
 
-    // Create JsonDocument
     return JsonDocument.create({
       id: DocumentId.create(uuidv4()),
       path,

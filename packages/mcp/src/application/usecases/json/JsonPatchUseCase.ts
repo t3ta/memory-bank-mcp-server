@@ -9,7 +9,7 @@ import { DocumentEventEmitter } from '../../../domain/events/DocumentEventEmitte
 import { EventType } from '../../../domain/events/EventType.js';
 
 /**
- * JSON Patchを使用してドキュメントを部分的に更新するユースケース
+ * Use case for partially updating a document using JSON Patch
  */
 export class JsonPatchUseCase {
   private readonly repository: JsonDocumentRepository;
@@ -17,10 +17,10 @@ export class JsonPatchUseCase {
   private readonly eventEmitter: DocumentEventEmitter;
 
   /**
-   * コンストラクタ
-   * @param repository JSONドキュメントリポジトリ
-   * @param eventEmitter ドキュメントイベントエミッタ
-   * @param patchService JsonPatchService（省略時はFastJsonPatchAdapterを使用）
+   * Constructor
+   * @param repository JSON document repository
+   * @param eventEmitter Document event emitter
+   * @param patchService JsonPatchService (uses FastJsonPatchAdapter if omitted)
    */
   constructor(
     repository: JsonDocumentRepository,
@@ -33,13 +33,13 @@ export class JsonPatchUseCase {
   }
 
   /**
-   * ドキュメントにパッチ操作を適用する
-   * @param path ドキュメントパス
-   * @param branch ブランチ名（指定時はブランチメモリバンク、未指定時はグローバルメモリバンク）
-   * @param operations 適用するパッチ操作の配列
-   * @param updateReason 更新理由（省略可）
-   * @returns 更新されたJSONドキュメント
-   * @throws DomainError ドキュメントが見つからない、操作が無効、その他のエラー
+   * Apply patch operations to a document
+   * @param path Document path
+   * @param operations Array of patch operations to apply
+   * @param branch Branch name (uses branch memory bank if specified, global otherwise)
+   * @param updateReason Reason for the update (optional)
+   * @returns Updated JSON document
+   * @throws DomainError if document not found, operation invalid, or other errors
    */
   async execute(
     path: string,
@@ -47,7 +47,7 @@ export class JsonPatchUseCase {
     branch?: string,
     updateReason?: string
   ): Promise<JsonDocument> {
-    // ドキュメントの取得
+    // Get the document
     const document = await this.getDocument(path, branch);
     if (!document) {
       throw new DomainError(
@@ -56,7 +56,7 @@ export class JsonPatchUseCase {
       );
     }
 
-    // パッチ操作のバリデーション
+    // Validate patch operations
     const isValid = this.patchService.validate(document.content, operations);
     if (!isValid) {
       throw new DomainError(
@@ -65,10 +65,10 @@ export class JsonPatchUseCase {
       );
     }
 
-    // パッチ操作の適用
+    // Apply patch operations
     const updatedContent = this.patchService.apply(document.content, operations);
 
-    // 新しいドキュメントバージョンの作成
+    // Create new document version info
     const updatedVersionInfo = new DocumentVersionInfo({
       version: document.versionInfo.version + 1,
       lastModified: new Date(),
@@ -76,7 +76,7 @@ export class JsonPatchUseCase {
       updateReason: updateReason || 'Updated via JSON Patch'
     });
 
-    // 更新されたドキュメントの作成
+    // Create updated document
     const updatedDocument = JsonDocument.create({
       path: document.path,
       id: document.id,
@@ -88,10 +88,10 @@ export class JsonPatchUseCase {
       versionInfo: updatedVersionInfo
     });
 
-    // ドキュメントの保存
+    // Save the document
     const savedDocument = await this.saveDocument(updatedDocument);
 
-    // 更新イベントの発行
+    // Emit update event
     this.eventEmitter.emit(EventType.DOCUMENT_UPDATED, {
       path: savedDocument.path,
       branch: savedDocument.branch,
@@ -102,13 +102,13 @@ export class JsonPatchUseCase {
   }
 
   /**
-   * 複数のパッチ操作をアトミックに適用する
-   * @param path ドキュメントパス
-   * @param operations 適用するパッチ操作の配列
-   * @param branch ブランチ名（指定時はブランチメモリバンク、未指定時はグローバルメモリバンク）
-   * @param updateReason 更新理由（省略可）
-   * @returns 更新されたJSONドキュメント
-   * @throws DomainError ドキュメントが見つからない、操作が無効、その他のエラー
+   * Apply multiple patch operations atomically
+   * @param path Document path
+   * @param operations Array of patch operations to apply
+   * @param branch Branch name (uses branch memory bank if specified, global otherwise)
+   * @param updateReason Reason for the update (optional)
+   * @returns Updated JSON document
+   * @throws DomainError if document not found, operation invalid, or other errors
    */
   async executeBatch(
     path: string,
@@ -116,18 +116,18 @@ export class JsonPatchUseCase {
     branch?: string,
     updateReason?: string
   ): Promise<JsonDocument> {
-    // 通常のexecuteメソッドを使用（すでにアトミック性を保証している）
+    // Use the regular execute method (already ensures atomicity)
     return this.execute(path, operations, branch, updateReason || 'Batch update via JSON Patch');
   }
 
   /**
-   * 2つのドキュメント間の差分をパッチ操作として生成する
-   * @param sourcePath 元のドキュメントのパス
-   * @param targetPath 目標のドキュメントのパス
-   * @param sourceBranch 元のドキュメントのブランチ（省略可）
-   * @param targetBranch 目標のドキュメントのブランチ（省略可）
-   * @returns 生成されたパッチ操作の配列
-   * @throws DomainError ドキュメントが見つからない場合
+   * Generate patch operations representing the difference between two documents
+   * @param sourcePath Path of the source document
+   * @param targetPath Path of the target document
+   * @param sourceBranch Branch of the source document (optional)
+   * @param targetBranch Branch of the target document (optional)
+   * @returns Array of generated patch operations
+   * @throws DomainError if documents are not found
    */
   async generatePatch(
     sourcePath: string,
@@ -135,7 +135,7 @@ export class JsonPatchUseCase {
     sourceBranch?: string,
     targetBranch?: string
   ): Promise<JsonPatchOperation[]> {
-    // 元ドキュメントの取得
+    // Get source document
     const sourceDocument = await this.getDocument(sourcePath, sourceBranch);
     if (!sourceDocument) {
       throw new DomainError(
@@ -144,7 +144,7 @@ export class JsonPatchUseCase {
       );
     }
 
-    // 目標ドキュメントの取得
+    // Get target document
     const targetDocument = await this.getDocument(targetPath, targetBranch);
     if (!targetDocument) {
       throw new DomainError(
@@ -153,18 +153,18 @@ export class JsonPatchUseCase {
       );
     }
 
-    // パッチ操作の生成
+    // Generate patch operations
     return this.patchService.generatePatch(sourceDocument.content, targetDocument.content);
   }
 
   /**
-   * テスト条件を検証してからパッチ操作を適用する
-   * @param path ドキュメントパス
-   * @param operations テスト操作と更新操作を含む配列
-   * @param branch ブランチ名（指定時はブランチメモリバンク、未指定時はグローバルメモリバンク）
-   * @param updateReason 更新理由（省略可）
-   * @returns 更新されたJSONドキュメント
-   * @throws DomainError ドキュメントが見つからない、テストが失敗、操作が無効、その他のエラー
+   * Apply patch operations after verifying test conditions
+   * @param path Document path
+   * @param operations Array including test and update operations
+   * @param branch Branch name (uses branch memory bank if specified, global otherwise)
+   * @param updateReason Reason for the update (optional)
+   * @returns Updated JSON document
+   * @throws DomainError if document not found, test fails, operation invalid, or other errors
    */
   async executeConditional(
     path: string,
@@ -172,7 +172,7 @@ export class JsonPatchUseCase {
     branch?: string,
     updateReason?: string
   ): Promise<JsonDocument> {
-    // executeメソッドを使用（テスト失敗時はpatchServiceのapplyメソッドが例外を投げる）
+    // Use the execute method (patchService's apply method will throw if test fails)
     return this.execute(
       path,
       operations,
@@ -182,10 +182,10 @@ export class JsonPatchUseCase {
   }
 
   /**
-   * ドキュメントを取得する（ブランチ指定の有無に応じて適切なリポジトリメソッドを使用）
-   * @param path ドキュメントパス
-   * @param branch ブランチ名（省略可）
-   * @returns JSONドキュメントまたはnull（見つからない場合）
+   * Get a document (uses appropriate repository method based on branch presence)
+   * @param path Document path
+   * @param branch Branch name (optional)
+   * @returns JSON document or null if not found
    */
   private async getDocument(path: string, branch?: string): Promise<JsonDocument | null> {
     return branch
@@ -194,9 +194,9 @@ export class JsonPatchUseCase {
   }
 
   /**
-   * ドキュメントを保存する（ブランチ指定の有無に応じて適切なリポジトリメソッドを使用）
-   * @param document 保存するドキュメント
-   * @returns 保存されたドキュメント
+   * Save a document (uses appropriate repository method based on branch presence)
+   * @param document Document to save
+   * @returns Saved document
    */
   private async saveDocument(document: JsonDocument): Promise<JsonDocument> {
     return document.branch

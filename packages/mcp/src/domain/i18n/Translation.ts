@@ -86,15 +86,12 @@ export class Translation {
       return this;
     }
 
-    // Create a copy with variables replaced
     let newText = this._text;
     Object.entries(variables).forEach(([name, value]) => {
-      // Replace all occurrences of {{name}} with value
       const pattern = new RegExp(`\\{\\{${name}\\}\\}`, 'g');
       newText = newText.replace(pattern, value);
     });
 
-    // If no replacements were done, return this instance
     if (newText === this._text) {
       return this;
     }

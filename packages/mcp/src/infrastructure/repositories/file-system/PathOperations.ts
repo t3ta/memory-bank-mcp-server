@@ -8,14 +8,14 @@ import type { IConfigProvider } from '../../config/index.js';
 import { FileSystemMemoryBankRepositoryBase } from './FileSystemMemoryBankRepositoryBase.js';
 
 /**
- * パス操作に関連する処理を担当するコンポーネント
+ * Component responsible for path-related operations
  */
 export class PathOperations extends FileSystemMemoryBankRepositoryBase {
   /**
-   * コンストラクタ
-   * @param basePath 基本パス
-   * @param fileSystemService ファイルシステムサービス
-   * @param configProvider 設定プロバイダー
+   * Constructor
+   * @param basePath Base path
+   * @param fileSystemService File system service
+   * @param configProvider Configuration provider
    */
   constructor(
     private readonly basePath: string,
@@ -26,33 +26,33 @@ export class PathOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ブランチの基本パスを取得する
-   * @param branchInfo ブランチ情報
-   * @returns ブランチの基本パス
+   * Get the base path for a branch
+   * @param branchInfo Branch information
+   * @returns Base path for the branch
    */
   getBranchBasePath(_branchInfo: BranchInfo): string {
-    // branchInfoパラメータは現在使用していませんが、将来的な拡張性のために残しています
+    // branchInfo parameter is currently unused but kept for future extensibility
     return this.basePath;
   }
 
   /**
-   * グローバルな基本パスを取得する
-   * @returns グローバルな基本パス
+   * Get the global base path
+   * @returns Global base path
    */
   getGlobalBasePath(): string {
     return this.basePath;
   }
 
   /**
-   * パスを解決する
-   * @param documentPath ドキュメントパス
-   * @returns 完全なファイルパス
+   * Resolve a path
+   * @param documentPath Document path
+   * @returns Full file path
    */
   resolvePath(documentPath: string): string {
-    // パスを正規化
+    // Normalize path
     const normalizedPath = path.normalize(documentPath);
 
-    // パストラバーサル攻撃のチェック
+    // Check for path traversal attacks
     if (normalizedPath.startsWith('..')) {
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
@@ -60,15 +60,15 @@ export class PathOperations extends FileSystemMemoryBankRepositoryBase {
       );
     }
 
-    // フルパスを解決
+    // Resolve full path
     return path.join(this.basePath, normalizedPath);
   }
 
   /**
-   * ブランチのパスを解決する
-   * @param branchInfo ブランチ情報
-   * @param documentPath ドキュメントパス
-   * @returns 完全なファイルパス
+   * Resolve a branch path
+   * @param branchInfo Branch information
+   * @param documentPath Document path
+   * @returns Full file path
    */
   resolveBranchPath(branchInfo: BranchInfo, documentPath: string): string {
     const branchBasePath = this.getBranchBasePath(branchInfo);
@@ -76,16 +76,16 @@ export class PathOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * 指定された基本パスを使用してパスを解決する
-   * @param basePath 基本パス
-   * @param documentPath ドキュメントパス
-   * @returns 完全なファイルパス
+   * Resolve a path using a specified base path
+   * @param basePath Base path
+   * @param documentPath Document path
+   * @returns Full file path
    */
   private resolvePathWithBase(basePath: string, documentPath: string): string {
-    // パスを正規化
+    // Normalize path
     const normalizedPath = path.normalize(documentPath);
 
-    // パストラバーサル攻撃のチェック
+    // Check for path traversal attacks
     if (normalizedPath.startsWith('..')) {
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
@@ -93,14 +93,14 @@ export class PathOperations extends FileSystemMemoryBankRepositoryBase {
       );
     }
 
-    // フルパスを解決
+    // Resolve full path
     return path.join(basePath, normalizedPath);
   }
 
   /**
-   * パスの存在確認
-   * @param documentPath ドキュメントパス
-   * @returns パスが存在する場合はtrue、それ以外はfalse
+   * Check if a path exists
+   * @param documentPath Document path
+   * @returns true if the path exists, false otherwise
    */
   async exists(documentPath: string): Promise<boolean> {
     try {
@@ -116,10 +116,10 @@ export class PathOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ブランチパスの存在確認
-   * @param branchInfo ブランチ情報
-   * @param documentPath ドキュメントパス
-   * @returns パスが存在する場合はtrue、それ以外はfalse
+   * Check if a branch path exists
+   * @param branchInfo Branch information
+   * @param documentPath Document path
+   * @returns true if the path exists, false otherwise
    */
   async branchPathExists(branchInfo: BranchInfo, documentPath: string): Promise<boolean> {
     try {
@@ -135,8 +135,8 @@ export class PathOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ディレクトリを作成する
-   * @param directoryPath ディレクトリパス
+   * Create a directory
+   * @param directoryPath Directory path
    */
   async createDirectory(directoryPath: string): Promise<void> {
     try {
@@ -156,9 +156,9 @@ export class PathOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ブランチディレクトリを作成する
-   * @param branchInfo ブランチ情報
-   * @param directoryPath ディレクトリパス
+   * Create a branch directory
+   * @param branchInfo Branch information
+   * @param directoryPath Directory path
    */
   async createBranchDirectory(branchInfo: BranchInfo, directoryPath: string): Promise<void> {
     try {
@@ -179,9 +179,9 @@ export class PathOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ディレクトリが存在するか確認する
-   * @param directoryPath ディレクトリパス
-   * @returns ディレクトリが存在する場合はtrue、それ以外はfalse
+   * Check if a directory exists
+   * @param directoryPath Directory path
+   * @returns true if the directory exists, false otherwise
    */
   async directoryExists(directoryPath: string): Promise<boolean> {
     try {
@@ -197,10 +197,10 @@ export class PathOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ブランチディレクトリが存在するか確認する
-   * @param branchInfo ブランチ情報
-   * @param directoryPath ディレクトリパス
-   * @returns ディレクトリが存在する場合はtrue、それ以外はfalse
+   * Check if a branch directory exists
+   * @param branchInfo Branch information
+   * @param directoryPath Directory path
+   * @returns true if the directory exists, false otherwise
    */
   async branchDirectoryExists(branchInfo: BranchInfo, directoryPath: string): Promise<boolean> {
     try {
@@ -216,9 +216,9 @@ export class PathOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ファイル一覧を取得する
-   * @param directoryPath ディレクトリパス
-   * @returns ファイルパスの配列
+   * Get a list of files
+   * @param directoryPath Directory path
+   * @returns Array of file paths
    */
   async listFiles(directoryPath: string): Promise<string[]> {
     try {
@@ -234,10 +234,10 @@ export class PathOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ブランチのファイル一覧を取得する
-   * @param branchInfo ブランチ情報
-   * @param directoryPath ディレクトリパス
-   * @returns ファイルパスの配列
+   * Get a list of files in a branch
+   * @param branchInfo Branch information
+   * @param directoryPath Directory path
+   * @returns Array of file paths
    */
   async listBranchFiles(branchInfo: BranchInfo, directoryPath: string): Promise<string[]> {
     try {
@@ -253,16 +253,16 @@ export class PathOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ファイルをコピーする
-   * @param sourcePath コピー元のパス
-   * @param destinationPath コピー先のパス
+   * Copy a file
+   * @param sourcePath Source path
+   * @param destinationPath Destination path
    */
   async copyFile(sourcePath: string, destinationPath: string): Promise<void> {
     try {
       const sourceFullPath = this.resolvePath(sourcePath);
       const destFullPath = this.resolvePath(destinationPath);
 
-      // コピー元のファイルが存在することを確認
+      // Ensure source file exists
       const exists = await this.fileExists(sourceFullPath);
       if (!exists) {
         throw new InfrastructureError(
@@ -271,14 +271,14 @@ export class PathOperations extends FileSystemMemoryBankRepositoryBase {
         );
       }
 
-      // ディレクトリが存在することを確認
+      // Ensure destination directory exists
       const destDir = path.dirname(destFullPath);
       await super.createDirectory(destDir);
 
-      // ファイルの内容を読み取り
+      // Read source file content
       const content = await this.readFile(sourceFullPath);
 
-      // 新しい場所にファイルを書き込み
+      // Write file to new location
       await this.writeFile(destFullPath, content);
     } catch (error) {
       if (error instanceof InfrastructureError) {
@@ -294,11 +294,11 @@ export class PathOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ブランチ間でファイルをコピーする
-   * @param sourceBranchInfo コピー元のブランチ情報
-   * @param sourcePath コピー元のパス
-   * @param destinationBranchInfo コピー先のブランチ情報
-   * @param destinationPath コピー先のパス
+   * Copy a file between branches
+   * @param sourceBranchInfo Source branch information
+   * @param sourcePath Source path
+   * @param destinationBranchInfo Destination branch information
+   * @param destinationPath Destination path
    */
   async copyFileBetweenBranches(
     sourceBranchInfo: BranchInfo,
@@ -310,7 +310,7 @@ export class PathOperations extends FileSystemMemoryBankRepositoryBase {
       const sourceFullPath = this.resolveBranchPath(sourceBranchInfo, sourcePath);
       const destFullPath = this.resolveBranchPath(destinationBranchInfo, destinationPath);
 
-      // コピー元のファイルが存在することを確認
+      // Ensure source file exists
       const exists = await this.fileExists(sourceFullPath);
       if (!exists) {
         throw new InfrastructureError(
@@ -319,14 +319,14 @@ export class PathOperations extends FileSystemMemoryBankRepositoryBase {
         );
       }
 
-      // ディレクトリが存在することを確認
+      // Ensure destination directory exists
       const destDir = path.dirname(destFullPath);
       await super.createDirectory(destDir);
 
-      // ファイルの内容を読み取り
+      // Read source file content
       const content = await this.readFile(sourceFullPath);
 
-      // 新しい場所にファイルを書き込み
+      // Write file to new location
       await this.writeFile(destFullPath, content);
 
       logger.debug(
@@ -346,16 +346,16 @@ export class PathOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ファイルを移動する
-   * @param sourcePath 移動元のパス
-   * @param destinationPath 移動先のパス
+   * Move a file
+   * @param sourcePath Source path
+   * @param destinationPath Destination path
    */
   async moveFile(sourcePath: string, destinationPath: string): Promise<void> {
     try {
-      // まずファイルをコピー
+      // First copy the file
       await this.copyFile(sourcePath, destinationPath);
 
-      // コピーが成功したら元のファイルを削除
+      // If copy succeeds, delete the original file
       const sourceFullPath = this.resolvePath(sourcePath);
       await super.deleteFile(sourceFullPath);
 
@@ -374,11 +374,11 @@ export class PathOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ブランチ間でファイルを移動する
-   * @param sourceBranchInfo 移動元のブランチ情報
-   * @param sourcePath 移動元のパス
-   * @param destinationBranchInfo 移動先のブランチ情報
-   * @param destinationPath 移動先のパス
+   * Move a file between branches
+   * @param sourceBranchInfo Source branch information
+   * @param sourcePath Source path
+   * @param destinationBranchInfo Destination branch information
+   * @param destinationPath Destination path
    */
   async moveFileBetweenBranches(
     sourceBranchInfo: BranchInfo,
@@ -387,7 +387,7 @@ export class PathOperations extends FileSystemMemoryBankRepositoryBase {
     destinationPath: string
   ): Promise<void> {
     try {
-      // まずファイルをコピー
+      // First copy the file
       await this.copyFileBetweenBranches(
         sourceBranchInfo,
         sourcePath,
@@ -395,7 +395,7 @@ export class PathOperations extends FileSystemMemoryBankRepositoryBase {
         destinationPath
       );
 
-      // コピーが成功したら元のファイルを削除
+      // If copy succeeds, delete the original file
       const sourceFullPath = this.resolveBranchPath(sourceBranchInfo, sourcePath);
       await super.deleteFile(sourceFullPath);
 
@@ -416,29 +416,29 @@ export class PathOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * 指定されたディレクトリ内のファイル一覧を取得する
-   * @param directoryPath ディレクトリパス
-   * @param allowedExtensions 許可される拡張子の配列（省略時は全ファイル）
-   * @returns ファイルパスの配列
+   * Get a list of files within a specified directory
+   * @param directoryPath Directory path
+   * @param allowedExtensions Array of allowed extensions (optional, defaults to all files)
+   * @returns Array of file paths
    */
   async listFilesInDirectory(directoryPath: string, allowedExtensions: string[] = []): Promise<string[]> {
     try {
       const fullPath = this.resolvePath(directoryPath);
-      
-      // ディレクトリの存在確認
+
+      // Check if directory exists
       const exists = await this.directoryExists(fullPath);
       if (!exists) {
         return [];
       }
-      
-      // ファイル一覧を取得
+
+      // Get list of files
       const allFiles = await super.listFiles(fullPath);
-      
-      // 拡張子フィルタリング
+
+      // Filter by extension
       if (allowedExtensions.length === 0) {
         return allFiles;
       }
-      
+
       return allFiles.filter(file => {
         const ext = path.extname(file);
         return allowedExtensions.includes(ext);
@@ -453,37 +453,37 @@ export class PathOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * DocumentPath配列をフィルタリングする
-   * @param paths DocumentPath配列
-   * @param pattern フィルターパターン (glob形式)
-   * @returns フィルタリングされたDocumentPath配列
+   * Filter an array of DocumentPaths
+   * @param paths Array of DocumentPaths
+   * @param pattern Filter pattern (glob-like)
+   * @returns Filtered array of DocumentPaths
    */
   filterPaths(paths: DocumentPath[], pattern: string): DocumentPath[] {
     try {
-      // 単純な前方一致・後方一致の処理
+      // Simple prefix/suffix matching
       let filtered: DocumentPath[] = paths;
 
-      // 拡張子でフィルタリング
+      // Filter by extension
       if (pattern.startsWith('*.')) {
         const extension = pattern.substring(1); // '*.json' -> '.json'
         filtered = paths.filter(p => p.value.endsWith(extension));
       }
-      // ディレクトリでフィルタリング
+      // Filter by directory
       else if (pattern.endsWith('/*')) {
         const dir = pattern.substring(0, pattern.length - 1); // 'dir/*' -> 'dir/'
         filtered = paths.filter(p => p.value.startsWith(dir));
       }
-      // 前方一致
+      // Prefix match
       else if (pattern.endsWith('*')) {
         const prefix = pattern.substring(0, pattern.length - 1); // 'prefix*' -> 'prefix'
         filtered = paths.filter(p => p.value.startsWith(prefix));
       }
-      // 後方一致
+      // Suffix match
       else if (pattern.startsWith('*')) {
         const suffix = pattern.substring(1); // '*suffix' -> 'suffix'
         filtered = paths.filter(p => p.value.endsWith(suffix));
       }
-      // 完全一致
+      // Exact match
       else {
         filtered = paths.filter(p => p.value === pattern);
       }

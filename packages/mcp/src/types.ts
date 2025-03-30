@@ -6,24 +6,12 @@
  * of the schemas package yet.
  */
 
-// Import what's available from schemas package
-import type { ValidationResult, ValidationErrorType } from '@memory-bank/schemas';
-// import type { CliOptions } from './infrastructure/config/WorkspaceConfig.js'; // Removed unused import
+import type { Language, ValidationResult, ValidationErrorType } from '@memory-bank/schemas';
 
-// Export common types
 export {
   ValidationResult,
   ValidationErrorType
 };
-
-// Our own type definitions (not yet moved to schemas package)
-// Removed duplicate MemoryDocument type definition (use class from domain/entities)
-// export type MemoryDocument = {
-//   path: string;
-//   content: string;
-//   tags: string[];
-//   lastModified: Date;
-// };
 
 export type ToolContent = {
   type: string;
@@ -61,7 +49,7 @@ export type WorkspaceConfig = {
   workspaceRoot: string;
   memoryBankRoot: string;
   verbose: boolean;
-  language: string;
+  language: Language;
 };
 
 export type SectionEdit = {

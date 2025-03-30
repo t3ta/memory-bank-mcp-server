@@ -23,7 +23,7 @@ export type SharedUtilsErrorCode = keyof typeof SharedUtilsErrorCodes;
 export class SharedUtilsError extends BaseError {
   /**
    * Create a new SharedUtilsError
-   * 
+   *
    * @param code Error code (without prefix)
    * @param message Human-readable error message
    * @param details Additional error details
@@ -48,23 +48,22 @@ export class SharedUtilsError extends BaseError {
   /**
    * Create a new SharedUtilsError with the same code but a new message
    * Useful for adding context to existing errors
-   * 
+   *
    * @param newMessage New error message
    * @param additionalDetails Additional details to merge with existing details
    */
   public override withMessage(newMessage: string, additionalDetails?: Record<string, unknown>): SharedUtilsError {
-    const combinedDetails = { 
+    const combinedDetails = {
       ...this.details,
       ...additionalDetails,
-      originalMessage: this.message 
+      originalMessage: this.message
     };
-    
-    // Extract the code part without the prefix
+
     const codeMatch = this.code.match(/SHARED_UTILS_(\w+)/);
-    const codeWithoutPrefix = codeMatch ? 
-      codeMatch[1] as SharedUtilsErrorCode : 
+    const codeWithoutPrefix = codeMatch ?
+      codeMatch[1] as SharedUtilsErrorCode :
       SharedUtilsErrorCodes.UNKNOWN_ERROR;
-    
+
     return new SharedUtilsError(
       codeWithoutPrefix,
       newMessage,
@@ -88,7 +87,7 @@ export const SharedUtilsErrors = {
       additionalDetails
     );
   },
-  
+
   /**
    * Create a parsing error
    */
@@ -100,7 +99,7 @@ export const SharedUtilsErrors = {
       { cause }
     );
   },
-  
+
   /**
    * Create an invalid argument error
    */

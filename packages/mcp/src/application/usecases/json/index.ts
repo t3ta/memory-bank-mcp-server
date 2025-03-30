@@ -1,4 +1,3 @@
-// Export all JSON usecases
 export * from './ReadJsonDocumentUseCase.js';
 export * from './WriteJsonDocumentUseCase.js';
 export * from './DeleteJsonDocumentUseCase.js';

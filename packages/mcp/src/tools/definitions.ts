@@ -2,7 +2,7 @@ import { LanguageCode } from '../domain/i18n/Language.js';
 import { createEnhancedPatchProperties } from './patch-utils.js';
 
 /**
- * MCPツール定義の共通インターフェース
+ * Common interface for MCP tool definitions
  */
 export interface ToolDefinition {
   name: string;
@@ -15,11 +15,11 @@ export interface ToolDefinition {
 }
 
 /**
- * ブランチ操作に必要な共通プロパティを生成
+ * Generate common properties required for branch operations
  */
 export function createBranchProperties() {
   return {
-    path: { 
+    path: {
       type: 'string',
       description: 'Document path to write (e.g. "progress.json")'
     },
@@ -35,11 +35,11 @@ export function createBranchProperties() {
 }
 
 /**
- * グローバルメモリバンク操作に必要な共通プロパティを生成
+ * Generate common properties required for global memory bank operations
  */
 export function createGlobalProperties() {
   return {
-    path: { 
+    path: {
       type: 'string',
       description: 'Document path to write (e.g. "core/config.json")'
     },
@@ -51,7 +51,7 @@ export function createGlobalProperties() {
 }
 
 /**
- * ツール定義一覧
+ * List of tool definitions
  */
 export function getToolDefinitions(): ToolDefinition[] {
   return [
@@ -65,7 +65,7 @@ export function getToolDefinitions(): ToolDefinition[] {
 }
 
 /**
- * list_toolsツールの定義
+ * Definition for the list_tools tool
  */
 function createListToolsTool(): ToolDefinition {
   return {
@@ -79,12 +79,12 @@ function createListToolsTool(): ToolDefinition {
 }
 
 /**
- * write_branch_memory_bankツールの定義
+ * Definition for the write_branch_memory_bank tool
  */
 function createWriteBranchMemoryBankTool(): ToolDefinition {
   const branchProps = createBranchProperties();
-  const patchProps = createEnhancedPatchProperties(); // 強化されたパッチプロパティを使用
-  
+  const patchProps = createEnhancedPatchProperties(); // Use enhanced patch properties
+
   return {
     name: 'write_branch_memory_bank',
     description: "Write a document to the current branch's memory bank. If using JSON Patch, follow RFC 6902 strictly.",
@@ -97,13 +97,13 @@ function createWriteBranchMemoryBankTool(): ToolDefinition {
           type: 'string',
           description: 'JSON Patch Implementation Notes (RFC 6902)',
           notes: [
-            '1. パスは必ず "/" で始めなければなりません',
-            '2. content と patches は同時に指定できません',
-            '3. "add"/"replace"/"test" 操作では value プロパティが必須です',
-            '4. "move"/"copy" 操作では from プロパティが必須です',
-            '5. パス内の特殊文字はエスケープが必要: "/" → "~1", "~" → "~0"',
-            '6. 配列への追加は "/array/-" を使用します (最後に追加)',
-            '7. 存在しないパスへの "remove" 操作はエラーになります'
+            '1. Paths MUST start with "/"',
+            '2. Cannot specify both content and patches simultaneously',
+            '3. "add"/"replace"/"test" operations require a value property',
+            '4. "move"/"copy" operations require a from property',
+            '5. Special characters in paths need escaping: "/" → "~1", "~" → "~0"',
+            '6. Use "/array/-" to append to an array (adds to the end)',
+            '7. "remove" operation on a non-existent path will result in an error'
           ]
         }
       },
@@ -113,11 +113,11 @@ function createWriteBranchMemoryBankTool(): ToolDefinition {
 }
 
 /**
- * read_branch_memory_bankツールの定義
+ * Definition for the read_branch_memory_bank tool
  */
 function createReadBranchMemoryBankTool(): ToolDefinition {
   const branchProps = createBranchProperties();
-  
+
   return {
     name: 'read_branch_memory_bank',
     description: "Read a document from the current branch's memory bank",
@@ -132,12 +132,12 @@ function createReadBranchMemoryBankTool(): ToolDefinition {
 }
 
 /**
- * write_global_memory_bankツールの定義
+ * Definition for the write_global_memory_bank tool
  */
 function createWriteGlobalMemoryBankTool(): ToolDefinition {
   const globalProps = createGlobalProperties();
   const patchProps = createEnhancedPatchProperties();
-  
+
   return {
     name: 'write_global_memory_bank',
     description: 'Write a document to the global memory bank',
@@ -150,13 +150,13 @@ function createWriteGlobalMemoryBankTool(): ToolDefinition {
           type: 'string',
           description: 'JSON Patch Implementation Notes (RFC 6902)',
           notes: [
-            '1. パスは必ず "/" で始めなければなりません',
-            '2. content と patches は同時に指定できません',
-            '3. "add"/"replace"/"test" 操作では value プロパティが必須です',
-            '4. "move"/"copy" 操作では from プロパティが必須です',
-            '5. パス内の特殊文字はエスケープが必要: "/" → "~1", "~" → "~0"',
-            '6. 配列への追加は "/array/-" を使用します (最後に追加)',
-            '7. 存在しないパスへの "remove" 操作はエラーになります'
+            '1. Paths MUST start with "/"',
+            '2. Cannot specify both content and patches simultaneously',
+            '3. "add"/"replace"/"test" operations require a value property',
+            '4. "move"/"copy" operations require a from property',
+            '5. Special characters in paths need escaping: "/" → "~1", "~" → "~0"',
+            '6. Use "/array/-" to append to an array (adds to the end)',
+            '7. "remove" operation on a non-existent path will result in an error'
           ]
         }
       },
@@ -166,11 +166,11 @@ function createWriteGlobalMemoryBankTool(): ToolDefinition {
 }
 
 /**
- * read_global_memory_bankツールの定義
+ * Definition for the read_global_memory_bank tool
  */
 function createReadGlobalMemoryBankTool(): ToolDefinition {
   const globalProps = createGlobalProperties();
-  
+
   return {
     name: 'read_global_memory_bank',
     description: 'Read a document from the global memory bank',
@@ -185,7 +185,7 @@ function createReadGlobalMemoryBankTool(): ToolDefinition {
 }
 
 /**
- * read_contextツールの定義
+ * Definition for the read_context tool
  */
 function createReadContextTool(): ToolDefinition {
   return {

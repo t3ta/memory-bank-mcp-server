@@ -3,7 +3,6 @@
  * Defines the contract for translation and localization services
  */
 
-// Import types from the schema package
 import type { Language, TranslationKey } from '@memory-bank/schemas';
 
 /**
@@ -19,7 +18,6 @@ export interface II18nProvider {
    * @param params.params Optional parameters for substitution
    * @returns Translated text
    */
-  // パラメータをオブジェクトリテラル型に変更
   translate(params: {
     key: TranslationKey;
     language: Language;

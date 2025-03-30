@@ -10,9 +10,8 @@ import type {
 import { DocumentType } from "../../../domain/entities/JsonDocument.js";
 import { ApplicationError } from "../../../shared/errors/ApplicationError.js";
 import { DomainError } from "../../../shared/errors/DomainError.js";
-// Removed unused InfrastructureError import
-import { BaseError } from "../../../shared/errors/BaseError.js"; // Import BaseError
-import { logger } from "../../../shared/utils/logger.js"; // Import logger
+import { BaseError } from "../../../shared/errors/BaseError.js";
+import { logger } from "../../../shared/utils/logger.js";
 import type { MCPResponsePresenter } from "../../presenters/MCPResponsePresenter.js";
 import type { MCPResponse } from "../../presenters/types/MCPResponse.js";
 import type { IBranchController } from "../interfaces/IBranchController.js";
@@ -34,7 +33,7 @@ export class JsonBranchController
     | "getRecentBranches"
   > {
   readonly _type = "controller" as const;
-  private readonly componentLogger = logger.withContext({ component: 'JsonBranchController' }); // Add component logger
+  private readonly componentLogger = logger.withContext({ component: 'JsonBranchController' });
 
   /**
     * Constructor
@@ -75,7 +74,7 @@ export class JsonBranchController
         id: options.id,
       });
 
-      return this.presenter.presentSuccess(result.document); // Changed present to presentSuccess
+      return this.presenter.presentSuccess(result.document);
     } catch (error) {
       return this.handleError(error);
     }
@@ -91,7 +90,6 @@ export class JsonBranchController
     try {
       logger.info(`Writing JSON document to branch ${branchName}: ${document.path || document.id}`);
 
-      // Validate required fields
       if (!document.title) {
         throw new DomainError("VALIDATION_ERROR", "Document title is required");
       }
@@ -118,7 +116,7 @@ export class JsonBranchController
         },
       });
 
-      return this.presenter.presentSuccess(result); // Changed present to presentSuccess
+      return this.presenter.presentSuccess(result);
     } catch (error) {
       return this.handleError(error);
     }
@@ -139,7 +137,6 @@ export class JsonBranchController
         `Deleting JSON document from branch ${branchName}: ${options.path || options.id}`
       );
 
-      // Validate that at least one option is provided
       if (!options.path && !options.id) {
         throw new DomainError(
           "VALIDATION_ERROR",
@@ -153,7 +150,7 @@ export class JsonBranchController
         id: options.id,
       });
 
-      return this.presenter.presentSuccess(result); // Changed present to presentSuccess
+      return this.presenter.presentSuccess(result);
     } catch (error) {
       return this.handleError(error);
     }
@@ -181,7 +178,7 @@ export class JsonBranchController
         tags: options?.tags,
       });
 
-      return this.presenter.presentSuccess(result.documents); // Changed present to presentSuccess
+      return this.presenter.presentSuccess(result.documents);
     } catch (error) {
       return this.handleError(error);
     }
@@ -200,8 +197,6 @@ export class JsonBranchController
     try {
       logger.info(`Searching JSON documents in branch ${branchName} with query: ${query}`);
 
-      // For now, we just use tag-based search
-      // In the future, this could be extended to support more complex queries
       const tags = query.split(/\s+/).filter((tag) => tag.trim() !== "");
 
       const result = await this.searchJsonDocumentsUseCase.execute({
@@ -209,7 +204,7 @@ export class JsonBranchController
         tags: tags.length > 0 ? tags : undefined,
       });
 
-      return this.presenter.presentSuccess(result.documents); // Changed present to presentSuccess
+      return this.presenter.presentSuccess(result.documents);
     } catch (error) {
       return this.handleError(error);
     }
@@ -232,7 +227,7 @@ export class JsonBranchController
         fullRebuild: options?.force,
       });
 
-      return this.presenter.presentSuccess(result); // Changed present to presentSuccess
+      return this.presenter.presentSuccess(result);
     } catch (error) {
       return this.handleError(error);
     }
@@ -248,10 +243,10 @@ export class JsonBranchController
       logger.info(`Getting recent branches (limit: ${limit || "default"})`);
 
       const result = await this.getRecentBranchesUseCase.execute({
-        limit: limit || 10 // Default limit if not specified
+        limit: limit || 10,
       });
 
-      return this.presenter.presentSuccess(result.branches); // Changed present to presentSuccess
+      return this.presenter.presentSuccess(result.branches);
     } catch (error) {
       return this.handleError(error);
     }
@@ -263,25 +258,21 @@ export class JsonBranchController
    * @returns Formatted error response
    */
   private handleError(error: any): MCPResponse {
-    // Use componentLogger for consistency
     this.componentLogger.error("Error details:", {
       errorType: error?.constructor?.name,
       message: error?.message,
-      code: error?.code, // BaseError and its children should have this
-      details: error?.details, // BaseError and its children might have this
+      code: error?.code,
+      details: error?.details,
       stack: error instanceof Error ? error.stack : undefined
     });
 
-    // Check if it's a BaseError (covers Domain, App, Infra if they inherit)
     if (error instanceof BaseError) {
       return this.presenter.presentError(error);
     }
 
-    // Handle unknown/native errors
     this.componentLogger.warn('Handling unknown error type in JsonBranchController', { errorName: error?.constructor?.name });
     return this.presenter.presentError(
-      // Wrap unknown errors in a generic ApplicationError or similar
-      new ApplicationError( // Using ApplicationError for unexpected controller issues
+      new ApplicationError(
         'UNEXPECTED_JSON_CONTROLLER_ERROR',
         error instanceof Error ? error.message : 'An unexpected JSON controller error occurred',
         { originalError: error }

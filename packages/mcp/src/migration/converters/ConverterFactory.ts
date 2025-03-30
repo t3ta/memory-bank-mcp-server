@@ -54,7 +54,6 @@ export class ConverterFactory {
     const converter = this.converters.get(documentType);
 
     if (!converter) {
-      // Fall back to generic converter
       const genericConverter = this.converters.get('generic');
 
       if (!genericConverter) {

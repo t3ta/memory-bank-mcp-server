@@ -1,15 +1,15 @@
 import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
 
 /**
- * JSON Patchで使用されるパス表現をカプセル化するクラス
- * RFC 6901に準拠したJSON Pointer実装
+ * Class encapsulating the path representation used in JSON Patch
+ * Implementation of JSON Pointer compliant with RFC 6901
  */
 export class JsonPath {
   private readonly _path: string;
   private readonly _segments: string[];
 
   /**
-   * コンストラクタ - 直接使用せず、静的ファクトリメソッドを使用してください
+   * Constructor - Do not use directly, use the static factory method instead
    */
   private constructor(path: string, segments: string[]) {
     this._path = path;
@@ -17,10 +17,10 @@ export class JsonPath {
   }
 
   /**
-   * パス文字列からJsonPathオブジェクトを生成する
-   * @param path JSON Pointerパス文字列（例: '/a/b/c'）
-   * @returns 新しいJsonPathインスタンス
-   * @throws DomainError パスが無効な場合
+   * Create a JsonPath object from a path string
+   * @param path JSON Pointer path string (e.g., '/a/b/c')
+   * @returns New JsonPath instance
+   * @throws DomainError if the path is invalid
    */
   static parse(path: string): JsonPath {
     if (!path) {
@@ -37,11 +37,11 @@ export class JsonPath {
       );
     }
 
-    // 先頭のスラッシュを除去して分割
+    // Remove leading slash and split
     const rawSegments = path === '/' ? [''] : path.substring(1).split('/');
     const segments: string[] = [];
 
-    // 各セグメントのエスケープシーケンスを処理
+    // Process escape sequences in each segment
     for (const segment of rawSegments) {
       let i = 0;
       let result = '';
@@ -79,17 +79,17 @@ export class JsonPath {
   }
 
   /**
-   * ルートパスを生成する
-   * @returns ルートパスを表すJsonPathインスタンス
+   * Generate the root path
+   * @returns JsonPath instance representing the root path
    */
   static root(): JsonPath {
     return new JsonPath('/', ['']);
   }
 
   /**
-   * セグメント配列からJsonPathオブジェクトを生成する
-   * @param segments パスセグメントの配列
-   * @returns 新しいJsonPathインスタンス
+   * Create a JsonPath object from an array of segments
+   * @param segments Array of path segments
+   * @returns New JsonPath instance
    */
   static fromSegments(segments: string[]): JsonPath {
     const escapedSegments = segments.map(segment => JsonPath.escapeSegment(segment));
@@ -98,49 +98,49 @@ export class JsonPath {
   }
 
   /**
-   * パスセグメントをエスケープする
-   * @param segment エスケープするセグメント
-   * @returns エスケープされたセグメント
+   * Escape a path segment
+   * @param segment Segment to escape
+   * @returns Escaped segment
    */
   static escapeSegment(segment: string): string {
     return segment.replace(/~/g, '~0').replace(/\//g, '~1');
   }
 
   /**
-   * エスケープされたパスセグメントを元に戻す
-   * @param segment エスケープされたセグメント
-   * @returns 元のセグメント
+   * Unescape an escaped path segment
+   * @param segment Escaped segment
+   * @returns Original segment
    */
   static unescapeSegment(segment: string): string {
     return segment.replace(/~1/g, '/').replace(/~0/g, '~');
   }
 
   /**
-   * パス文字列を取得
+   * Get the path string
    */
   get path(): string {
     return this._path;
   }
 
   /**
-   * パスセグメントの配列を取得
+   * Get the array of path segments
    */
   get segments(): readonly string[] {
     return this._segments;
   }
 
   /**
-   * パスがルートかどうかを判定
-   * @returns ルートパスの場合はtrue
+   * Check if the path is the root path
+   * @returns true if it is the root path
    */
   isRoot(): boolean {
     return this._path === '/';
   }
 
   /**
-   * 親パスを取得
-   * @returns 親パスを表すJsonPathインスタンス
-   * @throws DomainError ルートパスに対して呼び出された場合
+   * Get the parent path
+   * @returns JsonPath instance representing the parent path
+   * @throws DomainError if called on the root path
    */
   parent(): JsonPath {
     if (this.isRoot()) {
@@ -155,17 +155,17 @@ export class JsonPath {
   }
 
   /**
-   * パスの最後のセグメントを取得
-   * @returns 最後のセグメント
+   * Get the last segment of the path
+   * @returns The last segment
    */
   lastSegment(): string {
     return this._segments[this._segments.length - 1];
   }
 
   /**
-   * 子パスを生成
-   * @param childSegment 子セグメント
-   * @returns 新しいJsonPathインスタンス
+   * Generate a child path
+   * @param childSegment Child segment
+   * @returns New JsonPath instance
    */
   child(childSegment: string): JsonPath {
     const newSegments = [...this._segments, childSegment];
@@ -173,8 +173,8 @@ export class JsonPath {
   }
 
   /**
-   * 配列要素のパスかどうかを判定
-   * @returns 配列要素を指すパスの場合はtrue
+   * Check if the path points to an array element
+   * @returns true if the path points to an array element
    */
   isArrayElement(): boolean {
     const lastSegment = this.lastSegment();
@@ -182,25 +182,25 @@ export class JsonPath {
   }
 
   /**
-   * 配列末尾追加のパスかどうかを判定
-   * @returns 配列末尾追加を指すパスの場合はtrue
+   * Check if the path points to the end of an array for appending
+   * @returns true if the path points to the end of an array
    */
   isArrayAppend(): boolean {
     return this.lastSegment() === '-';
   }
 
   /**
-   * パスの等価性を判断
-   * @param other 比較対象のJsonPath
-   * @returns 等価の場合はtrue
+   * Check path equality
+   * @param other JsonPath to compare against
+   * @returns true if equal
    */
   equals(other: JsonPath): boolean {
     return this._path === other._path;
   }
 
   /**
-   * 文字列表現を取得
-   * @returns パス文字列
+   * Get the string representation
+   * @returns Path string
    */
   toString(): string {
     return this._path;

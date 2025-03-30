@@ -25,7 +25,6 @@ export function setDocumentLogger(logger: IDocumentLogger): void {
  */
 function getLogger(): IDocumentLogger {
   if (!documentLogger) {
-    // Return a no-op logger if not set
     return {
       debug: () => {},
       info: () => {},
@@ -62,7 +61,6 @@ export class MemoryDocument {
    * @returns MemoryDocument instance
    */
   public static create(props: MemoryDocumentProps): MemoryDocument {
-    // Create a defensive copy of the props
     const documentProps = {
       path: props.path,
       content: props.content,
@@ -233,7 +231,6 @@ export class MemoryDocument {
     const documentType = this.determineDocumentType();
     const title = this.title || this.props.path.filename;
 
-    // Create a default content structure based on document type
     let content: Record<string, unknown>;
     switch (documentType) {
       case 'branch_context':
@@ -281,7 +278,7 @@ export class MemoryDocument {
       createdAt: new Date(),
       version: 1,
       id: crypto.randomUUID(),
-      ...content, // Spread content properties at top level
+      ...content,
     } as JsonDocumentV2;
   }
 
@@ -296,28 +293,22 @@ export class MemoryDocument {
       schema: jsonDoc.schema
     });
 
-    // For V2 schema, properties are at the top level
     const lastModified = jsonDoc.lastModified;
 
-    // Sanitize tags before creating Tag objects
     const sanitizedTags = (jsonDoc.tags || []).map((tag: string) => {
-      // First try to create the tag as is
       try {
         const tagObj = Tag.create(tag);
         getLogger().debug('Created tag:', { tag: tagObj.value, source: tag });
         return tagObj;
       } catch (e: unknown) {
-        // If creation fails, sanitize the tag
         if (e instanceof DomainError && e.code === 'DOMAIN_ERROR.INVALID_TAG_FORMAT') {
-          // Make lowercase and replace invalid characters with hyphens
           const sanitizedTagStr = tag.toLowerCase().replace(/[^a-z0-9-]/g, '-');
-          // Log the sanitization for debugging
           getLogger().warn(`Sanitized tag '${tag}' to '${sanitizedTagStr}'`);
           const tagObj = Tag.create(sanitizedTagStr);
           getLogger().debug('Created sanitized tag:', { tag: tagObj.value });
           return tagObj;
         }
-        throw e; // Re-throw if it's not a format error
+        throw e;
       }
     });
 

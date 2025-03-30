@@ -11,7 +11,6 @@ import type { IJsonDocumentRepository } from "../../../domain/repositories/IJson
  * Used for testing purposes
  */
 export class MockJsonDocumentRepository implements IJsonDocumentRepository {
-  // Storage for documents, organized by branch name and document path
   private documents: Map<string, Map<string, JsonDocument>> = new Map();
 
   /**
@@ -20,7 +19,6 @@ export class MockJsonDocumentRepository implements IJsonDocumentRepository {
    * @returns Promise resolving to the document if found, or null if not found
    */
   public async findById(id: DocumentId): Promise<JsonDocument | null> {
-    // Iterate through all branches and documents to find matching ID
     for (const [, branchDocuments] of this.documents.entries()) {
       for (const document of branchDocuments.values()) {
         if (document.id.equals(id)) {
@@ -28,7 +26,6 @@ export class MockJsonDocumentRepository implements IJsonDocumentRepository {
         }
       }
     }
-
     return null;
   }
 
@@ -67,12 +64,10 @@ export class MockJsonDocumentRepository implements IJsonDocumentRepository {
 
     for (const document of branchDocuments.values()) {
       if (matchAll) {
-        // Document must have all tags
         if (tags.every((tag) => document.hasTag(tag))) {
           result.push(document);
         }
       } else {
-        // Document must have at least one tag
         if (tags.some((tag) => document.hasTag(tag))) {
           result.push(document);
         }
@@ -133,7 +128,6 @@ export class MockJsonDocumentRepository implements IJsonDocumentRepository {
     } else if (document instanceof DocumentPath) {
       return branchDocuments.delete(document.value);
     } else if (document instanceof DocumentId) {
-      // Find document by ID
       for (const [path, doc] of branchDocuments.entries()) {
         if (doc.id.equals(document)) {
           return branchDocuments.delete(path);
@@ -184,14 +178,14 @@ export class MockJsonDocumentRepository implements IJsonDocumentRepository {
   }
 
   /**
-   * Clear all documents (for testing)
+   * Clear all documents
    */
   public clear(): void {
     this.documents.clear();
   }
 
   /**
-   * Initialize with a set of documents (for testing)
+   * Initialize with a set of documents
    * @param documents Documents to initialize with
    * @param branchInfo Branch information
    */

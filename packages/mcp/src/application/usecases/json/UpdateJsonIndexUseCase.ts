@@ -81,7 +81,6 @@ export class UpdateJsonIndexUseCase
    */
   async execute(input: UpdateJsonIndexInput): Promise<UpdateJsonIndexOutput> {
     try {
-      // Determine if updating branch or global index
       const isGlobal = !input.branchName;
       const repository = isGlobal
         ? this.globalRepository || this.jsonRepository
@@ -89,14 +88,11 @@ export class UpdateJsonIndexUseCase
       const location = isGlobal ? 'global' : input.branchName!;
       const fullRebuild = input.fullRebuild ?? false;
 
-      // Create branch info - use feature/global for global operations to pass BranchInfo validation
       const branchInfo = isGlobal
         ? BranchInfo.create('feature/global')
         : BranchInfo.create(input.branchName!);
 
-      // Check if branch exists for branch index updates
       if (!isGlobal) {
-        // Create a dummy path to check if branch exists
         const dummyPath = DocumentPath.create('index.json');
         const branchExists = await this.jsonRepository.exists(branchInfo, dummyPath);
 
@@ -108,22 +104,16 @@ export class UpdateJsonIndexUseCase
         }
       }
 
-      // List all documents
       const documents = await repository.listAll(branchInfo);
 
-      // Update index
       if (fullRebuild) {
-        // Full rebuild
         await this.indexService.buildIndex(branchInfo, documents);
       } else {
-        // Incremental update - update each document in index
         for (const document of documents) {
           await this.indexService.addToIndex(branchInfo, document);
         }
       }
 
-      // Get index stats
-      // We need to extract tags from the documents since getIndex method isn't available
       const uniqueTags = new Set<string>();
       documents.forEach((doc) => {
         doc.tags.forEach((tag) => uniqueTags.add(tag.value));
@@ -131,7 +121,6 @@ export class UpdateJsonIndexUseCase
 
       const tags = Array.from(uniqueTags);
 
-      // Return result
       return {
         tags,
         documentCount: documents.length,
@@ -142,12 +131,10 @@ export class UpdateJsonIndexUseCase
         },
       };
     } catch (error) {
-      // Re-throw domain and application errors
       if (error instanceof DomainError || error instanceof ApplicationError) {
         throw error;
       }
 
-      // Wrap other errors
       throw new ApplicationError(
         ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
         `Failed to update JSON index: ${(error as Error).message}`,

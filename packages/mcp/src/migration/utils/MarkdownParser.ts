@@ -10,13 +10,10 @@ import { DocumentType } from '@/domain/entities/JsonDocument.js';
  * Common structure for parsed markdown content
  */
 export interface ParsedMarkdown {
-  // Document metadata
   title: string;
   path: string;
   tags: string[];
   documentType: DocumentType;
-
-  // Content sections
   content: Record<string, unknown>;
 }
 
@@ -37,7 +34,6 @@ export interface TechnicalDecision {
  * @returns Parsed markdown structure
  */
 export function parseMarkdownForMigration(content: string, path: string): ParsedMarkdown {
-  // Initialize result
   const result: ParsedMarkdown = {
     title: '',
     path,
@@ -46,10 +42,8 @@ export function parseMarkdownForMigration(content: string, path: string): Parsed
     content: {},
   };
 
-  // Split content into lines
   const lines = content.split('\n');
 
-  // Extract title from first H1 header
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
     if (line.startsWith('# ')) {
@@ -58,25 +52,22 @@ export function parseMarkdownForMigration(content: string, path: string): Parsed
     }
   }
 
-  // If no title found, use filename
   if (!result.title) {
     const filename = path.split('/').pop() || path;
     result.title = filename.replace(/\.(md|json)$/, '');
   }
 
-  // Extract tags
   const tagsLine = lines.find((line) => line.trim().startsWith('tags:'));
   if (tagsLine) {
     const tagsMatch = tagsLine.match(/#([a-zA-Z0-9-_]+)/g);
     if (tagsMatch) {
-      result.tags = tagsMatch.map((tag) => tag.substring(1)); // Remove # prefix
+      result.tags = tagsMatch.map((tag) => tag.substring(1));
     }
   }
 
-  // Determine document type based on the content or filename
   result.documentType = detectDocumentType(path, result.title);
 
-  // Add special handling for test files that have exact expected sections
+  // Special handling for test files
   if (content.includes('test branch context document')) {
     result.documentType = 'branch_context';
     result.content.purpose = 'This is a test branch context document.';
@@ -91,7 +82,6 @@ export function parseMarkdownForMigration(content: string, path: string): Parsed
     result.content.currentState = 'This is a test progress document.';
   }
 
-  // Parse document content based on document type
   switch (result.documentType) {
     case 'branch_context':
       parseBranchContext(lines, result.content);
@@ -123,7 +113,6 @@ function detectDocumentType(path: string, title: string): DocumentType {
   const pathLower = path.toLowerCase();
   const titleLower = title.toLowerCase();
 
-  // Check path for clues
   if (pathLower.includes('branchcontext') || pathLower.includes('branch-context')) {
     return 'branch_context';
   } else if (pathLower.includes('activecontext') || pathLower.includes('active-context')) {
@@ -136,7 +125,6 @@ function detectDocumentType(path: string, title: string): DocumentType {
     return 'system_patterns';
   }
 
-  // Check title for clues
   if (titleLower.includes('branch context') || titleLower.includes('ブランチコンテキスト')) {
     return 'branch_context';
   } else if (
@@ -152,7 +140,6 @@ function detectDocumentType(path: string, title: string): DocumentType {
     return 'system_patterns';
   }
 
-  // Default to generic
   return 'generic';
 }
 
@@ -168,12 +155,11 @@ function parseBranchContext(lines: string[], content: Record<string, unknown>): 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
 
-    // Check for section headers
-    if (line.startsWith('## 目的')) {
+    if (line.startsWith('## 目的') || line.startsWith('## Purpose')) {
       inPurposeSection = true;
       inUserStoriesSection = false;
       continue;
-    } else if (line.startsWith('## ユーザーストーリー')) {
+    } else if (line.startsWith('## ユーザーストーリー') || line.startsWith('## User Stories')) {
       inPurposeSection = false;
       inUserStoriesSection = true;
       continue;
@@ -183,41 +169,36 @@ function parseBranchContext(lines: string[], content: Record<string, unknown>): 
       continue;
     }
 
-    // Extract information
     if (inPurposeSection) {
-      if (line.startsWith('ブランチ:')) {
+      if (line.startsWith('ブランチ:') || line.startsWith('Branch:')) {
         // Skip branch name line
-      } else if (line.startsWith('作成日時:')) {
-        // Extract creation date for metadata
+      } else if (line.startsWith('作成日時:') || line.startsWith('Created At:')) {
+        // Extract creation date for metadata (optional)
       } else if (line) {
         purpose += line + '\n';
       }
     } else if (inUserStoriesSection) {
-      // Look for challenge section
-      if (line.startsWith('### 解決する課題')) {
+      if (line.startsWith('### 解決する課題') || line.startsWith('### Challenges to Solve')) {
         const challengesSection = extractListSection(lines, i + 1);
         content.challenges = challengesSection.items;
-        i = challengesSection.endIndex - 1; // Skip processed lines
+        i = challengesSection.endIndex - 1;
         continue;
       }
 
-      // Look for features section
-      if (line.startsWith('### 必要な機能')) {
+      if (line.startsWith('### 必要な機能') || line.startsWith('### Required Features')) {
         const featuresSection = extractListSection(lines, i + 1);
         content.features = featuresSection.items;
-        i = featuresSection.endIndex - 1; // Skip processed lines
+        i = featuresSection.endIndex - 1;
         continue;
       }
 
-      // Look for expectations section
-      if (line.startsWith('### 期待される動作')) {
+      if (line.startsWith('### 期待される動作') || line.startsWith('### Expected Behavior')) {
         const expectationsSection = extractListSection(lines, i + 1);
         content.expectations = expectationsSection.items;
-        i = expectationsSection.endIndex - 1; // Skip processed lines
+        i = expectationsSection.endIndex - 1;
         continue;
       }
 
-      // Parse user story checkboxes if not in a specific subsection
       const storyMatch = line.match(/^\s*-\s*\[([ x])\]\s*(.+)$/);
       if (storyMatch) {
         userStories.push({
@@ -246,20 +227,19 @@ function parseActiveContext(lines: string[], content: Record<string, unknown>): 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
 
-    // Check for section headers
-    if (line.startsWith('## 現在の作業内容')) {
+    if (line.startsWith('## 現在の作業内容') || line.startsWith('## Current Work')) {
       currentSection = 'currentWork';
       continue;
-    } else if (line.startsWith('## 直近の変更点')) {
+    } else if (line.startsWith('## 直近の変更点') || line.startsWith('## Recent Changes')) {
       currentSection = 'recentChanges';
       continue;
-    } else if (line.startsWith('## 今アクティブな決定事項')) {
+    } else if (line.startsWith('## 今アクティブな決定事項') || line.startsWith('## Active Decisions')) {
       currentSection = 'activeDecisions';
       continue;
-    } else if (line.startsWith('## 今アクティブな考慮点')) {
+    } else if (line.startsWith('## 今アクティブな考慮点') || line.startsWith('## Considerations')) {
       currentSection = 'considerations';
       continue;
-    } else if (line.startsWith('## 次のステップ')) {
+    } else if (line.startsWith('## 次のステップ') || line.startsWith('## Next Steps')) {
       currentSection = 'nextSteps';
       continue;
     } else if (line.startsWith('##')) {
@@ -267,46 +247,43 @@ function parseActiveContext(lines: string[], content: Record<string, unknown>): 
       continue;
     }
 
-    // Process content based on current section
     if (line && !line.startsWith('tags:')) {
       switch (currentSection) {
         case 'currentWork':
           if (!line.startsWith('_') && !line.endsWith('_')) {
-            // Handle both regular text and numbered/bulleted lists
             currentWork += line + '\n';
           }
           break;
         case 'recentChanges':
           if (line.startsWith('- ') || line.match(/^\d+\.\s/)) {
-            // Extract content from list items, whether bullet or numbered
-            const content = line.startsWith('- ')
+            const itemContent = line.startsWith('- ')
               ? line.substring(2).trim()
               : line.replace(/^\d+\.\s/, '').trim();
-            recentChanges.push(content);
+            recentChanges.push(itemContent);
           }
           break;
         case 'activeDecisions':
           if (line.startsWith('- ') || line.match(/^\d+\.\s/)) {
-            const content = line.startsWith('- ')
+            const itemContent = line.startsWith('- ')
               ? line.substring(2).trim()
               : line.replace(/^\d+\.\s/, '').trim();
-            activeDecisions.push(content);
+            activeDecisions.push(itemContent);
           }
           break;
         case 'considerations':
           if (line.startsWith('- ') || line.match(/^\d+\.\s/)) {
-            const content = line.startsWith('- ')
+            const itemContent = line.startsWith('- ')
               ? line.substring(2).trim()
               : line.replace(/^\d+\.\s/, '').trim();
-            considerations.push(content);
+            considerations.push(itemContent);
           }
           break;
         case 'nextSteps':
           if (line.startsWith('- ') || line.match(/^\d+\.\s/)) {
-            const content = line.startsWith('- ')
+            const itemContent = line.startsWith('- ')
               ? line.substring(2).trim()
               : line.replace(/^\d+\.\s/, '').trim();
-            nextSteps.push(content);
+            nextSteps.push(itemContent);
           }
           break;
       }
@@ -333,7 +310,6 @@ function parseProgress(lines: string[], content: Record<string, unknown>): void 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
 
-    // Check for section headers (support both English and Japanese)
     if (line.startsWith('## Working Features') || line.startsWith('## 現時点で動作している部分') || line.startsWith('## 動作している機能')) {
       currentSection = 'workingFeatures';
       continue;
@@ -351,17 +327,14 @@ function parseProgress(lines: string[], content: Record<string, unknown>): void 
       continue;
     }
 
-    // Process content based on current section
     if (line && !line.startsWith('tags:')) {
       switch (currentSection) {
         case 'workingFeatures':
           if (line.startsWith('- ')) {
             workingFeatures.push(line.substring(2).trim());
           } else if (line.match(/^\d+\.\s/)) {
-            // Handle numbered lists
             workingFeatures.push(line.replace(/^\d+\.\s/, '').trim());
           } else if (line.startsWith('- [ ]') || line.startsWith('- [x]')) {
-            // Handle checklist format
             const match = line.match(/^\s*-\s*\[([ x])\]\s*(.+)$/);
             if (match) {
               workingFeatures.push(match[2].trim());
@@ -372,10 +345,8 @@ function parseProgress(lines: string[], content: Record<string, unknown>): void 
           if (line.startsWith('- ')) {
             pendingImplementation.push(line.substring(2).trim());
           } else if (line.match(/^\d+\.\s/)) {
-            // Handle numbered lists
             pendingImplementation.push(line.replace(/^\d+\.\s/, '').trim());
           } else if (line.startsWith('- [ ]') || line.startsWith('- [x]')) {
-            // Handle checklist format
             const match = line.match(/^\s*-\s*\[([ x])\]\s*(.+)$/);
             if (match) {
               pendingImplementation.push(match[2].trim());
@@ -386,14 +357,12 @@ function parseProgress(lines: string[], content: Record<string, unknown>): void 
           if (!line.startsWith('_') && !line.endsWith('_')) {
             status += line + '\n';
           }
-          // Make sure to populate currentState as well since that's what the test expects
           content.currentState = status.trim();
           break;
         case 'knownIssues':
           if (line.startsWith('- ')) {
             knownIssues.push(line.substring(2).trim());
           } else if (line.match(/^\d+\.\s/)) {
-            // Handle numbered lists
             knownIssues.push(line.replace(/^\d+\.\s/, '').trim());
           }
           break;
@@ -404,7 +373,7 @@ function parseProgress(lines: string[], content: Record<string, unknown>): void 
   content.workingFeatures = workingFeatures;
   content.pendingImplementation = pendingImplementation;
   content.status = status.trim();
-  content.currentState = content.status; // Ensure both properties exist
+  content.currentState = content.status;
   content.knownIssues = knownIssues;
 }
 
@@ -420,14 +389,11 @@ function parseSystemPatterns(lines: string[], content: Record<string, unknown>):
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
 
-    // Check for technical decision header (H3 or bold with colon)
     if (line.startsWith('### ')) {
-      // Save previous decision if exists
       if (currentDecision) {
         technicalDecisions.push(currentDecision);
       }
 
-      // Start new decision
       currentDecision = {
         title: line.substring(4).trim(),
         context: '',
@@ -438,12 +404,12 @@ function parseSystemPatterns(lines: string[], content: Record<string, unknown>):
       continue;
     }
 
-    // Check for section headers (H4)
-    // Support both H4 headers and bold with colon format
     if (
       line.startsWith('#### コンテキスト') ||
       line.startsWith('#### 背景') ||
-      line.startsWith('**コンテキスト**:')
+      line.startsWith('#### Context') ||
+      line.startsWith('**コンテキスト**:') ||
+      line.startsWith('**Context**:')
     ) {
       currentSection = 'context';
       continue;
@@ -451,7 +417,9 @@ function parseSystemPatterns(lines: string[], content: Record<string, unknown>):
       line.startsWith('#### 決定事項') ||
       line.startsWith('#### 判断') ||
       line.startsWith('#### 決定内容') ||
-      line.startsWith('**決定事項**:')
+      line.startsWith('#### Decision') ||
+      line.startsWith('**決定事項**:') ||
+      line.startsWith('**Decision**:')
     ) {
       currentSection = 'decision';
       continue;
@@ -459,7 +427,9 @@ function parseSystemPatterns(lines: string[], content: Record<string, unknown>):
       line.startsWith('#### 影響') ||
       line.startsWith('#### 理由') ||
       line.startsWith('#### 結果') ||
-      line.startsWith('**結果**:')
+      line.startsWith('#### Consequences') ||
+      line.startsWith('**結果**:') ||
+      line.startsWith('**Consequences**:')
     ) {
       currentSection = 'consequences';
       continue;
@@ -468,7 +438,6 @@ function parseSystemPatterns(lines: string[], content: Record<string, unknown>):
       continue;
     }
 
-    // Process content if we're in a decision
     if (currentDecision && line && !line.startsWith('##') && !line.startsWith('tags:')) {
       switch (currentSection) {
         case 'context':
@@ -486,12 +455,10 @@ function parseSystemPatterns(lines: string[], content: Record<string, unknown>):
     }
   }
 
-  // Save last decision if exists
   if (currentDecision) {
     technicalDecisions.push(currentDecision);
   }
 
-  // Trim multiline strings
   technicalDecisions.forEach((decision) => {
     decision.context = decision.context.trim();
     decision.decision = decision.decision.trim();
@@ -510,14 +477,11 @@ function parseGenericDocument(lines: string[], content: Record<string, unknown>)
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
 
-    // Check for section headers
     if (line.startsWith('## ')) {
-      // Save previous section if exists
       if (currentSection && currentContent) {
         content[currentSection] = currentContent;
       }
 
-      // Start new section
       currentSection = line
         .substring(3)
         .trim()
@@ -528,25 +492,18 @@ function parseGenericDocument(lines: string[], content: Record<string, unknown>)
       continue;
     }
 
-    // Process content if in a section
     if (currentSection && line && !line.startsWith('#') && !line.startsWith('tags:')) {
       if (line.startsWith('- ')) {
-        // Convert to array if it's a list item
         if (typeof currentContent === 'string') {
           if (currentContent.trim()) {
-            // If we already have text, keep it as the first array item
             currentContent = [currentContent.trim()];
           } else {
-            // Otherwise start a fresh array
             currentContent = [];
           }
         }
-        // Add list item to array
         (currentContent as string[]).push(line.substring(2).trim());
       } else {
-        // Append as text if not a list item
         if (Array.isArray(currentContent)) {
-          // Convert back to string if this is no longer a list
           currentContent = currentContent.join('\n') + '\n' + line;
         } else {
           currentContent += line + '\n';
@@ -555,7 +512,6 @@ function parseGenericDocument(lines: string[], content: Record<string, unknown>)
     }
   }
 
-  // Save last section
   if (currentSection && currentContent) {
     if (typeof currentContent === 'string') {
       currentContent = currentContent.trim();
@@ -575,21 +531,17 @@ function extractListSection(
   const items: string[] = [];
   let i = startIndex;
 
-  // Skip any empty lines
   while (i < lines.length && lines[i].trim() === '') {
     i++;
   }
 
-  // Extract list items
   while (i < lines.length) {
     const line = lines[i].trim();
 
-    // Stop if we hit a header or end of section
     if (line.startsWith('#') || line === '') {
       break;
     }
 
-    // Extract list item
     if (line.startsWith('- ')) {
       items.push(line.substring(2).trim());
     }

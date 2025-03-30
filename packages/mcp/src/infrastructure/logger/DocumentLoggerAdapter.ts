@@ -7,18 +7,17 @@ import { logger, LogContext } from '../../shared/utils/logger.js';
  */
 export class DocumentLoggerAdapter implements IDocumentLogger {
   private componentLogger;
-  
+
   /**
    * Create a new DocumentLoggerAdapter
    * @param component Optional component name for this logger instance
    */
   constructor(component?: string) {
-    // Create a component-specific logger if component name is provided
-    this.componentLogger = component ? 
-      logger.withContext({ component }) : 
+    this.componentLogger = component ?
+      logger.withContext({ component }) :
       logger;
   }
-  
+
   /**
    * Log debug message
    * @param message Debug message

@@ -86,7 +86,6 @@ export class UpdateTagIndexUseCaseV2
    */
   async execute(input: UpdateTagIndexInput): Promise<UpdateTagIndexOutput> {
     try {
-      // Set default values
       const fullRebuild = input.fullRebuild ?? false;
       const updateLocation = input.branchName ? input.branchName : 'global';
       const timestamp = new Date().toISOString();
@@ -96,14 +95,11 @@ export class UpdateTagIndexUseCaseV2
       let documentCount = 0;
       let allTags: Tag[] = [];
 
-      // Update tag index in either branch or global memory bank
       if (input.branchName) {
-        // Branch memory bank
         const result = await this.updateBranchTagIndex(input.branchName, fullRebuild);
         documentCount = result.documentCount;
         allTags = result.tags;
       } else {
-        // Global memory bank
         const result = await this.updateGlobalTagIndex(fullRebuild);
         documentCount = result.documentCount;
         allTags = result.tags;
@@ -119,12 +115,10 @@ export class UpdateTagIndexUseCaseV2
         },
       };
     } catch (error) {
-      // Re-throw domain and application errors
       if (error instanceof DomainError || error instanceof ApplicationError) {
         throw error;
       }
 
-      // Wrap other errors
       throw new ApplicationError(
         ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
         `Failed to update tag index: ${(error as Error).message}`,
@@ -147,17 +141,14 @@ export class UpdateTagIndexUseCaseV2
     tags: Tag[];
     tagMap: Record<string, string[]>;
   }> {
-    // Check if branch exists
     const branchExists = await this.branchRepository.exists(branchName);
 
     if (!branchExists) {
       throw new DomainError(DomainErrorCodes.BRANCH_NOT_FOUND, `Branch "${branchName}" not found`);
     }
 
-    // Create branch info
     const branchInfo = BranchInfo.create(branchName);
 
-    // Check for existing tag index if not doing a full rebuild
     let existingTagIndex: BranchTagIndex | null = null;
     if (!fullRebuild) {
       if (this.tagIndexRepository) {
@@ -167,27 +158,23 @@ export class UpdateTagIndexUseCaseV2
       }
     }
 
-    // Get all documents in branch
     const documentPaths = await this.branchRepository.listDocuments(branchInfo);
     const documentCount = documentPaths.length;
 
-    // Process the documents and build the tag index
     const { tagMap, allTags } = await this.buildTagIndex(
       documentPaths,
       existingTagIndex,
       async (path) => await this.branchRepository.getDocument(branchInfo, path)
     );
 
-    // Create and save the tag index
-    // Create tag entries from tagMap
     const tagEntries = Object.entries(tagMap).map(([tagValue, paths]) => {
       return {
         tag: tagValue,
         documents: paths.map(path => ({
-          id: '', // ここでidを取得する手段がないため空文字列をセット
+          id: '', // ID cannot be retrieved here, set to empty string
           path: path,
           title: path.split('/').pop() || path,
-          lastModified: new Date() // Date型が要求されています
+          lastModified: new Date() // Date type is required
         }))
       };
     });
@@ -197,14 +184,13 @@ export class UpdateTagIndexUseCaseV2
       metadata: {
         indexType: 'branch',
         branchName: branchInfo.name,
-        lastUpdated: new Date(), // Date型が要求されています
+        lastUpdated: new Date(), // Date type is required
         documentCount,
         tagCount: allTags.length,
       },
       index: tagEntries,
     };
 
-    // Save the tag index using the repository, if available, otherwise fall back to direct save
     if (this.tagIndexRepository) {
       await this.tagIndexRepository.saveBranchTagIndex(branchInfo, tagIndex);
     } else {
@@ -225,7 +211,6 @@ export class UpdateTagIndexUseCaseV2
     tags: Tag[];
     tagMap: Record<string, string[]>;
   }> {
-    // Check for existing tag index if not doing a full rebuild
     let existingTagIndex: GlobalTagIndex | null = null;
     if (!fullRebuild) {
       if (this.tagIndexRepository) {
@@ -235,43 +220,38 @@ export class UpdateTagIndexUseCaseV2
       }
     }
 
-    // Get all documents in global memory bank
     const documentPaths = await this.globalRepository.listDocuments();
     const documentCount = documentPaths.length;
 
-    // Process the documents and build the tag index
     const { tagMap, allTags } = await this.buildTagIndex(
       documentPaths,
       existingTagIndex,
       async (path) => await this.globalRepository.getDocument(path)
     );
 
-    // Create tag entries from tagMap
     const tagEntries = Object.entries(tagMap).map(([tagValue, paths]) => {
       return {
         tag: tagValue,
         documents: paths.map(path => ({
-          id: '', // ここでidを取得する手段がないため空文字列をセット
+          id: '', // ID cannot be retrieved here, set to empty string
           path: path,
           title: path.split('/').pop() || path,
-          lastModified: new Date() // Date型が要求されています
+          lastModified: new Date() // Date type is required
         }))
       };
     });
 
-    // Create and save the tag index
     const tagIndex: GlobalTagIndex = {
       schema: 'tag_index_v1',
       metadata: {
         indexType: 'global',
-        lastUpdated: new Date(), // Date型が要求されています
+        lastUpdated: new Date(), // Date type is required
         documentCount,
         tagCount: allTags.length,
       },
       index: tagEntries,
     };
 
-    // Save the tag index using the repository, if available, otherwise fall back to direct save
     if (this.tagIndexRepository) {
       await this.tagIndexRepository.saveGlobalTagIndex(tagIndex);
     } else {
@@ -297,22 +277,16 @@ export class UpdateTagIndexUseCaseV2
     tagMap: Record<string, string[]>;
     allTags: Tag[];
   }> {
-    // Initialize new tag map
-    // Note: We're not using existingTagIndex right now, but keeping it for future use
     const tagMap: Record<string, string[]> = {};
-    // Silence unused parameter warning
-    void existingTagIndex;
+    void existingTagIndex; // Silence unused parameter warning for now
 
-    // Use Set to track unique tags
     const tagSet = new Set<string>();
 
-    // Process each document
     for (const path of documentPaths) {
       try {
         const document = await documentGetter(path);
 
         if (document) {
-          // For each tag in the document, add the document path to the tag's list
           for (const tag of document.tags) {
             const tagValue = tag.value;
             tagSet.add(tagValue);
@@ -321,19 +295,16 @@ export class UpdateTagIndexUseCaseV2
               tagMap[tagValue] = [];
             }
 
-            // Only add the path if it's not already in the list
             if (!tagMap[tagValue].includes(path.value)) {
               tagMap[tagValue].push(path.value);
             }
           }
         }
       } catch (error) {
-        // Log error but continue processing other documents
         logger.error(`Error processing document ${path.value} for tag index:`, error);
       }
     }
 
-    // Convert Set to an array of Tag objects
     const allTags = Array.from(tagSet).map((tagValue) => Tag.create(tagValue));
 
     return { tagMap, allTags };

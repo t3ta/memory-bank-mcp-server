@@ -1,2 +1,2 @@
 export * from './IResponsePresenter.js';
-export * from './IPresenter.js'; // 既存のIPresenterインターフェースも一緒にエクスポート
+export * from './IPresenter.js'; // Also export the existing IPresenter interface

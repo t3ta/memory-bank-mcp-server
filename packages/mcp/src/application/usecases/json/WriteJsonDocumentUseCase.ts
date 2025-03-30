@@ -144,45 +144,36 @@ export class WriteJsonDocumentUseCase
    */
   async execute(input: WriteJsonDocumentInput): Promise<WriteJsonDocumentOutput> {
     try {
-      // Validate input
       this.validateInput(input);
 
-      // Determine if saving in branch or global memory bank
       const isGlobal = !input.branchName;
       const location = isGlobal ? 'global' : input.branchName;
       const repository = isGlobal
         ? this.globalRepository || this.jsonRepository
         : this.jsonRepository;
 
-      // Create branch info - BranchInfo validation requires feature/ or fix/ prefix
-      // 注意: グローバルメモリバンクの操作でもBranchInfoを使用しています
-      // TODO: 将来的には設計を見直し、グローバルメモリバンクではBranchInfoに依存しない設計にすべき
+      // Note: Using BranchInfo even for global operations.
+      // TODO: Refactor in the future so global operations do not depend on BranchInfo.
       const branchInfo = isGlobal
         ? BranchInfo.create('feature/global')
         : BranchInfo.create(input.branchName!);
 
-      // Create document path
       const documentPath = DocumentPath.create(input.document.path);
 
-      // Check if document already exists
       const existingDocument = await repository.findByPath(branchInfo, documentPath);
       const isNew = !existingDocument;
 
-      // Create document ID (use existing or generate new)
       const documentId = existingDocument
         ? existingDocument.id
         : input.document.id
           ? DocumentId.create(input.document.id)
           : DocumentId.generate();
 
-      // Create tags
       const tags = (input.document.tags || []).map((tag) => Tag.create(tag));
 
-      // Handle document creation or update
       let document: JsonDocument;
 
       if (isNew) {
-        // Create new document
         document = JsonDocument.create({
           id: documentId,
           path: documentPath,
@@ -190,11 +181,8 @@ export class WriteJsonDocumentUseCase
           documentType: input.document.documentType,
           tags,
           content: input.document.content,
-          // Creation and modification dates will be automatically set to now
         });
       } else {
-        // Update existing document
-        // We'll create a new document but preserve creation date
         document = JsonDocument.create({
           id: documentId,
           path: documentPath,
@@ -207,17 +195,13 @@ export class WriteJsonDocumentUseCase
             lastModified: new Date(),
             modifiedBy: 'system'
           }),
-          // Last modified will be automatically set to now
         });
       }
 
-      // Save document
       const savedDocument = await repository.save(branchInfo, document);
 
-      // Update index
       await this.indexService.addToIndex(branchInfo, savedDocument);
 
-      // Transform to DTO
       return {
         document: {
           id: savedDocument.id.value,
@@ -234,12 +218,10 @@ export class WriteJsonDocumentUseCase
         location: location || '',
       };
     } catch (error) {
-      // Re-throw domain and application errors
       if (error instanceof DomainError || error instanceof ApplicationError) {
         throw error;
       }
 
-      // Wrap other errors
       throw new ApplicationError(
         ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
         `Failed to write JSON document: ${(error as Error).message}`,
@@ -254,27 +236,22 @@ export class WriteJsonDocumentUseCase
    * @throws ApplicationError if validation fails
    */
   private validateInput(input: WriteJsonDocumentInput): void {
-    // Check if document data is provided
     if (!input.document) {
       throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Document data is required');
     }
 
-    // Check if document path is provided
     if (!input.document.path) {
       throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Document path is required');
     }
 
-    // Check if document title is provided
     if (!input.document.title) {
       throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Document title is required');
     }
 
-    // Check if document type is provided
     if (!input.document.documentType) {
       throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Document type is required');
     }
 
-    // Check if document content is provided
     if (!input.document.content || Object.keys(input.document.content).length === 0) {
       throw new ApplicationError(
         ApplicationErrorCodes.INVALID_INPUT,
@@ -282,7 +259,6 @@ export class WriteJsonDocumentUseCase
       );
     }
 
-    // Check global repository for global documents
     if (!input.branchName && !this.globalRepository) {
       throw new ApplicationError(
         ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,

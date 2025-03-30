@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { BranchTagIndex, GlobalTagIndex, TAG_INDEX_VERSION, DocumentReference, TagEntry } from '@memory-bank/schemas'; // DocumentReference, TagEntry をインポート
+import { BranchTagIndex, GlobalTagIndex, TAG_INDEX_VERSION, DocumentReference, TagEntry } from '@memory-bank/schemas'; // Import DocumentReference, TagEntry
 
 import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
 import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
@@ -15,23 +15,23 @@ import { FileSystemMemoryBankRepositoryBase } from './FileSystemMemoryBankReposi
 import { FileSystemMemoryDocumentRepository } from './FileSystemMemoryDocumentRepository.js';
 
 /**
- * タグ操作に関連する処理を担当するコンポーネント
+ * Component responsible for tag-related operations
  */
 export class TagOperations extends FileSystemMemoryBankRepositoryBase {
-  // タグインデックスファイル名
+  // Tag index filenames
   private static readonly GLOBAL_INDEX_FILENAME = '_global_index.json';
   private static readonly BRANCH_INDEX_FILENAME = '_index.json';
 
-  // キャッシュ管理
-  private branchIndexCache = new Map<string, { index: BranchTagIndex, lastUpdated: Date }>(); // BranchTagIndex のみに変更
+  // Cache management
+  private branchIndexCache = new Map<string, { index: BranchTagIndex, lastUpdated: Date }>();
   private globalIndexCache: { index: GlobalTagIndex, lastUpdated: Date } | null = null;
-  private readonly CACHE_TTL_MS = 30000; // 30秒キャッシュを保持
+  private readonly CACHE_TTL_MS = 30000; // Cache duration: 30 seconds
 
   /**
-   * コンストラクタ
-   * @param basePath 基本パス
-   * @param fileSystemService ファイルシステムサービス
-   * @param configProvider 設定プロバイダー
+   * Constructor
+   * @param basePath Base path
+   * @param fileSystemService File system service
+   * @param configProvider Configuration provider
    */
   constructor(
     private readonly basePath: string,
@@ -42,41 +42,41 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ドキュメントリポジトリを取得
-   * @returns ドキュメントリポジトリ
+   * Get the document repository
+   * @returns Document repository
    */
   private getDocumentRepository(): FileSystemMemoryDocumentRepository {
     return new FileSystemMemoryDocumentRepository(this.basePath, this.fileSystemService);
   }
 
   /**
-   * ブランチインデックスファイルのパスを取得
-   * @param branchInfo ブランチ情報
-   * @returns インデックスファイルのパス
+   * Get the path to the branch index file
+   * @param branchInfo Branch information
+   * @returns Path to the index file
    */
   private getBranchIndexPath(_branchInfo: BranchInfo): string {
     return path.join(this.basePath, TagOperations.BRANCH_INDEX_FILENAME);
   }
 
   /**
-   * グローバルインデックスファイルのパスを取得
-   * @returns インデックスファイルのパス
+   * Get the path to the global index file
+   * @returns Path to the index file
    */
   private getGlobalIndexPath(): string {
     return path.join(this.basePath, TagOperations.GLOBAL_INDEX_FILENAME);
   }
 
   /**
-   * ブランチのタグインデックスを取得
-   * @param branchInfo ブランチ情報
-   * @returns タグインデックス、存在しない場合はnull
+   * Get the tag index for a branch
+   * @param branchInfo Branch information
+   * @returns Tag index, or null if not found
    */
-  async getBranchTagIndex(branchInfo: BranchInfo): Promise<BranchTagIndex | null> { // GlobalTagIndex を削除
+  async getBranchTagIndex(branchInfo: BranchInfo): Promise<BranchTagIndex | null> {
     try {
       const branchKey = branchInfo.safeName;
       const now = new Date();
 
-      // キャッシュチェック
+      // Check cache
       const cachedData = this.branchIndexCache.get(branchKey);
       if (cachedData && (now.getTime() - cachedData.lastUpdated.getTime()) < this.CACHE_TTL_MS) {
         logger.debug(`Using cached branch index for ${branchInfo.name}`);
@@ -86,17 +86,17 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
       const indexPath = this.getBranchIndexPath(branchInfo);
       logger.debug(`Reading branch index from disk: ${indexPath}`);
 
-      // ファイルが存在するかチェック
+      // Check if file exists
       const exists = await this.fileExists(indexPath);
       if (!exists) {
         return null;
       }
 
-      // インデックスファイルを読み込む
+      // Read index file
       const content = await this.readFile(indexPath);
       const indexData = JSON.parse(content);
 
-      // キャッシュに保存
+      // Save to cache
       this.branchIndexCache.set(branchKey, { index: indexData, lastUpdated: now });
 
       return indexData;
@@ -122,14 +122,14 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * グローバルタグインデックスを取得
-   * @returns タグインデックス、存在しない場合はnull
+   * Get the global tag index
+   * @returns Tag index, or null if not found
    */
   async getGlobalTagIndex(): Promise<GlobalTagIndex | null> {
     try {
       const now = new Date();
 
-      // キャッシュチェック
+      // Check cache
       if (this.globalIndexCache && (now.getTime() - this.globalIndexCache.lastUpdated.getTime()) < this.CACHE_TTL_MS) {
         logger.debug('Using cached global index');
         return this.globalIndexCache.index;
@@ -138,17 +138,17 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
       const indexPath = this.getGlobalIndexPath();
       logger.debug(`Reading global index from disk: ${indexPath}`);
 
-      // ファイルが存在するかチェック
+      // Check if file exists
       const exists = await this.fileExists(indexPath);
       if (!exists) {
         return null;
       }
 
-      // インデックスファイルを読み込む
+      // Read index file
       const content = await this.readFile(indexPath);
       const indexData = JSON.parse(content);
 
-      // キャッシュに保存
+      // Save to cache
       this.globalIndexCache = { index: indexData, lastUpdated: now };
 
       return indexData;
@@ -174,24 +174,24 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ブランチのタグインデックスを保存
-   * @param branchInfo ブランチ情報
-   * @param index タグインデックス
+   * Save the tag index for a branch
+   * @param branchInfo Branch information
+   * @param index Tag index
    */
-  async saveBranchTagIndex(branchInfo: BranchInfo, index: BranchTagIndex): Promise<void> { // GlobalTagIndex を削除
+  async saveBranchTagIndex(branchInfo: BranchInfo, index: BranchTagIndex): Promise<void> {
     try {
       const indexPath = this.getBranchIndexPath(branchInfo);
       const branchKey = branchInfo.safeName;
 
-      // ディレクトリが存在することを確認
+      // Ensure directory exists
       const dirPath = path.dirname(indexPath);
       await this.createDirectory(dirPath);
 
-      // ファイルを書き込む
+      // Write file
       const content = JSON.stringify(index, null, 2);
       await this.writeFile(indexPath, content);
 
-      // キャッシュを更新
+      // Update cache
       this.branchIndexCache.set(branchKey, { index, lastUpdated: new Date() });
       logger.debug(`Updated branch index cache for ${branchInfo.name}`);
     } catch (error) {
@@ -204,22 +204,22 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * グローバルタグインデックスを保存
-   * @param index タグインデックス
+   * Save the global tag index
+   * @param index Tag index
    */
   async saveGlobalTagIndex(index: GlobalTagIndex): Promise<void> {
     try {
       const indexPath = this.getGlobalIndexPath();
 
-      // ディレクトリが存在することを確認
+      // Ensure directory exists
       const dirPath = path.dirname(indexPath);
       await this.createDirectory(dirPath);
 
-      // ファイルを書き込む
+      // Write file
       const content = JSON.stringify(index, null, 2);
       await this.writeFile(indexPath, content);
 
-      // キャッシュを更新
+      // Update cache
       this.globalIndexCache = { index, lastUpdated: new Date() };
       logger.debug('Updated global index cache');
     } catch (error) {
@@ -232,15 +232,15 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ブランチのタグインデックスを生成
-   * @param branchInfo ブランチ情報
-   * @returns 生成されたタグインデックス
+   * Generate the tag index for a branch
+   * @param branchInfo Branch information
+   * @returns Generated tag index
    */
   async generateBranchTagIndex(branchInfo: BranchInfo): Promise<BranchTagIndex> {
     try {
       logger.debug(`Generating tag index for branch ${branchInfo.name}`);
 
-      // すべてのドキュメントを取得
+      // Get all documents
       const documentRepository = this.getDocumentRepository();
       const paths = await documentRepository.list();
       const documents: MemoryDocument[] = [];
@@ -252,17 +252,17 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
         }
       }
 
-      // タグインデックスを作成 (スキーマ定義に準拠)
+      // Create tag index (compliant with schema definition)
       const tagEntriesMap = new Map<string, { tag: Tag; documents: DocumentReference[] }>();
 
-      // ドキュメントごとにタグを収集し、Mapを構築
+      // Collect tags for each document and build the Map
       for (const doc of documents) {
-        const docJson = doc.toJSON(); // toJSON() を使って ID を取得
+        const docJson = doc.toJSON(); // Get ID using toJSON()
         const docRef: DocumentReference = {
-          id: docJson.id, // toJSON() で生成された ID を使用
+          id: docJson.id, // Use ID generated by toJSON()
           path: doc.path.value,
-          title: doc.title ?? doc.path.filename, // title が undefined なら filename を使用
-          lastModified: doc.lastModified, // Date型をそのまま渡す (FlexibleDateSchemaが処理)
+          title: doc.title ?? doc.path.filename, // Use filename if title is undefined
+          lastModified: doc.lastModified, // Pass Date object directly (FlexibleDateSchema handles it)
         };
 
         for (const tag of doc.tags) {
@@ -273,23 +273,23 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
         }
       }
 
-      // MapからTagEntryの配列を生成し、tagプロパティをstringに変換
+      // Generate TagEntry array from Map and convert tag property to string
       const tagEntries: TagEntry[] = Array.from(tagEntriesMap.values()).map(entry => ({
         ...entry,
-        tag: entry.tag.value, // Tagオブジェクトからstringへ変換
+        tag: entry.tag.value, // Convert Tag object to string
       }));
 
-      // BranchTagIndex を構築
+      // Build BranchTagIndex
       const tagIndex: BranchTagIndex = {
         schema: TAG_INDEX_VERSION,
         metadata: {
-          indexType: 'branch', // indexType を追加
-          branchName: branchInfo.name, // branchName を追加
-          lastUpdated: new Date(), // updatedAt -> lastUpdated に変更、Date型を渡す
+          indexType: 'branch', // Add indexType
+          branchName: branchInfo.name, // Add branchName
+          lastUpdated: new Date(), // Changed updatedAt -> lastUpdated, pass Date object
           documentCount: documents.length,
-          tagCount: tagEntries.length, // tagCount を計算して追加
+          tagCount: tagEntries.length, // Add calculated tagCount
         },
-        index: tagEntries, // 正しい型の配列をセット
+        index: tagEntries, // Set the correctly typed array
       };
 
       return tagIndex;
@@ -303,14 +303,14 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * グローバルタグインデックスを生成
-   * @returns 生成されたタグインデックス
+   * Generate the global tag index
+   * @returns Generated tag index
    */
   async generateGlobalTagIndex(): Promise<GlobalTagIndex> {
     try {
       logger.debug('Generating global tag index');
 
-      // すべてのドキュメントを取得
+      // Get all documents
       const documentRepository = this.getDocumentRepository();
       const paths = await documentRepository.list();
       const documents: MemoryDocument[] = [];
@@ -322,17 +322,17 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
         }
       }
 
-      // タグインデックスを作成 (スキーマ定義に準拠)
+      // Create tag index (compliant with schema definition)
       const tagEntriesMap = new Map<string, { tag: Tag; documents: DocumentReference[] }>();
 
-      // ドキュメントごとにタグを収集し、Mapを構築
+      // Collect tags for each document and build the Map
       for (const doc of documents) {
-        const docJson = doc.toJSON(); // toJSON() を使って ID を取得
+        const docJson = doc.toJSON(); // Get ID using toJSON()
         const docRef: DocumentReference = {
-          id: docJson.id, // toJSON() で生成された ID を使用
+          id: docJson.id, // Use ID generated by toJSON()
           path: doc.path.value,
-          title: doc.title ?? doc.path.filename, // title が undefined なら filename を使用
-          lastModified: doc.lastModified, // Date型をそのまま渡す (FlexibleDateSchemaが処理)
+          title: doc.title ?? doc.path.filename, // Use filename if title is undefined
+          lastModified: doc.lastModified, // Pass Date object directly (FlexibleDateSchema handles it)
         };
 
         for (const tag of doc.tags) {
@@ -343,22 +343,22 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
         }
       }
 
-      // MapからTagEntryの配列を生成し、tagプロパティをstringに変換
+      // Generate TagEntry array from Map and convert tag property to string
       const tagEntries: TagEntry[] = Array.from(tagEntriesMap.values()).map(entry => ({
         ...entry,
-        tag: entry.tag.value, // Tagオブジェクトからstringへ変換
+        tag: entry.tag.value, // Convert Tag object to string
       }));
 
-      // GlobalTagIndex を構築
+      // Build GlobalTagIndex
       const tagIndex: GlobalTagIndex = {
         schema: TAG_INDEX_VERSION,
         metadata: {
-          indexType: 'global', // indexType を追加
-          lastUpdated: new Date(), // updatedAt -> lastUpdated に変更、Date型を渡す
+          indexType: 'global', // Add indexType
+          lastUpdated: new Date(), // Changed updatedAt -> lastUpdated, pass Date object
           documentCount: documents.length,
-          tagCount: tagEntries.length, // tagCount を計算して追加
+          tagCount: tagEntries.length, // Add calculated tagCount
         },
-        index: tagEntries, // 正しい型の配列をセット
+        index: tagEntries, // Set the correctly typed array
       };
 
       return tagIndex;
@@ -372,11 +372,11 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * タグインデックスを使用してドキュメントを検索
-   * @param tags 検索するタグ
-   * @param documents ドキュメント配列（オプション、指定がない場合はインデックスのみ使用）
-   * @param matchAll すべてのタグにマッチする必要があるか（AND検索）
-   * @returns マッチしたドキュメントパスの配列
+   * Find documents using the tag index
+   * @param tags Tags to search for
+   * @param documents Optional array of documents (if provided, filters this array instead of using index)
+   * @param matchAll Whether all tags must match (AND search)
+   * @returns Array of matching document paths
    */
   async findDocumentPathsByTagsUsingIndex(
     tags: Tag[],
@@ -386,51 +386,49 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
     try {
       this.logDebug(`Finding documents by ${tags.length} tags using index (matchAll: ${matchAll})`);
 
-      // 提供されたドキュメントがある場合は、それらを直接フィルタリング
+      // If documents are provided, filter them directly
       if (documents && documents.length > 0) {
         this.logDebug(`Using provided ${documents.length} documents instead of index`);
-
-        // ドキュメントを直接フィルタリング
         const matchedDocs = this.filterDocumentsByTags(documents, tags, matchAll);
         return matchedDocs.map(doc => doc.path);
       }
 
-      // インデックスを使用して検索
+      // Search using the index
       const tagIndex = await this.getGlobalTagIndex();
 
       if (!tagIndex) {
-        // インデックスがなければ通常のメソッドにフォールバック
+        // Fallback to regular method if index doesn't exist
         this.logDebug('No tag index found, falling back to regular method');
-        const foundDocs = await this.findDocumentsByTags(tags, matchAll);
-        return foundDocs.map(doc => doc.path);
+        // Call findDocumentPathsByTags instead and return its result directly
+        return await this.findDocumentPathsByTags(tags, matchAll);
       }
 
-      // TagEntry[] を検索するロジックに修正
+      // Logic to search TagEntry[]
       const tagValuesToSearch = tags.map(t => t.value);
       let resultPathSet = new Set<string>();
 
       if (matchAll) {
-        // AND検索
+        // AND search
         if (tagValuesToSearch.length === 0) return [];
 
-        // 最初のタグで初期化
+        // Initialize with the first tag
         const firstTagEntry = tagIndex.index.find(entry => entry.tag === tagValuesToSearch[0]);
-        if (!firstTagEntry) return []; // 最初のタグがなければ空
+        if (!firstTagEntry) return []; // If first tag not found, result is empty
         resultPathSet = new Set(firstTagEntry.documents.map(doc => doc.path));
 
-        // 残りのタグで絞り込み
+        // Filter by remaining tags
         for (let i = 1; i < tagValuesToSearch.length; i++) {
           const currentTag = tagValuesToSearch[i];
           const currentTagEntry = tagIndex.index.find(entry => entry.tag === currentTag);
           const currentPaths = new Set(currentTagEntry ? currentTagEntry.documents.map(doc => doc.path) : []);
 
-          // 積集合を取る
+          // Intersect sets
           resultPathSet = new Set([...resultPathSet].filter(path => currentPaths.has(path)));
 
-          if (resultPathSet.size === 0) break; // 途中で0件になったら終了
+          if (resultPathSet.size === 0) break; // Stop if intersection is empty
         }
       } else {
-        // OR検索
+        // OR search
         for (const tagValue of tagValuesToSearch) {
           const tagEntry = tagIndex.index.find(entry => entry.tag === tagValue);
           if (tagEntry) {
@@ -439,7 +437,7 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
         }
       }
 
-      // 文字列パスをDocumentPathオブジェクトに変換
+      // Convert string paths to DocumentPath objects
       return Array.from(resultPathSet).map(p => DocumentPath.create(p));
     } catch (error) {
       throw new InfrastructureError(
@@ -451,175 +449,58 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * ドキュメント配列をタグでフィルタリングする
-   * @param documents フィルタリングするドキュメント配列
-   * @param tags 検索するタグ
-   * @param matchAll すべてのタグにマッチする必要があるか（AND検索）
-   * @returns マッチしたドキュメントの配列
+   * Filter an array of documents by tags
+   * @param documents Array of documents to filter
+   * @param tags Tags to search for
+   * @param matchAll Whether all tags must match (AND search)
+   * @returns Array of matching documents
    */
   private filterDocumentsByTags(
     documents: MemoryDocument[],
     tags: Tag[],
     matchAll: boolean = false
   ): MemoryDocument[] {
-    // タグがない場合はすべて返す
+    // If no tags, return all documents
     if (tags.length === 0) {
       return documents;
     }
 
     return documents.filter(doc => {
       if (matchAll) {
-        // AND検索 - すべてのタグを持っている必要がある
-        return tags.every(tag => doc.hasTag(tag));
+        // AND search - must have all tags
+        return tags.length > 0 && tags.every(tag => doc.hasTag(tag));
       } else {
-        // OR検索 - いずれかのタグがあればOK
-        return tags.some(tag => doc.hasTag(tag));
+        // OR search - must have at least one tag
+        return tags.length === 0 || tags.some(tag => doc.hasTag(tag));
       }
     });
   }
 
   /**
-   * タグを使ってドキュメントを検索
-   * @param tags 検索するタグ
-   * @param matchAll すべてのタグにマッチする必要があるか (AND検索)
-   * @returns マッチしたドキュメントパスの配列
+   * Find documents by tags (without using index)
+   * @param tags Tags to search for
+   * @param matchAll Whether all tags must match (AND search)
+   * @returns Array of matching document paths
    */
   async findDocumentPathsByTags(tags: Tag[], matchAll: boolean = false): Promise<DocumentPath[]> {
-    // 修正済みの findDocumentPathsByTagsUsingIndex を呼び出すように変更
+    // Changed to call the corrected findDocumentPathsByTagsUsingIndex
     return this.findDocumentPathsByTagsUsingIndex(tags, undefined, matchAll);
   }
 
   /**
-   * ブランチでタグを使ってドキュメントを検索
-   * @param branchInfo ブランチ情報
-   * @param tags 検索するタグ
-   * @param matchAll すべてのタグにマッチする必要があるか (AND検索)
-   * @returns マッチしたドキュメントパスの配列
+   * Find documents by tags in a branch (without using index)
+   * @param branchInfo Branch information
+   * @param tags Tags to search for
+   * @param matchAll Whether all tags must match (AND search)
+   * @returns Array of matching documents
    */
-  // パラメータをオブジェクトリテラル型に変更
-  async findBranchDocumentPathsByTags(params: {
-    branchInfo: BranchInfo;
-    tags: Tag[];
-    matchAll?: boolean;
-  }): Promise<DocumentPath[]> {
-    const { branchInfo, tags, matchAll = false } = params; // 分割代入で取り出す
-    try {
-      logger.debug(`Finding documents by tags in branch ${branchInfo.name} using index (matchAll: ${matchAll})`);
-
-      // ブランチのインデックスを取得
-      const tagIndex = await this.getBranchTagIndex(branchInfo);
-
-      if (!tagIndex) {
-        // インデックスがなければ通常のメソッドにフォールバック
-        logger.debug(`No tag index found for branch ${branchInfo.name}, falling back to regular method`);
-        // findBranchDocumentsByTags の呼び出し方を修正
-        const documents = await this.findBranchDocumentsByTags({ branchInfo, tags, matchAll });
-        return documents.map(doc => doc.path);
-      }
-
-      // TagEntry[] を検索するロジック (findDocumentPathsByTagsUsingIndex と同様)
-      const tagValuesToSearch = tags.map(t => t.value);
-      let resultPathSet = new Set<string>();
-
-      if (matchAll) {
-        // AND検索
-        if (tagValuesToSearch.length === 0) return [];
-
-        // 最初のタグで初期化
-        const firstTagEntry = tagIndex.index.find(entry => entry.tag === tagValuesToSearch[0]);
-        if (!firstTagEntry) return []; // 最初のタグがなければ空
-        resultPathSet = new Set(firstTagEntry.documents.map(doc => doc.path));
-
-        // 残りのタグで絞り込み
-        for (let i = 1; i < tagValuesToSearch.length; i++) {
-          const currentTag = tagValuesToSearch[i];
-          const currentTagEntry = tagIndex.index.find(entry => entry.tag === currentTag);
-          const currentPaths = new Set(currentTagEntry ? currentTagEntry.documents.map(doc => doc.path) : []);
-
-          // 積集合を取る
-          resultPathSet = new Set([...resultPathSet].filter(path => currentPaths.has(path)));
-
-          if (resultPathSet.size === 0) break; // 途中で0件になったら終了
-        }
-      } else {
-        // OR検索
-        for (const tagValue of tagValuesToSearch) {
-          const tagEntry = tagIndex.index.find(entry => entry.tag === tagValue);
-          if (tagEntry) {
-            tagEntry.documents.forEach(doc => resultPathSet.add(doc.path));
-          }
-        }
-      }
-
-      // 文字列パスをDocumentPathオブジェクトに変換
-      return Array.from(resultPathSet).map(p => DocumentPath.create(p));
-    } catch (error) {
-      throw new InfrastructureError(
-        InfrastructureErrorCodes.FILE_READ_ERROR,
-        `Failed to find documents by tags in branch ${branchInfo.name}: ${(error as Error).message}`,
-        { originalError: error }
-      );
-    }
-  }
-
-  /**
-   * タグでドキュメントを検索する（インデックスを使わない方法）
-   * @param tags 検索するタグ
-   * @param matchAll すべてのタグにマッチする必要があるか (AND検索)
-   * @returns マッチしたドキュメントの配列
-   */
-  async findDocumentsByTags(tags: Tag[], matchAll: boolean = false): Promise<MemoryDocument[]> {
-    try {
-      logger.debug('Finding documents by tags (no index)');
-
-      const documentRepository = this.getDocumentRepository();
-      const paths = await documentRepository.list();
-      const matchedDocs: MemoryDocument[] = [];
-
-      // すべてのドキュメントを取得して検索
-      for (const docPath of paths) {
-        const doc = await documentRepository.findByPath(docPath);
-        if (!doc) continue;
-
-        let isMatch = false;
-
-        if (matchAll) {
-          // AND検索 - すべてのタグを持っている必要がある
-          isMatch = tags.length > 0 && tags.every(tag => doc.hasTag(tag));
-        } else {
-          // OR検索 - いずれかのタグがあればOK
-          isMatch = tags.length === 0 || tags.some(tag => doc.hasTag(tag));
-        }
-
-        if (isMatch) {
-          matchedDocs.push(doc);
-        }
-      }
-
-      return matchedDocs;
-    } catch (error) {
-      throw new InfrastructureError(
-        InfrastructureErrorCodes.FILE_READ_ERROR,
-        `Failed to find documents by tags: ${(error as Error).message}`,
-        { originalError: error }
-      );
-    }
-  }
-
-  /**
-   * ブランチ内でタグでドキュメントを検索する（インデックスを使わない方法）
-   * @param branchInfo ブランチ情報
-   * @param tags 検索するタグ
-   * @param matchAll すべてのタグにマッチする必要があるか (AND検索)
-   * @returns マッチしたドキュメントの配列
-   */
-  // パラメータをオブジェクトリテラル型に変更
+  // Changed parameters to object literal type
   async findBranchDocumentsByTags(params: {
     branchInfo: BranchInfo;
     tags: Tag[];
     matchAll?: boolean;
   }): Promise<MemoryDocument[]> {
-    const { branchInfo, tags, matchAll = false } = params; // 分割代入で取り出す
+    const { branchInfo, tags, matchAll = false } = params; // Destructure parameters
     try {
       logger.debug(`Finding documents by tags in branch ${branchInfo.name} (no index)`);
 
@@ -627,7 +508,7 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
       const paths = await documentRepository.list();
       const matchedDocs: MemoryDocument[] = [];
 
-      // すべてのドキュメントを取得して検索
+      // Get all documents and search
       for (const docPath of paths) {
         const doc = await documentRepository.findByPath(docPath);
         if (!doc) continue;
@@ -635,10 +516,10 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
         let isMatch = false;
 
         if (matchAll) {
-          // AND検索 - すべてのタグを持っている必要がある
+          // AND search - must have all tags
           isMatch = tags.length > 0 && tags.every(tag => doc.hasTag(tag));
         } else {
-          // OR検索 - いずれかのタグがあればOK
+          // OR search - must have at least one tag
           isMatch = tags.length === 0 || tags.some(tag => doc.hasTag(tag));
         }
 
@@ -658,8 +539,8 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * キャッシュを無効化する
-   * @param branchInfo ブランチ情報、nullの場合はグローバルキャッシュのみを無効化
+   * Invalidate the cache
+   * @param branchInfo Branch information, or null to invalidate only global cache
    */
   invalidateCache(branchInfo: BranchInfo | null = null): void {
     if (branchInfo) {
@@ -673,7 +554,7 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * すべてのキャッシュを無効化する
+   * Invalidate all caches
    */
   invalidateAllCaches(): void {
     this.branchIndexCache.clear();
@@ -682,25 +563,25 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
   }
 
   /**
-   * タグインデックスを生成して保存する
-   * @param documents タグインデックスを生成するためのドキュメント配列
-   * @returns 生成したタグインデックス
+   * Generate and save the tag index
+   * @param documents Array of documents to generate the index from
+   * @returns The generated tag index
    */
   async generateAndSaveTagIndex(documents: MemoryDocument[]): Promise<GlobalTagIndex> {
     try {
       this.logDebug(`Generating tag index for ${documents.length} documents`);
 
-      // タグインデックスを作成 (スキーマ定義に準拠)
+      // Create tag index (compliant with schema definition)
       const tagEntriesMap = new Map<string, { tag: Tag; documents: DocumentReference[] }>();
 
-      // ドキュメントごとにタグを収集し、Mapを構築
+      // Collect tags for each document and build the Map
       for (const doc of documents) {
-        const docJson = doc.toJSON(); // toJSON() を使って ID を取得
+        const docJson = doc.toJSON(); // Get ID using toJSON()
         const docRef: DocumentReference = {
-          id: docJson.id, // toJSON() で生成された ID を使用
+          id: docJson.id, // Use ID generated by toJSON()
           path: doc.path.value,
-          title: doc.title ?? doc.path.filename, // title が undefined なら filename を使用
-          lastModified: doc.lastModified, // Date型をそのまま渡す (FlexibleDateSchemaが処理)
+          title: doc.title ?? doc.path.filename, // Use filename if title is undefined
+          lastModified: doc.lastModified, // Pass Date object directly (FlexibleDateSchema handles it)
         };
 
         for (const tag of doc.tags) {
@@ -711,26 +592,26 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
         }
       }
 
-      // MapからTagEntryの配列を生成し、tagプロパティをstringに変換
+      // Generate TagEntry array from Map and convert tag property to string
       const tagEntries: TagEntry[] = Array.from(tagEntriesMap.values()).map(entry => ({
         ...entry,
-        tag: entry.tag.value, // Tagオブジェクトからstringへ変換
+        tag: entry.tag.value, // Convert Tag object to string
       }));
 
-      // GlobalTagIndex を構築
+      // Build GlobalTagIndex
       const tagIndex: GlobalTagIndex = {
         schema: TAG_INDEX_VERSION,
         metadata: {
-          indexType: 'global', // indexType を追加
-          lastUpdated: new Date(), // updatedAt -> lastUpdated に変更、Date型を渡す
+          indexType: 'global', // Add indexType
+          lastUpdated: new Date(), // Changed updatedAt -> lastUpdated, pass Date object
           documentCount: documents.length,
-          tagCount: tagEntries.length, // tagCount を計算して追加
+          tagCount: tagEntries.length, // Add calculated tagCount
         },
-        index: tagEntries, // 正しい型の配列をセット
+        index: tagEntries, // Set the correctly typed array
       };
 
 
-      // タグインデックスを保存
+      // Save the tag index
       await this.saveGlobalTagIndex(tagIndex);
 
       return tagIndex;
@@ -743,10 +624,5 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
     }
   }
 
-  /**
-   * レガシーなタグインデックスを更新する
-   * @param documents ドキュメント配列
-   * @param language 言語設定
-   */
-  // async updateLegacyTagsIndex(documents: MemoryDocument[], language: Language): Promise<void> { ... } // 廃止されたメソッド
+  // async updateLegacyTagsIndex(documents: MemoryDocument[], language: Language): Promise<void> { ... } // Deprecated method removed
 }
