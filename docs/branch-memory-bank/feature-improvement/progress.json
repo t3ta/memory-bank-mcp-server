@@ -61,6 +61,18 @@
         "phase": 1,
         "completed": true,
         "completedAt": "2025-03-30T04:38:03.000Z"
+      },
+      {
+        "id": "21222324-2526-2728-292a-2b2c2d2e2f30",
+        "description": "SCHEMA-1: スキーマファイルの分割と整理",
+        "priority": "high",
+        "implementationOrder": 6,
+        "phase": 1,
+        "dependsOn": [
+          "31323334-3536-3738-393a-3b3c3d3e3f40"
+        ],
+        "completed": true,
+        "completedAt": "2025-03-30T04:57:52.000Z"
       }
     ],
     "pendingImplementation": [
@@ -110,16 +122,6 @@
         "phase": 3,
         "dependsOn": [
           "f6060708-090a-0b0c-0d0e-0f10111213"
-        ]
-      },
-      {
-        "id": "21222324-2526-2728-292a-2b2c2d2e2f30",
-        "description": "SCHEMA-1: スキーマファイルの分割と整理",
-        "priority": "high",
-        "implementationOrder": 6,
-        "phase": 1,
-        "dependsOn": [
-          "31323334-3536-3738-393a-3b3c3d3e3f40"
         ]
       },
       {

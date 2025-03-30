@@ -293,9 +293,9 @@ export class MemoryDocument {
       schema: jsonDoc.schema
     });
 
-    const lastModified = jsonDoc.lastModified;
+    const lastModified = jsonDoc.metadata.lastModified; // Access via metadata
 
-    const sanitizedTags = (jsonDoc.tags || []).map((tag: string) => {
+    const sanitizedTags = (jsonDoc.metadata.tags || []).map((tag: string) => { // Access via metadata
       try {
         const tagObj = Tag.create(tag);
         getLogger().debug('Created tag:', { tag: tagObj.value, source: tag });

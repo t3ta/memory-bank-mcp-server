@@ -1,25 +1,22 @@
 /**
- * JSON Document Schema Definitions v2
+ * JSON Document Schema Definitions v2 - Base and Metadata
  *
- * This file defines the schema for the v2 JSON documents used in Memory Bank.
- * The schema is structured to provide:
- * - Clear separation between metadata and content
- * - Type safety through zod validation
- * - Extensibility for future document types
- * - Explicit versioning
+ * This file defines the base schema and common metadata for v2 JSON documents.
+ * Specific document type schemas are now defined in the 'document-types' directory.
  */
 import { z } from 'zod';
-import { FlexibleDateSchema } from '../common/schemas.js';
-import { commonValidators } from '../validation-helpers.js'; // Import common validators
+// import { FlexibleDateSchema, TagSchema } from '../common/schemas.js'; // Removed unused import
+import { commonValidators } from '../validation-helpers.js';
+import * as DocumentTypes from '../document-types/index.js'; // Import all document types
 
-// Schema version identifier - used for migration and compatibility
+// Schema version identifier
 export const SCHEMA_VERSION = 'memory_document_v2';
 
 // Common metadata for all document types
 export const DocumentMetadataV2Schema = z.object({
   // Basic identification
   title: commonValidators.nonEmptyString('title'),
-  documentType: commonValidators.nonEmptyString('documentType'),
+  documentType: commonValidators.nonEmptyString('documentType'), // Still needed here for base validation
   id: commonValidators.uuidField('id'),
   path: commonValidators.nonEmptyString('path'),
 
@@ -28,7 +25,7 @@ export const DocumentMetadataV2Schema = z.object({
 
   // Tracking and versioning
   lastModified: commonValidators.isoDateField('lastModified'),
-  createdAt: commonValidators.isoDateField('createdAt'),
+  createdAt: commonValidators.isoDateField('createdAt'), // Use helper here too
   version: z.number().int().positive().default(1),
 });
 
@@ -41,172 +38,57 @@ export const BaseJsonDocumentV2Schema = z.object({
   }),
 });
 
-// Branch Context document type
-export const BranchContextContentV2Schema = z.object({
-  purpose: commonValidators.nonEmptyString('purpose'),
-  background: z.string().optional(),
-  userStories: z
-    .array(
-      z.object({
-        description: z.string(),
-        completed: z.boolean().default(false),
-      })
-    )
-    .default([]),
-});
-
-export const BranchContextJsonV2Schema = BaseJsonDocumentV2Schema.extend({
-  metadata: DocumentMetadataV2Schema.extend({
-    documentType: z.literal('branch_context'),
-  }),
-  content: BranchContextContentV2Schema,
-});
-
-// Active Context document type
-export const ActiveContextContentV2Schema = z.object({
-  currentWork: z.string().optional(),
-  recentChanges: z.array(z.string()).default([]),
-  activeDecisions: z.array(z.string()).default([]),
-  considerations: z.array(z.string()).default([]),
-  nextSteps: z.array(z.string()).default([]),
-});
-
-export const ActiveContextJsonV2Schema = BaseJsonDocumentV2Schema.extend({
-  metadata: DocumentMetadataV2Schema.extend({
-    documentType: z.literal('active_context'),
-  }),
-  content: ActiveContextContentV2Schema,
-});
-
-// Progress document type
-export const ProgressContentV2Schema = z.object({
-  workingFeatures: z.array(z.string()).default([]),
-  pendingImplementation: z.array(z.string()).default([]),
-  status: z.string().optional(),
-  currentState: z.string().optional(),
-  knownIssues: z.array(z.string()).default([]),
-});
-
-export const ProgressJsonV2Schema = BaseJsonDocumentV2Schema.extend({
-  metadata: DocumentMetadataV2Schema.extend({
-    documentType: z.literal('progress'),
-  }),
-  content: ProgressContentV2Schema,
-});
-
-// Technical Decision schema for System Patterns
-export const TechnicalDecisionContentV2Schema = z.object({
-  title: commonValidators.nonEmptyString('title'),
-  context: commonValidators.nonEmptyString('context'),
-  decision: commonValidators.nonEmptyString('decision'),
-  consequences: z.array(z.string()).min(1, { message: '少なくとも1つの結果を提供する必要があります' }), // Keep min(1) for array, adjust message if needed
-});
-
-// System Patterns document type
-export const SystemPatternsContentV2Schema = z.object({
-  technicalDecisions: z.array(TechnicalDecisionContentV2Schema).default([]),
-});
-
-export const SystemPatternsJsonV2Schema = BaseJsonDocumentV2Schema.extend({
-  metadata: DocumentMetadataV2Schema.extend({
-    documentType: z.literal('system_patterns'),
-  }),
-  content: SystemPatternsContentV2Schema,
-});
-
-// Generic document schema
-export const GenericDocumentContentV2Schema = z
-  .record(z.unknown())
-  .refine((val) => Object.keys(val).length > 0, {
-    message: 'Content cannot be empty',
-  });
-
-export const GenericDocumentJsonV2Schema = BaseJsonDocumentV2Schema.extend({
-  metadata: DocumentMetadataV2Schema.extend({
-    documentType: commonValidators.nonEmptyString('documentType'),
-  }),
-  content: GenericDocumentContentV2Schema,
-});
-
 // Union type for discriminated union of all document types
-export const JsonDocumentV2Schema = z
-  .object({
+// We need to define the union options explicitly here to ensure
+// the discriminator 'documentType' is at the top level for zod.
+export const JsonDocumentV2Schema = z.discriminatedUnion('documentType', [
+  // Branch Context
+  z.object({
     schema: z.literal(SCHEMA_VERSION),
-    documentType: z.enum(['branch_context', 'active_context', 'progress', 'system_patterns']), // Keep enum for discriminated union key
-    title: commonValidators.nonEmptyString('title'),
-    id: commonValidators.uuidField('id'),
-    path: commonValidators.nonEmptyString('path'),
-    tags: commonValidators.tagsArray('tags'), // Use helper here too
-    lastModified: commonValidators.isoDateField('lastModified'), // Use helper here too
-    createdAt: FlexibleDateSchema,
-    version: z.number().int().positive().default(1),
-  })
-  .and(
-    z.discriminatedUnion('documentType', [
-      z.object({
-        documentType: z.literal('branch_context'),
-        purpose: commonValidators.nonEmptyString('purpose'),
-        background: z.string().optional(),
-        userStories: z
-          .array(
-            z.object({
-              description: z.string(),
-              completed: z.boolean().default(false),
-            })
-          )
-          .default([]),
-      }),
-      z.object({
-        documentType: z.literal('active_context'),
-        currentWork: z.string().optional(),
-        recentChanges: z.array(z.string()).default([]),
-        activeDecisions: z.array(z.string()).default([]),
-        considerations: z.array(z.string()).default([]),
-        nextSteps: z.array(z.string()).default([]),
-      }),
-      z.object({
-        documentType: z.literal('progress'),
-        workingFeatures: z.array(z.string()).default([]),
-        pendingImplementation: z.array(z.string()).default([]),
-        status: z.string().optional(),
-        currentState: z.string().optional(),
-        knownIssues: z.array(z.string()).default([]),
-      }),
-      z.object({
-        documentType: z.literal('system_patterns'),
-        technicalDecisions: z
-          .array(
-            z.object({
-              title: commonValidators.nonEmptyString('title'),
-              context: commonValidators.nonEmptyString('context'),
-              decision: commonValidators.nonEmptyString('decision'),
-              consequences: z.array(z.string()).min(1, { message: '少なくとも1つの結果を提供する必要があります' }), // Keep min(1) for array
-            })
-          )
-          .default([]),
-      }),
-    ])
-  );
+    metadata: DocumentTypes.BranchContextJsonV2Schema.shape.metadata,
+    content: DocumentTypes.BranchContextJsonV2Schema.shape.content,
+    documentType: z.literal('branch_context'), // Discriminator at top level
+  }),
+  // Active Context
+  z.object({
+    schema: z.literal(SCHEMA_VERSION),
+    metadata: DocumentTypes.ActiveContextJsonV2Schema.shape.metadata,
+    content: DocumentTypes.ActiveContextJsonV2Schema.shape.content,
+    documentType: z.literal('active_context'), // Discriminator at top level
+  }),
+  // Progress
+  z.object({
+    schema: z.literal(SCHEMA_VERSION),
+    metadata: DocumentTypes.ProgressJsonV2Schema.shape.metadata,
+    content: DocumentTypes.ProgressJsonV2Schema.shape.content,
+    documentType: z.literal('progress'), // Discriminator at top level
+  }),
+  // System Patterns
+  z.object({
+    schema: z.literal(SCHEMA_VERSION),
+    metadata: DocumentTypes.SystemPatternsJsonV2Schema.shape.metadata,
+    content: DocumentTypes.SystemPatternsJsonV2Schema.shape.content,
+    documentType: z.literal('system_patterns'), // Discriminator at top level
+  }),
+  // Generic Document (Needs careful handling as documentType is string)
+  // For discriminated union, we might need a more specific type or handle it differently.
+  // Let's keep the base structure for now, but this might need refinement.
+  // z.object({
+  //   schema: z.literal(SCHEMA_VERSION),
+  //   metadata: DocumentTypes.GenericDocumentJsonV2Schema.shape.metadata,
+  //   content: DocumentTypes.GenericDocumentJsonV2Schema.shape.content,
+  //   documentType: z.string(), // Generic type might not fit well here
+  // }),
+  // NOTE: GenericDocumentJsonV2Schema is excluded for now as its documentType isn't a literal,
+  // which is required for discriminatedUnion. Consider alternative validation if needed.
+]);
 
-// Type exports for TypeScript usage
+// Type exports for base and metadata
 export type DocumentMetadataV2 = z.infer<typeof DocumentMetadataV2Schema>;
 export type BaseJsonDocumentV2 = z.infer<typeof BaseJsonDocumentV2Schema>;
 
-export type BranchContextContentV2 = z.infer<typeof BranchContextContentV2Schema>;
-export type BranchContextJsonV2 = z.infer<typeof BranchContextJsonV2Schema>;
+// Re-export all types from document-types for convenience
+export * from '../document-types/index.js';
 
-export type ActiveContextContentV2 = z.infer<typeof ActiveContextContentV2Schema>;
-export type ActiveContextJsonV2 = z.infer<typeof ActiveContextJsonV2Schema>;
-
-export type ProgressContentV2 = z.infer<typeof ProgressContentV2Schema>;
-export type ProgressJsonV2 = z.infer<typeof ProgressJsonV2Schema>;
-
-export type TechnicalDecisionContentV2 = z.infer<typeof TechnicalDecisionContentV2Schema>;
-export type SystemPatternsContentV2 = z.infer<typeof SystemPatternsContentV2Schema>;
-export type SystemPatternsJsonV2 = z.infer<typeof SystemPatternsJsonV2Schema>;
-
-export type GenericDocumentContentV2 = z.infer<typeof GenericDocumentContentV2Schema>;
-export type GenericDocumentJsonV2 = z.infer<typeof GenericDocumentJsonV2Schema>;
-
-// All document types union
+// Export the combined union type
 export type JsonDocumentV2 = z.infer<typeof JsonDocumentV2Schema>;

@@ -1,13 +1,4 @@
-/**
- * Schema v2 - Index
- *
- * This file re-exports all types and schemas from the v2 schemas,
- * providing a single import point for consumers.
- */
-
-// Re-export everything from the json-document file
+// Re-export all v2 schemas and types
 export * from './json-document.js';
 export * from './tag-index.js';
-export * from './i18n-schema.js';
-
-// We'll add additional schema exports here in future iterations
+export * from './i18n-schema.js'; // Export i18n definitions
