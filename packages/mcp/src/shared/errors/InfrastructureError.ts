@@ -19,6 +19,7 @@ export enum InfrastructureErrorCodes {
   INVALID_ARGUMENT = 'INFRASTRUCTURE_INVALID_ARGUMENT',
   PERSISTENCE_ERROR = 'INFRASTRUCTURE_PERSISTENCE_ERROR',
   MCP_SERVER_ERROR = 'INFRASTRUCTURE_MCP_SERVER_ERROR',
+  INVALID_FILE_CONTENT = 'INFRASTRUCTURE_INVALID_FILE_CONTENT', // Added
 }
 
 /**
@@ -186,6 +187,17 @@ export const InfrastructureErrors = {
   mcpServerError: (message: string, details?: OperationDetails) => {
     return new InfrastructureError(
       InfrastructureErrorCodes.MCP_SERVER_ERROR,
+      message,
+      details
+    );
+  },
+
+  /**
+   * Error for invalid file content
+   */
+  invalidFileContent: (message: string, details?: OperationDetails) => {
+    return new InfrastructureError(
+      InfrastructureErrorCodes.INVALID_FILE_CONTENT,
       message,
       details
     );

@@ -22,6 +22,15 @@
         "phase": 1,
         "completed": true,
         "completedAt": "2025-03-30T04:25:00.000Z"
+      },
+      {
+        "id": "c303d404-e505-f606-0708-090a0b0c0d0e",
+        "description": "MCP-3: 不足しているエラーファクトリーメソッドの追加",
+        "priority": "high",
+        "implementationOrder": 2,
+        "phase": 1,
+        "completed": true,
+        "completedAt": "2025-03-30T04:27:56.000Z"
       }
     ],
     "pendingImplementation": [
@@ -34,13 +43,6 @@
         "dependsOn": [
           "c303d404-e505-f606-0708-090a0b0c0d0e"
         ]
-      },
-      {
-        "id": "c303d404-e505-f606-0708-090a0b0c0d0e",
-        "description": "MCP-3: 不足しているエラーファクトリーメソッドの追加",
-        "priority": "high",
-        "implementationOrder": 2,
-        "phase": 1
       },
       {
         "id": "d404e505-f606-0708-090a-0b0c0d0e0f10",

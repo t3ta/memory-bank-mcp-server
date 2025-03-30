@@ -83,6 +83,7 @@ export const DomainErrorCodes = {
   INITIALIZATION_ERROR: 'INITIALIZATION_ERROR',
   FEATURE_NOT_AVAILABLE: 'FEATURE_NOT_AVAILABLE',
   UNEXPECTED_ERROR: 'UNEXPECTED_ERROR',
+  INVALID_OPERATION: 'INVALID_OPERATION', // Added
 
   // JSON Patch related errors
   INVALID_JSON_PATH: 'INVALID_JSON_PATH',
@@ -164,6 +165,17 @@ export const DomainErrors = {
       DomainErrorCodes.UNEXPECTED_ERROR,
       message,
       additionalDetails
+    );
+  },
+
+  /**
+   * Create an invalid operation error
+   */
+  invalidOperation: (operation: string, message: string, additionalDetails?: Record<string, unknown>) => {
+    return new DomainError(
+      DomainErrorCodes.INVALID_OPERATION,
+      `Invalid operation '${operation}': ${message}`,
+      { operation, ...additionalDetails }
     );
   }
 };

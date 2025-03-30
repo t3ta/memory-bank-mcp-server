@@ -83,6 +83,8 @@ export const ApplicationErrorCodes = {
   UNEXPECTED_CONTROLLER_ERROR: 'UNEXPECTED_CONTROLLER_ERROR',
   INVALID_STATE: 'INVALID_STATE',
   OPERATION_NOT_ALLOWED: 'OPERATION_NOT_ALLOWED',
+  CONFIGURATION_ERROR: 'CONFIGURATION_ERROR', // Added
+  VALIDATION_FAILED: 'VALIDATION_FAILED', // Added
 } as const;
 
 /**
@@ -148,6 +150,29 @@ export const ApplicationErrors = {
       `An unexpected error occurred in controller '${controllerName}'`,
       { controllerName, ...additionalDetails },
       { cause }
+    );
+  },
+
+  /**
+   * Create a configuration error
+   */
+  configurationError: (message: string, cause?: Error, additionalDetails?: Record<string, unknown>) => {
+    return new ApplicationError(
+      ApplicationErrorCodes.CONFIGURATION_ERROR,
+      message,
+      additionalDetails,
+      { cause }
+    );
+  },
+
+  /**
+   * Create a validation failed error for use cases
+   */
+  validationFailed: (useCaseName: string, message: string, additionalDetails?: Record<string, unknown>) => {
+    return new ApplicationError(
+      ApplicationErrorCodes.VALIDATION_FAILED,
+      `Validation failed in ${useCaseName}: ${message}`,
+      { useCaseName, ...additionalDetails }
     );
   }
 };
