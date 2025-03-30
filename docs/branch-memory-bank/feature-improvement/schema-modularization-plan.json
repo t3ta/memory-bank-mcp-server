@@ -1,0 +1,206 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "5b4a3c2d-1e0f-9e8d-7c6b-5a4f3e2d1c0b",
+    "title": "スキーマモジュール化計画",
+    "documentType": "plan",
+    "path": "schema-modularization-plan.json",
+    "tags": [
+      "improvement",
+      "schema",
+      "modularization"
+    ],
+    "lastModified": "2025-03-30T06:00:32.360Z",
+    "createdAt": "2025-03-30T06:00:32.360Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "title": "SCHEMA-1: スキーマファイルの分割と整理",
+      "description": "大きなスキーマファイルをドキュメントタイプごとに分割し、コードの保守性と可読性を向上させるための詳細実装計画。"
+    },
+    "currentState": {
+      "description": "現在のjson-document.tsファイルは200行以上あり、複数のドキュメントタイプの定義が含まれています。このファイル構造では、特定のドキュメントタイプの定義を見つけたり修正したりするのが難しく、また新しいドキュメントタイプの追加も複雑になっています。",
+      "codeSize": "約250行",
+      "documentTypes": [
+        "core",
+        "generic",
+        "branch_context",
+        "active_context",
+        "system_patterns",
+        "progress",
+        "plan",
+        "guide",
+        "reference",
+        "glossary",
+        "changelog"
+      ],
+      "currentStructure": "/packages/schemas/src/json-document.ts - すべてのスキーマ定義を含む単一ファイル"
+    },
+    "targetState": {
+      "description": "スキーマファイルをドキュメントタイプごとに分割し、インデックスファイルで再エクスポートします。これにより、コードの保守性が向上し、関心の分離が実現され、ファイルの変更理由も単一になります。",
+      "proposedStructure": [
+        "/packages/schemas/src/document-types/ - ドキュメントタイプごとのスキーマ定義",
+        "/packages/schemas/src/document-types/index.ts - 再エクスポート用のインデックス",
+        "/packages/schemas/src/document-types/core.ts - コアドキュメントスキーマ",
+        "/packages/schemas/src/document-types/branch-context.ts - ブランチコンテキストスキーマ",
+        "/packages/schemas/src/document-types/active-context.ts - アクティブコンテキストスキーマ",
+        "...その他のドキュメントタイプごとのファイル",
+        "/packages/schemas/src/json-document.ts - 共通スキーマ定義と再エクスポート"
+      ],
+      "perFileStructure": "各ファイルは特定のドキュメントタイプに関連するスキーマのみを定義し、共通の基本スキーマを再利用します。"
+    },
+    "implementationPlan": {
+      "steps": [
+        {
+          "order": 1,
+          "title": "ディレクトリ構造の作成",
+          "description": "document-typesディレクトリとインデックスファイルを作成します。",
+          "command": "mkdir -p /packages/schemas/src/document-types"
+        },
+        {
+          "order": 2,
+          "title": "共通スキーマの抽出",
+          "description": "JsonDocumentV2Schema, MetadataV2Schemaなどの共通スキーマを抽出し、ベースファイルに残します。",
+          "filePath": "/packages/schemas/src/json-document.ts"
+        },
+        {
+          "order": 3,
+          "title": "ドキュメントタイプごとのファイル作成",
+          "description": "各ドキュメントタイプのスキーマを個別のファイルに抽出します。",
+          "documentTypes": [
+            {
+              "type": "core",
+              "fileName": "core.ts",
+              "schema": "CoreContentV2Schema"
+            },
+            {
+              "type": "branch_context",
+              "fileName": "branch-context.ts",
+              "schema": "BranchContextContentV2Schema"
+            },
+            {
+              "type": "active_context",
+              "fileName": "active-context.ts",
+              "schema": "ActiveContextContentV2Schema"
+            },
+            {
+              "type": "system_patterns",
+              "fileName": "system-patterns.ts",
+              "schema": "SystemPatternsContentV2Schema"
+            },
+            {
+              "type": "progress",
+              "fileName": "progress.ts",
+              "schema": "ProgressContentV2Schema"
+            },
+            {
+              "type": "plan",
+              "fileName": "plan.ts",
+              "schema": "PlanContentV2Schema"
+            },
+            {
+              "type": "generic",
+              "fileName": "generic.ts",
+              "schema": "GenericContentV2Schema"
+            },
+            {
+              "type": "guide",
+              "fileName": "guide.ts",
+              "schema": "GuideContentV2Schema"
+            },
+            {
+              "type": "reference",
+              "fileName": "reference.ts",
+              "schema": "ReferenceContentV2Schema"
+            },
+            {
+              "type": "glossary",
+              "fileName": "glossary.ts",
+              "schema": "GlossaryContentV2Schema"
+            },
+            {
+              "type": "changelog",
+              "fileName": "changelog.ts",
+              "schema": "ChangelogContentV2Schema"
+            }
+          ]
+        },
+        {
+          "order": 4,
+          "title": "インデックスファイルの作成",
+          "description": "すべてのスキーマファイルを再エクスポートするインデックスファイルを作成します。",
+          "filePath": "/packages/schemas/src/document-types/index.ts",
+          "content": "// ドキュメントタイプごとのスキーマをすべてエクスポート\nexport * from './core.js';\nexport * from './branch-context.js';\nexport * from './active-context.js';\nexport * from './system-patterns.js';\nexport * from './progress.js';\nexport * from './plan.js';\nexport * from './generic.js';\nexport * from './guide.js';\nexport * from './reference.js';\nexport * from './glossary.js';\nexport * from './changelog.js';"
+        },
+        {
+          "order": 5,
+          "title": "メインスキーマファイルの更新",
+          "description": "元のjson-document.tsファイルを更新して、分割したファイルをインポートして使用するようにします。",
+          "filePath": "/packages/schemas/src/json-document.ts",
+          "importContent": "// 分割されたドキュメントタイプスキーマをインポート\nimport * as DocumentTypes from './document-types/index.js';"
+        },
+        {
+          "order": 6,
+          "title": "エクスポート更新",
+          "description": "ライブラリのエントリーポイントを更新して、新しい構造を反映させます。",
+          "filePath": "/packages/schemas/src/index.ts"
+        }
+      ],
+      "codeExamples": [
+        {
+          "title": "コアドキュメントタイプスキーマ例",
+          "fileName": "core.ts",
+          "content": "import { z } from 'zod';\nimport { MetadataV2Schema } from '../json-document.js';\n\n/**\n * コアドキュメントコンテンツのスキーマ\n */\nexport const CoreContentV2Schema = z.object({\n  sections: z.array(\n    z.object({\n      title: z.string(),\n      content: z.string(),\n    })\n  ),\n});\n\n/**\n * コアドキュメント全体のスキーマ\n */\nexport const CoreDocumentV2Schema = z.object({\n  schema: z.literal('memory_document_v2'),\n  metadata: MetadataV2Schema.extend({\n    documentType: z.literal('core'),\n  }),\n  content: CoreContentV2Schema,\n});"
+        },
+        {
+          "title": "ブランチコンテキストスキーマ例",
+          "fileName": "branch-context.ts",
+          "content": "import { z } from 'zod';\nimport { MetadataV2Schema } from '../json-document.js';\n\n/**\n * ブランチコンテキストコンテンツのスキーマ\n */\nexport const BranchContextContentV2Schema = z.object({\n  branchName: z.string(),\n  purpose: z.string(),\n  createdAt: z.string(),\n  userStories: z.array(\n    z.object({\n      id: z.string().uuid(),\n      description: z.string(),\n      completed: z.boolean(),\n      priority: z.number(),\n    })\n  ),\n  additionalNotes: z.string(),\n});\n\n/**\n * ブランチコンテキスト全体のスキーマ\n */\nexport const BranchContextDocumentV2Schema = z.object({\n  schema: z.literal('memory_document_v2'),\n  metadata: MetadataV2Schema.extend({\n    documentType: z.literal('branch_context'),\n  }),\n  content: BranchContextContentV2Schema,\n});"
+        },
+        {
+          "title": "更新されたメインスキーマファイル例",
+          "fileName": "json-document.ts",
+          "content": "import { z } from 'zod';\nimport * as DocumentTypes from './document-types/index.js';\n\n/**\n * メタデータスキーマ\n */\nexport const MetadataV2Schema = z.object({\n  id: z.string(),\n  title: z.string(),\n  documentType: z.string(),\n  path: z.string(),\n  tags: z.array(z.string()).optional(),\n  lastModified: z.string(),\n  createdAt: z.string(),\n  version: z.number(),\n});\n\n/**\n * JSONドキュメントV2の基本スキーマ\n */\nexport const JsonDocumentV2Schema = z.object({\n  schema: z.literal('memory_document_v2'),\n  metadata: MetadataV2Schema,\n  content: z.any(),\n});\n\n// ドキュメントタイプをすべて再エクスポート\nexport * from './document-types/index.js';\n\n// ドキュメントタイプに基づいた判別共用体スキーマ\nexport const DocumentV2Schema = z.discriminatedUnion('documentType', [\n  DocumentTypes.CoreDocumentV2Schema,\n  DocumentTypes.BranchContextDocumentV2Schema,\n  DocumentTypes.ActiveContextDocumentV2Schema,\n  // ... その他のドキュメントタイプ\n]);"
+        }
+      ],
+      "migrateExistingCode": {
+        "description": "既存のコードが新しいスキーマ構造を使用するように更新する必要があります。",
+        "affectedImports": [
+          "/packages/mcp/src/domain/entities/json-document.ts",
+          "/packages/mcp/src/application/usecases/json/ValidateJsonDocumentUseCase.ts"
+        ],
+        "importUpdates": "既存のインポートはそのまま機能しますが、特定のドキュメントタイプのスキーマを直接インポートすることも可能になります。"
+      },
+      "testingPlan": {
+        "approach": "ユニットテストとスキーマ検証",
+        "testFiles": [
+          "/packages/schemas/tests/json-document.test.ts",
+          "/packages/schemas/tests/document-types/core.test.ts",
+          "/packages/schemas/tests/document-types/branch-context.test.ts"
+        ],
+        "testCases": [
+          "既存のドキュメント検証が引き続き機能すること",
+          "新しく追加した各ドキュメントタイプスキーマが期待通りに動作すること",
+          "ドキュメントタイプの判別共用体が正しく機能すること"
+        ]
+      }
+    },
+    "benefits": [
+      "ファイルサイズの削減と可読性の向上",
+      "関心の分離による保守性の向上",
+      "新しいドキュメントタイプの追加が容易になる",
+      "型の安全性が向上する"
+    ],
+    "risks": [
+      "既存のインポートパスへの影響",
+      "ドキュメントタイプ間の整合性確保",
+      "リファクタリング中のバグ混入可能性"
+    ],
+    "mitigation": [
+      "詳細なテスト範囲で回帰を検出",
+      "インポートパスの互換性を維持",
+      "段階的な実装とレビュー"
+    ]
+  }
+}

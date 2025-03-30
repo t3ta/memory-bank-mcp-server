@@ -15,6 +15,7 @@ import type { BranchTagIndex as TagIndex } from "@memory-bank/schemas";
  */
 export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRepository {
   private readonly branchMemoryBankPath: string;
+  private readonly componentLogger = logger.withContext({ component: 'FileSystemBranchMemoryBankRepository' });
 
   /**
    * Constructor
@@ -32,12 +33,13 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
   async exists(branchName: string): Promise<boolean> {
     try {
       const branchPath = path.join(this.branchMemoryBankPath, branchName);
-      logger.debug('Checking if branch exists:', { branchPath });
+      this.componentLogger.debug('Checking if branch exists:', { operation: 'exists', branchPath });
       await fs.access(branchPath);
-      logger.debug('Branch exists:', { branchPath });
+      this.componentLogger.debug('Branch exists:', { operation: 'exists', branchPath });
       return true;
     } catch (err) {
-      logger.debug('Branch does not exist:', {
+      this.componentLogger.debug('Branch does not exist:', {
+        operation: 'exists',
         branchName,
         error: err instanceof Error ? err.message : 'Unknown error'
       });
@@ -54,7 +56,8 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
     const safeBranchName = branchInfo.safeName;
     const branchPath = path.join(this.branchMemoryBankPath, safeBranchName);
 
-    logger.debug('Initializing branch memory bank:', {
+    this.componentLogger.debug('Initializing branch memory bank:', {
+      operation: 'initialize',
       originalName: branchInfo.name,
       safeName: safeBranchName,
       branchPath
@@ -62,9 +65,10 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
 
     try {
       await fs.mkdir(branchPath, { recursive: true });
-      logger.debug('Successfully created branch directory:', { branchPath });
+      this.componentLogger.debug('Successfully created branch directory:', { operation: 'initialize', branchPath });
     } catch (error) {
-      logger.error('Failed to initialize branch memory bank:', {
+      this.componentLogger.error('Failed to initialize branch memory bank:', {
+        operation: 'initialize',
         error: error instanceof Error ? error.message : 'Unknown error',
         branchPath
       });
@@ -85,19 +89,19 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
     const safeBranchName = branchInfo.safeName;
     const filePath = path.join(this.branchMemoryBankPath, safeBranchName, documentPath.value);
 
-    logger.debug('Trying to read file:', { filePath });
+    this.componentLogger.debug('Trying to read file:', { operation: 'getDocument', filePath });
 
     // Special handling for .md requests (prefer .json)
     if (documentPath.value.endsWith('.md')) {
       const jsonPath = documentPath.value.replace('.md', '.json');
       const jsonFilePath = path.join(this.branchMemoryBankPath, safeBranchName, jsonPath);
 
-      logger.debug('Also trying JSON variant:', { jsonFilePath });
+      this.componentLogger.debug('Also trying JSON variant:', { operation: 'getDocument', jsonFilePath });
 
       try {
         // Try .json file first
         const content = await fs.readFile(jsonFilePath, 'utf-8');
-        logger.debug('Successfully read JSON file:', { path: jsonFilePath });
+        this.componentLogger.debug('Successfully read JSON file:', { operation: 'getDocument', path: jsonFilePath });
         return MemoryDocument.create({
           path: documentPath, // Keep the original .md path
           content,
@@ -106,10 +110,10 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
         });
       } catch {
         // If .json not found, try .md
-        logger.debug('JSON file not found, trying MD:', { path: filePath });
+        this.componentLogger.debug('JSON file not found, trying MD:', { operation: 'getDocument', path: filePath });
         try {
           const content = await fs.readFile(filePath, 'utf-8');
-          logger.debug('Successfully read MD file:', { path: filePath });
+          this.componentLogger.debug('Successfully read MD file:', { operation: 'getDocument', path: filePath });
           return MemoryDocument.create({
             path: documentPath,
             content,
@@ -117,7 +121,8 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
             lastModified: new Date()
           });
         } catch (err) {
-          logger.debug('MD file not found either:', {
+          this.componentLogger.debug('MD file not found either:', {
+            operation: 'getDocument',
             path: filePath,
             error: err instanceof Error ? err.message : 'Unknown error'
           });
@@ -151,7 +156,8 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
     const branchPath = path.join(this.branchMemoryBankPath, safeBranchName);
     const filePath = path.join(branchPath, document.path.value);
 
-    logger.debug('Saving document:', {
+    this.componentLogger.debug('Saving document:', {
+      operation: 'saveDocument',
       originalBranchName: branchInfo.name,
       safeBranchName,
       documentPath: document.path.value,
@@ -165,22 +171,24 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
       // Separate directory check and JSON validation for clearer error reporting
       try {
         await fs.access(branchPath);
-        logger.debug('Branch directory exists:', { branchPath });
+        this.componentLogger.debug('Branch directory exists:', { operation: 'saveDocument', branchPath });
       } catch (err) {
-        logger.debug('Creating branch directory:', { branchPath });
+        this.componentLogger.debug('Creating branch directory:', { operation: 'saveDocument', branchPath });
         await fs.mkdir(branchPath, { recursive: true });
-        logger.debug('Branch directory created:', { branchPath });
+        this.componentLogger.debug('Branch directory created:', { operation: 'saveDocument', branchPath });
       }
 
       // Validate JSON
       try {
         const parsedContent = JSON.parse(document.content);
-        logger.debug('Document content validated as JSON:', {
+        this.componentLogger.debug('Document content validated as JSON:', {
+          operation: 'saveDocument',
           schema: parsedContent.schema,
           documentType: parsedContent.metadata?.documentType
         });
       } catch (err) {
-        logger.error('Invalid JSON content:', {
+        this.componentLogger.error('Invalid JSON content:', {
+          operation: 'saveDocument',
           error: err instanceof Error ? err.message : 'Unknown error',
           content: document.content.substring(0, 100) + '...' // Log only first 100 chars
         });
@@ -191,17 +199,17 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
       }
 
       // Write file
-      logger.debug('Writing file:', { filePath });
+      this.componentLogger.debug('Writing file:', { operation: 'saveDocument', filePath });
       await fs.writeFile(filePath, document.content, 'utf-8');
-      logger.debug('Successfully wrote file:', { filePath });
+      this.componentLogger.debug('Successfully wrote file:', { operation: 'saveDocument', filePath });
 
       // Test support: If a .json file is created, also create an .md file with the same content
       if (document.path.value.endsWith('.json')) {
         const mdPath = document.path.value.replace('.json', '.md');
         const mdFilePath = path.join(branchPath, mdPath);
-        logger.debug('Creating MD version:', { path: mdFilePath });
+        this.componentLogger.debug('Creating MD version:', { operation: 'saveDocument', path: mdFilePath });
         await fs.writeFile(mdFilePath, document.content, 'utf-8');
-        logger.debug('Successfully wrote MD version:', { path: mdFilePath });
+        this.componentLogger.debug('Successfully wrote MD version:', { operation: 'saveDocument', path: mdFilePath });
       }
 
       // Special handling for branchContext (manual handling as it's not in CreateUseCase)
@@ -213,9 +221,9 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
         if (!await this.fileExists(path.join(branchPath, 'branchContext.md'))) {
           const branchContext = `# Test Branch Context\n\n## Purpose\n\nThis is a test branch.`;
           const branchContextPath = path.join(branchPath, 'branchContext.md');
-          logger.debug('Creating default branchContext.md:', { path: branchContextPath });
+          this.componentLogger.debug('Creating default branchContext.md:', { operation: 'saveDocument', path: branchContextPath });
           await fs.writeFile(branchContextPath, branchContext, 'utf-8');
-          logger.debug('Successfully wrote default branchContext.md:', { path: branchContextPath });
+          this.componentLogger.debug('Successfully wrote default branchContext.md:', { operation: 'saveDocument', path: branchContextPath });
         }
       }
 
@@ -243,7 +251,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
         }
       };
 
-      logger.error('Failed to save document:', errorContext);
+      this.componentLogger.error('Failed to save document:', { operation: 'saveDocument', ...errorContext });
       throw new DomainError(
         DomainErrorCodes.REPOSITORY_ERROR,
         `Failed to save document: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -259,10 +267,10 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
   private async fileExists(filePath: string): Promise<boolean> {
     try {
       await fs.access(filePath);
-      logger.debug('File exists:', { filePath });
+      this.componentLogger.debug('File exists:', { operation: 'fileExists', filePath });
       return true;
     } catch {
-      logger.debug('File does not exist:', { filePath });
+      this.componentLogger.debug('File does not exist:', { operation: 'fileExists', filePath });
       return false;
     }
   }
@@ -362,7 +370,8 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
    */
   async validateStructure(branchInfo: BranchInfo): Promise<boolean> {
     const safeBranchName = branchInfo.safeName;
-    logger.debug('Validating branch structure:', {
+    this.componentLogger.debug('Validating branch structure:', {
+      operation: 'validateStructure',
       originalName: branchInfo.name,
       safeName: safeBranchName
     });

@@ -33,7 +33,7 @@ export class BranchController {
    */
   async readDocument(branchName: string, path: string) {
     try {
-      this.componentLogger.info('Reading branch document', { branchName, path });
+      this.componentLogger.info('Reading branch document', { operation: 'readDocument', branchName, path });
       const document = await this.readBranchDocumentUseCase.execute({
         branchName,
         path,
@@ -41,7 +41,7 @@ export class BranchController {
 
       return this.presenter.presentSuccess(document);
     } catch (error) {
-      this.componentLogger.error('Failed to read branch document', { branchName, path, error });
+      this.componentLogger.error('Failed to read branch document', { operation: 'readDocument', branchName, path, error });
       return this.handleError(error);
     }
   }
@@ -49,11 +49,11 @@ export class BranchController {
   /**
    * Write a branch document
    */
- async writeDocument(branchName: string, path: string, content: any) {
-   try {
-     this.componentLogger.info('Writing branch document', { branchName, path });
-     await this.writeBranchDocumentUseCase.execute({
-       branchName,
+  async writeDocument(branchName: string, path: string, content: any) {
+    try {
+      this.componentLogger.info('Writing branch document', { operation: 'writeDocument', branchName, path });
+      await this.writeBranchDocumentUseCase.execute({
+        branchName,
        document: {
          path: path,
          content: content,
@@ -62,7 +62,7 @@ export class BranchController {
 
      return this.presenter.presentSuccess({ message: 'Document written successfully' });
     } catch (error) {
-      this.componentLogger.error('Failed to write branch document', { branchName, path, error });
+      this.componentLogger.error('Failed to write branch document', { operation: 'writeDocument', branchName, path, error });
       return this.handleError(error);
     }
   }
@@ -72,11 +72,11 @@ export class BranchController {
    */
   async readCoreFiles(branchName: string) {
     try {
-      this.componentLogger.info('Reading branch core files', { branchName });
+      this.componentLogger.info('Reading branch core files', { operation: 'readCoreFiles', branchName });
       const result = await this.readBranchCoreFilesUseCase.execute({ branchName });
       return this.presenter.presentSuccess(result);
     } catch (error) {
-      this.componentLogger.error('Failed to read branch core files', { branchName, error });
+      this.componentLogger.error('Failed to read branch core files', { operation: 'readCoreFiles', branchName, error });
       return this.handleError(error);
     }
   }
@@ -87,7 +87,7 @@ export class BranchController {
   async createCoreFiles(branchName: string, files: Record<string, any>) {
     try {
       this.validateFiles(files);
-      this.componentLogger.info('Creating branch core files', { branchName });
+      this.componentLogger.info('Creating branch core files', { operation: 'createCoreFiles', branchName });
 
       await this.createBranchCoreFilesUseCase.execute({
         branchName: branchName,
@@ -96,7 +96,7 @@ export class BranchController {
 
       return this.presenter.presentSuccess({ message: 'Core files created successfully' });
     } catch (error) {
-      this.componentLogger.error('Failed to create branch core files', { branchName, error });
+      this.componentLogger.error('Failed to create branch core files', { operation: 'createCoreFiles', branchName, error });
       return this.handleError(error);
     }
   }
@@ -106,11 +106,11 @@ export class BranchController {
    */
   async searchByTags(tags: string[]) {
     try {
-      this.componentLogger.info('Searching documents by tags', { tags });
+      this.componentLogger.info('Searching documents by tags', { operation: 'searchByTags', tags });
       const documents = await this.searchDocumentsByTagsUseCase.execute({ tags });
       return this.presenter.presentSuccess(documents);
     } catch (error) {
-      this.componentLogger.error('Failed to search documents by tags', { tags, error });
+      this.componentLogger.error('Failed to search documents by tags', { operation: 'searchByTags', tags, error });
       return this.handleError(error);
     }
   }
@@ -120,11 +120,11 @@ export class BranchController {
    */
   async updateTagIndex(branchName: string) {
     try {
-      this.componentLogger.info('Updating tag index', { branchName });
+      this.componentLogger.info('Updating tag index', { operation: 'updateTagIndex', branchName });
       await this.updateTagIndexUseCase.execute({ branchName });
       return this.presenter.presentSuccess({ message: 'Tag index updated successfully' });
     } catch (error) {
-      this.componentLogger.error('Failed to update tag index', { error });
+      this.componentLogger.error('Failed to update tag index', { operation: 'updateTagIndex', error });
       return this.handleError(error);
     }
   }
@@ -134,11 +134,11 @@ export class BranchController {
    */
   async getRecentBranches() {
     try {
-      this.componentLogger.info('Getting recent branches');
+      this.componentLogger.info('Getting recent branches', { operation: 'getRecentBranches' });
       const branches = await this.getRecentBranchesUseCase.execute({});
       return this.presenter.presentSuccess(branches);
     } catch (error) {
-      this.componentLogger.error('Failed to get recent branches', { error });
+      this.componentLogger.error('Failed to get recent branches', { operation: 'getRecentBranches', error });
       return this.handleError(error);
     }
   }

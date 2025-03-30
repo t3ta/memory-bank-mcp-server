@@ -65,13 +65,13 @@ export class GlobalController implements IGlobalController {
    */
   async readDocument(path: string): Promise<MCPResponse<DocumentDTO>> {
     try {
-      this.componentLogger.info(`Reading global document`, { path });
+      this.componentLogger.info(`Reading global document`, { operation: 'readDocument', path });
 
       const result = await this.readGlobalDocumentUseCase.execute({ path });
 
       return this.presenter.present(result.document);
     } catch (error) {
-      return this.handleError(error);
+      return this.handleError(error, 'readDocument');
     }
   }
 
@@ -89,7 +89,7 @@ export class GlobalController implements IGlobalController {
   }): Promise<MCPResponse> {
     const { path: docPath, content, tags: tagStrings } = params;
     try {
-      this.componentLogger.info(`Writing global document`, { docPath });
+      this.componentLogger.info(`Writing global document`, { operation: 'writeDocument', docPath });
 
       await this.writeGlobalDocumentUseCase.execute({
         document: {
@@ -101,7 +101,7 @@ export class GlobalController implements IGlobalController {
 
       return this.presenter.present({ success: true });
     } catch (error) {
-      return this.handleError(error);
+      return this.handleError(error, 'writeDocument');
     }
   }
 
@@ -111,7 +111,7 @@ export class GlobalController implements IGlobalController {
    */
   async readCoreFiles(): Promise<MCPResponse<Record<string, DocumentDTO>>> {
     try {
-      this.componentLogger.info('Reading global core files');
+      this.componentLogger.info('Reading global core files', { operation: 'readCoreFiles' });
 
       const coreFiles = [
         'architecture.json',
@@ -139,7 +139,7 @@ export class GlobalController implements IGlobalController {
             };
           }
         } catch (error) {
-          this.componentLogger.error(`Error reading global core file`, { documentPath, error });
+          this.componentLogger.error(`Error reading global core file`, { operation: 'readCoreFiles', documentPath, error });
           result[documentPath.replace('.json', '')] = {
             path: documentPath,
             content: '',
@@ -151,7 +151,7 @@ export class GlobalController implements IGlobalController {
 
       return this.presenter.present(result);
     } catch (error) {
-      return this.handleError(error);
+      return this.handleError(error, 'readCoreFiles');
     }
   }
 
@@ -161,17 +161,17 @@ export class GlobalController implements IGlobalController {
    */
   async updateTagsIndex(): Promise<MCPResponse> {
     try {
-      this.componentLogger.info('Updating global tags index');
+      this.componentLogger.info('Updating global tags index', { operation: 'updateTagsIndex' });
 
       if (this.updateTagIndexUseCaseV2) {
-        this.componentLogger.info('Using UpdateTagIndexUseCaseV2 for global tag index update');
+        this.componentLogger.info('Using UpdateTagIndexUseCaseV2 for global tag index update', { operation: 'updateTagsIndex' });
         const result = await this.updateTagIndexUseCaseV2.execute({
           branchName: undefined, // Global memory bank
           fullRebuild: true,
         });
         return this.presenter.present(result);
       } else {
-        this.componentLogger.info('Using UpdateTagIndexUseCase (V1) for global tag index update');
+        this.componentLogger.info('Using UpdateTagIndexUseCase (V1) for global tag index update', { operation: 'updateTagsIndex' });
         const result = await this.updateTagIndexUseCase.execute({
           branchName: undefined, // Global memory bank
           fullRebuild: true,
@@ -179,7 +179,7 @@ export class GlobalController implements IGlobalController {
         return this.presenter.present(result);
       }
     } catch (error) {
-      return this.handleError(error);
+      return this.handleError(error, 'updateTagsIndex');
     }
   }
 
@@ -194,8 +194,8 @@ export class GlobalController implements IGlobalController {
     matchAllTags?: boolean
   ): Promise<MCPResponse<DocumentDTO[]>> {
     try {
-      this.componentLogger.info(`Finding global documents by tags`, { tags: tags.join(', ') });
-      this.componentLogger.debug('Search request:', { tags, matchAllTags });
+      this.componentLogger.info(`Finding global documents by tags`, { operation: 'findDocumentsByTags', tags: tags.join(', ') });
+      this.componentLogger.debug('Search request:', { operation: 'findDocumentsByTags', tags, matchAllTags });
 
       const result = await this.searchDocumentsByTagsUseCase.execute({
         tags,
@@ -204,30 +204,32 @@ export class GlobalController implements IGlobalController {
       });
 
       this.componentLogger.debug('Search result:', {
+        operation: 'findDocumentsByTags',
         tags,
         matchAllTags,
         documentsFound: result.documents.length,
         searchInfo: result.searchInfo
       });
-
-      return this.presenter.present(result.documents);
-    } catch (error) {
-      this.componentLogger.error('Failed to search documents by tags:', {
-        tags,
-        matchAllTags,
-        error: error instanceof Error ? error.message : String(error)
-      });
-      return this.handleError(error);
-    }
-  }
+return this.presenter.present(result.documents);
+} catch (error) {
+this.componentLogger.error('Failed to search documents by tags:', {
+  operation: 'findDocumentsByTags',
+  tags,
+  matchAllTags,
+  error: error instanceof Error ? error.message : String(error)
+});
+return this.handleError(error, 'findDocumentsByTags');
+}
+}
 
   /**
    * Handle errors in controller methods
    * @param error Error to handle
    * @returns Formatted error response
    */
-  private handleError(error: any): MCPResponse {
+  private handleError(error: any, operation?: string): MCPResponse {
     this.componentLogger.error('Error details:', {
+      operation, // Add operation context
       errorType: error.constructor.name,
       message: error.message,
       code: error.code,
@@ -267,7 +269,7 @@ export class GlobalController implements IGlobalController {
     id?: string;
   }): Promise<MCPResponse<JsonDocumentDTO>> {
     try {
-      this.componentLogger.info(`Reading global JSON document`, { path: options.path, id: options.id });
+      this.componentLogger.info(`Reading global JSON document`, { operation: 'readJsonDocument', path: options.path, id: options.id });
 
       if (!this.readJsonDocumentUseCase) {
         throw DomainErrors.featureNotAvailable(
@@ -283,7 +285,7 @@ export class GlobalController implements IGlobalController {
 
       return this.presenter.present(result.document);
     } catch (error) {
-      return this.handleError(error);
+      return this.handleError(error, 'readJsonDocument');
     }
   }
 
@@ -294,7 +296,7 @@ export class GlobalController implements IGlobalController {
    */
   async writeJsonDocument(document: JsonDocumentDTO): Promise<MCPResponse> {
     try {
-      this.componentLogger.info(`Writing global JSON document`, { path: document.path });
+      this.componentLogger.info(`Writing global JSON document`, { operation: 'writeJsonDocument', path: document.path });
 
       if (!this.writeJsonDocumentUseCase) {
         throw DomainErrors.featureNotAvailable(
@@ -315,7 +317,7 @@ export class GlobalController implements IGlobalController {
 
       return this.presenter.present(result);
     } catch (error) {
-      return this.handleError(error);
+      return this.handleError(error, 'writeJsonDocument');
     }
   }
 
@@ -326,7 +328,7 @@ export class GlobalController implements IGlobalController {
    */
   async deleteJsonDocument(options: { path?: string; id?: string }): Promise<MCPResponse> {
     try {
-      this.componentLogger.info(`Deleting global JSON document`, { path: options.path, id: options.id });
+      this.componentLogger.info(`Deleting global JSON document`, { operation: 'deleteJsonDocument', path: options.path, id: options.id });
 
       if (!this.deleteJsonDocumentUseCase) {
         throw DomainErrors.featureNotAvailable(
@@ -342,7 +344,7 @@ export class GlobalController implements IGlobalController {
 
       return this.presenter.present(result);
     } catch (error) {
-      return this.handleError(error);
+      return this.handleError(error, 'deleteJsonDocument');
     }
   }
 
@@ -356,7 +358,7 @@ export class GlobalController implements IGlobalController {
     tags?: string[];
   }): Promise<MCPResponse<JsonDocumentDTO[]>> {
     try {
-      this.componentLogger.info('Listing global JSON documents', { type: options?.type, tags: options?.tags });
+      this.componentLogger.info('Listing global JSON documents', { operation: 'listJsonDocuments', type: options?.type, tags: options?.tags });
 
       if (!this.searchJsonDocumentsUseCase) {
         throw DomainErrors.featureNotAvailable(
@@ -372,7 +374,7 @@ export class GlobalController implements IGlobalController {
 
       return this.presenter.present(result.documents);
     } catch (error) {
-      return this.handleError(error);
+      return this.handleError(error, 'listJsonDocuments');
     }
   }
 
@@ -383,7 +385,7 @@ export class GlobalController implements IGlobalController {
    */
   async searchJsonDocuments(query: string): Promise<MCPResponse<JsonDocumentDTO[]>> {
     try {
-      this.componentLogger.info(`Searching global JSON documents`, { query });
+      this.componentLogger.info(`Searching global JSON documents`, { operation: 'searchJsonDocuments', query });
 
       if (!this.searchJsonDocumentsUseCase) {
         throw DomainErrors.featureNotAvailable(
@@ -397,7 +399,7 @@ export class GlobalController implements IGlobalController {
 
       return this.presenter.present(result.documents);
     } catch (error) {
-      return this.handleError(error);
+      return this.handleError(error, 'searchJsonDocuments');
     }
   }
 
@@ -408,7 +410,7 @@ export class GlobalController implements IGlobalController {
    */
   async updateJsonIndex(options?: { force?: boolean }): Promise<MCPResponse> {
     try {
-      this.componentLogger.info(`Updating global JSON index`, { force: options?.force });
+      this.componentLogger.info(`Updating global JSON index`, { operation: 'updateJsonIndex', force: options?.force });
 
       if (!this.updateJsonIndexUseCase) {
         throw DomainErrors.featureNotAvailable(
@@ -423,7 +425,7 @@ export class GlobalController implements IGlobalController {
 
       return this.presenter.present(result);
     } catch (error) {
-      return this.handleError(error);
+      return this.handleError(error, 'updateJsonIndex');
     }
   }
 }
