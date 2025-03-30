@@ -4,13 +4,16 @@
 import {
   DocumentMetadataV2Schema,
   BaseJsonDocumentV2Schema,
+  SCHEMA_VERSION
+} from '../../src/v2/json-document.js';
+
+import {
   BranchContextJsonV2Schema,
   ActiveContextJsonV2Schema,
   ProgressJsonV2Schema,
   SystemPatternsJsonV2Schema,
   GenericDocumentJsonV2Schema,
-  SCHEMA_VERSION
-} from '../../src/index.js'; // Import from the main package entry point
+} from '../../src/document-types/index.js';
 
 describe('DocumentMetadataV2Schema', () => {
   it('should validate correct metadata', () => {
