@@ -15,9 +15,3 @@ export const LARGE_DOC_THRESHOLD_KB = 100;
 export interface RendererFunction {
   (content: any): string;
 }
-
-// Helper function to render metadata (can be moved here if needed)
-// export function renderMetadata(metadata: any): string { ... }
-
-// Helper function for generic content rendering (can be moved here if needed)
-// export function renderGenericContentInternal(content: any): string { ... }

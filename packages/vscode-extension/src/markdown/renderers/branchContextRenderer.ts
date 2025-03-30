@@ -1,5 +1,5 @@
 import { MAX_ARRAY_ITEMS } from './common';
-import { renderGenericContent } from './genericRenderer'; // Import generic renderer for fallback
+import { renderGenericContent } from './genericRenderer';
 
 /**
  * Renders content for 'branch_context' document type.
@@ -15,26 +15,24 @@ export function renderBranchContextContent(content: any): string {
         if (content.branchName) {
           mdString += `### Branch Name\n\`${content.branchName}\`\n\n`;
         }
+        // Removed extra brace from line 18
         if (content.purpose) {
-          mdString += `### Purpose\n${content.purpose.replace(/\n/g, '  \n')}\n\n`; // Handle multiline purpose
+          mdString += `### Purpose\n${content.purpose.replace(/\n/g, '  \n')}\n\n`;
         }
          if (content.createdAt) {
             try {
                 mdString += `**Created At:** ${new Date(content.createdAt).toLocaleString()}\n\n`;
-            } catch(e) { /* ignore invalid date */ }
+            } catch(e) { /* ignore */ }
         }
-
-        const MAX_ARRAY_ITEMS = 10; // Limit array items displayed
 
         if (Array.isArray(content.userStories) && content.userStories.length > 0) {
           mdString += `### User Stories\n`;
-          // Sort by priority if available
           try {
               content.userStories.sort((a: any, b: any) => (a.priority || 99) - (b.priority || 99));
           } catch (e) { console.warn("Could not sort user stories by priority", e); }
 
           const displayStories = content.userStories.slice(0, MAX_ARRAY_ITEMS);
-          const remainingStories = content.userStories.length - displayStories.length;
+          const remainingStories = content.userStories.length - displayStories.length; // Define remainingStories here
           mdString += displayStories.map((story: any) => {
               const check = story.completed ? '[x]' : '[ ]';
               let storyLine = `- ${check} **${story.id || 'Story'}:** ${story.description || 'N/A'}`;
@@ -50,10 +48,9 @@ export function renderBranchContextContent(content: any): string {
         }
 
          if (content.additionalNotes) {
-          mdString += `### Additional Notes\n${content.additionalNotes.replace(/\n/g, '  \n')}\n\n`; // Handle multiline notes
+          mdString += `### Additional Notes\n${content.additionalNotes.replace(/\n/g, '  \n')}\n\n`;
         }
 
-        // Add any other top-level keys using generic rendering
         const handledKeys = ['branchName', 'purpose', 'createdAt', 'userStories', 'additionalNotes'];
         const remainingContent: any = {};
          for (const key in content) {

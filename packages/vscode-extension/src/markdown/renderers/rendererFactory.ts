@@ -5,7 +5,6 @@ import { renderActiveContextContent } from './activeContextRenderer';
 import { renderBranchContextContent } from './branchContextRenderer';
 import { renderSystemPatternsContent } from './systemPatternsRenderer';
 
-// Map document types to their specific renderer functions
 const rendererMap: { [key: string]: RendererFunction } = {
   progress: renderProgressContent,
   active_context: renderActiveContextContent,

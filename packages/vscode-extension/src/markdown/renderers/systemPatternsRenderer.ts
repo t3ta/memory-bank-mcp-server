@@ -1,5 +1,5 @@
 import { MAX_ARRAY_ITEMS } from './common';
-import { renderGenericContent } from './genericRenderer'; // Import generic renderer for fallback
+import { renderGenericContent } from './genericRenderer';
 
 /**
  * Renders content for 'system_patterns' document type.
@@ -12,7 +12,7 @@ export function renderSystemPatternsContent(content: any): string {
             return '_(Invalid or empty system_patterns content)_';
         }
 
-        const MAX_ARRAY_ITEMS = 10; // Limit array items displayed
+        // const MAX_ARRAY_ITEMS = 10; // Defined in common.ts
 
         if (Array.isArray(content.technicalDecisions) && content.technicalDecisions.length > 0) {
             mdString += `### Technical Decisions\n\n`;
@@ -20,58 +20,52 @@ export function renderSystemPatternsContent(content: any): string {
             const remainingDecisions = content.technicalDecisions.length - displayDecisions.length;
 
             displayDecisions.forEach((decision: any, index: number) => {
-                try { // Add try block for individual decision rendering
-                    mdString += `**${index + 1}. ${decision.title || decision.id || 'Decision'}**\n\n`; // Add extra newline
+                try {
+                    mdString += `**${index + 1}. ${decision.title || decision.id || 'Decision'}**\n\n`;
 
-                    // Context
                     try {
-                        if (decision.context) mdString += `   - **Context:**\n     ${String(decision.context).replace(/\n/g, '\n     ')}\n\n`; // Indent multiline, ensure string conversion
+                        if (decision.context) mdString += `   - **Context:**\n     ${String(decision.context).replace(/\n/g, '\n     ')}\n\n`;
                     } catch (e) {
                         mdString += `   - **Context:** _Error rendering context: ${e instanceof Error ? e.message : String(e)}_\n\n`;
                     }
 
-                    // Decision
                     try {
-                        if (decision.decision) mdString += `   - **Decision:**\n     ${String(decision.decision).replace(/\n/g, '\n     ')}\n\n`; // Indent multiline, ensure string conversion
+                        if (decision.decision) mdString += `   - **Decision:**\n     ${String(decision.decision).replace(/\n/g, '\n     ')}\n\n`;
                     } catch (e) {
                          mdString += `   - **Decision:** _Error rendering decision: ${e instanceof Error ? e.message : String(e)}_\n\n`;
                     }
 
-                    // Status
                     if (decision.status) mdString += `   - **Status:** ${decision.status}\n`;
 
-                    // Date
                     if (decision.date) {
                      try {
                         mdString += `   - **Date:** ${new Date(decision.date).toLocaleDateString()}\n`;
-                     } catch(e) { /* ignore invalid date */ }
+                     } catch(e) { /* ignore */ }
                     }
 
-                    // Consequences
                     try {
                         if (decision.consequences && typeof decision.consequences === 'object') {
                             if (Array.isArray(decision.consequences.positive) && decision.consequences.positive.length > 0) {
-                                mdString += `   - **Positive Consequences:**\n` + decision.consequences.positive.map((p: string) => `     - ${String(p).replace(/\n/g, ' ')}`).join('\n') + '\n'; // Ensure string conversion
+                                mdString += `   - **Positive Consequences:**\n` + decision.consequences.positive.map((p: string) => `     - ${String(p).replace(/\n/g, ' ')}`).join('\n') + '\n';
                             }
                              if (Array.isArray(decision.consequences.negative) && decision.consequences.negative.length > 0) {
-                                mdString += `   - **Negative Consequences:**\n` + decision.consequences.negative.map((n: string) => `     - ${String(n).replace(/\n/g, ' ')}`).join('\n') + '\n'; // Ensure string conversion
+                                mdString += `   - **Negative Consequences:**\n` + decision.consequences.negative.map((n: string) => `     - ${String(n).replace(/\n/g, ' ')}`).join('\n') + '\n';
                             }
                         }
                     } catch (e) {
                         mdString += `   - **Consequences:** _Error rendering consequences: ${e instanceof Error ? e.message : String(e)}_\n`;
                     }
 
-                    // Alternatives
                     try {
                          if (Array.isArray(decision.alternatives) && decision.alternatives.length > 0) {
-                             mdString += `   - **Alternatives Considered:**\n` + decision.alternatives.map((alt: any) => `     - ${typeof alt === 'string' ? String(alt).replace(/\n/g, ' ') : JSON.stringify(alt)}`).join('\n') + '\n'; // Ensure string conversion
+                             mdString += `   - **Alternatives Considered:**\n` + decision.alternatives.map((alt: any) => `     - ${typeof alt === 'string' ? String(alt).replace(/\n/g, ' ') : JSON.stringify(alt)}`).join('\n') + '\n';
                           }
                     } catch (e) {
                          mdString += `   - **Alternatives Considered:** _Error rendering alternatives: ${e instanceof Error ? e.message : String(e)}_\n`;
                     }
 
-                 mdString += '\n---\n\n'; // Use separator between decisions
-                } catch (e) { // Add catch block for the outer try
+                 mdString += '\n---\n\n';
+                } catch (e) {
                     mdString += `\n**Error rendering decision ${index + 1}:** ${e instanceof Error ? e.message : String(e)}\n\n---\n\n`;
                 }
              });
@@ -86,9 +80,8 @@ export function renderSystemPatternsContent(content: any): string {
             const remainingPatterns = content.implementationPatterns.length - displayPatterns.length;
 
              displayPatterns.forEach((pattern: any, index: number) => {
-                 mdString += `**${index + 1}. ${pattern.name || pattern.id || 'Pattern'}**\n\n`; // Add extra newline
-                 if (pattern.description) mdString += `   > ${pattern.description.replace(/\n/g, '\n   > ')}\n\n`; // Use blockquote for description
-                 // Add more details if needed based on pattern structure
+                 mdString += `**${index + 1}. ${pattern.name || pattern.id || 'Pattern'}**\n\n`;
+                 if (pattern.description) mdString += `   > ${pattern.description.replace(/\n/g, '\n   > ')}\n\n`;
                  mdString += '\n';
              });
              if (remainingPatterns > 0) {
