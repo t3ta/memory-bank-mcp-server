@@ -1,167 +1,193 @@
 import { BaseError } from './BaseError.js';
 
 /**
- * Error class for infrastructure layer
- * Used for external system integration errors, file system errors, etc.
+ * インフラストラクチャレイヤーのエラーコード
  */
-export class InfrastructureError extends BaseError {
-  /**
-   * Create a new InfrastructureError
-   *
-   * @param code Error code (without prefix)
-   * @param message Human-readable error message
-   * @param details Additional error details
-   * @param options Additional error options
-   */
-  constructor(
-    code: string,
-    message: string,
-    details?: Record<string, unknown>,
-    options?: { cause?: Error }
-  ) {
-    super(`INFRA_ERROR.${code}`, message, details, options);
-  }
-
-  /**
-   * Infrastructure errors typically correspond to server errors (5xx)
-   */
-  public override getHttpStatusCode(): number {
-    // Most infrastructure errors are server errors
-    return 500;
-  }
-
-  /**
-   * Create a new InfrastructureError with the same code but a new message
-   * Useful for adding context to existing errors
-   *
-   * @param newMessage New error message
-   * @param additionalDetails Additional details to merge with existing details
-   */
-  public override withMessage(newMessage: string, additionalDetails?: Record<string, unknown>): InfrastructureError {
-    const combinedDetails = {
-      ...this.details,
-      ...additionalDetails,
-      originalMessage: this.message
-    };
-
-    return new InfrastructureError(
-      this.code.replace('INFRA_ERROR.', ''),
-      newMessage,
-      combinedDetails,
-      { cause: this.cause }
-    );
-  }
+export enum InfrastructureErrorCodes {
+  FILE_NOT_FOUND = 'INFRASTRUCTURE_FILE_NOT_FOUND',
+  FILE_READ_ERROR = 'INFRASTRUCTURE_FILE_READ_ERROR',
+  FILE_WRITE_ERROR = 'INFRASTRUCTURE_FILE_WRITE_ERROR',
+  FILE_DELETE_ERROR = 'INFRASTRUCTURE_FILE_DELETE_ERROR',
+  FILE_PERMISSION_ERROR = 'INFRASTRUCTURE_FILE_PERMISSION_ERROR',
+  FILE_SYSTEM_ERROR = 'INFRASTRUCTURE_FILE_SYSTEM_ERROR',
+  FILE_ALREADY_EXISTS = 'INFRASTRUCTURE_FILE_ALREADY_EXISTS',
+  DIRECTORY_NOT_FOUND = 'INFRASTRUCTURE_DIRECTORY_NOT_FOUND',
+  DIRECTORY_CREATE_ERROR = 'INFRASTRUCTURE_DIRECTORY_CREATE_ERROR',
+  INDEX_UPDATE_ERROR = 'INFRASTRUCTURE_INDEX_UPDATE_ERROR',
+  INITIALIZATION_ERROR = 'INFRASTRUCTURE_INITIALIZATION_ERROR',
+  CONFIGURATION_ERROR = 'INFRASTRUCTURE_CONFIGURATION_ERROR', // Added
+  INVALID_ARGUMENT = 'INFRASTRUCTURE_INVALID_ARGUMENT',     // Added
+  PERSISTENCE_ERROR = 'INFRASTRUCTURE_PERSISTENCE_ERROR',     // Added
+  MCP_SERVER_ERROR = 'INFRASTRUCTURE_MCP_SERVER_ERROR',       // Added
 }
 
 /**
- * Infrastructure error code constants
+ * インフラストラクチャレイヤーのエラー
  */
-export const InfrastructureErrorCodes = {
-  // File system related errors
-  FILE_SYSTEM_ERROR: 'FILE_SYSTEM_ERROR',
-  FILE_NOT_FOUND: 'FILE_NOT_FOUND',
-  FILE_PERMISSION_ERROR: 'FILE_PERMISSION_ERROR',
-  FILE_READ_ERROR: 'FILE_READ_ERROR',
-  FILE_WRITE_ERROR: 'FILE_WRITE_ERROR',
+export class InfrastructureError extends BaseError {
+  constructor(code: InfrastructureErrorCodes, message: string, details?: Record<string, unknown>) {
+    super(code, message, details);
+  }
 
-  // External services related errors
-  EXTERNAL_SERVICE_ERROR: 'EXTERNAL_SERVICE_ERROR',
+  override withMessage(newMessage: string): InfrastructureError {
+    return new InfrastructureError(this.code as InfrastructureErrorCodes, newMessage, this.details);
+  }
 
-  // Configuration related errors
-  CONFIGURATION_ERROR: 'CONFIGURATION_ERROR',
+  override getHttpStatusCode(): number {
+    switch (this.code) {
+      case InfrastructureErrorCodes.FILE_NOT_FOUND:
+      case InfrastructureErrorCodes.DIRECTORY_NOT_FOUND:
+        return 404;
+      case InfrastructureErrorCodes.FILE_PERMISSION_ERROR:
+        return 403;
+      case InfrastructureErrorCodes.FILE_ALREADY_EXISTS:
+        return 409;
+      default:
+        return 500;
+    }
+  }
+}
 
-  // Server related errors
-  MCP_SERVER_ERROR: 'MCP_SERVER_ERROR',
-
-  // Version control related errors
-  GIT_ERROR: 'GIT_ERROR',
-
-  // Data persistence related errors
-  PERSISTENCE_ERROR: 'PERSISTENCE_ERROR',
-
-  // General infrastructure errors
-  INVALID_ARGUMENT: 'INVALID_ARGUMENT',
-} as const;
+interface OperationDetails extends Record<string, unknown> {
+  operation?: string;
+  branchName?: string;
+  path?: string;
+  cause?: Error | undefined; // Changed type from string to Error | undefined
+}
 
 /**
- * Type representing valid infrastructure error codes
- */
-export type InfrastructureErrorCode = keyof typeof InfrastructureErrorCodes;
-
-/**
- * Factory functions for creating standard infrastructure errors
+ * インフラストラクチャエラーのファクトリーメソッド
  */
 export const InfrastructureErrors = {
   /**
-   * Create a file not found error
+   * ファイルが見つからない場合のエラー
    */
-  fileNotFound: (filePath: string, additionalDetails?: Record<string, unknown>) => {
+  fileNotFound: (message: string, details?: OperationDetails) => {
     return new InfrastructureError(
       InfrastructureErrorCodes.FILE_NOT_FOUND,
-      `File not found: ${filePath}`,
-      { filePath, ...additionalDetails }
+      message,
+      details
     );
   },
 
   /**
-   * Create a file read error
+   * ファイルの読み込みエラー
    */
-  fileReadError: (filePath: string, cause?: Error, additionalDetails?: Record<string, unknown>) => {
+  fileReadError: (message: string, details?: OperationDetails) => {
     return new InfrastructureError(
       InfrastructureErrorCodes.FILE_READ_ERROR,
-      `Failed to read file: ${filePath}`,
-      { filePath, ...additionalDetails },
-      { cause }
+      message,
+      details
     );
   },
 
   /**
-   * Create a file write error
+   * ファイルの書き込みエラー
    */
-  fileWriteError: (filePath: string, cause?: Error, additionalDetails?: Record<string, unknown>) => {
+  fileWriteError: (message: string, details?: OperationDetails) => {
     return new InfrastructureError(
       InfrastructureErrorCodes.FILE_WRITE_ERROR,
-      `Failed to write file: ${filePath}`,
-      { filePath, ...additionalDetails },
-      { cause }
+      message,
+      details
     );
   },
 
   /**
-   * Create a file permission error
+   * ファイルの削除エラー
    */
-  permissionDenied: (filePath: string, operation?: string, additionalDetails?: Record<string, unknown>) => {
-    const message = operation
-      ? `Permission denied for operation '${operation}' on file: ${filePath}`
-      : `Permission denied for file: ${filePath}`;
+  fileDeleteError: (message: string, details?: OperationDetails) => {
+    return new InfrastructureError(
+      InfrastructureErrorCodes.FILE_DELETE_ERROR,
+      message,
+      details
+    );
+  },
+
+  /**
+   * ファイルのパーミッションエラー
+   */
+  permissionDenied: (message: string, details?: OperationDetails) => {
     return new InfrastructureError(
       InfrastructureErrorCodes.FILE_PERMISSION_ERROR,
       message,
-      { filePath, operation, ...additionalDetails }
+      details
     );
   },
 
   /**
-   * Create a generic file system error
+   * ファイルシステムの一般的なエラー
    */
-  fileSystemError: (message: string, cause?: Error, additionalDetails?: Record<string, unknown>) => {
+  fileSystemError: (message: string, details?: OperationDetails) => {
     return new InfrastructureError(
       InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
       message,
-      additionalDetails,
-      { cause }
+      details
     );
   },
 
   /**
-   * Create a persistence error
+   * ファイルが既に存在する場合のエラー
    */
-  persistenceError: (message: string, cause?: Error, additionalDetails?: Record<string, unknown>) => {
+  fileAlreadyExists: (message: string, details?: OperationDetails) => {
     return new InfrastructureError(
-      InfrastructureErrorCodes.PERSISTENCE_ERROR,
+      InfrastructureErrorCodes.FILE_ALREADY_EXISTS,
       message,
-      additionalDetails,
-      { cause }
+      details
     );
-  }
+  },
+
+  /**
+   * ディレクトリが見つからない場合のエラー
+   */
+  directoryNotFound: (message: string, details?: OperationDetails) => {
+    return new InfrastructureError(
+      InfrastructureErrorCodes.DIRECTORY_NOT_FOUND,
+      message,
+      details
+    );
+  },
+
+  /**
+   * ディレクトリの作成エラー
+   */
+  directoryCreateError: (message: string, details?: OperationDetails) => {
+    return new InfrastructureError(
+      InfrastructureErrorCodes.DIRECTORY_CREATE_ERROR,
+      message,
+      details
+    );
+  },
+
+  /**
+   * インデックス更新エラー
+   */
+  indexUpdateError: (message: string, details?: OperationDetails) => {
+    return new InfrastructureError(
+      InfrastructureErrorCodes.INDEX_UPDATE_ERROR,
+      message,
+      details
+    );
+  },
+
+  /**
+   * 初期化エラー
+   */
+  initializationError: (message: string, details?: OperationDetails) => {
+    return new InfrastructureError(
+      InfrastructureErrorCodes.INITIALIZATION_ERROR,
+      message,
+      details
+    );
+  },
+
+  /**
+   * MCPサーバーの一般的なエラー
+   */
+  mcpServerError: (message: string, details?: OperationDetails) => {
+    return new InfrastructureError(
+      InfrastructureErrorCodes.MCP_SERVER_ERROR,
+      message,
+      details
+    );
+  },
 };

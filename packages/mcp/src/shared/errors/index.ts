@@ -47,11 +47,10 @@ export const ErrorUtils = {
 
       // Default error mapping
       if (error instanceof Error) {
-        throw new InfrastructureError(
-          InfrastructureErrorCodes.MCP_SERVER_ERROR, // Changed UNKNOWN_ERROR to MCP_SERVER_ERROR
+        // Use factory and include cause in details
+        throw InfrastructureErrors.mcpServerError( // Assuming mcpServerError factory exists or needs creation
           error.message,
-          { originalError: error.toString() },
-          { cause: error }
+          { originalError: error.toString(), cause: error }
         );
       }
 

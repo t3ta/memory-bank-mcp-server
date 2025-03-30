@@ -1,0 +1,114 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "current-status-v1",
+    "title": "現状と実装計画",
+    "documentType": "status",
+    "path": "current-status.json",
+    "tags": [
+      "status",
+      "plan",
+      "tag-index",
+      "refactoring"
+    ],
+    "lastModified": "2025-03-29T18:00:00.000Z",
+    "createdAt": "2025-03-29T14:35:00.000Z",
+    "version": 2
+  },
+  "content": {
+    "currentStatus": {
+      "branch": "feature/schema-package-3",
+      "completedTasks": [
+        "リポジトリ分割の実装（FileSystemGlobalMemoryBankRepository、FileSystemMemoryBankRepositoryBase、DocumentOperations、TagOperations、PathOperations、BulkOperationsの各クラス実装）",
+        "タグインデックスの設計見直し方針の決定（tag-index-design.jsonに記録）",
+        "タグインデックス設計の実装完了",
+        "TagOperations.tsのエラー修正（TagIndexインポート、createFromJson呼び出し、暗黙的any、未使用パラメータ）",
+        "BulkOperations.tsの警告修正（不要なawait）",
+        "古い形式のタグインデックス関連コードの削除"
+      ],
+      "pendingTasks": [
+        "インターフェース設計の一貫性確保と命名規則統一",
+        "残りのビルドエラー解消",
+        "横断的関心事（ロギング、エラーハンドリング）の統合"
+      ],
+      "resolvedIssues": [
+        {
+          "file": "TagOperations.ts",
+          "issues": [
+            "Module '@memory-bank/schemas' has no exported member 'TagIndex'",
+            "Property 'createFromJson' does not exist on type 'typeof MemoryDocument'",
+            "Parameter 'path' implicitly has an 'any' type（複数箇所）",
+            "'branchInfo' is declared but its value is never read."
+          ]
+        },
+        {
+          "file": "BulkOperations.ts",
+          "issues": [
+            "'await' has no effect on the type of this expression."
+          ]
+        }
+      ],
+      "knownIssues": [
+        {
+          "id": "ki-interface-inconsistency",
+          "description": "インターフェース命名規則と設計が一貫していない",
+          "severity": "high"
+        },
+        {
+          "id": "ki-build-errors-remaining",
+          "description": "IndexService.tsなど他のファイルにまだビルドエラーが残っている可能性がある",
+          "severity": "high"
+        },
+        {
+          "id": "ki-logging-duplication",
+          "description": "複数のロギング実装が混在している",
+          "severity": "medium"
+        },
+        {
+          "id": "ki-error-inconsistency",
+          "description": "エラーハンドリングパターンが統一されていない",
+          "severity": "medium"
+        }
+      ]
+    },
+    "nextSteps": {
+      "priorityTask": "インターフェース設計の一貫性確保と命名規則統一",
+      "implementationPlan": {
+        "description": "interface-unification-plan.jsonに基づき、インターフェース名とメソッドシグネチャの統一を実装する。ドメインレイヤーから順に修正を行い、各レイヤー間の依存関係を正しく保つ。",
+        "steps": [
+          {
+            "id": "step1",
+            "action": "全インターフェースの一覧を作成し、命名規則違反を特定する",
+            "details": "「I」で始まるインターフェース命名規則に準拠していないものをリストアップ"
+          },
+          {
+            "id": "step2",
+            "action": "インターフェースのメソッドシグネチャ一貫性を分析",
+            "details": "非同期メソッドの戻り値型、パラメータ設計などを統一するための変更箇所を特定"
+          },
+          {
+            "id": "step3",
+            "action": "ドメインレイヤーのインターフェース名とメソッドシグネチャを修正",
+            "details": "最も基本的なレイヤーから順に修正を進める"
+          },
+          {
+            "id": "step4",
+            "action": "アプリケーションレイヤーのインターフェース修正",
+            "details": "ドメインレイヤーの変更に合わせて調整"
+          },
+          {
+            "id": "step5",
+            "action": "インフラストラクチャレイヤーのインターフェース修正",
+            "details": "上位レイヤーの変更に合わせて調整"
+          }
+        ]
+      },
+      "testingApproach": "各修正後にTypeScript診断を実行して問題が解決されたことを確認し、最終的には関連するユニットテストを実行して機能が正しく動作することを検証する。"
+    },
+    "modeTransition": {
+      "currentMode": "DesignGuru",
+      "recommendedNextMode": "CodeQueen",
+      "reason": "タグインデックス関連のエラー修正とビルドエラーは完了したが、引き続きインターフェース統一などの実装作業が必要なため、Codeモードへの切り替えが推奨される。"
+    }
+  }
+}

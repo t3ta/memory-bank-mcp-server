@@ -8,9 +8,9 @@
     "tags": [
       "progress"
     ],
-    "lastModified": "2025-03-29T14:30:00.000Z",
+    "lastModified": "2025-03-29T20:40:00.000Z",
     "createdAt": "2025-03-29T13:45:00.000Z",
-    "version": 3
+    "version": 6
   },
   "content": {
     "workingFeatures": [
@@ -19,52 +19,45 @@
         "description": "リポジトリ分割の実装",
         "status": "completed",
         "completionDate": "2025-03-29T14:30:00.000Z"
+      },
+      {
+        "id": "wf-tag-index-design-impl",
+        "description": "タグインデックス設計の実装",
+        "status": "completed",
+        "completionDate": "2025-03-29T18:00:00.000Z"
+      },
+      {
+        "id": "wf-build-errors-fix",
+        "status": "completed",
+        "description": "ビルドエラーの解消",
+        "completionDate": "2025-03-29T18:30:00.000Z"
+      },
+      {
+        "id": "wf-interface-unification",
+        "status": "completed",
+        "description": "インターフェース設計の一貫性確保と命名規則統一",
+        "completionDate": "2025-03-29T20:30:00.000Z"
       }
     ],
     "pendingImplementation": [
-      {
-        "id": "pi-interface-unification",
-        "description": "インターフェース設計の一貫性確保と命名規則統一",
-        "priority": "high"
-      },
-      {
-        "id": "pi-build-errors",
-        "description": "残りのビルドエラー（特にIndexService.ts）の解消",
-        "priority": "high"
-      },
       {
         "id": "pi-cross-cutting",
         "description": "横断的関心事（ロギング、エラーハンドリング）の統合",
         "priority": "medium"
       }
     ],
-    "status": "リポジトリ分割の実装が完了し、FileSystemGlobalMemoryBankRepository、FileSystemMemoryBankRepositoryBase、DocumentOperations、TagOperations、PathOperations、BulkOperationsの各クラスが実装された。次のステップはインターフェース命名規則の統一と残りのビルドエラーの解消。",
-    "completionPercentage": 25,
+    "status": "リポジトリ分割の実装とタグインデックス設計の実装が完了。すべてのビルドエラーが解消され、TypeScriptコンパイルが正常に通るようになった。インターフェース命名規則の統一も完了し、すべてのインターフェースが「I」プレフィックスを持ち、メソッドシグネチャも統一された。次のステップは横断的関心事（ロギング、エラーハンドリング）の統合。",
+    "completionPercentage": 80,
     "knownIssues": [
       {
-        "id": "ki-tag-index-type-mismatch",
-        "description": "IBranchMemoryBankRepositoryインターフェースとFileSystemBranchMemoryBankRepository実装の間でタグインデックス関連メソッドの型定義が不一致",
-        "severity": "high"
-      },
-      {
-        "id": "ki-interface-inconsistency",
-        "description": "インターフェース命名規則と設計が一貫していない",
-        "severity": "high"
-      },
-      {
         "id": "ki-logging-duplication",
-        "description": "複数のロギング実装が混在している",
-        "severity": "medium"
+        "severity": "medium",
+        "description": "複数のロギング実装が混在している"
       },
       {
         "id": "ki-error-inconsistency",
-        "description": "エラーハンドリングパターンが統一されていない",
-        "severity": "medium"
-      },
-      {
-        "id": "ki-build-errors",
-        "description": "残りのビルドエラー（82個）が未解消",
-        "severity": "high"
+        "severity": "medium",
+        "description": "エラーハンドリングパターンが統一されていない"
       }
     ],
     "completedTasks": [
@@ -72,23 +65,49 @@
         "id": "ct-repo-split",
         "description": "肥大化リポジトリの分割（FileSystemGlobalMemoryBankRepositoryを責務別のクラスに分割）",
         "completionDate": "2025-03-29T14:30:00.000Z"
+      },
+      {
+        "id": "ct-tag-errors",
+        "description": "TagOperations.tsのエラー修正（TagIndexインポート、createFromJson、暗黙的any、未使用パラメータ）",
+        "completionDate": "2025-03-29T18:00:00.000Z"
+      },
+      {
+        "id": "ct-bulk-warnings",
+        "description": "BulkOperations.tsの警告修正（不要なawait）",
+        "completionDate": "2025-03-29T18:00:00.000Z"
+      },
+      {
+        "id": "ct-legacy-tag-index",
+        "description": "古い形式のタグインデックス関連コードの削除（updateLegacyTagsIndexメソッドなど）",
+        "completionDate": "2025-03-29T18:00:00.000Z"
+      },
+      {
+        "id": "ct-build-errors",
+        "description": "すべてのビルドエラーの解消",
+        "completionDate": "2025-03-29T18:30:00.000Z"
+      },
+      {
+        "id": "ct-interface-naming",
+        "description": "インターフェース命名規則の統一（すべてのインターフェースがIプレフィックス）",
+        "completionDate": "2025-03-29T20:00:00.000Z"
+      },
+      {
+        "id": "ct-method-signatures",
+        "description": "メソッドシグネチャの統一（非同期メソッドのPromise<T>返り値）",
+        "completionDate": "2025-03-29T20:15:00.000Z"
+      },
+      {
+        "id": "ct-parameter-standardization",
+        "description": "3つ以上のパラメータを持つメソッドをオブジェクトリテラル型に標準化",
+        "completionDate": "2025-03-29T20:25:00.000Z"
+      },
+      {
+        "id": "ct-tsdoc-update",
+        "description": "インターフェースとメソッドへのTSDocコメント追加",
+        "completionDate": "2025-03-29T20:30:00.000Z"
       }
     ],
     "upcomingMilestones": [
-      {
-        "id": "um-interface-unified",
-        "title": "インターフェース設計の統一",
-        "description": "すべてのインターフェースが一貫した命名規則と設計に従うよう修正",
-        "dueDate": "2025-04-01",
-        "status": "planned"
-      },
-      {
-        "id": "um-build-error-fix",
-        "title": "ビルドエラー解消",
-        "description": "残っている82個のビルドエラーを解消し、ビルド成功を達成",
-        "dueDate": "2025-04-02",
-        "status": "planned"
-      },
       {
         "id": "um-cross-cutting-refactor",
         "title": "横断的関心事の統合",
@@ -102,6 +121,11 @@
         "file": "bulk-operations-implementation-plan.json",
         "description": "BulkOperationsクラス実装計画（完了済み）",
         "created_at": "2025-03-29T16:00:00.000Z"
+      },
+      {
+        "file": "interface-design-guidelines.json",
+        "description": "インターフェース設計ガイドライン（完了済み）",
+        "created_at": "2025-03-29T20:00:00.000Z"
       }
     ]
   }

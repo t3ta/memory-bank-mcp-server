@@ -4,7 +4,6 @@ import path from 'node:path';
 import { IFileSystemService } from './interfaces/IFileSystemService.js';
 import {
   InfrastructureError,
-  InfrastructureErrorCodes,
 } from '../../shared/errors/InfrastructureError.js';
 import { withFileSystemRetry } from '../repositories/file-system/FileSystemRetryUtils.js';
 import { logger } from '../../shared/utils/logger.js';
@@ -41,19 +40,17 @@ export class FileSystemService implements IFileSystemService {
               throw InfrastructureErrors.fileNotFound(filePath, { operation });
             }
             if (nodeError.code === 'EACCES') {
-              // No specific factory for permission error, use constructor
-              throw new InfrastructureError(
-                 InfrastructureErrorCodes.FILE_PERMISSION_ERROR,
-                 `Permission denied: ${filePath}`,
-                 { operation, filePath }
+              // Use permissionDenied factory
+              throw InfrastructureErrors.permissionDenied(
+                `Permission denied: ${filePath}`,
+                { operation, filePath }
               );
             }
           }
-          // Use factory for general read error
+          // Use factory for general read error, include cause in details
           throw InfrastructureErrors.fileReadError(
-            filePath,
-            error instanceof Error ? error : undefined,
-            { operation }
+            `Failed to read file: ${filePath}`,
+            { operation, cause: error instanceof Error ? error : undefined }
           );
         }
       }
@@ -94,20 +91,18 @@ export class FileSystemService implements IFileSystemService {
           if (error instanceof Error) {
             const nodeError = error as NodeJS.ErrnoException;
             if (nodeError.code === 'EACCES') {
-               // No specific factory for permission error, use constructor
-              throw new InfrastructureError(
-                InfrastructureErrorCodes.FILE_PERMISSION_ERROR,
+               // Use permissionDenied factory
+              throw InfrastructureErrors.permissionDenied(
                 `Permission denied: ${filePath}`,
                  { operation, filePath }
               );
             }
           }
 
-          // Use factory for general write error
+          // Use factory for general write error, include cause in details
           throw InfrastructureErrors.fileWriteError(
-            filePath,
-            error instanceof Error ? error : undefined,
-            { operation }
+            `Failed to write file: ${filePath}`,
+            { operation, cause: error instanceof Error ? error : undefined }
           );
         }
       }
@@ -159,18 +154,17 @@ export class FileSystemService implements IFileSystemService {
         // NOTE: Jest.fnへの移行の一環として、ここではテストに合わせてエラーコードを変更
         // 本来はFILE_PERMISSION_ERRORが適切ですが、テストとの一貫性のためにFILE_SYSTEM_ERRORを使用
         if (nodeError.code === 'EACCES') {
-          throw new InfrastructureError(
-            InfrastructureErrorCodes.FILE_SYSTEM_ERROR, // Changed from FILE_PERMISSION_ERROR for test compatibility
+          // Use fileSystemError factory, keeping the test compatibility note
+          throw InfrastructureErrors.fileSystemError(
             `Permission denied: ${filePath}`,
-            { originalError: error, operation, filePath } // Add operation context
+            { cause: error, operation, filePath } // Add operation context and cause
           );
         }
       }
-      // Wrap other unknown errors
-      throw new InfrastructureError(
-        InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
+      // Wrap other unknown errors using factory
+      throw InfrastructureErrors.fileSystemError(
         `Failed to ${operation}: ${filePath}`,
-        { originalError: error, operation, filePath }
+        { cause: error instanceof Error ? error : undefined, operation, filePath }
       );
     }
   }
@@ -201,9 +195,8 @@ export class FileSystemService implements IFileSystemService {
           if (error instanceof Error) {
             const nodeError = error as NodeJS.ErrnoException;
             if (nodeError.code === 'EACCES') {
-               // No specific factory for permission error, use constructor
-              throw new InfrastructureError(
-                InfrastructureErrorCodes.FILE_PERMISSION_ERROR,
+               // Use permissionDenied factory
+              throw InfrastructureErrors.permissionDenied(
                 `Permission denied: ${dirPath}`,
                  { operation, dirPath }
               );
@@ -214,11 +207,10 @@ export class FileSystemService implements IFileSystemService {
                 return; // Treat as success if it exists now
              }
           }
-          // Wrap other unknown errors
-          throw new InfrastructureError(
-            InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
+          // Wrap other unknown errors using factory
+          throw InfrastructureErrors.fileSystemError(
             `Failed to ${operation}: ${dirPath}`,
-            { originalError: error, operation, dirPath }
+            { cause: error instanceof Error ? error : undefined, operation, dirPath }
           );
         }
       },
@@ -321,19 +313,17 @@ export class FileSystemService implements IFileSystemService {
               throw InfrastructureErrors.fileNotFound(dirPath, { operation, reason: 'Directory not found during listFiles' });
             }
             if (nodeError.code === 'EACCES') {
-               // No specific factory for permission error, use constructor
-              throw new InfrastructureError(
-                InfrastructureErrorCodes.FILE_PERMISSION_ERROR,
+               // Use permissionDenied factory
+              throw InfrastructureErrors.permissionDenied(
                 `Permission denied: ${dirPath}`,
                  { operation, dirPath }
               );
             }
           }
-          // Wrap other unknown errors
-          throw new InfrastructureError(
-            InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
+          // Wrap other unknown errors using factory
+          throw InfrastructureErrors.fileSystemError(
             `Failed to ${operation}: ${dirPath}`,
-            { originalError: error, operation, dirPath }
+            { cause: error instanceof Error ? error : undefined, operation, dirPath }
           );
         }
       }
@@ -431,12 +421,11 @@ export class FileSystemService implements IFileSystemService {
 
         stream.on('error', (streamError) => {
            this.componentLogger.error(`Error during ${operation} stream`, { filePath, start, length, error: streamError });
-           // Use factory for stream read error
+           // Use factory for stream read error, include cause in details
           reject(
              InfrastructureErrors.fileReadError(
-               filePath,
-               streamError instanceof Error ? streamError : undefined,
-               { operation, start, length, reason: 'Stream error during chunk read' }
+               `Stream error during chunk read: ${filePath}`,
+               { operation, start, length, reason: 'Stream error during chunk read', cause: streamError instanceof Error ? streamError : undefined }
              )
           );
         });
@@ -448,11 +437,10 @@ export class FileSystemService implements IFileSystemService {
         throw error;
       }
 
-      // Wrap other unknown errors (e.g., fs.stat error) using the factory
+      // Wrap other unknown errors (e.g., fs.stat error) using the factory, include cause in details
       throw InfrastructureErrors.fileReadError(
-        filePath,
-        error instanceof Error ? error : undefined,
-        { operation, start, length: params.length, reason: 'Error during setup or stat' }
+        `Error during setup or stat for chunk read: ${filePath}`,
+        { operation, start, length: params.length, reason: 'Error during setup or stat', cause: error instanceof Error ? error : undefined }
       );
     }
   }
@@ -486,19 +474,17 @@ export class FileSystemService implements IFileSystemService {
           throw InfrastructureErrors.fileNotFound(filePath, { operation });
         }
         if (nodeError.code === 'EACCES') {
-           // No specific factory for permission error, use constructor
-          throw new InfrastructureError(
-            InfrastructureErrorCodes.FILE_PERMISSION_ERROR,
+           // Use permissionDenied factory
+          throw InfrastructureErrors.permissionDenied(
             `Permission denied: ${filePath}`,
              { operation, filePath }
           );
         }
       }
-      // Wrap other unknown errors
-      throw new InfrastructureError(
-        InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
+      // Wrap other unknown errors using factory
+      throw InfrastructureErrors.fileSystemError(
         `Failed to ${operation}: ${filePath}`,
-        { originalError: error, operation, filePath }
+        { cause: error instanceof Error ? error : undefined, operation, filePath }
       );
     }
   }

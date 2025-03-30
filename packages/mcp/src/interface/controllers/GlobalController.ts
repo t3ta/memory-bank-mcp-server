@@ -4,7 +4,7 @@ import type { UpdateTagIndexUseCaseV2 } from "../../application/usecases/common/
 import type { ReadJsonDocumentUseCase, WriteJsonDocumentUseCase, DeleteJsonDocumentUseCase, SearchJsonDocumentsUseCase, UpdateJsonIndexUseCase, ReadGlobalDocumentUseCase, WriteGlobalDocumentUseCase, SearchDocumentsByTagsUseCase, UpdateTagIndexUseCase } from "../../application/usecases/index.js";
 import { DocumentType } from "../../domain/entities/JsonDocument.js";
 import { BaseError } from "../../shared/errors/BaseError.js";
-import { DomainError } from "../../shared/errors/DomainError.js";
+import { DomainError, DomainErrors } from "../../shared/errors/DomainError.js"; // Import DomainErrors factory
 import { logger } from "../../shared/utils/logger.js";
 import type { MCPResponsePresenter } from "../presenters/types/MCPResponsePresenter.js";
 import type { MCPResponse } from "../presenters/types/MCPResponse.js";
@@ -17,6 +17,8 @@ import type { IGlobalController } from "./interfaces/IGlobalController.js";
  */
 export class GlobalController implements IGlobalController {
   readonly _type = 'controller' as const;
+  private readonly componentLogger = logger.withContext({ component: 'GlobalController' }); // Add component logger
+
   /**
    * Constructor
    * @param readGlobalDocumentUseCase Use case for reading global documents
@@ -65,7 +67,7 @@ export class GlobalController implements IGlobalController {
    */
   async readDocument(path: string): Promise<MCPResponse<DocumentDTO>> {
     try {
-      logger.info(`Reading global document: ${path}`);
+      this.componentLogger.info(`Reading global document`, { path }); // Use componentLogger
 
       const result = await this.readGlobalDocumentUseCase.execute({ path });
 
@@ -90,7 +92,7 @@ export class GlobalController implements IGlobalController {
   }): Promise<MCPResponse> {
     const { path: docPath, content, tags: tagStrings } = params; // 分割代入、path と tags は内部変数と衝突するため別名に
     try {
-      logger.info(`Writing global document: ${docPath}`); // path -> docPath に変更
+      this.componentLogger.info(`Writing global document`, { docPath }); // Use componentLogger, path -> docPath に変更
 
       await this.writeGlobalDocumentUseCase.execute({
         document: {
@@ -112,7 +114,7 @@ export class GlobalController implements IGlobalController {
    */
   async readCoreFiles(): Promise<MCPResponse<Record<string, DocumentDTO>>> {
     try {
-      logger.info('Reading global core files');
+      this.componentLogger.info('Reading global core files'); // Use componentLogger
 
       // Define core files to read directly
       const coreFiles = [
@@ -145,7 +147,7 @@ export class GlobalController implements IGlobalController {
           }
         } catch (error) {
           // Log error but continue with other files
-          logger.error(`Error reading global core file ${documentPath}:`, error);
+          this.componentLogger.error(`Error reading global core file`, { documentPath, error }); // Use componentLogger
 
           // Add empty placeholder for missing file
           result[documentPath.replace('.json', '')] = {
@@ -169,18 +171,18 @@ export class GlobalController implements IGlobalController {
    */
   async updateTagsIndex(): Promise<MCPResponse> {
     try {
-      logger.info('Updating global tags index');
+      this.componentLogger.info('Updating global tags index'); // Use componentLogger
 
       // Use V2 if available, otherwise fall back to V1
       if (this.updateTagIndexUseCaseV2) {
-        logger.info('Using UpdateTagIndexUseCaseV2 for global tag index update');
+        this.componentLogger.info('Using UpdateTagIndexUseCaseV2 for global tag index update'); // Use componentLogger
         const result = await this.updateTagIndexUseCaseV2.execute({
           branchName: undefined, // Global memory bank
           fullRebuild: true,
         });
         return this.presenter.present(result);
       } else {
-        logger.info('Using UpdateTagIndexUseCase (V1) for global tag index update');
+        this.componentLogger.info('Using UpdateTagIndexUseCase (V1) for global tag index update'); // Use componentLogger
         const result = await this.updateTagIndexUseCase.execute({
           branchName: undefined, // Global memory bank
           fullRebuild: true,
@@ -203,8 +205,8 @@ export class GlobalController implements IGlobalController {
     matchAllTags?: boolean
   ): Promise<MCPResponse<DocumentDTO[]>> {
     try {
-      logger.info(`Finding global documents by tags: ${tags.join(', ')}`);
-      logger.debug('Search request:', { tags, matchAllTags });
+      this.componentLogger.info(`Finding global documents by tags`, { tags: tags.join(', ') }); // Use componentLogger
+      this.componentLogger.debug('Search request:', { tags, matchAllTags }); // Use componentLogger
 
       // SearchDocumentsByTagsUseCaseに検索を委譲
       const result = await this.searchDocumentsByTagsUseCase.execute({
@@ -213,7 +215,7 @@ export class GlobalController implements IGlobalController {
         branchName: undefined, // Search in global memory bank
       });
 
-      logger.debug('Search result:', {
+      this.componentLogger.debug('Search result:', { // Use componentLogger
         tags,
         matchAllTags,
         documentsFound: result.documents.length,
@@ -222,7 +224,7 @@ export class GlobalController implements IGlobalController {
 
       return this.presenter.present(result.documents);
     } catch (error) {
-      logger.error('Failed to search documents by tags:', {
+      this.componentLogger.error('Failed to search documents by tags:', { // Use componentLogger
         tags,
         matchAllTags,
         error: error instanceof Error ? error.message : String(error)
@@ -237,7 +239,7 @@ export class GlobalController implements IGlobalController {
    * @returns Formatted error response
    */
   private handleError(error: any): MCPResponse {
-    logger.error('Error details:', {
+    this.componentLogger.error('Error details:', { // Use componentLogger
       errorType: error.constructor.name,
       message: error.message,
       code: error.code,
@@ -249,14 +251,25 @@ export class GlobalController implements IGlobalController {
       return this.presenter.presentError(error);
     }
 
-    // Unknown error
-    return this.presenter.presentError(
-      new DomainError(
-        'UNEXPECTED_ERROR',
-        error instanceof Error ? error.message : 'An unexpected error occurred',
-        { originalError: error }
-      )
-    );
+    // Unknown error - Use factory if available, otherwise keep constructor
+    // Check if DomainErrors.unexpectedError exists
+    if (DomainErrors.unexpectedError) {
+       return this.presenter.presentError(
+         DomainErrors.unexpectedError(
+           error instanceof Error ? error.message : 'An unexpected error occurred',
+           { originalError: error }
+         )
+       );
+    } else {
+       // Fallback to constructor if factory doesn't exist yet
+       return this.presenter.presentError(
+         new DomainError(
+           'UNEXPECTED_ERROR',
+           error instanceof Error ? error.message : 'An unexpected error occurred',
+           { originalError: error }
+         )
+       );
+    }
   }
 
   /**
@@ -269,12 +282,12 @@ export class GlobalController implements IGlobalController {
     id?: string;
   }): Promise<MCPResponse<JsonDocumentDTO>> {
     try {
-      logger.info(`Reading global JSON document: ${options.path || options.id}`);
+      this.componentLogger.info(`Reading global JSON document`, { path: options.path, id: options.id }); // Use componentLogger
 
       if (!this.readJsonDocumentUseCase) {
-        throw new DomainError(
-          'FEATURE_NOT_AVAILABLE',
-          'JSON document features are not available in this configuration'
+        // Use featureNotAvailable factory
+        throw DomainErrors.featureNotAvailable(
+          'JSON document features'
         );
       }
 
@@ -297,12 +310,12 @@ export class GlobalController implements IGlobalController {
    */
   async writeJsonDocument(document: JsonDocumentDTO): Promise<MCPResponse> {
     try {
-      logger.info(`Writing global JSON document: ${document.path}`);
+      this.componentLogger.info(`Writing global JSON document`, { path: document.path }); // Use componentLogger
 
       if (!this.writeJsonDocumentUseCase) {
-        throw new DomainError(
-          'FEATURE_NOT_AVAILABLE',
-          'JSON document features are not available in this configuration'
+        // Use featureNotAvailable factory
+        throw DomainErrors.featureNotAvailable(
+          'JSON document features'
         );
       }
 
@@ -330,12 +343,12 @@ export class GlobalController implements IGlobalController {
    */
   async deleteJsonDocument(options: { path?: string; id?: string }): Promise<MCPResponse> {
     try {
-      logger.info(`Deleting global JSON document: ${options.path || options.id}`);
+      this.componentLogger.info(`Deleting global JSON document`, { path: options.path, id: options.id }); // Use componentLogger
 
       if (!this.deleteJsonDocumentUseCase) {
-        throw new DomainError(
-          'FEATURE_NOT_AVAILABLE',
-          'JSON document features are not available in this configuration'
+        // Use featureNotAvailable factory
+        throw DomainErrors.featureNotAvailable(
+          'JSON document features'
         );
       }
 
@@ -361,12 +374,12 @@ export class GlobalController implements IGlobalController {
     tags?: string[];
   }): Promise<MCPResponse<JsonDocumentDTO[]>> {
     try {
-      logger.info('Listing global JSON documents');
+      this.componentLogger.info('Listing global JSON documents', { type: options?.type, tags: options?.tags }); // Use componentLogger
 
       if (!this.searchJsonDocumentsUseCase) {
-        throw new DomainError(
-          'FEATURE_NOT_AVAILABLE',
-          'JSON document features are not available in this configuration'
+        // Use featureNotAvailable factory
+        throw DomainErrors.featureNotAvailable(
+          'JSON document features'
         );
       }
 
@@ -389,12 +402,12 @@ export class GlobalController implements IGlobalController {
    */
   async searchJsonDocuments(query: string): Promise<MCPResponse<JsonDocumentDTO[]>> {
     try {
-      logger.info(`Searching global JSON documents with query: ${query}`);
+      this.componentLogger.info(`Searching global JSON documents`, { query }); // Use componentLogger
 
       if (!this.searchJsonDocumentsUseCase) {
-        throw new DomainError(
-          'FEATURE_NOT_AVAILABLE',
-          'JSON document features are not available in this configuration'
+        // Use featureNotAvailable factory
+        throw DomainErrors.featureNotAvailable(
+          'JSON document features'
         );
       }
 
@@ -415,12 +428,12 @@ export class GlobalController implements IGlobalController {
    */
   async updateJsonIndex(options?: { force?: boolean }): Promise<MCPResponse> {
     try {
-      logger.info(`Updating global JSON index (force: ${options?.force ? 'yes' : 'no'})`);
+      this.componentLogger.info(`Updating global JSON index`, { force: options?.force }); // Use componentLogger
 
       if (!this.updateJsonIndexUseCase) {
-        throw new DomainError(
-          'FEATURE_NOT_AVAILABLE',
-          'JSON document features are not available in this configuration'
+        // Use featureNotAvailable factory
+        throw DomainErrors.featureNotAvailable(
+          'JSON document features'
         );
       }
 

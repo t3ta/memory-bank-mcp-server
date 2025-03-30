@@ -8,9 +8,9 @@
     "tags": [
       "branch-context"
     ],
-    "lastModified": "2025-03-29T13:45:00.000Z",
+    "lastModified": "2025-03-29T20:40:00.000Z",
     "createdAt": "2025-03-29T13:45:00.000Z",
-    "version": 1
+    "version": 2
   },
   "content": {
     "branchName": "feature/schema-package-3",
@@ -20,19 +20,19 @@
       {
         "id": "f8e7d6c5-b4a3-2910-8f7e-6d5c4b3a2910",
         "description": "肥大化リポジトリを責務ごとに分割して設計を改善したい",
-        "completed": false,
+        "completed": true,
         "priority": 1
       },
       {
         "id": "3c86bf6f-2bf8-4253-8aab-9ca84d3f8cd0",
         "description": "インターフェース設計を一貫させ、命名規則を統一したい",
-        "completed": false,
+        "completed": true,
         "priority": 2
       },
       {
         "id": "pi-build-errors",
         "description": "残りのビルドエラー（特にIndexService.ts）の解消",
-        "completed": false,
+        "completed": true,
         "priority": 3
       },
       {
@@ -42,6 +42,6 @@
         "priority": 4
       }
     ],
-    "additionalNotes": "feature/schema-package-2では、テンプレート関連コードの削除完了とドメインエンティティの依存方向修正を実施。しかし、肥大化リポジトリの分割と残りのビルドエラーの解消は未完了のまま。feature/schema-package-3ではそれらの残タスクを完了させ、モノレポ化への道を整える。FileSystemBranchMemoryBankRepositoryとFileSystemGlobalMemoryBankRepository（共に850行超）の分割が最重要課題。"
+    "additionalNotes": "feature/schema-package-2では、テンプレート関連コードの削除完了とドメインエンティティの依存方向修正を実施。肥大化リポジトリの分割と残りのビルドエラーの解消は現在のブランチで完了した。インターフェースの命名規則統一も完了し、すべてのインターフェースが「I」プレフィックスを持ち、メソッドシグネチャも統一された。残るのは横断的関心事（ロギング、エラーハンドリング）の統合のみとなった。"
   }
 }

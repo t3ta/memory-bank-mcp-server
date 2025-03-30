@@ -18,133 +18,139 @@
     "workingFeatures": [
       {
         "id": "wf-logging-improvement",
-        "description": "shared/utils/loggerの機能強化",
-        "status": "completed"
+        "status": "completed",
+        "description": "shared/utils/loggerの機能強化"
       },
       {
         "id": "wf-error-hierarchy",
-        "description": "エラークラス階層の整理と強化",
-        "status": "completed"
+        "status": "completed",
+        "description": "エラークラス階層の整理と強化"
       },
       {
         "id": "wf-error-factories",
-        "description": "基本的なエラーファクトリメソッドの実装",
-        "status": "completed"
+        "status": "completed",
+        "description": "基本的なエラーファクトリメソッドの実装"
       },
       {
         "id": "wf-error-utils",
-        "description": "エラーユーティリティの実装",
-        "status": "completed"
+        "status": "completed",
+        "description": "ErrorUtilsの実装"
       },
       {
         "id": "wf-example-use-case",
-        "description": "サンプルユースケースの実装",
-        "status": "completed"
+        "status": "completed",
+        "description": "ReadBranchDocumentUseCaseの実装"
       },
       {
-        "id": "wf-high-priority-files",
-        "description": "高優先度ファイルへの新パターン適用",
-        "status": "in-progress"
+        "id": "wf-file-system-service",
+        "status": "in-progress",
+        "description": "FileSystemServiceの実装状況 - 権限エラーファクトリーメソッドが必要"
       },
       {
-        "id": "wf-missing-factory-methods",
-        "description": "特定のエラータイプ（権限エラーなど）のファクトリーメソッド追加",
-        "status": "pending"
+        "id": "wf-branch-repo",
+        "status": "in-progress",
+        "description": "FileSystemBranchMemoryBankRepositoryの実装状況 - ファイルシステムエラーファクトリーメソッドが必要"
       },
       {
-        "id": "wf-branch-controller-logger",
-        "description": "BranchControllerでの直接logger使用をcomponentLoggerに置き換え",
-        "status": "pending"
+        "id": "wf-branch-controller",
+        "status": "in-progress",
+        "description": "BranchControllerの実装状況 - loggerの置き換えとファクトリーメソッド適用が必要"
       }
     ],
     "pendingImplementation": [
       {
-        "id": "pi-global-adoption",
-        "description": "新しいパターンのコードベース全体への適用",
+        "id": "pi-permission-denied",
+        "status": "pending",
         "priority": "high",
-        "status": "in-progress"
+        "description": "InfrastructureErrors.permissionDeniedファクトリーメソッドの追加"
       },
       {
-        "id": "pi-domain-errors-factory",
-        "description": "DomainErrorsファクトリーメソッドの追加と適用",
+        "id": "pi-file-system-error",
+        "status": "pending",
         "priority": "high",
-        "status": "pending"
+        "description": "InfrastructureErrors.fileSystemErrorファクトリーメソッドの追加"
       },
       {
-        "id": "pi-application-errors-factory",
-        "description": "ApplicationErrorsファクトリーメソッドの追加と適用",
+        "id": "pi-domain-errors",
+        "status": "pending",
         "priority": "high",
-        "status": "pending"
+        "description": "DomainErrorsの各種ファクトリーメソッドの追加"
       },
       {
-        "id": "pi-infrastructure-errors-factory",
-        "description": "InfrastructureErrors.permissionDenied, fileSystemErrorなどのファクトリーメソッド追加",
+        "id": "pi-application-errors",
+        "status": "pending",
         "priority": "high",
-        "status": "pending"
+        "description": "ApplicationErrorsの各種ファクトリーメソッドの追加"
+      },
+      {
+        "id": "pi-branch-controller-logger",
+        "status": "pending",
+        "priority": "high",
+        "description": "BranchControllerでの直接logger使用をcomponentLoggerに置き換え"
+      },
+      {
+        "id": "pi-global-controller",
+        "status": "pending",
+        "priority": "high",
+        "description": "GlobalControllerの実装状況改善"
+      },
+      {
+        "id": "pi-medium-priority",
+        "status": "pending",
+        "priority": "medium",
+        "description": "中優先度ファイル（WriteJsonDocumentUseCase等）の実装"
       },
       {
         "id": "pi-error-documentation",
-        "description": "エラーコードの整理とドキュメント化",
+        "status": "pending",
         "priority": "medium",
-        "status": "pending"
+        "description": "エラーコードの整理とドキュメント化"
       },
       {
         "id": "pi-log-guidelines",
-        "description": "ログレベル使用ガイドラインの策定",
+        "status": "pending",
         "priority": "medium",
-        "status": "pending"
-      },
-      {
-        "id": "pi-medium-priority-files",
-        "description": "中優先度ファイル（ユースケースなど）への新パターン適用",
-        "priority": "medium",
-        "status": "pending"
+        "description": "ログレベル使用ガイドラインの策定"
       },
       {
         "id": "pi-tests",
-        "description": "ロギングとエラーハンドリングのテスト強化",
+        "status": "pending",
         "priority": "low",
-        "status": "pending"
-      },
-      {
-        "id": "pi-low-priority-files",
-        "description": "低優先度ファイル（マイグレーションツールなど）への新パターン適用",
-        "priority": "low",
-        "status": "pending"
+        "description": "ロギングとエラーハンドリングのテスト強化"
       }
     ],
-    "status": "新しいロギングとエラーハンドリングパターンのコードベース全体への適用準備完了。global-adoption-plan.jsonに基づいて実装開始予定。",
+    "status": "ロギングとエラーハンドリングの基本実装は完了。高優先度ファイルへの適用が進行中。各種ファクトリーメソッドの追加実装が必要。",
     "completionPercentage": 75,
     "knownIssues": [
       {
-        "id": "ki-logger-factory-usage",
-        "description": "LoggerFactoryは非推奨化したが、まだいくつかの場所で使用されている",
-        "severity": "low",
-        "implementationStatus": "partially-addressed"
-      },
-      {
-        "id": "ki-test-update",
-        "description": "テスト環境でのロガーモックが今回の変更で影響を受ける可能性がある",
-        "severity": "medium",
-        "implementationStatus": "not-started"
-      },
-      {
-        "id": "ki-logger-level-inconsistency",
-        "description": "ログレベルの使用基準が明確ではなく、不適切なレベルでのロギングが散見される",
-        "severity": "low",
-        "implementationStatus": "not-started"
-      },
-      {
         "id": "ki-missing-factory-methods",
-        "description": "一部のエラータイプに対応するファクトリーメソッドが実装されていない（特に権限エラーなど）",
-        "severity": "medium",
-        "implementationStatus": "not-started"
+        "severity": "high",
+        "description": "権限エラーやファイルシステムエラーなどのファクトリーメソッドが不足している",
+        "status": "unresolved"
       },
       {
         "id": "ki-direct-logger-usage",
-        "description": "BranchControllerなどで直接loggerが使用されており、コンポーネント固有ロガーが活用されていない",
         "severity": "medium",
-        "implementationStatus": "not-started"
+        "description": "BranchControllerでコンポーネントロガーが定義されているにも関わらず直接loggerが使用されている",
+        "status": "unresolved"
+      },
+      {
+        "id": "ki-logger-factory-usage",
+        "severity": "low",
+        "description": "LoggerFactoryは非推奨化済みだが、まだ大部分の箇所で移行が完了していない",
+        "status": "unresolved"
+      },
+      {
+        "id": "ki-test-logger-mock",
+        "severity": "medium",
+        "description": "テスト環境でのロガーモックが新しい実装に対応していない",
+        "status": "unresolved"
+      },
+      {
+        "id": "ki-logger-level-inconsistency",
+        "severity": "low",
+        "description": "ログレベルの使用基準が明確でなく、不適切なレベルでのロギングが見られる",
+        "status": "unresolved"
       }
     ],
     "completedTasks": [
@@ -174,34 +180,41 @@
         "completedAt": "2025-03-29T23:00:00.000Z"
       },
       {
-        "id": "ct-error-factories",
-        "description": "エラーファクトリメソッドの実装",
+        "id": "ct-basic-error-factories",
+        "description": "基本的なエラーファクトリメソッドの実装",
         "completedAt": "2025-03-29T23:15:00.000Z"
       },
       {
         "id": "ct-error-utils",
-        "description": "エラーユーティリティの実装",
+        "description": "ErrorUtilsの実装",
         "completedAt": "2025-03-29T23:20:00.000Z"
       },
       {
         "id": "ct-sample-use-case",
-        "description": "ReadBranchDocumentUseCaseのパターン適用",
+        "description": "ReadBranchDocumentUseCaseの実装",
         "completedAt": "2025-03-29T23:25:00.000Z"
       }
     ],
     "upcomingMilestones": [
       {
-        "id": "um-implementation-core",
-        "title": "コア機能実装完了",
-        "description": "基盤となるロギングとエラーハンドリングの仕組みの実装",
+        "id": "um-core-implementation",
+        "title": "基盤実装完了",
+        "description": "ロギングとエラーハンドリングの基盤実装",
         "dueDate": "2025-03-29",
         "status": "completed"
       },
       {
-        "id": "um-high-priority-implementation",
+        "id": "um-factory-methods-implementation",
+        "title": "ファクトリーメソッド実装",
+        "description": "必要な全てのファクトリーメソッドの追加",
+        "dueDate": "2025-04-03",
+        "status": "pending"
+      },
+      {
+        "id": "um-high-priority-files",
         "title": "高優先度ファイル実装",
-        "description": "高優先度ファイルへの新パターン適用完了",
-        "dueDate": "2025-04-05",
+        "description": "高優先度ファイルへの適用完了",
+        "dueDate": "2025-04-07",
         "status": "in-progress"
       },
       {
@@ -212,11 +225,11 @@
         "status": "pending"
       },
       {
-        "id": "um-global-adoption",
-        "title": "全体適用",
-        "description": "コードベース全体への新パターン適用",
+        "id": "um-all-files-implementation",
+        "title": "全ファイル実装",
+        "description": "コードベース全体への適用完了",
         "dueDate": "2025-04-15",
-        "status": "planned"
+        "status": "pending"
       }
     ],
     "references": [

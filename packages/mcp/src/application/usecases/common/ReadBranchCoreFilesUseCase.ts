@@ -16,7 +16,7 @@ interface ReadBranchCoreFilesInput {
   branchName: string;
 }
 
-interface ReadBranchCoreFilesOutput {
+export interface ReadBranchCoreFilesOutput { // Add export keyword
   files: CoreFilesDTO;
 }
 

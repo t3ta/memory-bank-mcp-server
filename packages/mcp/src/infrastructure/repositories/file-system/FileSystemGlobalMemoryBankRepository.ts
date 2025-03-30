@@ -119,11 +119,10 @@ export class FileSystemGlobalMemoryBankRepository
       this.componentLogger.info(`${operation} completed successfully`);
     } catch (error) {
       this.componentLogger.error(`Error during ${operation}`, { error });
-      // Wrap error using constructor and general code
-      throw new InfrastructureError(
-        InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
+      // Wrap error using factory
+      throw InfrastructureErrors.fileSystemError(
         `Failed to ${operation}: ${(error as Error).message}`,
-        { originalError: error, operation }
+        { cause: error instanceof Error ? error : undefined, operation }
       );
     }
   }
@@ -152,11 +151,10 @@ export class FileSystemGlobalMemoryBankRepository
         throw error;
       }
 
-      // Wrap unknown errors using the factory
+      // Wrap unknown errors using the factory, include cause in details
       throw InfrastructureErrors.fileReadError(
-        path.value,
-        error instanceof Error ? error : undefined,
-        { operation, documentPath: path.value }
+        `Failed to get global document: ${path.value}`,
+        { operation, documentPath: path.value, cause: error instanceof Error ? error : undefined }
       );
     }
   }
@@ -200,11 +198,10 @@ export class FileSystemGlobalMemoryBankRepository
         throw error;
       }
 
-      // Wrap unknown errors using the factory
+      // Wrap unknown errors using the factory, include cause in details
       throw InfrastructureErrors.fileWriteError(
-        documentPathValue,
-        error instanceof Error ? error : undefined,
-        { operation, documentPath: documentPathValue }
+        `Failed to save global document: ${documentPathValue}`,
+        { operation, documentPath: documentPathValue, cause: error instanceof Error ? error : undefined }
       );
     }
   }
@@ -258,11 +255,10 @@ export class FileSystemGlobalMemoryBankRepository
         throw error;
       }
 
-      // Wrap unknown errors using the constructor and general code
-      throw new InfrastructureError(
-        InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
+      // Wrap unknown errors using the factory
+      throw InfrastructureErrors.fileSystemError(
         `Failed to ${operation} for document ${documentPathValue}: ${(error as Error).message}`,
-        { originalError: error, operation, documentPath: documentPathValue }
+        { cause: error instanceof Error ? error : undefined, operation, documentPath: documentPathValue }
       );
     }
   }
@@ -290,11 +286,10 @@ export class FileSystemGlobalMemoryBankRepository
         throw error;
       }
 
-      // Wrap unknown errors using the constructor and general code
-      throw new InfrastructureError(
-        InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
+      // Wrap unknown errors using the factory
+      throw InfrastructureErrors.fileSystemError(
         `Failed to ${operation}: ${(error as Error).message}`,
-        { originalError: error, operation }
+        { cause: error instanceof Error ? error : undefined, operation }
       );
     }
   }
@@ -337,11 +332,10 @@ export class FileSystemGlobalMemoryBankRepository
         throw error;
       }
 
-      // Wrap unknown errors using the constructor and general code
-      throw new InfrastructureError(
-        InfrastructureErrorCodes.FILE_SYSTEM_ERROR, // General code as it involves multiple steps
+      // Wrap unknown errors using the factory
+      throw InfrastructureErrors.fileSystemError(
         `Failed to ${operation}: ${(error as Error).message}`,
-        { originalError: error, operation, tags: tagValues }
+        { cause: error instanceof Error ? error : undefined, operation, tags: tagValues }
       );
     }
   }
@@ -446,11 +440,10 @@ export class FileSystemGlobalMemoryBankRepository
       }
 
       // Wrap unknown errors using the factory
-      // Use a generic path context as the exact file might vary within tagOps
+      // Use a generic path context as the exact file might vary within tagOps, include cause
       throw InfrastructureErrors.fileWriteError(
         'Global Tag Index',
-        error instanceof Error ? error : undefined,
-        { operation, reason: 'Failed during tag index saving' }
+        { operation, reason: 'Failed during tag index saving', cause: error instanceof Error ? error : undefined }
       );
     }
   }
@@ -482,11 +475,10 @@ export class FileSystemGlobalMemoryBankRepository
       }
 
       // Wrap unknown errors using the factory
-      // Use a generic path context as the exact file might vary within tagOps
+      // Use a generic path context as the exact file might vary within tagOps, include cause
       throw InfrastructureErrors.fileReadError(
         'Global Tag Index',
-        error instanceof Error ? error : undefined,
-        { operation, reason: 'Failed during tag index retrieval' }
+        { operation, reason: 'Failed during tag index retrieval', cause: error instanceof Error ? error : undefined }
       );
     }
   }
@@ -514,11 +506,10 @@ export class FileSystemGlobalMemoryBankRepository
         throw error;
       }
 
-      // Wrap unknown errors using the constructor and general code
-      throw new InfrastructureError(
-        InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
+      // Wrap unknown errors using the factory
+      throw InfrastructureErrors.fileSystemError(
         `Failed to ${operation}: ${(error as Error).message}`,
-        { originalError: error, operation }
+        { cause: error instanceof Error ? error : undefined, operation }
       );
     }
   }
@@ -747,11 +738,10 @@ export class FileSystemGlobalMemoryBankRepository
         throw error;
       }
 
-      // Wrap unknown errors using the constructor and general code
-      throw new InfrastructureError(
-        InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
+      // Wrap unknown errors using the factory
+      throw InfrastructureErrors.fileSystemError(
         `Failed to ${operation}: ${(error as Error).message}`,
-        { originalError: error, operation }
+        { cause: error instanceof Error ? error : undefined, operation }
       );
     }
   }

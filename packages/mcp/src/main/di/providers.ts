@@ -72,10 +72,11 @@ export async function registerInfrastructureServices(
   });
 
   container.registerFactory('branchMemoryBankRepository', async () => {
-    const fileSystemService = await container.get<IFileSystemService>('fileSystemService');
-    const configProvider = await container.get<IConfigProvider>('configProvider');
+    // Request the concrete FileSystemService implementation
+    const fileSystemService = await container.get<FileSystemService>('fileSystemService');
+    // configProvider is not needed for FileSystemBranchMemoryBankRepository constructor
 
-    return new FileSystemBranchMemoryBankRepository(fileSystemService, configProvider);
+    return new FileSystemBranchMemoryBankRepository(fileSystemService);
   });
 
   // Register tag index repository
@@ -420,38 +421,38 @@ export async function registerInterfaceServices(container: DIContainer): Promise
   });
 
   // Register BranchController
-  container.registerFactory('branchController', () => {
+  container.registerFactory('branchController', async () => {
     // Use explicit type assertion for proper type safety
-    const readBranchDocumentUseCase = container.get(
+    const readBranchDocumentUseCase = await container.get<ReadBranchDocumentUseCase>(
       'readBranchDocumentUseCase'
-    ) as ReadBranchDocumentUseCase;
-    const writeBranchDocumentUseCase = container.get(
+    );
+    const writeBranchDocumentUseCase = await container.get<WriteBranchDocumentUseCase>(
       'writeBranchDocumentUseCase'
-    ) as WriteBranchDocumentUseCase;
-    const searchDocumentsByTagsUseCase = container.get(
+    );
+    const searchDocumentsByTagsUseCase = await container.get<SearchDocumentsByTagsUseCase>(
       'searchDocumentsByTagsUseCase'
-    ) as SearchDocumentsByTagsUseCase;
-    const updateTagIndexUseCase = container.get('updateTagIndexUseCase') as UpdateTagIndexUseCase;
-    const getRecentBranchesUseCase = container.get(
+    );
+    const updateTagIndexUseCase = await container.get<UpdateTagIndexUseCase>('updateTagIndexUseCase');
+    const getRecentBranchesUseCase = await container.get<GetRecentBranchesUseCase>(
       'getRecentBranchesUseCase'
-    ) as GetRecentBranchesUseCase;
-    const readBranchCoreFilesUseCase = container.get(
+    );
+    const readBranchCoreFilesUseCase = await container.get<ReadBranchCoreFilesUseCase>(
       'readBranchCoreFilesUseCase'
-    ) as ReadBranchCoreFilesUseCase;
-    const createBranchCoreFilesUseCase = container.get(
+    );
+    const createBranchCoreFilesUseCase = await container.get<CreateBranchCoreFilesUseCase>(
       'createBranchCoreFilesUseCase'
-    ) as CreateBranchCoreFilesUseCase;
-    const presenter = container.get('mcpResponsePresenter') as MCPResponsePresenter;
+    );
+    const presenter = await container.get<MCPResponsePresenter>('mcpResponsePresenter');
 
-    // Get optional use cases
-    const updateTagIndexUseCaseV2 = container.get(
-      'updateTagIndexUseCaseV2'
-    ) as UpdateTagIndexUseCaseV2;
-    const readJsonDocumentUseCase = container.get('readJsonDocumentUseCase') as ReadJsonDocumentUseCase;
-    const writeJsonDocumentUseCase = container.get('writeJsonDocumentUseCase') as WriteJsonDocumentUseCase;
-    const deleteJsonDocumentUseCase = container.get('deleteJsonDocumentUseCase') as DeleteJsonDocumentUseCase;
-    const searchJsonDocumentsUseCase = container.get('searchJsonDocumentsUseCase') as SearchJsonDocumentsUseCase;
-    const updateJsonIndexUseCase = container.get('updateJsonIndexUseCase') as UpdateJsonIndexUseCase;
+    // Optional use cases are no longer needed for BranchController constructor
+    // const updateTagIndexUseCaseV2 = await container.get<UpdateTagIndexUseCaseV2>(
+    //   'updateTagIndexUseCaseV2'
+    // );
+    // const readJsonDocumentUseCase = await container.get<ReadJsonDocumentUseCase>('readJsonDocumentUseCase');
+    // const writeJsonDocumentUseCase = await container.get<WriteJsonDocumentUseCase>('writeJsonDocumentUseCase');
+    // const deleteJsonDocumentUseCase = await container.get<DeleteJsonDocumentUseCase>('deleteJsonDocumentUseCase');
+    // const searchJsonDocumentsUseCase = await container.get<SearchJsonDocumentsUseCase>('searchJsonDocumentsUseCase');
+    // const updateJsonIndexUseCase = await container.get<UpdateJsonIndexUseCase>('updateJsonIndexUseCase');
 
     return new BranchController(
       readBranchDocumentUseCase,
@@ -461,15 +462,8 @@ export async function registerInterfaceServices(container: DIContainer): Promise
       getRecentBranchesUseCase,
       readBranchCoreFilesUseCase,
       createBranchCoreFilesUseCase,
-      presenter,
-      {
-        updateTagIndexUseCaseV2,
-        readJsonDocumentUseCase,
-        writeJsonDocumentUseCase,
-        deleteJsonDocumentUseCase,
-        searchJsonDocumentsUseCase,
-        updateJsonIndexUseCase,
-      } // Pass optional dependencies
+      presenter
+      // Remove the 9th argument (options object)
     );
   });
 }

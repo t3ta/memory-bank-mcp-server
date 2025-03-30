@@ -81,6 +81,8 @@ export const DomainErrorCodes = {
   REPOSITORY_ERROR: 'REPOSITORY_ERROR',
   JSON_PARSE_ERROR: 'JSON_PARSE_ERROR',
   INITIALIZATION_ERROR: 'INITIALIZATION_ERROR',
+  FEATURE_NOT_AVAILABLE: 'FEATURE_NOT_AVAILABLE', // Added for featureNotAvailable factory
+  UNEXPECTED_ERROR: 'UNEXPECTED_ERROR', // Added for unexpectedError factory
 
   // JSON Patch related errors
   INVALID_JSON_PATH: 'INVALID_JSON_PATH',
@@ -151,6 +153,17 @@ export const DomainErrors = {
       'FEATURE_NOT_AVAILABLE', // Assuming FEATURE_NOT_AVAILABLE is a valid code or needs to be added
       `Feature '${featureName}' is not available in this configuration`,
       { featureName, ...additionalDetails }
+    );
+  },
+
+  /**
+   * Create an unexpected error
+   */
+  unexpectedError: (message: string, additionalDetails?: Record<string, unknown>) => {
+    return new DomainError(
+      DomainErrorCodes.UNEXPECTED_ERROR,
+      message,
+      additionalDetails
     );
   }
 };
