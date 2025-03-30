@@ -1,0 +1,380 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "4e2f9c1d-7a32-4f5b-8e3a-d15f81b23c9f",
+    "title": "Markdownスタイルプレビュー機能設計",
+    "documentType": "design_spec",
+    "path": "editor-markdown-view.json",
+    "tags": [
+      "vscode-extension",
+      "editor",
+      "markdown",
+      "ui-design",
+      "feature-spec"
+    ],
+    "lastModified": "2025-03-30T16:30:00.000Z",
+    "createdAt": "2025-03-30T16:30:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "title": "Markdownスタイルプレビュー機能",
+      "description": "JSONドキュメントのcontentをMarkdown形式でレンダリングし、編集と閲覧を分離した形で表示するエディタ拡張機能",
+      "goals": [
+        "JSONドキュメントを人間にとって読みやすい形式で表示する",
+        "エディタ機能を維持しながらプレビュー機能を追加する",
+        "ドキュメントタイプに応じた最適な表示を提供する",
+        "VS Codeのテーマとの統合を実現する"
+      ],
+      "requirements": [
+        "JSONエディタとプレビューの分割表示",
+        "リアルタイム同期更新",
+        "エラー検出と表示",
+        "ドキュメントタイプごとのカスタムレンダリング"
+      ]
+    },
+    "architecture": {
+      "components": [
+        {
+          "name": "DocumentEditorProvider",
+          "description": "カスタムエディタのプロバイダー",
+          "improvements": [
+            "WebViewとの通信拡張",
+            "ReactアプリとMonacoエディタの統合"
+          ]
+        },
+        {
+          "name": "EditorWebView",
+          "description": "分割表示を提供するWebViewアプリケーション",
+          "subComponents": [
+            {
+              "name": "EditorPanel",
+              "description": "MonacoエディタによるJSON編集機能",
+              "responsibilities": [
+                "JSONの編集と検証",
+                "エラーのインライン表示",
+                "スキーマベースの補完"
+              ]
+            },
+            {
+              "name": "PreviewPanel",
+              "description": "Markdown形式でのプレビュー表示",
+              "responsibilities": [
+                "JSONのパースとMarkdownへの変換",
+                "ドキュメントタイプ別のレンダリング",
+                "メタデータのフォーマット表示"
+              ]
+            },
+            {
+              "name": "ControlPanel",
+              "description": "表示モード切替やアクションを提供するUI",
+              "responsibilities": [
+                "エディタ/プレビュー/分割モード切替",
+                "保存やその他のアクション",
+                "検証ステータスの表示"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "MarkdownRenderer",
+          "description": "JSONをMarkdown形式に変換するサービス",
+          "subComponents": [
+            {
+              "name": "DocumentTypeRenderers",
+              "description": "各ドキュメントタイプに特化したレンダラー",
+              "implementations": [
+                "ProgressRenderer",
+                "ActiveContextRenderer",
+                "BranchContextRenderer",
+                "SystemPatternsRenderer",
+                "GenericDocumentRenderer"
+              ]
+            },
+            {
+              "name": "MarkdownProcessor",
+              "description": "生成されたMarkdownをHTMLに変換",
+              "implementation": "marked.jsまたは同等のライブラリ"
+            }
+          ]
+        }
+      ],
+      "dataFlow": [
+        {
+          "step": 1,
+          "description": "WebViewが初期化され、VS Codeからドキュメントデータを受け取る"
+        },
+        {
+          "step": 2,
+          "description": "ユーザーがエディタパネルでJSONを編集"
+        },
+        {
+          "step": 3,
+          "description": "編集内容がリアルタイムでパースされMarkdownに変換"
+        },
+        {
+          "step": 4,
+          "description": "変換されたMarkdownがプレビューパネルに表示"
+        },
+        {
+          "step": 5,
+          "description": "保存時にVS Codeへ変更が送信される"
+        }
+      ]
+    },
+    "rendering": {
+      "approach": "JSONを一旦Markdown形式に変換し、その後標準的なMarkdownレンダリングを活用",
+      "strategies": [
+        {
+          "name": "共通メタデータ表示",
+          "description": "すべてのドキュメントタイプで共通するメタデータ表示",
+          "implementation": {
+            "title": "# タイトル形式で表示",
+            "documentType": "タイプをバッジで表示",
+            "lastModified": "最終更新日を表示",
+            "tags": "タグをラベル形式で表示"
+          }
+        },
+        {
+          "name": "content構造解析",
+          "description": "contentオブジェクトの構造に基づいたレンダリング",
+          "implementation": {
+            "sections": "セクションタイトルをH2として表示",
+            "arrays": "配列要素を箇条書きリストとして表示",
+            "nestedObjects": "ネストされたオブジェクトを階層的に表示"
+          }
+        },
+        {
+          "name": "プログレスドキュメント専用レンダリング",
+          "description": "進捗状況ドキュメントの最適化表示",
+          "implementation": {
+            "status": "強調表示",
+            "completionPercentage": "プログレスバーで視覚化",
+            "workingFeatures": "チェックリスト形式",
+            "pendingImplementation": "優先度でグループ化",
+            "knownIssues": "問題ごとに詳細表示"
+          }
+        },
+        {
+          "name": "アクティブコンテキスト専用レンダリング",
+          "description": "アクティブコンテキストドキュメントの最適化表示",
+          "implementation": {
+            "currentWork": "強調表示",
+            "recentChanges": "タイムライン形式",
+            "activeDecisions": "表形式",
+            "considerations": "アラートスタイル",
+            "nextSteps": "優先度別にグループ化"
+          }
+        },
+        {
+          "name": "mermaid図表サポート",
+          "description": "JSON内の図表情報をmermaidシンタックスに変換",
+          "implementation": {
+            "diagramDetection": "JSON内のdiagramやchartプロパティを検出",
+            "mermaidBlocks": "```mermaid ... ```形式で埋め込み",
+            "dynamicGeneration": "データから動的に図表を生成するメソッドも提供"
+          }
+        }
+      ],
+      "stylingApproach": {
+        "baseStyles": "VS Codeのテーマカラー変数を使用",
+        "lightAndDarkMode": "両モードに対応したスタイル定義",
+        "accessibilityConsiderations": [
+          "コントラスト比の確保",
+          "フォントサイズの調整可能性",
+          "スクリーンリーダー対応"
+        ]
+      },
+      "advancedFeatures": {
+        "mermaidDiagrams": {
+          "description": "JSONデータからダイアグラムを生成し表示",
+          "examples": [
+            {
+              "type": "flowchart",
+              "usage": "プロセスや状態遷移の可視化"
+            },
+            {
+              "type": "sequence",
+              "usage": "コンポーネント間の相互作用を表示"
+            },
+            {
+              "type": "gantt",
+              "usage": "プロジェクトのタイムラインやフェーズ"
+            },
+            {
+              "type": "class",
+              "usage": "クラスモデルやエンティティ関係"
+            },
+            {
+              "type": "pie",
+              "usage": "割合や分布の表示"
+            }
+          ]
+        },
+        "latexMath": {
+          "description": "LaTeX式の数式をサポート",
+          "implementation": "markdown-it-katexなどを統合可能"
+        },
+        "codeHighlighting": {
+          "description": "コードブロックのシンタックスハイライト",
+          "implementation": "highlight.jsまたはPrismJSとの統合"
+        },
+        "tableFormatting": {
+          "description": "表形式のレンダリング",
+          "implementation": "markdown-it-multimd-tableなどのプラグインで拡張可能"
+        },
+        "checklistsAndTasks": {
+          "description": "チェックボックス付きリストのサポート",
+          "usage": "タスクや機能実装状況の表示"
+        }
+      }
+    },
+    "implementation": {
+      "technologies": [
+        {
+          "name": "React",
+          "version": "^18.2.0",
+          "purpose": "WebViewのUIコンポーネント構築"
+        },
+        {
+          "name": "Monaco Editor",
+          "version": "latest",
+          "purpose": "高機能JSONエディタコンポーネント"
+        },
+        {
+          "name": "markdown-it",
+          "version": "^13.0.1",
+          "purpose": "MarkdownパーシングとHTML変換エンジン"
+        },
+        {
+          "name": "highlight.js",
+          "version": "^11.8.0",
+          "purpose": "コードブロックのシンタックスハイライト"
+        },
+        {
+          "name": "markdown-it-mermaid",
+          "version": "^0.2.5",
+          "purpose": "markdown-itの拡張でmermaid図表をサポート"
+        },
+        {
+          "name": "mermaid",
+          "version": "^10.6.1",
+          "purpose": "図表とチャートのレンダリング"
+        }
+      ],
+      "phases": [
+        {
+          "phase": 1,
+          "title": "package.json問題の修正と依存関係セットアップ",
+          "priority": "high",
+          "tasks": [
+            "package.jsonの重複セクション修正",
+            "activationEventsの修正（onStartupFinished追加）",
+            "Monaco、markdown-it、mermaidなどの依存関係追加",
+            "@memory-bank/schemasの参照問題解決"
+          ],
+          "duration": "1日"
+        },
+        {
+          "phase": 2,
+          "title": "分割エディタとMarkdown変換の基本実装",
+          "priority": "high",
+          "tasks": [
+            "基本的なReact WebViewの実装",
+            "Monacoエディタの統合",
+            "分割表示UIの実装",
+            "JSONからMarkdownへの変換基本ロジックの実装",
+            "markdown-it + mermaidの設定と基本レンダリング"
+          ],
+          "duration": "3日",
+          "dependsOn": [
+            "phase 1"
+          ]
+        },
+        {
+          "phase": 3,
+          "title": "ドキュメントタイプ別レンダラーと高度な機能",
+          "priority": "high",
+          "tasks": [
+            "ドキュメントタイプ別のレンダリングロジックの実装",
+            "mermaid図表の動的生成機能",
+            "プレビューとエディタの双方向同期",
+            "VS Codeテーマとのスタイル統合",
+            "モード切替機能（エディタのみ、プレビューのみ、分割）"
+          ],
+          "duration": "4日",
+          "dependsOn": [
+            "phase 2"
+          ]
+        },
+        {
+          "phase": 4,
+          "title": "パフォーマンス最適化と最終調整",
+          "priority": "medium",
+          "tasks": [
+            "大規模JSONでのパフォーマンス最適化",
+            "エラー処理と復旧機能の実装",
+            "アクセシビリティ対応",
+            "ユーザビリティテストと改善"
+          ],
+          "duration": "2日",
+          "dependsOn": [
+            "phase 3"
+          ]
+        }
+      ]
+    },
+    "benefits": [
+      {
+        "benefit": "ユーザー体験の向上",
+        "description": "JSONの生データとフォーマットされた表示を同時に閲覧・編集できることで、コンテンツの理解と編集が容易になる"
+      },
+      {
+        "benefit": "エラー削減",
+        "description": "構造化された表示により、JSONの構造が視覚的に把握しやすくなり、編集ミスが減少する"
+      },
+      {
+        "benefit": "生産性向上",
+        "description": "ドキュメントタイプに特化した表示により、情報の把握が早くなり、編集作業の効率が上がる"
+      },
+      {
+        "benefit": "アクセシビリティ改善",
+        "description": "構造化された表示はスクリーンリーダーなどの支援技術との相性が良く、多様なユーザーが使いやすい"
+      }
+    ],
+    "mockups": {
+      "splitViewLayout": "左側にJSONエディタ、右側にMarkdownプレビューを表示する分割レイアウト",
+      "controlBarLayout": "上部にタブ切り替えとアクションボタンを配置",
+      "tabOptions": [
+        "エディタのみ",
+        "プレビューのみ",
+        "分割表示（デフォルト）"
+      ],
+      "previewStyles": "VS Codeのシンタックスハイライトスタイルに合わせたMarkdown表示"
+    },
+    "risks": [
+      {
+        "risk": "パフォーマンス低下",
+        "description": "大規模なJSONファイルでのリアルタイム変換処理によるパフォーマンス問題",
+        "mitigation": "遅延ロードと部分更新の実装、非同期処理の最適化"
+      },
+      {
+        "risk": "表示の不一致",
+        "description": "複雑なJSONがMarkdown形式で適切に表現できない場合がある",
+        "mitigation": "ドキュメントタイプごとの専用レンダラーで最適な表示を実装"
+      },
+      {
+        "risk": "WebView通信の信頼性",
+        "description": "WebViewとVS Code拡張間の通信が不安定になる可能性",
+        "mitigation": "堅牢なエラーハンドリングと再試行メカニズムの実装"
+      }
+    ],
+    "nextSteps": [
+      "package.jsonの重複セクション修正とactivationEventsの更新",
+      "workspace依存関係問題解決（@memory-bank/schemasの参照問題）",
+      "Monaco、markdown-it、mermaidなどの依存関係追加",
+      "分割ビューを持つ基本的なReact WebViewの実装",
+      "JSONからMarkdownへの変換基本ロジックの実装"
+    ]
+  }
+}

@@ -44,3 +44,5 @@ tests/.temp
 
 # Memory Bank specific files
 docs/global-memory-bank/tags/index.json
+
+*.tsbuildinfo

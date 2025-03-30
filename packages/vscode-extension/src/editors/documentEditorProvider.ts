@@ -9,15 +9,15 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
 
   public static register(context: vscode.ExtensionContext): vscode.Disposable {
     const provider = new DocumentEditorProvider(context);
-    // Register the provider for the viewType defined in package.json
     const providerRegistration = vscode.window.registerCustomEditorProvider(
       'memoryBank.documentEditor', // Must match the viewType in package.json
       provider,
       {
-        // Optionally enable webview persistence
         webviewOptions: {
           retainContextWhenHidden: true,
         },
+        // Indicate that this editor supports undo/redo
+        supportsMultipleEditorsPerDocument: false,
       }
     );
     return providerRegistration;
@@ -38,81 +38,136 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
 
     // Setup initial content for the webview
     webviewPanel.webview.options = {
-      enableScripts: true, // Enable JavaScript in the webview
-      localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, 'media')] // Restrict webview access
+      enableScripts: true,
+      localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, 'media')]
     };
     webviewPanel.webview.html = this.getHtmlForWebview(webviewPanel.webview, document);
 
-    // TODO: Add message handling to sync document changes between webview and VS Code
-    // Example:
-    // webviewPanel.webview.onDidReceiveMessage(e => {
-    //   switch (e.type) {
-    //     case 'update':
-    //       this.updateTextDocument(document, e.payload);
-    //       return;
-    //   }
-    // });
+    let isWebViewReady = false; // Flag to track if webview is ready
+    let pendingExternalUpdate: string | null = null; // Store external updates if webview isn't ready
 
-    // TODO: Add logic to update webview when the document changes outside the editor
-    // const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument(e => {
-    //   if (e.document.uri.toString() === document.uri.toString()) {
-    //     webviewPanel.webview.postMessage({ type: 'update', text: document.getText() });
-    //   }
-    // });
+    // Handle messages from the webview (React App)
+    webviewPanel.webview.onDidReceiveMessage(e => {
+      switch (e.type) {
+        case 'ready': // Webview signals it's ready to receive content
+          console.log(`Webview ready for ${document.uri.fsPath}`);
+          isWebViewReady = true;
+          // Send initial content or any pending external update
+          const initialContent = pendingExternalUpdate ?? document.getText();
+          webviewPanel.webview.postMessage({ type: 'updateContent', text: initialContent });
+          pendingExternalUpdate = null; // Clear pending update
+          return;
+        case 'update': // Webview sends updated content
+          console.log(`Received update from webview for ${document.uri.fsPath}`);
+          // Prevent updates if the content hasn't actually changed
+          if (document.getText() !== e.text) {
+            this._updateTextDocument(document, e.text);
+          }
+          return;
+        case 'error': // Webview reports an error
+            console.error(`Error message from webview: ${e.message}`);
+            vscode.window.showErrorMessage(`Webview error: ${e.message}`);
+            return;
+        // Add other message types as needed (e.g., for theme changes)
+      }
+    }, null, this.context.subscriptions); // Ensure disposal
 
-    // // Clean up subscription on dispose
-    // webviewPanel.onDidDispose(() => {
-    //   changeDocumentSubscription.dispose();
-    // });
+    // Update webview when the document changes outside the editor
+    const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument(e => {
+      if (e.document.uri.toString() === document.uri.toString()) {
+        // Check if the webview panel is still valid and ready
+        if (webviewPanel.visible) {
+          const newText = document.getText();
+          if (isWebViewReady) {
+            console.log(`Document changed externally, updating webview for ${document.uri.fsPath}`);
+            webviewPanel.webview.postMessage({ type: 'updateContent', text: newText });
+          } else {
+            console.log(`Document changed externally, but webview not ready. Storing update for ${document.uri.fsPath}`);
+            pendingExternalUpdate = newText; // Store the update if webview isn't ready yet
+          }
+        }
+      }
+    });
+
+    // Clean up subscription on dispose
+    webviewPanel.onDidDispose(() => {
+      console.log(`Webview panel disposed for ${document.uri.fsPath}`);
+      changeDocumentSubscription.dispose();
+    });
+
+    // Note: Initial content push is now handled by the 'ready' message from the webview
   }
 
   /**
    * Generates the HTML content for the editor webview.
    */
   private getHtmlForWebview(webview: vscode.Webview, document: vscode.TextDocument): string {
-    // Use a nonce to only allow specific scripts to run
     const nonce = getNonce();
 
-    // Get document content
-    const documentContent = document.getText() || '{}'; // Default to empty object if file is empty
+    // Get URIs for required resources
+    const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'dist', 'webviews', 'editor.js'));
+    const stylesUri = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'media', 'editor.css')); // Keep existing CSS or add new one for React app
 
-    // TODO: In the future, load React app or more sophisticated UI here
+    // IMPORTANT: You need a build process (e.g., webpack, esbuild) to bundle
+    // your React app (src/webviews/editor/index.tsx) into dist/webviews/editor.js
+
     return `<!DOCTYPE html>
       <html lang="en">
       <head>
         <meta charset="UTF-8">
-        <!-- Use a content security policy to only allow loading images from https or from our extension directory, and only allow scripts that have a specific nonce -->
-        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; img-src ${webview.cspSource} https:; script-src 'nonce-${nonce}';">
+        <meta http-equiv="Content-Security-Policy" content="
+          default-src 'none';
+          style-src ${webview.cspSource} 'unsafe-inline';
+          font-src ${webview.cspSource};
+          img-src ${webview.cspSource} https: data:;
+          script-src 'nonce-${nonce}';
+        ">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="${stylesUri}" rel="stylesheet">
         <title>Memory Bank Editor</title>
-        <style>
-          body { font-family: sans-serif; padding: 1em; }
-          textarea { width: 95%; height: 80vh; font-family: monospace; }
-        </style>
       </head>
       <body>
-        <h1>Memory Bank Document Editor</h1>
-        <p>Editing: ${document.uri.fsPath}</p>
-        <textarea id="editor" nonce="${nonce}">${escapeHtml(documentContent)}</textarea>
-        <button id="save-button" nonce="${nonce}">Save (Not Implemented)</button>
+        <div id="root"></div> <!-- React app mounts here -->
 
-        <!-- Basic script for demonstration -->
         <script nonce="${nonce}">
-          // Basic example - real implementation would use message passing
-          // const vscode = acquireVsCodeApi();
-          // const editor = document.getElementById('editor');
-          // editor.addEventListener('input', (e) => {
-          //   // Send update message to extension host (needs implementation)
-          //   // vscode.postMessage({ type: 'update', payload: e.target.value });
-          // });
-          console.log("Webview script loaded.");
+          // Pass VS Code API to the webview
+          const vscode = acquireVsCodeApi();
+          // Pass initial state or other config if needed (optional)
+          // const initialState = ${JSON.stringify({ content: document.getText() })};
+          // window.initialState = initialState;
         </script>
+        <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
       </body>
       </html>`;
   }
 
-  // TODO: Implement method to update the actual TextDocument when webview sends changes
-  // private updateTextDocument(document: vscode.TextDocument, text: string) { ... }
+  /**
+   * Updates the underlying VS Code TextDocument with new content.
+   * @param document The document to update.
+   * @param jsonString The new content as a string.
+   */
+  private _updateTextDocument(document: vscode.TextDocument, jsonString: string): void {
+    const edit = new vscode.WorkspaceEdit();
+    // Replace the entire document content
+    edit.replace(
+      document.uri,
+      new vscode.Range(0, 0, document.lineCount, 0), // Select entire document range
+      jsonString
+    );
+    vscode.workspace.applyEdit(edit).then(success => {
+        if (!success) {
+            console.error(`Failed to apply edit to ${document.uri.fsPath}`);
+            vscode.window.showErrorMessage(`Failed to save changes to ${path.basename(document.uri.fsPath)}.`);
+        } else {
+            // Optionally trigger save after applying edit, though VS Code's autosave might handle it
+            // document.save();
+            console.log(`Successfully applied edit to ${document.uri.fsPath}`);
+        }
+    }, failureReason => {
+         console.error(`Error applying edit to ${document.uri.fsPath}:`, failureReason);
+         vscode.window.showErrorMessage(`Error saving changes to ${path.basename(document.uri.fsPath)}.`);
+    });
+  }
 }
 
 // Utility function to generate a nonce
