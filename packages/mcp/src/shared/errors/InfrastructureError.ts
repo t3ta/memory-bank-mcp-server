@@ -1,7 +1,7 @@
 import { BaseError } from './BaseError.js';
 
 /**
- * インフラストラクチャレイヤーのエラーコード
+ * Error codes for the infrastructure layer
  */
 export enum InfrastructureErrorCodes {
   FILE_NOT_FOUND = 'INFRASTRUCTURE_FILE_NOT_FOUND',
@@ -15,14 +15,14 @@ export enum InfrastructureErrorCodes {
   DIRECTORY_CREATE_ERROR = 'INFRASTRUCTURE_DIRECTORY_CREATE_ERROR',
   INDEX_UPDATE_ERROR = 'INFRASTRUCTURE_INDEX_UPDATE_ERROR',
   INITIALIZATION_ERROR = 'INFRASTRUCTURE_INITIALIZATION_ERROR',
-  CONFIGURATION_ERROR = 'INFRASTRUCTURE_CONFIGURATION_ERROR', // Added
-  INVALID_ARGUMENT = 'INFRASTRUCTURE_INVALID_ARGUMENT',     // Added
-  PERSISTENCE_ERROR = 'INFRASTRUCTURE_PERSISTENCE_ERROR',     // Added
-  MCP_SERVER_ERROR = 'INFRASTRUCTURE_MCP_SERVER_ERROR',       // Added
+  CONFIGURATION_ERROR = 'INFRASTRUCTURE_CONFIGURATION_ERROR',
+  INVALID_ARGUMENT = 'INFRASTRUCTURE_INVALID_ARGUMENT',
+  PERSISTENCE_ERROR = 'INFRASTRUCTURE_PERSISTENCE_ERROR',
+  MCP_SERVER_ERROR = 'INFRASTRUCTURE_MCP_SERVER_ERROR',
 }
 
 /**
- * インフラストラクチャレイヤーのエラー
+ * Error for the infrastructure layer
  */
 export class InfrastructureError extends BaseError {
   constructor(code: InfrastructureErrorCodes, message: string, details?: Record<string, unknown>) {
@@ -56,11 +56,11 @@ interface OperationDetails extends Record<string, unknown> {
 }
 
 /**
- * インフラストラクチャエラーのファクトリーメソッド
+ * Factory methods for infrastructure errors
  */
 export const InfrastructureErrors = {
   /**
-   * ファイルが見つからない場合のエラー
+   * Error for when a file is not found
    */
   fileNotFound: (message: string, details?: OperationDetails) => {
     return new InfrastructureError(
@@ -71,7 +71,7 @@ export const InfrastructureErrors = {
   },
 
   /**
-   * ファイルの読み込みエラー
+   * Error for file read errors
    */
   fileReadError: (message: string, details?: OperationDetails) => {
     return new InfrastructureError(
@@ -82,7 +82,7 @@ export const InfrastructureErrors = {
   },
 
   /**
-   * ファイルの書き込みエラー
+   * Error for file write errors
    */
   fileWriteError: (message: string, details?: OperationDetails) => {
     return new InfrastructureError(
@@ -93,7 +93,7 @@ export const InfrastructureErrors = {
   },
 
   /**
-   * ファイルの削除エラー
+   * Error for file delete errors
    */
   fileDeleteError: (message: string, details?: OperationDetails) => {
     return new InfrastructureError(
@@ -104,7 +104,7 @@ export const InfrastructureErrors = {
   },
 
   /**
-   * ファイルのパーミッションエラー
+   * Error for file permission errors
    */
   permissionDenied: (message: string, details?: OperationDetails) => {
     return new InfrastructureError(
@@ -115,7 +115,7 @@ export const InfrastructureErrors = {
   },
 
   /**
-   * ファイルシステムの一般的なエラー
+   * General file system error
    */
   fileSystemError: (message: string, details?: OperationDetails) => {
     return new InfrastructureError(
@@ -126,7 +126,7 @@ export const InfrastructureErrors = {
   },
 
   /**
-   * ファイルが既に存在する場合のエラー
+   * Error for when a file already exists
    */
   fileAlreadyExists: (message: string, details?: OperationDetails) => {
     return new InfrastructureError(
@@ -137,7 +137,7 @@ export const InfrastructureErrors = {
   },
 
   /**
-   * ディレクトリが見つからない場合のエラー
+   * Error for when a directory is not found
    */
   directoryNotFound: (message: string, details?: OperationDetails) => {
     return new InfrastructureError(
@@ -148,7 +148,7 @@ export const InfrastructureErrors = {
   },
 
   /**
-   * ディレクトリの作成エラー
+   * Error for directory creation errors
    */
   directoryCreateError: (message: string, details?: OperationDetails) => {
     return new InfrastructureError(
@@ -159,7 +159,7 @@ export const InfrastructureErrors = {
   },
 
   /**
-   * インデックス更新エラー
+   * Error for index update errors
    */
   indexUpdateError: (message: string, details?: OperationDetails) => {
     return new InfrastructureError(
@@ -170,7 +170,7 @@ export const InfrastructureErrors = {
   },
 
   /**
-   * 初期化エラー
+   * Error for initialization errors
    */
   initializationError: (message: string, details?: OperationDetails) => {
     return new InfrastructureError(
@@ -181,7 +181,7 @@ export const InfrastructureErrors = {
   },
 
   /**
-   * MCPサーバーの一般的なエラー
+   * General MCP server error
    */
   mcpServerError: (message: string, details?: OperationDetails) => {
     return new InfrastructureError(

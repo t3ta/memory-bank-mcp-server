@@ -5,7 +5,6 @@ import { InfrastructureError, InfrastructureErrorCodes, InfrastructureErrors } f
 import { SharedUtilsError, SharedUtilsErrorCodes, SharedUtilsErrors } from './SharedUtilsError.js';
 import { logger } from '../utils/logger.js';
 
-// Re-export all error types
 export {
   BaseError,
   ApplicationError, ApplicationErrorCodes, ApplicationErrors,
@@ -32,31 +31,25 @@ export const ErrorUtils = {
     try {
       return await promise;
     } catch (error) {
-      // If already a known error type, just rethrow
       if (error instanceof BaseError) {
         throw error;
       }
 
-      // Log the original error
       logger.error('Error caught in wrapAsync', { error });
 
-      // Map unknown errors if mapper provided
       if (errorMapper) {
         throw errorMapper(error);
       }
 
-      // Default error mapping
       if (error instanceof Error) {
-        // Use factory and include cause in details
-        throw InfrastructureErrors.mcpServerError( // Assuming mcpServerError factory exists or needs creation
+        throw InfrastructureErrors.mcpServerError(
           error.message,
           { originalError: error.toString(), cause: error }
         );
       }
 
-      // Completely unknown error
       throw new InfrastructureError(
-        InfrastructureErrorCodes.MCP_SERVER_ERROR, // Changed UNKNOWN_ERROR to MCP_SERVER_ERROR
+        InfrastructureErrorCodes.MCP_SERVER_ERROR,
         'An unknown error occurred',
         { originalError: String(error) }
       );
@@ -75,12 +68,10 @@ export const ErrorUtils = {
       return false;
     }
 
-    // Check if it's a BaseError with isInstanceOf method
     if (error instanceof BaseError) {
       return error.isInstanceOf(errorName);
     }
 
-    // Fallback to constructor name
     return error.constructor.name === errorName;
   },
 

@@ -53,7 +53,6 @@ export class ApplicationError extends BaseError {
    * @param newMessage New error message
    * @param additionalDetails Additional details to merge with existing details
    */
-  // Removed 'override' as BaseError.withMessage is now abstract
   public withMessage(newMessage: string, additionalDetails?: Record<string, unknown>): ApplicationError {
     const combinedDetails = {
       ...this.details,
@@ -81,7 +80,7 @@ export const ApplicationErrorCodes = {
   NOT_FOUND: 'NOT_FOUND',
   CONFLICT: 'CONFLICT',
   UNKNOWN_ERROR: 'UNKNOWN_ERROR',
-  UNEXPECTED_CONTROLLER_ERROR: 'UNEXPECTED_CONTROLLER_ERROR', // Added for unexpectedControllerError factory
+  UNEXPECTED_CONTROLLER_ERROR: 'UNEXPECTED_CONTROLLER_ERROR',
   INVALID_STATE: 'INVALID_STATE',
   OPERATION_NOT_ALLOWED: 'OPERATION_NOT_ALLOWED',
 } as const;

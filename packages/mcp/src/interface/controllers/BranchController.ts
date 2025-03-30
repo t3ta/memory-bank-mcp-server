@@ -10,10 +10,9 @@ import { CreateBranchCoreFilesUseCase } from '../../application/usecases/common/
 import { DomainErrors } from '../../shared/errors/DomainError.js';
 import { ApplicationErrors } from '../../shared/errors/ApplicationError.js';
 import { BaseError } from '../../shared/errors/BaseError.js';
-// import { BranchInfo } from '../../domain/entities/BranchInfo.js'; // Removed unused import
 
 /**
- * ブランチ関連のコントローラー
+ * Controller for branch related operations
  */
 export class BranchController {
   private readonly componentLogger = logger.withContext({ component: 'BranchController' });
@@ -30,7 +29,7 @@ export class BranchController {
   ) {}
 
   /**
-   * ブランチドキュメントを読み取る
+   * Read a branch document
    */
   async readDocument(branchName: string, path: string) {
     try {
@@ -48,17 +47,16 @@ export class BranchController {
   }
 
   /**
-   * ブランチドキュメントを書き込む
+   * Write a branch document
    */
  async writeDocument(branchName: string, path: string, content: any) {
    try {
      this.componentLogger.info('Writing branch document', { branchName, path });
      await this.writeBranchDocumentUseCase.execute({
        branchName,
-       document: { // Nest path and content within document object
+       document: {
          path: path,
          content: content,
-         // tags are not passed from this controller method, use default [] if needed by use case
        }
      });
 
@@ -70,7 +68,7 @@ export class BranchController {
   }
 
   /**
-   * ブランチのコアファイルを読み取る
+   * Read core files for a branch
    */
   async readCoreFiles(branchName: string) {
     try {
@@ -84,16 +82,15 @@ export class BranchController {
   }
 
   /**
-   * ブランチのコアファイルを作成する
+   * Create core files for a branch
    */
   async createCoreFiles(branchName: string, files: Record<string, any>) {
     try {
       this.validateFiles(files);
       this.componentLogger.info('Creating branch core files', { branchName });
 
-      // Pass branchName instead of branchInfo
       await this.createBranchCoreFilesUseCase.execute({
-        branchName: branchName, // Use branchName from method argument
+        branchName: branchName,
         files,
       });
 
@@ -105,7 +102,7 @@ export class BranchController {
   }
 
   /**
-   * タグでドキュメントを検索する
+   * Search documents by tags
    */
   async searchByTags(tags: string[]) {
     try {
@@ -119,12 +116,12 @@ export class BranchController {
   }
 
   /**
-   * タグインデックスを更新する
+   * Update tag index for a branch
    */
-  async updateTagIndex(branchName: string) { // Add branchName parameter
+  async updateTagIndex(branchName: string) {
     try {
-      this.componentLogger.info('Updating tag index', { branchName }); // Log branchName
-      await this.updateTagIndexUseCase.execute({ branchName }); // Pass branchName
+      this.componentLogger.info('Updating tag index', { branchName });
+      await this.updateTagIndexUseCase.execute({ branchName });
       return this.presenter.presentSuccess({ message: 'Tag index updated successfully' });
     } catch (error) {
       this.componentLogger.error('Failed to update tag index', { error });
@@ -133,12 +130,12 @@ export class BranchController {
   }
 
   /**
-   * 最近のブランチを取得する
+   * Get recent branches
    */
   async getRecentBranches() {
     try {
       this.componentLogger.info('Getting recent branches');
-      const branches = await this.getRecentBranchesUseCase.execute({}); // Pass empty object
+      const branches = await this.getRecentBranchesUseCase.execute({});
       return this.presenter.presentSuccess(branches);
     } catch (error) {
       this.componentLogger.error('Failed to get recent branches', { error });
@@ -147,7 +144,7 @@ export class BranchController {
   }
 
   /**
-   * ファイルの検証を行う
+   * Validate files input
    */
   private validateFiles(files: any): void {
     if (!files || typeof files !== 'object') {
@@ -156,14 +153,14 @@ export class BranchController {
   }
 
   /**
-   * エラー処理
+   * Handle errors
    */
   private handleError(error: unknown) {
     if (error instanceof BaseError) {
       return this.presenter.presentError(error);
     }
 
-    // 未知のエラーの場合は、ApplicationErrorに変換
+    // Convert unknown errors to ApplicationError
     const applicationError = ApplicationErrors.unexpectedControllerError(
       'BranchController',
       error instanceof Error ? error : undefined
