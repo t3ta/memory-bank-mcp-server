@@ -4,8 +4,8 @@
     "module": "NodeNext", // Changed to NodeNext for consistency
     "moduleResolution": "NodeNext", // Changed to NodeNext for consistency
     "esModuleInterop": true,
-    "strict": false,
-    "noImplicitAny": false,
+    "strict": true, // Enabled strict mode
+    "noImplicitAny": true, // Enabled noImplicitAny
     "skipLibCheck": true,
     "noEmitOnError": false,
     "forceConsistentCasingInFileNames": true,
@@ -15,8 +15,8 @@
     "preserveConstEnums": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+    "noUnusedLocals": true, // Enabled noUnusedLocals
+    "noUnusedParameters": true, // Enabled noUnusedParameters
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "allowUnreachableCode": false,
