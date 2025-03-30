@@ -1,0 +1,163 @@
+{
+  "title": "Schema Package Improvement Plan",
+  "createdAt": "2025-03-30T12:00:00Z",
+  "author": "みらい",
+  "improvements": [
+    {
+      "id": "version-management",
+      "title": "バージョン管理と互換性強化",
+      "summary": "スキーマバージョン間の互換性とマイグレーションメカニズムの強化",
+      "description": "現在のスキーマにはバージョン識別子があるものの、バージョン間の明示的な移行パスやマイグレーションユーティリティがありません。異なるバージョンのドキュメントを処理するための統一的なアプローチを提供することで、将来のスキーマ更新をよりスムーズに行えるようになります。",
+      "implementation": {
+        "code": "// export.ts\nexport const SCHEMA_VERSIONS = {\n  v1: 'memory_document_v1',\n  v2: 'memory_document_v2',\n  latest: 'memory_document_v2'\n};\n\nexport function migrateDocument(doc: any): JsonDocumentV2 {\n  if (doc.schema === 'memory_document_v1') {\n    // v1からv2へ変換するロジック\n    return /* 変換結果 */;\n  }\n  return doc;\n}",
+        "difficulty": "medium",
+        "impact": "high"
+      }
+    },
+    {
+      "id": "schema-modularization",
+      "title": "スキーマファイルの分割と整理",
+      "summary": "大きなスキーマファイルを機能単位で分割して保守性を向上",
+      "description": "現在の json-document.ts ファイルは200行以上あり、複数のドキュメントタイプの定義が含まれています。このファイルをドキュメントタイプごとに分割することで、コードの可読性、保守性、テスト容易性が向上します。",
+      "implementation": {
+        "code": "// document-types/branch-context.ts\nexport const BranchContextContentV2Schema = z.object({ /*...*/ });\n\n// document-types/active-context.ts\nexport const ActiveContextContentV2Schema = z.object({ /*...*/ });\n\n// インデックスファイルで再エクスポート\n// document-types/index.ts\nexport * from './branch-context.js';\nexport * from './active-context.js';",
+        "difficulty": "low",
+        "impact": "medium"
+      }
+    },
+    {
+      "id": "validation-helpers",
+      "title": "バリデーションヘルパーの拡張",
+      "summary": "再利用可能なバリデーション関数でコードの重複削減",
+      "description": "スキーマ定義内で繰り返し使用されるバリデーションロジックを共通のヘルパー関数として抽出することで、コードの重複を減らし、一貫性のあるエラーメッセージを提供できます。",
+      "implementation": {
+        "code": "// validation-helpers.ts\nexport const createErrorMessage = (field: string, reason: string) => \n  `${field}が無効です: ${reason}`;\n\nexport const commonValidators = {\n  nonEmptyString: (fieldName: string) => \n    z.string().min(1, createErrorMessage(fieldName, '空にできません')),\n  uuidField: (fieldName: string) => \n    z.string().uuid(createErrorMessage(fieldName, 'UUIDフォーマットではありません'))\n};",
+        "difficulty": "low",
+        "impact": "medium"
+      }
+    },
+    {
+      "id": "i18n-errors",
+      "title": "エラーメッセージの国際化対応",
+      "summary": "バリデーションエラーメッセージの多言語対応",
+      "description": "エラーメッセージを国際化対応にすることで、異なる言語を使用するユーザーに対して適切なフィードバックを提供できます。既存のi18n機能と統合することで、一貫した多言語体験を実現します。",
+      "implementation": {
+        "code": "// i18n-errors.ts\nexport const errorMessages = {\n  en: {\n    emptyTitle: 'Title cannot be empty',\n    invalidUuid: 'Document ID must be a valid UUID'\n  },\n  ja: {\n    emptyTitle: 'タイトルを入力してください',\n    invalidUuid: 'ドキュメントIDは有効なUUIDである必要があります'\n  },\n  zh: {\n    // 中国語メッセージ\n  }\n};",
+        "difficulty": "medium",
+        "impact": "medium"
+      }
+    },
+    {
+      "id": "schema-extension",
+      "title": "スキーマ拡張メカニズムの導入",
+      "summary": "基本スキーマを拡張するための再利用可能なパターン",
+      "description": "スキーマを拡張するための標準的なパターンを提供することで、新しいドキュメントタイプの作成を簡素化し、一貫性を確保します。このアプローチにより、プロジェクト固有の拡張が容易になります。",
+      "implementation": {
+        "code": "// extensible-schema.ts\nexport function extendDocumentSchema<T extends z.ZodObject<any>>(\n  baseSchema: T, \n  extensions: Record<string, z.ZodTypeAny>\n) {\n  return baseSchema.extend({\n    content: baseSchema.shape.content.extend(extensions)\n  });\n}",
+        "difficulty": "medium",
+        "impact": "high"
+      }
+    },
+    {
+      "id": "auto-documentation",
+      "title": "スキーマからの自動ドキュメント生成",
+      "summary": "スキーマ定義から自動的にドキュメントを生成する機能",
+      "description": "スキーマ定義からドキュメントを自動生成することで、仕様とドキュメントの同期が保たれ、最新の状態を常に維持できます。これにより、開発者は常に最新のスキーマ情報にアクセスできます。",
+      "implementation": {
+        "code": "// schema-docs-generator.ts\nexport function generateSchemaDocumentation(schema: z.ZodType<any>) {\n  // スキーマから構造情報を抽出\n  return { /* 構造化されたドキュメント情報 */ };\n}\n\n// 使用例\nconst jsonDocDocs = generateSchemaDocumentation(JsonDocumentV2Schema);\nwriteDocsToMarkdown(jsonDocDocs, './docs/json-document-v2.md');",
+        "difficulty": "high",
+        "impact": "medium"
+      }
+    },
+    {
+      "id": "json-schema-integration",
+      "title": "JSON Schemaとの相互運用",
+      "summary": "ZodスキーマとJSON Schemaの間の変換サポート",
+      "description": "ZodスキーマからJSON Schemaを生成する機能を追加することで、外部ツールやAPIドキュメントとの統合が容易になります。これにより、OpenAPIやSwaggerなどのツールとの連携が強化されます。",
+      "implementation": {
+        "code": "// json-schema-converter.ts\nimport { zodToJsonSchema } from 'zod-to-json-schema';\n\nexport function exportToJsonSchema(schema: z.ZodType<any>, name: string) {\n  return zodToJsonSchema(schema, { name });\n}",
+        "difficulty": "low",
+        "impact": "medium"
+      }
+    },
+    {
+      "id": "test-utilities",
+      "title": "スキーマテスト・検証ツールの強化",
+      "summary": "スキーマのテストと検証を効率化するユーティリティ",
+      "description": "スキーマからテストデータを自動生成し、バリデーションをテストするユーティリティを提供することで、スキーマの品質保証プロセスを効率化します。これにより、スキーマの変更に対する信頼性が向上します。",
+      "implementation": {
+        "code": "// schema-test-utils.ts\nexport function generateTestData<T>(schema: z.ZodType<T>): T {\n  // スキーマから有効なテストデータを自動生成\n  return { /* 生成されたテストデータ */ };\n}\n\nexport function validateExamples<T>(\n  schema: z.ZodType<T>, \n  examples: any[]\n): ValidationResult[] {\n  return examples.map(example => {\n    try {\n      schema.parse(example);\n      return { valid: true, example };\n    } catch (err) {\n      return { valid: false, example, errors: err.errors };\n    }\n  });\n}",
+        "difficulty": "medium",
+        "impact": "medium"
+      }
+    },
+    {
+      "id": "efficient-serialization",
+      "title": "効率的なシリアライズ/デシリアライズ",
+      "summary": "パフォーマンスを最適化したデータ処理ユーティリティ",
+      "description": "大規模なデータセットを処理する際のパフォーマンスを向上させるため、最適化されたシリアライズ/デシリアライズ関数を提供します。これにより、大量のドキュメントを扱う際のシステム全体のパフォーマンスが向上します。",
+      "implementation": {
+        "code": "// serialization.ts\nexport function optimizedParse<T>(\n  schema: z.ZodType<T>,\n  data: unknown,\n  options?: { cache?: boolean }\n): T {\n  // キャッシュや前処理を利用したパフォーマンス最適化\n  return schema.parse(data);\n}\n\nexport function safeStringify<T>(\n  data: T,\n  replacer?: (key: string, value: any) => any\n): string {\n  // 循環参照に対応した安全なJSON.stringify\n  return JSON.stringify(data, replacer);\n}",
+        "difficulty": "medium",
+        "impact": "medium"
+      }
+    },
+    {
+      "id": "type-safe-query",
+      "title": "型安全なクエリビルダー",
+      "summary": "型の恩恵を受けたドキュメント検索クエリの構築",
+      "description": "型安全なクエリビルダーを提供することで、開発者が安全かつ効率的にドキュメントを検索できるようにします。これにより、クエリ関連のバグが減少し、IDEの補完機能も活用できます。",
+      "implementation": {
+        "code": "// query-builder.ts\nexport function createDocumentQuery<T extends JsonDocumentV2>() {\n  return {\n    withTag: (tag: string) => ({ tag }),\n    byDocumentType: (type: T['metadata']['documentType']) => ({ type }),\n    modifiedAfter: (date: Date) => ({ after: date }),\n    // その他のクエリメソッド\n    build: () => ({ /* 構築されたクエリオブジェクト */ })\n  };\n}",
+        "difficulty": "high",
+        "impact": "high"
+      }
+    }
+  ],
+  "priorityRecommendations": [
+    {
+      "id": "version-management",
+      "reason": "将来のスキーマ更新をスムーズに行うための基盤となります。バージョン間の互換性を確保することで、システムの安定性が向上します。"
+    },
+    {
+      "id": "schema-modularization",
+      "reason": "大きなファイルを分割することで、コードの可読性と保守性がすぐに向上します。実装も比較的容易です。"
+    },
+    {
+      "id": "validation-helpers",
+      "reason": "コードの重複を減らし、バリデーションロジックを一元管理することで、一貫性と保守性が向上します。"
+    }
+  ],
+  "implementationStrategy": {
+    "phases": [
+      {
+        "name": "基盤整備",
+        "improvements": [
+          "schema-modularization",
+          "validation-helpers",
+          "version-management"
+        ],
+        "duration": "2週間"
+      },
+      {
+        "name": "機能強化",
+        "improvements": [
+          "schema-extension",
+          "i18n-errors",
+          "json-schema-integration"
+        ],
+        "duration": "2週間"
+      },
+      {
+        "name": "開発者体験向上",
+        "improvements": [
+          "auto-documentation",
+          "test-utilities",
+          "efficient-serialization",
+          "type-safe-query"
+        ],
+        "duration": "3週間"
+      }
+    ]
+  }
+}
