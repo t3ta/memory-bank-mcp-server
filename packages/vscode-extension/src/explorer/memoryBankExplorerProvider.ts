@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { MemoryBankProvider } from '../providers/memoryBankProvider';
+import { getCurrentGitBranch } from '../utils/gitUtils'; // Import the git utility
 
 // Define the custom tree item extending vscode.TreeItem
 class MemoryBankTreeItem extends vscode.TreeItem {
@@ -99,8 +100,16 @@ export class MemoryBankExplorerProvider implements vscode.TreeDataProvider<Memor
           if (element.label === 'Global Memory') {
             relativePath = 'global-memory-bank';
           } else if (element.label.startsWith('Branch Memory')) {
-            // TODO: Extract branch name dynamically
-            relativePath = 'branch-memory-bank/feature-vscode-extension'; // Placeholder
+            // Extract branch name from the label (e.g., "Branch Memory (my-branch)")
+            const match = element.label.match(/Branch Memory \((.+)\)/);
+            const branchName = match ? match[1] : null;
+            if (branchName) {
+                // Construct path using the extracted branch name
+                relativePath = path.join('branch-memory-bank', branchName);
+            } else {
+                console.warn(`Could not extract branch name from label: ${element.label}`);
+                return []; // Prevent listing if branch name extraction fails
+            }
           }
           break;
         case 'directory':
@@ -116,8 +125,8 @@ export class MemoryBankExplorerProvider implements vscode.TreeDataProvider<Memor
       }
     } else {
       // Root level: Show Global and Branch Memory roots
-      // TODO: Get current branch name dynamically
-      const currentBranchName = 'feature/vscode-extension'; // Placeholder
+      // Get current branch name dynamically
+      const currentBranchName = await getCurrentGitBranch(this.workspaceRoot) ?? 'main'; // Use 'main' as fallback
       // Ensure workspaceRoot is non-null before path.join
       const globalRootUri = vscode.Uri.file(path.join(this.workspaceRoot, 'docs', 'global-memory-bank'));
       const branchRootUri = vscode.Uri.file(path.join(this.workspaceRoot, 'docs', 'branch-memory-bank', currentBranchName));
@@ -157,9 +166,14 @@ export class MemoryBankExplorerProvider implements vscode.TreeDataProvider<Memor
                 return new MemoryBankTreeItem(name, collapsibleState, resourceUri, itemType, command);
             });
         } catch (error) {
+            // Handle cases where the branch directory might not exist yet
+            if (error instanceof vscode.FileSystemError && error.code === 'FileNotFound') {
+                console.warn(`Directory not found for listing children: ${relativePath}`);
+                return []; // Return empty if directory doesn't exist
+            }
             console.error(`Failed to list children for ${relativePath}:`, error);
             vscode.window.showErrorMessage(`Error listing directory: ${relativePath}`);
-            return []; // Return empty on error
+            return []; // Return empty on other errors
         }
     }
 
