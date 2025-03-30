@@ -270,10 +270,12 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
     try {
       parsedData = JSON.parse(jsonString);
       // Basic Markdown generation based on parsed content using the imported function
-      markdown = generateMarkdownFromData(parsedData); // Use imported function
+      // Pass the raw jsonString as the second argument for size checking
+      markdown = generateMarkdownFromData(parsedData, jsonString);
 
     } catch (error) {
       // If JSON is invalid, show error in Markdown preview
+      // Still pass the raw string to potentially show it in the error message
       markdown = `## JSON Parse Error\n\n\`\`\`error\n${error}\n\`\`\`\n\n### Raw Content:\n\`\`\`json\n${jsonString}\n\`\`\``;
       parsedData = null; // Ensure parsedData is null on error
     }
