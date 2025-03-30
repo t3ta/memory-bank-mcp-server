@@ -85,6 +85,18 @@
         ],
         "completed": true,
         "completedAt": "2025-03-30T05:00:02.000Z"
+      },
+      {
+        "id": "c1c2c3c4-c5c6-c7c8-c9ca-cbcccdcecfd0",
+        "description": "TS-2: エラーハンドリング強化ルール",
+        "priority": "high",
+        "implementationOrder": 8,
+        "phase": 1,
+        "dependsOn": [
+          "b202c303-d404-e505-f606-0708090a0b0c"
+        ],
+        "completed": true,
+        "completedAt": "2025-03-30T05:02:39.000Z"
       }
     ],
     "pendingImplementation": [
@@ -192,16 +204,6 @@
         "phase": 3,
         "dependsOn": [
           "41424344-4546-4748-494a-4b4c4d4e4f50"
-        ]
-      },
-      {
-        "id": "c1c2c3c4-c5c6-c7c8-c9ca-cbcccdcecfd0",
-        "description": "TS-2: エラーハンドリング強化ルール",
-        "priority": "high",
-        "implementationOrder": 8,
-        "phase": 1,
-        "dependsOn": [
-          "b202c303-d404-e505-f606-0708090a0b0c"
         ]
       },
       {

@@ -17,8 +17,8 @@ const baseConfig = {
       sourceType: 'module'
   },
   globals: {
-      ..globals.node,
-      ..globals.jest,
+      ...globals.node, // Use spread syntax
+      ...globals.jest, // Use spread syntax
       NodeJS: 'readonly'
     }
   },
@@ -33,15 +33,24 @@ const baseConfig = {
       'argsIgnorePattern': '^_',
       'varsIgnorePattern': '^_',
       'ignoreRestSiblings': true
-    }]
+    }],
+    // Added error handling rules (TS-2)
+    'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
+    '@typescript-eslint/no-explicit-any': 'warn',
+    'prefer-promise-reject-errors': 'error',
+    '@typescript-eslint/explicit-function-return-type': ['error', {
+      allowExpressions: true,
+      allowTypedFunctionExpressions: true
+    }],
+    '@typescript-eslint/consistent-type-assertions': 'error'
   }
 };
 
 // テスト用の設定（より緩い）
 const testConfig = {
-  ..baseConfig,
+  ...baseConfig, // Use spread syntax
   rules: {
-    ..baseConfig.rules,
+    ...baseConfig.rules, // Use spread syntax
     '@typescript-eslint/no-unused-vars': 'off', // テストでは未使用変数を許可
     'no-undef': 'off' // テストでは未定義変数の警告を無効化
   }
@@ -53,11 +62,11 @@ export default [
   },
   js.configs.recommended,
   {
-    ..baseConfig,
+    ...baseConfig, // Use spread syntax
     // src 配下のファイルに基本設定を適用
     files: ['src/**/*.ts'],
     rules: {
-      ..baseConfig.rules,
+      ...baseConfig.rules, // Use spread syntax
       // 警告をエラーにしない設定
       '@typescript-eslint/no-unused-vars': ['warn', {
         'argsIgnorePattern': '^_',
@@ -67,7 +76,7 @@ export default [
     }
   },
   {
-    ..testConfig,
+    ...testConfig, // Use spread syntax
     // tests 配下のファイルにテスト用設定を適用
     files: ['tests/**/*.ts', 'tests/**/*.js']
   }
