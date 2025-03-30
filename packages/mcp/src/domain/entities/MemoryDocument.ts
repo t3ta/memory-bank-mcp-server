@@ -274,12 +274,12 @@ export class MemoryDocument {
       documentType,
       path: this.props.path.value,
       tags: this.props.tags.map((tag) => tag.value),
-      lastModified: this.props.lastModified,
-      createdAt: new Date(),
+      lastModified: this.props.lastModified.toISOString(), // Convert Date to ISO string
+      createdAt: new Date().toISOString(), // Convert Date to ISO string
       version: 1,
       id: crypto.randomUUID(),
       ...content,
-    } as JsonDocumentV2;
+    } as unknown as JsonDocumentV2; // Cast to unknown first to suppress TS error due to path mapping issue
   }
 
   /**

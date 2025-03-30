@@ -9,7 +9,8 @@
  * - Explicit versioning
  */
 import { z } from 'zod';
-import { FlexibleDateSchema, TagSchema } from '../common/schemas.js';
+import { FlexibleDateSchema } from '../common/schemas.js';
+import { commonValidators } from '../validation-helpers.js'; // Import common validators
 
 // Schema version identifier - used for migration and compatibility
 export const SCHEMA_VERSION = 'memory_document_v2';
@@ -17,17 +18,17 @@ export const SCHEMA_VERSION = 'memory_document_v2';
 // Common metadata for all document types
 export const DocumentMetadataV2Schema = z.object({
   // Basic identification
-  title: z.string().min(1, 'Title cannot be empty'),
-  documentType: z.string().min(1, 'Document type cannot be empty'),
-  id: z.string().uuid('Document ID must be a valid UUID'),
-  path: z.string().min(1, 'Path cannot be empty'),
+  title: commonValidators.nonEmptyString('title'),
+  documentType: commonValidators.nonEmptyString('documentType'),
+  id: commonValidators.uuidField('id'),
+  path: commonValidators.nonEmptyString('path'),
 
   // Classification and organization
-  tags: z.array(TagSchema).default([]),
+  tags: commonValidators.tagsArray('tags'),
 
   // Tracking and versioning
-  lastModified: FlexibleDateSchema,
-  createdAt: FlexibleDateSchema,
+  lastModified: commonValidators.isoDateField('lastModified'),
+  createdAt: commonValidators.isoDateField('createdAt'),
   version: z.number().int().positive().default(1),
 });
 
@@ -42,7 +43,7 @@ export const BaseJsonDocumentV2Schema = z.object({
 
 // Branch Context document type
 export const BranchContextContentV2Schema = z.object({
-  purpose: z.string().min(1, 'Purpose cannot be empty'),
+  purpose: commonValidators.nonEmptyString('purpose'),
   background: z.string().optional(),
   userStories: z
     .array(
@@ -95,10 +96,10 @@ export const ProgressJsonV2Schema = BaseJsonDocumentV2Schema.extend({
 
 // Technical Decision schema for System Patterns
 export const TechnicalDecisionContentV2Schema = z.object({
-  title: z.string().min(1, 'Decision title cannot be empty'),
-  context: z.string().min(1, 'Decision context cannot be empty'),
-  decision: z.string().min(1, 'Decision details cannot be empty'),
-  consequences: z.array(z.string()).min(1, 'At least one consequence must be provided'),
+  title: commonValidators.nonEmptyString('title'),
+  context: commonValidators.nonEmptyString('context'),
+  decision: commonValidators.nonEmptyString('decision'),
+  consequences: z.array(z.string()).min(1, { message: '少なくとも1つの結果を提供する必要があります' }), // Keep min(1) for array, adjust message if needed
 });
 
 // System Patterns document type
@@ -122,7 +123,7 @@ export const GenericDocumentContentV2Schema = z
 
 export const GenericDocumentJsonV2Schema = BaseJsonDocumentV2Schema.extend({
   metadata: DocumentMetadataV2Schema.extend({
-    documentType: z.string().min(1, 'Document type cannot be empty'),
+    documentType: commonValidators.nonEmptyString('documentType'),
   }),
   content: GenericDocumentContentV2Schema,
 });
@@ -131,12 +132,12 @@ export const GenericDocumentJsonV2Schema = BaseJsonDocumentV2Schema.extend({
 export const JsonDocumentV2Schema = z
   .object({
     schema: z.literal(SCHEMA_VERSION),
-    documentType: z.enum(['branch_context', 'active_context', 'progress', 'system_patterns']),
-    title: z.string().min(1),
-    id: z.string().uuid(),
-    path: z.string().min(1),
-    tags: z.array(TagSchema).default([]),
-    lastModified: FlexibleDateSchema,
+    documentType: z.enum(['branch_context', 'active_context', 'progress', 'system_patterns']), // Keep enum for discriminated union key
+    title: commonValidators.nonEmptyString('title'),
+    id: commonValidators.uuidField('id'),
+    path: commonValidators.nonEmptyString('path'),
+    tags: commonValidators.tagsArray('tags'), // Use helper here too
+    lastModified: commonValidators.isoDateField('lastModified'), // Use helper here too
     createdAt: FlexibleDateSchema,
     version: z.number().int().positive().default(1),
   })
@@ -144,7 +145,7 @@ export const JsonDocumentV2Schema = z
     z.discriminatedUnion('documentType', [
       z.object({
         documentType: z.literal('branch_context'),
-        purpose: z.string().min(1),
+        purpose: commonValidators.nonEmptyString('purpose'),
         background: z.string().optional(),
         userStories: z
           .array(
@@ -176,10 +177,10 @@ export const JsonDocumentV2Schema = z
         technicalDecisions: z
           .array(
             z.object({
-              title: z.string().min(1),
-              context: z.string().min(1),
-              decision: z.string().min(1),
-              consequences: z.array(z.string()).min(1),
+              title: commonValidators.nonEmptyString('title'),
+              context: commonValidators.nonEmptyString('context'),
+              decision: commonValidators.nonEmptyString('decision'),
+              consequences: z.array(z.string()).min(1, { message: '少なくとも1つの結果を提供する必要があります' }), // Keep min(1) for array
             })
           )
           .default([]),
