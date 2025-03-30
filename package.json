@@ -1,7 +1,11 @@
 {
-  "name": "memory-bank-mcp-server",
+  "name": "memory-bank",
   "version": "2.2.1",
+  "private": true,
   "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "description": "MCP server for managing project documentation and context across sessions",
   "main": "dist/index.js",
   "bin": {
@@ -14,21 +18,25 @@
   ],
   "scripts": {
     "prepare": "husky",
-    "build": "tsc && chmod +x dist/index.js && node scripts/copy-assets.js",
+    "build": "yarn workspaces run build",
+    "build:mcp": "yarn workspace @memory-bank/mcp build",
+    "build:schemas": "yarn workspace @memory-bank/schemas build",
     "copy-assets": "node scripts/copy-assets.js",
-    "clean": "rm -rf dist",
+    "clean": "yarn workspaces run clean",
     "clean:temp": "node tests/utils/clean-temp.js",
-    "start": "node dist/index.js",
-    "dev": "ts-node src/index.ts",
+    "start": "yarn workspace @memory-bank/mcp start",
+    "dev": "yarn workspace @memory-bank/mcp dev",
     "lint": "eslint . --ext .ts --max-warnings 1000 || true",
     "lint:fix": "eslint . --ext .ts --fix",
-    "format": "prettier --write 'src/**/*.ts'",
-    "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
-    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' jest --watch",
-    "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage",
-    "test:integration": "NODE_OPTIONS='--experimental-vm-modules' jest --no-coverage --testMatch='**/tests/integration/**/*.test.ts' --config=tests/integration/jest.config.ts",
+    "format": "prettier --write 'packages/*/src/**/*.ts'",
+    "test": "yarn workspaces run test",
+    "test:mcp": "yarn workspace @memory-bank/mcp test",
+    "test:schemas": "yarn workspace @memory-bank/schemas test",
+    "test:watch": "yarn workspace @memory-bank/mcp test:watch",
+    "test:coverage": "yarn workspaces run test:coverage",
+    "test:integration": "yarn workspace @memory-bank/mcp test:integration",
     "test:list-failures": "NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest --no-coverage --json --testLocationInResults --silent --testMatch='**/tests/**/*.test.ts' --testPathIgnorePatterns='tests/e2e' 2>/dev/null | jq -r '[.testResults[] | select(.status == \"failed\") | .name] | .[]' | sed 's#.*/tests/##' | sort",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "yarn build"
   },
   "keywords": [
     "mcp",
@@ -68,6 +76,9 @@
     "ts-prune": "^0.10.3",
     "typescript": "^5.8.2",
     "typescript-eslint": "^8.26.1"
+  },
+  "resolutions": {
+    "@memory-bank/schemas": "1.0.0"
   },
   "engines": {
     "node": "^18.18.0 || ^20.9.0 || >=21.1.0"

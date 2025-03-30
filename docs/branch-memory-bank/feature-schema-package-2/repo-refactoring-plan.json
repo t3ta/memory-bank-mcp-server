@@ -1,0 +1,341 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "repo-refactoring-plan-id",
+    "title": "MemoryBankRepositoryリファクタリング計画",
+    "documentType": "plan",
+    "path": "repo-refactoring-plan.json",
+    "tags": [
+      "refactoring",
+      "repository",
+      "architecture",
+      "design-pattern"
+    ],
+    "lastModified": "2025-03-29T13:45:00.000Z",
+    "createdAt": "2025-03-29T13:45:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "description": "FileSystemBranchMemoryBankRepositoryとFileSystemGlobalMemoryBankRepositoryの肥大化問題を解決するための詳細リファクタリング計画",
+      "problem": "現在、FileSystemBranchMemoryBankRepository（871行）とFileSystemGlobalMemoryBankRepository（875行）が非常に肥大化しており、単一責任の原則に違反している。これらのクラスは多すぎる責任を持ち、テストが困難で、拡張性も低下している。",
+      "goal": "TagIndexRepositoryの実装で成功しているクラス分割パターン（ベースクラス、具体実装、ブリッジ層）を活用し、機能種別ごとにリポジトリクラスを分割して軽量化する。"
+    },
+    "currentAnalysis": {
+      "problemAreas": [
+        {
+          "name": "多すぎる責任",
+          "description": "ファイル操作、ドキュメント管理、タグ操作、テンプレート処理など、複数の責任が一つのクラスに集中している。",
+          "impact": "コードの可読性低下、バグのリスク増加、テスト困難性"
+        },
+        {
+          "name": "重複コード",
+          "description": "BranchリポジトリとGlobalリポジトリで類似の処理が重複している。",
+          "impact": "保守性の低下、一貫性の欠如、バグ修正時の複数箇所変更リスク"
+        },
+        {
+          "name": "テスト困難性",
+          "description": "大きなクラスは多くの依存関係を持ち、モックとテストがより複雑になる。",
+          "impact": "テストカバレッジの低下、品質保証の困難さ"
+        },
+        {
+          "name": "拡張性の低下",
+          "description": "新機能追加時に既存の複雑なコードを理解・変更する必要がある。",
+          "impact": "開発速度の低下、リグレッション発生リスク"
+        }
+      ],
+      "responsibilities": [
+        {
+          "category": "ファイルシステム操作",
+          "functions": [
+            "ファイル読み書き",
+            "ディレクトリ作成",
+            "パス解決"
+          ]
+        },
+        {
+          "category": "ドキュメント管理",
+          "functions": [
+            "読み取り",
+            "書き込み",
+            "検索",
+            "削除"
+          ]
+        },
+        {
+          "category": "タグ操作",
+          "functions": [
+            "タグインデックス管理",
+            "タグによる検索"
+          ]
+        },
+        {
+          "category": "ブランチ管理",
+          "functions": [
+            "ブランチ初期化",
+            "ブランチ存在確認",
+            "ブランチ構造検証"
+          ]
+        },
+        {
+          "category": "キャッシュ管理",
+          "functions": [
+            "ドキュメントキャッシュ",
+            "インデックスキャッシュ"
+          ]
+        },
+        {
+          "category": "テンプレート処理",
+          "functions": [
+            "デフォルトドキュメント生成",
+            "テンプレート適用"
+          ]
+        }
+      ]
+    },
+    "proposedSolution": {
+      "approach": "責任ごとに分割された軽量なクラス群を設計し、コンポジションパターンを用いて組み合わせる",
+      "components": [
+        {
+          "name": "FileSystemMemoryBankRepositoryBase",
+          "description": "基本的なファイル操作と共通機能を提供する抽象基底クラス",
+          "responsibilities": [
+            "パス解決",
+            "基本的なファイル操作",
+            "共通ユーティリティ"
+          ],
+          "benefitReason": "コード共有と一貫性の確保"
+        },
+        {
+          "name": "FileSystemDocumentOperations",
+          "description": "ドキュメントのCRUD操作に特化したコンポーネント",
+          "responsibilities": [
+            "読み取り",
+            "書き込み",
+            "検索",
+            "削除"
+          ],
+          "benefitReason": "ドキュメント操作の一元管理"
+        },
+        {
+          "name": "FileSystemTagOperations",
+          "description": "タグ関連の操作を担当するコンポーネント",
+          "responsibilities": [
+            "タグインデックス管理",
+            "タグによる検索"
+          ],
+          "benefitReason": "タグ操作の集約と整理"
+        },
+        {
+          "name": "MemoryBankTemplateManager",
+          "description": "テンプレートとデフォルト構造の管理",
+          "responsibilities": [
+            "デフォルトドキュメント生成",
+            "テンプレート適用"
+          ],
+          "benefitReason": "テンプレート処理の分離"
+        },
+        {
+          "name": "BranchMemoryBankManager",
+          "description": "ブランチ特有の操作を担当",
+          "responsibilities": [
+            "ブランチ初期化",
+            "ブランチ存在確認",
+            "ブランチ構造検証"
+          ],
+          "benefitReason": "ブランチ関連処理の集約"
+        },
+        {
+          "name": "FileSystemBranchMemoryBankRepository",
+          "description": "IBranchMemoryBankRepositoryインターフェースを実装する主クラス",
+          "responsibilities": [
+            "上記コンポーネントの組み合わせと連携"
+          ],
+          "benefitReason": "高レベルな振る舞いの提供"
+        },
+        {
+          "name": "FileSystemGlobalMemoryBankRepository",
+          "description": "IGlobalMemoryBankRepositoryインターフェースを実装する主クラス",
+          "responsibilities": [
+            "上記コンポーネントの組み合わせと連携"
+          ],
+          "benefitReason": "高レベルな振る舞いの提供"
+        }
+      ],
+      "dependencies": [
+        {
+          "from": "FileSystemBranchMemoryBankRepository",
+          "to": [
+            "FileSystemMemoryBankRepositoryBase",
+            "FileSystemDocumentOperations",
+            "FileSystemTagOperations",
+            "MemoryBankTemplateManager",
+            "BranchMemoryBankManager"
+          ],
+          "type": "コンポジション（所有）"
+        },
+        {
+          "from": "FileSystemGlobalMemoryBankRepository",
+          "to": [
+            "FileSystemMemoryBankRepositoryBase",
+            "FileSystemDocumentOperations",
+            "FileSystemTagOperations",
+            "MemoryBankTemplateManager"
+          ],
+          "type": "コンポジション（所有）"
+        },
+        {
+          "from": "FileSystemDocumentOperations",
+          "to": [
+            "FileSystemMemoryBankRepositoryBase"
+          ],
+          "type": "依存（参照）"
+        }
+      ]
+    },
+    "classDesignDetails": [
+      {
+        "className": "FileSystemMemoryBankRepositoryBase",
+        "type": "抽象基底クラス",
+        "properties": [
+          "protected readonly fileSystem: IFileSystemService",
+          "protected readonly configProvider: IConfigProvider"
+        ],
+        "methods": [
+          "protected getAbsolutePath(relativePath: string): string",
+          "protected getDocsRootPath(): string",
+          "protected async fileExists(path: string): Promise<boolean>",
+          "protected async readJsonFile<T>(path: string): Promise<T | null>",
+          "protected async writeJsonFile<T>(path: string, data: T): Promise<void>",
+          "protected async createDirectoryIfNotExists(dirPath: string): Promise<void>",
+          "protected generateUUID(): string"
+        ]
+      },
+      {
+        "className": "FileSystemDocumentOperations",
+        "type": "コンポーネントクラス",
+        "properties": [
+          "private readonly baseRepo: FileSystemMemoryBankRepositoryBase",
+          "private documentCache: Map<string, MemoryDocument>"
+        ],
+        "methods": [
+          "async findDocumentByPath(basePath: string, path: DocumentPath): Promise<MemoryDocument | null>",
+          "async saveDocument(basePath: string, document: MemoryDocument): Promise<void>",
+          "async deleteDocument(basePath: string, path: DocumentPath): Promise<boolean>",
+          "async listDocuments(basePath: string): Promise<DocumentPath[]>"
+        ]
+      },
+      {
+        "className": "FileSystemTagOperations",
+        "type": "コンポーネントクラス",
+        "properties": [
+          "private readonly baseRepo: FileSystemMemoryBankRepositoryBase",
+          "private tagCache: Map<string, Tag[]>"
+        ],
+        "methods": [
+          "async findDocumentsByTags(basePath: string, tags: Tag[]): Promise<MemoryDocument[]>",
+          "async findDocumentPathsByTagsUsingIndex(basePath: string, tags: Tag[], matchAll?: boolean): Promise<DocumentPath[]>",
+          "async saveTagIndex(basePath: string, tagIndex: BranchTagIndex | GlobalTagIndex): Promise<void>",
+          "async getTagIndex(basePath: string): Promise<BranchTagIndex | GlobalTagIndex | null>"
+        ]
+      },
+      {
+        "className": "MemoryBankTemplateManager",
+        "type": "コンポーネントクラス",
+        "properties": [
+          "private readonly baseRepo: FileSystemMemoryBankRepositoryBase",
+          "private readonly language: Language"
+        ],
+        "methods": [
+          "getDefaultTemplates(): Record<string, string | ((branchName?: string) => string)>",
+          "async createDefaultDocument(basePath: string, path: string, branchName?: string): Promise<MemoryDocument>"
+        ]
+      },
+      {
+        "className": "BranchMemoryBankManager",
+        "type": "コンポーネントクラス",
+        "properties": [
+          "private readonly baseRepo: FileSystemMemoryBankRepositoryBase",
+          "private readonly templateManager: MemoryBankTemplateManager"
+        ],
+        "methods": [
+          "async exists(branchName: string): Promise<boolean>",
+          "async validateStructure(branchInfo: BranchInfo): Promise<boolean>",
+          "async initialize(branchInfo: BranchInfo): Promise<void>",
+          "async getRecentBranches(limit?: number): Promise<RecentBranch[]>"
+        ]
+      }
+    ],
+    "implementationPlan": {
+      "phases": [
+        {
+          "number": 1,
+          "title": "基底クラスとコンポーネントの作成",
+          "tasks": [
+            "FileSystemMemoryBankRepositoryBaseの実装",
+            "FileSystemDocumentOperationsの実装",
+            "FileSystemTagOperationsの実装",
+            "MemoryBankTemplateManagerの実装",
+            "BranchMemoryBankManagerの実装"
+          ],
+          "estimatedEffort": "中（2-3日）"
+        },
+        {
+          "number": 2,
+          "title": "メインリポジトリクラスのリファクタリング",
+          "tasks": [
+            "FileSystemBranchMemoryBankRepositoryの再実装（コンポーネントを使用）",
+            "FileSystemGlobalMemoryBankRepositoryの再実装（コンポーネントを使用）"
+          ],
+          "estimatedEffort": "高（3-4日）"
+        },
+        {
+          "number": 3,
+          "title": "テストとドキュメント",
+          "tasks": [
+            "各コンポーネントの単体テスト作成",
+            "統合テストの更新",
+            "ドキュメントの更新"
+          ],
+          "estimatedEffort": "中（2日）"
+        }
+      ],
+      "risks": [
+        {
+          "description": "既存の依存関係による複雑な参照の処理",
+          "mitigation": "慎重な依存関係分析と段階的なリファクタリング"
+        },
+        {
+          "description": "テスト範囲の確保",
+          "mitigation": "テストカバレッジツールの使用とリファクタリング前後のカバレッジ比較"
+        },
+        {
+          "description": "パフォーマンスへの影響",
+          "mitigation": "ベンチマークの作成とパフォーマンス測定"
+        }
+      ]
+    },
+    "expectedBenefits": {
+      "maintainability": [
+        "クラスサイズの大幅な削減（各クラス200行以下を目標）",
+        "責任の明確な分離による理解容易性向上",
+        "変更影響範囲の局所化"
+      ],
+      "testability": [
+        "小さなコンポーネントを個別にテスト可能",
+        "モックが容易になり複雑なセットアップが不要に",
+        "テストカバレッジの向上"
+      ],
+      "extensibility": [
+        "新機能追加時に関連コンポーネントのみを修正",
+        "コンポーネント置換による機能拡張の柔軟性",
+        "実装変更の影響範囲の縮小"
+      ],
+      "quality": [
+        "バグの検出と修正が容易に",
+        "コードレビューの効率向上",
+        "複雑性の低減による品質向上"
+      ]
+    }
+  }
+}

@@ -39,6 +39,10 @@
       {
         "title": "関連ドキュメント",
         "content": "- [アーキテクチャの詳細情報](../02-architecture/architecture.json)\n- [設計決定の詳細情報](../02-architecture/architecture-decisions.json)\n- [JSON基盤のアーキテクチャ](../02-architecture/json-based-architecture.json)\n- [統合アーキテクチャドキュメント](../02-architecture/consolidated-architecture.json)"
+      },
+      {
+        "title": "アーキテクチャ改善計画",
+        "content": "2025年3月現在、以下のアーキテクチャ改善を進行中です：\n\n1. **レイヤー間の責任境界明確化**: ドメインレイヤーとアプリケーションレイヤーの責任境界をより明確にし、依存方向を内側に向ける修正を実施中\n\n2. **インターフェース設計の統一**: 一貫した命名規則とメソッドシグネチャを適用し、非同期処理パターンを標準化\n\n3. **横断的関心事の統合**: ロギング実装の一本化（shared/utils/loggerを標準化）とエラーハンドリングパターンの統一\n\n4. **肥大化リポジトリの分割**: 単一責任の原則に従い、FileSystemBranchMemoryBankRepositoryなどの肥大化したクラスを責務ごとに分割\n\n5. **モノレポ化とスキーマパッケージ分離**: リポジトリ全体をモノレポ構造に再編成し、スキーマ定義を独立したパッケージとして管理\n\nこれらの改善は`feature/schema-package-2`ブランチで進行中であり、詳細は`architecture-refactor-plan.json`を参照してください。"
       }
     ]
   }

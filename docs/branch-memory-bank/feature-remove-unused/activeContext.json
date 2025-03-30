@@ -1,0 +1,161 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "ee3217d1-f5a7-4fe8-b3e5-e4a4332f3b97",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context"
+    ],
+    "lastModified": "2025-03-28T20:00:00.000Z",
+    "createdAt": "2025-03-28T06:43:56.887Z",
+    "version": 2
+  },
+  "content": {
+    "currentWork": "ロガー実装の統一作業を行いました。複数のロガー実装（domain/logger/ILogger、infrastructure/logger/、shared/utils/logger/）を削除し、shared/utils/logger.tsを標準実装として拡張しました。LoggerFactory.tsも修正して新しいロガーを使用するように変更しました。ロガー関連の修正は完了しましたが、他の部分でビルドエラーが発生しているため、ビルドの修正は別タスクとして対応が必要です。",
+    "recentChanges": [
+      {
+        "date": "2025-03-28T22:15:00.000Z",
+        "description": "ロガー実装の統一を実施。shared/utils/logger.tsを拡張し、domain/logger/ILogger、infrastructure/logger/JsonLogger、shared/utils/logger/index.tsを削除。LoggerFactory.tsも修正して新しいロガーを使用するよう変更。",
+        "resultIssues": "ロガー関連の修正は完了したが、他の部分でビルドエラーが発生しているため、ビルドは通っていない状態。"
+      },
+      {
+        "date": "2025-03-28T21:00:00.000Z",
+        "description": "全テンプレート関連ファイルを削除し、参照コードも修正。ReadRulesUseCase.ts、FileSystemGlobalMemoryBankRepository.ts、FileSystemMemoryDocumentRepository.tsのマークダウン・テンプレート関連参照を修正してビルドエラーを解消。",
+        "resultIssues": "特に問題なく全作業が完了。ビルドも正常に成功。"
+      },
+      {
+        "date": "2025-03-28T20:10:00.000Z",
+        "description": "DocumentPath.tsのマークダウン関連メソッド（isMarkdownとtoAlternateFormat）は既に削除されていることを確認。MemoryDocument.tsでまだisMarkdownメソッドが参照されており、この削除が必要。"
+      },
+      {
+        "date": "2025-03-28T19:40:00.000Z",
+        "description": "テンプレート関連コード削除の実装計画を作成し、DocumentPath.tsとWriteBranchDocumentUseCase.tsの修正から着手"
+      },
+      {
+        "date": "2025-03-28T19:30:00.000Z",
+        "description": "テンプレート関連コード削除とマークダウン関連コード削除の計画を確定。migrationディレクトリは独立パッケージへの分離を見据えて現状維持"
+      },
+      {
+        "date": "2025-03-28T19:10:00.000Z",
+        "description": "テンプレート関連コードとマークダウン関連コードの詳細な削除計画を作成"
+      },
+      {
+        "date": "2025-03-28T18:15:00.000Z",
+        "description": "feature/remove-unused ブランチで不要コード削除のための作業計画を策定"
+      },
+      {
+        "date": "2025-03-28T17:50:00.000Z",
+        "description": "削除すべき不要コードのリストを整理"
+      },
+      {
+        "date": "2025-03-28T15:35:00.000Z",
+        "description": "feature/schema-package ブランチでBranchControllerのマークダウン関連コード削除を完了"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "d1e407a3-5c21-4f87-bf2a-8c3e7b6e8d9f",
+        "description": "マークダウン関連機能は完全に廃止し、JSON形式に統一する"
+      },
+      {
+        "id": "c2f518b4-6d32-5e98-af3b-9d4e8c7f9e0a",
+        "description": "テンプレート関連コードは、参照のみで実装がないものは完全に削除する"
+      },
+      {
+        "id": "b3g629c5-7e43-6f09-bg4c-0e5f9d8g0f1b",
+        "description": "ロガー実装は shared/utils/logger に統一する"
+      },
+      {
+        "id": "migration-package-decision",
+        "description": "マイグレーションツールは今後独立パッケージとして分離する方針"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "60c4384a-ec17-4663-a329-cb0ea45d4576",
+        "description": "テンプレート関連コードはスケルトン実装のみなので、完全に削除する方針に決定",
+        "status": "resolved"
+      },
+      {
+        "id": "4f43403d-e22d-41a6-9e60-af8c8f04fe2e",
+        "description": "モジュールの参照関係を全て洗い出し、削除によるエラーが発生しないよう注意する",
+        "status": "resolved"
+      },
+      {
+        "id": "247b7c32-6d1f-4203-90df-acb1ce268fe2",
+        "description": "DIコンテナの設定もあわせて修正する必要がある",
+        "status": "resolved"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "template-related-first",
+        "status": "completed",
+        "priority": "high",
+        "description": "GlobalControllerからのTemplateController参照を削除"
+      },
+      {
+        "id": "markdown-remains",
+        "status": "completed",
+        "priority": "high",
+        "description": "DIコンテナからのTemplateService/Repositoryの登録を削除"
+      },
+      {
+        "id": "di-container-fix",
+        "status": "completed",
+        "priority": "medium",
+        "description": "削除したコードに関連するDIコンテナの参照を修正"
+      },
+      {
+        "id": "logger-unification",
+        "status": "completed",
+        "priority": "low",
+        "description": "複数のロガー実装を統一する"
+      },
+      {
+        "id": "template-controller-removal",
+        "status": "completed",
+        "priority": "high",
+        "description": "TemplateControllerとそのインターフェースを削除"
+      },
+      {
+        "id": "template-service-removal",
+        "status": "completed",
+        "priority": "high",
+        "description": "TemplateServiceクラスを削除"
+      },
+      {
+        "id": "template-repository-removal",
+        "status": "completed",
+        "priority": "high",
+        "description": "FileTemplateRepositoryなどの実装クラスを削除"
+      },
+      {
+        "id": "template-domain-removal",
+        "status": "completed",
+        "priority": "high",
+        "description": "ITemplateRepositoryインターフェースとTemplateクラスなどを削除"
+      },
+      {
+        "id": "document-path-markdown-removal",
+        "status": "completed",
+        "priority": "medium",
+        "description": "DocumentPath.tsからisMarkdownとtoAlternateFormatメソッドを削除"
+      }
+    ],
+    "references": [
+      {
+        "file": "implementation-plan.json",
+        "description": "テンプレート関連コード削除の詳細な実装ステップと確認ポイント",
+        "created_at": "2025-03-28T19:40:00.000Z"
+      },
+      {
+        "file": "logger-migration-plan.json",
+        "description": "ロガー実装統一の詳細計画と手順",
+        "created_at": "2025-03-28T21:15:00.000Z"
+      }
+    ]
+  }
+}

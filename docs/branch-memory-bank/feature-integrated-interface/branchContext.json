@@ -1,0 +1,57 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "branch-context-integrated-interface",
+    "title": "インターフェース統一化ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context",
+      "interface",
+      "refactoring",
+      "design",
+      "typescript"
+    ],
+    "lastModified": "2025-03-29T19:00:00.000Z",
+    "createdAt": "2025-03-29T19:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "feature/integrated-interface",
+    "purpose": "インターフェース設計の一貫性確保と命名規則の統一を行うためのブランチ。すべてのインターフェースを「I」プレフィックスで始める命名規則に統一し、メソッドシグネチャ（特に非同期処理の返り値型）の一貫性を高め、パラメータの設計を標準化する。",
+    "createdAt": "2025-03-29T19:00:00.000Z",
+    "userStories": [
+      {
+        "id": "us-interface-prefix",
+        "description": "すべてのインターフェースを「I」プレフィックスで始める命名規則に統一することで、コードの可読性と保守性を向上させたい",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "us-method-signature",
+        "description": "メソッドシグネチャの一貫性を確保し、特に非同期メソッドはすべてPromiseを返すように統一したい",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "us-parameter-design",
+        "description": "複数パラメータを持つメソッドのパラメータ設計を標準化し、オブジェクトリテラル型を活用したい",
+        "completed": false,
+        "priority": 3
+      },
+      {
+        "id": "us-domain-layer",
+        "description": "ドメインレイヤーのインターフェースから整備を始め、外側のレイヤーに向かって段階的に修正を進めたい",
+        "completed": false,
+        "priority": 4
+      },
+      {
+        "id": "us-documentation",
+        "description": "インターフェース設計のガイドラインを文書化し、今後の開発で一貫性を保てるようにしたい",
+        "completed": false,
+        "priority": 5
+      }
+    ],
+    "additionalNotes": "feature/schema-package-3ブランチでリポジトリ分割とタグインデックス設計の実装が完了し、ビルドエラーも解消された状態から、インターフェース設計の統一に焦点を当てる。横断的関心事（ロギング、エラーハンドリング）の統合は後のタスクとして残し、まずはインターフェースの命名規則と設計の一貫性を確保することを優先する。"
+  }
+}

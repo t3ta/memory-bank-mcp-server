@@ -1,0 +1,222 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "logger-implementation-analysis",
+    "title": "ロガー実装の分析結果",
+    "documentType": "analysis",
+    "path": "logger-implementation-analysis.json",
+    "tags": [
+      "analysis",
+      "logger",
+      "refactoring"
+    ],
+    "lastModified": "2025-03-28T21:30:00.000Z",
+    "createdAt": "2025-03-28T21:30:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "description": "複数のロガー実装を分析し、統一化するための詳細な調査結果です。",
+      "findings": "プロジェクト内には4つの異なるロガー実装が存在しており、それぞれが異なる場所で使われています。shared/utils/logger.tsが最も広く使われており、シンプルな実装になっています。"
+    },
+    "loggerImplementations": [
+      {
+        "name": "domain/logger/ILogger",
+        "type": "Interface & Abstract Class",
+        "location": "packages/mcp/src/domain/logger/ILogger.ts",
+        "features": [
+          "複雑なインターフェース定義",
+          "BaseLogger抽象クラス実装",
+          "コンテキスト情報の追加機能",
+          "ロガー設定の更新機能"
+        ],
+        "usageAnalysis": {
+          "imports": 7,
+          "directUsage": "少ない - 主にJsonLoggerとLoggerFactoryから参照",
+          "dependencies": [
+            "domain/logger/types.ts"
+          ]
+        },
+        "complexity": "高",
+        "maintainability": "低 - 複雑なインターフェースと実装"
+      },
+      {
+        "name": "infrastructure/logger/JsonLogger",
+        "type": "Implementation",
+        "location": "packages/mcp/src/infrastructure/logger/JsonLogger.ts",
+        "features": [
+          "JSON形式でのログ出力",
+          "標準出力/標準エラー出力の使い分け",
+          "BaseLoggerの実装"
+        ],
+        "usageAnalysis": {
+          "imports": 2,
+          "directUsage": "少ない - LoggerFactoryを通じて間接的に使用",
+          "dependencies": [
+            "domain/logger/ILogger.ts",
+            "domain/logger/types.ts"
+          ]
+        },
+        "complexity": "中",
+        "maintainability": "中"
+      },
+      {
+        "name": "infrastructure/logger/LoggerFactory",
+        "type": "Factory",
+        "location": "packages/mcp/src/infrastructure/logger/LoggerFactory.ts",
+        "features": [
+          "シングルトンパターン",
+          "名前付きロガーの管理",
+          "defaultLoggerの提供"
+        ],
+        "usageAnalysis": {
+          "imports": 2,
+          "directUsage": "少ない - defaultLoggerのみ使用",
+          "dependencies": [
+            "domain/logger/ILogger.ts",
+            "domain/logger/types.ts",
+            "infrastructure/logger/JsonLogger.ts"
+          ]
+        },
+        "complexity": "中",
+        "maintainability": "中"
+      },
+      {
+        "name": "shared/utils/logger/index.ts",
+        "type": "Implementation",
+        "location": "packages/mcp/src/shared/utils/logger/index.ts",
+        "features": [
+          "独自のLoggerクラス",
+          "JsonLogTransformerストリーム変換",
+          "環境変数からのログレベル設定"
+        ],
+        "usageAnalysis": {
+          "imports": 0,
+          "directUsage": "未使用 - インポートされているファイルが見つからない",
+          "dependencies": [
+            "stream (Node.js標準)"
+          ]
+        },
+        "complexity": "中",
+        "maintainability": "低 - 使われていない"
+      },
+      {
+        "name": "shared/utils/logger.ts",
+        "type": "Implementation",
+        "location": "packages/mcp/src/shared/utils/logger.ts",
+        "features": [
+          "シンプルなファクトリベースのロガー",
+          "console.log/info/warn/errorベース",
+          "ログレベルの設定",
+          "可変長引数のサポート"
+        ],
+        "usageAnalysis": {
+          "imports": 2,
+          "directUsage": "広範囲 - logger.info/debug/warn/errorの呼び出しが89件",
+          "dependencies": [
+            "なし - 標準console APIのみ使用"
+          ]
+        },
+        "complexity": "低",
+        "maintainability": "高 - シンプルで理解しやすい"
+      }
+    ],
+    "importAnalysis": {
+      "summary": "shared/utils/logger.tsが最も広く使用されており、多くのファイルがlogger.info(), logger.error()などの形式で呼び出しています。domain/logger/ILoggerインターフェースは直接使われている箇所が少なく、主にJsonLoggerとLoggerFactoryからの参照のみです。shared/utils/logger/index.tsはインポートされている形跡がありません。",
+      "recommendation": "shared/utils/logger.tsを標準として使用し、他の実装を削除または置き換えることが妥当です。"
+    },
+    "implementationPlan": {
+      "strategy": "段階的置き換え",
+      "steps": [
+        {
+          "id": 1,
+          "description": "shared/utils/logger.tsのロガーインターフェースを拡張し、コンテキスト情報サポートなど必要な機能を追加",
+          "file": "packages/mcp/src/shared/utils/logger.ts",
+          "changes": [
+            "LogContextインターフェースの追加",
+            "コンテキスト情報をサポートするようにロガーメソッドを拡張"
+          ]
+        },
+        {
+          "id": 2,
+          "description": "LoggerFactoryからshared/utils/logger.tsへの参照に置き換え",
+          "files": [
+            "packages/mcp/src/infrastructure/logger/LoggerFactory.ts",
+            "packages/mcp/src/main/di/providers.ts"
+          ],
+          "changes": [
+            "LoggerFactoryの実装をshared/utils/logger.tsのcreatConsoleLoggerを使用するように変更",
+            "または完全に削除し、直接shared/utils/logger.tsを使用するよう変更"
+          ]
+        },
+        {
+          "id": 3,
+          "description": "domain/logger/ILoggerを使用している箇所を修正",
+          "files": [
+            "上記のGrepToolで検出された7ファイル"
+          ],
+          "changes": [
+            "ILoggerの代わりにLogger型を使用するよう変更",
+            "または直接shared/utils/loggerからimportするよう変更"
+          ]
+        },
+        {
+          "id": 4,
+          "description": "不要なロガー実装ファイルを削除",
+          "files": [
+            "packages/mcp/src/domain/logger/ILogger.ts",
+            "packages/mcp/src/domain/logger/types.ts",
+            "packages/mcp/src/infrastructure/logger/JsonLogger.ts",
+            "packages/mcp/src/infrastructure/logger/LoggerFactory.ts",
+            "packages/mcp/src/shared/utils/logger/index.ts"
+          ],
+          "changes": [
+            "これらのファイルを完全に削除"
+          ]
+        },
+        {
+          "id": 5,
+          "description": "テストコードの修正",
+          "files": [
+            "tests/unit/infrastructure/logger/LoggerFactory.test.ts",
+            "tests/unit/infrastructure/logger/JsonLogger.test.ts",
+            "tests/mocks/mockLogger.ts"
+          ],
+          "changes": [
+            "テストをshared/utils/logger.ts対応に修正",
+            "または不要なテストを削除"
+          ]
+        }
+      ]
+    },
+    "potentialIssues": [
+      {
+        "issue": "コンテキスト情報の扱い",
+        "severity": "中",
+        "description": "現在のshared/utils/logger.tsはシンプルなインターフェースでコンテキスト情報をサポートしていないため、この機能が必要な場面では拡張が必要",
+        "mitigation": "必要に応じてshared/utils/logger.tsにコンテキストサポートを追加"
+      },
+      {
+        "issue": "テストカバレッジ",
+        "severity": "低",
+        "description": "ロガー実装の変更に伴い、テストコードも更新が必要",
+        "mitigation": "新しいロガー実装に対応するテストを作成または修正"
+      },
+      {
+        "issue": "ログフォーマット変更",
+        "severity": "低",
+        "description": "JsonLoggerとconsoleロガーではログフォーマットが異なる可能性がある",
+        "mitigation": "必要に応じてログフォーマットを調整"
+      }
+    ],
+    "conclusions": {
+      "recommendation": "shared/utils/logger.tsを標準ロガー実装として採用し、他の実装を段階的に削除または置き換えることを推奨します。シンプルで広く使われている実装であり、メンテナンス性も高いです。",
+      "expectedBenefits": [
+        "コードの統一性向上",
+        "依存関係の削減",
+        "メンテナンス性の向上",
+        "学習コストの低減"
+      ]
+    }
+  }
+}

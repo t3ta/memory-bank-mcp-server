@@ -1,0 +1,136 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "91008518-f142-41b0-8292-0287f06bc891",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context"
+    ],
+    "lastModified": "2025-03-29T11:30:00.000Z",
+    "createdAt": "2025-03-28T11:01:55.755Z",
+    "version": 5
+  },
+  "content": {
+    "currentWork": "主要なビルドエラーの分析中。テンプレート関連コードの削除は完了しているが、タグインデックス関連の型定義不一致エラーが大量に発生している。IBranchMemoryBankRepositoryインターフェースではgetTagIndexの返り値型がBranchTagIndex | nullになっているが、FileSystemBranchMemoryBankRepositoryの実装ではBaseTagIndex | nullを返しており型不一致が発生。@memory-bank/schemasパッケージをモノレポ化する過程で発生した型定義の不整合が根本原因と思われる。",
+    "recentChanges": [
+      {
+        "date": "2025-03-29T14:30:00.000Z",
+        "description": "テンプレート関連コードの削除作業の確認完了。ビルドテストで77個のエラーがまだ残っているが、テンプレート関連コード削除自体は完了。次のステップとしてアーキテクチャリファクタリングの他のタスクに進む予定。"
+      },
+      {
+        "date": "2025-03-28T12:30:00.000Z",
+        "description": "テンプレート関連コードの削除完了。DocumentPath.tsからMarkdown関連メソッド削除、WriteBranchDocumentUseCase.tsのバグ修正。GlobalControllerとproviders.tsは既に修正済みだった。"
+      },
+      {
+        "date": "2025-03-29T14:15:00.000Z",
+        "description": "依存関係逆転パターンをロギングに適用。IDocumentLoggerインターフェースをドメイン層に作成し、MemoryDocumentクラスから共有loggerへの直接依存を除去。インフラ層にはDocumentLoggerAdapterを実装し、依存関係が正しく内側に向くようにした。"
+      },
+      {
+        "date": "2025-03-29T13:45:00.000Z",
+        "description": "MemoryBankRepositoryリファクタリングの詳細計画をrepo-refactoring-plan.jsonにまとめた。機能種別に分割された軽量なクラス群を設計し、コンポジションパターンで組み合わせる提案を追加。各コンポーネントの詳細設計と実装フェーズを整理。"
+      },
+      {
+        "date": "2025-03-29T13:30:00.000Z",
+        "description": "FileSystemTagIndexRepositoryの実装設計パターンを分析。傾向に基づく相関クラスの分割と非常にクリーンな設計を確認。同様のパターンをFileSystemBranchMemoryBankRepositoryなどの大規模クラスにも適用する必要あり。"
+      },
+      {
+        "date": "2025-03-29T13:15:00.000Z",
+        "description": "ドメインレイヤーのリポジトリインターフェースレビュー完了。インターフェース設計がクリーンで、依存関係逆転パターンが適切に適用されていることを確認。IDocumentValidatorのようなインターフェースを使って外部実装からドメインロジックを分離。"
+      },
+      {
+        "date": "2025-03-29T13:00:00.000Z",
+        "description": "ドメインレイヤーのリポジトリインターフェース（IBranchMemoryBankRepository、IGlobalMemoryBankRepository、ITagIndexRepository、IJsonDocumentRepository）をレビュー。予想よりもクリーンな設計になっており、外部依存は@memory-bank/schemasパッケージからインポートしている型定義のみ。今後は実装クラスの技術的依存に焦点を当てる。"
+      },
+      {
+        "date": "2025-03-29T12:30:00.000Z",
+        "description": "テンプレート関連コードの削除作業完了。DocumentPath.tsからisMarkdown()メソッドとtoAlternateFormat()メソッドを削除。WriteBranchDocumentUseCase.tsのバグ修正。GlobalControllerからtemplateController依存を除去し、readCoreFilesメソッドをシンプル化。providers.tsからテンプレート関連の登録を削除。"
+      },
+      {
+        "date": "2025-03-29T11:30:00.000Z",
+        "description": "DocumentPathとMemoryDocumentのリファクタリング完了。IDocumentLoggerインターフェースとDocumentLoggerAdapter実装を追加。依存関係逆転の原則に従い、ロギング機能を外部実装から切り離し、ドメイン層の独立性を向上。非推奨のMarkdown関連の古いメソッドもクリーンアップ。"
+      },
+      {
+        "date": "2025-03-29T10:30:00.000Z",
+        "description": "JsonDocumentエンティティのリファクタリング完了。IDocumentValidatorインターフェースとZodDocumentValidator実装に分離し、ディペンデンシーインジェクションパターンを適用。バリデーションロジックとドメインロジックを完全に分離。"
+      },
+      {
+        "date": "2025-03-29T09:15:00.000Z",
+        "description": "アーキテクチャリファクタリングの詳細計画策定完了。4段階のフェーズからなる実装計画を立案し、work-plan.jsonに詳細を記録。"
+      },
+      {
+        "date": "2025-03-28T20:00:00.000Z",
+        "description": "前ブランチ(feature/schema-package)でのテンプレート関連コード削除作業のレビューと反省"
+      },
+      {
+        "date": "2025-03-28T19:35:00.000Z",
+        "description": "テンプレート関連コードの削除が完了、GlobalControllerとproviders.tsの修正も完了"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "arch-decision-1",
+        "description": "レイヤー間の依存方向を正しく（内側に向かって）するために、ドメインモデルを中心とした設計に修正する"
+      },
+      {
+        "id": "arch-decision-2",
+        "description": "インターフェース命名規則を'Ixxx'形式に統一し、一貫性を確保する"
+      },
+      {
+        "id": "arch-decision-3",
+        "description": "ロギング実装を一本化し、shared/utils/loggerを標準として採用する"
+      },
+      {
+        "id": "arch-decision-4",
+        "description": "エラーハンドリングパターンを統一し、全体で一貫した例外処理方法を採用する"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "consideration-1",
+        "description": "ファイルシステムリポジトリの肥大化問題をどのように解決するか（分割すべきか、そのままにすべきか）",
+        "status": "open"
+      },
+      {
+        "id": "consideration-2",
+        "description": "モノレポ構造での最適なディレクトリ構成とパッケージ間依存関係のあり方",
+        "status": "open"
+      },
+      {
+        "id": "consideration-3",
+        "description": "ビルドエラー解消を優先すべきか、アーキテクチャ改善を優先すべきか",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "step-1",
+        "description": "ドメインレイヤーのリポジトリインターフェースの純粹化",
+        "priority": "high"
+      },
+      {
+        "id": "step-2",
+        "description": "FileSystemBranchMemoryBankRepositoryの肥大化解消計画の立案",
+        "priority": "high"
+      },
+      {
+        "id": "step-3",
+        "description": "IndexService.tsのエラー（39個）解消に向けた分析と対策立案",
+        "priority": "medium"
+      },
+      {
+        "id": "step-4",
+        "description": "FileSystemGlobalMemoryBankRepositoryのエラー（8個）解消計画立案",
+        "priority": "medium"
+      }
+    ],
+    "references": [
+      {
+        "file": "architecture-refactor-plan.json",
+        "description": "アーキテクチャリファクタリング詳細計画",
+        "created_at": "2025-03-28"
+      }
+    ]
+  }
+}

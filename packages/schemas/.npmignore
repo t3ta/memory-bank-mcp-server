@@ -1,0 +1,21 @@
+# ソースファイル
+src/
+
+# テスト
+tests/
+*.test.ts
+*.spec.ts
+coverage/
+
+# 設定ファイル
+.eslintrc*
+.prettierrc*
+tsconfig.json
+jest.config.js
+
+# その他
+node_modules/
+.DS_Store
+*.log
+.github/
+.vscode/

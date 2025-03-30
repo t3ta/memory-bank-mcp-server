@@ -1,0 +1,364 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "5f7b2e0a-c6d9-4b9c-8a1e-2d5c7908fb9e",
+    "title": "横断的関心事の統合計画",
+    "documentType": "plan",
+    "path": "cross-cutting-concerns-plan.json",
+    "tags": [
+      "logging",
+      "error-handling",
+      "architecture",
+      "refactoring"
+    ],
+    "lastModified": "2025-03-29T15:00:00.000Z",
+    "createdAt": "2025-03-29T15:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "title": "横断的関心事の統合計画",
+      "description": "ロギング実装やエラーハンドリングなどの横断的関心事を整理統合し、一貫性のある実装を実現するための計画",
+      "goals": [
+        "ロギング実装の一本化と標準化",
+        "一貫したエラーハンドリングパターンの確立",
+        "横断的関心事の依存関係を正しい方向に修正",
+        "共通ユーティリティの整理と標準化"
+      ],
+      "approach": "依存関係逆転パターンと集中管理戦略の適用"
+    },
+    "loggingStrategy": {
+      "currentState": {
+        "issues": [
+          "複数のロギング実装が混在している（Winston, console.log, カスタムロガー）",
+          "ドメインエンティティが直接ロギング実装に依存している",
+          "ログレベルや形式が統一されていない",
+          "出力先や保存方法が一貫していない"
+        ],
+        "examples": [
+          "DocumentPath.tsがloggerモジュールに直接依存",
+          "repositories/impl/ファイル内で独自のロギング実装"
+        ]
+      },
+      "targetArchitecture": {
+        "components": [
+          {
+            "name": "ILogger",
+            "description": "ドメインレイヤーに定義されるロガーインターフェース",
+            "location": "src/domain/interfaces/logger",
+            "methods": [
+              "debug(message: string, meta?: object): void",
+              "info(message: string, meta?: object): void",
+              "warn(message: string, meta?: object): void",
+              "error(message: string, meta?: object): void"
+            ]
+          },
+          {
+            "name": "WinstonLoggerAdapter",
+            "description": "ILoggerインターフェースのWinston実装",
+            "location": "src/infrastructure/adapters/logger",
+            "dependencies": [
+              "Winston",
+              "ILogger"
+            ]
+          },
+          {
+            "name": "LoggerProvider",
+            "description": "DI用のロガープロバイダ",
+            "location": "src/providers",
+            "responsibilities": [
+              "シングルトンロガーインスタンスの提供",
+              "ログ設定の一元管理",
+              "環境に応じたロガー実装の切り替え"
+            ]
+          },
+          {
+            "name": "LoggerContext",
+            "description": "コンテキスト情報を持つロガーラッパー",
+            "location": "src/infrastructure/adapters/logger",
+            "features": [
+              "コンテキスト情報の付加（ブランチ名、操作種別など）",
+              "構造化ロギングのサポート",
+              "ドメインオブジェクト用の特殊フォーマット"
+            ]
+          }
+        ],
+        "benefits": [
+          "ドメインレイヤーは具体的なロギング実装に依存しない",
+          "ロギング実装の差し替えが容易になる",
+          "一貫したログ形式と出力レベル",
+          "テスト時のモック化が容易"
+        ]
+      },
+      "implementationPhases": [
+        {
+          "phase": "フェーズ1: ILoggerインターフェース導入",
+          "tasks": [
+            "ドメインレイヤーにILoggerインターフェースを定義",
+            "既存のDocumentLoggerAdapterの拡張と標準化",
+            "最初の重要なコンポーネントでILoggerの採用"
+          ]
+        },
+        {
+          "phase": "フェーズ2: アダプターの実装",
+          "tasks": [
+            "WinstonLoggerAdapterの実装",
+            "ConsoleLoggerAdapterのテスト用実装",
+            "LoggerProviderの実装"
+          ]
+        },
+        {
+          "phase": "フェーズ3: 全体への適用",
+          "tasks": [
+            "直接logger依存を持つすべてのクラスをILogger使用に変更",
+            "コンソールログ直接使用箇所の特定と修正",
+            "ロギング標準の文書化"
+          ]
+        }
+      ]
+    },
+    "errorHandlingStrategy": {
+      "currentState": {
+        "issues": [
+          "エラー処理パターンが不統一（例外、戻り値、コールバックなど）",
+          "エラーの種類や分類が一貫していない",
+          "エラーメッセージの形式にばらつきがある",
+          "特定のエラーに対する処理が重複している"
+        ],
+        "examples": [
+          "一部のメソッドはPromiseのrejectを使用",
+          "別のメソッドは例外をスロー",
+          "さらに別のメソッドはエラーフラグを返す"
+        ]
+      },
+      "targetArchitecture": {
+        "components": [
+          {
+            "name": "DomainError",
+            "description": "すべてのドメインエラーの基底クラス",
+            "location": "src/domain/errors",
+            "properties": [
+              "code: string - エラーコード",
+              "message: string - 人間可読なメッセージ",
+              "details?: any - 追加エラー情報",
+              "cause?: Error - 原因となったエラー"
+            ]
+          },
+          {
+            "name": "ValidationError",
+            "description": "バリデーションエラー",
+            "location": "src/domain/errors",
+            "extends": "DomainError",
+            "specificProps": [
+              "invalidFields: string[] - 無効なフィールド名",
+              "validationContext?: string - 検証コンテキスト"
+            ]
+          },
+          {
+            "name": "NotFoundError",
+            "description": "リソース未検出エラー",
+            "location": "src/domain/errors",
+            "extends": "DomainError",
+            "specificProps": [
+              "resourceType: string - リソース種別",
+              "resourceId: string - リソースID"
+            ]
+          },
+          {
+            "name": "ErrorHandler",
+            "description": "エラー処理と変換を担当するユーティリティ",
+            "location": "src/common/errors",
+            "methods": [
+              "handleRepositoryError(error: Error): DomainError",
+              "handleServiceError(error: Error): DomainError",
+              "formatErrorResponse(error: Error): ErrorResponse"
+            ]
+          }
+        ],
+        "conventions": [
+          {
+            "name": "Promise拒否パターン",
+            "description": "非同期メソッドはPromiseを返し、エラーはrejectで処理",
+            "example": "return Promise.reject(new NotFoundError('Document', id));"
+          },
+          {
+            "name": "例外スローパターン",
+            "description": "同期メソッドは適切な型の例外をスロー",
+            "example": "throw new ValidationError('Document is invalid', ['content']);"
+          },
+          {
+            "name": "エラーチェーン",
+            "description": "エラーは原因を保持し情報を失わないようにする",
+            "example": "throw new DomainError('OPERATION_FAILED', 'Failed to process', { cause: originalError });"
+          }
+        ],
+        "benefits": [
+          "エラー分類の一貫性",
+          "処理ロジックの統一",
+          "根本原因の追跡容易性",
+          "適切なエラー情報の保持",
+          "クライアントへの一貫したエラーレスポンス"
+        ]
+      },
+      "implementationPhases": [
+        {
+          "phase": "フェーズ1: エラークラス階層の確立",
+          "tasks": [
+            "DomainErrorとその主要サブクラスの作成",
+            "既存エラーコードの整理と標準化",
+            "エラー変換ユーティリティの基本実装"
+          ]
+        },
+        {
+          "phase": "フェーズ2: リポジトリ層への適用",
+          "tasks": [
+            "リポジトリメソッドのエラーパターン統一",
+            "特殊なインフラエラーの適切なドメインエラーへの変換",
+            "エラー処理テストの追加"
+          ]
+        },
+        {
+          "phase": "フェーズ3: 全体への適用とエラーハンドラの強化",
+          "tasks": [
+            "ユースケースおよびサービス層のエラーパターン統一",
+            "グローバルエラーハンドラの実装",
+            "エラー処理ガイドラインの文書化"
+          ]
+        }
+      ]
+    },
+    "otherCrossCuttingConcerns": [
+      {
+        "name": "バリデーション",
+        "currentIssues": [
+          "バリデーション実装の散在",
+          "外部ライブラリ依存が内側のレイヤーに漏れている",
+          "重複するバリデーションロジック"
+        ],
+        "targetDesign": {
+          "components": [
+            {
+              "name": "IValidator",
+              "description": "ドメインレイヤーに定義されるバリデータインターフェース",
+              "methods": [
+                "validate(value: any): ValidationResult"
+              ]
+            },
+            {
+              "name": "ZodValidatorAdapter",
+              "description": "Zodを使ったバリデータ実装"
+            }
+          ],
+          "benefits": [
+            "バリデーションロジックの集中管理",
+            "ドメインルールの一貫した適用",
+            "テスト容易性の向上"
+          ]
+        }
+      },
+      {
+        "name": "設定管理",
+        "currentIssues": [
+          "設定読み込みロジックの散在",
+          "環境別設定の取り扱いが不統一",
+          "設定変更時の影響範囲が不明確"
+        ],
+        "targetDesign": {
+          "components": [
+            {
+              "name": "IConfigProvider",
+              "description": "設定提供を抽象化するインターフェース"
+            },
+            {
+              "name": "EnvConfigAdapter",
+              "description": ".env や環境変数からの設定読み込み"
+            }
+          ],
+          "benefits": [
+            "設定アクセスの一元化",
+            "環境差分の透過的な管理",
+            "設定変更の影響の局所化"
+          ]
+        }
+      }
+    ],
+    "implementationPriorities": [
+      {
+        "phase": "初期フェーズ",
+        "priority": "high",
+        "focus": "ILogger統合とDocumentLoggerAdapterの改善",
+        "rationale": "feature/schema-package-2でIDocumentLoggerインターフェースが一部導入されており、この基盤を活用できる。また、リポジトリ分割とも関連性が高い。",
+        "dependencies": []
+      },
+      {
+        "phase": "中期フェーズ",
+        "priority": "medium",
+        "focus": "エラー階層の確立とリポジトリ層への適用",
+        "rationale": "インターフェース統一と密接に関連しており、リポジトリ分割後に実施すると効果的。",
+        "dependencies": [
+          "リポジトリ分割",
+          "インターフェース統一"
+        ]
+      },
+      {
+        "phase": "後期フェーズ",
+        "priority": "low",
+        "focus": "その他の横断的関心事への適用拡大",
+        "rationale": "基本的なロギングとエラー処理が統一された後に実施することで、確立されたパターンを適用できる。",
+        "dependencies": [
+          "ロギング統一",
+          "エラー処理統一"
+        ]
+      }
+    ],
+    "risksAndMitigation": [
+      {
+        "risk": "広範囲な変更による影響",
+        "impact": "high",
+        "probability": "medium",
+        "mitigation": "小さな変更単位で進め、各ステップでテストを実行。優先度の高いコンポーネントから段階的に適用する。"
+      },
+      {
+        "risk": "既存機能の破損",
+        "impact": "high",
+        "probability": "low",
+        "mitigation": "テスト駆動で進め、各変更後にユニットテストと統合テストを実行。アダプターパターンで既存機能との互換性を維持。"
+      },
+      {
+        "risk": "リファクタリングの複雑化",
+        "impact": "medium",
+        "probability": "medium",
+        "mitigation": "明確なインターフェース定義と適用ガイドラインを事前に確立し、適用方法を文書化。"
+      },
+      {
+        "risk": "パフォーマンスへの影響",
+        "impact": "medium",
+        "probability": "low",
+        "mitigation": "追加される抽象レイヤーが最小限になるよう設計し、ベンチマークでパフォーマンスを検証。"
+      }
+    ],
+    "successCriteria": [
+      "すべてのドメインエンティティがILoggerインターフェースを通じてロギングを行っている",
+      "エラー処理が一貫したパターンで実装されている",
+      "依存方向が適切に（内側に向かって）なっている",
+      "ユニットテストにおいて横断的関心事がモック化可能になっている",
+      "ビルドとテストがすべて成功している"
+    ],
+    "documentation": {
+      "required": [
+        {
+          "title": "横断的関心事設計ガイド",
+          "description": "依存関係逆転パターンの活用とロギング・エラー処理の標準的実装"
+        },
+        {
+          "title": "エラーコード一覧",
+          "description": "標準化されたエラーコードとメッセージの定義"
+        },
+        {
+          "title": "ロギング規約",
+          "description": "ログレベルの使い分けや標準フォーマットの定義"
+        }
+      ]
+    }
+  }
+}

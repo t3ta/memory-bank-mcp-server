@@ -1,0 +1,304 @@
+{
+  "title": "MCP Package Improvement Plan",
+  "createdAt": "2025-03-30T12:30:00Z",
+  "author": "みらい",
+  "overview": {
+    "description": "packages/mcpのレビューに基づく改善計画。ロギングとエラーハンドリングパターンの統一的適用とコード品質向上を目的とする。",
+    "currentStatus": "feature/logging-error-handlingブランチでは、ロギングとエラーハンドリングの基盤実装が完了しているが、すべてのファイルに一貫して適用されているわけではない。",
+    "completionPercentage": 85
+  },
+  "codeReview": {
+    "strengths": [
+      {
+        "area": "ロギング基盤",
+        "description": "shared/utils/logger.tsは型安全で拡張性の高いロギングインターフェースを提供しており、構造化ロギングとコンテキスト継承をサポートしている。",
+        "examples": [
+          "LogLevel型とLOG_LEVEL_PRIORITYによる明確なログレベル階層",
+          "ExtendedLogContextインターフェースによる共通コンテキストフィールド定義",
+          "withContextメソッドによるコンポーネント固有ロガーの作成"
+        ]
+      },
+      {
+        "area": "エラー階層",
+        "description": "BaseErrorを基底とする明確なエラークラス階層が確立されており、各レイヤー固有のエラークラスが適切に設計されている。",
+        "examples": [
+          "getHttpStatusCode()メソッドによるHTTPステータスコード対応",
+          "isInstanceOf()メソッドによる型安全なエラー判定",
+          "withMessage()メソッドによるコンテキスト付加"
+        ]
+      },
+      {
+        "area": "エラーファクトリー",
+        "description": "各エラータイプに対するファクトリーメソッドが実装されており、一貫したエラー生成パターンが確立されている。",
+        "examples": [
+          "DomainErrorsオブジェクトのdocumentNotFound()やbranchNotFound()メソッド",
+          "InfrastructureErrorsオブジェクトのfileNotFound()やfileSystemError()メソッド",
+          "ApplicationErrorsオブジェクトのexecutionFailed()やunexpectedControllerError()メソッド"
+        ]
+      },
+      {
+        "area": "ErrorUtils",
+        "description": "共通のエラーハンドリングパターンを抽象化したユーティリティが提供されており、非同期処理でのエラーハンドリングが統一されている。",
+        "examples": [
+          "wrapAsync()メソッドによる非同期エラーラッピング",
+          "isErrorOfType()メソッドによる型安全なエラー判定",
+          "formatForLogging()メソッドによるログフォーマット標準化"
+        ]
+      },
+      {
+        "area": "サンプル実装",
+        "description": "ReadBranchDocumentUseCaseは新しいパターンを適切に活用しており、良い実装例となっている。",
+        "examples": [
+          "コンポーネント固有ロガーの使用 (useCaseLogger)",
+          "ErrorUtils.wrapAsyncによる非同期エラーハンドリングの実装",
+          "エラーファクトリーメソッドの適切な使用"
+        ]
+      }
+    ],
+    "weaknesses": [
+      {
+        "area": "一貫性の欠如",
+        "description": "新しいパターンが一部のファイルのみに適用されており、プロジェクト全体での一貫性が確保されていない。",
+        "examples": [
+          "BranchControllerではcomponentLoggerが定義されているが、ほとんどのメソッドで直接loggerを使用している",
+          "FileSystemBranchMemoryBankRepositoryでは一部メソッドでInfrastructureErrorsファクトリーを使用しているが、他のメソッドでは直接コンストラクタを使用している"
+        ],
+        "impact": "high"
+      },
+      {
+        "area": "エラーファクトリーの不足",
+        "description": "一部のエラータイプに対してファクトリーメソッドが実装されていないため、直接コンストラクタを使用せざるを得ない状況がある。",
+        "examples": [
+          "FileSystemBranchMemoryBankRepositoryのvalidateStructureメソッドでのエラー処理",
+          "BranchControllerのvalidateFilesメソッドでの直接的なDomainError使用"
+        ],
+        "impact": "medium"
+      },
+      {
+        "area": "コンポーネントロガーの不活用",
+        "description": "多くのコンポーネントでcomponentLoggerが定義されているにもかかわらず、実際には使用されていない。",
+        "examples": [
+          "BranchControllerの各メソッド内でのlogger.info, logger.errorの使用",
+          "一部のコードでは構造化コンテキストが十分に活用されていない"
+        ],
+        "impact": "medium"
+      },
+      {
+        "area": "ロガーレベルの不統一",
+        "description": "ログレベルの使用基準が明確でなく、不適切なレベルでのロギングが行われている箇所がある。",
+        "examples": [
+          "ユーザー入力エラーにerrorレベルを使用している箇所がある",
+          "重要な操作にdebugレベルを使用している箇所がある"
+        ],
+        "impact": "low"
+      },
+      {
+        "area": "エラー詳細の不足",
+        "description": "一部のエラーでは詳細情報（コンテキスト）が不足しており、トラブルシューティングが困難になる可能性がある。",
+        "examples": [
+          "一部のエラーでoperationやその他の重要なコンテキスト情報が欠けている",
+          "元のエラーの情報が失われているケースがある"
+        ],
+        "impact": "medium"
+      }
+    ]
+  },
+  "improvements": [
+    {
+      "id": "consistent-logger-usage",
+      "title": "ロガー使用の一貫性確保",
+      "summary": "すべてのコンポーネントでcomponentLoggerを一貫して使用する",
+      "description": "各クラスで定義されているcomponentLoggerを実際のロギング操作で使用するように変更する。直接loggerを使用している箇所をすべてcomponentLoggerに置き換える。",
+      "targetFiles": [
+        "/packages/mcp/src/interface/controllers/BranchController.ts",
+        "/packages/mcp/src/interface/controllers/GlobalController.ts",
+        "その他の直接loggerを使用しているファイル"
+      ],
+      "implementation": {
+        "code": "// 変更前\nlogger.info('Reading branch document', { branchName, path });\n\n// 変更後\nthis.componentLogger.info('Reading branch document', { branchName, path });",
+        "difficulty": "low",
+        "impact": "medium"
+      }
+    },
+    {
+      "id": "factory-methods-usage",
+      "title": "エラーファクトリーメソッドの一貫した使用",
+      "summary": "すべてのエラー生成箇所でファクトリーメソッドを使用する",
+      "description": "直接エラーコンストラクタを使用している箇所を、適切なファクトリーメソッドに置き換える。必要に応じて新しいファクトリーメソッドを追加する。",
+      "targetFiles": [
+        "/packages/mcp/src/infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.ts",
+        "/packages/mcp/src/interface/controllers/BranchController.ts"
+      ],
+      "implementation": {
+        "code": "// 変更前\nthrow new DomainError('VALIDATION_ERROR', 'Files must be provided as an object');\n\n// 変更後\nthrow DomainErrors.validationError('Files must be provided as an object');",
+        "difficulty": "low",
+        "impact": "high"
+      }
+    },
+    {
+      "id": "missing-factory-methods",
+      "title": "不足しているエラーファクトリーメソッドの追加",
+      "summary": "特定のエラータイプに対するファクトリーメソッドを実装",
+      "description": "現在直接コンストラクタを使用している特定のエラーパターンに対して、新しいファクトリーメソッドを追加する。特に、permissionDeniedおよびfileSystemErrorメソッドの実装。",
+      "targetFiles": [
+        "/packages/mcp/src/shared/errors/InfrastructureError.ts",
+        "/packages/mcp/src/shared/errors/DomainError.ts",
+        "/packages/mcp/src/shared/errors/ApplicationError.ts",
+        "/packages/mcp/src/shared/errors/SharedUtilsError.ts"
+      ],
+      "implementation": {
+        "code": "// InfrastructureErrorsに追加\npermissionDenied: (message: string, details?: OperationDetails) => {\n  return new InfrastructureError(\n    InfrastructureErrorCodes.FILE_PERMISSION_ERROR,\n    message,\n    details\n  );\n},\n\nfileSystemError: (message: string, details?: OperationDetails) => {\n  return new InfrastructureError(\n    InfrastructureErrorCodes.FILE_SYSTEM_ERROR,\n    message,\n    details\n  );\n}",
+        "difficulty": "low",
+        "impact": "high"
+      }
+    },
+    {
+      "id": "error-wrapping",
+      "title": "非同期エラーラッピングパターンの適用",
+      "summary": "すべての非同期処理にErrorUtils.wrapAsyncパターンを適用",
+      "description": "try-catchブロックで囲まれた非同期処理を、ErrorUtils.wrapAsyncを使用するパターンに置き換える。特にユースケースの実装で一貫して使用する。",
+      "targetFiles": [
+        "/packages/mcp/src/application/usecases/json/WriteJsonDocumentUseCase.ts",
+        "/packages/mcp/src/application/usecases/json/ReadJsonDocumentUseCase.ts",
+        "/packages/mcp/src/application/usecases/common/ReadContextUseCase.ts"
+      ],
+      "implementation": {
+        "code": "// 変更前\nasync execute(input: SomeInput): Promise<SomeOutput> {\n  try {\n    // 処理ロジック\n    return result;\n  } catch (error) {\n    // エラーハンドリング\n    throw ApplicationErrors.executionFailed('UseCase', error instanceof Error ? error : undefined);\n  }\n}\n\n// 変更後\nasync execute(input: SomeInput): Promise<SomeOutput> {\n  return await ErrorUtils.wrapAsync(\n    this.executeInternal(input),\n    (error) => ApplicationErrors.executionFailed(\n      'UseCase',\n      error instanceof Error ? error : undefined,\n      { input }\n    )\n  );\n}\n\nprivate async executeInternal(input: SomeInput): Promise<SomeOutput> {\n  // 処理ロジック\n  return result;\n}",
+        "difficulty": "medium",
+        "impact": "high"
+      }
+    },
+    {
+      "id": "structured-logging",
+      "title": "構造化ロギングの強化",
+      "summary": "すべてのログエントリに豊富なコンテキスト情報を付与",
+      "description": "ログメッセージに関連する全てのコンテキスト情報を構造化して付与することを徹底する。特に、operationやリソース識別子などの重要な情報。",
+      "targetFiles": [
+        "全てのファイル"
+      ],
+      "implementation": {
+        "code": "// 変更前\nthis.componentLogger.info('Writing document');\n\n// 変更後\nthis.componentLogger.info('Writing document', { \n  operation: 'saveDocument',\n  branchName: branchInfo.name, \n  path: document.path.value,\n  documentType: document.determineDocumentType()\n});",
+        "difficulty": "medium",
+        "impact": "medium"
+      }
+    },
+    {
+      "id": "log-level-guidelines",
+      "title": "ログレベル使用ガイドラインの策定と適用",
+      "summary": "ログレベルの一貫した使用基準を確立",
+      "description": "debug/info/warn/errorの各ログレベルをいつ使用すべきかの明確なガイドラインを策定し、コードベース全体で一貫して適用する。",
+      "examples": {
+        "debug": "詳細な開発・デバッグ情報。通常の運用では表示されない。",
+        "info": "通常の操作情報。システムの状態変化や重要な操作。",
+        "warn": "潜在的な問題や注意が必要な状況。処理は継続可能。",
+        "error": "エラーやシステム障害。処理が中断される状況。"
+      },
+      "implementation": {
+        "code": "// ガイドラインに基づいたログレベル使用例\n// error: 処理が中断される重大なエラー\nthis.componentLogger.error('Failed to read document', { error });\n\n// warn: 潜在的な問題だが処理は継続\nthis.componentLogger.warn('Document not found, using default', { path });\n\n// info: 重要な操作や状態変化\nthis.componentLogger.info('Document successfully saved', { path });\n\n// debug: 詳細な開発情報\nthis.componentLogger.debug('Processing document structure', { keys: Object.keys(content) });",
+        "difficulty": "medium",
+        "impact": "medium"
+      }
+    },
+    {
+      "id": "controller-error-handling",
+      "title": "コントローラーのエラーハンドリング改善",
+      "summary": "コントローラーでのエラーハンドリングパターンを統一",
+      "description": "すべてのコントローラーで一貫したエラーハンドリングパターンを適用する。特に共通のhandleErrorメソッドの使用と適切なエラーマッピング。",
+      "targetFiles": [
+        "/packages/mcp/src/interface/controllers/BranchController.ts",
+        "/packages/mcp/src/interface/controllers/GlobalController.ts",
+        "その他のコントローラー"
+      ],
+      "implementation": {
+        "code": "// 共通のhandleErrorメソッド\nprivate handleError(error: unknown, context?: Record<string, unknown>) {\n  if (error instanceof BaseError) {\n    this.componentLogger.error('Operation failed', { \n      error: ErrorUtils.formatForLogging(error),\n      ...context\n    });\n    return this.presenter.presentError(error);\n  }\n\n  // Convert unknown errors to ApplicationError\n  const applicationError = ApplicationErrors.unexpectedControllerError(\n    'BranchController',\n    error instanceof Error ? error : undefined,\n    context\n  );\n  \n  this.componentLogger.error('Unexpected controller error', { \n    error: ErrorUtils.formatForLogging(error),\n    ...context\n  });\n  \n  return this.presenter.presentError(applicationError);\n}",
+        "difficulty": "medium",
+        "impact": "high"
+      }
+    },
+    {
+      "id": "error-code-documentation",
+      "title": "エラーコード一覧ドキュメントの作成",
+      "summary": "すべてのエラーコードとその意味、推奨される対応方法の文書化",
+      "description": "各レイヤーのエラーコードを一覧化し、それぞれのエラーの意味、発生原因、推奨される対応方法を文書化する。",
+      "implementation": {
+        "structure": {
+          "domainErrors": [
+            {
+              "code": "DOMAIN_ERROR.DOCUMENT_NOT_FOUND",
+              "statusCode": 404,
+              "description": "指定されたドキュメントが見つかりません",
+              "resolution": "ドキュメントパスを確認してください"
+            },
+            {
+              "code": "DOMAIN_ERROR.BRANCH_NOT_FOUND",
+              "statusCode": 404,
+              "description": "指定されたブランチが見つかりません",
+              "resolution": "ブランチ名を確認してください"
+            }
+          ],
+          "infrastructureErrors": [
+            {
+              "code": "INFRASTRUCTURE_FILE_NOT_FOUND",
+              "statusCode": 404,
+              "description": "指定されたファイルが見つかりません",
+              "resolution": "ファイルパスを確認してください"
+            },
+            {
+              "code": "INFRASTRUCTURE_FILE_SYSTEM_ERROR",
+              "statusCode": 500,
+              "description": "ファイルシステム操作中にエラーが発生しました",
+              "resolution": "ファイルシステムの状態とアクセス権を確認してください"
+            }
+          ]
+        },
+        "difficulty": "low",
+        "impact": "medium"
+      }
+    }
+  ],
+  "priorityRecommendations": [
+    {
+      "id": "factory-methods-usage",
+      "reason": "エラーファクトリーメソッドを一貫して使用することで、エラー処理の一貫性と堅牢性がすぐに向上します。実装も比較的容易です。"
+    },
+    {
+      "id": "consistent-logger-usage",
+      "reason": "componentLoggerを一貫して使用することで、ロギングの質と一貫性がすぐに向上します。特にBranchControllerでの改善が効果的です。"
+    },
+    {
+      "id": "missing-factory-methods",
+      "reason": "不足しているエラーファクトリーメソッドを追加することで、直接コンストラクタを使用せざるを得ない状況を解消できます。"
+    }
+  ],
+  "implementationStrategy": {
+    "phases": [
+      {
+        "name": "基盤改善",
+        "improvements": [
+          "factory-methods-usage",
+          "consistent-logger-usage",
+          "missing-factory-methods"
+        ],
+        "duration": "1週間"
+      },
+      {
+        "name": "パターン統一",
+        "improvements": [
+          "error-wrapping",
+          "controller-error-handling",
+          "structured-logging"
+        ],
+        "duration": "1週間"
+      },
+      {
+        "name": "ドキュメント・ガイドライン",
+        "improvements": [
+          "log-level-guidelines",
+          "error-code-documentation"
+        ],
+        "duration": "1週間"
+      }
+    ]
+  },
+  "conclusion": "packages/mcpパッケージは全体的に堅牢で拡張性の高い設計になっており、特にロギングとエラーハンドリングの基盤実装は高品質です。しかし、これらのパターンがコードベース全体に一貫して適用されているわけではありません。優先度の高い改善点は、エラーファクトリーメソッドの一貫した使用、componentLoggerの活用、および不足しているエラーファクトリーメソッドの追加です。これらの改善を行うことで、コードの品質と保守性が大幅に向上し、デバッグや運用の効率も高まります。"
+}

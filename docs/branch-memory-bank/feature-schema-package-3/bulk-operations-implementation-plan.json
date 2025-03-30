@@ -1,0 +1,143 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "bulk-operations-implementation-plan",
+    "title": "BulkOperationsクラス実装計画",
+    "documentType": "plan",
+    "path": "bulk-operations-implementation-plan.json",
+    "tags": [
+      "refactoring",
+      "repository",
+      "implementation",
+      "bulk-operations"
+    ],
+    "lastModified": "2025-03-29T16:00:00.000Z",
+    "createdAt": "2025-03-29T16:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "title": "BulkOperationsクラス実装計画",
+      "description": "FileSystemGlobalMemoryBankRepositoryおよびFileSystemBranchMemoryBankRepositoryクラスのリファクタリングにおいて、BulkOperationsクラスの実装と関連するインターフェース修正の計画",
+      "goals": [
+        "バルク操作（一括取得・更新・削除等）の責務を分離",
+        "ビルドエラーの解消",
+        "インターフェースと実装の整合性確保",
+        "単一責任の原則に準拠した設計完成"
+      ],
+      "context": "feature/schema-package-3ブランチでは、肥大化したリポジトリクラスを責務ごとに分割するリファクタリングを行っている。その一環としてBulkOperationsクラスを実装し、複数ドキュメントの一括操作を担当させる。既存のリポジトリクラスが持っていたバルク操作の責務を移譲する形でリファクタリングを進める。"
+    },
+    "issues": [
+      {
+        "id": "issue-1",
+        "description": "TagOperationsクラスに必要なメソッドが存在しない",
+        "details": "generateAndSaveTagIndexメソッドやupdateLegacyTagsIndexなど、TagOperationsクラスに実装すべきメソッドがまだ存在していない",
+        "solution": "TagOperationsクラスに必要なメソッドを追加実装する"
+      },
+      {
+        "id": "issue-2",
+        "description": "PathOperationsクラスに必要なメソッドが存在しない",
+        "details": "listFilesInDirectoryメソッドがPathOperationsクラスにまだ実装されていない",
+        "solution": "PathOperationsクラスにlistFilesInDirectoryメソッドを実装する"
+      },
+      {
+        "id": "issue-3",
+        "description": "DocumentPathクラスのtoAlternateFormatメソッドが存在しない",
+        "details": "BulkOperations.ts内でDocumentPath.toAlternateFormat()を呼び出しているが、このメソッドはまだ実装されていない",
+        "solution": "DocumentPathクラスにtoAlternateFormatメソッドを実装する（.mdと.jsonの拡張子変換用）"
+      },
+      {
+        "id": "issue-4",
+        "description": "コンストラクタの引数不足",
+        "details": "TagOperationsとPathOperationsのコンストラクタでIConfigProviderを受け取っていない",
+        "solution": "コンストラクタの引数を修正し、必要なdependencyを注入する"
+      },
+      {
+        "id": "issue-5",
+        "description": "findDocumentPathsByTagsUsingIndexメソッドの引数が不一致",
+        "details": "BulkOperations.tsではtagOps.findDocumentPathsByTagsUsingIndexを呼び出す際に3つの引数を渡しているが、実装では2つしか引数を受け付けていない",
+        "solution": "メソッドシグネチャを統一する（引数を3つに修正するか、呼び出し側を2つに修正する）"
+      }
+    ],
+    "implementationPlan": {
+      "order": [
+        {
+          "id": "task-1",
+          "title": "DocumentPathクラスにtoAlternateFormat()を実装",
+          "description": ".mdファイルと.jsonファイルの間で拡張子を変換するtoAlternateFormatメソッドを実装する",
+          "estimatedEffort": "低"
+        },
+        {
+          "id": "task-2",
+          "title": "コンストラクタの引数を修正",
+          "description": "TagOperationsとPathOperationsのコンストラクタにIConfigProviderを追加し、FileSystemMemoryBankRepositoryBaseへ正しく渡す",
+          "estimatedEffort": "低"
+        },
+        {
+          "id": "task-3",
+          "title": "PathOperationsクラスにlistFilesInDirectoryを実装",
+          "description": "指定されたディレクトリ内のファイル一覧を取得するメソッドを実装する",
+          "estimatedEffort": "中"
+        },
+        {
+          "id": "task-4",
+          "title": "TagOperationsクラスの必要メソッドを実装",
+          "description": "generateAndSaveTagIndex、updateLegacyTagsIndexなどのメソッドを追加実装する",
+          "estimatedEffort": "高"
+        },
+        {
+          "id": "task-5",
+          "title": "findDocumentPathsByTagsUsingIndexメソッドの修正",
+          "description": "メソッドシグネチャと呼び出し側を整合させる",
+          "estimatedEffort": "低"
+        },
+        {
+          "id": "task-6",
+          "title": "BulkOperationsクラスのテスト",
+          "description": "修正・実装した機能の動作確認とユニットテストの追加",
+          "estimatedEffort": "中"
+        }
+      ]
+    },
+    "codeExamples": {
+      "documentPathToAlternateFormat": {
+        "description": "DocumentPath.toAlternateFormatメソッドの実装例",
+        "code": "/**\n * 代替フォーマットのパスを取得する（.md <-> .json変換）\n * @returns 代替フォーマットのDocumentPath\n */\npublic toAlternateFormat(): DocumentPath {\n  if (this.value.endsWith('.md')) {\n    return DocumentPath.create(this.value.replace(/\\.md$/, '.json'));\n  } else if (this.value.endsWith('.json')) {\n    return DocumentPath.create(this.value.replace(/\\.json$/, '.md'));\n  }\n  \n  // 変換対象外の場合は元のパスを返す\n  return this.clone();\n}"
+      },
+      "listFilesInDirectory": {
+        "description": "PathOperations.listFilesInDirectoryメソッドの実装例",
+        "code": "/**\n * 指定されたディレクトリ内のファイル一覧を取得する\n * @param directoryPath ディレクトリパス\n * @param allowedExtensions 許可される拡張子の配列（省略時は全ファイル）\n * @returns ファイルパスの配列\n */\nasync listFilesInDirectory(directoryPath: string, allowedExtensions: string[] = []): Promise<string[]> {\n  try {\n    const fullPath = this.resolvePath(directoryPath);\n    \n    // ディレクトリの存在確認\n    const exists = await this.directoryExists(fullPath);\n    if (!exists) {\n      return [];\n    }\n    \n    // ファイル一覧を取得\n    const allFiles = await super.listFiles(fullPath);\n    \n    // 拡張子フィルタリング\n    if (allowedExtensions.length === 0) {\n      return allFiles;\n    }\n    \n    return allFiles.filter(file => {\n      const ext = path.extname(file);\n      return allowedExtensions.includes(ext);\n    });\n  } catch (error) {\n    throw new InfrastructureError(\n      InfrastructureErrorCodes.FILE_SYSTEM_ERROR,\n      `Failed to list files in directory: ${directoryPath}`,\n      { originalError: error }\n    );\n  }\n}"
+      },
+      "generateAndSaveTagIndex": {
+        "description": "TagOperations.generateAndSaveTagIndexメソッドの実装例",
+        "code": "/**\n * タグインデックスを生成して保存する\n * @param documents タグインデックスを生成するためのドキュメント配列\n * @returns 生成したタグインデックス\n */\nasync generateAndSaveTagIndex(documents: MemoryDocument[]): Promise<TagIndex> {\n  try {\n    this.logDebug(`Generating tag index for ${documents.length} documents`);\n    \n    // タグインデックスを作成\n    const tagIndex: TagIndex = {\n      schema: TAG_INDEX_VERSION,\n      metadata: {\n        updatedAt: new Date().toISOString(),\n        documentCount: documents.length,\n        fullRebuild: true,\n        context: 'global',\n      },\n      index: {},\n    };\n\n    // ドキュメントごとにタグを収集\n    for (const doc of documents) {\n      for (const tag of doc.tags) {\n        if (!tagIndex.index[tag.value]) {\n          tagIndex.index[tag.value] = [];\n        }\n        tagIndex.index[tag.value].push(doc.path.value);\n      }\n    }\n    \n    // タグインデックスを保存\n    await this.saveGlobalTagIndex(tagIndex);\n    \n    return tagIndex;\n  } catch (error) {\n    throw new InfrastructureError(\n      InfrastructureErrorCodes.PERSISTENCE_ERROR,\n      `Failed to generate and save tag index: ${(error as Error).message}`,\n      { originalError: error }\n    );\n  }\n}"
+      },
+      "updateLegacyTagsIndex": {
+        "description": "TagOperations.updateLegacyTagsIndexメソッドの実装例",
+        "code": "/**\n * レガシーなタグインデックスを更新する\n * @param documents ドキュメント配列\n * @param language 言語設定\n */\nasync updateLegacyTagsIndex(documents: MemoryDocument[], language: Language): Promise<void> {\n  try {\n    this.logDebug('Updating legacy tags index');\n    \n    // tags/index.mdまたはtags/index.jsonのパスを構築\n    const indexPath = `tags/index.${language === 'en' ? 'json' : 'md'}`;\n    \n    // タグごとのドキュメント数をカウント\n    const tagCounts: Record<string, number> = {};\n    for (const doc of documents) {\n      for (const tag of doc.tags) {\n        if (!tagCounts[tag.value]) {\n          tagCounts[tag.value] = 0;\n        }\n        tagCounts[tag.value]++;\n      }\n    }\n    \n    // タグをアルファベット順にソート\n    const sortedTags = Object.keys(tagCounts).sort();\n    \n    // レガシーインデックスドキュメントを作成\n    const content = {\n      schema: 'memory_document_v2',\n      metadata: {\n        id: 'tags-index',\n        title: language === 'en' ? 'Tags Index' : 'タグインデックス',\n        documentType: 'generic',\n        path: indexPath,\n        tags: ['index', 'meta'],\n        lastModified: new Date().toISOString(),\n        createdAt: new Date().toISOString(),\n        version: 1\n      },\n      content: {\n        sections: [\n          {\n            title: language === 'en' ? 'Tags List' : 'タグ一覧',\n            content: JSON.stringify(sortedTags.map(tag => ({\n              name: tag,\n              count: tagCounts[tag]\n            })))\n          }\n        ]\n      }\n    };\n    \n    // ドキュメントを保存\n    const doc = MemoryDocument.createFromJson(content);\n    await new FileSystemMemoryDocumentRepository(this.basePath, this.fileSystemService).save(doc);\n    \n    this.logDebug('Legacy tags index updated');\n  } catch (error) {\n    // エラーは記録するが、処理は続行（非クリティカルな操作）\n    this.logError('Failed to update legacy tags index', error);\n  }\n}"
+      },
+      "findDocumentPathsByTagsUsingIndex": {
+        "description": "TagOperations.findDocumentPathsByTagsUsingIndexメソッドの修正例",
+        "code": "/**\n * タグインデックスを使用してドキュメントを検索する\n * @param tags 検索するタグ\n * @param documents ドキュメント配列（オプション、指定がない場合はインデックスのみ使用）\n * @param matchAll すべてのタグにマッチする必要があるか（AND検索）\n * @returns マッチしたドキュメントパスの配列\n */\nasync findDocumentPathsByTagsUsingIndex(\n  tags: Tag[],\n  documents?: MemoryDocument[], // オプショナルパラメータに変更\n  matchAll: boolean = false\n): Promise<DocumentPath[]> {\n  try {\n    this.logDebug(`Finding documents by ${tags.length} tags (matchAll: ${matchAll})`);\n\n    // インデックスを使用して検索\n    const tagIndex = await this.getGlobalTagIndex();\n    \n    if (!tagIndex) {\n      // インデックスがなければ通常のメソッドにフォールバック\n      this.logDebug('No tag index found, falling back to regular method');\n      \n      // documentsパラメータが渡されていればそれを使用\n      if (documents) {\n        // documentsから直接フィルタリング\n        const matchedDocs = this.filterDocumentsByTags(documents, tags, matchAll);\n        return matchedDocs.map(doc => doc.path);\n      } else {\n        // 通常のメソッドでドキュメントを検索\n        const matchedDocs = await this.findDocumentsByTags(tags, matchAll);\n        return matchedDocs.map(doc => doc.path);\n      }\n    }\n\n    // 以降は既存の実装と同じ...\n    // ...\n  } catch (error) {\n    // エラーハンドリング\n    // ...\n  }\n}"
+      }
+    },
+    "risks": [
+      {
+        "id": "risk-1",
+        "description": "メソッドのシグネチャ変更によるインタフェース互換性の問題",
+        "mitigation": "単体テストでインターフェース実装の整合性を確認し、必要に応じてモックを更新する"
+      },
+      {
+        "id": "risk-2",
+        "description": "既存機能の動作変更",
+        "mitigation": "実装を進める前後で既存テストを実行し、機能の一貫性を保証する"
+      },
+      {
+        "id": "risk-3",
+        "description": "リファクタリングによる予期せぬ副作用",
+        "mitigation": "変更を小さく分割し、段階的に実装・テストする"
+      }
+    ],
+    "nextSteps": "上記の実装計画に基づき、各修正を順番に適用していく。まずはDocumentPath.toAlternateFormat()メソッドの実装から開始し、次にコンストラクタの引数修正、PathOperationsのlistFilesInDirectoryメソッド実装、そしてTagOperationsクラスの必要メソッド実装と続ける。最終的にBulkOperationsクラスが正常に動作するようにテストを行う。"
+  }
+}

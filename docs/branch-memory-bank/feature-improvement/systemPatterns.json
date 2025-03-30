@@ -1,0 +1,204 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "dbda65e9-c9ee-47c8-b1db-2ffe6fd487ab",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "system-patterns"
+    ],
+    "lastModified": "2025-03-30T05:10:32.361Z",
+    "createdAt": "2025-03-30T03:50:32.361Z",
+    "version": 2
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "3966e371-1ee3-4f1c-bf58-e2ae160c815a",
+        "title": "一貫したエラーハンドリングパターンの適用",
+        "context": "現在のコードベースではエラーハンドリングの方法が統一されておらず、一部ではファクトリーメソッドを使用し、他の部分では直接コンストラクタを使用している。これにより、エラー処理の一貫性が損なわれ、デバッグが困難になっている。",
+        "decision": "全てのエラー生成箇所でファクトリーメソッドを一貫して使用し、必要に応じて新しいファクトリーメソッドを追加する。各レイヤー（ドメイン、インフラストラクチャ、アプリケーション）に適したエラータイプを使い分ける。",
+        "consequences": {
+          "positive": [
+            "エラー処理の一貫性が向上する",
+            "トラブルシューティングが容易になる",
+            "エラーメッセージとコンテキスト情報が標準化される"
+          ],
+          "negative": [
+            "既存コードの多くの箇所で変更が必要になる",
+            "一時的に開発者の学習コストが増える"
+          ]
+        },
+        "status": "accepted",
+        "date": "2025-03-30T05:10:32.361Z",
+        "alternatives": [
+          {
+            "title": "既存のパターンを維持",
+            "description": "既存のコードパターンを尊重し、新規コードのみに新しいパターンを適用する",
+            "reason": "変更範囲を限定できるが、コードベース全体の一貫性が達成できない"
+          }
+        ]
+      },
+      {
+        "id": "5f12a930-2a7d-412e-b8c5-6d4c89a1e2b3",
+        "title": "コンポーネントロガーの一貫した使用",
+        "context": "多くのコンポーネントでcomponentLoggerが定義されているにもかかわらず、実際の使用は一貫していない。一部のコードでは直接loggerを使用し、構造化コンテキストが十分に活用されていない。",
+        "decision": "全てのコンポーネントで一貫してcomponentLoggerを使用し、直接loggerを使用している箇所を全てcomponentLoggerに置き換える。ログエントリには常に関連するコンテキスト情報（操作名、リソース識別子など）を付与する。",
+        "consequences": {
+          "positive": [
+            "ログの一貫性と品質が向上する",
+            "コンテキスト情報の充実によりトラブルシューティングが容易になる",
+            "コンポーネント固有のログフィルタリングが可能になる"
+          ],
+          "negative": [
+            "広範囲のコード変更が必要になる"
+          ]
+        },
+        "status": "accepted",
+        "date": "2025-03-30T05:10:32.361Z",
+        "alternatives": [
+          {
+            "title": "グローバルロガーの使用",
+            "description": "コンポーネントロガーではなく、拡張されたグローバルロガーを使用する",
+            "reason": "実装が容易だが、コンポーネント固有のコンテキスト継承の利点が失われる"
+          }
+        ]
+      },
+      {
+        "id": "7d21b9c4-f5e3-4a9b-9c3d-8e6fa2b0d5c8",
+        "title": "スキーマモジュール化とバージョン管理強化",
+        "context": "現在のスキーマ定義は単一の大きなファイルに含まれており、保守が難しくなっている。また、バージョン間の互換性とマイグレーション機能が十分ではない。",
+        "decision": "スキーマファイルをドキュメントタイプごとに分割し、明示的なバージョン管理と互換性レイヤーを導入する。バージョン間の自動マイグレーション機能を追加する。",
+        "consequences": {
+          "positive": [
+            "スキーマの保守性と可読性が向上する",
+            "バージョン間の互換性が明示的に管理される",
+            "新しいドキュメントタイプの追加が容易になる"
+          ],
+          "negative": [
+            "初期実装の複雑さが増す",
+            "遡及的な互換性の維持が必要になる"
+          ]
+        },
+        "status": "accepted",
+        "date": "2025-03-30T05:10:32.361Z",
+        "alternatives": [
+          {
+            "title": "モノリシックスキーマの維持",
+            "description": "現在の単一ファイル構造を維持し、内部整理のみを行う",
+            "reason": "変更範囲が小さいが、長期的な保守性の問題が解決されない"
+          }
+        ]
+      },
+      {
+        "id": "a3c8d7e6-1b5f-4e2a-9d0f-c4e3b2a1d0e9",
+        "title": "TypeScript厳格モードとESLintルールの強化",
+        "context": "現在のTypeScript設定では、一部のファイルでstrict modeが有効になっていない。また、エラーハンドリングとロギングに関する特化したESLintルールが不足している。",
+        "decision": "プロジェクト全体でTypeScriptのstrict modeを有効にし、エラーハンドリングとロギングに特化したESLintルールを追加する。特に非同期エラーハンドリングの一貫性を強制するルールを導入する。",
+        "consequences": {
+          "positive": [
+            "型安全性が向上する",
+            "コード品質とバグ検出率が向上する",
+            "一貫したエラーハンドリングパターンが強制される"
+          ],
+          "negative": [
+            "既存コードでの型エラーの修正が必要になる",
+            "開発者の学習コストが一時的に増加する"
+          ]
+        },
+        "status": "accepted",
+        "date": "2025-03-30T05:10:32.361Z",
+        "alternatives": [
+          {
+            "title": "段階的な型強化",
+            "description": "ファイルごとに段階的に型チェックを強化する",
+            "reason": "影響範囲を管理できるが、プロジェクト全体の一貫性が遅れる"
+          }
+        ]
+      }
+    ],
+    "implementationPatterns": [
+      {
+        "id": "b1c2d3e4-f5g6-7h8i-9j0k-l1m2n3o4p5q6",
+        "title": "エラーファクトリーメソッドパターン",
+        "description": "各エラータイプに対して、静的ファクトリーメソッドを提供するパターン。エラーコード、メッセージ、オペレーション詳細を一貫した形式で受け取り、適切に構成されたエラーオブジェクトを返す。",
+        "examples": [
+          "// 変更前\nthrow new DomainError('VALIDATION_ERROR', 'Files must be provided as an object');\n\n// 変更後\nthrow DomainErrors.validationError('Files must be provided as an object');"
+        ],
+        "relatedFiles": [
+          "/packages/mcp/src/shared/errors/DomainError.ts",
+          "/packages/mcp/src/shared/errors/InfrastructureError.ts",
+          "/packages/mcp/src/shared/errors/ApplicationError.ts"
+        ],
+        "tags": [
+          "error-handling",
+          "factory-pattern"
+        ]
+      },
+      {
+        "id": "c2d3e4f5-g6h7-i8j9-k0l1-m2n3o4p5q6r7",
+        "title": "コンポーネントロガーパターン",
+        "description": "各クラスやモジュールで、コンポーネント固有のロガーインスタンスを作成して使用するパターン。withContext()メソッドを使用してコンポーネント名や固有識別子などの共通コンテキストを継承する。",
+        "examples": [
+          "// コンポーネントロガーの初期化\nprivate readonly componentLogger = logger.withContext({\n  component: 'BranchController'\n});\n\n// 使用例\nthis.componentLogger.info('Reading branch document', { \n  operation: 'readDocument',\n  branchName: branchInfo.name, \n  path: document.path.value\n});"
+        ],
+        "relatedFiles": [
+          "/packages/mcp/src/shared/utils/logger.ts",
+          "/packages/mcp/src/interface/controllers/BranchController.ts"
+        ],
+        "tags": [
+          "logging",
+          "context-inheritance"
+        ]
+      },
+      {
+        "id": "d3e4f5g6-h7i8-j9k0-l1m2-n3o4p5q6r7s8",
+        "title": "非同期エラーラッピングパターン",
+        "description": "非同期処理をErrorUtils.wrapAsync()でラップするパターン。内部処理とエラーハンドリングを分離し、エラー変換関数を通じて適切な型のエラーに変換する。",
+        "examples": [
+          "// 変更前\nasync execute(input: Input): Promise<Output> {\n  try {\n    // 処理ロジック\n    return result;\n  } catch (error) {\n    // エラーハンドリング\n    throw ApplicationErrors.executionFailed('UseCase', error);\n  }\n}\n\n// 変更後\nasync execute(input: Input): Promise<Output> {\n  return await ErrorUtils.wrapAsync(\n    this.executeInternal(input),\n    (error) => ApplicationErrors.executionFailed('UseCase', error, { input })\n  );\n}\n\nprivate async executeInternal(input: Input): Promise<Output> {\n  // 処理ロジック\n  return result;\n}"
+        ],
+        "relatedFiles": [
+          "/packages/mcp/src/shared/utils/ErrorUtils.ts",
+          "/packages/mcp/src/application/usecases/json/ReadJsonDocumentUseCase.ts"
+        ],
+        "tags": [
+          "async",
+          "error-handling"
+        ]
+      },
+      {
+        "id": "e4f5g6h7-i8j9-k0l1-m2n3-o4p5q6r7s8t9",
+        "title": "モジュール化スキーマパターン",
+        "description": "大きなスキーマ定義を機能単位で分割し、インデックスファイルで再エクスポートするパターン。各ドキュメントタイプごとに専用のスキーマファイルを作成する。",
+        "examples": [
+          "// document-types/branch-context.ts\nexport const BranchContextContentV2Schema = z.object({ /*...*/ });\n\n// document-types/active-context.ts\nexport const ActiveContextContentV2Schema = z.object({ /*...*/ });\n\n// インデックスファイルで再エクスポート\n// document-types/index.ts\nexport * from './branch-context.js';\nexport * from './active-context.js';"
+        ],
+        "relatedFiles": [
+          "/packages/schemas/src/json-document.ts"
+        ],
+        "tags": [
+          "schema",
+          "modularization"
+        ]
+      },
+      {
+        "id": "f5g6h7i8-j9k0-l1m2-n3o4-p5q6r7s8t9u0",
+        "title": "コントローラーエラーハンドリングパターン",
+        "description": "コントローラーでの一貫したエラーハンドリングパターン。共通のhandleError()メソッドを使用し、適切なエラーマッピングと詳細なロギングを行う。",
+        "examples": [
+          "// 共通のhandleErrorメソッド\nprivate handleError(error: unknown, context?: Record<string, unknown>) {\n  if (error instanceof BaseError) {\n    this.componentLogger.error('Operation failed', { \n      error: ErrorUtils.formatForLogging(error),\n      ...context\n    });\n    return this.presenter.presentError(error);\n  }\n\n  // Convert unknown errors to ApplicationError\n  const applicationError = ApplicationErrors.unexpectedControllerError(\n    'BranchController',\n    error instanceof Error ? error : undefined,\n    context\n  );\n  \n  this.componentLogger.error('Unexpected controller error', { \n    error: ErrorUtils.formatForLogging(error),\n    ...context\n  });\n  \n  return this.presenter.presentError(applicationError);\n}"
+        ],
+        "relatedFiles": [
+          "/packages/mcp/src/interface/controllers/BranchController.ts",
+          "/packages/mcp/src/interface/controllers/GlobalController.ts"
+        ],
+        "tags": [
+          "controller",
+          "error-handling"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,211 @@
+{
+  "title": "TypeScript & ESLint Settings Improvement Plan",
+  "createdAt": "2025-03-30T12:00:00Z",
+  "author": "みらい",
+  "improvements": [
+    {
+      "id": "typescript-strict-mode",
+      "title": "ルートtsconfig.jsonでのStrict Mode有効化",
+      "summary": "ルートのtsconfig.jsonでも厳格な型チェックを有効化",
+      "description": "現在のルートtsconfig.jsonでは、`strict`と`noImplicitAny`がfalseに設定されていますが、各パッケージ（schemas、mcp）ではtrueになっています。プロジェクト全体の型安全性を確保するため、ルートの設定も厳格にすべきです。",
+      "implementation": {
+        "code": "// tsconfig.json\n{\n  \"compilerOptions\": {\n    // 以下を変更\n    \"strict\": true,\n    \"noImplicitAny\": true,\n    // 未使用警告も有効化\n    \"noUnusedLocals\": true,\n    \"noUnusedParameters\": true\n  }\n}",
+        "difficulty": "low",
+        "impact": "high"
+      }
+    },
+    {
+      "id": "target-es2022",
+      "title": "ES2022ターゲットへのアップデート",
+      "summary": "Node.jsサポートバージョンに合わせたES2022ターゲットの採用",
+      "description": "package.jsonのenginesセクションでは「^18.18.0 || ^20.9.0 || >=21.1.0」のNode.jsバージョンをサポートしています。これらのバージョンはES2022の機能をサポートしているため、現在のES2020から更新することで、より最新の言語機能を活用できます。",
+      "implementation": {
+        "code": "// tsconfig.json\n{\n  \"compilerOptions\": {\n    \"target\": \"ES2022\" // ES2020から更新\n  }\n}",
+        "difficulty": "low",
+        "impact": "medium"
+      }
+    },
+    {
+      "id": "common-types",
+      "title": "共通型定義の明示",
+      "summary": "プロジェクト全体で使用する型定義を明示的に指定",
+      "description": "現在の設定では共通の型定義が明示的に含まれていません。typesフィールドを追加することで、ノードとJestの型が明示的に含まれるようになり、型エラーの減少が期待できます。",
+      "implementation": {
+        "code": "// tsconfig.json\n{\n  \"compilerOptions\": {\n    \"types\": [\"node\", \"jest\"]\n  }\n}",
+        "difficulty": "low",
+        "impact": "low"
+      }
+    },
+    {
+      "id": "package-config-unification",
+      "title": "パッケージ設定の統一",
+      "summary": "schemasとmcpパッケージのTypeScript設定を統一",
+      "description": "schemas（isolatedModules: true）とmcp（isolatedModules: 未設定）のパッケージで設定が異なります。これを統一することで、一貫した振る舞いとより予測可能なビルド結果が得られます。",
+      "implementation": {
+        "code": "// packages/mcp/tsconfig.json\n{\n  \"compilerOptions\": {\n    // 以下を追加\n    \"isolatedModules\": true\n  }\n}",
+        "difficulty": "low",
+        "impact": "medium"
+      }
+    },
+    {
+      "id": "advanced-type-checking",
+      "title": "型チェック強化オプションの追加",
+      "summary": "最新のTypeScriptでサポートされている強力な型チェックオプションを追加",
+      "description": "TypeScript 5.8で利用可能な高度な型チェックオプションをいくつか追加することで、より堅牢なタイプセーフティを実現できます。これらのオプションは特にエラーハンドリングに関連するバグの早期発見に役立ちます。",
+      "implementation": {
+        "code": "// tsconfig.json\n{\n  \"compilerOptions\": {\n    \"exactOptionalPropertyTypes\": true,\n    \"noUncheckedIndexedAccess\": true,\n    \"useUnknownInCatchVariables\": true\n  }\n}",
+        "difficulty": "medium",
+        "impact": "high"
+      }
+    },
+    {
+      "id": "eslint-plugins",
+      "title": "ESLintプラグインの拡充",
+      "summary": "コード品質向上のための追加ESLintプラグイン導入",
+      "description": "現在のESLint設定は基本的なものですが、未使用のインポート自動削除やコードスタイル統一のための追加プラグインを導入することで、コード品質を向上させることができます。",
+      "implementation": {
+        "code": "// eslint.config.js\nimport unusedImportsPlugin from 'eslint-plugin-unused-imports';\nimport perfectionist from 'eslint-plugin-perfectionist';\n\n// ルールに追加\n{\n  plugins: {\n    // 既存のものに加えて\n    'unused-imports': unusedImportsPlugin,\n    'perfectionist': perfectionist\n  },\n  rules: {\n    // 未使用importの自動削除\n    'unused-imports/no-unused-imports': 'error',\n    // importの整列\n    'perfectionist/sort-imports': ['warn', {\n      type: 'natural',\n      order: 'asc',\n      'newline-between-groups': true\n    }]\n  }\n}",
+        "difficulty": "low",
+        "impact": "medium"
+      }
+    },
+    {
+      "id": "error-handling-rules",
+      "title": "エラーハンドリング強化ルール",
+      "summary": "エラー処理とロギングに関する専用ESLintルールの追加",
+      "description": "feature/logging-error-handlingブランチの目的に合わせて、エラーハンドリングとロギングに特化したESLintルールを追加します。これにより、一貫したエラー処理パターンを強制し、未処理の例外や不適切なエラーログを防ぎます。",
+      "implementation": {
+        "code": "// eslint.config.js\n{\n  rules: {\n    'no-console': ['warn', { allow: ['warn', 'error', 'info'] }], // consoleはログ出力用に限定\n    '@typescript-eslint/no-explicit-any': 'warn', // anyを使う場所を明確に\n    'prefer-promise-reject-errors': 'error', // Promiseでのエラー処理改善\n    '@typescript-eslint/explicit-function-return-type': ['error', {\n      allowExpressions: true,\n      allowTypedFunctionExpressions: true\n    }], // 関数の戻り値の型を明示させる\n    '@typescript-eslint/consistent-type-assertions': 'error' // 型アサーションの一貫性\n  }\n}",
+        "difficulty": "medium",
+        "impact": "high"
+      }
+    },
+    {
+      "id": "promise-error-rules",
+      "title": "Promise/非同期エラー処理のルール",
+      "summary": "未処理のPromiseや非同期エラーを検出するためのルール",
+      "description": "非同期処理におけるエラーハンドリングは特に重要です。これらのルールを追加することで、未処理のPromiseや不適切な例外処理を検出し、より堅牢なエラーハンドリングを促進します。",
+      "implementation": {
+        "code": "// eslint.config.js\n{\n  rules: {\n    '@typescript-eslint/no-floating-promises': 'error', // 未ハンドルのPromiseを禁止\n    '@typescript-eslint/no-misused-promises': 'error', // Promiseの誤用を防止\n    '@typescript-eslint/no-throw-literal': 'error' // throwでErrorオブジェクト以外を投げるのを防止\n  }\n}",
+        "difficulty": "medium",
+        "impact": "high"
+      }
+    },
+    {
+      "id": "incremental-builds",
+      "title": "ビルド最適化の設定追加",
+      "summary": "増分ビルドによるビルド時間の短縮",
+      "description": "大規模プロジェクトではビルド時間が長くなりがちです。増分ビルドを有効にすることで、変更されたファイルのみを再コンパイルし、ビルド時間を大幅に短縮できます。これは開発効率の向上につながります。",
+      "implementation": {
+        "code": "// tsconfig.json\n{\n  \"compilerOptions\": {\n    \"incremental\": true,\n    \"tsBuildInfoFile\": \"./buildcache\"\n  }\n}",
+        "difficulty": "low",
+        "impact": "medium"
+      }
+    },
+    {
+      "id": "logger-custom-rule",
+      "title": "カスタムロガールール",
+      "summary": "プロジェクト固有のロガー使用を促進するカスタムESLintルール",
+      "description": "コンソールログの代わりに、プロジェクト独自のロガーを使用することを強制するカスタムルールを作成します。これにより、ログ出力の一貫性が向上し、構造化ロギングやログレベル管理が容易になります。",
+      "implementation": {
+        "code": "// custom-rules/use-logger.js\nmodule.exports = {\n  meta: {\n    type: 'suggestion',\n    docs: {\n      description: 'Enforce using Logger instead of console',\n      category: 'Best Practices',\n      recommended: true,\n    },\n  },\n  create(context) {\n    return {\n      CallExpression(node) {\n        if (\n          node.callee.type === 'MemberExpression' &&\n          node.callee.object.name === 'console' &&\n          ['log', 'info', 'warn', 'error'].includes(node.callee.property.name)\n        ) {\n          context.report({\n            node,\n            message: `Use Logger.${node.callee.property.name} instead of console.${node.callee.property.name}`,\n          });\n        }\n      },\n    };\n  },\n};\n\n// eslint.config.js に追加\nimport useLoggerRule from './custom-rules/use-logger.js';\n{\n  plugins: {\n    // 既存のプラグインに加えて\n    'use-logger': {\n      rules: {\n        'use-logger': useLoggerRule\n      }\n    }\n  },\n  rules: {\n    'use-logger/use-logger': 'error'\n  }\n}",
+        "difficulty": "high",
+        "impact": "high"
+      }
+    }
+  ],
+  "priorityRecommendations": [
+    {
+      "id": "typescript-strict-mode",
+      "reason": "プロジェクト全体の型安全性を確保する最も基本的な改善です。比較的簡単に実装でき、効果も高いため、最初に取り組むべきです。"
+    },
+    {
+      "id": "error-handling-rules",
+      "reason": "feature/logging-error-handlingブランチの主要な目的に直結する改善です。エラーハンドリングとロギングに特化したルールを追加することで、コードの品質と安定性が向上します。"
+    },
+    {
+      "id": "promise-error-rules",
+      "reason": "非同期処理のエラーハンドリングは特に見落としやすく、深刻なバグにつながりやすいため、早期に対応することが重要です。"
+    }
+  ],
+  "implementationStrategy": {
+    "phases": [
+      {
+        "name": "タイプセーフティ基盤強化",
+        "improvements": [
+          "typescript-strict-mode",
+          "target-es2022",
+          "common-types",
+          "advanced-type-checking"
+        ],
+        "duration": "1週間"
+      },
+      {
+        "name": "エラーハンドリング改善",
+        "improvements": [
+          "error-handling-rules",
+          "promise-error-rules"
+        ],
+        "duration": "1週間"
+      },
+      {
+        "name": "開発体験・コード品質向上",
+        "improvements": [
+          "eslint-plugins",
+          "package-config-unification",
+          "incremental-builds",
+          "logger-custom-rule"
+        ],
+        "duration": "2週間"
+      }
+    ],
+    "rolloutApproach": {
+      "description": "段階的に適用することで、既存コードベースへの影響を最小限に抑えます。",
+      "steps": [
+        "1. まずはESLintの警告レベルで導入し、既存の違反箇所を把握",
+        "2. 新規コードには厳格なルールを適用",
+        "3. 既存コードを段階的に修正",
+        "4. 十分な修正後、エラーレベルに引き上げ"
+      ]
+    }
+  },
+  "additionalConsiderations": {
+    "loggingLibrarySelection": {
+      "description": "エラーハンドリングとロギングの改善にあたり、適切なロギングライブラリの選定も検討すべきです。",
+      "options": [
+        {
+          "name": "winston",
+          "pros": [
+            "高い柔軟性",
+            "複数の出力先をサポート",
+            "ログレベル管理"
+          ],
+          "cons": [
+            "設定がやや複雑"
+          ]
+        },
+        {
+          "name": "pino",
+          "pros": [
+            "高いパフォーマンス",
+            "JSON形式のログ",
+            "シンプルなAPI"
+          ],
+          "cons": [
+            "機能がやや限定的"
+          ]
+        },
+        {
+          "name": "カスタムLogger",
+          "pros": [
+            "プロジェクト固有のニーズに最適化",
+            "依存関係の最小化"
+          ],
+          "cons": [
+            "実装と保守のコスト"
+          ]
+        }
+      ]
+    }
+  }
+}

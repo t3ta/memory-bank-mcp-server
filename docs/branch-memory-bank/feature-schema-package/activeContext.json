@@ -1,0 +1,196 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "94c9b19e-95ad-4cc6-a6c6-99fb2da73760",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context"
+    ],
+    "lastModified": "2025-03-28T15:31:47+09:00",
+    "createdAt": "2025-03-27T13:26:18.387Z",
+    "version": 4
+  },
+  "content": {
+    "currentWork": "テンプレート関連コードの削除作業がほぼ完了。GlobalController.tsのエラーを修正し、providers.tsも修正してGlobalControllerの生成とDI依存関係の問題を解消しました。まだ他のファイルにエラーがあるものの、テンプレート関連のコードは削除できました。",
+    "recentChanges": [
+      {
+        "date": "2025-03-28T20:00:00+09:00",
+        "description": "GlobalController.tsの構文重複エラーを修正し、providers.tsのDI設定も修正。両ファイルのエラーは解消したが、まだ一部のファイルにエラーが残っているので、モノレポ移行作業の中で対応予定。"
+      },
+      {
+        "date": "2025-03-28T19:40:00+09:00",
+        "description": "GlobalControllerの構文エラー修正完了。まだ型エラーなどは残っているが、テンプレート関連コードの削除作業は主要部分完了。"
+      },
+      {
+        "date": "2025-03-28T19:25:00+09:00",
+        "description": "テンプレート関連コードの物理的な削除（ITemplateRepository.ts、TemplateService.ts）とディレクトリ（templates/）を完了。providers.tsのインポート修正も実施。"
+      },
+      {
+        "date": "2025-03-28T18:45:00+09:00",
+        "description": "GlobalController.tsのreadCoreFilesメソッドを、JSON直接読み込み版に修正する計画を作成。providers.tsのテンプレート関連コード削除と併せて進める予定。"
+      },
+      {
+        "date": "2025-03-28T18:35:00+09:00",
+        "description": "テンプレート関連コードを大部分削除。一時的にモック実装を追加してビルドエラーを最小化。完全に削除するには追加作業が必要。"
+      },
+      {
+        "date": "2025-03-28T17:55:00+09:00",
+        "description": "テンプレート関連コード削除計画を策定。GlobalControllerからテンプレート関連のコードを削除し、JSON専用の実装に簡素化する計画。"
+      },
+      {
+        "date": "2025-03-28T15:31:47+09:00",
+        "description": "packages/mcp/src 以下のビルドエラーをすべて修正完了。Jestの構文エラーはテストコード側の修正で回避。"
+      },
+      {
+        "date": "2025-03-28T13:53:00+09:00",
+        "description": "src/ から packages/mcp/src/ へのファイル移動を完了。移動に伴うインポートパスや型エラーの修正を開始。ビルドエラーや fast-json-patch の依存関係問題が発生し、対応中。"
+      },
+      {
+        "date": "2025-03-28T17:30:00.000Z",
+        "description": "全コントローラーの単体テストを作成完了（BranchController, GlobalController, ContextController, TemplateControllerの4つ）"
+      },
+      {
+        "date": "2025-03-28T16:30:00.000Z",
+        "description": "BranchControllerのJSON専用実装のテストを作成し、テスト配置戦略を決定"
+      },
+      {
+        "date": "2025-03-28T15:30:00.000Z",
+        "description": "BranchControllerからマークダウン関連のコードを完全に削除し、JSON専用の実装に簡素化。また、モジュールインポートパスにも.js拡張子を追加"
+      },
+      {
+        "date": "2025-03-28T15:00:00.000Z",
+        "description": "マークダウン遺物のクリーンアップ計画を実行開始"
+      },
+      {
+        "date": "2025-03-28T14:30:00.000Z",
+        "description": "DIコンテナとAPIルーティングの設定を完了"
+      },
+      {
+        "date": "2025-03-28T12:00:00.000Z",
+        "description": "コントローラー実装完了後の次のステップとなるDIコンテナ設定とAPIルーティング更新の計画を策定"
+      },
+      {
+        "date": "2025-03-28T11:30:00.000Z",
+        "description": "MCPパッケージに残りのコントローラー（JsonBranchController, ContextController, TemplateController）を実装し、インターフェースレイヤーを完成"
+      },
+      {
+        "date": "2025-03-28T11:15:00.000Z",
+        "description": "コントローラー間の依存関係を整理し、インデックスファイルを適切に設定"
+      },
+      {
+        "date": "2025-03-28T11:00:00.000Z",
+        "description": "BranchControllerの実装を確認し、いくつかの改善点を特定"
+      },
+      {
+        "date": "2025-03-28T17:45:00.000Z",
+        "description": "テスト実行でBabelパーサーエラーが発生。packages/mcp配下にJestの設定ファイルが必要。"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "724a6e2a-e23c-4aa7-9b8f-97a72c815344",
+        "description": "スキーマ関連のコードを独立したパッケージに切り出す"
+      },
+      {
+        "id": "89a7b654-c321-4def-9876-543210fedcba",
+        "description": "リポジトリ全体を'memory-bank'としてモノレポ化する"
+      },
+      {
+        "id": "45f6e7d8-9c0b-1a2b-3c4d-5e6f7a8b9c0d",
+        "description": "パッケージ名を'@memory-bank/schemas'、'@memory-bank/mcp'などとする"
+      },
+      {
+        "id": "56781234-5678-1234-5678-123456781234",
+        "description": "パッケージ移行は機能ブロック単位で行い、段階的にテストするアプローチを取ることに決定"
+      },
+      {
+        "id": "test-placement-strategy",
+        "description": "各パッケージ内にテストを配置する戦略を採用。例: /packages/mcp/tests/unit/interface/controllers/BranchController.test.ts"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "test-coverage-priority",
+        "description": "重要なコントローラーから優先的に単体テストを追加し、カバレッジを向上させる",
+        "status": "active"
+      },
+      {
+        "id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+        "description": "単体テスト作成後にE2Eテストも実施して、APIの動作を確認する必要がある",
+        "status": "active"
+      },
+      {
+        "id": "q9r8s7t6-u5v4-w3x2-y1z0-a9b8c7d6e5f4",
+        "description": "APIルーティングは既存のインターフェースを維持しつつ、内部実装のみを新しいコントローラーに差し替える形で実装する",
+        "status": "active"
+      },
+      {
+        "id": "a3b4c5d6-e7f8-9g0h-i1j2-k3l4m5n6o7p8",
+        "description": "DIコンテナ設定は既存の設計を参考にしつつ、新しいパッケージ構造に合わせて適切に調整する必要がある",
+        "status": "active"
+      },
+      {
+        "id": "b2c3d4e5-f6g7-h8i9-j0k1-l2m3n4o5p6q7",
+        "description": "パッケージ移行の過程で、非推奨のマークダウン関連コード、重複するロガー実装、旧バージョンのスキーマを削除し、コードをクリーンアップすることも考慮する",
+        "status": "active"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "remaining-errors-check",
+        "priority": "medium",
+        "description": "テンプレート関連コードの削除は完了したが、まだファイルシステム関連などのコンポーネントで型エラーが残っている。これらは別途モノレポ移行作業の一環として対応する。",
+        "status": "pending",
+        "dependencies": []
+      },
+      {
+        "id": "run-tests",
+        "priority": "high",
+        "description": "packages/mcp で `npm run test` を実行し、テストが通ることを確認する。",
+        "status": "next"
+      },
+      {
+        "id": "template-class-fix",
+        "priority": "high",
+        "description": "FileTemplateRepository.ts で発生している Template クラス関連のエラーを修正する (Template クラスの実装更新が必要)。",
+        "status": "pending",
+        "dependencies": [
+          "run-tests"
+        ]
+      },
+      {
+        "id": "other-errors-fix",
+        "priority": "medium",
+        "description": "残りのエラーやヒント（非推奨メソッド呼び出しなど）を修正する。",
+        "status": "pending",
+        "dependencies": [
+          "run-tests"
+        ]
+      },
+      {
+        "id": "remove-src",
+        "priority": "low",
+        "description": "移行が完了したら、元の src/ ディレクトリを削除する",
+        "status": "pending",
+        "dependencies": [
+          "template-class-fix",
+          "other-errors-fix"
+        ]
+      }
+    ],
+    "references": [
+      {
+        "file": "implementation-plan.json",
+        "description": "コントローラー実装完了後の計画（DIコンテナ、APIルーティング、テスト等）",
+        "created_at": "2025-03-28"
+      },
+      {
+        "file": "test-strategy.json",
+        "description": "モノレポ構造でのテスト戦略と配置計画",
+        "created_at": "2025-03-28"
+      }
+    ]
+  }
+}

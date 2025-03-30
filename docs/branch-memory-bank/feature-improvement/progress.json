@@ -1,0 +1,316 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "60ed7241-c350-446c-a7be-f7842bec7bbf",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress"
+    ],
+    "lastModified": "2025-03-30T07:15:32.361Z",
+    "createdAt": "2025-03-30T03:50:32.361Z",
+    "version": 3
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "a101b202-c303-d404-e505-f6060708090a",
+        "description": "MCP-1: ロガー使用の一貫性確保 - componentLoggerの一貫した使用",
+        "priority": "high",
+        "implementationOrder": 1,
+        "phase": 1,
+        "completed": true,
+        "completedAt": "2025-03-30T04:25:00.000Z"
+      },
+      {
+        "id": "c303d404-e505-f606-0708-090a0b0c0d0e",
+        "description": "MCP-3: 不足しているエラーファクトリーメソッドの追加",
+        "priority": "high",
+        "implementationOrder": 2,
+        "phase": 1,
+        "completed": true,
+        "completedAt": "2025-03-30T04:27:56.000Z"
+      },
+      {
+        "id": "b202c303-d404-e505-f606-0708090a0b0c",
+        "description": "MCP-2: エラーファクトリーメソッドの一貫した使用",
+        "priority": "high",
+        "implementationOrder": 3,
+        "phase": 1,
+        "dependsOn": [
+          "c303d404-e505-f606-0708-090a0b0c0d0e"
+        ],
+        "completed": true,
+        "completedAt": "2025-03-30T04:30:18.000Z"
+      },
+      {
+        "id": "b1b2b3b4-b5b6-b7b8-b9ba-bbbcbdbebfc0",
+        "description": "TS-1: ルートtsconfig.jsonでのStrict Mode有効化",
+        "priority": "high",
+        "implementationOrder": 4,
+        "phase": 1,
+        "completed": true,
+        "completedAt": "2025-03-30T04:31:40.000Z"
+      },
+      {
+        "id": "31323334-3536-3738-393a-3b3c3d3e3f40",
+        "description": "SCHEMA-3: バリデーションヘルパーの拡張",
+        "priority": "high",
+        "implementationOrder": 5,
+        "phase": 1,
+        "completed": true,
+        "completedAt": "2025-03-30T04:38:03.000Z"
+      },
+      {
+        "id": "21222324-2526-2728-292a-2b2c2d2e2f30",
+        "description": "SCHEMA-1: スキーマファイルの分割と整理",
+        "priority": "high",
+        "implementationOrder": 6,
+        "phase": 1,
+        "dependsOn": [
+          "31323334-3536-3738-393a-3b3c3d3e3f40"
+        ],
+        "completed": true,
+        "completedAt": "2025-03-30T04:57:52.000Z"
+      },
+      {
+        "id": "41424344-4546-4748-494a-4b4c4d4e4f50",
+        "description": "SCHEMA-2: バージョン管理と互換性強化",
+        "priority": "high",
+        "implementationOrder": 7,
+        "phase": 1,
+        "dependsOn": [
+          "21222324-2526-2728-292a-2b2c2d2e2f30"
+        ],
+        "completed": true,
+        "completedAt": "2025-03-30T05:00:02.000Z"
+      },
+      {
+        "id": "c1c2c3c4-c5c6-c7c8-c9ca-cbcccdcecfd0",
+        "description": "TS-2: エラーハンドリング強化ルール",
+        "priority": "high",
+        "implementationOrder": 8,
+        "phase": 1,
+        "dependsOn": [
+          "b202c303-d404-e505-f606-0708090a0b0c"
+        ],
+        "completed": true,
+        "completedAt": "2025-03-30T05:02:39.000Z"
+      },
+      {
+        "id": "d1d2d3d4-d5d6-d7d8-d9da-dbdcdddedf",
+        "description": "TS-3: Promise/非同期エラー処理のルール",
+        "priority": "high",
+        "implementationOrder": 9,
+        "phase": 1,
+        "dependsOn": [
+          "c1c2c3c4-c5c6-c7c8-c9ca-cbcccdcecfd0"
+        ],
+        "completed": true,
+        "completedAt": "2025-03-30T05:04:11.000Z"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "d404e505-f606-0708-090a-0b0c0d0e0f10",
+        "description": "MCP-4: 非同期エラーラッピングパターンの適用",
+        "priority": "medium",
+        "implementationOrder": 10,
+        "phase": 2
+      },
+      {
+        "id": "e505f606-0708-090a-0b0c-0d0e0f101112",
+        "description": "MCP-5: 構造化ロギングの強化",
+        "priority": "medium",
+        "implementationOrder": 11,
+        "phase": 2,
+        "dependsOn": [
+          "a101b202-c303-d404-e505-f6060708090a"
+        ]
+      },
+      {
+        "id": "f6060708-090a-0b0c-0d0e-0f10111213",
+        "description": "MCP-6: コントローラーのエラーハンドリング改善",
+        "priority": "medium",
+        "implementationOrder": 12,
+        "phase": 2,
+        "dependsOn": [
+          "b202c303-d404-e505-f606-0708090a0b0c",
+          "d404e505-f606-0708-090a-0b0c0d0e0f10"
+        ]
+      },
+      {
+        "id": "01020304-0506-0708-090a-0b0c0d0e0f10",
+        "description": "MCP-7: ログレベル使用ガイドラインの策定と適用",
+        "priority": "low",
+        "implementationOrder": 19,
+        "phase": 3,
+        "dependsOn": [
+          "e505f606-0708-090a-0b0c-0d0e0f101112"
+        ]
+      },
+      {
+        "id": "11121314-1516-1718-191a-1b1c1d1e1f20",
+        "description": "MCP-8: エラーコード一覧ドキュメントの作成",
+        "priority": "low",
+        "implementationOrder": 20,
+        "phase": 3,
+        "dependsOn": [
+          "f6060708-090a-0b0c-0d0e-0f10111213"
+        ]
+      },
+      {
+        "id": "51525354-5556-5758-595a-5b5c5d5e5f60",
+        "description": "SCHEMA-4: スキーマ拡張メカニズムの導入",
+        "priority": "medium",
+        "implementationOrder": 13,
+        "phase": 2,
+        "dependsOn": [
+          "21222324-2526-2728-292a-2b2c2d2e2f30",
+          "41424344-4546-4748-494a-4b4c4d4e4f50"
+        ]
+      },
+      {
+        "id": "61626364-6566-6768-696a-6b6c6d6e6f70",
+        "description": "SCHEMA-5: JSON Schemaとの相互運用",
+        "priority": "medium",
+        "implementationOrder": 14,
+        "phase": 2,
+        "dependsOn": [
+          "51525354-5556-5758-595a-5b5c5d5e5f60"
+        ]
+      },
+      {
+        "id": "71727374-7576-7778-797a-7b7c7d7e7f80",
+        "description": "SCHEMA-6: エラーメッセージの国際化対応",
+        "priority": "low",
+        "implementationOrder": 21,
+        "phase": 3,
+        "dependsOn": [
+          "31323334-3536-3738-393a-3b3c3d3e3f40"
+        ]
+      },
+      {
+        "id": "81828384-8586-8788-898a-8b8c8d8e8f90",
+        "description": "SCHEMA-7: スキーマテスト・検証ツールの強化",
+        "priority": "low",
+        "implementationOrder": 22,
+        "phase": 3,
+        "dependsOn": [
+          "61626364-6566-6768-696a-6b6c6d6e6f70"
+        ]
+      },
+      {
+        "id": "91929394-9596-9798-999a-9b9c9d9e9fa0",
+        "description": "SCHEMA-8: 効率的なシリアライズ/デシリアライズ",
+        "priority": "low",
+        "implementationOrder": 23,
+        "phase": 3
+      },
+      {
+        "id": "a1a2a3a4-a5a6-a7a8-a9aa-abacadaeafb0",
+        "description": "SCHEMA-9: 型安全なクエリビルダー",
+        "priority": "low",
+        "implementationOrder": 24,
+        "phase": 3,
+        "dependsOn": [
+          "41424344-4546-4748-494a-4b4c4d4e4f50"
+        ]
+      },
+      {
+        "id": "e1e2e3e4-e5e6-e7e8-e9ea-ebecedeeeff0",
+        "description": "TS-4: ES2022ターゲットへのアップデート",
+        "priority": "medium",
+        "implementationOrder": 15,
+        "phase": 2,
+        "dependsOn": [
+          "b1b2b3b4-b5b6-b7b8-b9ba-bbbcbdbebfc0"
+        ]
+      },
+      {
+        "id": "f1f2f3f4-f5f6-f7f8-f9fa-fbfcfdfeff00",
+        "description": "TS-5: パッケージ設定の統一",
+        "priority": "medium",
+        "implementationOrder": 16,
+        "phase": 2,
+        "dependsOn": [
+          "b1b2b3b4-b5b6-b7b8-b9ba-bbbcbdbebfc0"
+        ]
+      },
+      {
+        "id": "01234567-89ab-cdef-0123-456789abcdef",
+        "description": "TS-6: ESLintプラグインの拡充",
+        "priority": "medium",
+        "implementationOrder": 17,
+        "phase": 2,
+        "dependsOn": [
+          "c1c2c3c4-c5c6-c7c8-c9ca-cbcccdcecfd0"
+        ]
+      },
+      {
+        "id": "fedcba98-7654-3210-fedc-ba9876543210",
+        "description": "TS-7: 型チェック強化オプションの追加",
+        "priority": "medium",
+        "implementationOrder": 18,
+        "phase": 2,
+        "dependsOn": [
+          "b1b2b3b4-b5b6-b7b8-b9ba-bbbcbdbebfc0"
+        ]
+      },
+      {
+        "id": "abcdef01-2345-6789-abcd-ef0123456789",
+        "description": "TS-8: ビルド最適化の設定追加",
+        "priority": "low",
+        "implementationOrder": 25,
+        "phase": 3,
+        "dependsOn": [
+          "b1b2b3b4-b5b6-b7b8-b9ba-bbbcbdbebfc0"
+        ]
+      },
+      {
+        "id": "98765432-10fe-dcba-9876-5432109876",
+        "description": "TS-9: カスタムロガールール",
+        "priority": "low",
+        "implementationOrder": 26,
+        "phase": 3,
+        "dependsOn": [
+          "01234567-89ab-cdef-0123-456789abcdef",
+          "01020304-0506-0708-090a-0b0c0d0e0f10"
+        ]
+      },
+      {
+        "id": "56789abc-def0-1234-5678-9abcdef01234",
+        "description": "TS-10: 共通型定義の明示",
+        "priority": "low",
+        "implementationOrder": 27,
+        "phase": 3,
+        "dependsOn": [
+          "b1b2b3b4-b5b6-b7b8-b9ba-bbbcbdbebfc0"
+        ]
+      }
+    ],
+    "status": "計画フェーズ。各改善計画を整理し、実装の優先順位と順序を決定しました。フェーズ1の実装を以下の順序で開始します：\n1. MCP-1: ロガー使用の一貫性確保\n2. MCP-3: 不足しているエラーファクトリーメソッドの追加\n3. MCP-2: エラーファクトリーメソッドの一貫した使用\n4. TS-1: ルートtsconfig.jsonでのStrict Mode有効化\n5. SCHEMA-3: バリデーションヘルパーの拡張\n6. SCHEMA-1: スキーマファイルの分割と整理\n7. SCHEMA-2: バージョン管理と互換性強化\n8. TS-2: エラーハンドリング強化ルール\n9. TS-3: Promise/非同期エラー処理のルール",
+    "completionPercentage": 0,
+    "knownIssues": [
+      {
+        "id": "12345678-90ab-cdef-1234-567890abcdef",
+        "description": "複数の改善を同時に行うことによる複雑さと相互依存性の管理",
+        "severity": "medium",
+        "mitigationStrategy": "実装順序を明確にし、依存関係に従って順次実装します。各ステップ完了後にテストを実行して問題を早期に検出します。"
+      },
+      {
+        "id": "90abcdef-1234-5678-90ab-cdef12345678",
+        "description": "既存のテストが改善によって影響を受ける可能性がある",
+        "severity": "medium",
+        "mitigationStrategy": "各改善項目の実装後にすぐテストスイートを実行し、失敗したテストを特定して修正します。"
+      },
+      {
+        "id": "34567890-abcd-ef12-3456-7890abcdef12",
+        "description": "パフォーマンスへの影響を最小限に抑えながら改善を進める必要がある",
+        "severity": "low",
+        "mitigationStrategy": "パフォーマンスに影響する可能性のある変更（スキーマの効率的なシリアライズなど）については、実装前後でベンチマークを実施します。"
+      }
+    ]
+  }
+}

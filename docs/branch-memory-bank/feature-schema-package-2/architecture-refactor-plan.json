@@ -1,0 +1,494 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "arch-refactor-plan",
+    "title": "アーキテクチャリファクタリング詳細計画",
+    "documentType": "plan",
+    "path": "architecture-refactor-plan.json",
+    "tags": [
+      "architecture",
+      "refactoring",
+      "clean-architecture",
+      "plan"
+    ],
+    "lastModified": "2025-03-28T20:15:00.000Z",
+    "createdAt": "2025-03-28T20:15:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "summary": {
+      "description": "モノレポ化とスキーマパッケージ分離に向けた、アーキテクチャ上の不整合を解消するための詳細リファクタリング計画",
+      "motivation": "テンプレート関連コードの削除作業で明らかになったアーキテクチャ上の問題（レイヤー間の責任境界のあいまいさ、依存方向の不整合、インターフェース設計の一貫性なさ、横断的関心事の分散）を解消し、将来的な拡張性と保守性を高める",
+      "approach": "段階的なリファクタリングを行い、各フェーズごとに明確なゴールと検証ポイントを設ける。優先順位はレイヤー構造の修正 > インターフェース統一 > 横断的関心事の整理 > 肥大化コンポーネントの分割"
+    },
+    "coreIssues": [
+      {
+        "id": "issue-1",
+        "title": "レイヤー間の責任境界があいまい",
+        "description": "ドメインレイヤーとアプリケーションレイヤーの責任境界が明確になっておらず、特にTagIndexRepositoryとUpdateTagIndexUseCaseの間で責務が重複している。また、インフラストラクチャレイヤーの実装がドメインロジックを含んでいる場所がある。",
+        "severity": "high",
+        "impactAreas": [
+          "コード保守性",
+          "テスト難易度",
+          "拡張性",
+          "モジュール分割"
+        ],
+        "exampleLocations": [
+          "/src/infrastructure/repositories/file-system/FileSystemTagIndexRepositoryV1Bridge.ts",
+          "/src/domain/repositories/ITagIndexRepository.ts",
+          "/src/application/usecases/common/UpdateTagIndexUseCaseV2.ts"
+        ],
+        "rootCause": "クリーンアーキテクチャの原則に沿った責務分割が徹底されておらず、レイヤー間の境界が時間経過とともに曖昧になった"
+      },
+      {
+        "id": "issue-2",
+        "title": "依存方向の不一致",
+        "description": "クリーンアーキテクチャでは依存は内側（ドメイン）に向かうべきだが、一部で外側レイヤーへの依存が発生している。これにより、ドメインロジックが技術的実装に依存してしまっている。",
+        "severity": "high",
+        "impactAreas": [
+          "アーキテクチャ一貫性",
+          "テスト容易性",
+          "コア機能の独立性"
+        ],
+        "exampleLocations": [
+          "/src/domain/entities/JsonDocument.ts が外部ライブラリに依存",
+          "/src/domain/repositories が具体的なファイルシステム実装に言及"
+        ],
+        "rootCause": "実装の容易さを優先し、正しい依存方向を守らないショートカットを許容してきた結果"
+      },
+      {
+        "id": "issue-3",
+        "title": "インターフェース設計の一貫性なし",
+        "description": "命名規則のブレ（IxxxRepository vs xxxRepositoryImpl）や同種の機能でもメソッドシグネチャが異なる問題。また非同期処理の取り扱いも一貫していない。",
+        "severity": "medium",
+        "impactAreas": [
+          "可読性",
+          "学習コスト",
+          "保守性"
+        ],
+        "exampleLocations": [
+          "/src/domain/repositories/IMemoryBankRepository.ts",
+          "/src/domain/repositories/TagIndexRepository.ts",
+          "/src/infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.ts"
+        ],
+        "rootCause": "コーディング規約の不在または不徹底、異なる開発者による実装の積み重ね"
+      },
+      {
+        "id": "issue-4",
+        "title": "横断的関心事の分散",
+        "description": "ロギング実装が複数存在し（domain/logger/ILogger, shared/utils/logger）、エラーハンドリングパターンも統一されていない。",
+        "severity": "medium",
+        "impactAreas": [
+          "一貫性",
+          "デバッグ容易性",
+          "運用性"
+        ],
+        "exampleLocations": [
+          "/src/domain/logger/ILogger.ts",
+          "/src/shared/utils/logger.ts",
+          "様々な場所に散らばるconsole.log/error"
+        ],
+        "rootCause": "横断的関心事に対する明確な方針が最初から確立されていなかった"
+      },
+      {
+        "id": "issue-5",
+        "title": "肥大化したリポジトリクラス",
+        "description": "FileSystemBranchMemoryBankRepositoryなど一部のクラスが肥大化し、単一責任の原則に違反している。また、テスタビリティも低下している。",
+        "severity": "high",
+        "impactAreas": [
+          "コード品質",
+          "テスト難易度",
+          "保守性"
+        ],
+        "exampleLocations": [
+          "/src/infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.ts: 699行",
+          "/src/infrastructure/repositories/file-system/FileSystemGlobalMemoryBankRepository.ts: 374行"
+        ],
+        "rootCause": "機能追加を重ねる中で、適切な時期にクラス分割のリファクタリングが行われなかった"
+      }
+    ],
+    "phases": [
+      {
+        "phaseNumber": 1,
+        "title": "ドメインレイヤーの再設計と依存方向修正",
+        "description": "ドメインモデルを中心に据え、依存方向を内側に向けるための基盤的な再設計を行う",
+        "tasks": [
+          {
+            "id": "task-1-1",
+            "title": "ドメインエンティティの依存関係見直し",
+            "description": "外部ライブラリへの依存をなくし、純粋なドメインモデルを作成",
+            "targetFiles": [
+              "/src/domain/entities/JsonDocument.ts",
+              "/src/domain/entities/MemoryDocument.ts",
+              "/src/domain/entities/DocumentPath.ts"
+            ],
+            "steps": [
+              "外部ライブラリ依存の特定と切り離し",
+              "ドメインロジックの抽出",
+              "純粋なモデル定義への移行"
+            ],
+            "estimatedTime": "4時間"
+          },
+          {
+            "id": "task-1-2",
+            "title": "リポジトリインターフェースの純粋化",
+            "description": "ドメインレイヤー内のリポジトリインターフェースが技術的な実装詳細に依存しないよう修正",
+            "targetFiles": [
+              "/src/domain/repositories/IMemoryBankRepository.ts",
+              "/src/domain/repositories/ITagIndexRepository.ts",
+              "/src/domain/repositories/IJsonDocumentRepository.ts"
+            ],
+            "steps": [
+              "技術的な詳細への参照を削除",
+              "ドメインモデルのみを使用するインターフェース定義",
+              "適切な抽象化レベルの設定"
+            ],
+            "estimatedTime": "3時間"
+          },
+          {
+            "id": "task-1-3",
+            "title": "依存関係の反転パターン適用",
+            "description": "インターフェース分離原則と依存関係逆転の原則を適用",
+            "targetFiles": [
+              "/src/domain/repositories/*.ts",
+              "/src/infrastructure/repositories/file-system/*.ts"
+            ],
+            "steps": [
+              "ドメインレイヤーがインフラレイヤーに依存している部分の特定",
+              "依存関係を逆転させるインターフェースの設計",
+              "アダプターの作成または修正"
+            ],
+            "estimatedTime": "5時間"
+          }
+        ],
+        "deliverables": [
+          "純粋なドメインモデル",
+          "技術詳細から独立したリポジトリインターフェース",
+          "依存方向が内側に向いた構造"
+        ],
+        "verificationCriteria": [
+          "ドメインレイヤーが外側レイヤーへの依存を持たないこと",
+          "ドメインモデルが純粋な状態（外部ライブラリ非依存）になっていること",
+          "リポジトリインターフェースが適切な抽象化レベルにあること"
+        ]
+      },
+      {
+        "phaseNumber": 2,
+        "title": "インターフェース設計の統一",
+        "description": "命名規則とインターフェース設計を一貫させる",
+        "tasks": [
+          {
+            "id": "task-2-1",
+            "title": "インターフェース命名規則の統一",
+            "description": "すべてのインターフェースを'Ixxx'形式に統一",
+            "targetFiles": [
+              "/src/domain/repositories/*.ts",
+              "/src/domain/services/*.ts",
+              "/src/infrastructure/**/interfaces/*.ts"
+            ],
+            "steps": [
+              "現在の命名規則の調査とマッピング",
+              "リネームプラン作成",
+              "参照箇所も含めた一括リネーム"
+            ],
+            "estimatedTime": "2時間"
+          },
+          {
+            "id": "task-2-2",
+            "title": "メソッドシグネチャの標準化",
+            "description": "同種の操作を行うメソッドのシグネチャを一貫させる",
+            "targetFiles": [
+              "/src/domain/repositories/*.ts",
+              "/src/infrastructure/repositories/**/*.ts"
+            ],
+            "steps": [
+              "共通操作のパターン抽出",
+              "標準シグネチャの定義",
+              "既存メソッドの標準化"
+            ],
+            "estimatedTime": "4時間"
+          },
+          {
+            "id": "task-2-3",
+            "title": "非同期処理の統一",
+            "description": "Promise<T>での一貫した非同期処理パターンの適用",
+            "targetFiles": [
+              "/src/domain/repositories/*.ts",
+              "/src/application/usecases/**/*.ts",
+              "/src/infrastructure/repositories/**/*.ts"
+            ],
+            "steps": [
+              "現在の非同期処理パターンの分析",
+              "標準化方針の策定",
+              "一貫した非同期パターンへの変換"
+            ],
+            "estimatedTime": "3時間"
+          }
+        ],
+        "deliverables": [
+          "統一された命名規則を持つインターフェース",
+          "一貫したメソッドシグネチャ",
+          "標準化された非同期処理パターン"
+        ],
+        "verificationCriteria": [
+          "すべてのインターフェースが命名規則に準拠していること",
+          "同種の操作を行うメソッドが一貫したシグネチャを持つこと",
+          "非同期処理が標準化されていること"
+        ]
+      },
+      {
+        "phaseNumber": 3,
+        "title": "横断的関心事の統合",
+        "description": "ロギングとエラーハンドリングなどの横断的関心事を整理・統合する",
+        "tasks": [
+          {
+            "id": "task-3-1",
+            "title": "ロギング実装の一本化",
+            "description": "shared/utils/loggerを標準として採用し、他のロギング実装を統合",
+            "targetFiles": [
+              "/src/domain/logger/ILogger.ts",
+              "/src/shared/utils/logger.ts",
+              "console.logの使用箇所"
+            ],
+            "steps": [
+              "ロギング実装の調査と比較",
+              "標準ロギングインターフェースの設計",
+              "既存コードの標準ロガーへの移行"
+            ],
+            "estimatedTime": "3時間"
+          },
+          {
+            "id": "task-3-2",
+            "title": "エラーハンドリングパターンの統一",
+            "description": "一貫したエラー処理パターンを全体に適用",
+            "targetFiles": [
+              "/src/shared/errors/*.ts",
+              "/src/application/usecases/**/*.ts",
+              "/src/infrastructure/**/*.ts"
+            ],
+            "steps": [
+              "現在のエラーハンドリングパターンの分析",
+              "標準エラーハンドリング方針の策定",
+              "統一されたエラー処理への移行"
+            ],
+            "estimatedTime": "4時間"
+          },
+          {
+            "id": "task-3-3",
+            "title": "横断的ユーティリティの整理",
+            "description": "共通ユーティリティの組織化と重複の排除",
+            "targetFiles": [
+              "/src/shared/utils/*.ts",
+              "散在するユーティリティ関数"
+            ],
+            "steps": [
+              "共通ユーティリティの特定",
+              "共通モジュールへの集約",
+              "参照の更新"
+            ],
+            "estimatedTime": "2時間"
+          }
+        ],
+        "deliverables": [
+          "統一されたロギングシステム",
+          "一貫したエラーハンドリングパターン",
+          "整理された共通ユーティリティ"
+        ],
+        "verificationCriteria": [
+          "単一のロギング実装が使用されていること",
+          "エラーハンドリングパターンが一貫していること",
+          "共通ユーティリティが整理されていること"
+        ]
+      },
+      {
+        "phaseNumber": 4,
+        "title": "肥大化リポジトリの分割",
+        "description": "単一責任の原則に従い、肥大化したリポジトリクラスを分割する",
+        "tasks": [
+          {
+            "id": "task-4-1",
+            "title": "FileSystemBranchMemoryBankRepositoryの分析と設計",
+            "description": "責務の明確化と分割戦略の策定",
+            "targetFiles": [
+              "/src/infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.ts"
+            ],
+            "steps": [
+              "クラスの責務分析",
+              "責務ごとのコンポーネント設計",
+              "分割計画の策定"
+            ],
+            "estimatedTime": "2時間"
+          },
+          {
+            "id": "task-4-2",
+            "title": "FileSystemBranchMemoryBankRepositoryの分割実装",
+            "description": "リポジトリを複数の特化したクラスに分割",
+            "targetFiles": [
+              "/src/infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.ts",
+              "新規作成ファイル"
+            ],
+            "steps": [
+              "読み取り専用リポジトリの実装",
+              "書き込み専用リポジトリの実装",
+              "インデックス関連リポジトリの実装",
+              "ファサードまたはコンポジションパターンの適用"
+            ],
+            "estimatedTime": "6時間"
+          },
+          {
+            "id": "task-4-3",
+            "title": "FileSystemGlobalMemoryBankRepositoryの分割",
+            "description": "グローバルメモリバンクリポジトリも同様の方針で分割",
+            "targetFiles": [
+              "/src/infrastructure/repositories/file-system/FileSystemGlobalMemoryBankRepository.ts",
+              "新規作成ファイル"
+            ],
+            "steps": [
+              "BranchMemoryBankリポジトリ分割の知見をもとに実装",
+              "共通コンポーネントの抽出",
+              "テストの作成または修正"
+            ],
+            "estimatedTime": "4時間"
+          }
+        ],
+        "deliverables": [
+          "責務ごとに分割されたリポジトリクラス",
+          "単一責任の原則に準拠したコンポーネント",
+          "より保守性の高いコード構造"
+        ],
+        "verificationCriteria": [
+          "各クラスが明確に定義された単一の責務を持つこと",
+          "クラス間の依存関係が明示的で管理可能であること",
+          "テストがより集中的かつ効果的になっていること"
+        ]
+      }
+    ],
+    "risks": [
+      {
+        "id": "risk-1",
+        "title": "リファクタリングによる機能退行",
+        "description": "広範なリファクタリングにより既存機能が損なわれるリスク",
+        "probability": "medium",
+        "impact": "high",
+        "mitigation": [
+          "変更前後での広範なテストカバレッジの確保",
+          "小さなインクリメントでのリファクタリング実施",
+          "各フェーズ後の動作検証"
+        ]
+      },
+      {
+        "id": "risk-2",
+        "title": "リファクタリングのスコープクリープ",
+        "description": "リファクタリング中に追加的な問題が発見され、スコープが拡大するリスク",
+        "probability": "high",
+        "impact": "medium",
+        "mitigation": [
+          "明確な境界と目標設定",
+          "発見された追加課題の記録と優先順位付け",
+          "今回のスコープ外の課題は別タスクとして管理"
+        ]
+      },
+      {
+        "id": "risk-3",
+        "title": "テストカバレッジの不足",
+        "description": "既存のテストカバレッジが不十分で、リファクタリングの安全性が確保できないリスク",
+        "probability": "medium",
+        "impact": "high",
+        "mitigation": [
+          "リファクタリング前のテストカバレッジ評価",
+          "必要に応じたテストの追加",
+          "手動テストのチェックリスト作成"
+        ]
+      },
+      {
+        "id": "risk-4",
+        "title": "モノレポ移行との競合",
+        "description": "同時進行中のモノレポ化作業との競合リスク",
+        "probability": "high",
+        "impact": "medium",
+        "mitigation": [
+          "モノレポ移行チームとの密な連携",
+          "変更の同期",
+          "競合解決の優先順位ルールの確立"
+        ]
+      }
+    ],
+    "implementationStrategy": {
+      "approach": "段階的リファクタリング",
+      "principles": [
+        "小さな変更の積み重ね",
+        "各変更ごとのテスト実行",
+        "一貫した方針の適用",
+        "ドキュメントの更新"
+      ],
+      "tooling": [
+        "TypeScriptコンパイラ: 静的型チェック",
+        "TSLint/ESLint: コーディング規約の自動チェック",
+        "Jest: 単体テスト実行",
+        "VSCode リファクタリングツール: 変数名変更など"
+      ],
+      "sequencing": "ドメインモデル → インターフェース → 横断的関心事 → コンポーネント分割"
+    },
+    "scheduleEstimate": {
+      "overallDuration": "3-4日",
+      "phaseBreakdown": [
+        {
+          "phase": 1,
+          "duration": "12時間"
+        },
+        {
+          "phase": 2,
+          "duration": "9時間"
+        },
+        {
+          "phase": 3,
+          "duration": "9時間"
+        },
+        {
+          "phase": 4,
+          "duration": "12時間"
+        }
+      ],
+      "dependencies": [
+        {
+          "id": "dep-1",
+          "description": "フェーズ2はフェーズ1完了後に開始",
+          "from": 1,
+          "to": 2
+        },
+        {
+          "id": "dep-2",
+          "description": "フェーズ3は他のフェーズと並行実施可能",
+          "from": null,
+          "to": 3
+        },
+        {
+          "id": "dep-3",
+          "description": "フェーズ4はフェーズ1と2完了後に開始",
+          "from": [
+            1,
+            2
+          ],
+          "to": 4
+        }
+      ]
+    },
+    "globalRefactorImpact": {
+      "description": "このリファクタリングの完了後、コードベースは以下の特性を持つようになる:",
+      "impacts": [
+        "レイヤー間の責任境界が明確になり、メンテナンスと拡張が容易になる",
+        "依存方向が内側に向かい、テスト容易性が向上する",
+        "一貫したインターフェース設計により、学習コストが低減する",
+        "統一された横断的関心事により、デバッグと運用が改善する",
+        "単一責任の原則に従ったコンポーネントにより、コード品質が向上する"
+      ],
+      "keyPerformanceIndicators": [
+        "コードの凝集度と結合度の改善",
+        "テストカバレッジの向上",
+        "新機能追加の効率化",
+        "バグ率の低減",
+        "開発者の生産性向上"
+      ]
+    }
+  }
+}

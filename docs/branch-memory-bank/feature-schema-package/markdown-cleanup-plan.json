@@ -1,0 +1,124 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "markdown-cleanup-plan",
+    "title": "マークダウン時代の遺物削除計画",
+    "documentType": "plan",
+    "path": "markdown-cleanup-plan.json",
+    "tags": [
+      "plan",
+      "cleanup",
+      "markdown",
+      "refactoring"
+    ],
+    "lastModified": "2025-03-28T12:15:00.000Z",
+    "createdAt": "2025-03-28T12:15:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "description": "現状、BranchControllerにマークダウン時代の遺物が残っており、JSONベースのアーキテクチャに完全に移行するためにこれらのコードを整理・削除する計画",
+      "targetFile": "/Users/t3ta/workspace/memory-bank-mcp-server/packages/mcp/src/interface/controllers/BranchController.ts",
+      "guidelineReference": "code-cleanup-targets.jsonの「マークダウン関連機能」セクション"
+    },
+    "identifiedCode": [
+      {
+        "type": "ファイル拡張子チェック",
+        "lines": "// Check for existence of files to determine extension preference",
+        "context": "readCoreFilesメソッド内で、.jsonと.mdの両方を試して、どちらが存在するかを確認するロジック",
+        "action": "削除して.json形式のみを使用するよう単純化"
+      },
+      {
+        "type": "マークダウンパースメソッド",
+        "lines": "private parseActiveContextContent(content: string): any { ... }",
+        "context": "マークダウン形式のアクティブコンテキストをパースするメソッド",
+        "action": "完全に削除（関連メソッドも含む）"
+      },
+      {
+        "type": "マークダウンパースメソッド",
+        "lines": "private parseProgressContent(content: string): any { ... }",
+        "context": "マークダウン形式の進捗状況をパースするメソッド",
+        "action": "完全に削除（関連メソッドも含む）"
+      },
+      {
+        "type": "マークダウンパースメソッド",
+        "lines": "private parseSystemPatternsContent(content: string): any { ... }",
+        "context": "マークダウン形式のシステムパターンをパースするメソッド",
+        "action": "完全に削除（関連メソッドも含む）"
+      },
+      {
+        "type": "マークダウン生成メソッド",
+        "lines": "private generateActiveContextContent(activeContext: any): string { ... }",
+        "context": "アクティブコンテキストからマークダウンを生成するメソッド",
+        "action": "完全に削除（関連メソッドも含む）"
+      },
+      {
+        "type": "マークダウン生成メソッド",
+        "lines": "private generateProgressContent(progress: any): string { ... }",
+        "context": "進捗状況からマークダウンを生成するメソッド",
+        "action": "完全に削除（関連メソッドも含む）"
+      },
+      {
+        "type": "マークダウン生成メソッド",
+        "lines": "private generateSystemPatternsContent(systemPatterns: any): string { ... }",
+        "context": "システムパターンからマークダウンを生成するメソッド",
+        "action": "完全に削除（関連メソッドも含む）"
+      },
+      {
+        "type": "マークダウンファイル処理",
+        "lines": "// Handle branchContext.md separately since it's not part of the CoreFilesDTO",
+        "context": "writeCoreFilesメソッド内でbranchContext.mdを特別に処理するロジック",
+        "action": "削除して.json形式のみの処理に簡素化"
+      },
+      {
+        "type": "マークダウンファイル検出",
+        "lines": "// Determine which file extension to use (.json preferred)",
+        "context": "readCoreFilesメソッド内で、.jsonと.mdどちらの拡張子を使うか判定するロジック",
+        "action": "削除して.json形式のみをサポートするよう単純化"
+      }
+    ],
+    "cleanupSteps": [
+      {
+        "id": "step-1",
+        "description": "readCoreFilesメソッドの簡素化",
+        "details": "ファイル拡張子チェックロジックを削除し、.json形式のみを扱うよう修正。extension変数を常に.jsonに固定。"
+      },
+      {
+        "id": "step-2",
+        "description": "writeCoreFilesメソッドの簡素化",
+        "details": "マークダウンファイル関連の処理を削除し、JSONオブジェクトのみを扱うよう修正。"
+      },
+      {
+        "id": "step-3",
+        "description": "不要なプライベートメソッドの削除",
+        "details": "マークダウンのパース・生成に関する6つのプライベートメソッドを削除。"
+      }
+    ],
+    "implementation": {
+      "approach": "慎重かつ段階的な変更",
+      "steps": [
+        "1. readCoreFilesメソッドを.jsonのみに対応するよう一部を編集",
+        "2. バックアップを取ってから更新を行う",
+        "3. 次にwriteCoreFilesメソッドからマークダウン関連処理を削除",
+        "4. 最後に使われなくなった6つのプライベートメソッドを削除"
+      ],
+      "testing": "各ステップ後にビルドして構文エラーがないことを確認する。最終的には実際のAPIリクエストを通じてテストを行う。"
+    },
+    "risks": [
+      {
+        "risk": "後方互換性の問題",
+        "mitigation": "すでに非推奨扱いされているため、JSONベースの実装に移行済みでこの変更による影響は最小限と想定"
+      },
+      {
+        "risk": "過去のマークダウンファイルが読めなくなる",
+        "mitigation": "古いマークダウンファイルはすでにJSONに変換済みであるはず。念のため、開発環境での動作確認時に注意する"
+      }
+    ],
+    "completionCriteria": [
+      "マークダウン関連のすべてのコードが削除されている",
+      "readCoreFilesとwriteCoreFilesメソッドがJSON形式のみを扱うよう単純化されている",
+      "すべての不要なプライベートメソッドが削除されている",
+      "ビルドが正常に完了し、基本機能が正常に動作することが確認されている"
+    ]
+  }
+}

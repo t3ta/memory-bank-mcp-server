@@ -1,0 +1,415 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "3e12bfd8-7f29-4a36-8d5a-9fc73e5db2a1",
+    "title": "総合作業計画",
+    "documentType": "plan",
+    "path": "comprehensive-work-plan.json",
+    "tags": [
+      "project-plan",
+      "refactoring",
+      "architecture",
+      "schema-package"
+    ],
+    "lastModified": "2025-03-29T15:15:00.000Z",
+    "createdAt": "2025-03-29T15:15:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "title": "feature/schema-package-3 総合作業計画",
+      "description": "feature/schema-package-2から引き継いだタスクを完了させ、モノレポ化とスキーマパッケージ分離を進めるための総合計画",
+      "background": "feature/schema-package-2では、テンプレート関連コードの削除完了とドメインエンティティの依存方向修正を実施したが、肥大化リポジトリの分割と残りのビルドエラーの解消は未完了のまま。feature/schema-package-3ではそれらの残タスクを完了させる。",
+      "primaryGoals": [
+        "肥大化リポジトリの分割と責務の明確化",
+        "インターフェース設計の一貫性確保と命名規則統一",
+        "残りのビルドエラー（特にタグインデックス関連）の解消",
+        "横断的関心事（ロギング、エラーハンドリング）の統合"
+      ]
+    },
+    "workStreams": [
+      {
+        "id": "ws-repo-split",
+        "name": "リポジトリ分割",
+        "description": "FileSystemBranchMemoryBankRepositoryとFileSystemGlobalMemoryBankRepositoryを小さなクラスに分割し、単一責任の原則に準拠した設計に変更",
+        "referenceDocuments": [
+          "repo-refactoring-plan.json"
+        ],
+        "priority": "highest",
+        "tasks": [
+          {
+            "id": "rs-task-1",
+            "description": "分析と準備フェーズ（詳細分析、基底クラス作成、DocumentOperations抽出）",
+            "estimatedEffort": "high",
+            "prerequisites": [],
+            "sequence": 1
+          },
+          {
+            "id": "rs-task-2",
+            "description": "コア機能の分割フェーズ（TagOperations・PathOperations抽出、初期ファサード実装）",
+            "estimatedEffort": "high",
+            "prerequisites": [
+              "rs-task-1"
+            ],
+            "sequence": 2
+          },
+          {
+            "id": "rs-task-3",
+            "description": "統合と高度機能フェーズ（BulkOperations実装、全操作統合、テスト強化）",
+            "estimatedEffort": "medium",
+            "prerequisites": [
+              "rs-task-2"
+            ],
+            "sequence": 3
+          },
+          {
+            "id": "rs-task-4",
+            "description": "グローバルリポジトリ実装とパフォーマンス最適化",
+            "estimatedEffort": "medium",
+            "prerequisites": [
+              "rs-task-3"
+            ],
+            "sequence": 4
+          }
+        ]
+      },
+      {
+        "id": "ws-interface-unify",
+        "name": "インターフェース統一",
+        "description": "コードベース全体のインターフェース命名規則と設計を統一し、一貫性のある設計を確立",
+        "referenceDocuments": [
+          "interface-unification-plan.json"
+        ],
+        "priority": "high",
+        "tasks": [
+          {
+            "id": "iu-task-1",
+            "description": "インターフェース分析と設計フェーズ（一覧作成、違反特定、シグネチャ分析）",
+            "estimatedEffort": "medium",
+            "prerequisites": [],
+            "sequence": 2
+          },
+          {
+            "id": "iu-task-2",
+            "description": "ドメインレイヤー統一フェーズ（リポジトリ、ドキュメント、サービスインターフェースの統一）",
+            "estimatedEffort": "high",
+            "prerequisites": [
+              "iu-task-1",
+              "rs-task-2"
+            ],
+            "sequence": 3
+          },
+          {
+            "id": "iu-task-3",
+            "description": "アプリケーションレイヤー統一フェーズ（ユースケース、サービス、コントローラーの統一）",
+            "estimatedEffort": "medium",
+            "prerequisites": [
+              "iu-task-2"
+            ],
+            "sequence": 5
+          },
+          {
+            "id": "iu-task-4",
+            "description": "インフラストラクチャレイヤー統一と検証フェーズ",
+            "estimatedEffort": "medium",
+            "prerequisites": [
+              "iu-task-3"
+            ],
+            "sequence": 6
+          }
+        ]
+      },
+      {
+        "id": "ws-build-errors",
+        "name": "ビルドエラー解消",
+        "description": "feature/schema-package-2から引き継いだ82個のビルドエラーを効率的に解消し、安定したビルドを実現",
+        "referenceDocuments": [
+          "build-error-resolution-plan.json"
+        ],
+        "priority": "high",
+        "tasks": [
+          {
+            "id": "be-task-1",
+            "description": "エラー分析と分類フェーズ（エラー収集、分類、優先度評価）",
+            "estimatedEffort": "low",
+            "prerequisites": [],
+            "sequence": 1
+          },
+          {
+            "id": "be-task-2",
+            "description": "タグインデックス関連の型不一致解消フェーズ",
+            "estimatedEffort": "high",
+            "prerequisites": [
+              "be-task-1",
+              "rs-task-2"
+            ],
+            "sequence": 4
+          },
+          {
+            "id": "be-task-3",
+            "description": "実装漏れとインポートエラーの解消フェーズ",
+            "estimatedEffort": "medium",
+            "prerequisites": [
+              "be-task-2",
+              "iu-task-3"
+            ],
+            "sequence": 7
+          },
+          {
+            "id": "be-task-4",
+            "description": "設定問題と残存エラーの解消フェーズ",
+            "estimatedEffort": "low",
+            "prerequisites": [
+              "be-task-3",
+              "cc-task-2"
+            ],
+            "sequence": 9
+          }
+        ]
+      },
+      {
+        "id": "ws-cross-cutting",
+        "name": "横断的関心事の統合",
+        "description": "ロギング実装やエラーハンドリングなどの横断的関心事を整理統合し、一貫性のある実装を実現",
+        "referenceDocuments": [
+          "cross-cutting-concerns-plan.json"
+        ],
+        "priority": "medium",
+        "tasks": [
+          {
+            "id": "cc-task-1",
+            "description": "ILogger統合とDocumentLoggerAdapterの改善",
+            "estimatedEffort": "medium",
+            "prerequisites": [
+              "rs-task-3",
+              "iu-task-2"
+            ],
+            "sequence": 6
+          },
+          {
+            "id": "cc-task-2",
+            "description": "エラー階層の確立とリポジトリ層への適用",
+            "estimatedEffort": "medium",
+            "prerequisites": [
+              "cc-task-1"
+            ],
+            "sequence": 8
+          },
+          {
+            "id": "cc-task-3",
+            "description": "その他の横断的関心事への適用拡大",
+            "estimatedEffort": "low",
+            "prerequisites": [
+              "cc-task-2",
+              "be-task-4"
+            ],
+            "sequence": 10
+          }
+        ]
+      }
+    ],
+    "milestones": [
+      {
+        "id": "m1",
+        "name": "リポジトリ分割完了",
+        "description": "FileSystemBranchMemoryBankRepositoryとFileSystemGlobalMemoryBankRepositoryの分割完了",
+        "tasks": [
+          "rs-task-4"
+        ],
+        "date": "2025-03-31"
+      },
+      {
+        "id": "m2",
+        "name": "インターフェース統一完了",
+        "description": "すべてのレイヤーでインターフェース命名規則と設計が統一された状態",
+        "tasks": [
+          "iu-task-4"
+        ],
+        "date": "2025-04-01"
+      },
+      {
+        "id": "m3",
+        "name": "ビルドエラー解消",
+        "description": "すべてのビルドエラーが解消され、安定したビルドが実現",
+        "tasks": [
+          "be-task-4"
+        ],
+        "date": "2025-04-02"
+      },
+      {
+        "id": "m4",
+        "name": "横断的関心事統合完了",
+        "description": "ロギングとエラーハンドリングを含む横断的関心事の統合完了",
+        "tasks": [
+          "cc-task-3"
+        ],
+        "date": "2025-04-03"
+      }
+    ],
+    "timeline": {
+      "start": "2025-03-29",
+      "end": "2025-04-03",
+      "criticalPath": [
+        "rs-task-1",
+        "rs-task-2",
+        "rs-task-3",
+        "iu-task-2",
+        "cc-task-1",
+        "cc-task-2",
+        "be-task-4",
+        "cc-task-3"
+      ],
+      "parallelTracks": [
+        {
+          "name": "分析フェーズ",
+          "tasks": [
+            "rs-task-1",
+            "be-task-1",
+            "iu-task-1"
+          ],
+          "timing": "初期"
+        },
+        {
+          "name": "主要実装フェーズ",
+          "tasks": [
+            "rs-task-2",
+            "rs-task-3",
+            "iu-task-2",
+            "be-task-2"
+          ],
+          "timing": "中期"
+        },
+        {
+          "name": "統合・完成フェーズ",
+          "tasks": [
+            "rs-task-4",
+            "iu-task-3",
+            "iu-task-4",
+            "cc-task-1",
+            "cc-task-2",
+            "be-task-3",
+            "be-task-4",
+            "cc-task-3"
+          ],
+          "timing": "後期"
+        }
+      ]
+    },
+    "resourceRequirements": {
+      "development": {
+        "primaryResponsibility": "t3ta",
+        "supportResponsibility": "AIエージェント（みらい）",
+        "tools": [
+          "TypeScript Language Service",
+          "Jest",
+          "VS Code",
+          "Git"
+        ]
+      },
+      "testing": {
+        "approaches": [
+          "単体テストの強化",
+          "統合テストの追加",
+          "既存テストの修正"
+        ],
+        "focusAreas": [
+          "リポジトリ分割に伴うテスト",
+          "インターフェース変更によるテスト修正",
+          "エラーケースのテスト強化"
+        ]
+      }
+    },
+    "dependenciesAndConstraints": {
+      "internalDependencies": [
+        "リポジトリ分割はインターフェース統一の一部に先行する必要がある",
+        "ビルドエラー解消はリポジトリ分割と一部のインターフェース統一に依存する",
+        "横断的関心事の統合はリポジトリ分割とインターフェース統一の後に行うのが効果的"
+      ],
+      "constraints": [
+        "既存機能の互換性を維持すること",
+        "テストはすべて成功する必要がある",
+        "大きな変更は小さく分割して実施すること"
+      ]
+    },
+    "risksAndMitigation": [
+      {
+        "risk": "大規模リファクタリングによる予期せぬ障害",
+        "impact": "high",
+        "probability": "medium",
+        "mitigation": "変更は小さなステップで行い、各ステップでテストを実行。リファクタリングの影響範囲を慎重に評価。"
+      },
+      {
+        "risk": "スケジュール遅延",
+        "impact": "medium",
+        "probability": "medium",
+        "mitigation": "優先度に基づいて作業を進め、リポジトリ分割とタグインデックス問題に集中。必要に応じてスコープを調整。"
+      },
+      {
+        "risk": "ビルドエラーの複雑な相互依存",
+        "impact": "high",
+        "probability": "high",
+        "mitigation": "エラーを種類ごとに分類し、関連するエラーをバッチで修正。一貫した修正アプローチを採用。"
+      },
+      {
+        "risk": "リファクタリングによるテストの破損",
+        "impact": "medium",
+        "probability": "medium",
+        "mitigation": "テストを先に修正し、モックや依存関係をリファクタリングに合わせて更新。"
+      }
+    ],
+    "successCriteria": [
+      "すべてのビルドエラー（82個）が解消されている",
+      "FileSystemBranchMemoryBankRepositoryとFileSystemGlobalMemoryBankRepositoryが責務別に分割されている",
+      "インターフェース命名規則が統一され、メソッドシグネチャが一貫している",
+      "横断的関心事（特にロギングとエラーハンドリング）が統一パターンで実装されている",
+      "すべてのテストが成功している",
+      "モノレポ化とスキーマパッケージ分離の次のステップに進める状態になっている"
+    ],
+    "executionStrategy": {
+      "approach": "インクリメンタルな変更と継続的検証",
+      "principles": [
+        "特に大きなファイル（300行以上）の場合は小さな変更単位で進める",
+        "各変更後に関連テストを実行して機能を検証",
+        "依存関係の強い機能は同時に修正",
+        "コードの可読性と保守性を常に優先",
+        "必要に応じてペアプログラミング的アプローチを採用"
+      ],
+      "workflow": {
+        "dailyRoutine": [
+          "朝：前日の作業の確認と当日の目標設定",
+          "作業：小さなタスク単位で実装とテスト",
+          "夕：進捗の記録とコミット、次のステップの計画"
+        ],
+        "communicationPoints": [
+          "設計変更が必要になった場合の相談",
+          "複雑なエラーやバグに遭遇した場合の協議",
+          "マイルストーン達成時の報告と次のステップの確認"
+        ]
+      }
+    },
+    "learningObjectives": {
+      "architecturalGoals": [
+        "クリーンアーキテクチャの原則をより深く理解し適用する",
+        "依存関係逆転パターンを効果的に使用する",
+        "レイヤー間の責任境界を明確に定義する"
+      ],
+      "technicalGoals": [
+        "大規模リファクタリングの効果的な進め方を理解する",
+        "横断的関心事の効率的な管理手法を習得する",
+        "TypeScriptのより高度な型システム活用法を学ぶ"
+      ]
+    },
+    "nextPhasePreparation": {
+      "documentationNeeds": [
+        "リファクタリングで行った主要な変更の記録",
+        "アーキテクチャ上の重要な決定事項とその理由",
+        "モノレポ化に向けた次のステップの計画"
+      ],
+      "futureConsiderations": [
+        "さらなるモノレポ構造の最適化",
+        "スキーマパッケージの独立化と公開の検討",
+        "ビルドプロセスとCI/CDパイプラインの改善"
+      ]
+    }
+  }
+}

@@ -1,0 +1,227 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "unused-code-removal-plan",
+    "title": "不要コード削除計画",
+    "documentType": "plan",
+    "path": "unused-code-removal-plan.json",
+    "tags": [
+      "plan",
+      "cleanup",
+      "refactoring",
+      "schema-package"
+    ],
+    "lastModified": "2025-03-28T18:15:00.000Z",
+    "createdAt": "2025-03-28T18:15:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "description": "Memory Bank全体をモノレポ化するのに伴い、不要なコードや機能を削除し、コードベースをクリーンアップする詳細計画",
+      "goals": [
+        "マークダウン関連の遺物を完全に削除する",
+        "テンプレート関連の中途半端な実装によるビルドエラーを解消する",
+        "重複するロガー実装を統一する",
+        "コードベース全体の品質と保守性を向上させる"
+      ]
+    },
+    "deletionTargets": [
+      {
+        "id": "markdown-related",
+        "title": "マークダウン関連機能",
+        "priority": "high",
+        "status": "部分的に完了",
+        "reason": "JSONベースのアーキテクチャに完全移行済みで不要。一部はすでにfeature/schema-packageで削除済み。",
+        "locations": [
+          {
+            "file": "packages/mcp/src/domain/entities/DocumentPath.ts",
+            "elements": [
+              "isMarkdown",
+              "toAlternateFormat"
+            ],
+            "status": "確認中"
+          },
+          {
+            "file": "packages/mcp/src/interface/controllers/BranchController.ts",
+            "elements": [
+              "拡張子チェック",
+              "マークダウン⇔JSON変換"
+            ],
+            "status": "一部削除済み"
+          },
+          {
+            "file": "その他のマークダウン関連ファイル",
+            "elements": [
+              "マークダウンパーサー",
+              "生成器"
+            ],
+            "status": "確認中"
+          }
+        ],
+        "deletionApproach": "GrepToolを使用して'markdown'や'.md'に関する参照を検索し、関連コードを段階的に削除する。BranchControllerではすでに削除されたパターンを参考に他のファイルも削除。",
+        "dependencies": [
+          "DIコンテナへの参照がある場合はそれも含めて削除"
+        ]
+      },
+      {
+        "id": "template-related",
+        "title": "テンプレート関連機能",
+        "priority": "high",
+        "status": "未着手",
+        "reason": "参照のみで実装がなく、ビルドエラーの原因になっている",
+        "locations": [
+          {
+            "file": "packages/mcp/src/infrastructure/templates/FileTemplateRepository.ts",
+            "elements": [
+              "クラス全体"
+            ],
+            "status": "確認中"
+          },
+          {
+            "file": "packages/mcp/src/domain/templates/ITemplateRepository.ts",
+            "elements": [
+              "インターフェース全体"
+            ],
+            "status": "確認中"
+          },
+          {
+            "file": "packages/mcp/src/main/di/providers.ts",
+            "elements": [
+              "テンプレート関連のDI設定"
+            ],
+            "status": "確認中"
+          }
+        ],
+        "deletionApproach": "まずGrepToolでテンプレート関連のコードを特定し、実際に使用されているかを確認。使用されていない場合は完全に削除し、DIコンテナの参照も修正する。",
+        "dependencies": [
+          "GlobalController内の参照があれば修正が必要"
+        ]
+      },
+      {
+        "id": "logger-duplication",
+        "title": "ロガー実装の重複",
+        "priority": "medium",
+        "status": "未着手",
+        "reason": "2つの異なるロガー実装が混在している",
+        "locations": [
+          {
+            "file": "packages/mcp/src/domain/logger/",
+            "elements": [
+              "ILogger",
+              "関連ファイル"
+            ],
+            "status": "確認中"
+          },
+          {
+            "file": "packages/mcp/src/shared/utils/logger.ts",
+            "elements": [
+              "logger実装"
+            ],
+            "status": "残す予定（標準として採用）"
+          }
+        ],
+        "deletionApproach": "shared/utils/loggerを標準として採用し、domain/logger配下のファイルを削除。依存関係を適切に整理するため、必要に応じて抽象化インターフェースを用意。",
+        "dependencies": [
+          "ロガーを使用している全てのファイル"
+        ]
+      },
+      {
+        "id": "naming-inconsistencies",
+        "title": "命名規則の不統一",
+        "priority": "low",
+        "status": "未着手",
+        "reason": "コードベース内で命名規則やスタイルが混在している",
+        "locations": [
+          {
+            "file": "全体",
+            "elements": [
+              "インターフェース名のIプレフィックス",
+              "プライベートメンバーの_アンダースコア"
+            ],
+            "status": "分析中"
+          }
+        ],
+        "deletionApproach": "実際のコード削除ではなく、命名規則の整理。まずは文書化し、大きな変更は別のリファクタリングフェーズで行う。",
+        "dependencies": []
+      }
+    ],
+    "verificationStrategy": {
+      "beforeDeletion": [
+        "対象コードの参照関係を特定（GrepToolで検索）",
+        "テストがあれば実行し、カバレッジを確認",
+        "実際に使用されているかどうかを確認"
+      ],
+      "afterDeletion": [
+        "ビルドを実行してエラーがないことを確認",
+        "修正後のテストを実行して機能が壊れていないことを確認",
+        "DIコンテナの設定に問題がないか確認"
+      ]
+    },
+    "deletionSteps": [
+      {
+        "step": 1,
+        "description": "まずはテンプレート関連のコードを特定し、削除または補完を行う",
+        "tasks": [
+          "FileTemplateRepository.tsとITemplateRepository.tsを確認",
+          "TemplateServiceとTemplateControllerの参照関係を整理",
+          "DIコンテナの設定を修正",
+          "参照しているコードを適切に修正"
+        ],
+        "estimatedTime": "2-3時間"
+      },
+      {
+        "step": 2,
+        "description": "マークダウン関連の残りのコードを削除する",
+        "tasks": [
+          "DocumentPath.tsのマークダウン関連メソッドの削除",
+          "その他のマークダウン変換/パース関連コードの特定と削除",
+          "拡張子チェックや条件分岐の削除"
+        ],
+        "estimatedTime": "1-2時間"
+      },
+      {
+        "step": 3,
+        "description": "ロガー実装の統一",
+        "tasks": [
+          "domain/logger/ILoggerの使用箇所確認",
+          "shared/utils/loggerへの置き換え",
+          "不要になったファイルの削除"
+        ],
+        "estimatedTime": "1-2時間"
+      },
+      {
+        "step": 4,
+        "description": "全体的な確認とクリーンアップ",
+        "tasks": [
+          "全てのビルドエラーが解消されたことを確認",
+          "テストがパスすることを確認",
+          "残った参照や不整合がないか最終確認"
+        ],
+        "estimatedTime": "1時間"
+      }
+    ],
+    "risks": [
+      {
+        "risk": "外部から参照されているコードを誤って削除する",
+        "severity": "high",
+        "mitigation": "削除前に参照を十分に確認し、テストカバレッジを確保する"
+      },
+      {
+        "risk": "テンプレート関連のコード削除によりGlobalControllerが動作しなくなる",
+        "severity": "medium",
+        "mitigation": "部分的な実装を残すか、mock化するなど適切な対応策を検討"
+      },
+      {
+        "risk": "依存関係の把握が不完全で予期せぬエラーが発生する",
+        "severity": "medium",
+        "mitigation": "小さな変更を段階的に行い、都度ビルドとテストを実行する"
+      }
+    ],
+    "completionCriteria": [
+      "全てのマークダウン関連コードが削除されている",
+      "テンプレート関連のビルドエラーが解消されている",
+      "ロガー実装が統一されている",
+      "ビルドが成功し、テストが通過する"
+    ]
+  }
+}

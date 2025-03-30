@@ -1,0 +1,103 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "714eccc9-d30f-4e95-9a56-65656f4fdc33",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context",
+      "logging",
+      "error-handling"
+    ],
+    "lastModified": "2025-03-30T01:20:00.000Z",
+    "createdAt": "2025-03-29T21:00:00.000Z",
+    "version": 2
+  },
+  "content": {
+    "currentWork": "横断的関心事（ロギングとエラーハンドリング）の統合。統一されたロギングシステムとエラーハンドリングパターンの実装が完了。shared/utils/loggerをベースとしたロガー実装と、BaseErrorを基盤とするエラークラス階層の整備を行った。パターン適用の評価を行い、一部のエラーファクトリーメソッドの不足などを特定した。",
+    "recentChanges": [
+      {
+        "date": "2025-03-30T00:00:00.000Z",
+        "description": "高優先度ファイルのレビューを実施し、残存している実装課題を特定"
+      },
+      {
+        "date": "2025-03-29T21:00:00.000Z",
+        "description": "feature/logging-error-handlingブランチの作成と初期分析の開始"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "ad-shared-logger",
+        "description": "shared/utils/logger.ts を標準のロギング実装として採用し、他の実装を段階的に置き換える"
+      },
+      {
+        "id": "ad-domain-logger-adapter",
+        "description": "ドメインレイヤーにはIDocumentLoggerを介してロギング機能を提供し、具体的な実装への依存を避ける"
+      },
+      {
+        "id": "ad-error-hierarchy",
+        "description": "エラークラスの階層を整理し、BaseErrorを基底として各レイヤー固有のエラーを派生させる"
+      },
+      {
+        "id": "ad-error-codes",
+        "description": "エラーには一意のコードを付与し、ドキュメントとの紐付けを容易にする"
+      },
+      {
+        "id": "ad-error-factories",
+        "description": "エラー生成にはファクトリメソッドを使用し、コード全体での一貫性を確保する"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "con-logger-factory-deprecation",
+        "description": "LoggerFactoryクラスを非推奨化し、shared/utils/loggerに移行する方法と時期",
+        "status": "resolved",
+        "resolution": "非推奨警告を追加し、段階的移行を促進するガイダンスを実装"
+      },
+      {
+        "id": "con-test-impact",
+        "description": "ロギングとエラーハンドリングの変更がテストに与える影響",
+        "status": "open"
+      },
+      {
+        "id": "con-error-serialization",
+        "description": "エラーオブジェクトのシリアライズ方法と、APIレスポンスへの変換方法",
+        "status": "resolved",
+        "resolution": "BaseError.toJSONを強化し、MCPResponsePresenterでの変換を改善"
+      },
+      {
+        "id": "con-logging-levels",
+        "description": "アプリケーション全体で一貫したログレベルの使用基準",
+        "status": "open"
+      },
+      {
+        "id": "con-missing-factory-methods",
+        "description": "一部のエラータイプ（特に権限エラーや一般的なファイルシステムエラー）に対してファクトリーメソッドが実装されていない",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "ns-global-adoption",
+        "description": "新しいロギングとエラーハンドリングパターンを他のコンポーネントにも適用する",
+        "priority": "high"
+      },
+      {
+        "id": "ns-error-documentation",
+        "description": "エラーコードの一覧と説明のドキュメントを作成する",
+        "priority": "medium"
+      },
+      {
+        "id": "ns-log-guidelines",
+        "description": "ログレベル使用ガイドラインを策定し、一貫したロギングを促進する",
+        "priority": "medium"
+      },
+      {
+        "id": "ns-test-update",
+        "description": "テストを更新して新しいパターンに対応させる",
+        "priority": "low"
+      }
+    ]
+  }
+}

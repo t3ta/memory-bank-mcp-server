@@ -1,0 +1,220 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "8d7c6b5a-4e3d-2c1b-0a9f-8e7d6c5b4a3e",
+    "title": "フェーズ1実装計画",
+    "documentType": "plan",
+    "path": "phase1-implementation-plan.json",
+    "tags": [
+      "improvement",
+      "plan",
+      "phase1"
+    ],
+    "lastModified": "2025-03-30T05:30:32.360Z",
+    "createdAt": "2025-03-30T05:30:32.360Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "title": "基盤改善フェーズ（フェーズ1）実装計画",
+      "description": "統合改善計画の第1フェーズ（基盤改善フェーズ）の詳細な実装計画。このフェーズでは、高優先度の改善項目を中心に、パターンや基盤の改善を行う。"
+    },
+    "implementationItems": [
+      {
+        "id": "MCP-1",
+        "title": "ロガー使用の一貫性確保",
+        "estimatedTime": "1日",
+        "targetFiles": [
+          "/packages/mcp/src/interface/controllers/BranchController.ts",
+          "/packages/mcp/src/interface/controllers/GlobalController.ts"
+        ],
+        "implementationSteps": [
+          "1. 各コントローラーでのcomponentLoggerの定義を確認",
+          "2. 直接loggerを使用している箇所をcomponentLoggerに置き換え",
+          "3. ログメッセージにコンテキスト情報を追加"
+        ],
+        "testStrategy": "影響を受けるコントローラーのユニットテストを実行し、ログ出力の変更がないことを確認",
+        "risks": [
+          "既存のテストがロガーの呼び出しをモックしている場合、更新が必要"
+        ]
+      },
+      {
+        "id": "MCP-2",
+        "title": "エラーファクトリーメソッドの一貫した使用",
+        "estimatedTime": "1日",
+        "targetFiles": [
+          "/packages/mcp/src/interface/controllers/BranchController.ts",
+          "/packages/mcp/src/infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.ts"
+        ],
+        "implementationSteps": [
+          "1. 直接エラーコンストラクタを使用している箇所を特定",
+          "2. 適切なファクトリーメソッドがあればそれを使用するよう変更",
+          "3. 適切なファクトリーメソッドがない場合はMCP-3で追加"
+        ],
+        "testStrategy": "既存のエラー処理テストが正常に機能することを確認",
+        "risks": [
+          "エラーコードやメッセージの変更により、クライアント側の処理に影響が出る可能性"
+        ]
+      },
+      {
+        "id": "MCP-3",
+        "title": "不足しているエラーファクトリーメソッドの追加",
+        "estimatedTime": "1日",
+        "targetFiles": [
+          "/packages/mcp/src/shared/errors/InfrastructureError.ts",
+          "/packages/mcp/src/shared/errors/DomainError.ts",
+          "/packages/mcp/src/shared/errors/ApplicationError.ts"
+        ],
+        "implementationSteps": [
+          "1. 現在のエラータイプと使用パターンを分析",
+          "2. 不足しているファクトリーメソッド（permissionDenied、fileSystemError、validationError等）を追加",
+          "3. ドキュメンテーションコメントを追加"
+        ],
+        "testStrategy": "新しいファクトリーメソッドのユニットテストを作成",
+        "risks": [
+          "既存コードとの整合性を確保する必要がある"
+        ]
+      },
+      {
+        "id": "SCHEMA-1",
+        "title": "スキーマファイルの分割と整理",
+        "estimatedTime": "2日",
+        "targetFiles": [
+          "/packages/schemas/src/json-document.ts",
+          "/packages/schemas/src/document-types/"
+        ],
+        "implementationSteps": [
+          "1. 新しいディレクトリ構造を作成（document-types/）",
+          "2. 各ドキュメントタイプごとに個別ファイルを作成",
+          "3. インデックスファイルでの再エクスポート設定",
+          "4. 元のスキーマファイルを更新して新しい構造を使用"
+        ],
+        "testStrategy": "全てのスキーマテストを実行し、既存のバリデーションが正常に機能することを確認",
+        "risks": [
+          "パス変更によるimport文の大規模な更新が必要",
+          "既存のスキーマ使用箇所との互換性確保"
+        ]
+      },
+      {
+        "id": "SCHEMA-2",
+        "title": "バージョン管理と互換性強化",
+        "estimatedTime": "2日",
+        "targetFiles": [
+          "/packages/schemas/src/versioning.ts",
+          "/packages/schemas/src/index.ts"
+        ],
+        "implementationSteps": [
+          "1. スキーマバージョン定数の定義ファイルを作成",
+          "2. バージョン間マイグレーション機能の実装",
+          "3. 下位互換性チェック機能の実装",
+          "4. 最新スキーマへの自動アップグレード機能の追加"
+        ],
+        "testStrategy": "異なるバージョンのドキュメントをマイグレーションするテストケースの作成",
+        "risks": [
+          "複雑なデータ構造のマイグレーションに特別な処理が必要な場合がある"
+        ]
+      },
+      {
+        "id": "SCHEMA-3",
+        "title": "バリデーションヘルパーの拡張",
+        "estimatedTime": "1日",
+        "targetFiles": [
+          "/packages/schemas/src/validation-helpers.ts",
+          "/packages/schemas/src/document-types/"
+        ],
+        "implementationSteps": [
+          "1. 共通バリデーション関数を抽出するヘルパーファイルを作成",
+          "2. 非空文字列、UUID、日付など頻出バリデーションのヘルパー実装",
+          "3. エラーメッセージ生成関数の実装",
+          "4. 分割したスキーマファイルでヘルパーを使用"
+        ],
+        "testStrategy": "各ヘルパー関数の単体テストを作成し、バリデーション動作を検証",
+        "risks": [
+          "既存のエラーメッセージとの一貫性を保つ必要がある"
+        ]
+      },
+      {
+        "id": "TS-1",
+        "title": "ルートtsconfig.jsonでのStrict Mode有効化",
+        "estimatedTime": "半日",
+        "targetFiles": [
+          "/tsconfig.json",
+          "/tsconfig.esm.json",
+          "/tsconfig.test.json"
+        ],
+        "implementationSteps": [
+          "1. strict, noImplicitAnyをtrueに設定",
+          "2. noUnusedLocals, noUnusedParametersもtrueに設定",
+          "3. 発生する型エラーを修正"
+        ],
+        "testStrategy": "全てのビルドとテストが成功することを確認",
+        "risks": [
+          "広範囲の型エラーが発生する可能性がある"
+        ]
+      },
+      {
+        "id": "TS-2",
+        "title": "エラーハンドリング強化ルール",
+        "estimatedTime": "半日",
+        "targetFiles": [
+          "/eslint.config.js"
+        ],
+        "implementationSteps": [
+          "1. ESLint設定にエラーハンドリング関連ルールを追加",
+          "2. no-console, @typescript-eslint/no-explicit-any, prefer-promise-reject-errorsなどのルール設定",
+          "3. 既存コードの問題箇所を特定"
+        ],
+        "testStrategy": "lint:fixコマンドを実行し、自動修正可能な問題が正しく修正されることを確認",
+        "risks": [
+          "多数の警告が発生し、すべての修正に時間がかかる可能性がある"
+        ]
+      },
+      {
+        "id": "TS-3",
+        "title": "Promise/非同期エラー処理のルール",
+        "estimatedTime": "半日",
+        "targetFiles": [
+          "/eslint.config.js"
+        ],
+        "implementationSteps": [
+          "1. ESLint設定に非同期処理関連ルールを追加",
+          "2. @typescript-eslint/no-floating-promises, @typescript-eslint/no-misused-promises, @typescript-eslint/no-throw-literalなどのルール設定",
+          "3. 既存コードの問題箇所を特定"
+        ],
+        "testStrategy": "lint:fixコマンドを実行し、自動修正可能な問題が正しく修正されることを確認",
+        "risks": [
+          "非同期処理パターンの大規模な変更が必要になる可能性がある"
+        ]
+      }
+    ],
+    "testingPlan": {
+      "unitTests": [
+        "logger.test.ts - ロガー機能のテスト",
+        "*Error.test.ts - 各種エラークラスのテスト",
+        "json-document.test.ts - スキーマ変更のテスト",
+        "versioning.test.ts - バージョン管理機能のテスト"
+      ],
+      "integrationTests": [
+        "controller-integration.test.ts - コントローラーとエラーハンドリングの統合テスト",
+        "schema-validation-integration.test.ts - スキーマバリデーションの統合テスト"
+      ]
+    },
+    "estimatedDeliveryDate": "2週間以内",
+    "dependencies": [
+      {
+        "id": "MCP-2",
+        "dependsOn": [
+          "MCP-3"
+        ],
+        "reason": "新しいファクトリーメソッドを使用するため"
+      },
+      {
+        "id": "SCHEMA-1",
+        "dependsOn": [
+          "SCHEMA-3"
+        ],
+        "reason": "分割したスキーマファイルでバリデーションヘルパーを使用するため"
+      }
+    ]
+  }
+}

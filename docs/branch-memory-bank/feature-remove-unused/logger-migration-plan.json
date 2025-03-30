@@ -1,0 +1,171 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "logger-migration-plan",
+    "title": "ロガー実装統一計画",
+    "documentType": "plan",
+    "path": "logger-migration-plan.json",
+    "tags": [
+      "plan",
+      "refactoring",
+      "logger"
+    ],
+    "lastModified": "2025-03-28T21:15:00.000Z",
+    "createdAt": "2025-03-28T21:15:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "description": "複数の異なるロガー実装を統一し、シンプルで一貫性のあるロギングシステムを実現するための計画。",
+      "currentState": "現在、プロジェクト内に複数のロガー実装が混在しており、一貫性のないロギング方法が使われている。",
+      "targetState": "shared/utils/logger.ts のシンプルなロガー実装に統一し、不要なロガー実装を削除する。"
+    },
+    "loggerImplementations": [
+      {
+        "name": "domain/logger/ILogger",
+        "type": "Interface and Abstract Class",
+        "location": "packages/mcp/src/domain/logger/ILogger.ts",
+        "status": "to-be-removed",
+        "features": [
+          "複雑なインターフェースとBaseLogger抽象クラス",
+          "コンテキスト情報の追加",
+          "ロガーの設定更新"
+        ],
+        "usage": "一部のクラスで使用されているが、直接利用は少ない"
+      },
+      {
+        "name": "domain/logger/types",
+        "type": "Type Definitions",
+        "location": "packages/mcp/src/domain/logger/types.ts",
+        "status": "to-be-removed",
+        "features": [
+          "LogLevel列挙型",
+          "LogContext, LogEntry, LoggerOptionsインターフェース"
+        ],
+        "usage": "ILoggerとJsonLoggerで使用"
+      },
+      {
+        "name": "infrastructure/logger/JsonLogger",
+        "type": "Implementation",
+        "location": "packages/mcp/src/infrastructure/logger/JsonLogger.ts",
+        "status": "to-be-removed",
+        "features": [
+          "JSONフォーマットでのログ出力",
+          "BaseLoggerの実装"
+        ],
+        "usage": "LoggerFactoryから利用されているが、直接使用箇所は少ない"
+      },
+      {
+        "name": "infrastructure/logger/LoggerFactory",
+        "type": "Factory",
+        "location": "packages/mcp/src/infrastructure/logger/LoggerFactory.ts",
+        "status": "to-be-removed",
+        "features": [
+          "シングルトンパターン",
+          "名前付きロガーの管理",
+          "ロガータイプの選択"
+        ],
+        "usage": "デフォルトロガーの提供のみで、ほとんど使用されていない"
+      },
+      {
+        "name": "shared/utils/logger/index.ts",
+        "type": "Implementation",
+        "location": "packages/mcp/src/shared/utils/logger/index.ts",
+        "status": "to-be-removed",
+        "features": [
+          "Logger クラス実装",
+          "JsonLogTransformer ストリーム変換"
+        ],
+        "usage": "おそらく新しい実装として追加されたが、使用箇所が少ない"
+      },
+      {
+        "name": "shared/utils/logger.ts",
+        "type": "Implementation",
+        "location": "packages/mcp/src/shared/utils/logger.ts",
+        "status": "to-be-kept",
+        "features": [
+          "シンプルなファクトリベースのロガー",
+          "console.log/info/warn/errorベース",
+          "ログレベルの設定"
+        ],
+        "usage": "プロジェクト全体でよく使用されている"
+      }
+    ],
+    "migrationSteps": [
+      {
+        "id": "1",
+        "description": "現在のロガー実装の使用状況を詳細に把握",
+        "tasks": [
+          "各ファイルでのロガーインポート箇所の特定",
+          "defaultLoggerの参照箇所の確認"
+        ]
+      },
+      {
+        "id": "2",
+        "description": "shared/utils/logger.ts を標準実装として強化",
+        "tasks": [
+          "必要に応じて機能追加（コンテキスト情報などが必要な場合）",
+          "文書化の改善"
+        ]
+      },
+      {
+        "id": "3",
+        "description": "移行対象ファイルの特定と修正",
+        "tasks": [
+          "domain/logger/ILoggerを参照しているファイルの特定",
+          "LoggerFactoryやJsonLoggerを使用しているファイルの特定",
+          "shared/utils/logger/index.tsを参照しているファイルの特定",
+          "各ファイルのimport文の修正"
+        ]
+      },
+      {
+        "id": "4",
+        "description": "不要なロガー実装ファイルの削除",
+        "tasks": [
+          "domain/logger/ILogger.ts の削除",
+          "domain/logger/types.ts の削除",
+          "infrastructure/logger/JsonLogger.ts の削除",
+          "infrastructure/logger/LoggerFactory.ts の削除",
+          "shared/utils/logger/index.ts の削除またはshared/utils/logger.tsとの統合"
+        ]
+      },
+      {
+        "id": "5",
+        "description": "ビルドとテスト",
+        "tasks": [
+          "ビルドエラーの確認と修正",
+          "ロギング機能の動作確認",
+          "既存のテストが正常に動作するか確認"
+        ]
+      }
+    ],
+    "considerations": [
+      {
+        "id": "logger-backward-compatibility",
+        "description": "shared/utils/logger.tsに移行する際に、既存コードとの互換性確保が必要",
+        "impact": "medium",
+        "resolution": "必要に応じてadapterパターンを使用するか、shared/utils/logger.tsにメソッドを追加"
+      },
+      {
+        "id": "logging-levels",
+        "description": "異なるロガー実装間でログレベルの整合性を確保",
+        "impact": "low",
+        "resolution": "統一されたLogLevelの定義に合わせる"
+      }
+    ],
+    "risks": [
+      {
+        "id": "hidden-dependencies",
+        "description": "見落としている依存関係がある可能性",
+        "severity": "medium",
+        "mitigation": "徹底的なgrep検索とビルドテストの実施"
+      },
+      {
+        "id": "functionality-loss",
+        "description": "高度なロギング機能（コンテキスト付きロギングなど）の喪失",
+        "severity": "low",
+        "mitigation": "必要な機能は標準ロガーに追加実装する"
+      }
+    ]
+  }
+}

@@ -1,0 +1,340 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "7d9e35a1-b42d-48a1-9853-31f5a8b7c6d5",
+    "title": "インターフェース統一計画",
+    "documentType": "plan",
+    "path": "interface-unification-plan.json",
+    "tags": [
+      "design",
+      "interface",
+      "naming-convention",
+      "refactoring"
+    ],
+    "lastModified": "2025-03-29T14:30:00.000Z",
+    "createdAt": "2025-03-29T14:30:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "title": "インターフェース設計統一化計画",
+      "description": "コードベース全体のインターフェース命名規則と設計を統一し、一貫性のある設計を確立する",
+      "goals": [
+        "すべてのインターフェースに一貫した命名規則を適用",
+        "メソッドシグネチャの統一（特に非同期処理の扱い）",
+        "パラメータ設計の標準化",
+        "ドメインレイヤーの依存方向の確保"
+      ],
+      "approach": "段階的リファクタリングと自動化ツールの活用"
+    },
+    "namingConventions": {
+      "interfacePrefix": {
+        "rule": "すべてのインターフェース名は接頭辞「I」で始める",
+        "example": {
+          "before": "MemoryBankRepository",
+          "after": "IMemoryBankRepository"
+        },
+        "exceptions": [
+          "標準ライブラリまたはフレームワークから継承するインターフェース"
+        ]
+      },
+      "implementationNaming": {
+        "rule": "実装クラス名はインターフェース名から「I」を除いた名前を基本とする",
+        "example": {
+          "interface": "IMemoryBankRepository",
+          "implementation": "MemoryBankRepository",
+          "specificImplementation": "FileSystemMemoryBankRepository"
+        },
+        "exceptions": [
+          "複数の実装がある場合は識別子を追加（例：FileSystemMemoryBankRepository）"
+        ]
+      },
+      "methodNaming": {
+        "rule": "メソッド名は動詞で始まるcamelCase形式",
+        "categories": [
+          {
+            "prefix": "get",
+            "usage": "データ取得操作（例：getDocument, getTagIndex）"
+          },
+          {
+            "prefix": "create",
+            "usage": "新規リソース作成（例：createDocument）"
+          },
+          {
+            "prefix": "update",
+            "usage": "既存リソース更新（例：updateDocument）"
+          },
+          {
+            "prefix": "delete",
+            "usage": "リソース削除（例：deleteDocument）"
+          },
+          {
+            "prefix": "has",
+            "usage": "存在確認のbooleanを返す操作（例：hasDocument）"
+          },
+          {
+            "prefix": "is",
+            "usage": "状態確認のbooleanを返す操作（例：isValid）"
+          }
+        ]
+      }
+    },
+    "methodSignatureRules": {
+      "asyncConsistency": {
+        "rule": "非同期メソッドはすべてPromiseを返す",
+        "example": {
+          "before": "readDocument(path: string): Document",
+          "after": "readDocument(path: string): Promise<Document>"
+        }
+      },
+      "parameterDesign": {
+        "rule": "複数パラメータの場合はオブジェクトリテラル型を使用",
+        "example": {
+          "before": "updateDocument(path: string, content: any, metadata: Metadata): Promise<void>",
+          "after": "updateDocument(params: { path: string; content: any; metadata: Metadata }): Promise<void>"
+        },
+        "exceptions": [
+          "単一パラメータの場合は直接指定可",
+          "標準的な2パラメータまでの単純なメソッド"
+        ]
+      },
+      "returnTypes": {
+        "rule": "明示的な戻り値型を常に指定",
+        "avoidTypes": [
+          "any",
+          "unknown（型ガードなし）",
+          "複雑な共用体型"
+        ],
+        "preferTypes": [
+          "具体的なドメイン型",
+          "Promise<T>",
+          "型エイリアス",
+          "読み取り専用型"
+        ]
+      },
+      "errorHandling": {
+        "rule": "エラーはPromiseのrejectまたは型付きのエラーオブジェクトで返す",
+        "example": {
+          "rejectApproach": "return Promise.reject(new DocumentNotFoundError(path))",
+          "resultApproach": "return { success: false, error: new DocumentNotFoundError(path) }"
+        }
+      }
+    },
+    "interfaceLocationRules": {
+      "domainLayer": {
+        "rule": "コアビジネスルールに関するインターフェースはドメインレイヤーに配置",
+        "examples": [
+          "IMemoryBankRepository",
+          "IDocument",
+          "ITagIndex"
+        ]
+      },
+      "applicationLayer": {
+        "rule": "アプリケーション固有のインターフェースはアプリケーションレイヤーに配置",
+        "examples": [
+          "IMemoryBankService",
+          "ITagSearchService"
+        ]
+      },
+      "infrastructureLayer": {
+        "rule": "技術的実装に関するインターフェースはインフラレイヤーに配置",
+        "examples": [
+          "IFileSystem",
+          "ILogger"
+        ]
+      }
+    },
+    "implementationPhases": [
+      {
+        "id": "phase1",
+        "name": "インターフェース分析と設計",
+        "description": "既存インターフェースの分析と統一設計の確立",
+        "tasks": [
+          {
+            "id": "task1-1",
+            "description": "全インターフェースの一覧作成とカテゴリ分類",
+            "estimatedEffort": "中",
+            "done": false
+          },
+          {
+            "id": "task1-2",
+            "description": "命名規則違反の特定とリネーム計画策定",
+            "estimatedEffort": "中",
+            "done": false
+          },
+          {
+            "id": "task1-3",
+            "description": "メソッドシグネチャの一貫性分析",
+            "estimatedEffort": "高",
+            "done": false
+          },
+          {
+            "id": "task1-4",
+            "description": "インターフェース配置の評価と移動計画",
+            "estimatedEffort": "中",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "phase2",
+        "name": "ドメインレイヤーの統一",
+        "description": "コアドメインインターフェースの統一化実装",
+        "tasks": [
+          {
+            "id": "task2-1",
+            "description": "IRepository系インターフェースの命名規則統一",
+            "estimatedEffort": "高",
+            "done": false
+          },
+          {
+            "id": "task2-2",
+            "description": "IDocument系インターフェースの統一",
+            "estimatedEffort": "中",
+            "done": false
+          },
+          {
+            "id": "task2-3",
+            "description": "ドメインサービスインターフェースの統一",
+            "estimatedEffort": "中",
+            "done": false
+          },
+          {
+            "id": "task2-4",
+            "description": "メソッドシグネチャの標準化（ドメインレイヤー）",
+            "estimatedEffort": "高",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "phase3",
+        "name": "アプリケーションレイヤーの統一",
+        "description": "アプリケーション層インターフェースの統一化実装",
+        "tasks": [
+          {
+            "id": "task3-1",
+            "description": "ユースケースインターフェースの命名規則統一",
+            "estimatedEffort": "中",
+            "done": false
+          },
+          {
+            "id": "task3-2",
+            "description": "サービスインターフェースの統一",
+            "estimatedEffort": "中",
+            "done": false
+          },
+          {
+            "id": "task3-3",
+            "description": "コントローラーインターフェースの統一",
+            "estimatedEffort": "中",
+            "done": false
+          },
+          {
+            "id": "task3-4",
+            "description": "メソッドシグネチャの標準化（アプリケーションレイヤー）",
+            "estimatedEffort": "高",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "phase4",
+        "name": "インフラストラクチャレイヤーの統一と検証",
+        "description": "インフラレイヤーの統一と全体検証",
+        "tasks": [
+          {
+            "id": "task4-1",
+            "description": "アダプターインターフェースの命名規則統一",
+            "estimatedEffort": "中",
+            "done": false
+          },
+          {
+            "id": "task4-2",
+            "description": "技術サービスインターフェースの統一",
+            "estimatedEffort": "中",
+            "done": false
+          },
+          {
+            "id": "task4-3",
+            "description": "クロスレイヤー依存関係の検証と修正",
+            "estimatedEffort": "高",
+            "done": false
+          },
+          {
+            "id": "task4-4",
+            "description": "最終一貫性チェックと問題の解決",
+            "estimatedEffort": "中",
+            "done": false
+          }
+        ]
+      }
+    ],
+    "riskMitigation": [
+      {
+        "risk": "広範囲な名前変更による混乱",
+        "strategy": "変更は小さなバッチで行い、各ステップでビルドとテストを実行"
+      },
+      {
+        "risk": "インターフェース変更による既存実装の破損",
+        "strategy": "コンパイラエラーを指針として系統的に修正し、テストスイートで検証"
+      },
+      {
+        "risk": "循環依存の発生",
+        "strategy": "依存関係グラフを定期的に分析し、レイヤー間の依存方向を監視"
+      },
+      {
+        "risk": "過剰な抽象化",
+        "strategy": "実際の使用パターンに基づいてインターフェースを設計し、使用されないメソッドの削除を検討"
+      }
+    ],
+    "toolsAndAutomation": {
+      "codeAnalysis": [
+        {
+          "name": "TypeScript Compiler",
+          "usage": "型チェックと依存関係検証"
+        },
+        {
+          "name": "ESLint",
+          "usage": "命名規則の遵守確認と自動修正"
+        },
+        {
+          "name": "Find-Replace Scripts",
+          "usage": "大規模な命名規則適用の自動化"
+        }
+      ],
+      "refactoringTools": [
+        {
+          "name": "VS Code Refactoring",
+          "usage": "シンボルのリネームと参照更新"
+        },
+        {
+          "name": "TypeScript Language Service",
+          "usage": "型定義とインターフェース変更の自動補完"
+        }
+      ],
+      "testingTools": [
+        {
+          "name": "Jest",
+          "usage": "変更後の機能検証"
+        },
+        {
+          "name": "TypeCoverage",
+          "usage": "型カバレッジの監視"
+        }
+      ]
+    },
+    "successCriteria": [
+      "すべてのインターフェースが命名規則に準拠していること",
+      "メソッドシグネチャが一貫していること",
+      "レイヤー間の依存方向が適切であること",
+      "ビルドとテストがすべて成功すること",
+      "型エラーが存在しないこと"
+    ],
+    "documentation": {
+      "style": "インターフェース設計スタイルガイドの作成と共有",
+      "reference": "標準インターフェースパターンの参照ドキュメント作成",
+      "examples": "適用例と推奨プラクティスの記録"
+    }
+  }
+}

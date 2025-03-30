@@ -1,0 +1,194 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "f3e2d1c0-b9a8-4765-8f9e-1d2c3b4a5d6e",
+    "title": "スキーマパッケージ設計",
+    "documentType": "design",
+    "path": "schema-package-design.json",
+    "tags": [
+      "design",
+      "schema",
+      "package"
+    ],
+    "lastModified": "2025-03-27T13:41:18.387Z",
+    "createdAt": "2025-03-27T13:41:18.387Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "description": "Memory Bank全体をモノレポ化し、スキーマ定義を独立したnpmパッケージとして管理する設計提案",
+      "goals": [
+        "スキーマを独立したパッケージとして管理し、再利用性を高める",
+        "バージョン管理を独立して行い、変更の影響範囲を明確にする",
+        "リポジトリ全体をモノレポ化し、拡張性と保守性を向上させる",
+        "VSCode拡張やその他の将来的なパッケージもシームレスに追加できるようにする"
+      ]
+    },
+    "currentState": {
+      "description": "現在のスキーマ関連コードの状態",
+      "structure": [
+        "src/schemas/common.ts - 共通のスキーマ定義（TagSchema, FlexibleDateSchemaなど）",
+        "src/schemas/index.ts - メインのエクスポートポイント",
+        "src/schemas/json-document.ts - JSONドキュメント関連のスキーマ",
+        "src/schemas/v2/ - バージョン2のスキーマ定義",
+        "src/schemas/tag-index/ - タグインデックス関連のスキーマ"
+      ],
+      "dependencies": [
+        "zod - スキーマバリデーション",
+        "内部型定義 - ValidationErrorTypeなど"
+      ]
+    },
+    "proposedDesign": {
+      "repositoryStructure": {
+        "name": "memory-bank",
+        "structure": [
+          "packages/ - 全パッケージを含むディレクトリ",
+          "packages/schemas/ - スキーマパッケージ",
+          "packages/mcp/ - MCPエンジン（現在のmcp-server）",
+          "packages/vscode-extension/ - 将来的なVSCode拡張（別ブランチで開発予定）"
+        ]
+      },
+      "packageName": "@memory-bank/schemas",
+      "structure": {
+        "root": [
+          "packages/schemas/package.json - パッケージ定義",
+          "packages/schemas/tsconfig.json - TypeScript設定",
+          "packages/schemas/README.md - 使用方法の説明",
+          "packages/schemas/jest.config.js - テスト設定"
+        ],
+        "src": [
+          "packages/schemas/src/index.ts - メインエントリポイント",
+          "packages/schemas/src/common/ - 共通ユーティリティ",
+          "packages/schemas/src/v2/ - バージョン2スキーマ",
+          "packages/schemas/src/types/ - 型定義"
+        ],
+        "tests": [
+          "packages/schemas/tests/common/ - 共通ユーティリティのテスト",
+          "packages/schemas/tests/v2/ - バージョン2スキーマのテスト"
+        ]
+      },
+      "packageJson": {
+        "name": "@memory-bank/schemas",
+        "version": "1.0.0",
+        "description": "Schema definitions for Memory Bank",
+        "main": "dist/index.js",
+        "types": "dist/index.d.ts",
+        "scripts": {
+          "build": "tsc",
+          "test": "jest",
+          "lint": "eslint src --ext .ts"
+        },
+        "dependencies": {
+          "zod": "^3.22.4"
+        }
+      },
+      "rootPackageJson": {
+        "name": "memory-bank",
+        "private": true,
+        "workspaces": [
+          "packages/*"
+        ]
+      }
+    },
+    "migrationStrategy": {
+      "steps": [
+        "リポジトリ名を 'memory-bank' に変更（オプション、後でも可）",
+        "モノレポ構造（packages/）を作成",
+        "スキーマパッケージのセットアップ（packages/schemas/）",
+        "既存のスキーマを移行",
+        "MCP（現サーバー）を移行（packages/mcp/）",
+        "ワークスペース設定でローカル依存関係を設定",
+        "パッケージをpublish"
+      ],
+      "phased": [
+        {
+          "phase": "フェーズ1：スキーマパッケージの作成",
+          "tasks": [
+            "packages/schemas/ ディレクトリ構造の作成",
+            "パッケージ設定ファイル（package.json等）の作成",
+            "共通ユーティリティと型定義の移行",
+            "v2スキーマの移行",
+            "テストの移行または新規作成"
+          ]
+        },
+        {
+          "phase": "フェーズ2：ワークスペース設定",
+          "tasks": [
+            "ルートpackage.jsonにworkspaces設定を追加",
+            "yarnまたはnpmの設定調整",
+            "ローカル開発環境でのテスト"
+          ]
+        },
+        {
+          "phase": "フェーズ3：リポジトリ構造の完全移行",
+          "tasks": [
+            "現在のコードをpackages/mcp/に移動",
+            "依存関係の調整",
+            "CI/CD設定の更新"
+          ]
+        }
+      ],
+      "considerations": [
+        "移行中の後方互換性の維持（新しいパッケージ名前空間への対応）",
+        "テスト網羅率の確保",
+        "VSCode拡張開発の準備"
+      ]
+    },
+    "versioning": {
+      "strategy": "セマンティックバージョニング（Semantic Versioning）",
+      "initialVersion": "1.0.0",
+      "guidelines": [
+        "メジャーバージョン（1.x.x）: 破壊的変更がある場合",
+        "マイナーバージョン（x.1.x）: 後方互換性のある機能追加",
+        "パッチバージョン（x.x.1）: バグ修正や非破壊的な変更"
+      ]
+    },
+    "publicApi": {
+      "exports": [
+        "スキーマ定義（DocumentMetadataV2Schema, TagSchema, etc.）",
+        "型定義（Document, Metadata, etc.）",
+        "ユーティリティ関数（dateStringToDate, etc.）"
+      ],
+      "examples": {
+        "importExample": "import { DocumentMetadataV2Schema } from '@memory-bank/schemas';",
+        "usageExample": "const result = DocumentMetadataV2Schema.safeParse(data);"
+      }
+    },
+    "monorepoManagement": {
+      "workspaceSetup": {
+        "tool": "Yarn Workspaces",
+        "benefits": [
+          "ローカル開発時のパッケージ間依存関係の簡単な管理",
+          "一貫したバージョン管理",
+          "コマンド一括実行の容易さ"
+        ],
+        "configuration": {
+          "root": {
+            "package.json": {
+              "workspaces": [
+                "packages/*"
+              ]
+            }
+          },
+          "packages": {
+            "dependencies": {
+              "format": "@memory-bank/schemas: workspace:*"
+            }
+          }
+        }
+      },
+      "publishing": {
+        "steps": [
+          "cd packages/schemas",
+          "yarn build",
+          "yarn publish"
+        ],
+        "considerations": [
+          "publishConfig.access: 'public' の設定（スコープパッケージの場合）",
+          "npmignore または files フィールドの適切な設定",
+          "バージョン管理の自動化"
+        ]
+      }
+    }
+  }
+}

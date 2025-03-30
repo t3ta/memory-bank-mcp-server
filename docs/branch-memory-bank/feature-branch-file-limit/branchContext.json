@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "0e3c3d72-4d28-4275-918f-b9f0a6b9186b",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-28T08:13:55.164Z",
+    "createdAt": "2025-03-28T08:13:55.164Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "feature/branch-file-limit",
+    "purpose": "このブランチの目的を記述してください",
+    "createdAt": "2025-03-28T08:13:55.164Z",
+    "userStories": [
+      {
+        "id": "82ac5859-9e1e-4d0d-ad1e-784dc9cef12e",
+        "description": "解決する課題1",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "b24253b1-cd5f-478f-99ea-6b58554c02eb",
+        "description": "解決する課題2",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "5366924a-2007-41df-a113-52d3a692cf8d",
+        "description": "解決する課題3",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": ""
+  }
+}

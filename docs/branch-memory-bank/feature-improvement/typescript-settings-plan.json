@@ -1,0 +1,191 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "4a3b2c1d-0e9f-8e7d-6c5b-4a3f2e1d0c9b",
+    "title": "TypeScript設定改善計画",
+    "documentType": "plan",
+    "path": "typescript-settings-plan.json",
+    "tags": [
+      "improvement",
+      "typescript",
+      "eslint"
+    ],
+    "lastModified": "2025-03-30T06:10:32.360Z",
+    "createdAt": "2025-03-30T06:10:32.360Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "title": "TS-1〜TS-3: TypeScript & ESLint設定改善計画",
+      "description": "TypeScriptの型安全性を向上させ、エラーハンドリングとロギングに関するESLintルールを強化するための詳細実装計画。これにより、バグの早期発見と開発効率の向上を目指します。"
+    },
+    "currentState": {
+      "description": "現在のルートtsconfig.jsonでは、strictとnoImplicitAnyがfalseに設定されています（各パッケージでは設定が異なります）。また、エラーハンドリングとロギングの一貫性を確保するための専用ESLintルールもありません。",
+      "tsconfig": {
+        "strict": false,
+        "noImplicitAny": false,
+        "target": "ES2020"
+      },
+      "eslintConfig": "基本的なルールのみが設定されており、エラーハンドリングや非同期処理に特化したルールが不足しています。"
+    },
+    "targetState": {
+      "description": "プロジェクト全体でTypeScriptの厳格な型チェックを有効にし、エラーハンドリングとロギングの一貫性を確保するための専用ESLintルールを追加します。特に非同期エラー処理の安全性を高めるルールを重視します。",
+      "tsconfig": {
+        "strict": true,
+        "noImplicitAny": true,
+        "target": "ES2022",
+        "noUnusedLocals": true,
+        "noUnusedParameters": true
+      },
+      "eslintRules": {
+        "errorHandling": [
+          "no-console",
+          "@typescript-eslint/no-explicit-any",
+          "prefer-promise-reject-errors",
+          "@typescript-eslint/explicit-function-return-type",
+          "@typescript-eslint/consistent-type-assertions"
+        ],
+        "asyncErrors": [
+          "@typescript-eslint/no-floating-promises",
+          "@typescript-eslint/no-misused-promises",
+          "@typescript-eslint/no-throw-literal"
+        ]
+      }
+    },
+    "implementationPlan": {
+      "tsconfigUpdate": {
+        "path": "/tsconfig.json",
+        "changes": [
+          {
+            "property": "strict",
+            "value": true,
+            "explanation": "型安全性の基本的な強化。nullチェック、anyの禁止、thisの型付けなどが含まれます。"
+          },
+          {
+            "property": "noImplicitAny",
+            "value": true,
+            "explanation": "型注釈がない場合にanyと推論されることを禁止します。"
+          },
+          {
+            "property": "noUnusedLocals",
+            "value": true,
+            "explanation": "未使用のローカル変数を警告します。"
+          },
+          {
+            "property": "noUnusedParameters",
+            "value": true,
+            "explanation": "未使用の関数パラメータを警告します。"
+          },
+          {
+            "property": "target",
+            "value": "ES2022",
+            "explanation": "Node.jsのサポートバージョンに合わせて、ES2022の機能を活用できるようにします。"
+          }
+        ],
+        "codeExample": "// tsconfig.json\n{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noImplicitAny\": true,\n    \"noUnusedLocals\": true,\n    \"noUnusedParameters\": true,\n    \"target\": \"ES2022\",\n    \"types\": [\"node\", \"jest\"]\n  }\n}"
+      },
+      "eslintErrorHandlingRules": {
+        "path": "/eslint.config.js",
+        "rules": [
+          {
+            "name": "no-console",
+            "config": "['warn', { allow: ['warn', 'error', 'info'] }]",
+            "explanation": "consoleの使用を制限し、ロガーの使用を促進します。info, warn, errorは許可します。"
+          },
+          {
+            "name": "@typescript-eslint/no-explicit-any",
+            "config": "'warn'",
+            "explanation": "anyの使用を警告します。型の安全性を高めるために、具体的な型を使用することを推奨します。"
+          },
+          {
+            "name": "prefer-promise-reject-errors",
+            "config": "'error'",
+            "explanation": "Promise.rejectでErrorオブジェクトのみを使用することを強制します。"
+          },
+          {
+            "name": "@typescript-eslint/explicit-function-return-type",
+            "config": "['error', {\n  allowExpressions: true,\n  allowTypedFunctionExpressions: true\n}]",
+            "explanation": "関数の戻り値の型を明示することを強制します。ただし、短い関数式などは例外とします。"
+          },
+          {
+            "name": "@typescript-eslint/consistent-type-assertions",
+            "config": "'error'",
+            "explanation": "型アサーションの一貫した形式を強制します。"
+          }
+        ],
+        "codeExample": "// eslint.config.js\n{\n  rules: {\n    'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],\n    '@typescript-eslint/no-explicit-any': 'warn',\n    'prefer-promise-reject-errors': 'error',\n    '@typescript-eslint/explicit-function-return-type': ['error', {\n      allowExpressions: true,\n      allowTypedFunctionExpressions: true\n    }],\n    '@typescript-eslint/consistent-type-assertions': 'error'\n  }\n}"
+      },
+      "eslintAsyncErrorRules": {
+        "path": "/eslint.config.js",
+        "rules": [
+          {
+            "name": "@typescript-eslint/no-floating-promises",
+            "config": "'error'",
+            "explanation": "未処理のPromiseを禁止します。非同期処理の結果を必ず処理するよう強制します。"
+          },
+          {
+            "name": "@typescript-eslint/no-misused-promises",
+            "config": "'error'",
+            "explanation": "Promiseの誤った使用方法を防止します。特に条件式などでの誤用を検出します。"
+          },
+          {
+            "name": "@typescript-eslint/no-throw-literal",
+            "config": "'error'",
+            "explanation": "throwでErrorオブジェクト以外を投げることを禁止します。"
+          }
+        ],
+        "codeExample": "// eslint.config.js\n{\n  rules: {\n    '@typescript-eslint/no-floating-promises': 'error',\n    '@typescript-eslint/no-misused-promises': 'error',\n    '@typescript-eslint/no-throw-literal': 'error'\n  }\n}"
+      },
+      "implementationSteps": [
+        {
+          "step": 1,
+          "title": "tsconfig.jsonの更新",
+          "description": "ルートのtsconfig.jsonをより厳格な設定に更新します。",
+          "action": "既存のtsconfig.jsonを更新し、strict, noImplicitAny, noUnusedLocals, noUnusedParametersをtrueに、targetをES2022に設定します。"
+        },
+        {
+          "step": 2,
+          "title": "エラーハンドリングESLintルールの追加",
+          "description": "エラー処理の一貫性を確保するためのESLintルールを追加します。",
+          "action": "eslint.config.jsにno-console, @typescript-eslint/no-explicit-any, prefer-promise-reject-errors, @typescript-eslint/explicit-function-return-type, @typescript-eslint/consistent-type-assertionsルールを追加します。"
+        },
+        {
+          "step": 3,
+          "title": "非同期エラー処理ESLintルールの追加",
+          "description": "非同期エラー処理の安全性を高めるためのESLintルールを追加します。",
+          "action": "eslint.config.jsに@typescript-eslint/no-floating-promises, @typescript-eslint/no-misused-promises, @typescript-eslint/no-throw-literalルールを追加します。"
+        },
+        {
+          "step": 4,
+          "title": "型エラーの修正",
+          "description": "新しい設定で発生する型エラーを修正します。",
+          "action": "yarn lintコマンドを実行し、発生するエラーを確認して修正します。特に、any型の排除と未使用変数の削除を中心に行います。"
+        }
+      ]
+    },
+    "testingPlan": {
+      "verificationSteps": [
+        "1. TypeScriptのコンパイル確認: tscコマンドで型エラーがないことを確認",
+        "2. ESLintの実行: yarn lintコマンドでESLint警告やエラーがないことを確認",
+        "3. テストの実行: yarn testコマンドで全てのテストが成功することを確認"
+      ],
+      "gradualApproach": "最初は警告レベルで導入し、既存コードの修正を進めながら、段階的にエラーレベルに引き上げます。"
+    },
+    "benefits": [
+      "型安全性の向上による潜在的なバグの早期発見",
+      "非同期エラー処理の安全性向上",
+      "コードベース全体の一貫性確保",
+      "IDEのコード補完機能の強化"
+    ],
+    "risks": [
+      "多数の型エラーが発生する可能性",
+      "既存コードの大規模な修正が必要になる可能性",
+      "開発者の学習コスト増加"
+    ],
+    "mitigation": [
+      "警告レベルからの段階的な導入",
+      "新規コードには厳格なルールを適用、既存コードは段階的に修正",
+      "チームへの事前周知と教育"
+    ]
+  }
+}

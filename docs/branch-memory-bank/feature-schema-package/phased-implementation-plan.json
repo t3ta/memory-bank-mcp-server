@@ -1,0 +1,596 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "phased-implementation-plan",
+    "title": "1チャット1フェーズの実装計画",
+    "documentType": "plan",
+    "path": "phased-implementation-plan.json",
+    "tags": [
+      "plan",
+      "implementation",
+      "monorepo",
+      "schema-package"
+    ],
+    "lastModified": "2025-03-27T15:10:00.000Z",
+    "createdAt": "2025-03-27T15:10:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "description": "モノレポ化とスキーマパッケージ化の実装を、1チャット1フェーズで効率的に進めるための詳細計画",
+      "goals": [
+        "既存のmemory-bank-mcp-serverリポジトリをモノレポ構造に移行",
+        "スキーマ定義を独立したパッケージとして切り出す",
+        "各フェーズを1チャットで完結できる粒度に分割",
+        "明確な成果物と完了条件を各フェーズに設定"
+      ]
+    },
+    "phaseDefinition": {
+      "description": "1チャット1フェーズの定義",
+      "characteristics": [
+        "1回のチャットで完了できる明確な作業範囲",
+        "具体的な開始条件と終了条件の設定",
+        "独立して検証可能な成果物の作成",
+        "次フェーズへの明確な橋渡し"
+      ],
+      "estimatedTimePerPhase": "30〜60分程度",
+      "completionCriteria": "各フェーズで定めた成果物が正常に動作し、次フェーズの前提条件を満たしていること"
+    },
+    "implementationPhases": [
+      {
+        "phaseNumber": 1,
+        "title": "モノレポの基本構造セットアップ",
+        "description": "リポジトリのモノレポ構造を作成し、Yarn Workspacesの基本設定を行う",
+        "preconditions": [
+          "feature/schema-packageブランチが最新の状態であること",
+          "設計ドキュメントが完成していること（monorepo-migration-plan.json, schema-package-design.json）"
+        ],
+        "tasks": [
+          {
+            "id": "1.1",
+            "description": "packages/ディレクトリを作成",
+            "estimatedTime": "5分"
+          },
+          {
+            "id": "1.2",
+            "description": "ルートpackage.jsonにworkspaces設定を追加",
+            "estimatedTime": "15分"
+          },
+          {
+            "id": "1.3",
+            "description": "共通開発ツール（ESLint, Prettierなど）の設定をルートに移動または作成",
+            "estimatedTime": "20分"
+          },
+          {
+            "id": "1.4",
+            "description": "packages/schemas/とpackages/mcp/の基本ディレクトリ構造を作成",
+            "estimatedTime": "10分"
+          }
+        ],
+        "artifacts": [
+          "packages/ディレクトリ構造",
+          "更新されたルートpackage.json",
+          "共通設定ファイル（.eslintrc, .prettierrcなど）"
+        ],
+        "completionCriteria": [
+          "ディレクトリ構造が正しく作成されていること",
+          "yarn installが正常に実行でき、workspacesが認識されること"
+        ],
+        "nextPhasePreparation": [
+          "次フェーズで使用するスキーマ関連ファイルの場所を確認"
+        ]
+      },
+      {
+        "phaseNumber": 2,
+        "title": "schemasパッケージの基本設定",
+        "description": "schemasパッケージの設定ファイルと基本構造を作成する",
+        "preconditions": [
+          "モノレポの基本構造が正しくセットアップされていること",
+          "packages/schemas/ディレクトリが存在すること"
+        ],
+        "tasks": [
+          {
+            "id": "2.1",
+            "description": "packages/schemas/package.jsonの作成",
+            "estimatedTime": "15分"
+          },
+          {
+            "id": "2.2",
+            "description": "packages/schemas/tsconfig.jsonの作成",
+            "estimatedTime": "10分"
+          },
+          {
+            "id": "2.3",
+            "description": "packages/schemas/src/ディレクトリ構造の作成（common, v2, typesなど）",
+            "estimatedTime": "10分"
+          },
+          {
+            "id": "2.4",
+            "description": "packages/schemas/.npmignoreまたはpackages.json内のfilesフィールドの設定",
+            "estimatedTime": "5分"
+          },
+          {
+            "id": "2.5",
+            "description": "packages/schemas/README.mdの作成",
+            "estimatedTime": "10分"
+          }
+        ],
+        "artifacts": [
+          "packages/schemas/package.json",
+          "packages/schemas/tsconfig.json",
+          "packages/schemas/src/ディレクトリ構造",
+          "packages/schemas/README.md"
+        ],
+        "completionCriteria": [
+          "schemasパッケージの設定ファイルが正しく作成されていること",
+          "packages/schemas/ディレクトリでyarn installが正常に実行できること"
+        ],
+        "nextPhasePreparation": [
+          "既存のスキーマコードの場所と移行すべきファイルの特定"
+        ]
+      },
+      {
+        "phaseNumber": 3,
+        "title": "基本スキーマコードの移行",
+        "description": "既存の共通スキーマおよび基本型定義をschemasパッケージに移行する",
+        "preconditions": [
+          "schemasパッケージの基本設定が完了していること",
+          "既存のスキーマコードが特定されていること"
+        ],
+        "tasks": [
+          {
+            "id": "3.1",
+            "description": "src/schemas/common.tsの移行",
+            "estimatedTime": "15分"
+          },
+          {
+            "id": "3.2",
+            "description": "基本的な型定義の移行",
+            "estimatedTime": "15分"
+          },
+          {
+            "id": "3.3",
+            "description": "packages/schemas/src/index.tsの作成（エクスポート定義）",
+            "estimatedTime": "10分"
+          },
+          {
+            "id": "3.4",
+            "description": "移行したコードの調整（パス変更など）",
+            "estimatedTime": "15分"
+          }
+        ],
+        "artifacts": [
+          "packages/schemas/src/common/",
+          "packages/schemas/src/types/",
+          "packages/schemas/src/index.ts"
+        ],
+        "completionCriteria": [
+          "基本スキーマが正常に移行されていること",
+          "packages/schemas/ディレクトリでyarn buildが正常に実行できること"
+        ],
+        "nextPhasePreparation": [
+          "v2スキーマコードと関連ファイルの特定"
+        ]
+      },
+      {
+        "phaseNumber": 4,
+        "title": "v2スキーマコードの移行",
+        "description": "v2スキーマ定義とその関連コードをschemasパッケージに移行する",
+        "preconditions": [
+          "基本スキーマコードが正常に移行されていること",
+          "v2スキーマコードが特定されていること"
+        ],
+        "tasks": [
+          {
+            "id": "4.1",
+            "description": "src/schemas/v2/ディレクトリの移行",
+            "estimatedTime": "20分"
+          },
+          {
+            "id": "4.2",
+            "description": "v2スキーマの依存関係の調整",
+            "estimatedTime": "15分"
+          },
+          {
+            "id": "4.3",
+            "description": "index.tsの更新（v2エクスポートの追加）",
+            "estimatedTime": "10分"
+          },
+          {
+            "id": "4.4",
+            "description": "必要に応じて型定義の調整",
+            "estimatedTime": "10分"
+          }
+        ],
+        "artifacts": [
+          "packages/schemas/src/v2/",
+          "更新されたpackages/schemas/src/index.ts"
+        ],
+        "completionCriteria": [
+          "v2スキーマが正常に移行されていること",
+          "パッケージ全体がビルドエラーなく構築できること"
+        ],
+        "nextPhasePreparation": [
+          "スキーマ用のテストファイルの特定"
+        ]
+      },
+      {
+        "phaseNumber": 5,
+        "title": "スキーマテストの移行と作成",
+        "description": "既存のスキーマテストを移行し、必要に応じて新しいテストを作成する",
+        "preconditions": [
+          "すべてのスキーマコードが正常に移行されていること",
+          "既存のテストファイルが特定されていること"
+        ],
+        "tasks": [
+          {
+            "id": "5.1",
+            "description": "packages/schemas/tests/ディレクトリの作成",
+            "estimatedTime": "5分"
+          },
+          {
+            "id": "5.2",
+            "description": "packages/schemas/jest.config.jsの作成",
+            "estimatedTime": "10分"
+          },
+          {
+            "id": "5.3",
+            "description": "既存のスキーマテストの移行",
+            "estimatedTime": "20分"
+          },
+          {
+            "id": "5.4",
+            "description": "必要に応じて新しいテストの作成",
+            "estimatedTime": "15分"
+          },
+          {
+            "id": "5.5",
+            "description": "テスト実行スクリプトの調整",
+            "estimatedTime": "5分"
+          }
+        ],
+        "artifacts": [
+          "packages/schemas/tests/",
+          "packages/schemas/jest.config.js",
+          "テスト実行結果"
+        ],
+        "completionCriteria": [
+          "すべてのテストが正常に実行され、パスすること",
+          "コードカバレッジが適切なレベルであること"
+        ],
+        "nextPhasePreparation": [
+          "メインプロジェクト（mcp）のpackage.json作成準備"
+        ]
+      },
+      {
+        "phaseNumber": 6,
+        "title": "mcpパッケージの基本設定",
+        "description": "既存のMCPサーバーコードをmcpパッケージとして設定する",
+        "preconditions": [
+          "schemasパッケージが完全に機能していること",
+          "packages/mcp/ディレクトリが存在すること"
+        ],
+        "tasks": [
+          {
+            "id": "6.1",
+            "description": "packages/mcp/package.jsonの作成",
+            "estimatedTime": "15分"
+          },
+          {
+            "id": "6.2",
+            "description": "packages/mcp/tsconfig.jsonの作成",
+            "estimatedTime": "10分"
+          },
+          {
+            "id": "6.3",
+            "description": "schemasパッケージへの依存関係の設定",
+            "estimatedTime": "10分"
+          },
+          {
+            "id": "6.4",
+            "description": "必要なディレクトリ構造の作成",
+            "estimatedTime": "10分"
+          },
+          {
+            "id": "6.5",
+            "description": "packages/mcp/README.mdの作成",
+            "estimatedTime": "10分"
+          }
+        ],
+        "artifacts": [
+          "packages/mcp/package.json",
+          "packages/mcp/tsconfig.json",
+          "packages/mcp/README.md"
+        ],
+        "completionCriteria": [
+          "mcpパッケージの設定ファイルが正しく作成されていること",
+          "schemasパッケージへの依存関係が正しく設定されていること"
+        ],
+        "nextPhasePreparation": [
+          "コアMCPコードの移行計画の作成"
+        ]
+      },
+      {
+        "phaseNumber": 7,
+        "title": "スキーマインポートの修正とMCPコード調整",
+        "description": "MCPコード内のスキーマインポートを修正し、新しいパッケージ構造に対応させる",
+        "preconditions": [
+          "mcpパッケージの基本設定が完了していること",
+          "schemasパッケージが完全に機能していること"
+        ],
+        "tasks": [
+          {
+            "id": "7.1",
+            "description": "MCPコード内のスキーマインポートパスの特定",
+            "estimatedTime": "15分"
+          },
+          {
+            "id": "7.2",
+            "description": "インポートパスの修正（src/schemas→@memory-bank/schemas）",
+            "estimatedTime": "20分"
+          },
+          {
+            "id": "7.3",
+            "description": "修正によって生じる型エラーの修正",
+            "estimatedTime": "15分"
+          },
+          {
+            "id": "7.4",
+            "description": "その他の依存関係の調整",
+            "estimatedTime": "10分"
+          }
+        ],
+        "artifacts": [
+          "修正されたインポートパスを持つMCPコードファイル"
+        ],
+        "completionCriteria": [
+          "すべてのスキーマインポートが新しいパッケージを参照していること",
+          "MCPコードがコンパイルエラーなくビルドできること"
+        ],
+        "nextPhasePreparation": [
+          "モノレポ全体のビルド・テスト手順の準備"
+        ]
+      },
+      {
+        "phaseNumber": 8,
+        "title": "モノレポ全体のビルドとテスト設定",
+        "description": "モノレポ全体のビルド・テスト・開発フローを設定する",
+        "preconditions": [
+          "schemasパッケージとmcpパッケージの両方が基本的に機能していること"
+        ],
+        "tasks": [
+          {
+            "id": "8.1",
+            "description": "ルートpackage.jsonのscriptsフィールドの更新",
+            "estimatedTime": "15分"
+          },
+          {
+            "id": "8.2",
+            "description": "パッケージ間の依存関係を考慮したビルド順序の設定",
+            "estimatedTime": "10分"
+          },
+          {
+            "id": "8.3",
+            "description": "開発環境での動作確認手順の確立",
+            "estimatedTime": "15分"
+          },
+          {
+            "id": "8.4",
+            "description": "統合テスト実行手順の設定",
+            "estimatedTime": "15分"
+          }
+        ],
+        "artifacts": [
+          "更新されたルートpackage.json",
+          "ビルド・テスト手順のドキュメント"
+        ],
+        "completionCriteria": [
+          "モノレポ全体が一括でビルドできること",
+          "すべてのテストが正常に実行できること",
+          "開発環境で正常に動作することが確認できること"
+        ],
+        "nextPhasePreparation": [
+          "パッケージ公開設定の準備"
+        ]
+      },
+      {
+        "phaseNumber": 9,
+        "title": "パッケージ公開設定とドキュメント更新",
+        "description": "npmパッケージとして公開するための設定とドキュメントの更新を行う",
+        "preconditions": [
+          "モノレポ全体が正常に機能していること"
+        ],
+        "tasks": [
+          {
+            "id": "9.1",
+            "description": "schemasパッケージのpublishConfig設定",
+            "estimatedTime": "10分"
+          },
+          {
+            "id": "9.2",
+            "description": "mcpパッケージのpublishConfig設定",
+            "estimatedTime": "10分"
+          },
+          {
+            "id": "9.3",
+            "description": "READMEとドキュメントの更新",
+            "estimatedTime": "20分"
+          },
+          {
+            "id": "9.4",
+            "description": "使用例とサンプルコードの作成",
+            "estimatedTime": "15分"
+          }
+        ],
+        "artifacts": [
+          "更新されたpackage.json（publishConfig付き）",
+          "更新されたREADMEとドキュメント",
+          "使用例とサンプルコード"
+        ],
+        "completionCriteria": [
+          "パッケージが公開可能な状態になっていること",
+          "ドキュメントが新しい構造と使用方法を正確に説明していること"
+        ],
+        "nextPhasePreparation": [
+          "CI/CD設定の調整準備"
+        ]
+      },
+      {
+        "phaseNumber": 10,
+        "title": "CI/CD設定の調整と最終確認",
+        "description": "CI/CDパイプラインをモノレポ構造に対応させ、全体の最終確認を行う",
+        "preconditions": [
+          "パッケージ公開設定とドキュメントが更新されていること"
+        ],
+        "tasks": [
+          {
+            "id": "10.1",
+            "description": "既存のCI/CD設定の確認と調整",
+            "estimatedTime": "15分"
+          },
+          {
+            "id": "10.2",
+            "description": "モノレポに対応したCI/CDワークフローの設定",
+            "estimatedTime": "20分"
+          },
+          {
+            "id": "10.3",
+            "description": "モノレポ全体の最終テスト実行",
+            "estimatedTime": "10分"
+          },
+          {
+            "id": "10.4",
+            "description": "README.mdのCIバッジ更新（必要に応じて）",
+            "estimatedTime": "5分"
+          },
+          {
+            "id": "10.5",
+            "description": "プルリクエスト準備またはマージ準備",
+            "estimatedTime": "10分"
+          }
+        ],
+        "artifacts": [
+          "更新されたCI/CD設定",
+          "最終テスト結果",
+          "更新されたREADME（CIバッジ付き）"
+        ],
+        "completionCriteria": [
+          "CI/CDパイプラインが正常に実行できること",
+          "すべてのテストがパスすること",
+          "モノレポ全体が本番環境で動作する準備が整っていること"
+        ],
+        "nextPhasePreparation": [
+          "本番環境へのデプロイ準備（必要に応じて）"
+        ]
+      }
+    ],
+    "dependencies": {
+      "between": [
+        {
+          "from": 1,
+          "to": 2,
+          "description": "Phase 1はモノレポ基本構造、Phase 2はschemasパッケージ設定"
+        },
+        {
+          "from": 2,
+          "to": 3,
+          "description": "Phase 2の設定が必要、Phase 3でコード移行開始"
+        },
+        {
+          "from": 3,
+          "to": 4,
+          "description": "基本スキーマコード移行後にv2スキーマコード移行"
+        },
+        {
+          "from": 4,
+          "to": 5,
+          "description": "スキーマコード移行完了後にテスト移行"
+        },
+        {
+          "from": 5,
+          "to": 6,
+          "description": "schemasパッケージ完成後にmcpパッケージ設定"
+        },
+        {
+          "from": 6,
+          "to": 7,
+          "description": "mcpパッケージ設定後にインポート修正"
+        },
+        {
+          "from": 7,
+          "to": 8,
+          "description": "基本コード調整後に全体ビルド設定"
+        },
+        {
+          "from": 8,
+          "to": 9,
+          "description": "全体ビルド確認後に公開設定"
+        },
+        {
+          "from": 9,
+          "to": 10,
+          "description": "公開設定完了後にCI/CD調整と最終確認"
+        }
+      ]
+    },
+    "riskManagement": {
+      "commonRisks": [
+        {
+          "risk": "既存コードとの互換性問題",
+          "impact": "high",
+          "probability": "medium",
+          "mitigation": "各フェーズでの徹底したテスト実施とインクリメンタルな変更アプローチ"
+        },
+        {
+          "risk": "依存関係の解決問題",
+          "impact": "medium",
+          "probability": "high",
+          "mitigation": "明示的な依存関係設定とworkspace:*記法の適切な使用"
+        },
+        {
+          "risk": "型定義の不整合",
+          "impact": "high",
+          "probability": "medium",
+          "mitigation": "共通の型定義を明確にし、適切にエクスポート・インポートする"
+        },
+        {
+          "risk": "ビルドプロセスの複雑化",
+          "impact": "medium",
+          "probability": "medium",
+          "mitigation": "シンプルな依存関係グラフを維持し、明確なビルド順序を確立する"
+        }
+      ],
+      "phaseSpecificRisks": [
+        {
+          "phase": 3,
+          "risk": "依存型の循環参照",
+          "mitigation": "型の再構成と明確な責任分離"
+        },
+        {
+          "phase": 7,
+          "risk": "インポートパスの見落とし",
+          "mitigation": "自動検索ツールの活用と段階的な変更確認"
+        },
+        {
+          "phase": 9,
+          "risk": "パッケージ公開設定ミス",
+          "mitigation": "ローカル環境での公開テスト（npm pack）の実施"
+        }
+      ]
+    },
+    "successCriteria": {
+      "technical": [
+        "すべてのパッケージが独立してビルド可能であること",
+        "すべてのテストがパスすること",
+        "既存の機能が引き続き正常に動作すること",
+        "型定義が正確で使いやすいこと",
+        "各パッケージのAPIが明確に文書化されていること"
+      ],
+      "usability": [
+        "新しい構造が開発者にとって理解しやすいこと",
+        "ドキュメントが十分に整備されていること",
+        "開発・テスト・ビルドプロセスがシンプルであること"
+      ]
+    }
+  }
+}

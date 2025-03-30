@@ -1,0 +1,114 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "template-removal-execution",
+    "title": "テンプレート関連コード削除の実行状況",
+    "documentType": "progress",
+    "path": "template-removal-execution.json",
+    "tags": [
+      "progress",
+      "cleanup",
+      "template",
+      "refactoring"
+    ],
+    "lastModified": "2025-03-28T18:30:00.000Z",
+    "createdAt": "2025-03-28T18:30:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "summary": {
+      "description": "テンプレート関連コードの削除実行中の進捗と課題の記録",
+      "status": "in_progress"
+    },
+    "completedTasks": [
+      {
+        "id": "task-1",
+        "title": "DocumentPathのマークダウン関連メソッド削除",
+        "description": "isMarkdownメソッドとtoAlternateFormatメソッドを削除し、JSONフォーマットに特化したクラスに簡素化",
+        "completionDate": "2025-03-28T18:10:00.000Z",
+        "status": "完了"
+      },
+      {
+        "id": "task-2",
+        "title": "WriteBranchDocumentUseCaseのマークダウン書き込みチェック削除",
+        "description": "マークダウン拡張子チェックのコードブロックを削除",
+        "completionDate": "2025-03-28T18:15:00.000Z",
+        "status": "完了"
+      },
+      {
+        "id": "task-3",
+        "title": "providerのテンプレートサービスのインポート削除",
+        "description": "providers.tsからITemplateRepositoryとTemplateServiceのインポートを削除",
+        "completionDate": "2025-03-28T18:20:00.000Z",
+        "status": "完了"
+      },
+      {
+        "id": "task-4",
+        "title": "テンプレート関連ファイルの削除",
+        "description": "不要なテンプレート関連ファイルを削除",
+        "completionDate": "2025-03-28T18:25:00.000Z",
+        "status": "完了",
+        "details": "次のディレクトリとファイルを削除:\n- /packages/mcp/src/domain/templates\n- /packages/mcp/src/application/templates\n- /packages/mcp/src/infrastructure/templates\n- /packages/mcp/src/interface/controllers/TemplateController.ts\n- /packages/mcp/src/interface/controllers/interfaces/ITemplateController.ts"
+      },
+      {
+        "id": "task-5",
+        "title": "GlobalControllerテストの修正",
+        "description": "GlobalController.test.tsからtempalteControllerの依存関係を削除",
+        "completionDate": "2025-03-28T18:30:00.000Z",
+        "status": "完了"
+      }
+    ],
+    "pendingTasks": [
+      {
+        "id": "task-6",
+        "title": "ビルドエラーの解決",
+        "description": "テンプレート関連コードの削除によって発生したビルドエラーの修正",
+        "status": "in_progress",
+        "details": "複数のファイルに渡る型エラーが発生しており、一時的な型定義ファイルの作成が必要"
+      }
+    ],
+    "issues": [
+      {
+        "id": "issue-1",
+        "title": "依存関係による型エラー",
+        "description": "多くのファイルがITemplateRepositoryなどの型に依存しており、完全に削除するとビルドエラーが多発する",
+        "severity": "medium",
+        "status": "open",
+        "solution": "一時的にインターフェースと仮実装を提供し、段階的に依存関係を解消する"
+      },
+      {
+        "id": "issue-2",
+        "title": "テストコードの依存",
+        "description": "テストコードがテンプレート関連の機能をモックしている部分があり、修正が必要",
+        "severity": "low",
+        "status": "resolved",
+        "solution": "モックを残しつつ、実装を削除する方針で対応済み"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "next-1",
+        "title": "追加のモックインターフェース作成",
+        "description": "ビルドを成功させるために必要な最小限のモックインターフェースを作成する",
+        "priority": "high"
+      },
+      {
+        "id": "next-2",
+        "title": "Template型の仮実装",
+        "description": "FileTemplateRepositoryなどの依存に必要なTemplate型の仮実装を作成する",
+        "priority": "high"
+      },
+      {
+        "id": "next-3",
+        "title": "ビルド成功の確認",
+        "description": "すべての一時的なインターフェースと実装を作成後、ビルドが成功することを確認する",
+        "priority": "high",
+        "dependencies": [
+          "next-1",
+          "next-2"
+        ]
+      }
+    ],
+    "conclusion": "テンプレート関連コードの削除は進行中で、主要なコードの削除は完了した。ビルドエラーを解消するために一時的なモックが必要だが、最終的にはすべての関連コードを削除する予定。"
+  }
+}
