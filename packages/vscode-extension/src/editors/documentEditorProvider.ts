@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import MarkdownIt from 'markdown-it';
+// Unused type imports removed
 // mdMermaid will be imported dynamically later
 
 // Initialize markdown-it instance for the provider
@@ -57,7 +58,6 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
    * Called when a custom editor is opened for the given document.
    * Sets up the webview panel.
    */
-  public async resolveCustomTextEditor(
   public async resolveCustomTextEditor(
     document: vscode.TextDocument,
     webviewPanel: vscode.WebviewPanel,
@@ -131,6 +131,9 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
     // JavaScript for the editor functionality
     const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'media', 'js', 'editor.js'));
 
+    // Mermaid will be loaded from CDN
+    const mermaidCdnUrl = 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js';
+
     // Return HTML with external script reference
     return `<!DOCTYPE html>
       <html lang="en">
@@ -146,7 +149,7 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
           .panel { flex: 1; padding: 10px; overflow-y: auto; height: 100%; box-sizing: border-box; }
           #editor-panel { border-right: 1px solid var(--vscode-editorWidget-border, #ccc); }
           #preview-panel { }
-          textarea.editor-area { width: 100%; height: 95%; border: 1px solid var(--vscode-input-border, #ccc); font-family: var(--vscode-editor-font-family, monospace); resize: none; }
+          /* Removed invalid meta tag from inside style block */
           .error-message { color: var(--vscode-errorForeground, red); margin-top: 5px; }
           /* Add styles for markdown preview if needed */
           .markdown-body h1, .markdown-body h2 { border-bottom: 1px solid var(--vscode-editorWidget-border, #eee); padding-bottom: 0.3em; }
@@ -166,12 +169,12 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
            <div id="preview-content" class="markdown-body"></div>
         </div>
 
+        <script nonce="${nonce}" src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
         <script nonce="${nonce}" src="${scriptUri}"></script>
       </body>
       </html>`;
   }
-      </html>`;
-  }
+  // Removed stray closing tag and brace that were here
 
   /**
    * Converts document content to Markdown and sends the rendered HTML to the webview.

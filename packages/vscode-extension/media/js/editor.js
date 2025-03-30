@@ -13,6 +13,7 @@
    * Initialize the editor functionality.
    */
   function initialize() {
+    console.log('[Webview] Initializing editor script...'); // Add log at the start
     // Get DOM elements
     editor = document.getElementById('editor');
     previewContentDiv = document.getElementById('preview-content');
@@ -32,11 +33,43 @@
 
     console.log('[Webview] Script loaded and listeners attached.');
 
+    // Initialize Mermaid if available
+    initializeMermaid();
+
     // Request initial preview
     requestInitialPreview();
 
     // Attempt initial Mermaid rendering after a delay
     setTimeout(attemptInitialMermaidRender, 150);
+
+    console.log('[Webview] Editor script initialization complete.');
+  }
+
+  /**
+   * Initialize Mermaid library if available
+   */
+  function initializeMermaid() {
+    try {
+      if (typeof mermaid !== 'undefined') {
+        console.log('[Webview] Mermaid library found, initializing...');
+        // Initialize with default config
+        mermaid.initialize({
+          startOnLoad: false, // We'll manually run rendering
+          theme: 'default',
+          securityLevel: 'loose', // Needed for webview rendering
+          flowchart: { useMaxWidth: true, htmlLabels: true },
+          logLevel: 3, // Error
+        });
+        console.log('[Webview] Mermaid initialized successfully');
+        return true;
+      } else {
+        console.warn('[Webview] Mermaid library not found during initialization.');
+        return false;
+      }
+    } catch (err) {
+      console.error('[Webview] Error initializing Mermaid:', err);
+      return false;
+    }
   }
 
   /**
@@ -143,7 +176,10 @@
                 '[Webview] Mermaid rendering failed for element ' + index + ':',
                 renderErr
               );
-              element.innerHTML = '<pre>Mermaid Error:' + renderErr + '</pre>';
+              // Add null check before setting innerHTML in catch block
+              if (element) {
+                  element.innerHTML = '<pre>Mermaid Error:' + renderErr + '</pre>';
+              }
             }
           });
         }
@@ -185,7 +221,10 @@
                 '[Webview] Initial Mermaid rendering failed for element ' + index + ':',
                 renderErr
               );
-              element.innerHTML = '<pre>Mermaid Error:' + renderErr + '</pre>';
+              // Add null check before setting innerHTML in catch block
+              if (element) {
+                  element.innerHTML = '<pre>Mermaid Error:' + renderErr + '</pre>';
+              }
             }
           });
         } else {
@@ -199,6 +238,10 @@
     }
   }
 
-  // Initialize when the script loads
-  initialize();
+  // Initialize after the DOM is fully loaded
+  if (document.readyState === 'loading') { // Loading hasn't finished yet
+      window.addEventListener('DOMContentLoaded', initialize);
+  } else { // DOMContentLoaded has already fired
+      initialize();
+  }
 })();
