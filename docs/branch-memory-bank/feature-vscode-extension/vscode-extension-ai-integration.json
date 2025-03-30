@@ -1,0 +1,349 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "vscode-extension-ai-integration",
+    "title": "VS Code拡張：Gemini AI連携機能",
+    "documentType": "feature_spec",
+    "path": "vscode-extension-ai-integration.json",
+    "tags": [
+      "vscode-extension",
+      "ai-integration",
+      "gemini-api",
+      "information-deduplication"
+    ],
+    "lastModified": "2025-03-30T12:00:00.000Z",
+    "createdAt": "2025-03-30T12:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "title": "Gemini AI連携による重複情報整理機能",
+      "description": "メモリバンク内の重複情報や関連情報をGemini AIを活用して効率的に検出・整理・最適化する機能。人間の開発者の認知負荷を軽減し、ナレッジベースの品質向上。",
+      "goals": [
+        "メモリバンク内の重複情報を自動検出",
+        "重複情報の統合や最適化を提案",
+        "関連情報間の整合性を検証",
+        "情報の自動要約や構造化",
+        "人間の開発者の効率向上とメモリバンクの品質向上"
+      ]
+    },
+    "features": [
+      {
+        "name": "重複情報検出",
+        "description": "メモリバンク内の重複情報や類似情報を自動検出する機能",
+        "details": [
+          "セマンティック検索による内容の類似性検出",
+          "JSON構造のパス分析による構造的重複検出",
+          "ドキュメント間の参照関係を考慮した重複検出",
+          "ヒートマップや関連性グラフによる重複情報の可視化"
+        ],
+        "priority": "high"
+      },
+      {
+        "name": "重複情報統合",
+        "description": "検出された重複情報を整理し、最適化された形で統合する機能",
+        "details": [
+          "重複部分の統合方法や参照方法を複数案提示",
+          "変更前後の差分とマージ後の状態をプレビュー表示",
+          "重複情報を共通部分として抽出し、参照構造に変換",
+          "ユーザー承認に基づく自動リファクタリング実行"
+        ],
+        "priority": "high"
+      },
+      {
+        "name": "整合性チェッカー",
+        "description": "メモリバンク内の情報の整合性を検証し、矛盾や不一致を検出する機能",
+        "details": [
+          "ドキュメント間の相互参照の検証と問題箇所の特定",
+          "AIによる内容の論理的整合性分析",
+          "タイムスタンプやバージョン情報に基づく時系列整合性検証",
+          "問題解決のための具体的な修正提案の生成"
+        ],
+        "priority": "medium"
+      },
+      {
+        "name": "インテリジェント要約",
+        "description": "メモリバンクの内容を自動的に要約し、主要ポイントを抽出する機能",
+        "details": [
+          "ユースケースや目的に合わせた柔軟な要約生成",
+          "ナレッジベース全体の構造や主要トピックの可視化",
+          "複雑な変更履歴を人間が理解しやすい形で要約",
+          "グラフやチャートを含む視覚的な要約の生成"
+        ],
+        "priority": "medium"
+      },
+      {
+        "name": "コンテンツ改善提案",
+        "description": "メモリバンクの内容を改善するための提案を生成する機能",
+        "details": [
+          "より効率的な情報構造への改善案の提示",
+          "欠けている情報や詳細の指摘",
+          "古くなった情報の検出と更新提案",
+          "ドキュメント間で一貫した表記・形式への改善提案"
+        ],
+        "priority": "low"
+      }
+    ],
+    "userInterface": {
+      "mainViews": [
+        {
+          "name": "AIアシスタントパネル",
+          "description": "VS Code内でAI分析結果や提案を表示するパネル",
+          "features": [
+            "分析結果リストと詳細表示",
+            "重要度・タイプ・影響範囲でのフィルタリング",
+            "適用/拒否/編集/詳細表示のアクション",
+            "問題箇所へのジャンプナビゲーション"
+          ]
+        },
+        {
+          "name": "重複情報マップ",
+          "description": "メモリバンク内の重複情報の視覚的マッピング",
+          "features": [
+            "ヒートマップ/ネットワークグラフ/ツリーマップ表示",
+            "ズーム/パン/クリック/ホバーでの操作",
+            "重複度/ドキュメントタイプ/タグでのフィルタリング",
+            "ノードクリックで詳細表示"
+          ]
+        },
+        {
+          "name": "統合エディタ",
+          "description": "重複情報の統合を行うための特殊エディタ",
+          "features": [
+            "左右分割差分ビューとマージコントロール",
+            "次/前のコンフリクトへのナビゲーション",
+            "マージ結果のリアルタイムプレビュー",
+            "マージ結果のスキーマ検証"
+          ]
+        }
+      ],
+      "interactionPatterns": [
+        {
+          "name": "シーケンシャル確認",
+          "description": "AIの提案を順番に確認して適用または拒否するフロー",
+          "bestFor": "重要度の高い変更や詳細な検討が必要な場合"
+        },
+        {
+          "name": "一括処理",
+          "description": "複数の提案をまとめてレビューし一括適用するフロー",
+          "bestFor": "類似性の高い多数の小さな変更や、信頼性の高い提案群"
+        },
+        {
+          "name": "ガイド付き編集",
+          "description": "AIガイダンスに基づいて手動で編集を行うフロー",
+          "bestFor": "複雑な変更や、AIの提案をベースに人間の判断が必要な場合"
+        }
+      ],
+      "commands": [
+        {
+          "name": "memory-bank.ai.analyzeCurrentDocument",
+          "description": "現在開いているドキュメントの重複分析を実行",
+          "keybinding": "ctrl+shift+a"
+        },
+        {
+          "name": "memory-bank.ai.fullBranchAnalysis",
+          "description": "現在のブランチ全体の重複分析を実行",
+          "keybinding": "ctrl+shift+b"
+        },
+        {
+          "name": "memory-bank.ai.showDuplicateMap",
+          "description": "重複情報マップを表示",
+          "keybinding": "ctrl+shift+m"
+        },
+        {
+          "name": "memory-bank.ai.applySelectedSuggestions",
+          "description": "選択した提案を適用",
+          "keybinding": "ctrl+shift+s"
+        }
+      ]
+    },
+    "implementation": {
+      "architecture": {
+        "components": [
+          {
+            "name": "AIService",
+            "description": "Gemini APIとの通信および分析を担当するコアサービス",
+            "responsibilities": [
+              "API通信管理",
+              "プロンプト構築と送信",
+              "レート制限とコスト最適化",
+              "レスポンス解析と構造化"
+            ]
+          },
+          {
+            "name": "AnalysisManager",
+            "description": "メモリバンク分析ジョブを管理するマネージャー",
+            "responsibilities": [
+              "分析ジョブのキュー管理",
+              "進行状況のトラッキング",
+              "複数分析タスクの調整",
+              "分析結果のキャッシュ"
+            ]
+          },
+          {
+            "name": "SuggestionProcessor",
+            "description": "AI提案の処理とアクション変換",
+            "responsibilities": [
+              "提案内容の構造化",
+              "アクション可能な変更への変換",
+              "変更のプレビュー生成",
+              "変更の適用処理"
+            ]
+          },
+          {
+            "name": "UIController",
+            "description": "AI統合機能のユーザーインターフェース制御",
+            "responsibilities": [
+              "WebViewの管理",
+              "ユーザー入力の処理",
+              "結果の表示と更新",
+              "インタラクションフローの制御"
+            ]
+          }
+        ]
+      },
+      "coreClasses": [
+        {
+          "name": "GeminiClient",
+          "description": "Gemini APIとの通信クライアント",
+          "methods": [
+            "generateContent(prompt, options)",
+            "generateTextEmbedding(text)"
+          ]
+        },
+        {
+          "name": "PromptBuilder",
+          "description": "効果的なプロンプトを構築するユーティリティ",
+          "methods": [
+            "buildPrompt(templateName, params)"
+          ]
+        },
+        {
+          "name": "ResultParser",
+          "description": "AI応答を構造化された結果に変換",
+          "methods": [
+            "parseResponse(response, expectedFormat)"
+          ]
+        },
+        {
+          "name": "EmbeddingService",
+          "description": "テキスト埋め込みの生成と管理",
+          "methods": [
+            "getEmbedding(text, id)",
+            "findSimilar(vector, threshold)"
+          ]
+        }
+      ],
+      "aiIntegration": {
+        "model": "gemini-1.5-pro",
+        "embeddingModel": "text-embedding-3-large",
+        "authentication": {
+          "method": "API key",
+          "storage": "VS Code設定（安全に保管）"
+        },
+        "costOptimization": [
+          "バッチ処理の活用",
+          "キャッシュの積極利用",
+          "ユーザー設定による使用量制御"
+        ]
+      }
+    },
+    "deployment": {
+      "rollout": {
+        "phase1": {
+          "features": [
+            "重複情報検出",
+            "AIアシスタントパネル"
+          ],
+          "duration": "2週間",
+          "success": "基本的な重複検出と可視化の実現"
+        },
+        "phase2": {
+          "features": [
+            "重複情報統合",
+            "統合エディタ"
+          ],
+          "duration": "2週間",
+          "success": "検出された重複の効率的な統合と参照化"
+        },
+        "phase3": {
+          "features": [
+            "整合性チェッカー",
+            "インテリジェント要約"
+          ],
+          "duration": "2週間",
+          "success": "ナレッジベースの整合性向上と把握しやすさ改善"
+        },
+        "phase4": {
+          "features": [
+            "コンテンツ改善提案",
+            "全体最適化"
+          ],
+          "duration": "2週間",
+          "success": "全機能統合と最終調整"
+        }
+      },
+      "qualityAssurance": {
+        "testTargets": [
+          "Gemini API通信",
+          "重複検出アルゴリズム",
+          "マージとリファクタリングの安全性",
+          "UIの応答性とアクセシビリティ"
+        ],
+        "successCriteria": [
+          "重複検出の精度 85%以上",
+          "リファクタリング操作の成功率 99%以上",
+          "レスポンス時間 2秒以内",
+          "ユーザー満足度スコア 4/5以上"
+        ]
+      }
+    },
+    "benefits": {
+      "userBenefits": [
+        {
+          "benefit": "認知負荷の軽減",
+          "description": "重複情報やメンテナンスポイントを自動検出することで、開発者は本質的な作業に集中できる",
+          "impact": "high"
+        },
+        {
+          "benefit": "情報品質の向上",
+          "description": "一貫性のあるナレッジベースが維持され、情報の信頼性が向上する",
+          "impact": "high"
+        },
+        {
+          "benefit": "効率的な情報構造",
+          "description": "最適化された情報構造により、必要な情報へのアクセスが容易になる",
+          "impact": "medium"
+        },
+        {
+          "benefit": "学習とナレッジ共有の促進",
+          "description": "整理された情報と自動要約により、チーム内の知識共有が促進される",
+          "impact": "medium"
+        }
+      ],
+      "businessBenefits": [
+        {
+          "benefit": "開発者生産性の向上",
+          "description": "ナレッジベース管理の効率化による作業時間の削減",
+          "impact": "high"
+        },
+        {
+          "benefit": "意思決定の品質向上",
+          "description": "より一貫性のある正確な情報に基づく意思決定",
+          "impact": "medium"
+        },
+        {
+          "benefit": "オンボーディング時間の短縮",
+          "description": "新メンバーが整理された情報から素早く学習可能",
+          "impact": "medium"
+        }
+      ]
+    },
+    "nextSteps": [
+      "Gemini API接続の基本実装",
+      "重複検出アルゴリズムのプロトタイプ開発",
+      "AIアシスタントパネルの基本UI実装",
+      "テキスト埋め込みサービスの実装"
+    ]
+  }
+}

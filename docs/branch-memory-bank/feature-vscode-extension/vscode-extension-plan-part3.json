@@ -1,0 +1,632 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "vscode-extension-plan-part3",
+    "title": "VS Code拡張の実装計画 (Part 3: ユーザー体験とデプロイメント)",
+    "documentType": "implementation_plan",
+    "path": "vscode-extension-plan-part3.json",
+    "tags": [
+      "vscode-extension",
+      "implementation-plan",
+      "memory-bank",
+      "editor-integration",
+      "user-experience",
+      "deployment",
+      "part3"
+    ],
+    "lastModified": "2025-03-30T12:00:00.000Z",
+    "createdAt": "2025-03-30T12:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "userExperience": {
+      "keyInteractions": [
+        {
+          "name": "ドキュメント作成",
+          "workflow": [
+            "コマンドパレットまたはエクスプローラーからの新規作成コマンド",
+            "ドキュメントタイプの選択（テンプレートベース）",
+            "必須フィールドの入力（推奨値を提示）",
+            "作成の確認と保存"
+          ],
+          "userInterface": {
+            "entryPoints": [
+              "コマンドパレット",
+              "エクスプローラーコンテキストメニュー",
+              "アクティビティバーボタン"
+            ],
+            "illustrations": "テンプレート選択と必須フィールド入力のフォームウィザード"
+          },
+          "errorHandling": [
+            "必須フィールドの未入力警告",
+            "スキーマ違反の即時フィードバック",
+            "同名ドキュメント存在時の上書き確認"
+          ]
+        },
+        {
+          "name": "ドキュメント編集",
+          "workflow": [
+            "エクスプローラーからドキュメントを選択",
+            "専用エディタでの編集（コード／フォームモード切り替え可能）",
+            "リアルタイム検証フィードバック",
+            "自動補完と提案",
+            "保存と検証の確認"
+          ],
+          "userInterface": {
+            "entryPoints": [
+              "エクスプローラービュー",
+              "最近使用したファイル",
+              "検索結果"
+            ],
+            "illustrations": "コードエディタとフォームエディタの切り替え可能なインターフェース"
+          },
+          "errorHandling": [
+            "リアルタイムエラー表示（エディタ内インライン）",
+            "問題パネルでのエラーリスト",
+            "保存時の最終検証"
+          ]
+        },
+        {
+          "name": "ドキュメント検索",
+          "workflow": [
+            "エクスプローラーの検索ボックスまたはコマンドパレットから検索開始",
+            "検索条件の指定（タイトル、ID、タグ、コンテンツ内容など）",
+            "検索結果のフィルタリングとソート",
+            "検索結果からのドキュメント選択と開く"
+          ],
+          "userInterface": {
+            "entryPoints": [
+              "検索ボックス",
+              "コマンドパレット",
+              "クイックアクセスバー"
+            ],
+            "illustrations": "高度な検索フィルターとリアルタイム結果表示"
+          },
+          "errorHandling": [
+            "検索結果なしの場合の提案",
+            "検索インデックス未構築時の通知"
+          ]
+        },
+        {
+          "name": "関連性探索",
+          "workflow": [
+            "ドキュメントの関連タブ選択",
+            "関連ドキュメント一覧表示",
+            "関連性グラフへの切り替え（オプション）",
+            "関連ドキュメントの選択と開く"
+          ],
+          "userInterface": {
+            "entryPoints": [
+              "ドキュメントエディタのサイドパネル",
+              "コンテキストメニュー"
+            ],
+            "illustrations": "関連ドキュメント一覧とインタラクティブグラフ表示"
+          },
+          "errorHandling": [
+            "関連ドキュメントなしの場合の通知",
+            "参照が解決できない場合の警告"
+          ]
+        },
+        {
+          "name": "ブランチ比較",
+          "workflow": [
+            "コマンドパレットまたはブランチビューからの比較コマンド",
+            "比較するブランチの選択",
+            "差分の表示とナビゲーション",
+            "差分の詳細表示と編集"
+          ],
+          "userInterface": {
+            "entryPoints": [
+              "ブランチビュー",
+              "コマンドパレット",
+              "ドキュメントコンテキストメニュー"
+            ],
+            "illustrations": "ブランチ間の差分を表示する分割ビュー"
+          },
+          "errorHandling": [
+            "ブランチが存在しない場合のエラー",
+            "差分生成に失敗した場合のフォールバック"
+          ]
+        }
+      ],
+      "designPrinciples": [
+        {
+          "name": "シンプルさ",
+          "description": "複雑な機能も直感的に使えるシンプルなUIデザイン",
+          "applicationPoints": [
+            "ドキュメント作成ウィザードの段階的なガイド",
+            "コンテキスト依存のコマンド表示",
+            "頻繁に使用する機能の優先的な表示"
+          ]
+        },
+        {
+          "name": "一貫性",
+          "description": "VS Codeの標準UIパターンに従った一貫性のある操作感",
+          "applicationPoints": [
+            "VS Codeのショートカットキーとの統一",
+            "アイコンとラベルの標準スタイル採用",
+            "エラー表示と問題パネルの統合"
+          ]
+        },
+        {
+          "name": "フィードバック",
+          "description": "ユーザー操作に対する明確で即時的なフィードバック",
+          "applicationPoints": [
+            "リアルタイムスキーマ検証",
+            "操作完了時の視覚的確認",
+            "長時間操作時の進行状況表示"
+          ]
+        },
+        {
+          "name": "効率性",
+          "description": "キーボードショートカットや操作ステップの最小化による効率的な作業フロー",
+          "applicationPoints": [
+            "すべての機能へのキーボードアクセス",
+            "よく使う操作のショートカット",
+            "コンテキストに応じた適切な操作の提案"
+          ]
+        }
+      ],
+      "accessibilityConsiderations": [
+        {
+          "category": "視覚的アクセシビリティ",
+          "features": [
+            "ハイコントラストモードのサポート",
+            "拡大表示との互換性",
+            "色だけに依存しない情報伝達",
+            "スクリーンリーダー対応"
+          ],
+          "implementation": {
+            "techniques": [
+              "セマンティックHTML構造の使用",
+              "ARIAラベルの適切な設定",
+              "アイコンと色のコントラスト比の確保",
+              "VS Code拡張のアクセシビリティAPIを活用"
+            ],
+            "testingApproach": "スクリーンリーダーとハイコントラストモードでの機能テスト"
+          }
+        },
+        {
+          "category": "キーボードアクセシビリティ",
+          "features": [
+            "すべての機能へのキーボードアクセス",
+            "ショートカットキーのカスタマイズ",
+            "タブナビゲーション対応"
+          ],
+          "implementation": {
+            "techniques": [
+              "すべてのUIコンポーネントにキーボードフォーカス",
+              "ショートカットキーの設定インターフェース",
+              "タブオーダーの論理的構造化"
+            ],
+            "testingApproach": "キーボードのみでの全機能アクセステスト"
+          }
+        },
+        {
+          "category": "認知的アクセシビリティ",
+          "features": [
+            "シンプルで一貫したインターフェース",
+            "ステップバイステップのガイド",
+            "エラーメッセージの明確な説明"
+          ],
+          "implementation": {
+            "techniques": [
+              "複雑なタスクの段階的な分割",
+              "直感的なアイコンとラベルの使用",
+              "ヘルプドキュメントへの容易なアクセス"
+            ],
+            "testingApproach": "ユーザビリティテストと初心者ユーザーによる評価"
+          }
+        }
+      ],
+      "localizations": {
+        "supportedLanguages": [
+          {
+            "code": "en",
+            "name": "English",
+            "status": "primary"
+          },
+          {
+            "code": "ja",
+            "name": "日本語",
+            "status": "full support"
+          },
+          {
+            "code": "zh-CN",
+            "name": "简体中文",
+            "status": "planned"
+          }
+        ],
+        "localizationStrategy": {
+          "approach": "i18nextベースの文字列外部化",
+          "tooling": "VS Code Localization Extension APIを活用",
+          "managementProcess": "ローカライズファイルの自動抽出とビルド時の統合"
+        },
+        "localizationElements": [
+          "UIテキスト",
+          "エラーメッセージ",
+          "ヘルプドキュメント",
+          "フォームラベル"
+        ]
+      }
+    },
+    "integration": {
+      "mcpIntegration": {
+        "description": "VS Code拡張とMemory Bank MCPサーバーとの連携",
+        "integrationType": "API通信とファイルシステム",
+        "connectionPoints": [
+          {
+            "name": "ファイルシステム連携",
+            "description": "ローカルファイルシステム上のメモリバンクファイルの直接読み書き",
+            "details": "FileSystemServiceクラスを通じて、VS Codeのワークスペース内のメモリバンクファイルと連携",
+            "implementation": {
+              "approach": "VS Code FileSystem APIを使用",
+              "keyMethods": [
+                "readFile(uri: vscode.Uri): Promise<Uint8Array>",
+                "writeFile(uri: vscode.Uri, content: Uint8Array): Promise<void>",
+                "watchFiles(pattern: string): FileSystemWatcher"
+              ]
+            }
+          },
+          {
+            "name": "スキーマ連携",
+            "description": "packages/schemasからスキーマ定義を取得",
+            "details": "スキーマ定義ファイルを直接読み込み、または独自の処理でスキーマ情報を抽出",
+            "implementation": {
+              "approach": "Zodスキーマをロードして検証に使用",
+              "keyMethods": [
+                "loadSchemaFiles(): Promise<SchemaCollection>",
+                "validateDocument(schema: ZodSchema, document: unknown): ValidationResult"
+              ]
+            }
+          },
+          {
+            "name": "サーバーAPI連携",
+            "description": "必要に応じてMemory Bank MCPサーバーのAPIと連携",
+            "details": "複雑な操作（バリデーション、変換など）が必要な場合はAPIを利用",
+            "implementation": {
+              "approach": "REST APIクライアントの実装",
+              "keyMethods": [
+                "validateDocument(data: unknown): Promise<ValidationResult>",
+                "transformDocument(data: unknown, version: string): Promise<unknown>"
+              ]
+            }
+          }
+        ],
+        "dataSync": {
+          "strategy": "ファイルウォッチとリアルタイム更新",
+          "details": "VS CodeのFileSystemWatcherを使用して、メモリバンクファイルの変更を監視し、リアルタイムで表示を更新",
+          "implementation": {
+            "approach": "ファイル変更イベントに基づく更新",
+            "components": [
+              "FileSystemWatcherによる変更検出",
+              "キャッシュ管理による高速アクセス",
+              "変更差分の効率的な計算と表示更新"
+            ]
+          }
+        },
+        "errorHandling": {
+          "strategy": "エラーコード準拠とユーザーフレンドリーメッセージ",
+          "details": "サーバー側のエラーコードを認識し、ユーザーにわかりやすいメッセージとして表示。ロギング機能との連携も行う。",
+          "implementation": {
+            "approach": "エラー変換マッピングとコンテキスト追加",
+            "components": [
+              "エラーコードとメッセージのマッピングテーブル",
+              "コンテキスト情報の付加",
+              "エラーログとユーザーメッセージの分離"
+            ]
+          }
+        }
+      },
+      "vscodeIntegration": {
+        "description": "VS Codeの機能との統合",
+        "extensionPoints": [
+          {
+            "name": "アクティビティバー",
+            "description": "メモリバンク専用のアクティビティバーアイコンを追加",
+            "details": "クリックでメモリバンクエクスプローラーを表示",
+            "implementation": {
+              "manifestEntry": "contributes.viewsContainers.activitybar",
+              "icon": "media/icons/memory-bank.svg",
+              "views": [
+                "memoryBankDocuments",
+                "memoryBankBranches"
+              ]
+            }
+          },
+          {
+            "name": "エディタ",
+            "description": "メモリバンク専用のカスタムエディタ登録",
+            "details": "JSONファイルをメモリバンクドキュメントとして認識し、専用エディタで開く",
+            "implementation": {
+              "manifestEntry": "contributes.customEditors",
+              "viewType": "memoryBank.documentEditor",
+              "selector": [
+                {
+                  "filenamePattern": "*.json"
+                }
+              ],
+              "editorImplementation": "DocumentEditorProvider"
+            }
+          },
+          {
+            "name": "コマンドパレット",
+            "description": "拡張機能関連のコマンドを登録",
+            "details": "新規ドキュメント作成、検索、比較などのコマンドを提供",
+            "implementation": {
+              "manifestEntry": "contributes.commands",
+              "commands": [
+                "memoryBank.createDocument",
+                "memoryBank.openDocument",
+                "memoryBank.compareDocuments",
+                "memoryBank.viewRelationships"
+              ]
+            }
+          },
+          {
+            "name": "ステータスバー",
+            "description": "現在の状態や操作を表示するステータスバーアイテム",
+            "details": "現在のブランチ、検証状態などを表示",
+            "implementation": {
+              "component": "StatusBarController",
+              "items": [
+                {
+                  "id": "branchIndicator",
+                  "position": "left",
+                  "tooltip": "現在のメモリバンクブランチ"
+                },
+                {
+                  "id": "validationStatus",
+                  "position": "right",
+                  "tooltip": "ドキュメント検証状態"
+                }
+              ]
+            }
+          },
+          {
+            "name": "WebView",
+            "description": "リッチなUIを提供するためのWebView",
+            "details": "フォームエディタ、グラフ表示などに使用",
+            "implementation": {
+              "component": "WebViewProvider",
+              "useCases": [
+                "FormEditorPanel",
+                "RelationshipGraphPanel",
+                "AnalyticsDashboard"
+              ],
+              "technologies": [
+                "React",
+                "TypeScript",
+                "D3.js"
+              ]
+            }
+          }
+        ],
+        "themeSupport": {
+          "strategy": "VS Codeテーマに従う",
+          "details": "VS Codeの現在のテーマを尊重し、それに合わせたUIを提供",
+          "implementation": {
+            "approach": "テーマ対応CSSクラスとカラー変数",
+            "components": [
+              "テーマカラー変数の使用",
+              "ダーク/ライトテーマ対応スタイル",
+              "高コントラストモードのサポート"
+            ]
+          }
+        }
+      },
+      "testIntegration": {
+        "description": "VS Code拡張のテスト方法",
+        "testTypes": [
+          {
+            "name": "ユニットテスト",
+            "framework": "Jest",
+            "scope": "内部コンポーネントとユーティリティ関数",
+            "setup": "jest.config.jsで設定"
+          },
+          {
+            "name": "統合テスト",
+            "framework": "VS Code Extension Testing",
+            "scope": "拡張機能のAPIとVS Code連携",
+            "setup": "extensionテストランナー使用"
+          },
+          {
+            "name": "E2Eテスト",
+            "framework": "Playwright",
+            "scope": "実際のVS Code環境での動作確認",
+            "setup": "実際のVS Codeインスタンス起動"
+          }
+        ],
+        "mockingStrategy": {
+          "approach": "インターフェースベースのモッキング",
+          "components": [
+            "FileSystemServiceの仮想ファイルシステム",
+            "SchemaValidatorのモック",
+            "VS Code APIのモック"
+          ]
+        }
+      }
+    },
+    "deployment": {
+      "ci": {
+        "tool": "GitHub Actions",
+        "workflows": [
+          {
+            "name": "ビルド＆テスト",
+            "steps": [
+              "依存関係のインストール",
+              "リント",
+              "ビルド",
+              "ユニットテスト実行",
+              "統合テスト実行"
+            ],
+            "trigger": "プルリクエスト、main/developブランチへのプッシュ",
+            "implementation": {
+              "filename": ".github/workflows/build-test.yml",
+              "jobs": [
+                {
+                  "name": "build",
+                  "runs-on": "ubuntu-latest",
+                  "steps": [
+                    "checkout",
+                    "setup-node",
+                    "install-dependencies",
+                    "lint",
+                    "build",
+                    "test"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "パッケージング＆公開",
+            "steps": [
+              "依存関係のインストール",
+              "ビルド",
+              "テスト実行",
+              "VSIX パッケージング",
+              "VS Code Marketplaceへの公開"
+            ],
+            "trigger": "リリースタグの作成",
+            "implementation": {
+              "filename": ".github/workflows/publish.yml",
+              "jobs": [
+                {
+                  "name": "publish",
+                  "runs-on": "ubuntu-latest",
+                  "steps": [
+                    "checkout",
+                    "setup-node",
+                    "install-dependencies",
+                    "build",
+                    "test",
+                    "package",
+                    "publish-to-marketplace"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "strategy": "VS Code Marketplace公開",
+      "versioning": {
+        "scheme": "セマンティックバージョニング（SemVer）",
+        "initialVersion": "0.1.0",
+        "releaseChannels": [
+          {
+            "name": "開発版（dev）",
+            "audience": "内部開発者",
+            "frequency": "継続的",
+            "distribution": "内部ビルドとインストール"
+          },
+          {
+            "name": "プレビュー版（preview）",
+            "audience": "早期テスターとフィードバック提供者",
+            "frequency": "隔週",
+            "distribution": "GitHubリリースとVS Code Marketplace（プレリリース）"
+          },
+          {
+            "name": "安定版（stable）",
+            "audience": "一般ユーザー",
+            "frequency": "月次",
+            "distribution": "VS Code Marketplace（正式リリース）"
+          }
+        ]
+      },
+      "documentation": {
+        "types": [
+          {
+            "name": "README.md",
+            "content": "インストール方法、基本的な使い方、機能の概要",
+            "audience": "すべてのユーザー",
+            "location": "リポジトリルートと拡張機能メタデータ"
+          },
+          {
+            "name": "CHANGELOG.md",
+            "content": "各バージョンでの変更点、新機能、修正内容",
+            "audience": "既存ユーザー",
+            "location": "リポジトリルート"
+          },
+          {
+            "name": "開発者ドキュメント",
+            "content": "アーキテクチャ、コンポーネント設計、開発環境セットアップ",
+            "audience": "拡張機能の開発者",
+            "location": "docs/ディレクトリ"
+          },
+          {
+            "name": "ユーザーガイド",
+            "content": "詳細な機能説明、ワークフロー例、トラブルシューティング",
+            "audience": "メモリバンク利用者",
+            "location": "docs/user-guide/ディレクトリとWebView内ヘルプ"
+          }
+        ],
+        "formats": [
+          {
+            "name": "マークダウン",
+            "usage": "基本的な文書化",
+            "tools": "VS Codeマークダウンプレビュー"
+          },
+          {
+            "name": "インライン画像とスクリーンショット",
+            "usage": "視覚的な説明",
+            "tools": "LICEcap、Snagit"
+          },
+          {
+            "name": "アニメーションGIF",
+            "usage": "操作手順の視覚化",
+            "tools": "LICEcap、Peek"
+          },
+          {
+            "name": "インタラクティブチュートリアル",
+            "usage": "実践的な学習",
+            "tools": "カスタムWebView実装"
+          }
+        ]
+      },
+      "maintenance": {
+        "updateStrategy": {
+          "approach": "継続的なインクリメンタルアップデート",
+          "schedule": {
+            "bugFixes": "必要に応じて即時",
+            "minorFeatures": "1-2週間ごと",
+            "majorFeatures": "2-3ヶ月ごと"
+          }
+        },
+        "feedback": {
+          "channels": [
+            {
+              "name": "GitHubイシュー",
+              "purpose": "バグ報告と機能リクエスト",
+              "response": "24-48時間以内"
+            },
+            {
+              "name": "VS Code Marketplaceレビュー",
+              "purpose": "一般的なフィードバック",
+              "response": "週次チェック"
+            },
+            {
+              "name": "テレメトリ",
+              "purpose": "使用状況と問題の自動収集",
+              "implementation": "VS Code拡張のテレメトリAPI使用"
+            }
+          ],
+          "prioritization": {
+            "criteria": [
+              "影響を受けるユーザー数",
+              "問題の深刻度",
+              "実装の複雑さ"
+            ],
+            "process": "週次トリアージミーティング"
+          }
+        },
+        "endOfLifePolicy": {
+          "majorVersionSupport": "最新メジャーバージョンとその前のバージョンのみサポート",
+          "legacySupport": "重大なセキュリティ問題のみ対応",
+          "migrationPath": "バージョン間の移行ガイドを提供"
+        }
+      }
+    }
+  }
+}

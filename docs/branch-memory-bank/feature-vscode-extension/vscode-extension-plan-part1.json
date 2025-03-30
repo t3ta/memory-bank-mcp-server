@@ -1,0 +1,470 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "vscode-extension-plan-part1",
+    "title": "VS Code拡張の実装計画 (Part 1: 概要とアーキテクチャ)",
+    "documentType": "implementation_plan",
+    "path": "vscode-extension-plan-part1.json",
+    "tags": [
+      "vscode-extension",
+      "implementation-plan",
+      "memory-bank",
+      "editor-integration",
+      "part1"
+    ],
+    "lastModified": "2025-03-30T12:00:00.000Z",
+    "createdAt": "2025-03-30T12:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "title": "メモリバンクVS Code拡張の実装計画",
+      "description": "メモリバンクの内容を人間の開発者が容易に閲覧・編集できるVS Code拡張の実装計画。スキーマ検証とリアルタイムフィードバックを備えた統合エディタ環境を提供する。",
+      "goals": [
+        "メモリバンクのコンテンツをVS Code内でシームレスに閲覧・編集できるようにする",
+        "スキーマに基づいた検証とリアルタイムフィードバックを提供する",
+        "メモリバンクコンテンツの検索・フィルタリングを容易にする",
+        "ドキュメント間のリンク・参照関係を可視化する",
+        "ブランチ間のコンテンツ比較を可能にする"
+      ],
+      "targetUsers": [
+        "メモリバンクを使用する開発者",
+        "プロジェクト管理者",
+        "ドキュメント作成者"
+      ]
+    },
+    "architecture": {
+      "components": [
+        {
+          "name": "VSCodeExtension",
+          "description": "VS Code拡張のコアコンポーネント。拡張のライフサイクル管理とVS Codeとの連携を担当。",
+          "responsibilities": [
+            "拡張のアクティベーション・デアクティベーション",
+            "コマンド登録",
+            "UI表示",
+            "イベントハンドリング"
+          ],
+          "dependencies": [
+            "MemoryBankProvider",
+            "SchemaValidator"
+          ]
+        },
+        {
+          "name": "MemoryBankProvider",
+          "description": "メモリバンクとのインタラクションを担当するプロバイダー。ファイルシステムとの連携を行う。",
+          "responsibilities": [
+            "メモリバンクの読み取り",
+            "メモリバンクの更新",
+            "ブランチ間の差分比較",
+            "ドキュメント間の関係解析"
+          ],
+          "dependencies": [
+            "FileSystemService",
+            "MemoryBankRepository"
+          ]
+        },
+        {
+          "name": "SchemaValidator",
+          "description": "JSONスキーマに基づいたドキュメント検証を行うコンポーネント",
+          "responsibilities": [
+            "スキーマに基づく検証",
+            "エラー・警告の生成",
+            "自動補完候補の提供"
+          ],
+          "dependencies": [
+            "SchemaProvider"
+          ]
+        },
+        {
+          "name": "SchemaProvider",
+          "description": "メモリバンクのスキーマ定義を管理するプロバイダー。packages/schemasと連携。",
+          "responsibilities": [
+            "スキーマの読み込み",
+            "スキーマバージョン管理",
+            "スキーマ変換"
+          ]
+        },
+        {
+          "name": "MemoryBankExplorer",
+          "description": "メモリバンクのコンテンツをツリービューで表示するエクスプローラー",
+          "responsibilities": [
+            "ドキュメントツリーの構築",
+            "ナビゲーション機能",
+            "コンテキストメニュー",
+            "フィルタリング・検索"
+          ],
+          "dependencies": [
+            "MemoryBankProvider"
+          ]
+        },
+        {
+          "name": "DocumentEditor",
+          "description": "メモリバンクドキュメントを編集するためのカスタムエディタ",
+          "responsibilities": [
+            "JSONエディタの拡張",
+            "リアルタイム検証",
+            "自動補完",
+            "フォーマット"
+          ],
+          "dependencies": [
+            "SchemaValidator"
+          ]
+        },
+        {
+          "name": "BranchManager",
+          "description": "ブランチの管理とブランチ間の比較を行うコンポーネント",
+          "responsibilities": [
+            "ブランチの一覧表示",
+            "ブランチ間のコンテンツ比較",
+            "差分のビジュアライズ"
+          ],
+          "dependencies": [
+            "MemoryBankProvider"
+          ]
+        }
+      ],
+      "dataFlow": [
+        {
+          "source": "VSCodeExtension",
+          "target": "MemoryBankExplorer",
+          "description": "エクスプローラービューの初期化と表示"
+        },
+        {
+          "source": "MemoryBankExplorer",
+          "target": "MemoryBankProvider",
+          "description": "メモリバンクコンテンツの取得"
+        },
+        {
+          "source": "VSCodeExtension",
+          "target": "DocumentEditor",
+          "description": "ドキュメント編集リクエストの処理"
+        },
+        {
+          "source": "DocumentEditor",
+          "target": "SchemaValidator",
+          "description": "編集中のドキュメント検証"
+        },
+        {
+          "source": "SchemaValidator",
+          "target": "SchemaProvider",
+          "description": "スキーマ定義の取得"
+        },
+        {
+          "source": "DocumentEditor",
+          "target": "MemoryBankProvider",
+          "description": "更新されたドキュメントの保存"
+        },
+        {
+          "source": "VSCodeExtension",
+          "target": "BranchManager",
+          "description": "ブランチ管理操作の処理"
+        },
+        {
+          "source": "BranchManager",
+          "target": "MemoryBankProvider",
+          "description": "ブランチ間の差分情報の取得"
+        }
+      ]
+    },
+    "technologySelection": {
+      "core": [
+        {
+          "name": "TypeScript",
+          "version": "^5.0.0",
+          "purpose": "メイン開発言語。型安全性と最新のECMAScript機能を活用",
+          "benefits": [
+            "VS Code拡張のデファクトスタンダード",
+            "型安全性による開発効率向上",
+            "packages/schemasとの親和性"
+          ]
+        },
+        {
+          "name": "VS Code Extension API",
+          "version": "最新",
+          "purpose": "VS Codeとの統合インターフェース",
+          "benefits": [
+            "豊富なUIコンポーネント",
+            "拡張ライフサイクル管理",
+            "イベントハンドリング"
+          ]
+        }
+      ],
+      "ui": [
+        {
+          "name": "VS Code WebView API",
+          "purpose": "リッチなカスタムUIの提供",
+          "useCases": [
+            "フォームベースのエディタ",
+            "ドキュメント関連性グラフ",
+            "差分ビジュアライザー"
+          ]
+        },
+        {
+          "name": "React",
+          "version": "^18.2.0",
+          "purpose": "WebViewベースのUIコンポーネント開発",
+          "benefits": [
+            "コンポーネントベースの開発",
+            "状態管理の容易さ",
+            "再利用可能なUI要素"
+          ]
+        }
+      ],
+      "validation": [
+        {
+          "name": "Zod",
+          "version": "^3.22.0",
+          "purpose": "JSONスキーマ検証と型生成",
+          "benefits": [
+            "packages/schemasとの相互運用性",
+            "エラーメッセージのカスタマイズ",
+            "TypeScript型との統合"
+          ]
+        },
+        {
+          "name": "JSONSchema",
+          "purpose": "スタンダードなJSON検証",
+          "benefits": [
+            "標準規格への準拠",
+            "VS Code JSONエディタとの統合"
+          ]
+        }
+      ],
+      "utilities": [
+        {
+          "name": "jsondiffpatch",
+          "version": "^0.4.1",
+          "purpose": "JSONドキュメントの差分検出と可視化",
+          "benefits": [
+            "高度な差分検出アルゴリズム",
+            "可視化オプション"
+          ]
+        },
+        {
+          "name": "D3.js",
+          "version": "^7.8.5",
+          "purpose": "データ可視化とグラフ描画",
+          "benefits": [
+            "ドキュメント関連性グラフの描画",
+            "高度なカスタマイズ性"
+          ]
+        },
+        {
+          "name": "Monaco Editor",
+          "purpose": "高度なコードエディタコンポーネント",
+          "benefits": [
+            "VS Codeと同じエディタエンジン",
+            "シンタックスハイライトとフォーマット",
+            "自動補完とエラー表示"
+          ]
+        }
+      ]
+    },
+    "projectStructure": {
+      "directory": "/packages/vscode-extension",
+      "files": [
+        {
+          "path": "package.json",
+          "description": "拡張機能のメタデータ、依存関係、VS Code拡張ポイント"
+        },
+        {
+          "path": "tsconfig.json",
+          "description": "TypeScriptコンパイラ設定"
+        },
+        {
+          "path": "README.md",
+          "description": "拡張機能の説明とユーザーガイド"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "description": "バージョン履歴と変更点"
+        },
+        {
+          "path": "src/extension.ts",
+          "description": "拡張機能のエントリーポイント"
+        },
+        {
+          "path": "src/providers/memoryBankProvider.ts",
+          "description": "メモリバンクプロバイダーの実装"
+        },
+        {
+          "path": "src/providers/schemaProvider.ts",
+          "description": "スキーマプロバイダーの実装"
+        },
+        {
+          "path": "src/validators/schemaValidator.ts",
+          "description": "スキーマ検証機能の実装"
+        },
+        {
+          "path": "src/explorer/memoryBankExplorer.ts",
+          "description": "メモリバンクエクスプローラーの実装"
+        },
+        {
+          "path": "src/editors/documentEditor.ts",
+          "description": "ドキュメントエディタの実装"
+        },
+        {
+          "path": "src/managers/branchManager.ts",
+          "description": "ブランチ管理機能の実装"
+        },
+        {
+          "path": "src/webviews/formEditor/index.tsx",
+          "description": "フォームベースエディタのReactコンポーネント"
+        },
+        {
+          "path": "src/webviews/relationGraph/index.tsx",
+          "description": "関連性グラフのReactコンポーネント"
+        },
+        {
+          "path": "src/utils/index.ts",
+          "description": "共通ユーティリティ関数"
+        },
+        {
+          "path": "src/types/index.ts",
+          "description": "共通型定義"
+        },
+        {
+          "path": "src/constants/index.ts",
+          "description": "定数定義"
+        },
+        {
+          "path": "media/icons",
+          "description": "拡張機能で使用するアイコン"
+        },
+        {
+          "path": "tests",
+          "description": "テストファイル"
+        }
+      ],
+      "rootConfigChanges": [
+        {
+          "file": "/package.json",
+          "changes": "workspaceにvscode-extensionを追加",
+          "example": "\"workspaces\": [\"packages/*\", \"packages/vscode-extension\"]"
+        },
+        {
+          "file": "/tsconfig.json",
+          "changes": "vscode-extensionディレクトリをincludeに追加",
+          "example": "\"include\": [\"packages/**/*\", \"packages/vscode-extension/**/*\"]"
+        }
+      ]
+    },
+    "extensionManifest": {
+      "name": "memory-bank-editor",
+      "displayName": "Memory Bank Editor",
+      "description": "メモリバンクを編集・閲覧するためのVS Code拡張",
+      "version": "0.1.0",
+      "engines": {
+        "vscode": "^1.77.0"
+      },
+      "activationEvents": [
+        "onStartupFinished"
+      ],
+      "main": "./dist/extension.js",
+      "contributes": {
+        "viewsContainers": {
+          "activitybar": [
+            {
+              "id": "memory-bank-explorer",
+              "title": "Memory Bank",
+              "icon": "media/icons/memory-bank.svg"
+            }
+          ]
+        },
+        "views": {
+          "memory-bank-explorer": [
+            {
+              "id": "memoryBankDocuments",
+              "name": "Documents"
+            },
+            {
+              "id": "memoryBankBranches",
+              "name": "Branches"
+            }
+          ]
+        },
+        "commands": [
+          {
+            "command": "memoryBank.refreshExplorer",
+            "title": "Refresh Memory Bank Explorer"
+          },
+          {
+            "command": "memoryBank.createDocument",
+            "title": "Create New Document"
+          },
+          {
+            "command": "memoryBank.openDocument",
+            "title": "Open Document"
+          },
+          {
+            "command": "memoryBank.compareDocuments",
+            "title": "Compare Documents"
+          },
+          {
+            "command": "memoryBank.compareBranches",
+            "title": "Compare Branches"
+          },
+          {
+            "command": "memoryBank.viewRelationships",
+            "title": "View Document Relationships"
+          }
+        ],
+        "menus": {
+          "view/title": [
+            {
+              "command": "memoryBank.refreshExplorer",
+              "when": "view == memoryBankDocuments",
+              "group": "navigation"
+            },
+            {
+              "command": "memoryBank.createDocument",
+              "when": "view == memoryBankDocuments",
+              "group": "navigation"
+            }
+          ],
+          "view/item/context": [
+            {
+              "command": "memoryBank.openDocument",
+              "when": "viewItem == memoryBankDocument",
+              "group": "inline"
+            }
+          ]
+        },
+        "customEditors": [
+          {
+            "viewType": "memoryBank.documentEditor",
+            "displayName": "Memory Bank Document Editor",
+            "selector": [
+              {
+                "filenamePattern": "*.json"
+              }
+            ],
+            "priority": "default"
+          }
+        ]
+      },
+      "scripts": {
+        "vscode:prepublish": "npm run build",
+        "build": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "test": "jest"
+      },
+      "dependencies": {
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "zod": "^3.22.0",
+        "jsondiffpatch": "^0.4.1",
+        "d3": "^7.8.5"
+      },
+      "devDependencies": {
+        "@types/vscode": "^1.77.0",
+        "@types/react": "^18.2.0",
+        "@types/react-dom": "^18.2.0",
+        "@types/node": "^18.15.0",
+        "typescript": "^5.0.0",
+        "jest": "^29.5.0",
+        "ts-jest": "^29.1.0"
+      }
+    }
+  }
+}

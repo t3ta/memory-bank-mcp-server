@@ -1,0 +1,70 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "sample-system-patterns-001",
+    "title": "Sample System Patterns",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "sample",
+      "system-patterns",
+      "vscode-extension"
+    ],
+    "lastModified": "2025-03-30T19:03:30.000Z",
+    "createdAt": "2025-03-30T19:03:30.000Z",
+    "version": 1
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "tech-decision-1",
+        "title": "Markdown Rendering Approach",
+        "context": "Need to display JSON content as readable Markdown in WebView.",
+        "decision": "Use markdown-it library on the extension side to convert JSON-derived Markdown to HTML. Send HTML to WebView for display.",
+        "status": "accepted",
+        "date": "2025-03-30",
+        "consequences": {
+          "positive": [
+            "Avoids bundling markdown-it into WebView.",
+            "Keeps WebView logic simpler."
+          ],
+          "negative": [
+            "Requires message passing for updates.",
+            "Extension handles rendering load."
+          ]
+        },
+        "alternatives": [
+          "Render Markdown directly in WebView using React component."
+        ]
+      },
+      {
+        "id": "tech-decision-2",
+        "title": "Mermaid Integration",
+        "context": "Requirement to render Mermaid diagrams defined in Markdown.",
+        "decision": "Use markdown-it-mermaid plugin on extension side to generate `<div class='mermaid'>` tags. Load Mermaid.js library via CDN in WebView and call mermaid.run() on those divs.",
+        "status": "accepted",
+        "date": "2025-03-30",
+        "consequences": {
+          "positive": [
+            "Leverages existing libraries.",
+            "Relatively simple integration."
+          ],
+          "negative": [
+            "Dependent on CDN availability.",
+            "Potential timing issues with mermaid.run()."
+          ]
+        },
+        "alternatives": [
+          "Server-side Mermaid rendering (more complex)."
+        ]
+      }
+    ],
+    "implementationPatterns": [
+      {
+        "id": "pattern-1",
+        "name": "Type-Specific Renderers",
+        "description": "Create separate functions (e.g., renderProgressContent) within DocumentEditorProvider to handle Markdown generation for specific document types."
+      }
+    ]
+  }
+}

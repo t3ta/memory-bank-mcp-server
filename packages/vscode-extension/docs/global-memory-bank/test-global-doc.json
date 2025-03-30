@@ -1,0 +1,35 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "test-global-doc-001",
+    "title": "Test Global Document",
+    "documentType": "core",
+    "path": "test-global-doc.json",
+    "tags": [
+      "test",
+      "global",
+      "vscode-extension",
+      "core",
+      "mermaid"
+    ],
+    "lastModified": "2025-03-30T17:18:00.000Z",
+    "createdAt": "2025-03-30T16:56:00.000Z",
+    "version": 3
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "Purpose",
+        "content": "This document serves as a test case for the custom editor within the global memory bank context."
+      },
+      {
+        "title": "Sample Data",
+        "content": "Includes various data types:\n- String: 'Example'\n- Number: 123\n- Boolean: true\n- Array: [1, 2, 3]\n- Object: { key: 'value' }"
+      },
+      {
+        "title": "Sample Mermaid Diagram",
+        "content": "This section includes a Mermaid diagram definition. The preview should render this as a flowchart.\n\n```mermaid\ngraph TD;\n    A[Start] --> B(Process 1);\n    B --> C{Decision};\n    C -->|Yes| D[End];\n    C -->|No| E[Process 2];\n    E --> D;\n```"
+      }
+    ]
+  }
+}
