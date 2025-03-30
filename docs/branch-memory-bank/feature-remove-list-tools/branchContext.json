@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "2e05b154-300d-4649-85c2-eb5e7ef4babc",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-30T05:15:19.559Z",
+    "createdAt": "2025-03-30T05:15:19.559Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "feature/remove-list-tools",
+    "purpose": "このブランチの目的を記述してください",
+    "createdAt": "2025-03-30T05:15:19.559Z",
+    "userStories": [
+      {
+        "id": "bbc88db5-1182-4647-bff9-34de9f94c05d",
+        "description": "解決する課題1",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "b0281957-1c61-436e-86dc-0624165ea649",
+        "description": "解決する課題2",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "765b5bc4-3118-41fd-9253-65876a2220d0",
+        "description": "解決する課題3",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": ""
+  }
+}

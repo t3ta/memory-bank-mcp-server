@@ -8,14 +8,6 @@ import type { CliOptions } from '@/infrastructure/config/WorkspaceConfig.js';
 // Simulated tool definitions
 const AVAILABLE_TOOLS = [
   {
-    name: 'list_tools',
-    description: 'List all available tools',
-    parameters: {
-      type: 'object',
-      properties: {}
-    }
-  },
-  {
     name: 'read_branch_memory_bank',
     description: 'Read a document from the current branch\'s memory bank',
     parameters: {
@@ -142,17 +134,6 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
     logger.debug('Parsed params:', params);
 
     switch (name) {
-      case 'list_tools': {
-        return {
-          content: [
-            {
-              type: 'text',
-              text: JSON.stringify(AVAILABLE_TOOLS, null, 2),
-            },
-          ],
-        };
-      }
-
       case 'write_branch_memory_bank': {
         const path = params.path as string;
         const content = params.content as string | undefined;

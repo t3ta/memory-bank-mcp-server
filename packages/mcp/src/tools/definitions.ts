@@ -55,27 +55,12 @@ export function createGlobalProperties() {
  */
 export function getToolDefinitions(): ToolDefinition[] {
   return [
-    createListToolsTool(),
     createWriteBranchMemoryBankTool(),
     createReadBranchMemoryBankTool(),
     createWriteGlobalMemoryBankTool(),
     createReadGlobalMemoryBankTool(),
     createReadContextTool()
   ];
-}
-
-/**
- * Definition for the list_tools tool
- */
-function createListToolsTool(): ToolDefinition {
-  return {
-    name: 'list_tools',
-    description: 'List all available tools',
-    inputSchema: {
-      type: 'object',
-      properties: {},
-    },
-  };
 }
 
 /**
