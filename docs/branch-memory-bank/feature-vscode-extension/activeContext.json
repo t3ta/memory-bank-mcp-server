@@ -9,13 +9,18 @@
       "active-context",
       "vscode-extension"
     ],
-    "lastModified": "2025-03-30T14:31:43.000Z",
+    "lastModified": "2025-03-30T16:10:58.000Z",
     "createdAt": "2025-03-30T05:25:42.076Z",
     "version": 2
   },
   "content": {
     "currentWork": "VS Code拡張機能（メモリバンク編集機能＋AI連携による重複情報整理機能）の初期計画と設計",
     "recentChanges": [
+      {
+        "id": "change-4",
+        "description": "package.jsonの依存関係問題とactivationEventsの問題を解決。markdown-it、markdown-it-mermaid、mermaidパッケージを追加完了",
+        "date": "2025-03-30T16:10:00.000Z"
+      },
       {
         "id": "change-1",
         "description": "AI関連機能の優先度を下げ、基本機能と既知の問題修正を優先",
@@ -60,6 +65,10 @@
       {
         "id": "decision-editor-2",
         "description": "markdown-it + mermaidを使用したレンダリング実装 (editor-markdown-view.json)"
+      },
+      {
+        "id": "decision-editor-3",
+        "description": "新規ファイルの作成は避け、既存ファイルに機能を追加する形で実装する"
       }
     ],
     "considerations": [
@@ -92,7 +101,7 @@
     "nextSteps": [
       {
         "id": "next-step-md-1",
-        "description": "エディタのMarkdownプレビュー機能の実装 (editor-markdown-view)",
+        "description": "エディタのMarkdownプレビュー機能の実装 (editor-markdown-view) - document-markdown-converter.tsモジュールの実装が最優先課題",
         "priority": "high"
       },
       {

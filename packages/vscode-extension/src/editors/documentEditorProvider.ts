@@ -1,5 +1,13 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import MarkdownIt from 'markdown-it'; // Import markdown-it
+
+// Initialize markdown-it instance for the provider
+const md = new MarkdownIt({
+  html: true,
+  linkify: true,
+  typographer: true,
+});
 
 /**
  * Provider for the Memory Bank Document custom editor.
@@ -23,7 +31,7 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
     return providerRegistration;
   }
 
-  constructor(private readonly context: vscode.ExtensionContext) {}
+  constructor(private readonly context: vscode.ExtensionContext) { }
 
   /**
    * Called when a custom editor is opened for the given document.
@@ -34,7 +42,7 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
     webviewPanel: vscode.WebviewPanel,
     _token: vscode.CancellationToken
   ): Promise<void> {
-    console.log(`Resolving custom editor for: ${document.uri.fsPath}`);
+    console.log(`[Provider] resolveCustomTextEditor started for: ${document.uri.fsPath}`); // Log start
 
     // Setup initial content for the webview
     webviewPanel.webview.options = {
@@ -42,52 +50,43 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
       localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, 'media')]
     };
     webviewPanel.webview.html = this.getHtmlForWebview(webviewPanel.webview, document);
+    console.log(`[Provider] Webview HTML set for: ${document.uri.fsPath}`); // Log HTML set
 
-    let isWebViewReady = false; // Flag to track if webview is ready
-    let pendingExternalUpdate: string | null = null; // Store external updates if webview isn't ready
-
-    // Handle messages from the webview (React App)
+    // Handle messages from the webview (inline script)
     webviewPanel.webview.onDidReceiveMessage(e => {
       switch (e.type) {
-        case 'ready': // Webview signals it's ready to receive content
-          console.log(`Webview ready for ${document.uri.fsPath}`);
-          isWebViewReady = true;
-          // Send initial content or any pending external update
-          const initialContent = pendingExternalUpdate ?? document.getText();
-          webviewPanel.webview.postMessage({ type: 'updateContent', text: initialContent });
-          pendingExternalUpdate = null; // Clear pending update
-          return;
-        case 'update': // Webview sends updated content
+        case 'update': // Message from the simple textarea input listener
           console.log(`Received update from webview for ${document.uri.fsPath}`);
-          // Prevent updates if the content hasn't actually changed
-          if (document.getText() !== e.text) {
-            this._updateTextDocument(document, e.text);
-          }
+          // Update the document first
+          this._updateTextDocument(document, e.payload);
+          // Then trigger preview update based on the new document content
+          this.updatePreview(document, webviewPanel);
           return;
-        case 'error': // Webview reports an error
-            console.error(`Error message from webview: ${e.message}`);
-            vscode.window.showErrorMessage(`Webview error: ${e.message}`);
-            return;
-        // Add other message types as needed (e.g., for theme changes)
+        case 'requestPreview': // Webview requests initial preview
+          console.log(`[Provider] Received 'requestPreview' from webview for ${document.uri.fsPath}`); // Log message reception
+          this.updatePreview(document, webviewPanel);
+          return;
+        case 'error': // Message for reporting errors (e.g., JSON parse error from webview)
+          console.error(`Error message from webview: ${e.payload}`);
+          // Log the error, maybe show a status bar message
+          return;
       }
     }, null, this.context.subscriptions); // Ensure disposal
+    console.log(`[Provider] onDidReceiveMessage listener set for: ${document.uri.fsPath}`); // Log listener set
 
-    // Update webview when the document changes outside the editor
+    // Update webview editor and preview when the document changes outside the editor
     const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument(e => {
       if (e.document.uri.toString() === document.uri.toString()) {
-        // Check if the webview panel is still valid and ready
         if (webviewPanel.visible) {
-          const newText = document.getText();
-          if (isWebViewReady) {
-            console.log(`Document changed externally, updating webview for ${document.uri.fsPath}`);
-            webviewPanel.webview.postMessage({ type: 'updateContent', text: newText });
-          } else {
-            console.log(`Document changed externally, but webview not ready. Storing update for ${document.uri.fsPath}`);
-            pendingExternalUpdate = newText; // Store the update if webview isn't ready yet
-          }
+          console.log(`Document changed externally, updating webview editor and preview for ${document.uri.fsPath}`);
+          // Update the editor content in the webview
+          webviewPanel.webview.postMessage({ type: 'update', text: document.getText() });
+          // Update the preview content
+          this.updatePreview(document, webviewPanel);
         }
       }
     });
+    console.log(`[Provider] onDidChangeTextDocument listener set for: ${document.uri.fsPath}`); // Log listener set
 
     // Clean up subscription on dispose
     webviewPanel.onDidDispose(() => {
@@ -95,7 +94,8 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
       changeDocumentSubscription.dispose();
     });
 
-    // Note: Initial content push is now handled by the 'ready' message from the webview
+    // Initial content push for editor is handled by the HTML itself.
+    // Initial preview push is handled by the 'requestPreview' message from the webview.
   }
 
   /**
@@ -103,42 +103,194 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
    */
   private getHtmlForWebview(webview: vscode.Webview, document: vscode.TextDocument): string {
     const nonce = getNonce();
+    const documentContent = document.getText() || '{}';
 
-    // Get URIs for required resources
-    const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'dist', 'webviews', 'editor.js'));
-    const stylesUri = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'media', 'editor.css')); // Keep existing CSS or add new one for React app
+    // Basic styles
+    const stylesUri = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'media', 'editor.css'));
 
-    // IMPORTANT: You need a build process (e.g., webpack, esbuild) to bundle
-    // your React app (src/webviews/editor/index.tsx) into dist/webviews/editor.js
-
+    // Reverted to simple textarea and inline script
     return `<!DOCTYPE html>
       <html lang="en">
       <head>
         <meta charset="UTF-8">
-        <meta http-equiv="Content-Security-Policy" content="
-          default-src 'none';
-          style-src ${webview.cspSource} 'unsafe-inline';
-          font-src ${webview.cspSource};
-          img-src ${webview.cspSource} https: data:;
-          script-src 'nonce-${nonce}';
-        ">
+        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; font-src ${webview.cspSource}; img-src ${webview.cspSource} https: data:; script-src 'nonce-${nonce}';">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="${stylesUri}" rel="stylesheet">
         <title>Memory Bank Editor</title>
+        <style>
+          /* Basic layout for side-by-side view */
+          body { display: flex; height: 100vh; margin: 0; padding: 0; overflow: hidden; }
+          .panel { flex: 1; padding: 10px; overflow-y: auto; height: 100%; box-sizing: border-box; }
+          #editor-panel { border-right: 1px solid var(--vscode-editorWidget-border, #ccc); }
+          #preview-panel { }
+          textarea.editor-area { width: 100%; height: 95%; border: 1px solid var(--vscode-input-border, #ccc); font-family: var(--vscode-editor-font-family, monospace); resize: none; }
+          .error-message { color: var(--vscode-errorForeground, red); margin-top: 5px; }
+          /* Add styles for markdown preview if needed */
+          .markdown-body h1, .markdown-body h2 { border-bottom: 1px solid var(--vscode-editorWidget-border, #eee); padding-bottom: 0.3em; }
+          .markdown-body code { background-color: var(--vscode-textCodeBlock-background, rgba(0,0,0,0.05)); padding: 0.2em 0.4em; border-radius: 3px; }
+          .markdown-body pre > code { padding: 0; }
+          .markdown-body pre { background-color: var(--vscode-textCodeBlock-background, rgba(0,0,0,0.05)); padding: 10px; border-radius: 3px; overflow-x: auto; }
+        </style>
       </head>
       <body>
-        <div id="root"></div> <!-- React app mounts here -->
+        <div id="editor-panel" class="panel">
+          <h2>Editor</h2>
+          <textarea id="editor" class="editor-area" nonce="${nonce}">${escapeHtml(documentContent)}</textarea>
+          <div id="error-message" class="error-message"></div>
+        </div>
+        <div id="preview-panel" class="panel">
+           <h2>Preview</h2>
+           <div id="preview-content" class="markdown-body"></div>
+        </div>
 
         <script nonce="${nonce}">
-          // Pass VS Code API to the webview
-          const vscode = acquireVsCodeApi();
-          // Pass initial state or other config if needed (optional)
-          // const initialState = ${JSON.stringify({ content: document.getText() })};
-          // window.initialState = initialState;
+          (function() {
+            const vscode = acquireVsCodeApi();
+            const editor = document.getElementById('editor');
+            const previewContentDiv = document.getElementById('preview-content');
+            const errorMessageDiv = document.getElementById('error-message');
+            let lastKnownText = editor.value;
+
+            // Handle messages from the extension
+            window.addEventListener('message', event => {
+              const message = event.data;
+              switch (message.type) {
+                case 'update': // Update editor content
+                  const newText = message.text;
+                  if (newText !== lastKnownText) {
+                    console.log("Webview received editor update from extension.");
+                    editor.value = newText;
+                    lastKnownText = newText;
+                    errorMessageDiv.textContent = '';
+                  }
+                  break;
+                case 'updatePreview': // Update preview content
+                  console.log("[Webview] Received 'updatePreview' from extension."); // Log message reception
+                  if (message.html !== undefined) {
+                    previewContentDiv.innerHTML = message.html; // Set rendered HTML
+                    console.log("[Webview] Preview HTML updated (length: " + message.html.length + ")"); // Log HTML update
+                  } else {
+                    console.error("[Webview] Received 'updatePreview' message without html content.");
+                  }
+                  break;
+                }
+            });
+
+            // Inform the extension host about changes in the textarea
+            editor.addEventListener('input', (e) => {
+              const newText = e.target.value;
+              lastKnownText = newText;
+              errorMessageDiv.textContent = '';
+
+              // Basic JSON validation
+              try {
+                  JSON.parse(newText);
+                  // Send update to extension host for processing and preview generation
+                  vscode.postMessage({ type: 'update', payload: newText });
+              } catch (err) {
+                  errorMessageDiv.textContent = 'Invalid JSON: ' + err.message;
+                  // Still send update so extension is aware of invalid state
+                  vscode.postMessage({ type: 'update', payload: newText });
+              }
+            });
+
+            console.log("[Webview] Script loaded and listeners attached."); // Updated log message
+            // Request initial preview
+            console.log("[Webview] Sending 'requestPreview' message to extension."); // Log message sending
+            vscode.postMessage({ type: 'requestPreview', payload: lastKnownText });
+
+          }());
         </script>
-        <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
       </body>
       </html>`;
+  }
+
+  /**
+   * Converts document content to Markdown and sends the rendered HTML to the webview.
+   */
+  private updatePreview(document: vscode.TextDocument, webviewPanel: vscode.WebviewPanel): void {
+    console.log(`[Provider] updatePreview called for ${document.uri.fsPath}`); // Log entry
+    const jsonString = document.getText();
+    let markdown = '';
+    let parsedData: any;
+
+    try {
+      parsedData = JSON.parse(jsonString);
+      // Basic Markdown generation based on parsed content
+      markdown = this.generateMarkdownFromData(parsedData);
+
+    } catch (error) {
+      // If JSON is invalid, show error in Markdown preview
+      markdown = `## JSON Parse Error\n\n\`\`\`error\n${error}\n\`\`\`\n\n### Raw Content:\n\`\`\`json\n${jsonString}\n\`\`\``;
+      parsedData = null; // Ensure parsedData is null on error
+    }
+
+    const html = md.render(markdown);
+    console.log(`[Provider] Generated HTML (length: ${html.length}):\n`, html.substring(0, 200) + '...'); // Log generated HTML (truncated)
+    webviewPanel.webview.postMessage({ type: 'updatePreview', html: html });
+    console.log(`[Provider] Sent 'updatePreview' message to webview.`); // Log message sending
+  }
+
+  /**
+   * Generates a basic Markdown string from parsed JSON data, focusing on common patterns.
+   * TODO: Enhance this based on specific document types and schema v2 structure.
+   */
+  private generateMarkdownFromData(data: any): string {
+    if (!data || typeof data !== 'object') {
+      return '```json\n' + JSON.stringify(data, null, 2) + '\n```';
+    }
+
+    let mdString = '';
+
+    // Handle metadata display (optional, could be a header)
+    if (data.metadata && typeof data.metadata === 'object') {
+      mdString += `# ${data.metadata.title || 'Document'}\n\n`;
+      mdString += `**ID:** ${data.metadata.id || 'N/A'}  \n`;
+      mdString += `**Type:** ${data.metadata.documentType || 'N/A'}  \n`;
+      mdString += `**Path:** ${data.metadata.path || 'N/A'}  \n`;
+      if (data.metadata.tags && Array.isArray(data.metadata.tags)) {
+        mdString += `**Tags:** ${data.metadata.tags.map((tag: string) => `\`${tag}\``).join(', ')}  \n`;
+      }
+      mdString += `**Version:** ${data.metadata.version || 'N/A'}  \n`;
+      mdString += `**Last Modified:** ${data.metadata.lastModified || 'N/A'}  \n`;
+      mdString += `**Created At:** ${data.metadata.createdAt || 'N/A'}  \n\n`;
+      mdString += '---\n\n'; // Separator
+    }
+
+    // Handle content - prioritize 'sections' array if it exists (common pattern)
+    if (data.content && typeof data.content === 'object') {
+      if (Array.isArray(data.content.sections)) {
+        data.content.sections.forEach((section: any) => {
+          if (section && typeof section === 'object' && section.title && section.content) {
+            mdString += `## ${section.title}\n\n${section.content}\n\n`;
+          }
+        });
+      } else {
+        // Fallback: Iterate through content keys for simple display
+        mdString += `## Content\n\n`;
+        for (const key in data.content) {
+          if (Object.prototype.hasOwnProperty.call(data.content, key)) {
+            const value = data.content[key];
+            mdString += `### ${key}\n\n`;
+            if (typeof value === 'string') {
+              mdString += `${value}\n\n`;
+            } else if (Array.isArray(value)) {
+              mdString += value.map(item => `- ${JSON.stringify(item)}`).join('\n') + '\n\n';
+            } else if (typeof value === 'object' && value !== null) {
+              mdString += '```json\n' + JSON.stringify(value, null, 2) + '\n```\n\n';
+            } else {
+              mdString += `${String(value)}\n\n`;
+            }
+          }
+        }
+      }
+    } else {
+      // If no content object, just stringify the whole thing
+      mdString += '```json\n' + JSON.stringify(data, null, 2) + '\n```';
+    }
+
+
+    return mdString;
   }
 
   /**
@@ -155,17 +307,17 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
       jsonString
     );
     vscode.workspace.applyEdit(edit).then(success => {
-        if (!success) {
-            console.error(`Failed to apply edit to ${document.uri.fsPath}`);
-            vscode.window.showErrorMessage(`Failed to save changes to ${path.basename(document.uri.fsPath)}.`);
-        } else {
-            // Optionally trigger save after applying edit, though VS Code's autosave might handle it
-            // document.save();
-            console.log(`Successfully applied edit to ${document.uri.fsPath}`);
-        }
+      if (!success) {
+        console.error(`Failed to apply edit to ${document.uri.fsPath}`);
+        vscode.window.showErrorMessage(`Failed to save changes to ${path.basename(document.uri.fsPath)}.`);
+      } else {
+        // Optionally trigger save after applying edit, though VS Code's autosave might handle it
+        // document.save();
+        console.log(`Successfully applied edit to ${document.uri.fsPath}`);
+      }
     }, failureReason => {
-         console.error(`Error applying edit to ${document.uri.fsPath}:`, failureReason);
-         vscode.window.showErrorMessage(`Error saving changes to ${path.basename(document.uri.fsPath)}.`);
+      console.error(`Error applying edit to ${document.uri.fsPath}:`, failureReason);
+      vscode.window.showErrorMessage(`Error saving changes to ${path.basename(document.uri.fsPath)}.`);
     });
   }
 }
@@ -182,10 +334,10 @@ function getNonce() {
 
 // Utility function to escape HTML characters in text content
 function escapeHtml(unsafe: string): string {
-    return unsafe
-         .replace(/&/g, "&amp;")
-         .replace(/</g, "&lt;") // Correctly replace less than
-         .replace(/>/g, "&gt;") // Correctly replace greater than
-         .replace(/"/g, "&quot;") // Correctly replace double quote
-         .replace(/'/g, "&#039;"); // Keep single quote replacement
- }
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;") // Correctly replace less than
+    .replace(/>/g, "&gt;") // Correctly replace greater than
+    .replace(/"/g, "&quot;") // Correctly replace double quote
+    .replace(/'/g, "&#039;"); // Keep single quote replacement
+}

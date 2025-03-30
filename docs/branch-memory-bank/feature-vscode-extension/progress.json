@@ -9,7 +9,7 @@
       "progress",
       "vscode-extension"
     ],
-    "lastModified": "2025-03-30T14:31:58.000Z",
+    "lastModified": "2025-03-30T16:10:58.000Z",
     "createdAt": "2025-03-30T05:25:42.077Z",
     "version": 2
   },
@@ -74,18 +74,18 @@
       },
       {
         "id": "feature-editor-markdown",
-        "description": "JSONをMarkdown形式で表示するエディタ機能",
+        "description": "JSONをMarkdown形式で表示するエディタ機能 (基本レイアウト実装済、変換ロジック実装中)",
         "priority": "high"
       }
     ],
-    "status": "基本機能（エクスプローラー、エディタ）とAI連携の初期実装完了。史上最優先案件としてMarkdownプレビュー機能を実装予定。package.jsonの問題や依存関係の問題解決が当面の課題。",
-    "completionPercentage": 25,
+    "status": "基本機能（エクスプローラー、エディタ）とAI連携の初期実装完了。package.jsonの依存関係問題は解決し、activationEventsも修正完了。markdown-it、markdown-it-mermaid、mermaidパッケージを追加し、Markdownプレビュー機能の実装準備完了。",
+    "completionPercentage": 30,
     "knownIssues": [
       {
         "id": "issue-1",
         "description": "アクティベーションイベントが「onView:memoryBankDocuments」のみ指定されているため、拡張機能の自動起動が機能していない",
-        "status": "open",
-        "solution": "package.jsonのactivationEventsに「onStartupFinished」を追加する"
+        "status": "resolved",
+        "solution": "✅ package.jsonのactivationEventsに「onStartupFinished」を追加した"
       },
       {
         "id": "issue-2",
@@ -96,8 +96,8 @@
       {
         "id": "issue-3",
         "description": "workspaceの依存関係でエラーが発生（@memory-bank/schemasの参照問題）",
-        "status": "open",
-        "solution": "モノレポ設定の見直しとworkspace依存関係の修正"
+        "status": "resolved",
+        "solution": "✅ workspace:1.0.0から1.0.0への変更で依存関係を修正完了"
       }
     ]
   }
