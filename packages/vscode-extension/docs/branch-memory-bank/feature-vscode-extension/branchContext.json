@@ -1,0 +1,38 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "sample-branch-context-001",
+    "title": "Sample Branch Context",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": ["sample", "branch-context", "vscode-extension"],
+    "lastModified": "2025-03-30T19:03:00.000Z",
+    "createdAt": "2025-03-30T19:03:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "feature/vscode-extension-preview-renderers",
+    "purpose": "Implement document type specific renderers for the Markdown preview.",
+    "userStories": [
+      {
+        "id": "US-001",
+        "description": "As a user, I want to see progress documents rendered with status, completion, and task lists.",
+        "completed": true,
+        "priority": 1
+      },
+      {
+        "id": "US-002",
+        "description": "As a user, I want to see active context documents rendered with current work, changes, decisions, etc.",
+        "completed": true,
+        "priority": 1
+      },
+      {
+        "id": "US-003",
+        "description": "As a user, I want to see branch context documents rendered with purpose and user stories.",
+        "completed": false,
+        "priority": 2
+      }
+    ],
+    "additionalNotes": "Focusing on clear and concise presentation for each document type."
+  }
+}
