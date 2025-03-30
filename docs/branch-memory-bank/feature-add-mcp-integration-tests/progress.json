@@ -1,0 +1,85 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "94dff624-84ef-41ce-9007-a9c040325bc3",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress"
+    ],
+    "lastModified": "2025-03-30T16:00:00.000Z",
+    "createdAt": "2025-03-30T12:15:01.578Z",
+    "version": 2
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "fe7da459-52b7-4901-986e-d4a7a5525007",
+        "description": "統合テスト計画の策定",
+        "implementedAt": "2025-03-30T16:00:00.000Z"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "be8dc9d-e3b6-4110-806a-b202c746fd7d",
+        "description": "統合テスト用ディレクトリ構造とsetup.tsの作成",
+        "priority": "high"
+      },
+      {
+        "id": "58f9d2eb-3a5d-4934-adbd-bf906961b3a7",
+        "description": "テスト環境管理ヘルパーの実装",
+        "priority": "high"
+      },
+      {
+        "id": "c8e7d6b5-a4f3-2e1d-0c9b-8a7b6c5d4e3f",
+        "description": "テストファクスチャの準備",
+        "priority": "high"
+      },
+      {
+        "id": "2a1fc33d-3904-49be-abf0-a196782dda37",
+        "description": "ContextController統合テストの実装",
+        "priority": "medium"
+      },
+      {
+        "id": "f5e4d3c2-b1a0-9f8e-7d6c-5b4a3c2d1e0f",
+        "description": "GlobalController統合テストの実装",
+        "priority": "medium"
+      },
+      {
+        "id": "0a1b2c3d-4e5f-6g7h-8i9j-0k1l2m3n4o5p",
+        "description": "BranchController統合テストの実装",
+        "priority": "medium"
+      },
+      {
+        "id": "a9b8c7d6-e5f4-g3h2-i1j0-k9l8m7n6o5p4",
+        "description": "ユースケース層の統合テストの実装",
+        "priority": "medium"
+      },
+      {
+        "id": "q3r2s1t0-u9v8-w7x6-y5z4-a3b2c1d0e9f8",
+        "description": "APIレイヤーの統合テストの実装",
+        "priority": "low"
+      }
+    ],
+    "status": "現在は設計フェーズ。統合テストの実装計画を策定済み。次のステップは統合テスト用ディレクトリ構造と環境セットアップコードの実装。",
+    "completionPercentage": 10,
+    "knownIssues": [
+      {
+        "id": "25499a92-ce07-423f-aace-0f3c5377c824",
+        "description": "実際のファイルシステムを使用するため、テスト実行時間が長くなる可能性がある",
+        "severity": "medium"
+      },
+      {
+        "id": "g7h6i5j4-k3l2-m1n0-o9p8-q7r6s5t4u3v2",
+        "description": "テスト間の独立性を確保するための追加的な対策が必要になる可能性がある",
+        "severity": "medium"
+      },
+      {
+        "id": "2d17015c-ce09-4197-8d16-5cf5a5c6e285",
+        "description": "テスト環境のクリーンアップが失敗した場合の対策を検討する必要がある",
+        "severity": "low"
+      }
+    ]
+  }
+}

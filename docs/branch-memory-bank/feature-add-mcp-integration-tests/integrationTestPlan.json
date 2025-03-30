@@ -1,0 +1,194 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "integration-test-plan",
+    "title": "MCPパッケージ統合テスト計画",
+    "documentType": "plan",
+    "path": "integrationTestPlan.json",
+    "tags": [
+      "integration-tests",
+      "test-plan",
+      "mcp"
+    ],
+    "lastModified": "2025-03-30T15:30:00.000Z",
+    "createdAt": "2025-03-30T15:30:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": "このドキュメントでは、packages/mcpに統合テストを実装するための計画を記述します。統合テストでは、複数のコンポーネントやレイヤーを組み合わせた際の動作を検証します。",
+    "goals": [
+      "異なるレイヤー間の連携が正しく動作することを確認する",
+      "実際のファイルシステムとの連携に問題がないことを確認する",
+      "エラーケースを含む現実的なシナリオをテストする"
+    ],
+    "testStructure": {
+      "directory": "packages/mcp/tests/integration",
+      "setupFile": "packages/mcp/tests/integration/setup.ts",
+      "testGroups": [
+        {
+          "name": "controller",
+          "description": "コントローラーレベルの統合テスト",
+          "files": [
+            "ContextController.integration.test.ts",
+            "GlobalController.integration.test.ts",
+            "BranchController.integration.test.ts"
+          ]
+        },
+        {
+          "name": "usecase",
+          "description": "ユースケースレベルの統合テスト",
+          "files": [
+            "ReadContext.integration.test.ts",
+            "ReadGlobalDocument.integration.test.ts",
+            "WriteGlobalDocument.integration.test.ts",
+            "ReadBranchDocument.integration.test.ts",
+            "WriteBranchDocument.integration.test.ts"
+          ]
+        },
+        {
+          "name": "api",
+          "description": "APIレベルの統合テスト",
+          "files": [
+            "McpServerRoutes.integration.test.ts"
+          ]
+        }
+      ]
+    },
+    "implementation": {
+      "steps": [
+        {
+          "id": "step-1",
+          "description": "テスト環境のセットアップ",
+          "tasks": [
+            "統合テスト用のsetup.tsファイルを作成",
+            "テスト用のテンポラリディレクトリを管理する仕組みを実装",
+            "テスト前後でのクリーンアップ処理を実装"
+          ]
+        },
+        {
+          "id": "step-2",
+          "description": "コントローラーレベルの統合テスト実装",
+          "tasks": [
+            "ContextControllerの統合テスト（実際のリポジトリとの連携）",
+            "GlobalControllerの統合テスト（実際のファイルシステムとの連携）",
+            "BranchControllerの統合テスト（実際のファイルシステムとの連携）"
+          ]
+        },
+        {
+          "id": "step-3",
+          "description": "ユースケースレベルの統合テスト実装",
+          "tasks": [
+            "ReadContextユースケースの統合テスト",
+            "ReadGlobalDocumentユースケースの統合テスト",
+            "WriteGlobalDocumentユースケースの統合テスト",
+            "ReadBranchDocumentユースケースの統合テスト",
+            "WriteBranchDocumentユースケースの統合テスト"
+          ]
+        },
+        {
+          "id": "step-4",
+          "description": "APIレイヤーの統合テスト実装",
+          "tasks": [
+            "MCP Serverのルートハンドラーの統合テスト"
+          ]
+        }
+      ]
+    },
+    "testScenarios": [
+      {
+        "name": "ContextController統合テスト",
+        "description": "実際のファイルシステムと連携してコンテキスト情報を読み取るテスト",
+        "scenarios": [
+          "空のブランチメモリバンクの読み取り",
+          "存在しないブランチの読み取り",
+          "テスト用のコンテンツを含むブランチの読み取り",
+          "グローバルメモリバンクとの統合読み取り",
+          "異なる言語でのルール読み取り（'ja', 'en', 'zh'）"
+        ]
+      },
+      {
+        "name": "GlobalController統合テスト",
+        "description": "グローバルメモリバンクの読み書きテスト",
+        "scenarios": [
+          "新規ドキュメントの作成",
+          "既存ドキュメントの更新",
+          "存在しないドキュメントの読み取り",
+          "無効なJSONコンテンツの書き込み試行"
+        ]
+      },
+      {
+        "name": "BranchController統合テスト",
+        "description": "ブランチメモリバンクの読み書きテスト",
+        "scenarios": [
+          "新規ブランチに対するドキュメントの作成",
+          "既存ブランチの更新",
+          "存在しないブランチへのアクセス",
+          "ブランチ間のデータ分離の確認"
+        ]
+      },
+      {
+        "name": "MCPサーバールート統合テスト",
+        "description": "APIルートハンドラーのテスト",
+        "scenarios": [
+          "read_contextツールの呼び出し",
+          "read_branch_memory_bankツールの呼び出し",
+          "write_branch_memory_bankツールの呼び出し",
+          "read_global_memory_bankツールの呼び出し",
+          "write_global_memory_bankツールの呼び出し",
+          "無効なパラメータでのツール呼び出し"
+        ]
+      }
+    ],
+    "testHelpers": [
+      {
+        "name": "テンポラリディレクトリ管理",
+        "description": "テスト用の一時ファイルを管理するヘルパー",
+        "implementation": "各テスト実行時に一意のテンポラリディレクトリを作成し、テスト終了後に削除する"
+      },
+      {
+        "name": "テストファクスチャ",
+        "description": "テスト用の固定データを提供するヘルパー",
+        "implementation": "テスト用のJSONドキュメントをあらかじめ定義し、テスト中に利用する"
+      },
+      {
+        "name": "Application Factory",
+        "description": "テスト用のApplicationインスタンスを生成するヘルパー",
+        "implementation": "テスト固有の設定でApplicationインスタンスを初期化するファクトリ関数"
+      }
+    ],
+    "dependencies": {
+      "libraries": [
+        "jest - テストランナー",
+        "supertest - APIテスト用ライブラリ（必要に応じて）",
+        "fs-extra - ファイルシステム操作の拡張ライブラリ"
+      ],
+      "testFiles": [
+        "既存のテストコードを参考に（packages/mcp/tests/unit/）"
+      ]
+    },
+    "considerationsAndChallenges": [
+      "テスト間の分離を確保する（テスト実行順序に依存しないこと）",
+      "ファイルシステム操作におけるパフォーマンスとテスト実行時間のバランス",
+      "テスト用のファイル構造をどう整えるか（全リポジトリ構造vs最小限）",
+      "エラーケースの効果的なテスト方法",
+      "クリーンアップが確実に行われるようにする（テスト失敗時も含めて）"
+    ],
+    "nextSteps": [
+      {
+        "id": "next-1",
+        "description": "統合テスト用のディレクトリ構造とsetupファイルの作成",
+        "priority": "high"
+      },
+      {
+        "id": "next-2",
+        "description": "テストヘルパーとユーティリティの実装",
+        "priority": "high"
+      },
+      {
+        "id": "next-3",
+        "description": "最初のController統合テストの実装",
+        "priority": "medium"
+      }
+    ]
+  }
+}

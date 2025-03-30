@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "cd49d2df-dd70-47c6-b03a-5418b4b732ff",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-30T15:40:00.000Z",
+    "createdAt": "2025-03-30T12:15:01.575Z",
+    "version": 2
+  },
+  "content": {
+    "branchName": "feature/add-mcp-integration-tests",
+    "purpose": "packages/mcpモジュールに対する統合テストを実装し、システムの信頼性を向上させる",
+    "createdAt": "2025-03-30T12:15:01.575Z",
+    "userStories": [
+      {
+        "id": "23481f21-064f-4683-86c1-bdd3dca0d2c2",
+        "description": "ContextControllerなどのコントローラー層の統合テストを実装する",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "25031728-ac58-4a57-842d-544da245216c",
+        "description": "実際のファイルシステムとの連携を含むユースケース層の統合テストを実装する",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "468ab871-32d9-444e-9eb3-5da762b665b0",
+        "description": "MCP Serverのルートハンドラー向けの統合テストを実装する",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": "統合テストでは、実際のファイルシステムと連携するため、テスト用の一時ディレクトリを使用する必要がある。また、テスト間の分離を確保して、各テストが他のテストに影響を与えないようにすることが重要。"
+  }
+}
