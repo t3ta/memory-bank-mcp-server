@@ -134,6 +134,16 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
     // Mermaid will be loaded from CDN
     const mermaidCdnUrl = 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js';
 
+    // Get current theme kind (light/dark/high contrast)
+    const themeKind = vscode.window.activeColorTheme.kind;
+    let themeClass = 'vscode-light'; // Default to light
+    if (themeKind === vscode.ColorThemeKind.Dark) {
+      themeClass = 'vscode-dark';
+    } else if (themeKind === vscode.ColorThemeKind.HighContrast) {
+      themeClass = 'vscode-high-contrast';
+    }
+    // Or more simply: const themeName = document.body.className; // VS Code adds theme classes to body
+
     // Return HTML with external script reference
     return `<!DOCTYPE html>
       <html lang="en">
@@ -156,9 +166,28 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
           .markdown-body code { background-color: var(--vscode-textCodeBlock-background, rgba(0,0,0,0.05)); padding: 0.2em 0.4em; border-radius: 3px; }
           .markdown-body pre > code { padding: 0; }
           .markdown-body pre { background-color: var(--vscode-textCodeBlock-background, rgba(0,0,0,0.05)); padding: 10px; border-radius: 3px; overflow-x: auto; }
+
+          /* Basic Dark Theme Adjustments */
+          body.vscode-dark {
+            color: var(--vscode-foreground);
+            background-color: var(--vscode-editor-background);
+          }
+          body.vscode-dark .panel {
+             border-color: var(--vscode-editorWidget-border); /* Use theme border color */
+          }
+          body.vscode-dark h2 {
+             border-bottom-color: var(--vscode-editorWidget-border);
+          }
+          body.vscode-dark textarea.editor-area {
+             background-color: var(--vscode-input-background);
+             color: var(--vscode-input-foreground);
+             border-color: var(--vscode-input-border);
+          }
+          /* Add more specific dark theme styles as needed */
+
         </style>
       </head>
-      <body>
+      <body class="${themeClass}">
         <div id="editor-panel" class="panel">
           <h2>Editor</h2>
           <textarea id="editor" class="editor-area" nonce="${nonce}">${escapeHtml(documentContent)}</textarea>

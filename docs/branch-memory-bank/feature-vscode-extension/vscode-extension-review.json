@@ -1,0 +1,181 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "dd6b5a42-2e9c-4f18-bfac-6d1235bf4fe8",
+    "title": "VS Code拡張機能コードレビュー",
+    "documentType": "code_review",
+    "path": "vscode-extension-review.json",
+    "tags": [
+      "code-review",
+      "vscode-extension",
+      "markdown-preview"
+    ],
+    "lastModified": "2025-03-30T17:30:00.000Z",
+    "createdAt": "2025-03-30T17:30:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "summary": {
+      "title": "VS Code拡張機能コードレビュー",
+      "description": "メモリバンクVS Code拡張機能のMarkdownプレビュー機能実装進捗状況と課題点",
+      "reviewDate": "2025-03-30",
+      "overallStatus": "進行中",
+      "completionPercentage": 40
+    },
+    "codebase": {
+      "reviewScope": "packages/vscode-extension",
+      "mainComponents": [
+        {
+          "name": "DocumentEditorProvider",
+          "path": "src/editors/documentEditorProvider.ts",
+          "status": "部分実装",
+          "description": "カスタムエディタプロバイダ。Markdown変換とエディタ/プレビューの分割表示を実装"
+        },
+        {
+          "name": "editor.js",
+          "path": "media/js/editor.js",
+          "status": "部分実装",
+          "description": "WebViewのフロントエンド機能。JSONエディタとMarkdownプレビュー処理を実装"
+        },
+        {
+          "name": "AIService",
+          "path": "src/services/aiService.ts",
+          "status": "部分実装",
+          "description": "Gemini APIとの連携機能。基本的な認証と生成機能を実装"
+        },
+        {
+          "name": "package.json",
+          "path": "package.json",
+          "status": "更新済み",
+          "description": "activationEvents, 依存関係（markdown-it, mermaid）の追加完了"
+        }
+      ],
+      "currentBranch": "feature/vscode-extension"
+    },
+    "achievements": [
+      {
+        "id": "achievement-1",
+        "title": "MarkdownプレビューのWebView統合",
+        "description": "DocumentEditorProviderでJSON編集機能とMarkdownプレビューの分割画面を実装",
+        "impact": "high"
+      },
+      {
+        "id": "achievement-2",
+        "title": "Markdown変換ロジックの実装",
+        "description": "JSONデータをMarkdown形式に変換する機能を実装（metadata表示、content構造化）",
+        "impact": "high"
+      },
+      {
+        "id": "achievement-3",
+        "title": "markdown-itとmermaid統合",
+        "description": "markdown-itとmermaid連携によるMarkdown→HTML変換と図表レンダリング機能を追加",
+        "impact": "medium"
+      },
+      {
+        "id": "achievement-4",
+        "title": "package.json依存関係の修正",
+        "description": "activationEventsを更新し「onStartupFinished」を追加。依存関係問題を解決",
+        "impact": "high"
+      },
+      {
+        "id": "achievement-5",
+        "title": "GeminiAPI連携の基本実装",
+        "description": "APIキー設定と基本的なコンテンツ生成機能の実装。テスト用コマンド追加",
+        "impact": "low"
+      }
+    ],
+    "issues": [
+      {
+        "id": "issue-1",
+        "title": "Mermaid図表レンダリングの不安定性",
+        "description": "Mermaid図表のレンダリングが安定しない場合がある。タイミングの問題と初期化方法の最適化が必要",
+        "severity": "medium",
+        "suggestedFix": "Mermaidの初期化と描画タイミングの調整。また描画失敗時のリトライ機構追加を検討"
+      },
+      {
+        "id": "issue-2",
+        "title": "package.jsonの重複セクション",
+        "description": "package.jsonに重複したcontributesセクションが残っている",
+        "severity": "low",
+        "suggestedFix": "package.jsonのcontributesセクションを整理し、重複を削除する"
+      },
+      {
+        "id": "issue-3",
+        "title": "ドキュメントタイプ別の最適レンダリング",
+        "description": "現在の実装では基本的なメタデータ表示とコンテンツ変換のみ。ドキュメントタイプに応じた最適な表示が未実装",
+        "severity": "medium",
+        "suggestedFix": "ドキュメントタイプ判定ロジックを強化し、タイプ別のレンダラークラスを追加実装"
+      },
+      {
+        "id": "issue-4",
+        "title": "大規模JSONのパフォーマンス",
+        "description": "大きなJSONファイルでリアルタイム変換処理を行うと、パフォーマンス低下の可能性がある",
+        "severity": "low",
+        "suggestedFix": "遅延ロードと部分更新の実装、非同期処理の最適化を検討"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "next-step-1",
+        "title": "ドキュメントタイプ別のレンダラー実装",
+        "description": "documentTypeに応じた専用レンダリングロジックの実装",
+        "priority": "high"
+      },
+      {
+        "id": "next-step-2",
+        "title": "エディタの表示/編集モード切替機能",
+        "description": "エディタのみ、プレビューのみ、分割表示のモード切替UI実装",
+        "priority": "medium"
+      },
+      {
+        "id": "next-step-3",
+        "title": "スタイル調整とテーマ統合",
+        "description": "VS Codeのテーマと統合したスタイリングの最適化",
+        "priority": "medium"
+      },
+      {
+        "id": "next-step-4",
+        "title": "package.jsonの重複セクション修正",
+        "description": "package.jsonの重複を解消し、構成を整理",
+        "priority": "low"
+      },
+      {
+        "id": "next-step-5",
+        "title": "図表生成機能の拡張",
+        "description": "対応図表の種類拡大（flowchart, sequence, class, ER図など）",
+        "priority": "low"
+      }
+    ],
+    "recommendations": [
+      {
+        "id": "recommendation-1",
+        "title": "レンダラーのモジュール化",
+        "description": "ドキュメントタイプ別レンダラーを別ファイルに分離し、プラグイン的に拡張可能な構造にする",
+        "impact": "high",
+        "priority": "high"
+      },
+      {
+        "id": "recommendation-2",
+        "title": "キャッシュ機構の追加",
+        "description": "大規模JSONの変換処理を最適化するため、部分更新とキャッシュの仕組みを導入",
+        "impact": "medium",
+        "priority": "medium"
+      },
+      {
+        "id": "recommendation-3",
+        "title": "エラー処理の強化",
+        "description": "WebView-拡張間通信のエラー処理を強化し、回復メカニズムを追加",
+        "impact": "medium",
+        "priority": "medium"
+      },
+      {
+        "id": "recommendation-4",
+        "title": "テスト追加",
+        "description": "Markdown変換ロジックとWebView通信のユニットテスト追加",
+        "impact": "medium",
+        "priority": "low"
+      }
+    ],
+    "reviewComments": "現状、Markdownプレビュー機能の基本実装がほぼ完了しており、パッケージ依存関係の問題も解決している。しかし、ドキュメントタイプに応じた最適なレンダリングはまだ実装されておらず、mermaid図表のレンダリングも安定性に課題がある。次のステップでは、レンダラーのモジュール化とドキュメントタイプ別の表示最適化に注力すべき。AIとの連携は基本機能が実装されたが、今後の機能拡充を見据えたインターフェース設計の改善も検討事項。VS Code拡張の安定起動とユーザビリティ向上の観点からは、今後UIの統一性と操作性の向上も重要な課題となる。"
+  }
+}
