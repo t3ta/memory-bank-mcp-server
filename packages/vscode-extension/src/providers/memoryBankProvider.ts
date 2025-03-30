@@ -47,5 +47,57 @@ export class MemoryBankProvider {
     }
   }
 
-  // Add methods for writing, listing files, comparing branches etc. later
+  /**
+   * Writes content to a memory bank document. Creates the file if it doesn't exist.
+   * @param relativePath The path relative to the memory bank root.
+   * @param content The content to write to the document.
+   * @throws Error if the file cannot be written.
+   */
+  public async updateDocumentContent(relativePath: string, content: string): Promise<void> {
+    // Assuming memory bank root is 'docs' within the workspace for now.
+    const memoryBankRoot = path.join(this.workspaceRoot, 'docs');
+    const fileUri = vscode.Uri.file(path.join(memoryBankRoot, relativePath));
+
+    try {
+      console.log(`Writing file: ${fileUri.fsPath}`);
+      const writeData = Buffer.from(content, 'utf8');
+      await vscode.workspace.fs.writeFile(fileUri, writeData);
+      console.log(`Successfully wrote file: ${relativePath}`);
+    } catch (error) {
+      console.error(`Error writing file ${fileUri.fsPath}:`, error);
+      vscode.window.showErrorMessage(`Failed to write memory bank document: ${relativePath}`);
+      throw new Error(`Failed to write document: ${relativePath}. Error: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  /**
+   * Lists files and directories within a given relative path in the memory bank.
+   * @param relativePath The path relative to the memory bank root.
+   * @returns A promise resolving to an array of [name, fileType] tuples.
+   * @throws Error if the directory cannot be read.
+   */
+  public async listDirectory(relativePath: string): Promise<[string, vscode.FileType][]> {
+    // Assuming memory bank root is 'docs' within the workspace for now.
+    const memoryBankRoot = path.join(this.workspaceRoot, 'docs');
+    const dirUri = vscode.Uri.file(path.join(memoryBankRoot, relativePath));
+
+    try {
+      console.log(`Listing directory: ${dirUri.fsPath}`);
+      const entries = await vscode.workspace.fs.readDirectory(dirUri);
+      console.log(`Successfully listed directory: ${relativePath}`);
+      // Filter out unwanted files like .DS_Store if necessary
+      return entries.filter(([name]) => !name.startsWith('.'));
+    } catch (error) {
+      // If the directory doesn't exist, return an empty array or handle specific errors
+      if (error instanceof vscode.FileSystemError && error.code === 'FileNotFound') {
+          console.warn(`Directory not found for listing: ${dirUri.fsPath}`);
+          return [];
+      }
+      console.error(`Error listing directory ${dirUri.fsPath}:`, error);
+      vscode.window.showErrorMessage(`Failed to list memory bank directory: ${relativePath}`);
+      throw new Error(`Failed to list directory: ${relativePath}. Error: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  // Add methods for comparing branches etc. later
 }
