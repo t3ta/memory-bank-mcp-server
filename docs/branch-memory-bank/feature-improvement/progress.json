@@ -73,6 +73,18 @@
         ],
         "completed": true,
         "completedAt": "2025-03-30T04:57:52.000Z"
+      },
+      {
+        "id": "41424344-4546-4748-494a-4b4c4d4e4f50",
+        "description": "SCHEMA-2: バージョン管理と互換性強化",
+        "priority": "high",
+        "implementationOrder": 7,
+        "phase": 1,
+        "dependsOn": [
+          "21222324-2526-2728-292a-2b2c2d2e2f30"
+        ],
+        "completed": true,
+        "completedAt": "2025-03-30T05:00:02.000Z"
       }
     ],
     "pendingImplementation": [
@@ -122,16 +134,6 @@
         "phase": 3,
         "dependsOn": [
           "f6060708-090a-0b0c-0d0e-0f10111213"
-        ]
-      },
-      {
-        "id": "41424344-4546-4748-494a-4b4c4d4e4f50",
-        "description": "SCHEMA-2: バージョン管理と互換性強化",
-        "priority": "high",
-        "implementationOrder": 7,
-        "phase": 1,
-        "dependsOn": [
-          "21222324-2526-2728-292a-2b2c2d2e2f30"
         ]
       },
       {

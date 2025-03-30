@@ -18,3 +18,6 @@ export * from './types/index.js';
 
 // Export validation helpers
 export * from './validation-helpers.js';
+
+// Export versioning utilities
+export * from './versioning.js';
