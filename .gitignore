@@ -42,4 +42,11 @@ tests/.temp
 # Local files
 .local/
 
+# Memory Bank specific files
 docs/global-memory-bank/tags/index.json
+
+# VS Code Extension Packages
+*.vsix
+
+# TypeScript
+*.tsbuildinfo

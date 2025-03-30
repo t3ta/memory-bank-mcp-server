@@ -1,9 +1,14 @@
 {
-  "name": "@memory-bank/vscode-extension",
+  "name": "memory-bank-vscode-extension",
   "displayName": "Memory Bank VS Code Extension",
   "description": "Memory Bank extension for Visual Studio Code",
   "version": "0.1.0",
   "publisher": "t3ta",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/t3ta/memory-bank-mcp-server.git",
+    "directory": "packages/vscode-extension"
+  },
   "engines": {
     "vscode": "^1.77.0"
   },
@@ -13,6 +18,12 @@
     "onCustomEditor:memoryBank.documentEditor"
   ],
   "main": "./dist/extension.js",
+  "files": [
+    "dist",
+    "media",
+    "README.md",
+    "LICENSE"
+  ],
   "contributes": {
     "viewsContainers": {
       "activitybar": [
@@ -141,6 +152,7 @@
     "@types/vscode": "^1.77.0",
     "@typescript-eslint/eslint-plugin": "^7.10.0",
     "@typescript-eslint/parser": "^7.10.0",
+    "@vscode/vsce": "^3.3.1",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.1",
