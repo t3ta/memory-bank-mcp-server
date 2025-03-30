@@ -16,9 +16,9 @@ const md = new MarkdownIt({
     if (lang && hljs.getLanguage(lang)) {
       try {
         return '<pre><code class="hljs ' + lang + '">' +
-               hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
-               '</code></pre>';
-      } catch (__) {/* ignore */}
+          hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
+          '</code></pre>';
+      } catch (__) {/* ignore */ }
     }
     // Use default escaping if language is not found or highlighting fails
     return '<pre><code class="hljs">' + md.utils.escapeHtml(str) + '</code></pre>';
@@ -26,7 +26,7 @@ const md = new MarkdownIt({
 });
 
 // Customize fenced block rendering for Mermaid (Re-adding custom renderer)
-const defaultFenceRenderer = md.renderer.rules.fence || function(tokens: any[], idx: number, options: any, env: any, self: any): string { // Add 'any' types
+const defaultFenceRenderer = md.renderer.rules.fence || function (tokens: any[], idx: number, options: any, env: any, self: any): string { // Add 'any' types
   // Basic fallback renderer if the default is somehow undefined
   const token = tokens[idx];
   const info = token.info ? token.info.trim() : '';
@@ -73,24 +73,18 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
     return providerRegistration;
   }
 
-  // Make constructor async to handle dynamic import
+  // Constructor
   private constructor(private readonly context: vscode.ExtensionContext) {
-    this.initializeMarkdownIt(); // Call async initialization
+    this.initializeMarkdownIt(); // Call initialization
   }
 
-  // Async function to initialize markdown-it with the plugin
-  private async initializeMarkdownIt(): Promise<void> {
-    try {
-      // Dynamically import the mermaid plugin
-      const mdMermaid = await import('markdown-it-mermaid');
-      // Apply the plugin to the markdown-it instance - REMOVED for custom renderer approach
-      // md.use(mdMermaid.default || mdMermaid);
-      // console.log('[Provider] markdown-it-mermaid plugin loaded and applied dynamically.');
-      console.log('[Provider] Skipping dynamic mermaid plugin loading, using custom fence renderer.');
-    } catch (error) {
-      console.error('[Provider] Failed to load or apply markdown-it-mermaid dynamically:', error);
-      // Handle the error appropriately, maybe disable mermaid rendering
-    }
+  // Function to perform any necessary markdown-it initialization.
+  // Currently, Mermaid rendering is handled by a custom fence renderer (lines 28-51)
+  // and the Mermaid library loaded via CDN in getHtmlForWebview (line 260).
+  // Dynamic plugin loading is not used.
+  private initializeMarkdownIt(): void {
+    console.log('[Provider] Markdown-it initialized. Using custom fence renderer for Mermaid.');
+    // No dynamic plugin loading needed here as custom renderer is used.
   }
 
   /**
@@ -334,8 +328,8 @@ function getNonce() {
 function escapeHtml(unsafe: string): string {
   return unsafe
     .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;") // Correctly replace less than
-    .replace(/>/g, "&gt;") // Correctly replace greater than
-    .replace(/"/g, "&quot;") // Correctly replace double quote
-    .replace(/'/g, "&#039;"); // Keep single quote replacement
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
 }

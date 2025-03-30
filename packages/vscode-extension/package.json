@@ -9,7 +9,8 @@
   },
   "activationEvents": [
     "onView:memoryBankDocuments",
-    "onStartupFinished"
+    "onStartupFinished",
+    "onCustomEditor:memoryBank.documentEditor"
   ],
   "main": "./dist/extension.js",
   "contributes": {
