@@ -104,8 +104,10 @@ export class MemoryBankExplorerProvider implements vscode.TreeDataProvider<Memor
             const match = element.label.match(/Branch Memory \((.+)\)/);
             const branchName = match ? match[1] : null;
             if (branchName) {
-                // Construct path using the extracted branch name
-                relativePath = path.join('branch-memory-bank', branchName);
+                // Convert branch name for directory path (replace / with -)
+                const branchDirName = branchName.replace(/\//g, '-');
+                // Construct path using the converted branch name
+                relativePath = path.join('branch-memory-bank', branchDirName);
             } else {
                 console.warn(`Could not extract branch name from label: ${element.label}`);
                 return []; // Prevent listing if branch name extraction fails
@@ -127,9 +129,11 @@ export class MemoryBankExplorerProvider implements vscode.TreeDataProvider<Memor
       // Root level: Show Global and Branch Memory roots
       // Get current branch name dynamically
       const currentBranchName = await getCurrentGitBranch(this.workspaceRoot) ?? 'main'; // Use 'main' as fallback
+      // Convert branch name for directory path (replace / with -)
+      const branchDirName = currentBranchName.replace(/\//g, '-');
       // Ensure workspaceRoot is non-null before path.join
       const globalRootUri = vscode.Uri.file(path.join(this.workspaceRoot, 'docs', 'global-memory-bank'));
-      const branchRootUri = vscode.Uri.file(path.join(this.workspaceRoot, 'docs', 'branch-memory-bank', currentBranchName));
+      const branchRootUri = vscode.Uri.file(path.join(this.workspaceRoot, 'docs', 'branch-memory-bank', branchDirName)); // Use converted name
       return [
         // Correct constructor calls with 5 arguments
         new MemoryBankTreeItem('Global Memory', vscode.TreeItemCollapsibleState.Collapsed, globalRootUri, 'root', undefined),
