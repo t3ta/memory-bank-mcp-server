@@ -1,0 +1,74 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "03af731c-cef6-4b17-b8d9-9345228c78eb",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress",
+      "vscode-extension"
+    ],
+    "lastModified": "2025-03-30T14:31:58.000Z",
+    "createdAt": "2025-03-30T05:25:42.077Z",
+    "version": 2
+  },
+  "content": {
+    "workingFeatures": [],
+    "pendingImplementation": [
+      {
+        "id": "feature-explorer",
+        "description": "メモリバンクエクスプローラー (基本機能)",
+        "priority": "high"
+      },
+      {
+        "id": "feature-editor",
+        "description": "ドキュメントエディタ (基本機能 + スキーマ検証)",
+        "priority": "high"
+      },
+      {
+        "id": "feature-ai-duplicate-detection",
+        "description": "AIによる重複情報検出 (基本機能)",
+        "priority": "high"
+      },
+      {
+        "id": "feature-ai-content-consolidation",
+        "description": "AIによる重複情報統合 (基本機能)",
+        "priority": "medium"
+      },
+      {
+        "id": "feature-diff",
+        "description": "差分比較機能",
+        "priority": "medium"
+      },
+      {
+        "id": "feature-link",
+        "description": "ドキュメント関連性可視化",
+        "priority": "medium"
+      },
+      {
+        "id": "feature-ai-consistency-checker",
+        "description": "AIによる整合性チェッカー",
+        "priority": "medium"
+      },
+      {
+        "id": "feature-ai-smart-summarization",
+        "description": "AIによるインテリジェント要約",
+        "priority": "medium"
+      },
+      {
+        "id": "feature-template",
+        "description": "テンプレート機能",
+        "priority": "low"
+      },
+      {
+        "id": "feature-analytics",
+        "description": "メモリバンク分析機能",
+        "priority": "low"
+      }
+    ],
+    "status": "VS Code拡張機能の初期計画と設計段階。実装準備中。",
+    "completionPercentage": 0,
+    "knownIssues": []
+  }
+}

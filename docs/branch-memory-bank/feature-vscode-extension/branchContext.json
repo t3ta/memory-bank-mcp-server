@@ -1,0 +1,54 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "a4b459fc-d51a-4333-8fd0-61e38bbe6702",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context",
+      "vscode-extension"
+    ],
+    "lastModified": "2025-03-30T14:31:31.000Z",
+    "createdAt": "2025-03-30T05:25:42.075Z",
+    "version": 2
+  },
+  "content": {
+    "branchName": "feature/vscode-extension",
+    "purpose": "メモリバンクの内容をVS Code内で簡単に閲覧・編集できる拡張機能。スキーマ検証とリアルタイムフィードバックを提供。",
+    "createdAt": "2025-03-30T05:25:42.075Z",
+    "userStories": [
+      {
+        "id": "goal-1",
+        "description": "メモリバンクのコンテンツをVS Code内でシームレスに閲覧・編集できるようにする",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "goal-2",
+        "description": "スキーマに基づいた検証とリアルタイムフィードバックを提供する",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "goal-3",
+        "description": "メモリバンクコンテンツの検索・フィルタリングを容易にする",
+        "completed": false,
+        "priority": 3
+      },
+      {
+        "id": "goal-4",
+        "description": "ドキュメント間のリンク・参照関係を可視化する",
+        "completed": false,
+        "priority": 4
+      },
+      {
+        "id": "goal-5",
+        "description": "ブランチ間のコンテンツ比較を可能にする",
+        "completed": false,
+        "priority": 5
+      }
+    ],
+    "additionalNotes": ""
+  }
+}
