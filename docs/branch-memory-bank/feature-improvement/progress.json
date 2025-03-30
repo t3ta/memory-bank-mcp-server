@@ -97,6 +97,18 @@
         ],
         "completed": true,
         "completedAt": "2025-03-30T05:02:39.000Z"
+      },
+      {
+        "id": "d1d2d3d4-d5d6-d7d8-d9da-dbdcdddedf",
+        "description": "TS-3: Promise/非同期エラー処理のルール",
+        "priority": "high",
+        "implementationOrder": 9,
+        "phase": 1,
+        "dependsOn": [
+          "c1c2c3c4-c5c6-c7c8-c9ca-cbcccdcecfd0"
+        ],
+        "completed": true,
+        "completedAt": "2025-03-30T05:04:11.000Z"
       }
     ],
     "pendingImplementation": [
@@ -204,16 +216,6 @@
         "phase": 3,
         "dependsOn": [
           "41424344-4546-4748-494a-4b4c4d4e4f50"
-        ]
-      },
-      {
-        "id": "d1d2d3d4-d5d6-d7d8-d9da-dbdcdddedf",
-        "description": "TS-3: Promise/非同期エラー処理のルール",
-        "priority": "high",
-        "implementationOrder": 9,
-        "phase": 1,
-        "dependsOn": [
-          "c1c2c3c4-c5c6-c7c8-c9ca-cbcccdcecfd0"
         ]
       },
       {

@@ -42,7 +42,11 @@ const baseConfig = {
       allowExpressions: true,
       allowTypedFunctionExpressions: true
     }],
-    '@typescript-eslint/consistent-type-assertions': 'error'
+    '@typescript-eslint/consistent-type-assertions': 'error',
+    // Added async error handling rules (TS-3)
+    '@typescript-eslint/no-floating-promises': 'error',
+    '@typescript-eslint/no-misused-promises': 'error',
+    '@typescript-eslint/no-throw-literal': 'error'
   }
 };
 
