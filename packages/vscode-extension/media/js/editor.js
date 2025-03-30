@@ -31,6 +31,9 @@
     // Handle messages from the extension
     window.addEventListener('message', handleExtensionMessages);
 
+    // Setup mode toggle buttons
+    setupModeToggle();
+
     console.log('[Webview] Script loaded and listeners attached.');
 
     // Initialize Mermaid if available
@@ -236,6 +239,51 @@
     } catch (err) {
       console.error('[Webview] Error during initial Mermaid rendering:', err);
     }
+  }
+
+  /**
+   * Sets up event listeners for the mode toggle buttons.
+   */
+  function setupModeToggle() {
+      const controls = document.getElementById('controls');
+      if (controls) {
+          controls.addEventListener('click', (event) => {
+              // Check if the clicked target is an HTMLButtonElement
+              if (event.target instanceof HTMLButtonElement) {
+                  const button = event.target; // Cast to button element
+                  const mode = button.getAttribute('data-mode');
+                  if (mode) {
+                      updateMode(mode);
+                  }
+              }
+          });
+      } else {
+          console.error('[Webview] Controls element not found');
+      }
+  }
+
+  /**
+   * Updates the body class and button states based on the selected mode.
+   * @param {string} newMode - The mode to switch to ('editor-only', 'split', 'preview-only').
+   */
+  function updateMode(newMode) {
+      // Remove existing mode classes from body
+      document.body.classList.remove('show-editor-only', 'show-split', 'show-preview-only');
+      // Add the new mode class
+      document.body.classList.add(`show-${newMode}`);
+
+      // Update button active states
+      const buttons = document.querySelectorAll('#controls button');
+      buttons.forEach(button => {
+          if (button.getAttribute('data-mode') === newMode) {
+              button.classList.add('active');
+          } else {
+              button.classList.remove('active');
+          }
+      });
+      console.log(`[Webview] Switched to mode: ${newMode}`);
+      // Persist mode preference if needed (using vscode.setState)
+      // vscode.setState({ viewMode: newMode });
   }
 
   // Initialize after the DOM is fully loaded
