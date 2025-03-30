@@ -52,6 +52,15 @@
         "phase": 1,
         "completed": true,
         "completedAt": "2025-03-30T04:31:40.000Z"
+      },
+      {
+        "id": "31323334-3536-3738-393a-3b3c3d3e3f40",
+        "description": "SCHEMA-3: バリデーションヘルパーの拡張",
+        "priority": "high",
+        "implementationOrder": 5,
+        "phase": 1,
+        "completed": true,
+        "completedAt": "2025-03-30T04:38:03.000Z"
       }
     ],
     "pendingImplementation": [
@@ -112,13 +121,6 @@
         "dependsOn": [
           "31323334-3536-3738-393a-3b3c3d3e3f40"
         ]
-      },
-      {
-        "id": "31323334-3536-3738-393a-3b3c3d3e3f40",
-        "description": "SCHEMA-3: バリデーションヘルパーの拡張",
-        "priority": "high",
-        "implementationOrder": 5,
-        "phase": 1
       },
       {
         "id": "41424344-4546-4748-494a-4b4c4d4e4f50",
