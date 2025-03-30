@@ -1,0 +1,527 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "vscode-extension-plan-part4-a",
+    "title": "VS Code拡張の実装計画 (Part 4-A: AI統合の概要と基本機能)",
+    "documentType": "implementation_plan",
+    "path": "vscode-extension-plan-part4-a.json",
+    "tags": [
+      "vscode-extension",
+      "implementation-plan",
+      "memory-bank",
+      "ai-integration",
+      "gemini-api",
+      "information-deduplication",
+      "part4"
+    ],
+    "lastModified": "2025-03-30T12:00:00.000Z",
+    "createdAt": "2025-03-30T12:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "aiIntegration": {
+      "overview": {
+        "title": "Gemini AI統合による重複情報整理機能",
+        "description": "メモリバンク内の重複情報や関連情報をGemini AIを活用して効率的に検出・整理・最適化する機能。人間の開発者の認知負荷を軽減し、ナレッジベースとしての品質を向上させる。",
+        "goals": [
+          "メモリバンク内の重複情報を自動的に検出する",
+          "重複情報の統合や最適化を提案する",
+          "関連情報間の整合性を検証する",
+          "情報の自動要約や構造化を行う",
+          "人間の開発者の作業効率とメモリバンクの品質を向上させる"
+        ],
+        "challenges": [
+          "コンテキスト理解の精度",
+          "APIレート制限とコスト",
+          "適切なユーザー介入のバランス",
+          "プライバシーとセキュリティ"
+        ],
+        "keyBenefits": [
+          {
+            "benefit": "情報品質の向上",
+            "description": "重複や矛盾を減らすことで、メモリバンク全体の一貫性と信頼性が向上",
+            "impact": "high"
+          },
+          {
+            "benefit": "開発者の認知負荷軽減",
+            "description": "複雑な情報構造を把握・管理するための労力を削減",
+            "impact": "high"
+          },
+          {
+            "benefit": "情報探索の効率化",
+            "description": "関連情報がより構造化され、必要な情報を見つけやすくなる",
+            "impact": "medium"
+          },
+          {
+            "benefit": "知識の再利用促進",
+            "description": "既存の情報を最適化することで、その再利用性が向上",
+            "impact": "medium"
+          }
+        ]
+      },
+      "geminiIntegration": {
+        "apiDetails": {
+          "provider": "Google Cloud Vertex AI",
+          "models": [
+            {
+              "name": "gemini-1.5-pro",
+              "usage": "メインの分析と整理タスク",
+              "capabilities": [
+                "重複検出",
+                "統合提案",
+                "関連性分析"
+              ],
+              "rateLimits": {
+                "tokensPerMinute": 1000000,
+                "requestsPerMinute": 60
+              }
+            },
+            {
+              "name": "gemini-1.5-flash",
+              "usage": "軽量な分析タスクとリアルタイム応答",
+              "capabilities": [
+                "速度重視の初期スキャン",
+                "単純な提案"
+              ],
+              "rateLimits": {
+                "tokensPerMinute": 2000000,
+                "requestsPerMinute": 100
+              }
+            }
+          ],
+          "authentication": {
+            "method": "API key or OAuth",
+            "configuration": "VS Code設定またはワークスペース設定から取得",
+            "fallbackBehavior": "認証情報がない場合は機能を無効化",
+            "securityConsiderations": [
+              "APIキーはローカルの安全な場所に保存",
+              "トークン使用量の監視と上限設定",
+              "ユーザーの明示的な許可なしにデータを送信しない"
+            ]
+          },
+          "costManagement": {
+            "strategies": [
+              "バッチ処理によるAPI呼び出し最適化",
+              "ローカルキャッシュの活用",
+              "分析範囲の制限オプション",
+              "ユーザー設定による使用量制御"
+            ],
+            "estimatedCost": "中規模プロジェクトで月額約$5-20"
+          }
+        },
+        "promptStrategies": {
+          "contextualPrompting": {
+            "description": "メモリバンクのコンテキストを考慮したプロンプト設計",
+            "approach": [
+              "メモリバンクのスキーマ構造を反映したテンプレートプロンプト",
+              "特定のドキュメントタイプに合わせた専用プロンプト",
+              "ユーザーのフィードバックから学習するプロンプト改善"
+            ],
+            "examples": [
+              "「以下のドキュメント群から重複情報を検出し、統合案を提案してください。各ドキュメントはschema: memory_document_v2に従い、content内に主要情報が含まれています。」",
+              "「このブランチメモリバンク内で不整合や矛盾している情報を特定し、修正案を提示してください。」"
+            ],
+            "contextElements": [
+              "スキーマ構造（memory_document_v2）",
+              "ドキュメントタイプとその特性",
+              "タグとメタデータ",
+              "ブランチの目的と状態",
+              "関連する過去の編集履歴"
+            ]
+          },
+          "resultFormatting": {
+            "description": "AIからの結果を構造化し、アクション可能な形式に整形",
+            "formats": [
+              {
+                "name": "重複検出レポート",
+                "structure": "重複箇所のパス、重複度合い、統合案"
+              },
+              {
+                "name": "整合性チェックレポート",
+                "structure": "矛盾箇所の指摘、修正提案"
+              },
+              {
+                "name": "リファクタリング提案",
+                "structure": "構造改善のための移動・分割・統合案"
+              }
+            ],
+            "standardFormat": {
+              "metaInfo": {
+                "analysisType": "分析の種類（重複検出、整合性チェックなど）",
+                "timestamp": "分析実行時刻",
+                "modelVersion": "使用されたAIモデル",
+                "confidence": "提案の信頼度"
+              },
+              "findings": [
+                {
+                  "type": "検出タイプ（重複、矛盾など）",
+                  "location": "該当箇所のパス情報",
+                  "severity": "重要度（high/medium/low）",
+                  "description": "問題の詳細説明",
+                  "context": "問題のコンテキスト情報"
+                }
+              ],
+              "recommendations": [
+                {
+                  "type": "提案タイプ（統合、移動など）",
+                  "description": "提案の詳細説明",
+                  "impact": "実装した場合の影響",
+                  "actionItems": "具体的なアクションステップ"
+                }
+              ]
+            }
+          },
+          "semanticSearch": {
+            "description": "埋め込みベースの意味的類似性検索による関連情報検出",
+            "implementation": {
+              "embeddingModel": "text-embedding-3-large",
+              "vectorDatabase": "インメモリベクトルストア（開発環境）/ Pinecone（本番環境）",
+              "similarityThreshold": "設定可能（デフォルト0.85）",
+              "indexingStrategy": {
+                "chunks": "ドキュメントを意味のある単位にチャンク分割",
+                "metadata": "埋め込みにメタデータを付与（ドキュメントタイプ、作成日など）",
+                "updateFrequency": "変更検出時に自動更新"
+              }
+            },
+            "queryOptimization": {
+              "techniques": [
+                "クエリ拡張（関連語句の追加）",
+                "重み付け（重要な単語に高い重みを付与）",
+                "フィルタリング（特定のドキュメントタイプやタグに限定）"
+              ],
+              "hybridSearch": "キーワード検索とセマンティック検索の組み合わせ"
+            }
+          }
+        }
+      },
+      "features": [
+        {
+          "id": "feature-ai-duplicate-detection",
+          "name": "重複情報検出",
+          "description": "メモリバンク内の重複情報や類似情報を自動的に検出する機能",
+          "subFeatures": [
+            {
+              "name": "コンテンツ重複検出",
+              "description": "テキスト内容の重複や類似性を検出",
+              "details": "セマンティック検索と正規表現パターンの組み合わせで内容の重複を検出",
+              "implementation": {
+                "approach": "埋め込みベクトルの類似度計算",
+                "threshold": "カスタマイズ可能な類似度閾値（デフォルト0.85）",
+                "scope": "ドキュメント全体または特定のフィールドに限定可能"
+              }
+            },
+            {
+              "name": "構造的重複検出",
+              "description": "データ構造やスキーマレベルでの重複検出",
+              "details": "JSON構造のパス分析による構造的重複の検出",
+              "implementation": {
+                "approach": "JSONパス解析とパターンマッチング",
+                "targets": [
+                  "配列内の類似オブジェクト",
+                  "異なるパスの同一データ",
+                  "冗長な階層構造"
+                ],
+                "optimizations": "ハッシュベースの高速パターン検出"
+              }
+            },
+            {
+              "name": "クロスドキュメント重複",
+              "description": "複数ドキュメント間の重複情報検出",
+              "details": "ドキュメント間の参照関係を考慮した重複検出",
+              "implementation": {
+                "approach": "グラフベースの関係分析",
+                "prioritization": "関連性が高いドキュメント間の優先検査",
+                "visualization": "ドキュメント間の重複関係の視覚化"
+              }
+            },
+            {
+              "name": "重複度合いの視覚化",
+              "description": "検出された重複の程度や影響範囲の視覚化",
+              "details": "ヒートマップや関連性グラフによる重複情報の可視化",
+              "implementation": {
+                "approach": "D3.jsベースのインタラクティブビジュアライゼーション",
+                "views": [
+                  "ヒートマップ",
+                  "関連性グラフ",
+                  "階層的クラスタリング表示"
+                ],
+                "interactivity": "フィルタリング、ズーム、詳細表示"
+              }
+            }
+          ],
+          "priority": "high",
+          "implementationDetails": {
+            "mainClasses": [
+              "DuplicateDetectionService",
+              "AIContentAnalyzer",
+              "SimilarityMatcher"
+            ],
+            "keyAlgorithms": [
+              "セマンティック類似度計算",
+              "構造的パターンマッチング",
+              "クラスタリングアルゴリズム"
+            ],
+            "geminiPromptExamples": [
+              "次のメモリバンクドキュメント群から重複している情報や概念を検出し、それぞれの重複度合いをスコア化してください。",
+              "これらのドキュメントで同じトピックについて異なる記述をしている箇所を特定し、不一致の程度を評価してください。"
+            ]
+          }
+        },
+        {
+          "id": "feature-ai-content-consolidation",
+          "name": "重複情報統合",
+          "description": "検出された重複情報を整理し、最適化された形で統合する機能",
+          "subFeatures": [
+            {
+              "name": "統合案生成",
+              "description": "重複情報を統合するための最適な方法を提案",
+              "details": "重複部分の統合方法や参照方法を複数案提示",
+              "implementation": {
+                "approach": "AIによる最適統合案の生成",
+                "strategies": [
+                  "マージ",
+                  "抽出と参照化",
+                  "再構成"
+                ],
+                "customization": "統合方針のユーザー設定（保守的/積極的）"
+              }
+            },
+            {
+              "name": "マージプレビュー",
+              "description": "統合案の適用結果をプレビュー表示",
+              "details": "変更前後の差分とマージ後の状態をわかりやすく表示",
+              "implementation": {
+                "approach": "差分表示と対話式プレビュー",
+                "views": [
+                  "サイドバイサイド",
+                  "インライン",
+                  "構造表示"
+                ],
+                "interactions": [
+                  "部分適用",
+                  "カスタマイズ",
+                  "承認/拒否"
+                ]
+              }
+            },
+            {
+              "name": "インテリジェント参照化",
+              "description": "重複コンテンツの参照化による効率化",
+              "details": "重複情報を共通部分として抽出し、参照構造に変換",
+              "implementation": {
+                "approach": "共通パターン抽出と参照変換",
+                "refactoringTypes": [
+                  "共通定義の抽出",
+                  "ポインタによる参照",
+                  "継承関係の構築"
+                ],
+                "validation": "参照化後の整合性検証"
+              }
+            },
+            {
+              "name": "自動リファクタリング",
+              "description": "AIが提案するリファクタリングの自動適用",
+              "details": "ユーザー承認に基づく自動リファクタリング実行（オプション）",
+              "implementation": {
+                "approach": "安全なJSONパッチ操作",
+                "safetyMeasures": [
+                  "バックアップ生成",
+                  "アトミック操作",
+                  "ロールバック機能"
+                ],
+                "progressTracking": "リファクタリング進捗の可視化"
+              }
+            }
+          ],
+          "priority": "high",
+          "implementationDetails": {
+            "mainClasses": [
+              "ContentConsolidationService",
+              "MergeProposalGenerator",
+              "RefactoringExecutor"
+            ],
+            "keyAlgorithms": [
+              "差分計算アルゴリズム",
+              "最適マージ戦略",
+              "参照構造変換"
+            ],
+            "geminiPromptExamples": [
+              "検出された以下の重複情報を最も効率的に統合する方法を提案してください。情報の損失を最小限に抑えつつ、再利用性を最大化する方法を考えてください。",
+              "これらの重複情報を統合する際に考慮すべき特別な条件や例外はありますか？各統合案のメリットとデメリットを分析してください。"
+            ]
+          }
+        },
+        {
+          "id": "feature-ai-consistency-checker",
+          "name": "整合性チェッカー",
+          "description": "メモリバンク内の情報の整合性を検証し、矛盾や不一致を検出する機能",
+          "subFeatures": [
+            {
+              "name": "クロスリファレンスチェック",
+              "description": "参照関係の整合性を検証",
+              "details": "ドキュメント間の相互参照の検証と問題箇所の特定",
+              "implementation": {
+                "approach": "グラフベースの参照解析",
+                "validations": [
+                  "存在性確認",
+                  "循環参照検出",
+                  "型互換性検証"
+                ],
+                "reporting": "問題の発見とナビゲーションリンク"
+              }
+            },
+            {
+              "name": "意味的整合性検証",
+              "description": "内容の意味的な矛盾や不一致を検出",
+              "details": "AIによる内容の論理的整合性分析",
+              "implementation": {
+                "approach": "自然言語理解と論理分析",
+                "focusAreas": [
+                  "定義の矛盾",
+                  "事実の不一致",
+                  "仮定の相違"
+                ],
+                "confidenceScoring": "検出された問題の確信度評価"
+              }
+            },
+            {
+              "name": "時系列整合性",
+              "description": "時間的な前後関係や変更履歴の整合性検証",
+              "details": "タイムスタンプやバージョン情報に基づく時系列整合性の確認",
+              "implementation": {
+                "approach": "時系列分析とバージョン比較",
+                "detectionTypes": [
+                  "因果関係の矛盾",
+                  "バージョン間の不整合",
+                  "時系列ギャップ"
+                ],
+                "visualization": "時系列変更の可視化"
+              }
+            },
+            {
+              "name": "修正提案",
+              "description": "検出された不整合に対する修正案の提示",
+              "details": "問題解決のための具体的な修正提案の生成",
+              "implementation": {
+                "approach": "AIによる修正案生成",
+                "proposalTypes": [
+                  "統合案",
+                  "削除案",
+                  "追加案",
+                  "変更案"
+                ],
+                "prioritization": "重要度と実装難易度に基づく優先順位付け"
+              }
+            }
+          ],
+          "priority": "medium",
+          "implementationDetails": {
+            "mainClasses": [
+              "ConsistencyCheckService",
+              "SemanticAnalyzer",
+              "ReferenceValidator"
+            ],
+            "keyAlgorithms": [
+              "グラフベース整合性検証",
+              "時系列分析",
+              "ロジック検証"
+            ],
+            "geminiPromptExamples": [
+              "これらのメモリバンクドキュメント間に論理的な矛盾や不整合がないか分析し、問題箇所を特定してください。",
+              "以下のドキュメントセットで、時系列的な矛盾や事実の不一致がある箇所を見つけ、修正案を提示してください。"
+            ]
+          }
+        },
+        {
+          "id": "feature-ai-smart-summarization",
+          "name": "インテリジェント要約",
+          "description": "メモリバンクの内容を自動的に要約し、主要ポイントを抽出する機能",
+          "subFeatures": [
+            {
+              "name": "コンテキスト対応要約",
+              "description": "コンテキストに応じた適切な要約生成",
+              "details": "ユースケースや目的に合わせた柔軟な要約生成",
+              "implementation": {
+                "approach": "コンテキスト考慮型要約モデル",
+                "customizations": [
+                  "長さ調整",
+                  "詳細度調整",
+                  "フォーカスエリア指定"
+                ],
+                "formats": [
+                  "箇条書き",
+                  "段落型",
+                  "ハイライト型"
+                ]
+              }
+            },
+            {
+              "name": "メタ情報生成",
+              "description": "メモリバンクの全体像を示すメタ情報の生成",
+              "details": "ナレッジベース全体の構造や主要トピックの可視化",
+              "implementation": {
+                "approach": "トピックモデリングと構造分析",
+                "outputs": [
+                  "トピックマップ",
+                  "カテゴリツリー",
+                  "関連性グラフ"
+                ],
+                "interactivity": "ドリルダウンとフィルタリング"
+              }
+            },
+            {
+              "name": "更新履歴の要約",
+              "description": "変更履歴を自然言語で要約",
+              "details": "複雑な変更履歴を人間が理解しやすい形で要約",
+              "implementation": {
+                "approach": "差分分析と変更意図の推論",
+                "granularity": [
+                  "日次",
+                  "週次",
+                  "マイルストーン別"
+                ],
+                "perspectives": [
+                  "機能視点",
+                  "構造視点",
+                  "プロセス視点"
+                ]
+              }
+            },
+            {
+              "name": "マルチモーダル要約",
+              "description": "テキストとビジュアル要素を組み合わせた要約",
+              "details": "グラフやチャートを含む視覚的な要約の生成",
+              "implementation": {
+                "approach": "データ抽出とビジュアライゼーション統合",
+                "visualTypes": [
+                  "チャート",
+                  "ダイアグラム",
+                  "ヒートマップ",
+                  "タイムライン"
+                ],
+                "interactivity": "インタラクティブ要素とドリルダウン"
+              }
+            }
+          ],
+          "priority": "medium",
+          "implementationDetails": {
+            "mainClasses": [
+              "SummarizationService",
+              "ContextAwareDigester",
+              "VisualSummaryGenerator"
+            ],
+            "keyAlgorithms": [
+              "抽出的要約アルゴリズム",
+              "生成的要約モデル",
+              "グラフ可視化アルゴリズム"
+            ],
+            "geminiPromptExamples": [
+              "このメモリバンクの主要な情報とトピックを簡潔に要約し、階層的な構造で整理してください。",
+              "次のドキュメント群の変更履歴を分析し、主要な変更点とその意図を自然言語で説明してください。"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
