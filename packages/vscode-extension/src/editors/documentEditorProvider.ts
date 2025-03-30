@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import MarkdownIt from 'markdown-it'; // Import markdown-it
+import MarkdownIt from 'markdown-it';
+// mdMermaid will be imported dynamically later
 
 // Initialize markdown-it instance for the provider
 const md = new MarkdownIt({
@@ -8,6 +9,7 @@ const md = new MarkdownIt({
   linkify: true,
   typographer: true,
 });
+// Mermaid plugin will be applied dynamically later
 
 /**
  * Provider for the Memory Bank Document custom editor.
@@ -31,12 +33,31 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
     return providerRegistration;
   }
 
-  constructor(private readonly context: vscode.ExtensionContext) { }
+  // Make constructor async to handle dynamic import
+  private constructor(private readonly context: vscode.ExtensionContext) {
+    this.initializeMarkdownIt(); // Call async initialization
+  }
+
+  // Async function to initialize markdown-it with the plugin
+  private async initializeMarkdownIt(): Promise<void> {
+    try {
+      // Dynamically import the mermaid plugin
+      const mdMermaid = await import('markdown-it-mermaid');
+      // Apply the plugin to the markdown-it instance
+      // Need to handle potential default export if it's CJS wrapped in ESM
+      md.use(mdMermaid.default || mdMermaid);
+      console.log('[Provider] markdown-it-mermaid plugin loaded and applied dynamically.');
+    } catch (error) {
+      console.error('[Provider] Failed to load or apply markdown-it-mermaid dynamically:', error);
+      // Handle the error appropriately, maybe disable mermaid rendering
+    }
+  }
 
   /**
    * Called when a custom editor is opened for the given document.
    * Sets up the webview panel.
    */
+  public async resolveCustomTextEditor(
   public async resolveCustomTextEditor(
     document: vscode.TextDocument,
     webviewPanel: vscode.WebviewPanel,
@@ -52,10 +73,10 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
     webviewPanel.webview.html = this.getHtmlForWebview(webviewPanel.webview, document);
     console.log(`[Provider] Webview HTML set for: ${document.uri.fsPath}`); // Log HTML set
 
-    // Handle messages from the webview (inline script)
+    // Handle messages from the webview
     webviewPanel.webview.onDidReceiveMessage(e => {
       switch (e.type) {
-        case 'update': // Message from the simple textarea input listener
+        case 'update': // Message from the editor.js script
           console.log(`Received update from webview for ${document.uri.fsPath}`);
           // Update the document first
           this._updateTextDocument(document, e.payload);
@@ -107,13 +128,15 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
 
     // Basic styles
     const stylesUri = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'media', 'editor.css'));
+    // JavaScript for the editor functionality
+    const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'media', 'js', 'editor.js'));
 
-    // Reverted to simple textarea and inline script
+    // Return HTML with external script reference
     return `<!DOCTYPE html>
       <html lang="en">
       <head>
         <meta charset="UTF-8">
-        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; font-src ${webview.cspSource}; img-src ${webview.cspSource} https: data:; script-src 'nonce-${nonce}';">
+        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; font-src ${webview.cspSource}; img-src ${webview.cspSource} https: data:; script-src 'nonce-${nonce}' ${webview.cspSource};">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="${stylesUri}" rel="stylesheet">
         <title>Memory Bank Editor</title>
@@ -143,65 +166,10 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
            <div id="preview-content" class="markdown-body"></div>
         </div>
 
-        <script nonce="${nonce}">
-          (function() {
-            const vscode = acquireVsCodeApi();
-            const editor = document.getElementById('editor');
-            const previewContentDiv = document.getElementById('preview-content');
-            const errorMessageDiv = document.getElementById('error-message');
-            let lastKnownText = editor.value;
-
-            // Handle messages from the extension
-            window.addEventListener('message', event => {
-              const message = event.data;
-              switch (message.type) {
-                case 'update': // Update editor content
-                  const newText = message.text;
-                  if (newText !== lastKnownText) {
-                    console.log("Webview received editor update from extension.");
-                    editor.value = newText;
-                    lastKnownText = newText;
-                    errorMessageDiv.textContent = '';
-                  }
-                  break;
-                case 'updatePreview': // Update preview content
-                  console.log("[Webview] Received 'updatePreview' from extension."); // Log message reception
-                  if (message.html !== undefined) {
-                    previewContentDiv.innerHTML = message.html; // Set rendered HTML
-                    console.log("[Webview] Preview HTML updated (length: " + message.html.length + ")"); // Log HTML update
-                  } else {
-                    console.error("[Webview] Received 'updatePreview' message without html content.");
-                  }
-                  break;
-                }
-            });
-
-            // Inform the extension host about changes in the textarea
-            editor.addEventListener('input', (e) => {
-              const newText = e.target.value;
-              lastKnownText = newText;
-              errorMessageDiv.textContent = '';
-
-              // Basic JSON validation
-              try {
-                  JSON.parse(newText);
-                  // Send update to extension host for processing and preview generation
-                  vscode.postMessage({ type: 'update', payload: newText });
-              } catch (err) {
-                  errorMessageDiv.textContent = 'Invalid JSON: ' + err.message;
-                  // Still send update so extension is aware of invalid state
-                  vscode.postMessage({ type: 'update', payload: newText });
-              }
-            });
-
-            console.log("[Webview] Script loaded and listeners attached."); // Updated log message
-            // Request initial preview
-            console.log("[Webview] Sending 'requestPreview' message to extension."); // Log message sending
-            vscode.postMessage({ type: 'requestPreview', payload: lastKnownText });
-
-          }());
-        </script>
+        <script nonce="${nonce}" src="${scriptUri}"></script>
       </body>
+      </html>`;
+  }
       </html>`;
   }
 
@@ -226,7 +194,8 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
     }
 
     const html = md.render(markdown);
-    console.log(`[Provider] Generated HTML (length: ${html.length}):\n`, html.substring(0, 200) + '...'); // Log generated HTML (truncated)
+    // Log the full HTML content to check if <div class="mermaid"> is generated
+    console.log(`[Provider] Generated HTML for preview:\n${html}`);
     webviewPanel.webview.postMessage({ type: 'updatePreview', html: html });
     console.log(`[Provider] Sent 'updatePreview' message to webview.`); // Log message sending
   }
