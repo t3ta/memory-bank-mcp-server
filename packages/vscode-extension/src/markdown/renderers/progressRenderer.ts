@@ -1,5 +1,5 @@
 import { MAX_ARRAY_ITEMS } from './common';
-import { renderGenericContent } from './genericRenderer'; // Import generic renderer for fallback
+import { renderGenericContent } from './genericRenderer';
 
 /**
  * Renders content for 'progress' document type.
@@ -15,12 +15,11 @@ export function renderProgressContent(content: any): string {
         if (content.status) {
           mdString += `**Status:** ${content.status}\n\n`;
         }
+        // Removed extra brace from line 18
         if (content.completionPercentage !== undefined && typeof content.completionPercentage === 'number') {
-          // Basic progress bar simulation
           const percentage = Math.max(0, Math.min(100, content.completionPercentage));
           const filledCount = Math.round(percentage / 10);
           const emptyCount = 10 - filledCount;
-          mdString += `**Completion:** \`[${'#'.repeat(filledCount)}${'-'.repeat(emptyCount)}]\` ${percentage}%\n\n`;
         }
 
         if (Array.isArray(content.workingFeatures) && content.workingFeatures.length > 0) {
@@ -40,7 +39,6 @@ export function renderProgressContent(content: any): string {
 
         if (Array.isArray(content.pendingImplementation) && content.pendingImplementation.length > 0) {
           mdString += `### Pending Implementation\n`;
-          // Group by priority if available
           const grouped: { [key: string]: any[] } = {};
           content.pendingImplementation.forEach((item: any) => {
               const priority = item.priority || 'medium';
@@ -57,10 +55,10 @@ export function renderProgressContent(content: any): string {
                    if (remainingItems > 0) {
                       mdString += `\n- ... (${remainingItems} more items)`;
                   }
-                  mdString += '\n'; // Add newline after each priority group list
+                  mdString += '\n';
               }
           });
-           mdString += '\n'; // Add final newline after all priorities
+           mdString += '\n';
         }
 
          if (Array.isArray(content.knownIssues) && content.knownIssues.length > 0) {
@@ -73,14 +71,13 @@ export function renderProgressContent(content: any): string {
                   issueStr += `\n  - **Solution:** ${issue.solution}`;
               }
               return issueStr;
-          }).join('\n\n'); // Keep double newline between issues for readability
+          }).join('\n\n');
           if (remainingIssues > 0) {
-              mdString += `\n\n- ... (${remainingIssues} more issues)`; // Add double newline before "more items"
+              mdString += `\n\n- ... (${remainingIssues} more issues)`;
           }
           mdString += '\n\n';
         }
 
-        // Add any other top-level keys from content using generic rendering as fallback
         const handledKeys = ['status', 'completionPercentage', 'workingFeatures', 'pendingImplementation', 'knownIssues'];
         const remainingContent: any = {};
         for (const key in content) {
@@ -90,7 +87,7 @@ export function renderProgressContent(content: any): string {
         }
         if (Object.keys(remainingContent).length > 0) {
              mdString += `### Other Information\n\n`;
-             mdString += renderGenericContent(remainingContent); // Use generic renderer for the rest
+             mdString += renderGenericContent(remainingContent);
         }
 
         return mdString || '_(Progress content seems empty)_';

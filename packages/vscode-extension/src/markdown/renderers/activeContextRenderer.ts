@@ -1,5 +1,5 @@
 import { MAX_ARRAY_ITEMS } from './common';
-import { renderGenericContent } from './genericRenderer'; // Import generic renderer for fallback
+import { renderGenericContent } from './genericRenderer';
 
 /**
  * Renders content for 'active_context' document type.
@@ -16,14 +16,12 @@ export function renderActiveContextContent(content: any): string {
           mdString += `### Current Work\n**${content.currentWork}**\n\n`;
         }
 
-        const MAX_ARRAY_ITEMS = 10; // Limit array items displayed
+        // const MAX_ARRAY_ITEMS = 10; // Defined in common.ts
 
         if (Array.isArray(content.recentChanges) && content.recentChanges.length > 0) {
           mdString += `### Recent Changes\n`;
-          // Sort by date descending if possible
           try {
               content.recentChanges.sort((a: any, b: any) => {
-                  // Handle potential invalid dates
                   const dateA = a.date ? new Date(a.date).getTime() : 0;
                   const dateB = b.date ? new Date(b.date).getTime() : 0;
                   return (isNaN(dateB) ? 0 : dateB) - (isNaN(dateA) ? 0 : dateA);
@@ -36,7 +34,7 @@ export function renderActiveContextContent(content: any): string {
               let dateStr = '';
               try {
                   dateStr = change.date ? new Date(change.date).toLocaleString() : '';
-              } catch (e) { /* ignore invalid date */ }
+              } catch (e) { /* ignore */ }
               return `- **${dateStr || (change.id || 'Change')}:** ${change.description || 'N/A'}`;
           }).join('\n');
           if (remainingChanges > 0) {
@@ -73,7 +71,6 @@ export function renderActiveContextContent(content: any): string {
 
         if (Array.isArray(content.nextSteps) && content.nextSteps.length > 0) {
            mdString += `### Next Steps\n`;
-           // Group by priority if available
            const grouped: { [key: string]: any[] } = {};
            content.nextSteps.forEach((item: any) => {
                const priority = item.priority || 'medium';
@@ -90,13 +87,12 @@ export function renderActiveContextContent(content: any): string {
                    if (remainingItems > 0) {
                        mdString += `\n- ... (${remainingItems} more items)`;
                    }
-                   mdString += '\n'; // Add newline after each priority group list
+                   mdString += '\n';
                }
            });
             mdString += '\n';
         }
 
-        // Add any other top-level keys using generic rendering
         const handledKeys = ['currentWork', 'recentChanges', 'activeDecisions', 'considerations', 'nextSteps'];
         const remainingContent: any = {};
          for (const key in content) {

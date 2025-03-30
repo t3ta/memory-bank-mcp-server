@@ -21,10 +21,8 @@ export class AIService {
             }
         } else {
             console.warn('Gemini API key not found. AI features will be disabled.');
-            // Optionally show a persistent warning or status bar item
         }
 
-        // Listen for configuration changes to update the API key dynamically
         vscode.workspace.onDidChangeConfiguration(event => {
             if (event.affectsConfiguration('memory-bank.ai.apiKey')) {
                 console.log('Gemini API key configuration changed. Reloading key and client.');
@@ -37,10 +35,10 @@ export class AIService {
                     } catch (error) {
                         console.error('Failed to re-initialize GoogleGenerativeAI client:', error);
                         vscode.window.showErrorMessage(`Failed to update Gemini API client: ${error instanceof Error ? error.message : String(error)}`);
-                        this.genAI = undefined; // Ensure client is undefined on error
+                        this.genAI = undefined;
                     }
                 } else {
-                    this.genAI = undefined; // Clear client if key is removed
+                    this.genAI = undefined;
                     console.warn('Gemini API key removed or invalid. AI features disabled.');
                 }
             }
@@ -55,12 +53,6 @@ export class AIService {
         this.apiKey = configuration.get<string>('apiKey');
         if (!this.apiKey) {
             console.warn("Configuration 'memory-bank.ai.apiKey' not found or empty.");
-            // Optionally prompt the user to enter the key if it's missing the first time
-            // vscode.window.showWarningMessage('Gemini API Key is not configured. AI features are disabled.', 'Open Settings').then(selection => {
-            //     if (selection === 'Open Settings') {
-            //         vscode.commands.executeCommand('workbench.action.openSettings', 'memory-bank.ai.apiKey');
-            //     }
-            // });
         } else {
             console.log("Gemini API key loaded from settings.");
         }
@@ -91,7 +83,6 @@ export class AIService {
         try {
             const model = this.genAI.getGenerativeModel({ model: modelName });
 
-            // Basic safety settings - adjust as needed
             const safetySettings = [
                 { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
                 { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
@@ -102,10 +93,7 @@ export class AIService {
             const result = await model.generateContent({
                 contents: [{ role: "user", parts: [{ text: prompt }] }],
                 generationConfig: {
-                    // temperature: 0.9, // Example config
-                    // topK: 1,
-                    // topP: 1,
-                    // maxOutputTokens: 2048,
+                    // Add specific generation config if needed
                 },
                 safetySettings,
             });
@@ -117,25 +105,21 @@ export class AIService {
                  return null;
             }
 
-            // Handle potential safety blocks
-            if (!response.candidates || response.candidates.length === 0 || !response.candidates[0].content) {
-                const blockReason = response.promptFeedback?.blockReason;
-                const safetyRatings = response.promptFeedback?.safetyRatings ?? [];
+           if (!response.candidates || response.candidates.length === 0 || !response.candidates[0].content) {
+               const blockReason = response.promptFeedback?.blockReason;
+               const safetyRatings = response.promptFeedback?.safetyRatings ?? [];
                 console.warn(`Content generation blocked. Reason: ${blockReason || 'Unknown'}. Ratings: ${JSON.stringify(safetyRatings)}`);
                 vscode.window.showWarningMessage(`Content generation blocked due to safety settings. Reason: ${blockReason || 'Check Logs'}`);
                 return null;
             }
 
-            const text = response.text(); // Use response.text() helper
+            const text = response.text();
             console.log('Content generated successfully.');
             return text;
-
         } catch (error) {
             console.error(`Error generating content with model ${modelName}:`, error);
             vscode.window.showErrorMessage(`Gemini API error: ${error instanceof Error ? error.message : String(error)}`);
             return null;
         }
     }
-
-    // Add more methods later for specific tasks like embedding, analysis, etc.
 }

@@ -3,7 +3,7 @@ import { MemoryBankProvider } from './providers/memoryBankProvider';
 import { SchemaProvider } from './providers/schemaProvider';
 import { MemoryBankExplorerProvider } from './explorer/memoryBankExplorerProvider';
 import { DocumentEditorProvider } from './editors/documentEditorProvider';
-import { AIService } from './services/aiService'; // Import AIService
+import { AIService } from './services/aiService';
 
 /**
  * This method is called when your extension is activated.
@@ -11,15 +11,14 @@ import { AIService } from './services/aiService'; // Import AIService
  * @param context The extension context provided by VS Code.
  */
 export function activate(context: vscode.ExtensionContext): void {
-  // Log entry point to confirm activation attempt
   console.log('--- Activating Memory Bank Editor ---');
-  vscode.window.showInformationMessage('Memory Bank Editor is activating...'); // Show message to user
+  vscode.window.showInformationMessage('Memory Bank Editor is activating...');
 
-  console.log('Congratulations, your extension "memory-bank-editor" is now active!'); // Keep original log
+  console.log('Congratulations, your extension "memory-bank-editor" is now active!');
 
   let memoryProvider: MemoryBankProvider | undefined;
   let schemaProvider: SchemaProvider | undefined;
-  let aiService: AIService | undefined; // Declare AIService variable
+  let aiService: AIService | undefined;
 
   try {
     memoryProvider = new MemoryBankProvider();
@@ -27,7 +26,6 @@ export function activate(context: vscode.ExtensionContext): void {
   } catch (error) {
     console.error('Failed to instantiate MemoryBankProvider:', error);
     vscode.window.showErrorMessage(`Failed to initialize Memory Bank Provider: ${error instanceof Error ? error.message : String(error)}`);
-    // Don't necessarily stop activation, maybe some features can work without it? Or maybe stop. Decide later.
   }
 
   try {
@@ -36,22 +34,19 @@ export function activate(context: vscode.ExtensionContext): void {
   } catch (error) {
     console.error('Failed to instantiate SchemaProvider:', error);
     vscode.window.showErrorMessage(`Failed to initialize Schema Provider: ${error instanceof Error ? error.message : String(error)}`);
-    // Decide if activation should stop here too.
   }
 
   try {
-    aiService = new AIService(); // Instantiate AIService
+    aiService = new AIService();
     console.log('AIService instantiated successfully.');
   } catch (error) {
     console.error('Failed to instantiate AIService:', error);
     vscode.window.showErrorMessage(`Failed to initialize AI Service: ${error instanceof Error ? error.message : String(error)}`);
-    // AI features might be disabled if this fails, but activation can continue
   }
 
 
   // --- Test Commands ---
 
-  // Test Reading
   const testReadCommand = vscode.commands.registerCommand('memoryBank.testRead', async () => {
     if (!memoryProvider) {
         vscode.window.showErrorMessage('Memory Bank Provider is not available.');
@@ -68,7 +63,6 @@ export function activate(context: vscode.ExtensionContext): void {
     }
   });
 
-  // Test Writing
   const testWriteCommand = vscode.commands.registerCommand('memoryBank.testWrite', async () => {
     if (!memoryProvider) {
         vscode.window.showErrorMessage('Memory Bank Provider is not available.');
@@ -89,15 +83,13 @@ export function activate(context: vscode.ExtensionContext): void {
     }
   });
 
-  // Test Schema Validation
   const testSchemaCommand = vscode.commands.registerCommand('memoryBank.testSchema', () => {
     if (!schemaProvider) {
         vscode.window.showErrorMessage('Schema Provider is not available.');
         return;
     }
-    const documentTypeToTest = 'progress'; // Test with the progress schema
+    const documentTypeToTest = 'progress';
 
-    // Construct valid test data including metadata and schema version
     const validTestData = {
         schema: 'memory_document_v2',
         metadata: {
@@ -116,7 +108,6 @@ export function activate(context: vscode.ExtensionContext): void {
         }
     };
 
-    // Construct invalid test data including metadata and schema version
     const invalidTestData = {
         schema: 'memory_document_v2',
         metadata: {
@@ -136,7 +127,6 @@ export function activate(context: vscode.ExtensionContext): void {
     };
 
 
-    // Test valid data - Pass only the document object
     const validResult = schemaProvider.validateDocument(validTestData);
     if (validResult.success) {
         vscode.window.showInformationMessage(`Validation successful for valid test data against schema '${documentTypeToTest}'.`);
@@ -146,7 +136,6 @@ export function activate(context: vscode.ExtensionContext): void {
         console.error("Valid data validation error:", validResult.error.errors);
     }
 
-    // Test invalid data - Pass only the document object
     const invalidResult = schemaProvider.validateDocument(invalidTestData);
     if (!invalidResult.success) {
         vscode.window.showInformationMessage(`Validation correctly failed for invalid test data against schema '${documentTypeToTest}'. See console.`);
@@ -156,7 +145,6 @@ export function activate(context: vscode.ExtensionContext): void {
         console.error("Invalid data validation passed unexpectedly:", invalidResult.data);
     }
 
-     // Test getting a schema using the documentType we tested validation with
      const retrievedSchema = schemaProvider.getSchema(documentTypeToTest);
      if (retrievedSchema) {
          console.log(`Successfully retrieved schema object for '${documentTypeToTest}'.`);
@@ -171,37 +159,30 @@ export function activate(context: vscode.ExtensionContext): void {
     ? vscode.workspace.workspaceFolders[0].uri.fsPath
     : undefined;
 
-  if (workspaceRoot && memoryProvider) { // Ensure memoryProvider is also available
-      explorerProvider = new MemoryBankExplorerProvider(workspaceRoot, memoryProvider); // Pass memoryProvider
-      // Register the TreeDataProvider using the view ID defined in package.json
+  if (workspaceRoot && memoryProvider) {
+      explorerProvider = new MemoryBankExplorerProvider(workspaceRoot, memoryProvider);
       vscode.window.registerTreeDataProvider('memoryBankDocuments', explorerProvider);
       console.log('MemoryBankExplorerProvider registered for view: memoryBankDocuments');
 
-      // Register the refresh command defined in package.json
       const refreshCommand = vscode.commands.registerCommand('memoryBank.refreshExplorer', () => {
-          explorerProvider?.refresh(); // Use optional chaining in case initialization failed
+          explorerProvider?.refresh();
           vscode.window.showInformationMessage('Memory Bank Explorer refreshed.');
       });
       context.subscriptions.push(refreshCommand);
 
   } else {
       console.warn("Memory Bank Explorer cannot be initialized because no workspace root is defined.");
-      // Optionally inform the user if the explorer cannot be shown
-      // vscode.window.showWarningMessage("Memory Bank Explorer requires an open folder.");
   }
 
   // --- Register Custom Editor ---
-  // The register method handles the registration and returns the disposable
   context.subscriptions.push(DocumentEditorProvider.register(context));
   console.log('DocumentEditorProvider registered.');
 
 
-  // Push all test commands into subscriptions
+  // --- Register Test Commands ---
   context.subscriptions.push(testReadCommand, testWriteCommand, testSchemaCommand);
-  // Note: TreeDataProvider registration doesn't return a disposable in the same way,
-  // but the refresh command's disposable was already pushed if the provider was created.
 
-  // Test AI Service Command
+  // --- Test AI Service Command ---
   const testAICommand = vscode.commands.registerCommand('memoryBank.testAI', async () => {
     if (!aiService || !aiService.isReady()) {
         vscode.window.showErrorMessage('AI Service is not available or not configured. Please check settings.');
@@ -209,7 +190,7 @@ export function activate(context: vscode.ExtensionContext): void {
     }
     const prompt = await vscode.window.showInputBox({ prompt: 'Enter a prompt for Gemini:' });
     if (!prompt) {
-        return; // User cancelled
+        return;
     }
 
     vscode.window.withProgress({
@@ -222,7 +203,6 @@ export function activate(context: vscode.ExtensionContext): void {
             const result = await aiService.generateContent('gemini-1.5-flash', prompt); // Use flash model for testing
             progress.report({ increment: 100 });
             if (result !== null) {
-                // Display result in a new untitled document
                 const doc = await vscode.workspace.openTextDocument({ content: result, language: 'markdown' });
                 await vscode.window.showTextDocument(doc);
                 vscode.window.showInformationMessage('Gemini response received.');
@@ -236,9 +216,7 @@ export function activate(context: vscode.ExtensionContext): void {
         }
     });
   });
-  context.subscriptions.push(testAICommand); // Add test command to subscriptions
-
-  // Add other command registrations and initialization logic here
+  context.subscriptions.push(testAICommand);
 }
 
 /**
@@ -246,5 +224,4 @@ export function activate(context: vscode.ExtensionContext): void {
  */
 export function deactivate(): void {
   console.log('Your extension "memory-bank-editor" is now deactivated.');
-  // Add cleanup logic here
 }
