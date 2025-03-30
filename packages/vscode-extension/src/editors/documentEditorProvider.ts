@@ -13,7 +13,7 @@ const md = new MarkdownIt({
 });
 
 // Customize fenced block rendering for Mermaid (Re-adding custom renderer)
-const defaultFenceRenderer = md.renderer.rules.fence || function(tokens, idx, options, env, self) {
+const defaultFenceRenderer = md.renderer.rules.fence || function (tokens, idx, options, env, self) {
   // Basic fallback renderer if the default is somehow undefined
   const token = tokens[idx];
   const info = token.info ? token.info.trim() : '';
@@ -180,11 +180,24 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
         <link href="${stylesUri}" rel="stylesheet">
         <title>Memory Bank Editor</title>
         <style>
-          /* Basic layout for side-by-side view */
-          body { display: flex; height: 100vh; margin: 0; padding: 0; overflow: hidden; }
-          .panel { flex: 1; padding: 10px; overflow-y: auto; height: 100%; box-sizing: border-box; }
+          /* Basic layout */
+          body { display: flex; flex-direction: column; height: 100vh; margin: 0; padding: 0; overflow: hidden; }
+          #controls { padding: 5px 10px; border-bottom: 1px solid var(--vscode-editorWidget-border, #ccc); flex-shrink: 0; }
+          #controls button { margin-right: 5px; padding: 3px 10px; background-color: var(--vscode-button-secondaryBackground); color: var(--vscode-button-secondaryForeground); border: 1px solid var(--vscode-button-border); border-radius: 3px; cursor: pointer; font-size: 12px; }
+          #controls button:hover { background-color: var(--vscode-button-secondaryHoverBackground); }
+          #controls button.active { background-color: var(--vscode-button-background); color: var(--vscode-button-foreground); border-color: var(--vscode-button-background); }
+          #main-area { display: flex; flex-grow: 1; overflow: hidden; } /* Container for editor/preview */
+          .panel { flex: 1; padding: 10px; overflow-y: auto; height: 100%; box-sizing: border-box; display: flex; flex-direction: column; } /* Ensure panels are flex columns */
+          .panel h2 { margin-top: 0; margin-bottom: 8px; flex-shrink: 0; }
           #editor-panel { border-right: 1px solid var(--vscode-editorWidget-border, #ccc); }
           #preview-panel { }
+          textarea.editor-area { flex-grow: 1; /* Make textarea fill available space */ width: 100%; border: 1px solid var(--vscode-input-border, #ccc); font-family: var(--vscode-editor-font-family, monospace); resize: none; }
+
+          /* Mode specific styles */
+          body.show-editor-only #preview-panel { display: none; }
+          body.show-editor-only #editor-panel { border-right: none; }
+          body.show-preview-only #editor-panel { display: none; }
+          body.show-split #editor-panel, body.show-split #preview-panel { display: flex; flex-direction: column; } /* Ensure panels are visible in split */
           /* Removed invalid meta tag from inside style block */
           .error-message { color: var(--vscode-errorForeground, red); margin-top: 5px; }
           /* Add styles for markdown preview if needed */
@@ -213,15 +226,22 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
 
         </style>
       </head>
-      <body class="${themeClass}">
-        <div id="editor-panel" class="panel">
-          <h2>Editor</h2>
-          <textarea id="editor" class="editor-area" nonce="${nonce}">${escapeHtml(documentContent)}</textarea>
-          <div id="error-message" class="error-message"></div>
+      <body class="${themeClass} show-split">
+        <div id="controls">
+          <button data-mode="editor-only">Editor</button>
+          <button data-mode="split" class="active">Split</button>
+          <button data-mode="preview-only">Preview</button>
         </div>
-        <div id="preview-panel" class="panel">
-           <h2>Preview</h2>
-           <div id="preview-content" class="markdown-body"></div>
+        <div id="main-area">
+          <div id="editor-panel" class="panel">
+            <h2>Editor</h2>
+            <textarea id="editor" class="editor-area" nonce="${nonce}">${escapeHtml(documentContent)}</textarea>
+            <div id="error-message" class="error-message"></div>
+          </div>
+          <div id="preview-panel" class="panel">
+             <h2>Preview</h2>
+             <div id="preview-content" class="markdown-body"></div>
+          </div>
         </div>
 
         <script nonce="${nonce}" src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
