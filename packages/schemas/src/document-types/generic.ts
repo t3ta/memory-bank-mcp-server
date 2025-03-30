@@ -9,13 +9,22 @@ export const GenericDocumentContentV2Schema = z
     message: 'Content cannot be empty',
   });
 
-export const GenericDocumentJsonV2Schema = BaseJsonDocumentV2Schema.extend({
-  metadata: DocumentMetadataV2Schema.extend({
-    documentType: commonValidators.nonEmptyString('documentType'), // Use helper
-  }),
-  content: GenericDocumentContentV2Schema,
-});
+  // Define Generic specific metadata
+  const GenericMetadataSchema = DocumentMetadataV2Schema.extend({
+    // For generic documents, documentType can be any non-empty string
+    documentType: commonValidators.nonEmptyString('documentType'),
+  });
 
-// Type exports
-export type GenericDocumentContentV2 = z.infer<typeof GenericDocumentContentV2Schema>;
+  // Define the full Generic schema by merging base (without metadata/content)
+  // with the specific metadata and content schemas.
+  export const GenericDocumentJsonV2Schema = BaseJsonDocumentV2Schema
+    .omit({ metadata: true, content: true }) // Omit base metadata and content
+    .merge(z.object({ // Merge with specific metadata and content
+      metadata: GenericMetadataSchema,
+      content: GenericDocumentContentV2Schema,
+    }));
+
+  // Type exports
+  export type GenericDocumentContentV2 = z.infer<typeof GenericDocumentContentV2Schema>;
+  export type GenericMetadataV2 = z.infer<typeof GenericMetadataSchema>; // Add metadata type export
 export type GenericDocumentJsonV2 = z.infer<typeof GenericDocumentJsonV2Schema>;

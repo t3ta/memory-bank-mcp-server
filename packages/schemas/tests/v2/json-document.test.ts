@@ -10,7 +10,7 @@ import {
   SystemPatternsJsonV2Schema,
   GenericDocumentJsonV2Schema,
   SCHEMA_VERSION
-} from '../../src/v2/json-document.js';
+} from '../../src/index.js'; // Import from the main package entry point
 
 describe('DocumentMetadataV2Schema', () => {
   it('should validate correct metadata', () => {
@@ -20,15 +20,15 @@ describe('DocumentMetadataV2Schema', () => {
       id: '123e4567-e89b-12d3-a456-426614174000',
       path: 'test/document.json',
       tags: ['test', 'example'],
-      lastModified: new Date(),
-      createdAt: new Date(),
+      lastModified: '2023-10-27T10:00:00.000Z', // Use ISO string
+      createdAt: '2023-10-26T10:00:00.000Z', // Use ISO string
       version: 1
     };
-    
+
     const result = DocumentMetadataV2Schema.safeParse(validMetadata);
     expect(result.success).toBe(true);
   });
-  
+
   it('should accept ISO date strings for dates', () => {
     const validMetadata = {
       title: 'Test Document',
@@ -40,24 +40,24 @@ describe('DocumentMetadataV2Schema', () => {
       createdAt: '2025-03-26T10:00:00Z',
       version: 1
     };
-    
+
     const result = DocumentMetadataV2Schema.safeParse(validMetadata);
     expect(result.success).toBe(true);
   });
-  
+
   it('should reject metadata with missing required fields', () => {
     const invalidMetadata = {
       title: 'Test Document',
       // missing documentType, id, path, etc.
     };
-    
+
     const result = DocumentMetadataV2Schema.safeParse(invalidMetadata);
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.issues.length).toBeGreaterThan(0);
     }
   });
-  
+
   it('should reject metadata with invalid UUID', () => {
     const invalidMetadata = {
       title: 'Test Document',
@@ -69,11 +69,11 @@ describe('DocumentMetadataV2Schema', () => {
       createdAt: new Date(),
       version: 1
     };
-    
+
     const result = DocumentMetadataV2Schema.safeParse(invalidMetadata);
     expect(result.success).toBe(false);
   });
-  
+
   it('should reject metadata with invalid tags', () => {
     const invalidMetadata = {
       title: 'Test Document',
@@ -85,7 +85,7 @@ describe('DocumentMetadataV2Schema', () => {
       createdAt: new Date(),
       version: 1
     };
-    
+
     const result = DocumentMetadataV2Schema.safeParse(invalidMetadata);
     expect(result.success).toBe(false);
   });
@@ -101,8 +101,8 @@ describe('BaseJsonDocumentV2Schema', () => {
         id: '123e4567-e89b-12d3-a456-426614174000',
         path: 'test/document.json',
         tags: ['test'],
-        lastModified: new Date(),
-        createdAt: new Date(),
+        lastModified: '2023-10-27T11:00:00.000Z', // Use ISO string
+        createdAt: '2023-10-26T11:00:00.000Z', // Use ISO string
         version: 1
       },
       content: {
@@ -110,11 +110,11 @@ describe('BaseJsonDocumentV2Schema', () => {
         array: [1, 2, 3]
       }
     };
-    
+
     const result = BaseJsonDocumentV2Schema.safeParse(validDocument);
     expect(result.success).toBe(true);
   });
-  
+
   it('should reject document with wrong schema version', () => {
     const invalidDocument = {
       schema: 'wrong_version',
@@ -132,11 +132,11 @@ describe('BaseJsonDocumentV2Schema', () => {
         key: 'value'
       }
     };
-    
+
     const result = BaseJsonDocumentV2Schema.safeParse(invalidDocument);
     expect(result.success).toBe(false);
   });
-  
+
   it('should reject document with empty content', () => {
     const invalidDocument = {
       schema: SCHEMA_VERSION,
@@ -152,7 +152,7 @@ describe('BaseJsonDocumentV2Schema', () => {
       },
       content: {}  // Empty content
     };
-    
+
     const result = BaseJsonDocumentV2Schema.safeParse(invalidDocument);
     expect(result.success).toBe(false);
   });
@@ -168,8 +168,8 @@ describe('BranchContextJsonV2Schema', () => {
         id: '123e4567-e89b-12d3-a456-426614174000',
         path: 'branchContext.json',
         tags: ['branch-context'],
-        lastModified: new Date(),
-        createdAt: new Date(),
+        lastModified: '2023-10-27T12:00:00.000Z', // Use ISO string
+        createdAt: '2023-10-26T12:00:00.000Z', // Use ISO string
         version: 1
       },
       content: {
@@ -183,11 +183,11 @@ describe('BranchContextJsonV2Schema', () => {
         ]
       }
     };
-    
+
     const result = BranchContextJsonV2Schema.safeParse(validDocument);
     expect(result.success).toBe(true);
   });
-  
+
   it('should reject branch context with wrong document type', () => {
     const invalidDocument = {
       schema: SCHEMA_VERSION,
@@ -206,11 +206,11 @@ describe('BranchContextJsonV2Schema', () => {
         userStories: []
       }
     };
-    
+
     const result = BranchContextJsonV2Schema.safeParse(invalidDocument);
     expect(result.success).toBe(false);
   });
-  
+
   it('should reject branch context without required purpose', () => {
     const invalidDocument = {
       schema: SCHEMA_VERSION,
@@ -229,7 +229,7 @@ describe('BranchContextJsonV2Schema', () => {
         userStories: []
       }
     };
-    
+
     const result = BranchContextJsonV2Schema.safeParse(invalidDocument);
     expect(result.success).toBe(false);
   });
@@ -245,8 +245,8 @@ describe('ActiveContextJsonV2Schema', () => {
         id: '123e4567-e89b-12d3-a456-426614174000',
         path: 'activeContext.json',
         tags: ['active-context'],
-        lastModified: new Date(),
-        createdAt: new Date(),
+        lastModified: '2023-10-27T13:00:00.000Z', // Use ISO string
+        createdAt: '2023-10-26T13:00:00.000Z', // Use ISO string
         version: 1
       },
       content: {
@@ -257,11 +257,11 @@ describe('ActiveContextJsonV2Schema', () => {
         nextSteps: ['Step 1', 'Step 2']
       }
     };
-    
+
     const result = ActiveContextJsonV2Schema.safeParse(validDocument);
     expect(result.success).toBe(true);
   });
-  
+
   it('should accept active context with only optional fields', () => {
     const validDocument = {
       schema: SCHEMA_VERSION,
@@ -271,15 +271,15 @@ describe('ActiveContextJsonV2Schema', () => {
         id: '123e4567-e89b-12d3-a456-426614174000',
         path: 'activeContext.json',
         tags: ['active-context'],
-        lastModified: new Date(),
-        createdAt: new Date(),
+        lastModified: '2023-10-27T14:00:00.000Z', // Use ISO string
+        createdAt: '2023-10-26T14:00:00.000Z', // Use ISO string
         version: 1
       },
       content: {
         // All fields are optional for ActiveContext
       }
     };
-    
+
     const result = ActiveContextJsonV2Schema.safeParse(validDocument);
     expect(result.success).toBe(true);
   });
@@ -295,8 +295,8 @@ describe('ProgressJsonV2Schema', () => {
         id: '123e4567-e89b-12d3-a456-426614174000',
         path: 'progress.json',
         tags: ['progress'],
-        lastModified: new Date(),
-        createdAt: new Date(),
+        lastModified: '2023-10-27T15:00:00.000Z', // Use ISO string
+        createdAt: '2023-10-26T15:00:00.000Z', // Use ISO string
         version: 1
       },
       content: {
@@ -307,11 +307,11 @@ describe('ProgressJsonV2Schema', () => {
         knownIssues: ['Issue 1']
       }
     };
-    
+
     const result = ProgressJsonV2Schema.safeParse(validDocument);
     expect(result.success).toBe(true);
   });
-  
+
   it('should accept progress document with minimum fields', () => {
     const validDocument = {
       schema: SCHEMA_VERSION,
@@ -321,15 +321,15 @@ describe('ProgressJsonV2Schema', () => {
         id: '123e4567-e89b-12d3-a456-426614174000',
         path: 'progress.json',
         tags: ['progress'],
-        lastModified: new Date(),
-        createdAt: new Date(),
+        lastModified: '2023-10-27T16:00:00.000Z', // Use ISO string
+        createdAt: '2023-10-26T16:00:00.000Z', // Use ISO string
         version: 1
       },
       content: {
         // All fields are optional or have defaults
       }
     };
-    
+
     const result = ProgressJsonV2Schema.safeParse(validDocument);
     expect(result.success).toBe(true);
   });
@@ -345,8 +345,8 @@ describe('SystemPatternsJsonV2Schema', () => {
         id: '123e4567-e89b-12d3-a456-426614174000',
         path: 'systemPatterns.json',
         tags: ['system-patterns'],
-        lastModified: new Date(),
-        createdAt: new Date(),
+        lastModified: '2023-10-27T17:00:00.000Z', // Use ISO string
+        createdAt: '2023-10-26T17:00:00.000Z', // Use ISO string
         version: 1
       },
       content: {
@@ -360,11 +360,11 @@ describe('SystemPatternsJsonV2Schema', () => {
         ]
       }
     };
-    
+
     const result = SystemPatternsJsonV2Schema.safeParse(validDocument);
     expect(result.success).toBe(true);
   });
-  
+
   it('should accept system patterns with empty technical decisions', () => {
     const validDocument = {
       schema: SCHEMA_VERSION,
@@ -374,19 +374,19 @@ describe('SystemPatternsJsonV2Schema', () => {
         id: '123e4567-e89b-12d3-a456-426614174000',
         path: 'systemPatterns.json',
         tags: ['system-patterns'],
-        lastModified: new Date(),
-        createdAt: new Date(),
+        lastModified: '2023-10-27T18:00:00.000Z', // Use ISO string
+        createdAt: '2023-10-26T18:00:00.000Z', // Use ISO string
         version: 1
       },
       content: {
         technicalDecisions: []
       }
     };
-    
+
     const result = SystemPatternsJsonV2Schema.safeParse(validDocument);
     expect(result.success).toBe(true);
   });
-  
+
   it('should reject technical decision with missing consequences', () => {
     const invalidDocument = {
       schema: SCHEMA_VERSION,
@@ -411,7 +411,7 @@ describe('SystemPatternsJsonV2Schema', () => {
         ]
       }
     };
-    
+
     const result = SystemPatternsJsonV2Schema.safeParse(invalidDocument);
     expect(result.success).toBe(false);
   });
@@ -427,8 +427,8 @@ describe('GenericDocumentJsonV2Schema', () => {
         id: '123e4567-e89b-12d3-a456-426614174000',
         path: 'custom.json',
         tags: ['custom'],
-        lastModified: new Date(),
-        createdAt: new Date(),
+        lastModified: '2023-10-27T19:00:00.000Z', // Use ISO string
+        createdAt: '2023-10-26T19:00:00.000Z', // Use ISO string
         version: 1
       },
       content: {
@@ -436,11 +436,11 @@ describe('GenericDocumentJsonV2Schema', () => {
         anotherField: 123
       }
     };
-    
+
     const result = GenericDocumentJsonV2Schema.safeParse(validDocument);
     expect(result.success).toBe(true);
   });
-  
+
   it('should reject generic document with empty content', () => {
     const invalidDocument = {
       schema: SCHEMA_VERSION,
@@ -456,7 +456,7 @@ describe('GenericDocumentJsonV2Schema', () => {
       },
       content: {} // Empty content
     };
-    
+
     const result = GenericDocumentJsonV2Schema.safeParse(invalidDocument);
     expect(result.success).toBe(false);
   });
