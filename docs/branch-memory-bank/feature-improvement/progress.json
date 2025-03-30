@@ -31,9 +31,7 @@
         "phase": 1,
         "completed": true,
         "completedAt": "2025-03-30T04:27:56.000Z"
-      }
-    ],
-    "pendingImplementation": [
+      },
       {
         "id": "b202c303-d404-e505-f606-0708090a0b0c",
         "description": "MCP-2: エラーファクトリーメソッドの一貫した使用",
@@ -42,8 +40,12 @@
         "phase": 1,
         "dependsOn": [
           "c303d404-e505-f606-0708-090a0b0c0d0e"
-        ]
-      },
+        ],
+        "completed": true,
+        "completedAt": "2025-03-30T04:30:18.000Z"
+      }
+    ],
+    "pendingImplementation": [
       {
         "id": "d404e505-f606-0708-090a-0b0c0d0e0f10",
         "description": "MCP-4: 非同期エラーラッピングパターンの適用",

@@ -6,7 +6,8 @@ import { MemoryDocument } from "../../../domain/entities/MemoryDocument.js";
 import type { Tag } from "../../../domain/entities/Tag.js";
 import type { IBranchMemoryBankRepository, RecentBranch } from "../../../domain/repositories/IBranchMemoryBankRepository.js";
 import { logger } from "../../../shared/utils/logger.js";
-import { DomainError, DomainErrorCodes } from "../../../shared/errors/DomainError.js";
+import { DomainError, DomainErrors } from "../../../shared/errors/DomainError.js"; // Removed DomainErrorCodes, Added DomainErrors
+import { InfrastructureErrors } from "../../../shared/errors/InfrastructureError.js"; // Added InfrastructureErrors
 import type { BranchTagIndex as TagIndex } from "@memory-bank/schemas";
 
 
@@ -72,9 +73,9 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
         error: error instanceof Error ? error.message : 'Unknown error',
         branchPath
       });
-      throw new DomainError(
-        DomainErrorCodes.REPOSITORY_ERROR,
-        `Failed to initialize branch memory bank: ${error instanceof Error ? error.message : 'Unknown error'}`
+      throw InfrastructureErrors.initializationError(
+        `Failed to initialize branch memory bank: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        { cause: error instanceof Error ? error : undefined, branchPath }
       );
     }
   }
@@ -192,9 +193,9 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
           error: err instanceof Error ? err.message : 'Unknown error',
           content: document.content.substring(0, 100) + '...' // Log only first 100 chars
         });
-        throw new DomainError(
-          DomainErrorCodes.INVALID_DOCUMENT_FORMAT,
-          'Document content is not valid JSON'
+        throw DomainErrors.validationError(
+          'Document content is not valid JSON',
+          { cause: err instanceof Error ? err : undefined, path: document.path.value }
         );
       }
 
@@ -252,9 +253,9 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
       };
 
       this.componentLogger.error('Failed to save document:', { operation: 'saveDocument', ...errorContext });
-      throw new DomainError(
-        DomainErrorCodes.REPOSITORY_ERROR,
-        `Failed to save document: ${error instanceof Error ? error.message : 'Unknown error'}`
+      throw InfrastructureErrors.fileWriteError(
+        `Failed to save document: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        { cause: error instanceof Error ? error : undefined, path: document.path.value }
       );
     }
   }
@@ -391,9 +392,9 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
     try {
       await fs.writeFile(indexPath, JSON.stringify(tagIndex, null, 2), 'utf-8');
     } catch (error) {
-      throw new DomainError(
-        DomainErrorCodes.REPOSITORY_ERROR,
-        `Failed to save tag index: ${error instanceof Error ? error.message : 'Unknown error'}`
+      throw InfrastructureErrors.fileWriteError(
+        `Failed to save tag index: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        { cause: error instanceof Error ? error : undefined, path: indexPath }
       );
     }
   }
