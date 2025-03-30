@@ -1,0 +1,67 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "sample-active-context-001",
+    "title": "Sample Active Context",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": ["sample", "active-context", "vscode-extension"],
+    "lastModified": "2025-03-30T19:02:30.000Z",
+    "createdAt": "2025-03-30T19:02:30.000Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "ドキュメントタイプ別レンダラーの実装とサンプル作成",
+    "recentChanges": [
+      {
+        "id": "change-1",
+        "description": "renderProgressContent を実装",
+        "date": "2025-03-30T18:55:00.000Z"
+      },
+      {
+        "id": "change-2",
+        "description": "renderActiveContextContent を実装",
+        "date": "2025-03-30T19:00:00.000Z"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "decision-1",
+        "description": "各ドキュメントタイプに対応するレンダリング関数を作成する方針を採用"
+      },
+      {
+        "id": "decision-2",
+        "description": "未対応タイプは renderGenericContent にフォールバックする"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "con-1",
+        "description": "各タイプのスキーマ構造を正確に反映する必要がある",
+        "status": "open"
+      },
+      {
+        "id": "con-2",
+        "description": "レンダリングパフォーマンスへの影響",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "next-1",
+        "description": "renderBranchContextContent の実装",
+        "priority": "high"
+      },
+      {
+        "id": "next-2",
+        "description": "renderSystemPatternsContent の実装",
+        "priority": "high"
+      },
+      {
+        "id": "next-3",
+        "description": "エディタ/プレビューモード切替機能の実装",
+        "priority": "medium"
+      }
+    ]
+  }
+}
