@@ -1,0 +1,180 @@
+/**
+ * @jest-environment node
+ */
+import { setupTestEnv, cleanupTestEnv, type TestEnv } from '../helpers/test-env.js';
+import { loadGlobalFixture, getFixtureContent } from '../helpers/fixtures-loader.js';
+// import { Application } from '../mocks/Application'; // Removed mock application
+import * as path from 'path';
+import { DIContainer, setupContainer } from '../../../src/main/di/providers.js'; // Import DI container and setup function
+import { GlobalController } from '../../../src/interface/controllers/GlobalController.js'; // Import real controller
+import type { DocumentDTO } from '../../../src/application/dtos/DocumentDTO.js'; // Import DTO type
+import type { MCPResponse } from '../../../src/interface/presenters/types/MCPResponse.js'; // Import response types
+import { DomainError } from '../../../src/shared/errors/DomainError.js';
+
+describe('GlobalController Integration Tests', () => {
+  let testEnv: TestEnv;
+  // let app: Application; // Removed mock application instance
+  let container: DIContainer; // Use DI container
+  const simpleDocument = {
+    schema: "memory_document_v2",
+    metadata: {
+      id: "test-global-doc",
+      title: "テストグローバルドキュメント",
+      documentType: "test",
+      path: 'test/global-document.json', // Default path, can be overridden
+      tags: ["test", "global"],
+      lastModified: expect.any(String),
+      createdAt: expect.any(String),
+      version: 1
+    },
+    content: {
+      value: "グローバルドキュメントのテスト内容"
+    }
+  };
+
+  beforeEach(async () => {
+    // Setup test environment
+    testEnv = await setupTestEnv();
+    // Initialize DI container with test configuration
+    container = await setupContainer({ docsRoot: testEnv.docRoot });
+    // Removed mock application initialization
+    // app = new Application({ docsRoot: testEnv.docRoot });
+  });
+
+  afterEach(async () => {
+    // Cleanup test environment
+    await cleanupTestEnv(testEnv);
+  });
+
+  describe('readDocument', () => {
+    it('should read a document from the global memory bank', async () => {
+      await loadGlobalFixture(testEnv.globalMemoryPath, 'minimal');
+
+      const controller = await container.get<GlobalController>('globalController');
+
+      const result = await controller.readDocument('core/navigation.json');
+
+      expect(result.success).toBe(true);
+      if (!result.success) fail('Expected success but got error'); // Add type guard
+      expect(result.data).toBeDefined();
+      expect(result.data.path).toBe('core/navigation.json');
+      expect(typeof result.data.content).toBe('string');
+
+      const parsed = JSON.parse(result.data.content);
+      expect(parsed).toHaveProperty('schema');
+      expect(parsed).toHaveProperty('metadata');
+      expect(parsed).toHaveProperty('content');
+    });
+
+    it('should return an error when reading a non-existent document', async () => {
+      const controller = await container.get<GlobalController>('globalController');
+
+      const result = await controller.readDocument('non-existent.json');
+
+      expect(result.success).toBe(false);
+      if (result.success) fail('Expected error but got success'); // Add type guard
+      expect(result.error).toBeDefined();
+    });
+  });
+
+  describe('writeDocument', () => {
+    it('should create a new global document successfully', async () => {
+      const controller = await container.get<GlobalController>('globalController');
+
+      const documentPath = 'test/simple-document.json';
+      // Use common simpleDocument, override path and potentially other fields
+      const testDoc = {
+        ...simpleDocument,
+        metadata: {
+          ...simpleDocument.metadata,
+          id: "test-simple-doc",
+          title: "テストドキュメント",
+          path: documentPath,
+          tags: ["test"],
+        },
+        content: {
+          value: "簡単なテストドキュメント"
+        }
+      };
+      const documentContentString = JSON.stringify(testDoc, null, 2);
+
+      const writeResult = await controller.writeDocument({
+        path: documentPath,
+        content: documentContentString
+      });
+
+      expect(writeResult.success).toBe(true);
+      if (!writeResult.success) fail('Expected success but got error'); // Add type guard
+      expect(writeResult.data).toBeDefined(); // Check data on success, remove message check
+
+      const readResult = await controller.readDocument(documentPath);
+      expect(readResult.success).toBe(true);
+      if (!readResult.success) fail('Expected success but got error on read'); // Add type guard
+      expect(readResult.data).toBeDefined();
+      const parsedRead = JSON.parse(readResult.data.content);
+      // Use testDoc for comparison
+      expect(parsedRead.metadata.id).toBe(testDoc.metadata.id);
+      expect(parsedRead.content.value).toBe(testDoc.content.value);
+    });
+
+    it('should return an error when writing invalid JSON content', async () => {
+      const controller = await container.get<GlobalController>('globalController');
+
+      const invalidContent = '{"schema": "memory_document_v2", "metadata": {}'; // Invalid JSON
+
+      const result = await controller.writeDocument({
+        path: 'test/invalid.json',
+        content: invalidContent
+      });
+
+      expect(result.success).toBe(false);
+      if (result.success) fail('Expected error but got success'); // Add type guard
+      expect(result.error).toBeDefined();
+      expect(result.error.code).toContain('VALIDATION_ERROR');
+    });
+    it('should update (overwrite) an existing global document successfully', async () => {
+      const controller = await container.get<GlobalController>('globalController');
+      const documentPath = 'test/document-to-update.json';
+
+      // Initial document setup using common definition
+      const initialDoc = {
+        ...simpleDocument,
+        metadata: { ...simpleDocument.metadata, id: "update-test-initial", path: documentPath, version: 1 },
+        content: { value: "Initial global content" }
+      };
+      const initialContentString = JSON.stringify(initialDoc, null, 2);
+
+      // Updated document setup
+      const updatedDoc = {
+        ...simpleDocument,
+        metadata: { ...simpleDocument.metadata, id: "update-test-updated", title: "Updated Global Title", path: documentPath, version: 2 },
+        content: { value: "Updated global content" }
+      };
+      const updatedContentString = JSON.stringify(updatedDoc, null, 2);
+
+      // 1. Write initial document
+      const initialWriteResult = await controller.writeDocument({ path: documentPath, content: initialContentString });
+      expect(initialWriteResult.success).toBe(true);
+      if (!initialWriteResult.success) fail('Expected success but got error on initial write');
+      expect(initialWriteResult.data).toBeDefined();
+
+      // 2. Write updated document (overwrite)
+      const updateResult = await controller.writeDocument({ path: documentPath, content: updatedContentString });
+      expect(updateResult.success).toBe(true);
+      if (!updateResult.success) fail('Expected success but got error on update write');
+      expect(updateResult.data).toBeDefined(); // Remove message check
+
+      // 3. Read the document and verify updated content
+      const readResult = await controller.readDocument(documentPath);
+      expect(readResult.success).toBe(true);
+      if (!readResult.success) fail('Expected success but got error on read after update');
+      expect(readResult.data).toBeDefined();
+      const parsed = JSON.parse(readResult.data.content);
+
+      expect(parsed.metadata.id).toBe(updatedDoc.metadata.id);
+      expect(parsed.metadata.title).toBe(updatedDoc.metadata.title);
+      expect(parsed.metadata.version).toBe(updatedDoc.metadata.version);
+      expect(parsed.content.value).toBe(updatedDoc.content.value);
+    });
+  });
+});

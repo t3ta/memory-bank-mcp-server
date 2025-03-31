@@ -1,5 +1,6 @@
 import path from "path";
 import fs from "fs/promises";
+import fsExtra from "fs-extra"; // Import fs-extra
 import { BranchInfo } from "../../../domain/entities/BranchInfo.js";
 import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
 import { MemoryDocument } from "../../../domain/entities/MemoryDocument.js";
@@ -7,7 +8,8 @@ import type { Tag } from "../../../domain/entities/Tag.js";
 import type { IBranchMemoryBankRepository, RecentBranch } from "../../../domain/repositories/IBranchMemoryBankRepository.js";
 import { logger } from "../../../shared/utils/logger.js";
 import { DomainError, DomainErrors } from "../../../shared/errors/DomainError.js"; // Removed DomainErrorCodes, Added DomainErrors
-import { InfrastructureErrors } from "../../../shared/errors/InfrastructureError.js"; // Added InfrastructureErrors
+// Import both the class and the enum/namespace
+import { InfrastructureError, InfrastructureErrorCodes, InfrastructureErrors } from "../../../shared/errors/InfrastructureError.js";
 import type { BranchTagIndex as TagIndex } from "@memory-bank/schemas";
 
 
@@ -25,6 +27,22 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
   constructor(rootPath: string) {
     this.branchMemoryBankPath = path.join(rootPath, 'branch-memory-bank');
   }
+
+  // Add resolvePath method for consistent path handling and logging
+  private resolvePath(documentPath: string): string {
+    const normalizedPath = path.normalize(documentPath);
+    if (normalizedPath.includes('..')) {
+      // Use a generic file system error for path traversal attempts
+      throw new InfrastructureError(
+        InfrastructureErrorCodes.FILE_SYSTEM_ERROR,
+        `Invalid document path: ${documentPath}. Path traversal attempt detected.`
+      );
+    }
+    const fullPath = path.join(this.branchMemoryBankPath, normalizedPath);
+    // this.componentLogger.debug(`[FSBranchRepo] Resolved path: ${fullPath} from documentPath: ${documentPath}`); // Remove log
+    return fullPath;
+  }
+
 
   /**
    * Check if branch exists
@@ -65,8 +83,29 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
     });
 
     try {
+      // Create directory
       await fs.mkdir(branchPath, { recursive: true });
       this.componentLogger.debug('Successfully created branch directory:', { operation: 'initialize', branchPath });
+
+      // Create default branchContext.json
+      const defaultContextPath = path.join(branchPath, 'branchContext.json');
+      const defaultContextContent = {
+        schema: 'memory_document_v2',
+        metadata: {
+          id: `${safeBranchName}-context`,
+          documentType: 'branch_context',
+          path: 'branchContext.json',
+          createdAt: new Date().toISOString(),
+          lastModified: new Date().toISOString(),
+        },
+        content: {
+          value: `Auto-initialized context for branch ${branchInfo.name}`
+        }
+      };
+      // Use fsExtra.outputJson for atomic write and directory creation safety (though dir exists)
+      await fsExtra.outputJson(defaultContextPath, defaultContextContent, { spaces: 2 });
+      this.componentLogger.debug('Successfully created default branchContext.json:', { operation: 'initialize', path: defaultContextPath });
+
     } catch (error) {
       this.componentLogger.error('Failed to initialize branch memory bank:', {
         operation: 'initialize',
@@ -87,17 +126,16 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
    * @returns Promise resolving to document if found, null otherwise
    */
   async getDocument(branchInfo: BranchInfo, documentPath: DocumentPath): Promise<MemoryDocument | null> {
-    const safeBranchName = branchInfo.safeName;
-    const filePath = path.join(this.branchMemoryBankPath, safeBranchName, documentPath.value);
-
-    this.componentLogger.debug('Trying to read file:', { operation: 'getDocument', filePath });
+    // Use resolvePath for consistent path handling and logging
+    const filePath = this.resolvePath(path.join(branchInfo.safeName, documentPath.value));
+    // this.componentLogger.debug('Trying to read file:', { operation: 'getDocument', filePath }); // Logging is now in resolvePath
 
     // Special handling for .md requests (prefer .json)
     if (documentPath.value.endsWith('.md')) {
       const jsonPath = documentPath.value.replace('.md', '.json');
-      const jsonFilePath = path.join(this.branchMemoryBankPath, safeBranchName, jsonPath);
-
-      this.componentLogger.debug('Also trying JSON variant:', { operation: 'getDocument', jsonFilePath });
+      // Use resolvePath for the JSON variant as well
+      const jsonFilePath = this.resolvePath(path.join(branchInfo.safeName, jsonPath));
+      // this.componentLogger.debug('Also trying JSON variant:', { operation: 'getDocument', jsonFilePath }); // Logging is now in resolvePath
 
       try {
         // Try .json file first
@@ -153,9 +191,10 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
    * @returns Promise resolving when done
    */
   async saveDocument(branchInfo: BranchInfo, document: MemoryDocument): Promise<void> {
-    const safeBranchName = branchInfo.safeName;
-    const branchPath = path.join(this.branchMemoryBankPath, safeBranchName);
-    const filePath = path.join(branchPath, document.path.value);
+    const safeBranchName = branchInfo.safeName; // Re-add safeBranchName
+    // Use resolvePath for consistent path handling and logging
+    const filePath = this.resolvePath(path.join(safeBranchName, document.path.value));
+    const branchPath = path.dirname(filePath); // Get branch path from resolved file path
 
     this.componentLogger.debug('Saving document:', {
       operation: 'saveDocument',
@@ -199,19 +238,21 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
         );
       }
 
-      // Write file
-      this.componentLogger.debug('Writing file:', { operation: 'saveDocument', filePath });
-      await fs.writeFile(filePath, document.content, 'utf-8');
-      this.componentLogger.debug('Successfully wrote file:', { operation: 'saveDocument', filePath });
+      // Use fsExtra.outputJson to handle directory creation and JSON writing atomically
+      this.componentLogger.debug('Writing JSON file using fsExtra.outputJson:', { operation: 'saveDocument', filePath });
+      const jsonData = JSON.parse(document.content); // Already validated above
+      await fsExtra.outputJson(filePath, jsonData, { spaces: 2 });
+      this.componentLogger.debug('Successfully wrote JSON file:', { operation: 'saveDocument', filePath });
 
-      // Test support: If a .json file is created, also create an .md file with the same content
-      if (document.path.value.endsWith('.json')) {
-        const mdPath = document.path.value.replace('.json', '.md');
-        const mdFilePath = path.join(branchPath, mdPath);
-        this.componentLogger.debug('Creating MD version:', { operation: 'saveDocument', path: mdFilePath });
-        await fs.writeFile(mdFilePath, document.content, 'utf-8');
-        this.componentLogger.debug('Successfully wrote MD version:', { operation: 'saveDocument', path: mdFilePath });
-      }
+      // // Test support: If a .json file is created, also create an .md file with the same content
+      // // This might be unnecessary now if only JSON is expected
+      // if (document.path.value.endsWith('.json')) {
+      //   const mdPath = document.path.value.replace('.json', '.md');
+      //   const mdFilePath = path.join(branchPath, mdPath);
+      //   this.componentLogger.debug('Creating MD version:', { operation: 'saveDocument', path: mdFilePath });
+      //   await fs.writeFile(mdFilePath, document.content, 'utf-8'); // Use standard writeFile for MD
+      //   this.componentLogger.debug('Successfully wrote MD version:', { operation: 'saveDocument', path: mdFilePath });
+      // }
 
       // Special handling for branchContext (manual handling as it's not in CreateUseCase)
       if (document.path.value === 'activeContext.json' ||
@@ -219,23 +260,28 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
         document.path.value === 'systemPatterns.json') {
 
         // Create branchContext.md for testing if it doesn't exist
-        if (!await this.fileExists(path.join(branchPath, 'branchContext.md'))) {
-          const branchContext = `# Test Branch Context\n\n## Purpose\n\nThis is a test branch.`;
-          const branchContextPath = path.join(branchPath, 'branchContext.md');
-          this.componentLogger.debug('Creating default branchContext.md:', { operation: 'saveDocument', path: branchContextPath });
-          await fs.writeFile(branchContextPath, branchContext, 'utf-8');
-          this.componentLogger.debug('Successfully wrote default branchContext.md:', { operation: 'saveDocument', path: branchContextPath });
-        }
+        // // Create branchContext.md for testing if it doesn't exist
+        // // This might be unnecessary now if only JSON is expected
+        // if (!await this.fileExists(path.join(branchPath, 'branchContext.md'))) {
+        //   const branchContext = `# Test Branch Context\n\n## Purpose\n\nThis is a test branch.`;
+        //   const branchContextPath = path.join(branchPath, 'branchContext.md');
+        //   this.componentLogger.debug('Creating default branchContext.md:', { operation: 'saveDocument', path: branchContextPath });
+        //   await fs.writeFile(branchContextPath, branchContext, 'utf-8'); // Use standard writeFile
+        //   this.componentLogger.debug('Successfully wrote default branchContext.md:', { operation: 'saveDocument', path: branchContextPath });
+        // }
       }
 
     } catch (error) {
-      // Detailed error context
+      // Detailed error context - Log the raw error object as well
       const errorContext = {
+        rawError: error, // Log the original error object
         error: {
           name: error instanceof Error ? error.name : 'Unknown',
           message: error instanceof Error ? error.message : 'Unknown error',
           stack: error instanceof Error ? error.stack : undefined,
-          code: error instanceof Error && error instanceof DomainError ? error.code : undefined
+          code: error instanceof Error && error instanceof DomainError ? error.code : undefined,
+          // Add code for non-DomainErrors if available
+          errorCode: !(error instanceof DomainError) && error && typeof error === 'object' && 'code' in error ? error.code : undefined
         },
         document: {
           path: document.path.value,
@@ -253,6 +299,13 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
       };
 
       this.componentLogger.error('Failed to save document:', { operation: 'saveDocument', ...errorContext });
+
+      // If the error is already a DomainError (e.g., validation error), re-throw it directly
+      if (error instanceof DomainError) {
+        throw error;
+      }
+
+      // Otherwise, wrap it as an InfrastructureError
       throw InfrastructureErrors.fileWriteError(
         `Failed to save document: ${error instanceof Error ? error.message : 'Unknown error'}`,
         { cause: error instanceof Error ? error : undefined, path: document.path.value }
@@ -283,11 +336,12 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
    * @returns Promise resolving to boolean indicating success
    */
   async deleteDocument(branchInfo: BranchInfo, documentPath: DocumentPath): Promise<boolean> {
-    const safeBranchName = branchInfo.safeName;
-    const filePath = path.join(this.branchMemoryBankPath, safeBranchName, documentPath.value);
+    // Use resolvePath for consistent path handling and logging
+    const filePath = this.resolvePath(path.join(branchInfo.safeName, documentPath.value));
 
     try {
-      await fs.unlink(filePath);
+      // Use fs-extra's remove for potentially better handling (though unlink is fine)
+      await fsExtra.remove(filePath);
       return true;
     } catch {
       return false;
@@ -298,18 +352,27 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
    * List all documents in branch
    * @param branchInfo Branch information
    * @returns Promise resolving to array of document paths
+   * @returns Promise resolving to array of document paths
    */
   async listDocuments(branchInfo: BranchInfo): Promise<DocumentPath[]> {
     const safeBranchName = branchInfo.safeName;
     const branchPath = path.join(this.branchMemoryBankPath, safeBranchName);
+    // this.componentLogger.debug(`[FSBranchRepo] Listing documents in branchPath: ${branchPath}`); // Remove log
 
     try {
       const files = await fs.readdir(branchPath);
       return files
         .filter(file => !file.startsWith('.') && !file.startsWith('_'))
         .map(file => DocumentPath.create(file));
-    } catch {
-      return [];
+    } catch (error) {
+      // Log the error if reading directory fails
+      this.componentLogger.error('Failed to list documents in branch:', {
+        operation: 'listDocuments',
+        branchName: branchInfo.name,
+        branchPath,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      return []; // Return empty array as before, but after logging
     }
   }
 

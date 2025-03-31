@@ -32,7 +32,8 @@
       // Keep schema paths pointing to dist as they are pre-built
       "@memory-bank/schemas": ["../schemas/dist"],
       "@memory-bank/schemas/*": ["../schemas/dist/*"]
-    }
+    },
+    "isolatedModules": true // Added as per ts-jest recommendation
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "**/*.test.ts", "dist", "tests"]

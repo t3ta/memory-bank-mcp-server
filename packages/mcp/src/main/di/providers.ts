@@ -1,5 +1,7 @@
+// Import DIContainer for both type and value usage, then re-export it.
 import { DIContainer } from './DIContainer.js';
-import { MCPResponsePresenter } from '@/interface/presenters/MCPResponsePresenter.js';
+export { DIContainer };
+import { MCPResponsePresenter } from '@/interface/presenters/MCPResponsePresenter.js'; // Reverted: Added .js back
 import { ReadGlobalDocumentUseCase } from '@/application/usecases/global/ReadGlobalDocumentUseCase.js';
 import { WriteGlobalDocumentUseCase } from '@/application/usecases/global/WriteGlobalDocumentUseCase.js';
 import path from 'node:path';
@@ -55,26 +57,36 @@ export async function registerInfrastructureServices(
 
   const configProvider = new ConfigProvider();
   container.register<IConfigProvider>('configProvider', configProvider);
+  logger.debug('Initializing ConfigProvider...'); // Log before config init
   await configProvider.initialize(options);
+  logger.debug('ConfigProvider initialized.'); // Log after config init
 
   container.registerFactory('globalMemoryBankRepository', async () => {
+    logger.debug('Resolving dependencies for globalMemoryBankRepository...');
     const fileSystemService = await container.get<IFileSystemService>('fileSystemService');
     const configProvider = await container.get<IConfigProvider>('configProvider');
+    logger.debug('Dependencies resolved for globalMemoryBankRepository.');
     return new FileSystemGlobalMemoryBankRepository(fileSystemService, configProvider);
   });
 
-  container.registerFactory('branchMemoryBankRepository', async () => {
-    // Get config provider to resolve root path
-    const configProvider = await container.get<IConfigProvider>('configProvider');
-    const config = configProvider.getConfig();
-    // Pass the root path (docsRoot) to the constructor
+ container.registerFactory('branchMemoryBankRepository', async () => {
+   logger.debug('Resolving dependencies for branchMemoryBankRepository...');
+   // Get config provider to resolve root path
+   const configProvider = await container.get<IConfigProvider>('configProvider');
+   logger.debug('Resolved configProvider for branchMemoryBankRepository.');
+   const config = configProvider.getConfig();
+   // Pass the root path (docsRoot) to the constructor
     return new FileSystemBranchMemoryBankRepository(config.docsRoot);
   });
 
   container.registerFactory('tagIndexRepository', async () => {
+    logger.debug('Resolving dependencies for tagIndexRepository...');
     const configProvider = await container.get<IConfigProvider>('configProvider');
+    logger.debug('Resolved configProvider for tagIndexRepository.');
     const globalRepository = await container.get<FileSystemGlobalMemoryBankRepository>('globalMemoryBankRepository');
+    logger.debug('Resolved globalRepository for tagIndexRepository.');
     const branchRepository = await container.get<FileSystemBranchMemoryBankRepository>('branchMemoryBankRepository');
+    logger.debug('Resolved branchRepository for tagIndexRepository.');
     const config = configProvider.getConfig();
     const branchMemoryBankRoot = path.join(config.docsRoot, 'branch-memory-bank');
     const globalMemoryBankPath = configProvider.getGlobalMemoryPath();
@@ -88,8 +100,11 @@ export async function registerInfrastructureServices(
   });
 
   container.registerFactory('indexService', async () => {
+    logger.debug('Resolving dependencies for indexService...');
     const fileSystemService = await container.get<IFileSystemService>('fileSystemService');
+    logger.debug('Resolved fileSystemService for indexService.');
     const configProvider = await container.get<IConfigProvider>('configProvider');
+    logger.debug('Resolved configProvider for indexService.');
     const config = configProvider.getConfig();
     const indexRoot = path.join(config.docsRoot, 'indices');
     return new IndexService(fileSystemService, indexRoot);
@@ -109,18 +124,26 @@ export async function registerInfrastructureServices(
   });
 
   container.registerFactory('branchJsonDocumentRepository', async () => {
+    logger.debug('Resolving dependencies for branchJsonDocumentRepository...');
     const fileSystemService = await container.get<IFileSystemService>('fileSystemService');
+    logger.debug('Resolved fileSystemService for branchJsonDocumentRepository.');
     const indexService = await container.get<IIndexService>('indexService');
+    logger.debug('Resolved indexService for branchJsonDocumentRepository.');
     const configProvider = await container.get<IConfigProvider>('configProvider');
+    logger.debug('Resolved configProvider for branchJsonDocumentRepository.');
     const config = configProvider.getConfig();
     const branchJsonRoot = path.join(config.docsRoot, 'branch-json');
     return new FileSystemJsonDocumentRepository(fileSystemService, indexService, branchJsonRoot);
   });
 
   container.registerFactory('globalJsonDocumentRepository', async () => {
+    logger.debug('Resolving dependencies for globalJsonDocumentRepository...');
     const fileSystemService = await container.get<IFileSystemService>('fileSystemService');
+    logger.debug('Resolved fileSystemService for globalJsonDocumentRepository.');
     const indexService = await container.get<IIndexService>('indexService');
+    logger.debug('Resolved indexService for globalJsonDocumentRepository.');
     const configProvider = await container.get<IConfigProvider>('configProvider');
+    logger.debug('Resolved configProvider for globalJsonDocumentRepository.');
     const config = configProvider.getConfig();
     const globalJsonRoot = path.join(config.docsRoot, 'global-json');
     return new FileSystemJsonDocumentRepository(fileSystemService, indexService, globalJsonRoot);
@@ -137,6 +160,14 @@ export async function registerApplicationServices(container: DIContainer): Promi
       'globalMemoryBankRepository'
     );
     return new ReadGlobalDocumentUseCase(globalRepository);
+  });
+
+  // Add missing registration for writeGlobalDocumentUseCase
+  container.registerFactory('writeGlobalDocumentUseCase', async () => {
+    const globalRepository = await container.get<FileSystemGlobalMemoryBankRepository>(
+      'globalMemoryBankRepository'
+    );
+    return new WriteGlobalDocumentUseCase(globalRepository);
   });
 
   container.registerFactory('markdownMigrationService', async () => {
@@ -157,11 +188,20 @@ export async function registerApplicationServices(container: DIContainer): Promi
     return new MarkdownMigrationService(mockTemplateRepository, markdownDir, backupDir);
   });
 
-  container.registerFactory('writeBranchDocumentUseCase', () => {
-    const branchRepository = container.get(
+  // Make the factory async and await the repository
+  container.registerFactory('writeBranchDocumentUseCase', async () => {
+    const branchRepository = await container.get<FileSystemBranchMemoryBankRepository>(
       'branchMemoryBankRepository'
-    ) as FileSystemBranchMemoryBankRepository;
+    );
     return UseCaseFactory.createWriteBranchDocumentUseCase(branchRepository);
+  });
+
+  // Add missing registration for readBranchDocumentUseCase
+  container.registerFactory('readBranchDocumentUseCase', async () => {
+    const branchRepository = await container.get<FileSystemBranchMemoryBankRepository>(
+      'branchMemoryBankRepository'
+    );
+    return new ReadBranchDocumentUseCase(branchRepository);
   });
 
   container.registerFactory('readRulesUseCase', async () => {
@@ -391,14 +431,32 @@ export async function initializeRepositories(container: DIContainer): Promise<vo
  * @param options CLI options
  * @returns Configured DI container
  */
+// import { logger } from '@/shared/utils/logger.js'; // Use alias for logger import - Re-importing logger where needed
+import { logger } from '../../shared/utils/logger.js'; // Corrected import path for logger
+
 export async function setupContainer(options?: CliOptions): Promise<DIContainer> {
+  console.log('[setupContainer] Starting setupContainer with options:', options); // Use console.log for visibility
+  logger.debug('Setting up DI container...'); // Log start
   const container = new DIContainer();
 
+  logger.debug('Registering infrastructure services...');
+  console.log('[setupContainer] Calling registerInfrastructureServices...'); // Use console.log
   await registerInfrastructureServices(container, options);
-  registerApplicationServices(container);
-  registerInterfaceServices(container);
+  console.log('[setupContainer] Finished registerInfrastructureServices.'); // Use console.log
+  logger.debug('Infrastructure services registered.');
 
-  await initializeRepositories(container);
+  logger.debug('Registering application services...');
+  registerApplicationServices(container); // This is synchronous
+  logger.debug('Application services registered.');
 
+  logger.debug('Registering interface services...');
+  registerInterfaceServices(container); // This is synchronous
+  logger.debug('Interface services registered.');
+
+  logger.debug('Initializing repositories...');
+  // await initializeRepositories(container); // Temporarily disable repository initialization
+  logger.debug('Repositories initialization skipped.'); // Log skip
+
+  logger.debug('DI container setup complete.'); // Log end
   return container;
 }

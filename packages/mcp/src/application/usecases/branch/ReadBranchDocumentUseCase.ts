@@ -83,7 +83,8 @@ export class ReadBranchDocumentUseCase
     const branchInfo = BranchInfo.create(input.branchName);
     const documentPath = DocumentPath.create(input.path);
 
-    const branchExists = await this.branchRepository.exists(input.branchName);
+    // Use branchInfo.safeName for the existence check to match filesystem structure
+    const branchExists = await this.branchRepository.exists(branchInfo.safeName);
 
     if (!branchExists) {
       this.useCaseLogger.warn('Branch not found', { branchName: input.branchName });

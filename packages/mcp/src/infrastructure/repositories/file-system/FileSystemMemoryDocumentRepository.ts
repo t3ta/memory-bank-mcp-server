@@ -210,9 +210,19 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
       const filePath = this.resolvePath(document.path.value);
 
       if (document.isJSON) {
-        const jsonDoc = document.toJSON();
-        const jsonContent = JSON.stringify(jsonDoc, null, 2);
-        await this.fileSystemService.writeFile(filePath, jsonContent);
+        // Validate JSON content before saving
+        try {
+          JSON.parse(document.content); // Attempt to parse to validate
+        } catch (error) {
+          logger.error(`Invalid JSON content for ${document.path.value}:`, { error });
+          throw new DomainError( // Throw DomainError for invalid JSON
+            'DOMAIN_ERROR.VALIDATION_ERROR', // Use a suitable error code/message
+            'Document content is not valid JSON',
+            { cause: error instanceof Error ? error : undefined, path: document.path.value }
+          );
+        }
+        // If valid, proceed to save (using the original content string is fine here)
+        await this.fileSystemService.writeFile(filePath, document.content);
         return;
       }
 

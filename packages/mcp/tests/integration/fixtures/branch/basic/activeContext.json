@@ -1,0 +1,11 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "basic-active-context",
+    "documentType": "active_context",
+    "path": "activeContext.json"
+  },
+  "content": {
+    "value": "Basic active context fixture"
+  }
+}

@@ -84,7 +84,13 @@ export class WriteGlobalDocumentUseCase
             });
           }
         } catch (error) {
-          logger.error('Failed to parse document content as JSON:', { error, path: documentPath.value });
+          logger.error(`Invalid JSON content provided for tag extraction in ${documentPath.value}:`, { error });
+          // If parsing for tags fails due to invalid JSON, throw a validation error immediately.
+          throw new DomainError(
+            'DOMAIN_ERROR.VALIDATION_ERROR',
+            'Document content is not valid JSON (detected during tag extraction)',
+            { cause: error instanceof Error ? error : undefined, path: documentPath.value }
+          );
         }
       }
 
@@ -126,15 +132,14 @@ export class WriteGlobalDocumentUseCase
         },
       };
     } catch (error) {
+      // If it's a known domain or application error, re-throw it directly
       if (error instanceof DomainError || error instanceof ApplicationError) {
         throw error;
       }
-
-      throw new ApplicationError(
-        ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
-        `Failed to write document: ${(error as Error).message}`,
-        { originalError: error }
-      );
+      // For any other unexpected errors, re-throw them directly as well.
+      // (Previously, these were wrapped in a generic ApplicationError)
+      logger.error('Unexpected error in WriteGlobalDocumentUseCase:', { error }); // Log unexpected errors
+      throw error;
     }
   }
 }

@@ -1,0 +1,46 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "integration-test-debug-notes",
+    "title": "統合テスト実行問題のデバッグノート",
+    "documentType": "analysis",
+    "path": "integrationTestDebugNotes.json",
+    "tags": [
+      "testing",
+      "integration-tests",
+      "debug",
+      "analysis"
+    ],
+    "lastModified": "2025-03-31T17:30:00.000Z",
+    "createdAt": "2025-03-31T17:30:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": "統合テスト実行時にSIGINTで落ちる問題の原因分析と解決策について記録します。",
+    "issue": {
+      "description": "packages/mcpのtest:integrationスクリプト実行中にfs.writeFileが関数ではないというエラーでテストが失敗し、SIGINTが発生します。",
+      "error": "TypeError: fs.writeFile is not a function",
+      "location": "helpers/test-env.ts:65:14",
+      "commandFailed": "yarn workspace @memory-bank/mcp test:integration"
+    },
+    "rootCause": {
+      "explanation": "ESM環境でのfs-extraモジュールの使い方に問題があります。ESMモジュールとして実行する場合、fs-extraからインポートされたfsオブジェクトのメソッドの呼び出し方が異なります。ESMではPromiseベースのAPIを使用する必要があります。",
+      "affectedFiles": [
+        "packages/mcp/tests/integration/helpers/test-env.ts"
+      ]
+    },
+    "solution": {
+      "approach": "fs-extraのPromiseベースのAPIを直接使用するように修正します。",
+      "changes": [
+        {
+          "file": "packages/mcp/tests/integration/helpers/test-env.ts",
+          "modifications": [
+            "fs.writeFile()を fs.writeFile()からfs.writeFileSync()に修正、またはfs.promises.writeFile()に修正します",
+            "ESM環境では、fs-extraが提供するPromiseベースのAPIを直接使用するのが正しい方法です"
+          ]
+        }
+      ],
+      "expectedResults": "テストが正常に実行され、SIGINTエラーが発生しなくなります。"
+    }
+  }
+}
