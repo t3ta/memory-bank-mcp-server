@@ -27,11 +27,14 @@
     "rootDir": "./src",
     "baseUrl": "./", // Keep baseUrl
     "paths": {
-      // Point alias back to the source directory for development/intellisense
-      "@/*": ["src/*"],
+      // "@/*": ["src/*"], // Temporarily comment out to isolate issues
+      "@memory-bank/schemas": ["../schemas/src"] // Ensure this points to the source for TS server
     },
     "isolatedModules": true // Added as per ts-jest recommendation
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "**/*.test.ts", "dist", "tests"]
+  "exclude": ["node_modules", "**/*.test.ts", "dist", "tests"],
+  "references": [
+    { "path": "../schemas" } // Add reference to the schemas package
+  ]
 }

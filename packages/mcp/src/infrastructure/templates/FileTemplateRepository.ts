@@ -9,7 +9,7 @@ import fs from 'fs/promises';
 import { ITemplateRepository } from '../../domain/templates/ITemplateRepository.js';
 import { Template } from '../../domain/templates/Template.js';
 import { Section, LanguageTextMap } from '../../domain/templates/Section.js';
-import { Language, LanguageCode } from '../../domain/i18n/Language.js';
+import { Language } from '../../domain/i18n/Language.js'; // Removed unused LanguageCode
 
 /**
  * Type representing the structure of a template file

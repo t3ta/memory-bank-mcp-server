@@ -59,7 +59,8 @@ export function getToolDefinitions(): ToolDefinition[] {
     createReadBranchMemoryBankTool(),
     createWriteGlobalMemoryBankTool(),
     createReadGlobalMemoryBankTool(),
-    createReadContextTool()
+    createReadContextTool(),
+    createSearchDocumentsByTagsTool() // Add new tool definition
   ];
 }
 
@@ -194,6 +195,47 @@ function createReadContextTool(): ToolDefinition {
         },
       },
       required: ['branch', 'docs', 'language'],
+    },
+  };
+}
+
+/**
+ * Definition for the search_documents_by_tags tool
+ */
+function createSearchDocumentsByTagsTool(): ToolDefinition {
+  return {
+    name: 'search_documents_by_tags',
+    description: 'Search documents in memory banks by tags',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        tags: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Array of tags to search for (e.g., ["architecture", "refactoring"])',
+        },
+        match: {
+          type: 'string',
+          enum: ['and', 'or'],
+          default: 'or',
+          description: 'Match type: "and" requires all tags, "or" requires any tag',
+        },
+        scope: {
+          type: 'string',
+          enum: ['branch', 'global', 'all'],
+          default: 'all',
+          description: 'Search scope: "branch", "global", or "all"',
+        },
+        branch: {
+          type: 'string',
+          description: 'Branch name (required if scope is "branch" or "all")',
+        },
+        docs: {
+          type: 'string',
+          description: 'Path to docs directory',
+        },
+      },
+      required: ['tags', 'docs'],
     },
   };
 }

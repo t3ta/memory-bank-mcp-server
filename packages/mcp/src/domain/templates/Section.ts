@@ -1,6 +1,6 @@
 /**
  * Section Domain Model
- * 
+ *
  * Represents a section within a template with multilingual title and content.
  * Implements value object pattern - immutable and equality based on value.
  */
@@ -22,7 +22,7 @@ export class Section {
 
   /**
    * Constructor with validation
-   * 
+   *
    * @param id Section identifier
    * @param titleMap Map of language codes to localized titles
    * @param contentMap Optional map of language codes to localized content
@@ -38,11 +38,11 @@ export class Section {
     if (!id || id.trim() === '') {
       throw new Error('Section ID cannot be empty');
     }
-    
+
     if (!titleMap || Object.keys(titleMap).length === 0) {
       throw new Error('Section must have at least one title translation');
     }
-    
+
     this._id = id.trim();
     this._titleMap = { ...titleMap };
     this._contentMap = { ...contentMap };
@@ -79,7 +79,7 @@ export class Section {
 
   /**
    * Creates a Section instance, validating inputs
-   * 
+   *
    * @param id Section identifier
    * @param titleMap Map of language codes to localized titles
    * @param contentMap Optional map of language codes to localized content
@@ -98,57 +98,61 @@ export class Section {
 
   /**
    * Gets the localized title for a specific language
-   * 
+   *
    * @param language Language to get title for
    * @returns Localized title string
    */
   getTitle(language: Language): string {
     // Try to get title for the requested language
     if (this._titleMap[language.code]) {
-      return this._titleMap[language.code];
+      // Return title for the specified language, fallback to English, then empty string
+      return this._titleMap[language.code] ?? this._titleMap['en'] ?? '';
     }
-    
+
     // Fall back to English if available
     if (this._titleMap.en) {
       return this._titleMap.en;
     }
-    
+
     // Fall back to first available language
     const firstKey = Object.keys(this._titleMap)[0] as LanguageCode;
-    return this._titleMap[firstKey];
+    // Fallback logic for getTitle without language (already handles fallback)
+    return this._titleMap[firstKey] ?? ''; // Ensure empty string fallback
   }
 
   /**
    * Gets the localized content for a specific language
-   * 
+   *
    * @param language Language to get content for
    * @returns Localized content string or empty string if not available
    */
   getContent(language: Language): string {
     // Try to get content for the requested language
     if (this._contentMap[language.code]) {
-      return this._contentMap[language.code];
+      // Return content for the specified language, fallback to English, then empty string
+      return this._contentMap[language.code] ?? this._contentMap['en'] ?? '';
     }
-    
+
     // If no content for requested language, try English
     if (this._contentMap.en) {
       return this._contentMap.en;
     }
-    
+
     // If no English content, try first available
     const contentKeys = Object.keys(this._contentMap);
     if (contentKeys.length > 0) {
       const firstKey = contentKeys[0] as LanguageCode;
-      return this._contentMap[firstKey];
+    // Fallback logic for getContent without language (already handles fallback)
+    return this._contentMap[firstKey] ?? ''; // Ensure empty string fallback
     }
-    
+
     // No content available
     return '';
   }
 
   /**
    * Creates a new Section with updated content for a language
-   * 
+   *
    * @param languageCode Language code to update content for
    * @param content New content text
    * @returns New Section instance with updated content
@@ -159,13 +163,13 @@ export class Section {
       ...this._contentMap,
       [languageCode]: content,
     };
-    
+
     return new Section(this._id, this._titleMap, newContentMap, this._isOptional);
   }
 
   /**
    * Creates a new Section with updated title for a language
-   * 
+   *
    * @param languageCode Language code to update title for
    * @param title New title text
    * @returns New Section instance with updated title
@@ -176,13 +180,13 @@ export class Section {
       ...this._titleMap,
       [languageCode]: title,
     };
-    
+
     return new Section(this._id, newTitleMap, this._contentMap, this._isOptional);
   }
 
   /**
    * Compare equality with another Section object
-   * 
+   *
    * @param other Another Section object to compare
    * @returns true if equal, false otherwise
    */
@@ -190,35 +194,35 @@ export class Section {
     if (this._id !== other.id || this._isOptional !== other.isOptional) {
       return false;
     }
-    
+
     // Compare title maps
     const thisTitleKeys = Object.keys(this._titleMap);
     const otherTitleKeys = Object.keys(other.titleMap);
-    
+
     if (thisTitleKeys.length !== otherTitleKeys.length) {
       return false;
     }
-    
+
     for (const key of thisTitleKeys) {
       if (this._titleMap[key as LanguageCode] !== other.titleMap[key as LanguageCode]) {
         return false;
       }
     }
-    
+
     // Compare content maps
     const thisContentKeys = Object.keys(this._contentMap);
     const otherContentKeys = Object.keys(other.contentMap);
-    
+
     if (thisContentKeys.length !== otherContentKeys.length) {
       return false;
     }
-    
+
     for (const key of thisContentKeys) {
       if (this._contentMap[key as LanguageCode] !== other.contentMap[key as LanguageCode]) {
         return false;
       }
     }
-    
+
     return true;
   }
 }

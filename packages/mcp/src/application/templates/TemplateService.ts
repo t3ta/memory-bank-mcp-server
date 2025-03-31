@@ -1,10 +1,10 @@
 /**
  * Template Service
- * 
+ *
  * Application service for managing templates and template operations.
  * Provides high-level functionality for working with templates.
  */
-import { Language, LanguageCode } from '../../domain/i18n/Language.js';
+import { Language } from '../../domain/i18n/Language.js'; // Removed unused LanguageCode
 import { ITemplateRepository } from '../../domain/templates/ITemplateRepository.js';
 import { Section, LanguageTextMap } from '../../domain/templates/Section.js';
 import { Template } from '../../domain/templates/Template.js';
@@ -17,7 +17,7 @@ export class TemplateService {
 
   /**
    * Constructor
-   * 
+   *
    * @param repository Repository for accessing templates
    */
   constructor(repository: ITemplateRepository) {
@@ -26,7 +26,7 @@ export class TemplateService {
 
   /**
    * Gets a template by ID
-   * 
+   *
    * @param id Template ID
    * @returns Promise resolving to Template or null if not found
    */
@@ -36,7 +36,7 @@ export class TemplateService {
 
   /**
    * Gets a template as Markdown for a specific language
-   * 
+   *
    * @param id Template ID
    * @param language Language to get template for
    * @param variables Optional variables for template substitution
@@ -53,7 +53,7 @@ export class TemplateService {
 
   /**
    * Creates a new template
-   * 
+   *
    * @param id Template ID
    * @param type Template type
    * @param namesMap Map of language codes to template names
@@ -80,7 +80,7 @@ export class TemplateService {
 
   /**
    * Updates a template's basic properties
-   * 
+   *
    * @param id Template ID
    * @param type New template type
    * @param namesMap New map of language codes to template names
@@ -100,7 +100,7 @@ export class TemplateService {
 
     // Create updated template
     const updatedTemplate = Template.create(id, type, namesMap, template.sections);
-    
+
     // Save and return
     await this.repository.saveTemplate(updatedTemplate);
     return updatedTemplate;
@@ -108,7 +108,7 @@ export class TemplateService {
 
   /**
    * Adds or updates a section in a template
-   * 
+   *
    * @param templateId Template ID
    * @param sectionId Section ID
    * @param titlesMap Map of language codes to section titles
@@ -132,10 +132,10 @@ export class TemplateService {
 
     // Create section
     const section = Section.create(sectionId, titlesMap, contentsMap, isOptional);
-    
+
     // Add section to template
     const updatedTemplate = template.withSection(section);
-    
+
     // Save and return
     await this.repository.saveTemplate(updatedTemplate);
     return updatedTemplate;
@@ -143,7 +143,7 @@ export class TemplateService {
 
   /**
    * Removes a section from a template
-   * 
+   *
    * @param templateId Template ID
    * @param sectionId Section ID
    * @returns Promise resolving to the updated template
@@ -161,12 +161,12 @@ export class TemplateService {
 
     // Remove section
     const updatedTemplate = template.withoutSection(sectionId);
-    
+
     // If no changes (section didn't exist), return existing template
     if (updatedTemplate === template) {
       return template;
     }
-    
+
     // Save and return
     await this.repository.saveTemplate(updatedTemplate);
     return updatedTemplate;
@@ -174,7 +174,7 @@ export class TemplateService {
 
   /**
    * Gets all templates of a specific type
-   * 
+   *
    * @param type Template type
    * @returns Promise resolving to array of Templates
    */
@@ -184,7 +184,7 @@ export class TemplateService {
 
   /**
    * Gets IDs of all available templates
-   * 
+   *
    * @returns Promise resolving to array of template IDs
    */
   async getAllTemplateIds(): Promise<string[]> {
@@ -193,7 +193,7 @@ export class TemplateService {
 
   /**
    * Gets all available template types
-   * 
+   *
    * @returns Promise resolving to array of template types
    */
   async getAllTemplateTypes(): Promise<string[]> {

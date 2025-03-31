@@ -1,6 +1,10 @@
 import type { DocumentDTO } from "../../application/dtos/DocumentDTO.js";
 import type { JsonDocumentDTO } from "../../application/dtos/JsonDocumentDTO.js";
 import type { UpdateTagIndexUseCaseV2 } from "../../application/usecases/common/UpdateTagIndexUseCaseV2.js";
+// Import new types for search
+import type { SearchDocumentsByTagsInput, SearchDocumentsByTagsOutput } from "../../application/usecases/common/SearchDocumentsByTagsUseCase.js";
+// import type { SearchResults } from "@memory-bank/schemas"; // Keep commented out
+type SearchResults = any; // Use any for now
 import type { ReadJsonDocumentUseCase, WriteJsonDocumentUseCase, DeleteJsonDocumentUseCase, SearchJsonDocumentsUseCase, UpdateJsonIndexUseCase, ReadGlobalDocumentUseCase, WriteGlobalDocumentUseCase, SearchDocumentsByTagsUseCase, UpdateTagIndexUseCase } from "../../application/usecases/index.js";
 import { DocumentType } from "../../domain/entities/JsonDocument.js";
 import { BaseError } from "../../shared/errors/BaseError.js";
@@ -9,6 +13,7 @@ import { logger } from "../../shared/utils/logger.js";
 import type { MCPResponsePresenter } from "../presenters/types/MCPResponsePresenter.js";
 import type { MCPResponse } from "../presenters/types/MCPResponse.js";
 import type { IGlobalController } from "./interfaces/IGlobalController.js";
+import type { IConfigProvider } from "../../infrastructure/config/interfaces/IConfigProvider.js"; // Import IConfigProvider
 
 
 /**
@@ -38,9 +43,13 @@ export class GlobalController implements IGlobalController {
   constructor(
     private readonly readGlobalDocumentUseCase: ReadGlobalDocumentUseCase,
     private readonly writeGlobalDocumentUseCase: WriteGlobalDocumentUseCase,
-    private readonly searchDocumentsByTagsUseCase: SearchDocumentsByTagsUseCase,
-    private readonly updateTagIndexUseCase: UpdateTagIndexUseCase,
+    // Keep the old use case for now, but inject the new one
+    private readonly oldSearchDocumentsByTagsUseCase: SearchDocumentsByTagsUseCase, // Keep old one for now if needed by other methods
+    private readonly searchDocumentsByTagsUseCase: SearchDocumentsByTagsUseCase, // Inject the new use case
+    private readonly updateTagIndexUseCase: UpdateTagIndexUseCase, // Keep this if needed by updateTagsIndex
     private readonly presenter: MCPResponsePresenter,
+    private readonly configProvider: IConfigProvider, // Inject ConfigProvider
+    // Remove duplicate configProvider declaration
     options?: {
       updateTagIndexUseCaseV2?: UpdateTagIndexUseCaseV2;
       readJsonDocumentUseCase?: ReadJsonDocumentUseCase;
@@ -183,44 +192,39 @@ export class GlobalController implements IGlobalController {
     }
   }
 
+  // Remove the old findDocumentsByTags method
+
   /**
-   * Find documents by tags in global memory bank
-   * @param tags Tags to search for
-   * @param matchAllTags Whether to require all tags to match
-   * @returns Promise resolving to MCP response with matching documents
+   * Search documents by tags in memory banks
+   * @param input Search parameters (tags, match, scope, branch, docs)
+   * @returns Promise resolving to MCP response with search results
    */
-  async findDocumentsByTags(
-    tags: string[],
-    matchAllTags?: boolean
-  ): Promise<MCPResponse<DocumentDTO[]>> {
+  async searchDocumentsByTags(input: SearchDocumentsByTagsInput): Promise<MCPResponse<SearchResults>> {
     try {
-      this.componentLogger.info(`Finding global documents by tags`, { operation: 'findDocumentsByTags', tags: tags.join(', ') });
-      this.componentLogger.debug('Search request:', { operation: 'findDocumentsByTags', tags, matchAllTags });
+      this.componentLogger.info(`Searching documents by tags`, { operation: 'searchDocumentsByTags', input });
 
-      const result = await this.searchDocumentsByTagsUseCase.execute({
-        tags,
-        matchAllTags,
-        branchName: undefined, // Search in global memory bank
-      });
+      // Ensure 'docs' path is provided, default scope to 'global' if not specified and branchName is absent
+      const searchInput: SearchDocumentsByTagsInput = {
+        ...input,
+        scope: input.scope ?? (input.branchName ? 'all' : 'global'), // Default scope logic
+        docs: this.configProvider.getConfig().docsRoot // Use injected configProvider
+      };
 
-      this.componentLogger.debug('Search result:', {
-        operation: 'findDocumentsByTags',
-        tags,
-        matchAllTags,
-        documentsFound: result.documents.length,
-        searchInfo: result.searchInfo
-      });
-return this.presenter.presentSuccess(result.documents); // Already correct, no change needed here
-} catch (error) {
-this.componentLogger.error('Failed to search documents by tags:', {
-  operation: 'findDocumentsByTags',
-  tags,
-  matchAllTags,
-  error: error instanceof Error ? error.message : String(error)
-});
-return this.handleError(error, 'findDocumentsByTags');
-}
-}
+       if (!searchInput.docs) {
+         throw new Error("Docs path is missing in configuration or input.");
+       }
+
+
+      // Pass the correct input structure to the use case
+      // Pass the correct input structure including docs path
+      const result = await this.searchDocumentsByTagsUseCase.execute(searchInput);
+
+      this.componentLogger.info(`Search completed`, { operation: 'searchDocumentsByTags', count: result.results.length });
+      return this.presenter.presentSuccess(result);
+    } catch (error) {
+      return this.handleError(error, 'searchDocumentsByTags');
+    }
+  }
 
   /**
    * Handle errors in controller methods

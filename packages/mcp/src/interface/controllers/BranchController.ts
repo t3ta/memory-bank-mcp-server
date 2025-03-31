@@ -2,12 +2,13 @@ import { logger } from '../../shared/utils/logger.js';
 import { MCPResponsePresenter } from '../presenters/MCPResponsePresenter.js';
 import { ReadBranchDocumentUseCase } from '../../application/usecases/branch/ReadBranchDocumentUseCase.js';
 import { WriteBranchDocumentUseCase } from '../../application/usecases/branch/WriteBranchDocumentUseCase.js';
-import { SearchDocumentsByTagsUseCase } from '../../application/usecases/common/SearchDocumentsByTagsUseCase.js';
+import { SearchDocumentsByTagsUseCase, SearchDocumentsByTagsInput } from '../../application/usecases/common/SearchDocumentsByTagsUseCase.js'; // Import input type
 import { UpdateTagIndexUseCase } from '../../application/usecases/common/UpdateTagIndexUseCase.js';
 import { GetRecentBranchesUseCase } from '../../application/usecases/common/GetRecentBranchesUseCase.js';
 import { ReadBranchCoreFilesUseCase } from '../../application/usecases/common/ReadBranchCoreFilesUseCase.js';
 import { CreateBranchCoreFilesUseCase } from '../../application/usecases/common/CreateBranchCoreFilesUseCase.js';
 import { DomainErrors } from '../../shared/errors/DomainError.js';
+import type { IConfigProvider } from '../../infrastructure/config/interfaces/IConfigProvider.js'; // Import IConfigProvider
 import { ApplicationErrors } from '../../shared/errors/ApplicationError.js';
 import { BaseError } from '../../shared/errors/BaseError.js';
 
@@ -26,6 +27,7 @@ export class BranchController {
     private readonly readBranchCoreFilesUseCase: ReadBranchCoreFilesUseCase,
     private readonly createBranchCoreFilesUseCase: CreateBranchCoreFilesUseCase,
     private readonly presenter: MCPResponsePresenter,
+    private readonly configProvider: IConfigProvider, // Inject ConfigProvider
   ) {}
 
   /**
@@ -104,13 +106,33 @@ export class BranchController {
   /**
    * Search documents by tags
    */
-  async searchByTags(tags: string[]) {
+  // Update method signature and implementation to use new input schema
+  // Update method signature: remove docs from params as it's obtained via configProvider
+  async searchByTags(params: {
+    tags: string[];
+    branchName: string;
+    match?: 'and' | 'or';
+    // Removed 'docs' from params type
+  }) {
     try {
-      this.componentLogger.info('Searching documents by tags', { operation: 'searchByTags', tags });
-      const documents = await this.searchDocumentsByTagsUseCase.execute({ tags });
-      return this.presenter.presentSuccess(documents);
+      const { tags, branchName, match } = params; // Remove docs from destructuring
+      this.componentLogger.info('Searching branch documents by tags', { operation: 'searchByTags', branchName, tags, match });
+      // Get docs path from injected configProvider
+      const docsPath = this.configProvider.getConfig().docsRoot; // Use a different variable name
+      if (!docsPath) {
+          throw new Error("Docs path could not be determined from config.");
+      }
+
+      const result = await this.searchDocumentsByTagsUseCase.execute({
+        tags,
+        branchName,
+        match: match ?? 'or', // Default to 'or'
+        scope: 'branch', // Always search within the specified branch
+        docs: docsPath, // Pass determined docs path
+      });
+      return this.presenter.presentSuccess(result); // Return the SearchResults object
     } catch (error) {
-      this.componentLogger.error('Failed to search documents by tags', { operation: 'searchByTags', tags, error });
+      this.componentLogger.error('Failed to search documents by tags', { operation: 'searchByTags', branchName: params.branchName, tags: params.tags, match: params.match, error }); // Use params.tags
       return this.handleError(error);
     }
   }

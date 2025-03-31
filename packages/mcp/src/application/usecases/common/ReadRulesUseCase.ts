@@ -27,7 +27,7 @@ export class ReadRulesUseCase {
  */
 constructor(
  rulesDir: string,
- private readonly templateLoader?: TemplateService // Change type to TemplateService
+ private readonly templateLoader?: TemplateService // Type is already TemplateService, ensure consistency
 ) {
  // Resolve the absolute path for rulesDir upon initialization
  this.rulesDir = path.resolve(rulesDir);

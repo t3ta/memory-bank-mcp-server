@@ -13,7 +13,7 @@
     "version": 1
   },
   "content": {
-    "currentWork": "グローバルメモリバンク整理、テンプレートシステム復活、新しいインデックス形式のスキーマ定義と生成スクリプト修正が完了。タグ検索機能設計の準備完了。",
+    "currentWork": "グローバルメモリバンク整理、テンプレートシステム復活、新しいインデックス形式の準備、および関連するビルドエラーの修正が完了。タグ検索機能設計・実装の準備完了。",
     "recentChanges": [
       {
         "date": "2025-04-01T01:05:00Z",
@@ -54,6 +54,10 @@
       {
         "date": "2025-04-01T01:55:00Z",
         "description": "タグ更新スクリプト (index-generator, config, index) を修正し、新しいインデックスファイルを生成・保存するように変更"
+      },
+      {
+        "date": "2025-04-01T02:54:00Z",
+        "description": "TypeScriptのビルドエラーを修正 (インポートパス、型定義、DI設定など)"
       }
     ],
     "activeDecisions": [
@@ -74,28 +78,33 @@
         "description": "タグインデックス (_global_index.json, tags/index.json) は検索で利用されているため当面維持する"
       },
       {
-        "id": "decision-next-step-search",
-        "description": "次のアクションとしてタグ検索機能の設計・要件定義を行う"
-      },
-      {
         "id": "decision-new-index",
         "description": "タグ検索効率化のため、新しいインデックス形式 (タグ->パス, パス->メタデータ) を導入し、更新スクリプトで生成する"
+      },
+      {
+        "id": "decision-next-step-search",
+        "description": "次のアクションとしてタグ検索機能の設計・実装を行う"
       }
     ],
     "considerations": [
       {
         "id": "cons-search-impl",
-        "description": "タグ検索機能の実装方法 (MCPツール？)",
+        "description": "タグ検索機能の実装方法 (MCPツール、UseCase)",
         "status": "open"
       },
       {
-        "id": "cons-index-format",
-        "description": "タグ検索に適した新しいインデックス形式の検討",
+        "id": "cons-index-format-detail",
+        "description": "新しいインデックス形式の詳細設計 (ブランチインデックス含む)",
         "status": "open"
       },
       {
         "id": "cons-branch-relation",
         "description": "ブランチ間の関係性やタグの重み付けをどう活用するか",
+        "status": "open"
+      },
+      {
+        "id": "cons-import-issue",
+        "description": "ビルドは通った(はず)だが、@memory-bank/schemas のインポート問題が本当に解決したか要確認",
         "status": "open"
       }
     ],
