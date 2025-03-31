@@ -4,7 +4,7 @@ import { IBranchController } from '../interface/controllers/interfaces/IBranchCo
 import { IContextController } from '../interface/controllers/interfaces/IContextController.js';
 import { Constants } from './config/constants.js';
 import { logger } from '../shared/utils/logger.js';
-import type { Language } from '@memory-bank/schemas/index.js';
+import type { Language } from '@memory-bank/schemas';
 
 // Minimal options interface needed by the Application
 interface MinimalAppOptions {
