@@ -14,7 +14,7 @@
   },
   "content": {
     "branchName": "feature/revise-tag-index",
-    "purpose": "このブランチの目的を記述してください",
+    "purpose": "タグインデックスの現状調査と問題点の洗い出し、改善方針の検討。および、それに伴うグローバルメモリバンクの整理と最適化。",
     "createdAt": "2025-03-31T15:29:40.375Z",
     "userStories": [
       {

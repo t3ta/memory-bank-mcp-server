@@ -13,66 +13,94 @@
     "version": 1
   },
   "content": {
-    "currentWork": "現在取り組んでいる作業の説明",
+    "currentWork": "グローバルメモリバンク整理、テンプレートシステム復活、関連コード・テスト修正が完了。タグ検索機能設計の準備完了。",
     "recentChanges": [
       {
-        "date": "2025-03-31T15:29:40.376Z",
-        "description": "変更点1"
+        "date": "2025-04-01T01:05:00Z",
+        "description": "タグインデックスの現状調査 (index.json, _global_index.json, tag_categorization.json, tag-update script)"
       },
       {
-        "date": "2025-03-31T15:29:40.376Z",
-        "description": "変更点2"
+        "date": "2025-04-01T01:05:00Z",
+        "description": "タグ検索機能(CLI)が廃止されていることを確認"
       },
       {
-        "date": "2025-03-31T15:29:40.376Z",
-        "description": "変更点3"
+        "date": "2025-04-01T01:05:00Z",
+        "description": "グローバルメモリバンクの整理方針を決定 (コア情報以外は削除)"
+      },
+      {
+        "date": "2025-04-01T01:05:00Z",
+        "description": "グローバルメモリバンクから不要なファイルを削除"
+      },
+      {
+        "date": "2025-04-01T01:05:00Z",
+        "description": "削除ファイルへの参照を関連ドキュメントから削除"
+      },
+      {
+        "date": "2025-04-01T01:05:00Z",
+        "description": "削除ファイルを参照していたテストコードを修正"
+      },
+      {
+        "date": "2025-04-01T01:05:00Z",
+        "description": "ブランチメモリバンク更新の必要性を確認"
+      },
+      {
+        "date": "2025-04-01T01:45:00Z",
+        "description": "テストを実行し、発生したエラーを修正 (DI設定、テストフィクスチャ、テストコード)"
       }
     ],
     "activeDecisions": [
       {
-        "id": "838dc25a-7f03-4ea2-b7d0-72109de48ce2",
-        "description": "決定事項1"
+        "id": "decision-global-scope",
+        "description": "グローバルメモリバンクは普遍的コア情報 (architecture, coding-standards, glossary) のみに限定する"
       },
       {
-        "id": "b3432466-0ff0-4506-a8f3-3d6717d1b666",
-        "description": "決定事項2"
+        "id": "decision-file-deletion",
+        "description": "上記方針に基づき、多数の不要ファイルをグローバルメモリバンクから削除した"
       },
       {
-        "id": "67fd67db-0a4c-4b8b-9c0c-16e0489f363d",
-        "description": "決定事項3"
+        "id": "decision-template-revival",
+        "description": "テンプレートシステムを復活させ、AIが参照するルールは rules.json テンプレート経由で提供する"
+      },
+      {
+        "id": "decision-index-maintenance",
+        "description": "タグインデックス (_global_index.json, tags/index.json) は検索で利用されているため当面維持する"
+      },
+      {
+        "id": "decision-next-step-search",
+        "description": "次のアクションとしてタグ検索機能の設計・要件定義を行う"
       }
     ],
     "considerations": [
       {
-        "id": "d40b99de-1a81-4f1b-983b-c5fa9f63dfb8",
-        "description": "検討事項1",
+        "id": "cons-search-impl",
+        "description": "タグ検索機能の実装方法 (MCPツール？)",
         "status": "open"
       },
       {
-        "id": "f178054d-f731-44a6-98c5-5050e3922d30",
-        "description": "検討事項2",
+        "id": "cons-index-format",
+        "description": "タグ検索に適した新しいインデックス形式の検討",
         "status": "open"
       },
       {
-        "id": "304e3220-eb97-4528-a4b3-b46a2cf74eda",
-        "description": "検討事項3",
+        "id": "cons-branch-relation",
+        "description": "ブランチ間の関係性やタグの重み付けをどう活用するか",
         "status": "open"
       }
     ],
     "nextSteps": [
       {
-        "id": "0b0d4456-5813-4ec6-b5b5-f7ba6ac153a2",
-        "description": "次のステップ1",
+        "id": "step-search-design",
+        "description": "タグ検索機能の要件定義と設計",
         "priority": "high"
       },
       {
-        "id": "c01caf9d-f3f3-42b1-95b0-dbbd74e0697f",
-        "description": "次のステップ2",
+        "id": "step-index-design",
+        "description": "新しいインデックス形式の設計",
         "priority": "medium"
       },
       {
-        "id": "464c143b-e442-4e0c-9d7a-580305beed51",
-        "description": "次のステップ3",
+        "id": "step-translate-rules",
+        "description": "rules.json の翻訳テキストを en.json, zh.json に反映",
         "priority": "low"
       }
     ]

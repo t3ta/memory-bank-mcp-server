@@ -15,55 +15,70 @@
   "content": {
     "workingFeatures": [
       {
-        "id": "acf2e751-9350-40ac-bf10-88a3150034c1",
-        "description": "機能1",
-        "implementedAt": "2025-03-31T15:29:40.376Z"
+        "id": "feat-global-cleanup",
+        "description": "グローバルメモリバンクの調査と不要ファイルの削除",
+        "implementedAt": "2025-04-01T01:06:00Z"
       },
       {
-        "id": "836b20d3-0cad-46e3-b53b-0ddda1b38f8e",
-        "description": "機能2",
-        "implementedAt": "2025-03-31T15:29:40.376Z"
+        "id": "feat-link-fix",
+        "description": "削除ファイルへの参照リンク修正 (ドキュメント、テストコード)",
+        "implementedAt": "2025-04-01T01:06:00Z"
       },
       {
-        "id": "494fd93b-3ec7-413e-8d7e-2e0ff0d230bd",
-        "description": "機能3",
-        "implementedAt": "2025-03-31T15:29:40.376Z"
+        "id": "feat-template-revival",
+        "description": "テンプレートシステムの復活 (コード移行、DI設定、UseCase修正)",
+        "implementedAt": "2025-04-01T01:45:00Z"
+      },
+      {
+        "id": "feat-rules-template",
+        "description": "rules.json テンプレート作成と翻訳ファイルへのガイドライン追記",
+        "implementedAt": "2025-04-01T01:45:00Z"
+      },
+      {
+        "id": "feat-test-fix",
+        "description": "関連するテストコードのエラー修正",
+        "implementedAt": "2025-04-01T01:45:00Z"
       }
     ],
     "pendingImplementation": [
       {
-        "id": "b2917196-8c56-4d1a-ad60-e2b100384c11",
-        "description": "未実装の機能1",
+        "id": "impl-search-design",
+        "description": "タグ検索機能の要件定義と設計",
         "priority": "high"
       },
       {
-        "id": "ecaa8189-e7fe-4888-ab5d-dfad97e5c352",
-        "description": "未実装の機能2",
+        "id": "impl-index-design",
+        "description": "新しいインデックス形式の設計",
         "priority": "medium"
       },
       {
-        "id": "8603312d-5146-4bc1-94ce-baa129c82997",
-        "description": "未実装の機能3",
+        "id": "impl-search-tool",
+        "description": "タグ検索MCPツールの実装",
+        "priority": "medium"
+      },
+      {
+        "id": "impl-index-script",
+        "description": "タグ更新スクリプトの修正 (新インデックス対応)",
+        "priority": "medium"
+      },
+      {
+        "id": "impl-translate-rules",
+        "description": "rules.json の翻訳テキストを en.json, zh.json に反映",
         "priority": "low"
       }
     ],
-    "status": "現在の実装状態の説明",
-    "completionPercentage": 0,
+    "status": "グローバルメモリバンク整理、テンプレートシステム復活、関連コード・テスト修正が完了。タグ検索機能設計の準備完了。",
+    "completionPercentage": 80,
     "knownIssues": [
       {
-        "id": "d953872b-cd6b-493c-a48f-0ffbc7990300",
-        "description": "問題1",
+        "id": "issue-search-missing",
+        "description": "タグ検索機能が存在しない (CLI廃止)",
         "severity": "high"
       },
       {
-        "id": "fb579da9-f917-4154-9502-0398b44b7649",
-        "description": "問題2",
+        "id": "issue-index-redundancy",
+        "description": "タグインデックスが2種類存在し、片方(_global_index.json)は検索で使われているが冗長",
         "severity": "medium"
-      },
-      {
-        "id": "a0cfc9d2-3f5b-4be9-976d-be714cc93c27",
-        "description": "問題3",
-        "severity": "low"
       }
     ]
   }

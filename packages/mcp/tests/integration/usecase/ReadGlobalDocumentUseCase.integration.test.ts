@@ -46,7 +46,7 @@ describe('ReadGlobalDocumentUseCase Integration Tests', () => {
       expect(document).toHaveProperty('schema', 'memory_document_v2');
       expect(document).toHaveProperty('metadata');
       expect(document).toHaveProperty('content');
-      expect(document.metadata).toHaveProperty('id', 'minimal-core-navigation');
+      expect(document.metadata).toHaveProperty('id', 'core-glossary-test'); // Update expected ID
       expect(document.metadata).toHaveProperty('documentType', 'core');
     });
 

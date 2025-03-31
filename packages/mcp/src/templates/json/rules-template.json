@@ -1,0 +1,111 @@
+{
+  "schema": "template_v1",
+  "metadata": {
+    "id": "rules",
+    "titleKey": "template.title.rules",
+    "descriptionKey": "template.description.rules",
+    "type": "system",
+    "lastModified": "2025-03-24T16:02:00.000Z"
+  },
+  "content": {
+    "sections": [
+      {
+        "id": "globalMemoryBank",
+        "titleKey": "template.section.global_memory_bank",
+        "contentKey": "template.content.global_memory_bank",
+        "isOptional": false
+      },
+      {
+        "id": "purposeOfGlobalMemoryBank",
+        "titleKey": "template.section.purpose_of_global_memory_bank",
+        "contentKey": "template.content.purpose_of_global_memory_bank",
+        "isOptional": false
+      },
+      {
+        "id": "globalMemoryBankStructure",
+        "titleKey": "template.section.global_memory_bank_structure",
+        "contentKey": "template.content.global_memory_bank_structure",
+        "isOptional": false
+      },
+      {
+        "id": "tagSystem",
+        "titleKey": "template.section.tag_system",
+        "contentKey": "template.content.tag_system",
+        "isOptional": false
+      },
+      {
+        "id": "jsonArchitecture",
+        "titleKey": "template.section.json_architecture",
+        "contentKey": "template.content.json_architecture",
+        "isOptional": false
+      },
+      {
+        "id": "branchMemoryBank",
+        "titleKey": "template.section.branch_memory_bank",
+        "contentKey": "template.content.branch_memory_bank",
+        "isOptional": false
+      },
+      {
+        "id": "memoryBankStructure",
+        "titleKey": "template.section.memory_bank_structure",
+        "contentKey": "template.content.memory_bank_structure",
+        "isOptional": false
+      },
+      {
+        "id": "requiredFiles",
+        "titleKey": "template.section.required_files",
+        "contentKey": "template.content.required_files",
+        "isOptional": false
+      },
+      {
+        "id": "additionalContext",
+        "titleKey": "template.section.additional_context",
+        "contentKey": "template.content.additional_context",
+        "isOptional": false
+      },
+      {
+        "id": "coreWorkflow",
+        "titleKey": "template.section.core_workflow",
+        "contentKey": "template.content.core_workflow",
+        "isOptional": false
+      },
+      {
+        "id": "taskProgressWorkflow",
+        "titleKey": "template.section.task_progress_workflow",
+        "contentKey": "template.content.task_progress_workflow",
+        "isOptional": false
+      },
+      {
+        "id": "documentUpdates",
+        "titleKey": "template.section.document_updates",
+        "contentKey": "template.content.document_updates",
+        "isOptional": false
+      },
+      {
+        "id": "migrationStrategy",
+        "titleKey": "template.section.migration_strategy",
+        "contentKey": "template.content.migration_strategy",
+        "isOptional": false
+      },
+      {
+        "id": "fileEditingRules",
+        "titleKey": "template.section.file_editing_rules",
+        "contentKey": "template.content.file_editing_rules",
+        "isOptional": false
+      },
+      {
+        "id": "finally",
+        "titleKey": "template.section.finally",
+        "contentKey": "template.content.finally",
+        "isOptional": false
+      },
+      {
+        "id": "footer",
+        "titleKey": "template.section.footer",
+        "contentKey": "template.content.footer",
+        "isOptional": false
+      }
+    ],
+    "placeholders": {}
+  }
+}

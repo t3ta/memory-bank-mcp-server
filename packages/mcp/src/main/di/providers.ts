@@ -8,8 +8,9 @@ import path from 'node:path';
 import { IndexService } from '@/infrastructure/index/IndexService.js';
 import { IIndexService } from '@/infrastructure/index/interfaces/IIndexService.js';
 import { FileSystemJsonDocumentRepository } from '@/infrastructure/repositories/file-system/FileSystemJsonDocumentRepository.js';
-import { IJsonDocumentRepository } from '@/domain/repositories/IJsonDocumentRepository.js';
-import { II18nRepository } from '@/domain/i18n/II18nRepository.js';
+import { IJsonDocumentRepository } from '../../domain/repositories/IJsonDocumentRepository.js';
+import { II18nRepository } from '../../domain/i18n/II18nRepository.js';
+import { ITemplateRepository } from '../../domain/templates/ITemplateRepository.js'; // Added import
 import { ReadRulesUseCase } from '@/application/usecases/common/ReadRulesUseCase.js';
 import { ReadContextUseCase } from '@/application/usecases/common/ReadContextUseCase.js';
 import { ReadBranchDocumentUseCase } from '@/application/usecases/branch/ReadBranchDocumentUseCase.js';
@@ -22,17 +23,17 @@ import { CreateBranchCoreFilesUseCase } from '@/application/usecases/common/Crea
 import { ReadJsonDocumentUseCase } from '@/application/usecases/json/ReadJsonDocumentUseCase.js';
 import { WriteJsonDocumentUseCase } from '@/application/usecases/json/WriteJsonDocumentUseCase.js';
 import { DeleteJsonDocumentUseCase } from '@/application/usecases/json/DeleteJsonDocumentUseCase.js';
-import { SearchJsonDocumentsUseCase } from '@/application/usecases/json/SearchJsonDocumentsUseCase.js';
-import { UpdateJsonIndexUseCase } from '@/application/usecases/json/UpdateJsonIndexUseCase.js';
-
+import { SearchJsonDocumentsUseCase } from '../../application/usecases/json/SearchJsonDocumentsUseCase.js';
+import { UpdateJsonIndexUseCase } from '../../application/usecases/json/UpdateJsonIndexUseCase.js';
+import { TemplateService } from '../../application/templates/TemplateService.js'; // Added import
 import { IFileSystemService } from '@/infrastructure/storage/interfaces/IFileSystemService.js';
 import { FileSystemService } from '@/infrastructure/storage/FileSystemService.js';
 import { IConfigProvider } from '@/infrastructure/config/interfaces/IConfigProvider.js';
 import { ConfigProvider } from '@/infrastructure/config/ConfigProvider.js';
 import { FileSystemGlobalMemoryBankRepository } from '@/infrastructure/repositories/file-system/FileSystemGlobalMemoryBankRepository.js';
-import { FileSystemBranchMemoryBankRepository } from '@/infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.js';
-import { FileSystemTagIndexRepositoryV1Bridge } from '@/infrastructure/repositories/file-system/FileSystemTagIndexRepositoryV1Bridge.js';
-
+import { FileSystemBranchMemoryBankRepository } from '../../infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.js';
+import { FileSystemTagIndexRepositoryV1Bridge } from '../../infrastructure/repositories/file-system/FileSystemTagIndexRepositoryV1Bridge.js';
+import { FileTemplateRepository } from '../../infrastructure/templates/FileTemplateRepository.js'; // Added import
 import { ContextController } from '@/interface/controllers/ContextController.js';
 import { JsonResponsePresenter } from '@/interface/presenters/JsonResponsePresenter.js';
 import { GlobalController } from '@/interface/controllers/GlobalController.js';
@@ -148,7 +149,25 @@ export async function registerInfrastructureServices(
     const globalJsonRoot = path.join(config.docsRoot, 'global-json');
     return new FileSystemJsonDocumentRepository(fileSystemService, indexService, globalJsonRoot);
   });
-}
+// Register FileTemplateRepository
+container.registerFactory('templateRepository', async () => {
+  logger.debug('Resolving dependencies for templateRepository...');
+  const configProvider = await container.get<IConfigProvider>('configProvider');
+  const config = configProvider.getConfig();
+  // Templates are now expected inside packages/mcp/src/templates/json
+  // Use import.meta.url to get the current file URL and derive the path
+  const currentFileURL = import.meta.url;
+  const currentDirPath = path.dirname(new URL(currentFileURL).pathname);
+  const templateBasePath = path.resolve(currentDirPath, '../../templates/json');
+  logger.debug(`Template base path resolved to: ${templateBasePath}`);
+  // Assuming i18nProvider is needed and registered elsewhere, or handle optional dependency
+  // i18nProvider is optional for FileTemplateRepository, pass undefined for now
+  const templateRepository = new FileTemplateRepository(templateBasePath, undefined);
+  await templateRepository.initialize(); // Initialize the repository
+  logger.debug('templateRepository initialized.');
+  return templateRepository;
+});
+} // Added missing closing brace for registerInfrastructureServices
 
 /**
  * Register application services
@@ -205,10 +224,11 @@ export async function registerApplicationServices(container: DIContainer): Promi
   });
 
   container.registerFactory('readRulesUseCase', async () => {
-    const configProvider = await container.get<IConfigProvider>('configProvider');
+    const configProvider = await container.get<IConfigProvider>('configProvider'); // Re-get configProvider
     const config = configProvider.getConfig();
-    const rulesDir = config.docsRoot;
-    return new ReadRulesUseCase(rulesDir);
+    const rulesDir = config.docsRoot; // Keep fallback path for now
+    const templateLoader = await container.get<TemplateService>('templateService'); // Get TemplateService
+    return new ReadRulesUseCase(rulesDir, templateLoader); // Pass templateLoader
   });
 
   container.registerFactory('readContextUseCase', async () => {
@@ -309,9 +329,17 @@ export async function registerApplicationServices(container: DIContainer): Promi
   });
 
   container.registerFactory('i18nService', async () => {
-    const i18nRepository = container.get('i18nRepository') as II18nRepository;
-    const { I18nService } = await import('@/application/i18n/I18nService.js');
+    const i18nRepository = await container.get<II18nRepository>('i18nRepository'); // Await repository
+    const { I18nService } = await import('../../application/i18n/I18nService.js'); // Corrected path
     return new I18nService(i18nRepository);
+  });
+
+  // Register TemplateService
+  container.registerFactory('templateService', async () => {
+    logger.debug('Resolving dependencies for templateService...');
+    const templateRepository = await container.get<ITemplateRepository>('templateRepository');
+    logger.debug('Resolved templateRepository for templateService.');
+    return new TemplateService(templateRepository);
   });
 }
 

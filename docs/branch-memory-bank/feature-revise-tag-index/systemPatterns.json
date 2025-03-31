@@ -15,21 +15,57 @@
   "content": {
     "technicalDecisions": [
       {
-        "id": "e8245fe4-6ad3-49b5-b4c1-1fda1a9edceb",
-        "title": "決定事項のタイトル",
-        "context": "決定の背景や理由",
-        "decision": "具体的な決定内容",
+        "id": "decision-global-scope-refine",
+        "title": "グローバルメモリバンクのスコープ限定",
+        "context": "グローバルメモリバンクの情報鮮度と信頼性の問題、およびブランチ中心の開発スタイルへの移行のため。",
+        "decision": "グローバルメモリバンクには普遍的で滅多に更新されないコア情報 (architecture, coding-standards, glossary) のみを格納する。それ以外の情報はブランチメモリバンクで管理する。",
         "consequences": {
           "positive": [
-            "影響1",
-            "影響2",
-            "影響3"
+            "グローバル情報の信頼性向上",
+            "ブランチコンテキストの重要性向上",
+            "メモリバンク構造の簡素化"
           ],
-          "negative": []
+          "negative": [
+            "プロジェクト全体の普遍的情報（更新頻度が中程度）の置き場所がなくなる可能性"
+          ]
         },
-        "status": "proposed",
-        "date": "2025-03-31T15:29:40.376Z",
-        "alternatives": []
+        "status": "accepted",
+        "date": "2025-04-01T01:06:00Z"
+      },
+      {
+        "id": "decision-index-strategy",
+        "title": "タグインデックス戦略 (当面)",
+        "context": "タグ検索機能(CLI)が廃止され、現状の検索メカニズムが不明瞭。また、インデックスが2種類(_global_index.json, tags/index.json)存在し、古い方が検索に使われている。",
+        "decision": "当面は両方のインデックスファイルを維持し、自動更新スクリプトも現状維持とする。将来的にタグ検索機能を再実装する際に、インデックス形式の見直しと一本化を行う。",
+        "consequences": {
+          "positive": [
+            "既存の検索機能(もしあれば)への影響を回避",
+            "将来的な改善の余地を残す"
+          ],
+          "negative": [
+            "インデックスの冗長性が残る",
+            "ファイルサイズが大きいまま"
+          ]
+        },
+        "status": "accepted",
+        "date": "2025-04-01T01:06:00Z"
+      },
+      {
+        "id": "decision-need-search-func",
+        "title": "タグ検索機能の必要性",
+        "context": "ブランチ中心の情報管理に移行する上で、ブランチ横断的な情報発見メカニズムが不可欠。現状、タグ検索機能が存在しない。",
+        "decision": "タグを活用した情報検索機能（MCPツールとして）を設計・実装する必要がある。",
+        "consequences": {
+          "positive": [
+            "メモリバンクの価値向上",
+            "開発効率の向上"
+          ],
+          "negative": [
+            "実装コストがかかる"
+          ]
+        },
+        "status": "accepted",
+        "date": "2025-04-01T01:06:00Z"
       }
     ],
     "implementationPatterns": []

@@ -1,8 +1,8 @@
 {
   "language": "zh",
   "translations": {
-    "template.title.rules": "记忆库规则",
-    "template.description.rules": "记忆库使用规则和结构说明",
+    "template.title.rules": "分支记忆库运用指南",
+    "template.description.rules": "分支记忆库核心文件的目的和推荐记录内容",
     "template.section.global_memory_bank": "全局记忆库",
     "template.content.global_memory_bank": "全局记忆库是一个中央存储库，用于存储整个项目共享的知识。它可以从所有分支访问，并包含重要信息，如项目基础信息、架构、设计决策等。",
     "template.section.purpose_of_global_memory_bank": "全局记忆库的目的",
@@ -101,10 +101,23 @@
     "template.section.architecture": "架构",
     "template.content.architecture": "<!-- 描述架构概述或显著方面 -->\n{{ARCHITECTURE}}",
     "template.placeholder.design_patterns": "设计模式的占位符",
-    "template.placeholder.architecture": "架构的占位符"
+    "template.placeholder.architecture": "架构的占位符",
+
+    "template.section.branchMemoryGuidelines": "はじめに",
+    "template.content.branchMemoryGuidelines": "このガイドラインは、ブランチメモリバンクの効果的な運用方法と、各コアファイルの目的および推奨される記録内容を定義します。ブランチメモリバンクは、特定の機能開発や修正作業に関するコンテキスト情報を集約し、チーム内の情報共有と作業の引き継ぎを円滑にすることを目的とします。",
+    "template.section.branchContextJson": "1. branchContext.json",
+    "template.content.branchContextJson": "**目的:** ブランチの基本的な情報と目的を定義します。\n**推奨される記録内容:**\n- `purpose`: このブランチが解決しようとしている課題や目的を具体的に記述します。\n- `userStories`: 関連するユーザーストーリーやタスクをリストアップし、進捗（completed）や優先度（priority）を管理します。\n- `additionalNotes`: その他、ブランチ全体に関する補足情報があれば記述します。\n**更新タイミング:** ブランチ作成時、またはブランチの目的やスコープに変更があった場合。",
+    "template.section.activeContextJson": "2. activeContext.json",
+    "template.content.activeContextJson": "**目的:** ブランチにおける現在の作業状況、直近の変更履歴、アクティブな決定事項、検討中の課題、次のステップを記録します。\n**推奨される記録内容:**\n- `currentWork`: 現在取り組んでいる具体的なタスクや作業内容を記述します。\n- `recentChanges`: 直近で行った重要な変更（コード修正、ドキュメント更新、設定変更など）を日付と共に記録します。\n- `activeDecisions`: 作業中に決定した事項（技術選定、仕様変更など）とその理由（任意）を記録します。\n- `considerations`: 現在検討中の課題や選択肢、そのステータス（open, resolved, deferred）を記録します。\n- `nextSteps`: 次に取り組むべきタスクやアクションアイテムを優先度と共にリストアップします。\n**更新タイミング:** 日々の作業終了時、重要な変更や決定があった時、作業を引き継ぐ前など、頻繁に更新することが推奨されます。",
+    "template.section.progressJson": "3. progress.json",
+    "template.content.progressJson": "**目的:** ブランチにおける機能実装の進捗状況、未実装のタスク、既知の問題点を管理します。\n**推奨される記録内容:**\n- `workingFeatures`: 実装が完了し、動作している機能やコンポーネントをリストアップし、実装日時を記録します。\n- `pendingImplementation`: これから実装する予定の機能やタスクを優先度と共にリストアップします。完了予定日（estimatedCompletion）も任意で記録できます。\n- `status`: ブランチ全体の開発ステータス（planning, in-development, testing, completedなど）を記述します。\n- `completionPercentage`: ブランチ全体の完了率（目安）を記録します。\n- `knownIssues`: 現在認識されているバグや問題点を重要度（severity）と共にリストアップします。回避策（workaround）も任意で記録できます。\n**更新タイミング:** 機能の実装が完了した時、新しい問題を発見した時、ブランチのマージ前など、進捗に変化があった場合に更新します。",
+    "template.section.systemPatternsJson": "4. systemPatterns.json",
+    "template.content.systemPatternsJson": "**目的:** ブランチ内で行われた重要な技術的決定や、採用された実装パターンを記録します。\n**推奨される記録内容:**\n- `technicalDecisions`: アーキテクチャに関する決定、ライブラリ選定、API設計など、将来の参照価値がある技術的決定事項を記録します。決定の背景（context）、具体的な決定内容（decision）、その影響（consequences）、ステータス（status）、代替案（alternatives）なども含めるとより有用です。\n- `implementationPatterns`: ブランチ内で繰り返し使用される特定の実装パターンやコードスニペットがあれば記録します（任意）。\n**更新タイミング:** 重要な技術的決定が行われた際や、特筆すべき実装パターンが確立された場合に記録します。",
+    "template.section.bestPractices": "运用的最佳实践",
+    "template.content.bestPractices": "- **こまめな更新:** 各コアファイルは、情報が古くならないように、関連する変更があった際にこまめに更新しましょう。\n- **簡潔かつ具体的に:** 誰が読んでも理解できるように、内容は簡潔かつ具体的に記述しましょう。\n- **チームでの共有:** ブランチメモリバンクの情報はチームメンバーと共有し、認識合わせに活用しましょう。\n- **タグの活用:** 各ドキュメントには適切なタグを付与し、将来的な情報検索に備えましょう（例: `core`, `decision`, `refactoring-plan` など）。"
   },
   "metadata": {
     "version": "1.0.0",
-    "updatedAt": "2025-03-24T08:08:18.000Z"
+    "updatedAt": "2025-04-01T01:39:00.000Z"
   }
 }
