@@ -10,7 +10,7 @@ export default {
       {
         useESM: true,
         tsconfig: 'tsconfig.json',
-        isolatedModules: true, // Skip type checking for tests
+        // isolatedModules: true, // Removed as per ts-jest recommendation (set in tsconfig.json)
       },
     ],
   },
@@ -29,12 +29,11 @@ export default {
   transformIgnorePatterns: [
     '/node_modules/(?!@modelcontextprotocol/sdk)(?!uuid)(?!fast-json-patch)/',
   ],
-  // Skip type checking to focus on functionality
-  globals: {
-    'ts-jest': {
-      isolatedModules: true,
-    },
-  },
+  // globals: { // Removed as per ts-jest recommendation
+  //   'ts-jest': {
+  //     isolatedModules: true,
+  //   },
+  // },
   // Setup files to run before tests
   setupFilesAfterEnv: ['<rootDir>/tests/setupTests.ts'],
 };
