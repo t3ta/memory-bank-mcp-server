@@ -1,0 +1,13 @@
+{
+  "schema": "rules_v1",
+  "metadata": {
+    "language": "zh",
+    "description": "Default Chinese rules (dummy for testing)"
+  },
+  "rules": {
+    "general": [
+      "简洁明了。",
+      "保持礼貌。"
+    ]
+  }
+}

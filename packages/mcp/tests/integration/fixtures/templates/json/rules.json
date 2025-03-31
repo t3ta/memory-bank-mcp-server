@@ -1,0 +1,13 @@
+{
+  "schema": "rules_v1",
+  "metadata": {
+    "language": "en",
+    "description": "Default English rules (dummy for testing)"
+  },
+  "rules": {
+    "general": [
+      "Be concise.",
+      "Be polite."
+    ]
+  }
+}

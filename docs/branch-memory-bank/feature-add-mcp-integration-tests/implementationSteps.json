@@ -1,0 +1,320 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "8a7b6c5d-4e3f-2a1b-9c8d-7e6f5a4b3c2d",
+    "title": "統合テスト実装ステップ",
+    "documentType": "implementation_steps",
+    "path": "implementationSteps.json",
+    "tags": [
+      "implementation",
+      "integration-tests",
+      "steps"
+    ],
+    "lastModified": "2025-03-31T11:35:00.000Z",
+    "createdAt": "2025-03-30T16:10:00.000Z",
+    "version": 3
+  },
+  "content": {
+    "overview": "packages/mcpモジュールの統合テスト実装に向けた具体的なステップを定義します。各ステップは順次実施していきます。",
+    "steps": [
+      {
+        "id": "step-1",
+        "title": "テスト環境の基本設定",
+        "description": "統合テストの基盤となるディレクトリ構造とJest設定を作成します。",
+        "tasks": [
+          {
+            "id": "task-1-1",
+            "description": "packages/mcp/tests/integration ディレクトリを作成",
+            "status": "completed",
+            "priority": "high"
+          },
+          {
+            "id": "task-1-2",
+            "description": "packages/mcp/tests/integration/jest.config.ts ファイルを作成",
+            "status": "completed",
+            "priority": "high"
+          },
+          {
+            "id": "task-1-3",
+            "description": "packages/mcp/tests/integration/setup.ts ファイルを作成",
+            "status": "completed",
+            "priority": "high"
+          },
+          {
+            "id": "task-1-4",
+            "description": "サブディレクトリ構造（controller, usecase, fixtures, helpers）を作成",
+            "status": "completed",
+            "priority": "high"
+          }
+        ],
+        "status": "completed",
+        "dependencies": []
+      },
+      {
+        "id": "step-2",
+        "title": "テストヘルパーの実装",
+        "description": "統合テストで使用する共通ヘルパー関数を実装します。",
+        "tasks": [
+          {
+            "id": "task-2-1",
+            "description": "テスト環境作成・削除ヘルパー（test-env.ts）の実装",
+            "status": "completed",
+            "priority": "high"
+          },
+          {
+            "id": "task-2-2",
+            "description": "テストファクスチャ読み込みヘルパー（fixtures-loader.ts）の実装",
+            "status": "completed",
+            "priority": "high"
+          },
+          {
+            "id": "task-2-3",
+            "description": "Applicationインスタンス生成ヘルパー（app-factory.ts）の実装",
+            "status": "completed",
+            "priority": "medium"
+          },
+          {
+            "id": "task-2-4",
+            "description": "テストユーティリティ関数の実装（test-utils.ts）",
+            "status": "pending",
+            "priority": "medium"
+          }
+        ],
+        "status": "in-progress",
+        "dependencies": [
+          "step-1"
+        ]
+      },
+      {
+        "id": "step-3",
+        "title": "テストファクスチャの準備",
+        "description": "統合テストで使用するテストデータを準備します。",
+        "tasks": [
+          {
+            "id": "task-3-1",
+            "description": "ブランチメモリバンク用テストファクスチャの作成",
+            "status": "completed",
+            "priority": "high"
+          },
+          {
+            "id": "task-3-2",
+            "description": "グローバルメモリバンク用テストファクスチャの作成",
+            "status": "completed",
+            "priority": "high"
+          },
+          {
+            "id": "task-3-3",
+            "description": "エラーケース用のファクスチャの作成",
+            "status": "in-progress",
+            "priority": "medium"
+          },
+          {
+            "id": "task-3-4",
+            "description": "さまざまなドキュメントタイプに対応したファクスチャの作成",
+            "status": "in-progress",
+            "priority": "medium"
+          }
+        ],
+        "status": "in-progress",
+        "dependencies": [
+          "step-1"
+        ]
+      },
+      {
+        "id": "step-4",
+        "title": "コントローラー統合テストの実装",
+        "description": "ContextController, GlobalController, BranchControllerの統合テストを実装します。",
+        "tasks": [
+          {
+            "id": "task-4-1",
+            "description": "ContextController統合テストの実装",
+            "status": "completed",
+            "priority": "high"
+          },
+          {
+            "id": "task-4-2",
+            "description": "GlobalController統合テストの実装",
+            "status": "completed",
+            "priority": "high"
+          },
+          {
+            "id": "task-4-3",
+            "description": "BranchController統合テストの実装",
+            "status": "completed",
+            "priority": "high"
+          },
+          {
+            "id": "task-4-4",
+            "description": "コントローラーテストのエラーケース実装",
+            "status": "completed",
+            "priority": "medium"
+          }
+        ],
+        "status": "completed",
+        "dependencies": [
+          "step-2",
+          "step-3"
+        ]
+      },
+      {
+        "id": "step-5",
+        "title": "ユースケース統合テストの実装",
+        "description": "各種ユースケースの統合テストを実装します。",
+        "tasks": [
+          {
+            "id": "task-5-1",
+            "description": "ReadContextユースケース統合テストの実装",
+            "status": "completed",
+            "priority": "medium"
+          },
+          {
+            "id": "task-5-2",
+            "description": "ReadGlobalDocumentユースケース統合テストの実装",
+            "status": "completed",
+            "priority": "medium"
+          },
+          {
+            "id": "task-5-3",
+            "description": "WriteGlobalDocumentユースケース統合テストの実装",
+            "status": "completed",
+            "priority": "medium"
+          },
+          {
+            "id": "task-5-4",
+            "description": "ReadBranchDocumentユースケース統合テストの実装",
+            "status": "completed",
+            "priority": "medium"
+          },
+          {
+            "id": "task-5-5",
+            "description": "WriteBranchDocumentユースケース統合テストの実装",
+            "status": "completed",
+            "priority": "medium"
+          }
+        ],
+        "status": "completed",
+        "dependencies": [
+          "step-2",
+          "step-3"
+        ]
+      },
+      {
+        "id": "step-6",
+        "title": "API統合テストの実装",
+        "description": "MCP Serverのルートハンドラーの統合テストを実装します。",
+        "tasks": [
+          {
+            "id": "task-6-1",
+            "description": "McpServerRoutes統合テストの実装",
+            "status": "cancelled",
+            "priority": "low"
+          },
+          {
+            "id": "task-6-2",
+            "description": "各ツール呼び出しのテスト実装（read_context, read_branch_memory_bank等）",
+            "status": "pending",
+            "priority": "low"
+          },
+          {
+            "id": "task-6-3",
+            "description": "エラーケースと境界値のテスト実装",
+            "status": "pending",
+            "priority": "low"
+          }
+        ],
+        "status": "pending",
+        "dependencies": [
+          "step-2",
+          "step-3",
+          "step-4",
+          "step-5"
+        ]
+      },
+      {
+        "id": "step-7",
+        "title": "テスト設定の修正と問題解決",
+        "description": "テスト実行時に発生する問題を解決します。",
+        "tasks": [
+          {
+            "id": "task-7-1",
+            "description": "ESMモジュール設定の問題修正",
+            "status": "in-progress",
+            "priority": "high"
+          },
+          {
+            "id": "task-7-2",
+            "description": "moduleNameMapperの設定修正",
+            "status": "in-progress",
+            "priority": "high"
+          },
+          {
+            "id": "task-7-3",
+            "description": "テスト実行コマンドの最適化",
+            "status": "pending",
+            "priority": "medium"
+          }
+        ],
+        "status": "in-progress",
+        "dependencies": [
+          "step-4",
+          "step-5"
+        ]
+      },
+      {
+        "id": "step-8",
+        "title": "パフォーマンスとリファクタリング",
+        "description": "既存テストの最適化と改善を行います。",
+        "tasks": [
+          {
+            "id": "task-8-1",
+            "description": "テスト実行時間の最適化",
+            "status": "pending",
+            "priority": "low"
+          },
+          {
+            "id": "task-8-2",
+            "description": "テストコードのリファクタリングと重複排除",
+            "status": "pending",
+            "priority": "low"
+          },
+          {
+            "id": "task-8-3",
+            "description": "テストカバレッジの確認と改善",
+            "status": "pending",
+            "priority": "low"
+          }
+        ],
+        "status": "pending",
+        "dependencies": [
+          "step-4",
+          "step-5",
+          "step-6",
+          "step-7"
+        ]
+      }
+    ],
+    "nextActionItems": [
+      {
+        "id": "action-1",
+        "description": "ESMモジュール対応問題の修正",
+        "assignee": "t3ta",
+        "dueDate": "2025-04-02",
+        "priority": "high"
+      },
+      {
+        "id": "action-2",
+        "description": "API統合テストの実装開始",
+        "assignee": "t3ta",
+        "dueDate": "2025-04-05",
+        "priority": "low"
+      },
+      {
+        "id": "action-3",
+        "description": "テスト実行コマンドの最適化",
+        "assignee": "t3ta",
+        "dueDate": "2025-04-03",
+        "priority": "medium"
+      }
+    ]
+  }
+}

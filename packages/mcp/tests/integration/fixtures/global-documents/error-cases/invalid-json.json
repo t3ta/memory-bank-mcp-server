@@ -1,0 +1,1 @@
+{ "schema": "memory_document_v2", "metadata": { "id": "invalid-json-test", "title": "Invalid JSON" }, "content": { "message": "This JSON is intentionally broken" 

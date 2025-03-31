@@ -313,19 +313,23 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
       // Get all documents
       const documentRepository = this.getDocumentRepository();
       const paths = await documentRepository.list();
+      logger.debug(`Found ${paths.length} document paths`); // Log path count
       const documents: MemoryDocument[] = [];
 
+      logger.debug('Starting document read loop...'); // Log loop start
       for (const docPath of paths) {
         const doc = await documentRepository.findByPath(docPath);
         if (doc) {
           documents.push(doc);
         }
       }
+      logger.debug('Finished document read loop.'); // Log loop end
 
       // Create tag index (compliant with schema definition)
       const tagEntriesMap = new Map<string, { tag: Tag; documents: DocumentReference[] }>();
 
       // Collect tags for each document and build the Map
+      logger.debug('Starting index creation loop...'); // Log loop start
       for (const doc of documents) {
         const docJson = doc.toJSON(); // Get ID using toJSON()
         const docRef: DocumentReference = {
@@ -342,6 +346,7 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
           tagEntriesMap.get(tag.value)!.documents.push(docRef);
         }
       }
+      logger.debug('Finished index creation loop.'); // Log loop end
 
       // Generate TagEntry array from Map and convert tag property to string
       const tagEntries: TagEntry[] = Array.from(tagEntriesMap.values()).map(entry => ({

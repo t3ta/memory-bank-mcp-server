@@ -2,6 +2,7 @@ import path from 'node:path';
 import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
 import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
 import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
+import { DomainError } from '../../../shared/errors/DomainError.js'; // Import DomainError
 import { InfrastructureError, InfrastructureErrorCodes } from '../../../shared/errors/InfrastructureError.js';
 import { logger } from '../../../shared/utils/logger.js';
 import type { IFileSystemService } from '../../storage/interfaces/IFileSystemService.js';
@@ -88,13 +89,15 @@ export class DocumentOperations extends FileSystemMemoryBankRepositoryBase {
       const documentRepository = this.getDocumentRepository();
       await documentRepository.save(document);
     } catch (error) {
-      if (error instanceof InfrastructureError) {
+      // If it's a known domain or infrastructure error, re-throw it directly
+      if (error instanceof DomainError || error instanceof InfrastructureError) {
         throw error;
       }
-
+      // For any other unexpected errors, wrap as InfrastructureError
+      logger.error(`Unexpected error saving document ${document.path.value}:`, { error }); // Log unexpected errors
       throw new InfrastructureError(
         InfrastructureErrorCodes.FILE_WRITE_ERROR,
-        `Failed to save document: ${document.path.value}`,
+        `Unexpected error saving document: ${document.path.value}`,
         { originalError: error }
       );
     }

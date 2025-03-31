@@ -1,0 +1,13 @@
+{
+  "schema": "rules_v1",
+  "metadata": {
+    "language": "ja",
+    "description": "Default Japanese rules (dummy for testing)"
+  },
+  "rules": {
+    "general": [
+      "簡潔に。",
+      "丁寧に。"
+    ]
+  }
+}

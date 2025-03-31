@@ -1,0 +1,25 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "test-guide-doc",
+    "title": "Test Guide Document",
+    "documentType": "guide",
+    "path": "guide-document.json",
+    "tags": ["guide", "test"],
+    "lastModified": "2025-03-30T00:00:00.000Z",
+    "createdAt": "2025-03-30T00:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "Introduction",
+        "content": "This is a test guide."
+      },
+      {
+        "title": "Usage",
+        "content": "How to use the test feature."
+      }
+    ]
+  }
+}

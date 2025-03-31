@@ -1,0 +1,80 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "a3e4b3bf-1e57-470f-8888-7c2f8f04babb",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context"
+    ],
+    "lastModified": "2025-03-30T15:45:00.000Z",
+    "createdAt": "2025-03-30T12:15:01.577Z",
+    "version": 2
+  },
+  "content": {
+    "currentWork": "MCPパッケージの統合テスト実装計画",
+    "recentChanges": [
+      {
+        "date": "2025-03-30T15:45:00.000Z",
+        "description": "統合テスト実装計画を作成"
+      },
+      {
+        "date": "2025-03-30T15:40:00.000Z",
+        "description": "ブランチコンテキスト情報を更新"
+      },
+      {
+        "date": "2025-03-30T12:15:01.577Z",
+        "description": "ブランチを作成"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "9e1a675d-8f22-4189-b8e4-4d2f352c6a89",
+        "description": "テスト間で独立した環境を提供するために、各テストケースでテンポラリディレクトリを使用する"
+      },
+      {
+        "id": "7b2c31f4-ea96-4fa2-a984-2f5d18e921c0",
+        "description": "実際のファイルシステムを使用するが、テスト用の仮想的なドキュメント構造を作成する"
+      },
+      {
+        "id": "c5de94a7-1b2f-48d1-9c8a-12a7e30fb152",
+        "description": "各統合テストは独立して実行できるように設計する（テスト順序に依存しない）"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "832e9d5f-a5b0-4c02-9af8-9f4c6b8da521",
+        "description": "テスト環境の初期化と破棄をどのレベル（各テスト / 各ファイル）で行うか",
+        "status": "resolved"
+      },
+      {
+        "id": "f547e21c-6d19-4a81-a0ca-b9c3468b1e52",
+        "description": "モックとスタブの使用バランス（純粋な統合テストvsハイブリッド）",
+        "status": "open"
+      },
+      {
+        "id": "3dc55d67-81b3-4b7b-91e3-648296e26df7",
+        "description": "テストカバレッジの目標設定（統合テストにおける適切なカバレッジ）",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "b21c5f48-e7a9-4d66-a2eb-fc39e3f0b912",
+        "description": "統合テスト用のディレクトリ構造とsetup.tsファイルを作成",
+        "priority": "high"
+      },
+      {
+        "id": "a67d1f3c-4ff5-49a9-bfc5-3f2e1d8c9e5a",
+        "description": "テストヘルパーとファクスチャを実装",
+        "priority": "high"
+      },
+      {
+        "id": "575835fd-089d-4252-b31b-082640b5d528",
+        "description": "ContextControllerの統合テストを実装",
+        "priority": "medium"
+      }
+    ]
+  }
+}

@@ -1,4 +1,5 @@
 import { DomainError, DomainErrorCodes } from "../../shared/errors/DomainError.js";
+import { toSafeBranchName } from "../../shared/utils/branchNameUtils.js";
 
 /**
  * Value object representing branch information
@@ -71,7 +72,7 @@ export class BranchInfo {
    * Get a safe branch name for filesystem usage
    */
   public get safeName(): string {
-    return this._name.replace(/\//g, '-');
+    return toSafeBranchName(this._name);
   }
 
   /**

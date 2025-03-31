@@ -1,0 +1,19 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "test-plan-doc",
+    "title": "Test Plan Document",
+    "documentType": "plan",
+    "path": "plan-document.json",
+    "tags": ["plan", "test"],
+    "lastModified": "2025-03-30T00:00:00.000Z",
+    "createdAt": "2025-03-30T00:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": "This is a test plan document.",
+    "steps": [
+      { "id": "step1", "description": "Plan step 1" }
+    ]
+  }
+}

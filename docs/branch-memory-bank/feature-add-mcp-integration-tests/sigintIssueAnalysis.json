@@ -1,0 +1,175 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "sigint-issue-analysis",
+    "title": "統合テスト実行時のSIGINT問題分析",
+    "documentType": "analysis",
+    "path": "sigintIssueAnalysis.json",
+    "tags": [
+      "integration-tests",
+      "debugging",
+      "analysis",
+      "SIGINT",
+      "VSCode"
+    ],
+    "lastModified": "2025-03-31T17:50:00.000Z",
+    "createdAt": "2025-03-31T17:50:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": "VSCodeのターミナルで統合テスト実行時に発生するSIGINT問題について分析し、解決策を提案するドキュメントです。",
+    "issue": {
+      "description": "VSCodeのターミナルで`yarn workspace @memory-bank/mcp test:integration`を実行すると、2回目以降の実行時にSIGINTが送信されてしまい、テストが正常に実行されない問題が発生しています。",
+      "environment": {
+        "editor": "VSCode",
+        "terminal": "VSCode統合ターミナル（cline）",
+        "command": "yarn workspace @memory-bank/mcp test:integration"
+      },
+      "symptoms": [
+        "1回目は正常に実行される",
+        "2回目以降はSIGINTが送信され、テストが中断される",
+        "デバッグログには特に関連するエラーメッセージが表示されない"
+      ]
+    },
+    "rootCauseAnalysis": {
+      "hypothesis": [
+        {
+          "id": "hypothesis-1",
+          "description": "VSCodeのターミナル実行環境におけるNodeプロセス管理の問題",
+          "details": "VSCodeでJestを実行した際、プロセスの終了処理が完全に行われず、2回目以降の実行時にVSCodeがデッドロックや競合を検出し、SIGINT信号を自動的に送信している可能性があります。",
+          "likelihood": "high"
+        },
+        {
+          "id": "hypothesis-2",
+          "description": "テスト環境のクリーンアップ不足",
+          "details": "テスト実行後にリソース（ファイルハンドルやプロセス）が適切に解放されておらず、2回目の実行時に競合が発生している可能性があります。test-env.tsの実装を確認すると、tmp-promiseを使用したクリーンアップ処理は実装されていますが、上手く機能していない可能性があります。",
+          "likelihood": "medium"
+        },
+        {
+          "id": "hypothesis-3",
+          "description": "非同期処理の問題",
+          "details": "テスト内の非同期処理が適切に完了していない状態でテストプロセスが終了しようとし、次回実行時に競合が発生している可能性があります。",
+          "likelihood": "medium"
+        },
+        {
+          "id": "hypothesis-4",
+          "description": "VSCodeとYarnの相互作用",
+          "details": "VSCodeのターミナルでYarnを介してJestを実行する際、シグナルのハンドリングに問題がある可能性があります。特にWorkspaceコマンドを使用した場合の挙動に問題がある可能性があります。",
+          "likelihood": "high"
+        }
+      ],
+      "confirmedCause": {
+        "description": "VSCodeのターミナル（cline）でYarnのワークスペースコマンドを使用した場合のプロセス管理に問題があることが最も可能性が高いです。Jestプロセスが完全に終了する前に、次のプロセスが開始されようとした場合、VSCodeが自動的にSIGINTを送信している可能性があります。特に統合テストでは、ファイルシステム操作やテンポラリディレクトリの作成・削除を行うため、プロセスの終了処理に時間がかかる可能性があります。"
+      }
+    },
+    "solutionOptions": [
+      {
+        "id": "solution-1",
+        "title": "外部ターミナルを使用する",
+        "description": "VSCode統合ターミナルではなく、iTerm2やターミナル.appなどの外部ターミナルでコマンドを実行する",
+        "pros": [
+          "VSCode特有の問題を回避できる",
+          "実装変更が不要"
+        ],
+        "cons": [
+          "開発ワークフローが分断される",
+          "根本原因の解決にはならない"
+        ],
+        "implementationSteps": [
+          "外部ターミナルを開く",
+          "プロジェクトディレクトリに移動",
+          "同じテストコマンドを実行"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "solution-2",
+        "title": "テスト実行コマンドの修正",
+        "description": "package.jsonのtest:integrationスクリプトを修正し、プロセス管理をより安定させる",
+        "pros": [
+          "根本的な問題に対処できる可能性がある",
+          "VSCode環境でも動作可能"
+        ],
+        "cons": [
+          "コマンド構文が複雑になる可能性がある"
+        ],
+        "implementationSteps": [
+          "package.jsonのtest:integrationスクリプトを修正",
+          "プロセス終了時の待機時間を追加する（--forceExitオプションの追加など）",
+          "NODE_ENVやその他の環境変数の設定を見直す"
+        ],
+        "priority": "medium"
+      },
+      {
+        "id": "solution-3",
+        "title": "テスト環境のクリーンアップ処理の強化",
+        "description": "test-env.tsのcleanupTestEnv関数を改善し、確実にリソースを解放する",
+        "pros": [
+          "テスト環境の安定性が向上する",
+          "他の問題も予防できる"
+        ],
+        "cons": [
+          "根本原因がこれでない場合、問題は解決しない"
+        ],
+        "implementationSteps": [
+          "test-env.tsのcleanupTestEnv関数にプロセス終了処理の待機を追加",
+          "fs.remove操作の前に明示的な遅延を追加",
+          "ファイルハンドルが確実に閉じられるようにする"
+        ],
+        "priority": "low"
+      },
+      {
+        "id": "solution-4",
+        "title": "npmの使用",
+        "description": "yarnの代わりにnpmを使用してテストを実行する",
+        "pros": [
+          "異なるプロセス管理メカニズムを使用するため、問題が回避できる可能性がある"
+        ],
+        "cons": [
+          "プロジェクト全体でパッケージマネージャが混在する"
+        ],
+        "implementationSteps": [
+          "npm run test:integrationコマンドを使用（package.jsonのスクリプトは共通）"
+        ],
+        "priority": "medium"
+      }
+    ],
+    "recommendedSolution": {
+      "id": "recommended-solution",
+      "title": "VSCode統合ターミナルを回避し、Jest設定を最適化",
+      "description": "短期的にはVSCode統合ターミナルを避け、外部ターミナルを使用します。長期的な解決策としては、Jestの設定を最適化し、プロセス管理を改善します。",
+      "implementation": {
+        "immediateSteps": [
+          "外部ターミナル（iTerm2など）でテストを実行",
+          "Jestの設定に「--forceExit」オプションを追加（package.jsonのtest:integrationスクリプトを修正）"
+        ],
+        "longTermSteps": [
+          "afterAll/afterEachフックでのリソース解放を徹底",
+          "テスト実行後の明示的な遅延を追加して、非同期処理の完了を確保",
+          "VS Code拡張機能「Jest Runner」などの代替実行環境の検討"
+        ]
+      }
+    },
+    "nextSteps": [
+      {
+        "id": "step-1",
+        "description": "外部ターミナルでのテスト実行を試みる",
+        "assignee": "t3ta",
+        "priority": "high"
+      },
+      {
+        "id": "step-2",
+        "description": "package.jsonのtest:integrationスクリプトに--forceExitオプションを追加",
+        "assignee": "t3ta",
+        "priority": "medium"
+      },
+      {
+        "id": "step-3",
+        "description": "テスト環境のクリーンアップ処理の改善",
+        "assignee": "t3ta",
+        "priority": "low"
+      }
+    ],
+    "conclusion": "VSCodeのターミナル（cline）を使用した場合のプロセス管理の問題が、SIGINTが自動的に送信される主な原因と考えられます。短期的には外部ターミナルを使用することで問題を回避し、長期的にはJestの設定やテスト環境のクリーンアップ処理を改善することで、より安定したテスト実行環境を構築することができます。"
+  }
+}

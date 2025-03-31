@@ -69,7 +69,7 @@ export class GlobalController implements IGlobalController {
 
       const result = await this.readGlobalDocumentUseCase.execute({ path });
 
-      return this.presenter.present(result.document);
+      return this.presenter.presentSuccess(result.document); // Already correct, no change needed here
     } catch (error) {
       return this.handleError(error, 'readDocument');
     }
@@ -99,7 +99,7 @@ export class GlobalController implements IGlobalController {
         },
       });
 
-      return this.presenter.present({ success: true });
+      return this.presenter.presentSuccess({ success: true }); // Already correct, no change needed here
     } catch (error) {
       return this.handleError(error, 'writeDocument');
     }
@@ -149,7 +149,7 @@ export class GlobalController implements IGlobalController {
         }
       }
 
-      return this.presenter.present(result);
+      return this.presenter.presentSuccess(result); // Already correct, no change needed here
     } catch (error) {
       return this.handleError(error, 'readCoreFiles');
     }
@@ -169,14 +169,14 @@ export class GlobalController implements IGlobalController {
           branchName: undefined, // Global memory bank
           fullRebuild: true,
         });
-        return this.presenter.present(result);
+        return this.presenter.presentSuccess(result); // Already correct, no change needed here
       } else {
         this.componentLogger.info('Using UpdateTagIndexUseCase (V1) for global tag index update', { operation: 'updateTagsIndex' });
         const result = await this.updateTagIndexUseCase.execute({
           branchName: undefined, // Global memory bank
           fullRebuild: true,
         });
-        return this.presenter.present(result);
+        return this.presenter.presentSuccess(result); // Already correct, no change needed here
       }
     } catch (error) {
       return this.handleError(error, 'updateTagsIndex');
@@ -210,7 +210,7 @@ export class GlobalController implements IGlobalController {
         documentsFound: result.documents.length,
         searchInfo: result.searchInfo
       });
-return this.presenter.present(result.documents);
+return this.presenter.presentSuccess(result.documents); // Already correct, no change needed here
 } catch (error) {
 this.componentLogger.error('Failed to search documents by tags:', {
   operation: 'findDocumentsByTags',
@@ -283,7 +283,7 @@ return this.handleError(error, 'findDocumentsByTags');
         id: options.id,
       });
 
-      return this.presenter.present(result.document);
+      return this.presenter.presentSuccess(result.document); // Already correct, no change needed here
     } catch (error) {
       return this.handleError(error, 'readJsonDocument');
     }
@@ -315,7 +315,7 @@ return this.handleError(error, 'findDocumentsByTags');
         },
       });
 
-      return this.presenter.present(result);
+      return this.presenter.presentSuccess(result); // Already correct, no change needed here
     } catch (error) {
       return this.handleError(error, 'writeJsonDocument');
     }
@@ -342,7 +342,7 @@ return this.handleError(error, 'findDocumentsByTags');
         id: options.id,
       });
 
-      return this.presenter.present(result);
+      return this.presenter.presentSuccess(result); // Already correct, no change needed here
     } catch (error) {
       return this.handleError(error, 'deleteJsonDocument');
     }
@@ -372,7 +372,7 @@ return this.handleError(error, 'findDocumentsByTags');
         tags: options?.tags,
       });
 
-      return this.presenter.present(result.documents);
+      return this.presenter.presentSuccess(result.documents); // Already correct, no change needed here
     } catch (error) {
       return this.handleError(error, 'listJsonDocuments');
     }
@@ -397,7 +397,7 @@ return this.handleError(error, 'findDocumentsByTags');
         branchName: undefined, // Global memory bank
       });
 
-      return this.presenter.present(result.documents);
+      return this.presenter.presentSuccess(result.documents); // Already correct, no change needed here
     } catch (error) {
       return this.handleError(error, 'searchJsonDocuments');
     }
@@ -423,7 +423,7 @@ return this.handleError(error, 'findDocumentsByTags');
         fullRebuild: options?.force,
       });
 
-      return this.presenter.present(result);
+      return this.presenter.presentSuccess(result); // Already correct, no change needed here
     } catch (error) {
       return this.handleError(error, 'updateJsonIndex');
     }

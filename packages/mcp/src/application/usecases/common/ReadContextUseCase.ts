@@ -43,19 +43,23 @@ export class ReadContextUseCase {
     // Add debug log (using logger)
     logger.debug(`ReadContextUseCase.execute: ${JSON.stringify(request, null, 2)}`);
     logger.debug(`Repository details: branchRepository=${this.branchRepository.constructor.name}, globalRepository=${this.globalRepository.constructor.name}`);
+    logger.debug('Entering try block in ReadContextUseCase.execute'); // Added log
 
     try {
       // Check branch existence
       logger.info(`Checking branch existence: ${branch}`);
       const branchExists = await this.branchRepository.exists(branch);
       logger.debug(`Branch ${branch} exists: ${branchExists}`);
+      logger.debug('Finished checking branch existence'); // Added log
 
       if (!branchExists) {
-        logger.info(`Branch ${branch} not found, auto-initializing...`);
+        logger.info(`Branch ${branch} not found, attempting auto-initialization...`); // Modified log
         try {
           const branchInfo = BranchInfo.create(branch);
+          logger.debug('Calling branchRepository.initialize...'); // Added log
           await this.branchRepository.initialize(branchInfo);
           logger.info(`Branch ${branch} auto-initialized successfully`);
+          logger.debug('Finished branchRepository.initialize'); // Added log
         } catch (initError) {
           logger.error(`Failed to auto-initialize branch ${branch}:`, initError);
           throw new DomainError(
@@ -67,14 +71,19 @@ export class ReadContextUseCase {
 
       // Read branch memory
       logger.info(`Reading branch memory for: ${branch}`);
+      logger.debug('Calling readBranchMemory...'); // Added log
       result.branchMemory = await this.readBranchMemory(branch);
       logger.debug(`Branch memory keys: ${Object.keys(result.branchMemory).join(', ')}`);
+      logger.debug('Finished readBranchMemory'); // Added log
 
       // Read global memory (core files only)
       logger.info(`Reading global memory (core files only)`);
+      logger.debug('Calling readGlobalMemory...'); // Added log
       result.globalMemory = await this.readGlobalMemory();
       logger.debug(`Global memory keys: ${Object.keys(result.globalMemory || {}).join(', ')}`);
+      logger.debug('Finished readGlobalMemory'); // Added log
 
+      logger.debug('Exiting try block in ReadContextUseCase.execute successfully'); // Added log
       return result;
     } catch (error) {
       logger.error(`ReadContextUseCase error: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -90,7 +99,9 @@ export class ReadContextUseCase {
    */
   private async readBranchMemory(branchName: string): Promise<Record<string, string>> {
     const branchInfo = BranchInfo.create(branchName);
+    logger.debug('Calling branchRepository.listDocuments...'); // Added log
     const paths = await this.branchRepository.listDocuments(branchInfo);
+    logger.debug('Finished branchRepository.listDocuments'); // Added log
     const result: Record<string, string> = {};
 
     logger.debug(`Reading branch memory paths: ${paths.map(p => p.value).join(', ')}`);
@@ -98,7 +109,9 @@ export class ReadContextUseCase {
     for (const path of paths) {
       logger.debug(`Reading branch document: ${path.value}`);
       try {
+        logger.debug('Calling branchRepository.getDocument...'); // Added log
         const document = await this.branchRepository.getDocument(branchInfo, path);
+        logger.debug('Finished branchRepository.getDocument'); // Added log
         if (document) {
           logger.debug(`Document found: ${path.value}`);
           result[path.value] = document.content;
@@ -119,7 +132,9 @@ export class ReadContextUseCase {
    * @returns Object with document paths as keys and content as values
    */
   private async readGlobalMemory(): Promise<Record<string, string>> {
+    logger.debug('Calling globalRepository.listDocuments...'); // Added log
     let paths = await this.globalRepository.listDocuments();
+    logger.debug('Finished globalRepository.listDocuments'); // Added log
     const result: Record<string, string> = {};
 
     // Filter for core files only
@@ -131,7 +146,9 @@ export class ReadContextUseCase {
     for (const path of paths) {
       logger.debug(`Reading global document: ${path.value}`);
       try {
+        logger.debug('Calling globalRepository.getDocument...'); // Added log
         const document = await this.globalRepository.getDocument(path);
+        logger.debug('Finished globalRepository.getDocument'); // Added log
         if (document) {
           logger.debug(`Document found: ${path.value}`);
           result[path.value] = document.content;

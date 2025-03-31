@@ -1,0 +1,60 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "integration-test-debug-results",
+    "title": "統合テスト実行修正の結果",
+    "documentType": "analysis",
+    "path": "integrationTestDebugResults.json",
+    "tags": [
+      "testing",
+      "integration-tests",
+      "debug",
+      "results"
+    ],
+    "lastModified": "2025-03-31T17:45:00.000Z",
+    "createdAt": "2025-03-31T17:45:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": "統合テスト実行時のSIGINT問題の修正結果について記録します。",
+    "fixedIssue": {
+      "description": "ESMモードでのfs-extraメソッドの使用に関する問題を修正しました。",
+      "originalError": "TypeError: fs.writeFile is not a function",
+      "solution": "fs.writeFileをfs.outputFileに変更し、JSONの出力はJSON.stringifyを使って直接文字列化してから書き込むようにしました。"
+    },
+    "testResults": {
+      "totalTestSuites": 8,
+      "passedTestSuites": 3,
+      "failedTestSuites": 5,
+      "totalTests": 39,
+      "passedTests": 31,
+      "failedTests": 8
+    },
+    "remainingIssues": {
+      "type": "テストロジックの問題",
+      "examples": [
+        "feature/new-branch-test-auto-init' was not found - 新規ブランチの自動作成ロジックが機能していないか、テストの期待が実装と一致していない",
+        "DomainErrorの発生 - テスト内の期待動作と実際の実装に差異がある"
+      ],
+      "analysis": "これらの問題はファイルシステムとの連携の問題ではなく、テスト自体のロジックと実装の差異に関連しています。特に新規ブランチの自動作成機能やエラーハンドリングの部分で、テストで期待している動作と実際の実装に違いがあるようです。"
+    },
+    "nextSteps": [
+      {
+        "id": "next-1",
+        "description": "テストコードと実装コードを照らし合わせ、期待動作の差異を特定する",
+        "priority": "medium"
+      },
+      {
+        "id": "next-2",
+        "description": "WriteBranchDocumentUseCaseの「新規ブランチ自動作成」機能の実装を確認",
+        "priority": "medium"
+      },
+      {
+        "id": "next-3",
+        "description": "テストヘルパー（test-env.ts）のさらなる改善と最適化",
+        "priority": "low"
+      }
+    ],
+    "conclusion": "ESM環境でのfs-extra使用に関する問題は修正され、テストの実行は大きく改善しました。8つのテストスイートのうち3つが成功し、39のテストのうち31が合格しています。残りの問題はテストロジックと実装の差異に関するもので、初期のSIGINTが発生する問題は解決されたと言えます。"
+  }
+}

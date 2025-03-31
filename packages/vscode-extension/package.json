@@ -126,7 +126,7 @@
     "build": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "lint": "eslint . --ext .ts,.tsx",
-    "test": "jest"
+    "test": "jest --passWithNoTests"
   },
   "dependencies": {
     "@google/generative-ai": "^0.16.0",

@@ -1,5 +1,5 @@
 import type { Language } from "@memory-bank/schemas";
-export { Language } from "@memory-bank/schemas";
+export type { Language } from "@memory-bank/schemas";
 
 
 /**

@@ -15,6 +15,7 @@
     "preserveConstEnums": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "isolatedModules": true, // Added as recommended by ts-jest
     "noUnusedLocals": true, // Enabled noUnusedLocals
     "noUnusedParameters": true, // Enabled noUnusedParameters
     "noImplicitReturns": true,

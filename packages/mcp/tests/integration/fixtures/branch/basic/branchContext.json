@@ -1,0 +1,11 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "basic-branch-context",
+    "documentType": "branch_context",
+    "path": "branchContext.json"
+  },
+  "content": {
+    "value": "Basic branch context fixture"
+  }
+}

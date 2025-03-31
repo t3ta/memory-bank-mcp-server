@@ -11,7 +11,7 @@ export interface MCPResponsePresenter {
    * @param data Response data
    * @returns Formatted MCP response
    */
-  present<T>(data: T): MCPResponse<T>;
+  presentSuccess<T>(data: T): MCPResponse<T>; // Correct method name
 
   /**
    * Present error response

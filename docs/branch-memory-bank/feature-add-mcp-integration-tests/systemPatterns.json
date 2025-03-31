@@ -1,0 +1,155 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "bbabc8c2-8d40-4003-8982-089f7d96e0ea",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "system-patterns"
+    ],
+    "lastModified": "2025-03-30T15:50:00.000Z",
+    "createdAt": "2025-03-30T12:15:01.578Z",
+    "version": 3
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "d81e7f32-5b9c-4a03-8d61-f63c7d48e904",
+        "title": "統合テストの基本構造",
+        "context": "統合テストを実装する際の基本的なディレクトリ構造とテスト設計パターンを決定する必要がある",
+        "decision": "1. packages/mcp/tests/integration/ディレクトリを作成\n2. テストタイプごとにサブディレクトリ分け（controller, usecase, api）\n3. 各テストファイルは[対象].integration.test.tsの命名規則\n4. 共通のsetup.tsファイルでテスト環境を初期化",
+        "consequences": {
+          "positive": [
+            "テストの分類が明確になり、目的別にテストを探しやすくなる",
+            "共通のセットアップコードを再利用できる",
+            "命名規則が統一されることで、統合テストを識別しやすくなる"
+          ],
+          "negative": [
+            "ディレクトリ階層が深くなる可能性がある"
+          ]
+        },
+        "status": "accepted",
+        "date": "2025-03-30T15:50:00.000Z",
+        "alternatives": [
+          "フラットなディレクトリ構造（統合テストを1つのディレクトリに配置）",
+          "対象のソースコードと同じ階層構造でテストを配置"
+        ]
+      },
+      {
+        "id": "f5ea2c47-9d6a-42b8-a073-c8d9e4f2b1a3",
+        "title": "テスト環境の分離方法",
+        "context": "統合テストでは、テスト間の分離を確保して互いに影響を与えないようにする必要がある",
+        "decision": "1. 各テストケース（it）ごとに一意のテンポラリディレクトリを生成\n2. beforeEach/afterEachでテスト環境の初期化とクリーンアップを行う\n3. fs-extraライブラリを使用してテンポラリディレクトリの作成・削除を管理\n4. テスト用のヘルパー関数「createTestEnv」と「cleanupTestEnv」を実装",
+        "consequences": {
+          "positive": [
+            "各テストが独立した環境で実行されるため、テスト間の干渉がない",
+            "テストの再現性と信頼性が向上する",
+            "並列実行を可能にする基盤ができる"
+          ],
+          "negative": [
+            "ファイル操作が増えるためテスト実行時間が長くなる可能性がある",
+            "テストごとのセットアップ・クリーンアップの負荷が増える"
+          ]
+        },
+        "status": "accepted",
+        "date": "2025-03-30T15:50:00.000Z",
+        "alternatives": [
+          "一つのテストスイート（describe）で共有環境を使用",
+          "メモリ内ファイルシステムモックを使用（完全な統合テストではなくなる）"
+        ]
+      },
+      {
+        "id": "1a3b5c7d-9e8f-4a2c-b1d3-f5e7a9c1b3d5",
+        "title": "テストファクスチャの管理",
+        "context": "テストで使用する固定データ（ファクスチャ）の管理方法を決定する必要がある",
+        "decision": "1. tests/integration/fixtures/ディレクトリに共通テストデータを配置\n2. JSON形式でテストに使用するドキュメントサンプルを定義\n3. ヘルパー関数でファクスチャの読み込みと一時環境へのコピーを実装",
+        "consequences": {
+          "positive": [
+            "テストデータが集中管理され、再利用しやすい",
+            "テストケースとテストデータの分離により、メンテナンス性が向上",
+            "実際のドキュメント構造に近いテストデータを使用できる"
+          ],
+          "negative": [
+            "ファクスチャの管理が複雑になる可能性がある",
+            "大量のテストデータがあると、整理が難しくなる"
+          ]
+        },
+        "status": "accepted",
+        "date": "2025-03-30T15:50:00.000Z",
+        "alternatives": [
+          "各テストファイル内にインラインでテストデータを定義",
+          "テストコード内でプログラム的にテストデータを生成"
+        ]
+      },
+      {
+        "id": "b4c6d8e0-f2g4-h6i8-j0k2-l4m6n8o0p2q4",
+        "title": "統合テストでのエラーハンドリング",
+        "context": "統合テストでは実際のファイルシステムと連携するため、エラーやタイミング問題が発生する可能性がある",
+        "decision": "1. エラーケース専用のテストを明示的に定義\n2. try-catchを活用したエラーチェックパターンを使用\n3. 非同期操作に関しては、適切なタイムアウト値を設定\n4. エラー発生時のリトライメカニズムをヘルパー関数に実装",
+        "consequences": {
+          "positive": [
+            "実際の運用に近い環境でのエラーケースを確認できる",
+            "エラーハンドリングコードの品質向上",
+            "タイミング依存の問題を早期発見できる"
+          ],
+          "negative": [
+            "テストが複雑化する可能性がある",
+            "テスト実行時間が長くなる"
+          ]
+        },
+        "status": "accepted",
+        "date": "2025-03-30T15:53:00.000Z",
+        "alternatives": [
+          "エラーケースをユニットテストレベルでのみテスト",
+          "モックを活用して制御されたエラーシナリオだけをテスト"
+        ]
+      }
+    ],
+    "implementationPatterns": [
+      {
+        "id": "a1b2c3d4-e5f6-7a8b-9c0d-e1f2a3b4c5d6",
+        "name": "統合テストのディレクトリ構造",
+        "description": "統合テストのための基本的なディレクトリ構造",
+        "structure": [
+          "packages/",
+          "  mcp/",
+          "    tests/",
+          "      integration/",
+          "        setup.ts",
+          "        jest.config.ts",
+          "        fixtures/",
+          "          branch-documents/",
+          "          global-documents/",
+          "        helpers/",
+          "          test-env.ts",
+          "          fixtures-loader.ts",
+          "        controller/",
+          "          ContextController.integration.test.ts",
+          "          GlobalController.integration.test.ts",
+          "          BranchController.integration.test.ts",
+          "        usecase/",
+          "          ReadContext.integration.test.ts",
+          "          ReadGlobalDocument.integration.test.ts",
+          "          WriteGlobalDocument.integration.test.ts",
+          "          ReadBranchDocument.integration.test.ts",
+          "          WriteBranchDocument.integration.test.ts",
+          "        api/",
+          "          McpServerRoutes.integration.test.ts"
+        ]
+      },
+      {
+        "id": "e1f2g3h4-i5j6-k7l8-m9n0-o1p2q3r4s5t6",
+        "name": "統合テストのベース構造",
+        "description": "統合テストファイルの基本的な構造パターン",
+        "codeExample": "/**\n * @jest-environment node\n */\nimport { setupTestEnv, cleanupTestEnv } from '../helpers/test-env';\nimport { loadFixtures } from '../helpers/fixtures-loader';\nimport { Application } from '../../../src/main/Application';\n\ndescribe('対象コンポーネント 統合テスト', () => {\n  let testEnv: { docRoot: string; tempDir: string };\n  let app: Application;\n\n  beforeEach(async () => {\n    // テスト環境のセットアップ\n    testEnv = await setupTestEnv();\n    \n    // テスト用データの準備\n    await loadFixtures(testEnv.tempDir, 'fixture-name');\n    \n    // アプリケーションの初期化\n    app = new Application({ docsRoot: testEnv.docRoot });\n    await app.initialize();\n  });\n\n  afterEach(async () => {\n    // テスト環境のクリーンアップ\n    await cleanupTestEnv(testEnv);\n  });\n\n  it('正常系: テスト名', async () => {\n    // テスト内容\n  });\n\n  it('異常系: テスト名', async () => {\n    // エラーケースのテスト内容\n  });\n});"
+      },
+      {
+        "id": "u1v2w3x4-y5z6-a7b8-c9d0-e1f2g3h4i5j6",
+        "name": "テストヘルパー関数パターン",
+        "description": "統合テストで使用するヘルパー関数の基本パターン",
+        "codeExample": "// test-env.ts\nimport * as fs from 'fs-extra';\nimport * as path from 'path';\nimport { v4 as uuid } from 'uuid';\n\nexport interface TestEnv {\n  docRoot: string;\n  tempDir: string;\n}\n\nexport async function setupTestEnv(): Promise<TestEnv> {\n  const tempDir = path.join(os.tmpdir(), 'memory-bank-test', uuid());\n  const docRoot = path.join(tempDir, 'docs');\n  \n  // テンポラリディレクトリの作成\n  await fs.ensureDir(docRoot);\n  await fs.ensureDir(path.join(docRoot, 'branch-memory-bank'));\n  await fs.ensureDir(path.join(docRoot, 'global-memory-bank'));\n  \n  return { docRoot, tempDir };\n}\n\nexport async function cleanupTestEnv(env: TestEnv): Promise<void> {\n  try {\n    await fs.remove(env.tempDir);\n  } catch (error) {\n    console.error('テスト環境のクリーンアップに失敗:', error);\n  }\n}"
+      }
+    ]
+  }
+}

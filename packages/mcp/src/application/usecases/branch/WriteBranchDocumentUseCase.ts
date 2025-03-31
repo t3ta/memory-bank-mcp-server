@@ -11,6 +11,7 @@ import {
   ApplicationError,
   ApplicationErrorCodes,
 } from '../../../shared/errors/ApplicationError.js';
+import { logger } from '../../../shared/utils/logger.js'; // Import logger
 
 /**
  * Input data for write branch document use case
@@ -42,6 +43,8 @@ export interface WriteBranchDocumentOutput {
  */
 export class WriteBranchDocumentUseCase
   implements IUseCase<WriteBranchDocumentInput, WriteBranchDocumentOutput> {
+
+  private readonly componentLogger = logger.withContext({ component: 'WriteBranchDocumentUseCase' }); // Add logger instance
 
   /**
    * Constructor
@@ -85,7 +88,23 @@ export class WriteBranchDocumentUseCase
       const documentPath = DocumentPath.create(input.document.path);
       const tags = (input.document.tags ?? []).map((tag) => Tag.create(tag));
 
-      await this.branchRepository.exists(input.branchName);
+      // Ensure branch exists before attempting to save document
+      const branchExists = await this.branchRepository.exists(branchInfo.safeName);
+      if (!branchExists) {
+        this.componentLogger.info(`Branch ${branchInfo.safeName} does not exist. Initializing...`);
+        try {
+          await this.branchRepository.initialize(branchInfo);
+          this.componentLogger.info(`Branch ${branchInfo.safeName} initialized successfully.`);
+        } catch (initError) {
+          this.componentLogger.error(`Failed to initialize branch ${branchInfo.safeName}`, { originalError: initError });
+          // Rethrow or handle initialization error appropriately
+          throw new ApplicationError(
+            ApplicationErrorCodes.BRANCH_INITIALIZATION_FAILED,
+            `Failed to initialize branch: ${(initError as Error).message}`,
+            { originalError: initError }
+          );
+        }
+      }
 
       const existingDocument = await this.branchRepository.getDocument(branchInfo, documentPath);
 
@@ -115,15 +134,13 @@ export class WriteBranchDocumentUseCase
         },
       };
     } catch (error) {
+      // If it's a known domain or application error, re-throw it directly
       if (error instanceof DomainError || error instanceof ApplicationError) {
         throw error;
       }
-
-      throw new ApplicationError(
-        ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
-        `Failed to write document: ${(error as Error).message}`,
-        { originalError: error }
-      );
+      // For any other unexpected errors, re-throw them directly as well.
+      this.componentLogger.error('Unexpected error in WriteBranchDocumentUseCase:', { error }); // Log unexpected errors
+      throw error;
     }
   }
 }

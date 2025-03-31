@@ -41,6 +41,8 @@ export class ApplicationError extends BaseError {
         return 404; // Not Found
       case ApplicationErrorCodes.CONFLICT:
         return 409; // Conflict
+      case ApplicationErrorCodes.BRANCH_INITIALIZATION_FAILED:
+        return 500; // Internal Server Error
       default:
         return 500; // Internal Server Error
     }
@@ -85,6 +87,7 @@ export const ApplicationErrorCodes = {
   OPERATION_NOT_ALLOWED: 'OPERATION_NOT_ALLOWED',
   CONFIGURATION_ERROR: 'CONFIGURATION_ERROR', // Added
   VALIDATION_FAILED: 'VALIDATION_FAILED', // Added
+  BRANCH_INITIALIZATION_FAILED: 'BRANCH_INITIALIZATION_FAILED', // Added for branch init errors
 } as const;
 
 /**
@@ -173,6 +176,18 @@ export const ApplicationErrors = {
       ApplicationErrorCodes.VALIDATION_FAILED,
       `Validation failed in ${useCaseName}: ${message}`,
       { useCaseName, ...additionalDetails }
+    );
+  },
+
+  /**
+   * Create a branch initialization failed error
+   */
+  branchInitializationFailed: (branchName: string, cause?: Error, additionalDetails?: Record<string, unknown>) => {
+    return new ApplicationError(
+      ApplicationErrorCodes.BRANCH_INITIALIZATION_FAILED,
+      `Failed to initialize branch '${branchName}'`,
+      { branchName, ...additionalDetails },
+      { cause }
     );
   }
 };
