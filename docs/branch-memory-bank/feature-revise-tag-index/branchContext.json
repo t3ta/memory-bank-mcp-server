@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "34e90e1f-956d-40ec-bf72-9e97d0802b79",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-31T15:29:40.375Z",
+    "createdAt": "2025-03-31T15:29:40.375Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "feature/revise-tag-index",
+    "purpose": "このブランチの目的を記述してください",
+    "createdAt": "2025-03-31T15:29:40.375Z",
+    "userStories": [
+      {
+        "id": "ac5e4dd8-c455-48a3-8d6a-2f2e1b841034",
+        "description": "解決する課題1",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "474c0cd7-c114-453e-9a78-c33629eb38e7",
+        "description": "解決する課題2",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "cbdf6d7f-ae5b-4268-aae6-2d8310dd290f",
+        "description": "解決する課題3",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": ""
+  }
+}

@@ -35,11 +35,11 @@ describe('ReadGlobalDocumentUseCase Integration Tests', () => {
     it('should read a document from the global memory bank', async () => {
       await loadGlobalFixture(testEnv.globalMemoryPath, 'minimal');
 
-      const result = await useCase.execute({ path: 'core/navigation.json' });
+      const result = await useCase.execute({ path: 'core/glossary.json' });
 
       expect(result).toBeDefined();
       expect(result.document).toBeDefined();
-      expect(result.document.path).toBe('core/navigation.json');
+      expect(result.document.path).toBe('core/glossary.json');
       expect(typeof result.document.content).toBe('string');
 
       const document = JSON.parse(result.document.content);
