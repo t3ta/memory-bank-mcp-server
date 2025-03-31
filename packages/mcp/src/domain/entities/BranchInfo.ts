@@ -1,5 +1,5 @@
 import { DomainError, DomainErrorCodes } from "../../shared/errors/DomainError.js";
-import { toSafeBranchName, isValidBranchName } from "../../shared/utils/branchNameUtils.js";
+import { toSafeBranchName } from "../../shared/utils/branchNameUtils.js";
 
 /**
  * Value object representing branch information

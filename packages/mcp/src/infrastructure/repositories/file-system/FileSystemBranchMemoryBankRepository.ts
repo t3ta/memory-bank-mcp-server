@@ -314,22 +314,6 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
   }
 
   /**
-   * Check if file exists
-   * @param filePath File path
-   * @returns true if exists
-   */
-  private async fileExists(filePath: string): Promise<boolean> {
-    try {
-      await fs.access(filePath);
-      this.componentLogger.debug('File exists:', { operation: 'fileExists', filePath });
-      return true;
-    } catch {
-      this.componentLogger.debug('File does not exist:', { operation: 'fileExists', filePath });
-      return false;
-    }
-  }
-
-  /**
    * Delete document from branch
    * @param branchInfo Branch information
    * @param documentPath Document path
