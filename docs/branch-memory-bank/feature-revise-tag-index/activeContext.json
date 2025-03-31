@@ -13,7 +13,7 @@
     "version": 1
   },
   "content": {
-    "currentWork": "グローバルメモリバンク整理、テンプレートシステム復活、関連コード・テスト修正が完了。タグ検索機能設計の準備完了。",
+    "currentWork": "グローバルメモリバンク整理、テンプレートシステム復活、新しいインデックス形式のスキーマ定義と生成スクリプト修正が完了。タグ検索機能設計の準備完了。",
     "recentChanges": [
       {
         "date": "2025-04-01T01:05:00Z",
@@ -46,6 +46,14 @@
       {
         "date": "2025-04-01T01:45:00Z",
         "description": "テストを実行し、発生したエラーを修正 (DI設定、テストフィクスチャ、テストコード)"
+      },
+      {
+        "date": "2025-04-01T01:55:00Z",
+        "description": "新しいインデックス形式 (TagsIndex, DocumentsMetaIndex) のスキーマを @memory-bank/schemas に定義"
+      },
+      {
+        "date": "2025-04-01T01:55:00Z",
+        "description": "タグ更新スクリプト (index-generator, config, index) を修正し、新しいインデックスファイルを生成・保存するように変更"
       }
     ],
     "activeDecisions": [
@@ -68,6 +76,10 @@
       {
         "id": "decision-next-step-search",
         "description": "次のアクションとしてタグ検索機能の設計・要件定義を行う"
+      },
+      {
+        "id": "decision-new-index",
+        "description": "タグ検索効率化のため、新しいインデックス形式 (タグ->パス, パス->メタデータ) を導入し、更新スクリプトで生成する"
       }
     ],
     "considerations": [
@@ -89,13 +101,18 @@
     ],
     "nextSteps": [
       {
-        "id": "step-search-design",
-        "description": "タグ検索機能の要件定義と設計",
+        "id": "step-search-usecase",
+        "description": "新しいインデックスを使用するタグ検索UseCase (SearchDocumentsByTagsUseCase) の実装",
         "priority": "high"
       },
       {
-        "id": "step-index-design",
-        "description": "新しいインデックス形式の設計",
+        "id": "step-search-tool-def",
+        "description": "タグ検索MCPツール (search_documents_by_tags) の定義",
+        "priority": "high"
+      },
+      {
+        "id": "step-search-controller",
+        "description": "タグ検索リクエストを処理するコントローラーの実装",
         "priority": "medium"
       },
       {
