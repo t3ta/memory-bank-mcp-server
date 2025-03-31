@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as micromatch from 'micromatch'; // ★ micromatch をインポート
 import MarkdownIt from 'markdown-it';
 import hljs from 'highlight.js';
 import { generateMarkdownFromData } from '../markdown/renderers';
-
 
 const md = new MarkdownIt({
   html: true,
@@ -86,6 +86,17 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
     _token: vscode.CancellationToken
   ): Promise<void> {
     console.log(`[Provider] resolveCustomTextEditor started for: ${document.uri.fsPath}`);
+
+    // カスタムエディタの登録パターンが一致するか特別なチェックは必要ない（VSCodeが既にfilename patternに基づいて選択している）
+    // 設定されたパターンはログ出力だけしておく（デバッグ用）
+    const config = vscode.workspace.getConfiguration('memory-bank');
+    const patterns = config.get<string[]>('documentPathPatterns', []);
+    const filePath = document.uri.fsPath;
+    console.log(`[Provider Debug] Editor activated for file: ${filePath}`);
+    console.log(`[Provider Debug] Configuration patterns (not used for filtering): ${JSON.stringify(patterns)}`);
+
+    // VSCode自体のカスタムエディタセレクタで既にフィルタリングされているため、
+    // 追加のパスチェック処理は不要（削除）
 
     webviewPanel.webview.options = {
       enableScripts: true,
@@ -237,15 +248,31 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
       parsedData = JSON.parse(jsonString);
       markdown = generateMarkdownFromData(parsedData, jsonString);
 
-    } catch (error) {
-      markdown = `## JSON Parse Error\n\n\`\`\`error\n${error}\n\`\`\`\n\n### Raw Content:\n\`\`\`json\n${jsonString}\n\`\`\``;
-      parsedData = null;
+    } catch (error: unknown) { // ★ エラーハンドリング修正
+      console.error(`[Provider] Error parsing JSON for ${document.uri.fsPath}:`, error);
+      // エラー情報をWebviewに送信
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      webviewPanel.webview.postMessage({
+        type: 'error',
+        message: `JSON Parse Error: ${errorMessage}`,
+        details: error instanceof Error ? error.stack : undefined
+      });
+      // プレビューは更新しないか、エラー表示用のHTMLを送る
+      // 今回はエラーメッセージをエディタ下部に表示するので、プレビューは空にする
+       webviewPanel.webview.postMessage({ type: 'updatePreview', html: '<p>Error parsing JSON. See details below the editor.</p>' });
+       console.log(`[Provider] Sent 'error' message to webview due to JSON parse error.`);
+      return; // エラーがあった場合はここで処理を終了
     }
 
-    const html = md.render(markdown);
-    console.log(`[Provider] Generated HTML for preview:\n${html}`); // Keep log for mermaid debugging
-    webviewPanel.webview.postMessage({ type: 'updatePreview', html: html });
-    console.log(`[Provider] Sent 'updatePreview' message to webview.`);
+    // ★ JSONパース成功時のみプレビューを更新
+    if (parsedData) {
+        const html = md.render(markdown);
+        console.log(`[Provider] Generated HTML for preview.`); // HTML内容はログに出さない方が良いかも
+        webviewPanel.webview.postMessage({ type: 'updatePreview', html: html });
+        console.log(`[Provider] Sent 'updatePreview' message to webview.`);
+        // エラーが解消されたらエラーメッセージをクリアするメッセージも送る
+        webviewPanel.webview.postMessage({ type: 'clearError' });
+    }
   }
 
   /**
