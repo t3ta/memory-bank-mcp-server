@@ -1,18 +1,14 @@
 import { BranchInfo } from "../../../domain/entities/BranchInfo.js";
-// Unused imports removed: Tag, IBranchMemoryBankRepository, IGlobalMemoryBankRepository, DomainError, DomainErrorCodes
 import { ApplicationError, ApplicationErrorCodes } from "../../../shared/errors/ApplicationError.js";
 import { logger } from "../../../shared/utils/logger.js";
-// Import new schema types and necessary infrastructure interfaces
-// Use 'any' for now due to persistent import issues
+
 type TagsIndex = any;
 type DocumentsMetaIndex = any;
 type SearchResultItem = any;
 type SearchResults = any;
-import type { IFileSystemService } from '../../../infrastructure/storage/interfaces/IFileSystemService.js';
-import type { IConfigProvider } from '../../../infrastructure/config/interfaces/IConfigProvider.js';
+import type { IFileSystemService } from '@/infrastructure/storage/interfaces/IFileSystemService.js';
 import type { IUseCase } from "../../interfaces/IUseCase.js";
-import path from 'path'; // Import path module
-
+import path from 'path';
 
 /**
  * Input data for searching documents by tags
@@ -62,15 +58,11 @@ export interface SearchDocumentsByTagsOutput {
 export class SearchDocumentsByTagsUseCase
   implements IUseCase<SearchDocumentsByTagsInput, SearchDocumentsByTagsOutput> {
   /**
-   * Constructor
-   * @param globalRepository Global memory bank repository
-   * @param branchRepository Branch memory bank repository
-   */
+    * Constructor
+    * @param fileSystemService File system service for reading index files
+    */
   constructor(
-    // Remove old repositories, inject new dependencies
     private readonly fileSystemService: IFileSystemService,
-    // private readonly configProvider: IConfigProvider // configProvider is used, keep it
-    private readonly configProvider: IConfigProvider
   ) { }
 
   /**
@@ -93,17 +85,20 @@ export class SearchDocumentsByTagsUseCase
     if (scope === 'branch' && !input.branchName) {
       throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Branch name is required for branch scope search.');
     }
+    // If scope is 'all' but no branchName provided, default to 'global' only.
+    const effectiveScope = (scope === 'all' && !input.branchName) ? 'global' : scope;
     if (scope === 'all' && !input.branchName) {
       logger.warn('Branch name not provided for "all" scope. Searching global only.');
-      // Or potentially throw error depending on desired behavior
     }
+
 
     // --- Load Indices ---
     let combinedTagsIndex: TagsIndex = {};
     let combinedDocumentsMeta: DocumentsMetaIndex = {};
 
     try {
-      if (scope === 'global' || scope === 'all') {
+      // Load Global Indices if needed
+      if (effectiveScope === 'global' || effectiveScope === 'all') {
         const globalTagsPath = path.join(input.docs, 'global-memory-bank', '.index', 'tags_index.json');
         const globalMetaPath = path.join(input.docs, 'global-memory-bank', '.index', 'documents_meta.json');
         logger.debug(`Loading global indices: ${globalTagsPath}, ${globalMetaPath}`);
@@ -111,53 +106,57 @@ export class SearchDocumentsByTagsUseCase
           this.readIndexFile<TagsIndex>(globalTagsPath),
           this.readIndexFile<DocumentsMetaIndex>(globalMetaPath)
         ]);
-        combinedTagsIndex = { ...combinedTagsIndex, ...globalTags };
-        combinedDocumentsMeta = { ...combinedDocumentsMeta, ...globalMeta };
+        // Ensure nulls are handled correctly when merging
+        if (globalTags) combinedTagsIndex = { ...combinedTagsIndex, ...globalTags };
+        if (globalMeta) combinedDocumentsMeta = { ...combinedDocumentsMeta, ...globalMeta };
         logger.debug(`Loaded ${Object.keys(globalTags || {}).length} global tags, ${Object.keys(globalMeta || {}).length} global meta entries.`);
       }
 
-      if ((scope === 'branch' || scope === 'all') && input.branchName) {
+      // Load Branch Indices if needed
+      if ((effectiveScope === 'branch' || effectiveScope === 'all') && input.branchName) {
         const branchInfo = BranchInfo.create(input.branchName); // Validate branch name format
         const branchIndexPath = path.join(input.docs, 'branch-memory-bank', branchInfo.safeName, '.index');
         const branchTagsPath = path.join(branchIndexPath, 'tags_index.json');
         const branchMetaPath = path.join(branchIndexPath, 'documents_meta.json');
         logger.debug(`Loading branch indices: ${branchTagsPath}, ${branchMetaPath}`);
-        // Note: Branch indices might not exist yet, handle gracefully
         const [branchTags, branchMeta] = await Promise.all([
           this.readIndexFile<TagsIndex>(branchTagsPath).catch(() => null), // Return null if not found
           this.readIndexFile<DocumentsMetaIndex>(branchMetaPath).catch(() => null) // Return null if not found
         ]);
+        // Ensure nulls are handled correctly when merging
         if (branchTags) combinedTagsIndex = { ...combinedTagsIndex, ...branchTags };
         if (branchMeta) combinedDocumentsMeta = { ...combinedDocumentsMeta, ...branchMeta };
         logger.debug(`Loaded ${Object.keys(branchTags || {}).length} branch tags, ${Object.keys(branchMeta || {}).length} branch meta entries.`);
       }
     } catch (error) {
       logger.error('Error loading index files:', error);
-      throw new ApplicationError(ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED, `Failed to load index files: ${(error as Error).message}`); // Use appropriate error code
+      throw new ApplicationError(ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED, `Failed to load index files: ${(error as Error).message}`);
     }
-
 
     // --- Perform Search ---
     logger.debug(`Performing search with match type: ${match}`);
     let matchingPaths: Set<string> = new Set();
 
     if (match === 'or') {
+      // OR match: Add paths from any matching tag
       for (const tag of input.tags) {
-        const paths: string[] = combinedTagsIndex[tag] || []; // Explicitly type paths
+        const paths: string[] = combinedTagsIndex[tag] || [];
         paths.forEach(p => matchingPaths.add(p));
       }
       logger.debug(`Found ${matchingPaths.size} paths with OR match.`);
     } else { // 'and' match
+      // AND match: Start with paths from the first tag, then intersect with subsequent tags
       let firstTag = true;
       for (const tag of input.tags) {
-        const pathsForTag = new Set<string>(combinedTagsIndex[tag] || []); // Explicitly type Set
+        const pathsForTag = new Set<string>(combinedTagsIndex[tag] || []);
         if (firstTag) {
           matchingPaths = pathsForTag;
           firstTag = false;
         } else {
+          // Intersect current matching paths with paths for this tag
           matchingPaths = new Set([...matchingPaths].filter(p => pathsForTag.has(p)));
         }
-        // Early exit if no paths match all tags so far
+        // Early exit if intersection results in empty set
         if (matchingPaths.size === 0) break;
       }
       logger.debug(`Found ${matchingPaths.size} paths with AND match.`);
@@ -168,6 +167,8 @@ export class SearchDocumentsByTagsUseCase
     for (const docPath of matchingPaths) {
       const meta = combinedDocumentsMeta[docPath];
       if (meta) {
+        // Ensure scope is correctly assigned based on where the meta came from
+        // (This assumes meta includes scope, which it should based on schema)
         results.push({
           path: docPath,
           title: meta.title,
@@ -175,18 +176,22 @@ export class SearchDocumentsByTagsUseCase
           scope: meta.scope,
         });
       } else {
-        logger.warn(`Metadata not found for path: ${docPath}`);
-        // Optionally include result with missing meta, or skip
+        // Log warning if metadata is missing for a path found in tags index
+        logger.warn(`Metadata not found for path found in tags index: ${docPath}`);
+        // Optionally, create a fallback result item
         results.push({
           path: docPath,
-          title: path.basename(docPath), // Fallback title
-          lastModified: new Date(0).toISOString(), // Default date
-          scope: docPath.includes('global-memory-bank') ? 'global' : 'branch', // Infer scope
+          title: path.basename(docPath), // Fallback title using path
+          lastModified: new Date(0).toISOString(), // Default/fallback date
+          scope: docPath.includes('/global-memory-bank/') ? 'global' : 'branch', // Infer scope from path
         });
       }
     }
 
-    logger.info(`Search completed. Found ${results.length} documents.`);
+    // Sort results (e.g., by lastModified date descending)
+    results.sort((a, b) => new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime());
+
+    logger.info(`Search completed. Found and sorted ${results.length} documents.`);
     return { results };
   }
 

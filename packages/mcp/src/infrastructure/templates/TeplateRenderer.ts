@@ -19,7 +19,7 @@ export class TemplateRenderer {
    *
    * @param i18nProvider Provider for internationalization services
    */
-  constructor(private readonly i18nProvider: II18nProvider) {}
+  constructor(private readonly i18nProvider: II18nProvider) { }
 
   /**
    * Renders a base template to Markdown format
@@ -104,12 +104,15 @@ export class TemplateRenderer {
     // Loop through section values, sectionId is not needed
     for (const section of Object.values(template.content.sections)) {
       // Use type assertion for section (assuming structure is known)
-      const sectionTyped = section as { title: Record<string, string>; content?: Record<string, string>; optional?: boolean; };
+      const sectionTyped = section as {
+        title: Record<string, string>;
+        content?: Record<string, string>;
+        optional?: boolean;
+      };
       const sectionContent = this.renderJsonSection(
         sectionTyped,
         language,
         variables,
-        template.content.placeholders
       );
 
       // Skip empty optional sections
@@ -153,7 +156,8 @@ export class TemplateRenderer {
     if (section.contentKey) {
       // Translate first, then replace variables
       let content = section.contentKey ? this.i18nProvider.translate(section.contentKey) : ''; // Handle potentially missing contentKey
-      if (variables && content) { // Ensure content exists before replacing
+      if (variables && content) {
+        // Ensure content exists before replacing
         content = this.replaceVariables(content, variables);
       }
       lines.push(content);
@@ -194,8 +198,7 @@ export class TemplateRenderer {
       optional?: boolean;
     },
     language: Language,
-    variables?: Record<string, string>,
-    // placeholders?: Record<string, string> // Remove unused placeholders parameter
+    variables?: Record<string, string>
   ): string {
     const lines: string[] = [];
 
@@ -252,8 +255,8 @@ export class TemplateRenderer {
 
     // Try to get a translation key specific to this placeholder
     const specificKey = `template.placeholder.${placeholderName.toLowerCase()}`;
-    // Assuming translate takes only the key
-    const comment = this.i18nProvider.translate(specificKey);
+    // Translate a specific comment key using the correct object format
+    const comment = this.i18nProvider.translate({ key: specificKey, language });
 
     // If we got back the key, it means there's no translation
     if (comment === specificKey) {

@@ -18,9 +18,12 @@
     "baseUrl": "../..",
     "allowJs": true,
     "paths": {
-      "@/*": ["src/*"],
-      "@memory-bank/schemas": ["../schemas/src"],
-      "@memory-bank/schemas/*": ["../schemas/src/*"]
+      "@memory-bank/schemas": [
+        "../schemas/src"
+      ],
+      "@memory-bank/schemas/*": [
+        "../schemas/src/*"
+      ]
     }
   },
   "include": [

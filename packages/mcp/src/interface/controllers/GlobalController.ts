@@ -1,9 +1,7 @@
 import type { DocumentDTO } from "../../application/dtos/DocumentDTO.js";
 import type { JsonDocumentDTO } from "../../application/dtos/JsonDocumentDTO.js";
 import type { UpdateTagIndexUseCaseV2 } from "../../application/usecases/common/UpdateTagIndexUseCaseV2.js";
-// Import new types for search
-import type { SearchDocumentsByTagsInput, SearchDocumentsByTagsOutput } from "../../application/usecases/common/SearchDocumentsByTagsUseCase.js";
-// import type { SearchResults } from "@memory-bank/schemas"; // Keep commented out
+import type { SearchDocumentsByTagsInput } from "../../application/usecases/common/SearchDocumentsByTagsUseCase.js";
 type SearchResults = any; // Use any for now
 import type { ReadJsonDocumentUseCase, WriteJsonDocumentUseCase, DeleteJsonDocumentUseCase, SearchJsonDocumentsUseCase, UpdateJsonIndexUseCase, ReadGlobalDocumentUseCase, WriteGlobalDocumentUseCase, SearchDocumentsByTagsUseCase, UpdateTagIndexUseCase } from "../../application/usecases/index.js";
 import { DocumentType } from "../../domain/entities/JsonDocument.js";
@@ -13,7 +11,7 @@ import { logger } from "../../shared/utils/logger.js";
 import type { MCPResponsePresenter } from "../presenters/types/MCPResponsePresenter.js";
 import type { MCPResponse } from "../presenters/types/MCPResponse.js";
 import type { IGlobalController } from "./interfaces/IGlobalController.js";
-import type { IConfigProvider } from "../../infrastructure/config/interfaces/IConfigProvider.js"; // Import IConfigProvider
+import type { IConfigProvider } from "../../infrastructure/config/interfaces/IConfigProvider.js";
 
 
 /**
@@ -43,13 +41,10 @@ export class GlobalController implements IGlobalController {
   constructor(
     private readonly readGlobalDocumentUseCase: ReadGlobalDocumentUseCase,
     private readonly writeGlobalDocumentUseCase: WriteGlobalDocumentUseCase,
-    // Keep the old use case for now, but inject the new one
-    private readonly oldSearchDocumentsByTagsUseCase: SearchDocumentsByTagsUseCase, // Keep old one for now if needed by other methods
-    private readonly searchDocumentsByTagsUseCase: SearchDocumentsByTagsUseCase, // Inject the new use case
-    private readonly updateTagIndexUseCase: UpdateTagIndexUseCase, // Keep this if needed by updateTagsIndex
+    private readonly searchDocumentsByTagsUseCase: SearchDocumentsByTagsUseCase,
+    private readonly updateTagIndexUseCase: UpdateTagIndexUseCase,
     private readonly presenter: MCPResponsePresenter,
-    private readonly configProvider: IConfigProvider, // Inject ConfigProvider
-    // Remove duplicate configProvider declaration
+    private readonly configProvider: IConfigProvider,
     options?: {
       updateTagIndexUseCaseV2?: UpdateTagIndexUseCaseV2;
       readJsonDocumentUseCase?: ReadJsonDocumentUseCase;
@@ -210,9 +205,9 @@ export class GlobalController implements IGlobalController {
         docs: this.configProvider.getConfig().docsRoot // Use injected configProvider
       };
 
-       if (!searchInput.docs) {
-         throw new Error("Docs path is missing in configuration or input.");
-       }
+      if (!searchInput.docs) {
+        throw new Error("Docs path is missing in configuration or input.");
+      }
 
 
       // Pass the correct input structure to the use case
@@ -246,20 +241,20 @@ export class GlobalController implements IGlobalController {
     }
 
     if (DomainErrors.unexpectedError) {
-       return this.presenter.presentError(
-         DomainErrors.unexpectedError(
-           error instanceof Error ? error.message : 'An unexpected error occurred',
-           { originalError: error }
-         )
-       );
+      return this.presenter.presentError(
+        DomainErrors.unexpectedError(
+          error instanceof Error ? error.message : 'An unexpected error occurred',
+          { originalError: error }
+        )
+      );
     } else {
-       return this.presenter.presentError(
-         new DomainError(
-           'UNEXPECTED_ERROR',
-           error instanceof Error ? error.message : 'An unexpected error occurred',
-           { originalError: error }
-         )
-       );
+      return this.presenter.presentError(
+        new DomainError(
+          'UNEXPECTED_ERROR',
+          error instanceof Error ? error.message : 'An unexpected error occurred',
+          { originalError: error }
+        )
+      );
     }
   }
 

@@ -1,10 +1,9 @@
-import type { DocumentDTO } from "../../../application/dtos/DocumentDTO.js"; // Keep for readDocument
-import type { JsonDocumentDTO } from "../../../application/dtos/JsonDocumentDTO.js";
-import type { MCPResponse } from "../../presenters/types/MCPResponse.js";
+import type { DocumentDTO } from "@/application/dtos/DocumentDTO.js"; // Keep for readDocument
+import type { JsonDocumentDTO } from "@/application/dtos/JsonDocumentDTO.js";
+import type { MCPResponse } from "@/interface/presenters/types/MCPResponse.js";
 import type { IController } from "./IController.js";
-import type { SearchDocumentsByTagsInput } from "../../../application/usecases/common/SearchDocumentsByTagsUseCase.js"; // Import input type
-import type { SearchResults } from "@memory-bank/schemas"; // Import output type
-
+import type { SearchDocumentsByTagsInput } from "@/application/usecases/common/SearchDocumentsByTagsUseCase.js";
+type SearchResults = any;
 
 /**
  * Interface for global memory bank controller
@@ -26,8 +25,8 @@ export interface IGlobalController extends IController {
    * @returns Promise resolving to MCP response with the result
    */
   writeDocument(params: {
-     path: string;
-     content: string;
+    path: string;
+    content: string;
     tags?: string[];
   }): Promise<MCPResponse>;
 

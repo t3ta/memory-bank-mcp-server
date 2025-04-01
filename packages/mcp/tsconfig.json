@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "composite": true, // Add composite flag for project references
+    "composite": true,
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
@@ -25,16 +25,29 @@
     "skipLibCheck": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "baseUrl": "./", // Keep baseUrl
+    "baseUrl": "./",
     "paths": {
-      // "@/*": ["src/*"], // Temporarily comment out to isolate issues
-      "@memory-bank/schemas": ["../schemas/src"] // Ensure this points to the source for TS server
+      "@/*": [
+        "src/*"
+      ],
+      "@memory-bank/schemas": [
+        "../schemas/src"
+      ]
     },
-    "isolatedModules": true // Added as per ts-jest recommendation
+    "isolatedModules": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "**/*.test.ts", "dist", "tests"],
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.test.ts",
+    "dist",
+    "tests"
+  ],
   "references": [
-    { "path": "../schemas" } // Add reference to the schemas package
+    {
+      "path": "../schemas"
+    }
   ]
 }

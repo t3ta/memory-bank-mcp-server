@@ -3,7 +3,7 @@ import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprot
 import { Application } from './Application.js';
 import { logger } from '../shared/utils/logger.js';
 import { Language, isValidLanguage } from '@memory-bank/schemas';
-import type { CliOptions } from '@/infrastructure/config/WorkspaceConfig.js';
+import type { CliOptions } from '@/infrastructure/config/WorkspaceConfig.js'; // Use relative path
 
 // Simulated tool definitions
 const AVAILABLE_TOOLS = [

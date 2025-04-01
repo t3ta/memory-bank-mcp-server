@@ -1,48 +1,48 @@
 // Import DIContainer for both type and value usage, then re-export it.
 import { DIContainer } from './DIContainer.js';
 export { DIContainer };
-import { MCPResponsePresenter } from '../../interface/presenters/MCPResponsePresenter.js'; // Use relative path
-import { ReadGlobalDocumentUseCase } from '../../application/usecases/global/ReadGlobalDocumentUseCase.js'; // Use relative path
-import { WriteGlobalDocumentUseCase } from '../../application/usecases/global/WriteGlobalDocumentUseCase.js'; // Use relative path
+import { MCPResponsePresenter } from '../../interface/presenters/MCPResponsePresenter.js';
+import { ReadGlobalDocumentUseCase } from '../../application/usecases/global/ReadGlobalDocumentUseCase.js';
+import { WriteGlobalDocumentUseCase } from '../../application/usecases/global/WriteGlobalDocumentUseCase.js';
 import path from 'node:path';
-import { IndexService } from '../../infrastructure/index/IndexService.js'; // Use relative path
-import { IIndexService } from '../../infrastructure/index/interfaces/IIndexService.js'; // Use relative path
-import { FileSystemJsonDocumentRepository } from '../../infrastructure/repositories/file-system/FileSystemJsonDocumentRepository.js'; // Use relative path
+import { IndexService } from '../../infrastructure/index/IndexService.js';
+import { IIndexService } from '../../infrastructure/index/interfaces/IIndexService.js';
+import { FileSystemJsonDocumentRepository } from '../../infrastructure/repositories/file-system/FileSystemJsonDocumentRepository.js';
 import { IJsonDocumentRepository } from '../../domain/repositories/IJsonDocumentRepository.js';
 import { II18nRepository } from '../../domain/i18n/II18nRepository.js';
 import { ITemplateRepository } from '../../domain/templates/ITemplateRepository.js'; // Added import
-import { ReadRulesUseCase } from '../../application/usecases/common/ReadRulesUseCase.js'; // Use relative path
-import { ReadContextUseCase } from '../../application/usecases/common/ReadContextUseCase.js'; // Use relative path
-import { ReadBranchDocumentUseCase } from '../../application/usecases/branch/ReadBranchDocumentUseCase.js'; // Use relative path
-import { WriteBranchDocumentUseCase } from '../../application/usecases/branch/WriteBranchDocumentUseCase.js'; // Use relative path
-import { SearchDocumentsByTagsUseCase } from '../../application/usecases/common/SearchDocumentsByTagsUseCase.js'; // Use relative path
-import { UpdateTagIndexUseCase } from '../../application/usecases/common/UpdateTagIndexUseCase.js'; // Use relative path
-import { UpdateTagIndexUseCaseV2 } from '../../application/usecases/common/UpdateTagIndexUseCaseV2.js'; // Use relative path
-import { GetRecentBranchesUseCase } from '../../application/usecases/common/GetRecentBranchesUseCase.js'; // Use relative path
-import { CreateBranchCoreFilesUseCase } from '../../application/usecases/common/CreateBranchCoreFilesUseCase.js'; // Use relative path
-import { ReadJsonDocumentUseCase } from '../../application/usecases/json/ReadJsonDocumentUseCase.js'; // Use relative path
-import { WriteJsonDocumentUseCase } from '../../application/usecases/json/WriteJsonDocumentUseCase.js'; // Use relative path
-import { DeleteJsonDocumentUseCase } from '../../application/usecases/json/DeleteJsonDocumentUseCase.js'; // Use relative path
+import { ReadRulesUseCase } from '../../application/usecases/common/ReadRulesUseCase.js';
+import { ReadContextUseCase } from '../../application/usecases/common/ReadContextUseCase.js';
+import { ReadBranchDocumentUseCase } from '../../application/usecases/branch/ReadBranchDocumentUseCase.js';
+import { WriteBranchDocumentUseCase } from '../../application/usecases/branch/WriteBranchDocumentUseCase.js';
+import { SearchDocumentsByTagsUseCase } from '../../application/usecases/common/SearchDocumentsByTagsUseCase.js';
+import { UpdateTagIndexUseCase } from '../../application/usecases/common/UpdateTagIndexUseCase.js';
+import { UpdateTagIndexUseCaseV2 } from '../../application/usecases/common/UpdateTagIndexUseCaseV2.js';
+import { GetRecentBranchesUseCase } from '../../application/usecases/common/GetRecentBranchesUseCase.js';
+import { CreateBranchCoreFilesUseCase } from '../../application/usecases/common/CreateBranchCoreFilesUseCase.js';
+import { ReadJsonDocumentUseCase } from '../../application/usecases/json/ReadJsonDocumentUseCase.js';
+import { WriteJsonDocumentUseCase } from '../../application/usecases/json/WriteJsonDocumentUseCase.js';
+import { DeleteJsonDocumentUseCase } from '../../application/usecases/json/DeleteJsonDocumentUseCase.js';
 import { SearchJsonDocumentsUseCase } from '../../application/usecases/json/SearchJsonDocumentsUseCase.js';
 import { UpdateJsonIndexUseCase } from '../../application/usecases/json/UpdateJsonIndexUseCase.js';
 import { TemplateService } from '../../application/templates/TemplateService.js'; // Added import
-import { IFileSystemService } from '../../infrastructure/storage/interfaces/IFileSystemService.js'; // Use relative path
-import { FileSystemService } from '../../infrastructure/storage/FileSystemService.js'; // Use relative path
-import { IConfigProvider } from '../../infrastructure/config/interfaces/IConfigProvider.js'; // Use relative path
-import { ConfigProvider } from '../../infrastructure/config/ConfigProvider.js'; // Use relative path
-import { FileSystemGlobalMemoryBankRepository } from '../../infrastructure/repositories/file-system/FileSystemGlobalMemoryBankRepository.js'; // Use relative path
+import { IFileSystemService } from '../../infrastructure/storage/interfaces/IFileSystemService.js';
+import { FileSystemService } from '../../infrastructure/storage/FileSystemService.js';
+import { IConfigProvider } from '../../infrastructure/config/interfaces/IConfigProvider.js';
+import { ConfigProvider } from '../../infrastructure/config/ConfigProvider.js';
+import { FileSystemGlobalMemoryBankRepository } from '../../infrastructure/repositories/file-system/FileSystemGlobalMemoryBankRepository.js';
 import { FileSystemBranchMemoryBankRepository } from '../../infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.js';
 import { FileSystemTagIndexRepositoryV1Bridge } from '../../infrastructure/repositories/file-system/FileSystemTagIndexRepositoryV1Bridge.js';
 import { FileTemplateRepository } from '../../infrastructure/templates/FileTemplateRepository.js'; // Added import
-import { ContextController } from '../../interface/controllers/ContextController.js'; // Use relative path
-import { JsonResponsePresenter } from '../../interface/presenters/JsonResponsePresenter.js'; // Use relative path
-import { GlobalController } from '../../interface/controllers/GlobalController.js'; // Use relative path
-import { BranchController } from '../../interface/controllers/BranchController.js'; // Use relative path
-import { JsonBranchController } from '../../interface/controllers/json/JsonBranchController.js'; // Use relative path
+import { ContextController } from '../../interface/controllers/ContextController.js';
+import { JsonResponsePresenter } from '../../interface/presenters/JsonResponsePresenter.js';
+import { GlobalController } from '../../interface/controllers/GlobalController.js';
+import { BranchController } from '../../interface/controllers/BranchController.js';
+import { JsonBranchController } from '../../interface/controllers/json/JsonBranchController.js';
 
-import { CliOptions } from '../../infrastructure/config/WorkspaceConfig.js'; // Use relative path
-import { UseCaseFactory } from '../../factory/use-case-factory.js'; // Use relative path
-import { ReadBranchCoreFilesUseCase } from '../../application/usecases/index.js'; // Use relative path
+import { CliOptions } from '../../infrastructure/config/WorkspaceConfig.js';
+import { UseCaseFactory } from '../../factory/use-case-factory.js';
+import { ReadBranchCoreFilesUseCase } from '../../application/usecases/index.js';
 
 /**
  * Register infrastructure services
@@ -70,13 +70,13 @@ export async function registerInfrastructureServices(
     return new FileSystemGlobalMemoryBankRepository(fileSystemService, configProvider);
   });
 
- container.registerFactory('branchMemoryBankRepository', async () => {
-   logger.debug('Resolving dependencies for branchMemoryBankRepository...');
-   // Get config provider to resolve root path
-   const configProvider = await container.get<IConfigProvider>('configProvider');
-   logger.debug('Resolved configProvider for branchMemoryBankRepository.');
-   const config = configProvider.getConfig();
-   // Pass the root path (docsRoot) to the constructor
+  container.registerFactory('branchMemoryBankRepository', async () => {
+    logger.debug('Resolving dependencies for branchMemoryBankRepository...');
+    // Get config provider to resolve root path
+    const configProvider = await container.get<IConfigProvider>('configProvider');
+    logger.debug('Resolved configProvider for branchMemoryBankRepository.');
+    const config = configProvider.getConfig();
+    // Pass the root path (docsRoot) to the constructor
     return new FileSystemBranchMemoryBankRepository(config.docsRoot);
   });
 
@@ -149,25 +149,19 @@ export async function registerInfrastructureServices(
     const globalJsonRoot = path.join(config.docsRoot, 'global-json');
     return new FileSystemJsonDocumentRepository(fileSystemService, indexService, globalJsonRoot);
   });
-// Register FileTemplateRepository
-container.registerFactory('templateRepository', async () => {
-  logger.debug('Resolving dependencies for templateRepository...');
-  const configProvider = await container.get<IConfigProvider>('configProvider');
-  // const config = configProvider.getConfig(); // config is unused here
-  // Templates are now expected inside packages/mcp/src/templates/json
-  // Use import.meta.url to get the current file URL and derive the path
-  const currentFileURL = import.meta.url;
-  const currentDirPath = path.dirname(new URL(currentFileURL).pathname);
-  const templateBasePath = path.resolve(currentDirPath, '../../templates/json');
-  logger.debug(`Template base path resolved to: ${templateBasePath}`);
-  // Assuming i18nProvider is needed and registered elsewhere, or handle optional dependency
-  // i18nProvider is optional for FileTemplateRepository, pass undefined for now
-  const templateRepository = new FileTemplateRepository(templateBasePath, undefined);
-  await templateRepository.initialize(); // Initialize the repository
-  logger.debug('templateRepository initialized.');
-  return templateRepository;
-});
-} // Added missing closing brace for registerInfrastructureServices
+  // Register FileTemplateRepository
+  container.registerFactory('templateRepository', async () => {
+    logger.debug('Resolving dependencies for templateRepository...');
+    const currentFileURL = import.meta.url;
+    const currentDirPath = path.dirname(new URL(currentFileURL).pathname);
+    const templateBasePath = path.resolve(currentDirPath, '../../templates/json');
+    logger.debug(`Template base path resolved to: ${templateBasePath}`);
+    const templateRepository = new FileTemplateRepository(templateBasePath, undefined);
+    await templateRepository.initialize();
+    logger.debug('templateRepository initialized.');
+    return templateRepository;
+  });
+}
 
 /**
  * Register application services
@@ -244,8 +238,7 @@ export async function registerApplicationServices(container: DIContainer): Promi
   // Register the updated SearchDocumentsByTagsUseCase
   container.registerFactory('searchDocumentsByTagsUseCase', async () => {
     const fileSystemService = await container.get<IFileSystemService>('fileSystemService');
-    const configProvider = await container.get<IConfigProvider>('configProvider');
-    return new SearchDocumentsByTagsUseCase(fileSystemService, configProvider);
+    return new SearchDocumentsByTagsUseCase(fileSystemService);
   });
   container.registerFactory('updateTagIndexUseCase', async () => {
     const globalRepository = await container.get<FileSystemGlobalMemoryBankRepository>(
@@ -377,7 +370,6 @@ export async function registerInterfaceServices(container: DIContainer): Promise
     const readGlobalDocumentUseCase = await container.get<ReadGlobalDocumentUseCase>('readGlobalDocumentUseCase');
     const writeGlobalDocumentUseCase = await container.get<WriteGlobalDocumentUseCase>('writeGlobalDocumentUseCase');
     // Inject both old and new search use cases for now
-    const oldSearchDocumentsByTagsUseCase = await container.get<SearchDocumentsByTagsUseCase>('searchDocumentsByTagsUseCase'); // Assuming old one is still registered with this key
     const searchDocumentsByTagsUseCase = await container.get<SearchDocumentsByTagsUseCase>('searchDocumentsByTagsUseCase'); // Inject the new one (registered with the same key for now)
     const updateTagIndexUseCase = await container.get<UpdateTagIndexUseCase>('updateTagIndexUseCase');
     const presenter = await container.get<MCPResponsePresenter>('mcpResponsePresenter');
@@ -394,18 +386,17 @@ export async function registerInterfaceServices(container: DIContainer): Promise
     return new GlobalController(
       readGlobalDocumentUseCase,
       writeGlobalDocumentUseCase,
-      oldSearchDocumentsByTagsUseCase, // Pass old use case
-      searchDocumentsByTagsUseCase, // Pass new use case
+      searchDocumentsByTagsUseCase,
       updateTagIndexUseCase,
       presenter,
-      configProvider, // Pass configProvider
-      { // Pass optional dependencies
+      configProvider,
+      {
         updateTagIndexUseCaseV2,
         readJsonDocumentUseCase,
         writeJsonDocumentUseCase,
         deleteJsonDocumentUseCase,
         searchJsonDocumentsUseCase,
-        updateJsonIndexUseCase: updateJsonIndexUseCaseJson // Use renamed variable
+        updateJsonIndexUseCase: updateJsonIndexUseCaseJson
       }
     );
   });
@@ -465,7 +456,7 @@ export async function initializeRepositories(container: DIContainer): Promise<vo
  * @returns Configured DI container
  */
 // import { logger } from '@/shared/utils/logger.js'; // Use alias for logger import - Re-importing logger where needed
-import { logger } from '../../shared/utils/logger.js'; // Use relative path
+import { logger } from '../../shared/utils/logger.js';
 
 export async function setupContainer(options?: CliOptions): Promise<DIContainer> {
   console.log('[setupContainer] Starting setupContainer with options:', options); // Use console.log for visibility

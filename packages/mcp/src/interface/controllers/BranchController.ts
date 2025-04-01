@@ -2,13 +2,13 @@ import { logger } from '../../shared/utils/logger.js';
 import { MCPResponsePresenter } from '../presenters/MCPResponsePresenter.js';
 import { ReadBranchDocumentUseCase } from '../../application/usecases/branch/ReadBranchDocumentUseCase.js';
 import { WriteBranchDocumentUseCase } from '../../application/usecases/branch/WriteBranchDocumentUseCase.js';
-import { SearchDocumentsByTagsUseCase, SearchDocumentsByTagsInput } from '../../application/usecases/common/SearchDocumentsByTagsUseCase.js'; // Import input type
+import { SearchDocumentsByTagsUseCase } from '../../application/usecases/common/SearchDocumentsByTagsUseCase.js';
 import { UpdateTagIndexUseCase } from '../../application/usecases/common/UpdateTagIndexUseCase.js';
 import { GetRecentBranchesUseCase } from '../../application/usecases/common/GetRecentBranchesUseCase.js';
 import { ReadBranchCoreFilesUseCase } from '../../application/usecases/common/ReadBranchCoreFilesUseCase.js';
 import { CreateBranchCoreFilesUseCase } from '../../application/usecases/common/CreateBranchCoreFilesUseCase.js';
 import { DomainErrors } from '../../shared/errors/DomainError.js';
-import type { IConfigProvider } from '../../infrastructure/config/interfaces/IConfigProvider.js'; // Import IConfigProvider
+import type { IConfigProvider } from '../../infrastructure/config/interfaces/IConfigProvider.js';
 import { ApplicationErrors } from '../../shared/errors/ApplicationError.js';
 import { BaseError } from '../../shared/errors/BaseError.js';
 
@@ -28,7 +28,7 @@ export class BranchController {
     private readonly createBranchCoreFilesUseCase: CreateBranchCoreFilesUseCase,
     private readonly presenter: MCPResponsePresenter,
     private readonly configProvider: IConfigProvider, // Inject ConfigProvider
-  ) {}
+  ) { }
 
   /**
    * Read a branch document
@@ -56,13 +56,13 @@ export class BranchController {
       this.componentLogger.info('Writing branch document', { operation: 'writeDocument', branchName, path });
       await this.writeBranchDocumentUseCase.execute({
         branchName,
-       document: {
-         path: path,
-         content: content,
-       }
-     });
+        document: {
+          path: path,
+          content: content,
+        }
+      });
 
-     return this.presenter.presentSuccess({ message: 'Document written successfully' });
+      return this.presenter.presentSuccess({ message: 'Document written successfully' });
     } catch (error) {
       this.componentLogger.error('Failed to write branch document', { operation: 'writeDocument', branchName, path, error });
       return this.handleError(error);
@@ -120,7 +120,7 @@ export class BranchController {
       // Get docs path from injected configProvider
       const docsPath = this.configProvider.getConfig().docsRoot; // Use a different variable name
       if (!docsPath) {
-          throw new Error("Docs path could not be determined from config.");
+        throw new Error("Docs path could not be determined from config.");
       }
 
       const result = await this.searchDocumentsByTagsUseCase.execute({
