@@ -11,6 +11,56 @@
     "README.md",
     "LICENSE"
   ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./v2": {
+      "import": "./dist/v2/index.js",
+      "types": "./dist/v2/index.d.ts"
+    },
+    "./v2/search-index": {
+      "import": "./dist/v2/search-index.js",
+      "types": "./dist/v2/search-index.d.ts"
+    },
+    "./v2/json-document": {
+      "import": "./dist/v2/json-document.js",
+      "types": "./dist/v2/json-document.d.ts"
+    },
+    "./v2/document-union": {
+      "import": "./dist/v2/document-union.js",
+      "types": "./dist/v2/document-union.d.ts"
+    },
+    "./v2/tag-index": {
+      "import": "./dist/v2/tag-index.js",
+      "types": "./dist/v2/tag-index.d.ts"
+    },
+    "./v2/i18n-schema": {
+      "import": "./dist/v2/i18n-schema.js",
+      "types": "./dist/v2/i18n-schema.d.ts"
+    },
+    "./common": {
+      "import": "./dist/common/index.js",
+      "types": "./dist/common/index.d.ts"
+    },
+    "./types": {
+      "import": "./dist/types/index.js",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./validation-helpers": {
+      "import": "./dist/validation-helpers.js",
+      "types": "./dist/validation-helpers.d.ts"
+    },
+    "./versioning": {
+      "import": "./dist/versioning.js",
+      "types": "./dist/versioning.d.ts"
+    },
+     "./document-types": {
+      "import": "./dist/document-types/index.js",
+      "types": "./dist/document-types/index.d.ts"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist",

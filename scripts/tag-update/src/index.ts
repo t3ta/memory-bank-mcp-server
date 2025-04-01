@@ -69,72 +69,74 @@ async function main() {
   try {
     // 設定の読み込み
     const config = new Config(argv.config);
-    
+
     // コマンドライン引数から設定を更新
     if (argv['root-dir']) {
       config.updateConfig({ rootDir: argv['root-dir'] });
     }
-    
+
     if (argv['tag-categorization']) {
       config.updateConfig({ tagCategorizationPath: argv['tag-categorization'] });
     }
-    
+
     if (argv['backup-dir']) {
       config.updateConfig({ backupDir: argv['backup-dir'] });
     }
-    
+
     // ログレベルの設定
     const logLevel = argv.verbose ? LogLevel.DEBUG : LogLevel.INFO;
     config.updateConfig({ logLevel });
-    
+
     // ドライランモードの設定
     config.updateConfig({ dryRun: argv['dry-run'] });
-    
+
     // ロガーの初期化
     const logger = new Logger(config.getConfig().logLevel);
-    
+
     logger.info(chalk.bold('グローバルメモリバンクタグ更新スクリプト'));
     logger.info(`実行モード: ${config.get('dryRun') ? chalk.yellow('ドライラン（変更は適用されません）') : chalk.green('本番（変更が適用されます）')}`);
-    
+
     // 設定の表示
     logger.info('設定:');
     logger.info(`  ルートディレクトリ: ${config.get('rootDir')}`);
     logger.info(`  バックアップディレクトリ: ${config.get('backupDir')}`);
     logger.info(`  タグカテゴリ定義: ${config.get('tagCategorizationPath')}`);
-    logger.info(`  新インデックスパス: ${config.get('newIndexPath')}`);
+    logger.info(`  タグインデックスパス: ${config.get('tagsIndexPath')}`); // Use new config key
+    logger.info(`  ドキュメントメタパス: ${config.get('documentsMetaPath')}`); // Use new config key
     logger.info(`  レガシーインデックスパス: ${config.get('legacyIndexPath')}`);
-    
+
     // バックアップマネージャーの初期化
     const backupManager = new BackupManager(logger);
-    
+
     // ファイルスキャナーの初期化
     const fileScanner = new FileScanner({
       rootDir: config.get('rootDir'),
       excludeDirs: config.get('excludeDirs'),
       fileExtensions: ['.json']
     }, logger);
-    
+
     // タグプロセッサーの初期化
     const tagProcessor = new TagProcessor(logger);
     await tagProcessor.loadTagCategorization(config.get('tagCategorizationPath'));
-    
+
     // インデックスジェネレーターの初期化
     const indexGenerator = new IndexGenerator(tagProcessor, logger);
-    
+
     // ファイルのスキャン
     logger.info(chalk.blue('ファイルのスキャンを開始します...'));
     const files = await fileScanner.scanFiles();
     logger.info(`${files.length}個のJSONファイルが見つかりました`);
-    
+
     // バックアップの作成（スキップオプションがない場合）
     if (!argv['skip-backup']) {
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       const backupTargets = [
-        config.get('newIndexPath'),
+        config.get('tagsIndexPath'), // Use new config key for backup target
+        config.get('documentsMetaPath'), // Use new config key for backup target
         config.get('legacyIndexPath'),
         ...files
       ];
-      
+
       logger.info(chalk.blue('バックアップを作成しています...'));
       const backupDir = await backupManager.createBackup({
         backupDir: config.get('backupDir'),
@@ -145,23 +147,23 @@ async function main() {
     } else {
       logger.warning('バックアップはスキップされました');
     }
-    
+
     // レガシーインデックスのみのモードでない場合はタグを更新
     if (!argv['legacy-only']) {
       // タグの更新
       logger.info(chalk.blue('タグの更新を開始します...'));
-      
+
       let processedCount = 0;
       for (const file of files) {
         await tagProcessor.processFile(file, config.get('dryRun'));
-        
+
         // 進捗表示
         processedCount++;
         if (processedCount % 10 === 0 || processedCount === files.length) {
           logger.info(`処理状況: ${processedCount}/${files.length} ファイル (${Math.floor(processedCount / files.length * 100)}%)`);
         }
       }
-      
+
       // 処理結果の表示
       const stats = tagProcessor.getStats();
       logger.info(chalk.green('タグの更新が完了しました'));
@@ -173,36 +175,42 @@ async function main() {
     } else if (argv['legacy-only']) {
       logger.info('レガシーインデックスのみモード: タグの更新はスキップされました');
     }
-    
+
     // 新しいタグインデックスの生成（レガシーのみモードでない場合）
     if (!argv['legacy-only']) {
       logger.info(chalk.blue('新しいタグインデックスを生成しています...'));
-      const newIndex = await indexGenerator.generateIndex(files);
-      
-      // インデックスの保存
-      await indexGenerator.saveIndex(newIndex, config.get('newIndexPath'), config.get('dryRun'));
+      // Generate both new indices
+      const { tagsIndex, documentsMetaIndex } = await indexGenerator.generateIndex(files);
+
+      // Save the new tags index
+      logger.info(chalk.blue('新しいタグインデックスを保存しています...'));
+      await indexGenerator.saveIndex(tagsIndex, config.get('tagsIndexPath'), config.get('dryRun'));
+
+      // Save the new documents metadata index
+      logger.info(chalk.blue('新しいドキュメントメタデータを保存しています...'));
+      await indexGenerator.saveIndex(documentsMetaIndex, config.get('documentsMetaPath'), config.get('dryRun'));
     }
-    
+
     // レガシーインデックスの生成
     logger.info(chalk.blue('レガシーインデックスを生成しています...'));
     const legacyIndex = await indexGenerator.generateLegacyIndex(files);
-    
+
     // レガシーインデックスの保存
     await indexGenerator.saveIndex(legacyIndex, config.get('legacyIndexPath'), config.get('dryRun'));
-    
+
     // 処理結果のサマリー
     logger.info(chalk.green.bold('処理が完了しました'));
-    
+
     if (config.get('dryRun')) {
       logger.info(chalk.yellow('ドライランモードのため、実際の変更は適用されていません'));
       logger.info('変更を適用するには、--dry-run オプションを外して再実行してください');
     } else {
       logger.info('すべての変更が適用されました');
     }
-    
+
     // 統計情報の表示
     logger.info(`統計情報: ${JSON.stringify(tagProcessor.getStats())}`);
-    
+
     // 完了
     if (!config.get('dryRun')) {
       logger.info(chalk.green('タグ更新プロセスが正常に完了しました'));

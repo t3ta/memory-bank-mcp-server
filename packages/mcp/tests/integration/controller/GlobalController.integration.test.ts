@@ -52,12 +52,12 @@ describe('GlobalController Integration Tests', () => {
 
       const controller = await container.get<GlobalController>('globalController');
 
-      const result = await controller.readDocument('core/navigation.json');
+      const result = await controller.readDocument('core/glossary.json');
 
       expect(result.success).toBe(true);
       if (!result.success) fail('Expected success but got error'); // Add type guard
       expect(result.data).toBeDefined();
-      expect(result.data.path).toBe('core/navigation.json');
+      expect(result.data.path).toBe('core/glossary.json');
       expect(typeof result.data.content).toBe('string');
 
       const parsed = JSON.parse(result.data.content);

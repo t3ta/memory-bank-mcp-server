@@ -1,8 +1,9 @@
-import type { DocumentDTO } from "../../../application/dtos/DocumentDTO.js";
-import type { JsonDocumentDTO } from "../../../application/dtos/JsonDocumentDTO.js";
-import type { MCPResponse } from "../../presenters/types/MCPResponse.js";
+import type { DocumentDTO } from "@/application/dtos/DocumentDTO.js"; // Keep for readDocument
+import type { JsonDocumentDTO } from "@/application/dtos/JsonDocumentDTO.js";
+import type { MCPResponse } from "@/interface/presenters/types/MCPResponse.js";
 import type { IController } from "./IController.js";
-
+import type { SearchDocumentsByTagsInput } from "@/application/usecases/common/SearchDocumentsByTagsUseCase.js";
+type SearchResults = any;
 
 /**
  * Interface for global memory bank controller
@@ -24,8 +25,8 @@ export interface IGlobalController extends IController {
    * @returns Promise resolving to MCP response with the result
    */
   writeDocument(params: {
-     path: string;
-     content: string;
+    path: string;
+    content: string;
     tags?: string[];
   }): Promise<MCPResponse>;
 
@@ -42,11 +43,11 @@ export interface IGlobalController extends IController {
   updateTagsIndex(): Promise<MCPResponse>;
 
   /**
-   * Find documents by tags in global memory bank
-   * @param tags Tags to search for
-   * @returns Promise resolving to MCP response with matching documents
+   * Search documents by tags in memory banks
+   * @param input Search parameters (tags, match, scope, branch, docs)
+   * @returns Promise resolving to MCP response with search results
    */
-  findDocumentsByTags(tags: string[]): Promise<MCPResponse<DocumentDTO[]>>;
+  searchDocumentsByTags(input: SearchDocumentsByTagsInput): Promise<MCPResponse<SearchResults>>;
 
   /**
    * Read JSON document from global memory bank

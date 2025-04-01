@@ -61,7 +61,7 @@ describe('ContextController Integration Tests', () => {
       expect(Object.keys(result.data?.branchMemory || {}).length).toBeGreaterThan(0);
       expect(Object.keys(result.data?.globalMemory || {}).length).toBeGreaterThan(0);
       expect(result.data?.rules).toBeDefined();
-      expect(result.data?.globalMemory?.['core/navigation.json']).toBeDefined();
+      expect(result.data?.globalMemory?.['core/glossary.json']).toBeDefined();
       expect(result.data?.branchMemory?.['activeContext.json']).toBeDefined();
     });
 

@@ -35,18 +35,18 @@ describe('ReadGlobalDocumentUseCase Integration Tests', () => {
     it('should read a document from the global memory bank', async () => {
       await loadGlobalFixture(testEnv.globalMemoryPath, 'minimal');
 
-      const result = await useCase.execute({ path: 'core/navigation.json' });
+      const result = await useCase.execute({ path: 'core/glossary.json' });
 
       expect(result).toBeDefined();
       expect(result.document).toBeDefined();
-      expect(result.document.path).toBe('core/navigation.json');
+      expect(result.document.path).toBe('core/glossary.json');
       expect(typeof result.document.content).toBe('string');
 
       const document = JSON.parse(result.document.content);
       expect(document).toHaveProperty('schema', 'memory_document_v2');
       expect(document).toHaveProperty('metadata');
       expect(document).toHaveProperty('content');
-      expect(document.metadata).toHaveProperty('id', 'minimal-core-navigation');
+      expect(document.metadata).toHaveProperty('id', 'core-glossary-test'); // Update expected ID
       expect(document.metadata).toHaveProperty('documentType', 'core');
     });
 

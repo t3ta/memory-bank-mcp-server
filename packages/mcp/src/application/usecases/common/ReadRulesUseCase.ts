@@ -3,11 +3,9 @@ import fs from "fs/promises"; // Use standard fs/promises
 import path from "path";
 import { DomainError, DomainErrorCodes } from "../../../shared/errors/DomainError.js";
 import { logger } from "../../../shared/utils/logger.js";
-// Mock interface for backwards compatibility if templateLoader is used
-interface ITemplateLoader {
-  getMarkdownTemplate(templateId: string, language: any): Promise<string>;
-}
-import { getSafeLanguage } from "@memory-bank/schemas";
+import { TemplateService } from '../../templates/TemplateService.js'; // Import TemplateService
+import { Language } from '../../../domain/i18n/Language.js'; // Import Language class from domain
+import { getSafeLanguage } from '@memory-bank/schemas';
 
 
 export type RulesResult = {
@@ -29,7 +27,7 @@ export class ReadRulesUseCase {
  */
 constructor(
  rulesDir: string,
- private readonly templateLoader?: ITemplateLoader
+ private readonly templateLoader?: TemplateService // Type is already TemplateService, ensure consistency
 ) {
  // Resolve the absolute path for rulesDir upon initialization
  this.rulesDir = path.resolve(rulesDir);
@@ -74,11 +72,13 @@ async execute(language: string): Promise<RulesResult> {
           logger.debug(`Using template loader to get rules for language: ${language}`);
 
           // Safely convert language code
-          const safeLanguage = getSafeLanguage(language);
+          const safeLanguageCode = getSafeLanguage(language); // Get safe language code ('en', 'ja', or 'zh')
 
-          const templateContent = await this.templateLoader.getMarkdownTemplate(
+          const langObject = new Language(safeLanguageCode); // Instantiate Language class
+
+          const templateContent = await this.templateLoader.getTemplateAsMarkdown(
             'rules',
-            safeLanguage
+            langObject // Pass Language object
           );
 
           // Assuming template loader returns JSON string that needs parsing

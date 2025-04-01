@@ -1,0 +1,100 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "6a009e42-6022-4f1d-8280-fe5cac59f9a4",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress"
+    ],
+    "lastModified": "2025-03-31T15:29:40.376Z",
+    "createdAt": "2025-03-31T15:29:40.376Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "feat-global-cleanup",
+        "description": "グローバルメモリバンクの調査と不要ファイルの削除",
+        "implementedAt": "2025-04-01T01:06:00Z"
+      },
+      {
+        "id": "feat-link-fix",
+        "description": "削除ファイルへの参照リンク修正 (ドキュメント、テストコード)",
+        "implementedAt": "2025-04-01T01:06:00Z"
+      },
+      {
+        "id": "feat-template-revival",
+        "description": "テンプレートシステムの復活 (コード移行、DI設定、UseCase修正)",
+        "implementedAt": "2025-04-01T01:45:00Z"
+      },
+      {
+        "id": "feat-rules-template",
+        "description": "rules.json テンプレート作成と翻訳ファイルへのガイドライン追記",
+        "implementedAt": "2025-04-01T01:45:00Z"
+      },
+      {
+        "id": "feat-test-fix",
+        "description": "関連するテストコードのエラー修正",
+        "implementedAt": "2025-04-01T01:45:00Z"
+      },
+      {
+        "id": "feat-new-index-schema",
+        "description": "新しいインデックス形式 (TagsIndex, DocumentsMetaIndex) のスキーマ定義",
+        "implementedAt": "2025-04-01T01:55:00Z"
+      },
+      {
+        "id": "feat-index-script-update",
+        "description": "タグ更新スクリプトを修正し、新しいインデックスファイルを生成するように変更",
+        "implementedAt": "2025-04-01T01:55:00Z"
+      },
+      {
+        "id": "feat-build-fix",
+        "description": "TypeScriptビルドエラーの修正",
+        "implementedAt": "2025-04-01T02:55:00Z"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "impl-search-usecase",
+        "description": "新しいインデックスを使用するタグ検索UseCaseの実装",
+        "priority": "high"
+      },
+      {
+        "id": "impl-search-tool-def",
+        "description": "タグ検索MCPツールの定義",
+        "priority": "high"
+      },
+      {
+        "id": "impl-search-controller",
+        "description": "タグ検索リクエストを処理するコントローラーの実装",
+        "priority": "medium"
+      },
+      {
+        "id": "impl-translate-rules",
+        "description": "rules.json の翻訳テキストを en.json, zh.json に反映",
+        "priority": "low"
+      }
+    ],
+    "status": "グローバルメモリバンク整理、テンプレートシステム復活、新しいインデックス形式の準備、関連コード・テスト・ビルドエラー修正が完了。タグ検索機能設計・実装の準備完了。",
+    "completionPercentage": 95,
+    "knownIssues": [
+      {
+        "id": "issue-search-missing",
+        "description": "タグ検索機能が存在しない (CLI廃止)",
+        "severity": "high"
+      },
+      {
+        "id": "issue-index-redundancy",
+        "description": "タグインデックスが2種類存在し、片方(_global_index.json)は検索で使われているが冗長",
+        "severity": "medium"
+      },
+      {
+        "id": "issue-import-unverified",
+        "description": "@memory-bank/schemas のインポート問題がビルド/テストで完全に解消されたか未確認",
+        "severity": "low"
+      }
+    ]
+  }
+}

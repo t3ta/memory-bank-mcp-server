@@ -1,13 +1,14 @@
 import { BranchInfo } from "../../../domain/entities/BranchInfo.js";
-import { Tag } from "../../../domain/entities/Tag.js";
-import type { IBranchMemoryBankRepository } from "../../../domain/repositories/IBranchMemoryBankRepository.js";
-import type { IGlobalMemoryBankRepository } from "../../../domain/repositories/IGlobalMemoryBankRepository.js";
 import { ApplicationError, ApplicationErrorCodes } from "../../../shared/errors/ApplicationError.js";
-import { DomainError, DomainErrorCodes } from "../../../shared/errors/DomainError.js";
 import { logger } from "../../../shared/utils/logger.js";
-import type { DocumentDTO } from "../../dtos/DocumentDTO.js";
-import type { IUseCase } from "../../interfaces/IUseCase.js";
 
+type TagsIndex = any;
+type DocumentsMetaIndex = any;
+type SearchResultItem = any;
+type SearchResults = any;
+import type { IFileSystemService } from '@/infrastructure/storage/interfaces/IFileSystemService.js';
+import type { IUseCase } from "../../interfaces/IUseCase.js";
+import path from 'path';
 
 /**
  * Input data for searching documents by tags
@@ -19,14 +20,26 @@ export interface SearchDocumentsByTagsInput {
   tags: string[];
 
   /**
-   * Branch name (optional - if not provided, searches in global memory bank)
+   * Branch name (required if scope is 'branch' or 'all')
    */
   branchName?: string;
 
   /**
-   * Whether to require all tags to match (default: false, meaning ANY tag matches)
+   * Search scope ('branch', 'global', or 'all')
+   * @default 'all'
    */
-  matchAllTags?: boolean;
+  scope?: 'branch' | 'global' | 'all';
+
+  /**
+   * Match type ('and' or 'or')
+   * @default 'or'
+   */
+  match?: 'and' | 'or';
+
+  /**
+   * Path to docs directory (needed to construct index paths)
+   */
+  docs: string;
 }
 
 /**
@@ -34,34 +47,9 @@ export interface SearchDocumentsByTagsInput {
  */
 export interface SearchDocumentsByTagsOutput {
   /**
-   * Matching documents
+   * Matching documents metadata
    */
-  documents: DocumentDTO[];
-
-  /**
-   * Information about the search
-   */
-  searchInfo: {
-    /**
-     * Number of documents found
-     */
-    count: number;
-
-    /**
-     * Tags used for search
-     */
-    searchedTags: string[];
-
-    /**
-     * Whether all tags were required to match
-     */
-    matchedAllTags: boolean;
-
-    /**
-     * Where the search was performed (branch name or 'global')
-     */
-    searchLocation: string;
-  };
+  results: SearchResultItem[];
 }
 
 /**
@@ -70,13 +58,11 @@ export interface SearchDocumentsByTagsOutput {
 export class SearchDocumentsByTagsUseCase
   implements IUseCase<SearchDocumentsByTagsInput, SearchDocumentsByTagsOutput> {
   /**
-   * Constructor
-   * @param globalRepository Global memory bank repository
-   * @param branchRepository Branch memory bank repository
-   */
+    * Constructor
+    * @param fileSystemService File system service for reading index files
+    */
   constructor(
-    private readonly globalRepository: IGlobalMemoryBankRepository,
-    private readonly branchRepository: IBranchMemoryBankRepository
+    private readonly fileSystemService: IFileSystemService,
   ) { }
 
   /**
@@ -84,110 +70,146 @@ export class SearchDocumentsByTagsUseCase
    * @param input Input data
    * @returns Promise resolving to output data
    */
-  async execute(input: SearchDocumentsByTagsInput): Promise<SearchDocumentsByTagsOutput> {
+  async execute(input: SearchDocumentsByTagsInput): Promise<SearchResults> {
+    logger.info('Executing SearchDocumentsByTagsUseCase:', input);
+
+    // --- Input Validation ---
+    if (!input.tags || input.tags.length === 0) {
+      throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'At least one tag must be provided.');
+    }
+    if (!input.docs) {
+      throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Docs path is required.');
+    }
+    const scope = input.scope ?? 'all';
+    const match = input.match ?? 'or';
+    if (scope === 'branch' && !input.branchName) {
+      throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Branch name is required for branch scope search.');
+    }
+    // If scope is 'all' but no branchName provided, default to 'global' only.
+    const effectiveScope = (scope === 'all' && !input.branchName) ? 'global' : scope;
+    if (scope === 'all' && !input.branchName) {
+      logger.warn('Branch name not provided for "all" scope. Searching global only.');
+    }
+
+
+    // --- Load Indices ---
+    let combinedTagsIndex: TagsIndex = {};
+    let combinedDocumentsMeta: DocumentsMetaIndex = {};
+
     try {
-      if (!input.tags || input.tags.length === 0) {
-        throw new ApplicationError(
-          ApplicationErrorCodes.INVALID_INPUT,
-          'At least one tag must be provided for search'
-        );
+      // Load Global Indices if needed
+      if (effectiveScope === 'global' || effectiveScope === 'all') {
+        const globalTagsPath = path.join(input.docs, 'global-memory-bank', '.index', 'tags_index.json');
+        const globalMetaPath = path.join(input.docs, 'global-memory-bank', '.index', 'documents_meta.json');
+        logger.debug(`Loading global indices: ${globalTagsPath}, ${globalMetaPath}`);
+        const [globalTags, globalMeta] = await Promise.all([
+          this.readIndexFile<TagsIndex>(globalTagsPath),
+          this.readIndexFile<DocumentsMetaIndex>(globalMetaPath)
+        ]);
+        // Ensure nulls are handled correctly when merging
+        if (globalTags) combinedTagsIndex = { ...combinedTagsIndex, ...globalTags };
+        if (globalMeta) combinedDocumentsMeta = { ...combinedDocumentsMeta, ...globalMeta };
+        logger.debug(`Loaded ${Object.keys(globalTags || {}).length} global tags, ${Object.keys(globalMeta || {}).length} global meta entries.`);
       }
 
-      logger.debug('Converting search tags:', { tags: input.tags });
-      const tags = input.tags.map((tag) => {
-        try {
-          logger.debug('Creating tag:', { tag });
-          const tagObj = Tag.create(tag);
-          logger.debug('Created tag object:', { tag: tagObj.value });
-          return tagObj;
-        } catch (error) {
-          logger.error('Failed to create tag:', { tag, error });
-          throw error;
+      // Load Branch Indices if needed
+      if ((effectiveScope === 'branch' || effectiveScope === 'all') && input.branchName) {
+        const branchInfo = BranchInfo.create(input.branchName); // Validate branch name format
+        const branchIndexPath = path.join(input.docs, 'branch-memory-bank', branchInfo.safeName, '.index');
+        const branchTagsPath = path.join(branchIndexPath, 'tags_index.json');
+        const branchMetaPath = path.join(branchIndexPath, 'documents_meta.json');
+        logger.debug(`Loading branch indices: ${branchTagsPath}, ${branchMetaPath}`);
+        const [branchTags, branchMeta] = await Promise.all([
+          this.readIndexFile<TagsIndex>(branchTagsPath).catch(() => null), // Return null if not found
+          this.readIndexFile<DocumentsMetaIndex>(branchMetaPath).catch(() => null) // Return null if not found
+        ]);
+        // Ensure nulls are handled correctly when merging
+        if (branchTags) combinedTagsIndex = { ...combinedTagsIndex, ...branchTags };
+        if (branchMeta) combinedDocumentsMeta = { ...combinedDocumentsMeta, ...branchMeta };
+        logger.debug(`Loaded ${Object.keys(branchTags || {}).length} branch tags, ${Object.keys(branchMeta || {}).length} branch meta entries.`);
+      }
+    } catch (error) {
+      logger.error('Error loading index files:', error);
+      throw new ApplicationError(ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED, `Failed to load index files: ${(error as Error).message}`);
+    }
+
+    // --- Perform Search ---
+    logger.debug(`Performing search with match type: ${match}`);
+    let matchingPaths: Set<string> = new Set();
+
+    if (match === 'or') {
+      // OR match: Add paths from any matching tag
+      for (const tag of input.tags) {
+        const paths: string[] = combinedTagsIndex[tag] || [];
+        paths.forEach(p => matchingPaths.add(p));
+      }
+      logger.debug(`Found ${matchingPaths.size} paths with OR match.`);
+    } else { // 'and' match
+      // AND match: Start with paths from the first tag, then intersect with subsequent tags
+      let firstTag = true;
+      for (const tag of input.tags) {
+        const pathsForTag = new Set<string>(combinedTagsIndex[tag] || []);
+        if (firstTag) {
+          matchingPaths = pathsForTag;
+          firstTag = false;
+        } else {
+          // Intersect current matching paths with paths for this tag
+          matchingPaths = new Set([...matchingPaths].filter(p => pathsForTag.has(p)));
         }
-      });
-      logger.debug('All tags converted:', { tags: tags.map(t => t.value) });
+        // Early exit if intersection results in empty set
+        if (matchingPaths.size === 0) break;
+      }
+      logger.debug(`Found ${matchingPaths.size} paths with AND match.`);
+    }
 
-      const matchAllTags = input.matchAllTags ?? false;
-      const searchLocation = input.branchName ? input.branchName : 'global';
-
-      let documents = [];
-
-      if (input.branchName) {
-        const branchExists = await this.branchRepository.exists(input.branchName);
-
-        if (!branchExists) {
-          throw new DomainError(
-            DomainErrorCodes.BRANCH_NOT_FOUND,
-            `Branch "${input.branchName}" not found`
-          );
-        }
-
-        const branchInfo = BranchInfo.create(input.branchName);
-        documents = await this.branchRepository.findDocumentsByTags(branchInfo, tags);
+    // --- Retrieve Metadata and Format Results ---
+    const results: SearchResultItem[] = [];
+    for (const docPath of matchingPaths) {
+      const meta = combinedDocumentsMeta[docPath];
+      if (meta) {
+        // Ensure scope is correctly assigned based on where the meta came from
+        // (This assumes meta includes scope, which it should based on schema)
+        results.push({
+          path: docPath,
+          title: meta.title,
+          lastModified: meta.lastModified,
+          scope: meta.scope,
+        });
       } else {
-        logger.debug('Searching in global memory bank:', { tags: tags.map(t => t.value) });
-        documents = await this.globalRepository.findDocumentsByTags(tags);
-        logger.debug('Found documents:', { documents: documents.map(d => d.path.value) });
-      }
-
-      logger.debug('Before filtering:', {
-        totalDocuments: documents.length,
-        matchAllTags,
-        searchTags: tags.map(t => t.value)
-      });
-
-      if (matchAllTags && tags.length > 1) {
-        documents = documents.filter((doc) => {
-          const hasAllTags = tags.every((searchTag) => {
-            const hasTag = doc.tags.some((docTag) => docTag.equals(searchTag));
-            logger.debug('Document tag check:', {
-              document: doc.path.value,
-              searchTag: searchTag.value,
-              documentTags: doc.tags.map(t => t.value),
-              hasTag
-            });
-            return hasTag;
-          });
-          logger.debug('Document tag match result:', { document: doc.path.value, hasAllTags });
-          return hasAllTags;
+        // Log warning if metadata is missing for a path found in tags index
+        logger.warn(`Metadata not found for path found in tags index: ${docPath}`);
+        // Optionally, create a fallback result item
+        results.push({
+          path: docPath,
+          title: path.basename(docPath), // Fallback title using path
+          lastModified: new Date(0).toISOString(), // Default/fallback date
+          scope: docPath.includes('/global-memory-bank/') ? 'global' : 'branch', // Infer scope from path
         });
       }
+    }
 
-      logger.debug('After filtering:', {
-        matchingDocuments: documents.length,
-        documents: documents.map(d => ({
-          path: d.path.value,
-          tags: d.tags.map(t => t.value),
-          hasAllRequiredTags: matchAllTags ? tags.every(tag => d.tags.some(dt => dt.equals(tag))) : 'N/A'
-        }))
-      });
+    // Sort results (e.g., by lastModified date descending)
+    results.sort((a, b) => new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime());
 
-      const documentDTOs = documents.map((doc) => ({
-        path: doc.path.value,
-        content: doc.content,
-        tags: doc.tags.map((tag) => tag.value),
-        lastModified: doc.lastModified.toISOString(),
-      }));
+    logger.info(`Search completed. Found and sorted ${results.length} documents.`);
+    return { results };
+  }
 
-      return {
-        documents: documentDTOs,
-        searchInfo: {
-          count: documentDTOs.length,
-          searchedTags: input.tags,
-          matchedAllTags: matchAllTags,
-          searchLocation,
-        },
-      };
+  /**
+   * Helper to read and parse index JSON file
+   */
+  private async readIndexFile<T>(filePath: string): Promise<T | null> {
+    try {
+      const content = await this.fileSystemService.readFile(filePath);
+      return JSON.parse(content) as T;
     } catch (error) {
-      if (error instanceof DomainError || error instanceof ApplicationError) {
-        throw error;
+      // If file not found, return null, otherwise rethrow
+      if (error instanceof Error && (error as NodeJS.ErrnoException).code === 'ENOENT') {
+        logger.warn(`Index file not found: ${filePath}`);
+        return null;
       }
-
-      throw new ApplicationError(
-        ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
-        `Failed to search documents by tags: ${(error as Error).message}`,
-        { originalError: error }
-      );
+      logger.error(`Failed to read or parse index file ${filePath}:`, error);
+      throw error; // Rethrow other errors
     }
   }
 }

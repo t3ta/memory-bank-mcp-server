@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "composite": true, // Add composite flag for project references
+    "composite": true,
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
@@ -25,13 +25,29 @@
     "skipLibCheck": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "baseUrl": "./", // Keep baseUrl
+    "baseUrl": "./",
     "paths": {
-      // Point alias back to the source directory for development/intellisense
-      "@/*": ["src/*"],
+      "@/*": [
+        "src/*"
+      ],
+      "@memory-bank/schemas": [
+        "../schemas/src"
+      ]
     },
-    "isolatedModules": true // Added as per ts-jest recommendation
+    "isolatedModules": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "**/*.test.ts", "dist", "tests"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.test.ts",
+    "dist",
+    "tests"
+  ],
+  "references": [
+    {
+      "path": "../schemas"
+    }
+  ]
 }

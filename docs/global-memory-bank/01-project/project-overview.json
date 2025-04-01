@@ -96,50 +96,12 @@
             "description": "テンプレート言語 ('en', 'ja', 'zh', デフォルト: 'en')"
           }
         ]
-      },
-      {
-        "name": "CLI Tool",
-        "commands": [
-          {
-            "name": "read-global",
-            "usage": "npx memory-bank read-global <path>",
-            "description": "グローバルメモリバンクからドキュメントを読み取る"
-          },
-          {
-            "name": "write-global",
-            "usage": "npx memory-bank write-global <path> [content]",
-            "description": "グローバルメモリバンクにドキュメントを書き込む"
-          },
-          {
-            "name": "read-branch",
-            "usage": "npx memory-bank read-branch <branch> <path>",
-            "description": "ブランチメモリバンクからドキュメントを読み取る"
-          },
-          {
-            "name": "write-branch",
-            "usage": "npx memory-bank write-branch <branch> <path> [content]",
-            "description": "ブランチメモリバンクにドキュメントを書き込む"
-          },
-          {
-            "name": "read-core-files",
-            "usage": "npx memory-bank read-core-files <branch>",
-            "description": "ブランチメモリバンクからすべてのコアファイルを読み取る"
-          },
-          {
-            "name": "recent-branches",
-            "usage": "npx memory-bank recent-branches [limit]",
-            "description": "最近のブランチを取得する"
-          }
-        ]
       }
     ],
     "references": {
       "architecture": "architecture.json",
       "codingStandards": "coding-standards.json",
-      "domainModels": "domain-models.json",
-      "glossary": "glossary.json",
-      "techStack": "tech-stack.json",
-      "userGuide": "user-guide.json"
+      "glossary": "glossary.json"
     }
   }
 }

@@ -4,3 +4,4 @@ export * from './document-union.js'; // Export the discriminated union schema
 export * from '../document-types/index.js'; // Export individual document type schemas
 export * from './tag-index.js';
 export * from './i18n-schema.js'; // Export i18n definitions
+export * from './search-index.js'; // Export new search index schemas

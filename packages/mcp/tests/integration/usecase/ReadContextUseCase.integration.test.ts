@@ -77,7 +77,7 @@ describe('ReadContextUseCase Integration Tests', () => {
 
       expect(result.globalMemory).toBeDefined();
       expect(Object.keys(result.globalMemory!).length).toBeGreaterThan(0);
-      expect(result.globalMemory!['core/navigation.json']).toBeDefined();
+      expect(result.globalMemory!['core/glossary.json']).toBeDefined();
 
       const branchContextContent = result.branchMemory!['branchContext.json'];
       expect(branchContextContent).toBeDefined();
