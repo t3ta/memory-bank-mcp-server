@@ -34,13 +34,6 @@ jobs:
           yarn workspace @memory-bank/mcp build
           yarn build
           
-          # Setup symlinks for schemas package to fix cross-package dependencies
-          mkdir -p packages/mcp/node_modules/@memory-bank/schemas
-          cp -r packages/schemas/dist/* packages/mcp/node_modules/@memory-bank/schemas/
-          cp packages/schemas/package.json packages/mcp/node_modules/@memory-bank/schemas/
-          # Fix package.json paths
-          sed -i 's/"main": "dist\/index.js"/"main": "index.js"/g' packages/mcp/node_modules/@memory-bank/schemas/package.json
-          sed -i 's/"module": "dist\/index.js"/"module": "index.js"/g' packages/mcp/node_modules/@memory-bank/schemas/package.json
-          sed -i 's/"types": "dist\/index.d.ts"/"types": "index.d.ts"/g' packages/mcp/node_modules/@memory-bank/schemas/package.json
-      
+          # Use Yarn workspaces to manage cross-package dependencies
+          yarn workspaces run build
       - run: yarn test
