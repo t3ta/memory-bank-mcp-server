@@ -33,14 +33,14 @@ jobs:
             echo "skip=true" >> $GITHUB_OUTPUT
             exit 0
           fi
-          
+
           # masterブランチの存在を確認
           if ! git rev-parse --verify origin/master &>/dev/null; then
             echo "Warning: master branch doesn't exist. Skipping PR creation."
             echo "skip=true" >> $GITHUB_OUTPUT
             exit 0
           fi
-          
+
           echo "skip=false" >> $GITHUB_OUTPUT
 
       - name: Check existing PR
@@ -82,32 +82,25 @@ jobs:
           changes=$(git log master..develop --pretty=format:'- %s' --reverse 2>/dev/null)
           exit_code=$?
           set -e  # エラーハンドリングを再度有効化
-          
+
           if [ $exit_code -ne 0 ] || [ -z "$changes" ]; then
             echo "警告: developとmasterの間に変更が見つかりませんでした、またはコマンドが失敗しました"
             changes="*変更履歴が見つかりませんでした*"
           fi
 
-          # 言語を判断（デフォルトは日本語）
-          if [[ "$GITHUB_REPOSITORY" =~ .*-en$ ]]; then
-            template_file=".github/workflow-templates/develop-to-master-pr-template-en.md"
-          else
-            template_file=".github/workflow-templates/develop-to-master-pr-template.md"
-          fi
+          # Use English template consistently
+          template_file=".github/workflow-templates/develop-to-master-pr-template-en.md"
 
-          # テンプレートファイルの存在確認
+          # Check if template file exists
           if [ ! -f "$template_file" ]; then
-            echo "エラー: テンプレートファイル '$template_file' が見つかりませんでした"
-            echo "デフォルトテンプレートを使用します"
-            
-            if [[ "$GITHUB_REPOSITORY" =~ .*-en$ ]]; then
-              body="## Changes\n\n${changes}\n\n---\n\n_This PR was automatically generated_"
-            else
-              body="## 変更内容\n\n${changes}\n\n---\n\n_このPRは自動的に作成されました_"
-            fi
+            echo "Error: Template file '$template_file' not found."
+            echo "Using default English template."
+            body="## Changes\n\n${changes}\n\n---\n\n_This PR was automatically generated_"
           else
-            # テンプレートを読み込んで変更履歴を挿入
-            body=$(cat "$template_file" | sed "s|{{CHANGES}}|$changes|g")
+            # Load template and insert changes
+            # Ensure CHANGES variable is properly escaped for sed if it contains special characters
+            # Using awk might be safer for complex replacements
+            body=$(awk -v changes="${changes}" '{gsub(/{{CHANGES}}/, changes)}1' "$template_file")
           fi
 
           # PRを作成
@@ -121,7 +114,7 @@ jobs:
             --label "$label" 2>&1)
           pr_status=$?
           set -e  # エラーハンドリングを再度有効化
-          
+
           if [ $pr_status -eq 0 ]; then
             echo "Pull Request created successfully!"
             echo "pr_url=$pr_result" >> $GITHUB_OUTPUT

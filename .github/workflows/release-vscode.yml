@@ -48,7 +48,7 @@ jobs:
           VERSION="${{ steps.get_version.outputs.VERSION }}"
           VSIX_FILENAME="${PACKAGE_NAME}-${VERSION}.vsix"
           # パッケージング実行
-          vsce package
+          vsce package --yarn
           # 作成されたか確認し、ファイル名を GitHub Actions の出力変数に設定
           if [ -f "$VSIX_FILENAME" ]; then
             echo "vsix_path=${VSIX_FILENAME}" >> $GITHUB_OUTPUT

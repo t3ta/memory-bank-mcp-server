@@ -1,0 +1,46 @@
+# Build output (Keep dist, ignore map files and out)
+out/**
+
+# Dependencies
+node_modules/**
+
+# Source code
+src/**
+
+# Config files
+tsconfig.json
+eslint.config.js
+jest.config.js
+
+# Lock file
+yarn.lock # このディレクトリの yarn.lock (あれば)
+**/yarn.lock # 再帰的に無視
+
+# Other development files within this package
+.vscode/**
+.vscode-test/**
+
+# Ignore top-level directories/files by name
+# (Assuming vsce resolves from the workspace root somehow, or relative paths are tricky)
+.git/
+.husky/
+coverage/
+docs/
+node_modules/ # Root node_modules and this package's node_modules
+packages/mcp/
+packages/schemas/
+scripts/
+tools/
+yarn.lock # Root yarn.lock
+CHANGELOG.md
+eslint.config.js
+jest.config.ts
+LICENSE # Root LICENSE
+package.json # Root package.json
+README.md # Root README.md
+tsconfig*.json # Root tsconfig files
+.dockerignore
+.gitignore
+.prettierignore
+.prettierrc
+.tool-versions
