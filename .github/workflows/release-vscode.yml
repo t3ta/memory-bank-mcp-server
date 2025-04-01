@@ -1,0 +1,71 @@
+name: Release VSCode Extension
+
+on:
+  push:
+    tags:
+      - 'vscode-v*' # vscode-vX.Y.Z 形式のタグでトリガー
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # GitHub リリース作成・アセット添付のために write が必要
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      # vscode-extension 固有のビルドスクリプトを実行
+      - name: Build VSCode Extension
+        run: yarn workspace memory-bank-vscode-extension build
+
+      - name: Install vsce
+        run: npm install -g @vscode/vsce
+
+      - name: Get version from tag
+        id: get_version
+        # タグ名 (例: refs/tags/vscode-v0.1.0) からバージョン部分 (0.1.0) を抽出
+        run: echo "VERSION=${GITHUB_REF#refs/tags/vscode-v}" >> $GITHUB_OUTPUT
+
+      # vsce package を実行して .vsix ファイルを作成
+      - name: Package VSIX
+        id: package_vsix
+        # vsce はカレントディレクトリの package.json を読むので、作業ディレクトリを移動
+        working-directory: ./packages/vscode-extension
+        run: |
+          # vsce package は <name>-<version>.vsix という名前でファイルを作成する
+          # package.json の name は memory-bank-vscode-extension
+          PACKAGE_NAME="memory-bank-vscode-extension"
+          VERSION="${{ steps.get_version.outputs.VERSION }}"
+          VSIX_FILENAME="${PACKAGE_NAME}-${VERSION}.vsix"
+          # パッケージング実行
+          vsce package
+          # 作成されたか確認し、ファイル名を GitHub Actions の出力変数に設定
+          if [ -f "$VSIX_FILENAME" ]; then
+            echo "vsix_path=${VSIX_FILENAME}" >> $GITHUB_OUTPUT
+            echo "VSIX created: ${VSIX_FILENAME}"
+          else
+            echo "Error: VSIX file '$VSIX_FILENAME' not found after packaging!"
+            exit 1
+          fi
+
+      # GitHub リリースを作成し、VSIXファイルを添付
+      - name: Create GitHub Release and Upload VSIX
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }} # トリガーとなったタグ名 (vscode-vX.Y.Z)
+          name: VSCode Extension ${{ steps.get_version.outputs.VERSION }}
+          body: Release of memory-bank-vscode-extension version ${{ steps.get_version.outputs.VERSION }}
+          # working-directory からの相対パスで指定
+          files: packages/vscode-extension/${{ steps.package_vsix.outputs.vsix_path }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
