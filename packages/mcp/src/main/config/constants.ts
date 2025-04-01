@@ -10,7 +10,7 @@ export const Constants = {
   /**
    * Application version
    */
-  VERSION: '1.0.0',
+  VERSION: '2.3.0',
 
   /**
    * Default port

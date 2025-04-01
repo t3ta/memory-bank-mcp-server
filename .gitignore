@@ -50,3 +50,6 @@ docs/global-memory-bank/tags/index.json
 
 # TypeScript
 *.tsbuildinfo
+
+# Roo Code
+.roo/
