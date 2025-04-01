@@ -1,0 +1,286 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "interface-inventory",
+    "title": "インターフェース一覧",
+    "documentType": "inventory",
+    "path": "interface-inventory.json",
+    "tags": [
+      "interface",
+      "design",
+      "typescript",
+      "inventory"
+    ],
+    "lastModified": "2025-03-29T20:00:00.000Z",
+    "createdAt": "2025-03-29T20:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "title": "インターフェース一覧",
+      "description": "Memory Bank MCPサーバーで使用されているインターフェースの一覧。命名規則の統一とインターフェース設計の一貫性確保のための基礎資料。",
+      "totalCount": 19,
+      "prefix": {
+        "withPrefix": 19,
+        "withoutPrefix": 0
+      },
+      "layers": {
+        "domain": 8,
+        "application": 1,
+        "infrastructure": 5,
+        "interface": 5
+      }
+    },
+    "interfaces": {
+      "domain": [
+        {
+          "name": "IJsonDocumentRepository",
+          "path": "/domain/repositories/IJsonDocumentRepository.ts",
+          "description": "Repository interface for managing JSON documents",
+          "methods": [
+            "findById(id: DocumentId): Promise<JsonDocument | null>",
+            "findByPath(branchInfo: BranchInfo, path: DocumentPath): Promise<JsonDocument | null>",
+            "findByTags(branchInfo: BranchInfo, tags: Tag[], matchAll?: boolean): Promise<JsonDocument[]>",
+            "findByType(branchInfo: BranchInfo, documentType: DocumentType): Promise<JsonDocument[]>",
+            "save(branchInfo: BranchInfo, document: JsonDocument): Promise<JsonDocument>",
+            "delete(branchInfo: BranchInfo, document: JsonDocument | DocumentId | DocumentPath): Promise<boolean>",
+            "listAll(branchInfo: BranchInfo): Promise<JsonDocument[]>",
+            "exists(branchInfo: BranchInfo, path: DocumentPath): Promise<boolean>"
+          ],
+          "returnsPromise": true,
+          "hasObjectParameters": false,
+          "prefixStatus": "with"
+        },
+        {
+          "name": "IBranchMemoryBankRepository",
+          "path": "/domain/repositories/IBranchMemoryBankRepository.ts",
+          "description": "Repository interface for branch memory bank",
+          "methods": [
+            "exists(branchName: string): Promise<boolean>",
+            "initialize(branchInfo: BranchInfo): Promise<void>",
+            "getDocument(branchInfo: BranchInfo, path: DocumentPath): Promise<MemoryDocument | null>",
+            "saveDocument(branchInfo: BranchInfo, document: MemoryDocument): Promise<void>",
+            "deleteDocument(branchInfo: BranchInfo, path: DocumentPath): Promise<boolean>",
+            "listDocuments(branchInfo: BranchInfo): Promise<DocumentPath[]>",
+            "findDocumentsByTags(branchInfo: BranchInfo, tags: Tag[]): Promise<MemoryDocument[]>",
+            "getRecentBranches(limit?: number): Promise<RecentBranch[]>",
+            "validateStructure(branchInfo: BranchInfo): Promise<boolean>",
+            "saveTagIndex(branchInfo: BranchInfo, tagIndex: BranchTagIndex): Promise<void>",
+            "getTagIndex(branchInfo: BranchInfo): Promise<BranchTagIndex | null>",
+            "findDocumentPathsByTagsUsingIndex(branchInfo: BranchInfo, tags: Tag[], matchAll?: boolean): Promise<DocumentPath[]>"
+          ],
+          "returnsPromise": true,
+          "hasObjectParameters": false,
+          "prefixStatus": "with"
+        },
+        {
+          "name": "IGlobalMemoryBankRepository",
+          "path": "/domain/repositories/IGlobalMemoryBankRepository.ts",
+          "description": "Repository interface for global memory bank",
+          "methods": [],
+          "returnsPromise": true,
+          "hasObjectParameters": false,
+          "prefixStatus": "with"
+        },
+        {
+          "name": "IMemoryDocumentRepository",
+          "path": "/domain/repositories/IMemoryDocumentRepository.ts",
+          "description": "Repository interface for memory documents",
+          "methods": [],
+          "returnsPromise": true,
+          "hasObjectParameters": false,
+          "prefixStatus": "with"
+        },
+        {
+          "name": "ITagIndexRepository",
+          "path": "/domain/repositories/ITagIndexRepository.ts",
+          "description": "Repository interface for tag indexing",
+          "methods": [],
+          "returnsPromise": true,
+          "hasObjectParameters": false,
+          "prefixStatus": "with"
+        },
+        {
+          "name": "IDocumentLogger",
+          "path": "/domain/logger/IDocumentLogger.ts",
+          "description": "Interface for document logging",
+          "methods": [],
+          "returnsPromise": false,
+          "hasObjectParameters": false,
+          "prefixStatus": "with"
+        },
+        {
+          "name": "IDocumentValidator",
+          "path": "/domain/validation/IDocumentValidator.ts",
+          "description": "Interface for document validation",
+          "methods": [],
+          "returnsPromise": false,
+          "hasObjectParameters": false,
+          "prefixStatus": "with"
+        },
+        {
+          "name": "II18nRepository",
+          "path": "/domain/i18n/II18nRepository.ts",
+          "description": "Interface for i18n repository",
+          "methods": [],
+          "returnsPromise": true,
+          "hasObjectParameters": false,
+          "prefixStatus": "with"
+        }
+      ],
+      "application": [
+        {
+          "name": "IUseCase",
+          "path": "/application/interfaces/IUseCase.ts",
+          "description": "Generic interface for use cases",
+          "methods": [
+            "execute(input: TInput): Promise<TOutput>"
+          ],
+          "returnsPromise": true,
+          "hasObjectParameters": false,
+          "prefixStatus": "with"
+        }
+      ],
+      "infrastructure": [
+        {
+          "name": "IFileSystemService",
+          "path": "/infrastructure/storage/interfaces/IFileSystemService.ts",
+          "description": "Interface for file system operations",
+          "methods": [
+            "readFile(filePath: string): Promise<string>",
+            "readFileChunk?(filePath: string, start: number, length: number): Promise<string>",
+            "writeFile(filePath: string, content: string): Promise<void>",
+            "fileExists(filePath: string): Promise<boolean>",
+            "deleteFile(filePath: string): Promise<boolean>",
+            "createDirectory(dirPath: string): Promise<void>",
+            "directoryExists(dirPath: string): Promise<boolean>",
+            "listFiles(dirPath: string): Promise<string[]>",
+            "getFileStats(filePath: string): Promise<{ size: number; isDirectory: boolean; isFile: boolean; lastModified: Date; createdAt: Date; }>",
+            "getBranchMemoryPath?(branchName: string): string",
+            "getConfig?(): { memoryBankRoot: string; [key: string]: any }"
+          ],
+          "returnsPromise": true,
+          "hasObjectParameters": false,
+          "prefixStatus": "with"
+        },
+        {
+          "name": "IConfigProvider",
+          "path": "/infrastructure/config/interfaces/IConfigProvider.ts",
+          "description": "Interface for configuration provider",
+          "methods": [],
+          "returnsPromise": false,
+          "hasObjectParameters": false,
+          "prefixStatus": "with"
+        },
+        {
+          "name": "IIndexService",
+          "path": "/infrastructure/index/interfaces/IIndexService.ts",
+          "description": "Interface for indexing service",
+          "methods": [],
+          "returnsPromise": true,
+          "hasObjectParameters": false,
+          "prefixStatus": "with"
+        },
+        {
+          "name": "II18nProvider",
+          "path": "/infrastructure/i18n/interfaces/II18nProvider.ts",
+          "description": "Interface for i18n provider",
+          "methods": [],
+          "returnsPromise": true,
+          "hasObjectParameters": false,
+          "prefixStatus": "with"
+        }
+      ],
+      "interface": [
+        {
+          "name": "IController",
+          "path": "/interface/controllers/interfaces/IController.ts",
+          "description": "Base controller interface",
+          "methods": [],
+          "returnsPromise": false,
+          "hasObjectParameters": false,
+          "prefixStatus": "with"
+        },
+        {
+          "name": "IBranchController",
+          "path": "/interface/controllers/interfaces/IBranchController.ts",
+          "description": "Interface for branch memory bank controller",
+          "methods": [
+            "readDocument(branchName: string, path: string): Promise<MCPResponse<DocumentDTO>>",
+            "writeDocument(branchName: string, path: string, content: string, tags?: string[]): Promise<MCPResponse>",
+            "readCoreFiles(branchName: string): Promise<MCPResponse<Record<string, DocumentDTO>>>",
+            "writeCoreFiles(branchName: string, files: Record<string, any>): Promise<MCPResponse>",
+            "getRecentBranches(limit?: number): Promise<MCPResponse>",
+            "findDocumentsByTags(branchName: string, tags: string[], matchAllTags?: boolean): Promise<MCPResponse<DocumentDTO[]>>",
+            "updateTagsIndex(branchName: string, fullRebuild?: boolean): Promise<MCPResponse>",
+            "readJsonDocument(branchName: string, options: { path?: string; id?: string }): Promise<MCPResponse<JsonDocumentDTO>>",
+            "writeJsonDocument(branchName: string, document: JsonDocumentDTO): Promise<MCPResponse>",
+            "deleteJsonDocument(branchName: string, options: { path?: string; id?: string }): Promise<MCPResponse>",
+            "listJsonDocuments(branchName: string, options?: { type?: string; tags?: string[] }): Promise<MCPResponse<JsonDocumentDTO[]>>",
+            "searchJsonDocuments(branchName: string, query: string): Promise<MCPResponse<JsonDocumentDTO[]>>",
+            "updateJsonIndex(branchName: string, options?: { force?: boolean }): Promise<MCPResponse>"
+          ],
+          "returnsPromise": true,
+          "hasObjectParameters": true,
+          "prefixStatus": "with"
+        },
+        {
+          "name": "IGlobalController",
+          "path": "/interface/controllers/interfaces/IGlobalController.ts",
+          "description": "Interface for global memory bank controller",
+          "methods": [],
+          "returnsPromise": true,
+          "hasObjectParameters": false,
+          "prefixStatus": "with"
+        },
+        {
+          "name": "IContextController",
+          "path": "/interface/controllers/interfaces/IContextController.ts",
+          "description": "Interface for context controller",
+          "methods": [],
+          "returnsPromise": true,
+          "hasObjectParameters": false,
+          "prefixStatus": "with"
+        },
+        {
+          "name": "IPresenter",
+          "path": "/interface/presenters/interfaces/IPresenter.ts",
+          "description": "Interface for presenters",
+          "methods": [],
+          "returnsPromise": false,
+          "hasObjectParameters": false,
+          "prefixStatus": "with"
+        },
+        {
+          "name": "IResponsePresenter",
+          "path": "/interface/presenters/interfaces/IResponsePresenter.ts",
+          "description": "Interface for response presenters",
+          "methods": [],
+          "returnsPromise": false,
+          "hasObjectParameters": false,
+          "prefixStatus": "with"
+        }
+      ]
+    },
+    "namingIssues": [],
+    "signatureIssues": [],
+    "parameterIssues": [
+      {
+        "interfaceName": "IBranchController",
+        "method": "readJsonDocument(branchName: string, options: { path?: string; id?: string })",
+        "issue": "メソッドが3つ以上のパラメータを持たないが、オブジェクトリテラル型を使用している。ガイドラインに準拠しているがパラメータ数に対して検討が必要。"
+      },
+      {
+        "interfaceName": "IBranchController",
+        "method": "deleteJsonDocument(branchName: string, options: { path?: string; id?: string })",
+        "issue": "メソッドが3つ以上のパラメータを持たないが、オブジェクトリテラル型を使用している。ガイドラインに準拠しているがパラメータ数に対して検討が必要。"
+      },
+      {
+        "interfaceName": "IBranchController",
+        "method": "listJsonDocuments(branchName: string, options?: { type?: string; tags?: string[] })",
+        "issue": "メソッドが3つ以上のパラメータを持たないが、オブジェクトリテラル型を使用している。ガイドラインに準拠しているがパラメータ数に対して検討が必要。"
+      }
+    ],
+    "notes": "すべてのインターフェースが既に「I」プレフィックスを持っているため、名前の統一に関するリファクタリングは必要ありません。主に以下の項目に焦点を当ててインターフェース設計を改善することが推奨されます：\n1. 一部のインターフェースで、メソッドのSignatureの詳細が不足しています。それらを完成させる必要があります。\n2. 非同期メソッドのPromise<T>返り値については既に一貫しています。\n3. パラメータの設計については、3つ以上のパラメータを持つメソッドはオブジェクトリテラル型を使うという方針は一部で採用されていますが、一貫した適用が必要です。"
+  }
+}

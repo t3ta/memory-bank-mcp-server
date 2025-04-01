@@ -1,0 +1,47 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "b1c05afe-e581-41aa-a170-4006158f1162",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-29T20:40:00.000Z",
+    "createdAt": "2025-03-29T13:45:00.000Z",
+    "version": 2
+  },
+  "content": {
+    "branchName": "feature/schema-package-3",
+    "purpose": "モノレポ化とスキーマパッケージ抽出のフェーズ3。feature/schema-package-2で未完了だった肥大化リポジトリの分割とインターフェース設計の統一化を完了させ、残りのビルドエラーも解消する。",
+    "createdAt": "2025-03-29T13:45:00.000Z",
+    "userStories": [
+      {
+        "id": "f8e7d6c5-b4a3-2910-8f7e-6d5c4b3a2910",
+        "description": "肥大化リポジトリを責務ごとに分割して設計を改善したい",
+        "completed": true,
+        "priority": 1
+      },
+      {
+        "id": "3c86bf6f-2bf8-4253-8aab-9ca84d3f8cd0",
+        "description": "インターフェース設計を一貫させ、命名規則を統一したい",
+        "completed": true,
+        "priority": 2
+      },
+      {
+        "id": "pi-build-errors",
+        "description": "残りのビルドエラー（特にIndexService.ts）の解消",
+        "completed": true,
+        "priority": 3
+      },
+      {
+        "id": "23f3c43c-ccd7-450e-b756-3828de2f8b3c",
+        "description": "ロギングやエラーハンドリングなどの横断的関心事を整理したい",
+        "completed": false,
+        "priority": 4
+      }
+    ],
+    "additionalNotes": "feature/schema-package-2では、テンプレート関連コードの削除完了とドメインエンティティの依存方向修正を実施。肥大化リポジトリの分割と残りのビルドエラーの解消は現在のブランチで完了した。インターフェースの命名規則統一も完了し、すべてのインターフェースが「I」プレフィックスを持ち、メソッドシグネチャも統一された。残るのは横断的関心事（ロギング、エラーハンドリング）の統合のみとなった。"
+  }
+}

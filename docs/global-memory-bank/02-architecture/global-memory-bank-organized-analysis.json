@@ -31,11 +31,11 @@
       },
       {
         "title": "ドキュメント構成分析",
-        "content": "ドキュメントのタイプと構造に関する分析：\n\n1. **ドキュメントタイプの分布**:\n   - generic: 28ドキュメント\n   - analysis: 3ドキュメント\n   - guide: 2ドキュメント\n   - reference: 1ドキュメント\n   - plan: 1ドキュメント\n\n2. **改善点**:\n   - 「generic」タイプが多すぎる: より具体的なタイプ（「design」「implementation」など）に分類すべき\n   - セクションのないドキュメントが多い: コンテンツを適切にセクション分けすべき\n   - タイトルが英語と日本語で混在: 言語の一貫性を保つべき\n\n3. **成功事例**:\n   - 「global-memory-bank-navigation.json」: 13セクションで適切に構造化\n   - 「global-memory-bank-reference.json」: 明確な目的と構造を持つ\n   - 「tags/reorganization-plan.json」: 計画を明確なセクションに分割\n\nこれらの改善を適用することで、ドキュメントの品質と一貫性が向上します。"
+        "content": "ドキュメントのタイプと構造に関する分析：\n\n1. **ドキュメントタイプの分布**:\n   - generic: 28ドキュメント\n   - analysis: 3ドキュメント\n   - guide: 2ドキュメント\n   - reference: 1ドキュメント\n   - plan: 1ドキュメント\n\n2. **改善点**:\n   - 「generic」タイプが多すぎる: より具体的なタイプ（「design」「implementation」など）に分類すべき\n   - セクションのないドキュメントが多い: コンテンツを適切にセクション分けすべき\n   - タイトルが英語と日本語で混在: 言語の一貫性を保つべき\n\n3. **成功事例**:\n   - 「global-memory-bank-reference.json」: 明確な目的と構造を持つ\n   - 「tags/reorganization-plan.json」: 計画を明確なセクションに分割\n\nこれらの改善を適用することで、ドキュメントの品質と一貫性が向上します。"
       },
       {
         "title": "ナビゲーション提案",
-        "content": "より効率的なナビゲーションのための提案：\n\n1. **カテゴリベースのナビゲーション構造**:\n   ```\n   docs/global-memory-bank/\n   ├── 01-project/            # プロジェクト基盤\n   ├── 02-architecture/       # 設計・アーキテクチャ\n   ├── 03-implementation/     # 実装・技術\n   ├── 04-guides/             # ドキュメント・ガイド\n   ├── 05-testing/            # テスト・品質\n   ├── 06-releases/           # バージョン・リリース\n   ├── 07-infrastructure/     # インフラ・運用\n   ├── 08-i18n/               # 国際化・多言語\n   ├── 09-refactoring/        # リファクタリング・技術的負債\n   └── meta/                  # メタ情報・インデックス\n   ```\n\n2. **ナビゲーションツールの強化**:\n   - すでに作成された「global-memory-bank-navigation.json」をカテゴリーごとに拡張\n   - 「global-memory-bank-reference.json」をより詳細なドキュメントガイドに発展\n\n3. **検索とフィルタリングの改善**:\n   - タグベースの検索機能の強化\n   - カテゴリフィルターの導入\n   - 関連ドキュメントの参照リンクの追加\n\nこれらの提案により、ユーザーはより素早く必要な情報にアクセスできるようになります。"
+        "content": "より効率的なナビゲーションのための提案：\n\n1. **カテゴリベースのナビゲーション構造**:\n   ```\n   docs/global-memory-bank/\n   ├── 01-project/            # プロジェクト基盤\n   ├── 02-architecture/       # 設計・アーキテクチャ\n   ├── 03-implementation/     # 実装・技術\n   ├── 04-guides/             # ドキュメント・ガイド\n   ├── 05-testing/            # テスト・品質\n   ├── 06-releases/           # バージョン・リリース\n   ├── 07-infrastructure/     # インフラ・運用\n   ├── 08-i18n/               # 国際化・多言語\n   ├── 09-refactoring/        # リファクタリング・技術的負債\n   └── meta/                  # メタ情報・インデックス\n   ```\n\n2. **ナビゲーションツールの強化**:\n   - 「global-memory-bank-reference.json」をより詳細なドキュメントガイドに発展\n\n3. **検索とフィルタリングの改善**:\n   - タグベースの検索機能の強化\n   - カテゴリフィルターの導入\n   - 関連ドキュメントの参照リンクの追加\n\nこれらの提案により、ユーザーはより素早く必要な情報にアクセスできるようになります。"
       },
       {
         "title": "ギャップ分析",
@@ -239,7 +239,7 @@
             "user-guide.json",
             "glossary.json",
             "global-memory-bank-reference.json",
-            "global-memory-bank-navigation.json"
+            "global-memory-bank-reference.json"
           ]
         },
         {
@@ -277,7 +277,7 @@
         },
         {
           "purpose": "メモリバンクのナビゲーション",
-          "document": "global-memory-bank-navigation.json"
+          "document": "global-memory-bank-reference.json"
         }
       ]
     },

@@ -1,0 +1,144 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "54cecd0e-e406-4890-a78f-e7c1542d9702",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context",
+      "vscode-extension"
+    ],
+    "lastModified": "2025-03-30T16:10:58.000Z",
+    "createdAt": "2025-03-30T05:25:42.076Z",
+    "version": 2
+  },
+  "content": {
+    "currentWork": "VS Code拡張機能（メモリバンク編集機能＋AI連携による重複情報整理機能）の初期計画と設計",
+    "recentChanges": [
+      {
+        "id": "change-4",
+        "description": "package.jsonの依存関係問題とactivationEventsの問題を解決。markdown-it、markdown-it-mermaid、mermaidパッケージを追加完了",
+        "date": "2025-03-30T16:10:00.000Z"
+      },
+      {
+        "id": "change-1",
+        "description": "AI関連機能の優先度を下げ、基本機能と既知の問題修正を優先",
+        "date": "2025-03-30T15:00:00.000Z"
+      },
+      {
+        "id": "change-2",
+        "description": "エディタ機能の詳細設計（Markdownスタイルプレビュー機能）を追加",
+        "date": "2025-03-30T16:30:00.000Z"
+      },
+      {
+        "id": "change-3",
+        "description": "Markdownプレビュー機能の優先度を最高に変更し、実装手順を再整理",
+        "date": "2025-03-30T17:00:00.000Z"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "decision-tech-1",
+        "description": "メイン開発言語としてTypeScriptを採用 (vscode-extension-plan-part1)"
+      },
+      {
+        "id": "decision-tech-2",
+        "description": "UIコンポーネント開発にReact (WebView) を採用 (vscode-extension-plan-part1)"
+      },
+      {
+        "id": "decision-tech-3",
+        "description": "JSONスキーマ検証にZodとJSONSchemaを併用 (vscode-extension-plan-part1)"
+      },
+      {
+        "id": "decision-ai-1",
+        "description": "AI連携のコアモデルとしてGemini 1.5 Proを使用 (vscode-extension-ai-integration)"
+      },
+      {
+        "id": "decision-ai-2",
+        "description": "Gemini API認証はAPIキー方式を基本とする (vscode-extension-ai-integration)"
+      },
+      {
+        "id": "decision-editor-1",
+        "description": "JSONをMarkdown形式に変換して表示する方式を採用 (editor-markdown-view.json)"
+      },
+      {
+        "id": "decision-editor-2",
+        "description": "markdown-it + mermaidを使用したレンダリング実装 (editor-markdown-view.json)"
+      },
+      {
+        "id": "decision-editor-3",
+        "description": "新規ファイルの作成は避け、既存ファイルに機能を追加する形で実装する"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "consideration-ai-1",
+        "description": "AIのコンテキスト理解精度と提案品質の確保 (vscode-extension-ai-integration)",
+        "status": "open"
+      },
+      {
+        "id": "consideration-ai-2",
+        "description": "Gemini APIのレート制限とコスト管理 (vscode-extension-ai-integration)",
+        "status": "open"
+      },
+      {
+        "id": "consideration-ai-3",
+        "description": "AI機能における適切なユーザー介入のバランス設計 (vscode-extension-ai-integration)",
+        "status": "open"
+      },
+      {
+        "id": "consideration-ai-4",
+        "description": "AI連携時のプライバシーとセキュリティ確保 (vscode-extension-ai-integration)",
+        "status": "open"
+      },
+      {
+        "id": "consideration-core-1",
+        "description": "VS Code拡張機能の安定起動とユーザビリティの向上",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "next-step-md-1",
+        "description": "エディタのMarkdownプレビュー機能の実装 (editor-markdown-view) - document-markdown-converter.tsモジュールの実装が最優先課題",
+        "priority": "high"
+      },
+      {
+        "id": "next-step-1",
+        "description": "既知の問題の修正（activationEvents、package.json重複セクション修正） (issue-fix-1)",
+        "priority": "high"
+      },
+      {
+        "id": "next-step-2",
+        "description": "workspace依存関係の問題解決（@memory-bank/schemasの参照問題） (issue-fix-2)",
+        "priority": "high"
+      },
+      {
+        "id": "next-step-3",
+        "description": "基本機能の改良（エクスプローラーとエディタの機能拡充） (core-feature)",
+        "priority": "medium"
+      },
+      {
+        "id": "next-step-4",
+        "description": "差分比較機能の実装 (feature-diff)",
+        "priority": "medium"
+      },
+      {
+        "id": "next-step-5",
+        "description": "ドキュメント関連性可視化機能の実装 (feature-link)",
+        "priority": "low"
+      },
+      {
+        "id": "next-step-6",
+        "description": "AI機能のテストとビルド整備（既存のGemini API接続を安定化） (ai-testing)",
+        "priority": "low"
+      },
+      {
+        "id": "next-step-7",
+        "description": "AIによる重複検出機能のプロトタイプ開発 (feature-ai-duplicate-detection)",
+        "priority": "low"
+      }
+    ]
+  }
+}

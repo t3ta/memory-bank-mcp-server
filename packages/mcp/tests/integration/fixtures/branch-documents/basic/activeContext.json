@@ -1,0 +1,42 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "test-active-context",
+    "title": "テストアクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": ["active-context", "test"],
+    "lastModified": "2025-03-30T00:00:00.000Z",
+    "createdAt": "2025-03-30T00:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "テスト作業",
+    "recentChanges": [
+      {
+        "date": "2025-03-30T00:00:00.000Z",
+        "description": "テスト変更"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "test-decision",
+        "description": "テスト決定事項"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "test-consideration",
+        "description": "テスト検討事項",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "test-step",
+        "description": "テスト次のステップ",
+        "priority": "high"
+      }
+    ]
+  }
+}

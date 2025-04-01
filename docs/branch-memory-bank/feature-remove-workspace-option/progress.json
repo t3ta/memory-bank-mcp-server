@@ -1,0 +1,65 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "b628cbdb-b6e3-4d8c-84b4-e4c6c03552cc",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress"
+    ],
+    "lastModified": "2025-03-27T14:30:00.000Z",
+    "createdAt": "2025-03-27T12:56:48.270Z",
+    "version": 2
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "6d161527-46f5-4251-b0d3-c9e037633251",
+        "description": "workspaceオプション撤廃に向けた調査完了",
+        "implementedAt": "2025-03-27T13:25:48.270Z"
+      },
+      {
+        "id": "8d745f6a-9c12-4e8c-b723-f9a7d4d5e6c7",
+        "description": "WorkspaceConfig型からworkspaceRootプロパティを削除",
+        "implementedAt": "2025-03-27T14:15:00.000Z"
+      },
+      {
+        "id": "a45b9c23-d67e-4f8a-9b2c-1a3b4c5d6e7f",
+        "description": "resolveWorkspaceAndDocs関数の削除と依存部分の修正",
+        "implementedAt": "2025-03-27T14:20:00.000Z"
+      },
+      {
+        "id": "b56c7d89-e01f-4a2b-8c3d-2a3b4c5d6e7f",
+        "description": "workspaceパラメータに関するコード・変数の削除",
+        "implementedAt": "2025-03-27T14:25:00.000Z"
+      },
+      {
+        "id": "c67d8e90-f12g-5h3i-9j4k-3a4b5c6d7e8f",
+        "description": "テストコードの修正",
+        "implementedAt": "2025-03-27T14:28:00.000Z"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "d78e9f01-g23h-6i4j-0k5l-4a5b6c7d8e9f",
+        "description": "最終的なテストの実行と動作確認",
+        "priority": "high"
+      }
+    ],
+    "status": "workspaceオプションの撤廃に向けたコード修正をほぼ完了しました。WorkspaceConfig型からworkspaceRootプロパティを削除し、関連するパラメータや関数（resolveWorkspaceAndDocs）を削除しました。テストコードも大幅に修正し、workspace関連のテストは削除しました。最終的なテストと確認を行った後、コミットする準備が整っています。",
+    "completionPercentage": 90,
+    "knownIssues": [
+      {
+        "id": "a921d6ba-1426-403a-9b36-367ba072c8c6",
+        "description": "テストファイルの一部がすでにskipされている状態であり、修正が必要",
+        "severity": "medium"
+      },
+      {
+        "id": "94e4ba50-8a54-4d21-a9c6-637ce661d94f",
+        "description": "workspaceとdocsの両方がある場合の挙動が複雑であり、注意が必要",
+        "severity": "medium"
+      }
+    ]
+  }
+}

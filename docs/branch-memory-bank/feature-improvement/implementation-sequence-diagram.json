@@ -1,0 +1,23 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "3e2d1c0b-9a8f-7e6d-5c4b-3a2f1e0d9c8b",
+    "title": "実装順序図",
+    "documentType": "diagram",
+    "path": "implementation-sequence-diagram.json",
+    "tags": [
+      "improvement",
+      "diagram",
+      "sequence"
+    ],
+    "lastModified": "2025-03-30T07:30:32.360Z",
+    "createdAt": "2025-03-30T07:30:32.360Z",
+    "version": 1
+  },
+  "content": {
+    "title": "feature/improvement実装順序",
+    "description": "改善項目の実装順序と依存関係を表した図。数字は実装順序を示し、矢印は依存関係を示しています。",
+    "mermaid": "graph TD\n    subgraph \"フェーズ1（高優先度）\"\n    MCP1[\"1. MCP-1: ロガー使用の一貫性確保\"] --- MCP1_desc[\"componentLoggerの一貫した使用\"]\n    MCP3[\"2. MCP-3: 不足しているエラーファクトリーメソッドの追加\"] --- MCP3_desc[\"新しいファクトリーメソッドの追加\"]\n    MCP2[\"3. MCP-2: エラーファクトリーメソッドの一貫した使用\"] --- MCP2_desc[\"エラー生成の統一\"]\n    TS1[\"4. TS-1: ルートtsconfig.jsonでのStrict Mode有効化\"] --- TS1_desc[\"型安全性の向上\"]\n    SCH3[\"5. SCHEMA-3: バリデーションヘルパーの拡張\"] --- SCH3_desc[\"共通バリデーション関数の追加\"]\n    SCH1[\"6. SCHEMA-1: スキーマファイルの分割と整理\"] --- SCH1_desc[\"モジュール化とファイル分割\"]\n    SCH2[\"7. SCHEMA-2: バージョン管理と互換性強化\"] --- SCH2_desc[\"バージョン間マイグレーション\"]\n    TS2[\"8. TS-2: エラーハンドリング強化ルール\"] --- TS2_desc[\"ESLintエラーハンドリングルール\"]\n    TS3[\"9. TS-3: Promise/非同期エラー処理のルール\"] --- TS3_desc[\"非同期エラー処理の安全性\"]\n    end\n    \n    subgraph \"フェーズ2（中優先度）\"\n    MCP4[\"10. MCP-4: 非同期エラーラッピングパターン\"] --- MCP4_desc[\"ErrorUtils.wrapAsyncの適用\"]\n    MCP5[\"11. MCP-5: 構造化ロギングの強化\"] --- MCP5_desc[\"豊富なコンテキスト情報付与\"]\n    MCP6[\"12. MCP-6: コントローラーのエラーハンドリング\"] --- MCP6_desc[\"一貫したエラーハンドリング\"]\n    SCH4[\"13. SCHEMA-4: スキーマ拡張メカニズム\"] --- SCH4_desc[\"基本スキーマ拡張パターン\"]\n    SCH5[\"14. SCHEMA-5: JSON Schema相互運用\"] --- SCH5_desc[\"ZodとJSON Schema変換\"]\n    TS4[\"15. TS-4: ES2022ターゲット更新\"] --- TS4_desc[\"最新言語機能の活用\"]\n    TS5[\"16. TS-5: パッケージ設定の統一\"] --- TS5_desc[\"設定の統一と一貫性確保\"]\n    TS6[\"17. TS-6: ESLintプラグイン拡充\"] --- TS6_desc[\"コード品質向上\"]\n    TS7[\"18. TS-7: 型チェック強化オプション\"] --- TS7_desc[\"さらなる型安全性向上\"]\n    end\n    \n    subgraph \"フェーズ3（低優先度）\"\n    MCP7[\"19. MCP-7: ログレベルガイドライン\"] --- MCP7_desc[\"レベル使用基準の確立\"]\n    MCP8[\"20. MCP-8: エラーコード一覧\"] --- MCP8_desc[\"エラーコードドキュメント\"]\n    SCH6[\"21. SCHEMA-6: エラーメッセージ国際化\"] --- SCH6_desc[\"多言語対応エラー\"]\n    SCH7[\"22. SCHEMA-7: スキーマテストツール\"] --- SCH7_desc[\"検証ツールの強化\"]\n    SCH8[\"23. SCHEMA-8: 効率的シリアライズ\"] --- SCH8_desc[\"パフォーマンス最適化\"]\n    SCH9[\"24. SCHEMA-9: 型安全クエリビルダー\"] --- SCH9_desc[\"型の恩恵を活用\"]\n    TS8[\"25. TS-8: ビルド最適化設定\"] --- TS8_desc[\"増分ビルドによる高速化\"]\n    TS9[\"26. TS-9: カスタムロガールール\"] --- TS9_desc[\"プロジェクト固有ルール\"]\n    TS10[\"27. TS-10: 共通型定義明示\"] --- TS10_desc[\"型定義の明示化\"]\n    end\n    \n    %% 依存関係\n    MCP3 --> MCP2\n    SCH3 --> SCH1\n    SCH1 --> SCH2\n    MCP2 --> TS2\n    TS2 --> TS3\n    \n    MCP1 --> MCP5\n    MCP2 --> MCP6\n    MCP4 --> MCP6\n    SCH1 --> SCH4\n    SCH2 --> SCH4\n    SCH4 --> SCH5\n    TS1 --> TS4\n    TS1 --> TS5\n    TS2 --> TS6\n    TS1 --> TS7\n    \n    MCP5 --> MCP7\n    MCP6 --> MCP8\n    SCH3 --> SCH6\n    SCH5 --> SCH7\n    SCH2 --> SCH9\n    TS1 --> TS8\n    TS6 --> TS9\n    MCP7 --> TS9\n    TS1 --> TS10\n",
+    "note": "この実装順序は以下の原則に基づいて設計されています：\n1. フェーズ1（高優先度）→フェーズ2（中優先度）→フェーズ3（低優先度）の順に実装\n2. 各フェーズ内では依存関係に従って順序付け（依存するものが先に実装される）\n3. 同時並行で実装可能な項目もあるが、関連する項目は連続して実装することで効率化\n4. 改善効果が早く現れる項目（ロガー一貫性、エラーファクトリー）を先行実装"
+  }
+}

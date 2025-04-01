@@ -1,0 +1,144 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "solution-proposal",
+    "title": "統合テスト実行時のSIGINT問題解決策",
+    "documentType": "proposal",
+    "path": "solutionProposal.json",
+    "tags": [
+      "integration-tests",
+      "debugging",
+      "proposal",
+      "SIGINT",
+      "VSCode"
+    ],
+    "lastModified": "2025-03-31T18:00:00.000Z",
+    "createdAt": "2025-03-31T18:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": "VSCodeのターミナルで統合テスト実行時に発生するSIGINT問題を解決するための具体的な提案です。",
+    "proposedSolutions": [
+      {
+        "id": "solution-1",
+        "title": "package.jsonのtest:integrationスクリプトに--forceExitフラグを追加",
+        "description": "Jestの実行時に--forceExitフラグを追加することで、テスト完了後にプロセスを強制終了します。これにより、プロセスが残留してVSCodeがSIGINTを送信する問題を回避できます。",
+        "implementation": {
+          "file": "packages/mcp/package.json",
+          "changes": [
+            {
+              "from": "\"test:integration\": \"NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest --runInBand --detectOpenHandles --config tests/integration/jest.config.ts\"",
+              "to": "\"test:integration\": \"NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest --runInBand --detectOpenHandles --forceExit --config tests/integration/jest.config.ts\""
+            }
+          ]
+        },
+        "benefits": [
+          "簡単な変更で実装可能",
+          "VSCode統合ターミナルでもテストが実行可能になる",
+          "コードの変更が必要ない"
+        ],
+        "drawbacks": [
+          "テストプロセスが強制終了されるため、非同期のクリーンアップ処理が完了しない可能性がある",
+          "本来はクリーンな終了処理が望ましい"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "solution-2",
+        "title": "setup.mtsファイルのafterAllフックを追加",
+        "description": "setup.mtsファイルにafterAllフックを追加し、テスト終了時に十分な遅延を設けることで、非同期処理の完了を待ちます。",
+        "implementation": {
+          "file": "packages/mcp/tests/integration/setup.mts",
+          "changes": [
+            {
+              "from": "// Keep error logging for debugging\n// console.error = jest.fn();",
+              "to": "// Keep error logging for debugging\n// console.error = jest.fn();\n\n// Add delay after all tests to ensure all async operations complete\nafterAll(() => new Promise(resolve => setTimeout(resolve, 1000)));"
+            }
+          ]
+        },
+        "benefits": [
+          "非同期処理の完了を待つことでプロセスのクリーンな終了を促進",
+          "--forceExitと組み合わせることでさらに効果的"
+        ],
+        "drawbacks": [
+          "テスト終了時に常に遅延が発生する",
+          "最適な遅延時間を決定するのが難しい"
+        ],
+        "priority": "medium"
+      },
+      {
+        "id": "solution-3",
+        "title": "テストヘルパーのクリーンアップ処理の改善",
+        "description": "test-env.tsファイルのcleanupTestEnv関数を改善し、クリーンアップ処理の信頼性を向上させます。",
+        "implementation": {
+          "file": "packages/mcp/tests/integration/helpers/test-env.ts",
+          "changes": [
+            {
+              "from": "try {\n    // Use the cleanup function returned by tmp.dir\n    await env.cleanup();\n    logger.debug(`Cleaned up temp directory: ${env.tempDir}`);\n  } catch (error) {",
+              "to": "try {\n    // Add a small delay before cleanup to ensure all file operations complete\n    await new Promise(resolve => setTimeout(resolve, 100));\n    // Use the cleanup function returned by tmp.dir\n    await env.cleanup();\n    logger.debug(`Cleaned up temp directory: ${env.tempDir}`);\n  } catch (error) {"
+            }
+          ]
+        },
+        "benefits": [
+          "ファイルシステム操作の完了を待つことでクリーンアップの信頼性が向上",
+          "リソースリークの可能性が減少"
+        ],
+        "drawbacks": [
+          "各テストのクリーンアップ時に遅延が発生",
+          "特定の問題の根本原因に対応していない可能性がある"
+        ],
+        "priority": "low"
+      }
+    ],
+    "recommendedImplementationPlan": {
+      "title": "段階的実装計画",
+      "steps": [
+        {
+          "id": "step-1",
+          "description": "package.jsonのtest:integrationスクリプトに--forceExitフラグを追加",
+          "priority": "high",
+          "timeEstimate": "5分",
+          "expected_outcome": "VSCode統合ターミナルでもSIGINTエラーなしでテストが実行可能になる"
+        },
+        {
+          "id": "step-2",
+          "description": "--forceExitが問題を解決しない場合、setup.mtsにafterAllフックを追加",
+          "priority": "medium",
+          "timeEstimate": "10分",
+          "expected_outcome": "非同期処理の完了を待つことでプロセスのクリーンな終了を促進"
+        },
+        {
+          "id": "step-3",
+          "description": "上記の対策が十分でない場合、test-env.tsのクリーンアップ処理を改善",
+          "priority": "low",
+          "timeEstimate": "15分",
+          "expected_outcome": "ファイルシステム操作の信頼性向上とリソースリークの減少"
+        }
+      ]
+    },
+    "alternativeSolutions": [
+      {
+        "id": "alternative-1",
+        "title": "外部ターミナルの使用",
+        "description": "VSCode統合ターミナルの代わりに、iTerm2やターミナル.appなどの外部ターミナルでテストを実行する",
+        "pros": "VSCode特有の問題を完全に回避できる",
+        "cons": "開発ワークフローが分断される"
+      },
+      {
+        "id": "alternative-2",
+        "title": "Jest Runner拡張機能の使用",
+        "description": "VSCode拡張機能「Jest Runner」を使用して、ターミナルを介さずにテストを実行する",
+        "pros": "統合ターミナルを使用しないため問題を回避できる",
+        "cons": "新たな拡張機能のインストールと設定が必要"
+      },
+      {
+        "id": "alternative-3",
+        "title": "ワークスペースコマンドの回避",
+        "description": "ワークスペースコマンド（yarn workspace @memory-bank/mcp test:integration）ではなく、直接パッケージディレクトリに移動してテストを実行する",
+        "pros": "ワークスペースコマンド特有の問題を回避できる",
+        "cons": "コマンド実行が複雑になる（cd packages/mcp && yarn test:integration）"
+      }
+    ],
+    "conclusion": "VSCodeのターミナルでの統合テスト実行時に発生するSIGINT問題は、主にプロセス管理とリソースクリーンアップの問題に起因しています。まずは簡単な対策として、package.jsonのtest:integrationスクリプトに--forceExitフラグを追加することを推奨します。これで問題が解決しない場合は、setup.mtsにafterAllフックを追加し、さらにtest-env.tsのクリーンアップ処理を改善することで、問題を段階的に解決できるでしょう。"
+  }
+}

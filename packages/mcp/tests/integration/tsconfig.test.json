@@ -1,0 +1,37 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "removeComments": false,
+    "strict": true,
+    "noImplicitAny": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "outDir": "./dist",
+    "baseUrl": "../..",
+    "allowJs": true,
+    "paths": {
+      "@memory-bank/schemas": [
+        "../schemas/src"
+      ],
+      "@memory-bank/schemas/*": [
+        "../schemas/src/*"
+      ]
+    }
+  },
+  "include": [
+    "./**/*.ts",
+    "../helpers/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

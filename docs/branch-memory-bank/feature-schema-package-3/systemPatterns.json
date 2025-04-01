@@ -1,0 +1,192 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "a3a5a851-7ba3-4a31-ad23-8c6344c704e4",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "system-patterns"
+    ],
+    "lastModified": "2025-03-29T13:45:00.000Z",
+    "createdAt": "2025-03-29T13:45:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "td-repo-split-implementation",
+        "title": "肥大化リポジトリの分割実装方針",
+        "context": "FileSystemBranchMemoryBankRepository（871行）とFileSystemGlobalMemoryBankRepository（875行）が肥大化しており、単一責任の原則に違反している。この問題を解決するために、feature/schema-package-2で分析されたTagIndexリポジトリの実装パターン（ベースクラス、具体実装、ブリッジ層の分割）を適用する必要がある。",
+        "decision": "以下の構造でリポジトリを分割する：\n1. **抽象基底クラス**: 共通の読み書き機能を提供\n2. **操作別クラス**:\n   - ドキュメント操作（読み書き）\n   - タグ操作（タグインデックス管理）\n   - パス操作（ファイルパス関連）\n3. **ブリッジ/アダプタクラス**: 互換性やAPIトランスレーション\n4. **ファサードクラス**: 外部向けの統合インターフェース",
+        "consequences": {
+          "positive": [
+            "単一責任の原則への準拠",
+            "テスト容易性の向上",
+            "拡張性の改善",
+            "コードの可読性向上"
+          ],
+          "negative": [
+            "クラス数の増加",
+            "初期実装の複雑さ",
+            "リファクタリングのリスク"
+          ]
+        },
+        "status": "approved",
+        "date": "2025-03-29T13:45:00.000Z",
+        "alternatives": [
+          {
+            "title": "プライベートメソッドへの分割のみ",
+            "description": "クラス分割せずにプライベートメソッドによる整理のみを行う",
+            "tradeoffs": "実装が簡単だが根本的な問題解決にならない"
+          },
+          {
+            "title": "段階的リファクタリング",
+            "description": "一度に全部を変更せず、徐々にリファクタリングしていく",
+            "tradeoffs": "リスクが低いが完了までに時間がかかり、一時的に不整合な状態が続く"
+          }
+        ]
+      },
+      {
+        "id": "td-interface-convention",
+        "title": "インターフェース命名規則と設計の統一",
+        "context": "現在のコードベースではインターフェース命名規則が混在している。接頭辞「I」が付くものと付かないもの、メソッドシグネチャの非一貫性（特に非同期処理の扱い）などが見られる。",
+        "decision": "以下の統一ルールを採用する：\n1. **接頭辞の統一**: すべてのインターフェースは「I」で始める\n2. **メソッドシグネチャの統一**: 非同期メソッドはすべてPromiseを返す\n3. **パラメータの統一**: 可能な限りオブジェクトリテラル型（{param: type}）を使用\n4. **位置**: ドメインレイヤーに配置",
+        "consequences": {
+          "positive": [
+            "コードの一貫性向上",
+            "可読性と理解しやすさの向上",
+            "新規開発者の学習曲線低減"
+          ],
+          "negative": [
+            "大規模な変更が必要",
+            "既存コードへの修正量が多い"
+          ]
+        },
+        "status": "approved",
+        "date": "2025-03-29T13:45:00.000Z",
+        "alternatives": [
+          {
+            "title": "新規コードのみに適用",
+            "description": "既存コードはそのままにし、新規コードだけに新しい規則を適用",
+            "tradeoffs": "変更量が少なくてすむが、長期的には一貫性のなさが続く"
+          }
+        ]
+      },
+      {
+        "id": "td-error-logging-unification",
+        "title": "エラーハンドリングとロギング統一",
+        "context": "現在のコードではエラーハンドリングとロギング実装が複数の場所に分散しており、一貫性がない。また、ドメインレイヤーが直接ロギング実装に依存しているケースもある。",
+        "decision": "以下の統一アプローチを採用：\n1. **共通エラークラス階層**: DomainError基底クラスと種類別サブクラス\n2. **依存関係逆転パターン適用**: ILoggerなどのインターフェースをドメインに定義\n3. **統一エラーハンドリング**: try-catchパターンの標準化\n4. **コード化されたエラー**: エラー種別を一意のコードで識別",
+        "consequences": {
+          "positive": [
+            "エラー追跡の容易性",
+            "クリーンなレイヤー境界",
+            "デバッグ容易性"
+          ],
+          "negative": [
+            "リファクタリングの工数",
+            "短期的な複雑性増加"
+          ]
+        },
+        "status": "approved",
+        "date": "2025-03-29T13:45:00.000Z",
+        "alternatives": [
+          {
+            "title": "最小限の変更",
+            "description": "最も重要な部分のみを統一し、残りは後回し",
+            "tradeoffs": "工数が少ないが部分的な改善にとどまる"
+          }
+        ]
+      },
+      {
+        "id": "td-build-error-resolution",
+        "title": "ビルドエラー解消のアプローチ",
+        "context": "現在82個のビルドエラーが残っており、主にタグインデックス関連の型定義不一致が原因。これらのエラーが解消されないとモノレポ化が進まない。",
+        "decision": "以下の段階的アプローチで解消する：\n1. **根本原因分析**: エラーの種類と原因を整理\n2. **型定義の統一**: 優先度の高い型定義の不一致から解消\n3. **バッチ処理**: 類似エラーをまとめて修正\n4. **テスト主導**: 修正後は常にビルドテスト実行",
+        "consequences": {
+          "positive": [
+            "安定したビルド",
+            "型安全性の向上",
+            "将来の問題予防"
+          ],
+          "negative": [
+            "短期的な工数増加",
+            "広範囲な変更必要性"
+          ]
+        },
+        "status": "approved",
+        "date": "2025-03-29T13:45:00.000Z",
+        "alternatives": [
+          {
+            "title": "型エラー抑制",
+            "description": "@ts-ignoreや型アサーションによる暫定対応",
+            "tradeoffs": "短期的に解決するがテクニカルデットになる"
+          }
+        ]
+      }
+    ],
+    "implementationPatterns": [
+      {
+        "id": "impl-repo-composition",
+        "name": "リポジトリコンポジションパターン",
+        "description": "大きなリポジトリを分割する際に、コンポジションパターン（委譲）を用いて複数の小さなクラスを組み合わせる方法。",
+        "examples": [
+          {
+            "name": "基本構造",
+            "code": "// 抽象基底クラス\nexport abstract class BaseMemoryBankRepository {\n  // 共通機能実装\n}\n\n// 操作別クラス\nexport class DocumentOperations {\n  // ドキュメント操作関連\n}\n\nexport class TagOperations {\n  // タグ操作関連\n}\n\n// ファサードクラス\nexport class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRepository {\n  private documentOps: DocumentOperations;\n  private tagOps: TagOperations;\n  \n  constructor() {\n    this.documentOps = new DocumentOperations();\n    this.tagOps = new TagOperations();\n  }\n  \n  // 委譲パターンを使用して各操作を適切なクラスに転送\n  readDocument(path: string): Promise<Document> {\n    return this.documentOps.readDocument(path);\n  }\n  \n  updateTagIndex(document: Document): Promise<void> {\n    return this.tagOps.updateIndex(document);\n  }\n}"
+          }
+        ],
+        "context": "単一責任の原則に従って、大きなクラスを責務ごとに分けつつ、外部向けのインターフェースは維持する必要がある場合に使用。"
+      },
+      {
+        "id": "impl-dependency-inversion",
+        "name": "依存関係逆転パターン",
+        "description": "ドメインレイヤーが外部実装に依存しないようにするため、ドメイン内にインターフェースを定義し、外部レイヤーでそれを実装する方法。",
+        "examples": [
+          {
+            "name": "ロギング依存の逆転",
+            "code": "// ドメインレイヤーにインターフェース定義\nexport interface ILogger {\n  debug(message: string, meta?: any): void;\n  info(message: string, meta?: any): void;\n  warn(message: string, meta?: any): void;\n  error(message: string, meta?: any): void;\n}\n\n// ドメインクラスでインターフェースを使用\nexport class MemoryDocument {\n  constructor(private logger: ILogger) {}\n  \n  performOperation(): void {\n    this.logger.info('Operation performed');\n  }\n}\n\n// インフラレイヤーで実装\nexport class WinstonLogger implements ILogger {\n  // Winston実装\n}"
+          }
+        ],
+        "context": "クリーンアーキテクチャでは、依存は内側に向かう必要がある。ロギングやエラーハンドリングなどの横断的関心事を扱う際に、この原則を維持するためのパターン。"
+      },
+      {
+        "id": "impl-error-hierarchy",
+        "name": "エラークラス階層パターン",
+        "description": "構造化されたエラーハンドリングのための階層的なエラークラスの設計パターン。",
+        "examples": [
+          {
+            "name": "基本構造",
+            "code": "// 基底エラークラス\nexport abstract class DomainError extends Error {\n  constructor(\n    public readonly code: string,\n    message: string,\n    public readonly details?: any\n  ) {\n    super(message);\n    this.name = this.constructor.name;\n  }\n}\n\n// 特定種類のエラー\nexport class NotFoundError extends DomainError {\n  constructor(resource: string, id: string, details?: any) {\n    super(\n      'RESOURCE_NOT_FOUND',\n      `${resource} with id ${id} not found`,\n      details\n    );\n  }\n}\n\nexport class ValidationError extends DomainError {\n  constructor(message: string, details?: any) {\n    super('VALIDATION_ERROR', message, details);\n  }\n}"
+          },
+          {
+            "name": "使用例",
+            "code": "try {\n  // 何らかの操作\n} catch (error) {\n  if (error instanceof ValidationError) {\n    // バリデーションエラー処理\n  } else if (error instanceof NotFoundError) {\n    // Not Foundエラー処理\n  } else if (error instanceof DomainError) {\n    // その他のドメインエラー処理\n  } else {\n    // 未知のエラーはラップして再スロー\n    throw new DomainError(\n      'UNEXPECTED_ERROR',\n      'An unexpected error occurred',\n      { originalError: error }\n    );\n  }\n}"
+          }
+        ],
+        "context": "エラー処理を一貫させ、エラー種別ごとに適切な処理を可能にすることで、システムの堅牢性とデバッグ性を向上させる。"
+      },
+      {
+        "id": "impl-interface-consistency",
+        "name": "インターフェース一貫性パターン",
+        "description": "システム全体でインターフェース設計を一貫させるためのパターン。",
+        "examples": [
+          {
+            "name": "命名規則",
+            "code": "// インターフェース名は「I」で始める\nexport interface IRepository {}\nexport interface IService {}\n\n// 実装クラス名はインターフェース名から「I」を除いたもの\nexport class Repository implements IRepository {}\nexport class Service implements IService {}"
+          },
+          {
+            "name": "非同期メソッド",
+            "code": "// すべての非同期メソッドはPromiseを返す\nexport interface IRepository {\n  findById(id: string): Promise<Entity>;\n  save(entity: Entity): Promise<void>;\n  delete(id: string): Promise<boolean>;\n}"
+          },
+          {
+            "name": "パラメータ設計",
+            "code": "// 複数パラメータはオブジェクトリテラルでまとめる\nexport interface IUserService {\n  // Before: createUser(firstName: string, lastName: string, email: string): Promise<User>\n  // After:\n  createUser(params: {\n    firstName: string;\n    lastName: string;\n    email: string;\n  }): Promise<User>;\n}"
+          }
+        ],
+        "context": "一貫したインターフェース設計により、コードの可読性、保守性、理解しやすさが向上し、開発者の生産性が高まる。"
+      }
+    ]
+  }
+}

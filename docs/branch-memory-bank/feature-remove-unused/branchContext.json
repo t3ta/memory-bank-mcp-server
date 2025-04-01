@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "ff4b6256-72d5-4ec2-8d18-2a158b436c5a",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-28T19:30:00.000Z",
+    "createdAt": "2025-03-28T06:43:56.886Z",
+    "version": 2
+  },
+  "content": {
+    "branchName": "feature/remove-unused",
+    "purpose": "モノレポ化に伴い、不要になったコードや実装の削除を行う。特にマークダウン関連の遺物やテンプレート機能の中途半端な実装を整理し、コードベースをすっきりさせる。",
+    "createdAt": "2025-03-28T06:43:56.886Z",
+    "userStories": [
+      {
+        "id": "10ea129a-f9ad-47c7-afe1-bf6a89fccbf6",
+        "description": "マークダウン関連の遺物を削除することでコードを簡素化したい",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "234c03bb-770f-4208-8a1b-4b111ccaf45d",
+        "description": "テンプレート関連の中途半端な実装を解消してビルドエラーを解消したい",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "9bfeade0-f326-4245-989c-9a6e299dcae9",
+        "description": "重複するロガー実装を統一し、シンプルな構造にしたい",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": "コードの削除作業においては、参照関係を十分に確認し、不測の問題が発生しないよう注意する。テンプレート関連コードを優先的に削除し、DocumentPathのマークダウン関連メソッドも削除する。migrationディレクトリは将来的に独立パッケージ化する予定のため、現時点では変更しない。"
+  }
+}

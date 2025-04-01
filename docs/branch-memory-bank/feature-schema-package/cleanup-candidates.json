@@ -1,0 +1,108 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "a9b8c7d6-e5f4-3g2h-1i0j-9k8l7m6n5o4",
+    "title": "コード整理候補",
+    "documentType": "cleanup",
+    "path": "cleanup-candidates.json",
+    "tags": [
+      "cleanup",
+      "refactoring",
+      "schema-package"
+    ],
+    "lastModified": "2025-03-27T14:15:18.387Z",
+    "createdAt": "2025-03-27T14:15:18.387Z",
+    "version": 1
+  },
+  "content": {
+    "description": "モノレポ化とスキーマパッケージ化に際して整理すべきコード候補のリスト",
+    "checkProcess": [
+      {
+        "step": "未使用コードの特定",
+        "tools": [
+          "ts-prune を使って未参照のexportを検出",
+          "使用されていないスキーマの特定",
+          "インポートされているが使用されていないコンポーネントの確認"
+        ],
+        "command": "yarn ts-prune -p path/to/tsconfig.json"
+      },
+      {
+        "step": "重複コードの特定",
+        "tools": [
+          "類似した機能を持つ関数やクラスを手動で比較",
+          "リファクタリングによる統合可能性の検討"
+        ]
+      },
+      {
+        "step": "古いバージョンのコードの特定",
+        "tools": [
+          "バージョン管理システムやコメントから古いコードを特定",
+          "使用されなくなった古い実装の確認"
+        ]
+      },
+      {
+        "step": "テストカバレッジの確認",
+        "tools": [
+          "Jest のカバレッジレポート生成",
+          "テストが不足している箇所の特定"
+        ],
+        "command": "yarn test --coverage"
+      }
+    ],
+    "candidates": {
+      "schemas": [
+        {
+          "path": "src/schemas/",
+          "description": "スキーマディレクトリ全体をチェックし、未使用のスキーマ定義を特定",
+          "action": "移行時に参照分析を行い、不要なスキーマを除外"
+        },
+        {
+          "path": "src/schemas/common.ts",
+          "description": "共通スキーマファイルに未使用のヘルパー関数や型がないか確認",
+          "action": "必要なもののみpackages/schemas/に移行"
+        },
+        {
+          "path": "src/schemas/v2/",
+          "description": "v2ディレクトリ内の不要または重複したスキーマ定義をチェック",
+          "action": "コード整理しながら移行"
+        }
+      ],
+      "types": [
+        {
+          "path": "src/shared/types/",
+          "description": "型定義の重複や未使用の型を確認",
+          "action": "スキーマパッケージに移行する型を最適化"
+        }
+      ],
+      "tests": [
+        {
+          "path": "tests/unit/schemas/",
+          "description": "スキーマに関連するテストの網羅性確認",
+          "action": "テストが不足している場合は追加し、packages/schemas/tests/に移行"
+        }
+      ]
+    },
+    "evaluationCriteria": [
+      "参照の有無: コードが他の場所から参照されているか",
+      "重複度: 類似機能を提供する別の実装が存在するか",
+      "最新性: より新しい代替実装が存在するか",
+      "テスト網羅性: 該当コードがテストでカバーされているか",
+      "ドキュメント: 該当コードが仕様やドキュメントで言及されているか"
+    ],
+    "decisionProcess": {
+      "steps": [
+        "候補を特定し、リストアップ",
+        "各候補の使用状況を分析",
+        "削除の影響範囲を評価",
+        "削除または統合の決定",
+        "変更をテストで検証",
+        "変更の適用"
+      ],
+      "stakeholders": [
+        "開発者",
+        "QAエンジニア",
+        "プロジェクト管理者"
+      ]
+    }
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "branch-controller-next-steps",
+    "title": "BranchController移行の次のステップ",
+    "documentType": "plan",
+    "path": "next-steps.json",
+    "tags": [
+      "plan",
+      "implementation",
+      "branch-controller"
+    ],
+    "lastModified": "2025-03-28T05:38:00.000Z",
+    "createdAt": "2025-03-28T05:38:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "summary": "BranchControllerの移行作業中にいくつか問題が発生しました。ファイル編集方法を改善して、安全に作業を進める方法を計画します。",
+    "issues": [
+      {
+        "issue": "apply_text_editによる部分編集で構造が崩れた",
+        "solution": "より小さな単位で編集して、毎回確認する"
+      },
+      {
+        "issue": "ファイルの入れ替えがうまくいかない",
+        "solution": "既存ファイルを残したまま、小さな変更を積み重ねる"
+      }
+    ],
+    "nextSteps": [
+      {
+        "step": "ファイルに必須のインポートとクラス宣言部分だけを書く",
+        "details": "最小限のスケルトンから始める"
+      },
+      {
+        "step": "1つのメソッドずつ実装する",
+        "details": "readDocument, writeDocument, readCoreFiles, writeCoreFiles, getRecentBranchesなど"
+      },
+      {
+        "step": "各メソッド実装後に動作確認する",
+        "details": "コンパイルエラーや型の問題がないことを確認"
+      },
+      {
+        "step": "JsonBranchControllerも同様の手順で移行する",
+        "details": "特定のJSON操作に特化したコントローラーも必要"
+      },
+      {
+        "step": "すべてのメソッド移行後に統合テストを行う",
+        "details": "全体の挙動が元の実装と同等であることを確認"
+      }
+    ],
+    "recommendation": "移行作業は少しずつ慎重に進めるべきです。特に元のコードベースを維持しながら、新しい構造に合わせて調整していく必要があります。完全に全部書き換えるよりも、インクリメンタルに進める方が安全です。次回は1メソッドずつ着実に移行作業を進めましょう。"
+  }
+}

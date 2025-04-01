@@ -1,0 +1,289 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "6c8f91a2-e5d3-4b7f-9c77-12dc3e7a8b2c",
+    "title": "リポジトリリファクタリング計画",
+    "documentType": "plan",
+    "path": "repo-refactoring-plan.json",
+    "tags": [
+      "refactoring",
+      "repository",
+      "design",
+      "clean-architecture"
+    ],
+    "lastModified": "2025-03-29T14:15:00.000Z",
+    "createdAt": "2025-03-29T14:15:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "title": "肥大化リポジトリ分割計画",
+      "description": "FileSystemBranchMemoryBankRepository（871行）とFileSystemGlobalMemoryBankRepository（875行）を責務ごとに分割し、単一責任の原則に準拠した設計に変更する。",
+      "goals": [
+        "単一責任の原則への準拠",
+        "テスト容易性の向上",
+        "拡張性と保守性の改善",
+        "コードの可読性向上"
+      ],
+      "approach": "既存のTagIndexリポジトリ実装（ベースクラス、具体実装、ブリッジ層の分割）パターンを適用する"
+    },
+    "repositoryStructure": {
+      "abstractBase": {
+        "name": "FileSystemMemoryBankRepositoryBase",
+        "description": "両リポジトリ（Branch/Global）に共通する基本機能を提供する抽象基底クラス",
+        "responsibilities": [
+          "ファイルシステムとの基本的なやり取り",
+          "パス解決と検証",
+          "基本的なファイル読み書き操作",
+          "エラーハンドリング共通ロジック"
+        ],
+        "dependencies": [
+          "ILogger",
+          "IFileSystem",
+          "IPathResolver"
+        ]
+      },
+      "operationalComponents": [
+        {
+          "name": "DocumentOperations",
+          "description": "ドキュメント読み書き操作を担当するコンポーネント",
+          "responsibilities": [
+            "単一ドキュメントの読み取り",
+            "ドキュメントの書き込み",
+            "ドキュメントの削除",
+            "ドキュメントのバリデーション"
+          ],
+          "dependencies": [
+            "FileSystemMemoryBankRepositoryBase",
+            "IDocumentValidator"
+          ]
+        },
+        {
+          "name": "TagOperations",
+          "description": "タグ関連操作を担当するコンポーネント",
+          "responsibilities": [
+            "タグインデックスの更新",
+            "タグによる検索",
+            "タグの追加と削除",
+            "タグインデックス最適化"
+          ],
+          "dependencies": [
+            "FileSystemMemoryBankRepositoryBase",
+            "ITagIndexRepository"
+          ]
+        },
+        {
+          "name": "PathOperations",
+          "description": "ファイルパス関連操作を担当するコンポーネント",
+          "responsibilities": [
+            "パス正規化",
+            "パス検証",
+            "ディレクトリ構造管理",
+            "ファイル一覧取得"
+          ],
+          "dependencies": [
+            "FileSystemMemoryBankRepositoryBase",
+            "IPathResolver"
+          ]
+        },
+        {
+          "name": "BulkOperations",
+          "description": "一括操作を担当するコンポーネント",
+          "responsibilities": [
+            "複数ドキュメントの読み取り",
+            "複数ドキュメントの更新",
+            "バッチ処理",
+            "トランザクション的操作"
+          ],
+          "dependencies": [
+            "FileSystemMemoryBankRepositoryBase",
+            "DocumentOperations"
+          ]
+        }
+      ],
+      "facade": [
+        {
+          "name": "FileSystemBranchMemoryBankRepository",
+          "description": "ブランチメモリバンク用のファサード（外部向けインターフェース実装）",
+          "responsibilities": [
+            "IBranchMemoryBankRepositoryインターフェース実装",
+            "適切なコンポーネントへの操作委譲",
+            "ブランチ固有の処理"
+          ],
+          "dependencies": [
+            "DocumentOperations",
+            "TagOperations",
+            "PathOperations",
+            "BulkOperations"
+          ]
+        },
+        {
+          "name": "FileSystemGlobalMemoryBankRepository",
+          "description": "グローバルメモリバンク用のファサード（外部向けインターフェース実装）",
+          "responsibilities": [
+            "IGlobalMemoryBankRepositoryインターフェース実装",
+            "適切なコンポーネントへの操作委譲",
+            "グローバル固有の処理"
+          ],
+          "dependencies": [
+            "DocumentOperations",
+            "TagOperations",
+            "PathOperations",
+            "BulkOperations"
+          ]
+        }
+      ]
+    },
+    "implementationPhases": [
+      {
+        "id": "phase1",
+        "name": "分析と準備",
+        "description": "既存コードの詳細分析と最初のコンポーネント抽出",
+        "tasks": [
+          {
+            "id": "task1-1",
+            "description": "FileSystemBranchMemoryBankRepository最新コードの詳細分析",
+            "estimatedEffort": "中",
+            "done": false
+          },
+          {
+            "id": "task1-2",
+            "description": "FileSystemMemoryBankRepositoryBase抽象基底クラスの作成",
+            "estimatedEffort": "高",
+            "done": false
+          },
+          {
+            "id": "task1-3",
+            "description": "DocumentOperationsコンポーネントの抽出実装",
+            "estimatedEffort": "高",
+            "done": false
+          },
+          {
+            "id": "task1-4",
+            "description": "初期テスト作成とリファクタリング前の動作確認",
+            "estimatedEffort": "中",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "phase2",
+        "name": "コア機能の分割",
+        "description": "残りの主要コンポーネントの抽出と単体テスト",
+        "tasks": [
+          {
+            "id": "task2-1",
+            "description": "TagOperationsコンポーネントの抽出実装",
+            "estimatedEffort": "高",
+            "done": false
+          },
+          {
+            "id": "task2-2",
+            "description": "PathOperationsコンポーネントの抽出実装",
+            "estimatedEffort": "中",
+            "done": false
+          },
+          {
+            "id": "task2-3",
+            "description": "各コンポーネントの単体テスト作成",
+            "estimatedEffort": "高",
+            "done": false
+          },
+          {
+            "id": "task2-4",
+            "description": "ファサードの初期実装（委譲パターン）",
+            "estimatedEffort": "中",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "phase3",
+        "name": "統合と高度機能",
+        "description": "全コンポーネントの統合とBulkOperationsの実装",
+        "tasks": [
+          {
+            "id": "task3-1",
+            "description": "BulkOperationsコンポーネントの実装",
+            "estimatedEffort": "高",
+            "done": false
+          },
+          {
+            "id": "task3-2",
+            "description": "ファサードへの全操作統合（Branch）",
+            "estimatedEffort": "中",
+            "done": false
+          },
+          {
+            "id": "task3-3",
+            "description": "統合テストの作成と実行",
+            "estimatedEffort": "高",
+            "done": false
+          },
+          {
+            "id": "task3-4",
+            "description": "旧実装からの段階的切り替え",
+            "estimatedEffort": "中",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "phase4",
+        "name": "グローバルリポジトリとパフォーマンス最適化",
+        "description": "GlobalRepositoryへの適用とパフォーマンス最適化",
+        "tasks": [
+          {
+            "id": "task4-1",
+            "description": "FileSystemGlobalMemoryBankRepositoryへのパターン適用",
+            "estimatedEffort": "高",
+            "done": false
+          },
+          {
+            "id": "task4-2",
+            "description": "パフォーマンステストと最適化",
+            "estimatedEffort": "中",
+            "done": false
+          },
+          {
+            "id": "task4-3",
+            "description": "最終リファクタリングと冗長コード削除",
+            "estimatedEffort": "中",
+            "done": false
+          },
+          {
+            "id": "task4-4",
+            "description": "ドキュメントの更新とAPIリファレンス作成",
+            "estimatedEffort": "低",
+            "done": false
+          }
+        ]
+      }
+    ],
+    "riskMitigation": [
+      {
+        "risk": "機能の欠落",
+        "strategy": "各フェーズで詳細なテストを行い、既存機能がすべて維持されていることを確認する"
+      },
+      {
+        "risk": "リファクタリング中の回帰",
+        "strategy": "小さな変更単位で進め、各ステップでのテスト実行を徹底する"
+      },
+      {
+        "risk": "パフォーマンス低下",
+        "strategy": "ベンチマークテストを導入し、リファクタリング前後でのパフォーマンス比較を行う"
+      },
+      {
+        "risk": "依存関係の複雑化",
+        "strategy": "依存関係図を常に更新し、循環依存を避ける設計を維持する"
+      }
+    ],
+    "successCriteria": [
+      "すべてのユニットテストが成功すること",
+      "リファクタリング前後で機能的な変更がないこと",
+      "各クラスが明確な単一の責任を持つこと",
+      "コードの可読性と保守性が向上すること",
+      "リファクタリング後もパフォーマンスが維持または向上すること"
+    ]
+  }
+}

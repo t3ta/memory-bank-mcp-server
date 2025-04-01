@@ -1,0 +1,277 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "c9859467-725a-4467-ad02-11c9a184d94e",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress"
+    ],
+    "lastModified": "2025-03-29T11:30:00.000Z",
+    "createdAt": "2025-03-28T11:01:55.756Z",
+    "version": 5
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "wf-template-removal",
+        "description": "テンプレート関連コードの削除（前ブランチで完了）",
+        "implementedAt": "2025-03-28T20:00:00.000Z"
+      },
+      {
+        "id": "wf-refactor-plan",
+        "description": "アーキテクチャリファクタリング計画策定",
+        "implementedAt": "2025-03-29T09:15:00.000Z"
+      },
+      {
+        "id": "wf-domain-dependency-inversion",
+        "description": "ドメインエンティティの依存関係を内側に向ける修正",
+        "implementedAt": "2025-03-29T10:30:00.000Z"
+      },
+      {
+        "id": "wf-documentpath-cleanup",
+        "description": "DocumentPath.tsからMarkdown関連メソッドの削除",
+        "implementedAt": "2025-03-29T12:15:00.000Z"
+      },
+      {
+        "id": "wf-writebranch-fix",
+        "description": "WriteBranchDocumentUseCase.tsのエラー修正",
+        "implementedAt": "2025-03-29T12:20:00.000Z"
+      },
+      {
+        "id": "wf-globalcontroller-readcorefiles",
+        "description": "GlobalControllerのreadCoreFilesメソッドをシンプル化",
+        "implementedAt": "2025-03-29T12:25:00.000Z"
+      },
+      {
+        "id": "wf-providers-cleanup",
+        "description": "providers.tsのテンプレート関連コード削除",
+        "implementedAt": "2025-03-29T12:30:00.000Z"
+      },
+      {
+        "id": "wf-repo-interface-reviewed",
+        "description": "ドメインレイヤーのリポジトリインターフェースレビュー完了",
+        "implementedAt": "2025-03-29T13:15:00.000Z"
+      },
+      {
+        "id": "wf-tagindex-repo-pattern",
+        "description": "TagIndexリポジトリの設計パターン分析",
+        "implementedAt": "2025-03-29T13:30:00.000Z"
+      },
+      {
+        "id": "wf-repo-refactoring-plan",
+        "description": "MemoryBankRepositoryリファクタリング計画策定",
+        "implementedAt": "2025-03-29T13:45:00.000Z"
+      },
+      {
+        "id": "wf-document-logger-di",
+        "description": "依存関係逆転パターンを用いたロギングシステムの修正",
+        "implementedAt": "2025-03-29T14:15:00.000Z"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "pi-layer-boundary",
+        "description": "レイヤー間の責任境界明確化",
+        "priority": "high"
+      },
+      {
+        "id": "pi-interface-unification",
+        "description": "インターフェース設計の一貫性確保",
+        "priority": "high"
+      },
+      {
+        "id": "pi-cross-cutting",
+        "description": "横断的関心事（ロギング、エラーハンドリング）の統合",
+        "priority": "medium"
+      },
+      {
+        "id": "pi-repo-split",
+        "description": "肥大化リポジトリの分割と責務の明確化",
+        "priority": "medium"
+      },
+      {
+        "id": "pi-build-errors",
+        "description": "残りのビルドエラー（特にIndexService.ts）の解消",
+        "priority": "medium"
+      }
+    ],
+    "status": "テンプレート関連コードの削除は完了し、ビルドテストは実行したが77個のエラーが発生。主なエラーはタグインデックス関連の型定義不一致で、IBranchMemoryBankRepositoryとFileSystemBranchMemoryBankRepositoryのgetTagIndexメソッドの返り値型が異なる。モノレポ化とスキーマパッケージ分離に伴う型定義の不整合を解消する必要がある。",
+    "completionPercentage": 70,
+    "knownIssues": [
+      {
+        "id": "ki-tag-index-type-mismatch",
+        "description": "IBranchMemoryBankRepositoryインターフェースとFileSystemBranchMemoryBankRepository実装の間でタグインデックス関連メソッドの型定義が不一致",
+        "severity": "high"
+      },
+      {
+        "id": "ki-layering",
+        "description": "レイヤー間の依存方向が一部逆転している（外側レイヤーへの依存）",
+        "severity": "high"
+      },
+      {
+        "id": "ki-interface-inconsistency",
+        "description": "インターフェース命名規則と設計が一貫していない",
+        "severity": "medium"
+      },
+      {
+        "id": "ki-logging-duplication",
+        "description": "複数のロギング実装が混在している",
+        "severity": "medium"
+      },
+      {
+        "id": "ki-error-inconsistency",
+        "description": "エラーハンドリングパターンが統一されていない",
+        "severity": "medium"
+      },
+      {
+        "id": "ki-build-errors",
+        "description": "残りのビルドエラー（82個）が未解消",
+        "severity": "high"
+      },
+      {
+        "id": "ki-repo-bloat",
+        "description": "FileSystemBranchMemoryBankRepositoryなどリポジトリが肥大化し、単一責任の原則に違反",
+        "severity": "high"
+      },
+      {
+        "id": "ki-repository-bloat",
+        "description": "FileSystemBranchMemoryBankRepository（871行）とFileSystemGlobalMemoryBankRepository（875行）がサイズで肥大化しすぎており、单一責任の原則に違反している",
+        "severity": "high"
+      }
+    ],
+    "completedTasks": [
+      {
+        "id": "ct-template-cleanup-verification",
+        "title": "テンプレート関連コード削除の確認と完了",
+        "description": "テンプレート関連コードの削除作業が完全に完了していることを確認。DocumentPath.tsからisMarkdownとtoAlternateFormatメソッドの削除、WriteBranchDocumentUseCase.tsのバグ修正、GlobalControllerのtemplateController依存の削除、providers.tsからテンプレート関連登録の削除が見つかられないことを確認。ビルドテストを実行し、他のエラーは残っているが、テンプレート関連の問題は解決済み。",
+        "completedAt": "2025-03-29T14:30:00.000Z"
+      },
+      {
+        "id": "ct-template-removal",
+        "title": "テンプレート関連コードの削除完了",
+        "description": "GlobalControllerとproviders.tsからテンプレート関連依存の完全削除を実施。",
+        "completedAt": "2025-03-28T20:00:00.000Z"
+      },
+      {
+        "id": "ct-arch-analysis",
+        "title": "アーキテクチャ課題の分析",
+        "description": "テンプレート削除から見えてきたアーキテクチャ上の不整合点を分析し、主要な課題を特定。",
+        "completedAt": "2025-03-28T20:15:00.000Z"
+      },
+      {
+        "id": "ct-detailed-refactor-plan",
+        "title": "アーキテクチャリファクタリング詳細計画策定",
+        "description": "4つのフェーズから成るリファクタリング計画を策定し、具体的なタスクとデリバラブルを定義。",
+        "completedAt": "2025-03-29T09:15:00.000Z"
+      },
+      {
+        "id": "ct-jsondocument-refactor",
+        "title": "JsonDocumentエンティティのリファクタリング",
+        "description": "外部ライブラリ依存を取り除き、DIパターンを使って実装を完全に分離。IDocumentValidatorインターフェースとZodDocumentValidator実装を追加し、依存方向を正しく（内側に向けて）修正。",
+        "completedAt": "2025-03-29T10:30:00.000Z"
+      },
+      {
+        "id": "ct-documentpath-memorydoc-refactor",
+        "title": "DocumentPathとMemoryDocumentエンティティのリファクタリング",
+        "description": "DocumentPathとMemoryDocumentから外部ライブラリ依存を取り除き、依存関係逆転パターンを適用。IDocumentLoggerインターフェースとDocumentLoggerAdapter実装を追加し、依存方向を正しく（内側に向けて）修正。非推奨のMarkdown関連メソッドも更新。",
+        "completedAt": "2025-03-29T11:30:00.000Z"
+      },
+      {
+        "id": "ct-documentpath-cleanup",
+        "title": "DocumentPath.tsからMarkdown関連メソッドの削除",
+        "description": "テンプレート関連コード削除計画に従い、DocumentPath.tsクラスから非推奨になったisMarkdown()メソッドとtoAlternateFormat()メソッドを削除。Markdownサポートは2.1.0で廃止されているため、関連コードをクリーンアップ。",
+        "completedAt": "2025-03-29T12:15:00.000Z"
+      },
+      {
+        "id": "ct-writebranch-fix",
+        "title": "WriteBranchDocumentUseCase.tsのエラー修正",
+        "description": "WriteBranchDocumentUseCase.tsで定義されていない変数(existingDocument)を参照しているバグを修正。適切なドキュメント取得処理を追加してexistingDocument変数を正しく初期化。",
+        "completedAt": "2025-03-29T12:20:00.000Z"
+      },
+      {
+        "id": "ct-globalcontroller-readcorefiles",
+        "title": "GlobalControllerのreadCoreFilesメソッドをシンプル化",
+        "description": "テンプレート関連コード削除計画に従い、GlobalControllerのreadCoreFilesメソッドからtemplateController依存を完全に除去。代わりに直接コアファイルを読み込むシンプルな実装に変更。",
+        "completedAt": "2025-03-29T12:25:00.000Z"
+      },
+      {
+        "id": "ct-providers-cleanup",
+        "title": "providers.tsのテンプレート関連コード削除完了",
+        "description": "テンプレート関連コード削除計画に従い、providers.tsからtemplateRepositoryとtemplateServiceなどの登録を完全に削除。markdownMigrationServiceにはモック実装を提供して互換性を保持。",
+        "completedAt": "2025-03-29T12:30:00.000Z"
+      },
+      {
+        "id": "ct-repo-interface-review",
+        "title": "ドメインレイヤーのリポジトリインターフェースレビュー",
+        "completedAt": "2025-03-29T13:15:00.000Z",
+        "description": "ドメインレイヤーのリポジトリインターフェース（IBranchMemoryBankRepository、IGlobalMemoryBankRepository、ITagIndexRepository、IJsonDocumentRepository、IMemoryDocumentRepository）をレビュー。予想よりもクリーンな設計になっており、外部依存がほとんど見つからない。代わりに、IDocumentValidatorのようなインターフェースを使ってドメインと外部実装が分帯されていることを確認。"
+      },
+      {
+        "id": "ct-tagindex-repo-review",
+        "title": "TagIndexリポジトリ実装の設計パターンレビュー",
+        "completedAt": "2025-03-29T13:30:00.000Z",
+        "description": "FileSystemTagIndexRepositoryの実装設計パターンを分析。ベースクラス、具体実装、ブリッジ層に分割した軽量な設計になっていることを確認。このパターンを他の大規模クラスにも適用すべきだと判断。"
+      },
+      {
+        "id": "ct-repo-refactoring-plan",
+        "title": "MemoryBankRepositoryリファクタリング計画の策定",
+        "completedAt": "2025-03-29T13:45:00.000Z",
+        "description": "FileSystemBranchMemoryBankRepositoryとFileSystemGlobalMemoryBankRepositoryの肥大化問題を解決するためのリファクタリング計画を作成。責任別に分割された軽量なコンポーネント群を設計し、コンポジションパターンを用いて組み合わせるアプローチを詳細化。"
+      },
+      {
+        "id": "ct-document-logger-di",
+        "title": "ロギング機能に依存関係逆転パターンを適用",
+        "completedAt": "2025-03-29T14:15:00.000Z",
+        "description": "MemoryDocumentから共有loggerへの直接依存を解消するため、ドメイン層にIDocumentLoggerインターフェースを作成し、インフラ層にDocumentLoggerAdapterを実装。これによりドメインエンティティが外部実装に依存せずにロギング機能を使用可能に。"
+      },
+      {
+        "id": "ct-markdown-cleanup",
+        "title": "テンプレート関連コードとMarkdown関連メソッドの削除",
+        "description": "DocumentPath.tsからisMarkdown()メソッドとtoAlternateFormat()メソッドを削除。WriteBranchDocumentUseCase.tsのバグも修正（branchInfoの二重定義、existingDocumentのif条件文、未使用変数）。GlobalControllerとproviders.tsはすでに対応済みだった。",
+        "completedAt": "2025-03-28T12:30:00.000Z"
+      }
+    ],
+    "upcomingMilestones": [
+      {
+        "id": "um-layer-fix",
+        "title": "レイヤー間の依存方向修正完了",
+        "description": "クリーンアーキテクチャの原則に従い、依存方向を内側に向ける修正を完了",
+        "dueDate": "2025-03-30",
+        "status": "planned"
+      },
+      {
+        "id": "um-build-error-fix",
+        "title": "ビルドエラー解消",
+        "description": "残っている82個のビルドエラーを解消し、ビルド成功を達成",
+        "dueDate": "2025-03-31",
+        "status": "planned"
+      },
+      {
+        "id": "um-interface-unified",
+        "title": "インターフェース設計の統一",
+        "description": "すべてのインターフェースが一貫した命名規則と設計に従うよう修正",
+        "dueDate": "2025-04-01",
+        "status": "planned"
+      }
+    ],
+    "references": [
+      {
+        "file": "repo-refactoring-plan.json",
+        "description": "MemoryBankRepositoryリファクタリングの詳細計画",
+        "created_at": "2025-03-29T13:45:00.000Z"
+      },
+      {
+        "file": "cleanup-plan.json",
+        "description": "テンプレート関連コードの削除計画",
+        "created_at": "2025-03-28"
+      },
+      {
+        "file": "schema-package-type-issues.json",
+        "description": "スキーマパッケージ移行による型定義不整合の問題分析",
+        "created_at": "2025-03-29T15:00:00.000Z"
+      }
+    ]
+  }
+}

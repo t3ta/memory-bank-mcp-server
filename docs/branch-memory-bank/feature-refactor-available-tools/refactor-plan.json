@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "title": "AVAILABLE_TOOLSリファクタリング計画",
+    "description": "src/index.tsのAVAILABLE_TOOLSをわかりやすくするためのリファクタリング計画",
+    "author": "みらい",
+    "createdAt": "2025-03-26"
+  },
+  "content": {
+    "currentIssues": [
+      "ツールの定義が一気に長く並んでいて見づらい",
+      "各ツールの定義がインラインで書かれており構造がわかりにくい",
+      "スキーマの部分がネストしすぎていて把握しづらい",
+      "共通パターンの繰り返しが多く、DRYの原則に反している"
+    ],
+    "improvementPlan": [
+      "ツール定義を別ファイルに分離する",
+      "共通のスキーマ定義を再利用可能にする",
+      "ツール間で共通するプロパティ定義をまとめる",
+      "型安全性を高める"
+    ],
+    "implementationApproach": {
+      "step1": "共通のツール定義インターフェースを作成",
+      "step2": "共通のスキーマコンポーネントを作成",
+      "step3": "各ツールを個別の変数や関数で定義",
+      "step4": "メインのindex.tsでツールを集約して登録"
+    },
+    "sampleCode": {
+      "toolInterface": "interface Tool { name: string; description: string; inputSchema: object; }",
+      "schemaComponents": "const createBasicProperties = () => ({ ... })",
+      "toolDefinition": "const createListToolsTool = (): Tool => ({ ... })",
+      "registration": "const AVAILABLE_TOOLS = [createListToolsTool(), ...]"
+    }
+  }
+}

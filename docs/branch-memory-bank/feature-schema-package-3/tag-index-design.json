@@ -1,0 +1,124 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "tag-index-design-v1",
+    "title": "タグインデックス設計見直し方針",
+    "documentType": "design",
+    "path": "tag-index-design.json",
+    "tags": [
+      "design",
+      "refactoring",
+      "tag-index",
+      "architecture"
+    ],
+    "lastModified": "2025-03-29T08:20:00.000Z",
+    "createdAt": "2025-03-29T08:20:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "title": "タグインデックス設計の明確化と統一",
+      "description": "現在のタグインデックス実装における曖昧さを解消し、コードの一貫性と保守性を向上させるための設計方針。",
+      "goals": [
+        "BranchTagIndexとGlobalTagIndexの役割と責任範囲を明確に分離する",
+        "関連するインターフェースと実装の型シグネチャを一貫させる",
+        "不要となった古い形式のタグインデックス関連コードを削除する"
+      ]
+    },
+    "designDecisions": [
+      {
+        "id": "dd-index-type-separation",
+        "title": "BranchTagIndexとGlobalTagIndexの厳密な分離",
+        "decision": "`BranchTagIndex` はブランチ固有のタグ情報のみを扱い、`GlobalTagIndex` はプロジェクト全体のタグ情報のみを扱うように役割を明確に分離する。",
+        "rationale": "現状のコード（特に `TagOperations.ts`）では、ブランチ操作メソッドの型指定が `BranchTagIndex | GlobalTagIndex` となっており曖昧。役割を明確にすることで、コードの意図が理解しやすくなり、バグのリスクも低減できる。"
+      },
+      {
+        "id": "dd-branch-method-type-unification",
+        "title": "ブランチ関連メソッドの型指定統一",
+        "decision": "`TagOperations.ts` および `IBranchMemoryBankRepository.ts` におけるブランチ関連メソッド（例: `getBranchTagIndex`, `saveBranchTagIndex`）の型シグネチャを、`BranchTagIndex` 型のみを使用するように修正する。",
+        "examples": [
+          "`getBranchTagIndex`: 戻り値を `Promise<BranchTagIndex | null>` に変更",
+          "`saveBranchTagIndex`: 引数を `index: BranchTagIndex` に変更"
+        ],
+        "rationale": "`dd-index-type-separation` の決定に基づき、ブランチ操作がブランチ固有のインデックスのみを扱うことをコードレベルで保証するため。"
+      },
+      {
+        "id": "dd-deprecate-legacy-index",
+        "title": "古い形式のタグインデックスの廃止",
+        "decision": "古い形式のタグインデックスファイル (`tags/index.json`, `tags/index.md`) およびそれらを更新する `TagOperations.updateLegacyTagsIndex` メソッドを完全に廃止・削除する。",
+        "rationale": "現在の主要なインデックス形式 (`_global_index.json`, `_index.json`) と役割が重複しており、不要な複雑性を生んでいるため。互換性の維持が不要であれば削除が望ましい。（ユーザー確認済み）"
+      },
+      {
+        "id": "dd-fix-index-generation-logic",
+        "title": "インデックス生成ロジックの修正",
+        "decision": "`generateBranchTagIndex` および `generateGlobalTagIndex` メソッド内で、`index` プロパティをスキーマ定義 (`TagEntry[]`) に準拠した形式で構築するように修正する。具体的には、タグごとに `TagEntry` オブジェクトを作成し、その `documents` 配列に `DocumentReference` を追加するロジックに変更する。",
+        "rationale": "現在の実装では `index` プロパティを `Record<string, string[]>` として扱っており、スキーマ定義と矛盾しているため。この修正により、型安全性が向上し、スキーマ定義との一貫性が保たれる。"
+      }
+    ],
+    "affectedComponents": [
+      {
+        "component": "`TagOperations.ts`",
+        "changes": [
+          "`getBranchTagIndex` メソッドの戻り値型を修正",
+          "`saveBranchTagIndex` メソッドの引数型を修正",
+          "`updateLegacyTagsIndex` メソッドを削除"
+        ]
+      },
+      {
+        "component": "`IBranchMemoryBankRepository.ts`",
+        "changes": [
+          "関連するメソッドの型シグネチャを `BranchTagIndex` を使用するように修正"
+        ]
+      },
+      {
+        "component": "`BulkOperations.ts`",
+        "changes": [
+          "`updateLegacyTagsIndex` の呼び出し箇所を削除"
+        ]
+      },
+      {
+        "component": "関連するテストコード",
+        "changes": [
+          "型シグネチャの変更に合わせてテストコードを修正",
+          "削除されたメソッドに関連するテストを削除または修正"
+        ]
+      },
+      {
+        "component": "`TagOperations.ts` (generate...Index メソッド)",
+        "changes": [
+          "インデックス構築ロジックを `TagEntry[]` 形式に修正"
+        ]
+      }
+    ],
+    "implementationPlan": {
+      "description": "以下の手順で実装を進める（Codeモードでの作業）",
+      "steps": [
+        {
+          "id": "step1",
+          "action": "`TagOperations.ts` の `getBranchTagIndex`, `saveBranchTagIndex` の型シグネチャを `BranchTagIndex` に修正する。"
+        },
+        {
+          "id": "step2",
+          "action": "`IBranchMemoryBankRepository.ts` の関連メソッドの型シグネチャを修正する。"
+        },
+        {
+          "id": "step3",
+          "action": "`TagOperations.ts` から `updateLegacyTagsIndex` メソッドを削除する。"
+        },
+        {
+          "id": "step4",
+          "action": "`BulkOperations.ts` から `updateLegacyTagsIndex` の呼び出し箇所を削除する。"
+        },
+        {
+          "id": "step5",
+          "action": "関連するユニットテストを修正し、すべてのテストがパスすることを確認する。"
+        },
+        {
+          "id": "step6",
+          "action": "`generateBranchTagIndex` と `generateGlobalTagIndex` のインデックス構築ロジックを修正する。"
+        }
+      ]
+    },
+    "nextSteps": "この設計ドキュメントに基づき、Codeモードに切り替えて実装作業を行う。"
+  }
+}

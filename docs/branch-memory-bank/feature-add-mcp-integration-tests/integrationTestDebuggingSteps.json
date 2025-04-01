@@ -1,0 +1,133 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "integration-test-debugging-steps",
+    "title": "統合テストデバッグのステップ",
+    "documentType": "analysis",
+    "path": "integrationTestDebuggingSteps.json",
+    "tags": [
+      "integration-tests",
+      "debugging",
+      "analysis",
+      "fix"
+    ],
+    "lastModified": "2025-03-31T18:30:00.000Z",
+    "createdAt": "2025-03-31T18:30:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": "統合テスト実行に関する問題（SIGINT問題は解決済み）について、残りのテスト失敗を解決するためのステップ計画です。",
+    "currentStatus": {
+      "sigintFix": "成功：--forceExitフラグとafterAllフックの追加により、VSCodeターミナルで連続実行できるようになりました。",
+      "testResults": "部分的成功：8テストスイート中7つがパス、1つが失敗しています。39テスト中35がパス、4が失敗しています。"
+    },
+    "remainingIssues": [
+      {
+        "id": "issue-1",
+        "description": "WriteBranchDocumentUseCaseの統合テストが失敗",
+        "specificTests": [
+          "正常系: 新規ブランチの作成と同時に文書が作成できること"
+        ],
+        "errorSource": "新規ブランチのディレクトリ作成処理で問題が発生",
+        "file": "FileSystemBranchMemoryBankRepository.ts:301:28",
+        "testFile": "usecase/WriteBranchDocumentUseCase.integration.test.ts:182:7"
+      }
+    ],
+    "rootCauseAnalysis": {
+      "summary": "問題の根本原因は、テスト環境での「新規ブランチの自動作成」機能において、safeBranchName変換とディレクトリ作成処理の不一致があることです。テストでは'feature/new-branch-test-auto-init'というブランチ名を使っていますが、この処理で'/'が'-'に置換されるため、リポジトリ内部の処理と一致しない状態になっています。",
+      "details": [
+        "test-env.tsのcreateBranchDir関数では'/'を'-'に変換する",
+        "テスト内では元のブランチ名（'/'を含む）を使用してwriteUseCaseを呼び出す",
+        "自動ブランチ作成処理ではこの変換が適切に行われていない可能性がある",
+        "ファイルシステムの安全なパス処理の問題のため、期待した場所にディレクトリが作成されない"
+      ]
+    },
+    "debuggingSteps": [
+      {
+        "id": "step-1",
+        "description": "自動ブランチ作成処理の確認",
+        "details": "WriteBranchDocumentUseCaseで新規ブランチが自動作成される処理を見直し、safeBranchName変換の一貫性を確認します。",
+        "priority": "high"
+      },
+      {
+        "id": "step-2",
+        "description": "テスト環境のブランチ名処理を修正",
+        "details": "テスト時のブランチ名処理とリポジトリの実装で一貫した変換が行われるようにします。両方の実装で同じロジックを使うよう調整します。",
+        "priority": "high"
+      },
+      {
+        "id": "step-3",
+        "description": "テストの期待値を調整",
+        "details": "新規ブランチの自動作成テストについて、期待する動作を明確にし、必要に応じてテストケースを修正します。",
+        "priority": "medium"
+      },
+      {
+        "id": "step-4",
+        "description": "デバッグログの追加",
+        "details": "問題発生箇所にデバッグログを追加して、実際のパス解決や変換結果を詳細に把握できるようにします。",
+        "priority": "medium"
+      }
+    ],
+    "proposedFixes": [
+      {
+        "id": "fix-1",
+        "title": "テスト内のブランチ名処理を実装と合わせる",
+        "description": "テスト内でもsafeBranchNameを使用してリポジトリを呼び出すか、または両方の実装で一貫した変換ロジックを使用するよう修正します。",
+        "implementation": {
+          "file1": "test-env.ts",
+          "changes1": "createBranchDir関数内のsafeBranchName変換ロジックを外部関数として切り出し、再利用可能にする",
+          "file2": "WriteBranchDocumentUseCase.integration.test.ts",
+          "changes2": "テスト内で同じブランチ名変換ロジックを使用するか、安全なブランチ名を明示的に渡す"
+        },
+        "priority": "high"
+      },
+      {
+        "id": "fix-2",
+        "title": "ブランチ自動作成機能のロバスト化",
+        "description": "WriteBranchDocumentUseCaseのブランチ自動作成処理で、ブランチ名変換の一貫性を確保し、エラーハンドリングを改善します。",
+        "implementation": {
+          "file": "WriteBranchDocumentUseCase.ts",
+          "changes": "ブランチが存在しない場合の処理で、safeBranchName変換を明示的に行い、エラーのより詳細な診断情報を提供する"
+        },
+        "priority": "medium"
+      },
+      {
+        "id": "fix-3",
+        "title": "テスト時のブランチ名に関する明確なドキュメント追加",
+        "description": "テスト用のブランチ名の制約や変換ルールを文書化し、テストケース作成時の参考にします。",
+        "implementation": {
+          "file": "README.md",
+          "changes": "テスト環境でのブランチ名処理に関する注意事項を追加"
+        },
+        "priority": "low"
+      }
+    ],
+    "implementationPlan": {
+      "step1": {
+        "title": "ブランチ名変換ロジックを統一",
+        "tasks": [
+          "test-env.tsからブランチ名変換ロジックを抽出して共通関数化",
+          "同じロジックをリポジトリとテストコードで使用するよう修正"
+        ],
+        "timeEstimate": "30分"
+      },
+      "step2": {
+        "title": "テストケースの修正",
+        "tasks": [
+          "問題のあるテストケースで正しいブランチ名変換を使用",
+          "期待値の調整（もし必要なら）"
+        ],
+        "timeEstimate": "20分"
+      },
+      "step3": {
+        "title": "テストとデバッグ",
+        "tasks": [
+          "修正したコードでテストを実行",
+          "必要に応じてさらに修正を行う"
+        ],
+        "timeEstimate": "20分"
+      }
+    },
+    "conclusion": "統合テスト実行の問題は主にブランチ名の変換処理の一貫性の問題に起因しています。テスト環境とリポジトリ実装の間でブランチ名の変換ロジックを統一することで、この問題は解決できると考えられます。SIGINT問題は解決済みなので、これらの修正を行えば、統合テストが安定して実行できるようになるでしょう。"
+  }
+}

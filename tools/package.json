@@ -1,0 +1,14 @@
+{
+  "name": "schema-package-analyzer",
+  "version": "1.0.0",
+  "description": "TS-morph based schema package analyzer",
+  "type": "commonjs",
+  "main": "bin/analyze-schema-package.ts",
+  "scripts": {
+    "analyze": "ts-node bin/analyze-schema-package.ts"
+  },
+  "dependencies": {
+    "ts-morph": "^19.0.0",
+    "ts-node": "^10.9.1"
+  }
+}

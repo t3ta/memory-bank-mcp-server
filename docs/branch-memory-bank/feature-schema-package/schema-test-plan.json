@@ -1,0 +1,268 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+    "title": "スキーマテスト計画",
+    "documentType": "test_plan",
+    "path": "schema-test-plan.json",
+    "tags": [
+      "test",
+      "schema",
+      "package",
+      "quality"
+    ],
+    "lastModified": "2025-03-27T17:15:00.000Z",
+    "createdAt": "2025-03-27T17:15:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "description": "@memory-bank/schemasパッケージのテスト設計と実装計画",
+      "goals": [
+        "すべてのスキーマ定義が期待通りに機能することを確認する",
+        "テストカバレッジを90%以上に維持する",
+        "将来の変更に対する回帰テストを提供する",
+        "型安全性を保証する"
+      ]
+    },
+    "testStrategy": {
+      "approach": "各スキーマ機能に対してユニットテストを記述し、jest/ts-jestを使用して実行します。既存のテストを移行しつつ、新しいテストを追加して網羅性を向上させます。",
+      "framework": "Jest + ts-jest",
+      "configuration": "ESMモジュールに対応した設定で実行します。jest.config.jsで適切な設定を行います。"
+    },
+    "testCategories": [
+      {
+        "name": "共通スキーマテスト",
+        "description": "タグスキーマ、柔軟な日付スキーマなどの基本的なスキーマのテスト",
+        "files": [
+          "tests/common/schemas.test.ts"
+        ],
+        "scenarios": [
+          "有効なタグ値の検証",
+          "無効なタグ値の拒否",
+          "日付文字列からDateオブジェクトへの変換",
+          "無効な日付形式の拒否"
+        ]
+      },
+      {
+        "name": "v2 JSONドキュメントスキーマテスト",
+        "description": "V2 JSONドキュメント構造のスキーマバリデーションテスト",
+        "files": [
+          "tests/v2/json-document.test.ts"
+        ],
+        "scenarios": [
+          "ドキュメントメタデータの検証",
+          "基本JSONドキュメントの検証",
+          "特定のドキュメントタイプ（BranchContext, ActiveContext, Progressなど）の検証",
+          "無効なドキュメントの拒否",
+          "カスタムバリデーションロジックの動作確認"
+        ]
+      },
+      {
+        "name": "v2 タグインデックススキーマテスト",
+        "description": "タグインデックス構造のスキーマバリデーションテスト",
+        "files": [
+          "tests/v2/tag-index.test.ts"
+        ],
+        "scenarios": [
+          "ドキュメント参照の検証",
+          "タグエントリの検証",
+          "ブランチ特有のタグインデックスの検証",
+          "グローバルタグインデックスの検証",
+          "インデックスのメタデータ検証"
+        ]
+      },
+      {
+        "name": "型定義テスト",
+        "description": "エクスポートされた型定義が期待通りに機能するかのテスト",
+        "files": [
+          "tests/types/index.test.ts"
+        ],
+        "scenarios": [
+          "ValidationErrorTypeの型チェック",
+          "ValidationResultの型チェック"
+        ]
+      },
+      {
+        "name": "統合テスト",
+        "description": "複数のスキーマコンポーネントを組み合わせた統合テスト",
+        "files": [
+          "tests/integration.test.ts"
+        ],
+        "scenarios": [
+          "実際のドキュメント例の検証",
+          "相互参照を持つ複雑なドキュメント構造の検証",
+          "エッジケースのハンドリング"
+        ]
+      }
+    ],
+    "testCases": {
+      "v2JsonDocumentTests": [
+        {
+          "id": "json-doc-test-1",
+          "description": "有効なドキュメントメタデータの検証",
+          "input": {
+            "title": "テストドキュメント",
+            "documentType": "test",
+            "id": "123e4567-e89b-12d3-a456-426614174000",
+            "path": "test-path.json",
+            "tags": [
+              "test",
+              "example"
+            ],
+            "lastModified": "2025-03-27T12:00:00Z",
+            "createdAt": "2025-03-27T10:00:00Z",
+            "version": 1
+          },
+          "expected": true
+        },
+        {
+          "id": "json-doc-test-2",
+          "description": "必須フィールドが欠けたメタデータの検証",
+          "input": {
+            "title": "テストドキュメント",
+            "documentType": "test",
+            "id": "123e4567-e89b-12d3-a456-426614174000",
+            "path": "test-path.json"
+          },
+          "expected": false
+        },
+        {
+          "id": "json-doc-test-3",
+          "description": "無効なUUIDのメタデータの検証",
+          "input": {
+            "title": "テストドキュメント",
+            "documentType": "test",
+            "id": "invalid-uuid",
+            "path": "test-path.json",
+            "tags": [
+              "test"
+            ],
+            "lastModified": "2025-03-27T12:00:00Z",
+            "createdAt": "2025-03-27T10:00:00Z",
+            "version": 1
+          },
+          "expected": false
+        }
+      ],
+      "tagIndexTests": [
+        {
+          "id": "tag-index-test-1",
+          "description": "有効なブランチタグインデックスの検証",
+          "input": {
+            "schema": "tag_index_v1",
+            "metadata": {
+              "indexType": "branch",
+              "branchName": "feature/test",
+              "lastUpdated": "2025-03-27T12:00:00Z",
+              "documentCount": 2,
+              "tagCount": 3
+            },
+            "index": [
+              {
+                "tag": "test",
+                "documents": [
+                  {
+                    "id": "123e4567-e89b-12d3-a456-426614174000",
+                    "path": "doc1.json",
+                    "title": "ドキュメント1",
+                    "lastModified": "2025-03-27T10:00:00Z"
+                  }
+                ]
+              }
+            ]
+          },
+          "expected": true
+        },
+        {
+          "id": "tag-index-test-2",
+          "description": "無効なタグを含むインデックスの検証",
+          "input": {
+            "schema": "tag_index_v1",
+            "metadata": {
+              "indexType": "branch",
+              "branchName": "feature/test",
+              "lastUpdated": "2025-03-27T12:00:00Z",
+              "documentCount": 1,
+              "tagCount": 1
+            },
+            "index": [
+              {
+                "tag": "Invalid Tag",
+                "documents": []
+              }
+            ]
+          },
+          "expected": false
+        }
+      ]
+    },
+    "implementationPlan": {
+      "tasks": [
+        {
+          "id": "1",
+          "description": "existing-schemas.testの複製・拡張",
+          "estimatedTime": "30分",
+          "status": "planned"
+        },
+        {
+          "id": "2",
+          "description": "v2/json-document.test.tsの作成",
+          "estimatedTime": "60分",
+          "status": "planned"
+        },
+        {
+          "id": "3",
+          "description": "v2/tag-index.test.tsの作成",
+          "estimatedTime": "45分",
+          "status": "planned"
+        },
+        {
+          "id": "4",
+          "description": "types/index.test.tsの作成",
+          "estimatedTime": "30分",
+          "status": "planned"
+        },
+        {
+          "id": "5",
+          "description": "integration.test.tsの作成",
+          "estimatedTime": "60分",
+          "status": "planned"
+        },
+        {
+          "id": "6",
+          "description": "テストカバレッジレポートの設定と確認",
+          "estimatedTime": "30分",
+          "status": "planned"
+        }
+      ],
+      "dependencies": [
+        {
+          "task": "2",
+          "dependsOn": [
+            "1"
+          ]
+        },
+        {
+          "task": "3",
+          "dependsOn": [
+            "1"
+          ]
+        },
+        {
+          "task": "5",
+          "dependsOn": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ]
+        }
+      ]
+    },
+    "testExamples": {
+      "commonSchemasTest": "```typescript\nimport { FlexibleDateSchema, TagSchema } from '../../src/common/schemas.js';\n\ndescribe('FlexibleDateSchema', () => {\n  it('should accept Date objects', () => {\n    const date = new Date();\n    const result = FlexibleDateSchema.safeParse(date);\n    expect(result.success).toBe(true);\n  });\n\n  it('should accept ISO date strings', () => {\n    const dateString = '2025-03-27T12:00:00Z';\n    const result = FlexibleDateSchema.safeParse(dateString);\n    expect(result.success).toBe(true);\n    if (result.success) {\n      expect(result.data).toBeInstanceOf(Date);\n    }\n  });\n\n  it('should reject invalid date strings', () => {\n    const invalidDate = 'not-a-date';\n    const result = FlexibleDateSchema.safeParse(invalidDate);\n    expect(result.success).toBe(false);\n  });\n});\n```",
+      "jsonDocumentTest": "```typescript\nimport { DocumentMetadataV2Schema, BranchContextJsonV2Schema } from '../../src/v2/json-document.js';\n\ndescribe('DocumentMetadataV2Schema', () => {\n  it('should validate correct metadata', () => {\n    const validMetadata = {\n      title: 'Test Document',\n      documentType: 'test',\n      id: '123e4567-e89b-12d3-a456-426614174000',\n      path: 'test/document.json',\n      tags: ['test', 'example'],\n      lastModified: new Date(),\n      createdAt: new Date(),\n      version: 1\n    };\n    \n    const result = DocumentMetadataV2Schema.safeParse(validMetadata);\n    expect(result.success).toBe(true);\n  });\n  \n  it('should reject metadata with missing required fields', () => {\n    const invalidMetadata = {\n      title: 'Test Document',\n      // missing documentType, id, etc.\n    };\n    \n    const result = DocumentMetadataV2Schema.safeParse(invalidMetadata);\n    expect(result.success).toBe(false);\n    if (!result.success) {\n      expect(result.error.issues.length).toBeGreaterThan(0);\n    }\n  });\n});\n```"
+    }
+  }
+}

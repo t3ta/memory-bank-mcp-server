@@ -1,0 +1,89 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "552bb314-8714-4953-a8d8-1b9a25914bec",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "system-patterns"
+    ],
+    "lastModified": "2025-03-27T13:30:48.270Z",
+    "createdAt": "2025-03-27T12:56:48.270Z",
+    "version": 2
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "ef8731ae-07c0-4e60-9410-7c84838564d2",
+        "title": "workspaceオプションの撤廃",
+        "context": "workspaceオプションはdocs指定と並行して生まれた概念だが、現在ではほとんど使われておらず、すでにdeprecatedマークがされている。コードの簡素化と一貫性のために完全に削除する。",
+        "decision": "workspaceオプションに関する全てのコードを削除し、代わりにdocsオプションのみを使用するように統一する。",
+        "consequences": {
+          "positive": [
+            "コードの複雑さが減少する",
+            "設定関連のロジックがシンプルになる",
+            "パスの解決が一貫したものになる",
+            "新規開発者にとって理解しやすいコードになる"
+          ],
+          "negative": [
+            "workspaceオプションを使用している古いスクリプトがあれば修正が必要",
+            "下位互換性が失われる可能性がある"
+          ]
+        },
+        "status": "proposed",
+        "date": "2025-03-27T13:30:48.270Z",
+        "alternatives": [
+          "workspaceオプションを維持し、単に内部的に非推奨化する",
+          "工程を分けて段階的に撤廃する"
+        ]
+      }
+    ],
+    "implementationPatterns": [
+      {
+        "id": "ip-001",
+        "title": "configプロバイダーパターン",
+        "description": "設定情報の提供は全てConfigProviderに集約されている。設定に関する変更はこのクラスを中心に行う。",
+        "codeExamples": [
+          {
+            "language": "typescript",
+            "code": "export class ConfigProvider implements IConfigProvider {\n  async initialize(options?: CliOptions): Promise<WorkspaceConfig> {\n    // ...\n  }\n}"
+          }
+        ],
+        "relatedFiles": [
+          "/Users/t3ta/workspace/memory-bank-mcp-server/src/infrastructure/config/ConfigProvider.ts",
+          "/Users/t3ta/workspace/memory-bank-mcp-server/src/infrastructure/config/WorkspaceConfig.ts",
+          "/Users/t3ta/workspace/memory-bank-mcp-server/src/infrastructure/config/interfaces/IConfigProvider.ts"
+        ]
+      },
+      {
+        "id": "ip-002",
+        "title": "CLIオプションパターン",
+        "description": "コマンドラインオプションはyargsライブラリを使用して管理されている。オプションの追加・削除はsrc/index.tsで行う。",
+        "codeExamples": [
+          {
+            "language": "typescript",
+            "code": "const argv = yargs(hideBin(process.argv))\n  .option('docs', {\n    alias: 'd',\n    type: 'string',\n    description: 'Path to docs directory',\n    default: './docs',\n  })\n  .option('workspace', {\n    alias: 'w',\n    type: 'string',\n    description: 'Path to workspace directory (deprecated)',\n    deprecated: true,\n    hidden: true\n  })\n  .help()\n  .parseSync();"
+          }
+        ],
+        "relatedFiles": [
+          "/Users/t3ta/workspace/memory-bank-mcp-server/src/index.ts"
+        ]
+      },
+      {
+        "id": "ip-003",
+        "title": "パス解決パターン",
+        "description": "ファイルパスの解決はresolveDocsRoot関数で統一的に行われている。この関数がパスの優先順位を決定する。",
+        "codeExamples": [
+          {
+            "language": "typescript",
+            "code": "export function resolveDocsRoot(toolDocs?: string) {\n  // 優先順位:\n  // 1. ツールパラメータ\n  // 2. コマンドラインオプション\n  // 3. 環境変数\n  // 4. デフォルト値\n  if (toolDocs) {\n    return toolDocs;\n  }\n  if (argv.docs) {\n    return argv.docs as string;\n  }\n  // ...\n}"
+          }
+        ],
+        "relatedFiles": [
+          "/Users/t3ta/workspace/memory-bank-mcp-server/src/index.ts"
+        ]
+      }
+    ]
+  }
+}

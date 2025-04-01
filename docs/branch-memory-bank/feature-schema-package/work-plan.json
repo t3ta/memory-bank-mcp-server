@@ -1,0 +1,262 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "f1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+    "title": "スキーマパッケージ化の作業計画",
+    "documentType": "plan",
+    "path": "work-plan.json",
+    "tags": [
+      "plan",
+      "schema-package",
+      "monorepo"
+    ],
+    "lastModified": "2025-03-28T00:20:00.000Z",
+    "createdAt": "2025-03-28T00:20:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "description": "スキーマパッケージ化とモノレポ化を完了させるための残りの作業計画",
+      "currentStatus": "フェーズ10実装中 - コントローラー実装の移行が進行中、GlobalControllerの移行完了"
+    },
+    "prioritizedTasks": [
+      {
+        "id": "task-1",
+        "title": "残りのスキーマインポートの修正",
+        "description": "src/schemas/から@memory-bank/schemasへのインポート参照を修正する",
+        "steps": [
+          "1. src/schemas/index.tsの内容を確認",
+          "2. 古いインポートパスを使用しているファイルを特定（GrepTool結果を参照）",
+          "3. 各ファイルを修正して新しいインポートパスに更新",
+          "4. インポートの種類に応じて適切に修正（src/schemas/→@memory-bank/schemas, src/schemas/v2/→@memory-bank/schemas/v2/）"
+        ],
+        "estimatedTime": "60分",
+        "priority": "high"
+      },
+      {
+        "id": "task-2",
+        "title": "MCPパッケージのsrcディレクトリ構造のセットアップ",
+        "description": "MCPパッケージのソースディレクトリ構造を作成し、基本的なエントリポイントを設定",
+        "steps": [
+          "1. 既存のsrcディレクトリ構造を確認",
+          "2. packages/mcp/srcに同様のディレクトリ構造を作成",
+          "3. 主要なエントリポイントファイル（index.ts）を作成",
+          "4. 基本的なタイプ定義や設定ファイルを作成"
+        ],
+        "estimatedTime": "30分",
+        "priority": "high"
+      },
+      {
+        "id": "task-3",
+        "title": "既存コードのMCPパッケージへの移行",
+        "description": "既存のソースコードをMCPパッケージに移動し、インポートパスを調整",
+        "steps": [
+          "1. 既存のsrcディレクトリからpackages/mcp/srcに主要なファイルをコピー",
+          "2. ファイル内のインポートパスを新しい構造に合わせて調整",
+          "3. @memory-bank/schemasへの参照を確認",
+          "4. 必要に応じてtsconfig.jsonの設定を調整"
+        ],
+        "estimatedTime": "90分",
+        "priority": "medium",
+        "dependencies": [
+          "task-1",
+          "task-2"
+        ]
+      },
+      {
+        "id": "task-4",
+        "title": "パッケージのビルドテスト",
+        "description": "各パッケージとモノレポ全体のビルドを実行し、エラーを修正",
+        "steps": [
+          "1. schemasパッケージのビルドを実行（yarn build:schemas）",
+          "2. mcpパッケージのビルドを実行（yarn build:mcp）",
+          "3. 全体のビルドを実行（yarn build）",
+          "4. 発生するエラーを特定し修正"
+        ],
+        "estimatedTime": "45分",
+        "priority": "medium",
+        "dependencies": [
+          "task-3"
+        ]
+      },
+      {
+        "id": "task-5",
+        "title": "テスト実行と検証",
+        "description": "ユニットテストを実行し、動作を検証",
+        "steps": [
+          "1. schemasパッケージのテストを実行（yarn test:schemas）",
+          "2. mcpパッケージのテストを実行（yarn test:mcp）",
+          "3. 全体のテストを実行（yarn test）",
+          "4. テスト失敗があれば修正"
+        ],
+        "estimatedTime": "30分",
+        "priority": "medium",
+        "dependencies": [
+          "task-4"
+        ]
+      },
+      {
+        "id": "task-6",
+        "title": "E2Eテストと最終検証",
+        "description": "実際の動作環境でE2Eテストを実行し、最終検証を行う",
+        "steps": [
+          "1. devモードでアプリケーション起動（yarn dev）",
+          "2. 基本機能の動作確認",
+          "3. 統合テストの実行（yarn test:integration）",
+          "4. 本番環境用のビルドと動作確認"
+        ],
+        "estimatedTime": "30分",
+        "priority": "low",
+        "dependencies": [
+          "task-5"
+        ]
+      }
+    ],
+    "filesToFocus": [
+      {
+        "path": "src/schemas/index.ts",
+        "reason": "このファイルが現在も参照されていて、修正が必要"
+      },
+      {
+        "path": "src/index.ts",
+        "reason": "メインエントリポイント、MCPパッケージに移行必要"
+      },
+      {
+        "path": "src/domain/entities/JsonDocument.ts",
+        "reason": "すでに@memory-bank/schemasへの参照が追加されている良いサンプル"
+      }
+    ],
+    "importPatterns": [
+      {
+        "oldPattern": "from '../schemas/common.js'",
+        "newPattern": "from '@memory-bank/schemas'",
+        "explanation": "共通スキーマは直接パッケージルートからエクスポートされている"
+      },
+      {
+        "oldPattern": "from '../schemas/v2/json-document.js'",
+        "newPattern": "from '@memory-bank/schemas/v2'",
+        "explanation": "v2スキーマは/v2サブディレクトリからエクスポートされている"
+      },
+      {
+        "oldPattern": "import * as V2 from '../schemas/v2/index.js'",
+        "newPattern": "import * as V2 from '@memory-bank/schemas/v2'",
+        "explanation": "名前空間インポートのパターン"
+      }
+    ],
+    "directoryStructure": {
+      "mcp": [
+        "src/ - ソースコード",
+        "src/application/ - アプリケーション層",
+        "src/domain/ - ドメイン層",
+        "src/infrastructure/ - インフラ層",
+        "src/interface/ - インターフェース層",
+        "src/main/ - アプリケーションのメインエントリポイント",
+        "src/tools/ - ユーティリティツール",
+        "src/types.ts - 共通型定義",
+        "src/index.ts - メインエクスポート"
+      ]
+    },
+    "risksAndMitigations": [
+      {
+        "risk": "インポートパスの修正漏れによるビルドエラー",
+        "mitigation": "grep検索で徹底的に検出し、一度に全てのファイルを修正する"
+      },
+      {
+        "risk": "循環参照の発生",
+        "mitigation": "パッケージ間の明確な責任境界を設定し、依存関係を一方向に保つ"
+      },
+      {
+        "risk": "ビルド後の実行時エラー",
+        "mitigation": "ユニットテストに加えて、統合テストとE2Eテストで実行時の動作を検証"
+      },
+      {
+        "risk": "パッケージ間の型定義の不一致",
+        "mitigation": "共通の型は全てschemasパッケージで定義し、そこから参照する設計にする"
+      }
+    ],
+    "testingStrategy": {
+      "description": "パッケージ構造変更後のテスト戦略",
+      "approaches": [
+        "各パッケージのユニットテストを個別に実行（yarn test:schemas, yarn test:mcp）",
+        "全パッケージの統合テストを実行（yarn test）",
+        "手動でのエンドツーエンドテスト（主要機能の動作確認）"
+      ],
+      "coverageGoals": "schemasパッケージは90%以上、mcpパッケージは80%以上のコードカバレッジを目指す"
+    },
+    "successCriteria": [
+      "全てのスキーマインポートが@memory-bank/schemasを参照している",
+      "MCPパッケージのsrcディレクトリに必要なコードが移行されている",
+      "yarn buildでエラーなくビルドできる",
+      "yarn testで全てのテストが成功する",
+      "APIが正常に動作し、基本機能が利用できる"
+    ],
+    "nextPhase": {
+      "phaseTitle": "基本構造の作成完了、新フェーズへ",
+      "description": "基本的なモノレポ構造とパッケージ設定が完了しました。次のフェーズでは既存のコードを機能単位でMCPパッケージに移行していく作業を進めます。",
+      "completedTasks": [
+        "スキーマパッケージの基本構造を作成",
+        "MCPパッケージの基本構造を作成",
+        "ビルド環境と依存関係を設定",
+        "モノレポ全体のビルドを成功させる"
+      ],
+      "nextFocusAreas": [
+        "既存コードの移行手順を決定",
+        "テスト環境の整備",
+        "既存のsrc/index.tsを新しいパッケージを使うように修正"
+      ]
+    },
+    "inProgressTasks": [
+      {
+        "id": "task-controller-1",
+        "title": "コントローラーの移行",
+        "description": "コントローラー実装をMCPパッケージに移行する",
+        "steps": [
+          "1. GlobalControllerの移行（完了）",
+          "2. BranchControllerの移行（未完了）",
+          "3. ContextControllerの移行（未完了）",
+          "4. TemplateControllerの移行（未完了）",
+          "5. MCPResponsePresenter実装クラスの移行（未完了）"
+        ],
+        "progress": 20,
+        "priority": "high",
+        "dependencies": []
+      }
+    ],
+    "nextTasks": [
+      {
+        "id": "next-task-1",
+        "title": "BranchControllerの移行",
+        "description": "BranchController実装をMCPパッケージに移行する",
+        "steps": [
+          "1. 必要な依存型がすべて提供されているか確認",
+          "2. BaseError、DomainErrorの参照を修正",
+          "3. 各種インポートパスを修正",
+          "4. 各種エラークラスの使用を統一"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "next-task-2",
+        "title": "ContextControllerの移行",
+        "description": "ContextController実装をMCPパッケージに移行する",
+        "steps": [
+          "1. 必要な依存型がすべて提供されているか確認",
+          "2. インポートパスを修正",
+          "3. エラーハンドリングを統一"
+        ],
+        "priority": "medium"
+      },
+      {
+        "id": "next-task-3",
+        "title": "MCPResponsePresenter実装クラスの移行",
+        "description": "MCPResponsePresenter実装クラスを移行する",
+        "steps": [
+          "1. MCPResponsePresenterの実装クラスをコピー",
+          "2. インポートパスを修正",
+          "3. コントローラークラスが使えるようにする"
+        ],
+        "priority": "high"
+      }
+    ]
+  }
+}

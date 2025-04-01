@@ -1,0 +1,176 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "7b6a5c4d-3e2f-1d0c-9b8a-7c6d5e4f3b2a",
+    "title": "ロガー使用一貫性改善計画",
+    "documentType": "plan",
+    "path": "logger-consistency-plan.json",
+    "tags": [
+      "improvement",
+      "logging",
+      "mcp"
+    ],
+    "lastModified": "2025-03-30T05:40:32.360Z",
+    "createdAt": "2025-03-30T05:40:32.360Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "title": "MCP-1: ロガー使用の一貫性確保",
+      "description": "すべてのコンポーネントでcomponentLoggerを一貫して使用するための詳細実装計画。直接loggerを使用している箇所をすべてcomponentLoggerに置き換え、構造化ロギングの質を向上させる。"
+    },
+    "currentState": {
+      "description": "現在、多くのコンポーネントではcomponentLoggerが定義されているにもかかわらず、実際のログ出力で直接loggerを使用している箇所が多い。これにより、コンポーネント固有のコンテキスト情報が継承されず、ログの質が低下している。",
+      "examples": [
+        "// コンポーネントロガーは定義されているが...\nprivate readonly componentLogger = logger.withContext({\n  component: 'BranchController'\n});\n\n// 実際のコードでは直接loggerを使用している\nlogger.info('Reading branch document', { branchName, path });"
+      ],
+      "affectedFiles": [
+        "BranchController.ts",
+        "GlobalController.ts",
+        "FileSystemBranchMemoryBankRepository.ts"
+      ]
+    },
+    "targetState": {
+      "description": "すべてのログ出力でcomponentLoggerを一貫して使用し、各操作に関連するコンテキスト情報（操作名、リソース識別子など）を常に付与する。これにより、ログの追跡性と分析性が向上する。",
+      "examples": [
+        "// コンポーネントロガーの定義\nprivate readonly componentLogger = logger.withContext({\n  component: 'BranchController'\n});\n\n// コンポーネントロガーの一貫した使用\nthis.componentLogger.info('Reading branch document', { \n  operation: 'readDocument',\n  branchName: branchInfo.name, \n  path: document.path.value\n});"
+      ],
+      "standardContext": [
+        "component: コンポーネント名",
+        "operation: 実行中の操作名",
+        "resourceType: 操作対象のリソースタイプ",
+        "resourceId: 操作対象のリソース識別子"
+      ]
+    },
+    "implementationPlan": {
+      "fileUpdates": [
+        {
+          "path": "/packages/mcp/src/interface/controllers/BranchController.ts",
+          "changes": [
+            {
+              "type": "検索",
+              "pattern": "logger.info",
+              "description": "すべてのlogger.info呼び出しをthis.componentLogger.info呼び出しに変更"
+            },
+            {
+              "type": "検索",
+              "pattern": "logger.error",
+              "description": "すべてのlogger.error呼び出しをthis.componentLogger.error呼び出しに変更"
+            },
+            {
+              "type": "検索",
+              "pattern": "logger.debug",
+              "description": "すべてのlogger.debug呼び出しをthis.componentLogger.debug呼び出しに変更"
+            },
+            {
+              "type": "検索",
+              "pattern": "logger.warn",
+              "description": "すべてのlogger.warn呼び出しをthis.componentLogger.warn呼び出しに変更"
+            },
+            {
+              "type": "拡張",
+              "description": "各ログメッセージに操作名（operation）を追加"
+            }
+          ]
+        },
+        {
+          "path": "/packages/mcp/src/interface/controllers/GlobalController.ts",
+          "changes": [
+            {
+              "type": "検索",
+              "pattern": "logger.info",
+              "description": "すべてのlogger.info呼び出しをthis.componentLogger.info呼び出しに変更"
+            },
+            {
+              "type": "検索",
+              "pattern": "logger.error",
+              "description": "すべてのlogger.error呼び出しをthis.componentLogger.error呼び出しに変更"
+            },
+            {
+              "type": "検索",
+              "pattern": "logger.debug",
+              "description": "すべてのlogger.debug呼び出しをthis.componentLogger.debug呼び出しに変更"
+            },
+            {
+              "type": "検索",
+              "pattern": "logger.warn",
+              "description": "すべてのlogger.warn呼び出しをthis.componentLogger.warn呼び出しに変更"
+            },
+            {
+              "type": "拡張",
+              "description": "各ログメッセージに操作名（operation）を追加"
+            }
+          ]
+        },
+        {
+          "path": "/packages/mcp/src/infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.ts",
+          "changes": [
+            {
+              "type": "検索",
+              "pattern": "logger.info",
+              "description": "すべてのlogger.info呼び出しをthis.componentLogger.info呼び出しに変更"
+            },
+            {
+              "type": "検索",
+              "pattern": "logger.error",
+              "description": "すべてのlogger.error呼び出しをthis.componentLogger.error呼び出しに変更"
+            },
+            {
+              "type": "検索",
+              "pattern": "logger.debug",
+              "description": "すべてのlogger.debug呼び出しをthis.componentLogger.debug呼び出しに変更"
+            },
+            {
+              "type": "検索",
+              "pattern": "logger.warn",
+              "description": "すべてのlogger.warn呼び出しをthis.componentLogger.warn呼び出しに変更"
+            },
+            {
+              "type": "追加",
+              "description": "componentLoggerが未定義の場合は定義を追加",
+              "code": "private readonly componentLogger = logger.withContext({\n  component: 'FileSystemBranchMemoryBankRepository'\n});"
+            },
+            {
+              "type": "拡張",
+              "description": "各ログメッセージにリソース情報（branchName, path）を追加"
+            }
+          ]
+        }
+      ],
+      "additionalFiles": [],
+      "templateExamples": [
+        {
+          "operation": "読み取り操作",
+          "template": "this.componentLogger.info('Reading document', { \n  operation: 'readDocument',\n  branchName: branchInfo.name, \n  path: document.path.value,\n  documentType: document.determineDocumentType()\n});"
+        },
+        {
+          "operation": "書き込み操作",
+          "template": "this.componentLogger.info('Writing document', { \n  operation: 'saveDocument',\n  branchName: branchInfo.name, \n  path: document.path.value,\n  documentType: document.determineDocumentType()\n});"
+        },
+        {
+          "operation": "エラー状況",
+          "template": "this.componentLogger.error('Failed to process document', { \n  operation: 'processDocument',\n  branchName: branchInfo.name, \n  path: document.path.value,\n  error: ErrorUtils.formatForLogging(error)\n});"
+        }
+      ]
+    },
+    "testingPlan": {
+      "approach": "ユニットテストとロギング検証",
+      "verificationSteps": [
+        "1. モックロガーを使用してログ出力を検証するテストを追加または更新",
+        "2. 各コントローラーメソッドがcomponentLoggerを使用していることを確認",
+        "3. ログメッセージに必要なコンテキスト情報が含まれていることを検証"
+      ],
+      "mockExample": "// ログ出力検証用モック\nconst mockComponentLogger = {\n  info: jest.fn(),\n  error: jest.fn(),\n  debug: jest.fn(),\n  warn: jest.fn()\n};\n\n// テスト内でモックを設定\nconst controller = new BranchController(...);\n(controller as any).componentLogger = mockComponentLogger;\n\n// テスト後に検証\nexpect(mockComponentLogger.info).toHaveBeenCalledWith(\n  'Reading branch document',\n  expect.objectContaining({\n    operation: 'readDocument',\n    branchName: 'feature/test'\n  })\n);"
+    },
+    "benefits": [
+      "ログの一貫性と品質向上",
+      "トラブルシューティングの効率化",
+      "操作の追跡性向上",
+      "ログフィルタリングの効率化"
+    ],
+    "dependencies": [
+      "shared/utils/logger.ts - 既存のロガーインターフェース",
+      "shared/utils/ErrorUtils.ts - エラーフォーマット関数"
+    ]
+  }
+}

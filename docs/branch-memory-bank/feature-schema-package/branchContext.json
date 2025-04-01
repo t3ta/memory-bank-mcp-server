@@ -1,0 +1,50 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "1520faca-c57b-4a30-be67-e682e6bded4c",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-27T13:38:18.386Z",
+    "createdAt": "2025-03-27T13:26:18.386Z",
+    "version": 2
+  },
+  "content": {
+    "branchName": "feature/schema-package",
+    "purpose": "スキーマ関連のコードを外部パッケージとして切り出し、再利用性と保守性を向上させる。また、リポジトリ全体をモノレポ化してVSCode拡張などの将来的なパッケージ開発に備える",
+    "createdAt": "2025-03-27T13:26:18.386Z",
+    "userStories": [
+      {
+        "id": "378b347e-010c-41b7-b3bd-85be016458f7",
+        "description": "スキーマをモノレポ内の独立したnpmパッケージとして切り出したい",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "b9df6b77-111f-44cd-aed6-e539812a4ecf",
+        "description": "スキーマパッケージを他のプロジェクトからも簡単に利用できるようにしたい",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "1b72465b-1534-4422-9dad-c7262a51b89c",
+        "description": "VSCode拡張を開発しやすくするための、モノレポ構造を実現したい",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": "スキーマパッケージ化とモノレポ対応によって、コードの再利用性と拡張性を高める。リポジトリ名を'memory-bank'に変更し、パッケージ名を'@memory-bank/schemas'、'@memory-bank/mcp'などとすることで一貫性を持たせる。また、将来的なVSCode拡張の開発も同じリポジトリ内で行えるようにする。",
+    "repositoryStructure": {
+      "current": "memory-bank-mcp-server/",
+      "proposed": "memory-bank/",
+      "packages": [
+        "packages/schemas/ - スキーマ定義パッケージ",
+        "packages/mcp/ - MCPエンジン（現在のmcp-server）",
+        "packages/vscode-extension/ - 将来的なVSCode拡張"
+      ]
+    }
+  }
+}

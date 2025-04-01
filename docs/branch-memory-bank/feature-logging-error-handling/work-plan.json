@@ -1,0 +1,24 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "work-plan-logging-error-adoption",
+    "title": "作業計画 - ロギング・エラーハンドリング全体適用",
+    "documentType": "plan",
+    "path": "work-plan.json",
+    "tags": [
+      "plan",
+      "logging",
+      "error-handling",
+      "adoption"
+    ],
+    "lastModified": "2025-03-30T00:00:00.000Z",
+    "createdAt": "2025-03-29T16:01:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "objective": "統一されたロギングとエラーハンドリングパターンをコードベース全体に適用する",
+    "referencePlan": "global-adoption-plan.json",
+    "nextStepSuggestion": "Codeモードに移行し、global-adoption-plan.json に基づいて高優先度のファイルから実装を開始する",
+    "status": "ready_for_implementation"
+  }
+}

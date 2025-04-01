@@ -1,0 +1,101 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "6688089b-bd05-4e4b-9474-76743196edbe",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context"
+    ],
+    "lastModified": "2025-03-29T20:40:00.000Z",
+    "createdAt": "2025-03-29T13:45:00.000Z",
+    "version": 5
+  },
+  "content": {
+    "currentWork": "インターフェース設計の一貫性確保と命名規則統一が完了した。すべてのインターフェースが「I」プレフィックスを持ち、非同期メソッドはPromise<T>を返すように統一され、複数パラメータのメソッドはオブジェクトリテラル型を使用するように修正された。次は横断的関心事（ロギング、エラーハンドリング）の統合を進める。",
+    "recentChanges": [
+      {
+        "date": "2025-03-29T20:40:00.000Z",
+        "description": "インターフェース設計の一貫性確保と命名規則統一が完了。すべてのインターフェースの「I」プレフィックス、メソッドシグネチャの統一、パラメータ設計の標準化が実施された"
+      },
+      {
+        "date": "2025-03-29T18:30:00.000Z",
+        "description": "すべてのビルドエラーが解消され、TypeScriptコンパイルが正常に通るようになった"
+      },
+      {
+        "date": "2025-03-29T18:00:00.000Z",
+        "description": "タグインデックス設計の実装完了。TagOperations.tsのエラー（TagIndexインポート、createFromJson呼び出し、暗黙的any、未使用パラメータ）とBulkOperations.tsの警告（不要なawait）が解消された"
+      },
+      {
+        "date": "2025-03-29T14:30:00.000Z",
+        "description": "リポジトリ分割の実装が完了。FileSystemGlobalMemoryBankRepository、FileSystemMemoryBankRepositoryBase、DocumentOperations、TagOperations、PathOperations、BulkOperationsの各クラスが実装された"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "ad-small-edits",
+        "description": "大きなファイルの変更は小さく分割して実施し、各ステップでテストを行う"
+      },
+      {
+        "id": "ad-interface-naming-rules",
+        "description": "全インターフェースを「I」で始める命名規則に統一し、メソッドシグネチャも一貫させる"
+      },
+      {
+        "id": "ad-deprecate-legacy-tag-index",
+        "description": "古い形式のタグインデックス（tags/index.json, tags/index.md）および関連する updateLegacyTagsIndex メソッドを廃止する"
+      },
+      {
+        "id": "ad-completed-build-errors",
+        "description": "すべてのビルドエラーが解消されたことを確認"
+      },
+      {
+        "id": "ad-parameter-design",
+        "description": "3つ以上のパラメータを持つメソッドはオブジェクトリテラル型を使用するように統一する"
+      },
+      {
+        "id": "ad-async-promise",
+        "description": "非同期メソッドはすべてPromise<T>を返すように統一する"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "con-error-handling",
+        "description": "エラーハンドリングパターンの統一をどの程度優先するか検討が必要",
+        "status": "open"
+      },
+      {
+        "id": "con-test-strategy",
+        "description": "リファクタリング中のテスト戦略（どのテストをいつ実行するか）",
+        "status": "open"
+      },
+      {
+        "id": "con-missing-unit-tests",
+        "description": "TagOperations および FileSystemGlobalMemoryBankRepository に関連するユニットテストが見つからなかった。今回の修正に対するテストは未実施。",
+        "status": "open"
+      },
+      {
+        "id": "con-logging-standardization",
+        "description": "複数のロギング実装を統一する方針（shared/utils/logger を標準とするか）",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "ns-cross-cutting",
+        "description": "横断的関心事（ロギング、エラーハンドリング）の統合を実装する",
+        "priority": "high"
+      },
+      {
+        "id": "ns-logging-refactor",
+        "description": "ロギング実装を shared/utils/logger に統一するリファクタリングを行う",
+        "priority": "high"
+      },
+      {
+        "id": "ns-error-handling",
+        "description": "エラーハンドリングパターンを統一し、共通のエラー基底クラスを整備する",
+        "priority": "medium"
+      }
+    ]
+  }
+}

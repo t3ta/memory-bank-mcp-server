@@ -1,0 +1,248 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "54021e23-264a-4692-8f78-7a67de43fd2e",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress",
+      "logging",
+      "error-handling"
+    ],
+    "lastModified": "2025-03-30T00:00:00.000Z",
+    "createdAt": "2025-03-29T21:00:00.000Z",
+    "version": 2
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "wf-logging-improvement",
+        "status": "completed",
+        "description": "shared/utils/loggerの機能強化"
+      },
+      {
+        "id": "wf-error-hierarchy",
+        "status": "completed",
+        "description": "エラークラス階層の整理と強化"
+      },
+      {
+        "id": "wf-error-factories",
+        "status": "completed",
+        "description": "基本的なエラーファクトリメソッドの実装"
+      },
+      {
+        "id": "wf-error-utils",
+        "status": "completed",
+        "description": "ErrorUtilsの実装"
+      },
+      {
+        "id": "wf-example-use-case",
+        "status": "completed",
+        "description": "ReadBranchDocumentUseCaseの実装"
+      },
+      {
+        "id": "wf-file-system-service",
+        "status": "in-progress",
+        "description": "FileSystemServiceの実装状況 - 権限エラーファクトリーメソッドが必要"
+      },
+      {
+        "id": "wf-branch-repo",
+        "status": "in-progress",
+        "description": "FileSystemBranchMemoryBankRepositoryの実装状況 - ファイルシステムエラーファクトリーメソッドが必要"
+      },
+      {
+        "id": "wf-branch-controller",
+        "status": "in-progress",
+        "description": "BranchControllerの実装状況 - loggerの置き換えとファクトリーメソッド適用が必要"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "pi-permission-denied",
+        "status": "pending",
+        "priority": "high",
+        "description": "InfrastructureErrors.permissionDeniedファクトリーメソッドの追加"
+      },
+      {
+        "id": "pi-file-system-error",
+        "status": "pending",
+        "priority": "high",
+        "description": "InfrastructureErrors.fileSystemErrorファクトリーメソッドの追加"
+      },
+      {
+        "id": "pi-domain-errors",
+        "status": "pending",
+        "priority": "high",
+        "description": "DomainErrorsの各種ファクトリーメソッドの追加"
+      },
+      {
+        "id": "pi-application-errors",
+        "status": "pending",
+        "priority": "high",
+        "description": "ApplicationErrorsの各種ファクトリーメソッドの追加"
+      },
+      {
+        "id": "pi-branch-controller-logger",
+        "status": "pending",
+        "priority": "high",
+        "description": "BranchControllerでの直接logger使用をcomponentLoggerに置き換え"
+      },
+      {
+        "id": "pi-global-controller",
+        "status": "pending",
+        "priority": "high",
+        "description": "GlobalControllerの実装状況改善"
+      },
+      {
+        "id": "pi-medium-priority",
+        "status": "pending",
+        "priority": "medium",
+        "description": "中優先度ファイル（WriteJsonDocumentUseCase等）の実装"
+      },
+      {
+        "id": "pi-error-documentation",
+        "status": "pending",
+        "priority": "medium",
+        "description": "エラーコードの整理とドキュメント化"
+      },
+      {
+        "id": "pi-log-guidelines",
+        "status": "pending",
+        "priority": "medium",
+        "description": "ログレベル使用ガイドラインの策定"
+      },
+      {
+        "id": "pi-tests",
+        "status": "pending",
+        "priority": "low",
+        "description": "ロギングとエラーハンドリングのテスト強化"
+      }
+    ],
+    "status": "ロギングとエラーハンドリングの基本実装は完了。高優先度ファイルへの適用が進行中。各種ファクトリーメソッドの追加実装が必要。",
+    "completionPercentage": 75,
+    "knownIssues": [
+      {
+        "id": "ki-missing-factory-methods",
+        "severity": "high",
+        "description": "権限エラーやファイルシステムエラーなどのファクトリーメソッドが不足している",
+        "status": "unresolved"
+      },
+      {
+        "id": "ki-direct-logger-usage",
+        "severity": "medium",
+        "description": "BranchControllerでコンポーネントロガーが定義されているにも関わらず直接loggerが使用されている",
+        "status": "unresolved"
+      },
+      {
+        "id": "ki-logger-factory-usage",
+        "severity": "low",
+        "description": "LoggerFactoryは非推奨化済みだが、まだ大部分の箇所で移行が完了していない",
+        "status": "unresolved"
+      },
+      {
+        "id": "ki-test-logger-mock",
+        "severity": "medium",
+        "description": "テスト環境でのロガーモックが新しい実装に対応していない",
+        "status": "unresolved"
+      },
+      {
+        "id": "ki-logger-level-inconsistency",
+        "severity": "low",
+        "description": "ログレベルの使用基準が明確でなく、不適切なレベルでのロギングが見られる",
+        "status": "unresolved"
+      }
+    ],
+    "completedTasks": [
+      {
+        "id": "ct-logger-extension",
+        "description": "shared/utils/loggerの機能強化",
+        "completedAt": "2025-03-29T22:00:00.000Z"
+      },
+      {
+        "id": "ct-logger-factory-deprecation",
+        "description": "LoggerFactoryの非推奨化と移行ガイダンスの追加",
+        "completedAt": "2025-03-29T22:15:00.000Z"
+      },
+      {
+        "id": "ct-document-logger-adapter",
+        "description": "DocumentLoggerAdapterの改善",
+        "completedAt": "2025-03-29T22:30:00.000Z"
+      },
+      {
+        "id": "ct-base-error",
+        "description": "BaseErrorクラスの強化",
+        "completedAt": "2025-03-29T22:45:00.000Z"
+      },
+      {
+        "id": "ct-error-hierarchy",
+        "description": "エラークラス階層の整理",
+        "completedAt": "2025-03-29T23:00:00.000Z"
+      },
+      {
+        "id": "ct-basic-error-factories",
+        "description": "基本的なエラーファクトリメソッドの実装",
+        "completedAt": "2025-03-29T23:15:00.000Z"
+      },
+      {
+        "id": "ct-error-utils",
+        "description": "ErrorUtilsの実装",
+        "completedAt": "2025-03-29T23:20:00.000Z"
+      },
+      {
+        "id": "ct-sample-use-case",
+        "description": "ReadBranchDocumentUseCaseの実装",
+        "completedAt": "2025-03-29T23:25:00.000Z"
+      }
+    ],
+    "upcomingMilestones": [
+      {
+        "id": "um-core-implementation",
+        "title": "基盤実装完了",
+        "description": "ロギングとエラーハンドリングの基盤実装",
+        "dueDate": "2025-03-29",
+        "status": "completed"
+      },
+      {
+        "id": "um-factory-methods-implementation",
+        "title": "ファクトリーメソッド実装",
+        "description": "必要な全てのファクトリーメソッドの追加",
+        "dueDate": "2025-04-03",
+        "status": "pending"
+      },
+      {
+        "id": "um-high-priority-files",
+        "title": "高優先度ファイル実装",
+        "description": "高優先度ファイルへの適用完了",
+        "dueDate": "2025-04-07",
+        "status": "in-progress"
+      },
+      {
+        "id": "um-documentation",
+        "title": "ドキュメント整備",
+        "description": "エラーコード一覧とロギングガイドラインの作成",
+        "dueDate": "2025-04-10",
+        "status": "pending"
+      },
+      {
+        "id": "um-all-files-implementation",
+        "title": "全ファイル実装",
+        "description": "コードベース全体への適用完了",
+        "dueDate": "2025-04-15",
+        "status": "pending"
+      }
+    ],
+    "references": [
+      {
+        "title": "実装サマリー",
+        "path": "implementation-summary.json",
+        "description": "実装の詳細と移行ガイド"
+      },
+      {
+        "title": "現状サマリー",
+        "path": "current-status-summary.json",
+        "description": "現在の作業状況と次のステップの詳細"
+      }
+    ]
+  }
+}

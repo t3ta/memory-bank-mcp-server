@@ -1,0 +1,97 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "markdown-cleanup-execution-plan",
+    "title": "BranchControllerのマークダウン遺物クリーンアップ実行計画",
+    "documentType": "plan",
+    "path": "controller-cleanup-execution-plan.json",
+    "tags": [
+      "plan",
+      "cleanup",
+      "implementation",
+      "markdown"
+    ],
+    "lastModified": "2025-03-28T15:05:00.000Z",
+    "createdAt": "2025-03-28T15:05:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "description": "BranchControllerからマークダウン時代の遺物を削除し、コードをJSON専用の実装に簡素化するための詳細な実行計画。markdown-cleanup-plan.jsonに基づいて実装する。",
+      "targetFile": "/Users/t3ta/workspace/memory-bank-mcp-server/packages/mcp/src/interface/controllers/BranchController.ts",
+      "currentStatus": "プライベートのパース・生成メソッドは既に削除済み（コメントあり）だが、readCoreFilesメソッドとwriteCoreFilesメソッド内にまだマークダウン関連のコードが残っている。"
+    },
+    "cleanupTasks": [
+      {
+        "id": "task-1",
+        "title": "readCoreFilesメソッドの簡素化",
+        "description": "readCoreFilesメソッド内の拡張子関連コードを削除し、JSON専用の実装に簡素化する",
+        "changes": [
+          {
+            "lineNumbers": "184-187",
+            "currentCode": "      // Assume .json extension for all core files\n      const extension = '.json';\n      logger.debug(`Using .json extension for core files in branch ${branchName}`);",
+            "newCode": "      // Core files are always using .json extension\n      const extension = '.json';",
+            "reason": "拡張子の選択ロジックを削除し、.json固定であることを明示"
+          },
+          {
+            "lineNumbers": "195-199",
+            "currentCode": "        const fileName = `activeContext${extension}`;\n        formattedResult[fileName] = {\n          path: fileName,\n          // Stringify the JSON object received from the use case\n          content: JSON.stringify(result.files.activeContext, null, 2),",
+            "newCode": "        const fileName = 'activeContext.json';\n        formattedResult[fileName] = {\n          path: fileName,\n          // Stringify the JSON object received from the use case\n          content: JSON.stringify(result.files.activeContext, null, 2),",
+            "reason": "変数の使用をやめて直接文字列を使用することで、拡張子の選択がないことを明確化"
+          },
+          {
+            "lineNumbers": "207-211",
+            "currentCode": "        const fileName = `progress${extension}`;\n        formattedResult[fileName] = {\n          path: fileName,\n          // Stringify the JSON object received from the use case\n          content: JSON.stringify(result.files.progress, null, 2),",
+            "newCode": "        const fileName = 'progress.json';\n        formattedResult[fileName] = {\n          path: fileName,\n          // Stringify the JSON object received from the use case\n          content: JSON.stringify(result.files.progress, null, 2),",
+            "reason": "変数の使用をやめて直接文字列を使用することで、拡張子の選択がないことを明確化"
+          },
+          {
+            "lineNumbers": "219-223",
+            "currentCode": "        const fileName = `systemPatterns${extension}`;\n        formattedResult[fileName] = {\n          path: fileName,\n          // Stringify the JSON object received from the use case\n          content: JSON.stringify(result.files.systemPatterns, null, 2),",
+            "newCode": "        const fileName = 'systemPatterns.json';\n        formattedResult[fileName] = {\n          path: fileName,\n          // Stringify the JSON object received from the use case\n          content: JSON.stringify(result.files.systemPatterns, null, 2),",
+            "reason": "変数の使用をやめて直接文字列を使用することで、拡張子の選択がないことを明確化"
+          },
+          {
+            "lineNumbers": "232-233",
+            "currentCode": "      const branchFileName = `branchContext${extension}`; // extension is always '.json' now\n      try {",
+            "newCode": "      const branchFileName = 'branchContext.json'; // Always using .json format\n      try {",
+            "reason": "変数の使用をやめて直接文字列を使用することで、拡張子の選択がないことを明確化"
+          }
+        ]
+      },
+      {
+        "id": "task-2",
+        "title": "不要なコメント削除",
+        "description": "マークダウン時代の名残を示すコメントを削除",
+        "changes": [
+          {
+            "lineNumbers": "232",
+            "currentCode": "      const branchFileName = `branchContext${extension}`; // extension is always '.json' now",
+            "newCode": "      const branchFileName = 'branchContext.json';",
+            "reason": "既に.json固定であることが明白なので、余分なコメントを削除"
+          }
+        ]
+      }
+    ],
+    "testingSteps": [
+      {
+        "id": "test-1",
+        "description": "変更後のコードがビルド可能かチェック",
+        "command": "cd /Users/t3ta/workspace/memory-bank-mcp-server && yarn build",
+        "expectedOutcome": "ビルドエラーなし"
+      },
+      {
+        "id": "test-2",
+        "description": "readCoreFilesの機能が正しく動作するかチェック",
+        "approach": "簡易的な統合テストで確認（開発用エンドポイントを使用）",
+        "expectedOutcome": "コアファイルが正常に読み取れる"
+      }
+    ],
+    "riskAssessment": {
+      "riskLevel": "low",
+      "justification": "すでにマークダウン形式は非推奨であり、JSONが標準。主要なメソッドはすでに削除されており、今回は残りの拡張子チェックなどの簡素化のみが対象。",
+      "fallbackPlan": "問題発生時は元に戻して段階的に変更する"
+    },
+    "completionCriteria": "BranchControllerのreadCoreFilesとwriteCoreFilesメソッドが.json形式のみを明示的に扱うようになり、余分なチェックやマークダウン関連の処理が全て削除されている"
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "progress-integrated-interface",
+    "title": "インターフェース統一化の進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress",
+      "interface",
+      "refactoring",
+      "typescript"
+    ],
+    "lastModified": "2025-03-29T19:00:00.000Z",
+    "createdAt": "2025-03-29T19:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "wf-domain-interfaces",
+        "description": "ドメインレイヤーのインターフェース修正",
+        "status": "in-progress"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "pi-domain-interfaces",
+        "description": "ドメインレイヤーのインターフェース修正",
+        "priority": "high"
+      },
+      {
+        "id": "pi-application-interfaces",
+        "description": "アプリケーションレイヤーのインターフェース修正",
+        "priority": "high"
+      },
+      {
+        "id": "pi-infrastructure-interfaces",
+        "description": "インフラストラクチャレイヤーのインターフェース修正",
+        "priority": "medium"
+      },
+      {
+        "id": "pi-method-signatures",
+        "description": "メソッドシグネチャの統一（非同期処理のPromise<T>返り値）",
+        "priority": "high"
+      },
+      {
+        "id": "pi-test-adjustment",
+        "description": "テストコードの調整（モックとスタブの修正）",
+        "priority": "low"
+      },
+      {
+        "id": "pi-documentation",
+        "description": "インターフェース設計ガイドラインの文書化",
+        "priority": "low"
+      }
+    ],
+    "status": "全レイヤーのインターフェースについて、パラメータ設計の標準化（3つ以上のパラメータはオブジェクトリテラル型）を完了。関連するTSDocコメントも修正済み。ビルドも正常に完了。",
+    "completionPercentage": 100,
+    "knownIssues": [
+      {
+        "id": "ki-interface-documentation",
+        "description": "一部のインターフェースやメソッドでTSDocコメントが不足している",
+        "severity": "medium"
+      },
+      {
+        "id": "ki-interface-responsibility",
+        "description": "一部のインターフェースの責務が大きすぎる可能性がある",
+        "severity": "low"
+      }
+    ],
+    "completedTasks": [
+      {
+        "id": "ct-interface-inventory",
+        "completedAt": "2025-03-29T20:20:00.000Z",
+        "description": "インターフェース一覧の作成と分析"
+      },
+      {
+        "id": "ct-implementation-plan",
+        "completedAt": "2025-03-29T20:20:00.000Z",
+        "description": "実装計画の策定"
+      },
+      {
+        "id": "ct-branch-repository-interface",
+        "completedAt": "2025-03-29T21:00:00.000Z",
+        "description": "IBranchMemoryBankRepositoryのfindDocumentPathsByTagsUsingIndexメソッドをオブジェクトリテラル型に修正"
+      },
+      {
+        "id": "ct-parameter-standardization",
+        "completedAt": "2025-03-29T10:33:00.000Z",
+        "description": "全レイヤーのインターフェースについて、パラメータ設計の標準化（3つ以上のパラメータはオブジェクトリテラル型）を完了"
+      },
+      {
+        "id": "ct-tsdoc-partial-update",
+        "completedAt": "2025-03-29T10:33:00.000Z",
+        "description": "パラメータ設計変更に伴うTSDocコメントの修正を完了"
+      },
+      {
+        "id": "ct-interface-unification",
+        "completedAt": "2025-03-29T06:17:00.000Z",
+        "description": "全レイヤーでのインターフェース統一化作業（パラメータ設計の標準化、TSDocコメントの修正、ビルドエラーの解消）を完了"
+      }
+    ]
+  }
+}

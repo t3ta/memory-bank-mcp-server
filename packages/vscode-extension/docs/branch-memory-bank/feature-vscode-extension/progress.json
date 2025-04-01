@@ -1,0 +1,70 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "sample-progress-001",
+    "title": "Sample Progress Document",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": ["sample", "progress", "vscode-extension"],
+    "lastModified": "2025-03-30T19:02:00.000Z",
+    "createdAt": "2025-03-30T19:02:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "status": "Markdownプレビューのタイプ別レンダリング実装中。",
+    "completionPercentage": 65,
+    "workingFeatures": [
+      {
+        "id": "feature-md-basic",
+        "description": "基本的なMarkdownプレビュー表示",
+        "status": "completed"
+      },
+      {
+        "id": "feature-mermaid",
+        "description": "Mermaid図のレンダリング",
+        "status": "completed"
+      },
+       {
+        "id": "feature-theme",
+        "description": "基本的なテーマ対応",
+        "status": "completed"
+      },
+      {
+        "id": "feature-type-render",
+        "description": "タイプ別レンダラーの構造実装",
+        "status": "in-progress"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "render-active-context",
+        "description": "active_context の詳細レンダリング",
+        "priority": "high"
+      },
+       {
+        "id": "render-branch-context",
+        "description": "branch_context の詳細レンダリング",
+        "priority": "high"
+      },
+      {
+        "id": "render-system-patterns",
+        "description": "system_patterns の詳細レンダリング",
+        "priority": "medium"
+      },
+      {
+        "id": "feature-scroll-sync",
+        "description": "エディタとプレビューのスクロール同期",
+        "priority": "medium"
+      }
+    ],
+    "knownIssues": [
+      {
+        "id": "issue-perf",
+        "description": "大規模ファイルでのプレビュー更新パフォーマンス",
+        "status": "open",
+        "solution": "遅延処理や差分更新を検討"
+      }
+    ],
+    "notes": "タイプ別レンダラーの実装を進めている。"
+  }
+}

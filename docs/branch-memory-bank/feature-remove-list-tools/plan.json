@@ -1,0 +1,39 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "remove-list-tools-plan",
+    "title": "list_tools 削除計画",
+    "documentType": "plan",
+    "path": "plan.json",
+    "tags": [
+      "refactoring",
+      "mcp-tools",
+      "list_tools"
+    ],
+    "version": 1
+  },
+  "content": {
+    "objective": "`list_tools` MCPツールをプロジェクトから完全に削除する。",
+    "steps": [
+      {
+        "id": "step-1",
+        "description": "`packages/mcp/src/tools/definitions.ts` から `list_tools` の定義ブロック（`createListToolsDefinition` 関数とその呼び出し部分）を削除する。",
+        "status": "pending",
+        "targetFile": "packages/mcp/src/tools/definitions.ts"
+      },
+      {
+        "id": "step-2",
+        "description": "`packages/mcp/src/main/routes.ts` から `availableTools` 配列内の `list_tools` エントリと、`switch` 文内の `case 'list_tools':` ブロックを削除する。",
+        "status": "pending",
+        "targetFile": "packages/mcp/src/main/routes.ts"
+      },
+      {
+        "id": "step-3",
+        "description": "`list_tools` に関連するテストコードが存在するか確認し、存在する場合は削除または修正する。",
+        "status": "pending",
+        "targetFile": "関連するテストファイル (*.test.ts)"
+      }
+    ],
+    "diagram": "```mermaid\ngraph TD\n    A[計画開始] --> B{ファイル特定};\n    B -- definitions.ts --> C[definitions.tsから定義削除];\n    B -- routes.ts --> D[routes.tsからルーティング削除];\n    C --> E{テストコード確認};\n    D --> E;\n    E -- あれば --> F[テストコード修正/削除];\n    E -- なければ --> G[完了✨];\n    F --> G;\n```"
+  }
+}

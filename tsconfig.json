@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "node16",
-    "moduleResolution": "node16",
+    "module": "NodeNext", // Changed to NodeNext for consistency
+    "moduleResolution": "NodeNext", // Changed to NodeNext for consistency
     "esModuleInterop": true,
-    "strict": false,
-    "noImplicitAny": false,
+    "strict": true, // Enabled strict mode
+    "noImplicitAny": true, // Enabled noImplicitAny
     "skipLibCheck": true,
     "noEmitOnError": false,
     "forceConsistentCasingInFileNames": true,
@@ -15,14 +15,27 @@
     "preserveConstEnums": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+    "isolatedModules": true, // Added as recommended by ts-jest
+    "noUnusedLocals": true, // Enabled noUnusedLocals
+    "noUnusedParameters": true, // Enabled noUnusedParameters
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@memory-bank/mcp": ["packages/mcp/src"],
+      "@memory-bank/mcp/*": ["packages/mcp/src/*"],
+      // schemas パッケージの参照先を src から dist に変更
+      "@memory-bank/schemas": ["packages/schemas/dist"],
+      "@memory-bank/schemas/*": ["packages/schemas/dist/*"]
+    }
   },
+  "references": [
+    { "path": "./packages/mcp" },
+    { "path": "./packages/schemas" }
+  ],
   "include": [
     "src/**/*"
   ],
@@ -30,6 +43,8 @@
     "node_modules",
     "dist",
     "**/__tests__/**",
-    "**/*.test.ts"
+    "**/*.test.ts",
+    "packages/**/dist",
+    "packages/**/node_modules"
   ]
 }

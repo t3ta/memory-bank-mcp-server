@@ -1,0 +1,80 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "94dff624-84ef-41ce-9007-a9c040325bc3",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress"
+    ],
+    "lastModified": "2025-03-31T11:30:00.000Z",
+    "createdAt": "2025-03-30T12:15:01.578Z",
+    "version": 4
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "fe7da459-52b7-4901-986e-d4a7a5525007",
+        "description": "統合テスト計画の策定",
+        "implementedAt": "2025-03-30T16:00:00.000Z"
+      },
+      {
+        "id": "a456b789-c123-45d6-e789-f012g345h678",
+        "description": "Controller統合テスト（ContextController, GlobalController, BranchController）の実装",
+        "implementedAt": "2025-03-31T09:30:00.000Z"
+      },
+      {
+        "id": "i901j234-k567-89l0-m123-n456o789p012",
+        "description": "UseCase統合テスト（ReadContextUseCase, ReadGlobalDocumentUseCase, WriteGlobalDocumentUseCase, ReadBranchDocumentUseCase, WriteBranchDocumentUseCase）の実装",
+        "implementedAt": "2025-03-31T11:30:00.000Z"
+      },
+      {
+        "id": "58f9d2eb-3a5d-4934-adbd-bf906961b3a7",
+        "description": "テスト環境管理ヘルパーの実装とテストファクスチャの準備",
+        "implementedAt": "2025-03-31T09:00:00.000Z"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "be8dc9d-e3b6-4110-806a-b202c746fd7d",
+        "description": "統合テスト用セットアップ設定の修正（ESMモジュール設定問題）",
+        "priority": "high"
+      },
+      {
+        "id": "q3r2s1t0-u9v8-w7x6-y5z4-a3b2c1d0e9f8",
+        "description": "APIレイヤーの統合テストの実装",
+        "priority": "low"
+      },
+      {
+        "id": "r1s2t3u4-v5w6-x7y8-z9a0-b1c2d3e4f5g6",
+        "description": "残りのユースケース層統合テストの実装",
+        "priority": "medium"
+      }
+    ],
+    "status": "統合テストの実装が大幅に進捗。コントローラー層の全てのコンポーネントとユースケース層の主要コンポーネントのテストを実装完了。テスト実行時にESMモジュール関連の設定問題が残っているため、実際のテスト実行ができない状態。次のステップはこの問題を解決することと残りのテストを実装すること。",
+    "completionPercentage": 70,
+    "knownIssues": [
+      {
+        "id": "25499a92-ce07-423f-aace-0f3c5377c824",
+        "description": "実際のファイルシステムを使用するため、テスト実行時間が長くなる可能性がある",
+        "severity": "medium"
+      },
+      {
+        "id": "g7h6i5j4-k3l2-m1n0-o9p8-q7r6s5t4u3v2",
+        "description": "テスト間の独立性を確保するための追加的な対策が必要になる可能性がある",
+        "severity": "medium"
+      },
+      {
+        "id": "2d17015c-ce09-4197-8d16-5cf5a5c6e285",
+        "description": "テスト環境のクリーンアップが失敗した場合の対策を検討する必要がある",
+        "severity": "low"
+      },
+      {
+        "id": "z9y8x7w6-v5u4-t3s2-r1q0-p9o8n7m6l5k4",
+        "description": "ESMモジュール対応の設定問題で統合テストが実行できない",
+        "severity": "high"
+      }
+    ]
+  }
+}

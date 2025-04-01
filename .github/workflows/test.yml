@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 21.x]
+        node-version: [20.x] # Remove 18.x and 21.x due to dependency incompatibilities
 
     steps:
       - uses: actions/checkout@v4
@@ -26,5 +26,14 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'yarn'
       - run: yarn install --frozen-lockfile
-      - run: yarn build
+      
+      # Build schemas package first, then mcp package, then the root package
+      - name: Build packages in order
+        run: |
+          yarn workspace @memory-bank/schemas build
+          yarn workspace @memory-bank/mcp build
+          yarn build
+          
+          # Use Yarn workspaces to manage cross-package dependencies
+          yarn workspaces run build
       - run: yarn test

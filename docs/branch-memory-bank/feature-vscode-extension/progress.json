@@ -1,0 +1,104 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "03af731c-cef6-4b17-b8d9-9345228c78eb",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress",
+      "vscode-extension"
+    ],
+    "lastModified": "2025-03-30T16:10:58.000Z",
+    "createdAt": "2025-03-30T05:25:42.077Z",
+    "version": 2
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "feature-explorer",
+        "description": "メモリバンクエクスプローラー (基本実装済)",
+        "status": "in-progress"
+      },
+      {
+        "id": "feature-editor",
+        "description": "ドキュメントエディタ (基本実装済、改良中)",
+        "status": "in-progress"
+      },
+      {
+        "id": "feature-ai-integration",
+        "description": "Gemini AI連携の基本機能 (APIクライアント、テスト機能)",
+        "status": "in-progress"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "feature-diff",
+        "description": "差分比較機能",
+        "priority": "high"
+      },
+      {
+        "id": "feature-link",
+        "description": "ドキュメント関連性可視化",
+        "priority": "high"
+      },
+      {
+        "id": "feature-template",
+        "description": "テンプレート機能",
+        "priority": "medium"
+      },
+      {
+        "id": "feature-analytics",
+        "description": "メモリバンク分析機能",
+        "priority": "medium"
+      },
+      {
+        "id": "feature-ai-duplicate-detection",
+        "description": "AIによる重複情報検出 (基本機能)",
+        "priority": "low"
+      },
+      {
+        "id": "feature-ai-content-consolidation",
+        "description": "AIによる重複情報統合 (基本機能)",
+        "priority": "low"
+      },
+      {
+        "id": "feature-ai-consistency-checker",
+        "description": "AIによる整合性チェッカー",
+        "priority": "low"
+      },
+      {
+        "id": "feature-ai-smart-summarization",
+        "description": "AIによるインテリジェント要約",
+        "priority": "low"
+      },
+      {
+        "id": "feature-editor-markdown",
+        "description": "JSONをMarkdown形式で表示するエディタ機能 (基本レイアウト実装済、変換ロジック実装中)",
+        "priority": "high"
+      }
+    ],
+    "status": "基本機能（エクスプローラー、エディタ）とAI連携の初期実装完了。package.jsonの依存関係問題は解決し、activationEventsも修正完了。markdown-it、markdown-it-mermaid、mermaidパッケージを追加し、Markdownプレビュー機能の実装準備完了。",
+    "completionPercentage": 30,
+    "knownIssues": [
+      {
+        "id": "issue-1",
+        "description": "アクティベーションイベントが「onView:memoryBankDocuments」のみ指定されているため、拡張機能の自動起動が機能していない",
+        "status": "resolved",
+        "solution": "✅ package.jsonのactivationEventsに「onStartupFinished」を追加した"
+      },
+      {
+        "id": "issue-2",
+        "description": "package.jsonに重複した「contributes」セクションがある",
+        "status": "open",
+        "solution": "package.jsonを整理して重複セクションを削除する"
+      },
+      {
+        "id": "issue-3",
+        "description": "workspaceの依存関係でエラーが発生（@memory-bank/schemasの参照問題）",
+        "status": "resolved",
+        "solution": "✅ workspace:1.0.0から1.0.0への変更で依存関係を修正完了"
+      }
+    ]
+  }
+}

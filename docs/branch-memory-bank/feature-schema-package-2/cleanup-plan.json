@@ -1,0 +1,194 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "template-cleanup-plan",
+    "title": "テンプレート関連コード削除計画",
+    "documentType": "plan",
+    "path": "cleanup-plan.json",
+    "tags": [
+      "refactoring",
+      "cleanup",
+      "template",
+      "plan"
+    ],
+    "lastModified": "2025-03-28T11:30:00.000Z",
+    "createdAt": "2025-03-28T11:30:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "summary": {
+      "description": "テンプレート関連コードを適切に削除するための詳細な実装計画",
+      "approach": "依存関係が最も少ない部分から段階的に修正し、最後に特定のファイルを完全削除する",
+      "expectedOutcome": "テンプレート関連コードの完全削除とシンプルで保守性の高いコードベース"
+    },
+    "currentProblems": [
+      {
+        "id": "problem-1",
+        "description": "DocumentPath.tsに非推奨のMarkdown関連メソッドが残っている",
+        "impact": "コードの明確さの欠如、非推奨機能の誤使用リスク",
+        "priority": "high"
+      },
+      {
+        "id": "problem-2",
+        "description": "WriteBranchDocumentUseCase.tsにバグがある（branchInfoの二重定義とexistingDocumentのif条件文が欠如）",
+        "impact": "実行時エラーが発生する可能性",
+        "priority": "high"
+      },
+      {
+        "id": "problem-3",
+        "description": "GlobalControllerがtemplateControllerに依存している",
+        "impact": "不要な依存関係によるコード複雑性の増加",
+        "priority": "medium"
+      },
+      {
+        "id": "problem-4",
+        "description": "providers.tsにtemlateRepository, templateService, templateControllerの登録が残っている",
+        "impact": "不要なサービス登録によるリソース無駄遣いと複雑性",
+        "priority": "medium"
+      }
+    ],
+    "implementationSteps": [
+      {
+        "id": "step-1",
+        "description": "DocumentPath.tsの修正",
+        "tasks": [
+          {
+            "id": "task-1-1",
+            "description": "isMarkdownメソッドを削除する",
+            "targetFile": "/packages/mcp/src/domain/entities/DocumentPath.ts",
+            "implementation": "メソッド全体を削除"
+          },
+          {
+            "id": "task-1-2",
+            "description": "toAlternateFormatメソッドを削除する",
+            "targetFile": "/packages/mcp/src/domain/entities/DocumentPath.ts",
+            "implementation": "メソッド全体を削除"
+          }
+        ],
+        "estimatedTime": "15分"
+      },
+      {
+        "id": "step-2",
+        "description": "WriteBranchDocumentUseCase.tsのバグ修正",
+        "tasks": [
+          {
+            "id": "task-2-1",
+            "description": "branchInfoの二重定義を修正",
+            "targetFile": "/packages/mcp/src/application/usecases/branch/WriteBranchDocumentUseCase.ts",
+            "implementation": "二重定義を削除して一箇所のみにする"
+          },
+          {
+            "id": "task-2-2",
+            "description": "existingDocumentのif条件分岐を追加",
+            "targetFile": "/packages/mcp/src/application/usecases/branch/WriteBranchDocumentUseCase.ts",
+            "implementation": "if (existingDocument) { ... } else { ... } の構造を正しく修正"
+          }
+        ],
+        "estimatedTime": "30分"
+      },
+      {
+        "id": "step-3",
+        "description": "GlobalControllerの修正",
+        "tasks": [
+          {
+            "id": "task-3-1",
+            "description": "templateControllerフィールドの削除",
+            "targetFile": "/packages/mcp/src/interface/controllers/GlobalController.ts",
+            "implementation": "private readonly templateController?: any;の行を削除"
+          },
+          {
+            "id": "task-3-2",
+            "description": "コンストラクタのtemplateControllerパラメータの削除",
+            "targetFile": "/packages/mcp/src/interface/controllers/GlobalController.ts",
+            "implementation": "コンストラクタのオプションからtemplateController?: any;を削除"
+          },
+          {
+            "id": "task-3-3",
+            "description": "templateControllerの代入部分を削除",
+            "targetFile": "/packages/mcp/src/interface/controllers/GlobalController.ts",
+            "implementation": "this.templateController = options?.templateController;の行を削除"
+          },
+          {
+            "id": "task-3-4",
+            "description": "readCoreFilesメソッドの実装を変更",
+            "targetFile": "/packages/mcp/src/interface/controllers/GlobalController.ts",
+            "implementation": "templateを使わずに直接JSONファイルを読み込む実装に変更"
+          }
+        ],
+        "estimatedTime": "45分"
+      },
+      {
+        "id": "step-4",
+        "description": "providers.tsの修正",
+        "tasks": [
+          {
+            "id": "task-4-1",
+            "description": "templateRepositoryとtemplateServiceのインポート削除",
+            "targetFile": "/packages/mcp/src/main/di/providers.ts",
+            "implementation": "不要なimport文を削除"
+          },
+          {
+            "id": "task-4-2",
+            "description": "templateRepositoryの登録を削除",
+            "targetFile": "/packages/mcp/src/main/di/providers.ts",
+            "implementation": "container.registerFactory('templateRepository', ...)の部分を削除"
+          },
+          {
+            "id": "task-4-3",
+            "description": "templateServiceの登録を削除",
+            "targetFile": "/packages/mcp/src/main/di/providers.ts",
+            "implementation": "container.registerFactory('templateService', ...)の部分を削除"
+          },
+          {
+            "id": "task-4-4",
+            "description": "templateControllerの登録を削除",
+            "targetFile": "/packages/mcp/src/main/di/providers.ts",
+            "implementation": "container.registerFactory('templateController', ...)の部分を削除"
+          },
+          {
+            "id": "task-4-5",
+            "description": "GlobalControllerへのtemplateController注入を削除",
+            "targetFile": "/packages/mcp/src/main/di/providers.ts",
+            "implementation": "GlobalControllerコンストラクタのオプションからtemplateControllerを削除"
+          }
+        ],
+        "estimatedTime": "45分"
+      }
+    ],
+    "riskAssessment": [
+      {
+        "riskType": "機能退行",
+        "probability": "低",
+        "impact": "中",
+        "mitigation": "各変更後にビルドとテストを実行して機能が正常に動作することを確認する"
+      },
+      {
+        "riskType": "依存関係の見落とし",
+        "probability": "中",
+        "impact": "高",
+        "mitigation": "修正後にプロジェクト全体でテンプレート関連の参照を検索して漏れがないか確認する"
+      },
+      {
+        "riskType": "不完全な削除",
+        "probability": "中",
+        "impact": "低",
+        "mitigation": "全ての変更を一貫した方法で行い、コードレビューを実施する"
+      }
+    ],
+    "recommendedApproach": {
+      "strategy": "依存関係の少ないものから多いものへと順番に修正することで、変更の影響範囲を最小限に抑える",
+      "implementation": [
+        "まずDocumentPath.tsとWriteBranchDocumentUseCase.tsのバグ修正を行う",
+        "次にGlobalControllerからtemplateController依存を取り除き、readCoreFilesメソッドを修正",
+        "最後にproviders.tsからテンプレート関連コードを削除",
+        "各ステップごとにビルドとテストを実行"
+      ],
+      "testing": "各変更後にTypeScriptコンパイラを実行してエラーがないことを確認する"
+    },
+    "additionalConsiderations": {
+      "scalability": "今回の修正はテンプレート関連コードの削除のみに焦点を当てているが、将来的には全てのMarkdown関連コードの削除も検討すべき",
+      "compatibility": "テンプレート関連機能に依存していたクライアントがあれば、代替手段を提供する必要がある",
+      "documentation": "削除した機能に関するドキュメントも更新が必要"
+    }
+  }
+}

@@ -1,0 +1,134 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "3d091fe7-3b42-43bb-bcde-9007a9f32339",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context"
+    ],
+    "lastModified": "2025-03-31T15:29:40.376Z",
+    "createdAt": "2025-03-31T15:29:40.376Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "グローバルメモリバンク整理、テンプレートシステム復活、新しいインデックス形式の準備、および関連するビルドエラーの修正が完了。タグ検索機能設計・実装の準備完了。",
+    "recentChanges": [
+      {
+        "date": "2025-04-01T01:05:00Z",
+        "description": "タグインデックスの現状調査 (index.json, _global_index.json, tag_categorization.json, tag-update script)"
+      },
+      {
+        "date": "2025-04-01T01:05:00Z",
+        "description": "タグ検索機能(CLI)が廃止されていることを確認"
+      },
+      {
+        "date": "2025-04-01T01:05:00Z",
+        "description": "グローバルメモリバンクの整理方針を決定 (コア情報以外は削除)"
+      },
+      {
+        "date": "2025-04-01T01:05:00Z",
+        "description": "グローバルメモリバンクから不要なファイルを削除"
+      },
+      {
+        "date": "2025-04-01T01:05:00Z",
+        "description": "削除ファイルへの参照を関連ドキュメントから削除"
+      },
+      {
+        "date": "2025-04-01T01:05:00Z",
+        "description": "削除ファイルを参照していたテストコードを修正"
+      },
+      {
+        "date": "2025-04-01T01:05:00Z",
+        "description": "ブランチメモリバンク更新の必要性を確認"
+      },
+      {
+        "date": "2025-04-01T01:45:00Z",
+        "description": "テストを実行し、発生したエラーを修正 (DI設定、テストフィクスチャ、テストコード)"
+      },
+      {
+        "date": "2025-04-01T01:55:00Z",
+        "description": "新しいインデックス形式 (TagsIndex, DocumentsMetaIndex) のスキーマを @memory-bank/schemas に定義"
+      },
+      {
+        "date": "2025-04-01T01:55:00Z",
+        "description": "タグ更新スクリプト (index-generator, config, index) を修正し、新しいインデックスファイルを生成・保存するように変更"
+      },
+      {
+        "date": "2025-04-01T02:54:00Z",
+        "description": "TypeScriptのビルドエラーを修正 (インポートパス、型定義、DI設定など)"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "decision-global-scope",
+        "description": "グローバルメモリバンクは普遍的コア情報 (architecture, coding-standards, glossary) のみに限定する"
+      },
+      {
+        "id": "decision-file-deletion",
+        "description": "上記方針に基づき、多数の不要ファイルをグローバルメモリバンクから削除した"
+      },
+      {
+        "id": "decision-template-revival",
+        "description": "テンプレートシステムを復活させ、AIが参照するルールは rules.json テンプレート経由で提供する"
+      },
+      {
+        "id": "decision-index-maintenance",
+        "description": "タグインデックス (_global_index.json, tags/index.json) は検索で利用されているため当面維持する"
+      },
+      {
+        "id": "decision-new-index",
+        "description": "タグ検索効率化のため、新しいインデックス形式 (タグ->パス, パス->メタデータ) を導入し、更新スクリプトで生成する"
+      },
+      {
+        "id": "decision-next-step-search",
+        "description": "次のアクションとしてタグ検索機能の設計・実装を行う"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "cons-search-impl",
+        "description": "タグ検索機能の実装方法 (MCPツール、UseCase)",
+        "status": "open"
+      },
+      {
+        "id": "cons-index-format-detail",
+        "description": "新しいインデックス形式の詳細設計 (ブランチインデックス含む)",
+        "status": "open"
+      },
+      {
+        "id": "cons-branch-relation",
+        "description": "ブランチ間の関係性やタグの重み付けをどう活用するか",
+        "status": "open"
+      },
+      {
+        "id": "cons-import-issue",
+        "description": "ビルドは通った(はず)だが、@memory-bank/schemas のインポート問題が本当に解決したか要確認",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "step-search-usecase",
+        "description": "新しいインデックスを使用するタグ検索UseCase (SearchDocumentsByTagsUseCase) の実装",
+        "priority": "high"
+      },
+      {
+        "id": "step-search-tool-def",
+        "description": "タグ検索MCPツール (search_documents_by_tags) の定義",
+        "priority": "high"
+      },
+      {
+        "id": "step-search-controller",
+        "description": "タグ検索リクエストを処理するコントローラーの実装",
+        "priority": "medium"
+      },
+      {
+        "id": "step-translate-rules",
+        "description": "rules.json の翻訳テキストを en.json, zh.json に反映",
+        "priority": "low"
+      }
+    ]
+  }
+}

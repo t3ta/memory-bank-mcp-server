@@ -1,0 +1,311 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "9c8b7a6d-5e4f-3c2d-1b0a-9e8d7c6b5a4f",
+    "title": "統合改善計画",
+    "documentType": "plan",
+    "path": "consolidated-improvement-plan.json",
+    "tags": [
+      "improvement",
+      "plan",
+      "refactoring"
+    ],
+    "lastModified": "2025-03-30T05:20:32.360Z",
+    "createdAt": "2025-03-30T05:20:32.360Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "title": "feature/improvement統合改善計画",
+      "description": "MCP、スキーマパッケージ、TypeScript設定の各改善計画を統合し、優先順位付けした実装計画。ロギング、エラーハンドリング、スキーマ構造化、型安全性強化を中心に、コード品質と開発者体験を向上させる。",
+      "currentStatus": "計画フェーズ。実装準備中。"
+    },
+    "sourceReferences": [
+      {
+        "title": "MCP Package Improvement Plan",
+        "path": "mcp-improvement-plan.json",
+        "description": "MCPパッケージのレビューに基づく改善計画。ロギングとエラーハンドリングパターンの統一的適用とコード品質向上がメイン。"
+      },
+      {
+        "title": "Schema Package Improvement Plan",
+        "path": "schema-improvement-plan.json",
+        "description": "スキーマパッケージの改善計画。モジュール化、バージョン管理、バリデーション強化などを含む。"
+      },
+      {
+        "title": "TypeScript & ESLint Settings Improvement Plan",
+        "path": "settings-improvement-plan.json",
+        "description": "TypeScriptとESLint設定の改善計画。型安全性向上とエラー早期発見のためのルール強化が主な目的。"
+      }
+    ],
+    "implementationPhases": [
+      {
+        "phaseNumber": 1,
+        "title": "基盤改善フェーズ",
+        "description": "コアとなるパターンと基盤の改善を行うフェーズ。主に高優先度の項目を対象とする。",
+        "estimatedDuration": "2週間",
+        "items": [
+          {
+            "id": "MCP-1",
+            "title": "ロガー使用の一貫性確保",
+            "source": "mcp-improvement-plan.json",
+            "priority": "high",
+            "description": "すべてのコンポーネントでcomponentLoggerを一貫して使用する。"
+          },
+          {
+            "id": "MCP-2",
+            "title": "エラーファクトリーメソッドの一貫した使用",
+            "source": "mcp-improvement-plan.json",
+            "priority": "high",
+            "description": "すべてのエラー生成箇所でファクトリーメソッドを使用する。"
+          },
+          {
+            "id": "MCP-3",
+            "title": "不足しているエラーファクトリーメソッドの追加",
+            "source": "mcp-improvement-plan.json",
+            "priority": "high",
+            "description": "現在直接コンストラクタを使用している特定のエラーパターンに対して、新しいファクトリーメソッドを追加する。"
+          },
+          {
+            "id": "SCHEMA-1",
+            "title": "スキーマファイルの分割と整理",
+            "source": "schema-improvement-plan.json",
+            "priority": "high",
+            "description": "大きなスキーマファイルをドキュメントタイプごとに分割して保守性を向上させる。"
+          },
+          {
+            "id": "SCHEMA-2",
+            "title": "バージョン管理と互換性強化",
+            "source": "schema-improvement-plan.json",
+            "priority": "high",
+            "description": "スキーマバージョン間の互換性とマイグレーションメカニズムを強化する。"
+          },
+          {
+            "id": "SCHEMA-3",
+            "title": "バリデーションヘルパーの拡張",
+            "source": "schema-improvement-plan.json",
+            "priority": "high",
+            "description": "再利用可能なバリデーション関数を提供し、コードの重複を削減する。"
+          },
+          {
+            "id": "TS-1",
+            "title": "ルートtsconfig.jsonでのStrict Mode有効化",
+            "source": "settings-improvement-plan.json",
+            "priority": "high",
+            "description": "プロジェクト全体の型安全性を確保するため、ルートの設定も厳格にする。"
+          },
+          {
+            "id": "TS-2",
+            "title": "エラーハンドリング強化ルール",
+            "source": "settings-improvement-plan.json",
+            "priority": "high",
+            "description": "エラー処理とロギングに関する専用ESLintルールを追加する。"
+          },
+          {
+            "id": "TS-3",
+            "title": "Promise/非同期エラー処理のルール",
+            "source": "settings-improvement-plan.json",
+            "priority": "high",
+            "description": "未処理のPromiseや非同期エラーを検出するためのルールを追加する。"
+          }
+        ]
+      },
+      {
+        "phaseNumber": 2,
+        "title": "パターン適用フェーズ",
+        "description": "基盤が整った後、中優先度の項目を実装し、パターンを広範囲に適用するフェーズ。",
+        "estimatedDuration": "2週間",
+        "items": [
+          {
+            "id": "MCP-4",
+            "title": "非同期エラーラッピングパターンの適用",
+            "source": "mcp-improvement-plan.json",
+            "priority": "medium",
+            "description": "すべての非同期処理にErrorUtils.wrapAsyncパターンを適用する。"
+          },
+          {
+            "id": "MCP-5",
+            "title": "構造化ロギングの強化",
+            "source": "mcp-improvement-plan.json",
+            "priority": "medium",
+            "description": "すべてのログエントリに豊富なコンテキスト情報を付与する。"
+          },
+          {
+            "id": "MCP-6",
+            "title": "コントローラーのエラーハンドリング改善",
+            "source": "mcp-improvement-plan.json",
+            "priority": "medium",
+            "description": "コントローラーでの一貫したエラーハンドリングパターンを適用する。"
+          },
+          {
+            "id": "SCHEMA-4",
+            "title": "スキーマ拡張メカニズムの導入",
+            "source": "schema-improvement-plan.json",
+            "priority": "medium",
+            "description": "基本スキーマを拡張するための再利用可能なパターンを提供する。"
+          },
+          {
+            "id": "SCHEMA-5",
+            "title": "JSON Schemaとの相互運用",
+            "source": "schema-improvement-plan.json",
+            "priority": "medium",
+            "description": "ZodスキーマとJSON Schemaの間の変換サポートを追加する。"
+          },
+          {
+            "id": "TS-4",
+            "title": "ES2022ターゲットへのアップデート",
+            "source": "settings-improvement-plan.json",
+            "priority": "medium",
+            "description": "Node.jsサポートバージョンに合わせてES2022ターゲットを採用する。"
+          },
+          {
+            "id": "TS-5",
+            "title": "パッケージ設定の統一",
+            "source": "settings-improvement-plan.json",
+            "priority": "medium",
+            "description": "schemasとmcpパッケージのTypeScript設定を統一する。"
+          },
+          {
+            "id": "TS-6",
+            "title": "ESLintプラグインの拡充",
+            "source": "settings-improvement-plan.json",
+            "priority": "medium",
+            "description": "コード品質向上のための追加ESLintプラグインを導入する。"
+          },
+          {
+            "id": "TS-7",
+            "title": "型チェック強化オプションの追加",
+            "source": "settings-improvement-plan.json",
+            "priority": "medium",
+            "description": "最新のTypeScriptでサポートされている強力な型チェックオプションを追加する。"
+          }
+        ]
+      },
+      {
+        "phaseNumber": 3,
+        "title": "拡張フェーズ",
+        "description": "低優先度の項目を実装し、ドキュメントやガイドラインを整備するフェーズ。",
+        "estimatedDuration": "2週間",
+        "items": [
+          {
+            "id": "MCP-7",
+            "title": "ログレベル使用ガイドラインの策定と適用",
+            "source": "mcp-improvement-plan.json",
+            "priority": "low",
+            "description": "ログレベルの一貫した使用基準を確立する。"
+          },
+          {
+            "id": "MCP-8",
+            "title": "エラーコード一覧ドキュメントの作成",
+            "source": "mcp-improvement-plan.json",
+            "priority": "low",
+            "description": "すべてのエラーコードとその意味、推奨される対応方法を文書化する。"
+          },
+          {
+            "id": "SCHEMA-6",
+            "title": "エラーメッセージの国際化対応",
+            "source": "schema-improvement-plan.json",
+            "priority": "low",
+            "description": "バリデーションエラーメッセージの多言語対応を追加する。"
+          },
+          {
+            "id": "SCHEMA-7",
+            "title": "スキーマテスト・検証ツールの強化",
+            "source": "schema-improvement-plan.json",
+            "priority": "low",
+            "description": "スキーマのテストと検証を効率化するユーティリティを提供する。"
+          },
+          {
+            "id": "SCHEMA-8",
+            "title": "効率的なシリアライズ/デシリアライズ",
+            "source": "schema-improvement-plan.json",
+            "priority": "low",
+            "description": "パフォーマンスを最適化したデータ処理ユーティリティを提供する。"
+          },
+          {
+            "id": "SCHEMA-9",
+            "title": "型安全なクエリビルダー",
+            "source": "schema-improvement-plan.json",
+            "priority": "low",
+            "description": "型の恩恵を受けたドキュメント検索クエリの構築機能を提供する。"
+          },
+          {
+            "id": "TS-8",
+            "title": "ビルド最適化の設定追加",
+            "source": "settings-improvement-plan.json",
+            "priority": "low",
+            "description": "増分ビルドによりビルド時間を短縮する設定を追加する。"
+          },
+          {
+            "id": "TS-9",
+            "title": "カスタムロガールール",
+            "source": "settings-improvement-plan.json",
+            "priority": "low",
+            "description": "プロジェクト固有のロガー使用を促進するカスタムESLintルールを作成する。"
+          },
+          {
+            "id": "TS-10",
+            "title": "共通型定義の明示",
+            "source": "settings-improvement-plan.json",
+            "priority": "low",
+            "description": "プロジェクト全体で使用する型定義を明示的に指定する。"
+          }
+        ]
+      }
+    ],
+    "implementations": {
+      "packageTargets": [
+        {
+          "name": "mcp",
+          "path": "/packages/mcp",
+          "keyFiles": [
+            "/packages/mcp/src/shared/utils/logger.ts",
+            "/packages/mcp/src/shared/errors/BaseError.ts",
+            "/packages/mcp/src/shared/errors/DomainError.ts",
+            "/packages/mcp/src/shared/errors/InfrastructureError.ts",
+            "/packages/mcp/src/shared/errors/ApplicationError.ts",
+            "/packages/mcp/src/interface/controllers/BranchController.ts",
+            "/packages/mcp/src/interface/controllers/GlobalController.ts",
+            "/packages/mcp/src/infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.ts",
+            "/packages/mcp/src/application/usecases/json/ReadJsonDocumentUseCase.ts",
+            "/packages/mcp/src/application/usecases/json/WriteJsonDocumentUseCase.ts",
+            "/packages/mcp/src/application/usecases/common/ReadContextUseCase.ts"
+          ]
+        },
+        {
+          "name": "schemas",
+          "path": "/packages/schemas",
+          "keyFiles": [
+            "/packages/schemas/src/json-document.ts",
+            "/packages/schemas/src/index.ts"
+          ]
+        },
+        {
+          "name": "tsconfig",
+          "path": "/",
+          "keyFiles": [
+            "/tsconfig.json",
+            "/tsconfig.esm.json",
+            "/tsconfig.test.json",
+            "/eslint.config.js",
+            "/packages/mcp/tsconfig.json",
+            "/packages/schemas/tsconfig.json"
+          ]
+        }
+      ],
+      "testingStrategy": {
+        "approach": "フェーズ毎に実施",
+        "unitTests": "各改善項目の実装後に関連するユニットテストを更新または追加",
+        "integrationTests": "各フェーズの最後に主要な統合テストを実行",
+        "e2eTests": "最終フェーズ完了後にのみE2Eテストを実施"
+      },
+      "rollbackPlan": {
+        "criteria": "既存機能の重大な障害が発生した場合",
+        "steps": [
+          "問題のあるコミットを特定",
+          "revertコマンドで該当コミットを打ち消す",
+          "原因分析と修正アプローチの再検討"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "a64ba081-86bb-4ff3-8a66-78762236411c",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-03-30T05:10:32.360Z",
+    "createdAt": "2025-03-30T03:50:32.360Z",
+    "version": 2
+  },
+  "content": {
+    "branchName": "feature/improvement",
+    "purpose": "複数の改善計画（MCP、スキーマパッケージ、TypeScript & ESLint設定）をまとめて実装するためのブランチ。ロギングとエラーハンドリングの統一、スキーマモジュール化、型安全性向上を中心に、コード品質と開発者体験を改善する。",
+    "createdAt": "2025-03-30T03:50:32.360Z",
+    "userStories": [
+      {
+        "id": "77a804aa-eccf-409b-b4f5-8abc44686777",
+        "description": "開発者として、ロギングとエラーハンドリングのパターンが一貫していることで、バグを減らしトラブルシューティングを容易にしたい",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "c0dd39a4-d84d-4aa5-a51f-cfc935040b66",
+        "description": "開発者として、スキーマの構造が整理され拡張しやすくなることで、新機能開発時のスキーマ管理を効率化したい",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "34d7dc1d-fb76-4eba-85fb-8915fb6e3ac8",
+        "description": "開発者として、TypeScriptとESLintの設定が強化されることで、早期にバグを発見し開発効率を向上させたい",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": "このブランチでは、feature/logging-error-handlingブランチの成果を拡張し、プロジェクト全体に一貫した改善を適用します。各改善計画は順次実装していきます。"
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "branch-name-utils-implementation-plan",
+    "title": "ブランチ名変換ユーティリティの実装計画",
+    "documentType": "implementation_plan",
+    "path": "implementationPlan.json",
+    "tags": [
+      "implementation",
+      "branch-name",
+      "utilities",
+      "integration-tests"
+    ],
+    "lastModified": "2025-03-31T18:40:00.000Z",
+    "createdAt": "2025-03-31T18:40:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": "ブランチ名の変換ロジックを共通化するための実装計画です。テスト環境とリポジトリ実装で一貫したブランチ名変換を行うことで、統合テストの問題を解決します。",
+    "scope": {
+      "problem": "現状、テスト環境(test-env.ts)とドメインエンティティ(BranchInfo.ts)でブランチ名の変換ロジックが重複し、整合性がとれていないため、新規ブランチ作成時のテストが失敗しています。",
+      "solution": "ブランチ名変換のロジックを共通のユーティリティ関数として切り出し、両方の実装から参照できるようにします。これにより、ブランチ名の扱いに一貫性を持たせることができます。"
+    },
+    "tasks": [
+      {
+        "id": "task-1",
+        "title": "ブランチ名変換ユーティリティの作成",
+        "description": "ブランチ名を安全なファイル名に変換するユーティリティ関数を作成します。",
+        "implementation": {
+          "file": "/packages/mcp/src/shared/utils/branchNameUtils.ts",
+          "content": "/**\n * Utility functions for branch name operations\n */\n\n/**\n * Convert a branch name to a safe file system name\n * @param branchName Original branch name (e.g. 'feature/my-branch')\n * @returns Safe branch name for file system operations (e.g. 'feature-my-branch')\n */\nexport function toSafeBranchName(branchName: string): string {\n  // Replace slashes with hyphens and remove any unsafe characters\n  return branchName.replace(/\\//g, '-').replace(/[^a-zA-Z0-9-_.]/g, '_');\n}\n\n/**\n * Check if a branch name is valid\n * @param branchName Branch name to validate\n * @returns Boolean indicating if the branch name is valid\n */\nexport function isValidBranchName(branchName: string): boolean {\n  if (!branchName || branchName.trim() === '') {\n    return false;\n  }\n  \n  // Branch name should include a namespace prefix with slash\n  if (!branchName.includes('/')) {\n    return false;\n  }\n  \n  const namespacePrefix = branchName.split('/')[0];\n  const displayName = branchName.substring(branchName.indexOf('/') + 1);\n  \n  // The name after the prefix shouldn't be empty\n  if (!displayName || displayName.trim() === '') {\n    return false;\n  }\n  \n  return true;\n}"
+        }
+      },
+      {
+        "id": "task-2",
+        "title": "BranchInfo.tsの修正",
+        "description": "BranchInfo.tsのsafeName実装を、新しいユーティリティ関数を使用するように修正します。",
+        "implementation": {
+          "file": "/packages/mcp/src/domain/entities/BranchInfo.ts",
+          "changes": [
+            {
+              "type": "import",
+              "content": "import { toSafeBranchName } from \"../../shared/utils/branchNameUtils.js\";"
+            },
+            {
+              "type": "replace",
+              "original": "  public get safeName(): string {\n    return this._name.replace(/\\//g, '-');\n  }",
+              "replacement": "  public get safeName(): string {\n    return toSafeBranchName(this._name);\n  }"
+            }
+          ]
+        }
+      },
+      {
+        "id": "task-3",
+        "title": "test-env.tsの修正",
+        "description": "test-env.tsのcreateBranchDir関数を、新しいユーティリティ関数を使用するように修正します。",
+        "implementation": {
+          "file": "/packages/mcp/tests/integration/helpers/test-env.ts",
+          "changes": [
+            {
+              "type": "import",
+              "content": "import { toSafeBranchName } from \"../../../src/shared/utils/branchNameUtils.js\";"
+            },
+            {
+              "type": "replace",
+              "original": "  // Convert slashes to hyphens for filesystem safety while maintaining readability\n  const safeBranchName = branchName.replace(/\\//g, '-').replace(/[^a-zA-Z0-9-_.]/g, '_');",
+              "replacement": "  // Convert branch name to safe file system name using shared utility\n  const safeBranchName = toSafeBranchName(branchName);"
+            }
+          ]
+        }
+      }
+    ],
+    "testingStrategy": {
+      "approach": "既存の統合テストを実行して、ブランチ名の変換ロジックが正しく動作することを確認します。特に、WriteBranchDocumentUseCase.integration.testで「新規ブランチの作成と同時に文書が作成できること」テストが成功することを確認します。",
+      "successCriteria": [
+        "統合テストが成功する（特に新規ブランチ作成関連のテスト）",
+        "テスト環境とリポジトリの実装で同じブランチ名変換ロジックが使用される",
+        "コードの重複が減少する"
+      ]
+    },
+    "rolloutPlan": {
+      "implementationSteps": [
+        "ブランチ名変換ユーティリティ関数の作成",
+        "BranchInfo.tsの修正",
+        "test-env.tsの修正"
+      ],
+      "testSteps": [
+        "修正した実装で統合テストを実行",
+        "テスト結果を確認し、必要に応じて調整"
+      ],
+      "reviewCriteria": [
+        "コードの簡潔さと読みやすさ",
+        "テストの成功率",
+        "変換ロジックの一貫性"
+      ]
+    },
+    "conclusion": "ブランチ名変換ロジックを共通化することで、テスト環境とリポジトリの実装間の整合性を確保し、統合テストの問題を解決します。これにより、より堅牢で保守性の高いコードベースを実現します。"
+  }
+}

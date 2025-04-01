@@ -1,0 +1,21 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "minimal-core-navigation",
+    "title": "Minimal Global Navigation",
+    "documentType": "core",
+    "path": "core/navigation.json",
+    "tags": ["navigation", "core", "minimal", "test"],
+    "lastModified": "2025-03-30T00:00:00.000Z",
+    "createdAt": "2025-03-30T00:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "Overview",
+        "content": "Minimal navigation guide for testing."
+      }
+    ]
+  }
+}

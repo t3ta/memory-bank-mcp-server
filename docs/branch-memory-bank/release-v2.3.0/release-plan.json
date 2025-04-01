@@ -1,0 +1,84 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "release-plan-individual-tag-trigger",
+    "title": "リリース計画 (個別パッケージ・タグトリガー)",
+    "documentType": "planning",
+    "path": "release-plan.json",
+    "tags": [
+      "release",
+      "github-actions",
+      "versioning",
+      "planning"
+    ],
+    "createdAt": "2025-04-01T05:41:40.000Z"
+  },
+  "content": {
+    "strategy": "個別パッケージ・タグトリガー",
+    "description": "各パッケージのバージョンアップ時に、対応するGitタグをトリガーとして個別にリリースを実行する戦略。",
+    "initialVersions": {
+      "@memory-bank/mcp": "2.3.0",
+      "@memory-bank/schemas": "1.0.0",
+      "memory-bank-vscode-extension": "0.1.0"
+    },
+    "workflows": [
+      {
+        "action": "削除",
+        "file": ".github/workflows/release.yml",
+        "reason": "masterブランチトリガーは不要になるため。"
+      },
+      {
+        "action": "作成",
+        "file": ".github/workflows/release-mcp.yml",
+        "trigger": "tags: 'mcp-v*'",
+        "summary": "@memory-bank/mcp を npm に公開する。",
+        "steps": [
+          "Checkout code",
+          "Setup Node.js",
+          "Install dependencies",
+          "Build",
+          "Get version from tag",
+          "Check npm version existence",
+          "Publish to npm if not exists"
+        ]
+      },
+      {
+        "action": "作成",
+        "file": ".github/workflows/release-schemas.yml",
+        "trigger": "tags: 'schemas-v*'",
+        "summary": "@memory-bank/schemas を npm に公開する。",
+        "steps": [
+          "Checkout code",
+          "Setup Node.js",
+          "Install dependencies",
+          "Build",
+          "Get version from tag",
+          "Check npm version existence",
+          "Publish to npm if not exists"
+        ]
+      },
+      {
+        "action": "作成",
+        "file": ".github/workflows/release-vscode.yml",
+        "trigger": "tags: 'vscode-v*'",
+        "summary": "VSCode拡張機能 (.vsix) をビルドし、GitHubリリースに添付する。",
+        "steps": [
+          "Checkout code",
+          "Setup Node.js",
+          "Install dependencies",
+          "Build extension",
+          "Install vsce",
+          "Package .vsix",
+          "Create GitHub Release and attach .vsix"
+        ]
+      }
+    ],
+    "nextImplementationSteps": [
+      "Update packages/mcp/package.json version to 2.3.0",
+      "Delete .github/workflows/release.yml",
+      "Create .github/workflows/release-mcp.yml",
+      "Create .github/workflows/release-schemas.yml",
+      "Create .github/workflows/release-vscode.yml"
+    ]
+  }
+}

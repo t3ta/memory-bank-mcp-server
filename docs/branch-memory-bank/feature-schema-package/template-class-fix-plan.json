@@ -1,0 +1,92 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "template-class-fix-plan",
+    "title": "Template クラス関連の修正計画",
+    "documentType": "plan",
+    "path": "template-class-fix-plan.json",
+    "tags": [
+      "template",
+      "cleanup",
+      "refactoring",
+      "schema-package"
+    ],
+    "lastModified": "2025-03-28T15:50:00.000Z",
+    "createdAt": "2025-03-28T15:50:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": {
+      "description": "Template クラス関連のコードがpackages/mcpに完全に移行されておらず、エラーが発生している状態を解決するための計画。テンプレート関連コード全体をモックに置き換えるか、安全に削除する方針で対応する。",
+      "problemStatement": "packages/mcp内でFileTemplateRepository.tsが参照しているTemplate関連のクラスが存在しないため、テスト実行時にエラーが発生している",
+      "approach": "テンプレート関連コードは最終的に削除する方針なので、可能な限り簡単にモック化または削除してテスト環境を整える"
+    },
+    "impactedFiles": [
+      {
+        "path": "/Users/t3ta/workspace/memory-bank-mcp-server/src/infrastructure/templates/FileTemplateRepository.ts",
+        "description": "テンプレートリポジトリの実装クラス（ファイルベース）。packages/mcpに移行されていない",
+        "status": "要削除または置換"
+      },
+      {
+        "path": "/Users/t3ta/workspace/memory-bank-mcp-server/src/domain/templates/Template.ts",
+        "description": "Template ドメインモデル。packages/mcpに移行されていない",
+        "status": "要削除または置換"
+      },
+      {
+        "path": "/Users/t3ta/workspace/memory-bank-mcp-server/src/domain/templates/Section.ts",
+        "description": "Template内のセクションを表すドメインモデル。packages/mcpに移行されていない",
+        "status": "要削除または置換"
+      },
+      {
+        "path": "/Users/t3ta/workspace/memory-bank-mcp-server/src/domain/templates/ITemplateRepository.ts",
+        "description": "テンプレートリポジトリのインターフェース。packages/mcpに移行されていない",
+        "status": "要削除または置換"
+      },
+      {
+        "path": "/Users/t3ta/workspace/memory-bank-mcp-server/packages/mcp/src/migration/MarkdownMigrationService.ts",
+        "description": "マークダウン変換サービス。内部でTemplate関連クラスをモック化している",
+        "status": "既にモック化済み、問題なし"
+      },
+      {
+        "path": "/Users/t3ta/workspace/memory-bank-mcp-server/packages/mcp/tests/unit/interface/controllers/TemplateController.test.ts",
+        "description": "テンプレートコントローラーのテスト",
+        "status": "削除済み"
+      }
+    ],
+    "actionPlan": [
+      {
+        "step": "Jest設定ファイルの調整",
+        "description": "テスト実行時に型チェックを緩和する設定を追加する",
+        "status": "完了",
+        "details": "isolatedModules: trueの設定を追加"
+      },
+      {
+        "step": "テストファイルに@jest/globalsをインポート",
+        "description": "テストファイルで「jest is not defined」エラーが発生する問題を修正",
+        "status": "必要に応じて実施"
+      },
+      {
+        "step": "テンプレート関連コードをモック化",
+        "description": "必要なモックをプロジェクト内に作成し、実際のコード参照を置き換える",
+        "status": "予定",
+        "options": [
+          "既存のtemplate-mockディレクトリを利用する",
+          "直接テストファイル内でモックを定義する",
+          "providers.tsのようにすでにモック化されている箇所を参考にする"
+        ]
+      },
+      {
+        "step": "不要なテンプレートコードの削除",
+        "description": "テストが通った後、元のsrc/内のテンプレート関連コードを削除する",
+        "status": "予定",
+        "details": "src/domain/templates/と関連するファイルを削除"
+      }
+    ],
+    "riskAssessment": {
+      "riskLevel": "低",
+      "justification": "テンプレート関連コードは最終的に削除予定であり、モック置換によるリスクは最小限。テストが通ることを確認してから進めるため、機能的な問題は発生しにくい",
+      "mitigationStrategy": "まずはモックで対応し、テストが通るようになってから本格的な削除作業を行う"
+    },
+    "testStrategy": "テンプレートコントローラーのテストは既に削除済み。GlobalControllerやBranchControllerのテストで残っているTemplate関連の参照はモックに置き換えて対応する"
+  }
+}

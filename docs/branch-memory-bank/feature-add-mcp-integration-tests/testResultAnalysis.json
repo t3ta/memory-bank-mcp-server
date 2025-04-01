@@ -1,0 +1,117 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "test-result-analysis",
+    "title": "統合テスト実行結果の分析",
+    "documentType": "analysis",
+    "path": "testResultAnalysis.json",
+    "tags": [
+      "integration-tests",
+      "debugging",
+      "analysis",
+      "test-results"
+    ],
+    "lastModified": "2025-03-31T18:15:00.000Z",
+    "createdAt": "2025-03-31T18:15:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": "統合テスト実行の結果を分析し、残存する問題点を特定します。SIGINT問題は解決されましたが、一部のテストが失敗しています。",
+    "testExecutionResults": {
+      "firstRun": {
+        "testSuites": {
+          "total": 8,
+          "passed": 6,
+          "failed": 2
+        },
+        "tests": {
+          "total": 39,
+          "passed": 34,
+          "failed": 5
+        },
+        "errors": [
+          {
+            "location": "MCPResponsePresenter.ts:41:12",
+            "message": "Error in BranchController.handleError",
+            "testFile": "controller/BranchController.integration.test.ts:121:22"
+          }
+        ]
+      },
+      "secondRun": {
+        "testSuites": {
+          "total": 8,
+          "passed": 6,
+          "failed": 2
+        },
+        "tests": {
+          "total": 39,
+          "passed": 34,
+          "failed": 5
+        },
+        "errors": [
+          {
+            "location": "FileSystemBranchMemoryBankRepository.ts:301:28",
+            "message": "Error in saveDocument",
+            "testFile": "usecase/WriteBranchDocumentUseCase.integration.test.ts:182:7"
+          }
+        ]
+      },
+      "sigintStatus": "解決済み - 2回連続で実行しても中断されなくなりました"
+    },
+    "problemAnalysis": {
+      "sigintIssue": {
+        "status": "解決済み",
+        "solution": "package.jsonのtest:integrationスクリプトに--forceExitフラグを追加し、setup.mtsにafterAllフックで1秒の遅延を追加したことで、SIGINTが自動的に送信される問題が解決されました。"
+      },
+      "failingTests": {
+        "issue1": {
+          "description": "BranchControllerのwriteDocumentテストが失敗",
+          "location": "controller/BranchController.integration.test.ts",
+          "potentialCauses": [
+            "テスト環境のブランチディレクトリが正しく設定されていない",
+            "テスト中のエラーハンドリングに問題がある",
+            "MCPResponsePresenterの実装とテストの期待値に差異がある"
+          ],
+          "priority": "high"
+        },
+        "issue2": {
+          "description": "WriteBranchDocumentUseCaseのテストが失敗",
+          "location": "usecase/WriteBranchDocumentUseCase.integration.test.ts",
+          "potentialCauses": [
+            "FileSystemBranchMemoryBankRepositoryのsaveDocument関数でのエラー",
+            "テスト環境のディレクトリ権限または構造の問題",
+            "ブランチ名の処理やパス解決に問題がある"
+          ],
+          "priority": "high"
+        }
+      }
+    },
+    "nextSteps": [
+      {
+        "id": "step-1",
+        "description": "BranchController.integration.testの失敗箇所（121行目付近）を詳しく調査",
+        "action": "テスト内容を確認し、期待値と実際の結果の差異を把握する",
+        "priority": "high"
+      },
+      {
+        "id": "step-2",
+        "description": "WriteBranchDocumentUseCase.integration.testの失敗箇所（182行目付近）を詳しく調査",
+        "action": "FileSystemBranchMemoryBankRepositoryのsaveDocument実装を確認する",
+        "priority": "high"
+      },
+      {
+        "id": "step-3",
+        "description": "テスト環境のセットアップを見直し、ブランチディレクトリの作成と設定を確認",
+        "action": "test-env.tsのcreateBranchDir関数を確認し、必要に応じて修正する",
+        "priority": "medium"
+      },
+      {
+        "id": "step-4",
+        "description": "ブランチ名の処理方法を確認",
+        "action": "ブランチ名に特殊文字（/など）が含まれる場合の処理を確認する",
+        "priority": "medium"
+      }
+    ],
+    "conclusion": "SIGINT問題は--forceExitフラグとafterAllフックの追加によって解決されました。これにより、VSCodeの統合ターミナルでも連続してテストを実行できるようになりました。ただし、39のテスト中5つが失敗しており、主にBranchControllerとWriteBranchDocumentUseCaseに関連するテストで問題が発生しています。これらの問題はテスト環境のセットアップやエラーハンドリングに関連していると思われます。次のステップとして、失敗しているテストの具体的な内容を確認し、必要な修正を行うことが重要です。"
+  }
+}

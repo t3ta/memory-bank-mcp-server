@@ -1,0 +1,48 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "d979d005-82b3-4748-884c-5fe94d98d74e",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress"
+    ],
+    "lastModified": "2025-03-26T04:40:00.000Z",
+    "createdAt": "2025-03-26T04:20:00.000Z",
+    "version": 2
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "a0e742b3-fa70-47e4-baf1-08f8edd04bf9",
+        "description": "CLI削除計画の立案",
+        "implementedAt": "2025-03-26T04:20:00.000Z"
+      },
+      {
+        "id": "d70b5c97-f670-45bd-9eeb-3bfb498aee51",
+        "description": "package.jsonからCLI関連エントリーの削除",
+        "implementedAt": "2025-03-26T04:35:00.000Z"
+      },
+      {
+        "id": "4d8a863d-20e0-4d8b-939d-d2edea18079e",
+        "description": "src/cli ディレクトリの削除",
+        "implementedAt": "2025-03-26T04:36:00.000Z"
+      },
+      {
+        "id": "c99cf810-33af-48f4-97eb-17d5c15f14ea",
+        "description": "CLI関連テストのチェック（特になし）",
+        "implementedAt": "2025-03-26T04:37:00.000Z"
+      },
+      {
+        "id": "e8bf6a92-1233-4c55-8910-7c65fdb32ab1",
+        "description": "CLI関連の依存関係（yargs）の削除",
+        "implementedAt": "2025-03-26T04:38:00.000Z"
+      }
+    ],
+    "pendingImplementation": [],
+    "status": "プロジェクトからCLI機能を完全に削除しました。package.jsonからのエントリー削除、CLIソースコードの削除、依存関係の整理を行い、ビルドも成功しています。",
+    "completionPercentage": 100,
+    "knownIssues": []
+  }
+}

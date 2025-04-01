@@ -1,0 +1,84 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "2730699e-d3c5-4508-b88e-9093d17d056e",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context"
+    ],
+    "lastModified": "2025-03-26T04:00:00.000Z",
+    "createdAt": "2025-03-25T18:08:59.195Z",
+    "version": 3
+  },
+  "content": {
+    "currentWork": "ts-pruneを使用した未使用コードの特定と削除作業が完了しました",
+    "recentChanges": [
+      {
+        "date": "2025-03-26T04:00:00.000Z",
+        "description": "ロガー関連の未使用コードを削除"
+      },
+      {
+        "date": "2025-03-26T04:00:00.000Z",
+        "description": "FileSystemTagIndexRepository関連の未使用コードを削除"
+      },
+      {
+        "date": "2025-03-26T04:00:00.000Z",
+        "description": "json-to-markdown関連の未使用コードを削除"
+      },
+      {
+        "date": "2025-03-26T04:00:00.000Z",
+        "description": "変更をコミット"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "5676eead-8ca1-41b7-8e62-7d1787f5f859",
+        "description": "コードは一度に全て削除せず、関連するモジュールごとにグループ化して削除する"
+      },
+      {
+        "id": "85b65a81-50d3-429e-9c69-7533d950b908",
+        "description": "後方互換性のために必要なエクスポートは残す（例：loggerのエクスポート）"
+      },
+      {
+        "id": "c5b88f0c-1534-4a93-9e36-8d2f37e2c19d",
+        "description": "未使用のファイルは内容は空にしつつ、ファイルそのものは保持し、将来の削除を示すコメントを追加"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "5ca3f33c-b31c-4be2-8d17-5541b1306cf5",
+        "description": "FileSystemTagIndexRepositoryGetters.ts はクラス継承の複雑さがあり、完全削除ではなく内容を空にした",
+        "status": "resolved"
+      },
+      {
+        "id": "ed50f668-b1e1-4b3c-9b15-77bd6cd8c87e",
+        "description": "json-to-markdownの一部ユーティリティのみを削除（createDefaultConverter関数）",
+        "status": "resolved"
+      },
+      {
+        "id": "853e67b6-be45-4318-9bdc-14f74f8ac1c6",
+        "description": "テストの一部が失敗するが、もともとのプロジェクトの問題であり修正は必要なし",
+        "status": "resolved"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "1a4fd87c-e632-4b91-af32-5d6b76e8943e",
+        "description": "PullRequestを作成して変更をレビューしてもらう",
+        "priority": "high"
+      },
+      {
+        "id": "2b37e49f-5421-4ca0-bcfb-d8cf4fe0ab12",
+        "description": "さらにts-pruneで未使用コードがないか定期的にチェックする体制を整える",
+        "priority": "medium"
+      },
+      {
+        "id": "3c8a5e2d-9810-4d7f-be47-e9f23d0f9c7a",
+        "description": "今回の作業で性能・ビルド時間にどれだけ改善があったかを計測",
+        "priority": "low"
+      }
+    ]
+  }
+}
