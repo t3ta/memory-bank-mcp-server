@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [develop, master]
   push:
-    branches: [develop, master]
+    branches: [develop] # master への push トリガーを削除
 
 # コンカレンシー制御 - 同じブランチで同時に実行されないようにする
 concurrency:
@@ -26,14 +26,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'yarn'
       - run: yarn install --frozen-lockfile
-      
-      # Build schemas package first, then mcp package, then the root package
-      - name: Build packages in order
-        run: |
-          yarn workspace @memory-bank/schemas build
-          yarn workspace @memory-bank/mcp build
-          yarn build
-          
-          # Use Yarn workspaces to manage cross-package dependencies
-          yarn workspaces run build
+
+      # Build the entire project using TypeScript project references
+      - name: Build project
+        run: yarn build
       - run: yarn test
