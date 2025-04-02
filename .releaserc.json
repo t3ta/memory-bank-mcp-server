@@ -61,13 +61,6 @@
         "prepareCmd": "./scripts/update-readme-version.sh ${nextRelease.version}"
       }
     ],
-    "@semantic-release/github",
-    [
-      "@semantic-release/git",
-      {
-        "assets": ["package.json", "packages/**/package.json", "CHANGELOG.md", "packages/mcp/README.md"],
-        "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
-      }
-    ]
+    "@semantic-release/github"
   ]
 }
