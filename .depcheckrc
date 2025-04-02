@@ -1,5 +1,14 @@
 {
   "ignores": [
-    "semver"
+    "semver",
+    "@semantic-release/changelog",
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/exec",
+    "@semantic-release/git",
+    "@semantic-release/github",
+    "@semantic-release/npm",
+    "@semantic-release/release-notes-generator",
+    "conventional-changelog-conventionalcommits",
+    "semantic-release"
   ]
 }
