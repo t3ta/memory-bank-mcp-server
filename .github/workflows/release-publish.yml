@@ -1,0 +1,102 @@
+# .github/workflows/release-publish.yml
+name: Publish Release
+
+on:
+  push:
+    branches:
+      - master
+    # Only run on pushes that include the release commit message
+    # This prevents running on every push to master
+    paths:
+      - 'package.json' # Assuming version bump always changes package.json
+
+permissions:
+  contents: write # Needed to create releases and tags
+  # issues: write # Potentially needed if linking issues in release notes
+  # pull-requests: write # Potentially needed if linking PRs
+
+jobs:
+  publish-release:
+    name: Publish Release
+    runs-on: ubuntu-latest
+    # Prevent running on forks
+    if: |
+      github.repository == 't3ta/memory-bank-mcp-server' &&
+      contains(github.event.head_commit.message, 'chore(release): prepare release v')
+    steps:
+      - name: Checkout master branch
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          # Fetch all history and tags for semantic-release (though not strictly needed here)
+          fetch-depth: 0
+          # Use PAT for potential future operations needing push access
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          # Optional: Configure registry for npm publish if needed later
+          # registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      # No build needed if artifacts are not required for release assets
+
+      - name: Get Version from package.json
+        id: get_version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "PACKAGE_VERSION=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Create Git Tag
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }} # Use PAT for tag creation
+          VERSION: ${{ steps.get_version.outputs.PACKAGE_VERSION }}
+        run: |
+          echo "Creating Git tag v${VERSION}"
+          # Create an annotated tag
+          git tag -a "v${VERSION}" -m "Release v${VERSION}"
+          git push origin "v${VERSION}"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }} # Use PAT for release creation
+          VERSION: ${{ steps.get_version.outputs.PACKAGE_VERSION }}
+        run: |
+          echo "Creating GitHub Release for v${VERSION}"
+          # Extract release notes from CHANGELOG.md for this version
+          # This assumes CHANGELOG format like: # [X.Y.Z] ... \n\n ... # [X.Y.Z-1]
+          # Ensure CHANGELOG.md exists before trying to read
+          if [ ! -f CHANGELOG.md ]; then
+            echo "CHANGELOG.md not found. Cannot extract release notes."
+            NOTES="*CHANGELOG.md not found.*"
+          else
+            NOTES=$(awk "/^# \\[${VERSION}\]/{flag=1; next} /^# \\[/ && flag{flag=0; exit} flag" CHANGELOG.md)
+            # Handle case where version header is not found or notes are empty
+            if [ -z "$NOTES" ]; then
+              NOTES="*Could not extract release notes from CHANGELOG.md. See the file for details.*"
+            fi
+          fi
+          # Create release using gh cli
+          gh release create "v${VERSION}" \
+            --title "Release v${VERSION}" \
+            --notes "${NOTES}" \
+            --target master # Explicitly target master
+
+      # --- Optional: Publish to npm ---
+      # - name: Publish to npm
+      #   if: steps.get_version.outputs.PACKAGE_VERSION # Ensure version was read
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      #   run: |
+      #     echo "Publishing version ${{ steps.get_version.outputs.PACKAGE_VERSION }} to npm"
+      #     # Add publishConfig to root package.json if needed, or publish workspaces individually
+      #     npm publish --access public # Adjust access level if needed
+
+      # --- Optional: Upload VSCode Extension ---
+      # Similar logic as in the original release.yml, triggered by tag push maybe?
+      # Or integrate here if the VSIX should be part of the main release assets.
+      # Needs careful consideration of how/when the VSIX is built.
