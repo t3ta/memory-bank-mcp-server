@@ -4,6 +4,13 @@
 import { setupTestEnv, cleanupTestEnv, createBranchDir, type TestEnv } from '../helpers/test-env.js';
 import { DIContainer, setupContainer } from '../../../src/main/di/providers.js'; // Import DI container and setup function
 import { BranchController } from '../../../src/interface/controllers/BranchController.js'; // Import real controller
+import type { DocumentDTO } from '../../../src/application/dtos/DocumentDTO.js'; // Import DocumentDTO for type guard
+
+// Custom Type Guard function to check if data is DocumentDTO
+function isDocumentDTO(data: any): data is DocumentDTO {
+  // Check for properties specific to DocumentDTO, like 'path' and 'content'
+  return data && typeof data === 'object' && 'path' in data && 'content' in data && 'lastModified' in data;
+}
 
 describe('BranchController Integration Tests', () => {
   let testEnv: TestEnv;
@@ -17,7 +24,7 @@ describe('BranchController Integration Tests', () => {
       documentType: "test",
       path: 'test-document.json', // Default path, can be overridden in tests
       tags: ["test", "branch"],
-      lastModified: expect.any(String),
+      lastModified: new Date().toISOString(), // Use valid ISO string
       createdAt: expect.any(String),
       version: 1
     },
@@ -41,7 +48,7 @@ describe('BranchController Integration Tests', () => {
       const result = await controller.readDocument(TEST_BRANCH, 'non-existent.json');
 
       expect(result.success).toBe(false);
-      if (result.success) fail('Expected error but got success'); // Add type guard with fail()
+      if (result.success) throw new Error('Expected error but got success'); // Use throw new Error
       expect(result.error).toBeDefined();
     });
 
@@ -52,17 +59,31 @@ describe('BranchController Integration Tests', () => {
       const testDoc = { ...simpleDocument, metadata: { ...simpleDocument.metadata, path: documentPath } };
       const documentContentString = JSON.stringify(testDoc, null, 2);
 
-      const writeResult = await controller.writeDocument(TEST_BRANCH, documentPath, documentContentString);
+      // Call writeDocument with a single params object
+      const writeResult = await controller.writeDocument({
+        branchName: TEST_BRANCH,
+        path: documentPath,
+        content: documentContentString,
+        tags: testDoc.metadata.tags // Pass tags too
+      });
 
       expect(writeResult.success).toBe(true);
-      if (!writeResult.success) fail('Expected success but got error'); // Add type guard with fail()
+      if (!writeResult.success) throw new Error('Expected success but got error'); // Use throw new Error
       expect(writeResult.data).toBeDefined();
-      expect(writeResult.data.message).toBe('Document written successfully');
+      // Assert that writeResult.data is a valid DocumentDTO using the type guard
+      expect(writeResult.data).toBeDefined();
+      if (!writeResult.data || !isDocumentDTO(writeResult.data)) {
+          // Log the actual data for debugging if the type guard fails
+          console.error("--- Assertion Error: writeResult.data was not DocumentDTO. Actual data:", JSON.stringify(writeResult.data, null, 2));
+          throw new Error('Expected writeResult.data to be a valid DocumentDTO');
+      }
+      // If type guard passes, assert the path
+      expect(writeResult.data.path).toBe(documentPath);
 
       const readResult = await controller.readDocument(TEST_BRANCH, documentPath);
 
       expect(readResult.success).toBe(true);
-      if (!readResult.success) fail('Expected success but got error'); // Add type guard with fail()
+      if (!readResult.success) throw new Error('Expected success but got error'); // Use throw new Error
       expect(readResult.data).toBeDefined();
       const parsed = JSON.parse(readResult.data.document.content);
 
@@ -82,7 +103,7 @@ describe('BranchController Integration Tests', () => {
       const result = await controller.readDocument('non-existent-branch', 'some-file.json');
 
       expect(result.success).toBe(false);
-      if (result.success) fail('Expected error but got success'); // Add type guard with fail()
+      if (result.success) throw new Error('Expected error but got success'); // Use throw new Error
       expect(result.error).toBeDefined();
     });
   });
@@ -92,10 +113,15 @@ describe('BranchController Integration Tests', () => {
       const controller = await container.get<BranchController>('branchController');
       const invalidContent = '{"schema": "memory_document_v2", "metadata": {}'; // Invalid JSON
 
-      const result = await controller.writeDocument(TEST_BRANCH, 'invalid.json', invalidContent);
+      // Call writeDocument with a single params object
+      const result = await controller.writeDocument({
+        branchName: TEST_BRANCH,
+        path: 'invalid.json',
+        content: invalidContent
+      });
 
       expect(result.success).toBe(false);
-      if (result.success) fail('Expected error but got success'); // Add type guard with fail()
+      if (result.success) throw new Error('Expected error but got success'); // Use throw new Error
       expect(result.error).toBeDefined();
     });
 
@@ -119,16 +145,22 @@ describe('BranchController Integration Tests', () => {
       };
       const documentContentString = JSON.stringify(newBranchDoc, null, 2);
 
-      const writeResult = await controller.writeDocument(NEW_BRANCH, documentPath, documentContentString);
+      // Call writeDocument with a single params object
+      const writeResult = await controller.writeDocument({
+        branchName: NEW_BRANCH,
+        path: documentPath,
+        content: documentContentString,
+        tags: newBranchDoc.metadata.tags // Pass tags too
+      });
 
       expect(writeResult.success).toBe(true);
-      if (!writeResult.success) fail('Expected success but got error'); // Add type guard with fail()
+      if (!writeResult.success) throw new Error('Expected success but got error'); // Use throw new Error
       expect(writeResult.data).toBeDefined();
 
       const readResult = await controller.readDocument(NEW_BRANCH, documentPath);
 
       expect(readResult.success).toBe(true);
-      if (!readResult.success) fail('Expected success but got error'); // Add type guard with fail()
+      if (!readResult.success) throw new Error('Expected success but got error'); // Use throw new Error
       expect(readResult.data).toBeDefined();
       const parsed = JSON.parse(readResult.data.document.content);
       // Use newBranchDoc for comparison
@@ -153,24 +185,44 @@ describe('BranchController Integration Tests', () => {
 
       // 1. Write initial document
       // 1. Write initial document
-      const initialWriteResult = await controller.writeDocument(TEST_BRANCH, documentPath, initialContentString);
+      // Call writeDocument with a single params object
+      const initialWriteResult = await controller.writeDocument({
+        branchName: TEST_BRANCH,
+        path: documentPath,
+        content: initialContentString,
+        tags: initialDoc.metadata.tags // Pass tags too
+      });
       expect(initialWriteResult.success).toBe(true);
-      if (!initialWriteResult.success) fail('Expected success but got error on initial write'); // Add type guard
+      if (!initialWriteResult.success) throw new Error('Expected success but got error on initial write'); // Use throw new Error
       expect(initialWriteResult.data).toBeDefined();
 
       // 2. Write updated document (overwrite)
       // 2. Write updated document (overwrite)
-      const updateResult = await controller.writeDocument(TEST_BRANCH, documentPath, updatedContentString);
+      // Call writeDocument with a single params object
+      const updateResult = await controller.writeDocument({
+        branchName: TEST_BRANCH,
+        path: documentPath,
+        content: updatedContentString,
+        tags: updatedDoc.metadata.tags // Pass tags too
+      });
       expect(updateResult.success).toBe(true);
-      if (!updateResult.success) fail('Expected success but got error on update write'); // Add type guard
+      if (!updateResult.success) throw new Error('Expected success but got error on update write'); // Use throw new Error
       expect(updateResult.data).toBeDefined();
-      expect(updateResult.data.message).toBe('Document written successfully');
+      // Assert that updateResult.data is a valid DocumentDTO using the type guard
+      expect(updateResult.data).toBeDefined();
+       if (!updateResult.data || !isDocumentDTO(updateResult.data)) {
+           // Log the actual data for debugging if the type guard fails
+           console.error("--- Assertion Error: updateResult.data was not DocumentDTO. Actual data:", JSON.stringify(updateResult.data, null, 2));
+           throw new Error('Expected updateResult.data to be a valid DocumentDTO');
+       }
+       // If type guard passes, assert the path
+       expect(updateResult.data.path).toBe(documentPath);
 
       // 3. Read the document and verify updated content
       // 3. Read the document and verify updated content
       const readResult = await controller.readDocument(TEST_BRANCH, documentPath);
       expect(readResult.success).toBe(true);
-      if (!readResult.success) fail('Expected success but got error on read after update'); // Add type guard
+      if (!readResult.success) throw new Error('Expected success but got error on read after update'); // Use throw new Error
       expect(readResult.data).toBeDefined();
       const parsed = JSON.parse(readResult.data.document.content);
 

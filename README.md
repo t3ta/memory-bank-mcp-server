@@ -1,9 +1,9 @@
-# Memory Bank MCP Server 2.2.2
+# Memory Bank MCP Server 2.3.4
 
 A Memory Bank implementation for managing project documentation and context
 across sessions. This server helps Claude maintain consistent project knowledge
-through global and branch-specific memory banks. Version 2.2.2 enhances JSON
-Patch support and adds workspace options along with numerous improvements.
+through global and branch-specific memory banks. Version 2.3.4 includes fixes
+for JSON Patch handling and updates to core documentation.
 
 This project is inspired by
 [Cline Memory Bank](https://github.com/nickbaumann98/cline_docs/blob/main/prompting/custom%20instructions%20library/cline-memory-bank.md)
@@ -11,39 +11,32 @@ from the [nickbaumann98/cline_docs](https://github.com/nickbaumann98/cline_docs)
 repository, which provides an excellent foundation for managing Claude's memory
 in software projects.
 
-## What's New in 2.2.2
+## What's New in 2.3.4 (and recent versions)
 
-### Enhanced JSON Patch Implementation
+### Core Functionality Enhancements (v2.3.x)
 
-- **Updated Implementation**: Improved JSON Patch adapter and operation handling
-- **Better Error Codes**: Enhanced error reporting for patch operations
-- **Comprehensive Documentation**: Added detailed templates and examples
-- **Event Handling**: Improved document event handling with patch operations
+- **JSON Patch Fixes (v2.3.4)**: Resolved bugs related to JSON Patch
+  application, tag updates during patching, and date handling (`lastModified`)
+  in the file system repository.
+- **Core Tool Manuals (v2.3.4)**: Added comprehensive English manuals for core
+  MCP tools (`write/read_branch/global_memory_bank`, `read_context`,
+  `search_documents_by_tags`) located in
+  `docs/global-memory-bank/core/mcp-tool-manual.json`.
+- **JSON Document Structure (v2.0.0)**: Introduced a JSON-based architecture for
+  all documents, improving structure, validation, and programmatic access.
+- **Enhanced API (v2.0.0)**: Added `read_context` tool, multilingual support
+  (en, ja, zh), and template-based initialization.
+- **Clean Architecture (v2.0.0)**: Refactored codebase following clean
+  architecture principles for better maintainability and testability.
+- **CLI Removal (v2.1.0)**: Removed the standalone CLI tool to focus on the MCP
+  server interface.
 
-### CLI Workspace Option Enhancement
-
-- **Direct Root Directory Specification**: Command line now supports specifying
-  the project root directory directly
-- **Flexible Project Management**: Work with different projects more seamlessly
-
-### Template System Integration
-
-- **Template Loading Support**: ReadRulesUseCase now supports template loading
-- **Improved Error Handling**: Better error codes and handling throughout the
-  system
-
-### Testing Improvements
+### Testing and Development Improvements
 
 - **Test Framework Migration**: Replaced ts-mockito with jest.fn() for better
-  testing
-- **Simplified Testing Setup**: Removed E2E test setup for more streamlined
-  testing
-
-### Logging Enhancements
-
-- **Logger Replacement**: Replaced console.log with logger across all files
-  (except CLI)
-- **Logging Adjustments**: Improved handling of empty code changes
+  testing.
+- **Logging Enhancements**: Replaced console.log with a dedicated logger across
+  most files.
 
 ## Usage
 
@@ -52,13 +45,13 @@ in software projects.
 #### NPX (Recommended)
 
 ```bash
-npx memory-bank-mcp-server
+npx @memory-bank/mcp@latest --docsRoot /path/to/your/docs
 ```
 
 With options:
 
 ```bash
-npx memory-bank-mcp-server --language ja --verbose
+npx @memory-bank/mcp@latest --docsRoot /path/to/your/docs --language ja --verbose
 ```
 
 #### Installation (Optional)
@@ -66,137 +59,44 @@ npx memory-bank-mcp-server --language ja --verbose
 If you prefer to install globally:
 
 ```bash
-npm install -g memory-bank-mcp-server
-memory-bank-mcp-server --help
+npm install -g @memory-bank/mcp
+memory-bank-mcp --docsRoot /path/to/your/docs --help
 ```
-
-### CLI Tool
-
-The package also includes a CLI tool for direct memory bank operations from your
-terminal.
-
-#### NPX Usage
-
-```bash
-npx memory-bank read-global architecture.md
-npx memory-bank write-global tech-stack.md -f ./tech-stack.md
-npx memory-bank read-branch feature/login activeContext.md
-npx memory-bank recent-branches
-```
-
-#### Installation
-
-```bash
-npm install -g memory-bank-mcp-server
-memory-bank --help
-```
-
-#### Available Commands
-
-- **read-global** `<path>`: Read a document from the global memory bank
-- **write-global** `<path> [content]`: Write a document to the global memory
-  bank
-- **read-branch** `<branch> <path>`: Read a document from a branch memory bank
-- **write-branch** `<branch> <path> [content]`: Write a document to a branch
-  memory bank
-- **read-core-files** `<branch>`: Read all core files from a branch memory bank
-- **recent-branches** `[limit]`: Get recent branches
 
 #### Options
 
-- **--docs, -d**: Path to docs directory (default: './docs')
-- **--verbose, -v**: Run with verbose logging (default: false)
-- **--language, -l**: Language for templates ('en', 'ja' or 'zh', default: 'en')
-- **--file, -f**: Read content from file (for write commands)
-- **--format**: Output format for read-core-files ('json' or 'pretty', default:
-  'pretty')
-
-## What's New in 2.0
-
-### JSON-based Document Structure
-
-Memory Bank 2.0 introduces a new JSON-based architecture for all documents,
-providing:
-
-- Better structure and validation through schema-based documents
-- Enhanced programmatic accessibility
-- Improved search and filtering capabilities
-- Future-proof design for database integration
-
-JSON documents follow this structure:
-
-```json
-{
-  "schema": "memory_document_v2",
-  "metadata": {
-    "id": "unique-id",
-    "title": "Document Title",
-    "documentType": "document_type",
-    "path": "relative/path.json",
-    "tags": ["tag1", "tag2"],
-    "lastModified": "2025-03-17T00:00:00Z",
-    "createdAt": "2025-03-17T00:00:00Z",
-    "version": 1
-  },
-  "content": {
-    // Document type-specific content
-  }
-}
-```
-
-### Enhanced API
-
-- New `read_context` command for fetching combined information
-- Multilingual support (English, Japanese, Chinese)
-- Template-based document initialization
-- Improved error handling and validation
-
-### Clean Architecture Implementation
-
-The codebase has been refactored to follow clean architecture principles:
-
-- Domain-centric design with explicit layers
-- Separation of concerns for better testability
-- Framework-agnostic core business logic
-- Improved maintainability and extensibility
+- **--docsRoot, -d**: Path to the project's documentation directory (required).
+  This is where `global-memory-bank` and `branch-memory-bank` reside.
+- **--verbose, -v**: Run with verbose logging (default: false).
+- **--language, -l**: Default language for templates ('en', 'ja' or 'zh',
+  default: 'en').
 
 ## Core Concepts
 
 ### Global Memory Bank
 
-The Global Memory Bank manages project-wide knowledge that persists across all
-branches:
-
-- Architecture documentation
-- Coding standards
-- Domain models
-- Project glossary
-- Technical stack information
-- User documentation
+Manages project-wide knowledge (architecture, standards, glossary, etc.) in
+`docs/global-memory-bank/`. Documents must be in JSON format following the
+`memory_document_v2` schema.
 
 Example structure:
 
 ```
 docs/global-memory-bank/
-  ├── architecture.json      # System architecture
-  ├── coding-standards.json  # Coding conventions
-  ├── domain-models.json     # Domain model definitions
-  ├── glossary.json         # Terminology
-  ├── tech-stack.json       # Technology stack
-  ├── user-guide.json       # User guide
-  └── tags/                 # Information organization
+  ├── core/
+  │   └── mcp-tool-manual.json # Core tool manual (New in v2.3.4)
+  ├── 02-architecture/
+  │   └── system-overview.json
+  ├── 04-guides/
+  │   └── how-to-use-json-patch.json
+  └── tags/
+      └── _global_index.json
 ```
-
-> Note: Only .json format is supported.
 
 ### Branch Memory Bank
 
-Branch Memory Banks store context specific to feature or fix branches:
-
-- Branch context and purpose
-- Active development state
-- System patterns and decisions
-- Implementation progress
+Stores context specific to feature/fix branches in `docs/branch-memory-bank/`.
+Documents must be in JSON format.
 
 Example structure:
 
@@ -208,157 +108,110 @@ docs/branch-memory-bank/feature-login/
   └── progress.json        # Implementation status
 ```
 
-> Note: Only .json format is supported.
+## API (MCP Tools)
 
-## API
-
-### Tools
+The server provides the following tools via the Model Context Protocol (MCP):
 
 - **write_branch_memory_bank**
 
-  - Write a document to the current branch's memory bank
-  - Input:
-    - `path` (string): Document path
-    - `content` (string, optional): Document content (full replacement)
-    - `patches` (array, optional): JSON Patch operations to apply (cannot be
-      used with content)
-    - `branch` (string, required): Branch name
-    - `docs` (string, optional): Path to docs directory
-  - Creates directories as needed
-  - Initializes with templates if content is empty
-  - Supports partial updates with JSON Patch
-  - Can work with different workspace/docs locations than the server default
+  - Creates or overwrites a document in the specified branch's memory bank.
+  - Input (`arguments`):
+    - `branch` (string, required): Target branch name (e.g., `feature/login`).
+    - `path` (string, required): Document path within the branch (e.g.,
+      `activeContext.json`).
+    - `docs` (string, required): Path to the documentation root directory.
+    - `content` (string or object, optional): Full document content (JSON).
+      Mutually exclusive with `patches`.
+    - `patches` (array, optional): JSON Patch operations (RFC 6902) for partial
+      updates. Mutually exclusive with `content`. Document must exist for
+      patching.
+    - `tags` (array, optional): Array of strings to set as document tags. If
+      omitted, tags will be empty.
+  - Creates directories if needed. Initializes with templates if `content` and
+    `patches` are omitted for standard paths (`branchContext.json`, etc.).
 
 - **read_branch_memory_bank**
 
-  - Read a document from the current branch's memory bank
-  - Input:
-    - `path` (string): Document path
-    - `branch` (string, required): Branch name
-    - `docs` (string, optional): Path to docs directory
-  - Returns document content and metadata
-  - Can work with different workspace/docs locations than the server default
+  - Reads a document from the specified branch's memory bank.
+  - Input (`arguments`):
+    - `branch` (string, required): Target branch name.
+    - `path` (string, required): Document path within the branch.
+    - `docs` (string, required): Path to the documentation root directory.
+  - Returns: `document` object containing `path`, `content` (string), `tags`
+    (array), and `lastModified` (ISO string).
 
 - **write_global_memory_bank**
 
-  - Write a document to the global memory bank
-  - Input:
-    - `path` (string): Document path
-    - `content` (string, optional): Document content (full replacement)
-    - `patches` (array, optional): JSON Patch operations to apply (cannot be
-      used with content)
-    - `docs` (string, optional): Path to docs directory
-  - Creates directories as needed
-  - Updates tags index automatically
-  - Supports partial updates with JSON Patch
-  - Can work with different workspace/docs locations than the server default
+  - Creates, overwrites, or patches a document in the global memory bank.
+  - Input (`arguments`):
+    - `path` (string, required): Document path within the global bank (e.g.,
+      `core/config.json`).
+    - `docs` (string, required): Path to the documentation root directory.
+    - `content` (string or object, optional): Full document content (JSON).
+      Mutually exclusive with `patches`.
+    - `patches` (array, optional): JSON Patch operations (RFC 6902). Mutually
+      exclusive with `content`. Document must exist for patching.
+    - `tags` (array, optional): Array of strings to set as document tags. If
+      omitted, tags will be empty.
+  - Creates directories if needed. Updates the global tag index.
 
 - **read_global_memory_bank**
 
-  - Read a document from the global memory bank
-  - Input:
-    - `path` (string): Document path
-    - `docs` (string, optional): Path to docs directory
-  - Returns document content and metadata
+  - Reads a document from the global memory bank.
+  - Input (`arguments`):
+    - `path` (string, required): Document path within the global bank.
+    - `docs` (string, required): Path to the documentation root directory.
+  - Returns: `document` object containing `path`, `content` (string), `tags`
+    (array), and `lastModified` (ISO string).
 
 - **read_context**
 
-  - Read all context information (rules, branch memory bank, global memory bank)
-    at once
-  - Input:
-    - `branch` (string): Branch name (required)
-    - `language` (string): Language code ('en', 'ja', or 'zh', default: 'ja')
-    - `docs` (string, optional): Path to docs directory
-  - Returns combined context information (rules, branch memory, and global
-    memory)
-  - Note: As of version 2.2.2, all context components (rules, branch memory,
-    global memory) are always included
+  - Reads rules, branch memory bank, and global memory bank information at once.
+  - Input (`arguments`):
+    - `branch` (string, required): Current branch name.
+    - `language` (string, required): Language code ('en', 'ja', or 'zh').
+    - `docs` (string, required): Path to the documentation root directory.
+  - Returns: Object with `rules` (object), `branchMemoryBank` (array of
+    DocumentDTOs), and `globalMemoryBank` (array of DocumentDTOs).
 
-- **read_rules**
-  - Read the memory bank rules in specified language
-  - Input:
-    - `language` (string): Language code ("en", "ja", or "zh")
-  - Returns rules documentation
+- **search_documents_by_tags**
+  - Searches for documents by tags across memory banks.
+  - Input (`arguments`):
+    - `tags` (array, required): Array of tag strings to search for.
+    - `match` (string, optional): `and` or `or` (default: `or`).
+    - `scope` (string, optional): `branch`, `global`, or `all` (default: `all`).
+    - `branch` (string, optional): Required if `scope` is `branch` or `all`.
+    - `docs` (string, required): Path to the documentation root directory.
+  - Returns: Array of matching DocumentDTOs.
 
 ## Usage with Claude Desktop
 
 ### Setup
 
-Add one of these configurations to your claude_desktop_config.json:
-
-### NPX (Recommended)
+Add this configuration to your `claude_desktop_config.json`, replacing
+`/path/to/your/docs` with the actual path to your project's documentation
+directory:
 
 ```json
 {
   "mcpServers": {
     "memory-bank": {
       "command": "npx",
-      "args": ["-y", "memory-bank-mcp-server"],
+      "args": ["-y", "@memory-bank/mcp@latest", "--docs", "/path/to/your/docs"],
       "env": {
-        "MEMORY_BANK_ROOT": "/path/to/docs",
-        "MEMORY_BANK_LANGUAGE": "ja"
+        "MEMORY_BANK_LANGUAGE": "ja" // Optional: set default language
       }
     }
   }
 }
 ```
 
-### Global Installation
+Configuration options for the environment (`env`):
 
-```json
-{
-  "mcpServers": {
-    "memory-bank": {
-      "command": "memory-bank-mcp-server",
-      "env": {
-        "MEMORY_BANK_ROOT": "/path/to/docs",
-        "MEMORY_BANK_LANGUAGE": "ja"
-      }
-    }
-  }
-}
-```
-
-Configuration options:
-
-- `WORKSPACE_ROOT`: Root directory for the project workspace (default: current
-  directory)
-- `MEMORY_BANK_ROOT`: Root directory for memory bank storage (default: `docs` in
-  workspace)
 - `MEMORY_BANK_LANGUAGE`: Default language for templates ("en", "ja", or "zh",
-  default: "en")
+  default: "en").
 
-#### Working with Multiple Projects
-
-You can specify the docs directory when starting the server:
-
-```json
-{
-  "mcpServers": {
-    "memory-bank": {
-      "command": "npx",
-      "args": ["-y", "memory-bank-mcp-server", "--docs", "/path/to/docs"],
-      "env": {
-        "MEMORY_BANK_LANGUAGE": "ja"
-      }
-    }
-  }
-}
-```
-
-Alternatively, with the `read_context` and other MCP tools, you can work with
-different projects in the same session:
-
-```
-read_context(branch: "feature/my-branch", docs: "/path/to/other/docs")
-```
-
-Path resolution follows this priority order:
-
-1. Tool parameters (highest priority)
-2. Command-line options
-3. Environment variables
-4. Default values (current directory and ./docs)
+The `--docs` argument in `args` specifies the documentation root directly.
 
 ### System Prompt
 
@@ -368,29 +221,29 @@ Here's a recommended system prompt for utilizing the memory bank:
 Follow these steps for each interaction:
 
 1. Branch Context:
-   - Always begin by checking the current git branch
-   - For feature/ or fix/ branches, load the branch memory bank
-   - Initialize memory bank with templates if not present
+   - Always begin by checking the current git branch using available tools.
+   - For feature/ or fix/ branches, load the branch memory bank using `read_context`.
+   - Use the `docs` parameter in MCP tools to specify the correct documentation root if it differs from the server's startup configuration.
 
 2. Memory Bank Access:
-   - Read relevant documentation from global and branch memory banks
-   - Keep context of project-wide standards and branch-specific work
-   - Maintain documentation structure and organization
+   - Read relevant documentation from global and branch memory banks (`read_global_memory_bank`, `read_branch_memory_bank`, `search_documents_by_tags`).
+   - Keep context of project-wide standards and branch-specific work.
+   - Maintain documentation structure and organization.
 
 3. Documentation Updates:
-   - Update branch memory bank when:
+   - Update branch memory bank (`write_branch_memory_bank`) when:
      a) Making code changes
      b) Adding new features
      c) Making technical decisions
      d) Discovering new patterns
-   - Update global memory bank for project-wide changes
-   - Use JSON Patch for targeted updates when appropriate
+   - Update global memory bank (`write_global_memory_bank`) for project-wide changes.
+   - Use JSON Patch (`patches` parameter) for targeted updates when appropriate.
 
 4. Memory Bank Maintenance:
-   - Keep documentation organized and up-to-date
-   - Use proper templates and structures
-   - Tag documents appropriately
-   - Maintain clear hierarchies
+   - Keep documentation organized and up-to-date.
+   - Use proper JSON structures (`memory_document_v2` schema).
+   - Tag documents appropriately using the `tags` parameter during writes.
+   - Maintain clear hierarchies within the `docs` directory.
 ```
 
 ## Development
@@ -400,19 +253,26 @@ Clone and install dependencies:
 ```bash
 git clone <repository-url>
 cd memory-bank-mcp-server
-npm install
+yarn install # Use yarn
 ```
 
-Run in development mode:
+Run in development mode (starts the MCP server):
 
 ```bash
-npm run dev
+yarn dev
 ```
 
 Build:
 
 ```bash
-npm run build
+yarn build
+```
+
+Run tests:
+
+```bash
+yarn test # Runs unit tests
+yarn test:integration # Runs integration tests
 ```
 
 ## CI/CD Pipeline
@@ -426,29 +286,21 @@ Tests are automatically run on:
 - Pull requests to `develop` and `master` branches
 - Direct pushes to `develop` and `master` branches
 
-The test workflow runs against multiple Node.js versions (16.x, 18.x, 20.x) to
-ensure compatibility.
+The test workflow currently runs against Node.js version `23.x` (based on
+`.tool-versions`).
 
 ### Automated Release
 
 When code is merged to the `master` branch:
 
-1. Tests are run to verify the build
-2. A git tag is created based on the version in package.json
-3. A GitHub Release is created with release notes
-4. The package is published to npm
+1. Tests are run to verify the build.
+2. A git tag is created based on the version in `packages/mcp/package.json`.
+3. A GitHub Release is created with release notes.
+4. The `@memory-bank/mcp` package is published to npm.
 
 ### Manual Version Bumping
 
-To bump the version before a release:
-
-1. Go to the Actions tab in GitHub
-2. Select the "Version Bump" workflow
-3. Click "Run workflow"
-4. Choose the version bump type (patch, minor, or major)
-5. Select the branch to bump the version on (typically `develop`)
-
-This will create a commit with the updated version number in package.json.
+(Instructions remain the same - uses GitHub Actions workflow)
 
 ## License
 

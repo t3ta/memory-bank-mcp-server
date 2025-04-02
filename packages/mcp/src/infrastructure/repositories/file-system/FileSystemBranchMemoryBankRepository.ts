@@ -4,7 +4,7 @@ import fsExtra from "fs-extra"; // Import fs-extra
 import { BranchInfo } from "../../../domain/entities/BranchInfo.js";
 import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
 import { MemoryDocument } from "../../../domain/entities/MemoryDocument.js";
-import type { Tag } from "../../../domain/entities/Tag.js";
+import { Tag } from "../../../domain/entities/Tag.js"; // Changed from import type
 import type { IBranchMemoryBankRepository, RecentBranch } from "../../../domain/repositories/IBranchMemoryBankRepository.js";
 import { logger } from "../../../shared/utils/logger.js";
 import { DomainError, DomainErrors } from "../../../shared/errors/DomainError.js"; // Removed DomainErrorCodes, Added DomainErrors
@@ -141,11 +141,15 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
         // Try .json file first
         const content = await fs.readFile(jsonFilePath, 'utf-8');
         this.componentLogger.debug('Successfully read JSON file:', { operation: 'getDocument', path: jsonFilePath });
+        // --- Parse JSON and extract tags ---
+        const jsonData = JSON.parse(content);
+        const tags = (jsonData.metadata?.tags ?? []).map((tagStr: string) => Tag.create(tagStr));
+        // --- End of tag extraction ---
         return MemoryDocument.create({
           path: documentPath, // Keep the original .md path
           content,
-          tags: [],
-          lastModified: new Date()
+          tags: tags, // Use extracted tags
+          lastModified: jsonData.metadata?.lastModified ? new Date(jsonData.metadata.lastModified) : new Date() // Use metadata date or current date
         });
       } catch {
         // If .json not found, try .md
@@ -153,11 +157,13 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
         try {
           const content = await fs.readFile(filePath, 'utf-8');
           this.componentLogger.debug('Successfully read MD file:', { operation: 'getDocument', path: filePath });
+          // --- For MD files, tags are not stored in the file itself, assume empty ---
+          // (If MD could contain frontmatter with tags, parsing logic would go here)
           return MemoryDocument.create({
             path: documentPath,
             content,
-            tags: [],
-            lastModified: new Date()
+            tags: [], // MD files don't have structured tags in this implementation
+            lastModified: new Date() // Use file system mtime for MD? Or keep simple? Let's keep simple for now.
           });
         } catch (err) {
           this.componentLogger.debug('MD file not found either:', {
@@ -173,11 +179,15 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
     // Normal read process
     try {
       const content = await fs.readFile(filePath, 'utf-8');
+      // --- Parse JSON and extract tags ---
+      const jsonData = JSON.parse(content);
+      const tags = (jsonData.metadata?.tags ?? []).map((tagStr: string) => Tag.create(tagStr));
+      // --- End of tag extraction ---
       return MemoryDocument.create({
         path: documentPath,
         content,
-        tags: [],
-        lastModified: new Date()
+        tags: tags, // Use extracted tags
+        lastModified: jsonData.metadata?.lastModified ? new Date(jsonData.metadata.lastModified) : new Date() // Use metadata date or current date
       });
     } catch {
       return null;
@@ -241,6 +251,12 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
       // Use fsExtra.outputJson to handle directory creation and JSON writing atomically
       this.componentLogger.debug('Writing JSON file using fsExtra.outputJson:', { operation: 'saveDocument', filePath });
       const jsonData = JSON.parse(document.content); // Already validated above
+      // --- Add tags to metadata before saving ---
+      if (!jsonData.metadata) {
+        jsonData.metadata = {}; // Ensure metadata object exists
+      }
+      jsonData.metadata.tags = document.tags.map(tag => tag.value); // Add tags here!
+      // --- End of tag addition ---
       await fsExtra.outputJson(filePath, jsonData, { spaces: 2 });
       this.componentLogger.debug('Successfully wrote JSON file:', { operation: 'saveDocument', filePath });
 

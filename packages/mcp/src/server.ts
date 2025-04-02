@@ -20,7 +20,7 @@ import type { SearchDocumentsByTagsInput } from './application/usecases/common/S
 
 // Parse command line arguments
 const argv = yargs(hideBin(process.argv))
-  .option('docsRoot', { // 'docs' から 'docsRoot' に変更 (Applicationの期待に合わせる)
+  .option('docs', { // Changed from docsRoot
     alias: 'd',
     type: 'string',
     description: 'Path to the documentation root directory',
@@ -99,7 +99,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           branchName: params.branch, // インターフェースに合わせて branchName に
           path: params.path,
           content: params.content,
-          tags: params.tags // tags を追加 (オプション)
+          tags: params.tags, // tags を追加 (オプション)
+          patches: params.patches // patches を追加！
         });
         break;
       case 'read_branch_memory_bank':
@@ -134,7 +135,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
            match: params.match, // 'and' or 'or'
            scope: params.scope, // 'branch', 'global', 'all'
            branchName: params.branch, // branch を branchName に修正
-           docs: argv.docsRoot // docs は必須
+           docs: argv.docs // Changed from docsRoot
          };
          response = await app.getGlobalController().searchDocumentsByTags(searchInput);
          break;
@@ -235,7 +236,7 @@ async function main() {
 
     // Initialize application
     app = await createApplication({
-        docsRoot: argv.docsRoot,
+        docsRoot: argv.docs, // Changed from docsRoot
         verbose: argv.verbose,
         language: safeLanguage, // 安全な型を渡す
     });

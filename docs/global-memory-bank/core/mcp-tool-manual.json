@@ -1,0 +1,134 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "mcp-tool-manual-en",
+    "title": "MCP Tool Manual (English)",
+    "documentType": "guide",
+    "path": "core/mcp-tool-manual.json",
+    "tags": ["guide", "mcp", "manual", "en", "core"],
+    "lastModified": "",
+    "createdAt": "",
+    "version": 1
+  },
+  "content": {
+    "introduction": "This document provides a manual for the core MCP tools provided by the memory-bank-mcp-server, translated into English.",
+    "tool_sections": [
+      {
+        "tool_name": "write_branch_memory_bank",
+        "description": "Creates or overwrites a document in a specific branch.",
+        "arguments": [
+          {"name": "`branch`", "description": "Target branch name (required, e.g., `feature/my-branch`)"},
+          {"name": "`path`", "description": "Target document path (required, e.g., `data/config.json`)"},
+          {"name": "`docs`", "description": "Path to the document root (required)"},
+          {"name": "`content`", "description": "The complete content of the document (optional, JSON string or object, mutually exclusive with `patches`)"},
+          {"name": "`patches`", "description": "Array of JSON Patch operation objects (optional, mutually exclusive with `content`, RFC 6902)"},
+          {"name": "`tags`", "description": "Array of tags to assign to the document (optional)"}
+        ],
+        "details": [
+          "Use `content` to create a new document or completely overwrite an existing one.",
+          "Use `patches` to partially update an existing document. The document must exist and its content must be valid JSON.",
+          "`content` and `patches` cannot be specified simultaneously.",
+          "If `tags` is specified, the document's tags will be set to the provided array. If omitted, tags will be empty (even on overwrite/patch)."
+        ],
+        "testing_notes": "Test by creating, overwriting with `content`, and updating with `patches`. Verify content and tags using `read_branch_memory_bank`."
+      },
+      {
+        "tool_name": "read_branch_memory_bank",
+        "description": "Reads the content of a document from a specified branch.",
+        "arguments": [
+          {"name": "`branch`", "description": "Target branch name (required, e.g., `feature/my-branch`)"},
+          {"name": "`path`", "description": "Target document path (required, e.g., `data/config.json`)"},
+          {"name": "`docs`", "description": "Path to the document root (required)"}
+        ],
+        "return_value": {
+          "description": "Returns an object containing the document details.",
+          "properties": [
+            "`document.path`: Document path (string)",
+            "`document.content`: Document content (string, usually JSON)",
+            "`document.tags`: Array of tags (string[])",
+            "`document.lastModified`: Last modified timestamp (ISO 8601 string)"
+          ],
+          "note": "Returns an error if the document or branch does not exist."
+        },
+        "testing_notes": "Test by reading a known document created with `write_branch_memory_bank`. Verify the returned content, tags, and lastModified timestamp. Test reading a non-existent path to ensure an error is returned."
+      },
+      {
+        "tool_name": "write_global_memory_bank",
+        "description": "Creates, overwrites, or patches a document in the global memory bank.",
+        "arguments": [
+          {"name": "`path`", "description": "Target document path (required, e.g., `core/config.json`)"},
+          {"name": "`docs`", "description": "Path to the document root (required)"},
+          {"name": "`content`", "description": "The complete content of the document (optional, JSON string or object, mutually exclusive with `patches`)"},
+          {"name": "`patches`", "description": "Array of JSON Patch operation objects (optional, mutually exclusive with `content`, RFC 6902)"},
+          {"name": "`tags`", "description": "Array of tags to assign to the document (optional)"}
+        ],
+        "details": [
+          "Functionality is similar to `write_branch_memory_bank` but operates on the global memory bank.",
+          "Use `content` for full writes/overwrites, `patches` for partial updates.",
+          "`content` and `patches` are mutually exclusive.",
+          "Tags are handled the same way as in `write_branch_memory_bank`."
+        ],
+        "testing_notes": "Test similarly to `write_branch_memory_bank`: create with `content`, update with `patches`, and verify using `read_global_memory_bank`."
+      },
+      {
+        "tool_name": "read_global_memory_bank",
+        "description": "Reads the content of a document from the global memory bank.",
+        "arguments": [
+          {"name": "`path`", "description": "Target document path (required, e.g., `core/config.json`)"},
+          {"name": "`docs`", "description": "Path to the document root (required)"}
+        ],
+        "return_value": {
+          "description": "Returns an object containing the document details.",
+          "properties": [
+            "`document.path`: Document path (string)",
+            "`document.content`: Document content (string, usually JSON)",
+            "`document.tags`: Array of tags (string[])",
+            "`document.lastModified`: Last modified timestamp (ISO 8601 string)"
+          ],
+          "note": "Returns an error if the document does not exist."
+        },
+        "testing_notes": "Test by reading a known document created with `write_global_memory_bank`. Verify the returned content, tags, and lastModified timestamp. Test reading a non-existent path."
+      },
+      {
+        "tool_name": "read_context",
+        "description": "Reads rules, branch memory bank, and global memory bank information at once.",
+        "arguments": [
+          {"name": "`branch`", "description": "Current branch name (required, e.g., `feature/my-branch`)"},
+          {"name": "`language`", "description": "Language code for rules (required, `en`, `ja`, or `zh`)"},
+          {"name": "`docs`", "description": "Path to the document root (required)"}
+        ],
+        "return_value": {
+          "description": "Returns an object containing rules and memory bank contents.",
+          "properties": [
+            "`rules`: Rule set for the specified language (object)",
+            "`branchMemoryBank`: Array of all documents in the branch (DocumentDTO[])",
+            "`globalMemoryBank`: Array of all documents in the global bank (DocumentDTO[])"
+          ],
+          "note": "DocumentDTO format is the same as in `read_*_memory_bank` results."
+        },
+        "testing_notes": "Test by creating documents in a test branch and globally. Execute `read_context` and verify that `rules`, `branchMemoryBank`, and `globalMemoryBank` contain the expected data. Test with different languages."
+      },
+      {
+        "tool_name": "search_documents_by_tags",
+        "description": "Searches for documents by tags in branch and/or global memory banks.",
+        "arguments": [
+          {"name": "`tags`", "description": "Array of tag names to search for (required, e.g., `[\"feature\", \"refactoring\"]`)"},
+          {"name": "`match`", "description": "Tag matching condition (optional, `and` or `or`, defaults to `or`)"},
+          {"name": "`scope`", "description": "Search scope (optional, `branch`, `global`, `all`, defaults to `all`)"},
+          {"name": "`branch`", "description": "Branch name (optional, required if `scope` is `branch` or `all`)"},
+          {"name": "`docs`", "description": "Path to the document root (required)"}
+        ],
+        "details": [
+          "`match: 'or'` finds documents with any of the specified tags.",
+          "`match: 'and'` finds documents with all of the specified tags.",
+          "`scope` determines where to search (`branch`, `global`, or `all`)."
+        ],
+        "return_value": {
+          "description": "Returns an array of documents (DocumentDTO[]) matching the criteria.",
+          "note": "Returns an empty array `[]` if no documents match."
+        },
+        "testing_notes": "Test by creating documents with various tags in a test branch and globally. Perform searches with different `tags`, `match`, and `scope` combinations and verify the results."
+      }
+    ]
+  }
+}
