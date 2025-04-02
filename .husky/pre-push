@@ -1,5 +1,11 @@
 #!/usr/bin/env sh
 
+# Skip pre-push hooks in CI environment
+if [ "$CI" = "true" ]; then
+  echo "Running in CI environment, skipping pre-push hooks..."
+  exit 0
+fi
+
 yarn lint-staged || exit 1 # Exit if lint-staged fails
 
 echo "Running dependency check..."
