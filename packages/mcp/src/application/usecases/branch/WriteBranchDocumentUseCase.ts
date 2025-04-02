@@ -34,6 +34,12 @@ export interface WriteBranchDocumentInput {
    * JSON Patch operations (optional, use instead of document.content)
    */
   patches?: any[];
+
+  /**
+   * If true, return the full document content in the output. Defaults to false.
+   * @optional
+   */
+  returnContent?: boolean;
 }
 
 /**
@@ -41,9 +47,13 @@ export interface WriteBranchDocumentInput {
  */
 export interface WriteBranchDocumentOutput {
   /**
-   * Document data after write
+   * Document data after write.
+   * Content and tags are included only if `returnContent` was true in the input.
    */
-  document: DocumentDTO;
+  document: Omit<DocumentDTO, 'content' | 'tags'> & {
+    content?: string;
+    tags?: string[];
+  };
 }
 
 /**
@@ -218,13 +228,14 @@ constructor(
          } else {
              this.componentLogger.warn(`Write request with no content/patches for existing document ${documentPath.value}. No changes made.`);
              // Return existing document data as success
+             // ★★★ ここも修正後の Output 型に合わせる必要がある ★★★
+             const minimalOutputDocument: WriteBranchDocumentOutput['document'] = {
+                 path: existingDocument.path.value,
+                 lastModified: existingDocument.lastModified.toISOString(),
+                 // content と tags は含めない
+             };
              return {
-                 document: {
-                     path: existingDocument.path.value,
-                     content: existingDocument.content,
-                     tags: existingDocument.tags.map((tag) => tag.value),
-                     lastModified: existingDocument.lastModified.toISOString(),
-                 },
+                 document: minimalOutputDocument,
              };
          }
       }
@@ -233,13 +244,22 @@ constructor(
       await this.branchRepository.saveDocument(branchInfo, documentToSave);
 
       // --- Return Output ---
-      return {
-        document: {
-          path: documentToSave.path.value,
+      // returnContent フラグ (デフォルトは false) を見てレスポンスを構築
+      const shouldReturnContent = input.returnContent === true; // 明示的に true の場合のみ
+
+      // ★★★ 型注釈を修正後の Output 型に合わせる ★★★
+      const outputDocument: WriteBranchDocumentOutput['document'] = {
+        path: documentToSave.path.value,
+        lastModified: documentToSave.lastModified.toISOString(),
+        // returnContent が true の場合のみ content と tags を含める
+        ...(shouldReturnContent && {
           content: documentToSave.content,
           tags: documentToSave.tags.map((tag) => tag.value),
-          lastModified: documentToSave.lastModified.toISOString(),
-        },
+        }),
+      };
+
+      return {
+        document: outputDocument,
       };
     } catch (error) {
       // --- Error Handling ---

@@ -79,6 +79,11 @@ function createWriteBranchMemoryBankTool(): ToolDefinition {
       properties: {
         ...branchProps,
         ...patchProps,
+        returnContent: {
+          type: 'boolean',
+          description: 'If true, return the full document content in the output. Defaults to false.',
+          default: false,
+        },
         _patchNotes: {
           type: 'string',
           description: 'JSON Patch Implementation Notes (RFC 6902)',
@@ -132,6 +137,11 @@ function createWriteGlobalMemoryBankTool(): ToolDefinition {
       properties: {
         ...globalProps,
         ...patchProps,
+        returnContent: {
+          type: 'boolean',
+          description: 'If true, return the full document content in the output. Defaults to false.',
+          default: false,
+        },
         _patchNotes: {
           type: 'string',
           description: 'JSON Patch Implementation Notes (RFC 6902)',

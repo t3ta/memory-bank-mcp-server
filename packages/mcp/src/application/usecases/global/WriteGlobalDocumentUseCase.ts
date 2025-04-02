@@ -18,6 +18,12 @@ export interface WriteGlobalDocumentInput {
    * Document data
    */
   document: WriteDocumentDTO;
+
+  /**
+   * If true, return the full document content in the output. Defaults to false.
+   * @optional
+   */
+  returnContent?: boolean;
 }
 
 /**
@@ -25,9 +31,13 @@ export interface WriteGlobalDocumentInput {
  */
 export interface WriteGlobalDocumentOutput {
   /**
-   * Document data after write
+   * Document data after write.
+   * Content and tags are included only if `returnContent` was true in the input.
    */
-  document: DocumentDTO;
+  document: Omit<DocumentDTO, 'content' | 'tags'> & {
+    content?: string;
+    tags?: string[];
+  };
 }
 
 /**
@@ -123,13 +133,22 @@ export class WriteGlobalDocumentUseCase
       await this.globalRepository.saveDocument(document);
       await this.globalRepository.updateTagsIndex();
 
-      return {
-        document: {
-          path: document.path.value,
+      // --- Return Output ---
+      // returnContent フラグ (デフォルトは false) を見てレスポンスを構築
+      const shouldReturnContent = input.returnContent === true; // 明示的に true の場合のみ
+
+      const outputDocument: WriteGlobalDocumentOutput['document'] = {
+        path: document.path.value,
+        lastModified: document.lastModified.toISOString(),
+        // returnContent が true の場合のみ content と tags を含める
+        ...(shouldReturnContent && {
           content: document.content,
           tags: document.tags.map((tag) => tag.value),
-          lastModified: document.lastModified.toISOString(),
-        },
+        }),
+      };
+
+      return {
+        document: outputDocument,
       };
     } catch (error) {
       // If it's a known domain or application error, re-throw it directly

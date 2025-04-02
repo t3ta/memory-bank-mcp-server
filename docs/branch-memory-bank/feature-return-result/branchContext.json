@@ -1,0 +1,13 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-return-result-context",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "createdAt": "2025-04-02T18:51:34.285Z",
+    "lastModified": "2025-04-02T18:51:34.285Z"
+  },
+  "content": {
+    "value": "Auto-initialized context for branch feature/return-result"
+  }
+}

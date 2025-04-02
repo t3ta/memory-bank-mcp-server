@@ -229,5 +229,140 @@ describe('WriteGlobalDocumentUseCase Integration Tests', () => {
       const potentiallyCreatedPath = path.resolve(testEnv.docRoot, '..', 'outside-global-memory.json');
       expect(fs.existsSync(potentiallyCreatedPath)).toBe(false); // Use existsSync after correct import
     });
-  });
-});
+
+    it('should return the created document content when returnContent is true', async () => {
+      const newDocument = {
+        schema: "memory_document_v2",
+        metadata: {
+          id: "test-global-return-true",
+          title: "テスト Global returnContent: true",
+          documentType: "test",
+          path: "test/global-return-true.json",
+          tags: ["test", "global", "return-content-true"],
+          version: 1
+        },
+        content: { value: "Global returnContent: true のテスト" }
+      };
+      const documentPath = 'test/global-return-true.json';
+      const documentContentString = JSON.stringify(newDocument, null, 2);
+
+      // returnContent: true を指定
+      const result = await writeUseCase.execute({
+        document: {
+          path: documentPath,
+          content: documentContentString,
+          tags: newDocument.metadata.tags
+        },
+        returnContent: true // ★★★ これが新しいオプション！ ★★★
+      });
+
+      // --- 検証 ---
+      expect(result).toBeDefined();
+      expect(result.document).toBeDefined();
+      expect(result.document.path).toBe(documentPath);
+      expect(result.document.tags).toEqual(newDocument.metadata.tags);
+      expect(result.document.lastModified).toEqual(expect.any(String));
+
+      // content が undefined でないことを確認してからパース
+      if (result.document.content === undefined) {
+        throw new Error('Expected document content to be defined when returnContent is true');
+      }
+      const returnedDocument = JSON.parse(result.document.content);
+
+      // 比較用に期待値を整形
+      const expectedDocumentStructure = {
+          schema: newDocument.schema,
+          metadata: {
+              id: newDocument.metadata.id,
+              title: newDocument.metadata.title,
+              documentType: newDocument.metadata.documentType,
+              path: newDocument.metadata.path,
+              tags: newDocument.metadata.tags,
+              version: newDocument.metadata.version
+          },
+          content: newDocument.content
+      };
+      expect(returnedDocument).toEqual(expectedDocumentStructure);
+
+      // 念のため readUseCase でも確認
+      const readResult = await readUseCase.execute({ path: documentPath });
+      // content が undefined でないことを確認してから比較
+      if (result.document.content === undefined) {
+        throw new Error('Expected document content to be defined when returnContent is true for comparison');
+      }
+      expect(readResult.document.content.trim()).toBe(result.document.content.trim());
+      expect(readResult.document.tags).toEqual(result.document.tags);
+      expect(readResult.document.lastModified).toEqual(expect.any(String));
+    });
+
+    it('should return only minimal info when returnContent is false', async () => {
+      const newDocument = {
+        schema: "memory_document_v2",
+        metadata: {
+          id: "test-global-return-false",
+          title: "テスト Global returnContent: false",
+          documentType: "test",
+          path: "test/global-return-false.json",
+          tags: ["test", "global", "return-content-false"],
+          version: 1
+        },
+        content: { value: "Global returnContent: false のテスト" }
+      };
+      const documentPath = 'test/global-return-false.json';
+      const documentContentString = JSON.stringify(newDocument, null, 2);
+
+      // returnContent: false を指定
+      const result = await writeUseCase.execute({
+        document: {
+          path: documentPath,
+          content: documentContentString,
+          tags: newDocument.metadata.tags
+        },
+        returnContent: false // ★★★ 明示的に false を指定 ★★★
+      });
+
+      expect(result).toBeDefined();
+      expect(result.document).toBeDefined();
+      expect(result.document.path).toBe(documentPath);
+      expect(result.document.lastModified).toEqual(expect.any(String));
+      // ★★★ content と tags が undefined であることを期待 ★★★
+      expect(result.document.content).toBeUndefined();
+      expect(result.document.tags).toBeUndefined();
+    });
+
+    it('should return only minimal info when returnContent is not specified (defaults to false)', async () => {
+       const newDocument = {
+         schema: "memory_document_v2",
+         metadata: {
+           id: "test-global-return-default",
+           title: "テスト Global returnContent: default",
+           documentType: "test",
+           path: "test/global-return-default.json",
+           tags: ["test", "global", "return-content-default"],
+           version: 1
+         },
+         content: { value: "Global returnContent: default のテスト" }
+       };
+       const documentPath = 'test/global-return-default.json';
+       const documentContentString = JSON.stringify(newDocument, null, 2);
+
+       // returnContent を指定しない
+       const result = await writeUseCase.execute({
+         document: {
+           path: documentPath,
+           content: documentContentString,
+           tags: newDocument.metadata.tags
+         }
+         // returnContent は指定しない
+       });
+
+       expect(result).toBeDefined();
+       expect(result.document).toBeDefined();
+       expect(result.document.path).toBe(documentPath);
+       expect(result.document.lastModified).toEqual(expect.any(String));
+       // ★★★ 本来は content と tags が undefined であることを期待 (今は実装がないので失敗するはず) ★★★
+       expect(result.document.content).toBeUndefined();
+       expect(result.document.tags).toBeUndefined();
+    });
+  }); // describe('execute', ...) の閉じ括弧
+}); // 一番外側の describe の閉じ括弧

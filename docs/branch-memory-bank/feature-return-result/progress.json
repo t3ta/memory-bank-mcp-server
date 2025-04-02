@@ -1,0 +1,72 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-return-result-progress",
+    "title": "Progress for feature/return-result",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": []
+  },
+  "content": {
+    "summary": "メモリバンク書き込みレスポンスのカスタマイズ機能を追加するブランチ",
+    "tasks": [
+      {
+        "id": "task-return-content-option",
+        "description": "メモリバンク書き込みレスポンスに returnContent オプションを追加する",
+        "status": "blocked",
+        "approach": "TDD",
+        "steps": [
+          {
+            "mode": "CodeQueen",
+            "action": "Add failing tests for returnContent=true response validation",
+            "status": "done"
+          },
+          {
+            "mode": "CodeQueen",
+            "action": "Implement logic to pass the tests",
+            "status": "done"
+          },
+          {
+            "mode": "CodeQueen",
+            "action": "Update schema definitions",
+            "status": "done"
+          },
+          {
+            "mode": "DesignGuru",
+            "action": "Update tool manuals",
+            "status": "blocked",
+            "notes": [
+              "write_global_memory_bank tool with patches failed to update core/mcp-tool-manual.json.",
+              "Error: 'Document content is required' when content is omitted.",
+              "Error: 'Document content is not valid JSON' when content is ''.",
+              "Error: File overwritten with '{}' when content is '{}'.",
+              "Manual update postponed. Need to create an issue for this tool behavior."
+            ]
+          }
+        ],
+        "designPlan": {
+          "parameter": {
+            "name": "returnContent",
+            "type": "boolean",
+            "default": false
+          },
+          "response_true": {
+            "success": true,
+            "document": {
+              "path": "string",
+              "content": "string",
+              "tags": [
+                "string"
+              ],
+              "lastModified": "string"
+            }
+          },
+          "response_false": {
+            "success": true
+          }
+        }
+      }
+    ],
+    "references": []
+  }
+}

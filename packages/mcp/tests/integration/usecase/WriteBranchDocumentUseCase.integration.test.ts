@@ -294,5 +294,151 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
       // Also verify tags if they were updated
       expect(readResult.document.tags).toEqual(["test", "patch", "updated"]);
     }); // Closing brace for it('should update a document using patches', ...)
-  }); // Closing brace for describe('execute', ...)
-}); // Closing brace for the top-level describe
+
+    it('should return the created document content when returnContent is true', async () => {
+      const newDocument = {
+        schema: "memory_document_v2",
+        metadata: {
+          id: "test-return-content-true",
+          title: "テスト returnContent: true",
+          documentType: "test",
+          path: "test/return-content-true.json",
+          tags: ["test", "return-content"], // 小文字とハイフンに修正
+          // lastModified と createdAt は writeUseCase が設定するので、ここでは含めないか、expect.any(String) を使う
+          version: 1
+        },
+        content: { value: "returnContent: true のテスト" }
+      };
+      const documentPath = 'test/return-content-true.json';
+      const documentContentString = JSON.stringify(newDocument, null, 2);
+
+      // returnContent: true を指定して書き込み
+      const result = await writeUseCase.execute({
+        branchName: TEST_BRANCH,
+        document: {
+          path: documentPath,
+          content: documentContentString,
+          tags: newDocument.metadata.tags // ここも修正後のタグを使う
+        },
+        returnContent: true // ★★★ これが新しいオプション！ ★★★
+      });
+
+      // --- 検証 ---
+      expect(result).toBeDefined();
+      // ★★★ 本来はここに document が返ってくるはず！ (今はまだ実装されてないので失敗するはず) ★★★
+      expect(result.document).toBeDefined();
+      expect(result.document.path).toBe(documentPath);
+      expect(result.document.tags).toEqual(newDocument.metadata.tags); // ここも修正後のタグを使う
+      expect(result.document.lastModified).toEqual(expect.any(String)); // 日時は生成されるはず
+
+      // 返却された content が正しいか検証
+      // content が undefined でないことを確認してからパース
+      if (result.document.content === undefined) {
+        throw new Error('Expected document content to be defined when returnContent is true');
+      }
+      const returnedDocument = JSON.parse(result.document.content);
+
+      // 比較用に期待値を整形 ★★★ content 文字列に含まれるべき構造だけを newDocument から抽出 ★★★
+      const expectedDocumentStructure = {
+          schema: newDocument.schema,
+          metadata: {
+              id: newDocument.metadata.id,
+              title: newDocument.metadata.title,
+              documentType: newDocument.metadata.documentType,
+              path: newDocument.metadata.path,
+              tags: newDocument.metadata.tags,
+              version: newDocument.metadata.version
+              // lastModified と createdAt は content 文字列には含まれないので除外
+          },
+          content: newDocument.content
+      };
+      // returnedDocument (パース結果) と expectedDocumentStructure を比較する
+      expect(returnedDocument).toEqual(expectedDocumentStructure);
+
+      // 念のため readUseCase でも確認 (返却された内容と同じはず)
+      const readResult = await readUseCase.execute({ branchName: TEST_BRANCH, path: documentPath });
+      // Compare content after trimming whitespace to avoid potential inconsistencies
+      // content が undefined でないことを確認してから比較
+      if (result.document.content === undefined) {
+        throw new Error('Expected document content to be defined when returnContent is true for comparison');
+      }
+      expect(readResult.document.content.trim()).toBe(result.document.content.trim());
+      expect(readResult.document.tags).toEqual(result.document.tags);
+      // lastModified はミリ秒単位でずれる可能性があるので、存在と型だけチェック
+      expect(result.document.lastModified).toEqual(expect.any(String));
+      expect(readResult.document.lastModified).toEqual(expect.any(String));
+    });
+
+    it('should return only minimal info when returnContent is false', async () => {
+      const newDocument = {
+        schema: "memory_document_v2",
+        metadata: {
+          id: "test-return-content-false",
+          title: "テスト returnContent: false",
+          documentType: "test",
+          path: "test/return-content-false.json",
+          tags: ["test", "return-content-false"],
+          version: 1
+        },
+        content: { value: "returnContent: false のテスト" }
+      };
+      const documentPath = 'test/return-content-false.json';
+      const documentContentString = JSON.stringify(newDocument, null, 2);
+
+      // returnContent: false を指定
+      const result = await writeUseCase.execute({
+        branchName: TEST_BRANCH,
+        document: {
+          path: documentPath,
+          content: documentContentString,
+          tags: newDocument.metadata.tags
+        },
+        returnContent: false // ★★★ 明示的に false を指定 ★★★
+      });
+
+      expect(result).toBeDefined();
+      // ★★★ 本来は document.content や document.tags が undefined であることを期待 (今は実装がないので失敗するはず) ★★★
+      expect(result.document).toBeDefined(); // document 自体は存在するかもしれない (型定義による)
+      expect(result.document.path).toBe(documentPath);
+      expect(result.document.lastModified).toEqual(expect.any(String));
+      expect(result.document.content).toBeUndefined(); // 実装後に期待するアサーション (今は失敗するはず)
+      expect(result.document.tags).toBeUndefined(); // 実装後に期待するアサーション (今は失敗するはず)
+    });
+
+    it('should return only minimal info when returnContent is not specified (defaults to false)', async () => {
+       const newDocument = {
+         schema: "memory_document_v2",
+         metadata: {
+           id: "test-return-content-default",
+           title: "テスト returnContent: default",
+           documentType: "test",
+           path: "test/return-content-default.json",
+           tags: ["test", "return-content-default"],
+           version: 1
+         },
+         content: { value: "returnContent: default のテスト" }
+       };
+       const documentPath = 'test/return-content-default.json';
+       const documentContentString = JSON.stringify(newDocument, null, 2);
+
+       // returnContent を指定しない
+       const result = await writeUseCase.execute({
+         branchName: TEST_BRANCH,
+         document: {
+           path: documentPath,
+           content: documentContentString,
+           tags: newDocument.metadata.tags
+         }
+         // returnContent は指定しない
+       }); // writeUseCase.execute の閉じ括弧
+
+       expect(result).toBeDefined();
+       // ★★★ 本来は document.content や document.tags が undefined であることを期待 (今は実装がないので失敗するはず) ★★★
+       expect(result.document).toBeDefined(); // document 自体は存在するかもしれない (型定義による)
+       expect(result.document.path).toBe(documentPath);
+       expect(result.document.lastModified).toEqual(expect.any(String));
+       expect(result.document.content).toBeUndefined(); // 実装後に期待するアサーション (今は失敗するはず)
+       expect(result.document.tags).toBeUndefined(); // 実装後に期待するアサーション (今は失敗するはず)
+    }); // it ブロックの閉じ括弧
+  }); // describe('execute', ...) の閉じ括弧
+}); // 一番外側の describe の閉じ括弧
