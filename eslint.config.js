@@ -85,5 +85,15 @@ export default [
     ...testConfig, // Use spread syntax
     // tests 配下のファイルにテスト用設定を適用
     files: ['tests/**/*.ts', 'tests/**/*.js']
+  },
+  {
+    ...baseConfig, // Apply base config to scripts
+    files: ['scripts/**/*.js'],
+    rules: {
+      ...baseConfig.rules,
+      '@typescript-eslint/explicit-function-return-type': 'off', // Allow missing return types in JS scripts
+      'import/no-commonjs': 'off', // Allow CommonJS in scripts if needed
+      '@typescript-eslint/no-var-requires': 'off' // Allow require in scripts if needed
+    }
   }
 ];

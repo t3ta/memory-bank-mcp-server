@@ -1,0 +1,13 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "fix-copy-assets-2-context",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "createdAt": "2025-04-02T16:03:09.831Z",
+    "lastModified": "2025-04-02T16:03:09.831Z"
+  },
+  "content": {
+    "value": "Auto-initialized context for branch fix/copy-assets-2"
+  }
+}
