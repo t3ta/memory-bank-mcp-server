@@ -1,6 +1,6 @@
 {
   "name": "@memory-bank/mcp",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "Memory-enabled Co-Pilot (MCP) server for managing project documentation and context",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -12,7 +12,7 @@
     "LICENSE"
   ],
   "bin": {
-    "memory-bank-mcp-server": "./dist/index.js"
+    "memory-bank-mcp-server": "./dist/server.js"
   },
   "scripts": {
     "build": "tsc",
