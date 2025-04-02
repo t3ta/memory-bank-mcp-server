@@ -6,6 +6,7 @@
  */
 import path from 'path';
 import fs from 'fs/promises';
+import { logger } from '../../shared/utils/logger.js'; // Import logger
 import { ITemplateRepository } from '../../domain/templates/ITemplateRepository.js';
 import { Template } from '../../domain/templates/Template.js';
 import { Section, LanguageTextMap } from '../../domain/templates/Section.js';
@@ -58,6 +59,7 @@ interface TemplateSectionData {
  * File-based implementation of Template Repository
  */
 export class FileTemplateRepository implements ITemplateRepository {
+  private readonly componentLogger = logger.withContext({ component: 'FileTemplateRepository' }); // Add logger instance
   private readonly basePath: string;
   private templateCache: Map<string, Template>;
   private cacheDirty: boolean;
@@ -193,7 +195,7 @@ export class FileTemplateRepository implements ITemplateRepository {
 
       return true;
     } catch (error) {
-      console.error(`Failed to save template: ${template.id}`, error);
+      this.componentLogger.error(`Failed to save template: ${template.id}`, { error }); // Use componentLogger
       return false;
     }
   }
@@ -278,7 +280,7 @@ export class FileTemplateRepository implements ITemplateRepository {
       // Cache is now clean
       this.cacheDirty = false;
     } catch (error) {
-      console.error('Failed to load templates', error);
+      this.componentLogger.error('Failed to load templates', { error }); // Use componentLogger
       throw new Error(`Failed to load templates: ${(error as Error).message}`);
     }
   }
@@ -341,7 +343,7 @@ export class FileTemplateRepository implements ITemplateRepository {
       // Add to cache
       this.templateCache.set(id, template);
     } catch (error) {
-      console.error(`Failed to load template: ${id}`, error);
+      this.componentLogger.error(`Failed to load template: ${id}`, { error }); // Use componentLogger
       throw new Error(`Failed to load template ${id}: ${(error as Error).message}`);
     }
   }
@@ -420,7 +422,7 @@ export class FileTemplateRepository implements ITemplateRepository {
       // Add to cache
       this.templateCache.set(id, template);
     } catch (error) {
-      console.error(`Failed to load template_v1: ${id}`, error);
+      this.componentLogger.error(`Failed to load template_v1: ${id}`, { error }); // Use componentLogger
       throw new Error(`Failed to load template_v1 ${id}: ${(error as Error).message}`);
     }
   }
@@ -455,7 +457,7 @@ export class FileTemplateRepository implements ITemplateRepository {
       const filePath = path.join(this.basePath, `${template.id}.json`);
       await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8');
     } catch (error) {
-      console.error(`Failed to save template to file: ${template.id}`, error);
+      this.componentLogger.error(`Failed to save template to file: ${template.id}`, { error }); // Use componentLogger
       throw new Error(`Failed to save template ${template.id}: ${(error as Error).message}`);
     }
   }

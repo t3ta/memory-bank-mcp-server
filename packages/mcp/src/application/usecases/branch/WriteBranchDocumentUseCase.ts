@@ -154,8 +154,8 @@ constructor(
           }
 
           // Log arguments before calling applyPatch
-          console.error('--- Applying patch - Current Object:', JSON.stringify(currentContentObject, null, 2));
-          console.error('--- Applying patch - Patches:', JSON.stringify(input.patches, null, 2));
+          // console.error('--- Applying patch - Current Object:', JSON.stringify(currentContentObject, null, 2)); // DEBUG LOG REMOVED
+          // console.error('--- Applying patch - Patches:', JSON.stringify(input.patches, null, 2)); // DEBUG LOG REMOVED
 
           // Convert input patches (any[]) to JsonPatchOperation[]
           // Assuming input.patches contains objects like { op: 'add', path: '/a', value: 1 }
@@ -170,13 +170,13 @@ constructor(
           // Convert patched object back to JSON string before updating content
           // Convert patched object back to JSON string before updating content
           // Log patched content before stringifying using console.error for visibility
-          console.error('--- Patched content (object):', JSON.stringify(patchedContent, null, 2));
+          // console.error('--- Patched content (object):', JSON.stringify(patchedContent, null, 2)); // DEBUG LOG REMOVED
           const stringifiedContent = JSON.stringify(patchedContent, null, 2);
           // Log stringified content using console.error for visibility
-          console.error('--- Stringified patched content:', stringifiedContent);
+          // console.error('--- Stringified patched content:', stringifiedContent); // DEBUG LOG REMOVED
           documentToSave = existingDocument.updateContent(stringifiedContent);
           // Log success message using console.error
-          console.error(`--- Document patched successfully: ${documentPath.value}`);
+          // console.error(`--- Document patched successfully: ${documentPath.value}`); // DEBUG LOG REMOVED
 
         } catch (patchError) {
           this.componentLogger.error(`Failed to apply JSON patch to ${documentPath.value}`, { error: patchError });

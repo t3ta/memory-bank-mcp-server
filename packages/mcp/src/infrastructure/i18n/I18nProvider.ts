@@ -3,6 +3,7 @@
  * Provides internationalization services for the application
  */
 import path from 'node:path';
+import { logger } from '../../shared/utils/logger.js'; // Import logger
 import { IFileSystemService } from '../storage/interfaces/IFileSystemService.js';
 import {
   Language,
@@ -15,6 +16,7 @@ import { II18nProvider } from './interfaces/II18nProvider.js';
  * Implementation of II18nProvider
  */
 export class I18nProvider implements II18nProvider {
+  private readonly componentLogger = logger.withContext({ component: 'I18nProvider' }); // Add logger instance
   private translations: Map<Language, Record<TranslationKey, string>> = new Map();
   private readonly defaultLanguage: Language = 'en';
   private readonly supportedLanguages: Language[] = ['en', 'ja', 'zh'];
@@ -102,7 +104,7 @@ export class I18nProvider implements II18nProvider {
       this.translations.set(language, translationFile.translations);
       return true;
     } catch (error) {
-      console.error(`Failed to load translations for ${language}:`, error);
+      this.componentLogger.error(`Failed to load translations for ${language}`, { error }); // Use componentLogger
       return false;
     }
   }

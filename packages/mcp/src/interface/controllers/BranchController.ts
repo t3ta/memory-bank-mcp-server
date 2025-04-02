@@ -67,10 +67,10 @@ export class BranchController {
       const hasContent = content !== undefined && content !== null && content !== '';
 
       this.componentLogger.info('Writing branch document', { operation: 'writeDocument', branchName, path, hasContent, hasPatches });
-      console.error(`--- BranchController: Checking conditions - hasPatches: ${hasPatches}, content type: ${typeof content}, content value: "${content}", hasContent: ${hasContent}`); // DEBUG LOG
+      // console.error(`--- BranchController: Checking conditions - hasPatches: ${hasPatches}, content type: ${typeof content}, content value: "${content}", hasContent: ${hasContent}`); // DEBUG LOG REMOVED
 
       if (hasPatches) {
-        console.error("--- BranchController: Entering 'patches' block"); // DEBUG LOG
+        // console.error("--- BranchController: Entering 'patches' block"); // DEBUG LOG REMOVED
         // Call WriteBranchDocumentUseCase with patches
         const result = await this.writeBranchDocumentUseCase.execute({
           branchName,
@@ -82,11 +82,11 @@ export class BranchController {
           patches: patches // Pass the patches array
         });
         // Log the result from the use case and the data being presented
-        console.error("--- BranchController: UseCase result:", JSON.stringify(result, null, 2));
-        console.error("--- BranchController: Presenting data:", JSON.stringify(result.document, null, 2));
+        // console.error("--- BranchController: UseCase result:", JSON.stringify(result, null, 2)); // DEBUG LOG REMOVED
+        // console.error("--- BranchController: Presenting data:", JSON.stringify(result.document, null, 2)); // DEBUG LOG REMOVED
        return this.presenter.presentSuccess(result.document);
       } else if (hasContent) {
-        console.error("--- BranchController: Entering 'content' block"); // DEBUG LOG
+        // console.error("--- BranchController: Entering 'content' block"); // DEBUG LOG REMOVED
         // If content is provided (and no patches), call the existing UseCase
         // Content is already known to be a non-empty string here due to hasContent check
         const result = await this.writeBranchDocumentUseCase.execute({
@@ -101,7 +101,7 @@ export class BranchController {
          // Return the document DTO directly from the use case result
         return this.presenter.presentSuccess(result.document);
       } else {
-        console.error("--- BranchController: Entering 'else' (init) block"); // DEBUG LOG
+        // console.error("--- BranchController: Entering 'else' (init) block"); // DEBUG LOG REMOVED
         // Handle the case where neither content nor patches are provided (or patches is an empty array)
         // This might need a dedicated initialization UseCase or logic.
         // For now, return the initialization message similar to routes.ts logic.
