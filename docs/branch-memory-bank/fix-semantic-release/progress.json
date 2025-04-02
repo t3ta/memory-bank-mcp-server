@@ -1,0 +1,36 @@
+{
+  "tasks": [
+    {
+      "title": "semantic-releaseのsedコマンド修正",
+      "description": "Linux環境でsedコマンドが失敗する問題を修正する",
+      "status": "done",
+      "plan": {
+        "steps": [
+          {
+            "title": "シェルスクリプトの作成",
+            "description": "OSに応じたsed構文を適切に使い分けるシェルスクリプトを作成",
+            "path": "scripts/update-readme-version.sh"
+          },
+          {
+            "title": ".releaserc.jsonの更新",
+            "description": "作成したシェルスクリプトを使用するように設定を変更"
+          }
+        ]
+      },
+      "technical_details": {
+        "issue": "Linuxのsedコマンドで-i ''オプションが動作しない",
+        "solution": "OSタイプに応じて適切なsed構文を使用するシェルスクリプトを作成して対応"
+      },
+      "results": {
+        "summary": "semantic-releaseのsedコマンドエラーを修正完了",
+        "files_modified": [
+          "scripts/update-readme-version.sh",
+          ".releaserc.json"
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "tags": []
+  }
+}
