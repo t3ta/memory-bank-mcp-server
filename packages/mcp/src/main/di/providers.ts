@@ -2,6 +2,8 @@
 import { DIContainer } from './DIContainer.js';
 export { DIContainer };
 import { MCPResponsePresenter } from '../../interface/presenters/MCPResponsePresenter.js';
+import { IBranchMemoryBankRepository } from '../../domain/repositories/IBranchMemoryBankRepository.js'; // Import interface
+import { JsonPatchService } from '../../domain/jsonpatch/JsonPatchService.js'; // Import interface
 import { ReadGlobalDocumentUseCase } from '../../application/usecases/global/ReadGlobalDocumentUseCase.js';
 import { WriteGlobalDocumentUseCase } from '../../application/usecases/global/WriteGlobalDocumentUseCase.js';
 import path from 'node:path';
@@ -41,7 +43,7 @@ import { BranchController } from '../../interface/controllers/BranchController.j
 import { JsonBranchController } from '../../interface/controllers/json/JsonBranchController.js';
 
 import { CliOptions } from '../../infrastructure/config/WorkspaceConfig.js';
-import { UseCaseFactory } from '../../factory/use-case-factory.js';
+// Removed unused import: import { UseCaseFactory } from '../../factory/use-case-factory.js';
 import { ReadBranchCoreFilesUseCase } from '../../application/usecases/index.js';
 
 /**
@@ -201,12 +203,22 @@ export async function registerApplicationServices(container: DIContainer): Promi
     return new MarkdownMigrationService(mockTemplateRepository, markdownDir, backupDir);
   });
 
-  // Make the factory async and await the repository
+  // Register JsonPatchService implementation (using the refactored adapter)
+  container.registerFactory('jsonPatchService', async () => {
+      // Import the adapter class directly (assuming file rename to Rfc6902JsonPatchAdapter.ts)
+      // Use the correct class name and ensure the path matches the renamed file
+      const { Rfc6902JsonPatchAdapter } = await import('../../domain/jsonpatch/Rfc6902JsonPatchAdapter.js');
+      return new Rfc6902JsonPatchAdapter();
+  });
+
+  // Make the factory async and await the repository and patch service
   container.registerFactory('writeBranchDocumentUseCase', async () => {
-    const branchRepository = await container.get<FileSystemBranchMemoryBankRepository>(
+    const branchRepository = await container.get<IBranchMemoryBankRepository>( // Use interface type
       'branchMemoryBankRepository'
     );
-    return UseCaseFactory.createWriteBranchDocumentUseCase(branchRepository);
+    const patchService = await container.get<JsonPatchService>('jsonPatchService'); // Get the patch service
+    // Directly instantiate the use case with dependencies
+    return new WriteBranchDocumentUseCase(branchRepository, patchService);
   });
 
   // Add missing registration for readBranchDocumentUseCase

@@ -1,3 +1,11 @@
 #!/usr/bin/env sh
 
-yarn lint-staged
+yarn lint-staged || exit 1 # Exit if lint-staged fails
+
+echo "Running dependency check..."
+yarn check:deps || exit 1 # Exit if depcheck fails
+
+echo "Running integration tests..."
+yarn test:integration || exit 1 # Exit if tests fail
+
+echo "Pre-push checks passed!"

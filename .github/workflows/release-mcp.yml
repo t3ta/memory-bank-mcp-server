@@ -48,11 +48,17 @@ jobs:
             echo "npm_exists=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Update mcp package.json version
+        if: steps.check-npm-mcp.outputs.npm_exists != 'true'
+        run: yarn workspace @memory-bank/mcp version --new-version ${{ steps.get_version.outputs.VERSION }} --no-git-tag-version
+        env:
+          # Needed if the workspace requires auth for versioning, unlikely but safe
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Publish mcp to npm
         if: steps.check-npm-mcp.outputs.npm_exists != 'true'
-        # package.json の publishConfig で access: public が設定されているので --access は不要
-        # タグから取得したバージョンを明示的に指定して公開
-        run: yarn workspace @memory-bank/mcp publish --new-version ${{ steps.get_version.outputs.VERSION }}
+        # Publish the specific workspace
+        run: npm publish --workspace @memory-bank/mcp
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

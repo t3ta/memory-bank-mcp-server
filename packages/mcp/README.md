@@ -1,97 +1,102 @@
-# @memory-bank/mcp
+# @memory-bank/mcp (v2.3.5)
 
-Memory-enabled Co-Pilot (MCP) server for managing project documentation and context across sessions.
+This package provides the core implementation of the Memory-enabled Co-Pilot (MCP) server for managing project documentation and context.
 
 ## Overview
 
-The MCP (Memory-enabled Co-Pilot) server is the core component of the Memory Bank system. It provides:
+The MCP (Memory-enabled Co-Pilot) server is the central component of the Memory Bank system. It offers:
 
-- Persistent storage of project knowledge and context
-- Branch-specific memory banks for feature work
-- Global memory bank for project-wide information
-- JSON-based document structure
-- Tag system for efficient information retrieval
+- Persistent storage for project knowledge and context using a file-system based approach.
+- Branch-specific memory banks for isolated feature work context.
+- A global memory bank for project-wide information accessible across branches.
+- A structured JSON-based document format (`memory_document_v2` schema).
+- A tagging system for organizing and retrieving information efficiently.
+- An MCP interface allowing AI agents (like Claude) to interact with the memory banks via defined tools.
 
 ## Installation
 
-```bash
-# Using yarn
-yarn add @memory-bank/mcp
+This package is primarily intended to be used as an MCP server executable.
 
-# Using npm
+```bash
+# Using yarn (within the monorepo)
+# No direct installation needed if running from the monorepo root
+
+# Using npm (if published)
 npm install @memory-bank/mcp
 ```
 
-## Usage
+## Usage as an MCP Server
 
-### As a CLI tool
+The primary way to use this package is by running it as an MCP server, which can then be connected to by an MCP client (e.g., Claude Desktop or a custom integration).
+
+### Running the Server
+
+**Using NPX (Recommended for published package):**
 
 ```bash
-# Read all context information
-memory-bank-mcp-server read-context --branch feature/my-feature --language en
-
-# Read from global memory bank
-memory-bank-mcp-server read-global-memory --path core/glossary.json
-
-# Write to branch memory bank
-memory-bank-mcp-server write-branch-memory --branch feature/my-feature --path progress.json --content '{"schema":"memory_document_v2",...}'
+# Replace @latest with the desired version if needed
+npx @memory-bank/mcp@latest --docs /path/to/your/docs
 ```
 
-### As a library
+**From Monorepo Source:**
 
-```typescript
-import { MemoryBankMCPServer } from '@memory-bank/mcp';
-
-// Initialize
-const mcp = new MemoryBankMCPServer({
-  memoryBankRoot: './docs'
-});
-
-// Read context
-const context = await mcp.readContext({
-  branch: 'feature/my-feature',
-  docs: './docs',
-  language: 'en'
-});
-
-// Write to memory bank
-await mcp.writeBranchMemoryBank({
-  branch: 'feature/my-feature',
-  path: 'progress.json',
-  content: '{"schema":"memory_document_v2",...}'
-});
+```bash
+# From the monorepo root directory
+yarn workspace @memory-bank/mcp start --docs /path/to/your/docs
+# Or for development with auto-reload:
+yarn workspace @memory-bank/mcp dev --docs /path/to/your/docs
 ```
+
+**Server Options:**
+
+- `--docs, -d`: **Required.** Path to the project's documentation directory (containing `global-memory-bank` and `branch-memory-bank`).
+- `--verbose, -v`: Enable verbose logging (default: false).
+- `--language, -l`: Default language for templates ('en', 'ja' or 'zh', default: 'en').
+
+### Interacting via MCP Tools
+
+Once the server is running, clients interact with it using the defined MCP tools. Refer to the core tool manual (`docs/global-memory-bank/core/mcp-tool-manual.json`) for details on available tools like:
+
+- `write_branch_memory_bank`
+- `read_branch_memory_bank`
+- `write_global_memory_bank`
+- `read_global_memory_bank`
+- `read_context`
+- `search_documents_by_tags`
 
 ## Architecture
 
-The MCP server follows a clean architecture approach:
+The `@memory-bank/mcp` package follows clean architecture principles:
 
-- **Domain Layer**: Core business logic and entities
-- **Application Layer**: Use cases that orchestrate the domain entities
-- **Interface Layer**: Controllers and presenters
-- **Infrastructure Layer**: External implementations like file system repositories
+- **Domain Layer**: Core business logic, entities (e.g., `MemoryDocument`, `BranchInfo`), and interfaces.
+- **Application Layer**: Use cases orchestrating domain logic (e.g., `WriteBranchDocumentUseCase`, `ReadContextUseCase`).
+- **Interface Layer**: Controllers handling MCP requests and presenters formatting responses.
+- **Infrastructure Layer**: Concrete implementations for external concerns like file system access (`FileSystem*Repository`), configuration, and indexing.
 
-## Dependencies
+## Key Dependencies
 
-- `@memory-bank/schemas`: JSON schema definitions for Memory Bank documents
-- `@modelcontextprotocol/sdk`: Model Context Protocol SDK
-- `fast-json-patch`: JSON Patch operations (RFC 6902)
-- `uuid`: Generate UUIDs for documents
+- `@memory-bank/schemas`: JSON schema definitions for Memory Bank documents.
+- `@modelcontextprotocol/sdk`: SDK for implementing MCP servers and clients.
+- `rfc6902`: Used for applying JSON Patch operations (RFC 6902).
+- `fs-extra`: Provides enhanced file system operations.
+- `yargs`: Used for parsing command-line arguments for the server executable.
+- `uuid`: Generates UUIDs.
 
 ## Development
 
 ```bash
-# Install dependencies
+# Install dependencies (from monorepo root)
 yarn install
 
-# Build
-yarn build
+# Build the package
+yarn workspace @memory-bank/mcp build
 
-# Run development server
-yarn dev
+# Run the server in development mode (with auto-reload)
+yarn workspace @memory-bank/mcp dev --docs /path/to/test/docs
 
 # Run tests
-yarn test
+yarn workspace @memory-bank/mcp test # Unit tests (if any)
+yarn workspace @memory-bank/mcp test:integration # Integration tests
 ```
 
 ## License

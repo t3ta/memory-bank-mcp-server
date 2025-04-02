@@ -1,0 +1,118 @@
+name: Auto Tag on Master Push
+
+on:
+  push:
+    branches:
+      - master
+    # Only run if changes are detected in packages/* or relevant root files
+    paths:
+      - 'packages/**'
+      - 'package.json'
+      - 'yarn.lock'
+
+jobs:
+  auto_tag:
+    runs-on: ubuntu-latest
+    # Prevent running on forks
+    if: github.repository == 't3ta/memory-bank-mcp-server'
+    permissions:
+      contents: write # Needed to push tags
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Fetch all history to compare commits correctly
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x' # Use the same version as other workflows
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      # Install jq for parsing package.json
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      # Detect changed packages
+      - name: Detect changed packages
+        id: changed_packages
+        run: |
+          echo "Detecting changes between ${{ github.event.before }} and ${{ github.sha }}"
+          # Get list of changed files between the previous and current commit on master
+          changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          echo "Changed files:"
+          echo "$changed_files"
+
+          declare -A changed_dirs # Use associative array for unique dirs
+
+          for file in $changed_files; do
+            if [[ "$file" == packages/* ]]; then
+              # Extract the package directory name (e.g., packages/mcp -> mcp)
+              package_dir=$(echo "$file" | cut -d/ -f2)
+              if [[ -n "$package_dir" ]]; then
+                changed_dirs["$package_dir"]=1
+                echo "Detected change in package: $package_dir"
+              fi
+            fi
+          done
+
+          # Convert keys of associative array to a space-separated string
+          changed_list="${!changed_dirs[@]}"
+          echo "Changed package list: $changed_list"
+          echo "packages=${changed_list}" >> $GITHUB_OUTPUT
+
+
+      # Loop through changed packages and create/push tags
+      - name: Tag and Push for changed packages
+        # Only run if the changed_packages step found changes
+        if: steps.changed_packages.outputs.packages != ''
+        run: |
+          # Loop through the space-separated list of changed package directories
+          for pkg_dir in ${{ steps.changed_packages.outputs.packages }}; do
+            echo "Processing package: $pkg_dir"
+            pkg_path="packages/$pkg_dir/package.json"
+            if [ ! -f "$pkg_path" ]; then
+              echo "Warning: package.json not found for $pkg_dir, skipping tag."
+              continue
+            fi
+
+            # Get current version from package.json using jq
+            current_version=$(jq -r '.version' "$pkg_path")
+            echo "Current version for $pkg_dir: $current_version"
+
+            # Calculate next patch version (simple increment, requires node/npm or custom script)
+            # Using Node.js for semver increment
+            # Ensure semver is installed (add 'npm install semver' or 'yarn add semver' in dependencies step if needed)
+            next_version=$(node -p "require('semver').inc('$current_version', 'patch')")
+            echo "Next version for $pkg_dir: $next_version"
+
+            # Determine tag prefix based on package directory
+            tag_prefix=""
+            if [ "$pkg_dir" == "mcp" ]; then
+              tag_prefix="mcp-v"
+            elif [ "$pkg_dir" == "schemas" ]; then
+              tag_prefix="schemas-v"
+            elif [ "$pkg_dir" == "vscode-extension" ]; then
+              tag_prefix="vscode-v"
+            else
+              echo "Warning: Unknown package directory '$pkg_dir', skipping tag."
+              continue
+            fi
+
+            new_tag="${tag_prefix}${next_version}"
+            echo "Creating tag: $new_tag"
+
+            # Create and push the tag
+            git tag "$new_tag"
+            git push origin "$new_tag"
+            echo "Pushed tag: $new_tag"
+          done
+        env:
+          # GITHUB_TOKEN is automatically available
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Need Node.js for semver calculation
+          NODE_PATH: ${{ github.workspace }}/node_modules
