@@ -30,4 +30,6 @@ jobs:
       # Build the entire project using TypeScript project references
       - name: Build project
         run: yarn build
+      - name: Run ESLint
+        run: yarn lint
       - run: yarn test

@@ -51,23 +51,77 @@ export class BranchController {
   /**
    * Write a branch document
    */
-  async writeDocument(branchName: string, path: string, content: any) {
+  async writeDocument(params: {
+    branchName: string;
+    path: string;
+    content?: string; // Explicitly define content as string
+    tags?: string[];
+    patches?: any[]; // Add patches parameter
+  }) {
+    // Destructure params
+    const { branchName, path, content, tags, patches } = params;
     try {
-      this.componentLogger.info('Writing branch document', { operation: 'writeDocument', branchName, path });
-      await this.writeBranchDocumentUseCase.execute({
-        branchName,
-        document: {
-          path: path,
-          content: content,
-        }
-      });
+      // Determine conditions first
+      const hasPatches = patches && Array.isArray(patches) && patches.length > 0;
+      // Check if content is not undefined, not null, AND not an empty string
+      const hasContent = content !== undefined && content !== null && content !== '';
 
-      return this.presenter.presentSuccess({ message: 'Document written successfully' });
+      this.componentLogger.info('Writing branch document', { operation: 'writeDocument', branchName, path, hasContent, hasPatches });
+      console.error(`--- BranchController: Checking conditions - hasPatches: ${hasPatches}, content type: ${typeof content}, content value: "${content}", hasContent: ${hasContent}`); // DEBUG LOG
+
+      if (hasPatches) {
+        console.error("--- BranchController: Entering 'patches' block"); // DEBUG LOG
+        // Call WriteBranchDocumentUseCase with patches
+        const result = await this.writeBranchDocumentUseCase.execute({
+          branchName,
+          document: { // Pass path and tags from the document object
+            path: path,
+            tags: tags,
+            content: '' // Pass empty string to satisfy the type when using patches
+          },
+          patches: patches // Pass the patches array
+        });
+        // Log the result from the use case and the data being presented
+        console.error("--- BranchController: UseCase result:", JSON.stringify(result, null, 2));
+        console.error("--- BranchController: Presenting data:", JSON.stringify(result.document, null, 2));
+       return this.presenter.presentSuccess(result.document);
+      } else if (hasContent) {
+        console.error("--- BranchController: Entering 'content' block"); // DEBUG LOG
+        // If content is provided (and no patches), call the existing UseCase
+        // Content is already known to be a non-empty string here due to hasContent check
+        const result = await this.writeBranchDocumentUseCase.execute({
+          branchName,
+          document: { // Pass data matching WriteDocumentDTO
+            path: path,
+            content: content, // Pass the valid string content
+            tags: tags // Pass tags if available
+          }
+          // No patches field here
+        });
+         // Return the document DTO directly from the use case result
+        return this.presenter.presentSuccess(result.document);
+      } else {
+        console.error("--- BranchController: Entering 'else' (init) block"); // DEBUG LOG
+        // Handle the case where neither content nor patches are provided (or patches is an empty array)
+        // This might need a dedicated initialization UseCase or logic.
+        // For now, return the initialization message similar to routes.ts logic.
+        // Or call UseCase with empty content for initialization? Let's return a specific message for now.
+        const patchesType = typeof patches;
+        const patchesValue = JSON.stringify(patches);
+        const patchesLength = Array.isArray(patches) ? patches.length : 'N/A';
+        const contentType = typeof content;
+        const contentValue = JSON.stringify(content);
+        const debugMessage = `DEBUG: Entered init branch unexpectedly. patches type: ${patchesType}, patches length: ${patchesLength}, patches value: ${patchesValue}, content type: ${contentType}, content value: ${contentValue}`;
+        this.componentLogger.info(debugMessage, { operation: 'writeDocument', branchName, path });
+        // Return debug information in the response
+        return this.presenter.presentSuccess({ message: debugMessage });
+      }
     } catch (error) {
-      this.componentLogger.error('Failed to write branch document', { operation: 'writeDocument', branchName, path, error });
+      // Log the error with destructured variables available in this scope
+      this.componentLogger.error('Failed to write branch document', { operation: 'writeDocument', branchName, path, error }); // Log with available context
       return this.handleError(error);
     }
-  }
+  } // Closing brace for the writeDocument method
 
   /**
    * Read core files for a branch

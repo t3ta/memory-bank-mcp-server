@@ -27,8 +27,9 @@ export interface IBranchController extends IController {
   writeDocument(params: {
      branchName: string;
      path: string;
-    content: string;
+    content?: any; // content は patches があれば不要なので optional に
     tags?: string[];
+    patches?: any[]; // patches を追加 (optional)
   }): Promise<MCPResponse>;
 
   /**

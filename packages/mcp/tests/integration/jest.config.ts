@@ -25,9 +25,8 @@ export default {
     // 4. @memory-bank/schemas (tsconfig.test.json の paths を反映)
     '^@memory-bank/schemas(.*)$': '<rootDir>/../../../schemas/src$1', // rootDir から ../../../schemas/src を指す
 
-    // 5. 特定の node_modules のマッピング (fast-json-patch など)
-    //    プロジェクトルートからの相対パスで指定
-    '^fast-json-patch$': '<rootDir>/../../../../node_modules/fast-json-patch/dist/fast-json-patch.js' // rootDir から ../../../../node_modules を指す
+    // 5. fast-json-patch のマッピングを削除 (Node.js の解決に任せる)
+    // '^fast-json-patch$': '<rootDir>/../../../../node_modules/fast-json-patch/dist/fast-json-patch.js' // Removed this mapping
   },
   extensionsToTreatAsEsm: ['.ts', '.mts'], // Add .mts
   maxWorkers: 1,
@@ -38,5 +37,5 @@ export default {
   // setupFilesAfterEnv は rootDir (tests/integration) からの相対パス
   setupFilesAfterEnv: ['<rootDir>/setup.mts'], // Change extension to .mts
   testTimeout: 30000, // みらいが追加☆ タイムアウトを30秒に延長！
-  silent: true, // Suppress console logs during tests
+  silent: false, // Temporarily disable silent mode to see logs
 };
