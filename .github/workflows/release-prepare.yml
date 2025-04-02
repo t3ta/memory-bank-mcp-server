@@ -1,0 +1,143 @@
+# .github/workflows/release-prepare.yml
+name: Prepare Release PR
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to analyze commits from (usually develop)'
+        required: true
+        default: 'develop'
+
+permissions:
+  contents: write # Needed to commit and push the release branch
+  pull-requests: write # Needed to create the pull request
+
+jobs:
+  prepare-release:
+    name: Prepare Release PR
+    runs-on: ubuntu-latest
+    # Prevent running on forks
+    if: github.repository == 't3ta/memory-bank-mcp-server'
+    steps:
+      - name: Checkout target branch (${{ github.event.inputs.branch }})
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+          # Fetch all history and tags for semantic-release
+          fetch-depth: 0
+          # Use PAT to allow pushing the new branch
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build packages
+        run: |
+          yarn build
+          yarn copy-assets
+
+      - name: Get next version and release notes (Dry Run)
+        id: get_version
+        # Run semantic-release in dry-run mode to get info without publishing
+        # Redirect stderr to stdout to capture all output
+        run: |
+          npx semantic-release --dry-run --branches ${{ github.event.inputs.branch }} > semantic_output.log 2>&1 || true
+          echo "--- Semantic Release Output ---"
+          cat semantic_output.log
+          echo "-------------------------------"
+          # Extract next version (adjust regex if needed)
+          VERSION=$(grep -oP 'The next release version is \K([0-9]+\.[0-9]+\.[0-9]+)' semantic_output.log || echo "")
+          # Extract release notes (this is tricky, might need adjustment)
+          # Assuming notes start after "## Features" or "## Bug Fixes" etc. and end before the next step log
+          NOTES=$(awk '/Published release/ {exit} flag; /## \[?[0-9]+\.[0-9]+\.[0-9]+\]?/ {flag=1}' semantic_output.log || echo "")
+          if [ -z "$VERSION" ]; then
+            echo "Could not determine next version from semantic-release output."
+            # Check if there are no changes detected
+            if grep -q "There are no relevant changes, so no new version is released." semantic_output.log; then
+              echo "No relevant changes detected. Exiting."
+              # Set output to indicate no version bump needed
+              echo "NEXT_VERSION=" >> $GITHUB_OUTPUT
+              exit 0 # Exit successfully, no PR needed
+            else
+              exit 1 # Exit with error if version couldn't be determined otherwise
+            fi
+          fi
+          echo "NEXT_VERSION=${VERSION}" >> $GITHUB_OUTPUT
+          # Store notes in an environment variable (might be large)
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+          echo "$NOTES" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Update package.json version
+        if: steps.get_version.outputs.NEXT_VERSION
+        run: |
+          echo "Updating package.json to version ${{ steps.get_version.outputs.NEXT_VERSION }}"
+          # Use npm version to update package.json without creating a git tag
+          npm version ${{ steps.get_version.outputs.NEXT_VERSION }} --no-git-tag-version --allow-same-version
+
+      - name: Update CHANGELOG.md
+        if: steps.get_version.outputs.NEXT_VERSION
+        run: |
+          echo "Updating CHANGELOG.md"
+          # Use conventional-changelog-cli to prepend the latest changes
+          # Ensure CHANGELOG.md exists, create if not
+          touch CHANGELOG.md
+          npx conventional-changelog-cli -p conventionalcommits -i CHANGELOG.md -s -r 0
+          # Add a header for the new version only if the file was modified or created
+          if ! git diff --quiet CHANGELOG.md; then
+            sed -i '1s/^/# \[${{ steps.get_version.outputs.NEXT_VERSION }}] - $(date +%Y-%m-%d)\n\n/' CHANGELOG.md
+          fi
+
+      - name: Update README version
+        if: steps.get_version.outputs.NEXT_VERSION
+        run: |
+          echo "Updating README version"
+          ./scripts/update-readme-version.sh ${{ steps.get_version.outputs.NEXT_VERSION }}
+
+      - name: Create Release Branch and Commit Changes
+        if: steps.get_version.outputs.NEXT_VERSION
+        id: commit_branch # Give this step an ID
+        run: |
+          VERSION=${{ steps.get_version.outputs.NEXT_VERSION }}
+          BRANCH_NAME="release/v${VERSION}"
+          echo "Creating release branch: ${BRANCH_NAME}"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          # Check if there are changes to commit before creating branch/committing
+          if git diff --quiet && git diff --staged --quiet; then
+            echo "No changes detected to commit."
+            # Set output to indicate no branch was created
+            echo "BRANCH_NAME=" >> $GITHUB_OUTPUT
+          else
+            git checkout -b ${BRANCH_NAME}
+            git add .
+            git commit -m "chore(release): prepare release v${VERSION}"
+            git push origin ${BRANCH_NAME}
+            echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Pull Request
+        # Only run if a branch was created and pushed
+        if: steps.commit_branch.outputs.BRANCH_NAME
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }} # Use PAT for PR creation as well
+          BRANCH_NAME: ${{ steps.commit_branch.outputs.BRANCH_NAME }}
+          VERSION: ${{ steps.get_version.outputs.NEXT_VERSION }}
+          # RELEASE_NOTES is available from the previous step's env
+        run: |
+          echo "Creating Pull Request for ${BRANCH_NAME}"
+          # Use gh cli to create the pull request
+          gh pr create \
+            --base master \
+            --head ${BRANCH_NAME} \
+            --title "chore(release): prepare release v${VERSION}" \
+            --body "This PR was automatically generated to prepare for release v${VERSION}.
+
+          **Release Notes:**
+          ${RELEASE_NOTES:-*No release notes generated by semantic-release.*}"
