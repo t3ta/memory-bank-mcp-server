@@ -117,20 +117,45 @@ describe('GlobalController Integration Tests', () => {
       expect(parsedRead.content.value).toBe(testDoc.content.value);
     });
 
-    it('should return an error when writing invalid JSON content', async () => {
+    it('should write invalid JSON content as plain text', async () => {
       const controller = await container.get<GlobalController>('globalController');
-
       const invalidContent = '{"schema": "memory_document_v2", "metadata": {}'; // Invalid JSON
+      const documentPath = 'test/invalid-as-plain-text-controller.txt'; // Use .txt extension
 
-      const result = await controller.writeDocument({
-        path: 'test/invalid.json',
+      // 不正なJSONを書き込む (プレーンテキストとして扱われるはず)
+      const writeResult = await controller.writeDocument({
+        path: documentPath,
         content: invalidContent
+        // tags はコントローラーの writeDocument では直接受け付けない
       });
 
-      expect(result.success).toBe(false);
-      if (result.success) fail('Expected error but got success'); // Add type guard
-      expect(result.error).toBeDefined();
-      expect(result.error.code).toContain('VALIDATION_ERROR');
+      // 書き込み成功を確認
+      expect(writeResult.success).toBe(true);
+      if (!writeResult.success) fail('Expected success but got error');
+      expect(writeResult.data).toBeDefined();
+      // 書き込み成功を確認 (returnContent: false なので最小限の情報のみ)
+      expect(writeResult.success).toBe(true);
+      if (!writeResult.success) fail('Expected success but got error');
+      expect(writeResult.data).toBeDefined();
+      // writeResult.data.document が期待通りの形か確認
+      expect(writeResult.data.document).toBeDefined();
+      expect(typeof writeResult.data.document.path).toBe('string');
+      expect(typeof writeResult.data.document.lastModified).toBe('string');
+      expect(writeResult.data.document.path).toBe(documentPath);
+      expect(writeResult.data.document.lastModified).toEqual(expect.any(String));
+      // content と tags が undefined であることを確認
+      expect(writeResult.data.document.content).toBeUndefined();
+      expect(writeResult.data.document.tags).toBeUndefined();
+
+      // 読み込んで再確認
+      const readResult = await controller.readDocument(documentPath);
+      expect(readResult.success).toBe(true);
+      if (!readResult.success) fail('Expected success but got error on read');
+      expect(readResult.data).toBeDefined();
+      expect(readResult.data.path).toBe(documentPath);
+      expect(readResult.data.content).toBe(invalidContent); // 内容がそのまま保存されているか
+      // プレーンテキストなのでタグは空のはず
+      expect(readResult.data.tags).toEqual([]);
     });
     it('should update (overwrite) an existing global document successfully', async () => {
       const controller = await container.get<GlobalController>('globalController');

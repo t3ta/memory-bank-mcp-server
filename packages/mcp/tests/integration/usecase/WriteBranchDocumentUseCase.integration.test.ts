@@ -152,16 +152,68 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
       expect(readDocument.content.value).toBe('更新後の内容');
     });
 
-    it('should return an error for invalid JSON content', async () => {
+    it('should write invalid JSON content as plain text', async () => {
       const invalidContent = '{"schema": "memory_document_v2", "metadata": {}'; // Invalid JSON
+      const documentPath = 'test/invalid-as-plain-text-branch.txt'; // Use .txt extension
+      const tags = ['test', 'invalid-json', 'plain-text', 'branch'];
 
-      await expect(writeUseCase.execute({
+      // 不正なJSONを書き込む (プレーンテキストとして扱われるはず)
+      const writeResult = await writeUseCase.execute({
         branchName: TEST_BRANCH,
         document: {
-          path: 'test/invalid.json',
-          content: invalidContent
-        }
-      })).rejects.toThrow('Document content is not valid JSON'); // Revert back to checking the error message string
+          path: documentPath,
+          content: invalidContent,
+          tags: tags
+        },
+        returnContent: true
+      });
+
+      // 書き込み成功を確認
+      expect(writeResult).toBeDefined();
+      expect(writeResult.document).toBeDefined();
+      expect(writeResult.document.path).toBe(documentPath);
+      expect(writeResult.document.content).toBe(invalidContent); // 内容がそのまま保存されているか
+
+      // 読み込んで再確認
+      const readResult = await readUseCase.execute({ branchName: TEST_BRANCH, path: documentPath });
+      expect(readResult).toBeDefined();
+      expect(readResult.document).toBeDefined();
+      expect(readResult.document.path).toBe(documentPath);
+      expect(readResult.document.content).toBe(invalidContent);
+      // プレーンテキストなのでタグは空のはず
+      expect(readResult.document.tags).toEqual([]);
+    });
+
+    it('should successfully write plain text content', async () => {
+      const plainTextContent = 'This is just plain text, not JSON.';
+      const documentPath = 'test/plain-text-document.txt'; // 拡張子も変えてみる
+      const tags = ['test', 'plain-text'];
+
+      // プレーンテキストを書き込む
+      const writeResult = await writeUseCase.execute({
+        branchName: TEST_BRANCH,
+        document: {
+          path: documentPath,
+          content: plainTextContent,
+          tags: tags
+        },
+        returnContent: true // 内容を確認するために true にする
+      });
+
+      // 書き込み結果を確認
+      expect(writeResult).toBeDefined();
+      expect(writeResult.document).toBeDefined();
+      expect(writeResult.document.path).toBe(documentPath);
+      expect(writeResult.document.content).toBe(plainTextContent);
+
+      // 読み込んで再確認
+      const readResult = await readUseCase.execute({ branchName: TEST_BRANCH, path: documentPath });
+      expect(readResult).toBeDefined();
+      expect(readResult.document).toBeDefined();
+      expect(readResult.document.path).toBe(documentPath);
+      expect(readResult.document.content).toBe(plainTextContent);
+      // プレーンテキストファイルからタグは読み込めないので空のはず
+      expect(readResult.document.tags).toEqual([]);
     });
 
 
@@ -353,16 +405,27 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
           content: newDocument.content
       };
       // returnedDocument (パース結果) と expectedDocumentStructure を比較する
-      expect(returnedDocument).toEqual(expectedDocumentStructure);
+      // lastModified は UseCase のレスポンスには含まれないので、それ以外のメタデータを比較
+      const expectedMeta = expectedDocumentStructure.metadata;
+      expect(returnedDocument.metadata).toEqual(expectedMeta);
+      expect(returnedDocument.content).toEqual(expectedDocumentStructure.content);
+      expect(returnedDocument.schema).toEqual(expectedDocumentStructure.schema);
+      // returnedLastModified のチェックは削除
 
       // 念のため readUseCase でも確認 (返却された内容と同じはず)
       const readResult = await readUseCase.execute({ branchName: TEST_BRANCH, path: documentPath });
-      // Compare content after trimming whitespace to avoid potential inconsistencies
       // content が undefined でないことを確認してから比較
-      if (result.document.content === undefined) {
-        throw new Error('Expected document content to be defined when returnContent is true for comparison');
+      if (result.document.content === undefined || readResult.document.content === undefined) {
+        throw new Error('Expected document content to be defined for comparison');
       }
-      expect(readResult.document.content.trim()).toBe(result.document.content.trim());
+      // パースして lastModified を除いて比較
+      const parsedReadResult = JSON.parse(readResult.document.content);
+      const { lastModified: readLastModified, ...readMeta } = parsedReadResult.metadata;
+      expect(readMeta).toEqual(expectedMeta); // UseCase のレスポンスと同じ期待値と比較
+      expect(parsedReadResult.content).toEqual(expectedDocumentStructure.content);
+      expect(parsedReadResult.schema).toEqual(expectedDocumentStructure.schema);
+      expect(readLastModified).toEqual(expect.any(String)); // ★ ファイルから読んだものには lastModified があることを確認 ★
+
       expect(readResult.document.tags).toEqual(result.document.tags);
       // lastModified はミリ秒単位でずれる可能性があるので、存在と型だけチェック
       expect(result.document.lastModified).toEqual(expect.any(String));
@@ -439,6 +502,6 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
        expect(result.document.lastModified).toEqual(expect.any(String));
        expect(result.document.content).toBeUndefined(); // 実装後に期待するアサーション (今は失敗するはず)
        expect(result.document.tags).toBeUndefined(); // 実装後に期待するアサーション (今は失敗するはず)
-    }); // it ブロックの閉じ括弧
+    });
   }); // describe('execute', ...) の閉じ括弧
 }); // 一番外側の describe の閉じ括弧

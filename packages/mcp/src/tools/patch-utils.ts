@@ -51,7 +51,7 @@ export function createEnhancedPatchProperties() {
     },
     content: {
       type: 'string',
-      description: 'Full document content (cannot be used together with patches)'
+      description: 'Full document content (JSON string or plain text, cannot be used together with patches)'
     }
   };
 }

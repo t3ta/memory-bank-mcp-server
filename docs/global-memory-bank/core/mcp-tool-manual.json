@@ -20,7 +20,7 @@
           {"name": "`branch`", "description": "Target branch name (required, e.g., `feature/my-branch`)"},
           {"name": "`path`", "description": "Target document path (required, e.g., `data/config.json`)"},
           {"name": "`docs`", "description": "Path to the document root (required)"},
-          {"name": "`content`", "description": "The complete content of the document (optional, JSON string or object, mutually exclusive with `patches`)"},
+          {"name": "`content`", "description": "The complete content of the document (optional, JSON string, object, or plain text, mutually exclusive with `patches`)"},
           {"name": "`patches`", "description": "Array of JSON Patch operation objects (optional, mutually exclusive with `content`, RFC 6902)"},
           {"name": "`tags`", "description": "Array of tags to assign to the document (optional)"}
         ],
@@ -58,7 +58,7 @@
         "arguments": [
           {"name": "`path`", "description": "Target document path (required, e.g., `core/config.json`)"},
           {"name": "`docs`", "description": "Path to the document root (required)"},
-          {"name": "`content`", "description": "The complete content of the document (optional, JSON string or object, mutually exclusive with `patches`)"},
+          {"name": "`content`", "description": "The complete content of the document (optional, JSON string, object, or plain text, mutually exclusive with `patches`)"},
           {"name": "`patches`", "description": "Array of JSON Patch operation objects (optional, mutually exclusive with `content`, RFC 6902)"},
           {"name": "`tags`", "description": "Array of tags to assign to the document (optional)"}
         ],
