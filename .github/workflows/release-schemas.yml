@@ -47,11 +47,16 @@ jobs:
             echo "npm_exists=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Publish schemas to npm
-        id: publish-schemas
+      - name: Update schemas package.json version
         if: steps.check-npm-schemas.outputs.npm_exists != 'true'
-        # package.json の publishConfig で access: public が設定されているので --access は不要
-        run: yarn workspace @memory-bank/schemas publish --new-version ${{ steps.get_version.outputs.VERSION }}
+        run: yarn workspace @memory-bank/schemas version --new-version ${{ steps.get_version.outputs.VERSION }} --no-git-tag-version
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish schemas to npm
+        id: publish-schemas # Keep id if needed elsewhere
+        if: steps.check-npm-schemas.outputs.npm_exists != 'true'
+        run: npm publish --workspace @memory-bank/schemas
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

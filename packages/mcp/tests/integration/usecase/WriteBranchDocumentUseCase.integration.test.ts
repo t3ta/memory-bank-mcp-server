@@ -161,7 +161,7 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
           path: 'test/invalid.json',
           content: invalidContent
         }
-      })).rejects.toThrow('Document content is not valid JSON'); // Check only the error message string
+      })).rejects.toThrow('Document content is not valid JSON'); // Revert back to checking the error message string
     });
 
 

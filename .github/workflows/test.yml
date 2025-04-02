@@ -30,6 +30,9 @@ jobs:
       # Build the entire project using TypeScript project references
       - name: Build project
         run: yarn build
+      - name: Check Dependencies
+        run: yarn check:deps # Add depcheck step
       - name: Run ESLint
         run: yarn lint
-      - run: yarn test
+      - name: Run Integration Tests # Change to run integration tests
+        run: yarn test:integration
