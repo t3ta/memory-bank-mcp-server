@@ -64,7 +64,7 @@ const server = new Server(
 );
 
 // Set up tool handlers
-server.setRequestHandler(ListToolsRequestSchema, async () => {
+server.setRequestHandler(ListToolsRequestSchema, async () => { // 元のスキーマ指定に戻す
   const tools = getToolDefinitions(); // 関数を呼び出してツールリストを取得
   return {
     tools: tools,
