@@ -237,10 +237,13 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
           documentType: parsedContent.metadata?.documentType
         });
       } catch (err) {
-        this.componentLogger.error('Invalid JSON content:', {
+        // Avoid logging potentially large invalid content directly in the structured context
+        // Log the error message and path separately.
+        this.componentLogger.error(`Invalid JSON content for document: ${document.path.value}`, {
           operation: 'saveDocument',
           error: err instanceof Error ? err.message : 'Unknown error',
-          content: document.content.substring(0, 100) + '...' // Log only first 100 chars
+          // Optionally log a small preview, ensuring it doesn't break logging format if it contains special chars
+          contentPreview: typeof document.content === 'string' ? document.content.substring(0, 50) + '...' : '[Non-string content]'
         });
         throw DomainErrors.validationError(
           'Document content is not valid JSON',

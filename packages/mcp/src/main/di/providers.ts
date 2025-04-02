@@ -121,7 +121,7 @@ export async function registerInfrastructureServices(
     const { FileI18nRepository } = await import('../../infrastructure/i18n/FileI18nRepository.js');
     const i18nRepository = new FileI18nRepository(translationsDir);
     await i18nRepository.initialize().catch(error => {
-      console.error('Failed to initialize i18n repository:', error);
+      logger.error('Failed to initialize i18n repository', { error }); // Use logger.error with context
     });
     return i18nRepository;
   });
@@ -471,14 +471,14 @@ export async function initializeRepositories(container: DIContainer): Promise<vo
 import { logger } from '../../shared/utils/logger.js';
 
 export async function setupContainer(options?: CliOptions): Promise<DIContainer> {
-  console.log('[setupContainer] Starting setupContainer with options:', options); // Use console.log for visibility
+  logger.debug('[setupContainer] Starting setupContainer', { options }); // Use logger.debug
   logger.debug('Setting up DI container...'); // Log start
   const container = new DIContainer();
 
   logger.debug('Registering infrastructure services...');
-  console.log('[setupContainer] Calling registerInfrastructureServices...'); // Use console.log
+  logger.debug('[setupContainer] Calling registerInfrastructureServices...'); // Use logger.debug
   await registerInfrastructureServices(container, options);
-  console.log('[setupContainer] Finished registerInfrastructureServices.'); // Use console.log
+  logger.debug('[setupContainer] Finished registerInfrastructureServices.'); // Use logger.debug
   logger.debug('Infrastructure services registered.');
 
   logger.debug('Registering application services...');
