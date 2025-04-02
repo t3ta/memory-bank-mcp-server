@@ -24,7 +24,7 @@ describe('BranchController Integration Tests', () => {
       documentType: "test",
       path: 'test-document.json', // Default path, can be overridden in tests
       tags: ["test", "branch"],
-      lastModified: expect.any(String),
+      lastModified: new Date().toISOString(), // Use valid ISO string
       createdAt: expect.any(String),
       version: 1
     },
