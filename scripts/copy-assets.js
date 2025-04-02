@@ -42,7 +42,7 @@ async function main() {
     console.log('✅ 翻訳ファイルをコピーしました！');
 
     // テンプレートをコピー
-    await copyDir('src/templates', 'dist/templates');
+    await copyDir('packages/mcp/src/templates', 'packages/mcp/dist/templates');
     console.log('✅ テンプレートをコピーしました！');
 
     console.log('✨ すべてのアセットを正常にコピーしました！');
