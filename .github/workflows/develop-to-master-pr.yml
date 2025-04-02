@@ -62,9 +62,10 @@ jobs:
         id: check_diff
         if: steps.check-pr.outputs.skip != 'true' && steps.check-branches.outputs.skip != 'true'
         run: |
-          # Fetch latest master and develop just in case
-          git fetch origin master:master develop:develop
-          changes=$(git log master..develop --oneline)
+          # Fetch latest master and develop branches from origin
+          git fetch origin master develop
+          # Compare remote tracking branches to avoid issues with local state
+          changes=$(git log origin/master..origin/develop --oneline)
           if [ -z "$changes" ]; then
             echo "No changes detected between develop and master. Skipping PR creation."
             echo "skip_pr_creation=true" >> $GITHUB_OUTPUT
