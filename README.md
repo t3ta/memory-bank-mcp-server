@@ -294,10 +294,6 @@ When code is merged to the `master` branch:
 3. A GitHub Release is created with release notes.
 4. The `@memory-bank/mcp` package is published to npm.
 
-### Manual Version Bumping
-
-(Instructions remain the same - uses GitHub Actions workflow)
-
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for
