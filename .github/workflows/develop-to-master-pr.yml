@@ -13,7 +13,7 @@ concurrency:
 jobs:
   create-pr:
     runs-on: ubuntu-latest
-    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
     permissions:
       contents: write
       pull-requests: write
@@ -58,8 +58,24 @@ jobs:
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Create Pull Request
+      - name: Check for changes between develop and master
+        id: check_diff
         if: steps.check-pr.outputs.skip != 'true' && steps.check-branches.outputs.skip != 'true'
+        run: |
+          # Fetch latest master and develop just in case
+          git fetch origin master:master develop:develop
+          changes=$(git log master..develop --oneline)
+          if [ -z "$changes" ]; then
+            echo "No changes detected between develop and master. Skipping PR creation."
+            echo "skip_pr_creation=true" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected. Proceeding with PR creation."
+            echo "skip_pr_creation=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Pull Request
+        # Only run if branches exist, no existing PR, AND changes were detected
+        if: steps.check-pr.outputs.skip != 'true' && steps.check-branches.outputs.skip != 'true' && steps.check_diff.outputs.skip_pr_creation != 'true'
         id: create-pr
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
