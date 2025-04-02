@@ -96,7 +96,7 @@ jobs:
 
           # 変更ログを生成
           set +e  # エラーが発生してもスクリプトを継続
-          changes=$(git log master..develop --pretty=format:'- %s' --reverse 2>/dev/null)
+          changes=$(git log origin/master..origin/develop --pretty=format:'- %s' --reverse 2>/dev/null)
           exit_code=$?
           set -e  # エラーハンドリングを再度有効化
 
