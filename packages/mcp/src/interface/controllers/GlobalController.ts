@@ -95,15 +95,21 @@ export class GlobalController implements IGlobalController {
     try {
       this.componentLogger.info(`Writing global document`, { operation: 'writeDocument', docPath });
 
-      await this.writeGlobalDocumentUseCase.execute({
+      // Execute the use case and store the result
+      const result = await this.writeGlobalDocumentUseCase.execute({
         document: {
           path: docPath,
           content,
           tags: tagStrings || [],
         },
+        // Note: The use case returns { document: { path, lastModified } }
+        // even if returnContent is false/undefined.
+        // So simply passing the result to the presenter is sufficient
+        // for the test expectation.
       });
 
-      return this.presenter.presentSuccess({ success: true }); // Already correct, no change needed here
+      // Pass the result from the use case to the presenter
+      return this.presenter.presentSuccess(result);
     } catch (error) {
       return this.handleError(error, 'writeDocument');
     }

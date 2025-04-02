@@ -147,16 +147,68 @@ describe('WriteGlobalDocumentUseCase Integration Tests', () => {
       expect(readDocument.content.value).toBe('更新後の内容');
     });
 
-    it('should return an error for invalid JSON content', async () => {
-      // Invalid JSON content (missing closing bracket)
+    it('should write invalid JSON content as plain text', async () => {
       const invalidContent = '{"schema": "memory_document_v2", "metadata": {}'; // Invalid JSON
+      const documentPath = 'test/invalid-as-plain-text.txt'; // Use .txt extension
+      const tags = ['test', 'invalid-json', 'plain-text'];
 
-      await expect(writeUseCase.execute({
+      // 不正なJSONを書き込む (プレーンテキストとして扱われるはず)
+      const writeResult = await writeUseCase.execute({
         document: {
-          path: 'test/invalid.json',
-          content: invalidContent
-        }
-      })).rejects.toThrow(DomainError); // Check for DomainError class
+          path: documentPath,
+          content: invalidContent,
+          tags: tags
+        },
+        returnContent: true
+      });
+
+      // 書き込み成功を確認
+      expect(writeResult).toBeDefined();
+      expect(writeResult.document).toBeDefined();
+      expect(writeResult.document.path).toBe(documentPath);
+      expect(writeResult.document.content).toBe(invalidContent); // 内容がそのまま保存されているか
+
+      // 読み込んで再確認
+      const readResult = await readUseCase.execute({ path: documentPath });
+      expect(readResult).toBeDefined();
+      expect(readResult.document).toBeDefined();
+      expect(readResult.document.path).toBe(documentPath);
+      expect(readResult.document.content).toBe(invalidContent);
+      // プレーンテキストなのでタグは空のはず
+      expect(readResult.document.tags).toEqual([]);
+    });
+
+    it('should successfully write plain text content', async () => {
+      const plainTextContent = 'This is just plain text, not JSON, for global.';
+      const documentPath = 'test/plain-text-global-document.txt'; // 拡張子も変えてみる
+      const tags = ['test', 'plain-text', 'global'];
+
+      // プレーンテキストを書き込む
+      const writeResult = await writeUseCase.execute({
+        document: {
+          path: documentPath,
+          content: plainTextContent,
+          tags: tags
+        },
+        returnContent: true // 内容を確認するために true にする
+      });
+
+      // 書き込み結果を確認
+      expect(writeResult).toBeDefined();
+      expect(writeResult.document).toBeDefined();
+      expect(writeResult.document.path).toBe(documentPath);
+      expect(writeResult.document.content).toBe(plainTextContent); // 内容が一致するか
+      // プレーンテキストの場合、tags は writeResult には含まれないはず (リポジトリ実装による)
+      // expect(writeResult.document.tags).toEqual(tags); // このアサーションは不要かも
+
+      // 読み込んで再確認
+      const readResult = await readUseCase.execute({ path: documentPath });
+      expect(readResult).toBeDefined();
+      expect(readResult.document).toBeDefined();
+      expect(readResult.document.path).toBe(documentPath);
+      expect(readResult.document.content).toBe(plainTextContent);
+      // プレーンテキストファイルからタグは読み込めないので空のはず
+      expect(readResult.document.tags).toEqual([]);
     });
 
 

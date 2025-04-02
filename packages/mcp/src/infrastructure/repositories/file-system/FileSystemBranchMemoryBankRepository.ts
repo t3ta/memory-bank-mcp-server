@@ -7,7 +7,7 @@ import { MemoryDocument } from "../../../domain/entities/MemoryDocument.js";
 import { Tag } from "../../../domain/entities/Tag.js"; // Changed from import type
 import type { IBranchMemoryBankRepository, RecentBranch } from "../../../domain/repositories/IBranchMemoryBankRepository.js";
 import { logger } from "../../../shared/utils/logger.js";
-import { DomainError, DomainErrors } from "../../../shared/errors/DomainError.js"; // Removed DomainErrorCodes, Added DomainErrors
+import { DomainError } from "../../../shared/errors/DomainError.js"; // Removed DomainErrorCodes, Added DomainErrors
 // Import both the class and the enum/namespace
 import { InfrastructureError, InfrastructureErrorCodes, InfrastructureErrors } from "../../../shared/errors/InfrastructureError.js";
 import type { BranchTagIndex as TagIndex } from "@memory-bank/schemas";
@@ -176,20 +176,45 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
       }
     }
 
-    // Normal read process
+    // Normal read process (JSON or other types)
     try {
       const content = await fs.readFile(filePath, 'utf-8');
-      // --- Parse JSON and extract tags ---
-      const jsonData = JSON.parse(content);
-      const tags = (jsonData.metadata?.tags ?? []).map((tagStr: string) => Tag.create(tagStr));
-      // --- End of tag extraction ---
-      return MemoryDocument.create({
-        path: documentPath,
-        content,
-        tags: tags, // Use extracted tags
-        lastModified: jsonData.metadata?.lastModified ? new Date(jsonData.metadata.lastModified) : new Date() // Use metadata date or current date
+      const stats = await fs.stat(filePath); // Get file stats for lastModified
+
+      if (documentPath.isJSON) {
+        // --- Try parsing as JSON ---
+        try {
+          const jsonData = JSON.parse(content);
+          const tags = (jsonData.metadata?.tags ?? []).map((tagStr: string) => Tag.create(tagStr));
+          return MemoryDocument.create({
+            path: documentPath,
+            content,
+            tags: tags,
+            lastModified: jsonData.metadata?.lastModified ? new Date(jsonData.metadata.lastModified) : stats.mtime // Prefer metadata date, fallback to file mtime
+          });
+        } catch (parseError) {
+          // If JSON parsing fails for a .json file, log a warning but treat as plain text for now? Or return null?
+          // Let's return null for corrupted JSON files to avoid unexpected behavior.
+          this.componentLogger.warn(`Failed to parse JSON content for ${filePath}, returning null.`, { error: parseError });
+          return null;
+        }
+      } else {
+        // --- Treat as Plain Text ---
+        this.componentLogger.debug('Reading non-JSON file as plain text:', { operation: 'getDocument', path: filePath });
+        return MemoryDocument.create({
+          path: documentPath,
+          content,
+          tags: [], // Plain text files have no embedded tags in this implementation
+          lastModified: stats.mtime // Use file modification time
+        });
+      }
+    } catch (err) {
+      // Handle file read errors (e.g., file not found)
+      this.componentLogger.debug('Failed to read file:', {
+        operation: 'getDocument',
+        path: filePath,
+        error: err instanceof Error ? err.message : 'Unknown error'
       });
-    } catch {
       return null;
     }
   }
@@ -228,40 +253,47 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
         this.componentLogger.debug('Branch directory created:', { operation: 'saveDocument', branchPath });
       }
 
-      // Validate JSON
+      // Try to parse as JSON, but allow plain text
+      let isJson = false;
+      let jsonData: any = null;
       try {
-        const parsedContent = JSON.parse(document.content);
-        this.componentLogger.debug('Document content validated as JSON:', {
+        jsonData = JSON.parse(document.content);
+        isJson = true;
+        this.componentLogger.debug('Document content is valid JSON.', {
           operation: 'saveDocument',
-          schema: parsedContent.schema,
-          documentType: parsedContent.metadata?.documentType
+          path: document.path.value,
+          schema: jsonData.schema,
+          documentType: jsonData.metadata?.documentType
         });
       } catch (err) {
-        // Avoid logging potentially large invalid content directly in the structured context
-        // Log the error message and path separately.
-        this.componentLogger.error(`Invalid JSON content for document: ${document.path.value}`, {
+        // Not JSON, treat as plain text
+        isJson = false;
+        this.componentLogger.debug('Document content is not JSON, treating as plain text.', {
           operation: 'saveDocument',
-          error: err instanceof Error ? err.message : 'Unknown error',
-          // Optionally log a small preview, ensuring it doesn't break logging format if it contains special chars
-          contentPreview: typeof document.content === 'string' ? document.content.substring(0, 50) + '...' : '[Non-string content]'
+          path: document.path.value,
+          error: err instanceof Error ? err.message : 'Unknown parse error'
         });
-        throw DomainErrors.validationError(
-          'Document content is not valid JSON',
-          { cause: err instanceof Error ? err : undefined, path: document.path.value }
-        );
       }
 
-      // Use fsExtra.outputJson to handle directory creation and JSON writing atomically
-      this.componentLogger.debug('Writing JSON file using fsExtra.outputJson:', { operation: 'saveDocument', filePath });
-      const jsonData = JSON.parse(document.content); // Already validated above
-      // --- Add tags to metadata before saving ---
-      if (!jsonData.metadata) {
-        jsonData.metadata = {}; // Ensure metadata object exists
+      if (isJson) {
+        // --- Save as JSON ---
+        this.componentLogger.debug('Writing JSON file using fsExtra.outputJson:', { operation: 'saveDocument', filePath });
+        // Add tags to metadata before saving
+        if (!jsonData.metadata) {
+          jsonData.metadata = {}; // Ensure metadata object exists
+        }
+        jsonData.metadata.tags = document.tags.map(tag => tag.value); // Add tags here!
+        jsonData.metadata.lastModified = document.lastModified.toISOString(); // Update lastModified
+        await fsExtra.outputJson(filePath, jsonData, { spaces: 2 });
+        this.componentLogger.debug('Successfully wrote JSON file:', { operation: 'saveDocument', filePath });
+      } else {
+        // --- Save as Plain Text ---
+        this.componentLogger.debug('Writing plain text file using fs.writeFile:', { operation: 'saveDocument', filePath });
+        await fs.writeFile(filePath, document.content, 'utf-8');
+        this.componentLogger.debug('Successfully wrote plain text file:', { operation: 'saveDocument', filePath });
+        // Note: Tags are not saved within the plain text file itself.
+        // Tag association would need to be handled by the index if required for plain text.
       }
-      jsonData.metadata.tags = document.tags.map(tag => tag.value); // Add tags here!
-      // --- End of tag addition ---
-      await fsExtra.outputJson(filePath, jsonData, { spaces: 2 });
-      this.componentLogger.debug('Successfully wrote JSON file:', { operation: 'saveDocument', filePath });
 
       // // Test support: If a .json file is created, also create an .md file with the same content
       // // This might be unnecessary now if only JSON is expected

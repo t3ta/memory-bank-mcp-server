@@ -122,21 +122,6 @@ describe('BranchController Integration Tests', () => {
   });
 
   describe('writeDocument', () => {
-    it('should return an error when writing invalid JSON content', async () => {
-      const controller = await container.get<BranchController>('branchController');
-      const invalidContent = '{"schema": "memory_document_v2", "metadata": {}'; // Invalid JSON
-
-      // Call writeDocument with a single params object
-      const result = await controller.writeDocument({
-        branchName: TEST_BRANCH,
-        path: 'invalid.json',
-        content: invalidContent
-      });
-
-      expect(result.success).toBe(false);
-      if (result.success) throw new Error('Expected error but got success'); // Use throw new Error
-      expect(result.error).toBeDefined();
-    });
 
     it('should create a new branch and write a document successfully', async () => {
       const controller = await container.get<BranchController>('branchController');
