@@ -10,7 +10,7 @@
     "noEmitOnError": false,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "rootDir": "./src",
+    // "rootDir": "./src", // ルートの src は使わないのでコメントアウト
     "declaration": true,
     "preserveConstEnums": true,
     "experimentalDecorators": true,
@@ -36,9 +36,8 @@
     { "path": "./packages/mcp" },
     { "path": "./packages/schemas" }
   ],
-  "include": [
-    "src/**/*"
-  ],
+  // "include": [], // ルートでは何もビルドしないのでコメントアウト
+  "files": [], // ビルド対象ファイルを明示的に空にする
   "exclude": [
     "node_modules",
     "dist",
