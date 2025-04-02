@@ -58,7 +58,7 @@
     [
       "@semantic-release/exec",
       {
-        "prepareCmd": "sed -i '' 's/(v[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+)/(v${nextRelease.version})/' packages/mcp/README.md && echo 'Updated README version for mcp package.'"
+        "prepareCmd": "./scripts/update-readme-version.sh ${nextRelease.version}"
       }
     ],
     "@semantic-release/github",
