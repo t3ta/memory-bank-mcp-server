@@ -12,6 +12,9 @@ import {
   ApplicationErrorCodes,
 } from '../../../shared/errors/ApplicationError.js';
 import { logger } from '../../../shared/utils/logger.js'; // Import logger
+// Import applyPatch and Operation from rfc6902
+import { applyPatch, Operation as PatchOperation } from 'rfc6902';
+// Remove previous fast-json-patch imports
 
 /**
  * Input data for write branch document use case
@@ -25,7 +28,12 @@ export interface WriteBranchDocumentInput {
   /**
    * Document data
    */
-  document: WriteDocumentDTO;
+  document: WriteDocumentDTO; // Keep this for content-based writes
+
+  /**
+   * JSON Patch operations (optional, use instead of document.content)
+   */
+  patches?: any[];
 }
 
 /**
@@ -62,33 +70,41 @@ export class WriteBranchDocumentUseCase
    */
   async execute(input: WriteBranchDocumentInput): Promise<WriteBranchDocumentOutput> {
     try {
+      // --- Input Validation ---
       if (!input.branchName) {
         throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Branch name is required');
       }
-
       if (!input.document) {
-        throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Document is required');
+        // Even if using patches, the document object (for path, tags) is needed
+        throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Document object is required');
       }
-
       if (!input.document.path) {
-        throw new ApplicationError(
-          ApplicationErrorCodes.INVALID_INPUT,
-          'Document path is required'
-        );
+        throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Document path is required');
       }
 
-      if (input.document.content === undefined || input.document.content === null) {
-        throw new ApplicationError(
-          ApplicationErrorCodes.INVALID_INPUT,
-          'Document content is required'
-        );
+      // Check if content is provided and is not an empty string
+      const hasContent = input.document.content !== undefined && input.document.content !== null && input.document.content !== '';
+      // Ensure patches is an array before checking length
+      const hasPatches = input.patches && Array.isArray(input.patches) && input.patches.length > 0;
+
+      if (hasContent && hasPatches) {
+        throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Cannot provide both document content and patches simultaneously');
+      }
+      // Allow initialization (no content, no patches) - this case is handled below
+      if (!hasContent && !hasPatches) {
+         this.componentLogger.debug('Neither content nor non-empty patches provided, proceeding (possibly for initialization).');
+      } else if (hasPatches && !Array.isArray(input.patches)) { // Redundant check but safe
+         throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Patches must be an array');
+      } else if (hasContent && typeof input.document.content !== 'string' && typeof input.document.content !== 'object') {
+         throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Document content must be a string or object');
       }
 
+      // --- Prepare Domain Objects ---
       const branchInfo = BranchInfo.create(input.branchName);
       const documentPath = DocumentPath.create(input.document.path);
       const tags = (input.document.tags ?? []).map((tag) => Tag.create(tag));
 
-      // Ensure branch exists before attempting to save document
+      // --- Ensure Branch Exists ---
       const branchExists = await this.branchRepository.exists(branchInfo.safeName);
       if (!branchExists) {
         this.componentLogger.info(`Branch ${branchInfo.safeName} does not exist. Initializing...`);
@@ -97,50 +113,134 @@ export class WriteBranchDocumentUseCase
           this.componentLogger.info(`Branch ${branchInfo.safeName} initialized successfully.`);
         } catch (initError) {
           this.componentLogger.error(`Failed to initialize branch ${branchInfo.safeName}`, { originalError: initError });
-          // Rethrow or handle initialization error appropriately
           throw new ApplicationError(
-            ApplicationErrorCodes.BRANCH_INITIALIZATION_FAILED,
+            ApplicationErrorCodes.BRANCH_INITIALIZATION_FAILED, // Keep specific error code
             `Failed to initialize branch: ${(initError as Error).message}`,
             { originalError: initError }
           );
         }
       }
 
+      // --- Determine Document to Save ---
+      let documentToSave: MemoryDocument;
       const existingDocument = await this.branchRepository.getDocument(branchInfo, documentPath);
 
-      let document: MemoryDocument;
-      if (existingDocument) {
-        document = existingDocument.updateContent(input.document.content);
+      if (hasPatches) {
+        // --- Patch Logic ---
+        if (!existingDocument) {
+          // Use existing error code and provide detail in message
+          throw new ApplicationError(ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED, `Document not found at path ${documentPath.value}, cannot apply patches.`);
+        }
+
+        try {
+          let currentContentObject: any;
+          if (typeof existingDocument.content === 'string') {
+            try {
+              currentContentObject = JSON.parse(existingDocument.content);
+            } catch (parseError) {
+              // Use existing error code
+              throw new ApplicationError(ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED, `Failed to parse existing document content as JSON for patching: ${(parseError as Error).message}`);
+            }
+          } else if (typeof existingDocument.content === 'object' && existingDocument.content !== null) {
+            currentContentObject = existingDocument.content;
+          } else {
+             // Use existing error code
+             throw new ApplicationError(ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED, `Existing document content is not a string or object, cannot apply patches. Type: ${typeof existingDocument.content}`);
+          }
+
+          // Log arguments before calling applyPatch
+          console.error('--- Applying patch - Current Object:', JSON.stringify(currentContentObject, null, 2));
+          console.error('--- Applying patch - Patches:', JSON.stringify(input.patches, null, 2));
+
+          // Apply the patches using rfc6902's applyPatch
+          // It might throw on error, so keep the try...catch
+          applyPatch(currentContentObject, input.patches as PatchOperation[]); // Assume mutation, ignore return value
+          const patchedContent = currentContentObject; // Use the (potentially) mutated object
+          // Remove the line trying to access patchResult.newDocument
+
+          // Update the document content
+          // Convert patched object back to JSON string before updating content
+          // Convert patched object back to JSON string before updating content
+          // Log patched content before stringifying using console.error for visibility
+          console.error('--- Patched content (object):', JSON.stringify(patchedContent, null, 2));
+          const stringifiedContent = JSON.stringify(patchedContent, null, 2);
+          // Log stringified content using console.error for visibility
+          console.error('--- Stringified patched content:', stringifiedContent);
+          documentToSave = existingDocument.updateContent(stringifiedContent);
+          // Log success message using console.error
+          console.error(`--- Document patched successfully: ${documentPath.value}`);
+
+        } catch (patchError) {
+          this.componentLogger.error(`Failed to apply JSON patch to ${documentPath.value}`, { error: patchError });
+          // Use existing error code
+          throw new ApplicationError(ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED, `Failed to apply JSON patch: ${(patchError as Error).message}`);
+        }
+
+        // Update tags if provided with patches (tags might be in input.document.tags)
         if (input.document.tags) {
-          document = document.updateTags(tags);
+           documentToSave = documentToSave.updateTags(tags);
+        }
+
+      } else if (hasContent) {
+        // --- Content Logic ---
+        if (existingDocument) {
+          documentToSave = existingDocument.updateContent(input.document.content);
+          if (input.document.tags) {
+            documentToSave = documentToSave.updateTags(tags);
+          }
+        } else {
+          // Create new document with content
+          documentToSave = MemoryDocument.create({
+            path: documentPath,
+            content: input.document.content,
+            tags,
+            lastModified: new Date(),
+          });
         }
       } else {
-        document = MemoryDocument.create({
-          path: documentPath,
-          content: input.document.content,
-          tags,
-          lastModified: new Date(),
-        });
+         // --- Initialization Logic (No content, No non-empty patches) ---
+         if (!existingDocument) {
+             this.componentLogger.info(`Initializing empty document at ${documentPath.value}`);
+             documentToSave = MemoryDocument.create({
+                 path: documentPath,
+                 content: '{}', // Initialize with empty JSON object string
+                 tags: tags, // Apply tags even during initialization if provided
+                 lastModified: new Date(),
+             });
+         } else {
+             this.componentLogger.warn(`Write request with no content/patches for existing document ${documentPath.value}. No changes made.`);
+             // Return existing document data as success
+             return {
+                 document: {
+                     path: existingDocument.path.value,
+                     content: existingDocument.content,
+                     tags: existingDocument.tags.map((tag) => tag.value),
+                     lastModified: existingDocument.lastModified.toISOString(),
+                 },
+             };
+         }
       }
 
-      await this.branchRepository.saveDocument(branchInfo, document);
+      // --- Save Document ---
+      await this.branchRepository.saveDocument(branchInfo, documentToSave);
 
+      // --- Return Output ---
       return {
         document: {
-          path: document.path.value,
-          content: document.content,
-          tags: document.tags.map((tag) => tag.value),
-          lastModified: document.lastModified.toISOString(),
+          path: documentToSave.path.value,
+          content: documentToSave.content,
+          tags: documentToSave.tags.map((tag) => tag.value),
+          lastModified: documentToSave.lastModified.toISOString(),
         },
       };
     } catch (error) {
-      // If it's a known domain or application error, re-throw it directly
+      // --- Error Handling ---
       if (error instanceof DomainError || error instanceof ApplicationError) {
         throw error;
       }
-      // For any other unexpected errors, re-throw them directly as well.
-      this.componentLogger.error('Unexpected error in WriteBranchDocumentUseCase:', { error }); // Log unexpected errors
-      throw error;
+      this.componentLogger.error('Unexpected error in WriteBranchDocumentUseCase:', { error });
+      // Wrap unexpected errors
+      throw new ApplicationError(ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED, `Unexpected error: ${(error as Error).message}`, { originalError: error });
     }
   }
 }

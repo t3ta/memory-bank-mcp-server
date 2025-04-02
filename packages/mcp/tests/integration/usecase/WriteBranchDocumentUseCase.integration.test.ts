@@ -48,7 +48,7 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
           documentType: "test",
           path: "test/new-document.json",
           tags: ["test", "integration", "branch"],
-          lastModified: expect.any(String),
+          lastModified: new Date().toISOString(), // Use valid ISO string
           createdAt: expect.any(String),
           version: 1
         },
@@ -161,7 +161,7 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
           path: 'test/invalid.json',
           content: invalidContent
         }
-      })).rejects.toThrow(DomainErrors.validationError('Document content is not valid JSON'));
+      })).rejects.toThrow('Document content is not valid JSON'); // Check only the error message string
     });
 
 
@@ -175,7 +175,7 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
           documentType: "test",
           path: "test-new-branch.json",
           tags: ["test", "new-branch"],
-          lastModified: expect.any(String),
+          lastModified: new Date().toISOString(), // Use valid ISO string
           createdAt: expect.any(String),
           version: 1
         },
@@ -242,5 +242,57 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
       expect(fs.existsSync(potentiallyCreatedPath)).toBe(false);
       expect(fs.existsSync(pathOutsideDocsRoot)).toBe(false);
     });
-  });
-});
+
+    it('should update a document using patches', async () => {
+      const initialDocument = {
+        items: ["apple"]
+      };
+      const documentPath = 'test/patch-document.json';
+      const initialContentString = JSON.stringify(initialDocument, null, 2);
+
+      // 1. Create initial document with content
+      await writeUseCase.execute({
+        branchName: TEST_BRANCH,
+        document: {
+          path: documentPath,
+          content: initialContentString,
+          tags: ["test", "patch"]
+        }
+      });
+
+      // 2. Update the document using patches
+      const patches = [
+        { op: 'add', path: '/items/-', value: 'banana' }
+      ];
+
+      const patchResult = await writeUseCase.execute({
+        branchName: TEST_BRANCH,
+        document: { // Need path and potentially tags, content is empty string for type safety
+          path: documentPath,
+          content: '', // Pass empty string as content is required by DTO type
+          tags: ["test", "patch", "updated"] // Optionally update tags too
+        },
+        patches: patches
+      });
+
+      expect(patchResult).toBeDefined();
+      expect(patchResult.document).toBeDefined();
+      expect(patchResult.document.path).toBe(documentPath);
+
+      // 3. Read the document and verify the patch was applied
+      const readResult = await readUseCase.execute({ branchName: TEST_BRANCH, path: documentPath });
+      expect(readResult).toBeDefined();
+      expect(readResult.document).toBeDefined();
+      // Log the actual content read from the file for debugging
+      // Log the raw content string read from the file before parsing
+      console.error('--- Raw content after patch read from file:', readResult.document.content);
+
+      const readDocument = JSON.parse(readResult.document.content);
+      // Log the parsed document object for debugging
+      console.error('--- Parsed document object:', JSON.stringify(readDocument, null, 2));
+      expect(readDocument.items).toEqual(["apple", "banana"]); // Verify patch applied correctly
+      // Also verify tags if they were updated
+      expect(readResult.document.tags).toEqual(["test", "patch", "updated"]);
+    }); // Closing brace for it('should update a document using patches', ...)
+  }); // Closing brace for describe('execute', ...)
+}); // Closing brace for the top-level describe

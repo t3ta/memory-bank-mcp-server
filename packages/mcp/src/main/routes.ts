@@ -135,9 +135,13 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
 
     switch (name) {
       case 'write_branch_memory_bank': {
+        // Add logging here to inspect params
+        logger.debug(`Executing write_branch_memory_bank with params: ${JSON.stringify(params)}`);
         const path = params.path as string;
         const content = params.content as string | undefined;
         const patches = params.patches as any[] | undefined;
+        // Log the value of patches right after extraction
+        logger.debug(`Extracted patches value: ${JSON.stringify(patches)}`);
         const branch = params.branch as string;
         const docs = params.docs as string | undefined;
 
@@ -151,7 +155,12 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
           throw new Error('Content and patches cannot be provided at the same time');
         }
         if (!content && !patches) {
-          return { content: [{ type: 'text', text: 'Branch memory bank initialized successfully' }] };
+          // Return debug info in the response when this unexpected branch is taken
+          const patchesType = typeof patches;
+          const patchesValue = JSON.stringify(patches);
+          const paramsKeys = JSON.stringify(Object.keys(params));
+          // デバッグ情報をレスポンスに含める
+          return { content: [{ type: 'text', text: `DEBUG: Entered init branch unexpectedly. params keys: ${paramsKeys}, patches type: ${patchesType}, patches value: ${patchesValue}` }] };
         }
         if (!app) {
           throw new Error('Application not initialized');
@@ -168,7 +177,7 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
 
         if (content) {
           logger.debug(`Writing branch memory bank (branch: ${branch}, path: ${path}, docsRoot: ${docsRoot})`);
-          // Corrected call to writeDocument
+          // Corrected call to writeDocument (Object argument is correct)
           const response = await branchApp.getBranchController().writeDocument({ branchName: branch, path, content });
           if (!response.success) {
             throw new Error((response as any).error?.message || 'Failed to write document');

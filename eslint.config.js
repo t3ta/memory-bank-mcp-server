@@ -46,7 +46,9 @@ const baseConfig = {
     // Added async error handling rules (TS-3)
     '@typescript-eslint/no-floating-promises': 'error',
     '@typescript-eslint/no-misused-promises': 'error',
-    '@typescript-eslint/no-throw-literal': 'error'
+    '@typescript-eslint/no-throw-literal': 'error',
+    // dependencies にないパッケージの import を禁止
+    'import/no-extraneous-dependencies': ['error', { 'devDependencies': false, 'optionalDependencies': false, 'peerDependencies': false }]
   }
 };
 

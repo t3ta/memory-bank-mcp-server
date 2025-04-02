@@ -1,0 +1,13 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-test-context",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "createdAt": "2025-04-02T08:48:08.910Z",
+    "lastModified": "2025-04-02T08:48:08.910Z"
+  },
+  "content": {
+    "value": "Auto-initialized context for branch feature/test"
+  }
+}
