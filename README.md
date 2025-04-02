@@ -1,4 +1,4 @@
-# Memory Bank MCP Server 2.3.4
+# Memory Bank MCP Server 2.3.5
 
 A Memory Bank implementation for managing project documentation and context
 across sessions. This server helps Claude maintain consistent project knowledge
@@ -11,17 +11,13 @@ from the [nickbaumann98/cline_docs](https://github.com/nickbaumann98/cline_docs)
 repository, which provides an excellent foundation for managing Claude's memory
 in software projects.
 
-## What's New in 2.3.4 (and recent versions)
+## What's New in 2.3.5 (and recent versions)
 
 ### Core Functionality Enhancements (v2.3.x)
 
-- **JSON Patch Fixes (v2.3.4)**: Resolved bugs related to JSON Patch
-  application, tag updates during patching, and date handling (`lastModified`)
-  in the file system repository.
-- **Core Tool Manuals (v2.3.4)**: Added comprehensive English manuals for core
-  MCP tools (`write/read_branch/global_memory_bank`, `read_context`,
-  `search_documents_by_tags`) located in
-  `docs/global-memory-bank/core/mcp-tool-manual.json`.
+- **JSON Patch Fixes & Refactoring (v2.3.5)**: Resolved bugs related to JSON Patch application, tag updates, and date handling. Refactored patch handling to consistently use the `rfc6902` library via an adapter (`Rfc6902JsonPatchAdapter.ts`), removing the `fast-json-patch` dependency and ensuring consistent application logic across use cases.
+- **Core Tool Manuals (v2.3.5)**: Added and updated a comprehensive English manual for core MCP tools, consolidating them into `docs/global-memory-bank/core/mcp-tool-manual.json`. Removed redundant information from individual manuals.
+- **Configuration Option Unification (v2.3.5)**: Unified the command-line option for the documentation directory to `--docs` (previously `--docsRoot`) in the server startup script (`src/server.ts`) and README examples. (Note: MCP tool argument remains `docs`).
 - **JSON Document Structure (v2.0.0)**: Introduced a JSON-based architecture for
   all documents, improving structure, validation, and programmatic access.
 - **Enhanced API (v2.0.0)**: Added `read_context` tool, multilingual support
@@ -84,7 +80,7 @@ Example structure:
 ```
 docs/global-memory-bank/
   ├── core/
-  │   └── mcp-tool-manual.json # Core tool manual (New in v2.3.4)
+  │   └── mcp-tool-manual.json # Core tool manual (Updated in v2.3.5)
   ├── 02-architecture/
   │   └── system-overview.json
   ├── 04-guides/

@@ -12,9 +12,9 @@ import {
   ApplicationErrorCodes,
 } from '../../../shared/errors/ApplicationError.js';
 import { logger } from '../../../shared/utils/logger.js'; // Import logger
-// Import applyPatch and Operation from rfc6902
-import { applyPatch, Operation as PatchOperation } from 'rfc6902';
-// Remove previous fast-json-patch imports
+// Removed direct import of rfc6902
+import { JsonPatchService } from '../../../domain/jsonpatch/JsonPatchService.js'; // Import the service interface
+import { JsonPatchOperation } from '../../../domain/jsonpatch/JsonPatchOperation.js'; // Keep this if needed for input type, or adjust input type
 
 /**
  * Input data for write branch document use case
@@ -53,15 +53,20 @@ export class WriteBranchDocumentUseCase
   implements IUseCase<WriteBranchDocumentInput, WriteBranchDocumentOutput> {
 
   private readonly componentLogger = logger.withContext({ component: 'WriteBranchDocumentUseCase' }); // Add logger instance
+private readonly patchService: JsonPatchService; // Add patch service instance variable
 
-  /**
-   * Constructor
-   * @param branchRepository Branch memory bank repository
-   */
-  constructor(
-    private readonly branchRepository: IBranchMemoryBankRepository
-  ) {
-  }
+/**
+ * Constructor
+ * @param branchRepository Branch memory bank repository
+ * @param patchService JSON Patch service implementation
+ */
+constructor(
+  private readonly branchRepository: IBranchMemoryBankRepository,
+  patchService: JsonPatchService // Inject JsonPatchService
+) {
+  this.patchService = patchService;
+}
+// Removed extra closing brace
 
   /**
    * Execute the use case
@@ -152,11 +157,14 @@ export class WriteBranchDocumentUseCase
           console.error('--- Applying patch - Current Object:', JSON.stringify(currentContentObject, null, 2));
           console.error('--- Applying patch - Patches:', JSON.stringify(input.patches, null, 2));
 
-          // Apply the patches using rfc6902's applyPatch
-          // It might throw on error, so keep the try...catch
-          applyPatch(currentContentObject, input.patches as PatchOperation[]); // Assume mutation, ignore return value
-          const patchedContent = currentContentObject; // Use the (potentially) mutated object
-          // Remove the line trying to access patchResult.newDocument
+          // Convert input patches (any[]) to JsonPatchOperation[]
+          // Assuming input.patches contains objects like { op: 'add', path: '/a', value: 1 }
+          const patchOperations = (input.patches ?? []).map(p =>
+              JsonPatchOperation.create(p.op, p.path, p.value, p.from)
+          );
+
+          // Apply the patches using the injected patch service
+          const patchedContent = this.patchService.apply(currentContentObject, patchOperations);
 
           // Update the document content
           // Convert patched object back to JSON string before updating content
