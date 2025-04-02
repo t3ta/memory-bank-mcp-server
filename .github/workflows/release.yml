@@ -40,8 +40,9 @@ jobs:
       - name: Run semantic-release
         id: semantic # Add an ID to potentially reference outputs if needed
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }} # Uncomment if publishing to npm
+          # Use PAT to bypass branch protection rules
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: yarn release
 
       - name: Build, Package and Upload VSCode Extension VSIX
@@ -68,4 +69,5 @@ jobs:
           # Upload the VSIX to the GitHub Release created by semantic-release
           gh release upload ${{ github.ref_name }} packages/vscode-extension/$VSIX_FILENAME --clobber
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Use PAT to bypass branch protection rules
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
