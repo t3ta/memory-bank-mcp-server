@@ -91,7 +91,8 @@ jobs:
           npx conventional-changelog-cli -p conventionalcommits -i CHANGELOG.md -s -r 0
           # Add a header for the new version only if the file was modified or created
           if ! git diff --quiet CHANGELOG.md; then
-            sed -i '1s/^/# \[${{ steps.get_version.outputs.NEXT_VERSION }}] - $(date +%Y-%m-%d)\n\n/' CHANGELOG.md
+            VERSION=${{ steps.get_version.outputs.NEXT_VERSION }}
+            sed -i "1s/^/# [${VERSION}] - $(date +%Y-%m-%d)\n\n/" CHANGELOG.md
           fi
 
       - name: Update README version
