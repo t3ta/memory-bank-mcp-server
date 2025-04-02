@@ -5,11 +5,19 @@ import { setupTestEnv, cleanupTestEnv, createBranchDir, type TestEnv } from '../
 import { DIContainer, setupContainer } from '../../../src/main/di/providers.js'; // Import DI container and setup function
 import { BranchController } from '../../../src/interface/controllers/BranchController.js'; // Import real controller
 import type { DocumentDTO } from '../../../src/application/dtos/DocumentDTO.js'; // Import DocumentDTO for type guard
+// ★★★ WriteBranchDocumentOutput をインポート ★★★
+import type { WriteBranchDocumentOutput } from '../../../src/application/usecases/branch/WriteBranchDocumentUseCase.js';
 
-// Custom Type Guard function to check if data is DocumentDTO
-function isDocumentDTO(data: any): data is DocumentDTO {
-  // Check for properties specific to DocumentDTO, like 'path' and 'content'
-  return data && typeof data === 'object' && 'path' in data && 'content' in data && 'lastModified' in data;
+// Custom Type Guard function to check if data matches the expected output structure
+// (content and tags are optional)
+function isWriteBranchDocumentOutputData(data: any): data is WriteBranchDocumentOutput['document'] {
+  return data &&
+         typeof data === 'object' &&
+         'path' in data && typeof data.path === 'string' &&
+         'lastModified' in data && typeof data.lastModified === 'string' &&
+         // content and tags are optional
+         (!('content' in data) || typeof data.content === 'string') &&
+         (!('tags' in data) || Array.isArray(data.tags));
 }
 
 describe('BranchController Integration Tests', () => {
@@ -70,14 +78,14 @@ describe('BranchController Integration Tests', () => {
       expect(writeResult.success).toBe(true);
       if (!writeResult.success) throw new Error('Expected success but got error'); // Use throw new Error
       expect(writeResult.data).toBeDefined();
-      // Assert that writeResult.data is a valid DocumentDTO using the type guard
-      expect(writeResult.data).toBeDefined();
-      if (!writeResult.data || !isDocumentDTO(writeResult.data)) {
+
+      // ★★★ タイプガードの条件を反転させ、エラーケースを先に処理 ★★★
+      if (!isWriteBranchDocumentOutputData(writeResult.data)) {
           // Log the actual data for debugging if the type guard fails
-          console.error("--- Assertion Error: writeResult.data was not DocumentDTO. Actual data:", JSON.stringify(writeResult.data, null, 2));
-          throw new Error('Expected writeResult.data to be a valid DocumentDTO');
+          console.error("--- Assertion Error: writeResult.data did not match expected output structure. Actual data:", JSON.stringify(writeResult.data, null, 2));
+          throw new Error('Expected writeResult.data to match the expected output structure');
       }
-      // If type guard passes, assert the path
+      // ★★★ タイプガードの後なので安全にアクセスできる ★★★
       expect(writeResult.data.path).toBe(documentPath);
 
       const readResult = await controller.readDocument(TEST_BRANCH, documentPath);
@@ -85,6 +93,11 @@ describe('BranchController Integration Tests', () => {
       expect(readResult.success).toBe(true);
       if (!readResult.success) throw new Error('Expected success but got error'); // Use throw new Error
       expect(readResult.data).toBeDefined();
+      // readResult.data の型ガードも追加 (readDocument は DocumentDTO を返す想定)
+      if (!readResult.data || !readResult.data.document || typeof readResult.data.document.content !== 'string') {
+          console.error("--- Assertion Error: readResult.data.document.content was not a string. Actual data:", JSON.stringify(readResult.data, null, 2));
+          throw new Error('Expected readResult.data.document.content to be a string');
+      }
       const parsed = JSON.parse(readResult.data.document.content);
 
       // Use testDoc for comparison as it has the correct path
@@ -162,6 +175,11 @@ describe('BranchController Integration Tests', () => {
       expect(readResult.success).toBe(true);
       if (!readResult.success) throw new Error('Expected success but got error'); // Use throw new Error
       expect(readResult.data).toBeDefined();
+      // readResult.data の型ガードも追加
+      if (!readResult.data || !readResult.data.document || typeof readResult.data.document.content !== 'string') {
+          console.error("--- Assertion Error: readResult.data.document.content was not a string. Actual data:", JSON.stringify(readResult.data, null, 2));
+          throw new Error('Expected readResult.data.document.content to be a string');
+      }
       const parsed = JSON.parse(readResult.data.document.content);
       // Use newBranchDoc for comparison
       expect(parsed.metadata.id).toBe(newBranchDoc.metadata.id);
@@ -184,7 +202,6 @@ describe('BranchController Integration Tests', () => {
       const updatedContentString = JSON.stringify(updatedDoc, null, 2);
 
       // 1. Write initial document
-      // 1. Write initial document
       // Call writeDocument with a single params object
       const initialWriteResult = await controller.writeDocument({
         branchName: TEST_BRANCH,
@@ -197,7 +214,6 @@ describe('BranchController Integration Tests', () => {
       expect(initialWriteResult.data).toBeDefined();
 
       // 2. Write updated document (overwrite)
-      // 2. Write updated document (overwrite)
       // Call writeDocument with a single params object
       const updateResult = await controller.writeDocument({
         branchName: TEST_BRANCH,
@@ -208,22 +224,26 @@ describe('BranchController Integration Tests', () => {
       expect(updateResult.success).toBe(true);
       if (!updateResult.success) throw new Error('Expected success but got error on update write'); // Use throw new Error
       expect(updateResult.data).toBeDefined();
-      // Assert that updateResult.data is a valid DocumentDTO using the type guard
-      expect(updateResult.data).toBeDefined();
-       if (!updateResult.data || !isDocumentDTO(updateResult.data)) {
+
+      // ★★★ タイプガードの条件を反転させ、エラーケースを先に処理 ★★★
+      if (!isWriteBranchDocumentOutputData(updateResult.data)) {
            // Log the actual data for debugging if the type guard fails
-           console.error("--- Assertion Error: updateResult.data was not DocumentDTO. Actual data:", JSON.stringify(updateResult.data, null, 2));
-           throw new Error('Expected updateResult.data to be a valid DocumentDTO');
+           console.error("--- Assertion Error: updateResult.data did not match expected output structure. Actual data:", JSON.stringify(updateResult.data, null, 2));
+           throw new Error('Expected updateResult.data to match the expected output structure');
        }
-       // If type guard passes, assert the path
+       // ★★★ タイプガードの後なので安全にアクセスできる ★★★
        expect(updateResult.data.path).toBe(documentPath);
 
-      // 3. Read the document and verify updated content
       // 3. Read the document and verify updated content
       const readResult = await controller.readDocument(TEST_BRANCH, documentPath);
       expect(readResult.success).toBe(true);
       if (!readResult.success) throw new Error('Expected success but got error on read after update'); // Use throw new Error
       expect(readResult.data).toBeDefined();
+      // readResult.data の型ガードも追加
+      if (!readResult.data || !readResult.data.document || typeof readResult.data.document.content !== 'string') {
+          console.error("--- Assertion Error: readResult.data.document.content was not a string. Actual data:", JSON.stringify(readResult.data, null, 2));
+          throw new Error('Expected readResult.data.document.content to be a string');
+      }
       const parsed = JSON.parse(readResult.data.document.content);
 
       expect(parsed.metadata.id).toBe(updatedDoc.metadata.id);

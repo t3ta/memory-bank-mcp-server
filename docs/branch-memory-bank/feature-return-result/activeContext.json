@@ -1,0 +1,18 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-return-result-active-context",
+    "title": "Active Context for feature/return-result",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": []
+  },
+  "content": {
+    "currentTask": "task-return-content-option",
+    "nextStep": "Switch to CodeQueen mode to implement failing tests.",
+    "status": "Design and planning complete. Ready for implementation.",
+    "relatedFiles": [
+      "progress.json"
+    ]
+  }
+}
