@@ -1,0 +1,71 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write # to be able to publish a GitHub release
+  issues: write # to be able to comment on released issues
+  pull-requests: write # to be able to comment on released pull requests
+  id-token: write # to enable use of OIDC for npm provenance
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    # Prevent running on forks
+    if: github.repository == 't3ta/memory-bank-mcp-server'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Fetch all history and tags for semantic-release
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x' # Use the same version as other workflows
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build packages
+        run: |
+          yarn build
+          yarn copy-assets
+
+      - name: Run semantic-release
+        id: semantic # Add an ID to potentially reference outputs if needed
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }} # Uncomment if publishing to npm
+        run: yarn release
+
+      - name: Build, Package and Upload VSCode Extension VSIX
+        # Only run if a VSCode extension tag was pushed by semantic-release
+        # Note: This assumes semantic-release creates tags like 'vscode-extension-vX.Y.Z' in independent mode
+        if: startsWith(github.ref, 'refs/tags/vscode-extension-v')
+        run: |
+          echo "VSCode Extension release detected for tag ${{ github.ref_name }}"
+          # Install vsce globally
+          npm install -g @vscode/vsce
+          # Build the extension (ensure the workspace name is correct)
+          yarn workspace memory-bank-vscode-extension build
+          # Package the extension
+          cd packages/vscode-extension
+          # vsce package outputs the filename, capture it
+          VSIX_FILENAME=$(vsce package --yarn --out . | grep -oE '\S+\.vsix')
+          if [ -z "$VSIX_FILENAME" ]; then
+            echo "Error: Failed to determine VSIX filename after packaging."
+            exit 1
+          fi
+          echo "VSIX packaged: $VSIX_FILENAME"
+          cd ../.. # Return to root
+          echo "Uploading $VSIX_FILENAME to release ${{ github.ref_name }}"
+          # Upload the VSIX to the GitHub Release created by semantic-release
+          gh release upload ${{ github.ref_name }} packages/vscode-extension/$VSIX_FILENAME --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
