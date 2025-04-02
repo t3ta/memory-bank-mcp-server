@@ -6,6 +6,7 @@
  */
 import path from 'path';
 import fs from 'fs/promises';
+import { logger } from '../../shared/utils/logger.js'; // Import logger
 import { II18nRepository } from '../../domain/i18n/II18nRepository.js';
 import { Language, LanguageCode } from '../../domain/i18n/Language.js';
 import { Translation, TranslationKey } from '../../domain/i18n/Translation.js';
@@ -23,6 +24,7 @@ interface TranslationFile {
  * File-based implementation of I18n Repository
  */
 export class FileI18nRepository implements II18nRepository {
+  private readonly componentLogger = logger.withContext({ component: 'FileI18nRepository' }); // Add logger instance
   private readonly basePath: string;
   private translationCache: Map<LanguageCode, Map<TranslationKey, string>>;
   private cacheDirty: boolean;
@@ -152,7 +154,7 @@ export class FileI18nRepository implements II18nRepository {
 
       return true;
     } catch (error) {
-      console.error(`Failed to save translation: ${translation.key}`, error);
+      this.componentLogger.error(`Failed to save translation: ${translation.key}`, { error }); // Use componentLogger
       return false;
     }
   }
@@ -238,7 +240,7 @@ export class FileI18nRepository implements II18nRepository {
 
       this.cacheDirty = false;
     } catch (error) {
-      console.error('Failed to load translations', error);
+      this.componentLogger.error('Failed to load translations', { error }); // Use componentLogger
       throw new Error(`Failed to load translations: ${(error as Error).message}`);
     }
   }
@@ -274,7 +276,7 @@ export class FileI18nRepository implements II18nRepository {
 
       this.translationCache.set(langCode, langCache);
     } catch (error) {
-      console.error(`Failed to load translations for ${langCode}`, error);
+      this.componentLogger.error(`Failed to load translations for ${langCode}`, { error }); // Use componentLogger
       throw new Error(`Failed to load translations for ${langCode}: ${(error as Error).message}`);
     }
   }
@@ -308,7 +310,7 @@ export class FileI18nRepository implements II18nRepository {
       const filePath = path.join(this.basePath, `${langCode}.json`);
       await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8');
     } catch (error) {
-      console.error(`Failed to save translations for ${language.code}`, error);
+      this.componentLogger.error(`Failed to save translations for ${language.code}`, { error }); // Use componentLogger
       throw new Error(`Failed to save translations for ${language.code}: ${(error as Error).message}`);
     }
   }

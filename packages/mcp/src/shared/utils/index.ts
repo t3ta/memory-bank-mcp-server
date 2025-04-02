@@ -1,7 +1,8 @@
 // Removed unused Language import
+import { logger } from './logger.js'; // Import logger
 
 // Logger is kept for backward compatibility
-export { logger } from './logger.js';
+// export { logger } from './logger.js'; // Remove re-export if logger is used internally
 
 /**
  * Parse a date string safely, returning a valid Date object
@@ -22,7 +23,7 @@ export const parseDateSafely = (dateInput: string | Date): Date => {
 
     return date;
   } catch (error) {
-    console.error(`Error parsing date: ${error instanceof Error ? error.message : String(error)}`);
+    logger.error('Error parsing date', { error: error instanceof Error ? error.message : String(error), dateInput }); // Use logger
     return new Date();
   }
 };
