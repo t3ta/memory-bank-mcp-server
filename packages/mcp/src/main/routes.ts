@@ -175,10 +175,13 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
           // Normally create a new app instance here, using existing for simplicity
         }
 
-        if (content) {
+        // Check if content is provided (not undefined and not null)
+        if (content !== undefined && content !== null) {
           logger.debug(`Writing branch memory bank (branch: ${branch}, path: ${path}, docsRoot: ${docsRoot})`);
+          // content がオブジェクトだったら stringify する！
+          const contentToWrite = typeof content === 'object' ? JSON.stringify(content, null, 2) : content;
           // Corrected call to writeDocument (Object argument is correct)
-          const response = await branchApp.getBranchController().writeDocument({ branchName: branch, path, content });
+          const response = await branchApp.getBranchController().writeDocument({ branchName: branch, path, content: contentToWrite });
           if (!response.success) {
             throw new Error((response as any).error?.message || 'Failed to write document');
           }
