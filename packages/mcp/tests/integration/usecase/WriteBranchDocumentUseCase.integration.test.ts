@@ -5,8 +5,8 @@ import { setupTestEnv, cleanupTestEnv, createBranchDir, type TestEnv } from '../
 import { DIContainer, setupContainer } from '../../../src/main/di/providers.js'; // Import DI container and setup function
 import { WriteBranchDocumentUseCase, type WriteBranchDocumentOutput } from '../../../src/application/usecases/branch/WriteBranchDocumentUseCase.js'; // Import real UseCase and types
 import { ReadBranchDocumentUseCase } from '../../../src/application/usecases/branch/ReadBranchDocumentUseCase.js'; // Keep Read UseCase for verification
-import { DomainErrors } from '../../../src/shared/errors/DomainError.js'; // Import specific errors for checking
-import { ApplicationErrors } from '../../../src/shared/errors/ApplicationError.js'; // Import specific errors for checking
+import { DomainError, DomainErrors } from '../../../src/shared/errors/DomainError.js'; // Import specific errors for checking
+import { ApplicationError, ApplicationErrors } from '../../../src/shared/errors/ApplicationError.js'; // Import specific errors for checking
 
 import * as path from 'path';
 import fs from 'fs-extra'; // Use default import for fs-extra
@@ -319,11 +319,11 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
 
       const patchResult = await writeUseCase.execute({
         branchName: TEST_BRANCH,
-        document: { // Need path and potentially tags, content is empty string for type safety
+        // content は省略し、as any でキャスト
+        document: {
           path: documentPath,
-          content: '', // Pass empty string as content is required by DTO type
           tags: ["test", "patch", "updated"] // Optionally update tags too
-        },
+        } as any,
         patches: patches
       });
 
@@ -543,20 +543,39 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
       expect(readContent.content.value).toBe("Valid context content for test");
     });
 
-    it('should throw error when writing empty string content to branchContext.json', async () => {
-      const documentPath = 'branchContext.json';
-      await expect(writeUseCase.execute({
-        branchName: TEST_BRANCH,
-        document: { path: documentPath, content: "" }
-      })).rejects.toThrow(ApplicationErrors.invalidInput('Content for branchContext.json cannot be empty or an empty object string'));
-    });
+    // [修正] 新仕様: branchContext.json への空文字列書き込みはエラーにならないはず (ただし、有効なJSONである必要はある)
+    // → このテストは意図的に空ファイルを作るテストに置き換える
+    // it('should throw error when writing empty string content to branchContext.json', async () => { ... });
 
-    it('should throw error when writing empty object string content to branchContext.json', async () => {
-      const documentPath = 'branchContext.json';
-      await expect(writeUseCase.execute({
+    // [修正] 新仕様: branchContext.json への空オブジェクト文字列書き込みはエラーにならないはず (有効なJSONとして)
+    // → このテストは有効なJSONなら書き込めるテストに含めるか、別途正常系テストで確認
+    // it('should throw error when writing empty object string content to branchContext.json', async () => { ... });
+
+    // [追加] content: "" で空ファイルが作成されるテスト (branchContext.json 以外)
+    it('should create an empty file when content is an empty string (non-branchContext)', async () => {
+      const documentPath = 'test/empty-file-branch.txt';
+      const tags = ['test', 'empty-string', 'branch'];
+
+      const writeResult = await writeUseCase.execute({
         branchName: TEST_BRANCH,
-        document: { path: documentPath, content: "{}" }
-      })).rejects.toThrow(ApplicationErrors.invalidInput('Content for branchContext.json cannot be empty or an empty object string'));
+        document: {
+          path: documentPath,
+          content: "", // ★★★ Empty string content ★★★
+          tags: tags
+        },
+        returnContent: true
+      });
+
+      expect(writeResult).toBeDefined();
+      expect(writeResult.document).toBeDefined();
+      expect(writeResult.document.path).toBe(documentPath);
+      expect(writeResult.document.content).toBe("");
+
+      const readResult = await readUseCase.execute({ branchName: TEST_BRANCH, path: documentPath });
+      expect(readResult).toBeDefined();
+      expect(readResult.document).toBeDefined();
+      expect(readResult.document.content).toBe("");
+      expect(readResult.document.tags).toEqual([]); // Empty file has no tags
     });
 
     it('should throw error when writing invalid JSON content to branchContext.json', async () => {
@@ -597,9 +616,41 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
       const patches = [{ op: 'replace', path: '/content/value', value: 'Patched context' }];
       await expect(writeUseCase.execute({
         branchName: TEST_BRANCH,
-        document: { path: 'branchContext.json', content: '' }, // Content is ignored when patches are present
+        // content は省略し、as any でキャスト
+        document: { path: 'branchContext.json' } as any,
         patches: patches
       })).rejects.toThrow(ApplicationErrors.invalidInput('Patch operations are currently not allowed for branchContext.json'));
+    });
+    // [削除] Issue #75 用のテストケースは新しい仕様で不要になったため削除
+
+    // [追加] content も patches も指定しない場合にエラーになるテスト
+    it('should throw an INVALID_INPUT error if neither content nor patches are provided (branch)', async () => {
+      const documentPath = 'test/no-content-or-patch-branch.json';
+
+      try {
+        await writeUseCase.execute({
+          branchName: TEST_BRANCH,
+          // document オブジェクトは必要だが、content は省略 (patches もなし)
+          document: {
+            path: documentPath,
+            tags: ['test']
+          } as any // Cast to allow missing content for testing
+        });
+        throw new Error('Expected WriteBranchDocumentUseCase to throw, but it did not.');
+      } catch (error) {
+        expect(error).toBeInstanceOf(ApplicationError);
+        if (error instanceof ApplicationError) {
+          // WriteBranchDocumentUseCase では初期化ロジックがあるため、
+          // content/patches なしでもエラーにならない場合がある。
+          // ここでは、初期化されないファイルパスでエラーになることを期待する。
+          // (より厳密なテストは UseCase のロジックに依存する)
+          // → 仕様変更により、初期化ロジックは削除され、エラーになるはず
+           expect(error.code).toBe('APP_ERROR.INVALID_INPUT');
+           expect(error.message).toBe('Either document content or patches must be provided');
+        } else {
+          throw new Error(`Expected ApplicationError, but caught ${error}`);
+        }
+      }
     });
 
   }); // describe('execute', ...) の閉じ括弧

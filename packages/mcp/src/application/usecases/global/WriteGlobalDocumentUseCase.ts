@@ -83,11 +83,12 @@ export class WriteGlobalDocumentUseCase
       }
 
       // ★ content と patches の存在チェック
-      const hasContent = input.document.content !== undefined && input.document.content !== null;
+      const hasContent = input.document.content !== undefined && input.document.content !== null; // 空文字列は true とする
       const hasPatches = (input.document as any).patches !== undefined && (input.document as any).patches !== null;
 
       // ★ content と patches の排他チェック
-      if (!hasContent && !hasPatches) {
+      // content が undefined または null で、かつ patches もない場合のみエラー
+      if ((input.document.content === undefined || input.document.content === null) && !hasPatches) { // ★ OR 条件に修正
         throw new ApplicationError(
           ApplicationErrorCodes.INVALID_INPUT,
           'Either document content or patches must be provided'
