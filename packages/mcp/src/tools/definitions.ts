@@ -25,7 +25,7 @@ export function createBranchProperties() {
     },
     branch: {
       type: 'string',
-      description: 'Branch name - must include namespace prefix with slash (e.g. "feature/my-branch"). Optional if running in project mode (branch name will be auto-detected).', // みらい修正：説明を更新！
+      description: 'Branch name - must include namespace prefix with slash (e.g. "feature/my-branch"). Optional if running in project mode (branch name will be auto-detected).',
     },
     docs: {
       type: 'string',
@@ -98,7 +98,7 @@ function createWriteBranchMemoryBankTool(): ToolDefinition {
           ]
         }
       },
-      required: ['path', 'docs'], // みらい修正：branch を required から削除！
+      required: ['path', 'docs'],
     },
   };
 }
@@ -117,7 +117,7 @@ function createReadBranchMemoryBankTool(): ToolDefinition {
       properties: {
         ...branchProps
       },
-      required: ['path', 'docs'], // みらい修正：branch を required から削除！
+      required: ['path', 'docs'],
     },
   };
 }
