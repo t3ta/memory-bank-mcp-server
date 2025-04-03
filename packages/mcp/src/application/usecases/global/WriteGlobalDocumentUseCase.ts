@@ -307,7 +307,7 @@ export class WriteGlobalDocumentUseCase
       // --- Return Output ---
       // ★★★ タグ更新が反映された最新のドキュメント情報を再取得 ★★★
       // ★★★ updateTagsIndex の完了を確実に待つために、さらに待機時間を追加 (例: 1000ms) ★★★
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await this.waitForUpdateTagsIndexCompletion();
       const savedDocument = await this.globalRepository.getDocument(documentPath);
       if (!savedDocument) {
          // 保存したはずのドキュメントが見つからないのは異常系
