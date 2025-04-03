@@ -180,12 +180,10 @@ if (hasPatches) {
   // --- Patch Logic ---
   this.componentLogger.debug('Processing write request with patches.', { path: documentPath.value });
 
-  // ★★★ デバッグログ追加: パッチ適用のガード処理前 ★★★
-  logger.debug('[Mirai Debug] Checking patch guard for branchContext.json', { pathValue: documentPath.value });
+  // Guard: Disallow patch operations on branchContext.json for now
   // Guard: Disallow patch operations on branchContext.json for now
   if (documentPath.value === 'branchContext.json') {
-    // ★★★ Add log inside the block ★★★
-    logger.error('[Mirai Error] Guard condition MET! Throwing error for branchContext.json patch.');
+    // Guard condition met, throw error
     throw ApplicationErrors.invalidInput(
       'Patch operations are currently not allowed for branchContext.json'
     );

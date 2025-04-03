@@ -1,0 +1,164 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "fix-issue-71-progress",
+    "title": "Issue #71 ブランチメモリバンク初期化問題の調査進捗",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "createdAt": "2025-04-03T13:36:00Z",
+    "lastModified": "2025-04-04T01:49:10Z"
+  },
+  "content": {
+    "summary": "GitHub Issue #71 (Branch memory bank is not initialized by read_context) の対応。テストダブルのリファクタリング計画（移動＆分割）を立案。移動計画は見直しが必要。分割リファクタリング（Facadeパターン）完了。全テストパスを確認。",
+    "status": "implementing",
+    "steps": [
+      {
+        "id": "step-1",
+        "description": "ブランチとコンテキストの確認",
+        "status": "done",
+        "timestamp": "2025-04-03T13:31:53Z",
+        "details": "現在のブランチは fix/issue-71。read_context を実行し、基本情報を取得。"
+      },
+      {
+        "id": "step-2",
+        "description": "GitHub Issue #71 の内容確認",
+        "status": "done",
+        "timestamp": "2025-04-03T13:32:01Z",
+        "details": "Issueを確認。read_context 実行時にブランチメモリバンクが初期化されない問題。"
+      },
+      {
+        "id": "step-3",
+        "description": "ReadContextUseCase.ts のコード調査",
+        "status": "done",
+        "timestamp": "2025-04-03T13:34:05Z",
+        "details": "packages/mcp/src/application/usecases/common/ReadContextUseCase.ts を確認。ブランチが存在しない場合に branchRepository.initialize() を呼び出すロジックは存在する。しかし、read_context 実行後に progress.json が存在しなかったことから、初期化が不完全であるか、別の箇所に問題がある可能性が高い。"
+      },
+      {
+        "id": "step-4",
+        "description": "progress.json の作成と記録",
+        "status": "done",
+        "timestamp": "2025-04-03T13:43:00Z",
+        "details": "progress.json が存在しなかったため、新規作成してここまでの調査状況を記録。"
+      },
+      {
+        "id": "step-5",
+        "description": "FileSystemBranchMemoryBankRepository.ts の調査",
+        "status": "done",
+        "timestamp": "2025-04-03T13:44:20Z",
+        "details": "initialize メソッドを確認。ブランチディレクトリ作成のみで、コアファイルの初期作成処理が欠落していることを特定。これが Issue #71 の原因。"
+      },
+      {
+        "id": "plan-refactor-fs-repo-location",
+        "description": "リファクタリング計画立案: FileSystemBranchMemoryBankRepository の移動",
+        "status": "blocked",
+        "details": {
+          "summary": "テスト用の FileSystemBranchMemoryBankRepository を src から tests/doubles (仮) へ移動するリファクタリング計画 (詳細版)。(※見直しが必要: src外への移動はtsconfig等の影響で困難)",
+          "target_file": "packages/mcp/src/infrastructure/repositories/FileSystemBranchMemoryBankRepository.ts",
+          "destination_dir_proposal": "packages/mcp/tests/doubles/infrastructure/repositories/",
+          "actual_destination": null,
+          "status": "blocked",
+          "tasks": [
+            {
+              "id": "task-1",
+              "description": "現状確認: DIコンテナでの使用状況、testsディレクトリ構成、直接インポート箇所の調査 (CodeQueenモードで要実行)",
+              "status": "done"
+            },
+            {
+              "id": "task-2",
+              "description": "ファイル移動の実行 (CodeQueenモード)",
+              "status": "blocked"
+            },
+            {
+              "id": "task-3",
+              "description": "DIコンテナ設定の修正 (CodeQueenモード)",
+              "status": "blocked"
+            },
+            {
+              "id": "task-4",
+              "description": "関連テストコードのインポートパス修正 (CodeQueenモード)",
+              "status": "blocked"
+            },
+            {
+              "id": "task-5",
+              "description": "ビルド確認 (CodeQueenモード)",
+              "status": "done"
+            },
+            {
+              "id": "task-6",
+              "description": "全テスト実行による動作確認 (CodeQueenモード)",
+              "status": "done",
+              "details": "yarn test 実行後、全てのテストがパスすることを確認。"
+            }
+          ],
+          "considerations": [
+            "他のテストダブル実装も移動対象とするか検討",
+            "tsconfig.json (paths, include/exclude) への影響確認",
+            "移動先ディレクトリ名の命名規則 (doubles/mocks/fakes等)",
+            "関連ドキュメントの更新",
+            "src外への移動が困難な場合の代替策検討 (例: src内にテスト用サブディレクトリ作成)"
+          ]
+        },
+        "tags": [
+          "refactoring",
+          "architecture",
+          "planning",
+          "blocked"
+        ]
+      },
+      {
+        "id": "plan-refactor-fs-repo-split",
+        "description": "リファクタリング計画立案: FileSystemBranchMemoryBankRepository の Facade パターンによる分割",
+        "status": "done",
+        "details": {
+          "summary": "FileSystemBranchMemoryBankRepository を Facade パターンで内部的に分割する計画。",
+          "target_file": "packages/mcp/src/infrastructure/repositories/FileSystemBranchMemoryBankRepository.ts",
+          "split_proposal": [
+            "BranchDirectoryManager (初期化の一部, exists)",
+            "DocumentIO (getDocument, saveDocument, deleteDocument)",
+            "DocumentLister (listDocuments)",
+            "TagIndexHandler (saveTagIndex, getTagIndex)",
+            "DocumentFinder (findDocumentsByTags...)"
+          ],
+          "benefits": [
+            "SRP準拠",
+            "可読性向上",
+            "保守性向上",
+            "AI編集容易化",
+            "テスト容易性向上",
+            "外部影響抑制"
+          ],
+          "status": "done",
+          "completed_tasks": [
+            "BranchDirectoryManager の作成と FileSystemBranchMemoryBankRepository への導入",
+            "DocumentIO の作成と FileSystemBranchMemoryBankRepository への導入",
+            "DocumentLister の作成と FileSystemBranchMemoryBankRepository への導入",
+            "TagIndexHandler の作成と FileSystemBranchMemoryBankRepository への導入",
+            "DocumentFinder の作成と FileSystemBranchMemoryBankRepository への導入"
+          ]
+        },
+        "tags": [
+          "refactoring",
+          "architecture",
+          "planning",
+          "facade-pattern",
+          "srp"
+        ]
+      }
+    ],
+    "next_steps": [
+      "Issue #71 の本来の修正 (initializeメソッドへのコアファイル作成処理追加) を行う。",
+      "関連するテストを追加・実行する。"
+    ],
+    "findings": [
+      "ReadContextUseCase.ts にはブランチ初期化ロジックが存在する。",
+      "read_context 実行後、branchContext.json は作成されるが、progress.json は作成されていなかった。",
+      "問題の原因は ReadContextUseCase 自身ではなく、呼び出している branchRepository の実装にある可能性が高い。",
+      "テスト用の FileSystemBranchMemoryBankRepository が src ディレクトリ内に存在しており、リファクタリングの余地がある。",
+      "FileSystemBranchMemoryBankRepository は複数の責務を持っており、Facadeパターン等での分割が有効である。",
+      "src 内のコードから tests 内のコードを直接インポートすることは tsconfig の設定等により困難である。",
+      "BranchDirectoryManager 導入と関連テスト修正後、全テストがパスすることを確認した。",
+      "FileSystemBranchMemoryBankRepository の Facade パターンによる分割リファクタリングを完了した。"
+    ]
+  }
+}

@@ -1,14 +1,14 @@
 /**
  * @jest-environment node
  */
-import { setupTestEnv, cleanupTestEnv, createBranchDir, type TestEnv } from '../helpers/test-env.ts'; // みらい：拡張子を .ts に修正
+import { setupTestEnv, cleanupTestEnv, createBranchDir, type TestEnv } from '../helpers/test-env.ts';
 import { loadBranchFixture, loadGlobalFixture } from '../helpers/fixtures-loader.js';
 import { DIContainer, setupContainer } from '../../../src/main/di/providers.js'; // Import DI container and setup function
 import { ReadContextUseCase, type ContextResult } from '../../../src/application/usecases/common/ReadContextUseCase.js'; // Import real UseCase and types
 import { ReadRulesUseCase } from '../../../src/application/usecases/common/ReadRulesUseCase.js'; // Import ReadRulesUseCase for rules check
 import { DomainErrors } from '../../../src/shared/errors/DomainError.js'; // Import specific errors for checking
-import type { IBranchMemoryBankRepository } from '../../../src/domain/repositories/IBranchMemoryBankRepository.js'; // みらい：リポジトリの型定義をインポート
-import fs from 'fs/promises'; // みらい：fsモジュールをインポート
+import type { IBranchMemoryBankRepository } from '../../../src/domain/repositories/IBranchMemoryBankRepository.js';
+import fs from 'fs/promises';
 
 import * as path from 'path';
 
@@ -17,7 +17,7 @@ describe('ReadContextUseCase Integration Tests', () => {
   let container: DIContainer; // Use DI container
   let useCase: ReadContextUseCase;
   let readRulesUseCase: ReadRulesUseCase;
-  let branchRepo: IBranchMemoryBankRepository; // みらい：リポジトリのインスタンスを保持する変数を追加
+  let branchRepo: IBranchMemoryBankRepository;
   const TEST_BRANCH = 'feature/test-branch';
 
   beforeEach(async () => {
@@ -33,7 +33,7 @@ describe('ReadContextUseCase Integration Tests', () => {
     // Get the use case instances from container
     useCase = await container.get<ReadContextUseCase>('readContextUseCase');
     readRulesUseCase = await container.get<ReadRulesUseCase>('readRulesUseCase'); // Get ReadRulesUseCase too
-    branchRepo = await container.get<IBranchMemoryBankRepository>('branchMemoryBankRepository'); // みらい：リポジトリを取得
+    branchRepo = await container.get<IBranchMemoryBankRepository>('branchMemoryBankRepository');
     // --- みらい：テスト実行時のみログレベルをdebugに設定 ---
     const { logger } = await import('../../../src/shared/utils/logger.js');
     logger.setLevel('debug');
@@ -128,7 +128,7 @@ describe('ReadContextUseCase Integration Tests', () => {
 
     it('should get auto-initialized context for a non-existent branch name', async () => {
       const nonExistentBranch = 'feature/non-existent-branch-auto-init';
-      const { BranchInfo } = await import('../../../src/domain/entities/BranchInfo.js'); // みらい：BranchInfoをインポート
+      const { BranchInfo } = await import('../../../src/domain/entities/BranchInfo.js');
 
       // --- みらい：デバッグのため initialize 呼び出しを復活させる ---
       // const { BranchInfo } = await import('../../../src/domain/entities/BranchInfo.js'); // ← ダブりなので削除

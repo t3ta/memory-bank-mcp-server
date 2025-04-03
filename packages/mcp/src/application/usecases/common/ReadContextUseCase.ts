@@ -105,9 +105,7 @@ export class ReadContextUseCase {
     // --- みらい：ここまで ---
     const paths = await this.branchRepository.listDocuments(branchInfo);
     logger.debug('Finished branchRepository.listDocuments'); // Added log
-    // --- みらい：デバッグログ追加 ---
-    logger.debug(`[Mirai Debug] listDocuments returned paths: ${JSON.stringify(paths.map(p => p.value))}`);
-    // --- みらい：ここまで ---
+    // Debug log removed by Mirai
     const result: Record<string, string> = {};
     logger.debug(`Reading branch memory paths: ${paths.map(p => p.value).join(', ')}`);
 
