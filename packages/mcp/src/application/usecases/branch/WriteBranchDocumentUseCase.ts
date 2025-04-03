@@ -12,8 +12,8 @@ import {
   ApplicationErrorCodes,
 } from '../../../shared/errors/ApplicationError.js';
 import { logger } from '../../../shared/utils/logger.js'; // Import logger
-import type { IGitService } from '@/infrastructure/git/IGitService.js'; // みらい修正：絶対パスエイリアス @/ を使う！
-import type { IConfigProvider } from '@/infrastructure/config/interfaces/IConfigProvider.js'; // みらい追加：ConfigProvider使うよ！
+import type { IGitService } from '@/infrastructure/git/IGitService.js';
+import type { IConfigProvider } from '@/infrastructure/config/interfaces/IConfigProvider.js';
 // Removed direct import of rfc6902
 import { JsonPatchService } from '../../../domain/jsonpatch/JsonPatchService.js'; // Import the service interface
 import { JsonPatchOperation } from '../../../domain/jsonpatch/JsonPatchOperation.js'; // Keep this if needed for input type, or adjust input type
@@ -25,7 +25,7 @@ export interface WriteBranchDocumentInput {
   /**
    * Branch name
    */
-  branchName?: string; // みらい変更：オプショナルにしたよ！
+  branchName?: string;
 
   /**
    * Document data
@@ -76,7 +76,7 @@ constructor(
   private readonly branchRepository: IBranchMemoryBankRepository,
   patchService: JsonPatchService, // Inject JsonPatchService
   private readonly gitService: IGitService,
-  private readonly configProvider: IConfigProvider // みらい追加：ConfigProvider注入！
+  private readonly configProvider: IConfigProvider
 ) {
   this.patchService = patchService;
 }
@@ -92,7 +92,7 @@ constructor(
 
       // --- Determine Branch Name ---
       let branchNameToUse = input.branchName;
-      // みらい修正：branchNameがなくて、かつプロジェクトモードの時だけGitから取る！
+
       if (!branchNameToUse) {
         const config = this.configProvider.getConfig(); // ConfigProviderから設定取得
         if (config.isProjectMode) { // プロジェクトモードかチェック
@@ -154,7 +154,7 @@ constructor(
       // else if (hasContent && typeof input.document.content !== 'string' && typeof input.document.content !== 'object') { ... }
 
 // --- Prepare Domain Objects ---
-const branchInfo = BranchInfo.create(branchNameToUse!); // みらい修正：!でundefinedじゃないって教える！
+const branchInfo = BranchInfo.create(branchNameToUse!);
 const documentPath = DocumentPath.create(input.document.path);
 const tags = (input.document.tags ?? []).map((tag) => Tag.create(tag));
 

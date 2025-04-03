@@ -33,7 +33,7 @@ export class BranchController {
   /**
    * Read a branch document
    */
-  // みらい変更：branchName をオプショナルに
+
   async readDocument(branchName: string | undefined, path: string) {
     try {
       // branchName が undefined でもログにはそのまま記録される
@@ -56,7 +56,7 @@ export class BranchController {
    * Write a branch document
    */
   async writeDocument(params: {
-    branchName?: string; // みらい変更：オプショナルに
+    branchName?: string;
     path: string;
     content?: string; // Explicitly define content as string
     tags?: string[];

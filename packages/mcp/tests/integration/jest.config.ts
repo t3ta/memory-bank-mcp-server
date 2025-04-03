@@ -36,6 +36,6 @@ export default {
   ],
   // setupFilesAfterEnv は rootDir (tests/integration) からの相対パス
   setupFilesAfterEnv: ['<rootDir>/setup.mts'], // Change extension to .mts
-  testTimeout: 30000, // みらいが追加☆ タイムアウトを30秒に延長！
+  testTimeout: 30000,
   silent: false, // Temporarily disable silent mode to see logs
 };

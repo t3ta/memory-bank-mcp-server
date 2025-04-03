@@ -9,7 +9,7 @@ import { fileURLToPath } from 'url'; // Import fileURLToPath for ESM path resolu
 import { logger } from '../../../src/shared/utils/logger.js';
 import { toSafeBranchName } from '../../../src/shared/utils/branchNameUtils.js';
 import tmp from 'tmp-promise'; // Import tmp-promise
-import { execSync } from 'child_process'; // みらい追加：Gitコマンド実行用
+import { execSync } from 'child_process';
 
 /**
  * Test environment interface

@@ -45,8 +45,8 @@ import { JsonBranchController } from '../../interface/controllers/json/JsonBranc
 import { CliOptions } from '../../infrastructure/config/WorkspaceConfig.js';
 // Removed unused import: import { UseCaseFactory } from '../../factory/use-case-factory.js';
 import { ReadBranchCoreFilesUseCase } from '../../application/usecases/index.js';
-import { GitService } from '../../infrastructure/git/GitService.js'; // みらい追加：GitServiceインポート
-import { IGitService } from '../../infrastructure/git/IGitService.js'; // みらい追加：IGitServiceインポート
+import { GitService } from '../../infrastructure/git/GitService.js';
+import { IGitService } from '../../infrastructure/git/IGitService.js';
 
 /**
  * Register infrastructure services
@@ -166,8 +166,8 @@ export async function registerInfrastructureServices(
     return templateRepository;
   });
 
-  // みらい追加：GitServiceを登録
-  // みらい追加：GitServiceを登録
+
+
   container.register<IGitService>('gitService', new GitService());
   logger.debug('GitService registered.');
 }
@@ -224,10 +224,10 @@ export async function registerApplicationServices(container: DIContainer): Promi
       'branchMemoryBankRepository'
     );
     const patchService = await container.get<JsonPatchService>('jsonPatchService'); // Get the patch service
-    const gitService = await container.get<IGitService>('gitService'); // みらい追加：GitServiceを取得
-    const configProvider = await container.get<IConfigProvider>('configProvider'); // みらい追加：ConfigProviderを取得
+    const gitService = await container.get<IGitService>('gitService');
+    const configProvider = await container.get<IConfigProvider>('configProvider');
     // Directly instantiate the use case with dependencies
-    return new WriteBranchDocumentUseCase(branchRepository, patchService, gitService, configProvider); // みらい変更：ConfigProviderも渡す
+    return new WriteBranchDocumentUseCase(branchRepository, patchService, gitService, configProvider);
   });
 
   // Add missing registration for readBranchDocumentUseCase
@@ -235,9 +235,9 @@ export async function registerApplicationServices(container: DIContainer): Promi
     const branchRepository = await container.get<FileSystemBranchMemoryBankRepository>(
       'branchMemoryBankRepository'
     );
-    const gitService = await container.get<IGitService>('gitService'); // みらい追加：GitServiceを取得
-    const configProvider = await container.get<IConfigProvider>('configProvider'); // みらい追加：ConfigProviderを取得
-    return new ReadBranchDocumentUseCase(branchRepository, gitService, configProvider); // みらい変更：ConfigProviderも渡す
+    const gitService = await container.get<IGitService>('gitService');
+    const configProvider = await container.get<IConfigProvider>('configProvider');
+    return new ReadBranchDocumentUseCase(branchRepository, gitService, configProvider);
   });
 
   container.registerFactory('readRulesUseCase', async () => {

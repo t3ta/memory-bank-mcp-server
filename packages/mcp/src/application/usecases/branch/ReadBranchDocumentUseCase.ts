@@ -7,7 +7,7 @@ import { DomainErrors } from '../../../shared/errors/DomainError.js';
 import { ApplicationErrors, ErrorUtils } from '../../../shared/errors/index.js';
 import { logger } from '../../../shared/utils/logger.js';
 import type { IGitService } from '@/infrastructure/git/IGitService.js';
-import type { IConfigProvider } from '@/infrastructure/config/interfaces/IConfigProvider.js'; // みらい追加：ConfigProvider使うよ！
+import type { IConfigProvider } from '@/infrastructure/config/interfaces/IConfigProvider.js';
 
 /**
  * Input data for read branch document use case
@@ -47,12 +47,12 @@ export class ReadBranchDocumentUseCase
    * Constructor
    * @param branchRepository Branch memory bank repository
    * @param gitService Git service
-   * @param configProvider Configuration provider // みらい追加
+   * @param configProvider Configuration provider
    */
   constructor(
     private readonly branchRepository: IBranchMemoryBankRepository,
     private readonly gitService: IGitService,
-    private readonly configProvider: IConfigProvider // みらい追加：ConfigProvider注入！
+    private readonly configProvider: IConfigProvider
   ) {}
 
   /**
@@ -63,7 +63,7 @@ export class ReadBranchDocumentUseCase
   async execute(input: ReadBranchDocumentInput): Promise<ReadBranchDocumentOutput> {
     let branchNameToUse = input.branchName;
 
-    // みらい修正：branchNameがなくて、かつプロジェクトモードの時だけGitから取る！
+
     if (!branchNameToUse) {
       const config = this.configProvider.getConfig(); // ConfigProviderから設定取得
       if (config.isProjectMode) { // プロジェクトモードかチェック
@@ -93,13 +93,13 @@ export class ReadBranchDocumentUseCase
     }
 
     return await ErrorUtils.wrapAsync(
-      // みらい変更：executeInternalには確定したブランチ名を渡す
-      // みらい修正：branchNameToUseがstringなのは確定してるから `!` で教えてあげる
+
+
       this.executeInternal({ ...input, branchName: branchNameToUse! }),
       (error) => ApplicationErrors.executionFailed(
         'ReadBranchDocumentUseCase',
         error instanceof Error ? error : undefined,
-        // みらい変更：エラーログにも確定したブランチ名を含める
+
         { input: { ...input, branchName: branchNameToUse } }
       )
     );
@@ -108,7 +108,7 @@ export class ReadBranchDocumentUseCase
   /**
    * Internal execution logic wrapped with error handling
    */
-  // みらい変更：引数のinputはbranchNameが確定している前提にする
+
   private async executeInternal(input: Required<ReadBranchDocumentInput>): Promise<ReadBranchDocumentOutput> {
     const branchInfo = BranchInfo.create(input.branchName);
     const documentPath = DocumentPath.create(input.path);

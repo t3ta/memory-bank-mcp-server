@@ -10,12 +10,12 @@ import { ReadBranchDocumentUseCase, type ReadBranchDocumentOutput } from '../../
 import { BranchInfo } from '../../../src/domain/entities/BranchInfo.js'; // Import BranchInfo
 import { DomainErrors } from '../../../src/shared/errors/DomainError.js'; // Import specific errors for checking
 import { ApplicationErrors } from '../../../src/shared/errors/ApplicationError.js'; // Import specific errors for checking
-import { IGitService } from '../../../src/infrastructure/git/IGitService.js'; // みらい追加：GitServiceのインターフェース
-import { IConfigProvider } from '../../../src/infrastructure/config/interfaces/IConfigProvider.js'; // みらい追加：ConfigProviderのインターフェース
-import type { WorkspaceConfig } from '../../../src/infrastructure/config/WorkspaceConfig.js'; // みらい追加：WorkspaceConfigの型
-import { jest } from '@jest/globals'; // みらい追加：Jestのモック機能使うよ！
-import { execSync } from 'child_process'; // みらい追加：Gitコマンド実行用
-import { logger } from '../../../src/shared/utils/logger.js'; // みらい追加：ロガー使うよ！
+import { IGitService } from '../../../src/infrastructure/git/IGitService.js';
+import { IConfigProvider } from '../../../src/infrastructure/config/interfaces/IConfigProvider.js';
+import type { WorkspaceConfig } from '../../../src/infrastructure/config/WorkspaceConfig.js';
+import { jest } from '@jest/globals';
+import { execSync } from 'child_process';
+import { logger } from '../../../src/shared/utils/logger.js';
 
 import * as path from 'path';
 import fsExtra from 'fs-extra'; // Use default import for fs-extra
@@ -25,8 +25,8 @@ describe('ReadBranchDocumentUseCase Integration Tests', () => {
   // let app: Application; // Removed app instance
   let container: DIContainer; // Use DI container
   let useCase: ReadBranchDocumentUseCase;
-  let mockGitService: jest.Mocked<IGitService>; // みらい追加：GitServiceモックの型定義
-  let mockConfigProvider: jest.Mocked<IConfigProvider>; // みらい追加：ConfigProviderモックの型定義
+  let mockGitService: jest.Mocked<IGitService>;
+  let mockConfigProvider: jest.Mocked<IConfigProvider>;
   const TEST_BRANCH = 'feature/test-branch';
   const SAFE_TEST_BRANCH = BranchInfo.create(TEST_BRANCH).safeName;
 
@@ -51,7 +51,7 @@ describe('ReadBranchDocumentUseCase Integration Tests', () => {
     // Initialize DI container
     container = await setupContainer({ docsRoot: testEnv.docRoot });
 
-    // みらい追加：GitServiceをモック化してコンテナに再登録
+
     mockGitService = {
       getCurrentBranchName: jest.fn<() => Promise<string>>() // モック関数を作成
     };
@@ -59,7 +59,7 @@ describe('ReadBranchDocumentUseCase Integration Tests', () => {
     mockGitService.getCurrentBranchName.mockResolvedValue(TEST_BRANCH);
     container.register<IGitService>('gitService', mockGitService); // コンテナにGitServiceモックを登録
 
-    // みらい追加：ConfigProviderもモック化してコンテナに再登録
+
     mockConfigProvider = {
       // initialize は呼ばれない想定なので jest.fn() だけ用意
       initialize: jest.fn(),

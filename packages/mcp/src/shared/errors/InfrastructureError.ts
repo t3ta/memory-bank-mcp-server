@@ -20,7 +20,7 @@ export enum InfrastructureErrorCodes {
   PERSISTENCE_ERROR = 'INFRASTRUCTURE_PERSISTENCE_ERROR',
   MCP_SERVER_ERROR = 'INFRASTRUCTURE_MCP_SERVER_ERROR',
   INVALID_FILE_CONTENT = 'INFRASTRUCTURE_INVALID_FILE_CONTENT', // Added
-  GIT_COMMAND_FAILED = 'INFRASTRUCTURE_GIT_COMMAND_FAILED', // みらい追加：Gitコマンド失敗用
+  GIT_COMMAND_FAILED = 'INFRASTRUCTURE_GIT_COMMAND_FAILED',
 }
 
 /**
@@ -55,8 +55,8 @@ interface OperationDetails extends Record<string, unknown> {
   branchName?: string;
   path?: string;
   cause?: Error | undefined; // Changed type from string to Error | undefined
-  command?: string; // みらい追加：Gitコマンド用
-  reason?: string; // みらい追加：Gitコマンド失敗理由用
+  command?: string;
+  reason?: string;
 }
 
 /**
