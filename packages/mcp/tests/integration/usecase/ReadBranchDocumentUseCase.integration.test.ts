@@ -177,7 +177,6 @@ describe('ReadBranchDocumentUseCase Integration Tests', () => {
       expect(document.metadata.path).toBe('subdir/test-document.json');
     });
 
-    // --- みらい修正：branchName 省略時のテストケース (プロジェクトモード) ---
     describe('when branchName is omitted in project mode (isProjectMode: true)', () => {
       beforeEach(() => {
         // この describe 内では isProjectMode: true を強制
@@ -218,7 +217,6 @@ describe('ReadBranchDocumentUseCase Integration Tests', () => {
       });
     });
 
-    // --- みらい追加：branchName 省略時のテストケース (非プロジェクトモード) ---
     describe('when branchName is omitted outside of project mode (isProjectMode: false)', () => {
       beforeEach(() => {
         // この describe 内では isProjectMode: false を強制

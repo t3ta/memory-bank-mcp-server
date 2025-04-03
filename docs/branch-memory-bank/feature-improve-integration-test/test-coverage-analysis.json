@@ -1,0 +1,190 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "test-coverage-analysis",
+    "title": "統合テストカバレッジ分析",
+    "documentType": "analysis",
+    "path": "test-coverage-analysis.json",
+    "tags": [
+      "test",
+      "integration",
+      "analysis"
+    ],
+    "createdAt": "2025-04-03T15:46:30Z",
+    "lastModified": "2025-04-03T15:46:30Z",
+    "version": 1
+  },
+  "content": {
+    "summary": "現在の統合テストの状況とカバレッジに関する分析",
+    "currentIntegrationTests": [
+      {
+        "file": "ContextController.integration.test.ts",
+        "testCases": [
+          "正常系: 自動初期化されたブランチメモリを含むコンテキストを読み取れること",
+          "正常系: ブランチとグローバルの両方のメモリバンクからコンテキストを読み取れること",
+          "正常系: 存在しないブランチでも自動初期化されたブランチメモリが返されること",
+          "正常系: ファイルが存在するブランチメモリバンクからコンテキストを読み取れること",
+          "正常系: 日本語のルールを取得できること",
+          "正常系: 英語のルールを取得できること",
+          "異常系: サポートされていない言語でエラーが返されること",
+          "正常系: 中国語のルールを取得できること"
+        ],
+        "coverage": "コンテキスト読み取りの基本機能を幅広くカバー"
+      },
+      {
+        "file": "BranchController.integration.test.ts",
+        "testCases": [
+          "should return an error when trying to read from an empty branch",
+          "should write and read a branch document successfully",
+          "should return an error when reading from a non-existent branch",
+          "should create a new branch and write a document successfully",
+          "should update (overwrite) an existing document successfully"
+        ],
+        "coverage": "基本的な読み書き機能とエラーケースをカバー"
+      },
+      {
+        "file": "GlobalController.integration.test.ts",
+        "testCases": [
+          "should read a document from the global memory bank",
+          "should return an error when reading a non-existent document",
+          "should create a new global document successfully",
+          "should write invalid JSON content as plain text",
+          "should update (overwrite) an existing global document successfully"
+        ],
+        "coverage": "グローバルデータの読み書き機能とエラーケースをカバー"
+      },
+      {
+        "file": "ReadContextUseCase.integration.test.ts",
+        "testCases": [
+          "should get context from an auto-initialized branch and global memory",
+          "should get context from populated branch and global memory",
+          "should get context regardless of language",
+          "should get auto-initialized context for a non-existent branch name",
+          "should get context even for unsupported language"
+        ],
+        "coverage": "コンテキスト読み取りの様々なパターンをカバー"
+      },
+      {
+        "file": "ReadBranchDocumentUseCase.integration.test.ts",
+        "testCases": [
+          "should read a document from the branch memory bank",
+          "should return an error if the document does not exist",
+          "should return an error if the branch does not exist",
+          "should return an error for an invalid path",
+          "should read a document from a subdirectory within the branch",
+          "should read a document using the current git branch (プロジェクトモード)",
+          "should return an error if current branch cannot be determined (プロジェクトモード)",
+          "should return an error when branchName is required (非プロジェクトモード)"
+        ],
+        "coverage": "基本的な読み取り機能と自動ブランチ検出機能をカバー"
+      },
+      {
+        "file": "WriteBranchDocumentUseCase.integration.test.ts",
+        "testCases": [
+          "should create a new branch document",
+          "should update an existing branch document",
+          "should write invalid JSON content as plain text",
+          "should successfully write plain text content",
+          "should create a document when initializing a new branch",
+          "should throw an error when attempting to write to a path outside the allowed branch directory",
+          "should update a document using patches",
+          "should return the created document content when returnContent is true",
+          "should return only minimal info when returnContent is false",
+          "should return only minimal info when returnContent is not specified (defaults to false)",
+          "should successfully write valid content to branchContext.json",
+          "should create an empty file when content is an empty string (non-branchContext)",
+          "should throw error when writing invalid JSON content to branchContext.json",
+          "should throw error when writing JSON content missing required keys to branchContext.json",
+          "should throw error when attempting to use patches on branchContext.json",
+          "should throw an INVALID_INPUT error if neither content nor patches are provided (branch)",
+          "should create a document using the current git branch (プロジェクトモード)",
+          "should update a document using patches using the current git branch (プロジェクトモード)",
+          "should return an error if current branch cannot be determined (プロジェクトモード)",
+          "should return an error when creating a document because branchName is required (非プロジェクトモード)",
+          "should return an error when updating with patches because branchName is required (非プロジェクトモード)"
+        ],
+        "coverage": "書き込み機能、パッチ適用、自動ブランチ検出など広範囲をカバー"
+      },
+      {
+        "file": "ReadGlobalDocumentUseCase.integration.test.ts",
+        "testCases": [
+          "should read a document from the global memory bank",
+          "should return an error if the document does not exist",
+          "should return an error for an invalid path",
+          "should read documents of various types"
+        ],
+        "coverage": "基本的な読み取り機能とエラーケースをカバー"
+      },
+      {
+        "file": "WriteGlobalDocumentUseCase.integration.test.ts",
+        "testCases": [
+          "should create a new document",
+          "should update an existing document",
+          "should write invalid JSON content as plain text",
+          "should successfully write plain text content",
+          "should handle path mismatch between input and metadata (uses input path)",
+          "should throw an error when attempting to write to a path outside the allowed directory",
+          "should return the created document content when returnContent is true",
+          "should return only minimal info when returnContent is false",
+          "should return only minimal info when returnContent is not specified (defaults to false)",
+          "should update an existing document using patches",
+          "should throw an error if patches are applied to a non-existent document",
+          "should throw an error if patches are invalid (e.g., test fails)",
+          "should throw an error if existing content is not valid JSON when applying patches",
+          "should throw an error if both content and patches are provided",
+          "should throw an INVALID_INPUT error if neither content nor patches are provided",
+          "should create an empty file when content is an empty string"
+        ],
+        "coverage": "書き込み機能、パッチ適用、各種エラーケースを広範囲にカバー"
+      }
+    ],
+    "missingTestCases": [
+      {
+        "component": "GitService",
+        "description": "GitServiceのユニットテストがない。ブランチ名の自動検出機能はモックテストのみでカバーされており、実際のGit連携の動作を検証するテストが必要。",
+        "suggestedTestCases": [
+          "正常系: git branch --show-currentが正常に動作する場合",
+          "異常系: gitコマンドがエラーを返す場合",
+          "異常系: gitコマンドが空の出力を返す場合",
+          "異常系: gitリポジトリ外で実行された場合",
+          "異常系: デタッチドHEAD状態の場合"
+        ]
+      },
+      {
+        "component": "エッジケース",
+        "description": "以下のエッジケースのテストが不足している可能性がある:",
+        "suggestedTestCases": [
+          "特殊文字を含むブランチ名の処理（自動検出と明示的指定の両方）",
+          "非常に長いブランチ名の処理",
+          "複数のGitブランチが存在する環境での自動検出の正確性",
+          "Gitとファイルシステムのブランチディレクトリの不整合時の挙動"
+        ]
+      },
+      {
+        "component": "パフォーマンス",
+        "description": "大規模データや多数のブランチが存在する場合のパフォーマンステスト",
+        "suggestedTestCases": [
+          "多数のブランチが存在する状態でのブランチ名自動検出のパフォーマンス",
+          "大量のデータが存在する状態での読み取り操作のパフォーマンス"
+        ]
+      }
+    ],
+    "recommendations": [
+      {
+        "priority": "高",
+        "description": "GitServiceの独立したユニットテストを作成する。モックではなく実際のGit操作を行うテストと、実行環境に依存しないモックテストの両方を実装する。",
+        "implementation": "GitService.test.tsを新規作成し、実際のGitコマンド操作と環境変数操作を行うテストと、child_processをモックしたテストを両方実装する。"
+      },
+      {
+        "priority": "中",
+        "description": "エッジケースのテストを追加する。特に特殊文字を含むブランチ名や、長いブランチ名、デタッチドHEAD状態など。",
+        "implementation": "ReadBranchDocumentUseCase.integration.test.tsとWriteBranchDocumentUseCase.integration.test.tsに追加のテストケースを実装する。"
+      },
+      {
+        "priority": "低",
+        "description": "大規模データや多数のブランチに対するパフォーマンステストを追加する。",
+        "implementation": "別途パフォーマンステスト用のスクリプトを作成し、CI/CDパイプラインに統合する。"
+      }
+    ]
+  }
+}
