@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] - 2025-04-04 (@memory-bank/mcp)
+
+### Added
+- Automatically detect branch name in project mode and for memory bank operations.
+- Unified Write UseCase specifications.
+- Add comprehensive test coverage analysis for integration tests.
+- Add initial context and progress documentation for issue #71.
+
+### Fixed
+- Issue #71: Resolved issues related to branch memory bank operations, including handling JSON objects in content.
+- Issue #75: Fixed inconsistencies in write use case specifications.
+- Issue #76: Addressed problems with global document writing and updated descriptions for memory bank tools, making the `branch` parameter optional.
+- Resolve potential issues where branch context could be unintentionally overwritten.
+- Resolve various test errors.
+
+### Changed
+- Apply Facade pattern to `FileSystemBranchMemoryBankRepository` for improved code structure.
+- Clean up comments and improve code readability across multiple files.
+- Remove commented-out test cases.
+
 ## [2.3.0] - 2025-04-01 (@memory-bank/mcp)
 
 ### Added
@@ -46,3 +66,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 <!-- Older releases below -->
+
