@@ -9,6 +9,7 @@ import { fileURLToPath } from 'url'; // Import fileURLToPath for ESM path resolu
 import { logger } from '../../../src/shared/utils/logger.js';
 import { toSafeBranchName } from '../../../src/shared/utils/branchNameUtils.js';
 import tmp from 'tmp-promise'; // Import tmp-promise
+import { execSync } from 'child_process';
 
 /**
  * Test environment interface
@@ -88,6 +89,24 @@ export async function setupTestEnv(): Promise<TestEnv> {
     throw createError;
   }
   // --- End: Create dummy files instead of copying ---
+
+  // --- Start: Initialize Git Repository ---
+  try {
+    logger.debug(`[setupTestEnv] Initializing Git repository in ${tempDir}...`);
+    // Gitリポジトリを初期化
+    execSync('git init', { cwd: tempDir, stdio: 'ignore' });
+    // Gitのユーザー設定（ないとコミットできない場合がある）
+    execSync('git config user.email "test@example.com"', { cwd: tempDir, stdio: 'ignore' });
+    execSync('git config user.name "Test User"', { cwd: tempDir, stdio: 'ignore' });
+    // 空の初期コミットを作成
+    execSync('git commit --allow-empty -m "Initial commit"', { cwd: tempDir, stdio: 'ignore' });
+    logger.debug(`[setupTestEnv] Git repository initialized and initial commit created in ${tempDir}.`);
+  } catch (gitError) {
+    logger.error('[setupTestEnv] Error initializing Git repository:', gitError);
+    await cleanup(); // エラー時はクリーンアップ
+    throw gitError;
+  }
+  // --- End: Initialize Git Repository ---
 
   // --- Start: Original Copy Logic ---
   // Copy necessary files from project's docs to temp docs
