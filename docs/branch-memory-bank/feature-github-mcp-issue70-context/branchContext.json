@@ -1,0 +1,13 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-github-mcp-issue70-context-context",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "createdAt": "2025-04-02T20:30:14.696Z",
+    "lastModified": "2025-04-02T20:30:14.696Z"
+  },
+  "content": {
+    "value": "Auto-initialized context for branch feature/github-mcp-issue70-context"
+  }
+}

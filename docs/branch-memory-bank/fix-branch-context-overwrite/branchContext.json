@@ -1,0 +1,13 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "fix-branch-context-overwrite-context",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "createdAt": "2025-04-03T09:31:57.616Z",
+    "lastModified": "2025-04-03T09:31:57.616Z"
+  },
+  "content": {
+    "value": "Auto-initialized context for branch fix/branch-context-overwrite"
+  }
+}

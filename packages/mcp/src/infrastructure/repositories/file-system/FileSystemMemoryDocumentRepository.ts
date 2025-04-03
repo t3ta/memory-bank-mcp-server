@@ -209,38 +209,38 @@ export class FileSystemMemoryDocumentRepository implements IMemoryDocumentReposi
     try {
       const filePath = this.resolvePath(document.path.value);
 
-      if (document.isJSON) {
-        // Validate JSON content before saving
-        try {
-          JSON.parse(document.content); // Attempt to parse to validate
-        } catch (error) {
-          logger.error(`Invalid JSON content for ${document.path.value}:`, { error });
-          throw new DomainError( // Throw DomainError for invalid JSON
-            'DOMAIN_ERROR.VALIDATION_ERROR', // Use a suitable error code/message
-            'Document content is not valid JSON',
-            { cause: error instanceof Error ? error : undefined, path: document.path.value }
-          );
-        }
-        // If valid, proceed to save (using the original content string is fine here)
-        await this.fileSystemService.writeFile(filePath, document.content);
-        return;
+      let contentToSave = document.content;
+      let isJson = false;
+
+      try {
+        // JSONかどうかを試す
+        JSON.parse(document.content);
+        isJson = true;
+        logger.debug(`Content is valid JSON for ${document.path.value}`);
+        // JSONの場合はそのままの contentToSave を使う
+      } catch (error) {
+        // JSONでない場合はプレーンテキストとして扱う
+        isJson = false;
+        logger.debug(`Content is not JSON for ${document.path.value}, treating as plain text.`);
+        // プレーンテキストの場合、タグ埋め込みはしない (シンプルにするため)
+        // もしタグ埋め込みが必要なら、ここで行う
+        // if (document.tags.length > 0) {
+        //   const tagLine = `tags: ${document.tags.map((tag) => tag.toHashtag()).join(' ')}\n\n`;
+        //   if (contentToSave.includes('tags:')) {
+        //     contentToSave = contentToSave.replace(/tags:.*\n\n/, tagLine);
+        //   } else {
+        //     const lines = contentToSave.split('\n');
+        //     const firstLine = lines[0];
+        //     const rest = lines.slice(1).join('\n');
+        //     contentToSave = `${firstLine}\n\n${tagLine}${rest}`;
+        //   }
+        // }
       }
 
-      let content = document.content;
+      // ファイル書き込み
+      await this.fileSystemService.writeFile(filePath, contentToSave);
+      logger.debug(`Successfully wrote file: ${filePath} (isJson: ${isJson})`);
 
-      if (document.tags.length > 0) {
-        const tagLine = `tags: ${document.tags.map((tag) => tag.toHashtag()).join(' ')}\n\n`;
-        if (content.includes('tags:')) {
-          content = content.replace(/tags:.*\n\n/, tagLine);
-        } else {
-          const lines = content.split('\n');
-          const firstLine = lines[0];
-          const rest = lines.slice(1).join('\n');
-          content = `${firstLine}\n\n${tagLine}${rest}`;
-        }
-      }
-
-      await this.fileSystemService.writeFile(filePath, content);
     } catch (error) {
       if (error instanceof DomainError) {
         throw error;

@@ -33,16 +33,20 @@ export class BranchController {
   /**
    * Read a branch document
    */
-  async readDocument(branchName: string, path: string) {
+
+  async readDocument(branchName: string | undefined, path: string) {
     try {
+      // branchName が undefined でもログにはそのまま記録される
       this.componentLogger.info('Reading branch document', { operation: 'readDocument', branchName, path });
+      // UseCase にそのまま渡す（UseCase側で undefined を処理）
       const document = await this.readBranchDocumentUseCase.execute({
-        branchName,
+        branchName, // undefined の可能性あり
         path,
       });
 
       return this.presenter.presentSuccess(document);
     } catch (error) {
+      // エラーログでも branchName は undefined の可能性がある
       this.componentLogger.error('Failed to read branch document', { operation: 'readDocument', branchName, path, error });
       return this.handleError(error);
     }
@@ -52,7 +56,7 @@ export class BranchController {
    * Write a branch document
    */
   async writeDocument(params: {
-    branchName: string;
+    branchName?: string;
     path: string;
     content?: string; // Explicitly define content as string
     tags?: string[];
@@ -66,6 +70,7 @@ export class BranchController {
       // Check if content is not undefined, not null, AND not an empty string
       const hasContent = content !== undefined && content !== null && content !== '';
 
+      // branchName が undefined でもログにはそのまま記録される
       this.componentLogger.info('Writing branch document', { operation: 'writeDocument', branchName, path, hasContent, hasPatches });
       // console.error(`--- BranchController: Checking conditions - hasPatches: ${hasPatches}, content type: ${typeof content}, content value: "${content}", hasContent: ${hasContent}`); // DEBUG LOG REMOVED
 
@@ -73,7 +78,7 @@ export class BranchController {
         // console.error("--- BranchController: Entering 'patches' block"); // DEBUG LOG REMOVED
         // Call WriteBranchDocumentUseCase with patches
         const result = await this.writeBranchDocumentUseCase.execute({
-          branchName,
+          branchName, // undefined の可能性あり
           document: { // Pass path and tags from the document object
             path: path,
             tags: tags,
@@ -90,7 +95,7 @@ export class BranchController {
         // If content is provided (and no patches), call the existing UseCase
         // Content is already known to be a non-empty string here due to hasContent check
         const result = await this.writeBranchDocumentUseCase.execute({
-          branchName,
+          branchName, // undefined の可能性あり
           document: { // Pass data matching WriteDocumentDTO
             path: path,
             content: content, // Pass the valid string content
@@ -112,12 +117,14 @@ export class BranchController {
         const contentType = typeof content;
         const contentValue = JSON.stringify(content);
         const debugMessage = `DEBUG: Entered init branch unexpectedly. patches type: ${patchesType}, patches length: ${patchesLength}, patches value: ${patchesValue}, content type: ${contentType}, content value: ${contentValue}`;
+        // branchName が undefined でもログにはそのまま記録される
         this.componentLogger.info(debugMessage, { operation: 'writeDocument', branchName, path });
         // Return debug information in the response
         return this.presenter.presentSuccess({ message: debugMessage });
       }
     } catch (error) {
       // Log the error with destructured variables available in this scope
+      // エラーログでも branchName は undefined の可能性がある
       this.componentLogger.error('Failed to write branch document', { operation: 'writeDocument', branchName, path, error }); // Log with available context
       return this.handleError(error);
     }

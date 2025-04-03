@@ -25,7 +25,7 @@ export function createBranchProperties() {
     },
     branch: {
       type: 'string',
-      description: 'Branch name - must include namespace prefix with slash (e.g. "feature/my-branch")',
+      description: 'Branch name - must include namespace prefix with slash (e.g. "feature/my-branch"). Optional if running in project mode (branch name will be auto-detected).',
     },
     docs: {
       type: 'string',
@@ -79,6 +79,11 @@ function createWriteBranchMemoryBankTool(): ToolDefinition {
       properties: {
         ...branchProps,
         ...patchProps,
+        returnContent: {
+          type: 'boolean',
+          description: 'If true, return the full document content in the output. Defaults to false.',
+          default: false,
+        },
         _patchNotes: {
           type: 'string',
           description: 'JSON Patch Implementation Notes (RFC 6902)',
@@ -93,7 +98,7 @@ function createWriteBranchMemoryBankTool(): ToolDefinition {
           ]
         }
       },
-      required: ['path', 'branch', 'docs'],
+      required: ['path', 'docs'],
     },
   };
 }
@@ -112,7 +117,7 @@ function createReadBranchMemoryBankTool(): ToolDefinition {
       properties: {
         ...branchProps
       },
-      required: ['path', 'branch', 'docs'],
+      required: ['path', 'docs'],
     },
   };
 }
@@ -132,6 +137,11 @@ function createWriteGlobalMemoryBankTool(): ToolDefinition {
       properties: {
         ...globalProps,
         ...patchProps,
+        returnContent: {
+          type: 'boolean',
+          description: 'If true, return the full document content in the output. Defaults to false.',
+          default: false,
+        },
         _patchNotes: {
           type: 'string',
           description: 'JSON Patch Implementation Notes (RFC 6902)',

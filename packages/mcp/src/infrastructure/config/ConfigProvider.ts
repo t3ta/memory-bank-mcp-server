@@ -25,13 +25,18 @@ export class ConfigProvider implements IConfigProvider {
     try {
       if (this.config) return this.config;
 
-      const docsRoot = await this.resolveDocsRoot(options);
+      // resolveDocsRoot がパスと解決方法を返すように変更
+      const { resolvedPath: docsRoot, resolvedBy } = await this.resolveDocsRoot(options);
       const language = await this.resolveLanguage(options);
+
+      // 解決方法が 'default' 以外ならプロジェクトモードと判断
+      const isProjectMode = resolvedBy !== 'default';
 
       this.config = {
         docsRoot,
         verbose: options?.verbose ?? false,
         language,
+        isProjectMode, // isProjectMode を設定
       };
 
       await this.ensureDirectories();
@@ -108,23 +113,29 @@ export class ConfigProvider implements IConfigProvider {
   /**
    * Resolve docs root directory
    * @param options CLI options
-   * @returns Promise resolving to docs root path
+   * @returns Promise resolving to an object containing the resolved path and how it was resolved ('cli', 'env', or 'default')
    */
-  private async resolveDocsRoot(options?: CliOptions): Promise<string> {
+  // 戻り値の型を変更
+  private async resolveDocsRoot(options?: CliOptions): Promise<{ resolvedPath: string; resolvedBy: 'cli' | 'env' | 'default' }> {
     try {
       if (options?.docsRoot) {
-        return await this.validatePath(options.docsRoot);
+        const resolvedPath = await this.validatePath(options.docsRoot);
+        return { resolvedPath, resolvedBy: 'cli' };
       }
 
       if (process.env.MEMORY_BANK_ROOT) {
-        return await this.validatePath(process.env.MEMORY_BANK_ROOT);
+        const resolvedPath = await this.validatePath(process.env.MEMORY_BANK_ROOT);
+        return { resolvedPath, resolvedBy: 'env' };
       }
 
       if (process.env.DOCS_ROOT) {
-        return await this.validatePath(process.env.DOCS_ROOT);
+        const resolvedPath = await this.validatePath(process.env.DOCS_ROOT);
+        return { resolvedPath, resolvedBy: 'env' };
       }
 
-      return await this.validatePath('./docs');
+      // デフォルトの場合
+      const resolvedPath = await this.validatePath('./docs');
+      return { resolvedPath, resolvedBy: 'default' };
     } catch (error) {
       throw new InfrastructureError(
         InfrastructureErrorCodes.CONFIGURATION_ERROR,

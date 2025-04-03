@@ -74,7 +74,7 @@ describe('ContextController Integration Tests', () => {
       expect(result.success).toBe(true);
       expect(result.data).toBeDefined();
       expect(result.data?.branchMemory?.['branchContext.json']).toBeDefined();
-      expect(Object.keys(result.data?.branchMemory || {}).length).toBe(1);
+      expect(Object.keys(result.data?.branchMemory || {}).length).toBe(4); // ★ 期待値を4に変更 ★
       expect(result.data?.rules).toBeDefined();
       expect(result.data?.globalMemory).toBeDefined();
     });

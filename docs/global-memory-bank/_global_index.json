@@ -1,435 +1,1162 @@
 {
   "schema": "tag_index_v1",
   "metadata": {
-    "updatedAt": "2025-03-28T11:06:14.910Z",
-    "documentCount": 85,
-    "fullRebuild": true,
-    "context": "global"
+    "indexType": "global",
+    "lastUpdated": "2025-04-02T19:28:00.431Z",
+    "documentCount": 38,
+    "tagCount": 56
   },
-  "index": {
-    "project": [
-      "01-project/README.json",
-      "01-project/project-overview.json"
-    ],
-    "documentation": [
-      "01-project/README.json",
-      "02-architecture/README.json",
-      "03-implementation/README.json",
-      "04-guides/README.json",
-      "04-guides/user-guide.json",
-      "05-testing/README.json",
-      "06-releases/README.json",
-      "07-infrastructure/README.json",
-      "08-i18n/README.json",
-      "09-refactoring/README.json",
-      "core/user-guide.json",
-      "meta/README.json",
-      "meta/consolidated-memory-bank-meta.json",
-      "meta/document-type-standards.json",
-      "meta/global-memory-bank-reference.json",
-      "tags/README.json"
-    ],
-    "guide": [
-      "01-project/README.json",
-      "02-architecture/README.json",
-      "03-implementation/README.json",
-      "04-guides/README.json",
-      "04-guides/migration-guide.json",
-      "04-guides/user-guide.json",
-      "05-testing/README.json",
-      "06-releases/README.json",
-      "07-infrastructure/README.json",
-      "08-i18n/README.json",
-      "08-i18n/template-system-usage.json",
-      "09-refactoring/README.json",
-      "core/navigation.json",
-      "core/user-guide.json",
-      "meta/README.json",
-      "meta/consolidated-memory-bank-meta.json",
-      "meta/global-memory-bank-navigation.json",
-      "meta/global-memory-bank-reference.json",
-      "tags/README.json",
-      "template-system-usage.json"
-    ],
-    "best-practices": [
-      "01-project/coding-standards.json",
-      "core/coding-standards.json"
-    ],
-    "typescript": [
-      "01-project/coding-standards.json",
-      "core/coding-standards.json"
-    ],
-    "clean-code": [
-      "01-project/coding-standards.json",
-      "core/coding-standards.json"
-    ],
-    "domain": [
-      "01-project/domain-models.json",
-      "core/domain-models.json"
-    ],
-    "models": [
-      "01-project/domain-models.json",
-      "core/domain-models.json"
-    ],
-    "architecture": [
-      "01-project/domain-models.json",
-      "02-architecture/README.json",
-      "02-architecture/architecture-decisions-details.json",
-      "02-architecture/architecture-decisions.json",
-      "02-architecture/architecture.json",
-      "02-architecture/consolidated-architecture.json",
-      "02-architecture/json-based-architecture-details.json",
-      "02-architecture/json-based-architecture.json",
-      "05-testing/e2e-to-integration-test-approach.json",
-      "06-releases/v2-design-decisions.json",
-      "core/architecture.json",
-      "core/domain-models.json",
-      "template-system.json"
-    ],
-    "json": [
-      "01-project/domain-models.json",
-      "02-architecture/architecture-decisions-details.json",
-      "02-architecture/architecture-decisions.json",
-      "02-architecture/consolidated-architecture.json",
-      "02-architecture/json-based-architecture-details.json",
-      "02-architecture/json-based-architecture.json",
-      "04-guides/migration-guide.json",
-      "04-guides/migration-policy.json",
-      "06-releases/v2-implementation-plan.json",
-      "08-i18n/template-system-json-i18n-design.json",
-      "core/domain-models.json"
-    ],
-    "document-model": [
-      "01-project/domain-models.json",
-      "core/domain-models.json"
-    ],
-    "glossary": [
-      "01-project/glossary.json",
-      "core/glossary.json"
-    ],
-    "terminology": [
-      "01-project/glossary.json",
-      "core/glossary.json"
-    ],
-    "definitions": [
-      "01-project/glossary.json",
-      "core/glossary.json"
-    ],
-    "overview": [
-      "01-project/project-overview.json"
-    ],
-    "v2": [
-      "01-project/project-overview.json",
-      "02-architecture/architecture-decisions-details.json",
-      "02-architecture/architecture-decisions.json",
-      "02-architecture/consolidated-architecture.json",
-      "02-architecture/json-based-architecture-details.json",
-      "02-architecture/json-based-architecture.json",
-      "03-implementation/read-context-command-design.json",
-      "03-implementation/read-context-command-implementation.json",
-      "06-releases/consolidated-v2-release.json",
-      "06-releases/release-v2.0.0.json",
-      "06-releases/v2-design-decisions.json",
-      "06-releases/v2-implementation-plan.json",
-      "08-i18n/template-system-json-i18n-design.json"
-    ],
-    "tech-stack": [
-      "01-project/tech-stack.json",
-      "core/tech-stack.json"
-    ],
-    "infrastructure": [
-      "01-project/tech-stack.json",
-      "07-infrastructure/README.json",
-      "core/tech-stack.json"
-    ],
-    "design": [
-      "02-architecture/README.json",
-      "02-architecture/consolidated-architecture.json",
-      "02-architecture/json-based-architecture-details.json",
-      "02-architecture/json-based-architecture.json",
-      "03-implementation/read-context-command-design.json",
-      "06-releases/v2-design-decisions.json",
-      "08-i18n/template-system-json-i18n-design.json",
-      "09-refactoring/json-global-design-issues.json"
-    ],
-    "decision": [
-      "02-architecture/architecture-decisions-details.json",
-      "02-architecture/architecture-decisions.json",
-      "02-architecture/consolidated-architecture.json",
-      "06-releases/v2-design-decisions.json"
-    ],
-    "refactoring": [
-      "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
-      "02-architecture/global-memory-bank-cleanup-strategy.json",
-      "09-refactoring/README.json",
-      "09-refactoring/json-global-design-issues.json",
-      "meta/global-memory-bank-index-analysis.json",
-      "meta/global-memory-bank-indexing-mechanism.json",
-      "meta/redundant-files-removal-plan.json",
-      "meta/reorganization-plan.json",
-      "meta/reorganization-summary.json"
-    ],
-    "memory-bank": [
-      "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
-      "02-architecture/global-memory-bank-cleanup-strategy.json",
-      "02-architecture/global-memory-bank-organized-analysis.json",
-      "07-infrastructure/ci-cd/memory-bank-errors.json",
-      "09-refactoring/analysis/global-memory-bank-analysis-raw.json",
-      "09-refactoring/json-global-design-issues.json",
-      "auto-initialization-fix.json",
-      "auto-initialization-test.json",
-      "initialization-behavior.json",
-      "meta/consolidated-memory-bank-meta.json",
-      "meta/global-memory-bank-index-analysis.json",
-      "meta/global-memory-bank-indexing-mechanism.json",
-      "meta/global-memory-bank-navigation.json",
-      "meta/global-memory-bank-reference.json",
-      "meta/redundant-files-removal-plan.json",
-      "meta/reorganization-plan.json",
-      "meta/reorganization-summary.json",
-      "tags/tag_categorization.json",
-      "tags/tag_index_update_plan.json"
-    ],
-    "plan": [
-      "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
-      "02-architecture/global-memory-bank-cleanup-strategy.json",
-      "06-releases/v2-implementation-plan.json",
-      "meta/redundant-files-removal-plan.json",
-      "meta/reorganization-plan.json",
-      "tags/tag_index_update_plan.json"
-    ],
-    "meta": [
-      "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
-      "02-architecture/global-memory-bank-cleanup-strategy.json",
-      "02-architecture/global-memory-bank-organized-analysis.json",
-      "09-refactoring/analysis/global-memory-bank-analysis-raw.json",
-      "core/navigation.json",
-      "meta/README.json",
-      "meta/consolidated-memory-bank-meta.json",
-      "meta/document-type-standards.json",
-      "meta/global-memory-bank-navigation.json",
-      "meta/redundant-files-removal-plan.json",
-      "meta/reorganization-plan.json",
-      "meta/reorganization-summary.json",
-      "tags/README.json",
-      "tags/tag_categorization.json",
-      "tags/tag_index_update_plan.json"
-    ],
-    "organization": [
-      "02-architecture/global-memory-bank-cleanup-implementation-plan.json",
-      "02-architecture/global-memory-bank-cleanup-strategy.json",
-      "02-architecture/global-memory-bank-organized-analysis.json"
-    ],
-    "analysis": [
-      "02-architecture/global-memory-bank-organized-analysis.json",
-      "09-refactoring/analysis/global-memory-bank-analysis-raw.json",
-      "meta/consolidated-memory-bank-meta.json",
-      "meta/global-memory-bank-index-analysis.json",
-      "meta/global-memory-bank-indexing-mechanism.json"
-    ],
-    "implementation": [
-      "03-implementation/README.json",
-      "03-implementation/read-context-command-implementation.json",
-      "05-testing/e2e-test-implementation.json",
-      "06-releases/consolidated-v2-release.json",
-      "06-releases/v2-implementation-plan.json"
-    ],
-    "cli": [
-      "03-implementation/cli-commands.json",
-      "05-testing/e2e-test-implementation.json"
-    ],
-    "reference": [
-      "03-implementation/cli-commands.json",
-      "meta/consolidated-memory-bank-meta.json",
-      "meta/document-type-standards.json",
-      "meta/global-memory-bank-reference.json",
-      "tags/tag_categorization.json"
-    ],
-    "mcp": [
-      "03-implementation/read-context-command-design.json",
-      "03-implementation/read-context-command-implementation.json"
-    ],
-    "command": [
-      "03-implementation/read-context-command-design.json",
-      "03-implementation/read-context-command-implementation.json"
-    ],
-    "context": [
-      "03-implementation/read-context-command-design.json",
-      "03-implementation/read-context-command-implementation.json"
-    ],
-    "migration": [
-      "04-guides/migration-guide.json",
-      "04-guides/migration-policy.json"
-    ],
-    "markdown": [
-      "04-guides/migration-guide.json",
-      "04-guides/migration-policy.json"
-    ],
-    "policy": [
-      "04-guides/migration-policy.json"
-    ],
-    "testing": [
-      "05-testing/README.json",
-      "05-testing/consolidated-test-strategy.json",
-      "05-testing/e2e-test-implementation.json",
-      "05-testing/e2e-to-integration-test-approach.json",
-      "05-testing/integration-test-details.json",
-      "05-testing/tag-search-system-test-plan.json"
-    ],
-    "e2e": [
-      "05-testing/consolidated-test-strategy.json",
-      "05-testing/e2e-test-implementation.json"
-    ],
-    "integration-test": [
-      "05-testing/consolidated-test-strategy.json",
-      "05-testing/e2e-to-integration-test-approach.json",
-      "05-testing/integration-test-details.json",
-      "09-refactoring/json-global-design-issues.json"
-    ],
-    "tdd": [
-      "05-testing/consolidated-test-strategy.json",
-      "05-testing/integration-test-details.json"
-    ],
-    "qa": [
-      "05-testing/consolidated-test-strategy.json",
-      "05-testing/integration-test-details.json"
-    ],
-    "controller": [
-      "05-testing/integration-test-details.json"
-    ],
-    "tag-system": [
-      "05-testing/tag-search-system-test-plan.json"
-    ],
-    "search": [
-      "05-testing/tag-search-system-test-plan.json"
-    ],
-    "index": [
-      "05-testing/tag-search-system-test-plan.json",
-      "meta/consolidated-memory-bank-meta.json",
-      "meta/global-memory-bank-indexing-mechanism.json",
-      "tags/README.json",
-      "tags/tag_categorization.json",
-      "tags/tag_index_update_plan.json"
-    ],
-    "implementation-plan": [
-      "05-testing/tag-search-system-test-plan.json"
-    ],
-    "release": [
-      "06-releases/README.json",
-      "06-releases/consolidated-v2-release.json",
-      "06-releases/release-v2.0.0.json",
-      "06-releases/v2.1.0-release-plan.json"
-    ],
-    "version": [
-      "06-releases/README.json"
-    ],
-    "planning": [
-      "06-releases/consolidated-v2-release.json",
-      "06-releases/v2.1.0-release-plan.json"
-    ],
-    "changelog": [
-      "06-releases/consolidated-v2-release.json",
-      "06-releases/release-v2.0.0.json",
-      "meta/reorganization-summary.json"
-    ],
-    "pr": [
-      "06-releases/release-v2.0.0.json"
-    ],
-    "v2-1-0": [
-      "06-releases/v2.1.0-release-plan.json"
-    ],
-    "json-migration": [
-      "06-releases/v2.1.0-release-plan.json"
-    ],
-    "operations": [
-      "07-infrastructure/README.json"
-    ],
-    "troubleshooting": [
-      "07-infrastructure/ci-cd/memory-bank-errors.json"
-    ],
-    "ci-cd": [
-      "07-infrastructure/ci-cd/workflows.json"
-    ],
-    "i18n": [
-      "08-i18n/README.json",
-      "08-i18n/template-system-json-i18n-design.json",
-      "08-i18n/template-system-usage.json",
-      "08-i18n/template-system.json",
-      "template-system-usage.json",
-      "template-system.json"
-    ],
-    "l10n": [
-      "08-i18n/README.json",
-      "08-i18n/template-system-json-i18n-design.json"
-    ],
-    "template": [
-      "08-i18n/template-system-json-i18n-design.json",
-      "08-i18n/template-system-usage.json",
-      "08-i18n/template-system.json"
-    ],
-    "internationalization": [
-      "08-i18n/template-system-usage.json",
-      "08-i18n/template-system.json"
-    ],
-    "tech-debt": [
-      "09-refactoring/README.json",
-      "09-refactoring/json-global-design-issues.json",
-      "meta/global-memory-bank-index-analysis.json",
-      "meta/global-memory-bank-indexing-mechanism.json"
-    ],
-    "raw-data": [
-      "09-refactoring/analysis/global-memory-bank-analysis-raw.json"
-    ],
-    "fix": [
-      "auto-initialization-fix.json"
-    ],
-    "auto-initialization": [
-      "auto-initialization-fix.json",
-      "auto-initialization-test.json"
-    ],
-    "test": [
-      "auto-initialization-test.json"
-    ],
-    "system-design": [
-      "core/architecture.json"
-    ],
-    "core": [
-      "core/architecture.json",
-      "core/coding-standards.json",
-      "core/domain-models.json",
-      "core/glossary.json",
-      "core/navigation.json",
-      "core/tech-stack.json",
-      "core/user-guide.json"
-    ],
-    "standards": [
-      "core/coding-standards.json",
-      "meta/document-type-standards.json"
-    ],
-    "navigation": [
-      "core/navigation.json",
-      "meta/consolidated-memory-bank-meta.json",
-      "meta/global-memory-bank-navigation.json"
-    ],
-    "initialization": [
-      "initialization-behavior.json"
-    ],
-    "behavior": [
-      "initialization-behavior.json"
-    ],
-    "tag": [
-      "meta/consolidated-memory-bank-meta.json",
-      "meta/global-memory-bank-indexing-mechanism.json",
-      "tags/README.json",
-      "tags/tag_categorization.json",
-      "tags/tag_index_update_plan.json"
-    ],
-    "templates": [
-      "template-system-usage.json",
-      "template-system.json"
-    ],
-    "usage": [
-      "template-system-usage.json"
-    ]
-  }
+  "index": [
+    {
+      "tag": "project",
+      "documents": [
+        {
+          "id": "project-directory-readme",
+          "path": "01-project/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.366Z"
+        },
+        {
+          "id": "project-overview-001",
+          "path": "01-project/project-overview.json",
+          "title": "project-overview.json",
+          "lastModified": "2025-04-02T15:24:18.366Z"
+        }
+      ]
+    },
+    {
+      "tag": "documentation",
+      "documents": [
+        {
+          "id": "project-directory-readme",
+          "path": "01-project/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.366Z"
+        },
+        {
+          "id": "architecture-directory-readme",
+          "path": "02-architecture/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.366Z"
+        },
+        {
+          "id": "implementation-directory-readme",
+          "path": "03-implementation/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.367Z"
+        },
+        {
+          "id": "guides-directory-readme",
+          "path": "04-guides/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.367Z"
+        },
+        {
+          "id": "testing-directory-readme",
+          "path": "05-testing/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.367Z"
+        },
+        {
+          "id": "releases-directory-readme",
+          "path": "06-releases/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        },
+        {
+          "id": "release-v2.2.0",
+          "path": "06-releases/release-v2.2.0.json",
+          "title": "release-v2.2.0.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        },
+        {
+          "id": "infrastructure-directory-readme",
+          "path": "07-infrastructure/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.369Z"
+        },
+        {
+          "id": "i18n-directory-readme",
+          "path": "08-i18n/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.369Z"
+        },
+        {
+          "id": "refactoring-directory-readme",
+          "path": "09-refactoring/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.369Z"
+        },
+        {
+          "id": "meta-directory-readme",
+          "path": "meta/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        },
+        {
+          "id": "consolidated-memory-bank-meta",
+          "path": "meta/consolidated-memory-bank-meta.json",
+          "title": "consolidated-memory-bank-meta.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        },
+        {
+          "id": "document-type-standards",
+          "path": "meta/document-type-standards.json",
+          "title": "document-type-standards.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        },
+        {
+          "id": "tags-directory-readme",
+          "path": "tags/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.371Z"
+        }
+      ]
+    },
+    {
+      "tag": "guide",
+      "documents": [
+        {
+          "id": "project-directory-readme",
+          "path": "01-project/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.366Z"
+        },
+        {
+          "id": "architecture-directory-readme",
+          "path": "02-architecture/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.366Z"
+        },
+        {
+          "id": "implementation-directory-readme",
+          "path": "03-implementation/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.367Z"
+        },
+        {
+          "id": "guides-directory-readme",
+          "path": "04-guides/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.367Z"
+        },
+        {
+          "id": "testing-directory-readme",
+          "path": "05-testing/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.367Z"
+        },
+        {
+          "id": "releases-directory-readme",
+          "path": "06-releases/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        },
+        {
+          "id": "infrastructure-directory-readme",
+          "path": "07-infrastructure/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.369Z"
+        },
+        {
+          "id": "i18n-directory-readme",
+          "path": "08-i18n/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.369Z"
+        },
+        {
+          "id": "refactoring-directory-readme",
+          "path": "09-refactoring/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.369Z"
+        },
+        {
+          "id": "mcp-tool-manual-en",
+          "path": "core/mcp-tool-manual.json",
+          "title": "mcp-tool-manual.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        },
+        {
+          "id": "meta-directory-readme",
+          "path": "meta/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        },
+        {
+          "id": "consolidated-memory-bank-meta",
+          "path": "meta/consolidated-memory-bank-meta.json",
+          "title": "consolidated-memory-bank-meta.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        },
+        {
+          "id": "tags-directory-readme",
+          "path": "tags/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.371Z"
+        }
+      ]
+    },
+    {
+      "tag": "best-practices",
+      "documents": [
+        {
+          "id": "d7ca88d8-814d-4ce5-9111-fa084d848538",
+          "path": "01-project/coding-standards.json",
+          "title": "coding-standards.json",
+          "lastModified": "2025-04-02T15:24:18.366Z"
+        },
+        {
+          "id": "core-coding-standards",
+          "path": "core/coding-standards.json",
+          "title": "coding-standards.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        }
+      ]
+    },
+    {
+      "tag": "typescript",
+      "documents": [
+        {
+          "id": "d7ca88d8-814d-4ce5-9111-fa084d848538",
+          "path": "01-project/coding-standards.json",
+          "title": "coding-standards.json",
+          "lastModified": "2025-04-02T15:24:18.366Z"
+        },
+        {
+          "id": "core-coding-standards",
+          "path": "core/coding-standards.json",
+          "title": "coding-standards.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        }
+      ]
+    },
+    {
+      "tag": "clean-code",
+      "documents": [
+        {
+          "id": "d7ca88d8-814d-4ce5-9111-fa084d848538",
+          "path": "01-project/coding-standards.json",
+          "title": "coding-standards.json",
+          "lastModified": "2025-04-02T15:24:18.366Z"
+        },
+        {
+          "id": "core-coding-standards",
+          "path": "core/coding-standards.json",
+          "title": "coding-standards.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        }
+      ]
+    },
+    {
+      "tag": "overview",
+      "documents": [
+        {
+          "id": "project-overview-001",
+          "path": "01-project/project-overview.json",
+          "title": "project-overview.json",
+          "lastModified": "2025-04-02T15:24:18.366Z"
+        }
+      ]
+    },
+    {
+      "tag": "v2",
+      "documents": [
+        {
+          "id": "project-overview-001",
+          "path": "01-project/project-overview.json",
+          "title": "project-overview.json",
+          "lastModified": "2025-04-02T15:24:18.366Z"
+        },
+        {
+          "id": "consolidated-architecture",
+          "path": "02-architecture/consolidated-architecture.json",
+          "title": "consolidated-architecture.json",
+          "lastModified": "2025-04-02T15:24:18.366Z"
+        },
+        {
+          "id": "091714da-0ab2-4f29-9003-9612292a8550",
+          "path": "03-implementation/read-context-command-design.json",
+          "title": "read-context-command-design.json",
+          "lastModified": "2025-04-02T15:24:18.367Z"
+        },
+        {
+          "id": "43e6cf1c-8bd9-40be-813d-ce72566cb625",
+          "path": "03-implementation/read-context-command-implementation.json",
+          "title": "read-context-command-implementation.json",
+          "lastModified": "2025-04-02T15:24:18.367Z"
+        },
+        {
+          "id": "consolidated-v2-release",
+          "path": "06-releases/consolidated-v2-release.json",
+          "title": "consolidated-v2-release.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        },
+        {
+          "id": "release-v2.0.0-001",
+          "path": "06-releases/release-v2.0.0.json",
+          "title": "release-v2.0.0.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        },
+        {
+          "id": "v2.0-design-decisions-001",
+          "path": "06-releases/v2-design-decisions.json",
+          "title": "v2-design-decisions.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        },
+        {
+          "id": "46a1d5d8-e99d-4242-a3b3-bdfbf097f017",
+          "path": "06-releases/v2-implementation-plan.json",
+          "title": "v2-implementation-plan.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        }
+      ]
+    },
+    {
+      "tag": "tech-stack",
+      "documents": [
+        {
+          "id": "57332794-aae1-43f2-9bf6-0ecdd06ff246",
+          "path": "01-project/tech-stack.json",
+          "title": "tech-stack.json",
+          "lastModified": "2025-04-02T15:24:18.366Z"
+        }
+      ]
+    },
+    {
+      "tag": "infrastructure",
+      "documents": [
+        {
+          "id": "57332794-aae1-43f2-9bf6-0ecdd06ff246",
+          "path": "01-project/tech-stack.json",
+          "title": "tech-stack.json",
+          "lastModified": "2025-04-02T15:24:18.366Z"
+        },
+        {
+          "id": "infrastructure-directory-readme",
+          "path": "07-infrastructure/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.369Z"
+        }
+      ]
+    },
+    {
+      "tag": "architecture",
+      "documents": [
+        {
+          "id": "architecture-directory-readme",
+          "path": "02-architecture/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.366Z"
+        },
+        {
+          "id": "consolidated-architecture",
+          "path": "02-architecture/consolidated-architecture.json",
+          "title": "consolidated-architecture.json",
+          "lastModified": "2025-04-02T15:24:18.366Z"
+        },
+        {
+          "id": "v2.0-design-decisions-001",
+          "path": "06-releases/v2-design-decisions.json",
+          "title": "v2-design-decisions.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        },
+        {
+          "id": "core-architecture",
+          "path": "core/architecture.json",
+          "title": "architecture.json",
+          "lastModified": "2025-04-02T15:24:18.369Z"
+        }
+      ]
+    },
+    {
+      "tag": "design",
+      "documents": [
+        {
+          "id": "architecture-directory-readme",
+          "path": "02-architecture/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.366Z"
+        },
+        {
+          "id": "consolidated-architecture",
+          "path": "02-architecture/consolidated-architecture.json",
+          "title": "consolidated-architecture.json",
+          "lastModified": "2025-04-02T15:24:18.366Z"
+        },
+        {
+          "id": "091714da-0ab2-4f29-9003-9612292a8550",
+          "path": "03-implementation/read-context-command-design.json",
+          "title": "read-context-command-design.json",
+          "lastModified": "2025-04-02T15:24:18.367Z"
+        },
+        {
+          "id": "v2.0-design-decisions-001",
+          "path": "06-releases/v2-design-decisions.json",
+          "title": "v2-design-decisions.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        },
+        {
+          "path": "09-refactoring/json-global-design-issues.json",
+          "title": "json-global-design-issues.json",
+          "lastModified": "2025-04-02T15:24:18.369Z"
+        }
+      ]
+    },
+    {
+      "tag": "decision",
+      "documents": [
+        {
+          "id": "consolidated-architecture",
+          "path": "02-architecture/consolidated-architecture.json",
+          "title": "consolidated-architecture.json",
+          "lastModified": "2025-04-02T15:24:18.366Z"
+        },
+        {
+          "id": "v2.0-design-decisions-001",
+          "path": "06-releases/v2-design-decisions.json",
+          "title": "v2-design-decisions.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        }
+      ]
+    },
+    {
+      "tag": "json",
+      "documents": [
+        {
+          "id": "consolidated-architecture",
+          "path": "02-architecture/consolidated-architecture.json",
+          "title": "consolidated-architecture.json",
+          "lastModified": "2025-04-02T15:24:18.366Z"
+        },
+        {
+          "id": "46a1d5d8-e99d-4242-a3b3-bdfbf097f017",
+          "path": "06-releases/v2-implementation-plan.json",
+          "title": "v2-implementation-plan.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        }
+      ]
+    },
+    {
+      "tag": "analysis",
+      "documents": [
+        {
+          "id": "global-memory-bank-organized-analysis",
+          "path": "02-architecture/global-memory-bank-organized-analysis.json",
+          "title": "global-memory-bank-organized-analysis.json",
+          "lastModified": "2025-04-02T15:24:18.367Z"
+        },
+        {
+          "id": "consolidated-memory-bank-meta",
+          "path": "meta/consolidated-memory-bank-meta.json",
+          "title": "consolidated-memory-bank-meta.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        }
+      ]
+    },
+    {
+      "tag": "memory-bank",
+      "documents": [
+        {
+          "id": "global-memory-bank-organized-analysis",
+          "path": "02-architecture/global-memory-bank-organized-analysis.json",
+          "title": "global-memory-bank-organized-analysis.json",
+          "lastModified": "2025-04-02T15:24:18.367Z"
+        },
+        {
+          "id": "293e958d-fca2-4005-97e4-bd2c0a5d99f9",
+          "path": "07-infrastructure/ci-cd/memory-bank-errors.json",
+          "title": "memory-bank-errors.json",
+          "lastModified": "2025-04-02T15:24:18.369Z"
+        },
+        {
+          "path": "09-refactoring/json-global-design-issues.json",
+          "title": "json-global-design-issues.json",
+          "lastModified": "2025-04-02T15:24:18.369Z"
+        },
+        {
+          "id": "consolidated-memory-bank-meta",
+          "path": "meta/consolidated-memory-bank-meta.json",
+          "title": "consolidated-memory-bank-meta.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        },
+        {
+          "id": "tag-categorization",
+          "path": "tags/tag_categorization.json",
+          "title": "tag_categorization.json",
+          "lastModified": "2025-04-02T15:24:18.371Z"
+        },
+        {
+          "id": "tag-index-update-plan",
+          "path": "tags/tag_index_update_plan.json",
+          "title": "tag_index_update_plan.json",
+          "lastModified": "2025-04-02T15:24:18.371Z"
+        }
+      ]
+    },
+    {
+      "tag": "organization",
+      "documents": [
+        {
+          "id": "global-memory-bank-organized-analysis",
+          "path": "02-architecture/global-memory-bank-organized-analysis.json",
+          "title": "global-memory-bank-organized-analysis.json",
+          "lastModified": "2025-04-02T15:24:18.367Z"
+        }
+      ]
+    },
+    {
+      "tag": "meta",
+      "documents": [
+        {
+          "id": "global-memory-bank-organized-analysis",
+          "path": "02-architecture/global-memory-bank-organized-analysis.json",
+          "title": "global-memory-bank-organized-analysis.json",
+          "lastModified": "2025-04-02T15:24:18.367Z"
+        },
+        {
+          "id": "meta-directory-readme",
+          "path": "meta/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        },
+        {
+          "id": "consolidated-memory-bank-meta",
+          "path": "meta/consolidated-memory-bank-meta.json",
+          "title": "consolidated-memory-bank-meta.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        },
+        {
+          "id": "document-type-standards",
+          "path": "meta/document-type-standards.json",
+          "title": "document-type-standards.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        },
+        {
+          "id": "tags-directory-readme",
+          "path": "tags/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.371Z"
+        },
+        {
+          "id": "tags-index",
+          "path": "tags/index.json",
+          "title": "index.json",
+          "lastModified": "2025-04-02T19:28:00.415Z"
+        },
+        {
+          "id": "tag-categorization",
+          "path": "tags/tag_categorization.json",
+          "title": "tag_categorization.json",
+          "lastModified": "2025-04-02T15:24:18.371Z"
+        },
+        {
+          "id": "tag-index-update-plan",
+          "path": "tags/tag_index_update_plan.json",
+          "title": "tag_index_update_plan.json",
+          "lastModified": "2025-04-02T15:24:18.371Z"
+        }
+      ]
+    },
+    {
+      "tag": "implementation",
+      "documents": [
+        {
+          "id": "implementation-directory-readme",
+          "path": "03-implementation/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.367Z"
+        },
+        {
+          "id": "43e6cf1c-8bd9-40be-813d-ce72566cb625",
+          "path": "03-implementation/read-context-command-implementation.json",
+          "title": "read-context-command-implementation.json",
+          "lastModified": "2025-04-02T15:24:18.367Z"
+        },
+        {
+          "id": "consolidated-v2-release",
+          "path": "06-releases/consolidated-v2-release.json",
+          "title": "consolidated-v2-release.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        },
+        {
+          "id": "46a1d5d8-e99d-4242-a3b3-bdfbf097f017",
+          "path": "06-releases/v2-implementation-plan.json",
+          "title": "v2-implementation-plan.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        }
+      ]
+    },
+    {
+      "tag": "mcp",
+      "documents": [
+        {
+          "id": "091714da-0ab2-4f29-9003-9612292a8550",
+          "path": "03-implementation/read-context-command-design.json",
+          "title": "read-context-command-design.json",
+          "lastModified": "2025-04-02T15:24:18.367Z"
+        },
+        {
+          "id": "43e6cf1c-8bd9-40be-813d-ce72566cb625",
+          "path": "03-implementation/read-context-command-implementation.json",
+          "title": "read-context-command-implementation.json",
+          "lastModified": "2025-04-02T15:24:18.367Z"
+        },
+        {
+          "id": "mcp-tool-manual-en",
+          "path": "core/mcp-tool-manual.json",
+          "title": "mcp-tool-manual.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        }
+      ]
+    },
+    {
+      "tag": "command",
+      "documents": [
+        {
+          "id": "091714da-0ab2-4f29-9003-9612292a8550",
+          "path": "03-implementation/read-context-command-design.json",
+          "title": "read-context-command-design.json",
+          "lastModified": "2025-04-02T15:24:18.367Z"
+        },
+        {
+          "id": "43e6cf1c-8bd9-40be-813d-ce72566cb625",
+          "path": "03-implementation/read-context-command-implementation.json",
+          "title": "read-context-command-implementation.json",
+          "lastModified": "2025-04-02T15:24:18.367Z"
+        }
+      ]
+    },
+    {
+      "tag": "context",
+      "documents": [
+        {
+          "id": "091714da-0ab2-4f29-9003-9612292a8550",
+          "path": "03-implementation/read-context-command-design.json",
+          "title": "read-context-command-design.json",
+          "lastModified": "2025-04-02T15:24:18.367Z"
+        },
+        {
+          "id": "43e6cf1c-8bd9-40be-813d-ce72566cb625",
+          "path": "03-implementation/read-context-command-implementation.json",
+          "title": "read-context-command-implementation.json",
+          "lastModified": "2025-04-02T15:24:18.367Z"
+        }
+      ]
+    },
+    {
+      "tag": "testing",
+      "documents": [
+        {
+          "id": "testing-directory-readme",
+          "path": "05-testing/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.367Z"
+        },
+        {
+          "id": "consolidated-test-strategy",
+          "path": "05-testing/consolidated-test-strategy.json",
+          "title": "consolidated-test-strategy.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        }
+      ]
+    },
+    {
+      "tag": "e2e",
+      "documents": [
+        {
+          "id": "consolidated-test-strategy",
+          "path": "05-testing/consolidated-test-strategy.json",
+          "title": "consolidated-test-strategy.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        }
+      ]
+    },
+    {
+      "tag": "integration-test",
+      "documents": [
+        {
+          "id": "consolidated-test-strategy",
+          "path": "05-testing/consolidated-test-strategy.json",
+          "title": "consolidated-test-strategy.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        },
+        {
+          "path": "09-refactoring/json-global-design-issues.json",
+          "title": "json-global-design-issues.json",
+          "lastModified": "2025-04-02T15:24:18.369Z"
+        }
+      ]
+    },
+    {
+      "tag": "tdd",
+      "documents": [
+        {
+          "id": "consolidated-test-strategy",
+          "path": "05-testing/consolidated-test-strategy.json",
+          "title": "consolidated-test-strategy.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        }
+      ]
+    },
+    {
+      "tag": "qa",
+      "documents": [
+        {
+          "id": "consolidated-test-strategy",
+          "path": "05-testing/consolidated-test-strategy.json",
+          "title": "consolidated-test-strategy.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        }
+      ]
+    },
+    {
+      "tag": "release",
+      "documents": [
+        {
+          "id": "releases-directory-readme",
+          "path": "06-releases/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        },
+        {
+          "id": "consolidated-v2-release",
+          "path": "06-releases/consolidated-v2-release.json",
+          "title": "consolidated-v2-release.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        },
+        {
+          "id": "release-v2.0.0-001",
+          "path": "06-releases/release-v2.0.0.json",
+          "title": "release-v2.0.0.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        },
+        {
+          "id": "release-v2.2.0",
+          "path": "06-releases/release-v2.2.0.json",
+          "title": "release-v2.2.0.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        },
+        {
+          "id": "a9c7b8d6-e5f4-4c3d-b2a1-0f9e8d7c6b5a",
+          "path": "06-releases/v2.1.0-release-plan.json",
+          "title": "v2.1.0-release-plan.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        }
+      ]
+    },
+    {
+      "tag": "version",
+      "documents": [
+        {
+          "id": "releases-directory-readme",
+          "path": "06-releases/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        }
+      ]
+    },
+    {
+      "tag": "planning",
+      "documents": [
+        {
+          "id": "consolidated-v2-release",
+          "path": "06-releases/consolidated-v2-release.json",
+          "title": "consolidated-v2-release.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        },
+        {
+          "id": "a9c7b8d6-e5f4-4c3d-b2a1-0f9e8d7c6b5a",
+          "path": "06-releases/v2.1.0-release-plan.json",
+          "title": "v2.1.0-release-plan.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        }
+      ]
+    },
+    {
+      "tag": "changelog",
+      "documents": [
+        {
+          "id": "consolidated-v2-release",
+          "path": "06-releases/consolidated-v2-release.json",
+          "title": "consolidated-v2-release.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        },
+        {
+          "id": "release-v2.0.0-001",
+          "path": "06-releases/release-v2.0.0.json",
+          "title": "release-v2.0.0.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        }
+      ]
+    },
+    {
+      "tag": "pr",
+      "documents": [
+        {
+          "id": "release-v2.0.0-001",
+          "path": "06-releases/release-v2.0.0.json",
+          "title": "release-v2.0.0.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        }
+      ]
+    },
+    {
+      "tag": "v2-2-0",
+      "documents": [
+        {
+          "id": "release-v2.2.0",
+          "path": "06-releases/release-v2.2.0.json",
+          "title": "release-v2.2.0.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        }
+      ]
+    },
+    {
+      "tag": "json-patch",
+      "documents": [
+        {
+          "id": "release-v2.2.0",
+          "path": "06-releases/release-v2.2.0.json",
+          "title": "release-v2.2.0.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        }
+      ]
+    },
+    {
+      "tag": "plan",
+      "documents": [
+        {
+          "id": "46a1d5d8-e99d-4242-a3b3-bdfbf097f017",
+          "path": "06-releases/v2-implementation-plan.json",
+          "title": "v2-implementation-plan.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        },
+        {
+          "id": "tag-index-update-plan",
+          "path": "tags/tag_index_update_plan.json",
+          "title": "tag_index_update_plan.json",
+          "lastModified": "2025-04-02T15:24:18.371Z"
+        }
+      ]
+    },
+    {
+      "tag": "v2-1-0",
+      "documents": [
+        {
+          "id": "a9c7b8d6-e5f4-4c3d-b2a1-0f9e8d7c6b5a",
+          "path": "06-releases/v2.1.0-release-plan.json",
+          "title": "v2.1.0-release-plan.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        }
+      ]
+    },
+    {
+      "tag": "json-migration",
+      "documents": [
+        {
+          "id": "a9c7b8d6-e5f4-4c3d-b2a1-0f9e8d7c6b5a",
+          "path": "06-releases/v2.1.0-release-plan.json",
+          "title": "v2.1.0-release-plan.json",
+          "lastModified": "2025-04-02T15:24:18.368Z"
+        }
+      ]
+    },
+    {
+      "tag": "operations",
+      "documents": [
+        {
+          "id": "infrastructure-directory-readme",
+          "path": "07-infrastructure/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.369Z"
+        }
+      ]
+    },
+    {
+      "tag": "troubleshooting",
+      "documents": [
+        {
+          "id": "293e958d-fca2-4005-97e4-bd2c0a5d99f9",
+          "path": "07-infrastructure/ci-cd/memory-bank-errors.json",
+          "title": "memory-bank-errors.json",
+          "lastModified": "2025-04-02T15:24:18.369Z"
+        }
+      ]
+    },
+    {
+      "tag": "ci-cd",
+      "documents": [
+        {
+          "id": "c2beb74f-caa1-43dd-9ed8-f3201c3c9864",
+          "path": "07-infrastructure/ci-cd/workflows.json",
+          "title": "workflows.json",
+          "lastModified": "2025-04-02T15:24:18.369Z"
+        }
+      ]
+    },
+    {
+      "tag": "i18n",
+      "documents": [
+        {
+          "id": "i18n-directory-readme",
+          "path": "08-i18n/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.369Z"
+        }
+      ]
+    },
+    {
+      "tag": "l10n",
+      "documents": [
+        {
+          "id": "i18n-directory-readme",
+          "path": "08-i18n/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.369Z"
+        }
+      ]
+    },
+    {
+      "tag": "refactoring",
+      "documents": [
+        {
+          "id": "refactoring-directory-readme",
+          "path": "09-refactoring/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.369Z"
+        },
+        {
+          "path": "09-refactoring/json-global-design-issues.json",
+          "title": "json-global-design-issues.json",
+          "lastModified": "2025-04-02T15:24:18.369Z"
+        }
+      ]
+    },
+    {
+      "tag": "tech-debt",
+      "documents": [
+        {
+          "id": "refactoring-directory-readme",
+          "path": "09-refactoring/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.369Z"
+        },
+        {
+          "path": "09-refactoring/json-global-design-issues.json",
+          "title": "json-global-design-issues.json",
+          "lastModified": "2025-04-02T15:24:18.369Z"
+        }
+      ]
+    },
+    {
+      "tag": "system-design",
+      "documents": [
+        {
+          "id": "core-architecture",
+          "path": "core/architecture.json",
+          "title": "architecture.json",
+          "lastModified": "2025-04-02T15:24:18.369Z"
+        }
+      ]
+    },
+    {
+      "tag": "core",
+      "documents": [
+        {
+          "id": "core-architecture",
+          "path": "core/architecture.json",
+          "title": "architecture.json",
+          "lastModified": "2025-04-02T15:24:18.369Z"
+        },
+        {
+          "id": "core-coding-standards",
+          "path": "core/coding-standards.json",
+          "title": "coding-standards.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        },
+        {
+          "id": "core-glossary",
+          "path": "core/glossary.json",
+          "title": "glossary.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        },
+        {
+          "id": "mcp-tool-manual-en",
+          "path": "core/mcp-tool-manual.json",
+          "title": "mcp-tool-manual.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        }
+      ]
+    },
+    {
+      "tag": "standards",
+      "documents": [
+        {
+          "id": "core-coding-standards",
+          "path": "core/coding-standards.json",
+          "title": "coding-standards.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        },
+        {
+          "id": "document-type-standards",
+          "path": "meta/document-type-standards.json",
+          "title": "document-type-standards.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        }
+      ]
+    },
+    {
+      "tag": "glossary",
+      "documents": [
+        {
+          "id": "core-glossary",
+          "path": "core/glossary.json",
+          "title": "glossary.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        }
+      ]
+    },
+    {
+      "tag": "terminology",
+      "documents": [
+        {
+          "id": "core-glossary",
+          "path": "core/glossary.json",
+          "title": "glossary.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        }
+      ]
+    },
+    {
+      "tag": "definitions",
+      "documents": [
+        {
+          "id": "core-glossary",
+          "path": "core/glossary.json",
+          "title": "glossary.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        }
+      ]
+    },
+    {
+      "tag": "manual",
+      "documents": [
+        {
+          "id": "mcp-tool-manual-en",
+          "path": "core/mcp-tool-manual.json",
+          "title": "mcp-tool-manual.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        }
+      ]
+    },
+    {
+      "tag": "en",
+      "documents": [
+        {
+          "id": "mcp-tool-manual-en",
+          "path": "core/mcp-tool-manual.json",
+          "title": "mcp-tool-manual.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        }
+      ]
+    },
+    {
+      "tag": "navigation",
+      "documents": [
+        {
+          "id": "consolidated-memory-bank-meta",
+          "path": "meta/consolidated-memory-bank-meta.json",
+          "title": "consolidated-memory-bank-meta.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        }
+      ]
+    },
+    {
+      "tag": "reference",
+      "documents": [
+        {
+          "id": "consolidated-memory-bank-meta",
+          "path": "meta/consolidated-memory-bank-meta.json",
+          "title": "consolidated-memory-bank-meta.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        },
+        {
+          "id": "document-type-standards",
+          "path": "meta/document-type-standards.json",
+          "title": "document-type-standards.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        },
+        {
+          "id": "tag-categorization",
+          "path": "tags/tag_categorization.json",
+          "title": "tag_categorization.json",
+          "lastModified": "2025-04-02T15:24:18.371Z"
+        }
+      ]
+    },
+    {
+      "tag": "index",
+      "documents": [
+        {
+          "id": "consolidated-memory-bank-meta",
+          "path": "meta/consolidated-memory-bank-meta.json",
+          "title": "consolidated-memory-bank-meta.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        },
+        {
+          "id": "tags-directory-readme",
+          "path": "tags/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.371Z"
+        },
+        {
+          "id": "tags-index",
+          "path": "tags/index.json",
+          "title": "index.json",
+          "lastModified": "2025-04-02T19:28:00.415Z"
+        },
+        {
+          "id": "tag-categorization",
+          "path": "tags/tag_categorization.json",
+          "title": "tag_categorization.json",
+          "lastModified": "2025-04-02T15:24:18.371Z"
+        },
+        {
+          "id": "tag-index-update-plan",
+          "path": "tags/tag_index_update_plan.json",
+          "title": "tag_index_update_plan.json",
+          "lastModified": "2025-04-02T15:24:18.371Z"
+        }
+      ]
+    },
+    {
+      "tag": "tag",
+      "documents": [
+        {
+          "id": "consolidated-memory-bank-meta",
+          "path": "meta/consolidated-memory-bank-meta.json",
+          "title": "consolidated-memory-bank-meta.json",
+          "lastModified": "2025-04-02T15:24:18.370Z"
+        },
+        {
+          "id": "tags-directory-readme",
+          "path": "tags/README.json",
+          "title": "README.json",
+          "lastModified": "2025-04-02T15:24:18.371Z"
+        },
+        {
+          "id": "tag-categorization",
+          "path": "tags/tag_categorization.json",
+          "title": "tag_categorization.json",
+          "lastModified": "2025-04-02T15:24:18.371Z"
+        },
+        {
+          "id": "tag-index-update-plan",
+          "path": "tags/tag_index_update_plan.json",
+          "title": "tag_index_update_plan.json",
+          "lastModified": "2025-04-02T15:24:18.371Z"
+        }
+      ]
+    }
+  ]
 }

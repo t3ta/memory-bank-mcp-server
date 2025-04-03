@@ -1,0 +1,50 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "fix-issue-75-progress",
+    "title": "Issue #75 修正 & 仕様統一 作業進捗",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "createdAt": "placeholder",
+    "lastModified": "placeholder"
+  },
+  "content": {
+    "issue": {
+      "number": 75,
+      "title": "[Bug] write_global_memory_bank with patches fails with empty string content",
+      "url": "https://github.com/t3ta/memory-bank-mcp-server/issues/75"
+    },
+    "status": "planning_completed",
+    "plan": [
+      {
+        "step": 1,
+        "description": "Write UseCase 仕様統一",
+        "details": [
+          "`content` と `patches` は排他的。両方 or どっちもなしは INVALID_INPUT エラー。",
+          "`content` が空文字列 `\"\"` の場合:",
+          "  - `branchContext.json` なら INVALID_INPUT エラー。",
+          "  - それ以外なら空ファイルとして作成/上書き。",
+          "`patches` は既存ファイルにのみ適用。ファイルなしは NOT_FOUND エラー。",
+          "`patches` 適用時に元ファイルが JSON でなければ INVALID_STATE エラー。",
+          "`patches` の `test` 操作失敗は INVALID_INPUT エラー。",
+          "`branchContext.json` への `patches` は INVALID_INPUT エラー。"
+        ],
+        "status": "completed"
+      },
+      {
+        "step": 2,
+        "description": "TDDによる実装",
+        "details": [
+          "まず、仕様変更/バグ修正を反映したテストケースを `WriteGlobalDocumentUseCase` と `WriteBranchDocumentUseCase` の integration test に追加/修正する。",
+          "テストが失敗することを確認する (必要な場合)。",
+          "テストが通るように UseCase の実装を修正する。",
+          "関連するテスト（最小限）を実行して、他の機能に影響がないか確認する。"
+        ],
+        "status": "pending",
+        "next_mode": "CodeQueen"
+      }
+    ],
+    "notes": "TDDで進め、実行するテストは最小限に抑える。"
+  }
+}

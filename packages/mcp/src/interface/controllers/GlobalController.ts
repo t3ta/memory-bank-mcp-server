@@ -1,4 +1,7 @@
+import * as rfc6902 from 'rfc6902'; // ★ rfc6902 をインポート
 import type { DocumentDTO } from "../../application/dtos/DocumentDTO.js";
+import type { WriteDocumentDTO } from "../../application/dtos/WriteDocumentDTO.js"; // ★ WriteDocumentDTO をインポート
+import { ApplicationError, ApplicationErrorCodes } from "../../shared/errors/ApplicationError.js"; // ★ ApplicationError と Codes をインポート
 import type { JsonDocumentDTO } from "../../application/dtos/JsonDocumentDTO.js";
 import type { UpdateTagIndexUseCaseV2 } from "../../application/usecases/common/UpdateTagIndexUseCaseV2.js";
 import type { SearchDocumentsByTagsInput } from "../../application/usecases/common/SearchDocumentsByTagsUseCase.js";
@@ -12,6 +15,16 @@ import type { MCPResponsePresenter } from "../presenters/types/MCPResponsePresen
 import type { MCPResponse } from "../presenters/types/MCPResponse.js";
 import type { IGlobalController } from "./interfaces/IGlobalController.js";
 import type { IConfigProvider } from "../../infrastructure/config/interfaces/IConfigProvider.js";
+/**
+ * Parameters for the writeDocument method in GlobalController
+ */
+interface WriteGlobalDocumentParams {
+  path: string;
+  content?: string;
+  patches?: rfc6902.Operation[];
+  tags?: string[];
+}
+
 
 
 /**
@@ -86,24 +99,60 @@ export class GlobalController implements IGlobalController {
    * @param tags Optional tags for the document
    * @returns Promise resolving to MCP response with the result
    */
-  async writeDocument(params: {
-    path: string;
-    content: string;
-    tags?: string[];
-  }): Promise<MCPResponse> {
-    const { path: docPath, content, tags: tagStrings } = params;
+  async writeDocument(params: WriteGlobalDocumentParams): Promise<MCPResponse> {
+    const { path: docPath, content, patches, tags: tagStrings } = params; // patches を追加
     try {
-      this.componentLogger.info(`Writing global document`, { operation: 'writeDocument', docPath });
+      this.componentLogger.info(`Writing global document`, { operation: 'writeDocument', docPath, hasContent: !!content, hasPatches: !!patches }); // ログに情報追加
 
-      await this.writeGlobalDocumentUseCase.execute({
-        document: {
+      // content と patches の排他チェック (ユースケースでもやるけど、コントローラーでもやるのが親切)
+      const hasContent = content !== undefined && content !== null;
+      const hasPatches = patches !== undefined && patches !== null;
+
+      if (!hasContent && !hasPatches) {
+        throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Either content or patches must be provided');
+      }
+      if (hasContent && hasPatches) {
+         throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Cannot provide both content and patches');
+      }
+
+      // ユースケースに渡す document オブジェクトを構築
+      // ユースケースに渡す document オブジェクトを構築
+      // WriteDocumentDTO には content が必須だが、patches を使う場合は content は不要。
+      // ユースケース側で patches を any キャストで受け取っているので、それに合わせる。
+      let documentInput: WriteDocumentDTO | { path: string; tags?: string[]; patches: rfc6902.Operation[] };
+
+      if (hasContent) {
+        // content がある場合は WriteDocumentDTO 型
+        documentInput = {
           path: docPath,
-          content,
+          content: content, // content は必須なので設定
           tags: tagStrings || [],
-        },
+        };
+      } else if (hasPatches) {
+        // patches がある場合は、content を含まず patches を持つオブジェクトを作成
+        // ユースケース側で any キャストされることを想定
+        documentInput = {
+          path: docPath,
+          tags: tagStrings || [],
+          patches: patches, // patches を設定
+        };
+      } else {
+        // このケースは上のチェックで弾かれるはず
+        throw new Error('Invalid state: No content or patches');
+      }
+
+
+      // Execute the use case and store the result
+      const result = await this.writeGlobalDocumentUseCase.execute({
+        // documentInput は WriteDocumentDTO | { ... patches ... } 型だが、
+        // ユースケースの execute は WriteGlobalDocumentInput (document: WriteDocumentDTO) を期待している。
+        // しかし、ユースケース内部で patches を any キャストで扱っているので、このまま渡す。
+        // (より厳密にするならユースケースの型定義を見直すべきだが、既存実装に合わせる)
+        document: documentInput as WriteDocumentDTO, // ユースケースの型定義に合わせるためのキャスト
       });
 
-      return this.presenter.presentSuccess({ success: true }); // Already correct, no change needed here
+      // Pass the result from the use case to the presenter
+      return this.presenter.presentSuccess(result);
     } catch (error) {
       return this.handleError(error, 'writeDocument');
     }

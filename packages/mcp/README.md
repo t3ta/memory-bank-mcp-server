@@ -1,7 +1,5 @@
 # @memory-bank/mcp (v2.3.5)
 
-<!-- Demo change for semantic-release -->
-
 This package provides the core implementation of the Memory-enabled Co-Pilot (MCP) server for managing project documentation and context.
 
 ## Overview
@@ -51,7 +49,7 @@ yarn workspace @memory-bank/mcp dev --docs /path/to/your/docs
 
 **Server Options:**
 
-- `--docs, -d`: **Required.** Path to the project's documentation directory (containing `global-memory-bank` and `branch-memory-bank`).
+- `--docs, -d`: **Required.** Path to the project's documentation directory (containing `global-memory-bank` and `branch-memory-bank`). Specifying this (or using environment variables `MEMORY_BANK_ROOT` or `DOCS_ROOT`) enables **Project Mode**, which allows features like automatic Git branch detection.
 - `--verbose, -v`: Enable verbose logging (default: false).
 - `--language, -l`: Default language for templates ('en', 'ja' or 'zh', default: 'en').
 
@@ -59,8 +57,8 @@ yarn workspace @memory-bank/mcp dev --docs /path/to/your/docs
 
 Once the server is running, clients interact with it using the defined MCP tools. Refer to the core tool manual (`docs/global-memory-bank/core/mcp-tool-manual.json`) for details on available tools like:
 
-- `write_branch_memory_bank`
-- `read_branch_memory_bank`
+- `write_branch_memory_bank`: Writes a document to a branch. The `branch` parameter is optional in Project Mode (uses current Git branch).
+- `read_branch_memory_bank`: Reads a document from a branch. The `branch` parameter is optional in Project Mode (uses current Git branch).
 - `write_global_memory_bank`
 - `read_global_memory_bank`
 - `read_context`
