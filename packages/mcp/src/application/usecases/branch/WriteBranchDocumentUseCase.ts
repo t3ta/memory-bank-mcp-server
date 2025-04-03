@@ -99,23 +99,25 @@ constructor(
       }
 
       // Check if content is provided and is not an empty string
-      const hasContent = input.document.content !== undefined && input.document.content !== null; // Remove check for empty string here
+      const hasContent = input.document.content !== undefined && input.document.content !== null; // 空文字列は true とする
       // Ensure patches is an array before checking length
       const hasPatches = input.patches && Array.isArray(input.patches) && input.patches.length > 0;
 
       // Allow initialization (no content, no patches) - this case is handled below
-      if (!hasContent && !hasPatches) {
-         this.componentLogger.debug('Neither content nor non-empty patches provided, proceeding (possibly for initialization).');
-      // Check for mutual exclusivity after defining both hasContent and hasPatches
+      // content が undefined または null で、かつ patches もない場合のみエラー
+      if ((input.document.content === undefined || input.document.content === null) && !hasPatches) { // ★ OR 条件に修正
+        throw new ApplicationError(
+          ApplicationErrorCodes.INVALID_INPUT,
+          'Either document content or patches must be provided'
+        );
+      }
+      // content と patches の排他チェック
       if (hasContent && hasPatches) {
         throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Cannot provide both document content and patches simultaneously');
       }
-
-      } else if (hasPatches && !Array.isArray(input.patches)) { // Redundant check but safe
-         throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Patches must be an array');
-      } else if (hasContent && typeof input.document.content !== 'string' && typeof input.document.content !== 'object') {
-         throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Document content must be a string or object');
-      }
+      // 不要な else if を削除
+      // else if (hasPatches && !Array.isArray(input.patches)) { ... }
+      // else if (hasContent && typeof input.document.content !== 'string' && typeof input.document.content !== 'object') { ... }
 
 // --- Prepare Domain Objects ---
 const branchInfo = BranchInfo.create(input.branchName);

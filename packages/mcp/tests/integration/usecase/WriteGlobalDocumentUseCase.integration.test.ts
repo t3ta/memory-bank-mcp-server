@@ -603,19 +603,60 @@ describe('WriteGlobalDocumentUseCase Integration Tests', () => {
        })).rejects.toThrow(ApplicationError); // Expect ApplicationError (INVALID_INPUT)
     });
 
-    it('should throw an error if neither content nor patches are provided', async () => {
-        const documentPath = 'test/no-content-no-patch.json';
+    it('should throw an INVALID_INPUT error if neither content nor patches are provided', async () => {
+      const documentPath = 'test/no-content-or-patch.json';
 
-        // Cast to any to bypass TypeScript check for content/patches
-        const invalidInput: any = {
+      try {
+        // as any でキャストして content/patches なしの入力をテスト
+        await writeUseCase.execute({
           document: {
-            path: documentPath
-            // No content or patches
-          }
-        };
-
-        await expect(writeUseCase.execute(invalidInput)).rejects.toThrow(ApplicationError); // Expect ApplicationError (INVALID_INPUT)
+            path: documentPath,
+            // content と patches を意図的に省略
+            tags: ['test']
+          } as any // ★★★ Cast to any ★★★
+        });
+        throw new Error('Expected WriteGlobalDocumentUseCase to throw, but it did not.');
+      } catch (error) {
+        expect(error).toBeInstanceOf(ApplicationError);
+        if (error instanceof ApplicationError) {
+          expect(error.code).toBe('APP_ERROR.INVALID_INPUT');
+          expect(error.message).toBe('Either document content or patches must be provided');
+        } else {
+          throw new Error(`Expected ApplicationError, but caught ${error}`);
+        }
+      }
     });
 
+    it('should create an empty file when content is an empty string', async () => {
+      const documentPath = 'test/empty-content-file.txt'; // Use .txt to emphasize it's not JSON
+      const tags = ['test', 'empty-string'];
+
+      // Execute with empty string content
+      const writeResult = await writeUseCase.execute({
+        document: {
+          path: documentPath,
+          content: "", // ★★★ Empty string content ★★★
+          tags: tags
+        },
+        returnContent: true
+      });
+
+      // Assert write result
+      expect(writeResult).toBeDefined();
+      expect(writeResult.document).toBeDefined();
+      expect(writeResult.document.path).toBe(documentPath);
+      expect(writeResult.document.content).toBe(""); // Expect empty string content
+      // Tags might be empty as empty content likely won't yield metadata
+      // expect(writeResult.document.tags).toEqual([]); // This depends on repo implementation
+
+      // Verify with readUseCase
+      const readResult = await readUseCase.execute({ path: documentPath });
+      expect(readResult).toBeDefined();
+      expect(readResult.document).toBeDefined();
+      expect(readResult.document.content).toBe("");
+      expect(readResult.document.tags).toEqual([]); // Reading empty file should result in empty tags
+    });
+
+    // [削除] Issue #75 用のテストケースは新しい仕様で不要になったため削除
     // --- ここまで追加 ---
 }); // 一番外側の describe の閉じ括弧
