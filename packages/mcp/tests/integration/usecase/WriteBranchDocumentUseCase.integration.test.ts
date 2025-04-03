@@ -703,7 +703,6 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
       }
     });
 
-    // --- みらい修正：branchName 省略時のテストケース (プロジェクトモード) ---
     describe('when branchName is omitted in project mode (isProjectMode: true)', () => {
       beforeEach(() => {
         // この describe 内では isProjectMode: true を強制
@@ -759,7 +758,6 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
       });
     });
 
-    // --- みらい追加：branchName 省略時のテストケース (非プロジェクトモード) ---
     describe('when branchName is omitted outside of project mode (isProjectMode: false)', () => {
       beforeEach(() => {
         // この describe 内では isProjectMode: false を強制
