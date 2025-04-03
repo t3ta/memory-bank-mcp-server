@@ -454,10 +454,9 @@ describe('WriteGlobalDocumentUseCase Integration Tests', () => {
       // ★★★ デバッグ用: applyPatch を直接呼び出して結果を確認 ★★★
       try {
         const initialContentObjectForDebug = JSON.parse(JSON.stringify(initialDocument)); // ディープコピー
-        console.log('★★★ Debug: Applying patch directly ★★★');
-        console.log('★★★ Debug: Initial Object (before patch):', JSON.stringify(initialContentObjectForDebug, null, 2));
-        console.log('★★★ Debug: Patches:', JSON.stringify(patches, null, 2));
-
+        // console.log('★★★ Debug: Applying patch directly ★★★');
+        // console.log('★★★ Debug: Initial Object (before patch):', JSON.stringify(initialContentObjectForDebug, null, 2));
+        // console.log('★★★ Debug: Patches:', JSON.stringify(patches, null, 2));
         // applyPatch を try...catch で囲む
         let directlyPatchedObject;
         let patchError = null;

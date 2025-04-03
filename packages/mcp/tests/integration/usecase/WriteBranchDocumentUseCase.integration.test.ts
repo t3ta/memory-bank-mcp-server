@@ -503,5 +503,104 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
        expect(result.document.content).toBeUndefined(); // 実装後に期待するアサーション (今は失敗するはず)
        expect(result.document.tags).toBeUndefined(); // 実装後に期待するアサーション (今は失敗するはず)
     });
+
+    // --- branchContext.json Guard Tests ---
+
+    it('should successfully write valid content to branchContext.json', async () => {
+      const validBranchContext = {
+        schema: "memory_document_v2",
+        metadata: {
+          id: `${TEST_BRANCH}-context`,
+          documentType: "branch_context",
+          path: "branchContext.json",
+          tags: ["context", "branch"],
+          createdAt: new Date().toISOString(),
+          lastModified: new Date().toISOString(),
+          version: 1
+        },
+        content: {
+          value: "Valid context content for test"
+        }
+      };
+      const documentPath = 'branchContext.json';
+      const contentString = JSON.stringify(validBranchContext, null, 2);
+
+      const result = await writeUseCase.execute({
+        branchName: TEST_BRANCH,
+        document: {
+          path: documentPath,
+          content: contentString,
+          tags: validBranchContext.metadata.tags
+        }
+      });
+
+      expect(result).toBeDefined();
+      expect(result.document.path).toBe(documentPath);
+
+      // Verify content was written
+      const readResult = await readUseCase.execute({ branchName: TEST_BRANCH, path: documentPath });
+      const readContent = JSON.parse(readResult.document.content);
+      expect(readContent.content.value).toBe("Valid context content for test");
+    });
+
+    it('should throw error when writing empty string content to branchContext.json', async () => {
+      const documentPath = 'branchContext.json';
+      await expect(writeUseCase.execute({
+        branchName: TEST_BRANCH,
+        document: { path: documentPath, content: "" }
+      })).rejects.toThrow(ApplicationErrors.invalidInput('Content for branchContext.json cannot be empty or an empty object string'));
+    });
+
+    it('should throw error when writing empty object string content to branchContext.json', async () => {
+      const documentPath = 'branchContext.json';
+      await expect(writeUseCase.execute({
+        branchName: TEST_BRANCH,
+        document: { path: documentPath, content: "{}" }
+      })).rejects.toThrow(ApplicationErrors.invalidInput('Content for branchContext.json cannot be empty or an empty object string'));
+    });
+
+    it('should throw error when writing invalid JSON content to branchContext.json', async () => {
+      const documentPath = 'branchContext.json';
+      const invalidJson = '{"schema": "v2", "metadata": {';
+      await expect(writeUseCase.execute({
+        branchName: TEST_BRANCH,
+        document: { path: documentPath, content: invalidJson }
+      })).rejects.toThrow(/Invalid JSON content for branchContext.json/);
+    });
+
+    it('should throw error when writing JSON content missing required keys to branchContext.json', async () => {
+      const documentPath = 'branchContext.json';
+      const missingKeysJson = JSON.stringify({
+        schema: "memory_document_v2",
+        // metadata is missing
+        content: { value: "test" }
+      }, null, 2);
+      await expect(writeUseCase.execute({
+        branchName: TEST_BRANCH,
+        document: { path: documentPath, content: missingKeysJson }
+      })).rejects.toThrow(/Invalid JSON content for branchContext.json: Missing required key: metadata/);
+    });
+
+    it('should throw error when attempting to use patches on branchContext.json', async () => {
+      // First, create a valid branchContext.json
+      const validBranchContext = {
+        schema: "memory_document_v2",
+        metadata: { id: `${TEST_BRANCH}-context`, documentType: "branch_context", path: "branchContext.json" },
+        content: { value: "Initial context" }
+      };
+      await writeUseCase.execute({
+        branchName: TEST_BRANCH,
+        document: { path: 'branchContext.json', content: JSON.stringify(validBranchContext) }
+      });
+
+      // Attempt to apply patches
+      const patches = [{ op: 'replace', path: '/content/value', value: 'Patched context' }];
+      await expect(writeUseCase.execute({
+        branchName: TEST_BRANCH,
+        document: { path: 'branchContext.json', content: '' }, // Content is ignored when patches are present
+        patches: patches
+      })).rejects.toThrow(ApplicationErrors.invalidInput('Patch operations are currently not allowed for branchContext.json'));
+    });
+
   }); // describe('execute', ...) の閉じ括弧
 }); // 一番外側の describe の閉じ括弧
