@@ -19,7 +19,7 @@
       "title": "[Bug] write_global_memory_bank with patches requires content parameter",
       "url": "https://github.com/t3ta/memory-bank-mcp-server/issues/74"
     },
-    "status": "blocked_by_build_error",
+    "status": "fixed",
     "plan": [
       {
         "step": 1,
@@ -61,7 +61,7 @@
     "nextSteps": [
       {
         "description": "`yarn build` で TS6133 エラー ('tags' is declared but its value is never read) が発生。`packages/mcp/src/application/usecases/global/WriteGlobalDocumentUseCase.ts` の修正が必要。",
-        "status": "todo",
+        "status": "done",
         "requiredMode": "bug"
       }
     ]
