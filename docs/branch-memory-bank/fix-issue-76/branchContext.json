@@ -1,0 +1,13 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "fix-issue-76-context",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "createdAt": "2025-04-03T11:08:25.300Z",
+    "lastModified": "2025-04-03T11:08:25.300Z"
+  },
+  "content": {
+    "value": "Auto-initialized context for branch fix/issue-76"
+  }
+}

@@ -12,6 +12,7 @@ import {
   ApplicationErrorCodes,
 } from '../../../shared/errors/ApplicationError.js';
 import { logger } from '../../../shared/utils/logger.js'; // Import logger
+import type { IGitService } from '@/infrastructure/git/IGitService.js'; // みらい修正：絶対パスエイリアス @/ を使う！
 // Removed direct import of rfc6902
 import { JsonPatchService } from '../../../domain/jsonpatch/JsonPatchService.js'; // Import the service interface
 import { JsonPatchOperation } from '../../../domain/jsonpatch/JsonPatchOperation.js'; // Keep this if needed for input type, or adjust input type
@@ -23,7 +24,7 @@ export interface WriteBranchDocumentInput {
   /**
    * Branch name
    */
-  branchName: string;
+  branchName?: string; // みらい変更：オプショナルにしたよ！
 
   /**
    * Document data
@@ -72,7 +73,8 @@ private readonly patchService: JsonPatchService; // Add patch service instance v
  */
 constructor(
   private readonly branchRepository: IBranchMemoryBankRepository,
-  patchService: JsonPatchService // Inject JsonPatchService
+  patchService: JsonPatchService, // Inject JsonPatchService
+  private readonly gitService: IGitService // みらい追加：Gitサービス注入！
 ) {
   this.patchService = patchService;
 }
@@ -86,10 +88,32 @@ constructor(
   async execute(input: WriteBranchDocumentInput): Promise<WriteBranchDocumentOutput> {
     try {
       let documentToSave: MemoryDocument; // Declare here
-      // --- Input Validation ---
-      if (!input.branchName) {
-        throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Branch name is required');
+
+      // --- Determine Branch Name ---
+      let branchNameToUse = input.branchName;
+      if (!branchNameToUse) {
+        try {
+          branchNameToUse = await this.gitService.getCurrentBranchName();
+          this.componentLogger.info(`Current branch name automatically detected: ${branchNameToUse}`);
+        } catch (error) {
+          this.componentLogger.error('Failed to get current branch name', { error });
+          throw new ApplicationError(
+            ApplicationErrorCodes.INVALID_INPUT,
+            'Branch name is required but could not be automatically determined. Please provide it explicitly or ensure you are in a Git repository.',
+            { originalError: error }
+          );
+        }
       }
+
+      // --- Input Validation (using determined branch name) ---
+      this.componentLogger.info('Executing write branch document use case', {
+        branchName: branchNameToUse, // Use determined branch name for logging
+        documentPath: input.document?.path, // Use optional chaining for safety
+        hasContent: input.document?.content !== undefined && input.document?.content !== null,
+        hasPatches: input.patches && Array.isArray(input.patches) && input.patches.length > 0,
+      });
+
+      // Remaining validations...
       if (!input.document) {
         // Even if using patches, the document object (for path, tags) is needed
         throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Document object is required');
@@ -120,22 +144,22 @@ constructor(
       // else if (hasContent && typeof input.document.content !== 'string' && typeof input.document.content !== 'object') { ... }
 
 // --- Prepare Domain Objects ---
-const branchInfo = BranchInfo.create(input.branchName);
+const branchInfo = BranchInfo.create(branchNameToUse!); // みらい修正：!でundefinedじゃないって教える！
 const documentPath = DocumentPath.create(input.document.path);
 const tags = (input.document.tags ?? []).map((tag) => Tag.create(tag));
 
 // --- Ensure Branch Exists ---
-const branchExists = await this.branchRepository.exists(branchInfo.safeName);
+const branchExists = await this.branchRepository.exists(branchInfo.safeName); // Use safeName here
 if (!branchExists) {
-  this.componentLogger.info(`Branch ${branchInfo.safeName} does not exist. Initializing...`);
+  this.componentLogger.info(`Branch '${branchInfo.safeName}' does not exist. Initializing...`); // Use safeName
   try {
-    await this.branchRepository.initialize(branchInfo);
-    this.componentLogger.info(`Branch ${branchInfo.safeName} initialized successfully.`);
+    await this.branchRepository.initialize(branchInfo); // Pass BranchInfo object
+    this.componentLogger.info(`Branch '${branchInfo.safeName}' initialized successfully.`); // Use safeName
   } catch (initError) {
-    this.componentLogger.error(`Failed to initialize branch ${branchInfo.safeName}`, { originalError: initError });
+    this.componentLogger.error(`Failed to initialize branch '${branchInfo.safeName}'`, { originalError: initError }); // Use safeName
     throw new ApplicationError(
-      ApplicationErrorCodes.BRANCH_INITIALIZATION_FAILED, // Keep specific error code
-      `Failed to initialize branch: ${(initError as Error).message}`,
+      ApplicationErrorCodes.BRANCH_INITIALIZATION_FAILED,
+      `Failed to initialize branch '${branchInfo.name}': ${(initError as Error).message}`, // Use original name for user message
       { originalError: initError }
     );
   }

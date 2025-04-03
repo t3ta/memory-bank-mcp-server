@@ -1,0 +1,32 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "fix-issue-76-progress",
+    "title": "fix/issue-76 作業進捗",
+    "documentType": "progress_log",
+    "path": "progress.json",
+    "tags": [
+      "progress",
+      "issue-76"
+    ],
+    "createdAt": "2025-04-03T11:12:30Z",
+    "lastModified": "2025-04-03T11:12:30Z",
+    "version": 1
+  },
+  "content": {
+    "tasks": [
+      {
+        "id": "implement-issue-72",
+        "summary": "Issue #72: ブランチ名自動検出機能の実装",
+        "status": "完了",
+        "details": [
+          "GitService を作成し、現在のブランチ名を取得する機能を追加",
+          "ReadBranchDocumentUseCase と WriteBranchDocumentUseCase を修正し、branchName が省略された場合に GitService を利用するように変更",
+          "BranchController の readDocument/writeDocument メソッドで branchName をオプショナルに変更",
+          "DIコンテナ (providers.ts) を修正し、GitService を UseCase に注入"
+        ],
+        "completedAt": "2025-04-03T11:12:30Z"
+      }
+    ]
+  }
+}

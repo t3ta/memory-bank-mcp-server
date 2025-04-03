@@ -45,6 +45,8 @@ import { JsonBranchController } from '../../interface/controllers/json/JsonBranc
 import { CliOptions } from '../../infrastructure/config/WorkspaceConfig.js';
 // Removed unused import: import { UseCaseFactory } from '../../factory/use-case-factory.js';
 import { ReadBranchCoreFilesUseCase } from '../../application/usecases/index.js';
+import { GitService } from '../../infrastructure/git/GitService.js'; // みらい追加：GitServiceインポート
+import { IGitService } from '../../infrastructure/git/IGitService.js'; // みらい追加：IGitServiceインポート
 
 /**
  * Register infrastructure services
@@ -163,6 +165,11 @@ export async function registerInfrastructureServices(
     logger.debug('templateRepository initialized.');
     return templateRepository;
   });
+
+  // みらい追加：GitServiceを登録
+  // みらい追加：GitServiceを登録
+  container.register<IGitService>('gitService', new GitService());
+  logger.debug('GitService registered.');
 }
 
 /**
@@ -217,8 +224,9 @@ export async function registerApplicationServices(container: DIContainer): Promi
       'branchMemoryBankRepository'
     );
     const patchService = await container.get<JsonPatchService>('jsonPatchService'); // Get the patch service
+    const gitService = await container.get<IGitService>('gitService'); // みらい追加：GitServiceを取得
     // Directly instantiate the use case with dependencies
-    return new WriteBranchDocumentUseCase(branchRepository, patchService);
+    return new WriteBranchDocumentUseCase(branchRepository, patchService, gitService); // みらい変更：GitServiceを渡す
   });
 
   // Add missing registration for readBranchDocumentUseCase
@@ -226,7 +234,8 @@ export async function registerApplicationServices(container: DIContainer): Promi
     const branchRepository = await container.get<FileSystemBranchMemoryBankRepository>(
       'branchMemoryBankRepository'
     );
-    return new ReadBranchDocumentUseCase(branchRepository);
+    const gitService = await container.get<IGitService>('gitService'); // みらい追加：GitServiceを取得
+    return new ReadBranchDocumentUseCase(branchRepository, gitService); // みらい変更：GitServiceを渡す
   });
 
   container.registerFactory('readRulesUseCase', async () => {

@@ -20,6 +20,7 @@ export enum InfrastructureErrorCodes {
   PERSISTENCE_ERROR = 'INFRASTRUCTURE_PERSISTENCE_ERROR',
   MCP_SERVER_ERROR = 'INFRASTRUCTURE_MCP_SERVER_ERROR',
   INVALID_FILE_CONTENT = 'INFRASTRUCTURE_INVALID_FILE_CONTENT', // Added
+  GIT_COMMAND_FAILED = 'INFRASTRUCTURE_GIT_COMMAND_FAILED', // みらい追加：Gitコマンド失敗用
 }
 
 /**
@@ -54,6 +55,8 @@ interface OperationDetails extends Record<string, unknown> {
   branchName?: string;
   path?: string;
   cause?: Error | undefined; // Changed type from string to Error | undefined
+  command?: string; // みらい追加：Gitコマンド用
+  reason?: string; // みらい追加：Gitコマンド失敗理由用
 }
 
 /**
@@ -200,6 +203,20 @@ export const InfrastructureErrors = {
       InfrastructureErrorCodes.INVALID_FILE_CONTENT,
       message,
       details
+    );
+  },
+
+  /**
+   * Error for Git command failures
+   * @param command The Git command that failed
+   * @param reason A description of why it failed (e.g., stderr output)
+   * @param cause The underlying error object, if any
+   */
+  gitCommandFailed: (command: string, reason: string, cause?: Error) => {
+    return new InfrastructureError(
+      InfrastructureErrorCodes.GIT_COMMAND_FAILED,
+      `Git command failed: '${command}'. Reason: ${reason}`,
+      { command, reason, cause }
     );
   },
 };
