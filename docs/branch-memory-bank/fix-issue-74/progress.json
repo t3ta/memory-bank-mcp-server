@@ -1,0 +1,62 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "fix-issue-74-progress",
+    "title": "Issue #74 バグ修正進捗",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "bugfix",
+      "issue-74",
+      "global-memory-bank"
+    ],
+    "createdAt": "2025-04-03T06:17:41.574Z",
+    "lastModified": "2025-04-03T06:17:41.574Z"
+  },
+  "content": {
+    "issue": {
+      "number": 74,
+      "title": "[Bug] write_global_memory_bank with patches requires content parameter",
+      "url": "https://github.com/t3ta/memory-bank-mcp-server/issues/74"
+    },
+    "status": "summarizing",
+    "plan": [
+      {
+        "step": 1,
+        "description": "バグの原因調査: `write_global_memory_bank` ツールで `patches` 使用時に `content` が必須となる原因を特定する。",
+        "targetFiles": [
+          "packages/mcp/src/interface/controllers/GlobalController.ts",
+          "packages/mcp/src/application/usecases/WriteGlobalDocumentUseCase.ts",
+          "packages/mcp/src/infrastructure/repositories/file-system/FileSystemGlobalMemoryBankRepository.ts"
+        ],
+        "status": "done"
+      },
+      {
+        "step": 2,
+        "description": "修正実装: `patches` が指定された場合、内部で既存ファイルの内容を読み込み、パッチを適用するように修正する。",
+        "status": "done"
+      },
+      {
+        "step": 3,
+        "description": "テスト追加/修正: `patches` のみで `write_global_memory_bank` を呼び出すケースの単体テストおよび結合テストを追加・修正する。",
+        "status": "done"
+      },
+      {
+        "step": 4,
+        "description": "動作確認: 修正後にツールが期待通り動作することを確認する。",
+        "status": "done"
+      }
+    ],
+    "currentTask": "修正内容のまとめ",
+    "summary": {
+      "description": "Issue #74 のバグ (write_global_memory_bank で patches 使用時に content が必須になる問題) を修正しました。主な修正点は、WriteGlobalDocumentUseCase で patches オプションを正しく処理し、test 操作の事前検証を追加、タグ更新処理の非同期問題を解決したことです。",
+      "fixedFiles": [
+        "packages/mcp/src/application/usecases/global/WriteGlobalDocumentUseCase.ts",
+        "packages/mcp/tests/integration/usecase/WriteGlobalDocumentUseCase.integration.test.ts"
+      ]
+    },
+    "results": {
+      "testStatus": "All tests passed (confirmed by user)."
+    }
+  }
+}
