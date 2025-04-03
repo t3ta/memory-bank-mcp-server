@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "fix-branch-context-overwrite-progress",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "createdAt": "2025-04-03T09:35:00Z",
+    "lastModified": "2025-04-03T09:35:00Z"
+  },
+  "content": {
+    "issue": {
+      "title": "branchContext.json が意図せず上書きされる問題",
+      "description": "クライアントからの不正なデータにより branchContext.json が初期化される可能性がある。"
+    },
+    "status": "investigating",
+    "plan": [],
+    "tasks": [
+      {
+        "id": "design-guard-for-branchContext",
+        "status": "todo",
+        "summary": "branchContext.json への書き込みガード処理の設計",
+        "details": [
+          "目的: クライアントからの意図しないデータによる branchContext.json の上書きをサーバー側で防ぐ。",
+          "修正箇所: WriteBranchDocumentUseCase.ts の execute メソッド内。",
+          "処理フロー:",
+          "1. input.document.path が 'branchContext.json' かチェック。",
+          "2. content が指定された場合:",
+          "   - 空文字列('')や空オブジェクト('{}')でないかチェック。",
+          "   - JSONとしてパース可能かチェック。",
+          "   - パース後、必須キー(schema, metadata, content)が存在するかチェック。",
+          "3. patches が指定された場合:",
+          "   - branchContext.json へのパッチ適用を一旦禁止する。",
+          "4. ガード違反時は ApplicationError/DomainError をスローする。"
+        ],
+        "created_at": "2025-04-03T09:33:00Z",
+        "updated_at": "2025-04-03T09:33:00Z"
+      }
+    ]
+  }
+}

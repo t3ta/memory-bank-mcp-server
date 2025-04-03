@@ -114,6 +114,55 @@ constructor(
          throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Document content must be a string or object');
       }
 
+      // --- Guard for branchContext.json ---
+      if (input.document.path === 'branchContext.json') {
+        this.componentLogger.debug('Applying specific guards for branchContext.json');
+
+        if (hasPatches) {
+          // Disallow patch operations on branchContext.json for now
+          throw new ApplicationError(
+            ApplicationErrorCodes.INVALID_INPUT,
+            'Patch operations are currently not allowed for branchContext.json'
+          );
+        }
+
+        if (hasContent) {
+          const content = input.document.content;
+          // Check if content is a non-empty string
+          if (typeof content !== 'string' || content.trim() === '' || content.trim() === '{}') {
+            throw new ApplicationError(
+              ApplicationErrorCodes.INVALID_INPUT,
+              'Content for branchContext.json cannot be empty or an empty object string'
+            );
+          }
+          // Check if content is valid JSON and has required keys
+          try {
+            const parsedContent = JSON.parse(content);
+            if (typeof parsedContent !== 'object' || parsedContent === null) {
+              throw new Error('Parsed content is not an object.');
+            }
+            const requiredKeys = ['schema', 'metadata', 'content'];
+            for (const key of requiredKeys) {
+              if (!(key in parsedContent)) {
+                throw new Error(`Missing required key: ${key}`);
+              }
+            }
+            // Optional: Add more specific checks for metadata or content structure if needed
+            this.componentLogger.debug('branchContext.json content validation passed.');
+          } catch (parseError) {
+            throw new ApplicationError(
+              ApplicationErrorCodes.INVALID_INPUT,
+              `Invalid JSON content for branchContext.json: ${(parseError as Error).message}`,
+              { originalError: parseError }
+            );
+          }
+        }
+        // If neither content nor patches (and path is branchContext.json),
+        // it might be an initialization attempt which is allowed by default logic later.
+        // Or it might be an invalid request if the file already exists.
+        // The existing logic handles the initialization case (L219-L241).
+      }
+
       // --- Prepare Domain Objects ---
       const branchInfo = BranchInfo.create(input.branchName);
       const documentPath = DocumentPath.create(input.document.path);
