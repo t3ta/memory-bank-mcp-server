@@ -110,36 +110,9 @@ export class WriteGlobalDocumentUseCase
 
       const documentPath = DocumentPath.create(input.document.path);
 
-      // ★ タグ抽出ロジックは content がある場合のみ実行
-      let tags: Tag[] = []; // メタデータから抽出されたタグを保持する変数
-      if (hasContent && documentPath.value.endsWith('.json')) {
-        try {
-          // content が null/undefined でないことは上でチェック済み
-          const parsed = JSON.parse(input.document.content!);
-          if (parsed.metadata?.tags && Array.isArray(parsed.metadata.tags)) {
-            logger.debug('Found tags in metadata:', { tags: parsed.metadata.tags });
-            tags = parsed.metadata.tags
-              .filter((tag: any): tag is string => typeof tag === 'string') // 文字列のみを対象 ★any型指定
-              .map((tag: string) => {
-                try {
-                   return Tag.create(tag);
-                } catch (tagError) {
-                   logger.warn(`Skipping invalid tag found in metadata: "${tag}"`, { path: documentPath.value, error: tagError });
-                   return null; // 無効なタグはスキップ
-                }
-              })
-              .filter((tag: any): tag is Tag => tag !== null); // nullを除去 ★any型指定
-          }
-        } catch (error) {
-          // JSONパースエラーは許容しない（content自体が無効なため）
-          logger.error(`Invalid JSON content provided for tag extraction in ${documentPath.value}:`, { error });
-          throw new DomainError(
-            'DOMAIN_ERROR.VALIDATION_ERROR',
-            'Document content is not valid JSON (detected during tag extraction)',
-            { cause: error instanceof Error ? error : undefined, path: documentPath.value }
-          );
-        }
-      }
+      // ★ content からタグを抽出するロジックは削除
+      // タグの更新はリポジトリ層の updateTagsIndex がファイル内容から行うため、
+      // ユースケースレベルでの抽出は不要になった。
 
       // ★ tags がメタデータから抽出されなかった場合、input.document.tags を使う
       // このロジックは後続のタグ更新処理に統合されたため削除
