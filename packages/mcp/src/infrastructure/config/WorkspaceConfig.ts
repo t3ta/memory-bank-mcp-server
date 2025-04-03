@@ -20,6 +20,12 @@ export interface WorkspaceConfig {
    * Language setting
    */
   language: Language;
+
+  /**
+   * Whether the server is running in project mode (docsRoot explicitly specified)
+   * @addedBy Mirai
+   */
+  isProjectMode: boolean;
 }
 
 /**

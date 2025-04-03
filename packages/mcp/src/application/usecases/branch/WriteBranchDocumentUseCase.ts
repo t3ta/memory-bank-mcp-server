@@ -13,6 +13,7 @@ import {
 } from '../../../shared/errors/ApplicationError.js';
 import { logger } from '../../../shared/utils/logger.js'; // Import logger
 import type { IGitService } from '@/infrastructure/git/IGitService.js'; // みらい修正：絶対パスエイリアス @/ を使う！
+import type { IConfigProvider } from '@/infrastructure/config/interfaces/IConfigProvider.js'; // みらい追加：ConfigProvider使うよ！
 // Removed direct import of rfc6902
 import { JsonPatchService } from '../../../domain/jsonpatch/JsonPatchService.js'; // Import the service interface
 import { JsonPatchOperation } from '../../../domain/jsonpatch/JsonPatchOperation.js'; // Keep this if needed for input type, or adjust input type
@@ -74,11 +75,11 @@ private readonly patchService: JsonPatchService; // Add patch service instance v
 constructor(
   private readonly branchRepository: IBranchMemoryBankRepository,
   patchService: JsonPatchService, // Inject JsonPatchService
-  private readonly gitService: IGitService // みらい追加：Gitサービス注入！
+  private readonly gitService: IGitService,
+  private readonly configProvider: IConfigProvider // みらい追加：ConfigProvider注入！
 ) {
   this.patchService = patchService;
 }
-// Removed extra closing brace
 
   /**
    * Execute the use case
@@ -91,17 +92,26 @@ constructor(
 
       // --- Determine Branch Name ---
       let branchNameToUse = input.branchName;
+      // みらい修正：branchNameがなくて、かつプロジェクトモードの時だけGitから取る！
       if (!branchNameToUse) {
-        try {
-          branchNameToUse = await this.gitService.getCurrentBranchName();
-          this.componentLogger.info(`Current branch name automatically detected: ${branchNameToUse}`);
-        } catch (error) {
-          this.componentLogger.error('Failed to get current branch name', { error });
-          throw new ApplicationError(
-            ApplicationErrorCodes.INVALID_INPUT,
-            'Branch name is required but could not be automatically determined. Please provide it explicitly or ensure you are in a Git repository.',
-            { originalError: error }
-          );
+        const config = this.configProvider.getConfig(); // ConfigProviderから設定取得
+        if (config.isProjectMode) { // プロジェクトモードかチェック
+          this.componentLogger.info('Branch name not provided in project mode, attempting to detect current branch...');
+          try {
+            branchNameToUse = await this.gitService.getCurrentBranchName();
+            this.componentLogger.info(`Current branch name automatically detected: ${branchNameToUse}`);
+          } catch (error) {
+            this.componentLogger.error('Failed to get current branch name', { error });
+            throw new ApplicationError(
+              ApplicationErrorCodes.INVALID_INPUT,
+              'Branch name is required but could not be automatically determined. Please provide it explicitly or ensure you are in a Git repository.',
+              { originalError: error }
+            );
+          }
+        } else {
+          // プロジェクトモードでない場合は、ブランチ名の省略はエラー
+          this.componentLogger.warn('Branch name omitted outside of project mode.');
+          throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT,'Branch name is required when not running in project mode.');
         }
       }
 

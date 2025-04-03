@@ -225,8 +225,9 @@ export async function registerApplicationServices(container: DIContainer): Promi
     );
     const patchService = await container.get<JsonPatchService>('jsonPatchService'); // Get the patch service
     const gitService = await container.get<IGitService>('gitService'); // みらい追加：GitServiceを取得
+    const configProvider = await container.get<IConfigProvider>('configProvider'); // みらい追加：ConfigProviderを取得
     // Directly instantiate the use case with dependencies
-    return new WriteBranchDocumentUseCase(branchRepository, patchService, gitService); // みらい変更：GitServiceを渡す
+    return new WriteBranchDocumentUseCase(branchRepository, patchService, gitService, configProvider); // みらい変更：ConfigProviderも渡す
   });
 
   // Add missing registration for readBranchDocumentUseCase
@@ -235,7 +236,8 @@ export async function registerApplicationServices(container: DIContainer): Promi
       'branchMemoryBankRepository'
     );
     const gitService = await container.get<IGitService>('gitService'); // みらい追加：GitServiceを取得
-    return new ReadBranchDocumentUseCase(branchRepository, gitService); // みらい変更：GitServiceを渡す
+    const configProvider = await container.get<IConfigProvider>('configProvider'); // みらい追加：ConfigProviderを取得
+    return new ReadBranchDocumentUseCase(branchRepository, gitService, configProvider); // みらい変更：ConfigProviderも渡す
   });
 
   container.registerFactory('readRulesUseCase', async () => {

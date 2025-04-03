@@ -8,6 +8,9 @@ import { ReadBranchDocumentUseCase } from '../../../src/application/usecases/bra
 import { DomainError, DomainErrors } from '../../../src/shared/errors/DomainError.js'; // Import specific errors for checking
 import { ApplicationError, ApplicationErrors } from '../../../src/shared/errors/ApplicationError.js'; // Import specific errors for checking
 import { IGitService } from '../../../src/infrastructure/git/IGitService.js'; // みらい追加：GitServiceのインターフェース
+import { IConfigProvider } from '../../../src/infrastructure/config/interfaces/IConfigProvider.js'; // みらい追加：ConfigProviderのインターフェース
+import type { WorkspaceConfig } from '../../../src/infrastructure/config/WorkspaceConfig.js'; // みらい追加：WorkspaceConfigの型
+import { BranchInfo } from '../../../src/domain/entities/BranchInfo.js'; // みらい追加：BranchInfoインポート！
 import { jest } from '@jest/globals'; // みらい追加：Jestのモック機能使うよ！
 import { execSync } from 'child_process'; // みらい追加：Gitコマンド実行用
 import { logger } from '../../../src/shared/utils/logger.js'; // みらい追加：ロガー使うよ！
@@ -20,7 +23,8 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
   let container: DIContainer; // Use DI container
   let writeUseCase: WriteBranchDocumentUseCase;
   let readUseCase: ReadBranchDocumentUseCase;
-  let mockGitService: jest.Mocked<IGitService>; // みらい追加：モックの型定義
+  let mockGitService: jest.Mocked<IGitService>; // みらい追加：GitServiceモックの型定義
+  let mockConfigProvider: jest.Mocked<IConfigProvider>; // みらい追加：ConfigProviderモックの型定義
   const TEST_BRANCH = 'feature/test-branch';
 
   beforeEach(async () => {
@@ -49,7 +53,30 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
     };
     // getCurrentBranchNameが呼ばれたらTEST_BRANCHを返すように設定
     mockGitService.getCurrentBranchName.mockResolvedValue(TEST_BRANCH);
-    container.register<IGitService>('gitService', mockGitService); // コンテナにモックを登録
+    container.register<IGitService>('gitService', mockGitService); // コンテナにGitServiceモックを登録
+
+    // みらい追加：ConfigProviderもモック化してコンテナに再登録
+    mockConfigProvider = {
+      initialize: jest.fn(),
+      getConfig: jest.fn<() => WorkspaceConfig>(),
+      getGlobalMemoryPath: jest.fn<() => string>(),
+      getBranchMemoryPath: jest.fn<() => string>(),
+      getLanguage: jest.fn<() => 'en' | 'ja' | 'zh'>()
+    };
+    // デフォルトの getConfig の戻り値を設定 (isProjectMode: true)
+    mockConfigProvider.getConfig.mockReturnValue({
+      docsRoot: testEnv.docRoot,
+      verbose: false,
+      language: 'en',
+      isProjectMode: true // デフォルトはプロジェクトモードとしておく
+    });
+    // 他のメソッドのデフォルト戻り値も設定 (必要に応じて)
+    const SAFE_TEST_BRANCH = BranchInfo.create(TEST_BRANCH).safeName; // safeName をここで計算
+    mockConfigProvider.getGlobalMemoryPath.mockReturnValue(testEnv.globalMemoryPath);
+    mockConfigProvider.getBranchMemoryPath.mockReturnValue(path.join(testEnv.branchMemoryPath, SAFE_TEST_BRANCH));
+    mockConfigProvider.getLanguage.mockReturnValue('en');
+
+    container.register<IConfigProvider>('configProvider', mockConfigProvider); // コンテナにConfigProviderモックを登録
 
     // Get the use case instances from container
     writeUseCase = await container.get<WriteBranchDocumentUseCase>('writeBranchDocumentUseCase');
@@ -676,90 +703,100 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
       }
     });
 
-    // --- みらい追加：branchName 省略時のテストケース ---
-
-    it('should create a document using the current git branch if branchName is omitted', async () => {
-      const newDocument = { content: { message: "Created without branchName" } };
-      const documentPath = 'test/created-no-branchname.json';
-      const documentContentString = JSON.stringify(newDocument, null, 2);
-
-      // 実行：branchName を省略
-      const result = await writeUseCase.execute({
-        // branchName: TEST_BRANCH, // 省略！
-        document: {
-          path: documentPath,
-          content: documentContentString,
-          tags: ["test", "no-branchname"]
-        }
+    // --- みらい修正：branchName 省略時のテストケース (プロジェクトモード) ---
+    describe('when branchName is omitted in project mode (isProjectMode: true)', () => {
+      beforeEach(() => {
+        // この describe 内では isProjectMode: true を強制
+        mockConfigProvider.getConfig.mockReturnValue({
+          docsRoot: testEnv.docRoot, verbose: false, language: 'en', isProjectMode: true
+        });
+        mockGitService.getCurrentBranchName.mockClear(); // 各テスト前に呼び出し回数をリセット
       });
 
-      // 検証：
-      // 1. GitService が呼ばれたか？
-      expect(mockGitService.getCurrentBranchName).toHaveBeenCalledTimes(1);
-      // 2. 結果確認
-      expect(result).toBeDefined();
-      expect(result.document.path).toBe(documentPath);
-      // 3. 実際にファイルが作成されたか確認 (readUseCase を使う)
-      //    読むときは branchName を省略してもOKなはず！
-      const readResult = await readUseCase.execute({ path: documentPath });
-      expect(readResult).toBeDefined();
-      const readDocument = JSON.parse(readResult.document.content);
-      expect(readDocument.content.message).toBe("Created without branchName");
+      it('should create a document using the current git branch', async () => {
+        const newDocument = { content: { message: "Created without branchName in project mode" } };
+        const documentPath = 'test/created-no-branchname-project.json';
+        const documentContentString = JSON.stringify(newDocument, null, 2);
+
+        const result = await writeUseCase.execute({
+          document: { path: documentPath, content: documentContentString, tags: ["test", "no-branchname"] }
+        });
+
+        expect(mockGitService.getCurrentBranchName).toHaveBeenCalledTimes(1);
+        expect(result.document.path).toBe(documentPath);
+        const readResult = await readUseCase.execute({ path: documentPath }); // 読むときも省略
+        const readDocument = JSON.parse(readResult.document.content);
+        expect(readDocument.content.message).toBe("Created without branchName in project mode");
+      });
+
+      it('should update a document using patches using the current git branch', async () => {
+        const initialDocument = { items: ["initial-project"] };
+        const documentPath = 'test/patched-no-branchname-project.json';
+        const initialContentString = JSON.stringify(initialDocument, null, 2);
+        await writeUseCase.execute({ branchName: TEST_BRANCH, document: { path: documentPath, content: initialContentString, tags: ["patch-test"] } });
+        mockGitService.getCurrentBranchName.mockClear();
+
+        const patches = [{ op: 'add', path: '/items/-', value: 'patched-project' }];
+        await writeUseCase.execute({
+          document: { path: documentPath, tags: ["patch-test", "updated"] } as any,
+          patches: patches
+        });
+
+        expect(mockGitService.getCurrentBranchName).toHaveBeenCalledTimes(1);
+        const readResult = await readUseCase.execute({ path: documentPath }); // 読むときも省略
+        const readDocument = JSON.parse(readResult.document.content);
+        expect(readDocument.items).toEqual(["initial-project", "patched-project"]);
+      });
+
+      it('should return an error if current branch cannot be determined', async () => {
+        const gitError = new Error('Not a git repository');
+        mockGitService.getCurrentBranchName.mockRejectedValue(gitError);
+
+        await expect(writeUseCase.execute({
+          document: { path: 'any/document.json', content: '{"data": "test"}', tags: ["error-test"] }
+        })).rejects.toThrow(ApplicationErrors.invalidInput('Branch name is required but could not be automatically determined. Please provide it explicitly or ensure you are in a Git repository.'));
+        expect(mockGitService.getCurrentBranchName).toHaveBeenCalledTimes(1);
+      });
     });
 
-    it('should update a document using patches when branchName is omitted', async () => {
-      const initialDocument = { items: ["initial"] };
-      const documentPath = 'test/patched-no-branchname.json';
-      const initialContentString = JSON.stringify(initialDocument, null, 2);
-
-      // 準備：まずドキュメントを作成 (branchName 指定ありで)
-      await writeUseCase.execute({
-        branchName: TEST_BRANCH,
-        document: { path: documentPath, content: initialContentString, tags: ["patch-test"] }
-      });
-      // GitService の呼び出し回数をリセット
-      mockGitService.getCurrentBranchName.mockClear();
-
-      // 実行：branchName を省略してパッチを適用
-      const patches = [{ op: 'add', path: '/items/-', value: 'patched' }];
-      const patchResult = await writeUseCase.execute({
-        // branchName: TEST_BRANCH, // 省略！
-        document: { path: documentPath, tags: ["patch-test", "updated"] } as any, // content は省略
-        patches: patches
+    // --- みらい追加：branchName 省略時のテストケース (非プロジェクトモード) ---
+    describe('when branchName is omitted outside of project mode (isProjectMode: false)', () => {
+      beforeEach(() => {
+        // この describe 内では isProjectMode: false を強制
+        mockConfigProvider.getConfig.mockReturnValue({
+          docsRoot: testEnv.docRoot, verbose: false, language: 'en', isProjectMode: false // ★ プロジェクトモード OFF ★
+        });
+        mockGitService.getCurrentBranchName.mockClear(); // 各テスト前に呼び出し回数をリセット
       });
 
-      // 検証：
-      // 1. GitService が呼ばれたか？
-      expect(mockGitService.getCurrentBranchName).toHaveBeenCalledTimes(1);
-      // 2. 結果確認
-      expect(patchResult).toBeDefined();
-      expect(patchResult.document.path).toBe(documentPath);
-      // 3. 実際にファイルが更新されたか確認 (readUseCase を使う)
-      //    読むときも branchName を省略
-      const readResult = await readUseCase.execute({ path: documentPath });
-      expect(readResult).toBeDefined();
-      const readDocument = JSON.parse(readResult.document.content);
-      expect(readDocument.items).toEqual(["initial", "patched"]);
-      expect(readResult.document.tags).toEqual(["patch-test", "updated"]);
-    });
+      it('should return an error when creating a document because branchName is required', async () => {
+        const newDocument = { content: { message: "Should not be created" } };
+        const documentPath = 'test/created-no-branchname-no-project.json';
+        const documentContentString = JSON.stringify(newDocument, null, 2);
 
-    it('should return an error if branchName is omitted and current branch cannot be determined', async () => {
-      // 準備：GitService がエラーを投げるようにモックを設定
-      const gitError = new Error('Not a git repository');
-      mockGitService.getCurrentBranchName.mockRejectedValue(gitError);
+        await expect(writeUseCase.execute({
+          document: { path: documentPath, content: documentContentString, tags: ["test", "no-branchname"] }
+        })).rejects.toThrow(ApplicationErrors.invalidInput('Branch name is required when not running in project mode.'));
 
-      // 実行＆検証：branchName を省略して書き込みを試み、特定のエラーが投げられることを確認
-      await expect(writeUseCase.execute({
-        // branchName: undefined, // 省略
-        document: {
-          path: 'any/document.json',
-          content: '{"data": "test"}',
-          tags: ["error-test"]
-        }
-      })).rejects.toThrow(ApplicationErrors.invalidInput('Branch name is required but could not be automatically determined. Please provide it explicitly or ensure you are in a Git repository.'));
+        expect(mockGitService.getCurrentBranchName).not.toHaveBeenCalled(); // GitService は呼ばれない
+      });
 
-      // GitService の getCurrentBranchName が呼ばれたか？
-      expect(mockGitService.getCurrentBranchName).toHaveBeenCalledTimes(1);
+      it('should return an error when updating with patches because branchName is required', async () => {
+        const initialDocument = { items: ["initial-no-project"] };
+        const documentPath = 'test/patched-no-branchname-no-project.json';
+        const initialContentString = JSON.stringify(initialDocument, null, 2);
+        // 準備：ドキュメントはブランチ名指定で作成しておく
+        await writeUseCase.execute({ branchName: TEST_BRANCH, document: { path: documentPath, content: initialContentString, tags: ["patch-test"] } });
+        mockGitService.getCurrentBranchName.mockClear();
+
+        const patches = [{ op: 'add', path: '/items/-', value: 'should-not-patch' }];
+        await expect(writeUseCase.execute({
+          document: { path: documentPath, tags: ["patch-test", "updated"] } as any,
+          patches: patches
+        })).rejects.toThrow(ApplicationErrors.invalidInput('Branch name is required when not running in project mode.'));
+
+        expect(mockGitService.getCurrentBranchName).not.toHaveBeenCalled(); // GitService は呼ばれない
+      });
     });
 
   }); // describe('execute', ...) の閉じ括弧
