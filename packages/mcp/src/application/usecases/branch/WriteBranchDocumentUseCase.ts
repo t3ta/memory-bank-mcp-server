@@ -9,7 +9,7 @@ import { Tag } from '../../../domain/entities/Tag.js';
 import { DomainError } from '../../../shared/errors/DomainError.js';
 import {
   ApplicationError,
-  ApplicationErrorCodes,
+  ApplicationErrors, // Use this for error creation
 } from '../../../shared/errors/ApplicationError.js';
 import { logger } from '../../../shared/utils/logger.js'; // Import logger
 import type { IGitService } from '@/infrastructure/git/IGitService.js';
@@ -102,16 +102,16 @@ constructor(
             this.componentLogger.info(`Current branch name automatically detected: ${branchNameToUse}`);
           } catch (error) {
             this.componentLogger.error('Failed to get current branch name', { error });
-            throw new ApplicationError(
-              ApplicationErrorCodes.INVALID_INPUT,
+            // ★★★ cause に元のエラーオブジェクトを渡す ★★★
+            throw ApplicationErrors.executionFailed(
               'Branch name is required but could not be automatically determined. Please provide it explicitly or ensure you are in a Git repository.',
-              { originalError: error }
+              error instanceof Error ? error : undefined // cause に Error オブジェクトを渡す
             );
           }
         } else {
           // プロジェクトモードでない場合は、ブランチ名の省略はエラー
           this.componentLogger.warn('Branch name omitted outside of project mode.');
-          throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT,'Branch name is required when not running in project mode.');
+          throw ApplicationErrors.invalidInput('Branch name is required when not running in project mode.');
         }
       }
 
@@ -126,10 +126,10 @@ constructor(
       // Remaining validations...
       if (!input.document) {
         // Even if using patches, the document object (for path, tags) is needed
-        throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Document object is required');
+        throw ApplicationErrors.invalidInput('Document object is required');
       }
       if (!input.document.path) {
-        throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Document path is required');
+        throw ApplicationErrors.invalidInput('Document path is required');
       }
 
       // Check if content is provided and is not an empty string
@@ -140,18 +140,14 @@ constructor(
       // Allow initialization (no content, no patches) - this case is handled below
       // content が undefined または null で、かつ patches もない場合のみエラー
       if ((input.document.content === undefined || input.document.content === null) && !hasPatches) { // ★ OR 条件に修正
-        throw new ApplicationError(
-          ApplicationErrorCodes.INVALID_INPUT,
+        throw ApplicationErrors.invalidInput(
           'Either document content or patches must be provided'
         );
       }
       // content と patches の排他チェック
       if (hasContent && hasPatches) {
-        throw new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Cannot provide both document content and patches simultaneously');
+        throw ApplicationErrors.invalidInput('Cannot provide both document content and patches simultaneously');
       }
-      // 不要な else if を削除
-      // else if (hasPatches && !Array.isArray(input.patches)) { ... }
-      // else if (hasContent && typeof input.document.content !== 'string' && typeof input.document.content !== 'object') { ... }
 
 // --- Prepare Domain Objects ---
 const branchInfo = BranchInfo.create(branchNameToUse!);
@@ -167,10 +163,12 @@ if (!branchExists) {
     this.componentLogger.info(`Branch '${branchInfo.safeName}' initialized successfully.`); // Use safeName
   } catch (initError) {
     this.componentLogger.error(`Failed to initialize branch '${branchInfo.safeName}'`, { originalError: initError }); // Use safeName
-    throw new ApplicationError(
-      ApplicationErrorCodes.BRANCH_INITIALIZATION_FAILED,
-      `Failed to initialize branch '${branchInfo.name}': ${(initError as Error).message}`, // Use original name for user message
-      { originalError: initError }
+    // ★★★ ApplicationErrors.branchInitializationFailed の引数を修正 ★★★
+    throw ApplicationErrors.branchInitializationFailed(
+      branchInfo.name, // branchName
+      initError instanceof Error ? initError : undefined, // cause
+      // details はオプションなので省略可能、またはメッセージを含める
+      { message: `Failed to initialize branch '${branchInfo.name}': ${(initError as Error).message}` }
     );
   }
 }
@@ -182,16 +180,19 @@ if (hasPatches) {
   // --- Patch Logic ---
   this.componentLogger.debug('Processing write request with patches.', { path: documentPath.value });
 
+  // ★★★ デバッグログ追加: パッチ適用のガード処理前 ★★★
+  logger.debug('[Mirai Debug] Checking patch guard for branchContext.json', { pathValue: documentPath.value });
   // Guard: Disallow patch operations on branchContext.json for now
   if (documentPath.value === 'branchContext.json') {
-    throw new ApplicationError(
-      ApplicationErrorCodes.INVALID_INPUT,
+    // ★★★ Add log inside the block ★★★
+    logger.error('[Mirai Error] Guard condition MET! Throwing error for branchContext.json patch.');
+    throw ApplicationErrors.invalidInput(
       'Patch operations are currently not allowed for branchContext.json'
     );
   }
 
   if (!existingDocument) {
-    throw new ApplicationError(ApplicationErrorCodes.NOT_FOUND, `Document not found at path ${documentPath.value}, cannot apply patches.`);
+    throw ApplicationErrors.notFound('Document', documentPath.value, { message: 'Cannot apply patches to non-existent document.'});
   }
 
   try {
@@ -200,12 +201,14 @@ if (hasPatches) {
       try {
         currentContentObject = JSON.parse(existingDocument.content);
       } catch (parseError) {
-        throw new ApplicationError(ApplicationErrorCodes.INVALID_STATE, `Failed to parse existing document content as JSON for patching: ${(parseError as Error).message}`);
+        // ★★★ ApplicationErrors.executionFailed に修正 ★★★
+        throw ApplicationErrors.executionFailed(`Failed to parse existing document content as JSON for patching: ${(parseError as Error).message}`);
       }
     } else if (typeof existingDocument.content === 'object' && existingDocument.content !== null) {
       currentContentObject = existingDocument.content;
     } else {
-       throw new ApplicationError(ApplicationErrorCodes.INVALID_STATE, `Existing document content is not a string or object, cannot apply patches. Type: ${typeof existingDocument.content}`);
+       // ★★★ ApplicationErrors.executionFailed に修正 ★★★
+       throw ApplicationErrors.executionFailed(`Existing document content is not a string or object, cannot apply patches. Type: ${typeof existingDocument.content}`);
     }
 
     const patchOperations = (input.patches ?? []).map(p =>
@@ -215,16 +218,20 @@ if (hasPatches) {
     const patchedContent = this.patchService.apply(currentContentObject, patchOperations);
     const stringifiedContent = JSON.stringify(patchedContent, null, 2);
     documentToSave = existingDocument.updateContent(stringifiedContent);
+    // ★★★ パッチ適用成功後にタグを更新 ★★★
+    if (input.document.tags) {
+        documentToSave = documentToSave.updateTags(tags);
+        this.componentLogger.debug('Tags updated along with patches.', { path: documentPath.value, newTags: input.document.tags });
+    }
+    // ★★★ ここまで ★★★
 
   } catch (patchError) {
     this.componentLogger.error(`Failed to apply JSON patch to ${documentPath.value}`, { error: patchError });
-    throw new ApplicationError(ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED, `Failed to apply JSON patch: ${(patchError as Error).message}`);
+    // ★★★ ApplicationErrors.executionFailed に修正 ★★★
+    throw ApplicationErrors.executionFailed(`Failed to apply JSON patch: ${(patchError as Error).message}`);
   }
 
-  // Update tags if provided with patches
-  if (input.document.tags) {
-     documentToSave = documentToSave.updateTags(tags);
-  }
+  // ★ タグ更新処理は try ブロック内に移動したので、ここは削除 ★
 
 } else if (hasContent) {
   // --- Content Logic ---
@@ -234,8 +241,7 @@ if (hasPatches) {
   if (documentPath.value === 'branchContext.json') {
     const content = input.document.content;
     if (typeof content !== 'string' || content.trim() === '' || content.trim() === '{}') {
-      throw new ApplicationError(
-        ApplicationErrorCodes.INVALID_INPUT,
+      throw ApplicationErrors.invalidInput(
         'Content for branchContext.json cannot be empty or an empty object string'
       );
     }
@@ -246,10 +252,9 @@ if (hasPatches) {
       for (const key of requiredKeys) { if (!(key in parsedContent)) { throw new Error(`Missing required key: ${key}`); } }
       this.componentLogger.debug('branchContext.json content validation passed.');
     } catch (parseError) {
-      throw new ApplicationError(
-        ApplicationErrorCodes.INVALID_INPUT,
+      throw ApplicationErrors.invalidInput(
         `Invalid JSON content for branchContext.json: ${(parseError as Error).message}`,
-        { originalError: parseError }
+        { originalError: parseError } // ここは details として渡すので OK
       );
     }
   }
@@ -317,7 +322,8 @@ if (hasPatches) {
       }
       this.componentLogger.error('Unexpected error in WriteBranchDocumentUseCase:', { error });
       // Wrap unexpected errors
-      throw new ApplicationError(ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED, `Unexpected error: ${(error as Error).message}`, { originalError: error });
+      // ★★★ cause に元のエラーオブジェクトを渡す ★★★
+      throw ApplicationErrors.executionFailed(`Unexpected error: ${(error as Error).message}`, error instanceof Error ? error : undefined);
     }
   }
 }

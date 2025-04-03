@@ -100,10 +100,15 @@ export class ReadContextUseCase {
   private async readBranchMemory(branchName: string): Promise<Record<string, string>> {
     const branchInfo = BranchInfo.create(branchName);
     logger.debug('Calling branchRepository.listDocuments...'); // Added log
+    // --- みらい：ファイルシステム反映のための短い待機を追加 (テスト失敗対応) ---
+    await new Promise(resolve => setTimeout(resolve, 50)); // 50ms待機
+    // --- みらい：ここまで ---
     const paths = await this.branchRepository.listDocuments(branchInfo);
     logger.debug('Finished branchRepository.listDocuments'); // Added log
+    // --- みらい：デバッグログ追加 ---
+    logger.debug(`[Mirai Debug] listDocuments returned paths: ${JSON.stringify(paths.map(p => p.value))}`);
+    // --- みらい：ここまで ---
     const result: Record<string, string> = {};
-
     logger.debug(`Reading branch memory paths: ${paths.map(p => p.value).join(', ')}`);
 
     for (const path of paths) {

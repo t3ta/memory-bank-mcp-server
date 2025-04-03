@@ -33,7 +33,7 @@ import { FileSystemService } from '../../infrastructure/storage/FileSystemServic
 import { IConfigProvider } from '../../infrastructure/config/interfaces/IConfigProvider.js';
 import { ConfigProvider } from '../../infrastructure/config/ConfigProvider.js';
 import { FileSystemGlobalMemoryBankRepository } from '../../infrastructure/repositories/file-system/FileSystemGlobalMemoryBankRepository.js';
-import { FileSystemBranchMemoryBankRepository } from '../../infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.js';
+import { FileSystemBranchMemoryBankRepository } from '../../infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.js'; // みらい：元のパスに戻す！
 import { FileSystemTagIndexRepositoryV1Bridge } from '../../infrastructure/repositories/file-system/FileSystemTagIndexRepositoryV1Bridge.js';
 import { FileTemplateRepository } from '../../infrastructure/templates/FileTemplateRepository.js'; // Added import
 import { ContextController } from '../../interface/controllers/ContextController.js';
