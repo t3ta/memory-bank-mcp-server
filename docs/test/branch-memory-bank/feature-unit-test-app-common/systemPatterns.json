@@ -1,0 +1,15 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-unit-test-app-common-system-patterns",
+    "title": "System Patterns for feature/unit-test-app-common",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [],
+    "createdAt": "2025-04-04T16:45:52.115Z",
+    "lastModified": "2025-04-04T16:45:52.115Z"
+  },
+  "content": {
+    "patterns": []
+  }
+}
