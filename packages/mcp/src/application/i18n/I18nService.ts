@@ -7,6 +7,7 @@
 import { Language, LanguageCode } from '../../domain/i18n/Language.js';
 import { II18nRepository } from '../../domain/i18n/II18nRepository.js';
 import { Translation } from '../../domain/i18n/Translation.js';
+import { logger } from '../../shared/utils/logger.js'; // みらい: logger をインポート
 
 /**
  * Service for handling internationalization and translations
@@ -103,7 +104,7 @@ export class I18nService {
       const languageCode = secondParam;
 
       if (!this.isTranslationLoaded) {
-        console.warn('Translations not loaded. Call loadAllTranslations() first.');
+        logger.warn('Translations not loaded. Call loadAllTranslations() first.', { component: 'I18nService' }); // みらい: console.warn を logger.warn に変更
         return `?${key}`;
       }
 

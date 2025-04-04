@@ -11,6 +11,7 @@ import { IFileSystemService } from '../storage/interfaces/IFileSystemService.js'
 import { II18nProvider } from '../i18n/interfaces/II18nProvider.js';
 import { TemplateRenderer } from './TeplateRenderer.js';
 import { ITemplateLoader } from './interfaces/ITemplateLoader.js';
+import { logger } from '../../shared/utils/logger.js'; // みらい: logger をインポート
 
 /**
  * Implementation of ITemplateLoader for JSON templates
@@ -102,8 +103,9 @@ export class JsonTemplateLoader implements ITemplateLoader {
         (error as Error).message.includes('Template not found') ||
         (error as Error).message.includes('Invalid JSON')
       ) {
-        console.warn(
-          `JSON template ${templateId} not found or invalid, falling back to legacy template..`
+        logger.warn( // みらい: console.warn を logger.warn に変更
+          `JSON template ${templateId} not found or invalid, falling back to legacy template..`,
+          { component: 'JsonTemplateLoader', templateId }
         );
 
         try {
