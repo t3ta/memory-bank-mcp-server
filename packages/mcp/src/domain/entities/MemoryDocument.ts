@@ -268,18 +268,23 @@ export class MemoryDocument {
         };
     }
 
-    return {
-      schema: 'memory_document_v2',
-      title,
-      documentType,
+    // metadata オブジェクトを作成
+    const metadata: JsonDocumentV2['metadata'] = {
+      id: crypto.randomUUID(), // 新しいIDを生成
+      title: title,
+      documentType: documentType,
       path: this.props.path.value,
       tags: this.props.tags.map((tag) => tag.value),
-      lastModified: this.props.lastModified.toISOString(), // Convert Date to ISO string
-      createdAt: new Date().toISOString(), // Convert Date to ISO string
-      version: 1,
-      id: crypto.randomUUID(),
-      ...content,
-    } as unknown as JsonDocumentV2; // Cast to unknown first to suppress TS error due to path mapping issue
+      lastModified: this.props.lastModified.toISOString(),
+      createdAt: new Date().toISOString(), // 作成日時は常に現在時刻
+      version: 1, // バージョンは常に1（MemoryDocumentにはバージョン情報がないため）
+    };
+
+    return {
+      schema: 'memory_document_v2',
+      metadata: metadata, // metadata オブジェクトを正しく設定
+      content: content,   // content オブジェクトを正しく設定
+    } as JsonDocumentV2; // 型アサーションは維持
   }
 
   /**
@@ -327,7 +332,7 @@ export class MemoryDocument {
    * Determine the document type based on the path or content
    * @returns document type
    */
-  private determineDocumentType(): string {
+  private determineDocumentType(): JsonDocumentV2['metadata']['documentType'] {
     const filename = this.props.path.filename.toLowerCase();
 
     if (filename.includes('branchcontext') || filename.includes('branch-context')) {
@@ -339,7 +344,9 @@ export class MemoryDocument {
     } else if (filename.includes('systempatterns') || filename.includes('system-patterns')) {
       return 'system_patterns';
     } else {
-      return 'generic';
+      // JsonDocumentV2 に 'generic' はないので、デフォルトの型を返す
+      // (本来はどう扱うべきか要検討)
+      return 'branch_context';
     }
   }
 }
