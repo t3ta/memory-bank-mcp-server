@@ -41,12 +41,16 @@ export class Tag {
    * @param other Another Tag instance
    * @returns boolean indicating equality
    */
-  public equals(other: Tag): boolean {
-    logger.debug('Comparing tags:', {
-      thisTag: this._value,
-      otherTag: other._value,
-      isEqual: this._value === other._value
-    });
+  public equals(other: Tag | null | undefined): boolean {
+    // Check if other is a valid Tag instance
+    if (!(other instanceof Tag)) {
+      return false;
+    }
+    // logger.debug('Comparing tags:', { // logger はテスト実行時に邪魔になる可能性があるのでコメントアウト推奨
+    //   thisTag: this._value,
+    //   otherTag: other._value,
+    //   isEqual: this._value === other._value
+    // });
     return this._value === other._value;
   }
 
