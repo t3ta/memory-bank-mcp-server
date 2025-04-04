@@ -1,5 +1,5 @@
 import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
-import { logger } from '../../shared/utils/logger.js';
+// import { logger } from '../../shared/utils/logger.js'; // 未使用のためコメントアウト
 
 /**
  * Value object representing a document tag
@@ -49,19 +49,18 @@ export class Tag {
    * @param other Another Tag instance
    * @returns boolean indicating equality
    */
-  public equals(other: Tag | null | undefined): boolean { // other が null/undefined の可能性を考慮
-    // ★★★ null/undefined チェックを追加 ★★★
-    if (!other) {
+  public equals(other: Tag | null | undefined): boolean {
+    // Check if other is a valid Tag instance
+    if (!(other instanceof Tag)) {
       return false;
     }
-    // logger.debug を安全な場所に移動
-    logger.debug('Comparing tags:', {
-      thisTag: this._value,
-      otherTag: other._value, // null チェック後なので安全
-      isEqual: this._value === other._value
-    });
-    return this._value === other._value; // 正しい return 文
-  } // 正しい閉じ括弧
+    // logger.debug('Comparing tags:', { // logger はテスト実行時に邪魔になる可能性があるのでコメントアウト推奨
+    //   thisTag: this._value,
+    //   otherTag: other._value,
+    //   isEqual: this._value === other._value
+    // });
+    return this._value === other._value;
+  }
 
   /**
    * Convert to string

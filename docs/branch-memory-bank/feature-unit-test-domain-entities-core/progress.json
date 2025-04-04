@@ -1,0 +1,19 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-unit-test-domain-entities-core-progress",
+    "title": "Progress for feature/unit-test-domain-entities-core",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "createdAt": "2025-04-04T12:25:49.418Z",
+    "lastModified": "2025-04-04T12:25:49.418Z"
+  },
+  "content": {
+    "summary": "Initial progress for branch: feature/unit-test-domain-entities-core",
+    "status": "initialized",
+    "steps": [],
+    "next_steps": [],
+    "findings": []
+  }
+}
