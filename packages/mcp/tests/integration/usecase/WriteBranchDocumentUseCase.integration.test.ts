@@ -9,11 +9,15 @@ import { DomainError, DomainErrors } from '../../../src/shared/errors/DomainErro
 import { ApplicationError, ApplicationErrors } from '../../../src/shared/errors/ApplicationError.js'; // Import specific errors for checking
 import { IGitService } from '../../../src/infrastructure/git/IGitService.js';
 import { IConfigProvider } from '../../../src/infrastructure/config/interfaces/IConfigProvider.js';
+import { IBranchMemoryBankRepository } from '../../../src/domain/repositories/IBranchMemoryBankRepository.js'; // Import missing interface
 import type { WorkspaceConfig } from '../../../src/infrastructure/config/WorkspaceConfig.js';
 import { BranchInfo } from '../../../src/domain/entities/BranchInfo.js';
 import { jest } from '@jest/globals';
 import { execSync } from 'child_process';
 import { logger } from '../../../src/shared/utils/logger.js';
+import { JsonPatchService } from '../../../src/domain/jsonpatch/JsonPatchService.js'; // Import JsonPatchService interface
+import { Rfc6902JsonPatchAdapter } from '../../../src/domain/jsonpatch/Rfc6902JsonPatchAdapter.js'; // Import concrete implementation for testing
+import { DocumentWriterService } from '../../../src/application/services/DocumentWriterService.js'; // Import DocumentWriterService
 
 import * as path from 'path';
 import fs from 'fs-extra'; // Use default import for fs-extra
@@ -78,9 +82,24 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
 
     container.register<IConfigProvider>('configProvider', mockConfigProvider); // コンテナにConfigProviderモックを登録
 
-    // Get the use case instances from container
-    writeUseCase = await container.get<WriteBranchDocumentUseCase>('writeBranchDocumentUseCase');
-    readUseCase = await container.get<ReadBranchDocumentUseCase>('readBranchDocumentUseCase');
+   // Register JsonPatchService and DocumentWriterService for the test
+   const jsonPatchService = new Rfc6902JsonPatchAdapter();
+   container.register<JsonPatchService>('jsonPatchService', jsonPatchService);
+   const documentWriterService = new DocumentWriterService(jsonPatchService);
+   container.register<DocumentWriterService>('documentWriterService', documentWriterService);
+
+   // Manually instantiate WriteBranchDocumentUseCase with mocks and real services for integration test
+   // This bypasses the potentially complex factory setup in providers.ts for focused testing
+   const branchRepository = await container.get<IBranchMemoryBankRepository>('branchMemoryBankRepository');
+   writeUseCase = new WriteBranchDocumentUseCase(
+       branchRepository,
+       documentWriterService, // Inject the real service instance
+       mockGitService,
+       mockConfigProvider
+   );
+
+   // Get ReadUseCase from container as before
+   readUseCase = await container.get<ReadBranchDocumentUseCase>('readBranchDocumentUseCase');
   });
 
   afterEach(async () => {

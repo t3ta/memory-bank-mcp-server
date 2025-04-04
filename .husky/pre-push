@@ -8,6 +8,8 @@ fi
 
 yarn lint-staged || exit 1 # Exit if lint-staged fails
 
+yarn build || exit 1 # Exit if build fails
+
 echo "Running dependency check..."
 yarn check:deps || exit 1 # Exit if depcheck fails
 
