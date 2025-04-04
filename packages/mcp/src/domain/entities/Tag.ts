@@ -1,5 +1,5 @@
 import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
-import { logger } from '../../shared/utils/logger.js';
+// import { logger } from '../../shared/utils/logger.js'; // 未使用のためコメントアウト
 
 /**
  * Value object representing a document tag
