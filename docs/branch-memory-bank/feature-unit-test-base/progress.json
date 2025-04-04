@@ -1,0 +1,94 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-unit-test-base-progress",
+    "title": "Progress for feature/unit-test-base",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "createdAt": "2025-04-04T11:46:16.875Z",
+    "lastModified": "2025-04-04T12:24:28.696Z"
+  },
+  "content": {
+    "summary": "packages/mcp へのユニットテスト導入計画に基づき、ブランチを分割し、テストスケルトンを作成しました。",
+    "status": "in progress",
+    "steps": [
+      {
+        "title": "1. 環境整備",
+        "details": [
+          "package.json スクリプト修正 (unit/integration分離)",
+          "Jest設定確認・最適化",
+          "モック戦略確立 (Repository, fs-extra, rfc6902 etc.)"
+        ],
+        "status": "todo"
+      },
+      {
+        "title": "2. Domain層テスト (最優先)",
+        "details": [
+          "Entities/ValueObjects (DocumentPath, JsonDocument, MemoryDocument, Tag, JsonPatchOperation, JsonPath)",
+          "Domain Services (もしあれば)"
+        ],
+        "status": "todo"
+      },
+      {
+        "title": "3. Application層テスト (重要)",
+        "details": [
+          "UseCases (Read/Write系, Context/Rules系, Search系, JsonPatchUseCase, CoreFiles系)"
+        ],
+        "status": "todo"
+      },
+      {
+        "title": "4. Infrastructure層テスト (モック中心)",
+        "details": [
+          "Adapters (Rfc6902JsonPatchAdapter)",
+          "Repositories (FileSystem*, GitService)"
+        ],
+        "status": "todo"
+      },
+      {
+        "title": "5. Interface層テスト (低優先度)",
+        "details": [
+          "Controllers"
+        ],
+        "status": "todo"
+      },
+      {
+        "title": "6. カバレッジ計測と向上",
+        "details": [
+          "レポート設定",
+          "目標設定",
+          "継続的なテスト追加"
+        ],
+        "status": "todo"
+      },
+      {
+        "title": "7. CI連携",
+        "details": [
+          "パイプラインにユニットテスト実行追加"
+        ],
+        "status": "todo"
+      }
+    ],
+    "next_steps": [
+      "各 feature/unit-test-* ブランチにチェックアウトし、担当範囲のテスト実装を進める。",
+      "実装完了後、各ブランチから develop (または main) へプルリクエストを作成する。"
+    ],
+    "findings": [
+      {
+        "type": "info",
+        "message": "ユニットテスト実装のために以下のブランチを作成し、スケルトンファイルをコミットしました。",
+        "details": {
+          "branches": [
+            "feature/unit-test-domain-entities-core: Domain層コアエンティティ、JsonPatch",
+            "feature/unit-test-domain-entities-others: Domain層その他エンティティ",
+            "feature/unit-test-app-rw: Application層 Read/Write ユースケース",
+            "feature/unit-test-app-common: Application層共通ユースケース",
+            "feature/unit-test-app-json: Application層 JSON ユースケース",
+            "feature/unit-test-infra-interface: Infrastructure層、Interface層"
+          ]
+        },
+        "timestamp": "2025-04-04T12:25:00.000Z"
+      }
+    ]
+  }
+}

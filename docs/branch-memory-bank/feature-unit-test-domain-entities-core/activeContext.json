@@ -1,0 +1,17 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-unit-test-domain-entities-core-active-context",
+    "title": "Active Context for feature/unit-test-domain-entities-core",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [],
+    "createdAt": "2025-04-04T12:25:49.418Z",
+    "lastModified": "2025-04-04T12:25:49.418Z"
+  },
+  "content": {
+    "current_task": "Initial active context for branch: feature/unit-test-domain-entities-core",
+    "relevant_files": [],
+    "recent_decisions": []
+  }
+}
