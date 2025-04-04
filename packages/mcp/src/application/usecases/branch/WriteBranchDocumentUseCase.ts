@@ -124,12 +124,18 @@ constructor(
         hasPatches: input.patches && Array.isArray(input.patches) && input.patches.length > 0,
       });
 
-     // Basic input validation (delegated most checks to DocumentWriterService)
+     // --- Input Validation (Basic checks in UseCase) ---
      if (!input.document) {
        throw ApplicationErrors.invalidInput('Document object is required');
      }
      if (!input.document.path) {
        throw ApplicationErrors.invalidInput('Document path is required');
+     }
+     // ★★★ content と patches の同時指定チェックを追加 ★★★
+     const hasContent = input.document.content !== undefined && input.document.content !== null;
+     const hasPatches = input.patches && Array.isArray(input.patches) && input.patches.length > 0;
+     if (hasContent && hasPatches) {
+       throw ApplicationErrors.invalidInput('Cannot provide both document content and patches simultaneously');
      }
 
 // --- Prepare Domain Objects ---

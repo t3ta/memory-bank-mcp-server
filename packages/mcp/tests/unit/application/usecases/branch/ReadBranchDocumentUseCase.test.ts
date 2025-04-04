@@ -4,7 +4,8 @@ import { DocumentPath } from '../../../../../src/domain/entities/DocumentPath';
 import { MemoryDocument } from '../../../../../src/domain/entities/MemoryDocument';
 import type { IGitService } from '../../../../../src/infrastructure/git/IGitService';
 import type { IConfigProvider } from '../../../../../src/infrastructure/config/interfaces/IConfigProvider';
-// import { DomainErrors } from '../../../../../src/domain/errors/DomainError'; // 必要に応じてコメント解除
+import { DomainErrors, ApplicationErrors } from '../../../../../src/shared/errors'; // ApplicationErrors をインポート
+import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo'; // BranchInfo をインポート
 
 // --- モックの準備 ---
 const mockBranchRepository = {
@@ -51,35 +52,85 @@ describe('ReadBranchDocumentUseCase', () => {
     );
   });
 
-  it.todo('存在するドキュメントを正しく読み込めること');
-  it.todo('ドキュメントが存在しない場合にエラー (DocumentNotFound) が発生すること');
-  it.todo('リポジトリで予期せぬエラーが発生した場合にエラーが伝播すること');
+  it('存在するドキュメントを正しく読み込めること', async () => {
+    const branchName = 'feature/test';
+    const docPath = DocumentPath.create('test.json');
+    const mockDocument = MemoryDocument.create({ path: docPath, content: '{"data":"test"}', tags: [], lastModified: new Date() }); // lastModified を追加
+    const branchInfo = BranchInfo.create(branchName); // BranchInfo を使う
+    const mockConfig = { isProjectMode: true, language: 'en' as const, docsRoot: '/mock/docs', verbose: false }; // language を 'en' (Language型) に修正
 
-  // --- 具体的なテストケースの例 ---
-  // it('存在するドキュメントを正しく読み込めること', async () => {
-  //   const branchName = 'feature/test';
-  //   const docPath = DocumentPath.create('test.json');
-  //   const mockDocument = MemoryDocument.create({ path: docPath, content: '{"data":"test"}', tags: [] });
-  //
-  //   mockBranchRepository.getDocument.mockResolvedValue(mockDocument); // メソッド名を修正
-  //
-  //   const result = await useCase.execute({ branch: branchName, path: docPath.value });
-  //
-  //   expect(result).toBeDefined();
-  //   expect(result.content).toBe('{"data":"test"}');
-  //   expect(mockBranchRepository.getDocument).toHaveBeenCalledWith(expect.any(BranchInfo), docPath); // 引数も修正
-  // });
-  //
-  // it('ドキュメントが存在しない場合にエラー (DocumentNotFound) が発生すること', async () => {
-  //   const branchName = 'feature/test';
-  //   const docPath = DocumentPath.create('nonexistent.json');
-  //   const expectedError = DomainErrors.documentNotFound(docPath.value); // 仮のエラーファクトリ
-  //
-  //   mockBranchRepository.getDocument.mockRejectedValue(expectedError); // メソッド名を修正
-  //
-  //   await expect(useCase.execute({ branch: branchName, path: docPath.value }))
-  //     .rejects.toThrow(expectedError);
-  //
-  //   expect(mockBranchRepository.getDocument).toHaveBeenCalledWith(expect.any(BranchInfo), docPath); // 引数も修正
-  // });
+    // モックの設定
+    mockGitService.getCurrentBranchName.mockResolvedValue(branchName);
+    mockConfigProvider.getConfig.mockReturnValue(mockConfig);
+    mockConfigProvider.getBranchMemoryPath.mockReturnValue(`/mock/path/to/${branchName}`);
+    mockBranchRepository.exists.mockResolvedValue(true); // ★★★ ブランチが存在することにする ★★★
+    mockBranchRepository.getDocument.mockResolvedValue(mockDocument);
+
+    // 実行
+    const result = await useCase.execute({ path: docPath.value }); // branch を削除
+
+    // 検証
+    expect(result).toBeDefined();
+    expect(result.document.content).toBe('{"data":"test"}'); // result.document.content に修正
+    expect(mockBranchRepository.getDocument).toHaveBeenCalledWith(branchInfo, docPath); // BranchInfo インスタンスで検証
+    // branchName が指定されているので getConfig や getCurrentBranchName は呼ばれないはず
+    // expect(mockGitService.getCurrentBranchName).toHaveBeenCalled();
+    // expect(mockConfigProvider.getConfig).toHaveBeenCalled();
+    // expect(mockConfigProvider.getBranchMemoryPath).toHaveBeenCalledWith(branchName); // branchName指定時は呼ばれない
+  });
+
+  it('ドキュメントが存在しない場合にエラー (DocumentNotFound) が発生すること', async () => {
+    const branchName = 'feature/test';
+    const docPath = DocumentPath.create('nonexistent.json');
+    const expectedError = DomainErrors.documentNotFound(docPath.value, { branchName });
+    const branchInfo = BranchInfo.create(branchName); // BranchInfo を使う
+    const mockConfig = { isProjectMode: true, language: 'en' as const, docsRoot: '/mock/docs', verbose: false }; // language を 'en' (Language型) に修正
+
+    // モックの設定
+    mockGitService.getCurrentBranchName.mockResolvedValue(branchName);
+    mockConfigProvider.getConfig.mockReturnValue(mockConfig);
+    mockConfigProvider.getBranchMemoryPath.mockReturnValue(`/mock/path/to/${branchName}`);
+    mockBranchRepository.exists.mockResolvedValue(true); // ★★★ ブランチが存在することにする ★★★
+    mockBranchRepository.getDocument.mockRejectedValue(expectedError); // エラーを返すように設定
+
+    // 実行＆検証
+    await expect(useCase.execute({ path: docPath.value })) // branch を削除
+      .rejects.toThrow(expectedError);
+
+    // モック呼び出し検証
+    expect(mockBranchRepository.getDocument).toHaveBeenCalledWith(branchInfo, docPath); // BranchInfo インスタンスで検証
+    // branchName が指定されているので getConfig や getCurrentBranchName は呼ばれないはず
+    // expect(mockGitService.getCurrentBranchName).toHaveBeenCalled();
+    // expect(mockConfigProvider.getConfig).toHaveBeenCalled();
+    // expect(mockConfigProvider.getBranchMemoryPath).toHaveBeenCalledWith(branchName); // branchName指定時は呼ばれない
+  });
+
+  it('リポジトリで予期せぬエラーが発生した場合にエラーが伝播すること', async () => {
+    const branchName = 'feature/test';
+    const docPath = DocumentPath.create('any.json');
+    const unexpectedError = new Error('Unexpected repository error');
+    const branchInfo = BranchInfo.create(branchName); // BranchInfo を使う
+    const mockConfig = { isProjectMode: true, language: 'en' as const, docsRoot: '/mock/docs', verbose: false }; // language を 'en' (Language型) に修正
+
+    // モックの設定
+    mockGitService.getCurrentBranchName.mockResolvedValue(branchName);
+    mockConfigProvider.getConfig.mockReturnValue(mockConfig);
+    mockConfigProvider.getBranchMemoryPath.mockReturnValue(`/mock/path/to/${branchName}`);
+    mockBranchRepository.exists.mockResolvedValue(true); // ★★★ ブランチが存在することにする ★★★
+    mockBranchRepository.getDocument.mockRejectedValue(unexpectedError); // 予期せぬエラーを返す
+
+    // 実行＆検証
+    await expect(useCase.execute({ path: docPath.value })) // branch を削除
+      // ErrorUtils.wrapAsync でラップされるため、期待するエラーを変更
+      .rejects.toThrow(ApplicationErrors.executionFailed('ReadBranchDocumentUseCase', unexpectedError));
+
+    // モック呼び出し検証
+    expect(mockBranchRepository.getDocument).toHaveBeenCalledWith(branchInfo, docPath); // BranchInfo インスタンスで検証
+    // branchName が指定されているので getConfig や getCurrentBranchName は呼ばれないはず
+    // expect(mockGitService.getCurrentBranchName).toHaveBeenCalled();
+    // expect(mockConfigProvider.getConfig).toHaveBeenCalled();
+    // expect(mockConfigProvider.getBranchMemoryPath).toHaveBeenCalledWith(branchName); // branchName指定時は呼ばれない
+  });
+
+  // --- 具体的なテストケースの例 (コメントアウト削除) ---
 });
