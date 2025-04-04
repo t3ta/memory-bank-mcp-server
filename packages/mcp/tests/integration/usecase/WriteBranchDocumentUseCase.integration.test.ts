@@ -395,7 +395,73 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
       expect(readDocument.items).toEqual(["apple", "banana"]); // Verify patch applied correctly
       // Also verify tags if they were updated
       expect(readResult.document.tags).toEqual(["test", "patch", "updated"]);
-    }); // Closing brace for it('should update a document using patches', ...)
+    });
+
+    it('should throw an error if patches are applied to a non-existent document (branch)', async () => {
+      const documentPath = 'test/non-existent-patch-target.json';
+      const patches = [{ op: 'add', path: '/newField', value: 'newValue' }];
+
+      await expect(writeUseCase.execute({
+        branchName: TEST_BRANCH,
+        document: { path: documentPath } as any, // Cast to avoid content requirement for this test
+        patches: patches
+      })).rejects.toThrow(ApplicationErrors.notFound('Document', documentPath));
+    });
+
+    it('should throw an error if patches test operation fails (branch)', async () => {
+      const initialDocument = { value: 'initial' };
+      const documentPath = 'test/patch-test-fail.json';
+      await writeUseCase.execute({
+        branchName: TEST_BRANCH,
+        document: { path: documentPath, content: JSON.stringify(initialDocument) }
+      });
+
+      const patches = [{ op: 'test', path: '/value', value: 'wrong-value' }];
+
+      await expect(writeUseCase.execute({
+        branchName: TEST_BRANCH,
+        document: { path: documentPath } as any,
+        patches: patches
+      })).rejects.toThrow(/Patch test operation failed/); // Match specific error if possible, otherwise general message
+    });
+
+    it('should throw an error if existing content is not valid JSON when applying patches (branch)', async () => {
+      const invalidContent = 'this is not json';
+      const documentPath = 'test/patch-invalid-json.txt';
+      await writeUseCase.execute({
+        branchName: TEST_BRANCH,
+        document: { path: documentPath, content: invalidContent }
+      });
+
+      const patches = [{ op: 'add', path: '/newField', value: 'newValue' }];
+
+      await expect(writeUseCase.execute({
+        branchName: TEST_BRANCH,
+        document: { path: documentPath } as any,
+        patches: patches
+      })).rejects.toThrow(/Failed to parse existing document content as JSON/);
+    });
+
+    it('should throw an error if both content and patches are provided (branch)', async () => {
+      const documentPath = 'test/content-and-patch.json';
+      const content = JSON.stringify({ initial: 'data' });
+      const patches = [{ op: 'add', path: '/newField', value: 'newValue' }];
+
+      await expect(writeUseCase.execute({
+        branchName: TEST_BRANCH,
+        document: { path: documentPath, content: content },
+        patches: patches
+      })).rejects.toThrow('Cannot provide both document content and patches simultaneously');
+    });
+
+    it('should throw an INVALID_INPUT error if neither content nor patches are provided (branch)', async () => {
+      const documentPath = 'test/no-content-no-patch.json';
+
+      await expect(writeUseCase.execute({
+        branchName: TEST_BRANCH,
+        document: { path: documentPath } // content と patches がない
+      })).rejects.toThrow('Either document content or patches must be provided');
+    });
 
     it('should return the created document content when returnContent is true', async () => {
       const newDocument = {

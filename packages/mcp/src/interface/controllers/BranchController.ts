@@ -82,7 +82,8 @@ export class BranchController {
           document: { // Pass path and tags from the document object
             path: path,
             tags: tags,
-            content: '' // Pass empty string to satisfy the type when using patches
+            // みらい: patches を使うときは content は undefined にする
+            content: undefined // Pass undefined when using patches
           },
           patches: patches // Pass the patches array
         });
