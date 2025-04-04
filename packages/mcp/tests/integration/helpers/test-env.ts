@@ -161,13 +161,13 @@ export async function cleanupTestEnv(env: TestEnv): Promise<void> {
     await env.cleanup();
     logger.debug(`Cleaned up temp directory: ${env.tempDir}`);
   } catch (error) {
-    logger.error('Error cleaning up test environment:', { error, component: 'test-env' }); // みらい: console.error を logger.error に変更
+    logger.error('Error cleaning up test environment:', { error, component: 'test-env' });
     // Attempt manual removal as fallback, but log the error
     try {
       await fs.remove(env.tempDir);
       logger.warn(`Fallback removal attempted for temp directory: ${env.tempDir}`);
     } catch (fallbackError) {
-      logger.error('Fallback removal failed:', { error: fallbackError, component: 'test-env' }); // みらい: console.error を logger.error に変更
+      logger.error('Fallback removal failed:', { error: fallbackError, component: 'test-env' });
     }
   }
 }

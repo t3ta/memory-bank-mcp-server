@@ -72,26 +72,26 @@ export class BranchController {
 
       // branchName が undefined でもログにはそのまま記録される
       this.componentLogger.info('Writing branch document', { operation: 'writeDocument', branchName, path, hasContent, hasPatches });
-      // みらい: 不要なデバッグログを削除
+
 
       if (hasPatches) {
-        // みらい: 不要なデバッグログを削除
+
         // Call WriteBranchDocumentUseCase with patches
         const result = await this.writeBranchDocumentUseCase.execute({
           branchName, // undefined の可能性あり
           document: { // Pass path and tags from the document object
             path: path,
             tags: tags,
-            // みらい: patches を使うときは content は undefined にする
+
             content: undefined // Pass undefined when using patches
           },
           patches: patches // Pass the patches array
         });
         // Log the result from the use case and the data being presented
-        // みらい: 不要なデバッグログを削除
+
        return this.presenter.presentSuccess(result.document);
       } else if (hasContent) {
-        // みらい: 不要なデバッグログを削除
+
         // If content is provided (and no patches), call the existing UseCase
         // Content is already known to be a non-empty string here due to hasContent check
         const result = await this.writeBranchDocumentUseCase.execute({
@@ -106,7 +106,7 @@ export class BranchController {
          // Return the document DTO directly from the use case result
         return this.presenter.presentSuccess(result.document);
       } else {
-        // みらい: 不要なデバッグログを削除
+
         // Handle the case where neither content nor patches are provided (or patches is an empty array)
         // This might need a dedicated initialization UseCase or logic.
         // For now, return the initialization message similar to routes.ts logic.

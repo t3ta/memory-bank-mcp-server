@@ -387,11 +387,11 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
       expect(readResult.document).toBeDefined();
       // Log the actual content read from the file for debugging
       // Log the raw content string read from the file before parsing
-      logger.error('--- Raw content after patch read from file:', { content: readResult.document.content, component: 'WriteBranchDocumentUseCase.integration.test' }); // みらい: console.error を logger.error に変更
+      logger.error('--- Raw content after patch read from file:', { content: readResult.document.content, component: 'WriteBranchDocumentUseCase.integration.test' });
 
       const readDocument = JSON.parse(readResult.document.content);
       // Log the parsed document object for debugging
-      logger.error('--- Parsed document object:', { document: readDocument, component: 'WriteBranchDocumentUseCase.integration.test' }); // みらい: console.error を logger.error に変更
+      logger.error('--- Parsed document object:', { document: readDocument, component: 'WriteBranchDocumentUseCase.integration.test' });
       expect(readDocument.items).toEqual(["apple", "banana"]); // Verify patch applied correctly
       // Also verify tags if they were updated
       expect(readResult.document.tags).toEqual(["test", "patch", "updated"]);

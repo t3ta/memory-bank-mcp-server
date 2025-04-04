@@ -9,7 +9,7 @@ import { ReadGlobalDocumentUseCase } from '../../../src/application/usecases/glo
 import { DomainError, DomainErrors } from '../../../src/shared/errors/DomainError.js'; // Import specific errors for checking
 import { ApplicationError, ApplicationErrors } from '../../../src/shared/errors/ApplicationError.js'; // ★ ApplicationError クラスもインポート
 import * as rfc6902 from 'rfc6902'; // ★ デバッグ用にインポート
-import { logger } from '../../../src/shared/utils/logger.js'; // みらい: logger をインポート
+import { logger } from '../../../src/shared/utils/logger.js';
 
 import fs from 'fs-extra'; // Use default import for fs-extra
 import * as path from 'path';
@@ -468,12 +468,12 @@ describe('WriteGlobalDocumentUseCase Integration Tests', () => {
           patchError = e;
         }
 
-        logger.debug('★★★ Debug: Error during applyPatch (if any):', { error: patchError, component: 'WriteGlobalDocumentUseCase.integration.test' }); // みらい: console.log を logger.debug に変更
+        logger.debug('★★★ Debug: Error during applyPatch (if any):', { error: patchError, component: 'WriteGlobalDocumentUseCase.integration.test' });
         // 元のオブジェクトが変更されていないか確認 (ディープコピーしたので変更されていないはず)
-        logger.debug('★★★ Debug: Initial Object (after patch attempt):', { object: initialContentObjectForDebug, component: 'WriteGlobalDocumentUseCase.integration.test' }); // みらい: console.log を logger.debug に変更
-        logger.debug('★★★ Debug: Directly Patched Object (result):', { object: directlyPatchedObject, component: 'WriteGlobalDocumentUseCase.integration.test' }); // みらい: console.log を logger.debug に変更
+        logger.debug('★★★ Debug: Initial Object (after patch attempt):', { object: initialContentObjectForDebug, component: 'WriteGlobalDocumentUseCase.integration.test' });
+        logger.debug('★★★ Debug: Directly Patched Object (result):', { object: directlyPatchedObject, component: 'WriteGlobalDocumentUseCase.integration.test' });
       } catch (debugError) {
-        logger.error('★★★ Debug: Error during outer debug block:', { error: debugError, component: 'WriteGlobalDocumentUseCase.integration.test' }); // みらい: console.error を logger.error に変更
+        logger.error('★★★ Debug: Error during outer debug block:', { error: debugError, component: 'WriteGlobalDocumentUseCase.integration.test' });
       }
       // ★★★ デバッグ用ここまで ★★★
 
@@ -513,7 +513,7 @@ describe('WriteGlobalDocumentUseCase Integration Tests', () => {
       const patchesAgain = [{ op: 'replace', path: '/content/value', value: 'Patched Again' } as const]; // ★ as const
       const finalTagsAgain = ['test', 'integration', 'patched', 'again'];
       // ★★★ デバッグ: 2回目の実行直前の引数を確認 ★★★
-      logger.debug('★★★ Debug: Executing 2nd patch with:', { patches: patchesAgain, tags: finalTagsAgain, component: 'WriteGlobalDocumentUseCase.integration.test' }); // みらい: console.log を logger.debug に変更
+      logger.debug('★★★ Debug: Executing 2nd patch with:', { patches: patchesAgain, tags: finalTagsAgain, component: 'WriteGlobalDocumentUseCase.integration.test' });
       const resultWithoutContent = await writeUseCase.execute({
         // ★ as any でキャスト
         document: {
