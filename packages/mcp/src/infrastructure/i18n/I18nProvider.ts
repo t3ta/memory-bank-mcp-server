@@ -45,7 +45,7 @@ export class I18nProvider implements II18nProvider {
     let language = langParam; // Declare language with let for reassignment
 
     if (!this.translations.has(language)) {
-      logger.warn( // みらい: console.warn を logger.warn に変更
+      logger.warn(
         `Translations not loaded for language ${language}, falling back to ${this.defaultLanguage}`,
         { component: 'I18nProvider', language }
       );
@@ -88,7 +88,7 @@ export class I18nProvider implements II18nProvider {
 
       const exists = await this.fileSystemService.fileExists(filePath);
       if (!exists) {
-        logger.warn(`Translation file not found: ${filePath}`, { component: 'I18nProvider', filePath }); // みらい: console.warn を logger.warn に変更
+        logger.warn(`Translation file not found: ${filePath}`, { component: 'I18nProvider', filePath });
         return false;
       }
 
@@ -96,7 +96,7 @@ export class I18nProvider implements II18nProvider {
       const translationFile = JSON.parse(content) as TranslationFile;
 
       if (translationFile.language !== language) {
-        logger.warn( // みらい: console.warn を logger.warn に変更
+        logger.warn(
           `Language mismatch in translation file: expected ${language}, got ${translationFile.language}`,
           { component: 'I18nProvider', filePath, expectedLanguage: language, actualLanguage: translationFile.language }
         );

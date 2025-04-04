@@ -213,7 +213,57 @@ if (hasPatches) {
         JsonPatchOperation.create(p.op, p.path, p.value, p.from)
     );
 
-    const patchedContent = this.patchService.apply(currentContentObject, patchOperations);
+    // ★★★ test 操作を自前で検証 (Global からコピー) ★★★
+    const testOperations = patchOperations.filter(op => op.op === 'test');
+    if (testOperations.length > 0) {
+      this.componentLogger.debug('Validating test operations before applying patch', { path: documentPath.value, testOperations });
+      for (const testOp of testOperations) {
+        // testOp の型を TestOperation に限定 (value が必須)
+        if (testOp.op !== 'test' || testOp.value === undefined) {
+           throw ApplicationErrors.invalidInput(`Invalid test operation format: ${JSON.stringify(testOp)}`);
+        }
+        try {
+           // JSON Pointer で値を取得 (JsonPath.segments を使用)
+           const expectedValue = testOp.value;
+           let actualValue: any = currentContentObject;
+           const segments = testOp.path.segments.slice(1); // ルートを示す最初の空文字列を除外
+
+           for (const segment of segments) {
+              // JsonPath.segments はデコード済みなのでそのまま使用
+              if (actualValue && typeof actualValue === 'object' && segment in actualValue) {
+                 actualValue = actualValue[segment];
+              } else if (Array.isArray(actualValue) && /^\d+$/.test(segment)) {
+                 // 配列インデックスの場合
+                 const index = parseInt(segment, 10);
+                 if (index >= 0 && index < actualValue.length) {
+                    actualValue = actualValue[index];
+                 } else {
+                    // インデックス範囲外ならパスが存在しない
+                    throw new Error(`Path not found at index: ${segment}`);
+                 }
+              } else {
+                 // パスが存在しない場合、テスト失敗
+                 throw new Error(`Path not found: ${testOp.path.path}`); // エラーメッセージには元のパス文字列を表示
+              }
+           }
+
+           // 値を比較 (JSON 文字列にして比較するのが確実)
+           if (JSON.stringify(actualValue) !== JSON.stringify(expectedValue)) {
+              throw new Error(`Value mismatch at path ${testOp.path.path}. Expected: ${JSON.stringify(expectedValue)}, Actual: ${JSON.stringify(actualValue)}`); // エラーメッセージには元のパス文字列を表示
+           }
+           this.componentLogger.debug('Test operation successful:', { testOp });
+
+        } catch (testError) {
+           this.componentLogger.error('Patch test operation failed:', { path: documentPath.value, testOp, error: testError });
+           const cause = testError instanceof Error ? testError : undefined;
+           throw ApplicationErrors.invalidInput(`Patch test operation failed: ${cause?.message ?? 'Test failed'}`, { cause });
+        }
+      }
+      // test 操作がすべて成功した場合のみ次に進む
+    }
+    // ★★★ test 操作以外のパッチを適用 ★★★
+    const nonTestOperations = patchOperations.filter(op => op.op !== 'test');
+    const patchedContent = this.patchService.apply(currentContentObject, nonTestOperations); // test 以外の操作を適用
     const stringifiedContent = JSON.stringify(patchedContent, null, 2);
     documentToSave = existingDocument.updateContent(stringifiedContent);
     // ★★★ パッチ適用成功後にタグを更新 ★★★
@@ -259,14 +309,16 @@ if (hasPatches) {
 
   // Proceed with content update/creation
   if (existingDocument) {
-    documentToSave = existingDocument.updateContent(input.document.content);
+    // content が undefined の場合は空文字列を渡す
+    documentToSave = existingDocument.updateContent(input.document.content ?? '');
     if (input.document.tags) {
       documentToSave = documentToSave.updateTags(tags);
     }
   } else {
     documentToSave = MemoryDocument.create({
       path: documentPath,
-      content: input.document.content,
+      // content が undefined の場合は空文字列を渡す
+      content: input.document.content ?? '',
       tags,
       lastModified: new Date(),
     });

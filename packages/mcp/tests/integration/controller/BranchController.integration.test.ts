@@ -7,7 +7,7 @@ import { BranchController } from '../../../src/interface/controllers/BranchContr
 import type { DocumentDTO } from '../../../src/application/dtos/DocumentDTO.js'; // Import DocumentDTO for type guard
 // ★★★ WriteBranchDocumentOutput をインポート ★★★
 import type { WriteBranchDocumentOutput } from '../../../src/application/usecases/branch/WriteBranchDocumentUseCase.js';
-import { logger } from '../../../src/shared/utils/logger.js'; // みらい: logger をインポート
+import { logger } from '../../../src/shared/utils/logger.js';
 // Custom Type Guard function to check if data matches the expected output structure
 // (content and tags are optional)
 function isWriteBranchDocumentOutputData(data: any): data is WriteBranchDocumentOutput['document'] {
@@ -82,7 +82,7 @@ describe('BranchController Integration Tests', () => {
       // ★★★ タイプガードの条件を反転させ、エラーケースを先に処理 ★★★
       if (!isWriteBranchDocumentOutputData(writeResult.data)) {
           // Log the actual data for debugging if the type guard fails
-          logger.error("--- Assertion Error: writeResult.data did not match expected output structure.", { actualData: writeResult.data, component: 'BranchController.integration.test' }); // みらい: console.error を logger.error に変更
+          logger.error("--- Assertion Error: writeResult.data did not match expected output structure.", { actualData: writeResult.data, component: 'BranchController.integration.test' });
           throw new Error('Expected writeResult.data to match the expected output structure');
       }
       // ★★★ タイプガードの後なので安全にアクセスできる ★★★
@@ -95,7 +95,7 @@ describe('BranchController Integration Tests', () => {
       expect(readResult.data).toBeDefined();
       // readResult.data の型ガードも追加 (readDocument は DocumentDTO を返す想定)
       if (!readResult.data || !readResult.data.document || typeof readResult.data.document.content !== 'string') {
-          logger.error("--- Assertion Error: readResult.data.document.content was not a string.", { actualData: readResult.data, component: 'BranchController.integration.test' }); // みらい: console.error を logger.error に変更
+          logger.error("--- Assertion Error: readResult.data.document.content was not a string.", { actualData: readResult.data, component: 'BranchController.integration.test' });
           throw new Error('Expected readResult.data.document.content to be a string');
       }
       const parsed = JSON.parse(readResult.data.document.content);
@@ -162,7 +162,7 @@ describe('BranchController Integration Tests', () => {
       expect(readResult.data).toBeDefined();
       // readResult.data の型ガードも追加
       if (!readResult.data || !readResult.data.document || typeof readResult.data.document.content !== 'string') {
-          logger.error("--- Assertion Error: readResult.data.document.content was not a string.", { actualData: readResult.data, component: 'BranchController.integration.test' }); // みらい: console.error を logger.error に変更
+          logger.error("--- Assertion Error: readResult.data.document.content was not a string.", { actualData: readResult.data, component: 'BranchController.integration.test' });
           throw new Error('Expected readResult.data.document.content to be a string');
       }
       const parsed = JSON.parse(readResult.data.document.content);
@@ -213,7 +213,7 @@ describe('BranchController Integration Tests', () => {
       // ★★★ タイプガードの条件を反転させ、エラーケースを先に処理 ★★★
       if (!isWriteBranchDocumentOutputData(updateResult.data)) {
            // Log the actual data for debugging if the type guard fails
-           logger.error("--- Assertion Error: updateResult.data did not match expected output structure.", { actualData: updateResult.data, component: 'BranchController.integration.test' }); // みらい: console.error を logger.error に変更
+           logger.error("--- Assertion Error: updateResult.data did not match expected output structure.", { actualData: updateResult.data, component: 'BranchController.integration.test' });
            throw new Error('Expected updateResult.data to match the expected output structure');
        }
        // ★★★ タイプガードの後なので安全にアクセスできる ★★★
@@ -226,7 +226,7 @@ describe('BranchController Integration Tests', () => {
       expect(readResult.data).toBeDefined();
       // readResult.data の型ガードも追加
       if (!readResult.data || !readResult.data.document || typeof readResult.data.document.content !== 'string') {
-          logger.error("--- Assertion Error: readResult.data.document.content was not a string.", { actualData: readResult.data, component: 'BranchController.integration.test' }); // みらい: console.error を logger.error に変更
+          logger.error("--- Assertion Error: readResult.data.document.content was not a string.", { actualData: readResult.data, component: 'BranchController.integration.test' });
           throw new Error('Expected readResult.data.document.content to be a string');
       }
       const parsed = JSON.parse(readResult.data.document.content);

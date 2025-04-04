@@ -172,7 +172,7 @@ export class DocumentIO {
       await fs.writeFile(filePath, contentToSave, 'utf-8');
       logger.debug('[DocumentIO] Successfully wrote file:', { filePath });
 
-      // みらい... .md ファイル作成処理を削除 (Issue #89 対応)
+
 
     } catch (error: unknown) {
       logger.error('[DocumentIO] Failed to save document:', { filePath, error });
