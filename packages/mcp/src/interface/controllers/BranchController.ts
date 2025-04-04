@@ -72,10 +72,10 @@ export class BranchController {
 
       // branchName が undefined でもログにはそのまま記録される
       this.componentLogger.info('Writing branch document', { operation: 'writeDocument', branchName, path, hasContent, hasPatches });
-      // console.error(`--- BranchController: Checking conditions - hasPatches: ${hasPatches}, content type: ${typeof content}, content value: "${content}", hasContent: ${hasContent}`); // DEBUG LOG REMOVED
+      // みらい: 不要なデバッグログを削除
 
       if (hasPatches) {
-        // console.error("--- BranchController: Entering 'patches' block"); // DEBUG LOG REMOVED
+        // みらい: 不要なデバッグログを削除
         // Call WriteBranchDocumentUseCase with patches
         const result = await this.writeBranchDocumentUseCase.execute({
           branchName, // undefined の可能性あり
@@ -87,11 +87,10 @@ export class BranchController {
           patches: patches // Pass the patches array
         });
         // Log the result from the use case and the data being presented
-        // console.error("--- BranchController: UseCase result:", JSON.stringify(result, null, 2)); // DEBUG LOG REMOVED
-        // console.error("--- BranchController: Presenting data:", JSON.stringify(result.document, null, 2)); // DEBUG LOG REMOVED
+        // みらい: 不要なデバッグログを削除
        return this.presenter.presentSuccess(result.document);
       } else if (hasContent) {
-        // console.error("--- BranchController: Entering 'content' block"); // DEBUG LOG REMOVED
+        // みらい: 不要なデバッグログを削除
         // If content is provided (and no patches), call the existing UseCase
         // Content is already known to be a non-empty string here due to hasContent check
         const result = await this.writeBranchDocumentUseCase.execute({
@@ -106,7 +105,7 @@ export class BranchController {
          // Return the document DTO directly from the use case result
         return this.presenter.presentSuccess(result.document);
       } else {
-        // console.error("--- BranchController: Entering 'else' (init) block"); // DEBUG LOG REMOVED
+        // みらい: 不要なデバッグログを削除
         // Handle the case where neither content nor patches are provided (or patches is an empty array)
         // This might need a dedicated initialization UseCase or logic.
         // For now, return the initialization message similar to routes.ts logic.

@@ -1,0 +1,57 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "fix-supress-logs-progress",
+    "title": "Progress for fix/supress-logs",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "createdAt": "2025-04-04T03:01:53.571Z",
+    "lastModified": "2025-04-04T03:32:59.561Z"
+  },
+  "content": {
+    "summary": "ロガー利用方針に基づき実装を完了し、コミットした。",
+    "status": "implementation_completed",
+    "steps": [
+      {
+        "id": "define_logger_policy",
+        "description": "ロガー利用方針を定義した。",
+        "status": "done",
+        "details": {
+          "policy": [
+            "標準ロガーへの移行: console.* を直接使わず、標準ロガー経由で出力。stderr への直接出力は避ける。",
+            "ログレベル定義: DEBUG, INFO, WARN, ERROR を定義し使い分ける。",
+            "console.* の扱い: 一時利用はOK、コミット前に整理。",
+            "本番ログ制御: 環境変数等でレベル制御、本番デフォルトは INFO。",
+            "構造化ロギング (JSON): ログは必ず JSON 形式で出力。",
+            "デバッグログ整理: テスト中の console.* を整理するタスクを追加。"
+          ]
+        }
+      },
+      {
+        "id": "implement_logger_policy",
+        "description": "定義したロガー方針に基づき実装（標準ロガー整備、既存ログ整理）を行い、コミットした。",
+        "status": "done"
+      }
+    ],
+    "next_steps": [
+      {
+        "id": "finalize_work",
+        "description": "DesignGuru モードに戻り、PR作成などの後処理を行う。",
+        "status": "todo"
+      }
+    ],
+    "findings": [
+      {
+        "id": "json_rpc_consideration",
+        "description": "標準入出力での JSON-RPC 通信のため、stderr への直接ログ出力は避け、ログは JSON 形式でシリアライズする必要がある。",
+        "source": "user_feedback"
+      },
+      {
+        "id": "debug_log_cleanup_needed",
+        "description": "テスト中に追加されたデバッグログの整理が必要。",
+        "source": "user_feedback"
+      }
+    ]
+  }
+}

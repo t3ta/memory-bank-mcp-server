@@ -9,7 +9,7 @@ import { ReadRulesUseCase } from '../../../src/application/usecases/common/ReadR
 import { DomainErrors } from '../../../src/shared/errors/DomainError.js'; // Import specific errors for checking
 import type { IBranchMemoryBankRepository } from '../../../src/domain/repositories/IBranchMemoryBankRepository.js';
 import fs from 'fs/promises';
-
+import { logger } from '../../../src/shared/utils/logger.js'; // みらい: logger をインポート
 import * as path from 'path';
 
 describe('ReadContextUseCase Integration Tests', () => {
@@ -140,9 +140,9 @@ describe('ReadContextUseCase Integration Tests', () => {
       const branchPath = path.join(testEnv.branchMemoryPath, toSafeBranchName(nonExistentBranch));
       try {
         const filesDirectly = await fs.readdir(branchPath);
-        console.log('[Mirai Debug] Files immediately after initialize:', filesDirectly.sort()); // ★デバッグログ追加 (ソート済み)
+        logger.debug('[Mirai Debug] Files immediately after initialize:', { files: filesDirectly.sort(), component: 'ReadContextUseCase.integration.test' }); // みらい: console.log を logger.debug に変更
       } catch (e) {
-        console.error('[Mirai Debug] Error reading directory after initialize:', e);
+        logger.error('[Mirai Debug] Error reading directory after initialize:', { error: e, component: 'ReadContextUseCase.integration.test' }); // みらい: console.error を logger.error に変更
       }
       // --- みらい：ここまで ---
 
