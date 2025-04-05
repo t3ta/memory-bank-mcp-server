@@ -1,0 +1,231 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "e31f2a98-c64d-47b5-a189-1234567890ab",
+    "title": "テスト改善計画",
+    "documentType": "generic",
+    "path": "test-improvement-plan.json",
+    "tags": [
+      "test",
+      "coverage",
+      "plan",
+      "improvement"
+    ],
+    "lastModified": "2025-04-05T12:00:00.000Z",
+    "createdAt": "2025-04-05T12:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "title": "MCPパッケージ テストカバレッジ改善計画",
+    "date": "2025-04-05",
+    "author": "みらい",
+    "summary": {
+      "overview": "前回のテストカバレッジレビューで特定された課題を解決し、全体のカバレッジ目標（ステートメント85%、ブランチ70%、関数85%、ライン85%）達成を目指す計画をまとめました。",
+      "currentCoverage": {
+        "statements": "79.81%",
+        "branches": "62.12%",
+        "functions": "81.19%",
+        "lines": "80.07%"
+      },
+      "targetCoverage": {
+        "statements": "85%",
+        "branches": "70%",
+        "functions": "85%",
+        "lines": "85%"
+      },
+      "keyAreas": [
+        "統合テストの修正",
+        "JSONパッチ操作のテスト強化",
+        "境界値テストの追加",
+        "エラーハンドリングモジュールのテスト強化"
+      ]
+    },
+    "prioritizedImplementations": [
+      {
+        "id": "integration-test-fix",
+        "title": "統合テスト修正",
+        "description": "ReadGlobalDocumentUseCase.integration.testの失敗を修正する",
+        "priority": "高",
+        "effort": "低",
+        "approach": "テストコードを修正し、documentTypeをトップレベルではなくメタデータ内で検証するように変更",
+        "estimatedLines": 10,
+        "files": [
+          "/Users/tmita/workspace/memory-bank-mcp-server/packages/mcp/tests/integration/usecase/ReadGlobalDocumentUseCase.integration.test.ts"
+        ],
+        "implementationSteps": [
+          "テストの失敗原因を詳細に分析",
+          "期待値をメタデータ内のdocumentTypeを検証するように変更",
+          "テストの実行と成功確認"
+        ]
+      },
+      {
+        "id": "jsonpatch-tests",
+        "title": "JSONパッチ操作テスト強化",
+        "description": "domain/jsonpatch配下のモジュールのテストを強化し、カバレッジを向上させる",
+        "priority": "高",
+        "effort": "中",
+        "approach": "パラメータ化テストを活用して多様な入力パターンとエッジケースをカバー",
+        "estimatedLines": 250,
+        "files": [
+          "/Users/tmita/workspace/memory-bank-mcp-server/packages/mcp/tests/unit/domain/jsonpatch/JsonPath.test.ts",
+          "/Users/tmita/workspace/memory-bank-mcp-server/packages/mcp/tests/unit/domain/jsonpatch/JsonPatchOperation.test.ts",
+          "/Users/tmita/workspace/memory-bank-mcp-server/packages/mcp/tests/unit/domain/jsonpatch/JsonPatchAdapter.test.ts"
+        ],
+        "implementationSteps": [
+          "既存のテストコードを分析し、カバレッジが低い部分を特定",
+          "パス解決のエッジケーステストを追加（深いネスト、エスケープ文字、特殊文字等）",
+          "配列操作の境界値テストを追加（-演算子、配列長以上のインデックス等）",
+          "無効なパッチ操作や競合するパッチのテストを追加",
+          "大きなJSONドキュメントや深くネストされたオブジェクトのテストを追加"
+        ]
+      },
+      {
+        "id": "boundary-tests",
+        "title": "境界値テスト追加",
+        "description": "条件分岐の多いモジュールに境界値テストを追加し、ブランチカバレッジを向上",
+        "priority": "中",
+        "effort": "中",
+        "approach": "条件分岐のカバレッジ分析を行い、テストが不足している分岐を特定して追加",
+        "estimatedLines": 200,
+        "files": [
+          "複数のモジュールが対象（詳細分析後に特定）"
+        ],
+        "implementationSteps": [
+          "条件分岐のカバレッジレポートを詳細に分析",
+          "テストが不足している分岐を優先度順にリストアップ",
+          "各モジュールに対する境界値テストケースを設計",
+          "テストの実装と検証"
+        ]
+      },
+      {
+        "id": "error-index-tests",
+        "title": "エラーインデックステスト強化",
+        "description": "shared/errors/index.tsのエラーファクトリ関数のテストを強化",
+        "priority": "低",
+        "effort": "低",
+        "approach": "各エラーファクトリ関数に対するテストを追加し、生成されるエラーオブジェクトの属性を検証",
+        "estimatedLines": 100,
+        "files": [
+          "/Users/tmita/workspace/memory-bank-mcp-server/packages/mcp/tests/unit/shared/errors/index.test.ts"
+        ],
+        "implementationSteps": [
+          "index.tsファイルに含まれるすべてのエラーファクトリ関数を特定",
+          "各関数に対するテストケースを設計（基本ケース、詳細情報付き、原因エラー付き等）",
+          "テストの実装と検証"
+        ]
+      }
+    ],
+    "testingApproaches": {
+      "parameterizedTests": {
+        "description": "パラメータ化テストを活用して同様のテストケースを効率的に実装",
+        "example": "test.each([\n  { input: value1, expected: result1 },\n  { input: value2, expected: result2 }\n])('should handle %p correctly', ({ input, expected }) => {\n  expect(functionUnderTest(input)).toEqual(expected);\n});"
+      },
+      "boundaryValueTesting": {
+        "description": "境界値テストを体系的に実装し、条件分岐のカバレッジを向上",
+        "categories": [
+          "入力値の境界（最小値、最大値、範囲外）",
+          "コレクションの境界（空、1要素、最大要素数）",
+          "特殊文字や形式（null、undefined、空文字、特殊文字）",
+          "非同期処理のエラーケース（タイムアウト、接続エラー等）"
+        ]
+      },
+      "errorHandlingTests": {
+        "description": "エラー処理パスを徹底的にテストし、例外処理の正確性を検証",
+        "focus": [
+          "エラーの型と属性の検証",
+          "エラーメッセージの正確性",
+          "エラーチェーンの検証",
+          "エラー変換ロジックの検証"
+        ]
+      }
+    },
+    "timeline": {
+      "phase1": {
+        "title": "統合テスト修正",
+        "duration": "0.5日",
+        "tasks": [
+          "ReadGlobalDocumentUseCase.integration.testの修正と検証"
+        ]
+      },
+      "phase2": {
+        "title": "JSONパッチテスト強化",
+        "duration": "2日",
+        "tasks": [
+          "JSONパス解決のテスト強化",
+          "パッチ操作のテスト強化",
+          "パッチアダプタのテスト強化"
+        ]
+      },
+      "phase3": {
+        "title": "境界値テスト追加",
+        "duration": "1.5日",
+        "tasks": [
+          "条件分岐カバレッジ分析",
+          "優先度の高いモジュールの境界値テスト実装",
+          "テスト実行と検証"
+        ]
+      },
+      "phase4": {
+        "title": "エラーインデックステスト強化",
+        "duration": "0.5日",
+        "tasks": [
+          "エラーファクトリ関数のテスト実装",
+          "テスト実行と検証"
+        ]
+      }
+    },
+    "testFileTemplates": {
+      "integrationTestFix": {
+        "description": "統合テスト修正のテンプレート",
+        "example": "// 修正前\nexpect(document).toHaveProperty('documentType');\nexpect(document.documentType).toBe('core');\n\n// 修正後\nexpect(document).toHaveProperty('metadata');\nexpect(document.metadata).toHaveProperty('documentType');\nexpect(document.metadata.documentType).toBe('core');"
+      },
+      "jsonPathTest": {
+        "description": "JSONパス解決のテストテンプレート",
+        "example": "describe('JsonPath', () => {\n  describe('parse', () => {\n    // 基本パス解析テスト\n    it('should correctly parse simple paths', () => { /* ... */ });\n    \n    // エスケープ文字テスト\n    it('should handle escaped characters in paths', () => { /* ... */ });\n    \n    // 特殊ケーステスト\n    it('should handle special cases like empty paths', () => { /* ... */ });\n  });\n  \n  describe('stringify', () => {\n    // パス文字列化テスト\n    it('should correctly stringify path components', () => { /* ... */ });\n  });\n});"
+      },
+      "patchOperationTest": {
+        "description": "パッチ操作のテストテンプレート",
+        "example": "describe('JsonPatchOperation', () => {\n  // 各操作タイプのテスト（add, remove, replace, move, copy, test）\n  describe('apply', () => {\n    describe('add operation', () => {\n      // 通常ケース\n      it('should add a value to an object', () => { /* ... */ });\n      \n      // 配列操作\n      it('should add a value to an array', () => { /* ... */ });\n      it('should add a value to the end of an array using - operator', () => { /* ... */ });\n      \n      // エラーケース\n      it('should throw when the parent does not exist', () => { /* ... */ });\n    });\n    \n    // 他の操作タイプも同様に実装\n  });\n});"
+      }
+    },
+    "coverageGoals": {
+      "overall": {
+        "statements": "85%",
+        "branches": "70%",
+        "functions": "85%",
+        "lines": "85%"
+      },
+      "moduleSpecific": {
+        "jsonPatch": {
+          "statements": "80%",
+          "branches": "75%",
+          "functions": "80%",
+          "lines": "80%"
+        },
+        "errorHandling": {
+          "statements": "85%",
+          "branches": "80%",
+          "functions": "90%",
+          "lines": "85%"
+        }
+      }
+    },
+    "jestConfigurations": {
+      "unitTestCommand": "npm run test:unit -- --coverage",
+      "integrationTestCommand": "npm run test:integration -- --coverage",
+      "singleTestCommand": "npm run test:unit -- -t \"テスト名\" --coverage",
+      "coverageOptions": {
+        "collectCoverageFrom": [
+          "src/**/*.ts",
+          "!src/**/*.d.ts",
+          "!src/types/**",
+          "!src/mocks/**"
+        ]
+      }
+    },
+    "conclusion": {
+      "summary": "今回のテスト改善計画では、前回のレビューで明らかになった課題を優先度順に対応し、全体的なテストカバレッジの向上を目指します。特に統合テストの修正、JSONパッチ操作のテスト強化、境界値テストの追加を重点的に行い、カバレッジ目標の達成を目指します。",
+      "nextSteps": "最初に統合テストの修正を行い、その後JSONパッチ操作のテスト強化に取り組みます。パラメータ化テストを活用して効率的にテストケースを追加し、境界値テストにも注力します。"
+    }
+  }
+}

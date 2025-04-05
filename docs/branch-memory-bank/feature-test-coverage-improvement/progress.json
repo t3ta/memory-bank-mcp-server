@@ -1,0 +1,70 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "8f91a3d7-6e48-4c15-9d02-54a37654edcf",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "lastModified": "2025-04-05T12:00:00.000Z",
+    "createdAt": "2025-04-05T12:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "branch-init",
+        "description": "feature/test-coverage-improvementブランチ作成とメモリバンク初期化",
+        "implementedAt": "2025-04-05T12:00:00.000Z"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "fix-integration-tests",
+        "description": "ReadGlobalDocumentUseCase.integration.test.tsの統合テスト修正",
+        "priority": "high"
+      },
+      {
+        "id": "improve-jsonpatch-tests",
+        "description": "JSONパッチ操作のドメインロジックテスト強化",
+        "priority": "high"
+      },
+      {
+        "id": "improve-boundary-tests",
+        "description": "境界値テストの追加によるBranchカバレッジの改善",
+        "priority": "medium"
+      },
+      {
+        "id": "error-index-tests",
+        "description": "shared/errors/index.tsのテスト強化",
+        "priority": "low"
+      }
+    ],
+    "status": "新ブランチでの作業開始。前回のテストカバレッジレビューに基づいた改善計画を立案中。",
+    "completionPercentage": 5,
+    "knownIssues": [
+      {
+        "id": "integration-test-failure",
+        "description": "ReadGlobalDocumentUseCase.integration.testでドキュメント構造の期待値が不一致",
+        "severity": "high"
+      },
+      {
+        "id": "low-jsonpatch-coverage",
+        "description": "JSONパッチ操作のドメインロジックのカバレッジが低い（44.85%）",
+        "severity": "medium"
+      },
+      {
+        "id": "low-branch-coverage",
+        "description": "全体的なBranchカバレッジが他指標より低い（62.12%）",
+        "severity": "medium"
+      }
+    ],
+    "references": [
+      {
+        "file": "test-improvement-plan.json",
+        "description": "テスト改善計画の詳細",
+        "created_at": "2025-04-05T12:00:00.000Z"
+      }
+    ]
+  }
+}
