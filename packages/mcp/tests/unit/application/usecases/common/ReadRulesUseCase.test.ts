@@ -1,5 +1,5 @@
 import { ReadRulesUseCase } from '../../../../../src/application/usecases/common/ReadRulesUseCase.js';
-import { DomainErrorCodes } from '../../../../../src/shared/errors/DomainError.js';
+import { DomainError, DomainErrorCodes } from '../../../../../src/shared/errors/DomainError.js'; // DomainError もインポート
 import fs from 'fs/promises';
 import path from 'path';
 import tmp from 'tmp-promise'; // tmp-promise をインポート
@@ -86,11 +86,16 @@ describe('ReadRulesUseCase', () => {
     // Arrange: ファイルを作成しない
 
     // Act & Assert
-    await expect(useCase.execute(language)).rejects.toThrow(
-      expect.objectContaining({
-          message: expect.stringMatching(`Rules file not found for language: ${language}\\.`)
-      })
-    );
+    try {
+      await useCase.execute(language);
+      // エラーが投げられなかったらテスト失敗
+      throw new Error('Expected DomainError to be thrown');
+    } catch (error) {
+      expect(error).toBeInstanceOf(DomainError); // まずDomainErrorインスタンスか確認
+      // エラーコードとメッセージの先頭部分をチェック
+      expect(error).toHaveProperty('code', 'DOMAIN_ERROR.DOCUMENT_NOT_FOUND'); // 実際のコード値に合わせる (再確認)
+      expect((error as Error).message).toContain(`Rules file not found for language: ${language}. Attempted paths:`); // みらい修正: toMatchからtoContainに変更し、正規表現を削除
+    }
   });
 
   it('should throw DomainError if language is not supported', async () => {

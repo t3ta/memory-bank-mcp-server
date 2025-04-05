@@ -5,6 +5,8 @@ import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo.js';
 import { MemoryDocument } from '../../../../../src/domain/entities/MemoryDocument.js';
 import { DocumentPath } from '../../../../../src/domain/entities/DocumentPath.js';
 import { Tag } from '../../../../../src/domain/entities/Tag.js';
+import { DomainError, DomainErrorCodes } from '../../../../../src/shared/errors/DomainError.js'; // DomainErrorCodesもインポート
+import { ApplicationError, ApplicationErrorCodes } from '../../../../../src/shared/errors/ApplicationError.js'; // ApplicationErrorをインポート
 
 describe('ReadBranchCoreFilesUseCase', () => {
   let useCase: ReadBranchCoreFilesUseCase;
@@ -47,18 +49,18 @@ describe('ReadBranchCoreFilesUseCase', () => {
     const result = await useCase.execute({ branchName });
 
     // Assert
-    expect(result.files.progress).toEqual(JSON.parse(mockProgress.content)); // result.files.progress に修正 & JSON.parse
-    expect(result.files.activeContext).toEqual(JSON.parse(mockActiveContext.content)); // result.files.activeContext に修正 & JSON.parse
-    expect(result.files.branchContext).toEqual(mockBranchContext.content); // result.files.branchContext に修正 (文字列なのでparse不要)
-    expect(result.files.systemPatterns).toEqual(JSON.parse(mockSystemPatterns.content)); // result.files.systemPatterns に修正 & JSON.parse
-    expect(mockBranchRepository.getDocument).toHaveBeenCalledTimes(4); // readDocument -> getDocument
+    expect(result.files.progress).toEqual(JSON.parse(mockProgress.content));
+    expect(result.files.activeContext).toEqual(JSON.parse(mockActiveContext.content));
+    expect(result.files.branchContext).toEqual(mockBranchContext.content);
+    expect(result.files.systemPatterns).toEqual(JSON.parse(mockSystemPatterns.content));
+    expect(mockBranchRepository.getDocument).toHaveBeenCalledTimes(4);
   });
 
   it('should return other core files even if progress.json is missing', async () => {
     // Arrange
     mockBranchRepository.getDocument.mockImplementation(async (argBranchInfo, argPath) => {
       if (!argBranchInfo.equals(branchInfo)) return null;
-      if (argPath.equals(DocumentPath.create('progress.json'))) return null; // progress.json だけ null を返す
+      if (argPath.equals(DocumentPath.create('progress.json'))) return null;
       if (argPath.equals(DocumentPath.create('activeContext.json'))) return mockActiveContext;
       if (argPath.equals(DocumentPath.create('branchContext.json'))) return mockBranchContext;
       if (argPath.equals(DocumentPath.create('systemPatterns.json'))) return mockSystemPatterns;
@@ -69,11 +71,11 @@ describe('ReadBranchCoreFilesUseCase', () => {
     const result = await useCase.execute({ branchName });
 
     // Assert
-    expect(result.files.progress).toBeUndefined(); // progress は undefined になるはず
+    expect(result.files.progress).toBeUndefined();
     expect(result.files.activeContext).toEqual(JSON.parse(mockActiveContext.content));
     expect(result.files.branchContext).toEqual(mockBranchContext.content);
     expect(result.files.systemPatterns).toEqual(JSON.parse(mockSystemPatterns.content));
-    expect(mockBranchRepository.getDocument).toHaveBeenCalledTimes(4); // 全てのファイル取得を試みるはず
+    expect(mockBranchRepository.getDocument).toHaveBeenCalledTimes(4);
   });
 
    it('should return other core files even if activeContext.json is missing', async () => {
@@ -81,7 +83,7 @@ describe('ReadBranchCoreFilesUseCase', () => {
     mockBranchRepository.getDocument.mockImplementation(async (argBranchInfo, argPath) => {
       if (!argBranchInfo.equals(branchInfo)) return null;
       if (argPath.equals(DocumentPath.create('progress.json'))) return mockProgress;
-      if (argPath.equals(DocumentPath.create('activeContext.json'))) return null; // activeContext.json だけ null を返す
+      if (argPath.equals(DocumentPath.create('activeContext.json'))) return null;
       if (argPath.equals(DocumentPath.create('branchContext.json'))) return mockBranchContext;
       if (argPath.equals(DocumentPath.create('systemPatterns.json'))) return mockSystemPatterns;
       return null;
@@ -92,12 +94,137 @@ describe('ReadBranchCoreFilesUseCase', () => {
 
     // Assert
     expect(result.files.progress).toEqual(JSON.parse(mockProgress.content));
-    expect(result.files.activeContext).toBeUndefined(); // activeContext は undefined になるはず
+    expect(result.files.activeContext).toBeUndefined();
     expect(result.files.branchContext).toEqual(mockBranchContext.content);
     expect(result.files.systemPatterns).toEqual(JSON.parse(mockSystemPatterns.content));
-    expect(mockBranchRepository.getDocument).toHaveBeenCalledTimes(4); // 全てのファイル取得を試みるはず
+    expect(mockBranchRepository.getDocument).toHaveBeenCalledTimes(4);
   });
 
-  // TODO: Add tests for missing branchContext.json and systemPatterns.json
-  // TODO: Add test for repository error during readDocument
+ it('should return other core files even if branchContext.json is missing', async () => {
+  // Arrange
+  mockBranchRepository.getDocument.mockImplementation(async (argBranchInfo, argPath) => {
+    if (!argBranchInfo.equals(branchInfo)) return null;
+    if (argPath.equals(DocumentPath.create('progress.json'))) return mockProgress;
+    if (argPath.equals(DocumentPath.create('activeContext.json'))) return mockActiveContext;
+    if (argPath.equals(DocumentPath.create('branchContext.json'))) return null;
+    if (argPath.equals(DocumentPath.create('systemPatterns.json'))) return mockSystemPatterns;
+    return null;
+  });
+
+  // Act
+  const result = await useCase.execute({ branchName });
+
+  // Assert
+  expect(result.files.progress).toEqual(JSON.parse(mockProgress.content));
+  expect(result.files.activeContext).toEqual(JSON.parse(mockActiveContext.content));
+  expect(result.files.branchContext).toBeUndefined();
+  expect(result.files.systemPatterns).toEqual(JSON.parse(mockSystemPatterns.content));
+  expect(mockBranchRepository.getDocument).toHaveBeenCalledTimes(4);
 });
+
+ it('should return default systemPatterns if systemPatterns.json is missing', async () => {
+  // Arrange
+  mockBranchRepository.getDocument.mockImplementation(async (argBranchInfo, argPath) => {
+    if (!argBranchInfo.equals(branchInfo)) return null;
+    if (argPath.equals(DocumentPath.create('progress.json'))) return mockProgress;
+    if (argPath.equals(DocumentPath.create('activeContext.json'))) return mockActiveContext;
+    if (argPath.equals(DocumentPath.create('branchContext.json'))) return mockBranchContext;
+    if (argPath.equals(DocumentPath.create('systemPatterns.json'))) return null;
+    return null;
+  });
+   mockBranchRepository.exists.mockResolvedValue(true);
+
+  // Act
+  const result = await useCase.execute({ branchName });
+
+  // Assert
+  expect(result.files.progress).toEqual(JSON.parse(mockProgress.content));
+  expect(result.files.activeContext).toEqual(JSON.parse(mockActiveContext.content));
+  expect(result.files.branchContext).toEqual(mockBranchContext.content);
+  expect(result.files.systemPatterns).toEqual({ technicalDecisions: [] });
+  expect(mockBranchRepository.getDocument).toHaveBeenCalledTimes(4);
+});
+
+ it('should throw ApplicationError if repository throws error during getDocument', async () => {
+  // Arrange
+  const repoError = new Error('Failed to read document');
+   mockBranchRepository.exists.mockResolvedValue(true);
+  mockBranchRepository.getDocument
+      .mockImplementation(async (argBranchInfo, argPath) => {
+          console.log(`[Test Debug] getDocument called with path: ${argPath.value}`); // みらいデバッグログ追加
+          if(argPath.equals(DocumentPath.create('activeContext.json'))) {
+              console.log('[Test Debug] Throwing error for activeContext.json'); // みらいデバッグログ追加
+              throw repoError;
+          }
+           if (argPath.equals(DocumentPath.create('progress.json'))) {
+               console.log('[Test Debug] Returning mockProgress'); // みらいデバッグログ追加
+               return mockProgress;
+           }
+           if (argPath.equals(DocumentPath.create('branchContext.json'))) {
+               console.log('[Test Debug] Returning mockBranchContext'); // みらいデバッグログ追加
+               return mockBranchContext;
+           }
+           if (argPath.equals(DocumentPath.create('systemPatterns.json'))) {
+               console.log('[Test Debug] Returning mockSystemPatterns'); // みらいデバッグログ追加
+               return mockSystemPatterns;
+           }
+          console.log('[Test Debug] Returning null'); // みらいデバッグログ追加
+          return null;
+      });
+
+
+  // Act & Assert
+  // エラーが ApplicationError であること、メッセージ、元のエラーが含まれることを確認
+  await expect(useCase.execute({ branchName })).rejects.toThrowError(
+      new ApplicationError(
+          ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
+          `Failed to read activeContext: ${repoError.message}`, // みらい修正: 実際に投げられるメッセージに合わせる
+          { originalError: repoError }
+      )
+  );
+   expect(mockBranchRepository.getDocument).toHaveBeenCalled();
+});
+
+ it('should throw ApplicationError if branch name is missing', async () => {
+  // Act & Assert
+  await expect(useCase.execute({ branchName: '' })).rejects.toThrowError(
+    new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Branch name is required') // エラーインスタンスで比較
+  );
+});
+
+ it('should attempt auto-initialization if branch does not exist', async () => {
+  // Arrange
+  mockBranchRepository.exists.mockResolvedValue(false);
+  mockBranchRepository.initialize.mockResolvedValue(undefined);
+   mockBranchRepository.getDocument.mockImplementation(async (argBranchInfo, argPath) => {
+    if (!argBranchInfo.equals(branchInfo)) return null;
+    return null;
+  });
+
+  // Act
+  const result = await useCase.execute({ branchName });
+
+  // Assert
+  expect(mockBranchRepository.exists).toHaveBeenCalledWith(branchName);
+  expect(mockBranchRepository.initialize).toHaveBeenCalledWith(branchInfo);
+  expect(mockBranchRepository.getDocument).toHaveBeenCalledTimes(4);
+  expect(result.files.progress).toBeUndefined();
+  expect(result.files.activeContext).toBeUndefined();
+  expect(result.files.branchContext).toBeUndefined();
+  expect(result.files.systemPatterns).toEqual({ technicalDecisions: [] });
+});
+
+ it('should throw DomainError if auto-initialization fails', async () => {
+  // Arrange
+  mockBranchRepository.exists.mockResolvedValue(false);
+  const initError = new Error('Initialization failed');
+  mockBranchRepository.initialize.mockRejectedValue(initError);
+
+  // Act & Assert
+  await expect(useCase.execute({ branchName })).rejects.toThrowError(
+    new DomainError(DomainErrorCodes.BRANCH_INITIALIZATION_FAILED, `Failed to auto-initialize branch: ${branchName}`) // エラーインスタンスで比較
+  );
+   expect(mockBranchRepository.initialize).toHaveBeenCalledWith(branchInfo);
+   expect(mockBranchRepository.getDocument).not.toHaveBeenCalled();
+});
+}); // describeブロックの閉じ括弧
