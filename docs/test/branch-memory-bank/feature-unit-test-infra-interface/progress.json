@@ -7,13 +7,58 @@
     "path": "progress.json",
     "tags": [],
     "createdAt": "2025-04-05T06:00:45.962Z",
-    "lastModified": "2025-04-05T06:00:45.962Z"
+    "lastModified": "2025-04-05T06:08:40.049Z"
   },
   "content": {
-    "summary": "Initial progress for branch: feature/unit-test-infra-interface",
-    "status": "initialized",
-    "steps": [],
-    "next_steps": [],
+    "summary": "Infrastructure レイヤーの全インターフェース (IConfigProvider, IGitService, II18nProvider, IIndexService, IFileSystemService, ITemplateLoader) のユニットテストを作成し、パスすることを確認しました。",
+    "status": "completed",
+    "steps": [
+      {
+        "description": "IConfigProvider のユニットテストを作成・修正し、パスを確認",
+        "status": "done",
+        "files": [
+          "packages/mcp/tests/unit/infrastructure/config/interfaces/IConfigProvider.test.ts"
+        ]
+      },
+      {
+        "description": "IGitService のユニットテストを作成し、パスを確認",
+        "status": "done",
+        "files": [
+          "packages/mcp/tests/unit/infrastructure/git/IGitService.test.ts"
+        ]
+      },
+      {
+        "description": "II18nProvider のユニットテストを作成・修正し、パスを確認",
+        "status": "done",
+        "files": [
+          "packages/mcp/tests/unit/infrastructure/i18n/interfaces/II18nProvider.test.ts"
+        ]
+      },
+      {
+        "description": "IIndexService のユニットテストを作成・修正し、パスを確認",
+        "status": "done",
+        "files": [
+          "packages/mcp/tests/unit/infrastructure/index/interfaces/IIndexService.test.ts"
+        ]
+      },
+      {
+        "description": "IFileSystemService のユニットテストを作成・修正し、パスを確認",
+        "status": "done",
+        "files": [
+          "packages/mcp/tests/unit/infrastructure/storage/interfaces/IFileSystemService.test.ts"
+        ]
+      },
+      {
+        "description": "ITemplateLoader のユニットテストを作成・修正し、パスを確認",
+        "status": "done",
+        "files": [
+          "packages/mcp/tests/unit/infrastructure/templates/interfaces/ITemplateLoader.test.ts"
+        ]
+      }
+    ],
+    "next_steps": [
+      "コミットの準備ができました。内容を確認してください。"
+    ],
     "findings": []
   }
 }
