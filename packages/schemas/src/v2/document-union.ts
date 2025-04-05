@@ -9,36 +9,14 @@ import { SystemPatternsJsonV2Schema } from '../document-types/system-patterns.js
 
 // Union type for discriminated union of all document types
 export const JsonDocumentV2Schema = z.discriminatedUnion('documentType', [
-  // Branch Context
-  z.object({
-    schema: z.literal(SCHEMA_VERSION),
-    metadata: BranchContextJsonV2Schema.shape.metadata,
-    content: BranchContextJsonV2Schema.shape.content,
-    documentType: z.literal('branch_context'), // Discriminator at top level
-  }),
-  // Active Context
-  z.object({
-    schema: z.literal(SCHEMA_VERSION),
-    metadata: ActiveContextJsonV2Schema.shape.metadata,
-    content: ActiveContextJsonV2Schema.shape.content,
-    documentType: z.literal('active_context'), // Discriminator at top level
-  }),
-  // Progress
-  z.object({
-    schema: z.literal(SCHEMA_VERSION),
-    metadata: ProgressJsonV2Schema.shape.metadata,
-    content: ProgressJsonV2Schema.shape.content,
-    documentType: z.literal('progress'), // Discriminator at top level
-  }),
-  // System Patterns
-  z.object({
-    schema: z.literal(SCHEMA_VERSION),
-    metadata: SystemPatternsJsonV2Schema.shape.metadata,
-    content: SystemPatternsJsonV2Schema.shape.content,
-    documentType: z.literal('system_patterns'), // Discriminator at top level
-  }),
+  BranchContextJsonV2Schema,   // スキーマ全体を渡す
+  ActiveContextJsonV2Schema,   // スキーマ全体を渡す
+  ProgressJsonV2Schema,        // スキーマ全体を渡す
+  SystemPatternsJsonV2Schema,  // スキーマ全体を渡す
   // NOTE: GenericDocumentJsonV2Schema is excluded for now as its documentType isn't a literal,
   // which is required for discriminatedUnion. Consider alternative validation if needed.
+  // If Generic needs to be included, a different approach like z.union might be necessary,
+  // or the Generic schema needs a literal documentType.
 ]);
 
 // Export the combined union type

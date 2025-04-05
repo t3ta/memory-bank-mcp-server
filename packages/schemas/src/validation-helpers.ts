@@ -46,7 +46,8 @@ export const commonValidators = {
   tagsArray: (fieldName: string) =>
     z.array(
       z.string()
-       .regex(/^[a-z0-9-]+$/, { message: createErrorMessage(fieldName, 'タグは小文字英数字とハイフンのみ使用可能です') })
-       .min(1, { message: createErrorMessage(fieldName, 'タグは空にできません') })
+        // Check for non-empty first, then check the format
+        .min(1, { message: createErrorMessage(fieldName, 'タグは空にできません') })
+        .regex(/^[a-z0-9-]+$/, { message: createErrorMessage(fieldName, 'タグは小文字英数字とハイフンのみ使用可能です') })
     ).optional(),
 };
