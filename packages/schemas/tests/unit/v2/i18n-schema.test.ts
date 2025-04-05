@@ -1,69 +1,84 @@
 import {
-  Language,
   isValidLanguage,
   getSafeLanguage,
-  // Types below are not directly testable via Jest functions
-  // TranslationKey,
-  // TranslationDictionary,
-  // TranslationFile,
-} from '../../../src/v2/i18n-schema'; // Adjust path as needed
+  type Language,
+  type TranslationFile, // Import type for potential future tests
+  type TranslationDictionary, // Import type for potential future tests
+} from '../../src/v2/i18n-schema';
 
-describe('i18n Schema Helpers', () => {
+describe('i18n Schema Utilities', () => {
   describe('isValidLanguage', () => {
-    it('should return true for supported language codes', () => {
+    it('should return true for supported languages', () => {
       expect(isValidLanguage('en')).toBe(true);
       expect(isValidLanguage('ja')).toBe(true);
       expect(isValidLanguage('zh')).toBe(true);
     });
 
-    it('should return false for unsupported language codes', () => {
-      expect(isValidLanguage('es')).toBe(false);
+    it('should return false for unsupported languages', () => {
       expect(isValidLanguage('fr')).toBe(false);
       expect(isValidLanguage('EN')).toBe(false); // Case-sensitive
+      expect(isValidLanguage(' ja ')).toBe(false); // Needs exact match
       expect(isValidLanguage('')).toBe(false);
-      expect(isValidLanguage(' japanese ')).toBe(false);
-      expect(isValidLanguage(null as any)).toBe(false);
-      expect(isValidLanguage(undefined as any)).toBe(false);
     });
 
-    it('should work as a type guard', () => {
-      const langString: string = 'ja';
-      let knownLang: Language | undefined;
+    it('should return false for non-string inputs', () => {
+      expect(isValidLanguage(undefined as any)).toBe(false);
+      expect(isValidLanguage(null as any)).toBe(false);
+      expect(isValidLanguage(123 as any)).toBe(false);
+      expect(isValidLanguage({} as any)).toBe(false);
+    });
 
-      if (isValidLanguage(langString)) {
-        // Inside this block, langString should be narrowed to type Language
-        knownLang = langString;
+    // Type guard test
+    it('should narrow the type for known languages', () => {
+      const lang: string = 'ja';
+      if (isValidLanguage(lang)) {
+        // If this compiles, the type guard works
+        const knownLang: Language = lang;
         expect(knownLang).toBe('ja');
       } else {
-        throw new Error('Type guard failed');
+        fail('Type guard failed for known language');
       }
-      expect(knownLang).toBeDefined();
-
-      const invalidLangString: string = 'de';
-      let knownLangInvalid: Language | undefined;
-       if (isValidLanguage(invalidLangString)) {
-         // Should not enter here
-         knownLangInvalid = invalidLangString;
-       }
-       expect(knownLangInvalid).toBeUndefined();
-
     });
   });
 
   describe('getSafeLanguage', () => {
-    it('should return the same language code if it is supported', () => {
+    it('should return the same language if it is supported', () => {
       expect(getSafeLanguage('en')).toBe('en');
       expect(getSafeLanguage('ja')).toBe('ja');
       expect(getSafeLanguage('zh')).toBe('zh');
     });
 
-    it('should return "en" (default) for unsupported language codes', () => {
+    it('should return "en" (default) for unsupported languages', () => {
       expect(getSafeLanguage('fr')).toBe('en');
-      expect(getSafeLanguage('DE')).toBe('en'); // Case-sensitive check first
+      expect(getSafeLanguage('JA')).toBe('en'); // Case-sensitive check from isValidLanguage
       expect(getSafeLanguage('')).toBe('en');
-      expect(getSafeLanguage(' english ')).toBe('en');
-      expect(getSafeLanguage(null as any)).toBe('en');
+    });
+
+    it('should return "en" for non-string inputs', () => {
       expect(getSafeLanguage(undefined as any)).toBe('en');
+      expect(getSafeLanguage(null as any)).toBe('en');
+      expect(getSafeLanguage(123 as any)).toBe('en');
+      expect(getSafeLanguage({} as any)).toBe('en');
     });
   });
+
+  // Placeholder for potential future tests on TranslationFile structure if needed
+  // describe('TranslationFile Structure (Type Check)', () => {
+  //   it('should conform to the TranslationFile interface', () => {
+  //     const validFile: TranslationFile = {
+  //       language: 'en',
+  //       translations: {
+  //         greeting: 'Hello',
+  //         farewell: 'Goodbye',
+  //       },
+  //       metadata: {
+  //         version: '1.0.0',
+  //         updatedAt: new Date().toISOString(),
+  //       },
+  //     };
+  //     // Basic check to ensure the structure is assignable
+  //     expect(validFile.language).toBe('en');
+  //     expect(validFile.translations.greeting).toBe('Hello');
+  //   });
+  // });
 });

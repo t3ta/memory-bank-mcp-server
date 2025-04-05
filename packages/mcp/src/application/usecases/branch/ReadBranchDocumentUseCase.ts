@@ -136,10 +136,11 @@ export class ReadBranchDocumentUseCase
       documentType: (document as any).determineDocumentType()
     });
 
+    // MemoryDocument から生の content 文字列を取得する
     return {
       document: {
         path: document.path.value,
-        content: document.content,
+        content: document.content, // ★ 生の content 文字列をそのまま返す ★
         tags: document.tags.map((tag) => tag.value),
         lastModified: document.lastModified.toISOString(),
       },

@@ -1,11 +1,15 @@
 {
   "schema": "memory_document_v2",
+  "documentType": "core",
   "metadata": {
     "id": "core-glossary-test",
     "title": "テスト用 用語集",
-    "documentType": "core",
     "path": "core/glossary.json",
-    "tags": ["glossary", "core", "test"],
+    "tags": [
+      "glossary",
+      "core",
+      "test"
+    ],
     "lastModified": "2025-04-01T01:42:00.000Z",
     "createdAt": "2025-04-01T01:42:00.000Z",
     "version": 1

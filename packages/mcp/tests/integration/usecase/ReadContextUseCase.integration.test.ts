@@ -91,7 +91,7 @@ describe('ReadContextUseCase Integration Tests', () => {
       expect(branchContextContent).toBeDefined();
       const branchContext = JSON.parse(branchContextContent);
       expect(branchContext.schema).toBe('memory_document_v2');
-      expect(branchContext.metadata.documentType).toBe('branch_context');
+      expect(branchContext.documentType).toBe('branch_context'); // トップレベルの documentType をチェック
     });
 
     it('should get context regardless of language', async () => {

@@ -7,22 +7,19 @@ export const GenericDocumentContentV2Schema = z
   .record(z.unknown())
   .refine((val) => Object.keys(val).length > 0, {
     message: 'Content cannot be empty',
-  });
+  }); // Remove .strict() as it cannot be applied after .refine() and content is generic anyway
 
-  // Define Generic specific metadata
-  const GenericMetadataSchema = DocumentMetadataV2Schema.extend({
+  // Define Generic specific metadata (documentType is now at top level)
+  const GenericMetadataSchema = DocumentMetadataV2Schema; // No need to extend for documentType anymore
+
+  // Define the full Generic schema
+  export const GenericDocumentJsonV2Schema = z.object({
+    schema: z.literal('memory_document_v2'), // Explicitly define schema version
     // For generic documents, documentType can be any non-empty string
-    documentType: commonValidators.nonEmptyString('documentType'),
+    documentType: commonValidators.nonEmptyString('documentType'), // Discriminator at top level (non-literal)
+    metadata: GenericMetadataSchema,     // Use the updated metadata schema
+    content: GenericDocumentContentV2Schema,      // Use the specific content schema
   });
-
-  // Define the full Generic schema by merging base (without metadata/content)
-  // with the specific metadata and content schemas.
-  export const GenericDocumentJsonV2Schema = BaseJsonDocumentV2Schema
-    .omit({ metadata: true, content: true }) // Omit base metadata and content
-    .merge(z.object({ // Merge with specific metadata and content
-      metadata: GenericMetadataSchema,
-      content: GenericDocumentContentV2Schema,
-    }));
 
   // Type exports
   export type GenericDocumentContentV2 = z.infer<typeof GenericDocumentContentV2Schema>;

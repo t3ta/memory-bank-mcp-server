@@ -6,7 +6,7 @@
     "documentType": "active_context",
     "path": "activeContext.json",
     "tags": [],
-    "lastModified": "2025-04-05T08:26:49.906Z",
+    "lastModified": "2025-04-05T10:55:00.000Z",
     "createdAt": "2025-04-05T06:26:34.145Z",
     "version": 1
   },
@@ -14,8 +14,8 @@
     "currentWork": "優先度の高かったJSONユースケース、エラーハンドリング、グローバル読み取り、loggerユーティリティ、およびカバレッジ0%だったLanguageドメインモデルのユニットテスト実装完了。テストカバレッジ改善タスクは一区切り。",
     "recentChanges": [
       {
-        "date": "2025-04-05T08:26:41.796Z",
-        "description": "カバレッジ 0% だった domain/i18n/Language.ts のユニットテストを実装・成功させた。"
+        "date": "2025-04-05T10:55:00.000Z",
+        "description": "テストカバレッジ改善作業のレビューを実施。mcp-test-coverage-updated.jsonにレビュー結果を記録。"
       },
       {
         "date": "2025-04-05T08:23:52.402Z",
@@ -79,18 +79,23 @@
     ],
     "nextSteps": [
       {
-        "id": "60295d20-cc9a-4b77-a6d6-7073f8a8e469",
-        "description": "次のステップ1",
-        "priority": "high"
-      },
-      {
-        "id": "a367cf13-4810-4097-86f6-f49c956130fe",
-        "description": "次のステップ2",
+        "id": "improve-boundary-tests",
+        "description": "境界値テストを追加してBranchカバレッジを改善する",
         "priority": "medium"
       },
       {
-        "id": "3b078dae-94ee-43c6-b949-4f54c3de390a",
-        "description": "次のステップ3",
+        "id": "fix-integration-tests",
+        "description": "ReadGlobalDocumentUseCase.integration.testのドキュメント構造期待値を修正する",
+        "priority": "high"
+      },
+      {
+        "id": "jsonpatch-tests",
+        "description": "JSONパッチ操作のドメインロジックのテストカバレッジを向上させる",
+        "priority": "medium"
+      },
+      {
+        "id": "error-index-tests",
+        "description": "shared/errors/index.tsのテストカバレッジを向上させる",
         "priority": "low"
       }
     ]

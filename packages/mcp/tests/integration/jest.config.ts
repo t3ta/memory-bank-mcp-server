@@ -1,15 +1,18 @@
 /** @type {import('jest').Config} */
-export default {
+import type { Config } from 'jest'; // Import Config type
+
+const config: Config = { // Use Config type
+  // preset: 'ts-jest/presets/default-esm', // <<<--- プリセットをやめて詳細設定に戻す
   testEnvironment: 'node',
   // rootDir は Jest が自動検出 (tests/integration)
   // testMatch は rootDir (tests/integration) からの相対パス
   testMatch: ['**/*.integration.test.ts'],
-  transform: {
-    '^.+\\.tsx?$': ['ts-jest', {
-      useESM: true,
-      // tsconfig を <rootDir> (tests/integration) からの相対パスで明示的に指定
-      tsconfig: '<rootDir>/tsconfig.test.json'
-    }]
+  transform: { // <<<--- transform のコメントアウトを解除
+    // preset がうまく動かない場合は、以下のように詳細設定を試す
+    '^.+\\.m?ts$': ['ts-jest', { // .mts も含める
+        useESM: true, // <<<--- useESM: true を確実に指定
+        tsconfig: '<rootDir>/tsconfig.test.json',
+     }],
   },
   moduleNameMapper: {
     // tsconfig.test.json の baseUrl ('../../') を基準にパスを解決
@@ -28,7 +31,8 @@ export default {
     // 5. fast-json-patch のマッピングを削除 (Node.js の解決に任せる)
     // '^fast-json-patch$': '<rootDir>/../../../../node_modules/fast-json-patch/dist/fast-json-patch.js' // Removed this mapping
   },
-  extensionsToTreatAsEsm: ['.ts', '.mts'], // Add .mts
+  // extensionsToTreatAsEsm は preset に含まれることが多いので不要かも <<<--- コメントアウト解除！
+  extensionsToTreatAsEsm: ['.ts', '.mts'],
   maxWorkers: 1,
   transformIgnorePatterns: [
     // Add fs-extra to ignore patterns to prevent transformation issues with ESM
@@ -39,3 +43,5 @@ export default {
   testTimeout: 30000,
   silent: false, // Temporarily disable silent mode to see logs
 };
+
+export default config; // Export the config object

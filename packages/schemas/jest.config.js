@@ -2,9 +2,17 @@ export default {
   preset: 'ts-jest/presets/default-esm', // Use ESM preset
   testEnvironment: 'node',
   extensionsToTreatAsEsm: ['.ts'],
-  transform: {}, // preset に任せるため空にする
-   // Restore moduleNameMapper to handle .js extensions in imports
+  transform: {
+    '^.+\\.ts$': [
+      'ts-jest',
+      {
+        // useESM: true, // preset が default-esm なので不要かも (再挑戦)
+        // tsconfig: 'tsconfig.json', // tsconfig は通常自動検出される
+      },
+    ],
+  },
    moduleNameMapper: {
+     // Restore original setting to handle .js extensions in source code imports
      '^(\\.{1,2}/.*)\\.js$': '$1',
    },
    testMatch: ['**/tests/**/*.test.ts'],

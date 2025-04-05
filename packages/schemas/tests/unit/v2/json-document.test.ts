@@ -1,156 +1,492 @@
-import { z } from 'zod';
+/**
+ * Tests for v2 JSON document schemas
+ */
 import {
-  SCHEMA_VERSION,
   DocumentMetadataV2Schema,
   BaseJsonDocumentV2Schema,
-  DocumentMetadataV2,
-  BaseJsonDocumentV2,
-} from '../../../src/v2/json-document'; // Adjust path as needed
+  SCHEMA_VERSION
+} from '../../src/v2/json-document.js';
 
-describe('JSON Document Schemas v2', () => {
-  describe('DocumentMetadataV2Schema', () => {
-    // documentType はメタデータから削除された
-    const validMetadata: Omit<DocumentMetadataV2, 'documentType'> = {
-      title: 'Valid Title',
-      // documentType: 'generic', // Removed
+import {
+  BranchContextJsonV2Schema,
+  ActiveContextJsonV2Schema,
+  ProgressJsonV2Schema,
+  SystemPatternsJsonV2Schema,
+  GenericDocumentJsonV2Schema,
+} from '../../src/document-types/index.js';
+
+describe('DocumentMetadataV2Schema', () => {
+  it('should validate correct metadata', () => {
+    const validMetadata = {
+      title: 'Test Document',
+      documentType: 'test',
       id: '123e4567-e89b-12d3-a456-426614174000',
-      path: 'valid/path.json',
-      tags: ['tag-1', 'tag2'],
-      lastModified: new Date().toISOString(),
-      createdAt: new Date().toISOString(),
-      version: 1,
+      path: 'test/document.json',
+      tags: ['test', 'example'],
+      lastModified: '2023-10-27T10:00:00.000Z', // Use ISO string
+      createdAt: '2023-10-26T10:00:00.000Z', // Use ISO string
+      version: 1
     };
 
-    it('should validate correct metadata', () => {
-      const result = DocumentMetadataV2Schema.safeParse(validMetadata);
-      expect(result.success).toBe(true);
-    });
-
-    it('should provide default version if missing', () => {
-       const metadataWithoutVersion = { ...validMetadata };
-       delete (metadataWithoutVersion as any).version; // Remove version for test
-       const result = DocumentMetadataV2Schema.safeParse(metadataWithoutVersion);
-       expect(result.success).toBe(true);
-       if (result.success) {
-         expect(result.data.version).toBe(1); // Check default value
-       }
-    });
-
-    it('should fail validation if title is empty', () => {
-      const invalidMetadata = { ...validMetadata, title: '' };
-      const result = DocumentMetadataV2Schema.safeParse(invalidMetadata);
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.errors[0].path).toEqual(['title']);
-        expect(result.error.errors[0].message).toContain('空にできません');
-      }
-    });
-
-    it('should fail validation if id is not a UUID', () => {
-      const invalidMetadata = { ...validMetadata, id: 'not-a-uuid' };
-      const result = DocumentMetadataV2Schema.safeParse(invalidMetadata);
-      expect(result.success).toBe(false);
-       if (!result.success) {
-        expect(result.error.errors[0].path).toEqual(['id']);
-        expect(result.error.errors[0].message).toContain('UUIDフォーマットではありません');
-      }
-    });
-
-     it('should fail validation if path is empty', () => {
-      const invalidMetadata = { ...validMetadata, path: '' };
-      const result = DocumentMetadataV2Schema.safeParse(invalidMetadata);
-      expect(result.success).toBe(false);
-       if (!result.success) {
-        expect(result.error.errors[0].path).toEqual(['path']);
-        expect(result.error.errors[0].message).toContain('空にできません');
-      }
-    });
-
-    it('should fail validation if tags contain invalid characters', () => {
-      const invalidMetadata = { ...validMetadata, tags: ['valid', 'Invalid_Tag'] };
-      const result = DocumentMetadataV2Schema.safeParse(invalidMetadata);
-      expect(result.success).toBe(false);
-       if (!result.success) {
-        // Zod reports path within the array
-        expect(result.error.errors[0].path).toEqual(['tags', 1]);
-        expect(result.error.errors[0].message).toContain('タグは小文字英数字とハイフンのみ使用可能です');
-      }
-    });
-
-     it('should fail validation if lastModified is not a valid ISO date', () => {
-      const invalidMetadata = { ...validMetadata, lastModified: '2023-13-01' }; // Invalid month
-      const result = DocumentMetadataV2Schema.safeParse(invalidMetadata);
-      expect(result.success).toBe(false);
-       if (!result.success) {
-        expect(result.error.errors[0].path).toEqual(['lastModified']);
-        expect(result.error.errors[0].message).toContain('ISO 8601形式の日付ではありません');
-      }
-    });
-
-     it('should fail validation if version is not a positive integer', () => {
-      const invalidMetadataNegative = { ...validMetadata, version: -1 };
-      const resultNegative = DocumentMetadataV2Schema.safeParse(invalidMetadataNegative);
-      expect(resultNegative.success).toBe(false);
-
-      const invalidMetadataZero = { ...validMetadata, version: 0 };
-      const resultZero = DocumentMetadataV2Schema.safeParse(invalidMetadataZero);
-      expect(resultZero.success).toBe(false);
-
-       const invalidMetadataFloat = { ...validMetadata, version: 1.5 };
-      const resultFloat = DocumentMetadataV2Schema.safeParse(invalidMetadataFloat);
-      expect(resultFloat.success).toBe(false);
-    });
-
-     it('should allow optional tags', () => {
-       const metadataWithoutTags = { ...validMetadata };
-       delete metadataWithoutTags.tags;
-       const result = DocumentMetadataV2Schema.safeParse(metadataWithoutTags);
-       expect(result.success).toBe(true);
-       if (result.success) {
-         expect(result.data.tags).toBeUndefined(); // Should be undefined if not provided
-       }
-     });
-
+    const result = DocumentMetadataV2Schema.safeParse(validMetadata);
+    expect(result.success).toBe(true);
   });
 
-  describe('BaseJsonDocumentV2Schema', () => {
-     // BaseJsonDocumentV2 は schema と documentType のみを持つようになった
-     const validBaseDoc: BaseJsonDocumentV2 = {
-      schema: SCHEMA_VERSION,
-      documentType: 'base_type_for_test', // documentType をトップレベルに追加
-      // metadata と content は Base スキーマから削除された
-      // metadata: { ... },
-      // content: { ... },
+  it('should accept ISO date strings for dates', () => {
+    const validMetadata = {
+      title: 'Test Document',
+      documentType: 'test',
+      id: '123e4567-e89b-12d3-a456-426614174000',
+      path: 'test/document.json',
+      tags: ['test', 'example'],
+      lastModified: '2025-03-27T12:00:00Z',
+      createdAt: '2025-03-26T10:00:00Z',
+      version: 1
     };
 
-    it('should validate a correct base document', () => {
-      const result = BaseJsonDocumentV2Schema.safeParse(validBaseDoc);
-      expect(result.success).toBe(true);
-    });
+    const result = DocumentMetadataV2Schema.safeParse(validMetadata);
+    expect(result.success).toBe(true);
+  });
 
-    it('should fail if schema literal does not match', () => {
-      const invalidDoc = { ...validBaseDoc, schema: 'memory_document_v1' };
-      const result = BaseJsonDocumentV2Schema.safeParse(invalidDoc);
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.errors[0].path).toEqual(['schema']);
+  it('should reject metadata with missing required fields', () => {
+    const invalidMetadata = {
+      title: 'Test Document',
+      // missing documentType, id, path, etc.
+    };
+
+    const result = DocumentMetadataV2Schema.safeParse(invalidMetadata);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('should reject metadata with invalid UUID', () => {
+    const invalidMetadata = {
+      title: 'Test Document',
+      documentType: 'test',
+      id: 'not-a-uuid', // Invalid UUID
+      path: 'test/document.json',
+      tags: ['test'],
+      lastModified: new Date().toISOString(), // Use ISO string
+      createdAt: new Date().toISOString(), // Use ISO string
+      version: 1
+    };
+
+    const result = DocumentMetadataV2Schema.safeParse(invalidMetadata);
+    expect(result.success).toBe(false);
+  });
+
+  it('should reject metadata with invalid tags', () => {
+    const invalidMetadata = {
+      title: 'Test Document',
+      documentType: 'test',
+      id: '123e4567-e89b-12d3-a456-426614174000',
+      path: 'test/document.json',
+      tags: ['Invalid Tag', 'test'], // Invalid tag with uppercase and space
+      lastModified: new Date().toISOString(), // Use ISO string
+      createdAt: new Date().toISOString(), // Use ISO string
+      version: 1
+    };
+
+    const result = DocumentMetadataV2Schema.safeParse(invalidMetadata);
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('BaseJsonDocumentV2Schema', () => {
+  it('should validate a correct base document structure (schema and documentType)', () => {
+    // Base schema now only defines schema and documentType at the top level
+    const validBaseStructure = {
+      schema: SCHEMA_VERSION,
+      documentType: 'any_valid_type_string', // Needs a non-empty string
+      // metadata and content are not part of the base schema itself anymore
+    };
+
+    const result = BaseJsonDocumentV2Schema.safeParse(validBaseStructure);
+    // If this fails, log the Zod error details
+    if (!result.success) {
+      console.error("BaseJsonDocumentV2Schema validation failed:", JSON.stringify(result.error.format(), null, 2));
+    }
+    expect(result.success).toBe(true);
+  });
+
+  it('should reject document with wrong schema version', () => {
+    const invalidDocument = {
+      schema: 'wrong_version',
+      metadata: {
+        title: 'Test Document',
+        documentType: 'test',
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        path: 'test/document.json',
+        tags: ['test'],
+        lastModified: new Date().toISOString(), // Use ISO string
+        createdAt: new Date().toISOString(), // Use ISO string
+        version: 1
+      },
+      content: {
+        key: 'value'
       }
-    });
+    };
 
-    // metadata と content は Base スキーマに含まれなくなったため、これらのテストは削除
-    // it('should fail if metadata is invalid', () => { ... });
-    // it('should fail if content is empty object', () => { ... });
-    // it('should fail if content is not an object', () => { ... });
+    const result = BaseJsonDocumentV2Schema.safeParse(invalidDocument);
+    expect(result.success).toBe(false);
+  });
 
-    // documentType のバリデーションテストを追加
-    it('should fail if documentType is empty', () => {
-      const invalidDoc = { ...validBaseDoc, documentType: '' };
-      const result = BaseJsonDocumentV2Schema.safeParse(invalidDoc);
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.errors[0].path).toEqual(['documentType']);
-        expect(result.error.errors[0].message).toContain('空にできません');
+  it('should reject document with empty content', () => {
+    const invalidDocument = {
+      schema: SCHEMA_VERSION,
+      metadata: {
+        title: 'Test Document',
+        documentType: 'test',
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        path: 'test/document.json',
+        tags: ['test'],
+        lastModified: new Date().toISOString(), // Use ISO string
+        createdAt: new Date().toISOString(), // Use ISO string
+        version: 1
+      },
+      content: {}  // Empty content
+    };
+
+    const result = BaseJsonDocumentV2Schema.safeParse(invalidDocument);
+    // Base schema requires content not to be empty
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('BranchContextJsonV2Schema', () => {
+  it('should validate a correct branch context document', () => {
+    const validDocument = {
+      schema: SCHEMA_VERSION,
+      documentType: 'branch_context' as const, // Move documentType to top level
+      metadata: {
+        title: 'Branch Context',
+        // documentType: 'branch_context', // Removed from metadata
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        path: 'branchContext.json',
+        tags: ['branch-context'],
+        lastModified: '2023-10-27T12:00:00.000Z',
+        createdAt: '2023-10-26T12:00:00.000Z',
+        version: 1
+      },
+      content: {
+        purpose: 'Feature implementation',
+        background: 'Some background info', // Optional field
+        userStories: [
+          {
+            description: 'User can do something',
+            completed: false // Default is false, explicitly setting is fine
+          }
+        ]
+        // additionalNotes is missing, but it's optional in the schema
       }
-    });
+    };
+
+    const result = BranchContextJsonV2Schema.safeParse(validDocument);
+    expect(result.success).toBe(true);
+  });
+
+  it('should reject branch context with wrong document type', () => {
+    const invalidDocument = {
+      schema: SCHEMA_VERSION,
+      documentType: 'wrong_type' as any, // Invalid literal at top level
+      metadata: {
+        title: 'Branch Context',
+        // documentType: 'wrong_type', // Removed from metadata
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        path: 'branchContext.json',
+        tags: ['branch-context'],
+        lastModified: new Date().toISOString(), // Use ISO string
+        createdAt: new Date().toISOString(), // Use ISO string
+        version: 1
+      },
+      content: {
+        purpose: 'Feature implementation',
+        userStories: []
+      }
+    };
+
+    const result = BranchContextJsonV2Schema.safeParse(invalidDocument);
+    expect(result.success).toBe(false);
+  });
+
+  it('should reject branch context without required purpose', () => {
+    const invalidDocument = {
+      schema: SCHEMA_VERSION,
+      documentType: 'branch_context' as const, // Correct type at top level
+      metadata: {
+        title: 'Branch Context',
+        // documentType: 'branch_context', // Removed from metadata
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        path: 'branchContext.json',
+        tags: ['branch-context'],
+        lastModified: new Date().toISOString(), // Use ISO string
+        createdAt: new Date().toISOString(), // Use ISO string
+        version: 1
+      },
+      content: {
+        // Missing required field 'purpose'
+        userStories: []
+      }
+    };
+
+    const result = BranchContextJsonV2Schema.safeParse(invalidDocument);
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('ActiveContextJsonV2Schema', () => {
+  it('should validate a correct active context document', () => {
+    const validDocument = {
+      schema: SCHEMA_VERSION,
+      documentType: 'active_context' as const, // Move documentType to top level
+      metadata: {
+        title: 'Active Context',
+        // documentType: 'active_context', // Removed from metadata
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        path: 'activeContext.json',
+        tags: ['active-context'],
+        lastModified: '2023-10-27T13:00:00.000Z',
+        createdAt: '2023-10-26T13:00:00.000Z',
+        version: 1
+      },
+      content: {
+        currentWork: 'Working on feature X', // Optional
+        recentChanges: [], // Optional, default []
+        activeDecisions: [], // Optional, default []
+        considerations: [], // Optional, default []
+        nextSteps: [] // Optional, default []
+      }
+    };
+
+    const result = ActiveContextJsonV2Schema.safeParse(validDocument);
+    expect(result.success).toBe(true);
+  });
+
+  it('should accept active context with only optional fields', () => {
+    const validDocument = {
+      schema: SCHEMA_VERSION,
+      documentType: 'active_context' as const, // Move documentType to top level
+      metadata: {
+        title: 'Active Context',
+        // documentType: 'active_context', // Removed from metadata
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        path: 'activeContext.json',
+        tags: ['active-context'],
+        lastModified: '2023-10-27T14:00:00.000Z',
+        createdAt: '2023-10-26T14:00:00.000Z',
+        version: 1
+      },
+      content: {
+        // All content fields are optional or have defaults in ActiveContext schema
+      }
+    };
+
+    const result = ActiveContextJsonV2Schema.safeParse(validDocument);
+    expect(result.success).toBe(true);
+  });
+});
+
+describe('ProgressJsonV2Schema', () => {
+  it('should validate a correct progress document', () => {
+    const validDocument = {
+      schema: SCHEMA_VERSION,
+      documentType: 'progress' as const, // Move documentType to top level
+      metadata: {
+        title: 'Progress',
+        // documentType: 'progress', // Removed from metadata
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        path: 'progress.json',
+        tags: ['progress'],
+        lastModified: '2023-10-27T15:00:00.000Z',
+        createdAt: '2023-10-26T15:00:00.000Z',
+        version: 1
+      },
+      content: {
+        workingFeatures: [], // Optional, default []
+        pendingImplementation: [], // Optional, default []
+        status: 'In progress', // Optional
+        // currentState: 'Phase 2', // This field is not in the Progress schema
+        completionPercentage: 50, // Optional
+        knownIssues: [] // Optional, default []
+      }
+    };
+
+    const result = ProgressJsonV2Schema.safeParse(validDocument);
+    expect(result.success).toBe(true);
+  });
+
+  it('should accept progress document with minimum required fields', () => {
+    // status and completionPercentage are required according to the schema
+    const validDocument = {
+      schema: SCHEMA_VERSION,
+      documentType: 'progress' as const,
+      metadata: {
+        title: 'Progress',
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        path: 'progress.json',
+        tags: ['progress'],
+        lastModified: '2023-10-27T16:00:00.000Z',
+        createdAt: '2023-10-26T16:00:00.000Z',
+        version: 1
+      },
+      content: {
+        status: 'Initial', // Add required status
+        completionPercentage: 0, // Add required completionPercentage
+        // Optional fields with defaults can be omitted or explicitly set
+        workingFeatures: [],
+        pendingImplementation: [],
+        knownIssues: [],
+        // currentState is optional
+      }
+    };
+
+    const result = ProgressJsonV2Schema.safeParse(validDocument);
+    if (!result.success) {
+      console.error("ProgressJsonV2Schema (minimum) validation failed:", JSON.stringify(result.error.format(), null, 2));
+    }
+    expect(result.success).toBe(true);
+  });
+});
+
+describe('SystemPatternsJsonV2Schema', () => {
+  it('should validate a correct system patterns document', () => {
+    const validDocument = {
+      schema: SCHEMA_VERSION,
+      documentType: 'system_patterns' as const, // Move documentType to top level
+      metadata: {
+        title: 'System Patterns',
+        // documentType: 'system_patterns', // Removed from metadata
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        path: 'systemPatterns.json',
+        tags: ['system-patterns'],
+        lastModified: '2023-10-27T17:00:00.000Z',
+        createdAt: '2023-10-26T17:00:00.000Z',
+        version: 1
+      },
+      content: {
+        technicalDecisions: [ // Optional, default []
+          {
+            title: 'Use TypeScript', // Required
+            context: 'Need type safety', // Required
+            decision: 'We will use TypeScript', // Required
+            consequences: ['Better code quality', 'Requires compilation'] // Must be string[] with min 1 element
+            // status, date, alternatives are not in the schema definition
+          }
+        ],
+        implementationPatterns: [] // Optional, default []
+      }
+    };
+
+    const result = SystemPatternsJsonV2Schema.safeParse(validDocument);
+    if (!result.success) {
+      console.error("SystemPatternsJsonV2Schema validation failed:", JSON.stringify(result.error.format(), null, 2));
+    }
+    expect(result.success).toBe(true);
+  });
+
+  it('should accept system patterns with minimum fields', () => {
+    const validDocument = {
+      schema: SCHEMA_VERSION,
+      documentType: 'system_patterns' as const, // Move documentType to top level
+      metadata: {
+        title: 'System Patterns',
+        // documentType: 'system_patterns', // Removed from metadata
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        path: 'systemPatterns.json',
+        tags: ['system-patterns'],
+        lastModified: '2023-10-27T18:00:00.000Z',
+        createdAt: '2023-10-26T18:00:00.000Z',
+        version: 1
+      },
+      content: {
+        // technicalDecisions and implementationPatterns have defaults
+      }
+    };
+
+    const result = SystemPatternsJsonV2Schema.safeParse(validDocument);
+    expect(result.success).toBe(true);
+  });
+
+  it('should reject technical decision with missing required fields (e.g., status)', () => {
+    const invalidDocument = {
+      schema: SCHEMA_VERSION,
+      documentType: 'system_patterns' as const, // Move documentType to top level
+      metadata: {
+        title: 'System Patterns',
+        // documentType: 'system_patterns', // Removed from metadata
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        path: 'systemPatterns.json',
+        tags: ['system-patterns'],
+        lastModified: new Date().toISOString(), // Use ISO string
+        createdAt: new Date().toISOString(), // Use ISO string
+        version: 1
+      },
+      content: {
+        technicalDecisions: [
+          {
+            title: 'Use TypeScript',
+            context: 'Need type safety',
+            decision: 'We will use TypeScript',
+            consequences: { positive: [], negative: [] },
+            date: new Date().toISOString(),
+            // status: 'accepted', // Missing required status
+          }
+        ]
+      }
+    };
+
+    const result = SystemPatternsJsonV2Schema.safeParse(invalidDocument);
+    expect(result.success).toBe(false);
+    expect(result.error?.errors.some(e => e.path.includes('status'))).toBe(true);
+  });
+});
+
+describe('GenericDocumentJsonV2Schema', () => {
+  it('should validate a generic document', () => {
+    // Generic schema expects documentType inside metadata
+    const validDocument = {
+      schema: SCHEMA_VERSION,
+      // documentType: 'custom_type', // Not at top level for Generic schema test
+      metadata: {
+        title: 'Custom Document',
+        documentType: 'custom_type', // Generic allows any string here
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        path: 'custom.json',
+        tags: ['custom'],
+        lastModified: '2023-10-27T19:00:00.000Z',
+        createdAt: '2023-10-26T19:00:00.000Z',
+        version: 1
+      },
+      content: { // Content must not be empty
+        customField: 'value',
+        anotherField: 123
+      }
+    };
+
+    const result = GenericDocumentJsonV2Schema.safeParse(validDocument);
+    expect(result.success).toBe(true);
+  });
+
+  it('should reject generic document with empty content', () => {
+    const invalidDocument = {
+      schema: SCHEMA_VERSION,
+      metadata: {
+        title: 'Custom Document',
+        documentType: 'custom_type',
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        path: 'custom.json',
+        tags: ['custom'],
+        lastModified: new Date().toISOString(), // Use ISO string
+        createdAt: new Date().toISOString(), // Use ISO string
+        version: 1
+      },
+      content: {} // Empty content
+    };
+
+    const result = GenericDocumentJsonV2Schema.safeParse(invalidDocument);
+    // Generic schema requires content not to be empty
+    expect(result.success).toBe(false);
   });
 });

@@ -16,7 +16,7 @@ export interface BaseJsonDocumentV2 {
 export interface DocumentMetadataV2 {
   id: string;
   title: string;
-  documentType: string;
+  // documentType: string; // Removed: Moved to top level of BaseJsonDocumentV2
   path: string;
   tags: string[];
   lastModified: string | Date;
@@ -119,20 +119,25 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
     }
 
     const baseDocument = jsonData as any;
-    const metadata = baseDocument.metadata || baseDocument;
-    const documentType = metadata.documentType as DocumentType;
+    // documentType はトップレベルから取得
+    const documentType = baseDocument.documentType as DocumentType;
+    const metadata = baseDocument.metadata; // metadata を直接取得
 
+    // metadata が存在するかチェック
+    if (!metadata) {
+        throw new DomainError(DomainErrorCodes.VALIDATION_ERROR, 'Metadata is missing in the document object');
+    }
     const id = DocumentId.create(metadata.id);
-    const tags = metadata.tags.map((tag: string) => Tag.create(tag));
+    const tags = (metadata.tags || []).map((tag: string) => Tag.create(tag)); // tags が optional な場合も考慮
     const lastModified = new Date(metadata.lastModified);
 
     const versionInfo = new DocumentVersionInfo({
       version: metadata.version || 1,
       lastModified: lastModified,
-      modifiedBy: 'system',
+      modifiedBy: 'system', // 必要に応じて変更
     });
 
-    const branch = (metadata as any).branch;
+    const branch = metadata.branch; // metadata から branch を取得
 
     return new JsonDocument(
       id,
@@ -432,29 +437,28 @@ export class JsonDocument<T extends Record<string, unknown> = Record<string, unk
    * Converts the document to a serializable object (BaseJsonDocumentV2)
    * @returns Document as a serializable object
    */
-  public toObject(): any {
-    const metadata: Record<string, any> = {
+  public toObject(): BaseJsonDocumentV2 & { documentType: DocumentType } { // 戻り値の型を修正
+    // metadata オブジェクトから documentType を除外
+    const metadata: DocumentMetadataV2 = {
       id: this._id.value,
       title: this._title,
-      documentType: this._documentType,
+      // documentType: this._documentType, // metadata には含めない
       path: this._path.value,
       tags: this._tags.map((tag) => tag.value),
-      lastModified: this._versionInfo.lastModified,
+      lastModified: this._versionInfo.lastModified.toISOString(), // ISO 文字列に変換
+      createdAt: new Date().toISOString(), // createdAt は常に現在時刻？ or VersionInfo から取得？ 要確認 -> 一旦 new Date()
       version: this._versionInfo.version,
     };
 
-    if ('createdAt' in this) {
-      metadata.createdAt = (this as any)._createdAt || new Date();
-    } else {
-      metadata.createdAt = new Date();
-    }
-
+    // branch は optional なので存在する場合のみ追加
     if (this._branch) {
-      metadata.branch = this._branch;
+      (metadata as any).branch = this._branch; // 型アサーションで追加
     }
 
+    // documentType をトップレベルに含める
     return {
       schema: SCHEMA_VERSION,
+      documentType: this._documentType, // documentType をトップレベルに
       metadata,
       content: this._content,
     };

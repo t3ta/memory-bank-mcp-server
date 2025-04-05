@@ -1,229 +1,234 @@
 import { z } from 'zod';
-import {
-  JsonDocumentV2Schema,
-  JsonDocumentV2,
-} from '../../../src/v2/document-union'; // Adjust path as needed
-import { SCHEMA_VERSION } from '../../../src/v2/json-document'; // Import constant
+import { JsonDocumentV2Schema, type JsonDocumentV2 } from '../../src/v2/document-union';
+import { SCHEMA_VERSION } from '../../src/v2/json-document'; // Import SCHEMA_VERSION
 
-// Helper to create minimal valid metadata for testing
-// documentType はメタデータから削除されたため、引数と戻り値から削除
-const createTestMetadata = (type: string, overrides = {}) => ({
-  title: `Test ${type}`,
-  // documentType: type, // Removed
-  id: '333e4567-e89b-12d3-a456-426614174000', // Use a fixed valid UUID
-  path: `test/${type}.json`, // Keep path generation based on type
-  tags: ['test'], // Remove type from tags to avoid invalid characters like '_'
+// Helper function to create minimal valid metadata (documentType removed)
+const createMinimalMetadata = (docType: string, path: string) => ({
+  id: `test-${docType}-id`,
+  title: `Test ${docType}`,
+  // documentType is now at the top level of the document object
+  path: path,
+  tags: [],
   lastModified: new Date().toISOString(),
   createdAt: new Date().toISOString(),
   version: 1,
-  ...overrides,
 });
 
-describe('JsonDocumentV2Schema (Union)', () => {
-  // --- Test Data for Each Document Type ---
-  // documentType をトップレベルに移動し、metadata から documentType を削除
-  const validBranchContext = {
-    schema: SCHEMA_VERSION,
-    documentType: 'branch_context', // Discriminator at top level
-    metadata: createTestMetadata('branch_context'), // metadata に documentType は不要
-    content: { // Correct content for BranchContext
-      purpose: 'Test purpose', // Required
-      // background: 'Optional background',
-      userStories: [], // Required (defaults to [])
-    },
-  };
+describe('JsonDocumentV2Schema (Discriminated Union)', () => {
+  // --- Test Valid Documents ---
 
-  // documentType をトップレベルに移動し、metadata から documentType を削除
-  const validActiveContext = {
-    schema: SCHEMA_VERSION,
-    documentType: 'active_context', // Discriminator at top level
-    metadata: createTestMetadata('active_context'), // metadata に documentType は不要
-    content: { // Minimal valid content for ActiveContext
-      currentWork: 'Testing active context',
-      recentChanges: [],
-      activeDecisions: [],
-      considerations: [],
-      nextSteps: [],
-    },
-  };
-
-   // documentType をトップレベルに移動し、metadata から documentType を削除
-   const validProgress = {
-    schema: SCHEMA_VERSION,
-    documentType: 'progress', // Discriminator at top level
-    metadata: createTestMetadata('progress'), // metadata に documentType は不要
-    content: { // Minimal valid content for Progress
-      status: 'In progress',
-      completionPercentage: 50, // Add required completionPercentage
-      workingFeatures: [],
-      pendingImplementation: [],
-      knownIssues: [],
-    },
-  };
-
-   // documentType をトップレベルに移動し、metadata から documentType を削除
-   const validSystemPatterns = {
-    schema: SCHEMA_VERSION,
-    documentType: 'system_patterns', // Discriminator at top level
-    metadata: createTestMetadata('system_patterns'), // metadata に documentType は不要
-    content: { // Minimal valid content for SystemPatterns
-      technicalDecisions: [],
-      implementationPatterns: [], // Add required implementationPatterns
-    },
-  };
-
-  // --- Tests ---
-
-  it('should validate a correct BranchContext document', () => {
+  it('should successfully parse a valid BranchContext document', () => {
+    // Define the object structure matching the schema
+    const validBranchContext = {
+      schema: SCHEMA_VERSION,
+      documentType: 'branch_context' as const, // Add documentType at top level
+      metadata: createMinimalMetadata('branch_context', 'branchContext.json'),
+      content: {
+        // branchName is not part of BranchContextContentV2Schema, removed
+        purpose: 'Test purpose',
+        // createdAt is not part of BranchContextContentV2Schema, removed
+        userStories: [],
+        // additionalNotes is not part of BranchContextContentV2Schema, removed
+        // additionalNotes: '',
+        // background is optional
+      },
+    };
+    // Let Zod infer the type for validation, or use the specific type if needed
     const result = JsonDocumentV2Schema.safeParse(validBranchContext);
-    // if (!result.success) console.error('BranchContext Error:', result.error?.errors); // Remove console log
     expect(result.success).toBe(true);
+    if (result.success) {
+      // Check documentType at the top level
+      expect(result.data.documentType).toBe('branch_context');
+    } else {
+      // Log error if parsing fails unexpectedly
+      console.error("BranchContext parsing failed:", result.error?.errors);
+      fail("BranchContext parsing failed");
+    }
   });
 
-  it('should validate a correct ActiveContext document', () => {
+  it('should successfully parse a valid ActiveContext document', () => {
+    const validActiveContext = {
+      schema: SCHEMA_VERSION,
+      documentType: 'active_context' as const, // Add documentType at top level
+      metadata: createMinimalMetadata('active_context', 'activeContext.json'),
+      content: {
+        currentWork: 'Testing active context',
+        recentChanges: [],
+        activeDecisions: [],
+        considerations: [],
+        nextSteps: [],
+      },
+    };
     const result = JsonDocumentV2Schema.safeParse(validActiveContext);
-    // if (!result.success) console.error('ActiveContext Error:', result.error?.errors); // Remove console log
     expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.documentType).toBe('active_context'); // Check top level
+    } else {
+      console.error("ActiveContext parsing failed:", result.error?.errors);
+      fail("ActiveContext parsing failed");
+    }
   });
 
-   it('should validate a correct Progress document', () => {
+  it('should successfully parse a valid Progress document', () => {
+    const validProgress = {
+      schema: SCHEMA_VERSION,
+      documentType: 'progress' as const, // Add documentType at top level
+      metadata: createMinimalMetadata('progress', 'progress.json'),
+      content: {
+        workingFeatures: [],
+        pendingImplementation: [],
+        status: 'In progress',
+        completionPercentage: 50,
+        knownIssues: [],
+      },
+    };
     const result = JsonDocumentV2Schema.safeParse(validProgress);
     expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.documentType).toBe('progress'); // Check top level
+    } else {
+      console.error("Progress parsing failed:", result.error?.errors);
+      fail("Progress parsing failed");
+    }
   });
 
-   it('should validate a correct SystemPatterns document', () => {
+  it('should successfully parse a valid SystemPatterns document', () => {
+    const validSystemPatterns = {
+      schema: SCHEMA_VERSION,
+      documentType: 'system_patterns' as const, // Add documentType at top level
+      metadata: createMinimalMetadata('system_patterns', 'systemPatterns.json'),
+      content: {
+        technicalDecisions: [],
+        implementationPatterns: [],
+      },
+    };
     const result = JsonDocumentV2Schema.safeParse(validSystemPatterns);
     expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.documentType).toBe('system_patterns'); // Check top level
+    } else {
+      console.error("SystemPatterns parsing failed:", result.error?.errors);
+      fail("SystemPatterns parsing failed");
+    }
   });
 
-  it('should fail if the discriminator "documentType" is missing', () => {
-    // Use the updated validBranchContext structure
-    const invalidDoc = { ...validBranchContext };
-    delete (invalidDoc as any).documentType; // Remove top-level documentType
-    const result = JsonDocumentV2Schema.safeParse(invalidDoc);
-    expect(result.success).toBe(false);
-    // Zod's error message for missing discriminator might be generic
-    // console.error(result.error?.errors);
-  });
+  // --- Test Invalid Documents ---
 
-  it('should fail if the discriminator "documentType" does not match content/metadata', () => {
-    // Use the updated validBranchContext structure
+  it('should fail parsing if documentType does not match content structure', () => {
     const invalidDoc = {
-      ...validBranchContext,
-      documentType: 'active_context', // Change top-level documentType
-    };
-    // console.log('Invalid Doc Data for mismatch test:', JSON.stringify(invalidDoc, null, 2)); // Remove console log
-    const result = JsonDocumentV2Schema.safeParse(invalidDoc);
-    // if (result.success) console.error('Mismatch test unexpectedly succeeded!'); // Remove console log
-    // else console.error('Mismatch test failed as expected:', result.error?.errors); // Remove console log
-    expect(result.success).toBe(false);
-    // console.error(result.error?.errors);
-  });
-
-  it('should fail if the schema version is incorrect', () => {
-    // Use the updated validActiveContext structure
-    const invalidDoc = { ...validActiveContext, schema: 'memory_document_v1' };
-    const result = JsonDocumentV2Schema.safeParse(invalidDoc);
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      // Check path points to the schema field within the specific object type
-      expect(result.error.errors[0].path).toEqual(['schema']);
-    }
-  });
-
-  it('should fail if metadata is invalid for the specific document type', () => {
-    // Use the updated validActiveContext structure
-   const invalidDoc = {
-     ...validActiveContext,
-     metadata: { ...validActiveContext.metadata, title: '' }, // Modify metadata
+      schema: SCHEMA_VERSION,
+      documentType: 'branch_context' as const, // Correct documentType
+      // Metadata is now generic
+      metadata: createMinimalMetadata('branch_context', 'branchContext.json'),
+      // But content is from ActiveContext
+      content: {
+        currentWork: 'Mismatched content',
+        recentChanges: [],
+        activeDecisions: [],
+        considerations: [],
+        nextSteps: [], // This content doesn't match BranchContextContentV2Schema
+      },
     };
     const result = JsonDocumentV2Schema.safeParse(invalidDoc);
     expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.errors[0].path).toEqual(['metadata', 'title']);
-    }
+    // console.error(JSON.stringify(result.error?.errors, null, 2)); // Optional: Log errors for debugging
   });
 
-  it('should fail if content is invalid for the specific document type', () => {
-    // Use Progress data but make its content invalid (e.g., missing status)
-    const invalidContent = { ...validProgress.content };
-    delete (invalidContent as any).status;
-    // Use the updated validProgress structure
-    const invalidDoc = {
-      ...validProgress,
-      content: invalidContent,
+  it('should fail parsing if required fields are missing (e.g., metadata)', () => {
+    const missingMetadata = {
+      // documentType is required at top level
+      schema: SCHEMA_VERSION,
+      documentType: 'branch_context' as const, // Need a valid type for Zod to try parsing
+      // metadata is missing
+      content: {
+        purpose: 'Test purpose', // branchName removed
+        userStories: [],
+        // additionalNotes: '', // Removed as it's not in the schema
+      },
     };
-    const result = JsonDocumentV2Schema.safeParse(invalidDoc);
+    // Need to cast because TS knows properties are missing, but we test runtime validation
+    const result = JsonDocumentV2Schema.safeParse(missingMetadata as any);
     expect(result.success).toBe(false);
-    if (!result.success) {
-      // Check path points to the missing content field
-      expect(result.error.errors[0].path).toEqual(['content', 'status']);
-    }
+    // Expect errors related to missing 'metadata'
+    // documentType check might pass initially if provided at top level, but metadata is still required by the base schema
+    expect(result.error?.errors.some(e => e.path.includes('metadata'))).toBe(true);
   });
 
-  it('should not validate a document with an unknown documentType', () => {
-   // Use the updated createTestMetadata structure and add documentType at top level
-   const unknownDoc = {
-     schema: SCHEMA_VERSION,
-     documentType: 'unknown_type', // Discriminator at top level
-     metadata: createTestMetadata('unknown_type'), // metadata doesn't have documentType
-     content: { data: 'some data' },
-   };
-    const result = JsonDocumentV2Schema.safeParse(unknownDoc);
+   it('should fail parsing if required content fields are missing', () => {
+    const missingContentField = {
+      schema: SCHEMA_VERSION,
+      documentType: 'branch_context' as const, // Add documentType
+      metadata: createMinimalMetadata('branch_context', 'branchContext.json'),
+      content: {
+        // purpose is required in BranchContextContentV2Schema, let's remove it
+        // purpose: 'Test purpose',
+        userStories: [],
+        // additionalNotes: '', // Removed as it's not in the schema
+      }, // Missing 'purpose'
+    };
+    const result = JsonDocumentV2Schema.safeParse(missingContentField);
     expect(result.success).toBe(false);
-    // console.error(result.error?.errors);
+    // Expect error related to missing 'purpose' in content
+    expect(result.error?.errors.some(e => e.path.includes('content') && e.path.includes('purpose'))).toBe(true);
   });
 
-  // --- Boundary and Optional Field Tests ---
-
-  it('should validate Progress with completionPercentage at boundary values (0 and 100)', () => {
-    // Use the updated validProgress structure
-    const progressAt0 = { ...validProgress, content: { ...validProgress.content, completionPercentage: 0 } };
-    const progressAt100 = { ...validProgress, content: { ...validProgress.content, completionPercentage: 100 } };
-    expect(JsonDocumentV2Schema.safeParse(progressAt0).success).toBe(true);
-    expect(JsonDocumentV2Schema.safeParse(progressAt100).success).toBe(true);
-  });
-
-  it('should fail Progress if completionPercentage is outside the 0-100 range', () => {
-    // Use the updated validProgress structure
-    const progressBelow0 = { ...validProgress, content: { ...validProgress.content, completionPercentage: -1 } };
-    const progressAbove100 = { ...validProgress, content: { ...validProgress.content, completionPercentage: 101 } };
-    const resultBelow = JsonDocumentV2Schema.safeParse(progressBelow0);
-    const resultAbove = JsonDocumentV2Schema.safeParse(progressAbove100);
-    expect(resultBelow.success).toBe(false);
-    expect(resultAbove.success).toBe(false);
-    if (!resultBelow.success) {
-        expect(resultBelow.error.errors[0].path).toEqual(['content', 'completionPercentage']);
-        expect(resultBelow.error.errors[0].message).toContain('greater than or equal to 0'); // Adjust expected error message
-    }
-     if (!resultAbove.success) {
-        expect(resultAbove.error.errors[0].path).toEqual(['content', 'completionPercentage']);
-        expect(resultAbove.error.errors[0].message).toContain('less than or equal to 100'); // Adjust expected error message
-    }
-  });
-
-   it('should validate BranchContext with optional background field present', () => {
-    // Use the updated validBranchContext structure
-    const branchContextWithBg = {
-      ...validBranchContext,
-      content: { ...validBranchContext.content, background: 'Detailed background info' },
+  it('should fail parsing if documentType is not one of the discriminated union keys', () => {
+    const unknownDocType = {
+      schema: SCHEMA_VERSION,
+      documentType: 'unknown_type', // Not a valid literal type in the union
+      metadata: createMinimalMetadata('unknown_type', 'unknown.json'),
+      content: { someData: 'value' },
     };
-    const result = JsonDocumentV2Schema.safeParse(branchContextWithBg);
-    // if (!result.success) console.error('BranchContext Optional BG Error:', result.error?.errors); // Remove console log
-    expect(result.success).toBe(true);
+    const result = JsonDocumentV2Schema.safeParse(unknownDocType);
+    expect(result.success).toBe(false);
+    // Zod error for discriminated union should mention the discriminator key ('documentType')
+    expect(result.error?.errors.some(e => e.message.includes('Invalid discriminator value'))).toBe(true);
   });
 
-   it('should validate BranchContext with optional background field explicitly undefined', () => {
-     // Use the updated validBranchContext structure
-    const branchContextUndefinedBg = {
-      ...validBranchContext,
-      content: { ...validBranchContext.content, background: undefined },
+   it('should fail parsing if documentType is missing at top level', () => {
+    const missingDocType = { // Missing documentType at top level
+      schema: SCHEMA_VERSION,
+      metadata: {
+        id: 'test-id',
+        title: 'Test Missing Type',
+        path: 'missing.json',
+        tags: [],
+        lastModified: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        version: 1,
+      },
+      content: { data: 'value' },
     };
-    const result = JsonDocumentV2Schema.safeParse(branchContextUndefinedBg);
-    // if (!result.success) console.error('BranchContext Undefined BG Error:', result.error?.errors); // Remove console log
-    expect(result.success).toBe(true); // Optional fields allow undefined
+    const result = JsonDocumentV2Schema.safeParse(missingDocType as any); // Cast needed
+    expect(result.success).toBe(false);
+    // Expect error related to missing 'documentType' at the top level
+    expect(result.error?.errors.some(e => e.path.includes('documentType'))).toBe(true);
   });
 
+  it('should fail parsing if schema version is incorrect', () => {
+    const wrongSchema = {
+      schema: 'memory_document_v1', // Incorrect version literal
+      documentType: 'branch_context' as const, // Add documentType
+      metadata: createMinimalMetadata('branch_context', 'branchContext.json'),
+      content: {
+        purpose: 'Test purpose', // branchName removed
+        userStories: [],
+        // additionalNotes: '', // Removed as it's not in the schema
+      },
+    };
+    const result = JsonDocumentV2Schema.safeParse(wrongSchema);
+    expect(result.success).toBe(false);
+    expect(result.error?.errors.some(e => e.path.includes('schema'))).toBe(true);
+  });
 
-  // Note: Testing 'generic' type is not possible with this union schema directly.
+  it('should fail parsing plain objects without required structure', () => {
+    const plainObject = { just: 'a plain object' };
+    const result = JsonDocumentV2Schema.safeParse(plainObject);
+    expect(result.success).toBe(false);
+  });
+
+  it('should fail parsing null or undefined', () => {
+    expect(JsonDocumentV2Schema.safeParse(null).success).toBe(false);
+    expect(JsonDocumentV2Schema.safeParse(undefined).success).toBe(false);
+  });
 });

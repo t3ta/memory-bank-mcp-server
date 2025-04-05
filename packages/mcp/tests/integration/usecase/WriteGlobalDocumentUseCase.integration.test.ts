@@ -55,16 +55,18 @@ describe('WriteGlobalDocumentUseCase Integration Tests', () => {
 
   describe('execute', () => {
     it('should create a new document', async () => {
+      // スキーマ変更に合わせて documentType をトップレベルに移動
       const newDocument = {
         schema: "memory_document_v2",
+        documentType: "test", // documentType をトップレベルに
         metadata: {
           id: "test-new-document",
           title: "テスト新規ドキュメント",
-          documentType: "test",
+          // documentType: "test", // metadata から削除
           path: "test/new-document.json",
           tags: ["test", "integration"],
-          lastModified: expect.any(String),
-          createdAt: expect.any(String),
+          lastModified: expect.any(String), // writeUseCase が設定
+          createdAt: expect.any(String), // writeUseCase が設定
           version: 1
         },
         content: {
@@ -98,20 +100,22 @@ describe('WriteGlobalDocumentUseCase Integration Tests', () => {
       const readDocument = JSON.parse(readResult.document.content);
       expect(readDocument.schema).toBe('memory_document_v2');
       expect(readDocument.metadata.id).toBe('test-new-document');
-      expect(readDocument.metadata.documentType).toBe('test');
+      expect(readDocument.documentType).toBe('test'); // トップレベルの documentType をチェック
     });
 
     it('should update an existing document', async () => {
+      // スキーマ変更に合わせて documentType をトップレベルに移動
       const originalDocument = {
         schema: "memory_document_v2",
+        documentType: "test", // documentType をトップレベルに
         metadata: {
           id: "test-update-document",
           title: "更新前ドキュメント",
-          documentType: "test",
+          // documentType: "test", // metadata から削除
           path: "test/update-document.json",
           tags: ["test", "integration"],
-          lastModified: expect.any(String),
-          createdAt: expect.any(String),
+          lastModified: expect.any(String), // writeUseCase が設定
+          createdAt: expect.any(String), // writeUseCase が設定
           version: 1
         },
         content: {
@@ -129,13 +133,15 @@ describe('WriteGlobalDocumentUseCase Integration Tests', () => {
         }
       });
 
+      // スキーマ変更に合わせて修正 (documentType は originalDocument から引き継がれる)
       const updatedDocumentData = {
-        ...originalDocument,
+        ...originalDocument, // documentType もコピーされる
         metadata: {
-          ...originalDocument.metadata,
+          ...originalDocument.metadata, // id, path, tags などもコピー
           title: "更新後ドキュメント",
-          lastModified: new Date().toISOString(),
-          version: 2
+          lastModified: new Date().toISOString(), // 更新日時を更新
+          version: 2 // バージョンを更新
+          // documentType は metadata に含めない
         },
         content: {
           value: "更新後の内容"
@@ -232,12 +238,14 @@ describe('WriteGlobalDocumentUseCase Integration Tests', () => {
 
     it('should handle path mismatch between input and metadata (uses input path)', async () => {
       // Document with mismatched path in metadata vs. input path
+      // スキーマ変更に合わせて documentType をトップレベルに移動
       const mismatchedDocument = {
         schema: "memory_document_v2",
+        documentType: "test", // documentType をトップレベルに
         metadata: {
           id: "test-path-mismatch",
           title: "パス不一致ドキュメント",
-          documentType: "test",
+          // documentType: "test", // metadata から削除
           path: "different/path.json", // Mismatched path
           tags: ["test"],
           lastModified: new Date().toISOString(),
@@ -273,12 +281,14 @@ describe('WriteGlobalDocumentUseCase Integration Tests', () => {
     });
     it('should throw an error when attempting to write to a path outside the allowed directory', async () => {
       const invalidPath = '../outside-global-memory.json'; // Path traversal attempt
+      // スキーマ変更に合わせて documentType をトップレベルに移動
       const documentContent = JSON.stringify({
         schema: "memory_document_v2",
+        documentType: "test", // documentType をトップレベルに
         metadata: {
           id: "test-invalid-path",
           title: "不正パスドキュメント",
-          documentType: "test",
+          // documentType: "test", // metadata から削除
           path: invalidPath, // Metadata path might be ignored, but include for completeness
           tags: ["test", "error"],
           lastModified: new Date().toISOString(),
@@ -301,12 +311,14 @@ describe('WriteGlobalDocumentUseCase Integration Tests', () => {
     });
 
     it('should return the created document content when returnContent is true', async () => {
+      // スキーマ変更に合わせて documentType をトップレベルに移動
       const newDocument = {
         schema: "memory_document_v2",
+        documentType: "test", // documentType をトップレベルに
         metadata: {
           id: "test-global-return-true",
           title: "テスト Global returnContent: true",
-          documentType: "test",
+          // documentType: "test", // metadata から削除
           path: "test/global-return-true.json",
           tags: ["test", "global", "return-content-true"],
           version: 1
@@ -340,12 +352,14 @@ describe('WriteGlobalDocumentUseCase Integration Tests', () => {
       const returnedDocument = JSON.parse(result.document.content);
 
       // 比較用に期待値を整形
+      // スキーマ変更に合わせて期待値を修正
       const expectedDocumentStructure = {
           schema: newDocument.schema,
+          documentType: newDocument.documentType, // documentType をトップレベルに
           metadata: {
               id: newDocument.metadata.id,
               title: newDocument.metadata.title,
-              documentType: newDocument.metadata.documentType,
+              // documentType: newDocument.documentType, // metadata から削除
               path: newDocument.metadata.path,
               tags: newDocument.metadata.tags,
               version: newDocument.metadata.version
@@ -366,12 +380,14 @@ describe('WriteGlobalDocumentUseCase Integration Tests', () => {
     });
 
     it('should return only minimal info when returnContent is false', async () => {
+      // スキーマ変更に合わせて documentType をトップレベルに移動
       const newDocument = {
         schema: "memory_document_v2",
+        documentType: "test", // documentType をトップレベルに
         metadata: {
           id: "test-global-return-false",
           title: "テスト Global returnContent: false",
-          documentType: "test",
+          // documentType: "test", // metadata から削除
           path: "test/global-return-false.json",
           tags: ["test", "global", "return-content-false"],
           version: 1
@@ -401,12 +417,14 @@ describe('WriteGlobalDocumentUseCase Integration Tests', () => {
     });
 
     it('should return only minimal info when returnContent is not specified (defaults to false)', async () => {
+       // スキーマ変更に合わせて documentType をトップレベルに移動
        const newDocument = {
          schema: "memory_document_v2",
+         documentType: "test", // documentType をトップレベルに
          metadata: {
            id: "test-global-return-default",
            title: "テスト Global returnContent: default",
-           documentType: "test",
+           // documentType: "test", // metadata から削除
            path: "test/global-return-default.json",
            tags: ["test", "global", "return-content-default"],
            version: 1
@@ -440,12 +458,14 @@ describe('WriteGlobalDocumentUseCase Integration Tests', () => {
 
     it('should update an existing document using patches', async () => {
       // 1. Setup: Create an initial document
+      // スキーマ変更に合わせて documentType をトップレベルに移動
       const initialDocument = {
         schema: "memory_document_v2",
+        documentType: "test", // documentType をトップレベルに
         metadata: {
           id: "test-patch-update",
           title: "パッチ更新前",
-          documentType: "test",
+          // documentType: "test", // metadata から削除
           path: "test/patch-update.json",
           tags: ["test", "integration"],
           version: 1

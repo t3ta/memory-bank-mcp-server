@@ -40,12 +40,14 @@ describe('JsonDocument', () => {
   describe('fromString', () => {
     // validJsonString は各テストケースで定義する方が柔軟性が高い場合があるが、
     // ここでは describe ブロック内で共通のものを定義
+    // スキーマ変更に合わせて documentType をトップレベルに移動
     const validJsonString = JSON.stringify({
       schema: SCHEMA_VERSION,
+      documentType: documentType, // documentType をトップレベルに
       metadata: {
         id: docId.value,
         title: title,
-        documentType: documentType,
+        // documentType: documentType, // metadata から削除
         path: validPath.value,
         tags: tags.map(t => t.value),
         lastModified: new Date().toISOString(),
@@ -84,9 +86,11 @@ describe('JsonDocument', () => {
        (mockValidator.validateDocument as jest.Mock).mockImplementationOnce(() => {
          throw new DomainError(DomainErrorCodes.VALIDATION_ERROR, 'Invalid schema version');
        });
+       // スキーマ変更に合わせて documentType をトップレベルに移動
        const jsonWithInvalidSchema = JSON.stringify({
          schema: 'invalid_version',
-         metadata: { id: docId.value, title, documentType, path: validPath.value, tags: [], lastModified: new Date(), createdAt: new Date(), version: 1 },
+         documentType: documentType, // documentType をトップレベルに
+         metadata: { id: docId.value, title, path: validPath.value, tags: [], lastModified: new Date(), createdAt: new Date(), version: 1 }, // metadata から documentType を削除
          content: {},
        });
        // toThrow にエラークラスとメッセージの完全一致チェックを渡す (モックで投げてるエラーなので完全一致でOK)
@@ -98,12 +102,14 @@ describe('JsonDocument', () => {
   });
 
   describe('fromObject', () => {
+     // スキーマ変更に合わせて documentType をトップレベルに移動
      const validObject = {
        schema: SCHEMA_VERSION,
+       documentType: documentType, // documentType をトップレベルに
        metadata: {
          id: docId.value,
          title: title,
-         documentType: documentType,
+         // documentType: documentType, // metadata から削除
          path: validPath.value,
          tags: tags.map(t => t.value),
          lastModified: new Date().toISOString(),
@@ -368,13 +374,15 @@ describe('JsonDocument', () => {
       const doc = JsonDocument.create({ id: docId, path: validPath, title, documentType, content, tags, branch, versionInfo });
       const obj = doc.toObject();
 
+      // スキーマ変更に合わせて期待値を修正
       expect(obj.schema).toBe(SCHEMA_VERSION);
+      expect(obj.documentType).toBe(documentType); // documentType がトップレベルにあることを確認
       expect(obj.metadata.id).toBe(docId.value);
       expect(obj.metadata.title).toBe(title);
-      expect(obj.metadata.documentType).toBe(documentType);
+      // expect(obj.metadata.documentType).toBe(documentType); // metadata にはない
       expect(obj.metadata.path).toBe(validPath.value);
       expect(obj.metadata.tags).toEqual(tags.map(t => t.value));
-      expect(obj.metadata.lastModified).toEqual(versionInfo.lastModified); // Dateオブジェクトの比較
+      expect(obj.metadata.lastModified).toEqual(versionInfo.lastModified.toISOString()); // ISO文字列で比較
       expect(obj.metadata.version).toBe(versionInfo.version);
       expect(obj.metadata.branch).toBe(branch);
       expect(obj.metadata.createdAt).toBeDefined(); // createdAt が存在することを確認
