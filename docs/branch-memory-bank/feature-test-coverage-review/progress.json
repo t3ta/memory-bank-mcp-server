@@ -6,7 +6,7 @@
     "documentType": "progress",
     "path": "progress.json",
     "tags": [],
-    "lastModified": "2025-04-05T08:18:32.222Z",
+    "lastModified": "2025-04-05T08:23:52.402Z",
     "createdAt": "2025-04-05T06:26:34.146Z",
     "version": 1
   },
@@ -41,6 +41,11 @@
         "id": "shared-errors-unit-tests",
         "description": "優先度「高」のエラーハンドリングモジュール (DomainError, ApplicationError, InfrastructureError, SharedUtilsError) のユニットテストを実装・成功させた",
         "implementedAt": "2025-04-05T08:18:24.000Z"
+      },
+      {
+        "id": "logger-util-unit-tests",
+        "description": "カバレッジが低かった logger.ts のユニットテストを実装・成功させた",
+        "implementedAt": "2025-04-05T08:23:45.000Z"
       }
     ],
     "pendingImplementation": [

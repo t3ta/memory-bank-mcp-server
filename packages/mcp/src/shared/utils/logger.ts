@@ -130,9 +130,10 @@ export interface Logger {
  * @param level Minimum log level to display
  * @returns Logger instance
  */
-export function createConsoleLogger(level: LogLevel = 'info'): Logger {
+// Allow passing initial default context
+export function createConsoleLogger(level: LogLevel = 'info', initialDefaultContext?: LogContext): Logger {
   let currentLevel = level;
-  let defaultContext: LogContext = {};
+  let defaultContext: LogContext = initialDefaultContext || {}; // Use initial context if provided
 
   /**
    * Check if a log level should be displayed
@@ -259,25 +260,14 @@ export function createConsoleLogger(level: LogLevel = 'info'): Logger {
     },
 
     withContext(context: LogContext): Logger {
-      const childLogger = createConsoleLogger(currentLevel);
-
+      // Create child logger passing the combined context
       const combinedContext = { ...defaultContext, ...context };
-
-      Object.defineProperty(childLogger, '_defaultContext', {
-        value: combinedContext,
-        writable: true,
-        enumerable: false
-      });
-
+      const childLogger = createConsoleLogger(currentLevel, combinedContext);
       return childLogger;
     }
   };
 
-  Object.defineProperty(logger, '_defaultContext', {
-    value: defaultContext,
-    writable: true,
-    enumerable: false
-  });
+  // Remove the Object.defineProperty for _defaultContext as it's handled internally now
 
   return logger;
 }
