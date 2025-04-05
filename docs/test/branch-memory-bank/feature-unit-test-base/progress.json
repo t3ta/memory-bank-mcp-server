@@ -1,0 +1,49 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-unit-test-base-progress",
+    "title": "Progress for feature/unit-test-base",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "createdAt": "2025-04-04T16:01:27.674Z",
+    "lastModified": "2025-04-04T16:01:59.896Z"
+  },
+  "content": {
+    "summary": "ドメインエンティティの単体テスト基盤構築と初期テスト実装",
+    "status": "in_progress",
+    "steps": [
+      {
+        "description": "単体テストのスケルトン作成 (b5047784)",
+        "status": "done"
+      },
+      {
+        "description": "コア ドメインエンティティ (BranchInfo, DocumentId, DocumentVersionInfo) の単体テスト追加 (85df919c)",
+        "status": "done"
+      },
+      {
+        "description": "その他のドメインエンティティ (BranchName, BranchPath, Document, MemoryBankIndex, TagIndex) の単体テスト追加 (27b12754)",
+        "status": "done"
+      },
+      {
+        "description": "WriteDocument ユースケースのリファクタリング (e09fefc2)",
+        "status": "done"
+      },
+      {
+        "description": "ロギングの改善 (db7faf75, d3863b78)",
+        "status": "done"
+      },
+      {
+        "description": "その他修正 (1f1ae880, bacf1d63, 4cd9f63b, 32b08df1)",
+        "status": "done"
+      }
+    ],
+    "next_steps": [
+      {
+        "description": "残りのドメインエンティティやユースケースの単体テストを追加する",
+        "status": "todo"
+      }
+    ],
+    "findings": []
+  }
+}

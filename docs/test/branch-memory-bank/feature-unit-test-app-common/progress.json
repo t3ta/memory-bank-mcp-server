@@ -1,0 +1,59 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-unit-test-app-common-progress",
+    "title": "Progress for feature/unit-test-app-common",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "createdAt": "2025-04-05T01:45:45.000Z",
+    "lastModified": "2025-04-04T18:05:14.740Z"
+  },
+  "content": {
+    "summary": "共通ユースケースの単体テストスケルトン作成と初期エラー修正中",
+    "status": "in_progress",
+    "steps": [
+      {
+        "description": "共通ユースケース (CreateBranchCoreFiles, GetRecentBranches, ReadBranchCoreFiles, ReadContext, ReadRules, SearchDocumentsByTags, UpdateTagIndex, UpdateTagIndexV2) のテストスケルトン作成",
+        "status": "done"
+      },
+      {
+        "description": "初期テスト実行とエラー修正",
+        "status": "in_progress"
+      }
+    ],
+    "next_steps": [
+      {
+        "description": "残りのテストエラー (ReadRules, ReadBranchCoreFiles, CreateBranchCoreFiles, GetRecentBranches) を修正する",
+        "status": "todo"
+      }
+    ],
+    "findings": [
+      {
+        "description": "ReadBranchCoreFilesUseCase.test.ts で構文エラー (括弧の対応) が発生している疑い",
+        "type": "issue",
+        "details": "テスト実行時に '}' expected エラーが発生。diff適用時の閉じ括弧修正が原因の可能性。",
+        "file": "packages/mcp/tests/unit/application/usecases/common/ReadBranchCoreFilesUseCase.test.ts"
+      },
+      {
+        "description": "ReadRulesUseCase.test.ts でエラーメッセージの toMatch が失敗している",
+        "type": "issue",
+        "details": "期待する正規表現と実際のエラーメッセージが一致していない。",
+        "file": "packages/mcp/tests/unit/application/usecases/common/ReadRulesUseCase.test.ts"
+      },
+      {
+        "description": "CreateBranchCoreFilesUseCase.test.ts, GetRecentBranchesUseCase.test.ts でエラーコードの比較 (toHaveProperty) が失敗している",
+        "type": "issue",
+        "details": "期待するエラーコード文字列と実際のエラーコード文字列が異なっている。",
+        "files": [
+          "packages/mcp/tests/unit/application/usecases/common/CreateBranchCoreFiles.test.ts",
+          "packages/mcp/tests/unit/application/usecases/common/GetRecentBranchesUseCase.test.ts"
+        ]
+      },
+      {
+        "description": "エラーコードの実際の値が 'DOMAIN_ERROR.XXX' や 'APP_ERROR.XXX' の形式である可能性が高い",
+        "type": "insight"
+      }
+    ]
+  }
+}

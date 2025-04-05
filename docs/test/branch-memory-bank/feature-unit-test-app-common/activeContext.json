@@ -1,0 +1,17 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-unit-test-app-common-active-context",
+    "title": "Active Context for feature/unit-test-app-common",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [],
+    "createdAt": "2025-04-04T16:45:52.115Z",
+    "lastModified": "2025-04-04T16:45:52.115Z"
+  },
+  "content": {
+    "current_task": "Initial active context for branch: feature/unit-test-app-common",
+    "relevant_files": [],
+    "recent_decisions": []
+  }
+}
