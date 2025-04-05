@@ -19,12 +19,7 @@ import { logger } from '../../shared/utils/logger.js';
 export class JsonTemplateLoader implements ITemplateLoader {
   private readonly templateRenderer: TemplateRenderer;
 
-  // Legacy template file naming patterns
-  private readonly LEGACY_PATTERNS = {
-    ja: '{{name}}.md',
-    en: '{{name}}-en.md',
-    zh: '{{name}}-zh.md',
-  };
+  // Legacy patterns removed as per user request
 
   /**
    * Constructor
@@ -47,12 +42,7 @@ export class JsonTemplateLoader implements ITemplateLoader {
     return path.join(process.cwd(), 'src/templates/json');
   }
 
-  /**
-   * Gets the legacy templates directory path
-   */
-  private getLegacyTemplatesDirectory(): string {
-    return path.join(process.cwd(), 'src/templates/markdown');
-  }
+  // Legacy directory method removed
 
   /**
    * Implements ITemplateLoader.loadJsonTemplate
@@ -74,6 +64,12 @@ export class JsonTemplateLoader implements ITemplateLoader {
       const template = JSON.parse(content);
       return validateJsonTemplate(template);
     } catch (error) {
+      // If it's a SyntaxError (JSON parse error), rethrow it directly
+      // so the caller can potentially identify it specifically.
+      if (error instanceof SyntaxError) {
+        throw error;
+      }
+      // Otherwise, wrap it in a generic load error message.
       throw new Error(`Failed to load JSON template ${templateId}: ${(error as Error).message}`);
     }
   }
@@ -98,53 +94,13 @@ export class JsonTemplateLoader implements ITemplateLoader {
       // Render to Markdown
       return this.templateRenderer.renderToMarkdown(template, language, variables);
     } catch (error) {
-      // If JSON template not found or invalid, try falling back to legacy template
-      if (
-        (error as Error).message.includes('Template not found') ||
-        (error as Error).message.includes('Invalid JSON')
-      ) {
-        logger.warn(
-          `JSON template ${templateId} not found or invalid, falling back to legacy template..`,
-          { component: 'JsonTemplateLoader', templateId }
-        );
-
-        try {
-          // Determine legacy file path based on naming convention
-          const legacyPath = this.getLegacyTemplatePath(templateId, language);
-          return this.loadLegacyTemplate(legacyPath, language);
-        } catch (legacyError) {
-          throw new Error(
-            `Failed to load template ${templateId}: ${(error as Error).message}. Legacy fallback also failed: ${(legacyError as Error).message}`
-          );
-        }
-      }
-
+      // Legacy fallback removed, rethrow the original error
+      logger.error(`Failed to load or render JSON template ${templateId}`, { error });
       throw error;
     }
   }
 
-  /**
-   * Implements ITemplateLoader.loadLegacyTemplate
-   */
-  async loadLegacyTemplate(templatePath: string, language: Language): Promise<string> {
-    try {
-      if (!templatePath.includes('.')) {
-        templatePath = this.getLegacyTemplatePath(templatePath, language);
-      }
-
-      // Check if file exists and read it
-      const exists = await this.fileSystemService.fileExists(templatePath);
-      if (!exists) {
-        throw new Error(`Legacy template file not found: ${templatePath}`);
-      }
-
-      return this.fileSystemService.readFile(templatePath);
-    } catch (error) {
-      throw new Error(
-        `Failed to load legacy template from path ${templatePath}: ${(error as Error).message}`
-      );
-    }
-  }
+  // loadLegacyTemplate method removed
 
   /**
    * Implements ITemplateLoader.templateExists
@@ -153,21 +109,6 @@ export class JsonTemplateLoader implements ITemplateLoader {
     const jsonPath = path.join(this.getJsonTemplatesDirectory(), `${templateId}.json`);
     return this.fileSystemService.fileExists(jsonPath);
   }
-
-  /**
-   * Gets the legacy template file path based on template name and language
-   *
-   * @param templateName Template name without extension
-   * @param language Target language
-   * @returns Full path to the legacy template file
-   */
-  private getLegacyTemplatePath(templateName: string, language: Language): string {
-    // Get the pattern for this language
-    const pattern = this.LEGACY_PATTERNS[language] || this.LEGACY_PATTERNS.en;
-
-    // Replace {{name}} with the template name
-    const fileName = pattern.replace('{{name}}', templateName);
-
-    return path.join(this.getLegacyTemplatesDirectory(), fileName);
-  }
+// getLegacyTemplatePath method removed
 }
+// Remove extra closing bracket

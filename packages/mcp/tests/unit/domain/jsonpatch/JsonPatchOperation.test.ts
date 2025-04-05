@@ -114,6 +114,50 @@ describe('JsonPatchOperation', () => {
         'JSON Pointer must start with "/" or be an empty string'
       );
     });
+
+    // 不要なプロパティが指定された場合のテストを追加
+    it('should ignore unnecessary "value" for "remove" operation', () => {
+      const operation = JsonPatchOperation.create('remove', '/foo', 'unnecessary_value');
+      expect(operation.op).toBe('remove');
+      expect(operation.path.toString()).toBe('/foo');
+      expect(operation.value).toBeUndefined(); // value は無視されるはず
+      expect(operation.from).toBeUndefined();
+    });
+
+    it('should ignore unnecessary "from" for "remove" operation', () => {
+      const operation = JsonPatchOperation.create('remove', '/foo', undefined, '/unnecessary_from');
+      expect(operation.op).toBe('remove');
+      expect(operation.path.toString()).toBe('/foo');
+      expect(operation.value).toBeUndefined();
+      expect(operation.from).toBeUndefined(); // from は無視されるはず
+    });
+
+    it.each(['add', 'replace', 'test'])(
+      'should ignore unnecessary "from" for "%s" operation',
+      (op) => {
+        const path = '/foo';
+        const value = 'test_value';
+        const operation = JsonPatchOperation.create(op as JsonPatchOperationType, path, value, '/unnecessary_from');
+        expect(operation.op).toBe(op);
+        expect(operation.path.toString()).toBe(path);
+        expect(operation.value).toBe(value);
+        expect(operation.from).toBeUndefined(); // from は無視されるはず
+      }
+    );
+
+    it.each(['move', 'copy'])(
+      'should ignore unnecessary "value" for "%s" operation',
+      (op) => {
+        const path = '/target';
+        const from = '/source';
+        const operation = JsonPatchOperation.create(op as JsonPatchOperationType, path, 'unnecessary_value', from);
+        expect(operation.op).toBe(op);
+        expect(operation.path.toString()).toBe(path);
+        expect(operation.value).toBeUndefined(); // value は無視されるはず
+        expect(operation.from?.toString()).toBe(from);
+      }
+    );
+  // }); // Remove extra closing bracket
   });
 
   describe('fromJSON', () => {

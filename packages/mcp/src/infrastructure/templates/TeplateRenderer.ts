@@ -34,7 +34,8 @@ export class TemplateRenderer {
     language: Language,
     variables?: Record<string, string>
   ): string {
-    if ('schema' in template) {
+    // Check for metadata property to identify JSON template structure
+    if ('metadata' in template && 'content' in template) {
       // It's a JSON template
       return this.renderJsonTemplateToMarkdown(template as JsonTemplate, language, variables);
     } else {
@@ -143,24 +144,34 @@ export class TemplateRenderer {
   ): string {
     const lines: string[] = [];
 
-    // Add section title
-    // Assuming translate takes only the key
-    const title = this.i18nProvider.translate(section.titleKey);
+    // Translate content first to check if it's effectively empty after translation/variable replacement
+    let content = section.contentKey ? this.i18nProvider.translate(section.contentKey) : '';
+    if (variables && content) {
+      content = this.replaceVariables(content, variables);
+    }
 
-    // Only add title if it's not empty
-    if (title.trim()) {
+    // If the section is optional and content is empty, return empty string immediately
+    if (section.isOptional && content.trim() === '') {
+        // Also check if placeholder exists, if so, don't return empty
+        if (!section.placeholder) {
+             return '';
+        }
+    }
+
+
+    // Add section title if content is not empty OR if there's a placeholder
+    const title = this.i18nProvider.translate(section.titleKey);
+    if (title.trim() && (content.trim() !== '' || section.placeholder)) {
       lines.push(`## ${title}\n`);
     }
 
     // Add section content if available
     if (section.contentKey) {
       // Translate first, then replace variables
-      let content = section.contentKey ? this.i18nProvider.translate(section.contentKey) : ''; // Handle potentially missing contentKey
-      if (variables && content) {
-        // Ensure content exists before replacing
-        content = this.replaceVariables(content, variables);
+      // Push the processed content if it's not empty
+      if (content.trim() !== '') {
+          lines.push(content);
       }
-      lines.push(content);
     }
 
     // Add placeholder if available
@@ -202,28 +213,33 @@ export class TemplateRenderer {
   ): string {
     const lines: string[] = [];
 
+    // Get content first to check if it's effectively empty
+    let content = '';
+    if (section.content) {
+      content = section.content[language] || section.content['en'] || Object.values(section.content)[0] || '';
+    }
+    let processedContent = content;
+    if (variables && processedContent) {
+      processedContent = this.replaceVariables(processedContent, variables);
+    }
+
+    // If the section is optional and content is empty, return empty string
+    if (section.optional && processedContent.trim() === '') {
+      return '';
+    }
+
     // Get title for this language, fall back to English or first available language
     const title = section.title[language] || section.title['en'] || Object.values(section.title)[0];
 
-    // Only add title if it's not empty
-    if (title && title.trim()) {
+    // Only add title if it's not empty AND content is not empty
+    if (title && title.trim() && processedContent.trim() !== '') {
       lines.push(`## ${title}\n`);
     }
 
     // Add section content if available for this language
-    if (section.content) {
-      const content =
-        section.content[language] || section.content['en'] || Object.values(section.content)[0];
-      if (content) {
-        let processedContent = content;
-
-        // Replace variables
-        if (variables) {
-          processedContent = this.replaceVariables(processedContent, variables);
-        }
-
+    // Add processed content if it's not empty
+    if (processedContent.trim() !== '') {
         lines.push(processedContent);
-      }
     }
 
     return lines.join('\n');
@@ -237,7 +253,8 @@ export class TemplateRenderer {
    * @returns Text with variables replaced
    */
   private replaceVariables(text: string, variables: Record<string, string>): string {
-    return text.replace(/\{\{([A-Z_]+)\}\}/g, (match, name) => {
+    // Allow lowercase letters and numbers in variable names
+    return text.replace(/\{\{([a-zA-Z0-9_]+)\}\}/g, (match, name) => {
       return variables[name] || match;
     });
   }
