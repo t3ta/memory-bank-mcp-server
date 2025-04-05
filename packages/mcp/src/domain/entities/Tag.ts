@@ -17,6 +17,10 @@ export class Tag {
     if (!value) {
       throw new DomainError(DomainErrorCodes.INVALID_TAG_FORMAT, 'Tag cannot be empty');
     }
+    // ★★★ 文字数制限チェックを追加 (例: 50文字) ★★★
+    if (value.length > 50) {
+      throw new DomainError(DomainErrorCodes.INVALID_TAG_FORMAT, 'Tag cannot exceed 50 characters');
+    }
 
     const tagRegex = /^[a-z0-9-]+$/;
     if (!tagRegex.test(value)) {
@@ -24,6 +28,10 @@ export class Tag {
         DomainErrorCodes.INVALID_TAG_FORMAT,
         'Tag must contain only lowercase letters, numbers, and hyphens'
       );
+    }
+    // ★★★ ハイフンで始まる/終わるチェックを追加 ★★★
+    if (value.startsWith('-') || value.endsWith('-')) {
+      throw new DomainError(DomainErrorCodes.INVALID_TAG_FORMAT, 'Tag cannot start or end with a hyphen');
     }
 
     return new Tag(value);

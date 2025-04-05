@@ -1,0 +1,15 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-unit-test-infra-interface-context",
+    "title": "Branch Context for feature/unit-test-infra-interface",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [],
+    "createdAt": "2025-04-04T16:44:43.181Z",
+    "lastModified": "2025-04-04T16:44:43.181Z"
+  },
+  "content": {
+    "description": "Context for branch: feature/unit-test-infra-interface"
+  }
+}
