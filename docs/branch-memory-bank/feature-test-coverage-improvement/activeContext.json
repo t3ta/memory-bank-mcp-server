@@ -1,0 +1,66 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "a63f2c91-8e74-4d2a-b5ca-9e7df12abcde",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [],
+    "lastModified": "2025-04-05T12:00:00.000Z",
+    "createdAt": "2025-04-05T12:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "テストカバレッジ改善のための新ブランチを初期化中。前回のレビューで特定された課題に取り組む準備を行っている。",
+    "recentChanges": [
+      {
+        "date": "2025-04-05T12:00:00.000Z",
+        "description": "feature/test-coverage-improvementブランチを作成し、メモリバンクを初期化。"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "priority-order",
+        "description": "1. 統合テスト修正 → 2. JSONパッチテスト強化 → 3. 境界値テスト追加 → 4. エラーインデックステスト強化 の順で取り組む"
+      },
+      {
+        "id": "test-approach",
+        "description": "境界値テストを重視し、カバレッジ目標（ステートメント85%、ブランチ70%、関数85%、ライン85%）達成を目指す"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "integration-test-approach",
+        "description": "ReadGlobalDocumentUseCase.integration.testの修正方法（トップレベルdocumentTypeの検証 vs メタデータ内のdocumentTypeの検証）",
+        "status": "open"
+      },
+      {
+        "id": "jsonpatch-test-strategy",
+        "description": "JSONパッチテストの効率的なカバレッジ向上方法（境界ケースの選定方法）",
+        "status": "open"
+      },
+      {
+        "id": "coverage-metric-focus",
+        "description": "どのカバレッジ指標を最も重視すべきか（ブランチカバレッジが最も低いが）",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "analyze-integration-test",
+        "description": "ReadGlobalDocumentUseCase.integration.testの失敗の原因を詳細に分析",
+        "priority": "high"
+      },
+      {
+        "id": "examine-jsonpatch-code",
+        "description": "JSONパッチモジュールのコードを詳細に調査し、テストが必要な境界ケースを特定",
+        "priority": "high"
+      },
+      {
+        "id": "make-test-improvement-plan",
+        "description": "各モジュールごとのテスト実装計画を詳細に作成",
+        "priority": "medium"
+      }
+    ]
+  }
+}

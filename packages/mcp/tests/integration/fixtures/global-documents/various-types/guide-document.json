@@ -1,6 +1,5 @@
 {
   "schema": "memory_document_v2",
-  "documentType": "guide",
   "metadata": {
     "id": "test-guide-doc",
     "title": "Test Guide Document",
@@ -11,7 +10,8 @@
     ],
     "lastModified": "2025-03-30T00:00:00.000Z",
     "createdAt": "2025-03-30T00:00:00.000Z",
-    "version": 1
+    "version": 1,
+    "documentType": "guide"
   },
   "content": {
     "sections": [

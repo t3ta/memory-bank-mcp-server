@@ -62,6 +62,30 @@ describe('InfrastructureError', () => {
       expect(error.getHttpStatusCode()).toBe(500);
       const gitError = new InfrastructureError(InfrastructureErrorCodes.GIT_COMMAND_FAILED, '');
       expect(gitError.getHttpStatusCode()).toBe(500);
+      // 他のデフォルト500を返すコードもテスト
+      const configError = new InfrastructureError(InfrastructureErrorCodes.CONFIGURATION_ERROR, '');
+      expect(configError.getHttpStatusCode()).toBe(500);
+      const fileReadError = new InfrastructureError(InfrastructureErrorCodes.FILE_READ_ERROR, '');
+      expect(fileReadError.getHttpStatusCode()).toBe(500);
+      const fileWriteError = new InfrastructureError(InfrastructureErrorCodes.FILE_WRITE_ERROR, '');
+      expect(fileWriteError.getHttpStatusCode()).toBe(500);
+      const fileDeleteError = new InfrastructureError(InfrastructureErrorCodes.FILE_DELETE_ERROR, '');
+      expect(fileDeleteError.getHttpStatusCode()).toBe(500);
+      const dirCreateError = new InfrastructureError(InfrastructureErrorCodes.DIRECTORY_CREATE_ERROR, '');
+      expect(dirCreateError.getHttpStatusCode()).toBe(500);
+      const indexUpdateError = new InfrastructureError(InfrastructureErrorCodes.INDEX_UPDATE_ERROR, '');
+      expect(indexUpdateError.getHttpStatusCode()).toBe(500);
+      const initError = new InfrastructureError(InfrastructureErrorCodes.INITIALIZATION_ERROR, '');
+      expect(initError.getHttpStatusCode()).toBe(500);
+      const mcpServerError = new InfrastructureError(InfrastructureErrorCodes.MCP_SERVER_ERROR, '');
+      expect(mcpServerError.getHttpStatusCode()).toBe(500);
+      const invalidFileContentError = new InfrastructureError(InfrastructureErrorCodes.INVALID_FILE_CONTENT, '');
+      expect(invalidFileContentError.getHttpStatusCode()).toBe(500);
+      const invalidArgumentError = new InfrastructureError(InfrastructureErrorCodes.INVALID_ARGUMENT, '');
+      expect(invalidArgumentError.getHttpStatusCode()).toBe(500);
+      const persistenceError = new InfrastructureError(InfrastructureErrorCodes.PERSISTENCE_ERROR, '');
+      expect(persistenceError.getHttpStatusCode()).toBe(500);
+      // 存在しない templateNotFoundError の参照を削除
     });
   });
 
@@ -99,46 +123,145 @@ describe('InfrastructureError', () => {
     expect(error.message).toBe(message);
     expect(error.details).toEqual(details);
     expect(error.getHttpStatusCode()).toBe(403);
-  });
-
-  it('should use factory function InfrastructureErrors.gitCommandFailed correctly', () => {
-    const command = 'git push origin main';
-    const reason = 'Authentication failed';
-    const cause = new Error('Underlying auth error');
-    const error = InfrastructureErrors.gitCommandFailed(command, reason, cause);
-
-    expect(error).toBeInstanceOf(InfrastructureError);
-    expect(error.code).toBe(InfrastructureErrorCodes.GIT_COMMAND_FAILED);
-    expect(error.message).toBe(`Git command failed: '${command}'. Reason: ${reason}`);
-    // Note: The factory adds 'cause' to details, not as the error's direct cause property based on BaseError constructor
-    expect(error.details).toEqual({ command, reason, cause });
-    expect(error.cause).toBeUndefined(); // BaseError constructor doesn't take cause from details
-    expect(error.getHttpStatusCode()).toBe(500); // Default
-  });
-
-  it('should create a new error with updated message using withMessage', () => {
-    const code = InfrastructureErrorCodes.INDEX_UPDATE_ERROR;
-    const originalMessage = 'Failed to update index.';
-    const originalDetails = { index: 'tags' };
-    const originalError = new InfrastructureError(code, originalMessage, originalDetails);
-
-    const newMessage = 'Index update failed due to lock.';
-    // withMessage for InfrastructureError doesn't take additionalDetails
-    const newError = originalError.withMessage(newMessage);
-
-    // Check new error properties
-    expect(newError).toBeInstanceOf(InfrastructureError);
-    expect(newError.code).toBe(code); // Code remains the same
-    expect(newError.message).toBe(newMessage);
-    // expect(newError.cause).toBeUndefined(); // Cause is not handled by this withMessage
-
-    // Check details (should remain the same as original)
-    expect(newError.details).toEqual(originalDetails);
-
-    // Ensure original error is unchanged
-    expect(originalError.message).toBe(originalMessage);
-    expect(originalError.details).toEqual(originalDetails);
-  });
-
-  // TODO: Add tests for other factory functions if needed
+  expect(error.getHttpStatusCode()).toBe(403);
 });
+
+// --- Test remaining factory functions ---
+
+it('should use factory function InfrastructureErrors.fileReadError correctly', () => {
+  const message = 'Cannot read file';
+  const details = { path: '/read/only.txt' };
+  const error = InfrastructureErrors.fileReadError(message, details);
+  expect(error.code).toBe(InfrastructureErrorCodes.FILE_READ_ERROR);
+  expect(error.message).toBe(message);
+  expect(error.details).toEqual(details);
+  expect(error.getHttpStatusCode()).toBe(500);
+});
+
+it('should use factory function InfrastructureErrors.fileDeleteError correctly', () => {
+  const message = 'Cannot delete file';
+  const details = { path: '/protected/file.cfg' };
+  const error = InfrastructureErrors.fileDeleteError(message, details);
+  expect(error.code).toBe(InfrastructureErrorCodes.FILE_DELETE_ERROR);
+  expect(error.message).toBe(message);
+  expect(error.details).toEqual(details);
+  expect(error.getHttpStatusCode()).toBe(500);
+});
+
+it('should use factory function InfrastructureErrors.fileSystemError correctly', () => {
+  const message = 'Disk full';
+  const details = { operation: 'write' };
+  const error = InfrastructureErrors.fileSystemError(message, details);
+  expect(error.code).toBe(InfrastructureErrorCodes.FILE_SYSTEM_ERROR);
+  expect(error.message).toBe(message);
+  expect(error.details).toEqual(details);
+  expect(error.getHttpStatusCode()).toBe(500);
+});
+
+it('should use factory function InfrastructureErrors.fileAlreadyExists correctly', () => {
+  const message = 'File already exists';
+  const details = { path: '/existing/file.txt' };
+  const error = InfrastructureErrors.fileAlreadyExists(message, details);
+  expect(error.code).toBe(InfrastructureErrorCodes.FILE_ALREADY_EXISTS);
+  expect(error.message).toBe(message);
+  expect(error.details).toEqual(details);
+  expect(error.getHttpStatusCode()).toBe(409);
+});
+
+it('should use factory function InfrastructureErrors.directoryNotFound correctly', () => {
+  const message = 'Directory not found';
+  const details = { path: '/missing/dir' };
+  const error = InfrastructureErrors.directoryNotFound(message, details);
+  expect(error.code).toBe(InfrastructureErrorCodes.DIRECTORY_NOT_FOUND);
+  expect(error.message).toBe(message);
+  expect(error.details).toEqual(details);
+  expect(error.getHttpStatusCode()).toBe(404);
+});
+
+it('should use factory function InfrastructureErrors.directoryCreateError correctly', () => {
+  const message = 'Cannot create directory';
+  const details = { path: '/no/permission/dir' };
+  const error = InfrastructureErrors.directoryCreateError(message, details);
+  expect(error.code).toBe(InfrastructureErrorCodes.DIRECTORY_CREATE_ERROR);
+  expect(error.message).toBe(message);
+  expect(error.details).toEqual(details);
+  expect(error.getHttpStatusCode()).toBe(500);
+});
+
+it('should use factory function InfrastructureErrors.indexUpdateError correctly', () => {
+  const message = 'Failed to update search index';
+  const details = { indexName: 'document_index' };
+  const error = InfrastructureErrors.indexUpdateError(message, details);
+  expect(error.code).toBe(InfrastructureErrorCodes.INDEX_UPDATE_ERROR);
+  expect(error.message).toBe(message);
+  expect(error.details).toEqual(details);
+  expect(error.getHttpStatusCode()).toBe(500);
+});
+
+it('should use factory function InfrastructureErrors.initializationError correctly', () => {
+  const message = 'Initialization failed';
+  const details = { component: 'DatabaseConnection' };
+  const error = InfrastructureErrors.initializationError(message, details);
+  expect(error.code).toBe(InfrastructureErrorCodes.INITIALIZATION_ERROR);
+  expect(error.message).toBe(message);
+  expect(error.details).toEqual(details);
+  expect(error.getHttpStatusCode()).toBe(500);
+});
+
+it('should use factory function InfrastructureErrors.mcpServerError correctly', () => {
+  const message = 'MCP server internal error';
+  const details = { requestId: '123-abc' };
+  const error = InfrastructureErrors.mcpServerError(message, details);
+  expect(error.code).toBe(InfrastructureErrorCodes.MCP_SERVER_ERROR);
+  expect(error.message).toBe(message);
+  expect(error.details).toEqual(details);
+  expect(error.getHttpStatusCode()).toBe(500);
+});
+
+it('should use factory function InfrastructureErrors.invalidFileContent correctly', () => {
+  const message = 'Invalid JSON content';
+  const details = { path: '/data.json', reason: 'Unexpected token' };
+  const error = InfrastructureErrors.invalidFileContent(message, details);
+  expect(error.code).toBe(InfrastructureErrorCodes.INVALID_FILE_CONTENT);
+  expect(error.message).toBe(message);
+  expect(error.details).toEqual(details);
+  expect(error.getHttpStatusCode()).toBe(500); // Or maybe 400 Bad Request? Let's stick to 500 for now.
+});
+
+it('should use factory function InfrastructureErrors.gitCommandFailed correctly', () => {
+  const command = 'git push origin main';
+  const reason = 'Authentication failed';
+  const cause = new Error('Underlying auth error');
+  const error = InfrastructureErrors.gitCommandFailed(command, reason, cause);
+
+  expect(error).toBeInstanceOf(InfrastructureError);
+  expect(error.code).toBe(InfrastructureErrorCodes.GIT_COMMAND_FAILED);
+  expect(error.message).toBe(`Git command failed: '${command}'. Reason: ${reason}`);
+  expect(error.details).toEqual({ command, reason, cause });
+  expect(error.cause).toBeUndefined();
+  expect(error.getHttpStatusCode()).toBe(500);
+});
+
+// --- Test withMessage ---
+it('should create a new error with updated message using withMessage', () => {
+  const code = InfrastructureErrorCodes.INDEX_UPDATE_ERROR;
+  const originalMessage = 'Failed to update index.';
+  const originalDetails = { index: 'tags' };
+  const originalError = new InfrastructureError(code, originalMessage, originalDetails);
+
+  const newMessage = 'Index update failed due to lock.';
+  const newError = originalError.withMessage(newMessage);
+
+  // Check new error properties
+  expect(newError).toBeInstanceOf(InfrastructureError);
+  expect(newError.code).toBe(code);
+  expect(newError.message).toBe(newMessage);
+  expect(newError.details).toEqual(originalDetails);
+
+  // Ensure original error is unchanged
+  expect(originalError.message).toBe(originalMessage);
+  expect(originalError.details).toEqual(originalDetails);
+});
+
+// withDetails does not exist, so tests for it are removed.
+}); // Add closing bracket for describe block

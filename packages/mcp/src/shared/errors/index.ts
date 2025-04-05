@@ -42,6 +42,7 @@ export const ErrorUtils = {
       }
 
       if (error instanceof Error) {
+        // InfrastructureErrors.mcpServerError の details に cause を含める
         throw InfrastructureErrors.mcpServerError(
           error.message,
           { originalError: error.toString(), cause: error }
@@ -67,11 +68,16 @@ export const ErrorUtils = {
     if (!(error instanceof Error)) {
       return false;
     }
-
+    // BaseError のインスタンスか、そのサブクラスかをチェック
     if (error instanceof BaseError) {
-      return error.isInstanceOf(errorName);
+      // errorName が 'BaseError' なら true
+      if (errorName === 'BaseError') {
+        return true;
+      }
+      // それ以外の場合は、具体的なクラス名と比較
+      return error.constructor.name === errorName;
     }
-
+    // BaseError でない場合は、コンストラクタ名で比較
     return error.constructor.name === errorName;
   },
 
