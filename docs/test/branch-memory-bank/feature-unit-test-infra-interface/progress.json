@@ -6,27 +6,58 @@
     "documentType": "progress",
     "path": "progress.json",
     "tags": [],
-    "createdAt": "2025-04-05T01:44:30.000Z",
-    "lastModified": "2025-04-04T16:44:43.182Z"
+    "createdAt": "2025-04-05T06:00:45.962Z",
+    "lastModified": "2025-04-05T06:08:40.049Z"
   },
   "content": {
-    "summary": "Infrastructure層とInterface層の単体テストスケルトン作成",
-    "status": "in_progress",
+    "summary": "Infrastructure レイヤーの全インターフェース (IConfigProvider, IGitService, II18nProvider, IIndexService, IFileSystemService, ITemplateLoader) のユニットテストを作成し、パスすることを確認しました。",
+    "status": "completed",
     "steps": [
       {
-        "description": "Infrastructure層 (repositories, git, index, logger, storage, templates, validation) のテストスケルトン作成",
-        "status": "done"
+        "description": "IConfigProvider のユニットテストを作成・修正し、パスを確認",
+        "status": "done",
+        "files": [
+          "packages/mcp/tests/unit/infrastructure/config/interfaces/IConfigProvider.test.ts"
+        ]
       },
       {
-        "description": "Interface層 (controllers) のテストスケルトン作成",
-        "status": "done"
+        "description": "IGitService のユニットテストを作成し、パスを確認",
+        "status": "done",
+        "files": [
+          "packages/mcp/tests/unit/infrastructure/git/IGitService.test.ts"
+        ]
+      },
+      {
+        "description": "II18nProvider のユニットテストを作成・修正し、パスを確認",
+        "status": "done",
+        "files": [
+          "packages/mcp/tests/unit/infrastructure/i18n/interfaces/II18nProvider.test.ts"
+        ]
+      },
+      {
+        "description": "IIndexService のユニットテストを作成・修正し、パスを確認",
+        "status": "done",
+        "files": [
+          "packages/mcp/tests/unit/infrastructure/index/interfaces/IIndexService.test.ts"
+        ]
+      },
+      {
+        "description": "IFileSystemService のユニットテストを作成・修正し、パスを確認",
+        "status": "done",
+        "files": [
+          "packages/mcp/tests/unit/infrastructure/storage/interfaces/IFileSystemService.test.ts"
+        ]
+      },
+      {
+        "description": "ITemplateLoader のユニットテストを作成・修正し、パスを確認",
+        "status": "done",
+        "files": [
+          "packages/mcp/tests/unit/infrastructure/templates/interfaces/ITemplateLoader.test.ts"
+        ]
       }
     ],
     "next_steps": [
-      {
-        "description": "各スケルトンファイルに具体的なテストケースを実装する",
-        "status": "todo"
-      }
+      "コミットの準備ができました。内容を確認してください。"
     ],
     "findings": []
   }
