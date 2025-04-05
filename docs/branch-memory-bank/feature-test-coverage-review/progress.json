@@ -6,7 +6,7 @@
     "documentType": "progress",
     "path": "progress.json",
     "tags": [],
-    "lastModified": "2025-04-05T08:23:52.402Z",
+    "lastModified": "2025-04-05T08:26:41.796Z",
     "createdAt": "2025-04-05T06:26:34.146Z",
     "version": 1
   },
@@ -46,6 +46,11 @@
         "id": "logger-util-unit-tests",
         "description": "カバレッジが低かった logger.ts のユニットテストを実装・成功させた",
         "implementedAt": "2025-04-05T08:23:45.000Z"
+      },
+      {
+        "id": "i18n-language-unit-tests",
+        "description": "カバレッジ 0% だった domain/i18n/Language.ts のユニットテストを実装・成功させた",
+        "implementedAt": "2025-04-05T08:26:31.000Z"
       }
     ],
     "pendingImplementation": [

@@ -6,13 +6,17 @@
     "documentType": "active_context",
     "path": "activeContext.json",
     "tags": [],
-    "lastModified": "2025-04-05T08:24:00.249Z",
+    "lastModified": "2025-04-05T08:26:49.906Z",
     "createdAt": "2025-04-05T06:26:34.145Z",
     "version": 1
   },
   "content": {
-    "currentWork": "優先度の高かったJSONユースケース、エラーハンドリング、グローバル読み取り、およびカバレッジの低かったloggerユーティリティのユニットテスト実装完了。テストカバレッジ改善タスクは一区切り。",
+    "currentWork": "優先度の高かったJSONユースケース、エラーハンドリング、グローバル読み取り、loggerユーティリティ、およびカバレッジ0%だったLanguageドメインモデルのユニットテスト実装完了。テストカバレッジ改善タスクは一区切り。",
     "recentChanges": [
+      {
+        "date": "2025-04-05T08:26:41.796Z",
+        "description": "カバレッジ 0% だった domain/i18n/Language.ts のユニットテストを実装・成功させた。"
+      },
       {
         "date": "2025-04-05T08:23:52.402Z",
         "description": "カバレッジが低かった logger.ts のユニットテストを実装・成功させた。"
