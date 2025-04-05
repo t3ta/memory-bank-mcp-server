@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { BaseJsonDocumentV2Schema, DocumentMetadataV2Schema } from '../v2/json-document.js'; // Adjust import path
+import { DocumentMetadataV2Schema } from '../v2/json-document.js'; // Adjust import path
 import { commonValidators } from '../validation-helpers.js';
 
 // Technical Decision schema for System Patterns

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { BaseJsonDocumentV2Schema, DocumentMetadataV2Schema } from '../v2/json-document.js'; // Adjust import path
+import { DocumentMetadataV2Schema } from '../v2/json-document.js'; // Adjust import path
 
 // Active Context document type
 export const ActiveContextContentV2Schema = z.object({

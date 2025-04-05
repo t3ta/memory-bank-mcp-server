@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { SCHEMA_VERSION } from './json-document.js'; // Import SCHEMA_VERSION
+// Unused import removed: SCHEMA_VERSION
 // Import specific document types directly to avoid circular dependency via index
 import { BranchContextJsonV2Schema } from '../document-types/branch-context.js';
 import { ActiveContextJsonV2Schema } from '../document-types/active-context.js';
