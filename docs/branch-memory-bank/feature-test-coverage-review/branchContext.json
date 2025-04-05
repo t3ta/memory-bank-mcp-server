@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "1202fc29-906b-45cd-8318-ebeb59e6e6d3",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-04-05T06:26:34.144Z",
+    "createdAt": "2025-04-05T06:26:34.144Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "feature/test-coverage-review",
+    "purpose": "このブランチの目的を記述してください",
+    "createdAt": "2025-04-05T06:26:34.144Z",
+    "userStories": [
+      {
+        "id": "08be5f9c-2c0d-4120-897f-7ba7961500ee",
+        "description": "解決する課題1",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "db337b07-115b-40a7-9134-8fff6feb8fca",
+        "description": "解決する課題2",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "bb000436-2f76-406b-9436-a7111ff22752",
+        "description": "解決する課題3",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": ""
+  }
+}

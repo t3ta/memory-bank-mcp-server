@@ -1,0 +1,82 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "0f485beb-1a7b-4d04-bb02-5c834e645385",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [],
+    "lastModified": "2025-04-05T07:54:37.619Z",
+    "createdAt": "2025-04-05T06:26:34.145Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "優先度「最高」のJSON関連ユースケースのユニットテスト実装完了。カバレッジレポートの他の項目を確認中。",
+    "recentChanges": [
+      {
+        "date": "2025-04-05T07:54:28.530Z",
+        "description": "優先度「最高」のJSONユースケース (Write, Read, Delete, Search, Patch, UpdateIndex) のユニットテストを実装・成功させた。"
+      },
+      {
+        "date": "2025-04-05T06:26:34.145Z",
+        "description": "変更点1"
+      },
+      {
+        "date": "2025-04-05T06:26:34.145Z",
+        "description": "変更点2"
+      },
+      {
+        "date": "2025-04-05T06:26:34.145Z",
+        "description": "変更点3"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "c226d26a-e223-423a-8623-d0d61ddf8bae",
+        "description": "決定事項1"
+      },
+      {
+        "id": "f3a3c3c6-c232-4b50-97a0-ee5f28e37446",
+        "description": "決定事項2"
+      },
+      {
+        "id": "99071da0-39eb-4a75-8bd0-fafb2a38ed64",
+        "description": "決定事項3"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "2b76bb1d-c3a3-4e96-8fd5-1167f95fa202",
+        "description": "検討事項1",
+        "status": "open"
+      },
+      {
+        "id": "d27050c5-35a3-41fb-a746-445a81e0c99a",
+        "description": "検討事項2",
+        "status": "open"
+      },
+      {
+        "id": "3e9eaec9-ca4b-477d-9dd4-5e16a5de7c82",
+        "description": "検討事項3",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "60295d20-cc9a-4b77-a6d6-7073f8a8e469",
+        "description": "次のステップ1",
+        "priority": "high"
+      },
+      {
+        "id": "a367cf13-4810-4097-86f6-f49c956130fe",
+        "description": "次のステップ2",
+        "priority": "medium"
+      },
+      {
+        "id": "3b078dae-94ee-43c6-b949-4f54c3de390a",
+        "description": "次のステップ3",
+        "priority": "low"
+      }
+    ]
+  }
+}

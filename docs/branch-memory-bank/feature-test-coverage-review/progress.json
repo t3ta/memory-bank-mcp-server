@@ -1,0 +1,73 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "290d0a0e-666c-4e5b-8313-8886e4d774ae",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "lastModified": "2025-04-05T07:54:28.530Z",
+    "createdAt": "2025-04-05T06:26:34.146Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "d9d3cb96-4c10-49ba-9503-fa7c0da31cea",
+        "description": "機能1",
+        "implementedAt": "2025-04-05T06:26:34.146Z"
+      },
+      {
+        "id": "5d11b9f8-a81d-4c86-bd82-01aa07aacb60",
+        "description": "機能2",
+        "implementedAt": "2025-04-05T06:26:34.146Z"
+      },
+      {
+        "id": "deae5b96-9034-4b3d-b476-32db2e4d276f",
+        "description": "機能3",
+        "implementedAt": "2025-04-05T06:26:34.146Z"
+      },
+      {
+        "id": "json-usecase-unit-tests",
+        "description": "優先度「最高」のJSON関連ユースケースのユニットテストを実装・成功させた (Write, Read, Delete, Search, Patch, UpdateIndex)",
+        "implementedAt": "2025-04-05T07:54:20.000Z"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "8646199c-aa2e-4183-b1ae-2d7c0c578981",
+        "description": "未実装の機能1",
+        "priority": "high"
+      },
+      {
+        "id": "f02ed007-ee14-4f59-b10c-a378a58ea1fe",
+        "description": "未実装の機能2",
+        "priority": "medium"
+      },
+      {
+        "id": "6b691307-bac4-498f-8dfd-89a50124f689",
+        "description": "未実装の機能3",
+        "priority": "low"
+      }
+    ],
+    "status": "現在の実装状態の説明",
+    "completionPercentage": 0,
+    "knownIssues": [
+      {
+        "id": "2835f12c-a519-43c8-9e0b-3088bd296ede",
+        "description": "問題1",
+        "severity": "high"
+      },
+      {
+        "id": "5f240d26-0a77-4745-9c89-5d5c8a58fed0",
+        "description": "問題2",
+        "severity": "medium"
+      },
+      {
+        "id": "1d5e119b-e124-4876-ba8f-e86775358202",
+        "description": "問題3",
+        "severity": "low"
+      }
+    ]
+  }
+}
