@@ -6,13 +6,17 @@
     "documentType": "active_context",
     "path": "activeContext.json",
     "tags": [],
-    "lastModified": "2025-04-05T08:02:33.306Z",
+    "lastModified": "2025-04-05T08:18:39.593Z",
     "createdAt": "2025-04-05T06:26:34.145Z",
     "version": 1
   },
   "content": {
-    "currentWork": "優先度「最高」のJSON関連ユースケースと、優先度「高」のReadGlobalDocumentUseCaseのユニットテスト実装完了。次のタスクを検討中。",
+    "currentWork": "優先度「高」のエラーハンドリングモジュール (DomainError, ApplicationError, InfrastructureError, SharedUtilsError) のユニットテスト実装完了。次のタスクを検討中。",
     "recentChanges": [
+      {
+        "date": "2025-04-05T08:18:32.222Z",
+        "description": "優先度「高」のエラーハンドリングモジュール (DomainError, ApplicationError, InfrastructureError, SharedUtilsError) のユニットテストを実装・成功させた。"
+      },
       {
         "date": "2025-04-05T08:02:26.506Z",
         "description": "優先度「高」の ReadGlobalDocumentUseCase のユニットテストを実装・成功させた。"
