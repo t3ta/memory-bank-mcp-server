@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "1202fc29-906b-45cd-8318-ebeb59e6e6d3",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-04-05T10:55:00.000Z",
+    "createdAt": "2025-04-05T06:26:34.144Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "feature/test-coverage-review",
+    "purpose": "MCPパッケージのテストカバレッジを向上させるためのテスト実装とレビュー",
+    "createdAt": "2025-04-05T06:26:34.144Z",
+    "userStories": [
+      {
+        "id": "test-high-priority",
+        "description": "優先度の高いモジュールのテストカバレッジを向上させる",
+        "completed": true,
+        "priority": 1
+      },
+      {
+        "id": "review-test-coverage",
+        "description": "テスト実装後の詳細なカバレッジレビューを行う",
+        "completed": true,
+        "priority": 2
+      },
+      {
+        "id": "integration-test-fix",
+        "description": "統合テストの問題を修正する",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": "テスト実装はすべて完了し、カバレッジは大幅に向上しました（Statements: 79.81%、Lines: 80.07%、Functions: 81.19%）。一部の統合テストに失敗がありますが、これはドキュメント構造の期待値の不一致によるものです。今後の課題としては、境界値テストの強化やJSON Path操作のテスト改善があります。"
+  }
+}

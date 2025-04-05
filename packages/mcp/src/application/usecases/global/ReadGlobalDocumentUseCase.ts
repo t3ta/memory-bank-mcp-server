@@ -75,10 +75,12 @@ export class ReadGlobalDocumentUseCase
         throw error;
       }
 
+      // Pass the original error as the 'cause' for better error chaining
       throw new ApplicationError(
         ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
         `Failed to read document: ${(error as Error).message}`,
-        { originalError: error }
+        undefined, // No additional details needed here
+        { cause: error as Error } // Pass the original error as cause
       );
     }
   }

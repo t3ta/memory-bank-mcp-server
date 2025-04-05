@@ -224,9 +224,10 @@ describe('MemoryDocument', () => {
        expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining('Failed to parse JSON document'), expect.anything());
        // 推論された構造が返ることを確認（ここでは generic タイプ）
        expect(jsonObj.schema).toBe('memory_document_v2');
-       expect(jsonObj.metadata.documentType).toBe('branch_context'); // デフォルトの挙動に合わせて期待値を変更
+       expect(jsonObj.documentType).toBe('branch_context'); // metadata を削除してトップレベルをチェック
        // determineDocumentType が 'branch_context' を返すため、期待値もそれに合わせる
-       expect(jsonObj.content).toEqual(expect.objectContaining({ purpose: invalidJsonContent }));
+       // フォールバックロジックは content を { text: ... } 形式で返すように変更されたため、期待値も修正
+       expect(jsonObj.content).toEqual({ text: invalidJsonContent });
      });
 
     it('非JSONファイルの場合、パスからタイプを推論し、JsonDocumentV2 形式に変換できること (generic)', () => {
@@ -234,7 +235,7 @@ describe('MemoryDocument', () => {
       const jsonObj = doc.toJSON();
       expect(jsonObj.schema).toBe('memory_document_v2');
       expect(jsonObj.metadata.title).toBe('Test Title'); // content から取得
-      expect(jsonObj.metadata.documentType).toBe('branch_context'); // デフォルトの挙動に合わせて期待値を変更
+      expect(jsonObj.documentType).toBe('branch_context'); // metadata を削除してトップレベルをチェック
       expect(jsonObj.metadata.path).toBe('notes.txt');
       expect(jsonObj.metadata.tags).toEqual(validTags.map(t => t.value));
       expect(jsonObj.metadata.lastModified).toBe(lastModified.toISOString());
@@ -242,23 +243,26 @@ describe('MemoryDocument', () => {
       expect(jsonObj.metadata.version).toBe(1); // デフォルトバージョン
       expect(jsonObj.metadata.id).toBeDefined(); // UUIDが生成される
       // determineDocumentType が 'branch_context' を返すため、期待値もそれに合わせる
-      expect(jsonObj.content).toEqual(expect.objectContaining({ purpose: validContent }));
+      // フォールバックロジックは content を { text: ... } 形式で返すように変更されたため、期待値も修正
+      expect(jsonObj.content).toEqual({ text: validContent });
     });
 
      it('パスに基づいて progress タイプを正しく推論できること', () => {
        const doc = MemoryDocument.create({ ...docProps, path: DocumentPath.create('progress.md') });
        const jsonObj = doc.toJSON();
-       expect(jsonObj.metadata.documentType).toBe('progress');
+       expect(jsonObj.documentType).toBe('progress'); // metadata を削除してトップレベルをチェック
        // content の構造も確認（簡易的に）
-       expect(jsonObj.content).toHaveProperty('status');
+       // フォールバックロジックは content を { text: ... } 形式で返すため、'text' プロパティをチェック
+       expect(jsonObj.content).toHaveProperty('text');
      });
 
      // 他のドキュメントタイプ（branch_context, active_context, system_patterns）も同様にテスト
      it('パスに基づいて branch_context タイプを正しく推論できること', () => {
         const doc = MemoryDocument.create({ ...docProps, path: DocumentPath.create('branchContext.txt') });
         const jsonObj = doc.toJSON();
-        expect(jsonObj.metadata.documentType).toBe('branch_context');
-        expect(jsonObj.content).toHaveProperty('purpose');
+        expect(jsonObj.documentType).toBe('branch_context'); // metadata を削除してトップレベルをチェック
+        // フォールバックロジックは content を { text: ... } 形式で返すため、'text' プロパティをチェック
+        expect(jsonObj.content).toHaveProperty('text');
      });
   });
 

@@ -1,17 +1,17 @@
 /**
  * Integration tests setup file
  */
-import { jest } from '@jest/globals';
+import { jest } from '@jest/globals'; // <<<--- やっぱりインポートする！
 
-// Export jest for global use
-global.jest = jest;
+// Export jest for global use (念のため残す)
+global.jest = jest; // <<<--- コメントアウト解除！
 
 // Set longer timeout for integration tests
 jest.setTimeout(60000);
 
 // Suppress console logs during tests to reduce noise
-console.log = jest.fn();
-console.warn = jest.fn();
+console.log = jest.fn(); // <<<--- コメントアウトを解除して元に戻す！
+console.warn = jest.fn(); // warn はそのまま抑制
 // Keep error logging for debugging
 // console.error = jest.fn();
 

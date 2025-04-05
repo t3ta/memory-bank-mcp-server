@@ -15,16 +15,18 @@ describe('GlobalController Integration Tests', () => {
   let testEnv: TestEnv;
   // let app: Application; // Removed mock application instance
   let container: DIContainer; // Use DI container
+  // スキーマ変更に合わせて documentType をトップレベルに移動
   const simpleDocument = {
     schema: "memory_document_v2",
+    documentType: "test", // documentType をトップレベルに
     metadata: {
       id: "test-global-doc",
       title: "テストグローバルドキュメント",
-      documentType: "test",
+      // documentType: "test", // metadata から削除
       path: 'test/global-document.json', // Default path, can be overridden
       tags: ["test", "global"],
-      lastModified: expect.any(String),
-      createdAt: expect.any(String),
+      lastModified: expect.any(String), // write 時に設定されるので any で OK
+      createdAt: expect.any(String), // write 時に設定されるので any で OK
       version: 1
     },
     content: {
@@ -83,14 +85,17 @@ describe('GlobalController Integration Tests', () => {
 
       const documentPath = 'test/simple-document.json';
       // Use common simpleDocument, override path and potentially other fields
+      // スキーマ変更に合わせて修正
       const testDoc = {
         ...simpleDocument,
+        documentType: "simple-test", // documentType をトップレベルに
         metadata: {
           ...simpleDocument.metadata,
           id: "test-simple-doc",
           title: "テストドキュメント",
           path: documentPath,
           tags: ["test"],
+          // documentType は metadata に含めない
         },
         content: {
           value: "簡単なテストドキュメント"
@@ -162,17 +167,21 @@ describe('GlobalController Integration Tests', () => {
       const documentPath = 'test/document-to-update.json';
 
       // Initial document setup using common definition
+      // スキーマ変更に合わせて修正
       const initialDoc = {
         ...simpleDocument,
-        metadata: { ...simpleDocument.metadata, id: "update-test-initial", path: documentPath, version: 1 },
+        documentType: "update-test", // documentType をトップレベルに
+        metadata: { ...simpleDocument.metadata, id: "update-test-initial", path: documentPath, version: 1 }, // metadata から documentType 削除
         content: { value: "Initial global content" }
       };
       const initialContentString = JSON.stringify(initialDoc, null, 2);
 
       // Updated document setup
+      // スキーマ変更に合わせて修正
       const updatedDoc = {
         ...simpleDocument,
-        metadata: { ...simpleDocument.metadata, id: "update-test-updated", title: "Updated Global Title", path: documentPath, version: 2 },
+        documentType: "update-test", // documentType は同じ
+        metadata: { ...simpleDocument.metadata, id: "update-test-updated", title: "Updated Global Title", path: documentPath, version: 2 }, // metadata から documentType 削除
         content: { value: "Updated global content" }
       };
       const updatedContentString = JSON.stringify(updatedDoc, null, 2);

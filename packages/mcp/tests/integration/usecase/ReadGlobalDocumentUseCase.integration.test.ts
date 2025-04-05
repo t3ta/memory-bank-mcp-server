@@ -44,10 +44,12 @@ describe('ReadGlobalDocumentUseCase Integration Tests', () => {
 
       const document = JSON.parse(result.document.content);
       expect(document).toHaveProperty('schema', 'memory_document_v2');
+      expect(document).toHaveProperty('documentType'); // documentType がトップレベルにあることを確認
       expect(document).toHaveProperty('metadata');
       expect(document).toHaveProperty('content');
+      expect(document.documentType).toBe('core'); // トップレベルの documentType をチェック
       expect(document.metadata).toHaveProperty('id', 'core-glossary-test'); // Update expected ID
-      expect(document.metadata).toHaveProperty('documentType', 'core');
+      // expect(document.metadata).toHaveProperty('documentType', 'core'); // metadata にはない
     });
 
     it('should return an error if the document does not exist', async () => {
@@ -69,7 +71,7 @@ describe('ReadGlobalDocumentUseCase Integration Tests', () => {
       expect(planResult.document).toBeDefined();
       expect(planResult.document.path).toBe('plan-document.json');
       const planDocument = JSON.parse(planResult.document.content);
-      expect(planDocument.metadata.documentType).toBe('plan');
+      expect(planDocument.documentType).toBe('plan'); // トップレベルの documentType をチェック
 
       const guideResult = await useCase.execute({ path: 'guide-document.json' });
 
@@ -77,7 +79,7 @@ describe('ReadGlobalDocumentUseCase Integration Tests', () => {
       expect(guideResult.document).toBeDefined();
       expect(guideResult.document.path).toBe('guide-document.json');
       const guideDocument = JSON.parse(guideResult.document.content);
-      expect(guideDocument.metadata.documentType).toBe('guide');
+      expect(guideDocument.documentType).toBe('guide'); // トップレベルの documentType をチェック
     });
   });
 });

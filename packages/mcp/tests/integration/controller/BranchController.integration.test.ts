@@ -24,16 +24,18 @@ describe('BranchController Integration Tests', () => {
   let testEnv: TestEnv;
   let container: DIContainer;
   const TEST_BRANCH = 'feature/test-branch';
+  // スキーマ変更に合わせて documentType をトップレベルに移動
   const simpleDocument = {
     schema: "memory_document_v2",
+    documentType: "test", // documentType をトップレベルに
     metadata: {
       id: "test-branch-doc",
       title: "テストブランチドキュメント",
-      documentType: "test",
+      // documentType: "test", // metadata から削除
       path: 'test-document.json', // Default path, can be overridden in tests
       tags: ["test", "branch"],
       lastModified: new Date().toISOString(), // Use valid ISO string
-      createdAt: expect.any(String),
+      createdAt: expect.any(String), // createdAt は write 時に設定されるので any で OK
       version: 1
     },
     content: {
@@ -64,6 +66,7 @@ describe('BranchController Integration Tests', () => {
       const controller = await container.get<BranchController>('branchController');
       const documentPath = 'test-document.json';
       // Use the common simpleDocument definition, potentially overriding path if needed
+      // スキーマ変更に合わせて修正 (documentType はトップレベルなので metadata の外)
       const testDoc = { ...simpleDocument, metadata: { ...simpleDocument.metadata, path: documentPath } };
       const documentContentString = JSON.stringify(testDoc, null, 2);
 
@@ -103,7 +106,7 @@ describe('BranchController Integration Tests', () => {
       // Use testDoc for comparison as it has the correct path
       expect(parsed.metadata.id).toBe(testDoc.metadata.id);
       expect(parsed.metadata.title).toBe(testDoc.metadata.title);
-      expect(parsed.metadata.documentType).toBe(testDoc.metadata.documentType);
+      expect(parsed.documentType).toBe(testDoc.documentType); // documentType はトップレベル
       expect(parsed.metadata.path).toBe(testDoc.metadata.path);
       expect(parsed.metadata.tags).toEqual(testDoc.metadata.tags);
       expect(readResult.data.document.lastModified).toEqual(expect.any(String));
@@ -128,14 +131,17 @@ describe('BranchController Integration Tests', () => {
       const NEW_BRANCH = 'feature/new-test-branch';
       const documentPath = 'new-branch-file.json';
       // Use the common simpleDocument definition, overriding necessary fields
+      // スキーマ変更に合わせて修正
       const newBranchDoc = {
         ...simpleDocument,
+        documentType: "new-branch-type", // 新しい documentType
         metadata: {
           ...simpleDocument.metadata,
           id: "new-branch-test",
           title: "新規ブランチテスト",
           path: documentPath,
           tags: ["test", "new-branch"],
+          // documentType は metadata に含めない
         },
         content: {
           value: "新規ブランチのドキュメント"
@@ -173,14 +179,18 @@ describe('BranchController Integration Tests', () => {
     it('should update (overwrite) an existing document successfully', async () => {
       const controller = await container.get<BranchController>('branchController');
       const documentPath = 'test-document-to-update.json';
+      // スキーマ変更に合わせて修正
       const initialDoc = {
         ...simpleDocument,
-        metadata: { ...simpleDocument.metadata, id: "update-test-initial", path: documentPath, version: 1 },
+        documentType: "update-test", // documentType をトップレベルに
+        metadata: { ...simpleDocument.metadata, id: "update-test-initial", path: documentPath, version: 1 }, // metadata から documentType 削除
         content: { value: "Initial content" }
       };
+      // スキーマ変更に合わせて修正
       const updatedDoc = {
         ...simpleDocument,
-        metadata: { ...simpleDocument.metadata, id: "update-test-updated", title: "Updated Title", path: documentPath, version: 2 },
+        documentType: "update-test", // documentType は同じ
+        metadata: { ...simpleDocument.metadata, id: "update-test-updated", title: "Updated Title", path: documentPath, version: 2 }, // metadata から documentType 削除
         content: { value: "Updated content" }
       };
       const initialContentString = JSON.stringify(initialDoc, null, 2);
