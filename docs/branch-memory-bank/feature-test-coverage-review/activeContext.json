@@ -1,0 +1,103 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "0f485beb-1a7b-4d04-bb02-5c834e645385",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [],
+    "lastModified": "2025-04-05T10:55:00.000Z",
+    "createdAt": "2025-04-05T06:26:34.145Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "優先度の高かったJSONユースケース、エラーハンドリング、グローバル読み取り、loggerユーティリティ、およびカバレッジ0%だったLanguageドメインモデルのユニットテスト実装完了。テストカバレッジ改善タスクは一区切り。",
+    "recentChanges": [
+      {
+        "date": "2025-04-05T10:55:00.000Z",
+        "description": "テストカバレッジ改善作業のレビューを実施。mcp-test-coverage-updated.jsonにレビュー結果を記録。"
+      },
+      {
+        "date": "2025-04-05T08:23:52.402Z",
+        "description": "カバレッジが低かった logger.ts のユニットテストを実装・成功させた。"
+      },
+      {
+        "date": "2025-04-05T08:18:32.222Z",
+        "description": "優先度「高」のエラーハンドリングモジュール (DomainError, ApplicationError, InfrastructureError, SharedUtilsError) のユニットテストを実装・成功させた。"
+      },
+      {
+        "date": "2025-04-05T08:02:26.506Z",
+        "description": "優先度「高」の ReadGlobalDocumentUseCase のユニットテストを実装・成功させた。"
+      },
+      {
+        "date": "2025-04-05T07:54:28.530Z",
+        "description": "優先度「最高」のJSONユースケース (Write, Read, Delete, Search, Patch, UpdateIndex) のユニットテストを実装・成功させた。"
+      },
+      {
+        "date": "2025-04-05T06:26:34.145Z",
+        "description": "変更点1"
+      },
+      {
+        "date": "2025-04-05T06:26:34.145Z",
+        "description": "変更点2"
+      },
+      {
+        "date": "2025-04-05T06:26:34.145Z",
+        "description": "変更点3"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "c226d26a-e223-423a-8623-d0d61ddf8bae",
+        "description": "決定事項1"
+      },
+      {
+        "id": "f3a3c3c6-c232-4b50-97a0-ee5f28e37446",
+        "description": "決定事項2"
+      },
+      {
+        "id": "99071da0-39eb-4a75-8bd0-fafb2a38ed64",
+        "description": "決定事項3"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "2b76bb1d-c3a3-4e96-8fd5-1167f95fa202",
+        "description": "検討事項1",
+        "status": "open"
+      },
+      {
+        "id": "d27050c5-35a3-41fb-a746-445a81e0c99a",
+        "description": "検討事項2",
+        "status": "open"
+      },
+      {
+        "id": "3e9eaec9-ca4b-477d-9dd4-5e16a5de7c82",
+        "description": "検討事項3",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "improve-boundary-tests",
+        "description": "境界値テストを追加してBranchカバレッジを改善する",
+        "priority": "medium"
+      },
+      {
+        "id": "fix-integration-tests",
+        "description": "ReadGlobalDocumentUseCase.integration.testのドキュメント構造期待値を修正する",
+        "priority": "high"
+      },
+      {
+        "id": "jsonpatch-tests",
+        "description": "JSONパッチ操作のドメインロジックのテストカバレッジを向上させる",
+        "priority": "medium"
+      },
+      {
+        "id": "error-index-tests",
+        "description": "shared/errors/index.tsのテストカバレッジを向上させる",
+        "priority": "low"
+      }
+    ]
+  }
+}

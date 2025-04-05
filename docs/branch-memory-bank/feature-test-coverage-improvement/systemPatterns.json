@@ -1,0 +1,87 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "b721e5f8-a3d9-49c3-bc6e-1d8945fedcba",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "system-patterns"
+    ],
+    "lastModified": "2025-04-05T12:00:00.000Z",
+    "createdAt": "2025-04-05T12:00:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "test-pattern-boundary-cases",
+        "title": "境界値テストパターン導入",
+        "context": "多くのモジュールで条件分岐のカバレッジが低い状況。特にJSONパッチ操作や複雑なビジネスロジックでの分岐テストが不足している。",
+        "decision": "すべてのテスト対象モジュールで境界値テストを積極的に導入し、条件分岐のカバレッジを向上させる。",
+        "consequences": {
+          "positive": [
+            "ブランチカバレッジの向上",
+            "エッジケースのバグ検出力向上",
+            "コードの堅牢性向上"
+          ],
+          "negative": [
+            "テスト実装工数の増加",
+            "テスト実行時間の増加"
+          ]
+        },
+        "status": "proposed",
+        "date": "2025-04-05T12:00:00.000Z",
+        "alternatives": [
+          "特定のモジュールのみ境界値テスト追加",
+          "例外処理のみテスト強化"
+        ]
+      },
+      {
+        "id": "test-pattern-parametrized",
+        "title": "パラメータ化テストの活用",
+        "context": "JSONパッチ操作など、多くのバリエーションが必要なテストケースがある。",
+        "decision": "Jestのパラメータ化テスト機能を活用し、多くのケースを効率的にテストする。",
+        "consequences": {
+          "positive": [
+            "テストケースの追加が容易",
+            "コード重複の削減",
+            "境界値テストの効率的な実装"
+          ],
+          "negative": [
+            "テスト失敗時の原因特定がやや難しくなる可能性"
+          ]
+        },
+        "status": "proposed",
+        "date": "2025-04-05T12:00:00.000Z",
+        "alternatives": [
+          "個別のテストケースとして実装",
+          "テストファクトリパターンの使用"
+        ]
+      }
+    ],
+    "implementationPatterns": [
+      {
+        "id": "test-pattern-error-factory",
+        "title": "エラーファクトリ関数のテストパターン",
+        "description": "エラーファクトリ関数のテストでは、エラーコード、メッセージ、詳細情報の正確性を検証する。また、エラーチェーンやカスタムプロパティの設定も確認する。",
+        "usage": "shared/errors/index.tsのテスト強化に適用",
+        "sampleCode": "it('should create factory error with correct properties', () => {\n  const details = { param: 'value' };\n  const cause = new Error('Original error');\n  const error = ErrorFactory.createSpecificError('message', details, { cause });\n\n  expect(error).toBeInstanceOf(SpecificError);\n  expect(error.code).toBe(ErrorCodes.SPECIFIC_ERROR);\n  expect(error.message).toBe('message');\n  expect(error.details).toEqual(details);\n  expect(error.cause).toBe(cause);\n});"
+      },
+      {
+        "id": "test-pattern-jsonpatch",
+        "title": "JSONパッチ操作のテストパターン",
+        "description": "JSONパッチ操作のテストでは、1.基本操作（add, remove, replace, move, copy, test）、2.パス解決（シンプル、複雑、エスケープ文字含む）、3.配列操作（インデックス、-演算子）、4.エラーケース（無効なパス、型不一致）のカテゴリで体系的にテストする。",
+        "usage": "domain/jsonpatch/*のテスト強化に適用",
+        "sampleCode": "// パラメータ化テストの例\nconst testCases = [\n  { path: '/simple', value: 'new', expected: { simple: 'new' } },\n  { path: '/nested/path', value: 42, expected: { nested: { path: 42 } } },\n  { path: '/array/0', value: 'first', expected: { array: ['first'] } },\n  { path: '/array/-', value: 'last', expected: { array: ['old', 'last'] } }\n];\n\ntest.each(testCases)('should handle path: %p', ({ path, value, expected }) => {\n  const result = applyPatch(document, [{ op: 'add', path, value }]);\n  expect(result).toEqual(expected);\n});"
+      },
+      {
+        "id": "test-pattern-integration",
+        "title": "統合テストの構造パターン",
+        "description": "統合テストでは、テストデータの設定、メタデータとコンテンツの検証を明確に分離する。また、テスト前後の状態確認を追加し、副作用の有無も検証する。",
+        "usage": "ReadGlobalDocumentUseCase.integration.testなど統合テストの修正に適用",
+        "sampleCode": "it('should read a document from the global memory bank', async () => {\n  // 1. テストデータのセットアップ\n  await setupTestDocument();\n\n  // 2. テスト対象の実行\n  const result = await useCase.execute({ path: 'test-document.json' });\n\n  // 3. 結果の検証\n  // 3.1 構造の検証\n  expect(result).toBeTruthy();\n  expect(result.document).toBeDefined();\n  \n  // 3.2 コンテンツの解析\n  const document = JSON.parse(result.document.content);\n  \n  // 3.3 構造検証\n  expect(document).toHaveProperty('schema');\n  expect(document).toHaveProperty('metadata');\n  expect(document).toHaveProperty('content');\n  \n  // 3.4 メタデータ検証（documentTypeはメタデータ内にある）\n  expect(document.metadata).toHaveProperty('documentType');\n  expect(document.metadata.documentType).toBe('expected-type');\n});"
+      }
+    ]
+  }
+}

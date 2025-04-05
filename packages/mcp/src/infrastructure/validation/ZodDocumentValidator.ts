@@ -2,8 +2,9 @@ import { IDocumentValidator } from '../../domain/validation/IDocumentValidator.j
 import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
 
 import {
-  SCHEMA_VERSION,
+  SCHEMA_VERSION, // ここで SCHEMA_VERSION をインポート
   BaseJsonDocumentV2Schema,
+  DocumentMetadataV2Schema, // DocumentMetadataV2Schema をインポート
   BranchContextJsonV2Schema,
   ActiveContextJsonV2Schema,
   ProgressJsonV2Schema,
@@ -100,7 +101,7 @@ export class ZodDocumentValidator implements IDocumentValidator {
    */
   public validateMetadata(metadata: Record<string, unknown>): boolean {
     try {
-      BaseJsonDocumentV2Schema.shape.metadata.parse(metadata);
+      DocumentMetadataV2Schema.parse(metadata); // DocumentMetadataV2Schema を直接使う
       return true;
     } catch (error) {
       throw new DomainError(

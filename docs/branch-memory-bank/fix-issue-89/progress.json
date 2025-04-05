@@ -1,0 +1,30 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "fix-issue-89-progress",
+    "title": "Progress for fix/issue-89",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "createdAt": "2025-04-04T13:52:00+09:00",
+    "lastModified": "2025-04-04T04:52:36.818Z",
+    "version": 2
+  },
+  "content": {
+    "summary": "Initial progress for branch: fix/issue-89",
+    "status": "修正完了、コミット待ち",
+    "workingFeatures": [],
+    "pendingImplementation": [],
+    "completionPercentage": 0,
+    "knownIssues": [],
+    "recentChanges": [
+      {
+        "date": "2025-04-04T13:51:00+09:00",
+        "description": "Issue #89 の修正: DocumentIO.ts で JSON 保存時に .md ファイルも作成する処理を削除したよ！",
+        "files": [
+          "packages/mcp/src/infrastructure/repositories/file-system/DocumentIO.ts"
+        ]
+      }
+    ]
+  }
+}

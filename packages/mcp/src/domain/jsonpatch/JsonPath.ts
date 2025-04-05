@@ -23,22 +23,27 @@ export class JsonPath {
    * @throws DomainError if the path is invalid
    */
   static parse(path: string): JsonPath {
-    if (!path) {
-      throw new DomainError(
-        DomainErrorCodes.INVALID_JSON_PATH,
-        'Invalid JSON path: path cannot be empty'
-      );
+    // Handle root path represented by an empty string
+    if (path === '') {
+      return new JsonPath('', []);
     }
 
+    // All non-empty paths must start with '/'
     if (!path.startsWith('/')) {
       throw new DomainError(
         DomainErrorCodes.INVALID_JSON_PATH,
-        'Invalid JSON path: must start with \'/\''
+        'JSON Pointer must start with "/" or be an empty string' // エラーメッセージ修正
       );
     }
 
     // Remove leading slash and split
-    const rawSegments = path === '/' ? [''] : path.substring(1).split('/');
+    // Handle root path represented by "/"
+    if (path === '/') {
+      return new JsonPath('/', []); // ルートパス '/' のセグメントは空配列
+    }
+
+    // Remove leading slash and split for non-root paths
+    const rawSegments = path.substring(1).split('/');
     const segments: string[] = [];
 
     // Process escape sequences in each segment
@@ -62,7 +67,7 @@ export class JsonPath {
           } else {
             throw new DomainError(
               DomainErrorCodes.INVALID_JSON_PATH,
-              'Invalid JSON path: invalid escape sequence'
+              'Invalid JSON Pointer escape sequence' // エラーメッセージ修正
             );
           }
           i += 2;
@@ -83,7 +88,7 @@ export class JsonPath {
    * @returns JsonPath instance representing the root path
    */
   static root(): JsonPath {
-    return new JsonPath('/', ['']);
+    return new JsonPath('/', []); // ルートパス '/' のセグメントは空配列
   }
 
   /**
@@ -92,6 +97,9 @@ export class JsonPath {
    * @returns New JsonPath instance
    */
   static fromSegments(segments: string[]): JsonPath {
+    if (segments.length === 0) {
+      return new JsonPath('', []); // 空セグメントの場合はルートパス "" を返す
+    }
     const escapedSegments = segments.map(segment => JsonPath.escapeSegment(segment));
     const path = '/' + escapedSegments.join('/');
     return new JsonPath(path, [...segments]);

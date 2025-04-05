@@ -33,7 +33,7 @@ export class LoggerFactory {
   private loggers: Map<string, Logger> = new Map();
 
   private constructor() {
-    console.warn('[DEPRECATED] LoggerFactory is deprecated. Use shared/utils/logger.ts instead.');
+    logger.warn('[DEPRECATED] LoggerFactory is deprecated. Use shared/utils/logger.ts instead.', { component: 'LoggerFactory' });
   }
 
   /**
@@ -53,7 +53,7 @@ export class LoggerFactory {
    * @deprecated Use createConsoleLogger from shared/utils/logger.ts instead.
    */
   public createLogger(options: LoggerFactoryOptions): Logger {
-    console.warn('[DEPRECATED] LoggerFactory.createLogger is deprecated. Use shared/utils/logger.ts instead.');
+    logger.warn('[DEPRECATED] LoggerFactory.createLogger is deprecated. Use shared/utils/logger.ts instead.', { component: 'LoggerFactory' });
 
     const { minLevel = 'info', defaultContext } = options;
     let newLogger: Logger;
@@ -75,7 +75,7 @@ export class LoggerFactory {
    * @deprecated Use logger.withContext({ component: name }) from shared/utils/logger.ts instead.
    */
   public getLogger(name: string, options: LoggerFactoryOptions): Logger {
-    console.warn('[DEPRECATED] LoggerFactory.getLogger is deprecated. Use logger.withContext({ component: name }) instead.');
+    logger.warn('[DEPRECATED] LoggerFactory.getLogger is deprecated. Use logger.withContext({ component: name }) instead.', { component: 'LoggerFactory', loggerName: name });
 
     if (this.loggers.has(name)) {
       return this.loggers.get(name)!;
@@ -92,7 +92,7 @@ export class LoggerFactory {
    * @deprecated Use the 'logger' export from shared/utils/logger.ts instead.
    */
   public static getDefaultLogger(): Logger {
-    console.warn('[DEPRECATED] LoggerFactory.getDefaultLogger is deprecated. Use the \'logger\' export from shared/utils/logger.ts instead.');
+    logger.warn('[DEPRECATED] LoggerFactory.getDefaultLogger is deprecated. Use the \'logger\' export from shared/utils/logger.ts instead.', { component: 'LoggerFactory' });
     return LoggerFactory.getInstance().getLogger('default', {
       type: LoggerType.CONSOLE,
       minLevel: 'info'
@@ -105,7 +105,7 @@ export class LoggerFactory {
    * @deprecated Use direct imports from shared/utils/logger.ts instead.
    */
   public clear(): void {
-    console.warn('[DEPRECATED] LoggerFactory.clear is deprecated.');
+    logger.warn('[DEPRECATED] LoggerFactory.clear is deprecated.', { component: 'LoggerFactory' });
     this.loggers.clear();
   }
 }

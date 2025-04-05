@@ -16,6 +16,7 @@ import { getToolDefinitions } from './tools/definitions.js'; // 関数をイン�
 import { Language, isValidLanguage } from '@memory-bank/schemas'; // Language 型とヘルパーをインポート
 import type { ContextRequest } from './application/usecases/types.js'; // 正しいパスからインポート
 import type { SearchDocumentsByTagsInput } from './application/usecases/common/SearchDocumentsByTagsUseCase.js'; // 正しいパスからインポート
+import type { DocumentDTO } from './application/dtos/DocumentDTO.js'; // DocumentDTO をインポート
 // import { applyPatch } from './tools/patch-utils.js'; // 不要なインポートを削除
 
 // Parse command line arguments
@@ -155,7 +156,29 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
            // DocumentDTO など、lastModified を持つ可能性のあるオブジェクト
            const meta = (response.data as any).lastModified ? { lastModified: (response.data as any).lastModified } : undefined;
            // content プロパティがあるか、なければ全体をJSON化
-           const contentText = (response.data as any).content ?? JSON.stringify(response.data, null, 2);
+           let contentText: string;
+           const documentData = response.data as DocumentDTO; // 型アサーション
+
+           // read_branch_memory_bank または read_global_memory_bank の場合のみJSONパースを試みる
+           if ((name === 'read_branch_memory_bank' || name === 'read_global_memory_bank') &&
+               documentData && typeof documentData.path === 'string' && documentData.path.endsWith('.json') && typeof documentData.content === 'string') {
+             try {
+               // JSON 文字列をパースしてオブジェクトにする
+               const parsedContent = JSON.parse(documentData.content);
+               // MCPレスポンスとしては整形されたJSON文字列を返す
+               contentText = JSON.stringify(parsedContent, null, 2);
+               logger.debug(`[Server] Parsed JSON content for response: ${documentData.path}`);
+             } catch (e) {
+               logger.warn('[Server] Failed to parse JSON content in response handling, returning raw string.', { path: documentData.path, error: e });
+               contentText = documentData.content; // パース失敗時は元の文字列
+             }
+           } else if (documentData && typeof documentData.content === 'string') {
+             // JSON以外、または content が文字列の場合
+             contentText = documentData.content;
+           } else {
+             // contentがない、または文字列でない場合、全体をJSON化
+             contentText = JSON.stringify(response.data, null, 2);
+           }
            return { content: [{ type: 'text', text: contentText }], _meta: meta };
        } else {
            // 文字列でもオブジェクトでもない成功データ (例: boolean)

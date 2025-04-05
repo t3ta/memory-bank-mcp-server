@@ -1,0 +1,15 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "fix-issue-89-context",
+    "title": "Branch Context for fix/issue-89",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [],
+    "createdAt": "2025-04-04T04:52:06.678Z",
+    "lastModified": "2025-04-04T04:52:06.678Z"
+  },
+  "content": {
+    "description": "Context for branch: fix/issue-89"
+  }
+}

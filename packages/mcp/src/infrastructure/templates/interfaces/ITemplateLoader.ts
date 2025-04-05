@@ -35,17 +35,7 @@ export interface ITemplateLoader {
     variables?: Record<string, string>
   ): Promise<string>;
 
-  /**
-   * Loads a legacy (Markdown) template directly from a file path
-   * This is primarily for backwards compatibility with existing code
-   *
-   * @param templatePath The path to the template file
-   * @param language The language code (used to determine which legacy file to load)
-   * @returns Promise resolving to Markdown content
-   * @throws Error if template not found
-   */
-  loadLegacyTemplate(templatePath: string, language: Language): Promise<string>;
-
+  // loadLegacyTemplate removed as per user request
   /**
    * Checks if a template with the given ID exists
    *

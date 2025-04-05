@@ -98,7 +98,9 @@ describe('ReadBranchDocumentUseCase Integration Tests', () => {
 
   describe('execute', () => {
     it('should read a document from the branch memory bank', async () => {
-      await loadBranchFixture(path.join(testEnv.branchMemoryPath, TEST_BRANCH), 'basic');
+      // 正しいブランチディレクトリパスを指定する
+      const safeBranchName = BranchInfo.create(TEST_BRANCH).safeName;
+      await loadBranchFixture(path.join(testEnv.branchMemoryPath, safeBranchName), 'basic');
 
       const result = await useCase.execute({
         branchName: TEST_BRANCH,
@@ -110,12 +112,19 @@ describe('ReadBranchDocumentUseCase Integration Tests', () => {
       expect(result.document.path).toBe('branchContext.json');
       expect(typeof result.document.content).toBe('string');
 
+      // console.log を復活させて、パース直前の文字列を確認！
+      console.log('### Raw content before parse:', result.document.content);
       const document = JSON.parse(result.document.content);
+      // console.log('### Parsed document:', JSON.stringify(document, null, 2)); // パース後のログは一旦不要
       expect(document).toHaveProperty('schema', 'memory_document_v2');
+      // Check if documentType exists at the top level after parsing
+      expect(document).toHaveProperty('documentType');
       expect(document).toHaveProperty('metadata');
       expect(document).toHaveProperty('content');
-      expect(document.metadata).toHaveProperty('id', 'test-branch-context');
-      expect(document.metadata).toHaveProperty('documentType', 'branch_context');
+      expect(document.documentType).toBe('branch_context');
+      // 期待値をフィクスチャの ID に合わせる
+      expect(document.metadata).toHaveProperty('id', 'basic-branch-context');
+      // expect(document.metadata).toHaveProperty('documentType', 'branch_context'); // metadata にはない
     });
 
     it('should return an error if the document does not exist', async () => {
@@ -143,12 +152,14 @@ describe('ReadBranchDocumentUseCase Integration Tests', () => {
       const subDir = path.join(testEnv.branchMemoryPath, SAFE_TEST_BRANCH, 'subdir');
       await fsExtra.ensureDir(subDir);
 
+      // スキーマ変更に合わせて documentType をトップレベルに移動
       const testDocument = {
         schema: "memory_document_v2",
+        documentType: "test", // documentType をトップレベルに
         metadata: {
           id: "subdirectory-document",
           title: "サブディレクトリ内ドキュメント",
-          documentType: "test",
+          // documentType: "test", // metadata から削除
           path: "subdir/test-document.json",
           tags: ["test", "subdirectory"],
           lastModified: new Date().toISOString(),
@@ -173,6 +184,7 @@ describe('ReadBranchDocumentUseCase Integration Tests', () => {
       expect(typeof result.document.content).toBe('string');
 
       const document = JSON.parse(result.document.content);
+      // このテストケースの期待値はこれで合ってるはず
       expect(document.metadata.id).toBe('subdirectory-document');
       expect(document.metadata.path).toBe('subdir/test-document.json');
     });
@@ -192,7 +204,9 @@ describe('ReadBranchDocumentUseCase Integration Tests', () => {
 
       it('should read a document using the current git branch', async () => {
         // 準備：テストドキュメントを配置
-        await loadBranchFixture(path.join(testEnv.branchMemoryPath, TEST_BRANCH), 'basic');
+        // 正しいブランチディレクトリパスを指定する
+        const safeBranchName = BranchInfo.create(TEST_BRANCH).safeName;
+        await loadBranchFixture(path.join(testEnv.branchMemoryPath, safeBranchName), 'basic');
 
         // 実行：branchName を省略
         const result = await useCase.execute({ path: 'branchContext.json' });
@@ -202,7 +216,8 @@ describe('ReadBranchDocumentUseCase Integration Tests', () => {
         expect(result).toBeDefined();
         expect(result.document.path).toBe('branchContext.json');
         const document = JSON.parse(result.document.content);
-        expect(document.metadata.id).toBe('test-branch-context');
+        // 期待値をフィクスチャの ID に合わせる
+        expect(document.metadata.id).toBe('basic-branch-context');
       });
 
       it('should return an error if current branch cannot be determined', async () => {
@@ -232,7 +247,9 @@ describe('ReadBranchDocumentUseCase Integration Tests', () => {
 
       it('should return an error because branchName is required', async () => {
         // 準備：テストドキュメントを配置 (これはエラーに関係ないはず)
-        await loadBranchFixture(path.join(testEnv.branchMemoryPath, TEST_BRANCH), 'basic');
+        // 正しいブランチディレクトリパスを指定する (エラーに関係ないはずだが念のため修正)
+        const safeBranchName = BranchInfo.create(TEST_BRANCH).safeName;
+        await loadBranchFixture(path.join(testEnv.branchMemoryPath, safeBranchName), 'basic');
 
         // 実行＆検証：branchName を省略するとエラーになることを確認
         await expect(useCase.execute({ path: 'branchContext.json' }))

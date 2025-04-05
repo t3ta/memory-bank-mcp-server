@@ -98,9 +98,10 @@ describe('ContextController Integration Tests', () => {
       expect(branchContextContent).toBeDefined();
       const branchContext = JSON.parse(branchContextContent!);
       expect(branchContext).toHaveProperty('schema');
+      expect(branchContext).toHaveProperty('documentType'); // documentType がトップレベルにあることを確認
       expect(branchContext).toHaveProperty('metadata');
       expect(branchContext).toHaveProperty('content');
-      expect(branchContext.metadata.documentType).toBe('branch_context');
+      expect(branchContext.documentType).toBe('branch_context'); // トップレベルの documentType をチェック
     });
   });
   describe('readRules', () => {

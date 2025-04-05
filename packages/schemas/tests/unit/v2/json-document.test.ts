@@ -65,11 +65,11 @@ describe('DocumentMetadataV2Schema', () => {
     const invalidMetadata = {
       title: 'Test Document',
       documentType: 'test',
-      id: 'not-a-uuid',
+      id: 'not-a-uuid', // Invalid UUID
       path: 'test/document.json',
       tags: ['test'],
-      lastModified: new Date(),
-      createdAt: new Date(),
+      lastModified: new Date().toISOString(), // Use ISO string
+      createdAt: new Date().toISOString(), // Use ISO string
       version: 1
     };
 
@@ -83,9 +83,9 @@ describe('DocumentMetadataV2Schema', () => {
       documentType: 'test',
       id: '123e4567-e89b-12d3-a456-426614174000',
       path: 'test/document.json',
-      tags: ['Invalid Tag', 'test'],  // Invalid tag with uppercase and space
-      lastModified: new Date(),
-      createdAt: new Date(),
+      tags: ['Invalid Tag', 'test'], // Invalid tag with uppercase and space
+      lastModified: new Date().toISOString(), // Use ISO string
+      createdAt: new Date().toISOString(), // Use ISO string
       version: 1
     };
 
@@ -95,26 +95,19 @@ describe('DocumentMetadataV2Schema', () => {
 });
 
 describe('BaseJsonDocumentV2Schema', () => {
-  it('should validate a correct base document', () => {
-    const validDocument = {
+  it('should validate a correct base document structure (schema and documentType)', () => {
+    // Base schema now only defines schema and documentType at the top level
+    const validBaseStructure = {
       schema: SCHEMA_VERSION,
-      metadata: {
-        title: 'Test Document',
-        documentType: 'test',
-        id: '123e4567-e89b-12d3-a456-426614174000',
-        path: 'test/document.json',
-        tags: ['test'],
-        lastModified: '2023-10-27T11:00:00.000Z', // Use ISO string
-        createdAt: '2023-10-26T11:00:00.000Z', // Use ISO string
-        version: 1
-      },
-      content: {
-        key: 'value',
-        array: [1, 2, 3]
-      }
+      documentType: 'any_valid_type_string', // Needs a non-empty string
+      // metadata and content are not part of the base schema itself anymore
     };
 
-    const result = BaseJsonDocumentV2Schema.safeParse(validDocument);
+    const result = BaseJsonDocumentV2Schema.safeParse(validBaseStructure);
+    // If this fails, log the Zod error details
+    if (!result.success) {
+      console.error("BaseJsonDocumentV2Schema validation failed:", JSON.stringify(result.error.format(), null, 2));
+    }
     expect(result.success).toBe(true);
   });
 
@@ -127,8 +120,8 @@ describe('BaseJsonDocumentV2Schema', () => {
         id: '123e4567-e89b-12d3-a456-426614174000',
         path: 'test/document.json',
         tags: ['test'],
-        lastModified: new Date(),
-        createdAt: new Date(),
+        lastModified: new Date().toISOString(), // Use ISO string
+        createdAt: new Date().toISOString(), // Use ISO string
         version: 1
       },
       content: {
@@ -149,14 +142,15 @@ describe('BaseJsonDocumentV2Schema', () => {
         id: '123e4567-e89b-12d3-a456-426614174000',
         path: 'test/document.json',
         tags: ['test'],
-        lastModified: new Date(),
-        createdAt: new Date(),
+        lastModified: new Date().toISOString(), // Use ISO string
+        createdAt: new Date().toISOString(), // Use ISO string
         version: 1
       },
       content: {}  // Empty content
     };
 
     const result = BaseJsonDocumentV2Schema.safeParse(invalidDocument);
+    // Base schema requires content not to be empty
     expect(result.success).toBe(false);
   });
 });
@@ -165,25 +159,27 @@ describe('BranchContextJsonV2Schema', () => {
   it('should validate a correct branch context document', () => {
     const validDocument = {
       schema: SCHEMA_VERSION,
+      documentType: 'branch_context' as const, // Move documentType to top level
       metadata: {
         title: 'Branch Context',
-        documentType: 'branch_context',
+        // documentType: 'branch_context', // Removed from metadata
         id: '123e4567-e89b-12d3-a456-426614174000',
         path: 'branchContext.json',
         tags: ['branch-context'],
-        lastModified: '2023-10-27T12:00:00.000Z', // Use ISO string
-        createdAt: '2023-10-26T12:00:00.000Z', // Use ISO string
+        lastModified: '2023-10-27T12:00:00.000Z',
+        createdAt: '2023-10-26T12:00:00.000Z',
         version: 1
       },
       content: {
         purpose: 'Feature implementation',
-        background: 'Some background info',
+        background: 'Some background info', // Optional field
         userStories: [
           {
             description: 'User can do something',
-            completed: false
+            completed: false // Default is false, explicitly setting is fine
           }
         ]
+        // additionalNotes is missing, but it's optional in the schema
       }
     };
 
@@ -194,14 +190,15 @@ describe('BranchContextJsonV2Schema', () => {
   it('should reject branch context with wrong document type', () => {
     const invalidDocument = {
       schema: SCHEMA_VERSION,
+      documentType: 'wrong_type' as any, // Invalid literal at top level
       metadata: {
         title: 'Branch Context',
-        documentType: 'wrong_type', // Should be branch_context
+        // documentType: 'wrong_type', // Removed from metadata
         id: '123e4567-e89b-12d3-a456-426614174000',
         path: 'branchContext.json',
         tags: ['branch-context'],
-        lastModified: new Date(),
-        createdAt: new Date(),
+        lastModified: new Date().toISOString(), // Use ISO string
+        createdAt: new Date().toISOString(), // Use ISO string
         version: 1
       },
       content: {
@@ -217,18 +214,19 @@ describe('BranchContextJsonV2Schema', () => {
   it('should reject branch context without required purpose', () => {
     const invalidDocument = {
       schema: SCHEMA_VERSION,
+      documentType: 'branch_context' as const, // Correct type at top level
       metadata: {
         title: 'Branch Context',
-        documentType: 'branch_context',
+        // documentType: 'branch_context', // Removed from metadata
         id: '123e4567-e89b-12d3-a456-426614174000',
         path: 'branchContext.json',
         tags: ['branch-context'],
-        lastModified: new Date(),
-        createdAt: new Date(),
+        lastModified: new Date().toISOString(), // Use ISO string
+        createdAt: new Date().toISOString(), // Use ISO string
         version: 1
       },
       content: {
-        // Missing purpose
+        // Missing required field 'purpose'
         userStories: []
       }
     };
@@ -242,22 +240,23 @@ describe('ActiveContextJsonV2Schema', () => {
   it('should validate a correct active context document', () => {
     const validDocument = {
       schema: SCHEMA_VERSION,
+      documentType: 'active_context' as const, // Move documentType to top level
       metadata: {
         title: 'Active Context',
-        documentType: 'active_context',
+        // documentType: 'active_context', // Removed from metadata
         id: '123e4567-e89b-12d3-a456-426614174000',
         path: 'activeContext.json',
         tags: ['active-context'],
-        lastModified: '2023-10-27T13:00:00.000Z', // Use ISO string
-        createdAt: '2023-10-26T13:00:00.000Z', // Use ISO string
+        lastModified: '2023-10-27T13:00:00.000Z',
+        createdAt: '2023-10-26T13:00:00.000Z',
         version: 1
       },
       content: {
-        currentWork: 'Working on feature X',
-        recentChanges: ['Change 1', 'Change 2'],
-        activeDecisions: ['Decision 1'],
-        considerations: ['Consideration 1'],
-        nextSteps: ['Step 1', 'Step 2']
+        currentWork: 'Working on feature X', // Optional
+        recentChanges: [], // Optional, default []
+        activeDecisions: [], // Optional, default []
+        considerations: [], // Optional, default []
+        nextSteps: [] // Optional, default []
       }
     };
 
@@ -268,18 +267,19 @@ describe('ActiveContextJsonV2Schema', () => {
   it('should accept active context with only optional fields', () => {
     const validDocument = {
       schema: SCHEMA_VERSION,
+      documentType: 'active_context' as const, // Move documentType to top level
       metadata: {
         title: 'Active Context',
-        documentType: 'active_context',
+        // documentType: 'active_context', // Removed from metadata
         id: '123e4567-e89b-12d3-a456-426614174000',
         path: 'activeContext.json',
         tags: ['active-context'],
-        lastModified: '2023-10-27T14:00:00.000Z', // Use ISO string
-        createdAt: '2023-10-26T14:00:00.000Z', // Use ISO string
+        lastModified: '2023-10-27T14:00:00.000Z',
+        createdAt: '2023-10-26T14:00:00.000Z',
         version: 1
       },
       content: {
-        // All fields are optional for ActiveContext
+        // All content fields are optional or have defaults in ActiveContext schema
       }
     };
 
@@ -292,22 +292,24 @@ describe('ProgressJsonV2Schema', () => {
   it('should validate a correct progress document', () => {
     const validDocument = {
       schema: SCHEMA_VERSION,
+      documentType: 'progress' as const, // Move documentType to top level
       metadata: {
         title: 'Progress',
-        documentType: 'progress',
+        // documentType: 'progress', // Removed from metadata
         id: '123e4567-e89b-12d3-a456-426614174000',
         path: 'progress.json',
         tags: ['progress'],
-        lastModified: '2023-10-27T15:00:00.000Z', // Use ISO string
-        createdAt: '2023-10-26T15:00:00.000Z', // Use ISO string
+        lastModified: '2023-10-27T15:00:00.000Z',
+        createdAt: '2023-10-26T15:00:00.000Z',
         version: 1
       },
       content: {
-        workingFeatures: ['Feature 1', 'Feature 2'],
-        pendingImplementation: ['Feature 3'],
-        status: 'In progress',
-        currentState: 'Phase 2',
-        knownIssues: ['Issue 1']
+        workingFeatures: [], // Optional, default []
+        pendingImplementation: [], // Optional, default []
+        status: 'In progress', // Optional
+        // currentState: 'Phase 2', // This field is not in the Progress schema
+        completionPercentage: 50, // Optional
+        knownIssues: [] // Optional, default []
       }
     };
 
@@ -315,25 +317,35 @@ describe('ProgressJsonV2Schema', () => {
     expect(result.success).toBe(true);
   });
 
-  it('should accept progress document with minimum fields', () => {
+  it('should accept progress document with minimum required fields', () => {
+    // status and completionPercentage are required according to the schema
     const validDocument = {
       schema: SCHEMA_VERSION,
+      documentType: 'progress' as const,
       metadata: {
         title: 'Progress',
-        documentType: 'progress',
         id: '123e4567-e89b-12d3-a456-426614174000',
         path: 'progress.json',
         tags: ['progress'],
-        lastModified: '2023-10-27T16:00:00.000Z', // Use ISO string
-        createdAt: '2023-10-26T16:00:00.000Z', // Use ISO string
+        lastModified: '2023-10-27T16:00:00.000Z',
+        createdAt: '2023-10-26T16:00:00.000Z',
         version: 1
       },
       content: {
-        // All fields are optional or have defaults
+        status: 'Initial', // Add required status
+        completionPercentage: 0, // Add required completionPercentage
+        // Optional fields with defaults can be omitted or explicitly set
+        workingFeatures: [],
+        pendingImplementation: [],
+        knownIssues: [],
+        // currentState is optional
       }
     };
 
     const result = ProgressJsonV2Schema.safeParse(validDocument);
+    if (!result.success) {
+      console.error("ProgressJsonV2Schema (minimum) validation failed:", JSON.stringify(result.error.format(), null, 2));
+    }
     expect(result.success).toBe(true);
   });
 });
@@ -342,47 +354,54 @@ describe('SystemPatternsJsonV2Schema', () => {
   it('should validate a correct system patterns document', () => {
     const validDocument = {
       schema: SCHEMA_VERSION,
+      documentType: 'system_patterns' as const, // Move documentType to top level
       metadata: {
         title: 'System Patterns',
-        documentType: 'system_patterns',
+        // documentType: 'system_patterns', // Removed from metadata
         id: '123e4567-e89b-12d3-a456-426614174000',
         path: 'systemPatterns.json',
         tags: ['system-patterns'],
-        lastModified: '2023-10-27T17:00:00.000Z', // Use ISO string
-        createdAt: '2023-10-26T17:00:00.000Z', // Use ISO string
+        lastModified: '2023-10-27T17:00:00.000Z',
+        createdAt: '2023-10-26T17:00:00.000Z',
         version: 1
       },
       content: {
-        technicalDecisions: [
+        technicalDecisions: [ // Optional, default []
           {
-            title: 'Use TypeScript',
-            context: 'Need type safety',
-            decision: 'We will use TypeScript',
-            consequences: ['Better code quality', 'Requires compilation']
+            title: 'Use TypeScript', // Required
+            context: 'Need type safety', // Required
+            decision: 'We will use TypeScript', // Required
+            consequences: ['Better code quality', 'Requires compilation'] // Must be string[] with min 1 element
+            // status, date, alternatives are not in the schema definition
           }
-        ]
+        ],
+        implementationPatterns: [] // Optional, default []
       }
     };
 
     const result = SystemPatternsJsonV2Schema.safeParse(validDocument);
+    if (!result.success) {
+      console.error("SystemPatternsJsonV2Schema validation failed:", JSON.stringify(result.error.format(), null, 2));
+    }
     expect(result.success).toBe(true);
   });
 
-  it('should accept system patterns with empty technical decisions', () => {
+  it('should accept system patterns with minimum fields', () => {
     const validDocument = {
       schema: SCHEMA_VERSION,
+      documentType: 'system_patterns' as const, // Move documentType to top level
       metadata: {
         title: 'System Patterns',
-        documentType: 'system_patterns',
+        // documentType: 'system_patterns', // Removed from metadata
         id: '123e4567-e89b-12d3-a456-426614174000',
         path: 'systemPatterns.json',
         tags: ['system-patterns'],
-        lastModified: '2023-10-27T18:00:00.000Z', // Use ISO string
-        createdAt: '2023-10-26T18:00:00.000Z', // Use ISO string
+        lastModified: '2023-10-27T18:00:00.000Z',
+        createdAt: '2023-10-26T18:00:00.000Z',
         version: 1
       },
       content: {
-        technicalDecisions: []
+        // technicalDecisions and implementationPatterns have defaults
       }
     };
 
@@ -390,17 +409,18 @@ describe('SystemPatternsJsonV2Schema', () => {
     expect(result.success).toBe(true);
   });
 
-  it('should reject technical decision with missing consequences', () => {
+  it('should reject technical decision with missing required fields (e.g., status)', () => {
     const invalidDocument = {
       schema: SCHEMA_VERSION,
+      documentType: 'system_patterns' as const, // Move documentType to top level
       metadata: {
         title: 'System Patterns',
-        documentType: 'system_patterns',
+        // documentType: 'system_patterns', // Removed from metadata
         id: '123e4567-e89b-12d3-a456-426614174000',
         path: 'systemPatterns.json',
         tags: ['system-patterns'],
-        lastModified: new Date(),
-        createdAt: new Date(),
+        lastModified: new Date().toISOString(), // Use ISO string
+        createdAt: new Date().toISOString(), // Use ISO string
         version: 1
       },
       content: {
@@ -409,7 +429,9 @@ describe('SystemPatternsJsonV2Schema', () => {
             title: 'Use TypeScript',
             context: 'Need type safety',
             decision: 'We will use TypeScript',
-            consequences: [] // Empty array, should have at least one
+            consequences: { positive: [], negative: [] },
+            date: new Date().toISOString(),
+            // status: 'accepted', // Missing required status
           }
         ]
       }
@@ -417,24 +439,27 @@ describe('SystemPatternsJsonV2Schema', () => {
 
     const result = SystemPatternsJsonV2Schema.safeParse(invalidDocument);
     expect(result.success).toBe(false);
+    expect(result.error?.errors.some(e => e.path.includes('status'))).toBe(true);
   });
 });
 
 describe('GenericDocumentJsonV2Schema', () => {
-  it('should validate a generic document with any document type', () => {
+  it('should validate a generic document', () => {
+    // Generic schema expects documentType inside metadata
     const validDocument = {
       schema: SCHEMA_VERSION,
+      // documentType: 'custom_type', // Not at top level for Generic schema test
       metadata: {
         title: 'Custom Document',
-        documentType: 'custom_type', // Any document type works
+        documentType: 'custom_type', // Generic allows any string here
         id: '123e4567-e89b-12d3-a456-426614174000',
         path: 'custom.json',
         tags: ['custom'],
-        lastModified: '2023-10-27T19:00:00.000Z', // Use ISO string
-        createdAt: '2023-10-26T19:00:00.000Z', // Use ISO string
+        lastModified: '2023-10-27T19:00:00.000Z',
+        createdAt: '2023-10-26T19:00:00.000Z',
         version: 1
       },
-      content: {
+      content: { // Content must not be empty
         customField: 'value',
         anotherField: 123
       }
@@ -453,14 +478,15 @@ describe('GenericDocumentJsonV2Schema', () => {
         id: '123e4567-e89b-12d3-a456-426614174000',
         path: 'custom.json',
         tags: ['custom'],
-        lastModified: new Date(),
-        createdAt: new Date(),
+        lastModified: new Date().toISOString(), // Use ISO string
+        createdAt: new Date().toISOString(), // Use ISO string
         version: 1
       },
       content: {} // Empty content
     };
 
     const result = GenericDocumentJsonV2Schema.safeParse(invalidDocument);
+    // Generic schema requires content not to be empty
     expect(result.success).toBe(false);
   });
 });

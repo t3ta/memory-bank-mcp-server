@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { BaseJsonDocumentV2Schema, DocumentMetadataV2Schema } from '../v2/json-document.js'; // Adjust import path
+import { DocumentMetadataV2Schema } from '../v2/json-document.js'; // Adjust import path
 
 // Active Context document type
 export const ActiveContextContentV2Schema = z.object({
@@ -8,21 +8,18 @@ export const ActiveContextContentV2Schema = z.object({
   activeDecisions: z.array(z.string()).default([]),
   considerations: z.array(z.string()).default([]),
   nextSteps: z.array(z.string()).default([]),
-});
+}).strict(); // Add .strict() to disallow extra fields
 
-// Define ActiveContext specific metadata
-const ActiveContextMetadataSchema = DocumentMetadataV2Schema.extend({
-  documentType: z.literal('active_context'),
-});
+// Define ActiveContext specific metadata (documentType is now at top level)
+const ActiveContextMetadataSchema = DocumentMetadataV2Schema; // No need to extend for documentType anymore
 
-// Define the full ActiveContext schema by merging base (without metadata/content)
-// with the specific metadata and content schemas.
-export const ActiveContextJsonV2Schema = BaseJsonDocumentV2Schema
-  .omit({ metadata: true, content: true }) // Omit base metadata and content
-  .merge(z.object({ // Merge with specific metadata and content
-    metadata: ActiveContextMetadataSchema,
-    content: ActiveContextContentV2Schema,
-  }));
+// Define the full ActiveContext schema
+export const ActiveContextJsonV2Schema = z.object({
+  schema: z.literal('memory_document_v2'), // Explicitly define schema version
+  documentType: z.literal('active_context'), // Discriminator at top level
+  metadata: ActiveContextMetadataSchema,     // Use the updated metadata schema
+  content: ActiveContextContentV2Schema,      // Use the specific content schema
+});
 
 // Type exports
 export type ActiveContextContentV2 = z.infer<typeof ActiveContextContentV2Schema>;

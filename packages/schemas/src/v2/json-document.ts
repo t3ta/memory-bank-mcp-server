@@ -16,7 +16,7 @@ export const SCHEMA_VERSION = 'memory_document_v2';
 export const DocumentMetadataV2Schema = z.object({
   // Basic identification
   title: commonValidators.nonEmptyString('title'),
-  documentType: commonValidators.nonEmptyString('documentType'), // Still needed here for base validation
+  // documentType: commonValidators.nonEmptyString('documentType'), // Removed: Moved to top level for discriminated union
   id: commonValidators.uuidField('id'),
   path: commonValidators.nonEmptyString('path'),
 
@@ -30,13 +30,17 @@ export const DocumentMetadataV2Schema = z.object({
 });
 
 // Base schema that all JSON documents must conform to
+// Base schema definition focusing on common top-level fields required for discriminated union
 export const BaseJsonDocumentV2Schema = z.object({
   schema: z.literal(SCHEMA_VERSION),
-  metadata: DocumentMetadataV2Schema,
-  content: z.record(z.unknown()).refine((val) => Object.keys(val).length > 0, {
-    message: 'Content cannot be empty',
-  }),
+  documentType: commonValidators.nonEmptyString('documentType'), // Added: Discriminator at top level
+  // metadata and content are now defined within each specific document type schema
+  // that merges/extends this base or defines them alongside documentType.
 });
+
+// Note: The original BaseJsonDocumentV2Schema included metadata and content directly.
+// This has been changed. Specific document schemas should now incorporate
+// DocumentMetadataV2Schema and their specific content schema.
 
 // Type exports for base and metadata
 export type DocumentMetadataV2 = z.infer<typeof DocumentMetadataV2Schema>;

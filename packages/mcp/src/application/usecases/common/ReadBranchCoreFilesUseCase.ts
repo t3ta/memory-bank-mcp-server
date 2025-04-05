@@ -76,13 +76,11 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
         }
       } catch (error) {
         if (error instanceof DomainError || error instanceof ApplicationError) {
-          throw error;
+          throw error; // Known errors are re-thrown
         }
-        logger.debug('Document not found', {
-          type: 'activeContext',
-          path: this.ACTIVE_CONTEXT_PATH,
-          branch: input.branchName
-        });
+        // Unexpected errors are wrapped and thrown as ApplicationError
+        logger.error('Unexpected error reading activeContext', { path: this.ACTIVE_CONTEXT_PATH, branch: input.branchName, error });
+        throw new ApplicationError(ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED, `Failed to read activeContext: ${(error as Error).message}`, { originalError: error });
       }
 
       try {
@@ -95,13 +93,11 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
         }
       } catch (error) {
         if (error instanceof DomainError || error instanceof ApplicationError) {
-          throw error;
+          throw error; // Known errors are re-thrown
         }
-        logger.debug('Document not found', {
-          type: 'progress',
-          path: this.PROGRESS_PATH,
-          branch: input.branchName
-        });
+        // Unexpected errors are wrapped and thrown as ApplicationError
+        logger.error('Unexpected error reading progress', { path: this.PROGRESS_PATH, branch: input.branchName, error });
+        throw new ApplicationError(ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED, `Failed to read progress: ${(error as Error).message}`, { originalError: error });
       }
 
       try {
@@ -114,13 +110,11 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
         }
       } catch (error) {
         if (error instanceof DomainError || error instanceof ApplicationError) {
-          throw error;
+          throw error; // Known errors are re-thrown
         }
-        logger.debug('Document not found', {
-          type: 'branchContext',
-          path: this.BRANCH_CONTEXT_PATH,
-          branch: input.branchName
-        });
+        // Unexpected errors are wrapped and thrown as ApplicationError
+        logger.error('Unexpected error reading branchContext', { path: this.BRANCH_CONTEXT_PATH, branch: input.branchName, error });
+        throw new ApplicationError(ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED, `Failed to read branchContext: ${(error as Error).message}`, { originalError: error });
       }
 
       let systemPatternsFound = false;
@@ -135,13 +129,11 @@ export class ReadBranchCoreFilesUseCase implements IUseCase<ReadBranchCoreFilesI
         }
       } catch (error) {
         if (error instanceof DomainError || error instanceof ApplicationError) {
-          throw error;
+          throw error; // Known errors are re-thrown
         }
-        logger.debug('Document not found', {
-          type: 'systemPatterns',
-          path: this.SYSTEM_PATTERNS_PATH,
-          branch: input.branchName
-        });
+        // Unexpected errors are wrapped and thrown as ApplicationError
+        logger.error('Unexpected error reading systemPatterns', { path: this.SYSTEM_PATTERNS_PATH, branch: input.branchName, error });
+        throw new ApplicationError(ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED, `Failed to read systemPatterns: ${(error as Error).message}`, { originalError: error });
       }
 
       // Set default value if SystemPatterns was not found

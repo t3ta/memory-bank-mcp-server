@@ -1,0 +1,33 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-unit-test-infra-interface-progress",
+    "title": "Progress for feature/unit-test-infra-interface",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "createdAt": "2025-04-05T01:44:30.000Z",
+    "lastModified": "2025-04-04T16:44:43.182Z"
+  },
+  "content": {
+    "summary": "Infrastructure層とInterface層の単体テストスケルトン作成",
+    "status": "in_progress",
+    "steps": [
+      {
+        "description": "Infrastructure層 (repositories, git, index, logger, storage, templates, validation) のテストスケルトン作成",
+        "status": "done"
+      },
+      {
+        "description": "Interface層 (controllers) のテストスケルトン作成",
+        "status": "done"
+      }
+    ],
+    "next_steps": [
+      {
+        "description": "各スケルトンファイルに具体的なテストケースを実装する",
+        "status": "todo"
+      }
+    ],
+    "findings": []
+  }
+}

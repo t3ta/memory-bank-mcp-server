@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { BaseJsonDocumentV2Schema, DocumentMetadataV2Schema } from '../v2/json-document.js'; // Adjust import path
+import { DocumentMetadataV2Schema } from '../v2/json-document.js'; // Adjust import path
 import { commonValidators } from '../validation-helpers.js';
 
 // Branch Context document type
@@ -14,21 +14,18 @@ export const BranchContextContentV2Schema = z.object({
       })
     )
     .default([]),
-});
+}).strict(); // Add .strict()
 
-// Define BranchContext specific metadata
-const BranchContextMetadataSchema = DocumentMetadataV2Schema.extend({
-  documentType: z.literal('branch_context'),
-});
+// Define BranchContext specific metadata (documentType is now at top level)
+const BranchContextMetadataSchema = DocumentMetadataV2Schema; // No need to extend for documentType anymore
 
-// Define the full BranchContext schema by merging base (without metadata/content)
-// with the specific metadata and content schemas.
-export const BranchContextJsonV2Schema = BaseJsonDocumentV2Schema
-  .omit({ metadata: true, content: true }) // Omit base metadata and content
-  .merge(z.object({ // Merge with specific metadata and content
-    metadata: BranchContextMetadataSchema,
-    content: BranchContextContentV2Schema,
-  }));
+// Define the full BranchContext schema
+export const BranchContextJsonV2Schema = z.object({
+  schema: z.literal('memory_document_v2'), // Explicitly define schema version
+  documentType: z.literal('branch_context'), // Discriminator at top level
+  metadata: BranchContextMetadataSchema,     // Use the updated metadata schema
+  content: BranchContextContentV2Schema,      // Use the specific content schema
+});
 
 
 // Type exports

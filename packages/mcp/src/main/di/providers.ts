@@ -17,6 +17,7 @@ import { ReadRulesUseCase } from '../../application/usecases/common/ReadRulesUse
 import { ReadContextUseCase } from '../../application/usecases/common/ReadContextUseCase.js';
 import { ReadBranchDocumentUseCase } from '../../application/usecases/branch/ReadBranchDocumentUseCase.js';
 import { WriteBranchDocumentUseCase } from '../../application/usecases/branch/WriteBranchDocumentUseCase.js';
+import { DocumentWriterService } from '../../application/services/DocumentWriterService.js'; // Import DocumentWriterService
 import { SearchDocumentsByTagsUseCase } from '../../application/usecases/common/SearchDocumentsByTagsUseCase.js';
 import { UpdateTagIndexUseCase } from '../../application/usecases/common/UpdateTagIndexUseCase.js';
 import { UpdateTagIndexUseCaseV2 } from '../../application/usecases/common/UpdateTagIndexUseCaseV2.js';
@@ -187,9 +188,11 @@ export async function registerApplicationServices(container: DIContainer): Promi
   // Add missing registration for writeGlobalDocumentUseCase
   container.registerFactory('writeGlobalDocumentUseCase', async () => {
     const globalRepository = await container.get<FileSystemGlobalMemoryBankRepository>(
-      'globalMemoryBankRepository'
-    );
-    return new WriteGlobalDocumentUseCase(globalRepository);
+     'globalMemoryBankRepository'
+   );
+   const patchService = await container.get<JsonPatchService>('jsonPatchService'); // Resolve JsonPatchService
+   const documentWriterService = new DocumentWriterService(patchService); // Instantiate DocumentWriterService
+   return new WriteGlobalDocumentUseCase(globalRepository, documentWriterService); // Inject DocumentWriterService
   });
 
   container.registerFactory('markdownMigrationService', async () => {
@@ -223,11 +226,13 @@ export async function registerApplicationServices(container: DIContainer): Promi
     const branchRepository = await container.get<IBranchMemoryBankRepository>( // Use interface type
       'branchMemoryBankRepository'
     );
-    const patchService = await container.get<JsonPatchService>('jsonPatchService'); // Get the patch service
-    const gitService = await container.get<IGitService>('gitService');
-    const configProvider = await container.get<IConfigProvider>('configProvider');
-    // Directly instantiate the use case with dependencies
-    return new WriteBranchDocumentUseCase(branchRepository, patchService, gitService, configProvider);
+   const patchService = await container.get<JsonPatchService>('jsonPatchService'); // Resolve JsonPatchService
+   const gitService = await container.get<IGitService>('gitService');
+   const configProvider = await container.get<IConfigProvider>('configProvider');
+   // Instantiate DocumentWriterService
+   const documentWriterService = new DocumentWriterService(patchService);
+   // Instantiate the use case with DocumentWriterService
+   return new WriteBranchDocumentUseCase(branchRepository, documentWriterService, gitService, configProvider);
   });
 
   // Add missing registration for readBranchDocumentUseCase

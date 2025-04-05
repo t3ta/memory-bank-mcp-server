@@ -28,7 +28,14 @@ export class DocumentPath {
       );
     }
 
-    const normalizedPath = value.replace(/\\/g, '/');
+    // ★★★ 不正なパス区切り文字チェックを追加 ★★★
+    if (value.includes('\\')) {
+      throw new DomainError(
+        DomainErrorCodes.INVALID_DOCUMENT_PATH,
+        'Document path cannot contain backslashes (\\). Use forward slashes (/) instead.'
+      );
+    }
+    const normalizedPath = value; // replace は不要になる
 
     if (normalizedPath.includes('..')) {
       throw new DomainError(
@@ -36,11 +43,26 @@ export class DocumentPath {
         'Document path cannot contain ".."'
       );
     }
+    // ★★★ 無効な文字チェックを追加 ★★★
+    const invalidChars = /[<>:"|?*]/; // : はWindowsドライブレターと区別が必要だが、絶対パスは既に弾いている
+    if (invalidChars.test(normalizedPath)) {
+      throw new DomainError(
+        DomainErrorCodes.INVALID_DOCUMENT_PATH,
+        'Document path contains invalid characters (<, >, :, ", |, ?, *)'
+      );
+    }
 
     if (normalizedPath.startsWith('/') || /^[a-zA-Z]:/.test(normalizedPath)) {
       throw new DomainError(
         DomainErrorCodes.INVALID_DOCUMENT_PATH,
         'Document path cannot be absolute'
+      );
+    }
+    // ★★★ 末尾スラッシュのチェックを追加 ★★★
+    if (normalizedPath.endsWith('/')) {
+      throw new DomainError(
+        DomainErrorCodes.INVALID_DOCUMENT_PATH,
+        'Document path cannot end with a slash'
       );
     }
 
@@ -92,7 +114,10 @@ export class DocumentPath {
    * @param other Other DocumentPath instance to compare with
    * @returns true if both paths have the same value
    */
-  public equals(other: DocumentPath): boolean {
+  public equals(other: DocumentPath | null | undefined): boolean { // Allow null/undefined check
+    if (!other) { // Check if other is null or undefined
+        return false;
+    }
     return this._value === other._value;
   }
 

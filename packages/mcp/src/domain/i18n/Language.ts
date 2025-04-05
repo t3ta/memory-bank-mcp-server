@@ -81,7 +81,10 @@ export class Language {
    * @param other Another Language object to compare
    * @returns true if equal, false otherwise
    */
-  equals(other: Language): boolean {
+  equals(other: Language | null | undefined): boolean { // Allow null/undefined check
+    if (!other) { // Check if other is null or undefined
+      return false;
+    }
     return this._code === other.code;
   }
 

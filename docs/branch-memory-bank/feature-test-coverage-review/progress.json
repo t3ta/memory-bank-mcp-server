@@ -1,0 +1,100 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "290d0a0e-666c-4e5b-8313-8886e4d774ae",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "lastModified": "2025-04-05T11:30:00.000Z",
+    "createdAt": "2025-04-05T06:26:34.146Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "json-usecase-unit-tests",
+        "description": "優先度「最高」のJSON関連ユースケースのユニットテストを実装・成功させた (Write, Read, Delete, Search, Patch, UpdateIndex)",
+        "implementedAt": "2025-04-05T07:54:20.000Z"
+      },
+      {
+        "id": "global-read-usecase-unit-tests",
+        "description": "優先度「高」の ReadGlobalDocumentUseCase のユニットテストを実装・成功させた",
+        "implementedAt": "2025-04-05T08:02:17.000Z"
+      },
+      {
+        "id": "shared-errors-unit-tests",
+        "description": "優先度「高」のエラーハンドリングモジュール (DomainError, ApplicationError, InfrastructureError, SharedUtilsError) のユニットテストを実装・成功させた",
+        "implementedAt": "2025-04-05T08:18:24.000Z"
+      },
+      {
+        "id": "logger-util-unit-tests",
+        "description": "カバレッジが低かった logger.ts のユニットテストを実装・成功させた",
+        "implementedAt": "2025-04-05T08:23:45.000Z"
+      },
+      {
+        "id": "i18n-language-unit-tests",
+        "description": "カバレッジ 0% だった domain/i18n/Language.ts のユニットテストを実装・成功させた",
+        "implementedAt": "2025-04-05T08:26:31.000Z"
+      },
+      {
+        "id": "test-coverage-review",
+        "description": "優先度の高いテスト実装内容のレビューを実施し、詳細なカバレッジ分析を作成",
+        "implementedAt": "2025-04-05T10:55:00.000Z"
+      },
+      {
+        "id": "test-coverage-consolidation",
+        "description": "テストカバレッジ関連の複数ファイルを統合し、最終レビューレポートを作成",
+        "implementedAt": "2025-04-05T11:30:00.000Z"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "fix-integration-tests",
+        "description": "ReadGlobalDocumentUseCase.integration.test.tsの統合テスト修正",
+        "priority": "high"
+      },
+      {
+        "id": "improve-boundary-tests",
+        "description": "境界値テストの追加によるBranchカバレッジの改善",
+        "priority": "medium"
+      },
+      {
+        "id": "jsonpatch-tests",
+        "description": "JSONパッチ操作のドメインロジックテスト強化（現在44.85%）",
+        "priority": "medium"
+      },
+      {
+        "id": "error-index-tests",
+        "description": "shared/errors/index.tsのテスト強化（現在30.76%）",
+        "priority": "low"
+      }
+    ],
+    "status": "優先度の高かったテストがすべて実装完了し、テストカバレッジが大幅に向上（Statements: 79.81%、Branches: 62.12%、Functions: 81.19%、Lines: 80.07%）。統合テストに一部失敗があるものの、ユニットテストはすべてパス。",
+    "completionPercentage": 85,
+    "knownIssues": [
+      {
+        "id": "integration-test-failure",
+        "description": "ReadGlobalDocumentUseCase.integration.testでドキュメント構造の期待値が不一致",
+        "severity": "medium"
+      },
+      {
+        "id": "low-branch-coverage",
+        "description": "境界値テストが少ないためBranchesカバレッジが他指標より低い（62.12%）",
+        "severity": "low"
+      },
+      {
+        "id": "jsonpatch-coverage",
+        "description": "JSONパッチ操作のドメインロジックのカバレッジが低い（44.85%）",
+        "severity": "low"
+      }
+    ],
+    "references": [
+      {
+        "file": "mcp-test-coverage-final.json",
+        "description": "MCPテストカバレッジ改善の最終レビューレポート",
+        "created_at": "2025-04-05T11:30:00.000Z"
+      }
+    ]
+  }
+}

@@ -39,6 +39,7 @@ export class ProgressConverter implements BaseConverter {
       knownIssues: Array.isArray(parsed.content.knownIssues)
         ? (parsed.content.knownIssues as string[])
         : [],
+      completionPercentage: 0, // Add default value for required field
     };
 
     const markdownLower = markdownContent.toLowerCase();

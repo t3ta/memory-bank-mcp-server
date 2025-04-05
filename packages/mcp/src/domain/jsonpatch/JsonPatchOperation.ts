@@ -53,7 +53,13 @@ export class JsonPatchOperation {
       );
     }
 
-    // Parse path
+    // Validate and parse path
+    if (path === undefined || path === null) { // path の存在チェックを追加
+      throw new DomainError(
+        DomainErrorCodes.INVALID_JSON_PATCH_OPERATION,
+        `Operation of type '${op}' requires 'path'`
+      );
+    }
     const jsonPath = JsonPath.parse(path);
 
     // Parse 'from' if specified
@@ -76,8 +82,21 @@ export class JsonPatchOperation {
       );
     }
 
-    // Create instance
-    return new JsonPatchOperation(op, jsonPath, value, jsonFrom);
+    // 操作タイプに応じて不要な引数をクリア
+    let finalValue = value;
+    let finalFrom = jsonFrom;
+
+    if (op === 'remove') {
+      finalValue = undefined;
+      finalFrom = undefined;
+    } else if (['add', 'replace', 'test'].includes(op)) {
+      finalFrom = undefined;
+    } else if (['move', 'copy'].includes(op)) {
+      finalValue = undefined;
+    }
+
+    // Create instance with potentially cleared arguments
+    return new JsonPatchOperation(op, jsonPath, finalValue, finalFrom);
   }
 
   /**
