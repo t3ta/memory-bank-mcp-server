@@ -9,6 +9,7 @@
     "@semantic-release/npm",
     "@semantic-release/release-notes-generator",
     "conventional-changelog-conventionalcommits",
-    "semantic-release"
+    "semantic-release",
+    "jest-mock-extended"
   ]
 }

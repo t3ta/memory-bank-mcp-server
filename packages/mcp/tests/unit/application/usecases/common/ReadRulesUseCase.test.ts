@@ -94,7 +94,7 @@ describe('ReadRulesUseCase', () => {
       expect(error).toBeInstanceOf(DomainError); // まずDomainErrorインスタンスか確認
       // エラーコードとメッセージの先頭部分をチェック
       expect(error).toHaveProperty('code', 'DOMAIN_ERROR.DOCUMENT_NOT_FOUND'); // 実際のコード値に合わせる (再確認)
-      expect((error as Error).message).toContain(`Rules file not found for language: ${language}. Attempted paths:`); // みらい修正: toMatchからtoContainに変更し、正規表現を削除
+      expect((error as Error).message).toContain(`Rules file not found for language: ${language}. Attempted paths:`);
     }
   });
 

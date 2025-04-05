@@ -151,24 +151,24 @@ describe('ReadBranchCoreFilesUseCase', () => {
    mockBranchRepository.exists.mockResolvedValue(true);
   mockBranchRepository.getDocument
       .mockImplementation(async (argBranchInfo, argPath) => {
-          console.log(`[Test Debug] getDocument called with path: ${argPath.value}`); // みらいデバッグログ追加
+          console.log(`[Test Debug] getDocument called with path: ${argPath.value}`);
           if(argPath.equals(DocumentPath.create('activeContext.json'))) {
-              console.log('[Test Debug] Throwing error for activeContext.json'); // みらいデバッグログ追加
+              console.log('[Test Debug] Throwing error for activeContext.json');
               throw repoError;
           }
            if (argPath.equals(DocumentPath.create('progress.json'))) {
-               console.log('[Test Debug] Returning mockProgress'); // みらいデバッグログ追加
+               console.log('[Test Debug] Returning mockProgress');
                return mockProgress;
            }
            if (argPath.equals(DocumentPath.create('branchContext.json'))) {
-               console.log('[Test Debug] Returning mockBranchContext'); // みらいデバッグログ追加
+               console.log('[Test Debug] Returning mockBranchContext');
                return mockBranchContext;
            }
            if (argPath.equals(DocumentPath.create('systemPatterns.json'))) {
-               console.log('[Test Debug] Returning mockSystemPatterns'); // みらいデバッグログ追加
+               console.log('[Test Debug] Returning mockSystemPatterns');
                return mockSystemPatterns;
            }
-          console.log('[Test Debug] Returning null'); // みらいデバッグログ追加
+          console.log('[Test Debug] Returning null');
           return null;
       });
 
@@ -178,7 +178,7 @@ describe('ReadBranchCoreFilesUseCase', () => {
   await expect(useCase.execute({ branchName })).rejects.toThrowError(
       new ApplicationError(
           ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
-          `Failed to read activeContext: ${repoError.message}`, // みらい修正: 実際に投げられるメッセージに合わせる
+          `Failed to read activeContext: ${repoError.message}`,
           { originalError: repoError }
       )
   );

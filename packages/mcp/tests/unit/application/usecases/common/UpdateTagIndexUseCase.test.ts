@@ -57,7 +57,7 @@ describe('UpdateTagIndexUseCase', () => {
     expect(result.updateInfo.updateLocation).toBe(branchName);
     expect(result.updateInfo.fullRebuild).toBe(false); // デフォルトは false
     expect(result.updateInfo.timestamp).toBeDefined();
-  }); // みらい... 閉じ括弧を追加！
+  });
 
    it('should return correct tags and count for global scope', async () => {
     // Arrange
