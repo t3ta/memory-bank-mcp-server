@@ -114,7 +114,10 @@ export class DocumentPath {
    * @param other Other DocumentPath instance to compare with
    * @returns true if both paths have the same value
    */
-  public equals(other: DocumentPath): boolean {
+  public equals(other: DocumentPath | null | undefined): boolean { // Allow null/undefined check
+    if (!other) { // Check if other is null or undefined
+        return false;
+    }
     return this._value === other._value;
   }
 
