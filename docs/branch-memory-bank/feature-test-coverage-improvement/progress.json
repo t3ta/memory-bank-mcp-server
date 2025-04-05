@@ -6,7 +6,7 @@
     "documentType": "progress",
     "path": "progress.json",
     "tags": [],
-    "lastModified": "2025-04-05T12:00:00.000Z",
+    "lastModified": "2025-04-05T13:45:53.136Z",
     "createdAt": "2025-04-05T12:00:00.000Z",
     "version": 1
   },
@@ -16,32 +16,72 @@
         "id": "branch-init",
         "description": "feature/test-coverage-improvementブランチ作成とメモリバンク初期化",
         "implementedAt": "2025-04-05T12:00:00.000Z"
-      }
-    ],
-    "pendingImplementation": [
+      },
       {
-        "id": "fix-integration-tests",
+        "id": "integration-test-fix",
         "description": "ReadGlobalDocumentUseCase.integration.test.tsの統合テスト修正",
-        "priority": "high"
+        "status": "completed",
+        "startedAt": "2025-04-05T11:43:30.000Z",
+        "completedAt": "2025-04-05T11:45:25.000Z"
       },
       {
-        "id": "improve-jsonpatch-tests",
-        "description": "JSONパッチ操作のドメインロジックテスト強化",
-        "priority": "high"
+        "id": "jsonpatch-tests-jsonpath",
+        "description": "JSONパッチ操作テスト強化 (JsonPath.test.ts)",
+        "status": "completed",
+        "startedAt": "2025-04-05T11:45:40.000Z",
+        "completedAt": "2025-04-05T11:53:11.000Z"
       },
       {
-        "id": "improve-boundary-tests",
-        "description": "境界値テストの追加によるBranchカバレッジの改善",
-        "priority": "medium"
+        "id": "jsonpatch-tests-operation",
+        "description": "JSONパッチ操作テスト強化 (JsonPatchOperation.test.ts)",
+        "status": "completed",
+        "startedAt": "2025-04-05T11:50:05.000Z",
+        "completedAt": "2025-04-05T11:53:11.000Z"
       },
       {
         "id": "error-index-tests",
         "description": "shared/errors/index.tsのテスト強化",
-        "priority": "low"
+        "status": "completed",
+        "startedAt": "2025-04-05T12:06:33.000Z",
+        "completedAt": "2025-04-05T12:11:51.000Z"
+      },
+      {
+        "id": "improve-boundary-tests",
+        "description": "境界値テストの追加によるBranchカバレッジの改善",
+        "status": "completed",
+        "startedAt": "2025-04-05T12:12:06.000Z",
+        "subTasks": [
+          {
+            "id": "read-branch-doc-test-fix",
+            "description": "ReadBranchDocumentUseCase.test.ts のテストケース追加・修正 (未カバー分岐対応)",
+            "status": "completed",
+            "completedAt": "2025-04-05T13:41:39.000Z"
+          },
+          {
+            "id": "shared-errors-fix",
+            "description": "shared/errors/index.ts (isErrorOfType, wrapAsync) 修正",
+            "status": "completed",
+            "completedAt": "2025-04-05T13:41:39.000Z"
+          },
+          {
+            "id": "shared-errors-test-fix",
+            "description": "shared/errors/index.test.ts (loggerモック, 期待値) 修正",
+            "status": "completed",
+            "completedAt": "2025-04-05T13:41:39.000Z"
+          },
+          {
+            "id": "run-test-read-branch-doc",
+            "description": "ReadBranchDocumentUseCase.test.ts のテスト実行 (結果未確認)",
+            "status": "completed",
+            "executedAt": "2025-04-05T13:41:39.000Z"
+          }
+        ],
+        "completedAt": "2025-04-05T13:45:46.336Z"
       }
     ],
-    "status": "新ブランチでの作業開始。前回のテストカバレッジレビューに基づいた改善計画を立案中。",
-    "completionPercentage": 5,
+    "pendingImplementation": [],
+    "status": "ReadBranchDocumentUseCase のテスト修正完了、テスト結果確認待ち。",
+    "completionPercentage": 75,
     "knownIssues": [
       {
         "id": "integration-test-failure",

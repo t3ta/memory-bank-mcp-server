@@ -53,7 +53,13 @@ export class JsonPatchOperation {
       );
     }
 
-    // Parse path
+    // Validate and parse path
+    if (path === undefined || path === null) { // path の存在チェックを追加
+      throw new DomainError(
+        DomainErrorCodes.INVALID_JSON_PATCH_OPERATION,
+        `Operation of type '${op}' requires 'path'`
+      );
+    }
     const jsonPath = JsonPath.parse(path);
 
     // Parse 'from' if specified
