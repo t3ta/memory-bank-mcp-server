@@ -6,7 +6,7 @@
     "documentType": "progress",
     "path": "progress.json",
     "tags": [],
-    "lastModified": "2025-04-05T07:54:28.530Z",
+    "lastModified": "2025-04-05T08:02:26.506Z",
     "createdAt": "2025-04-05T06:26:34.146Z",
     "version": 1
   },
@@ -31,6 +31,11 @@
         "id": "json-usecase-unit-tests",
         "description": "優先度「最高」のJSON関連ユースケースのユニットテストを実装・成功させた (Write, Read, Delete, Search, Patch, UpdateIndex)",
         "implementedAt": "2025-04-05T07:54:20.000Z"
+      },
+      {
+        "id": "global-read-usecase-unit-tests",
+        "description": "優先度「高」の ReadGlobalDocumentUseCase のユニットテストを実装・成功させた",
+        "implementedAt": "2025-04-05T08:02:17.000Z"
       }
     ],
     "pendingImplementation": [

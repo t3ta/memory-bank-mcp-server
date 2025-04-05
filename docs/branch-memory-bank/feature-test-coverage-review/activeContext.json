@@ -6,13 +6,17 @@
     "documentType": "active_context",
     "path": "activeContext.json",
     "tags": [],
-    "lastModified": "2025-04-05T07:54:37.619Z",
+    "lastModified": "2025-04-05T08:02:33.306Z",
     "createdAt": "2025-04-05T06:26:34.145Z",
     "version": 1
   },
   "content": {
-    "currentWork": "優先度「最高」のJSON関連ユースケースのユニットテスト実装完了。カバレッジレポートの他の項目を確認中。",
+    "currentWork": "優先度「最高」のJSON関連ユースケースと、優先度「高」のReadGlobalDocumentUseCaseのユニットテスト実装完了。次のタスクを検討中。",
     "recentChanges": [
+      {
+        "date": "2025-04-05T08:02:26.506Z",
+        "description": "優先度「高」の ReadGlobalDocumentUseCase のユニットテストを実装・成功させた。"
+      },
       {
         "date": "2025-04-05T07:54:28.530Z",
         "description": "優先度「最高」のJSONユースケース (Write, Read, Delete, Search, Patch, UpdateIndex) のユニットテストを実装・成功させた。"
