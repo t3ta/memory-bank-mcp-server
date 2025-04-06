@@ -1,0 +1,590 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "vitest-implementation-roadmap",
+    "title": "Vitest実装ロードマップ",
+    "documentType": "roadmap",
+    "path": "implementation-roadmap.json",
+    "tags": [
+      "vitest",
+      "roadmap",
+      "implementation",
+      "planning"
+    ],
+    "lastModified": "2025-04-06T20:00:35.497Z",
+    "createdAt": "2025-04-06T20:00:35.497Z",
+    "version": 1
+  },
+  "content": {
+    "overview": "このドキュメントは、memory-bank-mcp-serverプロジェクトでJestからVitestへの移行を段階的に実施するための詳細なロードマップを提供します。",
+    "goals": {
+      "primary": "ESMプロジェクトでのテスト実行に関する問題を解決し、より高速で安定したテスト環境を構築する",
+      "secondary": [
+        "開発者体験（DX）を向上させる",
+        "テスト実行の高速化と安定性の向上",
+        "モダンなJavaScriptエコシステムとの互換性を強化",
+        "実験的フラグや複雑な設定への依存を減らす"
+      ]
+    },
+    "implementation_phases": [
+      {
+        "phase": 1,
+        "name": "初期環境セットアップ",
+        "description": "Vitestと関連パッケージのインストール、基本設定ファイルの作成",
+        "tasks": [
+          {
+            "id": "1.1",
+            "name": "Vitestパッケージのインストール",
+            "description": "Vitestと関連パッケージをdevDependenciesに追加",
+            "steps": [
+              "プロジェクトルートで `yarn add -D vitest @vitest/coverage-v8 vite-tsconfig-paths` を実行",
+              "package.jsonの依存関係を確認"
+            ],
+            "estimated_time": "30分",
+            "dependencies": [],
+            "status": "pending"
+          },
+          {
+            "id": "1.2",
+            "name": "ワークスペース設定ファイルの作成",
+            "description": "モノレポのためのvitest.workspace.ts設定ファイルを作成",
+            "steps": [
+              "ルートディレクトリにvitest.workspace.ts作成",
+              "packages/mcpとpackages/schemasを含める"
+            ],
+            "estimated_time": "45分",
+            "dependencies": [
+              "1.1"
+            ],
+            "status": "pending"
+          },
+          {
+            "id": "1.3",
+            "name": "開発環境テスト",
+            "description": "初期設定が機能するか簡単なテストを実行",
+            "steps": [
+              "最小限のvitest.config.tsをテスト用に作成",
+              "簡単なテストでコマンド実行確認"
+            ],
+            "estimated_time": "1時間",
+            "dependencies": [
+              "1.2"
+            ],
+            "status": "pending"
+          }
+        ],
+        "deliverables": [
+          "インストール済みのVitestパッケージ",
+          "vitest.workspace.ts基本設定ファイル",
+          "開発環境での初期テスト確認"
+        ],
+        "estimated_completion": "2.25時間"
+      },
+      {
+        "phase": 2,
+        "name": "MCPパッケージのユニットテスト移行",
+        "description": "MCPパッケージのユニットテスト環境をVitestに移行",
+        "tasks": [
+          {
+            "id": "2.1",
+            "name": "MCPユニットテスト設定ファイル作成",
+            "description": "packages/mcp/vitest.config.ts作成",
+            "steps": [
+              "現在のjest.config.js分析",
+              "対応するVitest設定に変換",
+              "resolve.alias設定で依存関係のマッピング",
+              "test.includeでユニットテストのパターン設定"
+            ],
+            "estimated_time": "1.5時間",
+            "dependencies": [
+              "1.3"
+            ],
+            "status": "pending"
+          },
+          {
+            "id": "2.2",
+            "name": "setupTests.tsの更新",
+            "description": "Jestのsetupから対応するVitest設定に更新",
+            "steps": [
+              "jest importをvi importに変更",
+              "グローバル設定の更新"
+            ],
+            "estimated_time": "30分",
+            "dependencies": [
+              "2.1"
+            ],
+            "status": "pending"
+          },
+          {
+            "id": "2.3",
+            "name": "package.jsonスクリプト更新",
+            "description": "テスト実行スクリプトをVitest用に更新",
+            "steps": [
+              "test:unit スクリプトの更新",
+              "test:watch スクリプトの更新",
+              "test:coverage スクリプトの更新"
+            ],
+            "estimated_time": "30分",
+            "dependencies": [
+              "2.2"
+            ],
+            "status": "pending"
+          },
+          {
+            "id": "2.4",
+            "name": "ユニットテスト実行テスト",
+            "description": "新しい設定でユニットテストを実行",
+            "steps": [
+              "yarn workspace @memory-bank/mcp test:unit の実行",
+              "発生する問題の特定と修正"
+            ],
+            "estimated_time": "2時間",
+            "dependencies": [
+              "2.3"
+            ],
+            "status": "pending"
+          }
+        ],
+        "deliverables": [
+          "MCPパッケージのvitest.config.ts",
+          "更新されたsetupTests.ts",
+          "更新されたpackage.jsonスクリプト",
+          "ユニットテスト実行成功確認"
+        ],
+        "estimated_completion": "4.5時間"
+      },
+      {
+        "phase": 3,
+        "name": "MCPパッケージの統合テスト移行",
+        "description": "統合テスト環境をVitestに移行",
+        "tasks": [
+          {
+            "id": "3.1",
+            "name": "統合テスト設定ファイル作成",
+            "description": "packages/mcp/tests/integration/vitest.config.ts作成",
+            "steps": [
+              "現在のjest.config.ts分析",
+              "対応するVitest設定に変換",
+              "特殊な依存関係や設定の調整"
+            ],
+            "estimated_time": "1.5時間",
+            "dependencies": [
+              "2.4"
+            ],
+            "status": "pending"
+          },
+          {
+            "id": "3.2",
+            "name": "統合テスト用setupファイル更新",
+            "description": "setup.mtsの更新",
+            "steps": [
+              "Jest依存のコードをVitestに対応するよう更新",
+              "環境設定の確認"
+            ],
+            "estimated_time": "1時間",
+            "dependencies": [
+              "3.1"
+            ],
+            "status": "pending"
+          },
+          {
+            "id": "3.3",
+            "name": "統合テスト実行テスト",
+            "description": "新しい設定で統合テストを実行",
+            "steps": [
+              "yarn workspace @memory-bank/mcp test:integration の実行",
+              "発生する問題の特定と修正"
+            ],
+            "estimated_time": "3時間",
+            "dependencies": [
+              "3.2"
+            ],
+            "status": "pending"
+          }
+        ],
+        "deliverables": [
+          "統合テスト用vitest.config.ts",
+          "更新されたsetup.mts",
+          "統合テスト実行成功確認"
+        ],
+        "estimated_completion": "5.5時間"
+      },
+      {
+        "phase": 4,
+        "name": "Schemasパッケージの移行",
+        "description": "Schemasパッケージのテスト環境をVitestに移行",
+        "tasks": [
+          {
+            "id": "4.1",
+            "name": "Schemas用Vitest設定ファイル作成",
+            "description": "packages/schemas/vitest.config.ts作成",
+            "steps": [
+              "現在の設定分析",
+              "Vitest対応設定の作成",
+              "必要なalias設定の調整"
+            ],
+            "estimated_time": "1時間",
+            "dependencies": [
+              "3.3"
+            ],
+            "status": "pending"
+          },
+          {
+            "id": "4.2",
+            "name": "package.jsonスクリプト更新",
+            "description": "Schemasパッケージのテストスクリプトを更新",
+            "steps": [
+              "テスト実行スクリプトのVitestコマンドへの変更",
+              "オプションパラメータの調整"
+            ],
+            "estimated_time": "30分",
+            "dependencies": [
+              "4.1"
+            ],
+            "status": "pending"
+          },
+          {
+            "id": "4.3",
+            "name": "Schemasテスト実行テスト",
+            "description": "新しい設定でSchemasテストを実行",
+            "steps": [
+              "yarn workspace @memory-bank/schemas test の実行",
+              "発生する問題の特定と修正"
+            ],
+            "estimated_time": "1.5時間",
+            "dependencies": [
+              "4.2"
+            ],
+            "status": "pending"
+          }
+        ],
+        "deliverables": [
+          "Schemas用vitest.config.ts",
+          "更新されたpackage.jsonスクリプト",
+          "Schemasテスト実行成功確認"
+        ],
+        "estimated_completion": "3時間"
+      },
+      {
+        "phase": 5,
+        "name": "全体テストとクリーンアップ",
+        "description": "全パッケージの統合テストとJest依存関係のクリーンアップ",
+        "tasks": [
+          {
+            "id": "5.1",
+            "name": "ルートpackage.jsonスクリプト更新",
+            "description": "ルートディレクトリのテストスクリプトを更新",
+            "steps": [
+              "workspaces実行コマンドをvitest workspaceコマンドに変更",
+              "新しいスクリプトのテスト"
+            ],
+            "estimated_time": "30分",
+            "dependencies": [
+              "4.3"
+            ],
+            "status": "pending"
+          },
+          {
+            "id": "5.2",
+            "name": "全体テスト実行",
+            "description": "全パッケージのテストを一括実行",
+            "steps": [
+              "ルートディレクトリでyarn testの実行",
+              "すべてのテストが成功することを確認"
+            ],
+            "estimated_time": "1時間",
+            "dependencies": [
+              "5.1"
+            ],
+            "status": "pending"
+          },
+          {
+            "id": "5.3",
+            "name": "Jest依存関係のクリーンアップ",
+            "description": "不要になったJest関連パッケージを削除",
+            "steps": [
+              "ルートとパッケージごとのdevDependenciesからJest関連パッケージを削除",
+              "yarn installで依存関係ツリーをクリーンアップ"
+            ],
+            "estimated_time": "45分",
+            "dependencies": [
+              "5.2"
+            ],
+            "status": "pending"
+          },
+          {
+            "id": "5.4",
+            "name": "Jest設定ファイル削除",
+            "description": "不要になったJest設定ファイルを削除",
+            "steps": [
+              "ルートのjest.config.ts削除",
+              "各パッケージのjest.config.js削除",
+              "他のJest特有の設定ファイル削除"
+            ],
+            "estimated_time": "30分",
+            "dependencies": [
+              "5.3"
+            ],
+            "status": "pending"
+          },
+          {
+            "id": "5.5",
+            "name": "最終テスト確認",
+            "description": "クリーンアップ後の最終テスト確認",
+            "steps": [
+              "依存関係の削除後にすべてのテストが問題なく実行できることを確認",
+              "CI環境での実行をシミュレート"
+            ],
+            "estimated_time": "1時間",
+            "dependencies": [
+              "5.4"
+            ],
+            "status": "pending"
+          }
+        ],
+        "deliverables": [
+          "更新されたルートpackage.json",
+          "Jest依存関係を削除したクリーンな状態",
+          "すべてのテストが成功する最終確認"
+        ],
+        "estimated_completion": "3.75時間"
+      }
+    ],
+    "timeline": {
+      "total_estimated_time": "19時間",
+      "recommended_allocation": [
+        {
+          "day": 1,
+          "phases": [
+            "Phase 1",
+            "Phase 2初期"
+          ],
+          "hours": "4-5時間"
+        },
+        {
+          "day": 2,
+          "phases": [
+            "Phase 2完了",
+            "Phase 3初期"
+          ],
+          "hours": "4-5時間"
+        },
+        {
+          "day": 3,
+          "phases": [
+            "Phase 3完了",
+            "Phase 4"
+          ],
+          "hours": "4-5時間"
+        },
+        {
+          "day": 4,
+          "phases": [
+            "Phase 5",
+            "最終確認とドキュメント更新"
+          ],
+          "hours": "4-5時間"
+        }
+      ],
+      "milestones": [
+        {
+          "name": "初期環境設定完了",
+          "condition": "Phase 1の完了後"
+        },
+        {
+          "name": "MCPユニットテスト移行完了",
+          "condition": "Phase 2の完了後"
+        },
+        {
+          "name": "統合テスト移行完了",
+          "condition": "Phase 3の完了後"
+        },
+        {
+          "name": "全パッケージ移行完了",
+          "condition": "Phase 4の完了後"
+        },
+        {
+          "name": "Jest完全撤去完了",
+          "condition": "Phase 5の完了後"
+        }
+      ]
+    },
+    "risk_assessment": {
+      "high_risk_areas": [
+        {
+          "risk": "テストコードの互換性問題",
+          "description": "Jestの特定機能や拡張機能に依存したテストが動作しなくなる可能性",
+          "probability": "中",
+          "impact": "高",
+          "mitigation": "問題が発生したテストケースを特定し、Vitestの同等機能に置き換える。必要に応じてヘルパー関数を作成して互換性レイヤーを提供する。"
+        },
+        {
+          "risk": "モジュール解決の問題",
+          "description": "ESMとCJSの混在による予期せぬインポート問題や解決エラー",
+          "probability": "高",
+          "impact": "中",
+          "mitigation": "resolve.aliasを適切に設定し、問題が発生した場合は個別に対応。必要に応じてimportMapを使用。"
+        },
+        {
+          "risk": "テスト実行時間の増加",
+          "description": "設定問題による特定のテストケースの実行時間増加",
+          "probability": "低",
+          "impact": "中",
+          "mitigation": "パフォーマンスの比較測定を行い、問題が発生した場合は個別に最適化。"
+        }
+      ],
+      "medium_risk_areas": [
+        {
+          "risk": "CI/CD統合の問題",
+          "description": "CI環境でのVitest実行に関する問題",
+          "probability": "中",
+          "impact": "中",
+          "mitigation": "ローカル環境で先にCI条件をシミュレートしてテストし、必要に応じてCI設定を調整。"
+        },
+        {
+          "risk": "カバレッジレポートの違い",
+          "description": "JestとVitestでのカバレッジ計算方法の違いによる報告の不一致",
+          "probability": "中",
+          "impact": "低",
+          "mitigation": "移行前後でカバレッジレポートを比較し、必要に応じてしきい値を調整。"
+        }
+      ],
+      "low_risk_areas": [
+        {
+          "risk": "開発者の学習コスト",
+          "description": "チームメンバーがVitestの使い方を学ぶ必要がある",
+          "probability": "高",
+          "impact": "低",
+          "mitigation": "基本的なドキュメントを作成し、主な違いや注意点をまとめる。"
+        },
+        {
+          "risk": "スナップショットテストの違い",
+          "description": "スナップショットの形式や保存場所の違いによる問題",
+          "probability": "低",
+          "impact": "低",
+          "mitigation": "スナップショットを使用するテストを特定し、必要に応じて再生成。"
+        }
+      ]
+    },
+    "checkpoints_and_validations": [
+      {
+        "checkpoint": "初期環境設定完了",
+        "validation_criteria": [
+          "Vitestパッケージが正しくインストールされている",
+          "基本的なvitest.workspace.ts設定が機能する",
+          "単純なテストが実行できる"
+        ]
+      },
+      {
+        "checkpoint": "MCPユニットテスト移行",
+        "validation_criteria": [
+          "すべてのユニットテストが正常に実行される",
+          "テスト実行時間がJestと同等以上",
+          "エラーメッセージが明確で理解しやすい"
+        ]
+      },
+      {
+        "checkpoint": "MCPパッケージ統合テスト移行",
+        "validation_criteria": [
+          "すべての統合テストが正常に実行される",
+          "テスト環境が正しく設定されている",
+          "DIコンテナなどの特殊な設定が機能している"
+        ]
+      },
+      {
+        "checkpoint": "Schemasパッケージ移行",
+        "validation_criteria": [
+          "Schemasパッケージのすべてのテストが正常に実行される",
+          "型定義の検証が正しく機能している"
+        ]
+      },
+      {
+        "checkpoint": "全体テストとクリーンアップ",
+        "validation_criteria": [
+          "ルートディレクトリからの一括テスト実行が成功する",
+          "Jest依存関係がすべて削除されている",
+          "不要な設定ファイルがクリーンアップされている",
+          "テスト実行時間がJestと比較して改善されている"
+        ]
+      }
+    ],
+    "team_involvement": {
+      "developers": {
+        "responsibilities": [
+          "実装作業の実行",
+          "テスト実行と検証",
+          "問題の特定と修正"
+        ],
+        "estimated_effort": "15-20時間"
+      },
+      "reviewers": {
+        "responsibilities": [
+          "設定変更のレビュー",
+          "実装アプローチの確認",
+          "最終成果物の検証"
+        ],
+        "estimated_effort": "3-5時間"
+      },
+      "project_manager": {
+        "responsibilities": [
+          "進捗管理",
+          "リスク管理",
+          "ステークホルダーへの報告"
+        ],
+        "estimated_effort": "2-3時間"
+      }
+    },
+    "knowledge_transfer": {
+      "documentation": [
+        {
+          "document": "Vitest移行ガイド",
+          "audience": "開発者",
+          "content_outline": [
+            "移行の背景と目的",
+            "Vitestの基本概念",
+            "JestとVitestの主な違い",
+            "テスト実行方法",
+            "よくある問題と解決策"
+          ]
+        },
+        {
+          "document": "CI/CD設定ガイド",
+          "audience": "DevOps担当者",
+          "content_outline": [
+            "CI環境でのVitest実行方法",
+            "必要な環境変数と設定",
+            "パフォーマンス最適化のヒント"
+          ]
+        }
+      ],
+      "training": [
+        {
+          "session": "Vitest入門",
+          "duration": "30分",
+          "topics": [
+            "Vitestの基本機能",
+            "JestからVitestへの移行のポイント",
+            "デモンストレーション"
+          ]
+        }
+      ]
+    },
+    "implementation_success_criteria": {
+      "functional_criteria": [
+        "すべてのテストが正常に実行される",
+        "テストカバレッジが維持または向上する",
+        "CI/CDパイプラインが正常に動作する"
+      ],
+      "performance_criteria": [
+        "テスト実行時間がJestと比較して少なくとも20%改善する",
+        "ウォッチモードの再実行が迅速に行われる",
+        "メモリ使用量が適切である"
+      ],
+      "maintenance_criteria": [
+        "設定ファイルがシンプルで理解しやすい",
+        "実験的フラグや複雑な設定が排除されている",
+        "ESM関連の問題が解消されている"
+      ]
+    }
+  }
+}

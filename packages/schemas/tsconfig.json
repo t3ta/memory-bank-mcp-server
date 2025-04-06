@@ -3,12 +3,12 @@
     "composite": true, // Add composite flag for project references
     "target": "ES2022",
     "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "NodeNext", // Bundler から NodeNext に戻す
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "./src", // rootDir を追加！
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -32,6 +32,6 @@
   "exclude": [
     "node_modules",
     "dist",
-    "**/*.test.ts"
+    // "**/*.test.ts" // テストファイルを除外しないようにコメントアウト
   ]
 }

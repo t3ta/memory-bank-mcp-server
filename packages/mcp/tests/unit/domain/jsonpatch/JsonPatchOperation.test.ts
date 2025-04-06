@@ -1,4 +1,4 @@
-import { JsonPatchOperation, type JsonPatchOperationType } from '../../../../src/domain/jsonpatch/JsonPatchOperation'; // JsonPatchOperationType をインポート
+import { JsonPatchOperation, type JsonPatchOperationType } from '../../../../src/domain/jsonpatch/JsonPatchOperation.js'; // .js 追加 (再確認)
 // import { DomainError, DomainErrorCodes } from '../../../../src/shared/errors/DomainError'; // 必要に応じてコメント解除
 
 describe('JsonPatchOperation', () => {

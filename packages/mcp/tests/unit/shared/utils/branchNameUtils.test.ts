@@ -1,4 +1,4 @@
-import { toSafeBranchName, isValidBranchName } from '../../../../src/shared/utils/branchNameUtils';
+import { toSafeBranchName, isValidBranchName } from '../../../../src/shared/utils/branchNameUtils.js'; // .js 追加
 
 describe('branchNameUtils', () => {
   describe('toSafeBranchName', () => {

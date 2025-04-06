@@ -1,10 +1,10 @@
-import { z } from 'zod';
-import { JsonDocumentV2Schema, type JsonDocumentV2 } from '../../src/v2/document-union';
-import { SCHEMA_VERSION } from '../../src/v2/json-document'; // Import SCHEMA_VERSION
+// import { z } from 'zod'; // 未使用なので削除
+import { JsonDocumentV2Schema } from '../../../src/v2/document-union.js'; // 相対パスを修正
+import { SCHEMA_VERSION } from '../../../src/v2/json-document.js'; // 相対パスを修正
 
 // Helper function to create minimal valid metadata (documentType removed)
 const createMinimalMetadata = (docType: string, path: string) => ({
-  id: `test-${docType}-id`,
+  id: '123e4567-e89b-12d3-a456-426614174000', // 固定のUUIDに変更
   title: `Test ${docType}`,
   // documentType is now at the top level of the document object
   path: path,
@@ -21,16 +21,11 @@ describe('JsonDocumentV2Schema (Discriminated Union)', () => {
     // Define the object structure matching the schema
     const validBranchContext = {
       schema: SCHEMA_VERSION,
-      documentType: 'branch_context' as const, // Add documentType at top level
-      metadata: createMinimalMetadata('branch_context', 'branchContext.json'),
-      content: {
-        // branchName is not part of BranchContextContentV2Schema, removed
+      documentType: 'branch_context' as const,
+      metadata: createMinimalMetadata('branch_context', 'branchContext.json'), // metadata はそのまま
+      content: { // content はそのまま
         purpose: 'Test purpose',
-        // createdAt is not part of BranchContextContentV2Schema, removed
         userStories: [],
-        // additionalNotes is not part of BranchContextContentV2Schema, removed
-        // additionalNotes: '',
-        // background is optional
       },
     };
     // Let Zod infer the type for validation, or use the specific type if needed
@@ -49,9 +44,9 @@ describe('JsonDocumentV2Schema (Discriminated Union)', () => {
   it('should successfully parse a valid ActiveContext document', () => {
     const validActiveContext = {
       schema: SCHEMA_VERSION,
-      documentType: 'active_context' as const, // Add documentType at top level
-      metadata: createMinimalMetadata('active_context', 'activeContext.json'),
-      content: {
+      documentType: 'active_context' as const,
+      metadata: createMinimalMetadata('active_context', 'activeContext.json'), // metadata はそのまま
+      content: { // content はそのまま
         currentWork: 'Testing active context',
         recentChanges: [],
         activeDecisions: [],
@@ -72,9 +67,9 @@ describe('JsonDocumentV2Schema (Discriminated Union)', () => {
   it('should successfully parse a valid Progress document', () => {
     const validProgress = {
       schema: SCHEMA_VERSION,
-      documentType: 'progress' as const, // Add documentType at top level
-      metadata: createMinimalMetadata('progress', 'progress.json'),
-      content: {
+      documentType: 'progress' as const,
+      metadata: createMinimalMetadata('progress', 'progress.json'), // metadata はそのまま
+      content: { // content はそのまま
         workingFeatures: [],
         pendingImplementation: [],
         status: 'In progress',
@@ -95,9 +90,9 @@ describe('JsonDocumentV2Schema (Discriminated Union)', () => {
   it('should successfully parse a valid SystemPatterns document', () => {
     const validSystemPatterns = {
       schema: SCHEMA_VERSION,
-      documentType: 'system_patterns' as const, // Add documentType at top level
-      metadata: createMinimalMetadata('system_patterns', 'systemPatterns.json'),
-      content: {
+      documentType: 'system_patterns' as const,
+      metadata: createMinimalMetadata('system_patterns', 'systemPatterns.json'), // metadata はそのまま
+      content: { // content はそのまま
         technicalDecisions: [],
         implementationPatterns: [],
       },
@@ -151,7 +146,7 @@ describe('JsonDocumentV2Schema (Discriminated Union)', () => {
     expect(result.success).toBe(false);
     // Expect errors related to missing 'metadata'
     // documentType check might pass initially if provided at top level, but metadata is still required by the base schema
-    expect(result.error?.errors.some(e => e.path.includes('metadata'))).toBe(true);
+    expect(result.error?.errors.some((e: any) => e.path.includes('metadata'))).toBe(true); // e に any 型を指定
   });
 
    it('should fail parsing if required content fields are missing', () => {
@@ -169,7 +164,7 @@ describe('JsonDocumentV2Schema (Discriminated Union)', () => {
     const result = JsonDocumentV2Schema.safeParse(missingContentField);
     expect(result.success).toBe(false);
     // Expect error related to missing 'purpose' in content
-    expect(result.error?.errors.some(e => e.path.includes('content') && e.path.includes('purpose'))).toBe(true);
+    expect(result.error?.errors.some((e: any) => e.path.includes('content') && e.path.includes('purpose'))).toBe(true); // e に any 型を指定
   });
 
   it('should fail parsing if documentType is not one of the discriminated union keys', () => {
@@ -182,7 +177,7 @@ describe('JsonDocumentV2Schema (Discriminated Union)', () => {
     const result = JsonDocumentV2Schema.safeParse(unknownDocType);
     expect(result.success).toBe(false);
     // Zod error for discriminated union should mention the discriminator key ('documentType')
-    expect(result.error?.errors.some(e => e.message.includes('Invalid discriminator value'))).toBe(true);
+    expect(result.error?.errors.some((e: any) => e.message.includes('Invalid discriminator value'))).toBe(true); // e に any 型を指定
   });
 
    it('should fail parsing if documentType is missing at top level', () => {
@@ -202,7 +197,7 @@ describe('JsonDocumentV2Schema (Discriminated Union)', () => {
     const result = JsonDocumentV2Schema.safeParse(missingDocType as any); // Cast needed
     expect(result.success).toBe(false);
     // Expect error related to missing 'documentType' at the top level
-    expect(result.error?.errors.some(e => e.path.includes('documentType'))).toBe(true);
+    expect(result.error?.errors.some((e: any) => e.path.includes('documentType'))).toBe(true); // e に any 型を指定
   });
 
   it('should fail parsing if schema version is incorrect', () => {
@@ -218,7 +213,7 @@ describe('JsonDocumentV2Schema (Discriminated Union)', () => {
     };
     const result = JsonDocumentV2Schema.safeParse(wrongSchema);
     expect(result.success).toBe(false);
-    expect(result.error?.errors.some(e => e.path.includes('schema'))).toBe(true);
+    expect(result.error?.errors.some((e: any) => e.path.includes('schema'))).toBe(true); // e に any 型を指定
   });
 
   it('should fail parsing plain objects without required structure', () => {

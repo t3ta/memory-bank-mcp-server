@@ -1,20 +1,23 @@
-import type { IConfigProvider } from '../../../../../src/infrastructure/config/interfaces/IConfigProvider';
-import type { WorkspaceConfig, CliOptions } from '../../../../../src/infrastructure/config/WorkspaceConfig';
+import { vi } from 'vitest'; // vi をインポート
+import type { Mock } from 'vitest'; // Mock 型をインポート
+import type { IConfigProvider } from '../../../../../src/infrastructure/config/interfaces/IConfigProvider.js'; // .js 追加
+import type { WorkspaceConfig, CliOptions } from '../../../../../src/infrastructure/config/WorkspaceConfig.js'; // .js 追加
 import type { Language } from '@memory-bank/schemas';
 
 // IConfigProvider のモック実装を作成
-const mockConfigProvider: jest.Mocked<IConfigProvider> = {
-  initialize: jest.fn(),
-  getConfig: jest.fn(),
-  getGlobalMemoryPath: jest.fn(),
-  getBranchMemoryPath: jest.fn(),
-  getLanguage: jest.fn(),
+// jest.Mocked を削除し、手動モックの型を指定
+const mockConfigProvider: IConfigProvider = {
+  initialize: vi.fn(), // jest -> vi
+  getConfig: vi.fn(), // jest -> vi
+  getGlobalMemoryPath: vi.fn(), // jest -> vi
+  getBranchMemoryPath: vi.fn(), // jest -> vi
+  getLanguage: vi.fn(), // jest -> vi
 };
 
 describe('IConfigProvider Interface', () => {
   beforeEach(() => {
     // 各テストの前にモックをリセット
-    jest.clearAllMocks();
+    vi.clearAllMocks(); // jest -> vi
   });
 
   it('should define the initialize method', async () => {
@@ -28,7 +31,7 @@ describe('IConfigProvider Interface', () => {
       isProjectMode: true,
       // workspace プロパティは WorkspaceConfig にないので削除
     };
-    mockConfigProvider.initialize.mockResolvedValue(expectedConfig);
+    (mockConfigProvider.initialize as Mock).mockResolvedValue(expectedConfig); // as Mock 追加
 
     const config = await mockConfigProvider.initialize(options);
     expect(mockConfigProvider.initialize).toHaveBeenCalledWith(options);
@@ -46,7 +49,7 @@ describe('IConfigProvider Interface', () => {
       language: 'en',
       isProjectMode: true,
     }; // ここで expectedConfig を閉じる
-    mockConfigProvider.getConfig.mockReturnValue(expectedConfig);
+    (mockConfigProvider.getConfig as Mock).mockReturnValue(expectedConfig); // as Mock 追加
 
     const config = mockConfigProvider.getConfig();
     expect(mockConfigProvider.getConfig).toHaveBeenCalled();
@@ -56,7 +59,7 @@ describe('IConfigProvider Interface', () => {
 
   it('should define the getGlobalMemoryPath method', () => {
     const expectedPath = '/path/to/docs/global-memory-bank';
-    mockConfigProvider.getGlobalMemoryPath.mockReturnValue(expectedPath);
+    (mockConfigProvider.getGlobalMemoryPath as Mock).mockReturnValue(expectedPath); // as Mock 追加
 
     const path = mockConfigProvider.getGlobalMemoryPath();
     expect(mockConfigProvider.getGlobalMemoryPath).toHaveBeenCalled();
@@ -66,7 +69,7 @@ describe('IConfigProvider Interface', () => {
   it('should define the getBranchMemoryPath method', () => {
     const branchName = 'feature/new-stuff';
     const expectedPath = `/path/to/docs/branch-memory-bank/${branchName}`;
-    mockConfigProvider.getBranchMemoryPath.mockReturnValue(expectedPath);
+    (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(expectedPath); // as Mock 追加
 
     const path = mockConfigProvider.getBranchMemoryPath(branchName);
     expect(mockConfigProvider.getBranchMemoryPath).toHaveBeenCalledWith(branchName);
@@ -75,7 +78,7 @@ describe('IConfigProvider Interface', () => {
 
   it('should define the getLanguage method', () => {
     const expectedLang: Language = 'ja';
-    mockConfigProvider.getLanguage.mockReturnValue(expectedLang);
+    (mockConfigProvider.getLanguage as Mock).mockReturnValue(expectedLang); // as Mock 追加
 
     const lang = mockConfigProvider.getLanguage();
     expect(mockConfigProvider.getLanguage).toHaveBeenCalled();

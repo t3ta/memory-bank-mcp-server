@@ -1,17 +1,20 @@
+import { vi } from 'vitest'; // vi をインポート
+import type { Mock } from 'vitest'; // Mock 型をインポート
 import { UpdateTagIndexUseCaseV2 } from '../../../../../src/application/usecases/common/UpdateTagIndexUseCaseV2.js';
 import { IBranchMemoryBankRepository } from '../../../../../src/domain/repositories/IBranchMemoryBankRepository.js';
 import { IGlobalMemoryBankRepository } from '../../../../../src/domain/repositories/IGlobalMemoryBankRepository.js';
-import { mock } from 'jest-mock-extended';
+// import { mock } from 'jest-mock-extended'; // jest-mock-extended を削除
 import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo.js';
 import { DocumentPath } from '../../../../../src/domain/entities/DocumentPath.js';
 import { MemoryDocument } from '../../../../../src/domain/entities/MemoryDocument.js';
 import { Tag } from '../../../../../src/domain/entities/Tag.js';
-import { BranchTagIndex, GlobalTagIndex } from '@memory-bank/schemas'; // Import index types
+import { BranchTagIndex, GlobalTagIndex, TagEntry } from '@memory-bank/schemas'; // Import index types and TagEntry
 
 describe('UpdateTagIndexUseCaseV2', () => {
   let useCase: UpdateTagIndexUseCaseV2;
-  let mockBranchRepo: jest.Mocked<IBranchMemoryBankRepository>;
-  let mockGlobalRepo: jest.Mocked<IGlobalMemoryBankRepository>;
+  // jest.Mocked を削除し、手動モックの型を指定
+  let mockBranchRepo: IBranchMemoryBankRepository;
+  let mockGlobalRepo: IGlobalMemoryBankRepository;
   // let mockTagIndexRepo: jest.Mocked<any>; // 必要に応じて追加
 
   const branchName = 'feature/index-test-v2';
@@ -23,21 +26,47 @@ describe('UpdateTagIndexUseCaseV2', () => {
   const mockDoc2 = MemoryDocument.create({ path: mockDoc2Path, content: 'content', tags: [Tag.create('tagy'), Tag.create('tagz')], lastModified: new Date() }); // tagY -> tagy, tagZ -> tagz
 
   beforeEach(() => {
-    mockBranchRepo = mock<IBranchMemoryBankRepository>();
-    mockGlobalRepo = mock<IGlobalMemoryBankRepository>();
+    // jest-mock-extended の代わりに vi.fn() で手動モックを作成する
+    mockBranchRepo = {
+      initialize: vi.fn(),
+      exists: vi.fn(),
+      getDocument: vi.fn(),
+      saveDocument: vi.fn(),
+      deleteDocument: vi.fn(),
+      getRecentBranches: vi.fn(),
+      listDocuments: vi.fn(),
+      findDocumentsByTags: vi.fn(),
+      validateStructure: vi.fn(),
+      saveTagIndex: vi.fn(),
+      getTagIndex: vi.fn(),
+      findDocumentPathsByTagsUsingIndex: vi.fn(),
+    };
+    mockGlobalRepo = {
+      initialize: vi.fn(),
+      getDocument: vi.fn(),
+      saveDocument: vi.fn(),
+      deleteDocument: vi.fn(),
+      listDocuments: vi.fn(),
+      findDocumentsByTags: vi.fn(),
+      validateStructure: vi.fn(),
+      saveTagIndex: vi.fn(),
+      getTagIndex: vi.fn(),
+      findDocumentPathsByTagsUsingIndex: vi.fn(),
+      updateTagsIndex: vi.fn(),
+    };
     // mockTagIndexRepo = mock<any>();
     // useCase = new UpdateTagIndexUseCaseV2(mockGlobalRepo, mockBranchRepo, mockTagIndexRepo);
     useCase = new UpdateTagIndexUseCaseV2(mockGlobalRepo, mockBranchRepo); // まずは tagIndexRepo なしでテスト
-    jest.clearAllMocks();
+    vi.clearAllMocks(); // jest -> vi
   });
 
   describe('Branch Scope', () => {
     it('should build and save branch tag index correctly when no existing index', async () => {
       // Arrange
-      mockBranchRepo.exists.mockResolvedValue(true);
-      mockBranchRepo.getTagIndex.mockResolvedValue(null); // 既存インデックスなし
-      mockBranchRepo.listDocuments.mockResolvedValue([mockDoc1Path, mockDoc2Path]);
-      mockBranchRepo.getDocument.mockImplementation(async (argBranchInfo, argPath) => {
+      (mockBranchRepo.exists as Mock).mockResolvedValue(true); // as Mock 追加
+      (mockBranchRepo.getTagIndex as Mock).mockResolvedValue(null); // as Mock 追加
+      (mockBranchRepo.listDocuments as Mock).mockResolvedValue([mockDoc1Path, mockDoc2Path]); // as Mock 追加
+      (mockBranchRepo.getDocument as Mock).mockImplementation(async (_argBranchInfo, argPath) => { // as Mock 追加
         if (argPath.equals(mockDoc1Path)) return mockDoc1;
         if (argPath.equals(mockDoc2Path)) return mockDoc2;
         return null;
@@ -54,7 +83,7 @@ describe('UpdateTagIndexUseCaseV2', () => {
       expect(mockBranchRepo.saveTagIndex).toHaveBeenCalledTimes(1);
 
       // Verify the saved index content
-      const savedIndex: BranchTagIndex = mockBranchRepo.saveTagIndex.mock.calls[0][1];
+      const savedIndex: BranchTagIndex = (mockBranchRepo.saveTagIndex as Mock).mock.calls[0][1]; // as Mock 追加
       expect(savedIndex.schema).toBe('tag_index_v1');
       expect(savedIndex.metadata.indexType).toBe('branch');
       expect(savedIndex.metadata.branchName).toBe(branchName);
@@ -65,9 +94,9 @@ describe('UpdateTagIndexUseCaseV2', () => {
         expect.objectContaining({ tag: 'tagy', documents: expect.arrayContaining([expect.objectContaining({ path: mockDoc1Path.value }), expect.objectContaining({ path: mockDoc2Path.value })]) }),
         expect.objectContaining({ tag: 'tagz', documents: expect.arrayContaining([expect.objectContaining({ path: mockDoc2Path.value })]) }),
       ]));
-      expect(savedIndex.index.find(i => i.tag === 'tagx')?.documents).toHaveLength(1);
-      expect(savedIndex.index.find(i => i.tag === 'tagy')?.documents).toHaveLength(2);
-      expect(savedIndex.index.find(i => i.tag === 'tagz')?.documents).toHaveLength(1);
+      expect(savedIndex.index.find((i: TagEntry) => i.tag === 'tagx')?.documents).toHaveLength(1);
+      expect(savedIndex.index.find((i: TagEntry) => i.tag === 'tagy')?.documents).toHaveLength(2);
+      expect(savedIndex.index.find((i: TagEntry) => i.tag === 'tagz')?.documents).toHaveLength(1);
 
 
       // Verify the output
@@ -80,8 +109,8 @@ describe('UpdateTagIndexUseCaseV2', () => {
 
     it('should not call getTagIndex when fullRebuild is true', async () => {
        // Arrange
-      mockBranchRepo.exists.mockResolvedValue(true);
-      mockBranchRepo.listDocuments.mockResolvedValue([]); // ドキュメントは空でもOK
+      (mockBranchRepo.exists as Mock).mockResolvedValue(true); // as Mock 追加
+      (mockBranchRepo.listDocuments as Mock).mockResolvedValue([]); // as Mock 追加
 
       // Act
       await useCase.execute({ branchName, fullRebuild: true });
@@ -93,7 +122,7 @@ describe('UpdateTagIndexUseCaseV2', () => {
 
      it('should throw error if branch does not exist', async () => {
       // Arrange
-      mockBranchRepo.exists.mockResolvedValue(false);
+      (mockBranchRepo.exists as Mock).mockResolvedValue(false); // as Mock 追加
 
       // Act & Assert
       // エラーメッセージが期待通りか直接チェックする
@@ -109,9 +138,9 @@ describe('UpdateTagIndexUseCaseV2', () => {
       // Arrange
       const mockGlobalPath = DocumentPath.create('global/doc-g.json');
       const mockGlobalDoc = MemoryDocument.create({ path: mockGlobalPath, content: '{}', tags: [Tag.create('globala')], lastModified: new Date() }); // globalA -> globala
-      mockGlobalRepo.getTagIndex.mockResolvedValue(null);
-      mockGlobalRepo.listDocuments.mockResolvedValue([mockGlobalPath]);
-      mockGlobalRepo.getDocument.mockResolvedValue(mockGlobalDoc);
+      (mockGlobalRepo.getTagIndex as Mock).mockResolvedValue(null); // as Mock 追加
+      (mockGlobalRepo.listDocuments as Mock).mockResolvedValue([mockGlobalPath]); // as Mock 追加
+      (mockGlobalRepo.getDocument as Mock).mockResolvedValue(mockGlobalDoc); // as Mock 追加
 
       // Act
       const result = await useCase.execute({}); // グローバルスコープ
@@ -123,7 +152,7 @@ describe('UpdateTagIndexUseCaseV2', () => {
       expect(mockGlobalRepo.saveTagIndex).toHaveBeenCalledTimes(1);
 
        // Verify the saved index content
-      const savedIndex: GlobalTagIndex = mockGlobalRepo.saveTagIndex.mock.calls[0][0];
+      const savedIndex: GlobalTagIndex = (mockGlobalRepo.saveTagIndex as Mock).mock.calls[0][0]; // as Mock 追加
       expect(savedIndex.schema).toBe('tag_index_v1');
       expect(savedIndex.metadata.indexType).toBe('global');
       expect(savedIndex.metadata.documentCount).toBe(1);

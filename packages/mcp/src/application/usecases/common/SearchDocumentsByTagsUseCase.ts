@@ -6,7 +6,7 @@ type TagsIndex = any;
 type DocumentsMetaIndex = any;
 type SearchResultItem = any;
 type SearchResults = any;
-import type { IFileSystemService } from '@/infrastructure/storage/interfaces/IFileSystemService.js';
+import type { IFileSystemService } from '../../../infrastructure/storage/interfaces/IFileSystemService.js';
 import type { IUseCase } from "../../interfaces/IUseCase.js";
 import path from 'path';
 

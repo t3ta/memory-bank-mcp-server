@@ -1,5 +1,5 @@
 import { ReadRulesUseCase } from '../../../../../src/application/usecases/common/ReadRulesUseCase.js';
-import { DomainError, DomainErrorCodes } from '../../../../../src/shared/errors/DomainError.js'; // DomainError もインポート
+import { DomainError } from '../../../../../src/shared/errors/DomainError.js'; // DomainError もインポート
 import fs from 'fs/promises';
 import path from 'path';
 import tmp from 'tmp-promise'; // tmp-promise をインポート

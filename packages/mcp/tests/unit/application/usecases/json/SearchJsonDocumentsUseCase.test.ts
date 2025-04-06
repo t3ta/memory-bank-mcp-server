@@ -1,42 +1,47 @@
-import { SearchJsonDocumentsUseCase, SearchJsonDocumentsInput, SearchJsonDocumentsOutput } from '../../../../../src/application/usecases/json/SearchJsonDocumentsUseCase';
-import { IJsonDocumentRepository } from '../../../../../src/domain/repositories/IJsonDocumentRepository';
-import { JsonDocument, DocumentType } from '../../../../../src/domain/entities/JsonDocument';
-import { DocumentPath } from '../../../../../src/domain/entities/DocumentPath';
-import { DocumentId } from '../../../../../src/domain/entities/DocumentId';
-import { Tag } from '../../../../../src/domain/entities/Tag';
-import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo';
-import { DocumentVersionInfo } from '../../../../../src/domain/entities/DocumentVersionInfo';
-import { IDocumentValidator } from '../../../../../src/domain/validation/IDocumentValidator';
-import { jest } from '@jest/globals';
+import { vi } from 'vitest'; // vi をインポート
+import type { Mock } from 'vitest'; // Mock 型をインポート
+import { SearchJsonDocumentsUseCase, SearchJsonDocumentsInput } from '../../../../../src/application/usecases/json/SearchJsonDocumentsUseCase.js'; // 未使用の SearchJsonDocumentsOutput を削除
+import { IJsonDocumentRepository } from '../../../../../src/domain/repositories/IJsonDocumentRepository.js'; // .js 追加
+import { JsonDocument, DocumentType } from '../../../../../src/domain/entities/JsonDocument.js'; // .js 追加
+import { DocumentPath } from '../../../../../src/domain/entities/DocumentPath.js'; // .js 追加
+import { DocumentId } from '../../../../../src/domain/entities/DocumentId.js'; // .js 追加
+import { Tag } from '../../../../../src/domain/entities/Tag.js'; // .js 追加
+import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo.js'; // .js 追加
+import { DocumentVersionInfo } from '../../../../../src/domain/entities/DocumentVersionInfo.js'; // .js 追加
+import { IDocumentValidator } from '../../../../../src/domain/validation/IDocumentValidator.js'; // .js 追加
+// import { jest } from '@jest/globals'; // jest インポート削除
 
 // Mocks
-const mockJsonDocumentRepository: jest.Mocked<IJsonDocumentRepository> = {
-  findById: jest.fn<() => Promise<JsonDocument | null>>(),
-  findByPath: jest.fn<() => Promise<JsonDocument | null>>(),
-  findByTags: jest.fn<() => Promise<JsonDocument[]>>(), // This will be used
-  findByType: jest.fn<() => Promise<JsonDocument[]>>(),
-  save: jest.fn<() => Promise<JsonDocument>>(),
-  delete: jest.fn<() => Promise<boolean>>(),
-  listAll: jest.fn<() => Promise<JsonDocument[]>>(),
-  exists: jest.fn<() => Promise<boolean>>(),
+// jest.Mocked を削除し、手動モックの型を指定
+const mockJsonDocumentRepository: IJsonDocumentRepository = {
+  findById: vi.fn(), // jest -> vi, 型引数削除
+  findByPath: vi.fn(), // jest -> vi, 型引数削除
+  findByTags: vi.fn(), // jest -> vi, 型引数削除
+  findByType: vi.fn(), // jest -> vi, 型引数削除
+  save: vi.fn(), // jest -> vi, 型引数削除
+  delete: vi.fn(), // jest -> vi, 型引数削除
+  listAll: vi.fn(), // jest -> vi, 型引数削除
+  exists: vi.fn(), // jest -> vi, 型引数削除
 };
 
-const mockGlobalRepository: jest.Mocked<IJsonDocumentRepository> = {
-  findById: jest.fn<() => Promise<JsonDocument | null>>(),
-  findByPath: jest.fn<() => Promise<JsonDocument | null>>(),
-  findByTags: jest.fn<() => Promise<JsonDocument[]>>(), // This will be used
-  findByType: jest.fn<() => Promise<JsonDocument[]>>(),
-  save: jest.fn<() => Promise<JsonDocument>>(),
-  delete: jest.fn<() => Promise<boolean>>(),
-  listAll: jest.fn<() => Promise<JsonDocument[]>>(),
-  exists: jest.fn<() => Promise<boolean>>(),
+// jest.Mocked を削除し、手動モックの型を指定
+const mockGlobalRepository: IJsonDocumentRepository = {
+  findById: vi.fn(), // jest -> vi, 型引数削除
+  findByPath: vi.fn(), // jest -> vi, 型引数削除
+  findByTags: vi.fn(), // jest -> vi, 型引数削除
+  findByType: vi.fn(), // jest -> vi, 型引数削除
+  save: vi.fn(), // jest -> vi, 型引数削除
+  delete: vi.fn(), // jest -> vi, 型引数削除
+  listAll: vi.fn(), // jest -> vi, 型引数削除
+  exists: vi.fn(), // jest -> vi, 型引数削除
 };
 
 // Mock validator (needed for JsonDocument creation in mocks)
-const mockValidator: jest.Mocked<IDocumentValidator> = {
-  validateContent: jest.fn<(documentType: string, content: Record<string, unknown>) => boolean>().mockReturnValue(true),
-  validateDocument: jest.fn<(document: unknown) => boolean>().mockReturnValue(true),
-  validateMetadata: jest.fn<(metadata: Record<string, unknown>) => boolean>().mockReturnValue(true),
+// jest.Mocked を削除し、手動モックの型を指定
+const mockValidator: IDocumentValidator = {
+  validateContent: vi.fn().mockReturnValue(true), // jest -> vi, 型引数削除
+  validateDocument: vi.fn().mockReturnValue(true), // jest -> vi, 型引数削除
+  validateMetadata: vi.fn().mockReturnValue(true), // jest -> vi, 型引数削除
 };
 
 // Helper to create a mock JsonDocument
@@ -62,7 +67,7 @@ describe('SearchJsonDocumentsUseCase', () => {
   let useCaseWithGlobal: SearchJsonDocumentsUseCase;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks(); // jest -> vi
     JsonDocument.setValidator(mockValidator); // Set validator for JsonDocument creation
     useCase = new SearchJsonDocumentsUseCase(mockJsonDocumentRepository);
     useCaseWithGlobal = new SearchJsonDocumentsUseCase(mockJsonDocumentRepository, mockGlobalRepository);
@@ -81,14 +86,14 @@ describe('SearchJsonDocumentsUseCase', () => {
     const expectedSearchTags = searchTags.map(t => Tag.create(t));
 
     // Mock branch existence check
-    mockJsonDocumentRepository.exists.mockResolvedValue(true);
+    (mockJsonDocumentRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
     // Mock repository findByTags to return matching documents (use valid tags)
     const mockDoc1 = createMockJsonDocument('path/doc1.json', ['search-tag', 'other']);
     const mockDoc2 = createMockJsonDocument('path/doc2.json', ['search-tag']);
     // Add createdAt manually for the mapping step
     (mockDoc1 as any).createdAt = new Date();
     (mockDoc2 as any).createdAt = new Date();
-    mockJsonDocumentRepository.findByTags.mockResolvedValue([mockDoc1, mockDoc2]);
+    (mockJsonDocumentRepository.findByTags as Mock).mockResolvedValue([mockDoc1, mockDoc2]); // as Mock 追加
 
     const result = await useCase.execute(input);
 
@@ -120,14 +125,14 @@ describe('SearchJsonDocumentsUseCase', () => {
     const expectedSearchTags = searchTags.map(t => Tag.create(t));
 
     // Mock branch existence check
-    mockJsonDocumentRepository.exists.mockResolvedValue(true);
+    (mockJsonDocumentRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
     // Mock repository findByTags (use valid tags)
     const mockDoc1 = createMockJsonDocument('path/and.json', ['taga', 'tagb', 'tagc']);
     // Add createdAt manually for the mapping step
     (mockDoc1 as any).createdAt = new Date();
     // This one shouldn't match (no need for createdAt as it won't be returned/mapped)
     // const mockDoc2 = createMockJsonDocument('path/or.json', ['taga']);
-    mockJsonDocumentRepository.findByTags.mockResolvedValue([mockDoc1]); // Assume repo handles filtering
+    (mockJsonDocumentRepository.findByTags as Mock).mockResolvedValue([mockDoc1]); // as Mock 追加
 
     const result = await useCase.execute(input);
 
@@ -160,7 +165,7 @@ describe('SearchJsonDocumentsUseCase', () => {
     const mockDocGlobal = createMockJsonDocument('core/global.json', ['global-tag']);
     // Add createdAt manually to the mock object for the mapping step in the use case
     (mockDocGlobal as any).createdAt = new Date();
-    mockGlobalRepository.findByTags.mockResolvedValue([mockDocGlobal]);
+    (mockGlobalRepository.findByTags as Mock).mockResolvedValue([mockDocGlobal]); // as Mock 追加
 
     // Use the useCase instance configured with the global repository
     const result = await useCaseWithGlobal.execute(input);
@@ -190,9 +195,9 @@ describe('SearchJsonDocumentsUseCase', () => {
     const expectedSearchTags = searchTags.map(t => Tag.create(t));
 
     // Mock branch existence check to return true
-    mockJsonDocumentRepository.exists.mockResolvedValue(true);
+    (mockJsonDocumentRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
     // Mock repository findByTags to return an empty array
-    mockJsonDocumentRepository.findByTags.mockResolvedValue([]);
+    (mockJsonDocumentRepository.findByTags as Mock).mockResolvedValue([]); // as Mock 追加
 
     const result = await useCase.execute(input);
 

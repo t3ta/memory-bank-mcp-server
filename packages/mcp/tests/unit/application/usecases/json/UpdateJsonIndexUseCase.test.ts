@@ -1,47 +1,52 @@
-import { UpdateJsonIndexUseCase, UpdateJsonIndexInput, UpdateJsonIndexOutput } from '../../../../../src/application/usecases/json/UpdateJsonIndexUseCase';
-import { IIndexService } from '../../../../../src/infrastructure/index/interfaces/IIndexService';
-import { IJsonDocumentRepository } from '../../../../../src/domain/repositories/IJsonDocumentRepository';
-import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo';
-import { JsonDocument } from '../../../../../src/domain/entities/JsonDocument';
-import { DocumentPath } from '../../../../../src/domain/entities/DocumentPath';
-import { DocumentId } from '../../../../../src/domain/entities/DocumentId';
-import { Tag } from '../../../../../src/domain/entities/Tag';
-import { DocumentVersionInfo } from '../../../../../src/domain/entities/DocumentVersionInfo';
-import { IDocumentValidator } from '../../../../../src/domain/validation/IDocumentValidator';
-import { jest } from '@jest/globals';
+import { vi } from 'vitest'; // vi をインポート
+import type { Mock } from 'vitest'; // Mock 型をインポート
+import { UpdateJsonIndexUseCase, UpdateJsonIndexInput } from '../../../../../src/application/usecases/json/UpdateJsonIndexUseCase.js'; // 未使用の UpdateJsonIndexOutput を削除
+import { IIndexService } from '../../../../../src/infrastructure/index/interfaces/IIndexService.js'; // .js 追加
+import { IJsonDocumentRepository } from '../../../../../src/domain/repositories/IJsonDocumentRepository.js'; // .js 追加
+import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo.js'; // .js 追加
+import { JsonDocument } from '../../../../../src/domain/entities/JsonDocument.js'; // .js 追加
+import { DocumentPath } from '../../../../../src/domain/entities/DocumentPath.js'; // .js 追加
+import { DocumentId } from '../../../../../src/domain/entities/DocumentId.js'; // .js 追加
+import { Tag } from '../../../../../src/domain/entities/Tag.js'; // .js 追加
+import { DocumentVersionInfo } from '../../../../../src/domain/entities/DocumentVersionInfo.js'; // .js 追加
+import { IDocumentValidator } from '../../../../../src/domain/validation/IDocumentValidator.js'; // .js 追加済み
+// import { jest } from '@jest/globals'; // jest インポート削除
 
 // Mocks
-const mockIndexService: jest.Mocked<IIndexService> = {
-  initializeIndex: jest.fn<() => Promise<void>>(),
-  buildIndex: jest.fn<() => Promise<void>>(), // This will be used
-  addToIndex: jest.fn<() => Promise<void>>(),
-  removeFromIndex: jest.fn<() => Promise<void>>(),
-  findById: jest.fn<() => Promise<any>>(),
-  findByPath: jest.fn<() => Promise<any>>(),
-  findByTags: jest.fn<() => Promise<any[]>>(),
-  findByType: jest.fn<() => Promise<any[]>>(),
-  listAll: jest.fn<() => Promise<any[]>>(), // This might be used if repo.listAll is called
-  saveIndex: jest.fn<() => Promise<void>>(), // This will be used
-  loadIndex: jest.fn<() => Promise<void>>(),
+// jest.Mocked を削除し、手動モックの型を指定
+const mockIndexService: IIndexService = {
+  initializeIndex: vi.fn(), // jest -> vi, 型引数削除
+  buildIndex: vi.fn(), // jest -> vi, 型引数削除
+  addToIndex: vi.fn(), // jest -> vi, 型引数削除
+  removeFromIndex: vi.fn(), // jest -> vi, 型引数削除
+  findById: vi.fn(), // jest -> vi, 型引数削除
+  findByPath: vi.fn(), // jest -> vi, 型引数削除
+  findByTags: vi.fn(), // jest -> vi, 型引数削除
+  findByType: vi.fn(), // jest -> vi, 型引数削除
+  listAll: vi.fn(), // jest -> vi, 型引数削除
+  saveIndex: vi.fn(), // jest -> vi, 型引数削除
+  loadIndex: vi.fn(), // jest -> vi, 型引数削除
 };
 
 // Mock Repository (needed to provide documents for indexing)
-const mockJsonDocumentRepository: jest.Mocked<IJsonDocumentRepository> = {
-  findById: jest.fn<() => Promise<JsonDocument | null>>(),
-  findByPath: jest.fn<() => Promise<JsonDocument | null>>(),
-  findByTags: jest.fn<() => Promise<JsonDocument[]>>(),
-  findByType: jest.fn<() => Promise<JsonDocument[]>>(),
-  save: jest.fn<() => Promise<JsonDocument>>(),
-  delete: jest.fn<() => Promise<boolean>>(),
-  listAll: jest.fn<() => Promise<JsonDocument[]>>(), // This will be used
-  exists: jest.fn<() => Promise<boolean>>(),
+// jest.Mocked を削除し、手動モックの型を指定
+const mockJsonDocumentRepository: IJsonDocumentRepository = {
+  findById: vi.fn(), // jest -> vi, 型引数削除
+  findByPath: vi.fn(), // jest -> vi, 型引数削除
+  findByTags: vi.fn(), // jest -> vi, 型引数削除
+  findByType: vi.fn(), // jest -> vi, 型引数削除
+  save: vi.fn(), // jest -> vi, 型引数削除
+  delete: vi.fn(), // jest -> vi, 型引数削除
+  listAll: vi.fn(), // jest -> vi, 型引数削除
+  exists: vi.fn(), // jest -> vi, 型引数削除
 };
 
 // Mock validator (needed for JsonDocument creation in mocks)
-const mockValidator: jest.Mocked<IDocumentValidator> = {
-  validateContent: jest.fn<(documentType: string, content: Record<string, unknown>) => boolean>().mockReturnValue(true),
-  validateDocument: jest.fn<(document: unknown) => boolean>().mockReturnValue(true),
-  validateMetadata: jest.fn<(metadata: Record<string, unknown>) => boolean>().mockReturnValue(true),
+// jest.Mocked を削除し、手動モックの型を指定
+const mockValidator: IDocumentValidator = {
+  validateContent: vi.fn().mockReturnValue(true), // jest -> vi, 型引数削除
+  validateDocument: vi.fn().mockReturnValue(true), // jest -> vi, 型引数削除
+  validateMetadata: vi.fn().mockReturnValue(true), // jest -> vi, 型引数削除
 };
 
 // Helper to create a mock JsonDocument
@@ -65,7 +70,7 @@ describe('UpdateJsonIndexUseCase', () => {
   // No need for useCaseWithGlobal as this use case doesn't seem to have separate global logic path
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks(); // jest -> vi
     JsonDocument.setValidator(mockValidator); // Set validator for JsonDocument creation
     useCase = new UpdateJsonIndexUseCase(mockJsonDocumentRepository, mockIndexService); // Correct argument order
   });
@@ -79,17 +84,17 @@ describe('UpdateJsonIndexUseCase', () => {
     const expectedBranchInfo = BranchInfo.create(branchName);
 
     // Mock branch existence check
-    mockJsonDocumentRepository.exists.mockResolvedValue(true);
+    (mockJsonDocumentRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
     // Mock repository listAll to return some documents
     const mockDocs = [
       createMockJsonDocument('doc1.json', ['tag1']),
       createMockJsonDocument('doc2.json', ['tag2', 'tag1']),
     ];
-    mockJsonDocumentRepository.listAll.mockResolvedValue(mockDocs);
+    (mockJsonDocumentRepository.listAll as Mock).mockResolvedValue(mockDocs); // as Mock 追加
 
     // Mock index service methods
-    mockIndexService.buildIndex.mockResolvedValue(undefined);
-    mockIndexService.saveIndex.mockResolvedValue(undefined);
+    (mockIndexService.buildIndex as Mock).mockResolvedValue(undefined); // as Mock 追加
+    (mockIndexService.saveIndex as Mock).mockResolvedValue(undefined); // as Mock 追加
 
     const result = await useCase.execute(input);
 
@@ -122,13 +127,13 @@ describe('UpdateJsonIndexUseCase', () => {
     const expectedBranchInfo = BranchInfo.create(branchName);
 
     // Mock branch existence check
-    mockJsonDocumentRepository.exists.mockResolvedValue(true);
+    (mockJsonDocumentRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
     // Mock repository listAll to return empty array
-    mockJsonDocumentRepository.listAll.mockResolvedValue([]);
+    (mockJsonDocumentRepository.listAll as Mock).mockResolvedValue([]); // as Mock 追加
 
     // Mock index service methods
-    mockIndexService.buildIndex.mockResolvedValue(undefined);
-    mockIndexService.saveIndex.mockResolvedValue(undefined);
+    (mockIndexService.buildIndex as Mock).mockResolvedValue(undefined); // as Mock 追加
+    (mockIndexService.saveIndex as Mock).mockResolvedValue(undefined); // as Mock 追加
 
     const result = await useCase.execute(input);
 
@@ -158,14 +163,14 @@ describe('UpdateJsonIndexUseCase', () => {
     const expectedBranchInfo = BranchInfo.create(branchName);
 
     // Mock branch existence check
-    mockJsonDocumentRepository.exists.mockResolvedValue(true);
+    (mockJsonDocumentRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
     // Mock repository listAll
     const mockDocs = [createMockJsonDocument('rebuild.json', ['rebuild-tag'])];
-    mockJsonDocumentRepository.listAll.mockResolvedValue(mockDocs);
+    (mockJsonDocumentRepository.listAll as Mock).mockResolvedValue(mockDocs); // as Mock 追加
 
     // Mock index service methods for rebuild
-    mockIndexService.buildIndex.mockResolvedValue(undefined);
-    // mockIndexService.saveIndex.mockResolvedValue(undefined); // Not called by use case
+    (mockIndexService.buildIndex as Mock).mockResolvedValue(undefined); // as Mock 追加
+    // (mockIndexService.saveIndex as Mock).mockResolvedValue(undefined); // Not called by use case
 
     const result = await useCase.execute(input);
 

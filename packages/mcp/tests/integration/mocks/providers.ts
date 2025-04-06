@@ -20,15 +20,15 @@ const MCPResponsePresenterMock = {
 /**
  * Setup DI container with mocked services
  */
-export async function setupContainer(options?: CliOptions): Promise<any> {
+export async function setupContainer(_options?: CliOptions): Promise<any> {
   const container = new DIContainer();
-  
+
   // Register mocked MCPResponsePresenter
   container.register('mcpResponsePresenter', MCPResponsePresenterMock);
-  
+
   // Setup minimal services required for tests
   // Controllers will be registered by actual test code
-  
+
   return container;
 }
 

@@ -1,17 +1,18 @@
-import { MemoryDocument, setDocumentLogger } from '../../../../src/domain/entities/MemoryDocument';
-import { DocumentPath } from '../../../../src/domain/entities/DocumentPath';
-import { Tag } from '../../../../src/domain/entities/Tag';
-import { DomainError, DomainErrorCodes } from '../../../../src/shared/errors/DomainError';
-import { IDocumentLogger } from '../../../../src/domain/logger/IDocumentLogger';
+import { vi } from 'vitest'; // vi をインポート
+import { MemoryDocument, setDocumentLogger } from '../../../../src/domain/entities/MemoryDocument.js'; // .js 追加
+import { DocumentPath } from '../../../../src/domain/entities/DocumentPath.js'; // .js 追加
+import { Tag } from '../../../../src/domain/entities/Tag.js'; // .js 追加
+// import { DomainError, DomainErrorCodes } from '../../../../src/shared/errors/DomainError.js'; // 未使用なので削除
+import { IDocumentLogger } from '../../../../src/domain/logger/IDocumentLogger.js'; // .js 追加
 import { JsonDocumentV2 } from '@memory-bank/schemas'; // スキーマ定義をインポート
-import { DocumentId } from '../../../../src/domain/entities/DocumentId'; // DocumentIdも使うかも
+import { DocumentId } from '../../../../src/domain/entities/DocumentId.js'; // .js 追加
 
 // モックロガー
 const mockLogger: IDocumentLogger = {
-  debug: jest.fn(),
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
+  debug: vi.fn(), // jest -> vi
+  info: vi.fn(), // jest -> vi
+  warn: vi.fn(), // jest -> vi
+  error: vi.fn(), // jest -> vi
 };
 
 describe('MemoryDocument', () => {
@@ -24,10 +25,12 @@ describe('MemoryDocument', () => {
 
   // Helper to create a valid JsonDocumentV2 object for testing fromJSON
   const createValidJsonDocV2 = (overrides: { metadata?: Partial<JsonDocumentV2['metadata']>, content?: any } = {}): JsonDocumentV2 => {
-    const baseMetadata: JsonDocumentV2['metadata'] = {
+    // JsonDocumentV2['metadata'] の型から documentType を除外する必要がある
+    // 一旦 any で回避するか、正確な型を定義する
+    const baseMetadata: Omit<JsonDocumentV2['metadata'], 'documentType'> & { documentType?: string } = { // documentType を削除し、オーバーライド用にオプショナルで追加
       id: DocumentId.generate().value,
       title: 'Test Title from JSON',
-      documentType: 'branch_context', // デフォルトを許可された型に変更
+      // documentType: 'branch_context', // ここから削除
       path: validPath.value,
       tags: validTags.map(t => t.value),
       createdAt: new Date().toISOString(),
@@ -38,7 +41,10 @@ describe('MemoryDocument', () => {
     const baseContent = overrides.content || { text: 'Content from JSON' }; // content 全体を上書き or デフォルト
 
     // documentType は metadata の override で上書きされる可能性があるため、ここで再取得
-    const finalDocumentType = baseMetadata.documentType;
+    // documentType は metadata からではなく、overrides.metadata またはデフォルト値から取得
+    // documentType は metadata からではなく、overrides.metadata またはデフォルト値から取得 -> metadata からは取得しない
+    // TODO: overrides のトップレベルから documentType を取得できるように修正する
+    const finalDocumentType = 'branch_context'; // 一旦デフォルト値に固定
 
     // JsonDocumentV2 は documentType によって必須プロパティが変わるため、型アサーションを使う
     // (より厳密にするなら、documentType ごとに分岐して型を組み立てる)
@@ -58,7 +64,7 @@ describe('MemoryDocument', () => {
 
   beforeEach(() => {
     // 各テストの前にモックの呼び出し履歴をリセット
-    jest.clearAllMocks();
+    vi.clearAllMocks(); // jest -> vi
   });
 
   describe('create', () => {

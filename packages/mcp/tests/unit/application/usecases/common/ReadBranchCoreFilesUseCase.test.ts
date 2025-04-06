@@ -1,6 +1,8 @@
+import { vi } from 'vitest'; // vi をインポート
+import type { Mock } from 'vitest'; // Mock 型をインポート
 import { ReadBranchCoreFilesUseCase } from '../../../../../src/application/usecases/common/ReadBranchCoreFilesUseCase.js';
 import { IBranchMemoryBankRepository } from '../../../../../src/domain/repositories/IBranchMemoryBankRepository.js';
-import { mock } from 'jest-mock-extended';
+// import { mock } from 'jest-mock-extended'; // jest-mock-extended を削除
 import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo.js';
 import { MemoryDocument } from '../../../../../src/domain/entities/MemoryDocument.js';
 import { DocumentPath } from '../../../../../src/domain/entities/DocumentPath.js';
@@ -10,7 +12,8 @@ import { ApplicationError, ApplicationErrorCodes } from '../../../../../src/shar
 
 describe('ReadBranchCoreFilesUseCase', () => {
   let useCase: ReadBranchCoreFilesUseCase;
-  let mockBranchRepository: jest.Mocked<IBranchMemoryBankRepository>;
+  // jest.Mocked を削除し、手動モックの型を指定
+  let mockBranchRepository: IBranchMemoryBankRepository;
 
   const branchName = 'feature/test-branch';
   const branchInfo = BranchInfo.create(branchName);
@@ -30,13 +33,27 @@ describe('ReadBranchCoreFilesUseCase', () => {
 
 
   beforeEach(() => {
-    mockBranchRepository = mock<IBranchMemoryBankRepository>();
+    // jest-mock-extended の代わりに vi.fn() で手動モックを作成する
+    mockBranchRepository = {
+      initialize: vi.fn(),
+      exists: vi.fn(),
+      getDocument: vi.fn(),
+      saveDocument: vi.fn(),
+      deleteDocument: vi.fn(),
+      getRecentBranches: vi.fn(),
+      listDocuments: vi.fn(),
+      findDocumentsByTags: vi.fn(),
+      validateStructure: vi.fn(),
+      saveTagIndex: vi.fn(),
+      getTagIndex: vi.fn(),
+      findDocumentPathsByTagsUsingIndex: vi.fn(),
+    };
     useCase = new ReadBranchCoreFilesUseCase(mockBranchRepository);
   });
 
   it('should return all core files when they exist', async () => {
     // Arrange
-    mockBranchRepository.getDocument.mockImplementation(async (argBranchInfo, argPath) => {
+    (mockBranchRepository.getDocument as Mock).mockImplementation(async (argBranchInfo, argPath) => { // as Mock 追加
       if (!argBranchInfo.equals(branchInfo)) return null;
       if (argPath.equals(DocumentPath.create('progress.json'))) return mockProgress;
       if (argPath.equals(DocumentPath.create('activeContext.json'))) return mockActiveContext;
@@ -58,7 +75,7 @@ describe('ReadBranchCoreFilesUseCase', () => {
 
   it('should return other core files even if progress.json is missing', async () => {
     // Arrange
-    mockBranchRepository.getDocument.mockImplementation(async (argBranchInfo, argPath) => {
+    (mockBranchRepository.getDocument as Mock).mockImplementation(async (argBranchInfo, argPath) => { // as Mock 追加
       if (!argBranchInfo.equals(branchInfo)) return null;
       if (argPath.equals(DocumentPath.create('progress.json'))) return null;
       if (argPath.equals(DocumentPath.create('activeContext.json'))) return mockActiveContext;
@@ -80,7 +97,7 @@ describe('ReadBranchCoreFilesUseCase', () => {
 
    it('should return other core files even if activeContext.json is missing', async () => {
     // Arrange
-    mockBranchRepository.getDocument.mockImplementation(async (argBranchInfo, argPath) => {
+    (mockBranchRepository.getDocument as Mock).mockImplementation(async (argBranchInfo, argPath) => { // as Mock 追加
       if (!argBranchInfo.equals(branchInfo)) return null;
       if (argPath.equals(DocumentPath.create('progress.json'))) return mockProgress;
       if (argPath.equals(DocumentPath.create('activeContext.json'))) return null;
@@ -102,7 +119,7 @@ describe('ReadBranchCoreFilesUseCase', () => {
 
  it('should return other core files even if branchContext.json is missing', async () => {
   // Arrange
-  mockBranchRepository.getDocument.mockImplementation(async (argBranchInfo, argPath) => {
+  (mockBranchRepository.getDocument as Mock).mockImplementation(async (argBranchInfo, argPath) => { // as Mock 追加
     if (!argBranchInfo.equals(branchInfo)) return null;
     if (argPath.equals(DocumentPath.create('progress.json'))) return mockProgress;
     if (argPath.equals(DocumentPath.create('activeContext.json'))) return mockActiveContext;
@@ -124,7 +141,7 @@ describe('ReadBranchCoreFilesUseCase', () => {
 
  it('should return default systemPatterns if systemPatterns.json is missing', async () => {
   // Arrange
-  mockBranchRepository.getDocument.mockImplementation(async (argBranchInfo, argPath) => {
+  (mockBranchRepository.getDocument as Mock).mockImplementation(async (argBranchInfo, argPath) => { // as Mock 追加
     if (!argBranchInfo.equals(branchInfo)) return null;
     if (argPath.equals(DocumentPath.create('progress.json'))) return mockProgress;
     if (argPath.equals(DocumentPath.create('activeContext.json'))) return mockActiveContext;
@@ -132,7 +149,7 @@ describe('ReadBranchCoreFilesUseCase', () => {
     if (argPath.equals(DocumentPath.create('systemPatterns.json'))) return null;
     return null;
   });
-   mockBranchRepository.exists.mockResolvedValue(true);
+   (mockBranchRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
 
   // Act
   const result = await useCase.execute({ branchName });
@@ -148,9 +165,9 @@ describe('ReadBranchCoreFilesUseCase', () => {
  it('should throw ApplicationError if repository throws error during getDocument', async () => {
   // Arrange
   const repoError = new Error('Failed to read document');
-   mockBranchRepository.exists.mockResolvedValue(true);
-  mockBranchRepository.getDocument
-      .mockImplementation(async (argBranchInfo, argPath) => {
+   (mockBranchRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
+  (mockBranchRepository.getDocument as Mock)
+      .mockImplementation(async (_argBranchInfo, argPath) => { // as Mock 追加
           console.log(`[Test Debug] getDocument called with path: ${argPath.value}`);
           if(argPath.equals(DocumentPath.create('activeContext.json'))) {
               console.log('[Test Debug] Throwing error for activeContext.json');
@@ -175,28 +192,36 @@ describe('ReadBranchCoreFilesUseCase', () => {
 
   // Act & Assert
   // エラーが ApplicationError であること、メッセージ、元のエラーが含まれることを確認
-  await expect(useCase.execute({ branchName })).rejects.toThrowError(
-      new ApplicationError(
-          ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
-          `Failed to read activeContext: ${repoError.message}`,
-          { originalError: repoError }
-      )
+  // エラーオブジェクト全体ではなく、code と message で比較
+  const expectedError = new ApplicationError(
+      ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
+      `Failed to read activeContext: ${repoError.message}`,
+      { originalError: repoError }
   );
+  await expect(useCase.execute({ branchName })).rejects.toMatchObject({
+      code: expectedError.code,
+      message: expectedError.message,
+      // cause の比較は難しい場合があるので省略するか、より柔軟なマッチャーを使う
+      // cause: repoError
+  });
    expect(mockBranchRepository.getDocument).toHaveBeenCalled();
 });
 
  it('should throw ApplicationError if branch name is missing', async () => {
   // Act & Assert
-  await expect(useCase.execute({ branchName: '' })).rejects.toThrowError(
-    new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Branch name is required') // エラーインスタンスで比較
-  );
+  // エラーオブジェクト全体ではなく、code と message で比較
+  const expectedError = new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Branch name is required');
+  await expect(useCase.execute({ branchName: '' })).rejects.toMatchObject({
+      code: expectedError.code,
+      message: expectedError.message,
+  });
 });
 
  it('should attempt auto-initialization if branch does not exist', async () => {
   // Arrange
-  mockBranchRepository.exists.mockResolvedValue(false);
-  mockBranchRepository.initialize.mockResolvedValue(undefined);
-   mockBranchRepository.getDocument.mockImplementation(async (argBranchInfo, argPath) => {
+  (mockBranchRepository.exists as Mock).mockResolvedValue(false); // as Mock 追加
+  (mockBranchRepository.initialize as Mock).mockResolvedValue(undefined); // as Mock 追加
+   (mockBranchRepository.getDocument as Mock).mockImplementation(async (argBranchInfo, _argPath) => { // as Mock 追加
     if (!argBranchInfo.equals(branchInfo)) return null;
     return null;
   });
@@ -216,14 +241,17 @@ describe('ReadBranchCoreFilesUseCase', () => {
 
  it('should throw DomainError if auto-initialization fails', async () => {
   // Arrange
-  mockBranchRepository.exists.mockResolvedValue(false);
+  (mockBranchRepository.exists as Mock).mockResolvedValue(false); // as Mock 追加
   const initError = new Error('Initialization failed');
-  mockBranchRepository.initialize.mockRejectedValue(initError);
+  (mockBranchRepository.initialize as Mock).mockRejectedValue(initError); // as Mock 追加
 
   // Act & Assert
-  await expect(useCase.execute({ branchName })).rejects.toThrowError(
-    new DomainError(DomainErrorCodes.BRANCH_INITIALIZATION_FAILED, `Failed to auto-initialize branch: ${branchName}`) // エラーインスタンスで比較
-  );
+  // エラーオブジェクト全体ではなく、code と message で比較
+  const expectedError = new DomainError(DomainErrorCodes.BRANCH_INITIALIZATION_FAILED, `Failed to auto-initialize branch: ${branchName}`);
+  await expect(useCase.execute({ branchName })).rejects.toMatchObject({
+      code: expectedError.code,
+      message: expectedError.message,
+  });
    expect(mockBranchRepository.initialize).toHaveBeenCalledWith(branchInfo);
    expect(mockBranchRepository.getDocument).not.toHaveBeenCalled();
 });

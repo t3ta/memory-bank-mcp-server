@@ -3,7 +3,7 @@
     "composite": true,
     "target": "ES2022",
     "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "NodeNext", // Bundler から NodeNext に戻す
     "esModuleInterop": true,
     "sourceMap": true,
     "declaration": true,
@@ -24,26 +24,30 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "outDir": "./dist",
-    "rootDir": "./src",
-    "baseUrl": "./",
-    "paths": {
+    // "rootDir": "./src", // テストファイルがrootDir外になるため削除
+    "baseUrl": "./", // baseUrl を設定
+    "paths": { // paths を設定 (@/* と @memory-bank/schemas)
       "@/*": [
         "src/*"
       ],
-      "@memory-bank/schemas": [
+      "@memory-bank/schemas": [ // src を参照するように戻す
         "../schemas/src"
+      ],
+      "@memory-bank/schemas/*": [ // src を参照するように戻す
+        "../schemas/src/*"
       ]
     },
     "isolatedModules": true
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "tests/**/*.ts" // テストファイルを含める
   ],
   "exclude": [
     "node_modules",
-    "**/*.test.ts",
-    "dist",
-    "tests"
+    // "**/*.test.ts", // テストファイルは除外しない
+    "dist"
+    // "tests" // testsディレクトリは除外しない
   ],
   "references": [
     {

@@ -1,5 +1,5 @@
-import { DocumentPath } from '../../../../src/domain/entities/DocumentPath';
-import { DomainError, DomainErrorCodes } from '../../../../src/shared/errors/DomainError';
+import { DocumentPath } from '../../../../src/domain/entities/DocumentPath.js'; // .js 追加
+import { DomainError, DomainErrorCodes } from '../../../../src/shared/errors/DomainError.js'; // .js 追加
 
 describe('DocumentPath', () => {
   describe('create', () => {
@@ -11,8 +11,10 @@ describe('DocumentPath', () => {
     });
 
     it('空のパス文字列でエラーが発生すること', () => {
+      // エラーオブジェクト全体ではなく、code と message で比較
+      const expectedError = new DomainError(DomainErrorCodes.INVALID_DOCUMENT_PATH, 'Document path cannot be empty');
       expect(() => DocumentPath.create('')).toThrow(
-        new DomainError(DomainErrorCodes.INVALID_DOCUMENT_PATH, 'Document path cannot be empty') // ピリオド削除
+          expect.objectContaining({ code: expectedError.code, message: expectedError.message })
       );
     });
 
@@ -21,48 +23,58 @@ describe('DocumentPath', () => {
       const invalidChars = ['*', '?', '<', '>', '|', ':'];
       for (const char of invalidChars) {
         const invalidPath = `core/docu${char}ment.json`;
-        expect(() => DocumentPath.create(invalidPath)).toThrow(
-          new DomainError(
+        // エラーオブジェクト全体ではなく、code と message で比較
+        const expectedError = new DomainError(
             DomainErrorCodes.INVALID_DOCUMENT_PATH,
-            'Document path contains invalid characters (<, >, :, ", |, ?, *)' // 実際のエラーメッセージ
-          )
+            'Document path contains invalid characters (<, >, :, ", |, ?, *)'
+        );
+        expect(() => DocumentPath.create(invalidPath)).toThrow(
+            expect.objectContaining({ code: expectedError.code, message: expectedError.message })
         );
       }
       // ダブルクォーテーション " もチェック
+       // エラーオブジェクト全体ではなく、code と message で比較
+       const expectedErrorDoubleQuote = new DomainError(
+           DomainErrorCodes.INVALID_DOCUMENT_PATH,
+           'Document path contains invalid characters (<, >, :, ", |, ?, *)'
+       );
        expect(() => DocumentPath.create('core/"doc".json')).toThrow(
-          new DomainError(
-            DomainErrorCodes.INVALID_DOCUMENT_PATH,
-            'Document path contains invalid characters (<, >, :, ", |, ?, *)'
-          )
-        );
+           expect.objectContaining({ code: expectedErrorDoubleQuote.code, message: expectedErrorDoubleQuote.message })
+       );
     });
 
      // パス区切り文字チェックのテストを有効化し、実際のエラーメッセージに合わせる
      it('バックスラッシュを含むパス文字列でエラーが発生すること', () => {
       const invalidPath = 'core\\document.json'; // Windows style separator
+       // エラーオブジェクト全体ではなく、code と message で比較
+       const expectedErrorBackslash = new DomainError(
+           DomainErrorCodes.INVALID_DOCUMENT_PATH,
+           'Document path cannot contain backslashes (\\). Use forward slashes (/) instead.'
+       );
        expect(() => DocumentPath.create(invalidPath)).toThrow(
-         new DomainError(
-            DomainErrorCodes.INVALID_DOCUMENT_PATH,
-            'Document path cannot contain backslashes (\\). Use forward slashes (/) instead.' // 実際のエラーメッセージ
-          )
+           expect.objectContaining({ code: expectedErrorBackslash.code, message: expectedErrorBackslash.message })
        );
      });
 
      it('先頭がスラッシュの場合にエラーが発生すること', () => {
        const invalidPath = '/core/document.json';
+       // エラーオブジェクト全体ではなく、code と message で比較
+       const expectedErrorAbsolute = new DomainError(DomainErrorCodes.INVALID_DOCUMENT_PATH, 'Document path cannot be absolute');
        expect(() => DocumentPath.create(invalidPath)).toThrow(
-         new DomainError(DomainErrorCodes.INVALID_DOCUMENT_PATH, 'Document path cannot be absolute') // 実際のエラーメッセージに合わせる
+           expect.objectContaining({ code: expectedErrorAbsolute.code, message: expectedErrorAbsolute.message })
        );
      });
 
      // 末尾スラッシュチェックのテストを有効化し、実際のエラーメッセージに合わせる
      it('末尾がスラッシュの場合にエラーが発生すること', () => {
        const invalidPath = 'core/document.json/';
+       // エラーオブジェクト全体ではなく、code と message で比較
+       const expectedErrorTrailingSlash = new DomainError(
+           DomainErrorCodes.INVALID_DOCUMENT_PATH,
+           'Document path cannot end with a slash'
+       );
        expect(() => DocumentPath.create(invalidPath)).toThrow(
-         new DomainError(
-            DomainErrorCodes.INVALID_DOCUMENT_PATH,
-            'Document path cannot end with a slash' // 実際のエラーメッセージ
-          )
+           expect.objectContaining({ code: expectedErrorTrailingSlash.code, message: expectedErrorTrailingSlash.message })
        );
      });
   });
@@ -146,8 +158,10 @@ describe('DocumentPath', () => {
     });
 
     it('空の拡張子を指定するとエラーが発生すること', () => {
+      // エラーオブジェクト全体ではなく、code と message で比較
+      const expectedErrorEmptyExt = new DomainError(DomainErrorCodes.INVALID_DOCUMENT_PATH, 'Extension cannot be empty');
       expect(() => docPath.withExtension('')).toThrow(
-        new DomainError(DomainErrorCodes.INVALID_DOCUMENT_PATH, 'Extension cannot be empty')
+          expect.objectContaining({ code: expectedErrorEmptyExt.code, message: expectedErrorEmptyExt.message })
       );
     });
 

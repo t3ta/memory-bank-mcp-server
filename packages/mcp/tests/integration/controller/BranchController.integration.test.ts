@@ -4,7 +4,6 @@
 import { setupTestEnv, cleanupTestEnv, createBranchDir, type TestEnv } from '../helpers/test-env.js';
 import { DIContainer, setupContainer } from '../../../src/main/di/providers.js'; // Import DI container and setup function
 import { BranchController } from '../../../src/interface/controllers/BranchController.js'; // Import real controller
-import type { DocumentDTO } from '../../../src/application/dtos/DocumentDTO.js'; // Import DocumentDTO for type guard
 // ★★★ WriteBranchDocumentOutput をインポート ★★★
 import type { WriteBranchDocumentOutput } from '../../../src/application/usecases/branch/WriteBranchDocumentUseCase.js';
 import { logger } from '../../../src/shared/utils/logger.js';
