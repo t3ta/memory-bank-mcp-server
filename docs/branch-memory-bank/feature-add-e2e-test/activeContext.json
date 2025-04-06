@@ -1,0 +1,102 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "dc8ec1ab-b7c6-4ac9-92d2-baa8f8a293f4",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context"
+    ],
+    "lastModified": "2025-04-06T11:50:00.000Z",
+    "createdAt": "2025-04-06T08:52:04.656Z",
+    "version": 5
+  },
+  "content": {
+    "currentWork": "MemoryBank MCPサーバーのE2Eテスト機能の計画と設計",
+    "recentChanges": [
+      {
+        "date": "2025-04-06T11:05:00.000Z",
+        "description": "SDKの直接利用を反映したE2Eテスト実装計画の更新"
+      },
+      {
+        "date": "2025-04-06T10:15:30.000Z",
+        "description": "E2Eテスト実装ステップの詳細計画を作成"
+      },
+      {
+        "date": "2025-04-06T09:45:20.000Z",
+        "description": "E2Eテスト導入計画を作成"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "e9f3a782-12c4-42e5-91f8-d63c8e6a2bd5",
+        "description": "@modelcontextprotocol/sdkのInMemoryTransportを直接インポートして使用し、クライアント-サーバー間通信のE2Eテストを実装する"
+      },
+      {
+        "id": "58f91d67-3e19-4b0a-a3ac-c7a8932fdec2",
+        "description": "テスト用のディレクトリ構造を「packages/mcp/tests/e2e/」に設置する"
+      },
+      {
+        "id": "f4bc7519-a6d8-4e9c-b208-e5ad12df630e",
+        "description": "MCPサーバーの主要機能（ブランチ/グローバルメモリバンク操作、コンテキスト読み込み）をE2Eテストでカバーする"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "c1a840d7-6e8d-4ec3-9f2a-b26e6a44f5e1",
+        "description": "テスト環境のセットアップとティアダウンの最適化方法",
+        "status": "open"
+      },
+      {
+        "id": "3e7cb2f4-d5ef-4b9b-b7f5-fc4921c68d4a",
+        "description": "MCPサーバーをインメモリトランスポートで動作させるための最適なアプローチ",
+        "status": "open"
+      },
+      {
+        "id": "9d68ae5b-f890-4741-8a9c-7f82ea3e3f41",
+        "description": "E2Eテストの実行時間を最適化する方法",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "7e0df6b2-8d63-4c9a-b491-2c3e78a27e6d",
+        "description": "E2Eテスト用のディレクトリ構造とJest設定ファイルを作成する",
+        "priority": "high"
+      },
+      {
+        "id": "b1af6382-29c5-4c8d-8c22-e6b9efc843a7",
+        "description": "E2Eテスト環境のセットアップユーティリティを実装する",
+        "priority": "high"
+      },
+      {
+        "id": "4fda7cb5-9efa-49bd-8afa-d215cc9f7261",
+        "description": "InMemoryTransportを活用したMCPクライアントクラスを実装する",
+        "priority": "medium"
+      }
+    ],
+    "references": [
+      {
+        "file": "e2e-test-plan.json",
+        "description": "E2Eテスト導入の全体計画",
+        "created_at": "2025-04-06T09:35:15.000Z"
+      },
+      {
+        "file": "implementation-steps.json",
+        "description": "E2Eテスト実装の詳細ステップ",
+        "created_at": "2025-04-06T09:45:20.000Z"
+      },
+      {
+        "file": "sdk-implementation-examples.json",
+        "description": "SDKを使用したE2Eテスト実装サンプル集",
+        "created_at": "2025-04-06T11:25:00.000Z"
+      },
+      {
+        "file": "e2e-test-environment.json",
+        "created_at": "2025-04-06T11:45:00.000Z",
+        "description": "E2Eテストの実行環境設定（ローカル、Docker、CI）"
+      }
+    ]
+  }
+}

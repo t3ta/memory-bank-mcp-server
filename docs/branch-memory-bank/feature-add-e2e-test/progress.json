@@ -1,0 +1,135 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "ce175153-6de0-4b46-805b-6b47fab4bd79",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [
+      "progress"
+    ],
+    "lastModified": "2025-04-06T11:10:15.000Z",
+    "createdAt": "2025-04-06T08:52:04.657Z",
+    "version": 3
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "7864013c-523e-4a75-8270-e83c50a70963",
+        "description": "E2Eテスト導入計画の作成",
+        "implementedAt": "2025-04-06T09:35:15.000Z"
+      },
+      {
+        "id": "f24024d3-906c-40fc-93af-1783f9fcb31e",
+        "description": "E2Eテスト実装ステップの詳細計画（SDKを直接利用）",
+        "implementedAt": "2025-04-06T10:55:20.000Z"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "e2e-dir-setup",
+        "description": "E2Eテスト用ディレクトリ構造とJest設定の作成",
+        "priority": "high"
+      },
+      {
+        "id": "e2e-env-setup",
+        "description": "E2Eテスト環境セットアップの実装",
+        "priority": "high"
+      },
+      {
+        "id": "inmemory-client",
+        "description": "InMemoryTransportを活用したMCPクライアントの実装",
+        "priority": "high"
+      },
+      {
+        "id": "init-tests",
+        "description": "初期化テストの実装",
+        "priority": "medium"
+      },
+      {
+        "id": "branch-tests",
+        "description": "ブランチメモリバンク操作のE2Eテスト実装",
+        "priority": "medium"
+      },
+      {
+        "id": "global-tests",
+        "description": "グローバルメモリバンク操作のE2Eテスト実装",
+        "priority": "medium"
+      },
+      {
+        "id": "context-tests",
+        "description": "コンテキスト操作とその他機能のE2Eテスト実装",
+        "priority": "medium"
+      },
+      {
+        "id": "ci-integration",
+        "description": "CI/CD統合",
+        "priority": "low"
+      },
+      {
+        "id": "documentation",
+        "description": "ドキュメント作成と完了確認",
+        "priority": "low"
+      }
+    ],
+    "status": "現在、E2Eテストの導入計画と実装ステップの詳細設計が完了しました。SDKを直接インポートできることがわかり、より効率的な実装が可能になりました。次のステップはディレクトリ構造の作成と実際のテスト環境実装に進みます。",
+    "completionPercentage": 20,
+    "milestones": [
+      {
+        "id": "planning-complete",
+        "description": "E2Eテスト導入計画の作成完了",
+        "completedAt": "2025-04-06T11:10:15.000Z"
+      },
+      {
+        "id": "dir-setup",
+        "description": "E2Eテスト用ディレクトリ構造とJest設定の作成",
+        "completedAt": null,
+        "targetDate": "2025-04-07T12:00:00.000Z"
+      },
+      {
+        "id": "client-impl",
+        "description": "MCPインメモリクライアントの実装",
+        "completedAt": null,
+        "targetDate": "2025-04-08T12:00:00.000Z"
+      },
+      {
+        "id": "tests-impl",
+        "description": "主要機能のE2Eテスト実装",
+        "completedAt": null,
+        "targetDate": "2025-04-10T12:00:00.000Z"
+      },
+      {
+        "id": "ci-doc-complete",
+        "description": "CI統合とドキュメント作成",
+        "completedAt": null,
+        "targetDate": "2025-04-12T12:00:00.000Z"
+      }
+    ],
+    "knownIssues": [
+      {
+        "id": "non-deterministic-tests",
+        "description": "E2Eテストが環境によって非決定的な結果になる可能性",
+        "severity": "medium",
+        "notes": "テスト環境のセットアップと破棄の方法を工夫して、テスト間の干渉を防ぐ必要があります"
+      },
+      {
+        "id": "test-performance",
+        "description": "E2Eテストの実行時間が長くなる可能性",
+        "severity": "low",
+        "notes": "テストの並列実行やスコープの絞り込みなどを検討する必要があるかもしれません"
+      }
+    ],
+    "references": [
+      {
+        "file": "e2e-test-plan.json",
+        "description": "E2Eテスト導入の全体計画",
+        "created_at": "2025-04-06T09:35:15.000Z"
+      },
+      {
+        "file": "implementation-steps.json",
+        "description": "E2Eテスト実装の詳細ステップ",
+        "created_at": "2025-04-06T09:45:20.000Z"
+      }
+    ]
+  }
+}
