@@ -1,4 +1,4 @@
-import type { WriteDocumentDTO } from '../../../../src/application/dtos/WriteDocumentDTO';
+import type { WriteDocumentDTO } from '../../../../src/application/dtos/WriteDocumentDTO.js';
 
 describe('WriteDocumentDTO Interface', () => {
   it('should allow creation with required path and optional content (string/object) / tags', () => {

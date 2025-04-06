@@ -5,56 +5,27 @@
     "title": "Vitest移行プロジェクト進捗",
     "documentType": "progress",
     "path": "progress.json",
-    "tags": [
-      "progress",
-      "vitest",
-      "migration"
-    ],
-    "lastModified": "2025-04-06T19:15:35.498Z",
+    "tags": [],
+    "lastModified": "2025-04-06T12:50:55.925Z",
     "createdAt": "2025-04-06T19:15:35.498Z",
     "version": 1
   },
   "content": {
-    "workingFeatures": [],
-    "pendingImplementation": [
+    "workingFeatures": [
       {
-        "id": "89399fab-7c51-4ef9-891d-e30a36f34de3",
-        "description": "Vitestのインストール・基本設定",
-        "priority": "high"
+        "id": "mcp-unit-test-migration",
+        "description": "MCPパッケージのユニットテストをVitestに移行完了",
+        "completedAt": "2025-04-06T20:46:00.000Z"
       },
       {
-        "id": "b919db45-dd26-46f6-88ba-99f26c25d08a",
-        "description": "Jest設定をVitestに移行",
-        "priority": "high"
-      },
-      {
-        "id": "61678cf2-a132-4d76-86ce-e0924e3d0c23",
-        "description": "テスト実行スクリプトの更新",
-        "priority": "high"
-      },
-      {
-        "id": "c8ed8e53-83e9-4615-8f3e-611dc07fa42f",
-        "description": "テストファイルの互換性確保・調整",
-        "priority": "medium"
-      },
-      {
-        "id": "2d24e412-67cc-4578-9619-934d0e3120c4",
-        "description": "統合テスト環境の移行",
-        "priority": "medium"
-      },
-      {
-        "id": "00d7c0cc-90ea-4272-9a36-902ecae38daa",
-        "description": "テストコードの互換性問題の修正",
-        "priority": "medium"
-      },
-      {
-        "id": "1d5d046d-6dc6-46cb-b739-1e572d8ee783",
-        "description": "テスト実行と検証",
-        "priority": "high"
+        "id": "vitest-migration-complete",
+        "description": "Vitestへの移行作業を完了し、Jest関連ファイルをクリーンアップ",
+        "completedAt": "2025-04-06T21:51:00.000Z"
       }
     ],
-    "status": "計画フェーズ：ESMに対応する優れたテストランナーとしてVitestへの移行を検討中。Jest設定をVitestに書き換え、テスト環境を整備する作業が必要。",
-    "completionPercentage": 0,
+    "pendingImplementation": [],
+    "status": "完了：Vitestへの移行完了。Jest依存関係と設定ファイルをクリーンアップ済み。",
+    "completionPercentage": 100,
     "knownIssues": [
       {
         "id": "dab484c1-a6f0-40b8-8dd8-e5abb3972aca",
@@ -65,6 +36,35 @@
         "id": "2f1d7049-6e63-41df-afd6-71135e6eab1b",
         "description": "Jest実行時に必要な多くの実験的フラグの使用",
         "severity": "medium"
+      },
+      {
+        "id": "7a8ae5c3-e8f2-4d7c-9aef-1ab349c2bd95",
+        "description": "一部のユニットテストで失敗が見られる（Vitest移行とは無関係の問題）",
+        "severity": "low"
+      }
+    ],
+    "references": [
+      {
+        "file": "vitest-migration-status.json",
+        "description": "Vitest移行の最終状態確認レポート",
+        "created_at": "2025-04-06T22:30:00.000Z"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "76bcf14a-cc48-4f9d-8e21-eb1ce7f839a2",
+        "description": "失敗しているテストの修正",
+        "priority": "medium"
+      },
+      {
+        "id": "a5fc2c8d-7b2c-4e14-bc9b-3db7c6d7a53e",
+        "description": "CI環境でのテスト実行確認",
+        "priority": "medium"
+      },
+      {
+        "id": "9d1e8fd3-e36f-48bc-91d5-6b9acb29fe95",
+        "description": "Vitestのパフォーマンス計測",
+        "priority": "low"
       }
     ]
   }

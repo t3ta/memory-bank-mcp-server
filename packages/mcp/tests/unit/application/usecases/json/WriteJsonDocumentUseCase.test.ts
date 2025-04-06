@@ -1,60 +1,64 @@
-import { WriteJsonDocumentUseCase } from '../../../../../src/application/usecases/json/WriteJsonDocumentUseCase';
-import { IFileSystemService } from '../../../../../src/infrastructure/storage/interfaces/IFileSystemService';
+import { vi, type Mock } from 'vitest'; // vi と Mock をまとめてインポート
+import { WriteJsonDocumentUseCase } from '../../../../../src/application/usecases/json/WriteJsonDocumentUseCase.js'; // .js 追加済み
+// import { IFileSystemService } from '../../../../../src/infrastructure/storage/interfaces/IFileSystemService.js'; // 未使用なので削除
 // Duplicate import removed by Mirai
 import { DocumentPath } from '../../../../../src/domain/entities/DocumentPath.js';
 import { JsonDocument, DocumentType } from '../../../../../src/domain/entities/JsonDocument.js';
 import { Tag } from '../../../../../src/domain/entities/Tag.js';
 import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo.js';
 import { DocumentId } from '../../../../../src/domain/entities/DocumentId.js';
-import { jest } from '@jest/globals';
+// import { jest } from '@jest/globals'; // jest インポート削除済み
 import { IJsonDocumentRepository } from '../../../../../src/domain/repositories/IJsonDocumentRepository.js';
-import { WriteJsonDocumentInput, WriteJsonDocumentOutput } from '../../../../../src/application/usecases/json/WriteJsonDocumentUseCase.js';
+import { WriteJsonDocumentInput } from '../../../../../src/application/usecases/json/WriteJsonDocumentUseCase.js'; // 未使用の WriteJsonDocumentOutput を削除
 import { IIndexService } from '../../../../../src/infrastructure/index/interfaces/IIndexService.js';
 import { DocumentVersionInfo } from '../../../../../src/domain/entities/DocumentVersionInfo.js';
 import { IDocumentValidator } from '../../../../../src/domain/validation/IDocumentValidator.js';
 
 // Mocks for IJsonDocumentRepository
-const mockJsonDocumentRepository: jest.Mocked<IJsonDocumentRepository> = {
-  findById: jest.fn<() => Promise<JsonDocument | null>>(),
-  findByPath: jest.fn<() => Promise<JsonDocument | null>>(),
-  findByTags: jest.fn<() => Promise<JsonDocument[]>>(),
-  findByType: jest.fn<() => Promise<JsonDocument[]>>(),
-  save: jest.fn<() => Promise<JsonDocument>>(),
-  delete: jest.fn<() => Promise<boolean>>(), // deleteById -> delete
-  listAll: jest.fn<() => Promise<JsonDocument[]>>(),
-  exists: jest.fn<() => Promise<boolean>>(),
+// jest.Mocked を削除し、手動モックの型を指定
+const mockJsonDocumentRepository: IJsonDocumentRepository = {
+  findById: vi.fn(), // jest -> vi, 型引数削除
+  findByPath: vi.fn(), // jest -> vi, 型引数削除
+  findByTags: vi.fn(), // jest -> vi, 型引数削除
+  findByType: vi.fn(), // jest -> vi, 型引数削除
+  save: vi.fn(), // jest -> vi, 型引数削除
+  delete: vi.fn(), // jest -> vi, 型引数削除
+  listAll: vi.fn(), // jest -> vi, 型引数削除
+  exists: vi.fn(), // jest -> vi, 型引数削除
 };
 
-const mockTagIndexService: jest.Mocked<IIndexService> = {
-  initializeIndex: jest.fn<() => Promise<void>>(),
-  buildIndex: jest.fn<() => Promise<void>>(),
-  addToIndex: jest.fn<() => Promise<void>>(), // addDocument -> addToIndex
-  removeFromIndex: jest.fn<() => Promise<void>>(),
-  findById: jest.fn<() => Promise<any>>(), // Return type might need adjustment based on DocumentReference
-  findByPath: jest.fn<() => Promise<any>>(),
-  findByTags: jest.fn<() => Promise<any[]>>(),
-  findByType: jest.fn<() => Promise<any[]>>(),
-  listAll: jest.fn<() => Promise<any[]>>(),
-  saveIndex: jest.fn<() => Promise<void>>(),
-  loadIndex: jest.fn<() => Promise<void>>(),
+// jest.Mocked を削除し、手動モックの型を指定
+const mockTagIndexService: IIndexService = {
+  initializeIndex: vi.fn(), // jest -> vi, 型引数削除
+  buildIndex: vi.fn(), // jest -> vi, 型引数削除
+  addToIndex: vi.fn(), // jest -> vi, 型引数削除
+  removeFromIndex: vi.fn(), // jest -> vi, 型引数削除
+  findById: vi.fn(), // jest -> vi, 型引数削除
+  findByPath: vi.fn(), // jest -> vi, 型引数削除
+  findByTags: vi.fn(), // jest -> vi, 型引数削除
+  findByType: vi.fn(), // jest -> vi, 型引数削除
+  listAll: vi.fn(), // jest -> vi, 型引数削除
+  saveIndex: vi.fn(), // jest -> vi, 型引数削除
+  loadIndex: vi.fn(), // jest -> vi, 型引数削除
 };
 
 describe('WriteJsonDocumentUseCase', () => {
   let useCase: WriteJsonDocumentUseCase;
 
   // Create a mock validator
-  const mockValidator: jest.Mocked<IDocumentValidator> = {
-    validateContent: jest.fn<(documentType: string, content: Record<string, unknown>) => boolean>().mockReturnValue(true),
-    validateDocument: jest.fn<(document: unknown) => boolean>().mockReturnValue(true),
-    validateMetadata: jest.fn<(metadata: Record<string, unknown>) => boolean>().mockReturnValue(true),
+  // jest.Mocked を削除し、手動モックの型を指定
+  const mockValidator: IDocumentValidator = {
+    validateContent: vi.fn().mockReturnValue(true), // jest -> vi, 型引数削除
+    validateDocument: vi.fn().mockReturnValue(true), // jest -> vi, 型引数削除
+    validateMetadata: vi.fn().mockReturnValue(true), // jest -> vi, 型引数削除
   };
 
   beforeEach(() => {
     // Reset mocks before each test
-    jest.clearAllMocks();
+    vi.clearAllMocks(); // jest -> vi
     // Set the validator before creating the use case or documents
     JsonDocument.setValidator(mockValidator);
-    jest.clearAllMocks();
+    vi.clearAllMocks(); // jest -> vi
     useCase = new WriteJsonDocumentUseCase(
       mockJsonDocumentRepository,
       mockTagIndexService // Pass the index service mock
@@ -86,7 +90,7 @@ describe('WriteJsonDocumentUseCase', () => {
     const expectedTags = docTags.map(t => Tag.create(t));
 
     // Mock findByPath to return null (indicating new document)
-    mockJsonDocumentRepository.findByPath.mockResolvedValue(null);
+    (mockJsonDocumentRepository.findByPath as Mock).mockResolvedValue(null); // as Mock 追加
 
     // Mock repository save to return the saved document
     // We need to construct the expected JsonDocument that save should return
@@ -99,10 +103,10 @@ describe('WriteJsonDocumentUseCase', () => {
       content: docContent,
       // versionInfo will be default for new doc
     });
-    mockJsonDocumentRepository.save.mockResolvedValue(savedDocument);
+    (mockJsonDocumentRepository.save as Mock).mockResolvedValue(savedDocument); // as Mock 追加
 
     // Mock index service addToIndex
-    mockTagIndexService.addToIndex.mockResolvedValue(undefined);
+    (mockTagIndexService.addToIndex as Mock).mockResolvedValue(undefined); // as Mock 追加
     const result = await useCase.execute(input);
 
     // Verify findByPath was called
@@ -123,8 +127,8 @@ describe('WriteJsonDocumentUseCase', () => {
       })
     );
     // Verify the tags match (comparing Tag objects might be tricky, compare values)
-    const savedDocArg = mockJsonDocumentRepository.save.mock.calls[0][1];
-    expect(savedDocArg.tags.map(t => t.value)).toEqual(docTags);
+    const savedDocArg = (mockJsonDocumentRepository.save as Mock).mock.calls[0][1]; // as Mock 追加
+    expect(savedDocArg.tags.map((t: Tag) => t.value)).toEqual(docTags); // t に Tag 型を指定
 
 
     // Verify index service was called
@@ -186,7 +190,7 @@ describe('WriteJsonDocumentUseCase', () => {
       content: { status: 'wip' },
       versionInfo: existingVersionInfo // Pass the created versionInfo object
     });
-    mockJsonDocumentRepository.findByPath.mockResolvedValue(existingDocument);
+    (mockJsonDocumentRepository.findByPath as Mock).mockResolvedValue(existingDocument); // as Mock 追加
 
     // Mock repository save to return the updated document
     const updatedDocument = JsonDocument.create({
@@ -200,10 +204,10 @@ describe('WriteJsonDocumentUseCase', () => {
       // The actual use case calculates the next version, so we mimic that structure.
       versionInfo: existingVersionInfo.nextVersion() // Simulate version increment
     });
-    mockJsonDocumentRepository.save.mockResolvedValue(updatedDocument);
+    (mockJsonDocumentRepository.save as Mock).mockResolvedValue(updatedDocument); // as Mock 追加
 
     // Mock index service addToIndex (it handles updates too)
-    mockTagIndexService.addToIndex.mockResolvedValue(undefined);
+    (mockTagIndexService.addToIndex as Mock).mockResolvedValue(undefined); // as Mock 追加
 
     const result = await useCase.execute(input);
 
@@ -226,8 +230,8 @@ describe('WriteJsonDocumentUseCase', () => {
       })
     );
      // Verify the tags match
-    const savedDocArgUpdate = mockJsonDocumentRepository.save.mock.calls[0][1];
-    expect(savedDocArgUpdate.tags.map(t => t.value)).toEqual(docTags);
+    const savedDocArgUpdate = (mockJsonDocumentRepository.save as Mock).mock.calls[0][1]; // as Mock 追加
+    expect(savedDocArgUpdate.tags.map((t: Tag) => t.value)).toEqual(docTags); // t に Tag 型を指定
 
 
     // Verify index service was called with the updated document
@@ -268,15 +272,16 @@ describe('WriteJsonDocumentUseCase', () => {
     };
 
     // Create a distinct mock for the global repository
-    const mockGlobalRepository: jest.Mocked<IJsonDocumentRepository> = {
-      findById: jest.fn<() => Promise<JsonDocument | null>>(),
-      findByPath: jest.fn<() => Promise<JsonDocument | null>>(),
-      findByTags: jest.fn<() => Promise<JsonDocument[]>>(),
-      findByType: jest.fn<() => Promise<JsonDocument[]>>(),
-      save: jest.fn<() => Promise<JsonDocument>>(),
-      delete: jest.fn<() => Promise<boolean>>(),
-      listAll: jest.fn<() => Promise<JsonDocument[]>>(),
-      exists: jest.fn<() => Promise<boolean>>(),
+    // jest.Mocked を削除し、手動モックの型を指定
+    const mockGlobalRepository: IJsonDocumentRepository = {
+      findById: vi.fn(), // jest -> vi, 型引数削除
+      findByPath: vi.fn(), // jest -> vi, 型引数削除
+      findByTags: vi.fn(), // jest -> vi, 型引数削除
+      findByType: vi.fn(), // jest -> vi, 型引数削除
+      save: vi.fn(), // jest -> vi, 型引数削除
+      delete: vi.fn(), // jest -> vi, 型引数削除
+      listAll: vi.fn(), // jest -> vi, 型引数削除
+      exists: vi.fn(), // jest -> vi, 型引数削除
     };
     const useCaseWithGlobal = new WriteJsonDocumentUseCase(
       mockJsonDocumentRepository, // Default repo
@@ -290,7 +295,7 @@ describe('WriteJsonDocumentUseCase', () => {
     const expectedBranchInfo = BranchInfo.create('feature/global');
 
     // Mock findByPath on the global repo
-    mockGlobalRepository.findByPath.mockResolvedValue(null);
+    (mockGlobalRepository.findByPath as Mock).mockResolvedValue(null); // as Mock 追加
 
     const savedDocument = JsonDocument.create({
       id: DocumentId.generate(),
@@ -300,8 +305,8 @@ describe('WriteJsonDocumentUseCase', () => {
       tags: expectedTags,
       content: docContent,
     });
-    mockGlobalRepository.save.mockResolvedValue(savedDocument);
-    mockTagIndexService.addToIndex.mockResolvedValue(undefined);
+    (mockGlobalRepository.save as Mock).mockResolvedValue(savedDocument); // as Mock 追加
+    (mockTagIndexService.addToIndex as Mock).mockResolvedValue(undefined); // as Mock 追加
 
     const result = await useCaseWithGlobal.execute(input);
 

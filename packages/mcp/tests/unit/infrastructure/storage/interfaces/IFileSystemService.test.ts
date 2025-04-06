@@ -1,4 +1,6 @@
-import type { IFileSystemService } from '../../../../../src/infrastructure/storage/interfaces/IFileSystemService';
+import { vi } from 'vitest'; // vi をインポート
+import type { Mock } from 'vitest'; // Mock 型をインポート
+import type { IFileSystemService } from '../../../../../src/infrastructure/storage/interfaces/IFileSystemService.js'; // .js 追加
 
 // モックデータの準備
 const mockFilePath = '/path/to/file.txt';
@@ -15,29 +17,30 @@ const mockFileStats = {
 const mockConfig = { memoryBankRoot: '/path/to/docs' };
 
 // IFileSystemService のモック実装を作成
-const mockFileSystemService: jest.Mocked<IFileSystemService> = {
-  readFile: jest.fn(),
-  readFileChunk: jest.fn(), // オプションでもモックは用意
-  writeFile: jest.fn(),
-  fileExists: jest.fn(),
-  deleteFile: jest.fn(),
-  createDirectory: jest.fn(),
-  directoryExists: jest.fn(),
-  listFiles: jest.fn(),
-  getFileStats: jest.fn(),
-  getBranchMemoryPath: jest.fn(), // オプションでもモックは用意
-  getConfig: jest.fn(), // オプションでもモックは用意
+// jest.Mocked を削除し、手動モックの型を指定
+const mockFileSystemService: IFileSystemService = {
+  readFile: vi.fn(), // jest -> vi
+  readFileChunk: vi.fn(), // jest -> vi
+  writeFile: vi.fn(), // jest -> vi
+  fileExists: vi.fn(), // jest -> vi
+  deleteFile: vi.fn(), // jest -> vi
+  createDirectory: vi.fn(), // jest -> vi
+  directoryExists: vi.fn(), // jest -> vi
+  listFiles: vi.fn(), // jest -> vi
+  getFileStats: vi.fn(), // jest -> vi
+  getBranchMemoryPath: vi.fn(), // jest -> vi
+  getConfig: vi.fn(), // jest -> vi
 };
 
 describe('IFileSystemService Interface', () => {
   beforeEach(() => {
     // 各テストの前にモックをリセット
-    jest.clearAllMocks();
+    vi.clearAllMocks(); // jest -> vi
   });
 
   // --- readFile ---
   it('should define the readFile method (success)', async () => {
-    mockFileSystemService.readFile.mockResolvedValue(mockFileContent);
+    (mockFileSystemService.readFile as Mock).mockResolvedValue(mockFileContent); // as Mock 追加
     const content = await mockFileSystemService.readFile(mockFilePath);
     expect(mockFileSystemService.readFile).toHaveBeenCalledWith(mockFilePath);
     expect(content).toBe(mockFileContent);
@@ -45,7 +48,7 @@ describe('IFileSystemService Interface', () => {
 
   it('should define the readFile method (failure)', async () => {
     const error = new Error('File not found');
-    mockFileSystemService.readFile.mockRejectedValue(error);
+    (mockFileSystemService.readFile as Mock).mockRejectedValue(error); // as Mock 追加
     await expect(mockFileSystemService.readFile(mockFilePath)).rejects.toThrow(error);
     expect(mockFileSystemService.readFile).toHaveBeenCalledWith(mockFilePath);
   });
@@ -57,7 +60,7 @@ describe('IFileSystemService Interface', () => {
     // オプショナルなので、モックが存在する場合のみテスト
     if (mockFileSystemService.readFileChunk) {
         // jest.Mock として型アサーションを追加
-        (mockFileSystemService.readFileChunk as jest.Mock).mockResolvedValue(chunkContent);
+        (mockFileSystemService.readFileChunk as Mock).mockResolvedValue(chunkContent); // as jest.Mock -> as Mock
         const content = await mockFileSystemService.readFileChunk(params);
         expect(mockFileSystemService.readFileChunk).toHaveBeenCalledWith(params);
         expect(content).toBe(chunkContent);
@@ -72,7 +75,7 @@ describe('IFileSystemService Interface', () => {
     const error = new Error('Read error');
      if (mockFileSystemService.readFileChunk) {
         // jest.Mock として型アサーションを追加
-        (mockFileSystemService.readFileChunk as jest.Mock).mockRejectedValue(error);
+        (mockFileSystemService.readFileChunk as Mock).mockRejectedValue(error); // as jest.Mock -> as Mock
         await expect(mockFileSystemService.readFileChunk(params)).rejects.toThrow(error);
         expect(mockFileSystemService.readFileChunk).toHaveBeenCalledWith(params);
      } else {
@@ -83,28 +86,28 @@ describe('IFileSystemService Interface', () => {
 
   // --- writeFile ---
   it('should define the writeFile method (success)', async () => {
-    mockFileSystemService.writeFile.mockResolvedValue(undefined);
+    (mockFileSystemService.writeFile as Mock).mockResolvedValue(undefined); // as Mock 追加
     await mockFileSystemService.writeFile(mockFilePath, mockFileContent);
     expect(mockFileSystemService.writeFile).toHaveBeenCalledWith(mockFilePath, mockFileContent);
   });
 
    it('should define the writeFile method (failure)', async () => {
     const error = new Error('Write permission denied');
-    mockFileSystemService.writeFile.mockRejectedValue(error);
+    (mockFileSystemService.writeFile as Mock).mockRejectedValue(error); // as Mock 追加
     await expect(mockFileSystemService.writeFile(mockFilePath, mockFileContent)).rejects.toThrow(error);
     expect(mockFileSystemService.writeFile).toHaveBeenCalledWith(mockFilePath, mockFileContent);
   });
 
   // --- fileExists ---
   it('should define the fileExists method (true)', async () => {
-    mockFileSystemService.fileExists.mockResolvedValue(true);
+    (mockFileSystemService.fileExists as Mock).mockResolvedValue(true); // as Mock 追加
     const exists = await mockFileSystemService.fileExists(mockFilePath);
     expect(mockFileSystemService.fileExists).toHaveBeenCalledWith(mockFilePath);
     expect(exists).toBe(true);
   });
 
   it('should define the fileExists method (false)', async () => {
-    mockFileSystemService.fileExists.mockResolvedValue(false);
+    (mockFileSystemService.fileExists as Mock).mockResolvedValue(false); // as Mock 追加
     const exists = await mockFileSystemService.fileExists(mockFilePath);
     expect(mockFileSystemService.fileExists).toHaveBeenCalledWith(mockFilePath);
     expect(exists).toBe(false);
@@ -112,14 +115,14 @@ describe('IFileSystemService Interface', () => {
 
   // --- deleteFile ---
   it('should define the deleteFile method (success)', async () => {
-    mockFileSystemService.deleteFile.mockResolvedValue(true);
+    (mockFileSystemService.deleteFile as Mock).mockResolvedValue(true); // as Mock 追加
     const success = await mockFileSystemService.deleteFile(mockFilePath);
     expect(mockFileSystemService.deleteFile).toHaveBeenCalledWith(mockFilePath);
     expect(success).toBe(true);
   });
 
    it('should define the deleteFile method (failure)', async () => {
-    mockFileSystemService.deleteFile.mockResolvedValue(false); // or mockRejectedValue
+    (mockFileSystemService.deleteFile as Mock).mockResolvedValue(false); // as Mock 追加
     const success = await mockFileSystemService.deleteFile(mockFilePath);
     expect(mockFileSystemService.deleteFile).toHaveBeenCalledWith(mockFilePath);
     expect(success).toBe(false);
@@ -127,28 +130,28 @@ describe('IFileSystemService Interface', () => {
 
   // --- createDirectory ---
   it('should define the createDirectory method (success)', async () => {
-    mockFileSystemService.createDirectory.mockResolvedValue(undefined);
+    (mockFileSystemService.createDirectory as Mock).mockResolvedValue(undefined); // as Mock 追加
     await mockFileSystemService.createDirectory(mockDirPath);
     expect(mockFileSystemService.createDirectory).toHaveBeenCalledWith(mockDirPath);
   });
 
    it('should define the createDirectory method (failure)', async () => {
     const error = new Error('Cannot create directory');
-    mockFileSystemService.createDirectory.mockRejectedValue(error);
+    (mockFileSystemService.createDirectory as Mock).mockRejectedValue(error); // as Mock 追加
     await expect(mockFileSystemService.createDirectory(mockDirPath)).rejects.toThrow(error);
     expect(mockFileSystemService.createDirectory).toHaveBeenCalledWith(mockDirPath);
   });
 
   // --- directoryExists ---
   it('should define the directoryExists method (true)', async () => {
-    mockFileSystemService.directoryExists.mockResolvedValue(true);
+    (mockFileSystemService.directoryExists as Mock).mockResolvedValue(true); // as Mock 追加
     const exists = await mockFileSystemService.directoryExists(mockDirPath);
     expect(mockFileSystemService.directoryExists).toHaveBeenCalledWith(mockDirPath);
     expect(exists).toBe(true);
   });
 
   it('should define the directoryExists method (false)', async () => {
-    mockFileSystemService.directoryExists.mockResolvedValue(false);
+    (mockFileSystemService.directoryExists as Mock).mockResolvedValue(false); // as Mock 追加
     const exists = await mockFileSystemService.directoryExists(mockDirPath);
     expect(mockFileSystemService.directoryExists).toHaveBeenCalledWith(mockDirPath);
     expect(exists).toBe(false);
@@ -156,14 +159,14 @@ describe('IFileSystemService Interface', () => {
 
   // --- listFiles ---
   it('should define the listFiles method (success)', async () => {
-    mockFileSystemService.listFiles.mockResolvedValue(mockFileList);
+    (mockFileSystemService.listFiles as Mock).mockResolvedValue(mockFileList); // as Mock 追加
     const files = await mockFileSystemService.listFiles(mockDirPath);
     expect(mockFileSystemService.listFiles).toHaveBeenCalledWith(mockDirPath);
     expect(files).toEqual(mockFileList);
   });
 
    it('should define the listFiles method (empty)', async () => {
-    mockFileSystemService.listFiles.mockResolvedValue([]);
+    (mockFileSystemService.listFiles as Mock).mockResolvedValue([]); // as Mock 追加
     const files = await mockFileSystemService.listFiles(mockDirPath);
     expect(mockFileSystemService.listFiles).toHaveBeenCalledWith(mockDirPath);
     expect(files).toEqual([]);
@@ -171,14 +174,14 @@ describe('IFileSystemService Interface', () => {
 
    it('should define the listFiles method (failure)', async () => {
     const error = new Error('Directory not found');
-    mockFileSystemService.listFiles.mockRejectedValue(error);
+    (mockFileSystemService.listFiles as Mock).mockRejectedValue(error); // as Mock 追加
     await expect(mockFileSystemService.listFiles(mockDirPath)).rejects.toThrow(error);
     expect(mockFileSystemService.listFiles).toHaveBeenCalledWith(mockDirPath);
   });
 
   // --- getFileStats ---
   it('should define the getFileStats method (success)', async () => {
-    mockFileSystemService.getFileStats.mockResolvedValue(mockFileStats);
+    (mockFileSystemService.getFileStats as Mock).mockResolvedValue(mockFileStats); // as Mock 追加
     const stats = await mockFileSystemService.getFileStats(mockFilePath);
     expect(mockFileSystemService.getFileStats).toHaveBeenCalledWith(mockFilePath);
     expect(stats).toEqual(mockFileStats);
@@ -186,7 +189,7 @@ describe('IFileSystemService Interface', () => {
 
    it('should define the getFileStats method (failure)', async () => {
     const error = new Error('File not found');
-    mockFileSystemService.getFileStats.mockRejectedValue(error);
+    (mockFileSystemService.getFileStats as Mock).mockRejectedValue(error); // as Mock 追加
     await expect(mockFileSystemService.getFileStats(mockFilePath)).rejects.toThrow(error);
     expect(mockFileSystemService.getFileStats).toHaveBeenCalledWith(mockFilePath);
   });
@@ -197,7 +200,7 @@ describe('IFileSystemService Interface', () => {
         const branchName = 'feature/test';
         const expectedPath = `/path/to/docs/branch-memory-bank/${branchName}`;
         // jest.Mock として型アサーションを追加
-        (mockFileSystemService.getBranchMemoryPath as jest.Mock).mockReturnValue(expectedPath);
+        (mockFileSystemService.getBranchMemoryPath as Mock).mockReturnValue(expectedPath); // as jest.Mock -> as Mock
         const path = mockFileSystemService.getBranchMemoryPath(branchName);
         expect(mockFileSystemService.getBranchMemoryPath).toHaveBeenCalledWith(branchName);
         expect(path).toBe(expectedPath);
@@ -210,7 +213,7 @@ describe('IFileSystemService Interface', () => {
   it('should define the getConfig method', () => {
     if (mockFileSystemService.getConfig) {
        // jest.Mock として型アサーションを追加
-       (mockFileSystemService.getConfig as jest.Mock).mockReturnValue(mockConfig);
+       (mockFileSystemService.getConfig as Mock).mockReturnValue(mockConfig); // as jest.Mock -> as Mock
         const config = mockFileSystemService.getConfig();
         expect(mockFileSystemService.getConfig).toHaveBeenCalled();
         expect(config).toEqual(mockConfig);

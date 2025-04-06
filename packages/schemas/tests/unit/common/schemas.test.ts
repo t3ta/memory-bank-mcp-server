@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { jest } from '@jest/globals'; // Import jest for mocking
+import { vi, Mock } from 'vitest'; // jest -> vi, Mock をインポート
 import {
   dateStringToDate,
   FlexibleDateSchema,
@@ -10,13 +10,13 @@ describe('Common Schemas', () => {
   describe('dateStringToDate', () => {
     // Mock Zod refinement context
     const mockCtx: z.RefinementCtx = {
-      addIssue: jest.fn(),
+      addIssue: vi.fn(), // jest -> vi
       path: [],
     };
 
     beforeEach(() => {
       // Reset mock before each test
-      (mockCtx.addIssue as jest.Mock).mockClear();
+      (mockCtx.addIssue as Mock).mockClear(); // jest.Mock -> Mock
     });
 
     it('should parse valid date strings into Date objects', () => {
@@ -48,12 +48,12 @@ describe('Common Schemas', () => {
 
      it('should handle potential errors during Date construction and suppress console.error', () => {
         // Suppress console.error for this specific test case
-        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {}); // jest -> vi
 
         // This case is hard to trigger reliably as new Date() is quite robust,
         // but we test the catch block logic. We can mock Date temporarily.
         const originalDate = global.Date;
-        global.Date = jest.fn(() => { throw new Error('Mock Date Error'); }) as any;
+        global.Date = vi.fn(() => { throw new Error('Mock Date Error'); }) as any; // jest -> vi
 
         const dateString = '2023-10-27T10:00:00.000Z';
         const result = dateStringToDate(dateString, mockCtx);

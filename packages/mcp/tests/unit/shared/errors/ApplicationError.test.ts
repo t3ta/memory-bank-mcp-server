@@ -1,5 +1,5 @@
-import { ApplicationError, ApplicationErrorCodes, ApplicationErrors } from '../../../../src/shared/errors/ApplicationError';
-import { BaseError } from '../../../../src/shared/errors/BaseError';
+import { ApplicationError, ApplicationErrorCodes, ApplicationErrors } from '../../../../src/shared/errors/ApplicationError.js'; // .js 追加
+import { BaseError } from '../../../../src/shared/errors/BaseError.js'; // .js 追加
 
 describe('ApplicationError', () => {
   it('should create an ApplicationError instance with correct properties', () => {

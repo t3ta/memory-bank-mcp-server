@@ -2,14 +2,12 @@
  * @jest-environment node
  */
 import { setupTestEnv, cleanupTestEnv, type TestEnv } from '../helpers/test-env.js';
-import { loadGlobalFixture, getFixtureContent } from '../helpers/fixtures-loader.js';
 import { DIContainer, setupContainer } from '../../../src/main/di/providers.js'; // Import DI container and setup function
-import { WriteGlobalDocumentUseCase, type WriteGlobalDocumentOutput } from '../../../src/application/usecases/global/WriteGlobalDocumentUseCase.js'; // Import real UseCase and types
+import { WriteGlobalDocumentUseCase } from '../../../src/application/usecases/global/WriteGlobalDocumentUseCase.js'; // Import real UseCase and types
 import { ReadGlobalDocumentUseCase } from '../../../src/application/usecases/global/ReadGlobalDocumentUseCase.js'; // Keep Read UseCase for verification
-import { DomainError, DomainErrors } from '../../../src/shared/errors/DomainError.js'; // Import specific errors for checking
-import { ApplicationError, ApplicationErrors } from '../../../src/shared/errors/ApplicationError.js';
+import { DomainError } from '../../../src/shared/errors/DomainError.js'; // Import specific errors for checking
+import { ApplicationError } from '../../../src/shared/errors/ApplicationError.js';
 // Removed direct import of rfc6902
-import { logger } from '../../../src/shared/utils/logger.js';
 import { JsonPatchService } from '../../../src/domain/jsonpatch/JsonPatchService.js'; // Import JsonPatchService interface
 import { Rfc6902JsonPatchAdapter } from '../../../src/domain/jsonpatch/Rfc6902JsonPatchAdapter.js'; // Import concrete implementation for testing
 import { DocumentWriterService } from '../../../src/application/services/DocumentWriterService.js'; // Import DocumentWriterService
@@ -529,10 +527,17 @@ describe('WriteGlobalDocumentUseCase Integration Tests', () => {
       const documentPath = 'test/non-existent-patch-target.json';
       const patches = [{ op: 'add', path: '/newField', value: 'newValue' }];
 
-      await expect(writeUseCase.execute({
-        document: { path: documentPath }, // Minimal document object
-        patches: patches // patches at top level
-      })).rejects.toThrow(ApplicationErrors.notFound('Document', documentPath));
+      try {
+        await writeUseCase.execute({
+          document: { path: documentPath }, // Minimal document object
+          patches: patches // patches at top level
+        });
+        throw new Error('Expected ApplicationError but no error was thrown.');
+      } catch (error) {
+        expect(error).toBeInstanceOf(ApplicationError);
+        expect((error as ApplicationError).message).toBe(`Document with id ${documentPath} was not found`);
+        expect((error as ApplicationError).code).toBe('APP_ERROR.NOT_FOUND');
+      }
     });
 
     it('should throw an error if patches are invalid (e.g., test fails)', async () => {

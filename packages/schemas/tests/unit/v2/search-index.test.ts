@@ -1,4 +1,3 @@
-import { z } from 'zod';
 import {
   DocumentMetaSchema,
   DocumentsMetaIndexSchema,
@@ -10,7 +9,7 @@ import {
   type TagsIndex,
   type SearchResultItem,
   type SearchResults,
-} from '../../src/v2/search-index';
+} from '@/v2/search-index.js'; // エイリアスパスに変更
 
 describe('Search Index Schemas (v2)', () => {
   const validDate = new Date().toISOString();

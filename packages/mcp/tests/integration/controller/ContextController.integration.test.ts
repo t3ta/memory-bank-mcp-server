@@ -1,5 +1,5 @@
 /**
- * @jest-environment node
+ * Integration tests for ContextController
  */
 import { setupTestEnv, cleanupTestEnv, createBranchDir, type TestEnv } from '../helpers/test-env.js';
 import { loadBranchFixture, loadGlobalFixture } from '../helpers/fixtures-loader.js';

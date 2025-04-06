@@ -1,21 +1,22 @@
+import { vi } from 'vitest'; // vi をインポート
 import {
-  BaseError,
-  ApplicationError, ApplicationErrorCodes, ApplicationErrors,
-  DomainError, DomainErrorCodes, DomainErrors,
-  InfrastructureError, InfrastructureErrorCodes, InfrastructureErrors,
-  SharedUtilsError, SharedUtilsErrorCodes, SharedUtilsErrors,
+  // BaseError, // 未使用なので削除
+  ApplicationError, ApplicationErrorCodes, // 未使用の ApplicationErrors を削除
+  DomainError, DomainErrorCodes, // 未使用の DomainErrors を削除
+  InfrastructureError, InfrastructureErrorCodes, // 未使用の InfrastructureErrors を削除
+  // SharedUtilsError, // 未使用なので削除
   ErrorUtils
-} from '../../../../src/shared/errors/index';
-import { logger } from '../../../../src/shared/utils/logger';
+} from '../../../../src/shared/errors/index.js'; // .js 拡張子を追加
+import { logger } from '../../../../src/shared/utils/logger.js'; // .js 拡張子を追加
 
 // jest.mock を削除し、spyOn を使う方式に変更
 
 describe('ErrorUtils', () => {
-  let errorSpy: jest.SpyInstance;
+  let errorSpy: ReturnType<typeof vi.spyOn>; // より正確な型推論を使うか、シンプルに型指定を削除
 
   beforeEach(() => {
     // 各テスト前に logger.error の呼び出し履歴をクリアし、実装を空にする
-    errorSpy = jest.spyOn(logger, 'error').mockImplementation(() => {});
+    errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {}); // jest -> vi
   });
 
   afterEach(() => {
@@ -39,7 +40,7 @@ describe('ErrorUtils', () => {
     it('should map unknown errors using the errorMapper if provided', async () => {
       const originalError = new Error('Original error');
       const mappedError = new ApplicationError(ApplicationErrorCodes.UNKNOWN_ERROR, 'Mapped error'); // エラーコード修正
-      const errorMapper = jest.fn().mockReturnValue(mappedError);
+      const errorMapper = vi.fn().mockReturnValue(mappedError); // jest -> vi
       const promise = Promise.reject(originalError);
 
       await expect(ErrorUtils.wrapAsync(promise, errorMapper)).rejects.toThrow(mappedError);
@@ -145,7 +146,7 @@ describe('ErrorUtils', () => {
   describe('formatForLogging', () => {
     it('should call toJSON for BaseError instances', () => {
       const baseError = new DomainError(DomainErrorCodes.REPOSITORY_ERROR, 'DB Error', { table: 'users' });
-      const jsonSpy = jest.spyOn(baseError, 'toJSON');
+      const jsonSpy = vi.spyOn(baseError, 'toJSON'); // jest -> vi
       const result = ErrorUtils.formatForLogging(baseError);
 
       expect(jsonSpy).toHaveBeenCalledTimes(1);
@@ -154,9 +155,9 @@ describe('ErrorUtils', () => {
     });
     it('should format standard Errors correctly', () => {
       const standardError = new Error('Standard Test Error');
-      // jest.fn() を使って Date.toISOString をモック化し、固定値を返すようにする
+      // vi.spyOn() を使って Date.toISOString をモック化し、固定値を返すようにする
       const mockDate = new Date('2025-04-05T12:10:15.000Z');
-      const toISOStringSpy = jest.spyOn(Date.prototype, 'toISOString').mockReturnValue(mockDate.toISOString());
+      const toISOStringSpy = vi.spyOn(Date.prototype, 'toISOString').mockReturnValue(mockDate.toISOString()); // jest -> vi
 
       const result = ErrorUtils.formatForLogging(standardError);
 
@@ -170,7 +171,7 @@ describe('ErrorUtils', () => {
     it('should format non-Error types (string) correctly', () => {
       const nonError = 'Just a string';
       const mockDate = new Date('2025-04-05T12:10:23.000Z');
-      const toISOStringSpy = jest.spyOn(Date.prototype, 'toISOString').mockReturnValue(mockDate.toISOString());
+      const toISOStringSpy = vi.spyOn(Date.prototype, 'toISOString').mockReturnValue(mockDate.toISOString()); // jest -> vi
 
       const result = ErrorUtils.formatForLogging(nonError);
 
@@ -183,7 +184,7 @@ describe('ErrorUtils', () => {
 
     it('should format non-Error types (null) correctly', () => {
       const mockDate = new Date('2025-04-05T12:10:24.000Z');
-      const toISOStringSpy = jest.spyOn(Date.prototype, 'toISOString').mockReturnValue(mockDate.toISOString());
+      const toISOStringSpy = vi.spyOn(Date.prototype, 'toISOString').mockReturnValue(mockDate.toISOString()); // jest -> vi
 
       const nullResult = ErrorUtils.formatForLogging(null);
       expect(nullResult).toEqual({

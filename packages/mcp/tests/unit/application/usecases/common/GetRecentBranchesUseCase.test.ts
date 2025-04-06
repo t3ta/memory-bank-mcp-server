@@ -1,14 +1,31 @@
+import { vi } from 'vitest'; // vi をインポート
+import type { Mock } from 'vitest'; // Mock 型をインポート
 import { GetRecentBranchesUseCase } from '../../../../../src/application/usecases/common/GetRecentBranchesUseCase.js';
 import { IBranchMemoryBankRepository } from '../../../../../src/domain/repositories/IBranchMemoryBankRepository.js';
-import { mock } from 'jest-mock-extended';
+// import { mock } from 'jest-mock-extended'; // jest-mock-extended を削除
 import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo.js';
 
 describe('GetRecentBranchesUseCase', () => {
   let useCase: GetRecentBranchesUseCase;
-  let mockBranchRepository: jest.Mocked<IBranchMemoryBankRepository>;
+  // jest.Mocked を削除し、手動モックの型を指定
+  let mockBranchRepository: IBranchMemoryBankRepository;
 
   beforeEach(() => {
-    mockBranchRepository = mock<IBranchMemoryBankRepository>();
+    // jest-mock-extended の代わりに vi.fn() で手動モックを作成する
+    mockBranchRepository = {
+      initialize: vi.fn(),
+      exists: vi.fn(),
+      getDocument: vi.fn(),
+      saveDocument: vi.fn(),
+      deleteDocument: vi.fn(),
+      getRecentBranches: vi.fn(),
+      listDocuments: vi.fn(),
+      findDocumentsByTags: vi.fn(),
+      validateStructure: vi.fn(),
+      saveTagIndex: vi.fn(),
+      getTagIndex: vi.fn(),
+      findDocumentPathsByTagsUsingIndex: vi.fn(),
+    };
     useCase = new GetRecentBranchesUseCase(mockBranchRepository);
   });
 
@@ -18,7 +35,7 @@ describe('GetRecentBranchesUseCase', () => {
       { branchInfo: BranchInfo.create('feature/branch-1'), lastModified: new Date(), summary: { currentWork: 'Task 1', recentChanges: [] } },
       { branchInfo: BranchInfo.create('feature/branch-2'), lastModified: new Date(), summary: { currentWork: 'Task 2', recentChanges: [] } },
     ];
-    mockBranchRepository.getRecentBranches.mockResolvedValue(mockRecentBranches);
+    (mockBranchRepository.getRecentBranches as Mock).mockResolvedValue(mockRecentBranches); // as Mock 追加
 
     // Act
     const result = await useCase.execute({ limit: 5 });
@@ -32,7 +49,7 @@ describe('GetRecentBranchesUseCase', () => {
 
   it('should return an empty list if no recent branches found', async () => {
     // Arrange
-    mockBranchRepository.getRecentBranches.mockResolvedValue([]);
+    (mockBranchRepository.getRecentBranches as Mock).mockResolvedValue([]); // as Mock 追加
 
     // Act
     const result = await useCase.execute({ limit: 5 });
@@ -44,7 +61,7 @@ describe('GetRecentBranchesUseCase', () => {
 
   it('should use default limit (10) if limit is not provided', async () => {
     // Arrange
-    mockBranchRepository.getRecentBranches.mockResolvedValue([]); // 結果は空で良い
+    (mockBranchRepository.getRecentBranches as Mock).mockResolvedValue([]); // as Mock 追加
 
     // Act
     await useCase.execute({}); // limit を指定しない
@@ -77,7 +94,7 @@ describe('GetRecentBranchesUseCase', () => {
    it('should throw ApplicationError if repository throws error', async () => {
     // Arrange
     const repoError = new Error('Database connection failed');
-    mockBranchRepository.getRecentBranches.mockRejectedValue(repoError);
+    (mockBranchRepository.getRecentBranches as Mock).mockRejectedValue(repoError); // as Mock 追加
 
     // Act & Assert
     try {

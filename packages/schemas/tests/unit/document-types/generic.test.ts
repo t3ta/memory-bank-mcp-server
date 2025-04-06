@@ -1,9 +1,9 @@
-import { z } from 'zod';
+// import { z } from 'zod'; // 未使用なので削除
 import {
   GenericDocumentJsonV2Schema,
   GenericDocumentJsonV2,
-} from '../../../src/document-types/generic'; // Adjust path as needed
-import { SCHEMA_VERSION } from '../../../src/v2/json-document'; // Import constant
+} from '../../../src/document-types/generic.js'; // .js 追加
+import { SCHEMA_VERSION } from '../../../src/v2/json-document.js'; // .js 追加
 
 // Helper to create minimal valid metadata for testing generic docs
 // Note: documentType is NOT part of metadata in the new structure

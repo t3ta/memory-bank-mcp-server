@@ -1,5 +1,5 @@
-import { DomainError, DomainErrorCodes, DomainErrors } from '../../../../src/shared/errors/DomainError';
-import { BaseError } from '../../../../src/shared/errors/BaseError';
+import { DomainError, DomainErrorCodes, DomainErrors } from '../../../../src/shared/errors/DomainError.js'; // .js 追加
+import { BaseError } from '../../../../src/shared/errors/BaseError.js'; // .js 追加
 
 describe('DomainError', () => {
   it('should create a DomainError instance with correct properties', () => {

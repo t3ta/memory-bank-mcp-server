@@ -1,5 +1,4 @@
-import { z } from 'zod';
-import { createErrorMessage, commonValidators } from '../../src/validation-helpers'; // Adjust path as needed
+import { createErrorMessage, commonValidators } from '../../src/validation-helpers.js'; // Adjust path as needed
 
 describe('Validation Helpers', () => {
   describe('createErrorMessage', () => {

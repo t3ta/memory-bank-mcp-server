@@ -1,73 +1,26 @@
-import { WriteGlobalDocumentUseCase } from '../../../../../src/application/usecases/global/WriteGlobalDocumentUseCase';
-import { IGlobalMemoryBankRepository } from '../../../../../src/domain/repositories/IGlobalMemoryBankRepository';
-import { IBranchMemoryBankRepository } from '../../../../../src/domain/repositories/IBranchMemoryBankRepository'; // TagIndex更新で使うかも
-import { IDocumentRepository } from '../../../../../src/domain/repositories/IDocumentRepository'; // TagIndex更新で使うかも
-import { JsonPatchService } from '../../../../../src/domain/jsonpatch/JsonPatchService';
-import { DocumentPath } from '../../../../../src/domain/entities/DocumentPath';
-import { MemoryDocument } from '../../../../../src/domain/entities/MemoryDocument';
-import { Tag } from '../../../../../src/domain/entities/Tag';
-import { UpdateTagIndexUseCaseV2 } from '../../../../../src/application/usecases/common/UpdateTagIndexUseCaseV2';
-import { DocumentWriterService } from '../../../../../src/application/services/DocumentWriterService';
-// import { DomainErrors } from '../../../../../src/shared/errors/DomainError'; // 必要に応じてコメント解除
-// import { ApplicationErrors } from '../../../../../src/shared/errors/ApplicationError'; // 必要に応じてコメント解除
+import { vi } from 'vitest'; // vi をインポート
+// import { DomainErrors } from '../../../../../src/shared/errors/DomainError.js'; // .js 追加
+// import { ApplicationErrors } from '../../../../../src/shared/errors/ApplicationError.js'; // .js 追加
 
 // --- モックの準備 ---
-const mockGlobalRepository = {
-  initialize: jest.fn(),
-  getDocument: jest.fn(),
-  saveDocument: jest.fn(),
-  deleteDocument: jest.fn(),
-  listDocuments: jest.fn(),
-  findDocumentsByTags: jest.fn(),
-  updateTagsIndex: jest.fn(),
-  saveTagIndex: jest.fn(),
-  getTagIndex: jest.fn(),
-  findDocumentPathsByTagsUsingIndex: jest.fn(),
-  validateStructure: jest.fn(),
-} satisfies jest.Mocked<IGlobalMemoryBankRepository>;
+// satisfies jest.Mocked を削除し、手動モックの型を指定
 
-const mockBranchRepository = { // TagIndex更新で使う可能性あり
-  // 必要なメソッドをモック化
-} satisfies Partial<jest.Mocked<IBranchMemoryBankRepository>>;
+// satisfies jest.Mocked を削除し、手動モックの型を指定
 
-const mockDocumentRepository = { // DocumentWriterService が使う可能性あり
-  getDocument: jest.fn(),
-  saveDocument: jest.fn(),
-} satisfies Partial<jest.Mocked<IDocumentRepository>>;
+// satisfies jest.Mocked を削除し、手動モックの型を指定
 
-const mockJsonPatchService = {
-  apply: jest.fn(),
-  validate: jest.fn(),
-  generatePatch: jest.fn(),
-} satisfies jest.Mocked<JsonPatchService>;
+// satisfies jest.Mocked を削除し、手動モックの型を指定
 
 // UpdateTagIndexUseCaseV2 のモック (execute のみモック)
-const mockUpdateTagIndexUseCase = {
-  execute: jest.fn(),
-};
 
 // DocumentWriterService のモック (satisfies を一旦外す)
-const mockDocumentWriterService = {
-  write: jest.fn(),
-  patchService: mockJsonPatchService,
-};
 // --- モックの準備ここまで ---
 
 
 describe('WriteGlobalDocumentUseCase', () => {
-  let useCase: WriteGlobalDocumentUseCase;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    // TODO: WriteGlobalDocumentUseCase のコンストラクタ引数を確認して正しくインスタンス化する
-    // useCase = new WriteGlobalDocumentUseCase(
-    //   mockGlobalRepository,
-    //   mockBranchRepository, // 仮
-    //   mockDocumentRepository, // 仮
-    //   mockJsonPatchService, // 仮
-    //   mockUpdateTagIndexUseCase, // 仮
-    //   mockDocumentWriterService // 仮
-    // );
+    vi.clearAllMocks(); // jest -> vi
   });
 
   describe('execute', () => {

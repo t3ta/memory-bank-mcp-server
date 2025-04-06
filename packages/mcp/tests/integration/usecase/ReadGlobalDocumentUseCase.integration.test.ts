@@ -4,11 +4,8 @@
 import { setupTestEnv, cleanupTestEnv, type TestEnv } from '../helpers/test-env.js';
 import { loadGlobalFixture } from '../helpers/fixtures-loader.js';
 import { DIContainer, setupContainer } from '../../../src/main/di/providers.js'; // Import DI container and setup function
-import { ReadGlobalDocumentUseCase, type ReadGlobalDocumentOutput } from '../../../src/application/usecases/global/ReadGlobalDocumentUseCase.js'; // Import real UseCase and types
-import { DomainErrors } from '../../../src/shared/errors/DomainError.js'; // Import specific errors for checking
-import { ApplicationErrors } from '../../../src/shared/errors/ApplicationError.js'; // Import specific errors for checking
+import { ReadGlobalDocumentUseCase } from '../../../src/application/usecases/global/ReadGlobalDocumentUseCase.js'; // Import real UseCase and types
 
-import * as path from 'path';
 
 describe('ReadGlobalDocumentUseCase Integration Tests', () => {
   let testEnv: TestEnv;

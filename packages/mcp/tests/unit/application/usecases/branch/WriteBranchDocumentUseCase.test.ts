@@ -1,69 +1,57 @@
-import { WriteBranchDocumentUseCase } from '../../../../../src/application/usecases/branch/WriteBranchDocumentUseCase';
-import { IBranchMemoryBankRepository } from '../../../../../src/domain/repositories/IBranchMemoryBankRepository';
-import { IGlobalMemoryBankRepository } from '../../../../../src/domain/repositories/IGlobalMemoryBankRepository'; // TagIndex更新で使うかも
-import { IDocumentRepository } from '../../../../../src/domain/repositories/IDocumentRepository'; // TagIndex更新で使うかも
-import { JsonPatchService } from '../../../../../src/domain/jsonpatch/JsonPatchService'; // Patch適用で使うかも
-import { DocumentPath } from '../../../../../src/domain/entities/DocumentPath';
-import { MemoryDocument } from '../../../../../src/domain/entities/MemoryDocument';
-import { Tag } from '../../../../../src/domain/entities/Tag';
-import type { IGitService } from '../../../../../src/infrastructure/git/IGitService';
-import type { IConfigProvider } from '../../../../../src/infrastructure/config/interfaces/IConfigProvider';
-import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo'; // BranchInfo をインポート
-import { UpdateTagIndexUseCaseV2 } from '../../../../../src/application/usecases/common/UpdateTagIndexUseCaseV2'; // 内部で使ってる可能性
-import { DocumentWriterService } from '../../../../../src/application/services/DocumentWriterService'; // 内部で使ってる可能性
-import { DomainErrors } from '../../../../../src/shared/errors'; // 必要に応じてコメント解除
-import { ApplicationErrors } from '../../../../../src/shared/errors'; // 必要に応じてコメント解除
+import { vi } from 'vitest'; // vi をインポート
+import type { Mock } from 'vitest'; // Mock 型をインポート
+import { WriteBranchDocumentUseCase } from '../../../../../src/application/usecases/branch/WriteBranchDocumentUseCase.js'; // .js 追加
+import { IBranchMemoryBankRepository } from '../../../../../src/domain/repositories/IBranchMemoryBankRepository.js'; // .js 追加
+import { DocumentPath } from '../../../../../src/domain/entities/DocumentPath.js'; // .js 追加
+import { MemoryDocument } from '../../../../../src/domain/entities/MemoryDocument.js'; // .js 追加
+import { Tag } from '../../../../../src/domain/entities/Tag.js'; // .js 追加
+import type { IGitService } from '../../../../../src/infrastructure/git/IGitService.js'; // .js 追加
+import type { IConfigProvider } from '../../../../../src/infrastructure/config/interfaces/IConfigProvider.js'; // .js 追加
+import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo.js'; // .js 追加
+import { ApplicationError, ApplicationErrors } from '../../../../../src/shared/errors/index.js'; // ApplicationError を追加
 
 // --- モックの準備 ---
-const mockBranchRepository = {
-  exists: jest.fn(),
-  initialize: jest.fn(),
-  getDocument: jest.fn(),
-  saveDocument: jest.fn(),
-  deleteDocument: jest.fn(),
-  listDocuments: jest.fn(),
-  findDocumentsByTags: jest.fn(),
-  getRecentBranches: jest.fn(),
-  validateStructure: jest.fn(),
-  saveTagIndex: jest.fn(),
-  getTagIndex: jest.fn(),
-  findDocumentPathsByTagsUsingIndex: jest.fn(),
-} satisfies jest.Mocked<IBranchMemoryBankRepository>;
-
-const mockGlobalRepository = { // 追加
-  // 必要なメソッドをモック化
-} satisfies Partial<jest.Mocked<IGlobalMemoryBankRepository>>;
-
-const mockDocumentRepository = { // 追加
-  // 必要なメソッドをモック化
-} satisfies Partial<jest.Mocked<IDocumentRepository>>;
-
-const mockJsonPatchService = { // 追加
-  apply: jest.fn(),
-  validate: jest.fn(),
-  generatePatch: jest.fn(),
-} satisfies jest.Mocked<JsonPatchService>;
-
-const mockGitService: jest.Mocked<IGitService> = {
-  getCurrentBranchName: jest.fn(),
+// jest.Mocked と satisfies を削除し、手動モックの型を指定
+const mockBranchRepository: IBranchMemoryBankRepository = {
+  exists: vi.fn(), // jest -> vi
+  initialize: vi.fn(), // jest -> vi
+  getDocument: vi.fn(), // jest -> vi
+  saveDocument: vi.fn(), // jest -> vi
+  deleteDocument: vi.fn(), // jest -> vi
+  listDocuments: vi.fn(), // jest -> vi
+  findDocumentsByTags: vi.fn(), // jest -> vi
+  getRecentBranches: vi.fn(), // jest -> vi
+  validateStructure: vi.fn(), // jest -> vi
+  saveTagIndex: vi.fn(), // jest -> vi
+  getTagIndex: vi.fn(), // jest -> vi
+  findDocumentPathsByTagsUsingIndex: vi.fn(), // jest -> vi
 };
 
-const mockConfigProvider: jest.Mocked<IConfigProvider> = {
-  initialize: jest.fn(),
-  getConfig: jest.fn(),
-  getGlobalMemoryPath: jest.fn(),
-  getBranchMemoryPath: jest.fn(),
-  getLanguage: jest.fn(),
+// jest.Mocked と satisfies を削除し、手動モックの型を指定
+
+// jest.Mocked と satisfies を削除し、手動モックの型を指定
+
+// jest.Mocked と satisfies を削除し、手動モックの型を指定
+
+// jest.Mocked を削除し、手動モックの型を指定
+const mockGitService: IGitService = {
+  getCurrentBranchName: vi.fn(), // jest -> vi
+};
+
+// jest.Mocked を削除し、手動モックの型を指定
+const mockConfigProvider: IConfigProvider = {
+  initialize: vi.fn(), // jest -> vi
+  getConfig: vi.fn(), // jest -> vi
+  getGlobalMemoryPath: vi.fn(), // jest -> vi
+  getBranchMemoryPath: vi.fn(), // jest -> vi
+  getLanguage: vi.fn(), // jest -> vi
 };
 
 // UpdateTagIndexUseCaseV2 のモック (execute のみモック)
-const mockUpdateTagIndexUseCase = {
-  execute: jest.fn(),
-};
 
 // DocumentWriterService のモック (write メソッドのみ)
 const mockDocumentWriterService = {
-  write: jest.fn(),
+  write: vi.fn(), // jest -> vi
   // patchService は DocumentWriterService のコンストラクタ引数なので、
   // UseCase のテストでは直接モックする必要はないことが多い。
   // UseCase が内部で patchService を直接使っている場合は必要。
@@ -77,7 +65,7 @@ describe('WriteBranchDocumentUseCase', () => {
   let useCase: WriteBranchDocumentUseCase;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks(); // jest -> vi
     // WriteBranchDocumentUseCase のインスタンス化 (正しい引数で)
     useCase = new WriteBranchDocumentUseCase(
       mockBranchRepository,
@@ -98,13 +86,13 @@ describe('WriteBranchDocumentUseCase', () => {
       const expectedSavedDoc = MemoryDocument.create({ path: docPath, content, tags, lastModified: new Date() });
 
       // モックの設定
-      mockGitService.getCurrentBranchName.mockResolvedValue(branchName);
-      mockConfigProvider.getBranchMemoryPath.mockReturnValue(`/mock/path/to/${branchName}`);
-      mockBranchRepository.exists.mockResolvedValue(false); // ブランチは存在しない
-      mockBranchRepository.initialize.mockResolvedValue(undefined); // 初期化は成功
+      (mockGitService.getCurrentBranchName as Mock).mockResolvedValue(branchName); // as Mock 追加
+      (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${branchName}`); // as Mock 追加
+      (mockBranchRepository.exists as Mock).mockResolvedValue(false); // as Mock 追加
+      (mockBranchRepository.initialize as Mock).mockResolvedValue(undefined); // as Mock 追加
       // documentWriterService.write は、渡されたリポジトリアダプタ経由で saveDocument を呼ぶはず
       // ここでは write が成功し、保存されたドキュメントを返すようにモック
-      mockDocumentWriterService.write.mockResolvedValue(expectedSavedDoc);
+      (mockDocumentWriterService.write as Mock).mockResolvedValue(expectedSavedDoc); // as Mock 追加
 
       // 実行
       const result = await useCase.execute({ branchName, document: documentInput, returnContent: true });
@@ -141,11 +129,11 @@ describe('WriteBranchDocumentUseCase', () => {
       const expectedSavedDoc = existingDoc.updateContent(newContent).updateTags(tags); // 上書きされたドキュメント
 
       // モックの設定
-      mockGitService.getCurrentBranchName.mockResolvedValue(branchName);
-      mockConfigProvider.getBranchMemoryPath.mockReturnValue(`/mock/path/to/${branchName}`);
-      mockBranchRepository.exists.mockResolvedValue(true); // ブランチは存在する
+      (mockGitService.getCurrentBranchName as Mock).mockResolvedValue(branchName); // as Mock 追加
+      (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${branchName}`); // as Mock 追加
+      (mockBranchRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
       // documentWriterService.write は既存ドキュメントを内部で取得し、更新して保存する
-      mockDocumentWriterService.write.mockResolvedValue(expectedSavedDoc); // 更新されたドキュメントを返す
+      (mockDocumentWriterService.write as Mock).mockResolvedValue(expectedSavedDoc); // as Mock 追加
 
       // 実行
       const result = await useCase.execute({ branchName, document: documentInput, returnContent: true });
@@ -182,11 +170,11 @@ describe('WriteBranchDocumentUseCase', () => {
       const expectedSavedDoc = existingDoc.updateContent(expectedPatchedContent).updateTags(tags); // パッチ適用後のドキュメント
 
       // モックの設定
-      mockGitService.getCurrentBranchName.mockResolvedValue(branchName);
-      mockConfigProvider.getBranchMemoryPath.mockReturnValue(`/mock/path/to/${branchName}`);
-      mockBranchRepository.exists.mockResolvedValue(true); // ブランチは存在する
+      (mockGitService.getCurrentBranchName as Mock).mockResolvedValue(branchName); // as Mock 追加
+      (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${branchName}`); // as Mock 追加
+      (mockBranchRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
       // documentWriterService.write がパッチ適用後のドキュメントを返すようにモック
-      mockDocumentWriterService.write.mockResolvedValue(expectedSavedDoc);
+      (mockDocumentWriterService.write as Mock).mockResolvedValue(expectedSavedDoc); // as Mock 追加
 
       // 実行
       const result = await useCase.execute({ branchName, document: documentInput, patches, returnContent: true }); // patches を渡す
@@ -222,11 +210,11 @@ describe('WriteBranchDocumentUseCase', () => {
       const expectedSavedDoc = existingDoc.updateContent(newContent).updateTags(newTags); // content と tags が更新されたドキュメント
 
       // モックの設定
-      mockGitService.getCurrentBranchName.mockResolvedValue(branchName);
-      mockConfigProvider.getBranchMemoryPath.mockReturnValue(`/mock/path/to/${branchName}`);
-      mockBranchRepository.exists.mockResolvedValue(true);
+      (mockGitService.getCurrentBranchName as Mock).mockResolvedValue(branchName); // as Mock 追加
+      (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${branchName}`); // as Mock 追加
+      (mockBranchRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
       // write が更新されたドキュメントを返すようにモック
-      mockDocumentWriterService.write.mockResolvedValue(expectedSavedDoc);
+      (mockDocumentWriterService.write as Mock).mockResolvedValue(expectedSavedDoc); // as Mock 追加
 
       // 実行
       const result = await useCase.execute({ branchName, document: documentInput, returnContent: true });
@@ -263,11 +251,11 @@ describe('WriteBranchDocumentUseCase', () => {
       const expectedSavedDoc = existingDoc.updateContent(expectedPatchedContent).updateTags(newTags); // content と tags が更新されたドキュメント
 
       // モックの設定
-      mockGitService.getCurrentBranchName.mockResolvedValue(branchName);
-      mockConfigProvider.getBranchMemoryPath.mockReturnValue(`/mock/path/to/${branchName}`);
-      mockBranchRepository.exists.mockResolvedValue(true);
+      (mockGitService.getCurrentBranchName as Mock).mockResolvedValue(branchName); // as Mock 追加
+      (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${branchName}`); // as Mock 追加
+      (mockBranchRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
       // write が更新されたドキュメントを返すようにモック
-      mockDocumentWriterService.write.mockResolvedValue(expectedSavedDoc);
+      (mockDocumentWriterService.write as Mock).mockResolvedValue(expectedSavedDoc); // as Mock 追加
 
       // 実行 (patches と document.tags を両方渡す)
       const result = await useCase.execute({ branchName, document: documentInput, patches, returnContent: true });
@@ -299,11 +287,11 @@ describe('WriteBranchDocumentUseCase', () => {
       const expectedSavedDoc = MemoryDocument.create({ path: docPath, content, tags: [], lastModified: new Date() });
 
       // モックの設定
-      mockConfigProvider.getConfig.mockReturnValue({ isProjectMode: true, language: 'en', docsRoot: '/mock/docs', verbose: false }); // docsRoot と verbose を追加
-      mockGitService.getCurrentBranchName.mockResolvedValue(detectedBranchName); // Gitがブランチ名を返す
-      mockConfigProvider.getBranchMemoryPath.mockReturnValue(`/mock/path/to/${detectedBranchName}`);
-      mockBranchRepository.exists.mockResolvedValue(true); // ブランチは存在する想定
-      mockDocumentWriterService.write.mockResolvedValue(expectedSavedDoc);
+      (mockConfigProvider.getConfig as Mock).mockReturnValue({ isProjectMode: true, language: 'en', docsRoot: '/mock/docs', verbose: false }); // as Mock 追加
+      (mockGitService.getCurrentBranchName as Mock).mockResolvedValue(detectedBranchName); // as Mock 追加
+      (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${detectedBranchName}`); // as Mock 追加
+      (mockBranchRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
+      (mockDocumentWriterService.write as Mock).mockResolvedValue(expectedSavedDoc); // as Mock 追加
 
       // 実行 (branchName を省略)
       const result = await useCase.execute({ document: documentInput });
@@ -325,11 +313,17 @@ describe('WriteBranchDocumentUseCase', () => {
       const expectedError = ApplicationErrors.invalidInput('Branch name is required when not running in project mode.');
 
       // モックの設定
-      mockConfigProvider.getConfig.mockReturnValue({ isProjectMode: false, language: 'en', docsRoot: '/mock/docs', verbose: false }); // プロジェクトモードOFF
+      (mockConfigProvider.getConfig as Mock).mockReturnValue({ isProjectMode: false, language: 'en', docsRoot: '/mock/docs', verbose: false }); // as Mock 追加
 
       // 実行＆検証 (branchName を省略)
-      await expect(useCase.execute({ document: documentInput }))
-        .rejects.toThrow(expectedError);
+      try {
+        await useCase.execute({ document: documentInput });
+        throw new Error('Expected ApplicationError but no error was thrown.');
+      } catch (error) {
+        expect(error).toBeInstanceOf(ApplicationError);
+        expect((error as ApplicationError).message).toBe(expectedError.message);
+        expect((error as ApplicationError).code).toBe(expectedError.code);
+      }
 
       // 検証
       expect(mockConfigProvider.getConfig).toHaveBeenCalled();
@@ -345,8 +339,8 @@ describe('WriteBranchDocumentUseCase', () => {
       const expectedError = ApplicationErrors.invalidInput('Document path is required');
 
       // モックの設定 (branchName は指定するが、他は呼ばれないはず)
-      mockGitService.getCurrentBranchName.mockResolvedValue(branchName);
-      mockConfigProvider.getBranchMemoryPath.mockReturnValue(`/mock/path/to/${branchName}`);
+      (mockGitService.getCurrentBranchName as Mock).mockResolvedValue(branchName); // as Mock 追加
+      (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${branchName}`); // as Mock 追加
 
       // 実行＆検証
       await expect(useCase.execute({ branchName, document: documentInput }))
@@ -365,8 +359,8 @@ describe('WriteBranchDocumentUseCase', () => {
       const expectedError = ApplicationErrors.invalidInput('Cannot provide both document content and patches simultaneously');
 
       // モックの設定 (branchName は指定するが、他は呼ばれないはず)
-      mockGitService.getCurrentBranchName.mockResolvedValue(branchName);
-      mockConfigProvider.getBranchMemoryPath.mockReturnValue(`/mock/path/to/${branchName}`);
+      (mockGitService.getCurrentBranchName as Mock).mockResolvedValue(branchName); // as Mock 追加
+      (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${branchName}`); // as Mock 追加
 
       // 実行＆検証 (content と patches を両方渡す)
       await expect(useCase.execute({ branchName, document: documentInput, patches }))
@@ -385,12 +379,12 @@ describe('WriteBranchDocumentUseCase', () => {
       const expectedError = ApplicationErrors.executionFailed('Failed to parse existing document content as JSON for patching'); // エラーメッセージは内部実装に依存する可能性あり
 
       // モックの設定
-      mockGitService.getCurrentBranchName.mockResolvedValue(branchName);
-      mockConfigProvider.getBranchMemoryPath.mockReturnValue(`/mock/path/to/${branchName}`);
-      mockBranchRepository.exists.mockResolvedValue(true); // ブランチは存在する
+      (mockGitService.getCurrentBranchName as Mock).mockResolvedValue(branchName); // as Mock 追加
+      (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${branchName}`); // as Mock 追加
+      (mockBranchRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
       // DocumentWriterService.write がエラーを投げるように設定
       // (実際には write の内部で getDocument してパースしようとして失敗する)
-      mockDocumentWriterService.write.mockRejectedValue(expectedError);
+      (mockDocumentWriterService.write as Mock).mockRejectedValue(expectedError); // as Mock 追加
 
       // 実行＆検証
       await expect(useCase.execute({ branchName, document: documentInput, patches }))
@@ -413,12 +407,12 @@ describe('WriteBranchDocumentUseCase', () => {
       const expectedError = ApplicationErrors.notFound('Document', docPath.value, { message: 'Cannot apply patches to non-existent document.' });
 
       // モックの設定
-      mockGitService.getCurrentBranchName.mockResolvedValue(branchName);
-      mockConfigProvider.getBranchMemoryPath.mockReturnValue(`/mock/path/to/${branchName}`);
-      mockBranchRepository.exists.mockResolvedValue(true); // ブランチは存在する
+      (mockGitService.getCurrentBranchName as Mock).mockResolvedValue(branchName); // as Mock 追加
+      (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${branchName}`); // as Mock 追加
+      (mockBranchRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
       // DocumentWriterService.write がエラーを投げるように設定
       // (実際には write の内部で getDocument して null が返り、エラーになる)
-      mockDocumentWriterService.write.mockRejectedValue(expectedError);
+      (mockDocumentWriterService.write as Mock).mockRejectedValue(expectedError); // as Mock 追加
 
       // 実行＆検証
       await expect(useCase.execute({ branchName, document: documentInput, patches }))
@@ -442,14 +436,15 @@ describe('WriteBranchDocumentUseCase', () => {
       const expectedError = ApplicationErrors.branchInitializationFailed(branchName, initializationError);
 
       // モックの設定
-      mockGitService.getCurrentBranchName.mockResolvedValue(branchName); // branchName は指定されている
-      mockConfigProvider.getBranchMemoryPath.mockReturnValue(`/mock/path/to/${branchName}`);
-      mockBranchRepository.exists.mockResolvedValue(false); // ブランチは存在しない
-      mockBranchRepository.initialize.mockRejectedValue(initializationError); // ブランチ初期化が失敗する
+      (mockGitService.getCurrentBranchName as Mock).mockResolvedValue(branchName); // as Mock 追加
+      (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${branchName}`); // as Mock 追加
+      (mockBranchRepository.exists as Mock).mockResolvedValue(false); // as Mock 追加
+      (mockBranchRepository.initialize as Mock).mockRejectedValue(initializationError); // as Mock 追加
 
       // 実行＆検証
+      // エラーオブジェクト全体ではなく、code と message で比較
       await expect(useCase.execute({ branchName, document: documentInput }))
-        .rejects.toThrow(expectedError);
+        .rejects.toMatchObject({ code: expectedError.code, message: expectedError.message });
 
       // 検証
       expect(mockBranchRepository.exists).toHaveBeenCalledWith(branchInfo.safeName);
@@ -461,18 +456,18 @@ describe('WriteBranchDocumentUseCase', () => {
       const docPath = DocumentPath.create('saveError.txt');
       const content = 'This content will fail to save.';
       const documentInput = { path: docPath.value, content };
-      const branchInfo = BranchInfo.create(branchName);
+      BranchInfo.create(branchName);
       const repositoryError = new Error('Disk full or permission denied'); // リポジトリ層のエラー
       // DocumentWriterService.write が内部で saveDocument を呼び出し、それが失敗するケース
       const expectedError = ApplicationErrors.executionFailed(`Unexpected error: ${repositoryError.message}`, repositoryError); // UseCase がラップして返すエラー
 
       // モックの設定
-      mockGitService.getCurrentBranchName.mockResolvedValue(branchName);
-      mockConfigProvider.getBranchMemoryPath.mockReturnValue(`/mock/path/to/${branchName}`);
-      mockBranchRepository.exists.mockResolvedValue(true); // ブランチは存在する
+      (mockGitService.getCurrentBranchName as Mock).mockResolvedValue(branchName); // as Mock 追加
+      (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${branchName}`); // as Mock 追加
+      (mockBranchRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
       // DocumentWriterService.write がリポジトリのエラーをそのまま投げるか、ラップして投げるかを確認
       // ここでは write がエラーを投げるように設定
-      mockDocumentWriterService.write.mockRejectedValue(expectedError); // write がラップしたエラーを返す想定
+      (mockDocumentWriterService.write as Mock).mockRejectedValue(expectedError); // as Mock 追加
 
       // 実行＆検証
       await expect(useCase.execute({ branchName, document: documentInput }))

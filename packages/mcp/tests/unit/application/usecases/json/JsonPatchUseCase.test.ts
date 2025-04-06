@@ -1,5 +1,5 @@
-import { JsonPatchUseCase } from '../../../../../src/application/usecases/json/JsonPatchUseCase';
-import { IIndexService } from '../../../../../src/infrastructure/index/interfaces/IIndexService';
+import { vi, type Mock } from 'vitest'; // 重複した vi のインポートを削除し、Mock をインポート
+import { JsonPatchUseCase } from '../../../../../src/application/usecases/json/JsonPatchUseCase.js'; // .js 追加
 // import { IJsonSchemaValidator } from '../../../../../src/infrastructure/validation/interfaces/IJsonSchemaValidator';
 import { JsonDocument, DocumentType } from '../../../../../src/domain/entities/JsonDocument.js';
 import { DocumentVersionInfo } from '../../../../../src/domain/entities/DocumentVersionInfo.js';
@@ -11,52 +11,58 @@ import { DocumentPath } from '../../../../../src/domain/entities/DocumentPath.js
 import { JsonPatchOperation, JsonPatchOperationType } from '../../../../../src/domain/jsonpatch/JsonPatchOperation.js';
 import { Tag } from '../../../../../src/domain/entities/Tag.js';
 import { IDocumentValidator } from '../../../../../src/domain/validation/IDocumentValidator.js';
-import { jest } from '@jest/globals'; // jest をインポート
-import { v4 as uuidv4, validate as uuidValidate } from 'uuid'; // uuid をインポート
+// import { jest } from '@jest/globals'; // jest インポート削除済み
+// import { v4 as uuidv4, validate as uuidValidate } from 'uuid'; // 未使用なので削除
 
 // --- Mocks ---
 
-jest.mock('uuid', () => ({
-  v4: jest.fn(() => '11111111-1111-1111-1111-111111111111'), // generate() が固定値を返すように
-  validate: jest.fn(() => true), // create() で使われるバリデーションを常に true にする
+// jest.mock を vi.mock に変更
+vi.mock('uuid', () => ({
+  v4: vi.fn(() => '11111111-1111-1111-1111-111111111111'), // jest -> vi
+  validate: vi.fn(() => true), // jest -> vi
 }));
 
 
-const mockJsonDocumentRepository: jest.Mocked<JsonDocumentRepository> = {
-  findBranchDocument: jest.fn(),
-  findGlobalDocument: jest.fn(),
-  saveBranchDocument: jest.fn(),
-  saveGlobalDocument: jest.fn(),
-  deleteBranchDocument: jest.fn(),
-  deleteGlobalDocument: jest.fn(),
-  listBranchDocuments: jest.fn(),
-  listGlobalDocuments: jest.fn(),
+// jest.Mocked を削除し、手動モックの型を指定
+const mockJsonDocumentRepository: JsonDocumentRepository = {
+  findBranchDocument: vi.fn(), // jest -> vi
+  findGlobalDocument: vi.fn(), // jest -> vi
+  saveBranchDocument: vi.fn(), // jest -> vi
+  saveGlobalDocument: vi.fn(), // jest -> vi
+  deleteBranchDocument: vi.fn(), // jest -> vi
+  deleteGlobalDocument: vi.fn(), // jest -> vi
+  listBranchDocuments: vi.fn(), // jest -> vi
+  listGlobalDocuments: vi.fn(), // jest -> vi
 };
 
-const mockDocumentEventEmitter: jest.Mocked<DocumentEventEmitter> = {
-  emit: jest.fn(),
-  on: jest.fn(),
-  off: jest.fn(),
+// jest.Mocked を削除し、手動モックの型を指定
+const mockDocumentEventEmitter: DocumentEventEmitter = {
+  emit: vi.fn(), // jest -> vi
+  on: vi.fn(), // jest -> vi
+  off: vi.fn(), // jest -> vi
 };
 
-const mockIndexService: jest.Mocked<IIndexService> = {
-  initializeIndex: jest.fn(),
-  buildIndex: jest.fn(),
-  addToIndex: jest.fn(),
-  removeFromIndex: jest.fn(),
-  findById: jest.fn(),
-  findByPath: jest.fn(),
-  findByTags: jest.fn(),
-  findByType: jest.fn(),
-  listAll: jest.fn(),
-  saveIndex: jest.fn(),
-  loadIndex: jest.fn(),
-};
+// jest.Mocked を削除し、手動モックの型を指定
+// jest.Mocked を削除し、手動モックの型を指定
+// const mockIndexService: IIndexService = { // 未使用なので削除
+//   initializeIndex: vi.fn(),
+//   buildIndex: vi.fn(),
+//   addToIndex: vi.fn(),
+//   removeFromIndex: vi.fn(),
+//   findById: vi.fn(),
+//   findByPath: vi.fn(),
+//   findByTags: vi.fn(),
+//   findByType: vi.fn(),
+//   listAll: vi.fn(),
+//   saveIndex: vi.fn(),
+//   loadIndex: vi.fn(),
+// };
 
-const mockValidator: jest.Mocked<IDocumentValidator> = {
-  validateContent: jest.fn<(documentType: string, content: Record<string, unknown>) => boolean>().mockReturnValue(true),
-  validateDocument: jest.fn<(document: unknown) => boolean>().mockReturnValue(true),
-  validateMetadata: jest.fn<(metadata: Record<string, unknown>) => boolean>().mockReturnValue(true),
+// jest.Mocked を削除し、手動モックの型を指定
+const mockValidator: IDocumentValidator = {
+  validateContent: vi.fn().mockReturnValue(true), // jest -> vi, 型引数削除
+  validateDocument: vi.fn().mockReturnValue(true), // jest -> vi, 型引数削除
+  validateMetadata: vi.fn().mockReturnValue(true), // jest -> vi, 型引数削除
 };
 // --- End Mocks ---
 
@@ -68,7 +74,7 @@ describe('JsonPatchUseCase', () => {
   let useCase: JsonPatchUseCase;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks(); // jest -> vi
     useCase = new JsonPatchUseCase(mockJsonDocumentRepository, mockDocumentEventEmitter);
   });
 
@@ -95,7 +101,7 @@ describe('JsonPatchUseCase', () => {
       tags: [] as Tag[],
       versionInfo: new DocumentVersionInfo({ version: 1, lastModified: new Date(), modifiedBy: 'test' }),
     });
-    mockJsonDocumentRepository.findBranchDocument.mockResolvedValue(mockInitialDocument);
+    (mockJsonDocumentRepository.findBranchDocument as Mock).mockResolvedValue(mockInitialDocument); // as Mock 追加
 
 
     const mockSavedDocument = JsonDocument.create({
@@ -108,7 +114,7 @@ describe('JsonPatchUseCase', () => {
       content: expectedContent,
       versionInfo: new DocumentVersionInfo({ version: 2, lastModified: new Date(), modifiedBy: 'system', updateReason: 'Updated via JSON Patch' }),
     });
-    mockJsonDocumentRepository.saveBranchDocument.mockResolvedValue(mockSavedDocument);
+    (mockJsonDocumentRepository.saveBranchDocument as Mock).mockResolvedValue(mockSavedDocument); // as Mock 追加
 
 
     // Act

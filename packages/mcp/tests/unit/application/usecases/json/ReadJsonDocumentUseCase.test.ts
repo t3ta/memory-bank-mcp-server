@@ -1,45 +1,50 @@
-import { ReadJsonDocumentUseCase, ReadJsonDocumentInput, ReadJsonDocumentOutput } from '../../../../../src/application/usecases/json/ReadJsonDocumentUseCase';
-import { IJsonDocumentRepository } from '../../../../../src/domain/repositories/IJsonDocumentRepository';
-import { JsonDocument, DocumentType } from '../../../../../src/domain/entities/JsonDocument';
-import { DocumentPath } from '../../../../../src/domain/entities/DocumentPath';
-import { DocumentId } from '../../../../../src/domain/entities/DocumentId';
-import { Tag } from '../../../../../src/domain/entities/Tag';
-import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo';
-import { DocumentVersionInfo } from '../../../../../src/domain/entities/DocumentVersionInfo';
+import { vi } from 'vitest'; // vi をインポート
+import type { Mock } from 'vitest'; // Mock 型をインポート
+import { ReadJsonDocumentUseCase, ReadJsonDocumentInput } from '../../../../../src/application/usecases/json/ReadJsonDocumentUseCase.js'; // 未使用の ReadJsonDocumentOutput を削除
+import { IJsonDocumentRepository } from '../../../../../src/domain/repositories/IJsonDocumentRepository.js'; // .js 追加済み
+import { JsonDocument, DocumentType } from '../../../../../src/domain/entities/JsonDocument.js'; // .js 追加済み
+import { DocumentPath } from '../../../../../src/domain/entities/DocumentPath.js'; // .js 追加済み
+import { DocumentId } from '../../../../../src/domain/entities/DocumentId.js'; // .js 追加済み
+import { Tag } from '../../../../../src/domain/entities/Tag.js'; // .js 追加済み
+import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo.js'; // .js 追加
+import { DocumentVersionInfo } from '../../../../../src/domain/entities/DocumentVersionInfo.js'; // .js 追加
 import { IDocumentValidator } from '../../../../../src/domain/validation/IDocumentValidator.js';
 import { DomainError } from '../../../../../src/shared/errors/DomainError.js'; // ← これを追加！
-import { jest } from '@jest/globals';
+// import { jest } from '@jest/globals'; // jest インポート削除
 
 // Mocks
-const mockJsonDocumentRepository: jest.Mocked<IJsonDocumentRepository> = {
-  findById: jest.fn<() => Promise<JsonDocument | null>>(),
-  findByPath: jest.fn<() => Promise<JsonDocument | null>>(),
-  findByTags: jest.fn<() => Promise<JsonDocument[]>>(),
-  findByType: jest.fn<() => Promise<JsonDocument[]>>(),
-  save: jest.fn<() => Promise<JsonDocument>>(),
-  delete: jest.fn<() => Promise<boolean>>(),
-  listAll: jest.fn<() => Promise<JsonDocument[]>>(),
-  exists: jest.fn<() => Promise<boolean>>(),
+// jest.Mocked を削除し、手動モックの型を指定
+const mockJsonDocumentRepository: IJsonDocumentRepository = {
+  findById: vi.fn(), // jest -> vi, 型引数削除
+  findByPath: vi.fn(), // jest -> vi, 型引数削除
+  findByTags: vi.fn(), // jest -> vi, 型引数削除
+  findByType: vi.fn(), // jest -> vi, 型引数削除
+  save: vi.fn(), // jest -> vi, 型引数削除
+  delete: vi.fn(), // jest -> vi, 型引数削除
+  listAll: vi.fn(), // jest -> vi, 型引数削除
+  exists: vi.fn(), // jest -> vi, 型引数削除
 };
 
 // Global repo mock (distinct instance)
-const mockGlobalRepository: jest.Mocked<IJsonDocumentRepository> = {
-  findById: jest.fn<() => Promise<JsonDocument | null>>(),
-  findByPath: jest.fn<() => Promise<JsonDocument | null>>(),
-  findByTags: jest.fn<() => Promise<JsonDocument[]>>(),
-  findByType: jest.fn<() => Promise<JsonDocument[]>>(),
-  save: jest.fn<() => Promise<JsonDocument>>(),
-  delete: jest.fn<() => Promise<boolean>>(),
-  listAll: jest.fn<() => Promise<JsonDocument[]>>(),
-  exists: jest.fn<() => Promise<boolean>>(),
+// jest.Mocked を削除し、手動モックの型を指定
+const mockGlobalRepository: IJsonDocumentRepository = {
+  findById: vi.fn(), // jest -> vi, 型引数削除
+  findByPath: vi.fn(), // jest -> vi, 型引数削除
+  findByTags: vi.fn(), // jest -> vi, 型引数削除
+  findByType: vi.fn(), // jest -> vi, 型引数削除
+  save: vi.fn(), // jest -> vi, 型引数削除
+  delete: vi.fn(), // jest -> vi, 型引数削除
+  listAll: vi.fn(), // jest -> vi, 型引数削除
+  exists: vi.fn(), // jest -> vi, 型引数削除
 };
 
 
 // Mock validator
-const mockValidator: jest.Mocked<IDocumentValidator> = {
-  validateContent: jest.fn<(documentType: string, content: Record<string, unknown>) => boolean>().mockReturnValue(true),
-  validateDocument: jest.fn<(document: unknown) => boolean>().mockReturnValue(true),
-  validateMetadata: jest.fn<(metadata: Record<string, unknown>) => boolean>().mockReturnValue(true),
+// jest.Mocked を削除し、手動モックの型を指定
+const mockValidator: IDocumentValidator = {
+  validateContent: vi.fn().mockReturnValue(true), // jest -> vi, 型引数削除
+  validateDocument: vi.fn().mockReturnValue(true), // jest -> vi, 型引数削除
+  validateMetadata: vi.fn().mockReturnValue(true), // jest -> vi, 型引数削除
 };
 
 
@@ -48,7 +53,7 @@ describe('ReadJsonDocumentUseCase', () => {
   let useCaseWithGlobal: ReadJsonDocumentUseCase;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks(); // jest -> vi
     // Set validator for JsonDocument creation/validation within the use case if needed
     JsonDocument.setValidator(mockValidator);
     useCase = new ReadJsonDocumentUseCase(mockJsonDocumentRepository);
@@ -83,7 +88,7 @@ describe('ReadJsonDocumentUseCase', () => {
       content: docContent,
       versionInfo: versionInfo,
     });
-    mockJsonDocumentRepository.findByPath.mockResolvedValue(existingDocument);
+    (mockJsonDocumentRepository.findByPath as Mock).mockResolvedValue(existingDocument); // as Mock 追加
 
     const result = await useCase.execute(input);
 
@@ -120,7 +125,7 @@ describe('ReadJsonDocumentUseCase', () => {
     const expectedDocPath = DocumentPath.create(docPathStr);
 
     // Mock findByPath to return null
-    mockJsonDocumentRepository.findByPath.mockResolvedValue(null);
+    (mockJsonDocumentRepository.findByPath as Mock).mockResolvedValue(null); // as Mock 追加
 
     // Expect the use case to reject with a DomainError
     await expect(useCase.execute(input)).rejects.toThrow(DomainError);
@@ -165,7 +170,7 @@ describe('ReadJsonDocumentUseCase', () => {
       content: docContent,
       versionInfo: versionInfo,
     });
-    mockGlobalRepository.findByPath.mockResolvedValue(existingDocument);
+    (mockGlobalRepository.findByPath as Mock).mockResolvedValue(existingDocument); // as Mock 追加
 
     // Use the useCase instance configured with the global repository
     const result = await useCaseWithGlobal.execute(input);

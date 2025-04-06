@@ -30,19 +30,23 @@
       // schemas パッケージの参照先を src から dist に変更
       "@memory-bank/schemas": ["packages/schemas/dist"],
       "@memory-bank/schemas/*": ["packages/schemas/dist/*"]
-    }
+    },
   },
   "references": [
     { "path": "./packages/mcp" },
     { "path": "./packages/schemas" }
   ],
-  // "include": [], // ルートでは何もビルドしないのでコメントアウト
+  "include": [
+    "test/**/*.ts", // テストファイルを含める
+    // "vitest.config.ts", // 不要になったので削除
+    "vitest.workspace.ts" // Vitestワークスペース設定も対象に
+  ],
   "files": [], // ビルド対象ファイルを明示的に空にする
   "exclude": [
     "node_modules",
     "dist",
-    "**/__tests__/**",
-    "**/*.test.ts",
+    "**/__tests__/**", // __tests__ ディレクトリは除外
+    // "**/*.test.ts", // テストファイルは除外しない
     "packages/**/dist",
     "packages/**/node_modules"
   ]

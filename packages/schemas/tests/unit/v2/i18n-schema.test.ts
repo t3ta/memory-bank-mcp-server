@@ -2,10 +2,7 @@ import {
   isValidLanguage,
   getSafeLanguage,
   type Language,
-  type TranslationFile, // Import type for potential future tests
-  type TranslationDictionary, // Import type for potential future tests
-} from '../../src/v2/i18n-schema';
-
+} from '@/v2/i18n-schema.js'; // エイリアスパス (再確認)
 describe('i18n Schema Utilities', () => {
   describe('isValidLanguage', () => {
     it('should return true for supported languages', () => {

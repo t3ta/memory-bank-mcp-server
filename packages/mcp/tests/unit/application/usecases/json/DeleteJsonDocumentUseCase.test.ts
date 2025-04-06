@@ -1,57 +1,63 @@
-import { DeleteJsonDocumentUseCase, DeleteJsonDocumentInput, DeleteJsonDocumentOutput } from '../../../../../src/application/usecases/json/DeleteJsonDocumentUseCase';
-import { IJsonDocumentRepository } from '../../../../../src/domain/repositories/IJsonDocumentRepository';
-import { JsonDocument, DocumentType } from '../../../../../src/domain/entities/JsonDocument';
-import { DocumentPath } from '../../../../../src/domain/entities/DocumentPath';
-import { DocumentId } from '../../../../../src/domain/entities/DocumentId';
-import { Tag } from '../../../../../src/domain/entities/Tag';
-import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo';
-import { IIndexService } from '../../../../../src/infrastructure/index/interfaces/IIndexService';
-import { IDocumentValidator } from '../../../../../src/domain/validation/IDocumentValidator';
-import { DomainError } from '../../../../../src/shared/errors/DomainError';
-import { jest } from '@jest/globals';
+import { vi } from 'vitest'; // vi をインポート
+import type { Mock } from 'vitest'; // Mock 型をインポート
+import { DeleteJsonDocumentUseCase, DeleteJsonDocumentInput } from '../../../../../src/application/usecases/json/DeleteJsonDocumentUseCase.js'; // 未使用の DeleteJsonDocumentOutput を削除
+import { IJsonDocumentRepository } from '../../../../../src/domain/repositories/IJsonDocumentRepository.js'; // .js 追加
+import { JsonDocument } from '../../../../../src/domain/entities/JsonDocument.js'; // 未使用の DocumentType を削除
+import { DocumentPath } from '../../../../../src/domain/entities/DocumentPath.js'; // .js 追加
+// import { DocumentId } from '../../../../../src/domain/entities/DocumentId.js'; // 未使用なので削除
+// import { Tag } from '../../../../../src/domain/entities/Tag.js'; // 未使用なので削除
+import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo.js'; // .js 追加
+import { IIndexService } from '../../../../../src/infrastructure/index/interfaces/IIndexService.js'; // .js 追加
+import { IDocumentValidator } from '../../../../../src/domain/validation/IDocumentValidator.js'; // .js 追加
+// import { DomainError } from '../../../../../src/shared/errors/DomainError.js'; // 未使用なので削除
+// import { jest } from '@jest/globals'; // jest インポート削除
 
 // Mocks
-const mockJsonDocumentRepository: jest.Mocked<IJsonDocumentRepository> = {
-  findById: jest.fn<() => Promise<JsonDocument | null>>(),
-  findByPath: jest.fn<() => Promise<JsonDocument | null>>(),
-  findByTags: jest.fn<() => Promise<JsonDocument[]>>(),
-  findByType: jest.fn<() => Promise<JsonDocument[]>>(),
-  save: jest.fn<() => Promise<JsonDocument>>(),
-  delete: jest.fn<() => Promise<boolean>>(),
-  listAll: jest.fn<() => Promise<JsonDocument[]>>(),
-  exists: jest.fn<() => Promise<boolean>>(),
+// jest.Mocked を削除し、手動モックの型を指定
+const mockJsonDocumentRepository: IJsonDocumentRepository = {
+  findById: vi.fn(), // jest -> vi, 型引数削除
+  findByPath: vi.fn(), // jest -> vi, 型引数削除
+  findByTags: vi.fn(), // jest -> vi, 型引数削除
+  findByType: vi.fn(), // jest -> vi, 型引数削除
+  save: vi.fn(), // jest -> vi, 型引数削除
+  delete: vi.fn(), // jest -> vi, 型引数削除
+  listAll: vi.fn(), // jest -> vi, 型引数削除
+  exists: vi.fn(), // jest -> vi, 型引数削除
 };
 
-const mockGlobalRepository: jest.Mocked<IJsonDocumentRepository> = {
-  findById: jest.fn<() => Promise<JsonDocument | null>>(),
-  findByPath: jest.fn<() => Promise<JsonDocument | null>>(),
-  findByTags: jest.fn<() => Promise<JsonDocument[]>>(),
-  findByType: jest.fn<() => Promise<JsonDocument[]>>(),
-  save: jest.fn<() => Promise<JsonDocument>>(),
-  delete: jest.fn<() => Promise<boolean>>(),
-  listAll: jest.fn<() => Promise<JsonDocument[]>>(),
-  exists: jest.fn<() => Promise<boolean>>(),
+// jest.Mocked を削除し、手動モックの型を指定
+const mockGlobalRepository: IJsonDocumentRepository = {
+  findById: vi.fn(), // jest -> vi, 型引数削除
+  findByPath: vi.fn(), // jest -> vi, 型引数削除
+  findByTags: vi.fn(), // jest -> vi, 型引数削除
+  findByType: vi.fn(), // jest -> vi, 型引数削除
+  save: vi.fn(), // jest -> vi, 型引数削除
+  delete: vi.fn(), // jest -> vi, 型引数削除
+  listAll: vi.fn(), // jest -> vi, 型引数削除
+  exists: vi.fn(), // jest -> vi, 型引数削除
 };
 
-const mockIndexService: jest.Mocked<IIndexService> = {
-  initializeIndex: jest.fn<() => Promise<void>>(),
-  buildIndex: jest.fn<() => Promise<void>>(),
-  addToIndex: jest.fn<() => Promise<void>>(),
-  removeFromIndex: jest.fn<() => Promise<void>>(), // This will be used
-  findById: jest.fn<() => Promise<any>>(),
-  findByPath: jest.fn<() => Promise<any>>(),
-  findByTags: jest.fn<() => Promise<any[]>>(),
-  findByType: jest.fn<() => Promise<any[]>>(),
-  listAll: jest.fn<() => Promise<any[]>>(),
-  saveIndex: jest.fn<() => Promise<void>>(),
-  loadIndex: jest.fn<() => Promise<void>>(),
+// jest.Mocked を削除し、手動モックの型を指定
+const mockIndexService: IIndexService = {
+  initializeIndex: vi.fn(), // jest -> vi, 型引数削除
+  buildIndex: vi.fn(), // jest -> vi, 型引数削除
+  addToIndex: vi.fn(), // jest -> vi, 型引数削除
+  removeFromIndex: vi.fn(), // jest -> vi, 型引数削除
+  findById: vi.fn(), // jest -> vi, 型引数削除
+  findByPath: vi.fn(), // jest -> vi, 型引数削除
+  findByTags: vi.fn(), // jest -> vi, 型引数削除
+  findByType: vi.fn(), // jest -> vi, 型引数削除
+  listAll: vi.fn(), // jest -> vi, 型引数削除
+  saveIndex: vi.fn(), // jest -> vi, 型引数削除
+  loadIndex: vi.fn(), // jest -> vi, 型引数削除
 };
 
 // Mock validator
-const mockValidator: jest.Mocked<IDocumentValidator> = {
-  validateContent: jest.fn<(documentType: string, content: Record<string, unknown>) => boolean>().mockReturnValue(true),
-  validateDocument: jest.fn<(document: unknown) => boolean>().mockReturnValue(true),
-  validateMetadata: jest.fn<(metadata: Record<string, unknown>) => boolean>().mockReturnValue(true),
+// jest.Mocked を削除し、手動モックの型を指定
+const mockValidator: IDocumentValidator = {
+  validateContent: vi.fn().mockReturnValue(true), // jest -> vi, 型引数削除
+  validateDocument: vi.fn().mockReturnValue(true), // jest -> vi, 型引数削除
+  validateMetadata: vi.fn().mockReturnValue(true), // jest -> vi, 型引数削除
 };
 
 describe('DeleteJsonDocumentUseCase', () => {
@@ -59,7 +65,7 @@ describe('DeleteJsonDocumentUseCase', () => {
   let useCaseWithGlobal: DeleteJsonDocumentUseCase;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks(); // jest -> vi
     // Set validator (though likely not directly used by delete, good practice)
     JsonDocument.setValidator(mockValidator);
     useCase = new DeleteJsonDocumentUseCase(mockJsonDocumentRepository, mockIndexService);
@@ -79,11 +85,11 @@ describe('DeleteJsonDocumentUseCase', () => {
     const expectedDocPath = DocumentPath.create(docPathStr);
 
     // Mock repository exists to return true
-    mockJsonDocumentRepository.exists.mockResolvedValue(true);
+    (mockJsonDocumentRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
     // Mock repository delete to return true (success)
-    mockJsonDocumentRepository.delete.mockResolvedValue(true);
+    (mockJsonDocumentRepository.delete as Mock).mockResolvedValue(true); // as Mock 追加
     // Mock index service removeFromIndex to succeed
-    mockIndexService.removeFromIndex.mockResolvedValue(undefined);
+    (mockIndexService.removeFromIndex as Mock).mockResolvedValue(undefined); // as Mock 追加
 
     const result = await useCase.execute(input);
 
@@ -124,11 +130,11 @@ describe('DeleteJsonDocumentUseCase', () => {
     const expectedDocPath = DocumentPath.create(docPathStr);
 
     // Mock repository exists to return true (even if delete fails later)
-    mockJsonDocumentRepository.exists.mockResolvedValue(true);
+    (mockJsonDocumentRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
     // Mock repository delete to return false (failure)
-    mockJsonDocumentRepository.delete.mockResolvedValue(false);
+    (mockJsonDocumentRepository.delete as Mock).mockResolvedValue(false); // as Mock 追加
     // Index service should not be called if repo delete fails
-    mockIndexService.removeFromIndex.mockResolvedValue(undefined);
+    (mockIndexService.removeFromIndex as Mock).mockResolvedValue(undefined); // as Mock 追加
 
     const result = await useCase.execute(input);
 
@@ -165,10 +171,10 @@ describe('DeleteJsonDocumentUseCase', () => {
     const expectedDocPath = DocumentPath.create(docPathStr);
 
     // Mock GLOBAL repository exists to return true
-    mockGlobalRepository.exists.mockResolvedValue(true);
+    (mockGlobalRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
     // Mock GLOBAL repository delete to return true
-    mockGlobalRepository.delete.mockResolvedValue(true);
-    mockIndexService.removeFromIndex.mockResolvedValue(undefined);
+    (mockGlobalRepository.delete as Mock).mockResolvedValue(true); // as Mock 追加
+    (mockIndexService.removeFromIndex as Mock).mockResolvedValue(undefined); // as Mock 追加
 
     // Use the useCase instance configured with the global repository
     const result = await useCaseWithGlobal.execute(input);

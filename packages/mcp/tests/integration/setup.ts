@@ -1,17 +1,17 @@
 /**
- * Integration tests setup file
+ * Integration tests setup file for Vitest
  */
-import { jest } from '@jest/globals'; // <<<--- やっぱりインポートする！
+import { vi } from 'vitest'; // vi をインポート
 
-// Export jest for global use (念のため残す)
-global.jest = jest; // <<<--- コメントアウト解除！
+// global.jest は不要なので削除
 
 // Set longer timeout for integration tests
-jest.setTimeout(60000);
+// Vitest の設定でタイムアウトを設定 (vi.setConfig はテストファイル内でのみ有効な場合があるため、vitest.config.ts で設定済み)
+// vi.setConfig({ testTimeout: 60000 });
 
 // Suppress console logs during tests to reduce noise
-console.log = jest.fn(); // <<<--- コメントアウトを解除して元に戻す！
-console.warn = jest.fn(); // warn はそのまま抑制
+console.log = vi.fn(); // jest -> vi
+console.warn = vi.fn(); // jest -> vi
 // Keep error logging for debugging
 // console.error = jest.fn();
 

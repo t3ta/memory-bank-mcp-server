@@ -5,7 +5,7 @@ import {
   DocumentMetadataV2Schema,
   BaseJsonDocumentV2Schema,
   SCHEMA_VERSION
-} from '../../src/v2/json-document.js';
+} from '@/v2/json-document.js'; // エイリアスパスに変更
 
 import {
   BranchContextJsonV2Schema,
@@ -13,7 +13,7 @@ import {
   ProgressJsonV2Schema,
   SystemPatternsJsonV2Schema,
   GenericDocumentJsonV2Schema,
-} from '../../src/document-types/index.js';
+} from '@/document-types/index.js'; // エイリアスパスに変更
 
 describe('DocumentMetadataV2Schema', () => {
   it('should validate correct metadata', () => {
@@ -409,7 +409,7 @@ describe('SystemPatternsJsonV2Schema', () => {
     expect(result.success).toBe(true);
   });
 
-  it('should reject technical decision with missing required fields (e.g., status)', () => {
+  it('should reject technical decision with missing required fields (e.g., title)', () => { // テストケース名を修正
     const invalidDocument = {
       schema: SCHEMA_VERSION,
       documentType: 'system_patterns' as const, // Move documentType to top level
@@ -426,12 +426,13 @@ describe('SystemPatternsJsonV2Schema', () => {
       content: {
         technicalDecisions: [
           {
-            title: 'Use TypeScript',
+            // title: 'Use TypeScript', // title を削除して必須フィールド欠落をテスト
             context: 'Need type safety',
             decision: 'We will use TypeScript',
-            consequences: { positive: [], negative: [] },
-            date: new Date().toISOString(),
-            // status: 'accepted', // Missing required status
+            // consequences は TechnicalDecisionContentV2Schema では string[] なので修正
+            consequences: ['Consequence 1'],
+            // date は TechnicalDecisionContentV2Schema にないので削除
+            // date: new Date().toISOString(),
           }
         ]
       }
@@ -439,7 +440,8 @@ describe('SystemPatternsJsonV2Schema', () => {
 
     const result = SystemPatternsJsonV2Schema.safeParse(invalidDocument);
     expect(result.success).toBe(false);
-    expect(result.error?.errors.some(e => e.path.includes('status'))).toBe(true);
+    // title が欠落しているエラーを確認 (パスは content.technicalDecisions[0].title になるはず)
+    expect(result.error?.errors.some((e: any) => e.path.includes('title'))).toBe(true);
   });
 });
 
@@ -448,10 +450,10 @@ describe('GenericDocumentJsonV2Schema', () => {
     // Generic schema expects documentType inside metadata
     const validDocument = {
       schema: SCHEMA_VERSION,
-      // documentType: 'custom_type', // Not at top level for Generic schema test
+      documentType: 'custom_type', // トップレベルに移動
       metadata: {
         title: 'Custom Document',
-        documentType: 'custom_type', // Generic allows any string here
+        // documentType: 'custom_type', // metadata から削除
         id: '123e4567-e89b-12d3-a456-426614174000',
         path: 'custom.json',
         tags: ['custom'],

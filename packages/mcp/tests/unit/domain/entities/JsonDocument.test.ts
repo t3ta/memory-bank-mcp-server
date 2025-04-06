@@ -1,16 +1,18 @@
-import { JsonDocument, SCHEMA_VERSION, DocumentType } from '../../../../src/domain/entities/JsonDocument';
-import { DocumentPath } from '../../../../src/domain/entities/DocumentPath';
-import { Tag } from '../../../../src/domain/entities/Tag';
-import { DomainError, DomainErrorCodes } from '../../../../src/shared/errors/DomainError';
-import { IDocumentValidator } from '../../../../src/domain/validation/IDocumentValidator';
-import { DocumentId } from '../../../../src/domain/entities/DocumentId';
-import { DocumentVersionInfo } from '../../../../src/domain/entities/DocumentVersionInfo';
+import { vi } from 'vitest'; // vi をインポート
+import type { Mock } from 'vitest'; // Mock 型をインポート
+import { JsonDocument, SCHEMA_VERSION, DocumentType } from '../../../../src/domain/entities/JsonDocument.js'; // .js 追加
+import { DocumentPath } from '../../../../src/domain/entities/DocumentPath.js'; // .js 追加
+import { Tag } from '../../../../src/domain/entities/Tag.js'; // .js 追加
+import { DomainError, DomainErrorCodes } from '../../../../src/shared/errors/DomainError.js'; // .js 追加
+import { IDocumentValidator } from '../../../../src/domain/validation/IDocumentValidator.js'; // .js 追加
+import { DocumentId } from '../../../../src/domain/entities/DocumentId.js'; // .js 追加
+import { DocumentVersionInfo } from '../../../../src/domain/entities/DocumentVersionInfo.js'; // .js 追加
 
 // モックバリデーター
 const mockValidator: IDocumentValidator = {
-  validateDocument: jest.fn(),
-  validateMetadata: jest.fn(), // これを追加！
-  validateContent: jest.fn(),
+  validateDocument: vi.fn(), // jest -> vi
+  validateMetadata: vi.fn(), // jest -> vi
+  validateContent: vi.fn(), // jest -> vi
 };
 
 describe('JsonDocument', () => {
@@ -32,7 +34,7 @@ describe('JsonDocument', () => {
   beforeEach(() => {
     // 各テストの前にバリデーターを再設定し、モックの呼び出し履歴をリセット
     JsonDocument.setValidator(mockValidator);
-    jest.clearAllMocks();
+    vi.clearAllMocks(); // jest -> vi
   });
 
   // --- Static Factory Methods ---
@@ -83,7 +85,7 @@ describe('JsonDocument', () => {
 
     it('スキーマバージョンが不正な場合にバリデーションエラーが発生すること', () => {
        // バリデーターがエラーを投げるようにモックを設定
-       (mockValidator.validateDocument as jest.Mock).mockImplementationOnce(() => {
+       (mockValidator.validateDocument as Mock).mockImplementationOnce(() => { // as Mock に修正
          throw new DomainError(DomainErrorCodes.VALIDATION_ERROR, 'Invalid schema version');
        });
        // スキーマ変更に合わせて documentType をトップレベルに移動
@@ -132,7 +134,7 @@ describe('JsonDocument', () => {
     it('無効なオブジェクト構造でバリデーションエラーが発生すること', () => {
       const invalidObject = { invalid: 'structure' };
       // バリデーターがエラーを投げるようにモックを設定
-      (mockValidator.validateDocument as jest.Mock).mockImplementationOnce(() => {
+      (mockValidator.validateDocument as Mock).mockImplementationOnce(() => { // as Mock に修正
         throw new DomainError(DomainErrorCodes.VALIDATION_ERROR, 'Invalid structure');
       });
       // toThrow にエラークラスとメッセージの完全一致チェックを渡す (モックで投げてるエラーなので完全一致でOK)
@@ -191,7 +193,7 @@ describe('JsonDocument', () => {
     it('不正なコンテンツでバリデーションエラーが発生すること', () => {
       const invalidContent = { wrong: 'structure' };
       // バリデーターがエラーを投げるようにモックを設定
-      (mockValidator.validateContent as jest.Mock).mockImplementationOnce(() => {
+      (mockValidator.validateContent as Mock).mockImplementationOnce(() => { // as Mock に修正
         throw new DomainError(DomainErrorCodes.VALIDATION_ERROR, 'Invalid content');
       });
 
@@ -273,7 +275,7 @@ describe('JsonDocument', () => {
       const newContent = { newKey: 'newValue' };
       // この行は重複しているので削除
 
-      jest.clearAllMocks(); // モック呼び出し履歴をクリアしてから updateContent を呼ぶ
+      vi.clearAllMocks(); // jest -> vi, モック呼び出し履歴をクリアしてから updateContent を呼ぶ
       const updatedDoc = doc.updateContent(newContent); // updateContent を呼び出す
 
       // コンテンツバリデーションが呼ばれたことを確認
@@ -291,11 +293,11 @@ describe('JsonDocument', () => {
     it('不正なコンテンツで更新しようとするとエラーが発生すること', () => {
        const invalidContent = { wrong: 'structure' };
        // バリデーターがエラーを投げるようにモックを設定
-       (mockValidator.validateContent as jest.Mock).mockImplementationOnce(() => {
+       (mockValidator.validateContent as Mock).mockImplementationOnce(() => { // as Mock に修正
          throw new DomainError(DomainErrorCodes.VALIDATION_ERROR, 'Invalid content');
        });
 
-       jest.clearAllMocks(); // モック呼び出し履歴をクリア
+       vi.clearAllMocks(); // jest -> vi, モック呼び出し履歴をクリア
        // toThrow 内で updateContent が呼ばれる
        expect(() => doc.updateContent(invalidContent)).toThrow(
          new DomainError(DomainErrorCodes.VALIDATION_ERROR, 'Invalid content')
@@ -307,6 +309,10 @@ describe('JsonDocument', () => {
     let doc: JsonDocument;
     const newTag = Tag.create('new-tag'); // 小文字とハイフンのみに修正
     beforeEach(() => {
+      // 念のため、ここで全てのバリデーターモックを再設定して true を返すようにする
+      (mockValidator.validateDocument as Mock).mockReturnValue(true);
+      (mockValidator.validateMetadata as Mock).mockReturnValue(true);
+      (mockValidator.validateContent as Mock).mockReturnValue(true);
       doc = JsonDocument.create({ path: validPath, title, documentType, content, tags });
     });
 

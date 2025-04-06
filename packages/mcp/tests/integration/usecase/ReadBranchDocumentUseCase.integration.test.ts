@@ -6,14 +6,14 @@ import { loadBranchFixture } from '../helpers/fixtures-loader.js';
 // import { createTestApplication } from '../helpers/app-factory.js'; // Removed app-factory
 // import { Application } from '../../../src/main/Application.js'; // Removed Application import
 import { DIContainer, setupContainer } from '../../../src/main/di/providers.js'; // Import DI container and setup function
-import { ReadBranchDocumentUseCase, type ReadBranchDocumentOutput } from '../../../src/application/usecases/branch/ReadBranchDocumentUseCase.js'; // Import real UseCase and types
+import { ReadBranchDocumentUseCase } from '../../../src/application/usecases/branch/ReadBranchDocumentUseCase.js'; // Import real UseCase and types
 import { BranchInfo } from '../../../src/domain/entities/BranchInfo.js'; // Import BranchInfo
-import { DomainErrors } from '../../../src/shared/errors/DomainError.js'; // Import specific errors for checking
-import { ApplicationErrors } from '../../../src/shared/errors/ApplicationError.js'; // Import specific errors for checking
+import { DomainError } from '../../../src/shared/errors/DomainError.js'; // Import DomainError type and specific errors for checking
+import { ApplicationError, ApplicationErrors } from '../../../src/shared/errors/ApplicationError.js'; // Import ApplicationError type and specific errors for checking
 import { IGitService } from '../../../src/infrastructure/git/IGitService.js';
 import { IConfigProvider } from '../../../src/infrastructure/config/interfaces/IConfigProvider.js';
 import type { WorkspaceConfig } from '../../../src/infrastructure/config/WorkspaceConfig.js';
-import { jest } from '@jest/globals';
+import { vi, Mocked } from 'vitest'; // Mocked 型をインポート
 import { execSync } from 'child_process';
 import { logger } from '../../../src/shared/utils/logger.js';
 
@@ -25,8 +25,8 @@ describe('ReadBranchDocumentUseCase Integration Tests', () => {
   // let app: Application; // Removed app instance
   let container: DIContainer; // Use DI container
   let useCase: ReadBranchDocumentUseCase;
-  let mockGitService: jest.Mocked<IGitService>;
-  let mockConfigProvider: jest.Mocked<IConfigProvider>;
+  let mockGitService: Mocked<IGitService>; // vi.Mocked -> Mocked
+  let mockConfigProvider: Mocked<IConfigProvider>; // vi.Mocked -> Mocked
   const TEST_BRANCH = 'feature/test-branch';
   const SAFE_TEST_BRANCH = BranchInfo.create(TEST_BRANCH).safeName;
 
@@ -53,7 +53,7 @@ describe('ReadBranchDocumentUseCase Integration Tests', () => {
 
 
     mockGitService = {
-      getCurrentBranchName: jest.fn<() => Promise<string>>() // モック関数を作成
+      getCurrentBranchName: vi.fn<() => Promise<string>>() // jest -> vi
     };
     // getCurrentBranchNameが呼ばれたらTEST_BRANCHを返すように設定
     mockGitService.getCurrentBranchName.mockResolvedValue(TEST_BRANCH);
@@ -61,14 +61,14 @@ describe('ReadBranchDocumentUseCase Integration Tests', () => {
 
 
     mockConfigProvider = {
-      // initialize は呼ばれない想定なので jest.fn() だけ用意
-      initialize: jest.fn(),
+      // initialize は呼ばれない想定なので vi.fn() だけ用意
+      initialize: vi.fn(), // jest -> vi
       // getConfig はテストケースごとに振る舞いを変えるのでモック関数を用意
-      getConfig: jest.fn<() => WorkspaceConfig>(),
-      // 他のメソッドも jest.fn() でモック化しておく
-      getGlobalMemoryPath: jest.fn<() => string>(),
-      getBranchMemoryPath: jest.fn<() => string>(),
-      getLanguage: jest.fn<() => 'en' | 'ja' | 'zh'>()
+      getConfig: vi.fn<() => WorkspaceConfig>(), // jest -> vi
+      // 他のメソッドも vi.fn() でモック化しておく
+      getGlobalMemoryPath: vi.fn<() => string>(), // jest -> vi
+      getBranchMemoryPath: vi.fn<(branchName: string) => string>(), // 引数を追加
+      getLanguage: vi.fn<() => 'en' | 'ja' | 'zh'>() // jest -> vi
     };
     // デフォルトの getConfig の戻り値を設定 (isProjectMode: true)
     mockConfigProvider.getConfig.mockReturnValue({
@@ -128,24 +128,51 @@ describe('ReadBranchDocumentUseCase Integration Tests', () => {
     });
 
     it('should return an error if the document does not exist', async () => {
-      await expect(useCase.execute({
-        branchName: TEST_BRANCH,
-        path: 'non-existent.json'
-      })).rejects.toThrow(DomainErrors.documentNotFound('non-existent.json', { branchName: TEST_BRANCH }));
+      const documentPath = 'non-existent.json';
+      try {
+        await useCase.execute({
+          branchName: TEST_BRANCH,
+          path: documentPath
+        });
+        throw new Error('Expected documentNotFound error but no error was thrown.');
+      } catch (error) {
+        expect(error).toBeInstanceOf(DomainError);
+        expect((error as DomainError).message).toBe(`Document with ID ${documentPath} was not found`);
+        expect((error as DomainError).code).toBe('DOMAIN_ERROR.DOCUMENT_NOT_FOUND');
+        // details のチェックも追加（必要に応じて）
+        expect((error as DomainError).details).toEqual({
+          branchName: TEST_BRANCH,
+          documentId: documentPath
+        });
+      }
     });
 
     it('should return an error if the branch does not exist', async () => {
-      await expect(useCase.execute({
-        branchName: 'non-existent-branch',
-        path: 'some-document.json'
-      })).rejects.toThrow('Branch name must include a namespace prefix');
+      try {
+        await useCase.execute({
+          branchName: 'non-existent-branch', // prefixなし
+          path: 'some-document.json'
+        });
+        throw new Error('Expected validationError but no error was thrown.');
+      } catch (error) {
+        expect(error).toBeInstanceOf(DomainError);
+        expect((error as DomainError).message).toBe('Branch name must include a namespace prefix with slash (e.g. "feature/my-branch")'); // 期待値を修正
+        expect((error as DomainError).code).toBe('DOMAIN_ERROR.INVALID_BRANCH_NAME'); // 期待値を修正
+      }
     });
 
     it('should return an error for an invalid path', async () => {
-      await expect(useCase.execute({
-        branchName: TEST_BRANCH,
-        path: '../outside-documents/sensitive.json'
-      })).rejects.toThrow('Document path cannot contain ".."');
+      try {
+        await useCase.execute({
+          branchName: TEST_BRANCH,
+          path: '../outside-documents/sensitive.json'
+        });
+        throw new Error('Expected validationError but no error was thrown.');
+      } catch (error) {
+        expect(error).toBeInstanceOf(DomainError);
+        expect((error as DomainError).message).toBe('Document path cannot contain ".."');
+        expect((error as DomainError).code).toBe('DOMAIN_ERROR.INVALID_DOCUMENT_PATH'); // 期待値を修正
+      }
     });
 
     it('should read a document from a subdirectory within the branch', async () => {
@@ -226,8 +253,14 @@ describe('ReadBranchDocumentUseCase Integration Tests', () => {
         mockGitService.getCurrentBranchName.mockRejectedValue(gitError);
 
         // 実行＆検証：エラーが投げられることを確認
-        await expect(useCase.execute({ path: 'any/document.json' }))
-          .rejects.toThrow(ApplicationErrors.invalidInput('Branch name is required but could not be automatically determined. Please provide it explicitly or ensure you are in a Git repository.'));
+        try {
+          await useCase.execute({ path: 'any/document.json' });
+          throw new Error('Expected ApplicationError but no error was thrown.');
+        } catch (error) {
+          expect(error).toBeInstanceOf(ApplicationError);
+          expect((error as ApplicationError).message).toBe('Branch name is required but could not be automatically determined. Please provide it explicitly or ensure you are in a Git repository.');
+          expect((error as ApplicationError).code).toBe('APP_ERROR.INVALID_INPUT');
+        }
         expect(mockGitService.getCurrentBranchName).toHaveBeenCalledTimes(1); // GitService が呼ばれる
       });
     });
