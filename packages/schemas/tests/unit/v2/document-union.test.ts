@@ -1,6 +1,6 @@
 // import { z } from 'zod'; // 未使用なので削除
-import { JsonDocumentV2Schema } from '@/v2/document-union.js'; // エイリアスパスに戻す (拡張子なし)
-import { SCHEMA_VERSION } from '@/v2/json-document.js'; // エイリアスパスに戻す (拡張子なし)
+import { JsonDocumentV2Schema } from '../../../src/v2/document-union.js'; // 相対パスを修正
+import { SCHEMA_VERSION } from '../../../src/v2/json-document.js'; // 相対パスを修正
 
 // Helper function to create minimal valid metadata (documentType removed)
 const createMinimalMetadata = (docType: string, path: string) => ({

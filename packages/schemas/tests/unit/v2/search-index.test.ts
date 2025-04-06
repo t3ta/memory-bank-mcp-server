@@ -9,7 +9,7 @@ import {
   type TagsIndex,
   type SearchResultItem,
   type SearchResults,
-} from '@/v2/search-index.js'; // エイリアスパスに変更
+} from '../../../src/v2/search-index.js'; // 相対パスに変更
 
 describe('Search Index Schemas (v2)', () => {
   const validDate = new Date().toISOString();

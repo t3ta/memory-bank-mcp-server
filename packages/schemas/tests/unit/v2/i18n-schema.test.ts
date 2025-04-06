@@ -2,7 +2,7 @@ import {
   isValidLanguage,
   getSafeLanguage,
   type Language,
-} from '@/v2/i18n-schema.js'; // エイリアスパス (再確認)
+} from '../../../src/v2/i18n-schema.js'; // 相対パスに変更
 describe('i18n Schema Utilities', () => {
   describe('isValidLanguage', () => {
     it('should return true for supported languages', () => {

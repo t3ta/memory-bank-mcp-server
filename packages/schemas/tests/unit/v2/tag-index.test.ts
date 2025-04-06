@@ -8,7 +8,7 @@ import {
   BranchTagIndexSchema,
   GlobalTagIndexSchema,
   TAG_INDEX_VERSION
-} from '@/v2/tag-index.js'; // エイリアスパスに変更し、.js を削除
+} from '../../../src/v2/tag-index.js'; // 相対パスに変更
 
 describe('DocumentReferenceSchema', () => {
   it('should validate a correct document reference', () => {

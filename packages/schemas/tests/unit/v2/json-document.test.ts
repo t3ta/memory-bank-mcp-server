@@ -5,7 +5,7 @@ import {
   DocumentMetadataV2Schema,
   BaseJsonDocumentV2Schema,
   SCHEMA_VERSION
-} from '@/v2/json-document.js'; // エイリアスパスに変更
+} from '../../../src/v2/json-document.js'; // 相対パスに変更
 
 import {
   BranchContextJsonV2Schema,
@@ -13,7 +13,7 @@ import {
   ProgressJsonV2Schema,
   SystemPatternsJsonV2Schema,
   GenericDocumentJsonV2Schema,
-} from '@/document-types/index.js'; // エイリアスパスに変更
+} from '../../../src/document-types/index.js'; // 相対パスに変更
 
 describe('DocumentMetadataV2Schema', () => {
   it('should validate correct metadata', () => {
