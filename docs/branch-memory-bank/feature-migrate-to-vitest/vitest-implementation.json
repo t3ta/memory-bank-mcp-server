@@ -1,0 +1,331 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "vitest-implementation-details",
+    "title": "Vitest実装詳細",
+    "documentType": "implementation_guide",
+    "path": "vitest-implementation.json",
+    "tags": [
+      "vitest",
+      "implementation",
+      "testing",
+      "guide"
+    ],
+    "lastModified": "2025-04-06T19:30:35.497Z",
+    "createdAt": "2025-04-06T19:30:35.497Z",
+    "version": 1
+  },
+  "content": {
+    "overview": "このドキュメントでは、JestからVitestへの移行における具体的な実装手順と、変更が必要なファイルについて詳細に説明します。",
+    "required_packages": [
+      {
+        "name": "vitest",
+        "version": "latest",
+        "purpose": "Vitestのコア機能"
+      },
+      {
+        "name": "@vitest/coverage-v8",
+        "version": "latest",
+        "purpose": "コードカバレッジ計測"
+      },
+      {
+        "name": "vite-tsconfig-paths",
+        "version": "latest",
+        "purpose": "TypeScriptのパス設定を解決するViteプラグイン"
+      }
+    ],
+    "files_to_add": [
+      {
+        "path": "/vitest.workspace.ts",
+        "purpose": "ワークスペース全体の設定",
+        "description": "モノレポ内の複数パッケージ間の関係を定義",
+        "template": "import { defineWorkspace } from 'vitest/config';\n\nexport default defineWorkspace([\n  'packages/mcp',\n  'packages/schemas',\n]);"
+      },
+      {
+        "path": "/packages/mcp/vitest.config.ts",
+        "purpose": "MCPパッケージのユニットテスト設定",
+        "description": "MCPパッケージのユニットテスト用Vitest設定",
+        "template": "import { defineConfig } from 'vitest/config';\nimport { resolve } from 'path';\nimport tsconfigPaths from 'vite-tsconfig-paths';\n\nexport default defineConfig({\n  plugins: [tsconfigPaths()],\n  test: {\n    environment: 'node',\n    include: ['tests/unit/**/*.test.ts'],\n    exclude: ['node_modules', 'dist'],\n    root: '.',\n    globals: true,\n    testTimeout: 60000,\n    threads: {\n      maxWorkers: 1\n    },\n    setupFiles: ['tests/setupTests.ts'],\n    resolveSnapshotPath: (testPath, snapExt) => testPath + snapExt,\n  },\n  resolve: {\n    alias: {\n      '@memory-bank/schemas': resolve('../schemas/src'),\n      '@': resolve('src')\n    }\n  }\n});"
+      },
+      {
+        "path": "/packages/mcp/tests/integration/vitest.config.ts",
+        "purpose": "MCPパッケージの統合テスト設定",
+        "description": "MCPパッケージの統合テスト用Vitest設定",
+        "template": "import { defineConfig } from 'vitest/config';\nimport { resolve } from 'path';\nimport tsconfigPaths from 'vite-tsconfig-paths';\n\nexport default defineConfig({\n  plugins: [tsconfigPaths()],\n  test: {\n    environment: 'node',\n    include: ['**/*.integration.test.ts'],\n    root: '.',\n    globals: true,\n    testTimeout: 30000,\n    threads: {\n      maxWorkers: 1\n    },\n    setupFiles: ['setup.mts'],\n    silent: false\n  },\n  resolve: {\n    alias: {\n      '@memory-bank/schemas': resolve('../../../schemas/src'),\n      '@': resolve('../../src')\n    }\n  }\n});"
+      },
+      {
+        "path": "/packages/schemas/vitest.config.ts",
+        "purpose": "Schemasパッケージのテスト設定",
+        "description": "Schemasパッケージのテスト用Vitest設定",
+        "template": "import { defineConfig } from 'vitest/config';\nimport { resolve } from 'path';\nimport tsconfigPaths from 'vite-tsconfig-paths';\n\nexport default defineConfig({\n  plugins: [tsconfigPaths()],\n  test: {\n    environment: 'node',\n    include: ['**/tests/**/*.test.ts'],\n    exclude: ['node_modules', 'dist'],\n    root: '.',\n    globals: true\n  },\n  resolve: {\n    alias: {\n      '^(\\.{1,2}/.*)\\.js$': '$1'\n    }\n  }\n});"
+      }
+    ],
+    "files_to_modify": [
+      {
+        "path": "/package.json",
+        "changes": [
+          {
+            "description": "devDependenciesにVitestパッケージを追加",
+            "current": "\"devDependencies\": {\n  // 既存の依存関係\n}",
+            "new": "\"devDependencies\": {\n  // 既存の依存関係\n  \"vitest\": \"^0.34.6\",\n  \"@vitest/coverage-v8\": \"^0.34.6\",\n  \"vite-tsconfig-paths\": \"^4.2.1\"\n}"
+          },
+          {
+            "description": "ルートのテストスクリプトを更新",
+            "current": "\"test\": \"yarn workspaces run test\"",
+            "new": "\"test\": \"vitest run --config vitest.workspace.ts\""
+          }
+        ]
+      },
+      {
+        "path": "/packages/mcp/package.json",
+        "changes": [
+          {
+            "description": "テスト実行スクリプトをVitestに更新",
+            "current": "\"test:unit\": \"NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest --config jest.config.js\",\n\"test:integration\": \"NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest --runInBand --detectOpenHandles --forceExit --config tests/integration/jest.config.ts\",\n\"test\": \"yarn test:unit && yarn test:integration\",\n\"test:watch\": \"NODE_OPTIONS='--experimental-vm-modules' jest --config jest.config.js --watch\",\n\"test:coverage\": \"NODE_OPTIONS='--experimental-vm-modules' jest --config jest.config.js --coverage\"",
+            "new": "\"test:unit\": \"vitest run\",\n\"test:integration\": \"vitest run -c tests/integration/vitest.config.ts\",\n\"test\": \"vitest run && vitest run -c tests/integration/vitest.config.ts\",\n\"test:watch\": \"vitest\",\n\"test:coverage\": \"vitest run --coverage\""
+          },
+          {
+            "description": "devDependenciesを更新",
+            "current": "\"devDependencies\": {\n  \"@types/jest\": \"^29.5.0\",\n  \"jest\": \"^29.7.0\",\n  \"ts-jest\": \"^29.1.0\",\n  // 他の依存関係\n}",
+            "new": "\"devDependencies\": {\n  // Jest関連パッケージは最終段階で削除\n  // 他の依存関係\n}"
+          }
+        ]
+      },
+      {
+        "path": "/packages/schemas/package.json",
+        "changes": [
+          {
+            "description": "テスト実行スクリプトをVitestに更新",
+            "current": "現在のテスト実行スクリプト（Jest使用）",
+            "new": "\"test\": \"vitest run\",\n\"test:watch\": \"vitest\",\n\"test:coverage\": \"vitest run --coverage\""
+          }
+        ]
+      },
+      {
+        "path": "/packages/mcp/tests/setupTests.ts",
+        "changes": [
+          {
+            "description": "JestのグローバルからVitestのグローバルに更新",
+            "current": "import { jest } from '@jest/globals';\n\nglobal.jest = jest;",
+            "new": "import { vi } from 'vitest';\n\n// Vitestのグローバル設定\n// 注: vitest.config.tsで globals: true を設定している場合は\n// このファイルの内容はほとんど必要ない可能性があります\nglobal.vi = vi;"
+          }
+        ]
+      }
+    ],
+    "files_to_eventually_remove": [
+      {
+        "path": "/jest.config.ts",
+        "when": "すべてのパッケージの移行が完了した後"
+      },
+      {
+        "path": "/packages/mcp/jest.config.js",
+        "when": "MCPパッケージの移行が完了した後"
+      },
+      {
+        "path": "/packages/schemas/jest.config.js",
+        "when": "schemasパッケージの移行が完了した後"
+      },
+      {
+        "path": "/packages/mcp/tests/integration/jest.config.ts",
+        "when": "統合テストの移行が完了した後"
+      }
+    ],
+    "test_code_changes": {
+      "overview": "テストコード自体の変更は最小限に抑えることを目指します。主な変更点は以下の通りです。",
+      "required_changes": [
+        {
+          "pattern": "jest.fn()",
+          "replacement": "vi.fn()",
+          "explanation": "モック関数の作成はvi.fn()を使用"
+        },
+        {
+          "pattern": "jest.spyOn()",
+          "replacement": "vi.spyOn()",
+          "explanation": "スパイの作成はvi.spyOn()を使用"
+        },
+        {
+          "pattern": "jest.mock()",
+          "replacement": "vi.mock()",
+          "explanation": "モジュールのモックはvi.mock()を使用"
+        },
+        {
+          "pattern": "import { jest } from '@jest/globals';",
+          "replacement": "import { vi } from 'vitest';",
+          "explanation": "Vitestのグローバル関数をインポート"
+        }
+      ],
+      "advanced_cases": [
+        {
+          "case": "resetModules",
+          "jest": "jest.resetModules()",
+          "vitest": "vi.resetModules()",
+          "notes": "モジュールキャッシュのリセット方法"
+        },
+        {
+          "case": "hoisted modules",
+          "jest": "jest.mock()はホイスティングされる",
+          "vitest": "vi.mock()もホイスティングされるが、挙動が少し異なる場合がある",
+          "notes": "必要に応じて手動でimport順を調整する場合がある"
+        },
+        {
+          "case": "timer mocks",
+          "jest": "jest.useFakeTimers()",
+          "vitest": "vi.useFakeTimers()",
+          "notes": "タイマーモックの使い方はほぼ同じ"
+        }
+      ]
+    },
+    "implementation_steps": [
+      {
+        "step": 1,
+        "title": "Vitestパッケージをインストール",
+        "commands": [
+          "cd /Users/tmita/workspace/memory-bank-mcp-server",
+          "yarn add -D vitest @vitest/coverage-v8 vite-tsconfig-paths"
+        ]
+      },
+      {
+        "step": 2,
+        "title": "ワークスペース設定ファイルの作成",
+        "description": "vitest.workspace.tsファイルを作成します",
+        "location": "ルートディレクトリ"
+      },
+      {
+        "step": 3,
+        "title": "MCPパッケージの設定",
+        "description": "MCPパッケージ用のvitest.config.tsファイルを作成し、package.jsonのスクリプトを更新します",
+        "tasks": [
+          "vitest.config.tsファイルの作成",
+          "package.jsonのtest関連スクリプトの更新",
+          "setupTests.tsファイルの更新"
+        ]
+      },
+      {
+        "step": 4,
+        "title": "統合テスト設定の作成",
+        "description": "統合テスト用のvitest.config.tsファイルを作成します",
+        "location": "packages/mcp/tests/integration/"
+      },
+      {
+        "step": 5,
+        "title": "ユニットテストの実行と問題解決",
+        "description": "ユニットテストを実行し、発生した問題を解決します",
+        "commands": [
+          "cd /Users/tmita/workspace/memory-bank-mcp-server",
+          "yarn workspace @memory-bank/mcp test:unit"
+        ]
+      },
+      {
+        "step": 6,
+        "title": "統合テストの実行と問題解決",
+        "description": "統合テストを実行し、発生した問題を解決します",
+        "commands": [
+          "cd /Users/tmita/workspace/memory-bank-mcp-server",
+          "yarn workspace @memory-bank/mcp test:integration"
+        ]
+      },
+      {
+        "step": 7,
+        "title": "schemasパッケージの設定",
+        "description": "schemasパッケージ用のvitest.config.tsファイルを作成し、package.jsonのスクリプトを更新します",
+        "tasks": [
+          "vitest.config.tsファイルの作成",
+          "package.jsonのtest関連スクリプトの更新"
+        ]
+      },
+      {
+        "step": 8,
+        "title": "全体テストの実行",
+        "description": "プロジェクト全体のテストを実行し、問題がないことを確認します",
+        "commands": [
+          "cd /Users/tmita/workspace/memory-bank-mcp-server",
+          "yarn test"
+        ]
+      },
+      {
+        "step": 9,
+        "title": "Jest関連パッケージの削除",
+        "description": "不要になったJest関連パッケージを削除します",
+        "commands": [
+          "cd /Users/tmita/workspace/memory-bank-mcp-server",
+          "yarn remove jest ts-jest @types/jest",
+          "cd packages/mcp",
+          "yarn remove jest ts-jest @types/jest",
+          "cd ../schemas",
+          "yarn remove jest ts-jest @types/jest"
+        ]
+      },
+      {
+        "step": 10,
+        "title": "Jest設定ファイルの削除",
+        "description": "不要になったJest設定ファイルを削除します",
+        "files_to_remove": [
+          "/jest.config.ts",
+          "/packages/mcp/jest.config.js",
+          "/packages/schemas/jest.config.js",
+          "/packages/mcp/tests/integration/jest.config.ts"
+        ]
+      }
+    ],
+    "troubleshooting": {
+      "common_issues": [
+        {
+          "issue": "モジュール解決の問題",
+          "symptom": "テスト実行時に「Cannot find module」エラーが発生する",
+          "solution": "resolve.aliasの設定を確認し、必要に応じて調整してください。また、tsconfigPathsプラグインが正しく設定されているか確認してください。"
+        },
+        {
+          "issue": "TypeScriptファイルの解析エラー",
+          "symptom": "TypeScriptファイルのパースエラーが発生する",
+          "solution": "tsconfig.jsonの設定を確認し、必要に応じてtest専用のtsconfig.jsonを用意してください。"
+        },
+        {
+          "issue": "タイムアウトエラー",
+          "symptom": "テスト実行時にタイムアウトエラーが発生する",
+          "solution": "vitest.config.tsのtestTimeoutオプションを増やしてください。"
+        },
+        {
+          "issue": "vi.mockの動作の違い",
+          "symptom": "モックが期待通りに動作しない",
+          "solution": "vi.mockの使い方がjest.mockと異なる場合があります。特に自動モック化の挙動が異なる場合があるため、明示的にモック関数を定義してください。"
+        },
+        {
+          "issue": "watch modeの問題",
+          "symptom": "watch modeでテストが自動的に再実行されない",
+          "solution": "vitest.config.tsのwatchオプションを確認し、適切なファイルパターンが設定されているか確認してください。"
+        }
+      ],
+      "solutions": [
+        {
+          "title": "グローバル変数の扱い",
+          "description": "Vitestでグローバル変数を使用するには、vitest.config.tsにglobals: trueを設定するか、各テストファイルで明示的にインポートする必要があります。"
+        },
+        {
+          "title": "ESMとCJSの互換性",
+          "description": "Vitestは基本的にESMベースですが、CJSモジュールも扱えます。ただし、一部の互換性の問題が発生する場合があります。その場合は、resolve.aliasで適切なエイリアスを設定してください。"
+        },
+        {
+          "title": "スナップショットの扱い",
+          "description": "Vitestのスナップショットテストは基本的にJestと互換性がありますが、スナップショットの保存場所やフォーマットが異なる場合があります。resolveSnapshotPathオプションで調整できます。"
+        }
+      ]
+    },
+    "benefits": {
+      "performance": [
+        "Vitestはesbuildベースのトランスパイラを使用しているため、テスト実行が高速化されます。",
+        "並列実行のデフォルトサポートにより、大規模なテストスイートの実行時間が短縮されます。",
+        "HMR（Hot Module Replacement）サポートにより、開発中のテスト実行が高速化されます。"
+      ],
+      "developer_experience": [
+        "ESMネイティブサポートにより、実験的フラグが不要になります。",
+        "Viteとの統合により、モダンな開発ツールチェーンとの互換性が向上します。",
+        "より明確なエラーメッセージとスタックトレースを提供します。"
+      ],
+      "maintenance": [
+        "シンプルな設定により、メンテナンスコストが低減します。",
+        "Viteエコシステムとの一貫性により、他のツールとの統合が容易になります。",
+        "積極的なメンテナンスとコミュニティサポートにより、長期的な安定性が期待できます。"
+      ]
+    }
+  }
+}

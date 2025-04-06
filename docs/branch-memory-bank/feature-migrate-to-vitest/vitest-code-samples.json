@@ -1,0 +1,265 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "vitest-code-samples",
+    "title": "Vitest実装コードサンプル集",
+    "documentType": "code_samples",
+    "path": "vitest-code-samples.json",
+    "tags": [
+      "vitest",
+      "code-samples",
+      "implementation",
+      "testing"
+    ],
+    "lastModified": "2025-04-06T20:15:35.497Z",
+    "createdAt": "2025-04-06T20:15:35.497Z",
+    "version": 1
+  },
+  "content": {
+    "introduction": "このドキュメントでは、JestからVitestへの移行に必要なコードサンプルを提供します。設定ファイルやテストコードの変換例を含み、実装作業の参考になります。",
+    "configuration_files": {
+      "workspace_config": {
+        "file_path": "/vitest.workspace.ts",
+        "description": "モノレポ全体のワークスペース設定",
+        "code": "import { defineWorkspace } from 'vitest/config';\n\nexport default defineWorkspace([\n  'packages/mcp',\n  'packages/schemas',\n]);"
+      },
+      "mcp_unit_test_config": {
+        "file_path": "/packages/mcp/vitest.config.ts",
+        "description": "MCPパッケージのユニットテスト設定",
+        "code": "import { defineConfig } from 'vitest/config';\nimport { resolve } from 'path';\nimport tsconfigPaths from 'vite-tsconfig-paths';\n\nexport default defineConfig({\n  plugins: [tsconfigPaths()],\n  test: {\n    environment: 'node',\n    include: ['tests/unit/**/*.test.ts'],\n    exclude: ['node_modules', 'dist'],\n    root: '.',\n    globals: true,\n    testTimeout: 60000,\n    threads: {\n      maxWorkers: 1\n    },\n    setupFiles: ['tests/setupTests.ts'],\n    resolveSnapshotPath: (testPath, snapExt) => testPath + snapExt,\n  },\n  resolve: {\n    alias: {\n      '@memory-bank/schemas': resolve('../schemas/src'),\n      '@': resolve('src')\n    }\n  }\n});"
+      },
+      "mcp_integration_test_config": {
+        "file_path": "/packages/mcp/tests/integration/vitest.config.ts",
+        "description": "MCPパッケージの統合テスト設定",
+        "code": "import { defineConfig } from 'vitest/config';\nimport { resolve } from 'path';\nimport tsconfigPaths from 'vite-tsconfig-paths';\n\nexport default defineConfig({\n  plugins: [tsconfigPaths()],\n  test: {\n    environment: 'node',\n    include: ['**/*.integration.test.ts'],\n    root: '.',\n    globals: true,\n    testTimeout: 30000,\n    threads: {\n      maxWorkers: 1\n    },\n    setupFiles: ['setup.mts'],\n    silent: false\n  },\n  resolve: {\n    alias: {\n      '@memory-bank/schemas': resolve('../../../schemas/src'),\n      '@': resolve('../../src')\n    }\n  }\n});"
+      },
+      "schemas_test_config": {
+        "file_path": "/packages/schemas/vitest.config.ts",
+        "description": "Schemasパッケージのテスト設定",
+        "code": "import { defineConfig } from 'vitest/config';\nimport { resolve } from 'path';\nimport tsconfigPaths from 'vite-tsconfig-paths';\n\nexport default defineConfig({\n  plugins: [tsconfigPaths()],\n  test: {\n    environment: 'node',\n    include: ['**/tests/**/*.test.ts'],\n    exclude: ['node_modules', 'dist'],\n    root: '.',\n    globals: true\n  },\n  resolve: {\n    alias: {\n      '^(\\\\.{1,2}/.*)\\\\.js$': '$1'\n    }\n  }\n});"
+      }
+    },
+    "setup_files": {
+      "unit_test_setup": {
+        "file_path": "/packages/mcp/tests/setupTests.ts",
+        "description": "ユニットテスト用のセットアップファイル",
+        "original": "/**\n * Jest setup file for tests\n */\nimport { jest } from '@jest/globals';\n\nglobal.jest = jest;",
+        "updated": "/**\n * Vitest setup file for tests\n */\nimport { vi } from 'vitest';\n\n// Vitestのグローバル設定\n// 注: vitest.config.tsで globals: true を設定している場合は\n// このファイルの内容は最小限で済む\nglobal.vi = vi;"
+      },
+      "integration_test_setup": {
+        "file_path": "/packages/mcp/tests/integration/setup.mts",
+        "description": "統合テスト用のセットアップファイル",
+        "transformation_notes": [
+          "Jestの関連importをVitestに変更 (例: jest → vi)",
+          "afterAll, beforeAll などのライフサイクルフックはそのまま使用可能",
+          "jest.spyOn などは vi.spyOn に置き換え",
+          "モックやタイマー関連のAPIはほぼ同等の命名で置き換え"
+        ]
+      }
+    },
+    "package_json_updates": {
+      "root_package_json": {
+        "file_path": "/package.json",
+        "description": "ルートのpackage.jsonスクリプト更新",
+        "original": "\"scripts\": {\n  \"test\": \"yarn workspaces run test\",\n  \"test:mcp\": \"yarn workspace @memory-bank/mcp test\",\n  \"test:schemas\": \"yarn workspace @memory-bank/schemas test\"\n}",
+        "updated": "\"scripts\": {\n  \"test\": \"vitest run --config vitest.workspace.ts\",\n  \"test:mcp\": \"yarn workspace @memory-bank/mcp test\",\n  \"test:schemas\": \"yarn workspace @memory-bank/schemas test\"\n}"
+      },
+      "mcp_package_json": {
+        "file_path": "/packages/mcp/package.json",
+        "description": "MCPパッケージのpackage.jsonスクリプト更新",
+        "original": "\"scripts\": {\n  \"test:unit\": \"NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest --config jest.config.js\",\n  \"test:integration\": \"NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest --runInBand --detectOpenHandles --forceExit --config tests/integration/jest.config.ts\",\n  \"test\": \"yarn test:unit && yarn test:integration\",\n  \"test:watch\": \"NODE_OPTIONS='--experimental-vm-modules' jest --config jest.config.js --watch\",\n  \"test:coverage\": \"NODE_OPTIONS='--experimental-vm-modules' jest --config jest.config.js --coverage\"\n}",
+        "updated": "\"scripts\": {\n  \"test:unit\": \"vitest run\",\n  \"test:integration\": \"vitest run -c tests/integration/vitest.config.ts\",\n  \"test\": \"vitest run && vitest run -c tests/integration/vitest.config.ts\",\n  \"test:watch\": \"vitest\",\n  \"test:coverage\": \"vitest run --coverage\"\n}"
+      },
+      "schemas_package_json": {
+        "file_path": "/packages/schemas/package.json",
+        "description": "Schemasパッケージのpackage.jsonスクリプト更新",
+        "original": "\"scripts\": {\n  \"test\": \"NODE_OPTIONS='--experimental-vm-modules' jest --config jest.config.js\",\n  \"test:watch\": \"NODE_OPTIONS='--experimental-vm-modules' jest --config jest.config.js --watch\",\n  \"test:coverage\": \"NODE_OPTIONS='--experimental-vm-modules' jest --config jest.config.js --coverage\"\n}",
+        "updated": "\"scripts\": {\n  \"test\": \"vitest run\",\n  \"test:watch\": \"vitest\",\n  \"test:coverage\": \"vitest run --coverage\"\n}"
+      }
+    },
+    "test_code_updates": {
+      "import_statements": {
+        "description": "テストファイルのインポート文更新",
+        "original": "import { jest } from '@jest/globals';",
+        "updated": "import { vi } from 'vitest';"
+      },
+      "mock_functions": {
+        "description": "モック関数の更新",
+        "samples": [
+          {
+            "original": "const mockFn = jest.fn();",
+            "updated": "const mockFn = vi.fn();"
+          },
+          {
+            "original": "jest.spyOn(object, 'method').mockImplementation(() => 'mocked');",
+            "updated": "vi.spyOn(object, 'method').mockImplementation(() => 'mocked');"
+          },
+          {
+            "original": "jest.mock('./module');",
+            "updated": "vi.mock('./module');"
+          }
+        ]
+      },
+      "timers": {
+        "description": "タイマー関数の更新",
+        "samples": [
+          {
+            "original": "jest.useFakeTimers();",
+            "updated": "vi.useFakeTimers();"
+          },
+          {
+            "original": "jest.advanceTimersByTime(1000);",
+            "updated": "vi.advanceTimersByTime(1000);"
+          },
+          {
+            "original": "jest.runAllTimers();",
+            "updated": "vi.runAllTimers();"
+          }
+        ]
+      },
+      "mocks_implementation": {
+        "description": "モックの実装方法",
+        "samples": [
+          {
+            "original": "jest.mock('./path/to/module', () => ({\n  default: jest.fn(),\n  namedExport: jest.fn()\n}));",
+            "updated": "vi.mock('./path/to/module', () => ({\n  default: vi.fn(),\n  namedExport: vi.fn()\n}));"
+          },
+          {
+            "original": "jest.mock('./module', () => {\n  return {\n    __esModule: true,\n    default: jest.fn().mockImplementation(() => 'mocked')\n  };\n});",
+            "updated": "vi.mock('./module', () => {\n  return {\n    __esModule: true,\n    default: vi.fn().mockImplementation(() => 'mocked')\n  };\n});"
+          }
+        ]
+      }
+    },
+    "example_test_conversions": {
+      "simple_test": {
+        "description": "シンプルなテストファイルの変換例",
+        "original": "/**\n * @jest-environment node\n */\nimport { jest } from '@jest/globals';\nimport { someFunction } from '../src/someModule';\n\ndescribe('someFunction', () => {\n  it('should return expected result', () => {\n    const mockDependency = jest.fn().mockReturnValue('mocked');\n    jest.mock('../src/dependency', () => ({\n      dependency: mockDependency\n    }));\n    \n    const result = someFunction();\n    \n    expect(result).toBe('expected');\n    expect(mockDependency).toHaveBeenCalled();\n  });\n});",
+        "updated": "// Vitestでは環境コメントは不要 (vitest.config.tsで設定)\nimport { vi } from 'vitest';\nimport { someFunction } from '../src/someModule';\n\ndescribe('someFunction', () => {\n  it('should return expected result', () => {\n    const mockDependency = vi.fn().mockReturnValue('mocked');\n    vi.mock('../src/dependency', () => ({\n      dependency: mockDependency\n    }));\n    \n    const result = someFunction();\n    \n    expect(result).toBe('expected');\n    expect(mockDependency).toHaveBeenCalled();\n  });\n});"
+      },
+      "async_test": {
+        "description": "非同期テストの変換例",
+        "original": "import { jest } from '@jest/globals';\nimport { fetchData } from '../src/api';\n\n// モックの自動ホイスティング\njest.mock('../src/api');\n\ndescribe('async operations', () => {\n  beforeEach(() => {\n    jest.resetModules();\n  });\n  \n  it('should fetch data asynchronously', async () => {\n    const mockData = { id: 1, name: 'Test' };\n    fetchData.mockResolvedValue(mockData);\n    \n    const result = await fetchData();\n    \n    expect(result).toEqual(mockData);\n    expect(fetchData).toHaveBeenCalledTimes(1);\n  });\n});",
+        "updated": "import { vi } from 'vitest';\nimport { fetchData } from '../src/api';\n\n// モックの自動ホイスティング（Vitestでも同様）\nvi.mock('../src/api');\n\ndescribe('async operations', () => {\n  beforeEach(() => {\n    vi.resetModules();\n  });\n  \n  it('should fetch data asynchronously', async () => {\n    const mockData = { id: 1, name: 'Test' };\n    fetchData.mockResolvedValue(mockData);\n    \n    const result = await fetchData();\n    \n    expect(result).toEqual(mockData);\n    expect(fetchData).toHaveBeenCalledTimes(1);\n  });\n});"
+      },
+      "timer_test": {
+        "description": "タイマーを使用したテストの変換例",
+        "original": "import { jest } from '@jest/globals';\nimport { delayedFunction } from '../src/utils';\n\ndescribe('Timer functions', () => {\n  beforeEach(() => {\n    jest.useFakeTimers();\n  });\n  \n  afterEach(() => {\n    jest.useRealTimers();\n  });\n  \n  it('should execute after delay', () => {\n    const callback = jest.fn();\n    delayedFunction(callback, 1000);\n    \n    expect(callback).not.toHaveBeenCalled();\n    \n    jest.advanceTimersByTime(1000);\n    \n    expect(callback).toHaveBeenCalledTimes(1);\n  });\n});",
+        "updated": "import { vi } from 'vitest';\nimport { delayedFunction } from '../src/utils';\n\ndescribe('Timer functions', () => {\n  beforeEach(() => {\n    vi.useFakeTimers();\n  });\n  \n  afterEach(() => {\n    vi.useRealTimers();\n  });\n  \n  it('should execute after delay', () => {\n    const callback = vi.fn();\n    delayedFunction(callback, 1000);\n    \n    expect(callback).not.toHaveBeenCalled();\n    \n    vi.advanceTimersByTime(1000);\n    \n    expect(callback).toHaveBeenCalledTimes(1);\n  });\n});"
+      },
+      "snapshot_test": {
+        "description": "スナップショットテストの変換例",
+        "original": "import { jest } from '@jest/globals';\nimport { renderComponent } from '../src/renderer';\n\ndescribe('Component rendering', () => {\n  it('should match snapshot', () => {\n    const component = renderComponent({ title: 'Test Component' });\n    \n    expect(component).toMatchSnapshot();\n  });\n});",
+        "updated": "import { vi } from 'vitest';\nimport { renderComponent } from '../src/renderer';\n\ndescribe('Component rendering', () => {\n  it('should match snapshot', () => {\n    const component = renderComponent({ title: 'Test Component' });\n    \n    expect(component).toMatchSnapshot();\n  });\n});"
+      },
+      "integration_test": {
+        "description": "統合テストの変換例",
+        "original": "/**\n * @jest-environment node\n */\nimport { jest } from '@jest/globals';\nimport { setupTestEnv, cleanupTestEnv } from './helpers';\nimport { Container } from '../src/di/container';\n\ndescribe('Integration Test', () => {\n  let testEnv;\n  let container;\n  \n  beforeEach(async () => {\n    testEnv = await setupTestEnv();\n    container = new Container({ /* config */ });\n    await container.initialize();\n    \n    // モックのセットアップ\n    jest.spyOn(container.get('service'), 'method').mockImplementation(() => 'mocked');\n  });\n  \n  afterEach(async () => {\n    await cleanupTestEnv(testEnv);\n  });\n  \n  it('should perform integration test', async () => {\n    const controller = container.get('controller');\n    const result = await controller.action();\n    \n    expect(result.success).toBe(true);\n    expect(result.data).toEqual(expect.objectContaining({\n      id: expect.any(String),\n      timestamp: expect.any(String)\n    }));\n  });\n});",
+        "updated": "// Vitestでは環境コメントは不要 (vitest.config.tsで設定)\nimport { vi } from 'vitest';\nimport { setupTestEnv, cleanupTestEnv } from './helpers';\nimport { Container } from '../src/di/container';\n\ndescribe('Integration Test', () => {\n  let testEnv;\n  let container;\n  \n  beforeEach(async () => {\n    testEnv = await setupTestEnv();\n    container = new Container({ /* config */ });\n    await container.initialize();\n    \n    // モックのセットアップ\n    vi.spyOn(container.get('service'), 'method').mockImplementation(() => 'mocked');\n  });\n  \n  afterEach(async () => {\n    await cleanupTestEnv(testEnv);\n  });\n  \n  it('should perform integration test', async () => {\n    const controller = container.get('controller');\n    const result = await controller.action();\n    \n    expect(result.success).toBe(true);\n    expect(result.data).toEqual(expect.objectContaining({\n      id: expect.any(String),\n      timestamp: expect.any(String)\n    }));\n  });\n});"
+      }
+    },
+    "command_line_examples": {
+      "installation": {
+        "description": "Vitestパッケージのインストール",
+        "command": "yarn add -D vitest @vitest/coverage-v8 vite-tsconfig-paths"
+      },
+      "run_all_tests": {
+        "description": "すべてのテストを実行",
+        "original": "yarn test",
+        "updated": "yarn test"
+      },
+      "run_unit_tests": {
+        "description": "ユニットテストのみ実行",
+        "original": "yarn workspace @memory-bank/mcp test:unit",
+        "updated": "yarn workspace @memory-bank/mcp test:unit"
+      },
+      "run_integration_tests": {
+        "description": "統合テストのみ実行",
+        "original": "yarn workspace @memory-bank/mcp test:integration",
+        "updated": "yarn workspace @memory-bank/mcp test:integration"
+      },
+      "watch_mode": {
+        "description": "ウォッチモードでテスト実行",
+        "original": "yarn workspace @memory-bank/mcp test:watch",
+        "updated": "yarn workspace @memory-bank/mcp test:watch"
+      },
+      "coverage_report": {
+        "description": "カバレッジレポート作成",
+        "original": "yarn workspace @memory-bank/mcp test:coverage",
+        "updated": "yarn workspace @memory-bank/mcp test:coverage"
+      }
+    },
+    "common_issues_solutions": {
+      "module_resolution": {
+        "issue": "ESMモジュール解決の問題",
+        "symptom": "「Cannot find module」または「Module not found」エラーが発生",
+        "solution": "resolve.aliasの設定を正しく行う。tsconfigPathsプラグインを使用してtsconfig.jsonのパス設定を反映する。",
+        "code_example": "// vitest.config.ts\nimport { defineConfig } from 'vitest/config';\nimport { resolve } from 'path';\nimport tsconfigPaths from 'vite-tsconfig-paths';\n\nexport default defineConfig({\n  plugins: [tsconfigPaths()],\n  resolve: {\n    alias: {\n      '@': resolve('src'),\n      // 必要に応じて追加のエイリアス\n    }\n  }\n});"
+      },
+      "typescript_integration": {
+        "issue": "TypeScriptの統合問題",
+        "symptom": "TypeScriptファイルの処理エラーや型チェックの問題",
+        "solution": "VitestはTypeScriptをネイティブにサポートしているが、特殊な設定が必要な場合はViteのTypeScript設定を活用する。",
+        "code_example": "// vitest.config.ts\nimport { defineConfig } from 'vitest/config';\n\nexport default defineConfig({\n  test: {\n    // TypeScript関連の設定\n    typecheck: {\n      enabled: true,\n      tsconfig: './tsconfig.test.json' // テスト専用のTSConfig\n    }\n  }\n});"
+      },
+      "mock_hoisting": {
+        "issue": "モックのホイスティング動作の違い",
+        "symptom": "Jestと同様の方法でモックを設定したが、正しく動作しない",
+        "solution": "Vitestもモックのホイスティングをサポートしているが、インポート順序が重要になる場合がある。モックをテストファイルの先頭に明示的に配置する。",
+        "code_example": "// テストファイル\nimport { vi } from 'vitest';\n\n// モックをインポート前に配置\nvi.mock('../src/module-to-mock');\n\n// モックの後でインポート\nimport { functionToTest } from '../src/module-to-test';\nimport { mockedFunction } from '../src/module-to-mock';"
+      },
+      "timers_behavior": {
+        "issue": "タイマーの挙動の違い",
+        "symptom": "Jestのタイマーモックと動作が若干異なる",
+        "solution": "VitestのタイマーAPIはJestとほぼ同じだが、一部の高度な機能は微妙に異なる。明示的にタイマーのセットアップと後処理を行う。",
+        "code_example": "beforeEach(() => {\n  // 明示的にタイマーをリセット\n  vi.useFakeTimers();\n  // 必要に応じてシステム時間を設定\n  vi.setSystemTime(new Date('2025-04-06'));\n});\n\nafterEach(() => {\n  // 明示的にタイマーを後処理\n  vi.useRealTimers();\n});"
+      },
+      "snapshot_paths": {
+        "issue": "スナップショットのパス解決",
+        "symptom": "スナップショットファイルが正しい場所に生成/読み込みされない",
+        "solution": "resolveSnapshotPathオプションを使用してスナップショットのパス解決をカスタマイズする",
+        "code_example": "// vitest.config.ts\nexport default defineConfig({\n  test: {\n    // スナップショットのパス解決\n    resolveSnapshotPath: (testPath, snapExt) => testPath + snapExt\n  }\n});"
+      },
+      "test_environment": {
+        "issue": "テスト環境の違い",
+        "symptom": "テスト環境の設定がJestと異なる",
+        "solution": "Vitestではvitest.config.tsにenvironmentオプションで環境を設定する。Jestのコメントによる設定は不要。",
+        "code_example": "// vitest.config.ts\nexport default defineConfig({\n  test: {\n    environment: 'node', // または 'jsdom', 'happy-dom' など\n    // 環境特有の設定\n    environmentOptions: {\n      // 環境変数など\n    }\n  }\n});"
+      }
+    },
+    "migration_checklist": {
+      "preparation": [
+        "現在のJest設定ファイルの分析と理解",
+        "Vitestとその関連パッケージのインストール",
+        "テストコードの特徴（モック、タイマー使用など）の把握"
+      ],
+      "configuration": [
+        "vitest.workspace.tsの作成（モノレポの場合）",
+        "各パッケージのvitest.config.tsの作成",
+        "適切なエイリアス設定とモジュール解決の設定",
+        "setupFilesの作成または更新"
+      ],
+      "code_updates": [
+        "jestからviへのグローバル関数の置き換え",
+        "モック実装の更新",
+        "タイマー関連コードの更新",
+        "環境設定コメントの削除"
+      ],
+      "script_updates": [
+        "package.jsonのスクリプト更新",
+        "CI/CD設定の更新（必要に応じて）"
+      ],
+      "testing": [
+        "ユニットテストの実行と確認",
+        "統合テストの実行と確認",
+        "カバレッジレポートの確認",
+        "パフォーマンス比較"
+      ],
+      "cleanup": [
+        "不要なJest設定ファイルの削除",
+        "不要なJest依存関係の削除",
+        "ドキュメント更新"
+      ]
+    }
+  }
+}
