@@ -30,7 +30,9 @@
       "@/*": [
         "src/*"
       ],
-      // "@memory-bank/schemas" のパスは Project References で解決されるはずなので不要
+      "@memory-bank/schemas": [ // schemas へのパスも復活
+        "../schemas/src"
+      ]
     },
     "isolatedModules": true
   },
