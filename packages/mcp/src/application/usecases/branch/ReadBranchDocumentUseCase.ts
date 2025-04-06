@@ -72,12 +72,12 @@ export class ReadBranchDocumentUseCase
           branchNameToUse = await this.gitService.getCurrentBranchName();
           this.useCaseLogger.info(`Current branch name automatically detected: ${branchNameToUse}`);
         } catch (error) {
-          this.useCaseLogger.error('Failed to get current branch name', { error });
+          // this.useCaseLogger.error('Failed to get current branch name', { error }); // みらい... テストログ抑制
           throw ApplicationErrors.invalidInput('Branch name is required but could not be automatically determined. Please provide it explicitly or ensure you are in a Git repository.');
         }
       } else {
         // プロジェクトモードでない場合は、ブランチ名の省略はエラー
-        this.useCaseLogger.warn('Branch name omitted outside of project mode.');
+        // this.useCaseLogger.warn('Branch name omitted outside of project mode.'); // みらい... テストログ抑制
         throw ApplicationErrors.invalidInput('Branch name is required when not running in project mode.');
       }
     }
@@ -117,17 +117,17 @@ export class ReadBranchDocumentUseCase
     const branchExists = await this.branchRepository.exists(branchInfo.safeName);
 
     if (!branchExists) {
-      this.useCaseLogger.warn('Branch not found', { branchName: input.branchName });
+      // this.useCaseLogger.warn('Branch not found', { branchName: input.branchName }); // みらい... テストログ抑制
       throw DomainErrors.branchNotFound(input.branchName);
     }
 
     const document = await this.branchRepository.getDocument(branchInfo, documentPath);
 
     if (!document) {
-      this.useCaseLogger.warn('Document not found', {
-        branchName: input.branchName,
-        documentPath: input.path
-      });
+      // this.useCaseLogger.warn('Document not found', { // みらい... テストログ抑制
+      //   branchName: input.branchName,
+      //   documentPath: input.path
+      // });
       throw DomainErrors.documentNotFound(input.path, { branchName: input.branchName });
     }
 

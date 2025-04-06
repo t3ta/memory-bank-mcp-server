@@ -3,6 +3,7 @@
  * Loads and processes JSON templates with internationalization support
  */
 import path from 'node:path';
+import { fileURLToPath } from 'node:url'; // 追加
 // Use 'any' for now due to persistent import issues
 type JsonTemplate = any;
 const validateJsonTemplate = (data: any) => data; // Dummy validator
@@ -12,6 +13,9 @@ import { II18nProvider } from '../i18n/interfaces/II18nProvider.js';
 import { TemplateRenderer } from './TeplateRenderer.js';
 import { ITemplateLoader } from './interfaces/ITemplateLoader.js';
 import { logger } from '../../shared/utils/logger.js';
+
+const __filename = fileURLToPath(import.meta.url); // 追加
+const __dirname = path.dirname(__filename); // 追加
 
 /**
  * Implementation of ITemplateLoader for JSON templates
@@ -38,8 +42,8 @@ export class JsonTemplateLoader implements ITemplateLoader {
    * Gets the JSON templates directory path
    */
   private getJsonTemplatesDirectory(): string {
-    // Use project-relative paths instead of import.meta.url
-    return path.join(process.cwd(), 'src/templates/json');
+    // Resolve path relative to the current file's directory
+    return path.resolve(__dirname, '../../templates/json');
   }
 
   // Legacy directory method removed

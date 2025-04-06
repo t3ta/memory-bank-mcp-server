@@ -1,11 +1,14 @@
-import fs from "fs/promises"; // Use standard fs/promises
-// import fsExtra from "fs-extra"; // Remove fs-extra import for readJson
+import fs from "fs/promises"; // ★★★ コメント解除 ★★★
 import path from "path";
 import { DomainError, DomainErrorCodes } from "../../../shared/errors/DomainError.js";
 import { logger } from "../../../shared/utils/logger.js";
-import { TemplateService } from '../../templates/TemplateService.js'; // Import TemplateService
-import { Language } from '../../../domain/i18n/Language.js'; // Import Language class from domain
-import { getSafeLanguage } from '@memory-bank/schemas';
+import { fileURLToPath } from 'node:url'; // ★★★ コメント解除 ★★★
+// import { TemplateService } from '../../templates/TemplateService.js'; // ★★★ コメントアウト ★★★
+// import { Language } from '../../../domain/i18n/Language.js'; // ★★★ コメントアウト ★★★
+// import { getSafeLanguage } from '@memory-bank/schemas'; // ★★★ コメントアウト ★★★
+
+const __filename = fileURLToPath(import.meta.url); // ★★★ コメント解除 ★★★
+const __dirname = path.dirname(__filename); // ★★★ コメント解除 ★★★
 
 
 export type RulesResult = {
@@ -17,136 +20,60 @@ export type RulesResult = {
  * Use case for reading rules
  */
 export class ReadRulesUseCase {
-  private readonly rulesDir: string;
+  private readonly rulesDir: string; // 使われてないけど残しておく
   private readonly supportedLanguages = ['en', 'ja', 'zh'];
 
   /**
    * Constructor
    * @param rulesDir Rules directory path
- * @param templateLoader Template loader (optional)
- */
-constructor(
- rulesDir: string,
- private readonly templateLoader?: TemplateService // Type is already TemplateService, ensure consistency
-) {
- // Resolve the absolute path for rulesDir upon initialization
- this.rulesDir = path.resolve(rulesDir);
- logger.debug(`ReadRulesUseCase initialized with resolved rulesDir: ${this.rulesDir}`); // Log resolved rulesDir
-}
+   */
+  constructor(
+   rulesDir: string // rulesDir はエラーメッセージ用に残すかもしれないけど、実際には使わない
+   // private readonly templateLoader: TemplateService // ★★★ コメントアウト ★★★
+  ) {
+   // Resolve the absolute path for rulesDir upon initialization
+   this.rulesDir = path.resolve(rulesDir);
+   logger.debug(`ReadRulesUseCase initialized with resolved rulesDir: ${this.rulesDir}`); // Log resolved rulesDir
+  }
 
   /**
    * Read rules for the specified language
    * @param language Language code ('en', 'ja', 'zh')
    * @returns Rules content and metadata
    * @throws If language is not supported or file is not found
- */
-async execute(language: string): Promise<RulesResult> {
-  logger.debug(`Executing ReadRulesUseCase for language: ${language}`); // Log execution start
-  // Validate language code
-  if (!this.supportedLanguages.includes(language)) {
-      throw new DomainError(
-        DomainErrorCodes.VALIDATION_ERROR,
-        `Unsupported language code: ${language}. Supported languages are: ${this.supportedLanguages.join(', ')}`
-      );
-    }
+   */
+  async execute(language: string): Promise<RulesResult> {
+    // Validate language code
+    if (!this.supportedLanguages.includes(language)) {
+        throw new DomainError(
+          DomainErrorCodes.VALIDATION_ERROR,
+          `Unsupported language code: ${language}. Supported languages are: ${this.supportedLanguages.join(', ')}`
+        );
+      } // ★★★ 正しい if 文の閉じ括弧の位置 ★★★
 
-    // Define possiblePaths outside the try block to access it in catch
-    const possiblePaths = [
-      // New single template path
-      path.join(this.rulesDir, 'templates', 'json', 'rules.json'),
-      // New path (domain/templates replaced templates/json)
-      path.join(this.rulesDir, 'domain', 'templates', `rules-${language}.json`),
-      // Previous path (for compatibility with older systems)
-      path.join(this.rulesDir, 'templates', 'json', `rules-${language}.json`),
-      // Fallback path
-      path.join(this.rulesDir, `rules-${language}.json`)
-    ];
-
-    let jsonContent = ''; // Declare jsonContent here to be accessible in the outer scope
-    let jsonFilePath = ''; // Declare jsonFilePath here
+    // ★★★ fs.readFile を使うロジック ★★★
+    const rulesJsonPath = path.resolve(__dirname, '../../../templates/json/rules.json'); // ★★★ rulesJsonPath を try の外で宣言 ★★★
+    logger.debug(`Attempting to read rules file from: ${rulesJsonPath}`);
 
     try {
-      // Use template loader if provided
-      if (this.templateLoader) {
-        try {
-          logger.debug(`Using template loader to get rules for language: ${language}`);
+      // Directly read the rules.json file
+      const jsonContent = await fs.readFile(rulesJsonPath, 'utf-8'); // ★★★ fs を使う ★★★
+      logger.debug('[ReadRules] Successfully read file content', { path: rulesJsonPath });
 
-          // Safely convert language code
-          const safeLanguageCode = getSafeLanguage(language); // Get safe language code ('en', 'ja', or 'zh')
-
-          const langObject = new Language(safeLanguageCode); // Instantiate Language class
-
-          const templateContent = await this.templateLoader.getTemplateAsMarkdown(
-            'rules',
-            langObject // Pass Language object
-          );
-
-          // Assuming template loader returns JSON string that needs parsing
-          const jsonData = JSON.parse(templateContent);
-          const content = JSON.stringify(jsonData, null, 2);
-
-          return {
-            content,
-            language
-          };
-        } catch (templateError) {
-          logger.warn(`Failed to load rules using template loader: ${templateError instanceof Error ? templateError.message : 'Unknown error'}`);
-          logger.debug('Falling back to direct file loading');
-          // Fallback to direct file loading if template loader fails
-        }
-      }
-
-      // Load JSON file directly (fallback or primary method)
-      // Find the existing path and read content using standard fs.readFile
-      for (const p of possiblePaths) {
-        const absolutePath = path.resolve(p); // Resolve to absolute path
-        logger.debug(`[ReadRules] Attempting path: ${absolutePath}`);
-        try {
-          // Check file existence explicitly before reading
-          await fs.access(absolutePath);
-          logger.debug(`[ReadRules] File exists at: ${absolutePath}`);
-          try {
-            jsonContent = await fs.readFile(absolutePath, 'utf-8'); // Use standard fs.readFile
-            jsonFilePath = absolutePath; // Assign value here
-            logger.debug('[ReadRules] Successfully read file content', { path: jsonFilePath });
-            break; // Exit loop once file is found and read
-          } catch (readError: any) {
-            logger.error(`[ReadRules] File exists but failed to read: ${absolutePath}`, { error: readError.message });
-            // Continue to next path if read fails even if file exists
-          }
-        } catch (accessError: any) {
-          if (accessError.code === 'ENOENT') {
-            logger.debug(`[ReadRules] File does not exist at: ${absolutePath}`);
-          } else {
-            logger.warn(`[ReadRules] Error checking file access for ${absolutePath}: ${accessError.message}`);
-          }
-          // Continue to the next path if access fails (e.g., file not found)
-        }
-      }
-
-      if (!jsonContent) {
-        // If no file was found after trying all paths, throw the specific error
-        throw new Error(`Rules file not found for language: ${language}`);
-      }
-
-      // Parse the content after reading
-      const jsonData = JSON.parse(jsonContent);
-
-      // No need to convert JSON to Markdown, return JSON string directly
-      // (Markdown support was removed)
-      const content = JSON.stringify(jsonData, null, 2);
+      // 読み込んだJSON文字列をそのまま返す
+      const content = jsonContent;
 
       return {
         content,
         language
       };
     } catch (error: any) {
-      const attemptedPaths = possiblePaths.join(', ');
-      logger.error(`Failed to find or read rules file for language ${language}. Attempted paths: ${attemptedPaths}`, { originalError: error });
+      // ★★★ fs.readFile のエラーハンドリング ★★★
+      logger.error(`Failed to read rules file at path: ${rulesJsonPath}`, { originalError: error });
       throw new DomainError(
         DomainErrorCodes.DOCUMENT_NOT_FOUND,
-        `Rules file not found for language: ${language}. Attempted paths: ${attemptedPaths}`,
-        { originalError: error, attemptedPaths }
+        `Rules file not found at path: ${rulesJsonPath}`,
+        { originalError: error, attemptedPath: rulesJsonPath }
       );
     }
   }

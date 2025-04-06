@@ -86,12 +86,18 @@ export class ContextController implements IContextController {
 
       // Get rules (using a separate use case)
       try {
-        logger.debug(`Requesting rules for language: ${request.language}`);
-        contextResult.rules = await this.readRulesUseCase.execute(request.language);
-        logger.debug(`Rules retrieved successfully for language: ${request.language}`);
+        // console.error(`[CONSOLE_ERROR_MIRAILOG] Requesting rules for language: ${request.language}`); // みらい... デバッグログ削除
+        // logger.debug(`Requesting rules for language: ${request.language}`);
+        const rulesResult = await this.readRulesUseCase.execute(request.language);
+        // console.error('[CONSOLE_ERROR_MIRAILOG] Result from readRulesUseCase.execute:', { rulesResult: rulesResult ? { ...rulesResult, content: rulesResult.content.substring(0, 100) + '...' } : 'null' }); // みらい... デバッグログ削除
+        // logger.debug('Result from readRulesUseCase.execute:', { rulesResult });
+        contextResult.rules = rulesResult;
+        // logger.debug(`Rules assigned to contextResult for language: ${request.language}`);
+        // console.error(`[CONSOLE_ERROR_MIRAILOG] Rules assigned to contextResult for language: ${request.language}`); // みらい... デバッグログ削除
       } catch (error) {
-        logger.error(`Failed to read rules for language ${request.language}:`, error);
-        // Failure to read rules is not fatal, return other context information
+        // console.error(`[CONSOLE_ERROR_MIRAILOG] Failed to read rules for language ${request.language}:`, error); // みらい... デバッグログ削除
+        // logger.error(`Failed to read rules for language ${request.language}:`, error);
+        // Failure to read rules is not fatal, return other context information // ★★★ エラーを握りつぶすように戻す ★★★
       }
 
       return {

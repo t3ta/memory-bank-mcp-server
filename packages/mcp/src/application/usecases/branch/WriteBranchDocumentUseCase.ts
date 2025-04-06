@@ -102,7 +102,7 @@ constructor(
             branchNameToUse = await this.gitService.getCurrentBranchName();
             this.componentLogger.info(`Current branch name automatically detected: ${branchNameToUse}`);
           } catch (error) {
-            this.componentLogger.error('Failed to get current branch name', { error });
+            // this.componentLogger.error('Failed to get current branch name', { error }); // みらい... テストログ抑制
             // ★★★ cause に元のエラーオブジェクトを渡す ★★★
             throw ApplicationErrors.executionFailed(
               'Branch name is required but could not be automatically determined. Please provide it explicitly or ensure you are in a Git repository.',
@@ -111,7 +111,7 @@ constructor(
           }
         } else {
           // プロジェクトモードでない場合は、ブランチ名の省略はエラー
-          this.componentLogger.warn('Branch name omitted outside of project mode.');
+          // this.componentLogger.warn('Branch name omitted outside of project mode.'); // みらい... テストログ抑制
           throw ApplicationErrors.invalidInput('Branch name is required when not running in project mode.');
         }
       }
@@ -187,7 +187,7 @@ if (!branchExists) {
     await this.branchRepository.initialize(branchInfo); // Pass BranchInfo object
     this.componentLogger.info(`Branch '${branchInfo.safeName}' initialized successfully.`); // Use safeName
   } catch (initError) {
-    this.componentLogger.error(`Failed to initialize branch '${branchInfo.safeName}'`, { originalError: initError }); // Use safeName
+    // this.componentLogger.error(`Failed to initialize branch '${branchInfo.safeName}'`, { originalError: initError }); // みらい... テストログ抑制 // Use safeName
     // ★★★ ApplicationErrors.branchInitializationFailed の引数を修正 ★★★
     throw ApplicationErrors.branchInitializationFailed(
       branchInfo.name, // branchName

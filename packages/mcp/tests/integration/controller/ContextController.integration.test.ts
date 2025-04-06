@@ -102,6 +102,37 @@ describe('ContextController Integration Tests', () => {
       expect(branchContext).toHaveProperty('metadata');
       expect(branchContext).toHaveProperty('content');
       expect(branchContext.documentType).toBe('branch_context'); // トップレベルの documentType をチェック
+    }); // 既存のテストケースの終わり
+
+    // ★★★ 新しいテストケースを追加 ★★★
+    it('正常系: readContext で取得した rules に content が含まれていること (日本語)', async () => {
+      const controller = await container.get<ContextController>('contextController');
+      const request: ContextRequest = { branch: TEST_BRANCH, language: 'ja' };
+      const result = await controller.readContext(request);
+
+      expect(result.success).toBe(true);
+      expect(result.data).toBeDefined();
+      expect(result.data?.rules).toBeDefined();
+      expect(result.data?.rules?.content).toBeDefined();
+      expect(result.data?.rules?.content).not.toBe('');
+      expect(result.data?.rules?.language).toBe('ja');
+
+      // content が有効な JSON 文字列であり、期待される構造を持つことを確認
+      let parsedContent;
+      try {
+        parsedContent = JSON.parse(result.data!.rules!.content);
+      } catch (e) {
+        // JSON パース失敗の場合はテスト失敗
+        throw new Error(`Failed to parse rules content as JSON: ${result.data!.rules!.content}`);
+      }
+      expect(parsedContent).toHaveProperty('schema', 'template_v1');
+      expect(parsedContent).toHaveProperty('metadata');
+      expect(parsedContent.metadata).toHaveProperty('id', 'rules');
+      expect(parsedContent.metadata).toHaveProperty('titleKey', 'template.title.rules'); // rules.json に基づくキー
+      expect(parsedContent).toHaveProperty('content');
+      expect(parsedContent.content).toHaveProperty('sections');
+      expect(Array.isArray(parsedContent.content.sections)).toBe(true);
+      expect(parsedContent.content.sections.length).toBeGreaterThan(0); // 少なくとも1つのセクションがあるはず
     });
   });
   describe('readRules', () => {

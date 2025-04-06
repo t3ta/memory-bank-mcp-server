@@ -118,9 +118,9 @@ export async function registerInfrastructureServices(
 
 
   container.registerFactory('i18nRepository', async () => {
-    const configProvider = await container.get<IConfigProvider>('configProvider');
-    const config = configProvider.getConfig();
-    const translationsDir = path.join(config.docsRoot, 'translations');
+    // Correct path to translations within the 'mcp' package infrastructure
+    // No longer relies on config.docsRoot for translations path
+    const translationsDir = path.resolve(process.cwd(), 'packages/mcp/src/infrastructure/i18n/translations');
     const { FileI18nRepository } = await import('../../infrastructure/i18n/FileI18nRepository.js');
     const i18nRepository = new FileI18nRepository(translationsDir);
     await i18nRepository.initialize().catch(error => {
@@ -248,9 +248,9 @@ export async function registerApplicationServices(container: DIContainer): Promi
   container.registerFactory('readRulesUseCase', async () => {
     const configProvider = await container.get<IConfigProvider>('configProvider'); // Get configProvider within the factory scope
     const config = configProvider.getConfig();
-    const rulesDir = config.docsRoot; // Keep fallback path for now
-    const templateLoader = await container.get<TemplateService>('templateService'); // Get TemplateService
-    return new ReadRulesUseCase(rulesDir, templateLoader); // Pass templateLoader
+    const rulesDir = config.docsRoot; // This path might still be used for resolving rules.json
+    // const templateLoader = await container.get<TemplateService>('templateService'); // ★★★ コメントアウト ★★★
+    return new ReadRulesUseCase(rulesDir); // ★★★ 引数を rulesDir のみに戻す ★★★
   });
 
   container.registerFactory('readContextUseCase', async () => {
