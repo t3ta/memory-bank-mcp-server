@@ -4,7 +4,7 @@
  * Parses markdown content to extract metadata and content sections
  * similar to existing markdown-parser.ts but tailored for migration
  */
-import { DocumentType } from '@/domain/entities/JsonDocument.js';
+import { DocumentType } from '../../domain/entities/JsonDocument.js';
 
 /**
  * Common structure for parsed markdown content

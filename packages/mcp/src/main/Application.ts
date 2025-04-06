@@ -1,7 +1,7 @@
 import { setupContainer } from './di/providers.js';
-import { IGlobalController } from '@/interface/controllers/interfaces/IGlobalController.js';
-import { IBranchController } from '@/interface/controllers/interfaces/IBranchController.js';
-import { IContextController } from '@/interface/controllers/interfaces/IContextController.js';
+import { IGlobalController } from '../interface/controllers/interfaces/IGlobalController.js';
+import { IBranchController } from '../interface/controllers/interfaces/IBranchController.js';
+import { IContextController } from '../interface/controllers/interfaces/IContextController.js';
 import { Constants } from './config/constants.js';
 import { logger } from '../shared/utils/logger.js'; // パスエイリアスを相対パスに修正
 import type { Language } from '@memory-bank/schemas';

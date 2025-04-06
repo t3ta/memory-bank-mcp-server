@@ -1,8 +1,8 @@
-import type { DocumentDTO } from "@/application/dtos/DocumentDTO.js"; // Keep for readDocument
-import type { JsonDocumentDTO } from "@/application/dtos/JsonDocumentDTO.js";
-import type { MCPResponse } from "@/interface/presenters/types/MCPResponse.js";
+import type { DocumentDTO } from "../../../application/dtos/DocumentDTO.js"; // Keep for readDocument
+import type { JsonDocumentDTO } from "../../../application/dtos/JsonDocumentDTO.js";
+import type { MCPResponse } from "../../presenters/types/MCPResponse.js";
 import type { IController } from "./IController.js";
-import type { SearchDocumentsByTagsInput } from "@/application/usecases/common/SearchDocumentsByTagsUseCase.js";
+import type { SearchDocumentsByTagsInput } from "../../../application/usecases/common/SearchDocumentsByTagsUseCase.js";
 type SearchResults = any;
 
 /**

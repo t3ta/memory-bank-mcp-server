@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { BranchTagIndex, GlobalTagIndex, TAG_INDEX_VERSION, DocumentReference, TagEntry } from '@memory-bank/schemas'; // Import DocumentReference, TagEntry
+import { BranchTagIndex, GlobalTagIndex, TAG_INDEX_VERSION, DocumentReference, TagEntry } from '@memory-bank/schemas'; // Use package name
 
 import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
 import { DocumentPath } from '../../../domain/entities/DocumentPath.js';

@@ -6,7 +6,7 @@
     "documentType": "progress",
     "path": "progress.json",
     "tags": [],
-    "lastModified": "2025-04-06T12:50:55.925Z",
+    "lastModified": "2025-04-06T15:36:14.009Z",
     "createdAt": "2025-04-06T19:15:35.498Z",
     "version": 1
   },
@@ -24,7 +24,7 @@
       }
     ],
     "pendingImplementation": [],
-    "status": "完了：Vitestへの移行完了。Jest依存関係と設定ファイルをクリーンアップ済み。",
+    "status": "CIビルドエラー調査中：`tsc -b` が `@memory-bank/schemas` を解決できない問題が発生中。",
     "completionPercentage": 100,
     "knownIssues": [
       {
@@ -41,6 +41,13 @@
         "id": "7a8ae5c3-e8f2-4d7c-9aef-1ab349c2bd95",
         "description": "一部のユニットテストで失敗が見られる（Vitest移行とは無関係の問題）",
         "severity": "low"
+      },
+      {
+        "id": "ci-build-error-schemas-resolution",
+        "description": "CI環境での `yarn build` (`tsc -b`) が `@memory-bank/schemas` モジュールを見つけられずに失敗する。ローカルの pre-push フックはパスする。",
+        "severity": "critical",
+        "status": "open",
+        "details": "tsconfig.json の paths/baseUrl 設定、Project References、CI のキャッシュやビルド順序など、様々な設定を試したが解決に至っていない。"
       }
     ],
     "references": [

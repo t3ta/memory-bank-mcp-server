@@ -8,11 +8,7 @@
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "./dist",
-    // "rootDir": "./src", // rootDir を削除
-    "baseUrl": "./", // baseUrl を復活
-    "paths": { // paths を復活
-      "@/*": ["src/*"]
-    },
+    "rootDir": "./src", // rootDir を追加！
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,

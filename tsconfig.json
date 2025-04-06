@@ -22,16 +22,9 @@
     "noFallthroughCasesInSwitch": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
-    "resolveJsonModule": true,
-    "baseUrl": ".", // baseUrl を復活
-    "paths": { // paths を復活
-      "@memory-bank/mcp": ["packages/mcp/src"],
-      "@memory-bank/mcp/*": ["packages/mcp/src/*"],
-      "@memory-bank/schemas": ["packages/schemas/src"],
-      "@memory-bank/schemas/*": ["packages/schemas/src/*"]
-    },
+    "resolveJsonModule": true
   },
-  "references": [
+  "references": [ // references を元に戻す！
     { "path": "./packages/mcp" },
     { "path": "./packages/schemas" }
   ],

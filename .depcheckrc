@@ -11,6 +11,7 @@
     "conventional-changelog-conventionalcommits",
     "semantic-release",
     "jest-mock-extended",
-    "vite-tsconfig-paths"
+    "vite-tsconfig-paths",
+    "turbo"
   ]
 }

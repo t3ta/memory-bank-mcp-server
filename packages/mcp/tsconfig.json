@@ -25,13 +25,16 @@
     "skipLibCheck": true,
     "outDir": "./dist",
     // "rootDir": "./src", // テストファイルがrootDir外になるため削除
-    "baseUrl": "./", // baseUrl を復活
-    "paths": { // paths を復活
+    "baseUrl": "./", // baseUrl を設定
+    "paths": { // paths を設定 (@/* と @memory-bank/schemas)
       "@/*": [
         "src/*"
       ],
-      "@memory-bank/schemas": [ // schemas へのパスも復活
+      "@memory-bank/schemas": [ // src を参照するように戻す
         "../schemas/src"
+      ],
+      "@memory-bank/schemas/*": [ // src を参照するように戻す
+        "../schemas/src/*"
       ]
     },
     "isolatedModules": true

@@ -10,7 +10,7 @@ import type { DocumentDTO } from "../../dtos/DocumentDTO.js";
 import type { WriteDocumentDTO } from "../../dtos/WriteDocumentDTO.js";
 import type { IUseCase } from "../../interfaces/IUseCase.js";
 import { DocumentWriterService, DocumentWriterInput } from '../../services/DocumentWriterService.js'; // Import the new service
-import type { IDocumentRepository } from '@/domain/repositories/IDocumentRepository.js'; // Import the common repository interface
+import type { IDocumentRepository } from '../../../domain/repositories/IDocumentRepository.js'; // Import the common repository interface
 // Removed unused import: import { JsonPatchService } from '@/domain/jsonpatch/JsonPatchService.js';
 
 

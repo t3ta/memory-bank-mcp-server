@@ -24,16 +24,27 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'yarn'
+          # cache: 'yarn' # Disable yarn cache for debugging CI issues
       - run: yarn install --frozen-lockfile
+      # - name: Force reinstall dependencies # Remove force install step
+      #   run: yarn install --force
 
-      # Build schemas package first
-      - name: Build schemas package
+      # Check linked packages in node_modules for debugging
+      - name: Check linked packages in node_modules
+        run: ls -la node_modules/@memory-bank
+
+      # Clean TypeScript build cache before building
+      - name: Clean TypeScript build cache
+        run: find . -name '*.tsbuildinfo' -delete
+
+      # Build schemas package explicitly first (to ensure dist exists)
+      - name: Build schemas package explicitly
         run: yarn workspace @memory-bank/schemas build
 
-      # Build the entire project using TypeScript project references
-      - name: Build project
-        run: yarn build
+      # Build the project using tsc -b directly (for debugging CI issues)
+      - name: Build project using tsc -b
+        run: yarn tsc -b # Use tsc -b directly instead of Turborepo
+
       - name: Check Dependencies
         run: yarn check:deps # Add depcheck step
       - name: Run ESLint
