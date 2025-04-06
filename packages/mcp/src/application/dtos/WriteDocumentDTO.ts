@@ -10,7 +10,7 @@ export interface WriteDocumentDTO {
   /**
    * Document content (optional if patches are provided)
    */
-  content?: string; // Make content optional
+  content?: Record<string, unknown> | string;
 
   /**
    * Document tags (optional)

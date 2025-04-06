@@ -143,41 +143,7 @@ constructor(
    const documentPath = DocumentPath.create(input.document.path);
    const tags = (input.document.tags ?? []).map((tag) => Tag.create(tag));
 
-   // --- Guard for branchContext.json (Keep specific logic in UseCase) ---
-   if (documentPath.value === 'branchContext.json') {
-       const hasPatches = input.patches && Array.isArray(input.patches) && input.patches.length > 0;
-       if (hasPatches) {
-           // Disallow patch operations on branchContext.json
-           throw ApplicationErrors.invalidInput(
-               'Patch operations are currently not allowed for branchContext.json'
-           );
-       }
-       // Validate content if provided
-       const content = input.document.content;
-       if (typeof content === 'string') { // Only validate if content is provided
-           if (content.trim() === '' || content.trim() === '{}') {
-               throw ApplicationErrors.invalidInput(
-                   'Content for branchContext.json cannot be empty or an empty object string'
-               );
-           }
-           try {
-               const parsedContent = JSON.parse(content);
-               if (typeof parsedContent !== 'object' || parsedContent === null) { throw new Error('Parsed content is not an object.'); }
-               const requiredKeys = ['schema', 'metadata', 'content'];
-               for (const key of requiredKeys) { if (!(key in parsedContent)) { throw new Error(`Missing required key: ${key}`); } }
-               this.componentLogger.debug('branchContext.json content validation passed.');
-           } catch (parseError) {
-               throw ApplicationErrors.invalidInput(
-                   `Invalid JSON content for branchContext.json: ${(parseError as Error).message}`,
-                   { originalError: parseError }
-               );
-           }
-       } else if (content !== undefined && content !== null) {
-            // If content exists but is not a string, it's invalid
-            throw ApplicationErrors.invalidInput('Invalid content type for branchContext.json, must be a JSON string.');
-       }
-       // If content is null/undefined (and no patches), it's allowed (e.g., initialization)
-   }
+   // --- Guard for branchContext.json removed as per user request ---
 
 // --- Ensure Branch Exists ---
 const branchExists = await this.branchRepository.exists(branchInfo.safeName); // Use safeName here

@@ -34,10 +34,10 @@ describe('ReadContextUseCase Integration Tests', () => {
     useCase = await container.get<ReadContextUseCase>('readContextUseCase');
     readRulesUseCase = await container.get<ReadRulesUseCase>('readRulesUseCase'); // Get ReadRulesUseCase too
     branchRepo = await container.get<IBranchMemoryBankRepository>('branchMemoryBankRepository');
-    // --- みらい：テスト実行時のみログレベルをdebugに設定 ---
+
     const { logger } = await import('../../../src/shared/utils/logger.js');
     logger.setLevel('debug');
-    // --- みらい：ここまで ---
+
   });
 
   afterEach(async () => {
@@ -130,12 +130,12 @@ describe('ReadContextUseCase Integration Tests', () => {
       const nonExistentBranch = 'feature/non-existent-branch-auto-init';
       const { BranchInfo } = await import('../../../src/domain/entities/BranchInfo.js');
 
-      // --- みらい：デバッグのため initialize 呼び出しを復活させる ---
+
       // const { BranchInfo } = await import('../../../src/domain/entities/BranchInfo.js'); // ← ダブりなので削除
       const branchInfo = BranchInfo.create(nonExistentBranch);
       await branchRepo.initialize(branchInfo); // initialize を呼ぶ
 
-      // --- みらい：initialize 直後のファイルシステム状態を直接確認 ---
+
       const { toSafeBranchName } = await import('../../../src/shared/utils/branchNameUtils.js');
       const branchPath = path.join(testEnv.branchMemoryPath, toSafeBranchName(nonExistentBranch));
       try {
@@ -144,7 +144,7 @@ describe('ReadContextUseCase Integration Tests', () => {
       } catch (e) {
         logger.error('[Mirai Debug] Error reading directory after initialize:', { error: e, component: 'ReadContextUseCase.integration.test' });
       }
-      // --- みらい：ここまで ---
+
 
       // initialize 完了後に UseCase を実行して結果を取得
       const result = await useCase.execute({
@@ -155,7 +155,7 @@ describe('ReadContextUseCase Integration Tests', () => {
       expect(result).toBeDefined();
       expect(result.branchMemory).toBeDefined();
 
-      // --- みらい：4つのコアファイルが作成されることを確認 ---
+
       const expectedCoreFiles = [
         'branchContext.json',
         'progress.json',
@@ -176,7 +176,7 @@ describe('ReadContextUseCase Integration Tests', () => {
           throw new Error(`Failed to parse JSON for ${coreFile}: ${e}`);
         }
       }
-      // --- みらい：ここまで ---
+
 
       expect(typeof result.globalMemory).toBe('object');
 

@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "df66b9a1-e08f-48ae-8222-d687ffabcbb7",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-04-06T07:35:54.373Z",
+    "createdAt": "2025-04-06T07:35:54.373Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "fix/content-type",
+    "purpose": "WriteDocumentDTOのcontent型修正によるJSONオブジェクト対応",
+    "createdAt": "2025-04-06T07:35:54.373Z",
+    "userStories": [
+      {
+        "id": "ee7e5226-6445-4eff-88c6-922dfd8387ba",
+        "description": "WriteDocumentDTOのcontentフィールドをstring型からオブジェクト型に修正し、JSONデータをそのまま扱えるようにする",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "5e8abcba-9d52-4f1b-be12-f4d563d1a132",
+        "description": "DocumentWriterServiceやUseCaseなど関連クラスでJSONオブジェクトを適切に処理できるように修正する",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "eaa8d887-4233-4dfd-8964-50026d1e62b6",
+        "description": "修正した実装が既存のテストに合格することを確認し、必要に応じてテストも更新する",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": "現在はcontent型がstringとして定義されているため、JSONオブジェクトを渡す場合には文字列化（シリアライズ）が必要。これをオブジェクトとしてそのまま渡せるように修正する。"
+  }
+}
