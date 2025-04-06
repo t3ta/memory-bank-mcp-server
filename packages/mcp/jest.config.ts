@@ -1,5 +1,6 @@
-/** @type {import('jest').Config} */
-export default {
+import type { Config } from 'jest'; // 型定義をインポート
+
+const config: Config = { // 型注釈を追加
   preset: 'ts-jest/presets/default-esm',
   testEnvironment: 'node',
   rootDir: '.',
@@ -37,3 +38,5 @@ export default {
   // Setup files to run before tests
   setupFilesAfterEnv: ['<rootDir>/tests/setupTests.ts'],
 };
+
+export default config; // export default を最後に移動

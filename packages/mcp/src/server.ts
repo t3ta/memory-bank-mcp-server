@@ -266,8 +266,17 @@ async function main() {
     logger.info('Application initialized successfully');
 
     // Connect the server to the Stdio transport
+    logger.info('Attempting to connect server to stdio transport...'); // 接続試行前のログ
     await server.connect(new StdioServerTransport());
-    logger.info('MCP Server connected to stdio transport');
+    logger.info('MCP Server connected to stdio transport'); // 接続完了後のログ
+    // ★★★ テストのために起動完了メッセージを手動で出力 ★★★
+    console.log('MCP server listening on stdio');
+
+    // プロセスが終了しないように待機する (Stdioモード用)
+    logger.info('Server process is running and waiting for stdin...');
+    logger.info('Entering dummy await loop to keep process alive...'); // ★★★ 待機処理に入る直前のログを追加 ★★★
+    await new Promise(() => {}); // 無限に待機するダミーPromise
+
   } catch (error) {
     logger.error('Failed to start MCP server:', error);
     process.exit(1);

@@ -50,8 +50,8 @@ export function createEnhancedPatchProperties() {
       ]
     },
     content: {
-      type: 'string',
-      description: 'Full document content (JSON string or plain text, cannot be used together with patches)'
+      type: ['string', 'object'], // 文字列とオブジェクトの両方を受け付けるように変更
+      description: 'Full document content (JSON object, JSON string, or plain text, cannot be used together with patches)' // 説明も更新
     }
   };
 }

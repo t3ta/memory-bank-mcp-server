@@ -27,7 +27,7 @@ const AVAILABLE_TOOLS = [
       type: 'object',
       properties: {
         path: { type: 'string' },
-        content: { type: 'string' },
+        content: { type: ['string', 'object'] }, // オブジェクトも受け付けるように変更
         patches: { type: 'array' },
         branch: { type: 'string' },
         docs: { type: 'string' }
@@ -138,7 +138,7 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
         // Add logging here to inspect params
         logger.debug(`Executing write_branch_memory_bank with params: ${JSON.stringify(params)}`);
         const path = params.path as string;
-        const content = params.content as string | undefined;
+        const content = params.content as string | object | undefined; // オブジェクトも受け付けるように型定義を修正
         const patches = params.patches as any[] | undefined;
         // Log the value of patches right after extraction
         logger.debug(`Extracted patches value: ${JSON.stringify(patches)}`);

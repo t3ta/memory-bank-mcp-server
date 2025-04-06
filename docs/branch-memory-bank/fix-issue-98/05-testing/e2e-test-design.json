@@ -1,0 +1,49 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "e2e-test-design-stdio",
+    "title": "E2Eテスト設計プラン (stdio版 MCPサーバー)",
+    "documentType": "design",
+    "path": "05-testing/e2e-test-design.json",
+    "tags": [],
+    "createdAt": "2025-04-06T14:45:00.000Z",
+    "version": 1,
+    "lastModified": "2025-04-06T05:44:44.607Z"
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "目的",
+        "content": "- 実際にサーバープロセスを起動し、標準入出力を通じて主要なMCPツール (`read_context`, `write_branch_memory_bank` など) が正しく動作することを確認する。\n- 特に、今回問題になった `read_context` で `rules` が欠落しないかを確実にテストする。\n- ユニットテストや統合テストではカバーしきれない、プロセス起動や標準入出力の連携部分の問題を検出する。"
+      },
+      {
+        "title": "テストフレームワーク",
+        "content": "Jest (既存テストと統一)"
+      },
+      {
+        "title": "テスト実行環境",
+        "content": "1. **独立したテスト環境:** 各テストスイートまたはテストケースごとに、独立した一時ディレクトリを作成する (`tmp-promise` などを使用)。\n2. **メモリバンクのセットアップ:** 作成した一時ディレクトリ内に、テスト用の `docs` ディレクトリ構造 (メモリバンク) を動的に作成・配置する。\n   - テストに必要な `rules.json` や、テストケースに応じたダミーのブランチ/グローバルメモリファイルを用意する。\n   - 既存の統合テストヘルパー (`test-env.js`, `fixtures-loader.js`) を参考に、セットアップ/クリーンアップ用のヘルパー関数を作成する。\n3. **サーバープロセス起動:** `child_process.spawn` を使用して、Node.js でサーバープロセス (`packages/mcp/dist/server.js`) を起動する。\n   - 起動時引数 `--docs` で、作成した一時 `docs` ディレクトリを指定する。\n   - プロセスの `stdin`, `stdout`, `stderr` をテストコードから制御・監視できるようにする。"
+      },
+      {
+        "title": "テストケースの構成",
+        "content": "- **基本動作テスト:**\n  - `read_context`: 正常系 (rules, branchMemory, globalMemory 確認、言語指定変更)、異常系 (不正な引数)\n  - `write_branch_memory_bank`: 正常系 (content, patches)、異常系 (同時指定、不正パッチ)\n  - `read_branch_memory_bank`: 正常系、異常系 (存在しないパス/ブランチ)\n  - `write_global_memory_bank` / `read_global_memory_bank`: 同様\n  - `search_documents_by_tags`: 正常系 (タグ、match、scope 組み合わせ)\n- **境界値・エラーケース:**\n  - 空ファイル/パッチ書き込み\n  - 大きなファイル\n  - 不正なJSON-RPCリクエスト\n  - サーバープロセス予期せぬ終了"
+      },
+      {
+        "title": "ヘルパー関数/クラス",
+        "content": "- `TestMcpServerProcess`: サーバー起動/停止、stdin書き込み、stdout/stderr読み取り、レスポンス待機/解析 (JSON-RPC区切り処理含む)、タイムアウト処理。\n- `TestEnvironment`: 一時ディレクトリ、テスト用docsセットアップ、フィクスチャロード、クリーンアップ (既存ヘルパー流用)。"
+      },
+      {
+        "title": "テストファイルの配置",
+        "content": "`packages/mcp/tests/e2e/` ディレクトリを新規作成し、`mcp-server.e2e.test.ts` 等を配置。"
+      },
+      {
+        "title": "実行方法",
+        "content": "- ルート `package.json` に `test:e2e` スクリプト追加。\n- `packages/mcp/package.json` に `test:e2e` スクリプト追加 (Jest実行、専用設定ファイル使用)。"
+      },
+      {
+        "title": "その他",
+        "content": "- レスポンス待機時間/タイムアウト値の適切な設定。\n- テスト実行前のビルド確認 (スクリプト or CI)。\n- CI環境での実行考慮 (環境変数、パス)。"
+      }
+    ]
+  }
+}

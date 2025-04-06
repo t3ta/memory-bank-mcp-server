@@ -34,7 +34,9 @@
         "../schemas/src"
       ]
     },
-    "isolatedModules": true
+    "isolatedModules": true,
+    "allowImportingTsExtensions": true, // .ts ファイルのインポートを許可
+    "noEmit": true // 型チェックのみでファイルは出力しない (Jest実行時用)
   },
   "include": [
     "src/**/*"

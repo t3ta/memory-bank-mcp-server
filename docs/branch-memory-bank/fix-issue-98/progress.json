@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "fix-issue-98-progress",
+    "title": "Progress for fix/issue-98",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "createdAt": "2025-04-06T07:06:30Z",
+    "lastModified": "2025-04-06T07:07:26.997Z"
+  },
+  "content": {
+    "summary": "E2Eテスト実装引き継ぎ、インメモリテストへの移行作業中",
+    "status": "in_progress",
+    "steps": [
+      {
+        "timestamp": "2025-04-06T07:06:30Z",
+        "summary": "E2Eテスト実装引き継ぎ＆インメモリテストへの移行",
+        "details": [
+          "E2Eテストファイル (mcp-server.e2e.test.ts) をインメモリテスト用に書き換え",
+          "Jest設定ファイル (jest.config.e2e.ts, jest.config.ts) を修正",
+          "テストヘルパーファイル (e2e-test-env.ts, test-mcp-server-process.ts) を修正",
+          "サーバーエントリーポイント (server.ts) にデバッグログ追加・削除",
+          "テスト実行時の各種エラー (パス、型、アサーション、レスポンス整形、環境分離) を修正",
+          "read_context テストはパス成功",
+          "write_branch_memory_bank テストはアサーションエラーで失敗中 (readDocumentの結果と期待値の比較部分)"
+        ],
+        "status": "in_progress"
+      }
+    ],
+    "next_steps": [
+      "write_branch_memory_bank テストのアサーションエラーを修正する",
+      "残りのMCPツールのテストケースを追加する"
+    ],
+    "findings": [
+      "E2Eテストはプロセス起動やファイルI/Oのタイミング問題で不安定になりがち",
+      "インメモリテストの方が安定して実行できる可能性が高い",
+      "read_branch_memory_bank のレスポンス形式とテストのアサーションが一致していなかった"
+    ]
+  }
+}

@@ -34,6 +34,7 @@
     "test:watch": "yarn workspace @memory-bank/mcp test:watch",
     "test:coverage": "yarn workspaces run test:coverage",
     "test:integration": "yarn workspace @memory-bank/mcp test:integration",
+    "test:e2e": "yarn workspace @memory-bank/mcp test:e2e",
     "prepublishOnly": "yarn build",
     "check:deps": "depcheck",
     "release": "semantic-release"
