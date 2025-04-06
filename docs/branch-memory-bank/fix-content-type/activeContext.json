@@ -1,0 +1,376 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "4058e8e1-e0cf-47e5-8c6d-e4e30a4771b1",
+    "title": "アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context"
+    ],
+    "lastModified": "2025-04-06T08:30:54.374Z",
+    "createdAt": "2025-04-06T07:35:54.374Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "WriteDocumentDTOのcontent型をstring型からオブジェクト型に変更する作業",
+    "recentChanges": [
+      {
+        "date": "2025-04-06T08:30:54.374Z",
+        "description": "問題調査：WriteDocumentDTOのcontent型がstring型として定義されており、JSONオブジェクトをそのまま渡せない問題を特定"
+      },
+      {
+        "date": "2025-04-06T08:30:54.374Z",
+        "description": "関連ファイル分析：BranchController, WriteBranchDocumentUseCase, DocumentWriterServiceなどでの処理フローを解析"
+      },
+      {
+        "date": "2025-04-06T08:30:54.374Z",
+        "description": "修正計画作成：必要な変更箇所と修正アプローチを決定"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "a001df57-8973-418f-9a87-555d3650e973",
+        "description": "WriteDocumentDTOのcontent型をstring型から「Record<string, unknown> | string」のユニオン型に変更する（後方互換性確保）"
+      },
+      {
+        "id": "d6a5b138-0048-4915-bdd6-e822b01b0f92",
+        "description": "型チェック処理を追加し、文字列とオブジェクトの両方を適切に処理する"
+      },
+      {
+        "id": "77d0d0de-c9e6-443b-8100-bbbe63b6bf82",
+        "description": "DocumentWriterServiceでcontent処理のロジックを修正し、型に応じた適切な処理を行う"
+      },
+      {
+        "id": "f2e3d4b5-c6a7-48b9-9a0c-d81e2f3c4b5a",
+        "description": "DocumentWriterServiceのpatch適用ロジックを改善し、オブジェクト形式でのPatch処理を効率化する"
+      },
+      {
+        "id": "q1r2s3t4-u5v6-7w8x-9y0z-a1b2c3d4e5f6",
+        "description": "レイヤー別責任分担を明確にし、Controllerが入力変換、UseCaseがオブジェクト処理、Repositoryがストレージ保存を担当するパターンを実装する"
+      },
+      {
+        "id": "j7k8l9m0-n1o2-3p4q-5r6s-t7u8v9w0x1y2",
+        "description": "出力形式もオブジェクトで統一し、APIレスポンスはJSONオブジェクトとして返却する"
+      },
+      {
+        "id": "f5g6h7i8-j9k0-1l2m-3n4o-p5q6r7s8t9u0",
+        "description": "vscode-extensionがオブジェクト形式を期待しているため、既存データを読み込んだ後の修正時にもオブジェクト形式を維持する"
+      },
+      {
+        "id": "a1b2c3d4-e5f6-7g8h-9i0j-k1l2m3n4o5p6",
+        "description": "VSCode拡張の実装を確認したところ、memoryBankProvider.tsから読み込んだ文字列データをdocumentEditorProvider.tsでJSON.parseしてオブジェクト化している。APIから直接オブジェクトを受け取ることで、一度ロードしたレガシーデータも次回保存時にはオブジェクト形式で展開される"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "6713a37b-daa6-4b7e-af5c-50cdab4faefd",
+        "description": "既存テストへの影響：多くのテストがstringとしてcontentを扱っているため、型変更による影響を考慮する必要がある",
+        "status": "open"
+      },
+      {
+        "id": "d105272b-4bc0-4142-b296-109c1555e88a",
+        "description": "後方互換性：既存の呼び出し元コードが文字列を渡している箇所への影響を最小限に抑える",
+        "status": "open"
+      },
+      {
+        "id": "c31a86d5-97cd-4701-a119-c76f6485854b",
+        "description": "パフォーマンス：JSON.parse/JSON.stringifyの呼び出し回数削減によるパフォーマンス向上が期待できる",
+        "status": "open"
+      },
+      {
+        "id": "8dfa4721-e59c-4d83-b2f0-19fe7ab35c4d",
+        "description": "既存の文字列形式JSONは現状通り処理し、新たにオブジェクト形式もサポートする（両方受け入れ可能な実装）",
+        "status": "open"
+      },
+      {
+        "id": "e2b49f31-a7c5-4f82-b9d3-1ca8e27d4590",
+        "status": "open",
+        "description": "JSON patchの効率化: 文字列型のままだとJSON patch適用時に文字列→オブジェクト→文字列の変換が必要だが、オブジェクト型に変更することでこの変換を削減できる"
+      },
+      {
+        "id": "a7b8c9d0-e1f2-4g3h-5i6j-k7l8m9n0o1p2",
+        "status": "open",
+        "description": "ストレージレベルでは引き続きJSON文字列形式のまま保存する。内部処理ではオブジェクト形式で効率化するが、ストレージには標準的なJSON形式で保存することで、可読性やポータビリティを確保する"
+      },
+      {
+        "id": "z1a2b3c4-d5e6-7f8g-9h0i-j1k2l3m4n5o6",
+        "status": "open",
+        "description": "既存データの移行戦略: 文字列形式で保存されている既存データは読み込み時に自動的にパースしてオブジェクトに変換し、内部処理ではオブジェクトとして扱う"
+      },
+      {
+        "id": "v1w2x3y4-z5a6-7b8c-9d0e-f1g2h3i4j5k6",
+        "status": "open",
+        "description": "一度読み込んだ既存データ（文字列形式）を修正して書き込む際にオブジェクト形式で書き込まれるようにすることで、徐々に文字列形式からオブジェクト形式に移行できる"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "b7d6ef4c-92c0-4183-858d-7a45555cbaf7",
+        "description": "WriteDocumentDTO.tsのcontent型定義を修正する",
+        "priority": "high"
+      },
+      {
+        "id": "86d4ed18-b4ac-44fe-9206-dc33b098c241",
+        "description": "DocumentWriterService.tsの処理を修正し、オブジェクトと文字列の両方に対応する",
+        "priority": "high"
+      },
+      {
+        "id": "1e49eaa5-27c6-4af2-8bcf-e981f5ecec80",
+        "description": "BranchController.tsでのcontent処理ロジックを修正する",
+        "priority": "medium"
+      },
+      {
+        "id": "4e82a5c3-a9b8-4f15-8901-d9b7fd2cea64",
+        "description": "テストを実行して機能が正常に動作することを確認する",
+        "priority": "high"
+      },
+      {
+        "id": "5f72b6d9-c1e8-42a7-9a3f-e8f5b92c17d5",
+        "description": "必要に応じてテストを修正・更新する",
+        "priority": "medium"
+      },
+      {
+        "id": "7d9e8f23-b10c-4a35-95d7-6c13e05ba2f4",
+        "description": "MemoryDocument.updateContentメソッドを拡張し、オブジェクト型も受け入れ可能にする",
+        "priority": "medium"
+      }
+    ],
+    "modificationPlan": {
+      "targetFiles": [
+        {
+          "path": "/Users/tmita/workspace/memory-bank-mcp-server/packages/mcp/src/application/dtos/WriteDocumentDTO.ts",
+          "changes": "content型をstring型からRecord<string, unknown> | stringのユニオン型に変更"
+        },
+        {
+          "path": "/Users/tmita/workspace/memory-bank-mcp-server/packages/mcp/src/application/services/DocumentWriterService.ts",
+          "changes": "DocumentWriterInputインターフェースのcontent型を修正し、オブジェクトと文字列を適切に処理するロジックを実装"
+        },
+        {
+          "path": "/Users/tmita/workspace/memory-bank-mcp-server/packages/mcp/src/interface/controllers/BranchController.ts",
+          "changes": "オブジェクト型のcontentを適切に処理できるようにwriteDocumentメソッドを修正"
+        },
+        {
+          "path": "/Users/tmita/workspace/memory-bank-mcp-server/packages/mcp/src/application/usecases/branch/WriteBranchDocumentUseCase.ts",
+          "changes": "オブジェクト型のcontentを適切に扱えるように修正"
+        }
+      ]
+    },
+    "testingStrategy": {
+      "description": "WriteDocumentDTOのcontent型修正に関するテスト戦略",
+      "testCases": [
+        {
+          "id": "tc-001",
+          "title": "WriteDocumentDTO - 文字列型のcontentを渡した場合",
+          "description": "既存の動作を維持するため、content パラメータに文字列型のJSONを渡した場合のテスト",
+          "expectations": [
+            "処理が従来通り行われること",
+            "文字列として正しく処理されること",
+            "エラーが発生しないこと"
+          ],
+          "mockData": {
+            "content": "{\"key\": \"value\"}",
+            "path": "test/document.json",
+            "tags": [
+              "test"
+            ]
+          }
+        },
+        {
+          "id": "tc-002",
+          "title": "WriteDocumentDTO - オブジェクト型のcontentを渡した場合",
+          "description": "新しい機能として、content パラメータにJSONオブジェクトを直接渡した場合のテスト",
+          "expectations": [
+            "オブジェクトが正しく処理されること",
+            "内部で文字列に変換されること",
+            "エラーが発生しないこと"
+          ],
+          "mockData": {
+            "content": {
+              "key": "value"
+            },
+            "path": "test/document.json",
+            "tags": [
+              "test"
+            ]
+          }
+        },
+        {
+          "id": "tc-003",
+          "title": "DocumentWriterService - コンテンツ型チェックと変換処理",
+          "description": "DocumentWriterServiceのwrite()メソッドが文字列とオブジェクトの両方を適切に処理できることを確認",
+          "expectations": [
+            "文字列の場合:検証のみ行い、そのまま処理",
+            "オブジェクトの場合:JSON.stringifyで文字列化して処理",
+            "不正な形式の場合:適切なエラーメッセージを返す"
+          ],
+          "mockData": {
+            "stringContent": "{\"key\": \"value\"}",
+            "objectContent": {
+              "key": "value"
+            },
+            "invalidContent": 123
+          }
+        },
+        {
+          "id": "tc-004",
+          "title": "JSON Patch適用の効率化テスト",
+          "description": "JSON Patchをオブジェクトに直接適用する最適化が正しく機能するかテスト",
+          "expectations": [
+            "文字列型データへのパッチ適用:一度パースしてオブジェクトに変換してからパッチ適用",
+            "オブジェクト型データへのパッチ適用:直接パッチを適用できること",
+            "パッチ適用後のオブジェクトが正しいこと"
+          ],
+          "mockData": {
+            "originalContent": {
+              "items": [
+                {
+                  "id": 1,
+                  "name": "Item 1"
+                }
+              ]
+            },
+            "patches": [
+              {
+                "op": "add",
+                "path": "/items/-",
+                "value": {
+                  "id": 2,
+                  "name": "Item 2"
+                }
+              }
+            ],
+            "expectedResult": {
+              "items": [
+                {
+                  "id": 1,
+                  "name": "Item 1"
+                },
+                {
+                  "id": 2,
+                  "name": "Item 2"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "tc-005",
+          "title": "既存データ互換性テスト",
+          "description": "既存の文字列形式JSONデータが引き続き正しく処理されることを確認",
+          "expectations": [
+            "既存の文字列形式JSONデータを読み込めること",
+            "修正後も既存のテストが全て通ること",
+            "既存のAPIクライアントとの互換性が維持されること"
+          ],
+          "mockData": {
+            "existingData": "{\"legacy\": true, \"version\": \"1.0\"}",
+            "expectedResult": {
+              "legacy": true,
+              "version": "1.0"
+            }
+          }
+        },
+        {
+          "id": "tc-006",
+          "title": "BranchController - リクエスト処理の型チェック",
+          "description": "BranchControllerがリクエストのcontent型に応じて適切に処理できるかテスト",
+          "expectations": [
+            "文字列型リクエスト:従来通り処理",
+            "オブジェクト型リクエスト:適切にUseCaseに渡す",
+            "不正なリクエスト:明確なエラーメッセージでリジェクト"
+          ],
+          "mockData": {
+            "stringRequest": {
+              "content": "{\"name\": \"test\"}"
+            },
+            "objectRequest": {
+              "content": {
+                "name": "test"
+              }
+            },
+            "invalidRequest": {
+              "content": 123
+            }
+          }
+        },
+        {
+          "id": "tc-007",
+          "title": "VSCode拡張連携テスト",
+          "description": "VSCode拡張との連携が正しく機能することを確認するテスト",
+          "expectations": [
+            "APIがオブジェクト形式のレスポンスを返すこと",
+            "既存の文字列処理フローが壊れないこと",
+            "レガシーデータを読み込んで修正保存する流れが機能すること"
+          ],
+          "mockData": {
+            "legacyData": "{\"fromVSCode\": true}",
+            "modifiedData": {
+              "fromVSCode": true,
+              "modified": true
+            }
+          }
+        },
+        {
+          "id": "tc-008",
+          "title": "エラーハンドリングテスト",
+          "description": "様々なエラーケースでの適切なエラーハンドリングを確認",
+          "expectations": [
+            "不正なJSON文字列:適切なエラーメッセージ",
+            "不正な型のcontent:明確なエラーメッセージ",
+            "パッチ適用エラー:わかりやすいエラー説明"
+          ],
+          "mockData": {
+            "invalidJson": "{key: value}",
+            "invalidType": 123,
+            "invalidPatch": [
+              {
+                "op": "unknown",
+                "path": "/nonexistent",
+                "value": "test"
+              }
+            ]
+          }
+        }
+      ],
+      "integrationTests": [
+        {
+          "id": "it-001",
+          "title": "エンドツーエンドのデータフローテスト",
+          "description": "文字列とオブジェクトの両方のケースでエンドツーエンドの処理フローが正しく機能することを確認",
+          "steps": [
+            "1. 文字列形式でデータを保存",
+            "2. データを読み込んでオブジェクトとして処理",
+            "3. 修正してオブジェクト形式で保存",
+            "4. 再度読み込んで確認"
+          ],
+          "expectations": [
+            "処理の各ステップでエラーが発生しないこと",
+            "データが正しく往復変換されること",
+            "文字列形式からオブジェクト形式への変換が正しく行われること"
+          ]
+        },
+        {
+          "id": "it-002",
+          "title": "実際のAPIリクエスト/レスポンステスト",
+          "description": "実際のAPIを通じて文字列とオブジェクトの両方のケースが正しく処理されることを確認",
+          "steps": [
+            "1. 文字列形式でAPIリクエスト送信",
+            "2. オブジェクト形式でAPIリクエスト送信",
+            "3. レスポンスを検証"
+          ],
+          "expectations": [
+            "両方のリクエストが成功すること",
+            "レスポンスがオブジェクト形式で返却されること",
+            "レスポンスの内容が期待通りであること"
+          ]
+        }
+      ],
+      "performanceConsiderations": [
+        "JSON.stringify/JSON.parseの回数削減によるパフォーマンス向上を検証",
+        "大量のデータに対するJSON Patch操作の効率性の検証",
+        "VSCode拡張連携時のパフォーマンスへの影響評価"
+      ]
+    }
+  }
+}

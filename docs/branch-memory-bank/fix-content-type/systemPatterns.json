@@ -1,0 +1,211 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "affa94ba-f7cb-47ae-b44e-9b8185169465",
+    "title": "システムパターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "system-patterns"
+    ],
+    "lastModified": "2025-04-06T08:45:54.374Z",
+    "createdAt": "2025-04-06T07:35:54.374Z",
+    "version": 1
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "c8314f98-bbc1-440b-bb3b-46f756a79332",
+        "title": "WriteDocumentDTOのcontent型修正",
+        "context": "現在、WriteDocumentDTOのcontent型はstring型として定義されているため、JSONオブジェクトを渡す際に文字列化する必要がある。これにより余分な変換処理が発生し、またオブジェクトデータの直感的な操作が難しくなっている。",
+        "decision": "WriteDocumentDTOのcontent型をstring型からユニオン型（Record<string, unknown> | string）に変更し、JSONオブジェクトをそのまま渡せるようにする。また、関連するクラスやインターフェースも同様に修正し、型に応じた適切な処理を行うようにする。",
+        "consequences": {
+          "positive": [
+            "JSONオブジェクトをそのまま渡せるようになり、余分な変換処理が不要になる",
+            "コード内での変換回数が減少し、パフォーマンスが向上する",
+            "より直感的なAPIになり、開発者体験が向上する",
+            "後方互換性を維持しながら機能拡張できる"
+          ],
+          "negative": [
+            "一部のテストコードや呼び出し元コードで修正が必要になる可能性がある",
+            "型チェックや型変換のロジックが追加され、若干複雑化する"
+          ]
+        },
+        "status": "proposed",
+        "date": "2025-04-06T08:45:54.374Z",
+        "alternatives": [
+          {
+            "title": "contentをanyに変更",
+            "description": "contentの型をanyにすることでどんな型でも受け入れられるようにする",
+            "reasons_rejected": "型安全性が失われ、バグの原因になる可能性がある"
+          },
+          {
+            "title": "二つの別メソッドを用意",
+            "description": "文字列用とオブジェクト用の別々のメソッドを用意する",
+            "reasons_rejected": "APIが複雑化し、使い分けの負担が増える"
+          },
+          {
+            "title": "現状維持（文字列のみ）",
+            "description": "現在の文字列のみの実装を維持する",
+            "reasons_rejected": "無駄な変換処理が発生し続け、開発者体験が向上しない"
+          }
+        ]
+      }
+    ],
+    "implementationPatterns": [
+      {
+        "id": "78a2d3e5-f6c9-4b1d-9a42-c85e3f9d6e17",
+        "title": "型に応じたコンテンツ処理パターン",
+        "description": "コンテンツがオブジェクト型か文字列型かを検出し、適切な処理を行うパターン",
+        "implementation": {
+          "code_snippet": "// 型チェックと処理の例\nif (typeof content === 'string') {\n  // 文字列として処理\n  processStringContent(content);\n} else if (typeof content === 'object' && content !== null) {\n  // オブジェクトとして処理\n  const contentStr = JSON.stringify(content);\n  processStringContent(contentStr);\n} else {\n  throw new Error('Invalid content type');\n}",
+          "use_cases": [
+            "DocumentWriterServiceでのコンテンツ処理",
+            "メモリドキュメントの更新処理",
+            "コントローラーでのリクエスト処理"
+          ],
+          "considerations": [
+            "nullチェックを忘れないこと",
+            "型チェックを先に行い、適切なエラーメッセージを表示すること",
+            "後方互換性のために文字列型もサポートし続けること"
+          ]
+        }
+      },
+      {
+        "id": "92b6c7d8-e9f0-4a23-b1c5-d3e7a8f9b0c1",
+        "title": "ユニオン型を使った型定義パターン",
+        "description": "複数の型を受け入れるインターフェースを定義するパターン",
+        "implementation": {
+          "code_snippet": "// ユニオン型による定義の例\nexport interface WriteDocumentDTO {\n  path: string;\n  content?: Record<string, unknown> | string; // オブジェクトまたは文字列\n  tags?: string[];\n}",
+          "use_cases": [
+            "DTOの定義",
+            "サービスの入力インターフェース",
+            "リポジトリの保存メソッド"
+          ],
+          "considerations": [
+            "型ガードを適切に使用して型安全性を確保すること",
+            "コメントでどのような型が期待されているかを明記すること",
+            "型定義が複雑になりすぎないよう注意すること"
+          ]
+        }
+      },
+      {
+        "id": "53a9b8c7-d4e6-4f12-8093-e7d5f2a1b0c9",
+        "title": "後方互換性を持つコンテンツ処理パターン",
+        "description": "文字列とオブジェクトの両方に対応するコンテンツ処理パターン",
+        "implementation": {
+          "code_snippet": "// 型によって分岐する処理例\nlet contentToSave: string;\n\nif (typeof content === 'string') {\n  // 1. 文字列の場合は、そのまま使用（現状維持）\n  contentToSave = content;\n  \n  // オプション: JSON形式の文字列かどうか検証\n  try {\n    JSON.parse(content); // バリデーションのみ\n  } catch (error) {\n    // 文字列だがJSONとして不正な場合のエラーハンドリング\n  }\n} else if (typeof content === 'object' && content !== null) {\n  // 2. オブジェクトの場合は、JSON文字列に変換\n  contentToSave = JSON.stringify(content, null, 2);\n} else {\n  // 3. その他の型や無効な値の場合はエラー\n  throw new Error('Content must be a string or an object');\n}",
+          "use_cases": [
+            "DocumentWriterServiceでのコンテンツ処理",
+            "MemoryDocumentの更新処理",
+            "コントローラーでのリクエスト処理"
+          ],
+          "considerations": [
+            "null/undefinedチェックを忘れないこと",
+            "オブジェクトをJSON文字列化する際は適切なフォーマット（インデントなど）を考慮",
+            "文字列からオブジェクトへの変換は、必ず try-catch で囲むこと",
+            "既存の処理フローを壊さないよう注意する"
+          ]
+        }
+      },
+      {
+        "id": "c7d8e9f0-a1b2-4c3d-9e0f-g1h2i3j4k5l6",
+        "title": "JSON Patch最適化パターン",
+        "description": "JSON Patch処理を最適化し、変換オーバーヘッドを最小化するパターン",
+        "implementation": {
+          "use_cases": [
+            "DocumentWriterServiceでのPatch処理",
+            "JsonPatchServiceの利用",
+            "メモリドキュメントの更新処理"
+          ],
+          "code_snippet": "// 文字列→オブジェクト変換を最小化するパターン\n\n// 1. 内部で扱うデータは常にオブジェクト形式で保持\nlet internalContentObject: any;\n\n// 2. 入力が文字列の場合は一度だけパース\nif (typeof inputContent === 'string') {\n  try {\n    internalContentObject = JSON.parse(inputContent);\n  } catch (parseError) {\n    throw new Error(`Failed to parse content as JSON: ${parseError.message}`);\n  }\n} else if (typeof inputContent === 'object' && inputContent !== null) {\n  // 入力がすでにオブジェクトの場合はそのまま使用\n  internalContentObject = inputContent;\n}\n\n// 3. JSON Patchをオブジェクトに直接適用\nif (patches && patches.length > 0) {\n  // パッチ操作をオブジェクトに直接適用\n  internalContentObject = jsonPatchService.apply(internalContentObject, patches);\n}\n\n// 4. 出力時に必要に応じて文字列化\nlet outputForStorage: string;\nif (needStringForStorage) {\n  outputForStorage = JSON.stringify(internalContentObject, null, 2);\n}\n\n// 5. APIレスポンスでは、型に応じて出力\nreturn {\n  content: returnRawObject ? internalContentObject : JSON.stringify(internalContentObject)\n};\n",
+          "considerations": [
+            "内部処理では常にオブジェクト形式で扱い、変換は入出力時のみにする",
+            "JSON Patchはオブジェクトに直接適用し、中間変換を避ける",
+            "ストレージへの保存時にのみ文字列化が必要",
+            "エラーハンドリングは入力時に集中して行い、その後の処理では型安全性を確保する",
+            "既存コードとの互換性を保つための型チェックと型変換ロジックを組み込む"
+          ]
+        }
+      },
+      {
+        "id": "z9y8x7w6-v5u4-3t2s-1r0q-p9o8n7m6l5k4",
+        "title": "レイヤー別データ形式管理パターン",
+        "description": "各レイヤーで最適なデータ形式を管理し、効率化と標準化を両立するパターン",
+        "implementation": {
+          "use_cases": [
+            "インターフェース層とアプリケーション層の切り分け",
+            "入出力回りのデータ変換",
+            "ストレージへの保存時の形式標準化"
+          ],
+          "code_snippet": "// Controller層（入力変換担当）\nasync writeDocument(params) {\n  // 入力が文字列かオブジェクトかをチェック\n  const { content } = params;\n  let processedContent;\n  \n  if (typeof content === 'string') {\n    try {\n      // 文字列ならJSONとしてパースしてみる（検証のみ）\n      JSON.parse(content); // 検証、使用はしない\n      processedContent = content; // 文字列のまま渡す\n    } catch (e) {\n      // JSONとしてパース不可能な文字列の場合のハンドリング\n      throw new Error(`Invalid JSON string: ${e.message}`);\n    }\n  } else if (typeof content === 'object' && content !== null) {\n    // オブジェクトをそのまま渡す（文字列化はしない）\n    processedContent = content;\n  }\n  \n  // UseCaseに引き渡す\n  return this.useCase.execute({ content: processedContent });\n}\n\n// UseCase層（内部処理担当）\nasync execute(input) {\n  // 内部処理は常にオブジェクト形式\n  let contentObject;\n  \n  if (typeof input.content === 'string') {\n    // 文字列からオブジェクトに変換\n    contentObject = JSON.parse(input.content);\n  } else {\n    // すでにオブジェクトならそのまま使用\n    contentObject = input.content;\n  }\n  \n  // 処理...\n  \n  // Repositoryに渡すときはオブジェクトとして渡す\n  return this.repository.save(contentObject);\n}\n\n// Repository層（ストレージ保存担当）\nasync save(content) {\n  // ストレージに保存する前に必ずJSON文字列に変換\n  const contentString = JSON.stringify(content, null, 2);\n  \n  // ストレージに保存（常にJSON文字列形式）\n  await this.storageService.writeFile(path, contentString);\n  \n  // 成功時はオブジェクト形式で返却\n  return content;\n}",
+          "considerations": [
+            "Controller層では入力検証とデータ型チェックを集中管理する",
+            "UseCase層では常にオブジェクト形式で処理し、ビジネスロジックの効率を最大化する",
+            "Repository層では必ずJSON形式でストレージに保存し、標準化とポータビリティを確保する",
+            "JSON Patch操作はオブジェクトに直接適用し、中間変換を最小化する",
+            "同じデータでもレイヤーおよび目的に応じて形式を最適化することで、パフォーマンスと保守性のバランスを取る"
+          ]
+        }
+      },
+      {
+        "id": "p7q8r9s0-t1u2-3v4w-5x6y-z7a8b9c0d1e2",
+        "title": "既存データ自動変換パターン",
+        "description": "既存の文字列形式JSONを自動的にオブジェクトに変換して処理するパターン",
+        "implementation": {
+          "use_cases": [
+            "レガシーデータの読み込み",
+            "フォーマット移行",
+            "ホットリロード"
+          ],
+          "code_snippet": "// データロード時の自動変換パターン\n\n// ファイルからの読み込み時\n// 1. ファイル読み込み\nasync function loadDocument(path) {\n  // ファイルからの読み込み\n  const fileContent = await fileSystem.readFile(path, 'utf8');\n  \n  // 2. 文字列→オブジェクト変換\n  let documentObject;\n  try {\n    documentObject = JSON.parse(fileContent);\n    // ログ記録: 文字列からオブジェクトに変換されたことをログに記録\n    logger.debug(`Document ${path} was loaded from string format and converted to object`);\n  } catch (e) {\n    logger.error(`Failed to parse document ${path}: ${e.message}`);\n    throw new Error(`Invalid JSON format in document ${path}: ${e.message}`);\n  }\n  \n  // 3. 内部処理用のオブジェクトを返却\n  return documentObject;\n}\n\n// APIレスポンス時\n// 1. 出力は常にオブジェクト形式\n// 2. JSON.stringify()はクライアント側で行われる\nfunction respondWithDocument(documentObject) {\n  // オブジェクトをそのまま返却\n  return {\n    success: true,\n    data: documentObject  // オブジェクトをそのままAPIレスポンスに含める\n  };\n}",
+          "considerations": [
+            "既存データは読み込み時に自動的にオブジェクトに変換されるため、移行作業は不要",
+            "パースエラーは明確なメッセージで通知し、デバッグ情報も含める",
+            "内部処理では常にオブジェクト形式で扱い、必要な変換は入出力器だけで行う",
+            "APIレスポンスではオブジェクトをそのまま返却し、JSON.stringify()はクライアント側で行われるようにする",
+            "ロギングを充実させ、変換処理の追跡と分析を可能にする"
+          ]
+        }
+      },
+      {
+        "id": "l7m8n9o0-p1q2-3r4s-5t6u-v7w8x9y0z1a2",
+        "title": "既存データオブジェクト化マイグレーションパターン",
+        "description": "既存の文字列形式JSONデータを徐々にオブジェクト形式に移行するパターン",
+        "implementation": {
+          "use_cases": [
+            "レガシーデータの自動移行",
+            "vscode-extension対応",
+            "データフォーマット移行"
+          ],
+          "code_snippet": "// 1. 読み込み時の自動変換\n// 既存の文字列データを読む時に自動的にオブジェクトに変換\nasync function readDocument(path) {\n  const fileContent = await fileSystem.readFile(path, 'utf8');\n  \n  // 文字列をオブジェクトに変換\n  let documentObject;\n  try {\n    documentObject = JSON.parse(fileContent);\n    logger.debug(`Legacy document from ${path} converted to object format`);\n  } catch (e) {\n    throw new Error(`Invalid JSON format: ${e.message}`);\n  }\n  \n  // オブジェクト形式で返却\n  return documentObject;\n}\n\n// 2. 書き込み時の対応\n// 書き込み時には常にオブジェクト形式で保存\nasync function writeDocument(repository, path, content) {\n  // 型チェックと変換\n  let contentObject;\n  \n  if (typeof content === 'string') {\n    try {\n      // もし文字列ならオブジェクトに変換\n      contentObject = JSON.parse(content);\n      logger.debug(`String content converted to object for ${path}`);\n    } catch (e) {\n      throw new Error(`Invalid JSON string: ${e.message}`);\n    }\n  } else if (typeof content === 'object' && content !== null) {\n    // すでにオブジェクト形式ならそのまま使用\n    contentObject = content;\n  } else {\n    throw new Error('Content must be a valid JSON string or object');\n  }\n  \n  // オブジェクト形式で保存\n  // ストレージには文字列化されるが、内部ではオブジェクトとして扱う\n  return repository.saveDocument(path, contentObject);\n}\n\n// 3. APIレスポンスの対応\n// レスポンスでは常にオブジェクトを返却\nfunction respondWithDocument(document) {\n  // APIレスポンスとしてオブジェクトをそのまま返却\n  return {\n    success: true,\n    data: document // オブジェクトをそのまま返却する\n  };\n}",
+          "considerations": [
+            "移行作業は「使用されたときに更新する」という戦略で進めるため、一度にすべてのデータを移行する必要がない",
+            "読み込み時には常にオブジェクト形式に変換し、APIでは常にオブジェクトとして使用する",
+            "ストレージに書き込む際はデータの整合性を保つために在庫チェックやバリデーションを充分に行う",
+            "vscode-extension側がオブジェクト形式を期待しているため、APIレスポンスは常に一貫してオブジェクトを返す"
+          ]
+        }
+      },
+      {
+        "id": "n1o2p3q4-r5s6-7t8u-9v0w-x1y2z3a4b5c6",
+        "title": "VSCode拡張対応データ自動マイグレーションパターン",
+        "description": "VSCode拡張が文字列からオブジェクト化したデータを自動的にオブジェクト形式へマイグレーションするパターン",
+        "implementation": {
+          "use_cases": [
+            "VSCode拡張との连携",
+            "レガシーデータのオブジェクト形式への移行",
+            "APIレスポンスの標準化"
+          ],
+          "code_snippet": "// VSCode拡張のエディタとの連携フロー\n\n// 1. ファイル読み込み時の流れ\n// memoryBankProvider.ts\npublic async getDocumentContent(relativePath) {\n  // ファイル読み込み - 現状は文字列で返している\n  const content = await vscode.workspace.fs.readFile(fileUri);\n  return Buffer.from(content).toString('utf8');\n}\n\n// documentEditorProvider.ts\nprivate updatePreview(document, webviewPanel) {\n  const jsonString = document.getText();\n  try {\n    const parsedData = JSON.parse(jsonString); // オブジェクトにパース\n    const markdown = generateMarkdownFromData(parsedData, jsonString);\n    const html = md.render(markdown);\n    webviewPanel.webview.postMessage({ type: 'updatePreview', html: html });\n  } catch (error) {\n    // エラー処理\n  }\n}\n\n// 2. API側の対応 - ここを修正\n// サーバのAPI応答\n function presentSuccess(result) {\n   // 以前は文字列を返していたが、オブジェクトをそのまま返すように変更\n   return {\n     success: true,\n     data: result // オブジェクトをそのまま返す\n   };\n }\n\n// 3. VSCode拡張側でのフロー\n// APIからデータ取得サービス\n\nasync function fetchData(document) {\n  // APIからオブジェクトを受け取る\n  const response = await api.getDocument(document);\n  return response.data; // オブジェクトをそのまま利用できる\n}\n\n// 4. 更新時のフロー\nasync function updateDocument(data) {\n  // エディタで編集されたデータをAPIに送信\n  // ここではオブジェクトを送信することで、文字列形式からまたオブジェクト形式に移行される\n  return api.updateDocument(document, data);\n}",
+          "considerations": [
+            "VSCode拡張では文字列からオブジェクトにパースしているフローが存在するため、APIがオブジェクトを返すように変更しても問題ない",
+            "読み込み時にはJSONParse、書き込み時にはJSON.stringifyのサイクルがあるので、APIでオブジェクトを返すようにしても、クライアント側で適切に処理される",
+            "一度読み込まれたレガシーの文字列形式データも、次に保存されるときにはオブジェクト形式に移行されるため、徐々にオブジェクト形式に統一される",
+            "パフォーマンスとメモリ使用量に注意し、大きなデータの場合は流れを最適化することを考慮する"
+          ]
+        }
+      }
+    ]
+  }
+}
