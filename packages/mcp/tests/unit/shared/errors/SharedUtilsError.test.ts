@@ -1,5 +1,5 @@
-import { SharedUtilsError, SharedUtilsErrorCodes, SharedUtilsErrors } from '../../../../src/shared/errors/SharedUtilsError';
-import { BaseError } from '../../../../src/shared/errors/BaseError';
+import { SharedUtilsError, SharedUtilsErrorCodes, SharedUtilsErrors } from '../../../../src/shared/errors/SharedUtilsError.js'; // .js 追加
+import { BaseError } from '../../../../src/shared/errors/BaseError.js'; // .js 追加
 
 describe('SharedUtilsError', () => {
   it('should create a SharedUtilsError instance with correct properties', () => {

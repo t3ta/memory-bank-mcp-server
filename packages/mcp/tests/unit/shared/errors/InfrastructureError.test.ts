@@ -1,5 +1,5 @@
-import { InfrastructureError, InfrastructureErrorCodes, InfrastructureErrors } from '../../../../src/shared/errors/InfrastructureError';
-import { BaseError } from '../../../../src/shared/errors/BaseError';
+import { InfrastructureError, InfrastructureErrorCodes, InfrastructureErrors } from '../../../../src/shared/errors/InfrastructureError.js'; // .js 追加
+import { BaseError } from '../../../../src/shared/errors/BaseError.js'; // .js 追加
 
 describe('InfrastructureError', () => {
   it('should create an InfrastructureError instance with correct properties', () => {

@@ -3,7 +3,7 @@
     "composite": true,
     "target": "ES2022",
     "module": "NodeNext",
-    "moduleResolution": "bundler", // Issue #218 を参考に bundler に変更
+    "moduleResolution": "NodeNext",
     "esModuleInterop": true,
     "sourceMap": true,
     "declaration": true,
@@ -24,7 +24,6 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "outDir": "./dist",
-    "rootDir": "./src",
     "baseUrl": "./",
     "paths": {
       "@/*": [
@@ -32,19 +31,20 @@
       ],
       "@memory-bank/schemas": [
         "../schemas/src"
+      ],
+      "@memory-bank/schemas/*": [
+        "../schemas/src/*"
       ]
     },
     "isolatedModules": true
   },
   "include": [
     "src/**/*",
-    "tests/**/*" // testsディレクトリもコンパイル対象に追加
+    "tests/**/*.ts"
   ],
   "exclude": [
     "node_modules",
-    "**/*.test.ts",
     "dist"
-    // "tests" // testsディレクトリを除外対象から削除
   ],
   "references": [
     {

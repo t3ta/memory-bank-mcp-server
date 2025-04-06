@@ -1,5 +1,5 @@
-import { BranchInfo } from '../../../../src/domain/entities/BranchInfo';
-import { DomainError, DomainErrorCodes } from '../../../../src/shared/errors/DomainError';
+import { BranchInfo } from '../../../../src/domain/entities/BranchInfo.js'; // .js 追加
+import { DomainError, DomainErrorCodes } from '../../../../src/shared/errors/DomainError.js'; // .js 追加
 
 describe('BranchInfo', () => {
   // ここにテストケースを追加していく
@@ -14,9 +14,16 @@ describe('BranchInfo', () => {
 
     it('空のブランチ名でエラーが発生すること', () => {
       // TODO: 実装
-      expect(() => BranchInfo.create('')).toThrow(
-        new DomainError(DomainErrorCodes.INVALID_BRANCH_NAME, 'Branch name cannot be empty') // ピリオド削除
-      );
+      const expectedMessage = 'Branch name cannot be empty';
+      // const expectedCode = DomainErrorCodes.INVALID_BRANCH_NAME; // 未使用なので削除
+      try {
+        BranchInfo.create('');
+        throw new Error('Expected DomainError but no error was thrown.');
+      } catch (error) {
+        expect(error).toBeInstanceOf(DomainError);
+        expect((error as DomainError).message).toBe(expectedMessage);
+        expect((error as DomainError).code).toBe("DOMAIN_ERROR.INVALID_BRANCH_NAME"); // 期待値を修正
+      }
     });
 
     it('プレフィックスがないブランチ名でエラーが発生すること', () => {

@@ -1,0 +1,117 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "migrate-to-vitest-system-patterns",
+    "title": "Vitest移行技術設計パターン",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [
+      "system-patterns",
+      "vitest",
+      "architecture"
+    ],
+    "lastModified": "2025-04-06T19:15:35.497Z",
+    "createdAt": "2025-04-06T19:15:35.497Z",
+    "version": 1
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "id": "b6f5ad89-4620-4056-80a2-6370fafec047",
+        "title": "JestからVitestへのテスト環境移行",
+        "context": "現状のJest設定はESMプロジェクトとの互換性に課題があり、実験的フラグや複雑な設定が必要となっている。また、モジュール解決の問題でテスト実行が不安定になることがある。",
+        "decision": "テスト環境をJestからVitestに移行する。Vitestは最初からESM対応が強く、モジュール解決の問題が少ない。またJest互換APIを提供しているため、移行コストを最小化できる。",
+        "consequences": {
+          "positive": [
+            "ESMプロジェクトとの互換性向上",
+            "実験的フラグの削減によるメンテナンス性向上",
+            "テスト実行速度の向上",
+            "HMRなどの開発者体験の向上"
+          ],
+          "negative": [
+            "移行に伴う一時的な工数の発生",
+            "Jest特有の機能に依存したテストコードの修正が必要になる可能性",
+            "Vitestに関する新しい知識の習得が必要"
+          ]
+        },
+        "status": "approved",
+        "date": "2025-04-06T19:15:35.497Z",
+        "alternatives": [
+          {
+            "option": "Jest設定の改善",
+            "pros": [
+              "既存コードの変更が不要",
+              "チームの習熟度が高い"
+            ],
+            "cons": [
+              "根本的な問題が解決しない",
+              "ESMとの互換性の問題が残る"
+            ],
+            "reason": "ESMとJestの互換性問題は根本的に解決が難しく、今後も問題が継続する可能性が高い"
+          },
+          {
+            "option": "他のテストランナー（例：node:test, tape）への移行",
+            "pros": [
+              "Node.js標準機能の使用",
+              "依存関係の削減"
+            ],
+            "cons": [
+              "移行コストが非常に大きい",
+              "テスト機能の豊富さでVitestに劣る"
+            ],
+            "reason": "Jest互換APIを持つVitestの方が移行コストが低く、機能も充実している"
+          }
+        ]
+      }
+    ],
+    "implementationPatterns": [
+      {
+        "id": "vitest-migration-strategy",
+        "name": "Vitest移行戦略",
+        "description": "既存のJestプロジェクトからVitestへの移行パターン",
+        "steps": [
+          {
+            "id": "step1",
+            "name": "パッケージのインストール",
+            "description": "VitestとTSLibを追加し、devDependenciesを整理"
+          },
+          {
+            "id": "step2",
+            "name": "設定ファイルの移行",
+            "description": "jest.config.jsをvitest.config.tsに変換し、オプションを適切に設定"
+          },
+          {
+            "id": "step3",
+            "name": "テスト実行スクリプトの更新",
+            "description": "package.jsonのスクリプトをVitestコマンドに更新"
+          },
+          {
+            "id": "step4",
+            "name": "テストコードの修正",
+            "description": "Jest特有機能に依存する箇所の修正（必要に応じて）"
+          },
+          {
+            "id": "step5",
+            "name": "CI/CD設定の更新",
+            "description": "テスト実行環境の設定を更新（該当する場合）"
+          }
+        ],
+        "considerations": [
+          "Jestの設定からVitestへのマッピングには互換性の理解が必要",
+          "グローバルな型定義の扱いを注意する（特にTypeScriptプロジェクトの場合）",
+          "モックとスパイの使用パターンが異なる場合がある"
+        ],
+        "examples": [
+          {
+            "title": "基本設定の移行例",
+            "content": "Jest: moduleNameMapper, transform, extensionsToTreatAsEsmなどの設定をVitestの同等設定に変換"
+          },
+          {
+            "title": "テスト実行の違い",
+            "content": "JestのNODE_OPTIONS実験的フラグが不要になり、直接vitest runで実行可能"
+          }
+        ]
+      }
+    ]
+  }
+}

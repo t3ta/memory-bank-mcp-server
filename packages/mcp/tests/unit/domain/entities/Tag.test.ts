@@ -1,5 +1,5 @@
-import { Tag } from '../../../../src/domain/entities/Tag';
-import { DomainError, DomainErrorCodes } from '../../../../src/shared/errors/DomainError';
+import { Tag } from '../../../../src/domain/entities/Tag.js'; // .js 追加
+import { DomainError, DomainErrorCodes } from '../../../../src/shared/errors/DomainError.js'; // .js 追加
 
 describe('Tag', () => {
   describe('create', () => {
@@ -26,9 +26,16 @@ describe('Tag', () => {
 
     it('無効な文字（大文字）を含む場合にエラーが発生すること', () => {
       const invalidTag = 'Invalid-Tag';
-      expect(() => Tag.create(invalidTag)).toThrow(
-        new DomainError(DomainErrorCodes.INVALID_TAG_FORMAT, 'Tag must contain only lowercase letters, numbers, and hyphens')
-      );
+      const expectedMessage = 'Tag must contain only lowercase letters, numbers, and hyphens';
+      // const expectedCode = DomainErrorCodes.INVALID_TAG_FORMAT; // 未使用なので削除
+      try {
+        Tag.create(invalidTag);
+        throw new Error('Expected DomainError but no error was thrown.');
+      } catch (error) {
+        expect(error).toBeInstanceOf(DomainError);
+        expect((error as DomainError).message).toBe(expectedMessage);
+        expect((error as DomainError).code).toBe("DOMAIN_ERROR.INVALID_TAG_FORMAT"); // 期待値を修正
+      }
     });
 
     it('無効な文字（スペース）を含む場合にエラーが発生すること', () => {

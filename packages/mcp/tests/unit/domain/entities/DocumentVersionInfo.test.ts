@@ -1,4 +1,4 @@
-import { DocumentVersionInfo } from '../../../../src/domain/entities/DocumentVersionInfo';
+import { DocumentVersionInfo } from '../../../../src/domain/entities/DocumentVersionInfo.js'; // .js 追加
 
 describe('DocumentVersionInfo', () => {
   const initialVersion = 1;

@@ -1,39 +1,42 @@
+import { vi } from 'vitest'; // vi をインポート
+import type { Mock } from 'vitest'; // Mock 型をインポート
 import { SearchDocumentsByTagsUseCase } from '../../../../../src/application/usecases/common/SearchDocumentsByTagsUseCase.js';
-import { IBranchMemoryBankRepository } from '../../../../../src/domain/repositories/IBranchMemoryBankRepository.js';
-import { IGlobalMemoryBankRepository } from '../../../../../src/domain/repositories/IGlobalMemoryBankRepository.js';
 import { IFileSystemService } from '../../../../../src/infrastructure/storage/interfaces/IFileSystemService.js';
 import path from 'path';
-import { mock } from 'jest-mock-extended';
+// import { mock } from 'jest-mock-extended'; // jest-mock-extended を削除
 import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo.js';
-import { Tag } from '../../../../../src/domain/entities/Tag.js';
 import { DocumentPath } from '../../../../../src/domain/entities/DocumentPath.js';
-import { MemoryDocument } from '../../../../../src/domain/entities/MemoryDocument.js';
 
 describe('SearchDocumentsByTagsUseCase', () => {
   let useCase: SearchDocumentsByTagsUseCase;
-  let mockBranchRepo: jest.Mocked<IBranchMemoryBankRepository>;
-  let mockGlobalRepo: jest.Mocked<IGlobalMemoryBankRepository>;
-  let mockFileSystemService: jest.Mocked<IFileSystemService>;
+  // jest.Mocked を削除し、手動モックの型を指定
+  let mockFileSystemService: IFileSystemService;
 
   const branchName = 'feature/search-test';
   const branchInfo = BranchInfo.create(branchName);
-  const tagsToSearch = [Tag.create('test'), Tag.create('search')];
   const docsPath = '/path/to/docs'; // Input に必要
 
   const mockBranchDocPath1 = DocumentPath.create('branch/doc1.json');
   const mockBranchDocPath2 = DocumentPath.create('branch/doc2.md');
   const mockGlobalDocPath1 = DocumentPath.create('global/doc3.json');
 
-  const mockBranchDoc1 = MemoryDocument.create({ path: mockBranchDocPath1, content: '{"data": "branch1"}', tags: tagsToSearch, lastModified: new Date() });
-  const mockGlobalDoc1 = MemoryDocument.create({ path: mockGlobalDocPath1, content: '{"data": "global1"}', tags: [Tag.create('test')], lastModified: new Date() });
 
 
   beforeEach(() => {
-    mockBranchRepo = mock<IBranchMemoryBankRepository>();
-    mockGlobalRepo = mock<IGlobalMemoryBankRepository>();
-    mockFileSystemService = mock<IFileSystemService>();
+    // jest-mock-extended の代わりに vi.fn() で手動モックを作成する
+    mockFileSystemService = {
+      fileExists: vi.fn(),
+      readFile: vi.fn(),
+      writeFile: vi.fn(),
+      deleteFile: vi.fn(),
+      createDirectory: vi.fn(),
+      directoryExists: vi.fn(),
+      listFiles: vi.fn(),
+      getFileStats: vi.fn(),
+      readFileChunk: vi.fn(),
+    };
     useCase = new SearchDocumentsByTagsUseCase(mockFileSystemService);
-    jest.clearAllMocks();
+    vi.clearAllMocks(); // jest -> vi
   });
 
   it('should search in all scopes (branch and global) by default using index files', async () => {
@@ -56,7 +59,7 @@ describe('SearchDocumentsByTagsUseCase', () => {
     };
 
 
-    mockFileSystemService.readFile.mockImplementation(async (filePath) => {
+    (mockFileSystemService.readFile as Mock).mockImplementation(async (filePath) => { // as Mock 追加
       const resolvedPath = path.resolve(filePath);
       if (resolvedPath.endsWith(path.join(branchInfo.safeName, '.index', 'tags_index.json'))) return JSON.stringify(branchTagsIndex);
       if (resolvedPath.endsWith(path.join(branchInfo.safeName, '.index', 'documents_meta.json'))) return JSON.stringify(branchMetaIndex);
@@ -89,7 +92,7 @@ describe('SearchDocumentsByTagsUseCase', () => {
     // Arrange
     const branchTagsIndex = { 'test': [mockBranchDocPath1.value] };
     const branchMetaIndex = { [mockBranchDocPath1.value]: { title: 'Branch Doc 1', lastModified: new Date().toISOString(), scope: 'branch' } };
-    mockFileSystemService.readFile.mockImplementation(async (filePath) => {
+    (mockFileSystemService.readFile as Mock).mockImplementation(async (filePath) => { // as Mock 追加
       const resolvedPath = path.resolve(filePath);
       if (resolvedPath.endsWith(path.join(branchInfo.safeName, '.index', 'tags_index.json'))) return JSON.stringify(branchTagsIndex);
       if (resolvedPath.endsWith(path.join(branchInfo.safeName, '.index', 'documents_meta.json'))) return JSON.stringify(branchMetaIndex);
@@ -112,7 +115,7 @@ describe('SearchDocumentsByTagsUseCase', () => {
     // Arrange
     const globalTagsIndex = { 'test': [mockGlobalDocPath1.value] };
     const globalMetaIndex = { [mockGlobalDocPath1.value]: { title: 'Global Doc 1', lastModified: new Date().toISOString(), scope: 'global' } };
-     mockFileSystemService.readFile.mockImplementation(async (filePath) => {
+     (mockFileSystemService.readFile as Mock).mockImplementation(async (filePath) => { // as Mock 追加
       const resolvedPath = path.resolve(filePath);
       if (resolvedPath.endsWith(path.join('global-memory-bank', '.index', 'tags_index.json'))) return JSON.stringify(globalTagsIndex);
       if (resolvedPath.endsWith(path.join('global-memory-bank', '.index', 'documents_meta.json'))) return JSON.stringify(globalMetaIndex);
@@ -137,7 +140,7 @@ describe('SearchDocumentsByTagsUseCase', () => {
     const branchMetaIndex = { [mockBranchDocPath1.value]: { title: 'Branch Doc 1', lastModified: new Date().toISOString(), scope: 'branch' } };
     const globalTagsIndex = { 'test': [mockGlobalDocPath1.value], 'search': [] }; // globalはtestのみ
     const globalMetaIndex = { [mockGlobalDocPath1.value]: { title: 'Global Doc 1', lastModified: new Date().toISOString(), scope: 'global' } };
-     mockFileSystemService.readFile.mockImplementation(async (filePath) => {
+     (mockFileSystemService.readFile as Mock).mockImplementation(async (filePath) => { // as Mock 追加
       const resolvedPath = path.resolve(filePath);
       if (resolvedPath.endsWith(path.join(branchInfo.safeName, '.index', 'tags_index.json'))) return JSON.stringify(branchTagsIndex);
       if (resolvedPath.endsWith(path.join(branchInfo.safeName, '.index', 'documents_meta.json'))) return JSON.stringify(branchMetaIndex);
@@ -164,7 +167,7 @@ describe('SearchDocumentsByTagsUseCase', () => {
     const branchMetaIndex = {};
     const globalTagsIndex = {};
     const globalMetaIndex = {};
-     mockFileSystemService.readFile.mockImplementation(async (filePath) => {
+     (mockFileSystemService.readFile as Mock).mockImplementation(async (filePath) => { // as Mock 追加
       const resolvedPath = path.resolve(filePath);
       if (resolvedPath.endsWith(path.join(branchInfo.safeName, '.index', 'tags_index.json'))) return JSON.stringify(branchTagsIndex);
       if (resolvedPath.endsWith(path.join(branchInfo.safeName, '.index', 'documents_meta.json'))) return JSON.stringify(branchMetaIndex);

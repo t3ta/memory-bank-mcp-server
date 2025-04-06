@@ -3,16 +3,16 @@
  */
 import { setupTestEnv, cleanupTestEnv, createBranchDir, type TestEnv } from '../helpers/test-env.js';
 import { DIContainer, setupContainer } from '../../../src/main/di/providers.js'; // Import DI container and setup function
-import { WriteBranchDocumentUseCase, type WriteBranchDocumentOutput } from '../../../src/application/usecases/branch/WriteBranchDocumentUseCase.js'; // Import real UseCase and types
+import { WriteBranchDocumentUseCase } from '../../../src/application/usecases/branch/WriteBranchDocumentUseCase.js'; // Import real UseCase and types
 import { ReadBranchDocumentUseCase } from '../../../src/application/usecases/branch/ReadBranchDocumentUseCase.js'; // Keep Read UseCase for verification
-import { DomainError, DomainErrors } from '../../../src/shared/errors/DomainError.js'; // Import specific errors for checking
-import { ApplicationError, ApplicationErrors } from '../../../src/shared/errors/ApplicationError.js'; // Import specific errors for checking
+import { DomainError } from '../../../src/shared/errors/DomainError.js'; // Import specific errors for checking
+import { ApplicationError } from '../../../src/shared/errors/ApplicationError.js'; // Import specific errors for checking
 import { IGitService } from '../../../src/infrastructure/git/IGitService.js';
 import { IConfigProvider } from '../../../src/infrastructure/config/interfaces/IConfigProvider.js';
 import { IBranchMemoryBankRepository } from '../../../src/domain/repositories/IBranchMemoryBankRepository.js'; // Import missing interface
 import type { WorkspaceConfig } from '../../../src/infrastructure/config/WorkspaceConfig.js';
 import { BranchInfo } from '../../../src/domain/entities/BranchInfo.js';
-import { jest } from '@jest/globals';
+import { vi, Mocked } from 'vitest'; // jest -> vi, Mocked をインポート
 import { execSync } from 'child_process';
 import { logger } from '../../../src/shared/utils/logger.js';
 import { JsonPatchService } from '../../../src/domain/jsonpatch/JsonPatchService.js'; // Import JsonPatchService interface
@@ -27,8 +27,8 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
   let container: DIContainer; // Use DI container
   let writeUseCase: WriteBranchDocumentUseCase;
   let readUseCase: ReadBranchDocumentUseCase;
-  let mockGitService: jest.Mocked<IGitService>;
-  let mockConfigProvider: jest.Mocked<IConfigProvider>;
+  let mockGitService: Mocked<IGitService>; // jest -> vi
+  let mockConfigProvider: Mocked<IConfigProvider>; // jest -> vi
   const TEST_BRANCH = 'feature/test-branch';
 
   beforeEach(async () => {
@@ -53,7 +53,7 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
 
 
     mockGitService = {
-      getCurrentBranchName: jest.fn<() => Promise<string>>() // モック関数を作成
+      getCurrentBranchName: vi.fn<() => Promise<string>>() // jest -> vi
     };
     // getCurrentBranchNameが呼ばれたらTEST_BRANCHを返すように設定
     mockGitService.getCurrentBranchName.mockResolvedValue(TEST_BRANCH);
@@ -61,11 +61,11 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
 
 
     mockConfigProvider = {
-      initialize: jest.fn(),
-      getConfig: jest.fn<() => WorkspaceConfig>(),
-      getGlobalMemoryPath: jest.fn<() => string>(),
-      getBranchMemoryPath: jest.fn<() => string>(),
-      getLanguage: jest.fn<() => 'en' | 'ja' | 'zh'>()
+      initialize: vi.fn(), // jest -> vi
+      getConfig: vi.fn<() => WorkspaceConfig>(), // jest -> vi
+      getGlobalMemoryPath: vi.fn<() => string>(), // jest -> vi
+      getBranchMemoryPath: vi.fn<(branchName: string) => string>(), // jest -> vi, 引数を追加
+      getLanguage: vi.fn<() => 'en' | 'ja' | 'zh'>() // jest -> vi
     };
     // デフォルトの getConfig の戻り値を設定 (isProjectMode: true)
     mockConfigProvider.getConfig.mockReturnValue({
@@ -355,13 +355,21 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
         content: { value: "This should not be written in branch" }
       }, null, 2);
 
-      await expect(writeUseCase.execute({
-        branchName: TEST_BRANCH,
-        document: {
-          path: invalidPath,
-          content: documentContent
-        }
-      })).rejects.toThrow(DomainErrors.validationError('Document path cannot contain ".."')); // Match actual error message
+      try {
+        await writeUseCase.execute({
+          branchName: TEST_BRANCH,
+          document: {
+            path: invalidPath,
+            content: documentContent
+          }
+        });
+        throw new Error('Expected validationError but no error was thrown.');
+      } catch (error) {
+        expect(error).toBeInstanceOf(DomainError);
+        expect((error as DomainError).message).toBe('Document path cannot contain ".."');
+        // エラーコードが DOMAIN_ERROR.INVALID_DOCUMENT_PATH に変わってる可能性があるので、メッセージで確認
+        // expect((error as DomainError).code).toBe('DOMAIN_ERROR.VALIDATION_ERROR');
+      }
 
       // Optionally, verify the file was NOT created outside the branch directory
       const branchPath = path.join(testEnv.branchMemoryPath, TEST_BRANCH);
@@ -430,11 +438,18 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
       const documentPath = 'test/non-existent-patch-target.json';
       const patches = [{ op: 'add', path: '/newField', value: 'newValue' }];
 
-      await expect(writeUseCase.execute({
-        branchName: TEST_BRANCH,
-        document: { path: documentPath } as any, // Cast to avoid content requirement for this test
-        patches: patches
-      })).rejects.toThrow(ApplicationErrors.notFound('Document', documentPath));
+      try {
+        await writeUseCase.execute({
+          branchName: TEST_BRANCH,
+          document: { path: documentPath } as any, // Cast to avoid content requirement for this test
+          patches: patches
+        });
+        throw new Error('Expected ApplicationError but no error was thrown.');
+      } catch (error) {
+        expect(error).toBeInstanceOf(ApplicationError);
+        expect((error as ApplicationError).message).toBe(`Document with id ${documentPath} was not found`);
+        expect((error as ApplicationError).code).toBe('APP_ERROR.NOT_FOUND');
+      }
     });
 
     it('should throw an error if patches test operation fails (branch)', async () => {

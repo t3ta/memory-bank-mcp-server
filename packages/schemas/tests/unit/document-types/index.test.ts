@@ -5,13 +5,12 @@ import {
   ProgressJsonV2Schema,
   SystemPatternsJsonV2Schema,
   GenericDocumentJsonV2Schema,
-  // Also maybe a type export if needed
-  BranchContextContentV2,
-  ActiveContextContentV2,
-  ProgressContentV2,
-  SystemPatternsContentV2,
-  GenericDocumentContentV2,
-
+  // 未使用の型インポートを削除
+  // BranchContextContentV2,
+  // ActiveContextContentV2,
+  // ProgressContentV2,
+  // SystemPatternsContentV2,
+  // GenericDocumentContentV2,
 } from '@memory-bank/schemas/document-types'; // Import using package path defined in exports
 
 describe('Document Types Index Exports (src/document-types/index.ts)', () => {

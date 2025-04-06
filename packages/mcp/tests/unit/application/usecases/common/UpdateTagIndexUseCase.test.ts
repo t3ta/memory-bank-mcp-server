@@ -1,21 +1,22 @@
+import { vi } from 'vitest'; // vi をインポート
+import type { Mock } from 'vitest'; // Mock 型をインポート
 import { UpdateTagIndexUseCase } from '../../../../../src/application/usecases/common/UpdateTagIndexUseCase.js';
 import { IBranchMemoryBankRepository } from '../../../../../src/domain/repositories/IBranchMemoryBankRepository.js';
 import { IGlobalMemoryBankRepository } from '../../../../../src/domain/repositories/IGlobalMemoryBankRepository.js';
-import { mock } from 'jest-mock-extended';
+// import { mock } from 'jest-mock-extended'; // jest-mock-extended を削除
 import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo.js';
 import { DocumentPath } from '../../../../../src/domain/entities/DocumentPath.js';
 import { MemoryDocument } from '../../../../../src/domain/entities/MemoryDocument.js';
 import { Tag } from '../../../../../src/domain/entities/Tag.js';
-import type { BranchTagIndex } from '@memory-bank/schemas';
 
 describe('UpdateTagIndexUseCase', () => {
   let useCase: UpdateTagIndexUseCase;
-  let mockBranchRepo: jest.Mocked<IBranchMemoryBankRepository>;
-  let mockGlobalRepo: jest.Mocked<IGlobalMemoryBankRepository>;
+  // jest.Mocked を削除し、手動モックの型を指定
+  let mockBranchRepo: IBranchMemoryBankRepository;
+  let mockGlobalRepo: IGlobalMemoryBankRepository;
 
   const branchName = 'feature/index-test';
   const branchInfo = BranchInfo.create(branchName);
-  const docsPath = '/path/to/docs'; // Input に必要
 
   const mockDoc1Path = DocumentPath.create('doc1.json');
   const mockDoc2Path = DocumentPath.create('subdir/doc2.md');
@@ -23,18 +24,44 @@ describe('UpdateTagIndexUseCase', () => {
   const mockDoc2 = MemoryDocument.create({ path: mockDoc2Path, content: 'content', tags: [Tag.create('tagb'), Tag.create('tagc')], lastModified: new Date() }); // tagB -> tagb, tagC -> tagc
 
   beforeEach(() => {
-    mockBranchRepo = mock<IBranchMemoryBankRepository>();
-    mockGlobalRepo = mock<IGlobalMemoryBankRepository>();
+    // jest-mock-extended の代わりに vi.fn() で手動モックを作成する
+    mockBranchRepo = {
+      initialize: vi.fn(),
+      exists: vi.fn(),
+      getDocument: vi.fn(),
+      saveDocument: vi.fn(),
+      deleteDocument: vi.fn(),
+      getRecentBranches: vi.fn(),
+      listDocuments: vi.fn(),
+      findDocumentsByTags: vi.fn(),
+      validateStructure: vi.fn(),
+      saveTagIndex: vi.fn(),
+      getTagIndex: vi.fn(),
+      findDocumentPathsByTagsUsingIndex: vi.fn(),
+    };
+    mockGlobalRepo = {
+      initialize: vi.fn(),
+      getDocument: vi.fn(),
+      saveDocument: vi.fn(),
+      deleteDocument: vi.fn(),
+      listDocuments: vi.fn(),
+      findDocumentsByTags: vi.fn(),
+      validateStructure: vi.fn(),
+      saveTagIndex: vi.fn(),
+      getTagIndex: vi.fn(),
+      findDocumentPathsByTagsUsingIndex: vi.fn(),
+      updateTagsIndex: vi.fn(),
+    };
     useCase = new UpdateTagIndexUseCase(mockGlobalRepo, mockBranchRepo);
-    jest.clearAllMocks();
-    mockBranchRepo.exists.mockResolvedValue(true);
+    vi.clearAllMocks(); // jest -> vi
+    (mockBranchRepo.exists as Mock).mockResolvedValue(true); // as Mock 追加
   });
 
   it('should return correct tags and count for branch scope', async () => {
     // Arrange
-    mockBranchRepo.listDocuments.mockResolvedValue([mockDoc1Path, mockDoc2Path]);
+    (mockBranchRepo.listDocuments as Mock).mockResolvedValue([mockDoc1Path, mockDoc2Path]); // as Mock 追加
     // getDocument は特定の引数で呼ばれるわけではないので、単純なモックでOK
-    mockBranchRepo.getDocument.mockImplementation(async (argBranchInfo, argPath) => {
+    (mockBranchRepo.getDocument as Mock).mockImplementation(async (_argBranchInfo, argPath) => { // as Mock 追加
         if (argPath.equals(mockDoc1Path)) return mockDoc1;
         if (argPath.equals(mockDoc2Path)) return mockDoc2;
         return null;
@@ -63,8 +90,8 @@ describe('UpdateTagIndexUseCase', () => {
     // Arrange
     const mockGlobalDocPath = DocumentPath.create('global/doc.json');
     const mockGlobalDoc = MemoryDocument.create({ path: mockGlobalDocPath, content: '{}', tags: [Tag.create('globaltag')], lastModified: new Date() }); // globalTag -> globaltag
-    mockGlobalRepo.listDocuments.mockResolvedValue([mockGlobalDocPath]);
-    mockGlobalRepo.getDocument.mockResolvedValue(mockGlobalDoc);
+    (mockGlobalRepo.listDocuments as Mock).mockResolvedValue([mockGlobalDocPath]); // as Mock 追加
+    (mockGlobalRepo.getDocument as Mock).mockResolvedValue(mockGlobalDoc); // as Mock 追加
 
     // Act
     await useCase.execute({}); // 引数なしでグローバルスコープになる
@@ -86,7 +113,7 @@ describe('UpdateTagIndexUseCase', () => {
 
   it('should return empty tags and zero count for empty branch', async () => {
     // Arrange
-    mockBranchRepo.listDocuments.mockResolvedValue([]);
+    (mockBranchRepo.listDocuments as Mock).mockResolvedValue([]); // as Mock 追加
 
     // Act
     const result = await useCase.execute({ branchName }); // scope, docs は不要

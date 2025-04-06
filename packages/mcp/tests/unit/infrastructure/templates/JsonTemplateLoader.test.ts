@@ -1,14 +1,36 @@
 import path from 'node:path';
-import { mock } from 'jest-mock-extended';
-import { JsonTemplateLoader } from '../../../../src/infrastructure/templates/JsonTemplateLoader';
-import { IFileSystemService } from '../../../../src/infrastructure/storage/interfaces/IFileSystemService';
-import { II18nProvider } from '../../../../src/infrastructure/i18n/interfaces/II18nProvider';
+import { vi } from 'vitest'; // vi をインポート
+import type { Mock } from 'vitest'; // Mock 型をインポート
+// import { mock } from 'jest-mock-extended'; // jest-mock-extended を削除
+import { JsonTemplateLoader } from '../../../../src/infrastructure/templates/JsonTemplateLoader.js'; // .js 追加
+import { IFileSystemService } from '../../../../src/infrastructure/storage/interfaces/IFileSystemService.js'; // .js 追加
+import { II18nProvider } from '../../../../src/infrastructure/i18n/interfaces/II18nProvider.js'; // .js 追加
 import { Language } from '@memory-bank/schemas/v2'; // 正しい Language 型を schemas からインポート
-import { TemplateRenderer } from '../../../../src/infrastructure/templates/TeplateRenderer'; // Rendererもテストで使うかも
+// import { TemplateRenderer } from '../../../../src/infrastructure/templates/TeplateRenderer.js'; // 未使用なので削除
 
 // Mocks
-const mockFileSystemService = mock<IFileSystemService>();
-const mockI18nProvider = mock<II18nProvider>();
+// jest-mock-extended の代わりに vi.fn() で手動モックを作成する
+const mockFileSystemService: IFileSystemService = {
+  fileExists: vi.fn(),
+  readFile: vi.fn(),
+  writeFile: vi.fn(),
+  deleteFile: vi.fn(),
+  // ensureDir: vi.fn(), // IFileSystemService に存在しないため削除
+  // readDir: vi.fn(), // IFileSystemService に存在しないため削除
+  readFileChunk: vi.fn(), // readFileChunk もモック
+  // 不足していたメソッドを追加
+  createDirectory: vi.fn(),
+  directoryExists: vi.fn(),
+  listFiles: vi.fn(),
+  getFileStats: vi.fn(),
+};
+const mockI18nProvider: II18nProvider = {
+  translate: vi.fn(),
+  loadTranslations: vi.fn(),
+  isLanguageSupported: vi.fn(),
+  getSupportedLanguages: vi.fn(), // 不足していたメソッドを追加
+  getDefaultLanguage: vi.fn(), // 不足していたメソッドを追加
+};
 
 // TemplateRenderer のモックは難しいので、本物を使うか、必要なら部分的にモックする
 // 今回は i18nProvider をモックしているので、Renderer の i18n 関連は制御できる
@@ -38,23 +60,23 @@ const dummyJsonTemplate = {
   }
 };
 const dummyJsonTemplateString = JSON.stringify(dummyJsonTemplate);
-const dummyLegacyTemplateContent = '# Legacy {{title_placeholder}}\n\nLegacy content {{var1}}.';
+// const dummyLegacyTemplateContent = '# Legacy {{title_placeholder}}\n\nLegacy content {{var1}}.'; // 未使用なので削除
 
 // Mock paths (assuming test runs from project root)
 const jsonTemplatesDir = path.join(process.cwd(), 'src/templates/json');
-const legacyTemplatesDir = path.join(process.cwd(), 'src/templates/markdown');
+// const legacyTemplatesDir = path.join(process.cwd(), 'src/templates/markdown'); // 未使用なので削除
 const jsonTemplatePath = path.join(jsonTemplatesDir, `${dummyTemplateId}.json`);
-const legacyTemplatePathEn = path.join(legacyTemplatesDir, `${dummyTemplateId}-en.md`);
-const legacyTemplatePathJa = path.join(legacyTemplatesDir, `${dummyTemplateId}.md`); // ja is default
+// const legacyTemplatePathEn = path.join(legacyTemplatesDir, `${dummyTemplateId}-en.md`); // 未使用なので削除
+// const legacyTemplatePathJa = path.join(legacyTemplatesDir, `${dummyTemplateId}.md`); // 未使用なので削除
 
 describe('JsonTemplateLoader', () => {
   beforeEach(() => {
-    jest.resetAllMocks();
+    vi.clearAllMocks(); // jest -> vi
 
     // Default mock implementations
-    mockI18nProvider.isLanguageSupported.mockImplementation((lang) => ['en', 'ja'].includes(lang));
+    (mockI18nProvider.isLanguageSupported as Mock).mockImplementation((lang: string) => ['en', 'ja'].includes(lang)); // as Mock と型注釈を追加
     // Setup mock for i18nProvider.translate to handle both string and object arguments
-    mockI18nProvider.translate.mockImplementation((arg: string | { key: string; language: Language; params?: Record<string, string> }) => {
+    (mockI18nProvider.translate as Mock).mockImplementation((arg: string | { key: string; language: Language; params?: Record<string, string> }) => { // as Mock を追加
       let key: string;
       let language: Language | undefined;
       // Determine key and language based on argument type
@@ -83,8 +105,9 @@ describe('JsonTemplateLoader', () => {
 
   describe('loadJsonTemplate', () => {
     it('should load and parse a valid JSON template', async () => {
-      mockFileSystemService.fileExists.calledWith(jsonTemplatePath).mockResolvedValue(true);
-      mockFileSystemService.readFile.calledWith(jsonTemplatePath).mockResolvedValue(dummyJsonTemplateString);
+      // calledWith は削除し、expect で確認する
+      (mockFileSystemService.fileExists as Mock).mockResolvedValue(true); // as Mock に修正
+      (mockFileSystemService.readFile as Mock).mockResolvedValue(dummyJsonTemplateString); // as Mock に修正
 
       const template = await templateLoader.loadJsonTemplate(dummyTemplateId);
 
@@ -94,7 +117,7 @@ describe('JsonTemplateLoader', () => {
     });
 
     it('should throw an error if the template file does not exist', async () => {
-      mockFileSystemService.fileExists.calledWith(jsonTemplatePath).mockResolvedValue(false);
+      (mockFileSystemService.fileExists as Mock).mockResolvedValue(false); // as Mock に修正
 
       await expect(templateLoader.loadJsonTemplate(dummyTemplateId))
         .rejects.toThrow(`Failed to load JSON template ${dummyTemplateId}: Template not found: ${dummyTemplateId}`);
@@ -105,8 +128,8 @@ describe('JsonTemplateLoader', () => {
 
     it('should throw an error if reading the file fails', async () => {
       const readError = new Error('Permission denied');
-      mockFileSystemService.fileExists.calledWith(jsonTemplatePath).mockResolvedValue(true);
-      mockFileSystemService.readFile.calledWith(jsonTemplatePath).mockRejectedValue(readError);
+      (mockFileSystemService.fileExists as Mock).mockResolvedValue(true); // as Mock に修正
+      (mockFileSystemService.readFile as Mock).mockRejectedValue(readError); // as Mock に修正
 
       await expect(templateLoader.loadJsonTemplate(dummyTemplateId))
         .rejects.toThrow(`Failed to load JSON template ${dummyTemplateId}: Permission denied`);
@@ -117,8 +140,8 @@ describe('JsonTemplateLoader', () => {
 
     it('should throw an error if the JSON content is invalid', async () => {
       const invalidJsonString = '{"title": "Test", sections: []}'; // Invalid JSON (missing quotes around sections)
-      mockFileSystemService.fileExists.calledWith(jsonTemplatePath).mockResolvedValue(true);
-      mockFileSystemService.readFile.calledWith(jsonTemplatePath).mockResolvedValue(invalidJsonString);
+      (mockFileSystemService.fileExists as Mock).mockResolvedValue(true); // as Mock に修正
+      (mockFileSystemService.readFile as Mock).mockResolvedValue(invalidJsonString); // as Mock に修正
 
       // Expect SyntaxError directly because loadJsonTemplate rethrows it
       await expect(templateLoader.loadJsonTemplate(dummyTemplateId))
@@ -133,8 +156,8 @@ describe('JsonTemplateLoader', () => {
     const variables = { var1: 'VariableValue' };
 
     it('should load JSON template and render markdown for a supported language', async () => {
-      mockFileSystemService.fileExists.calledWith(jsonTemplatePath).mockResolvedValue(true);
-      mockFileSystemService.readFile.calledWith(jsonTemplatePath).mockResolvedValue(dummyJsonTemplateString);
+      (mockFileSystemService.fileExists as Mock).mockResolvedValue(true); // as Mock に修正
+      (mockFileSystemService.readFile as Mock).mockResolvedValue(dummyJsonTemplateString); // as Mock に修正
 
       // Note: TemplateRenderer uses translate differently now, adjust expectations if needed
       // For now, just check if the method runs without the previous TypeError
@@ -162,9 +185,8 @@ describe('JsonTemplateLoader', () => {
 
     it('should throw error if JSON template fails and legacy fallback also fails (file not found)', async () => {
       // JSON template does not exist
-      mockFileSystemService.fileExists.calledWith(jsonTemplatePath).mockResolvedValue(false);
-      // Legacy template also does not exist
-      mockFileSystemService.fileExists.calledWith(legacyTemplatePathJa).mockResolvedValue(false);
+      (mockFileSystemService.fileExists as Mock).mockResolvedValue(false); // as Mock に修正
+      // Legacy template check removed
 
       // Expect the final error message to reflect both failures
       // Expect the final error message from the legacy load failure, as the JSON error triggers fallback
@@ -181,13 +203,11 @@ describe('JsonTemplateLoader', () => {
 
      it('should throw error if JSON template fails and legacy fallback also fails (read error)', async () => {
       const jsonReadError = new Error('JSON read failed');
-      const legacyReadError = new Error('Legacy read failed');
+      // const legacyReadError = new Error('Legacy read failed'); // 未使用なので削除
       // JSON template exists but read fails
-      mockFileSystemService.fileExists.calledWith(jsonTemplatePath).mockResolvedValue(true);
-      mockFileSystemService.readFile.calledWith(jsonTemplatePath).mockRejectedValue(jsonReadError);
-      // Legacy template exists but read fails
-      mockFileSystemService.fileExists.calledWith(legacyTemplatePathEn).mockResolvedValue(true);
-      mockFileSystemService.readFile.calledWith(legacyTemplatePathEn).mockRejectedValue(legacyReadError);
+      (mockFileSystemService.fileExists as Mock).mockResolvedValue(true); // as Mock に修正
+      (mockFileSystemService.readFile as Mock).mockRejectedValue(jsonReadError); // as Mock に修正
+      // Legacy template checks removed
 
       // Expect the final error message from the legacy load failure, as JSON read error should trigger fallback
       // Expect the final error message from the legacy load failure, as JSON read error should trigger fallback
@@ -204,8 +224,8 @@ describe('JsonTemplateLoader', () => {
 
     it('should throw original error if JSON load fails for reason other than not found or invalid JSON', async () => {
         const unexpectedError = new Error('Unexpected network error');
-        mockFileSystemService.fileExists.calledWith(jsonTemplatePath).mockResolvedValue(true);
-        mockFileSystemService.readFile.calledWith(jsonTemplatePath).mockRejectedValue(unexpectedError);
+        (mockFileSystemService.fileExists as Mock).mockResolvedValue(true); // as Mock に修正
+        (mockFileSystemService.readFile as Mock).mockRejectedValue(unexpectedError); // as Mock に修正
 
         await expect(templateLoader.getMarkdownTemplate(dummyTemplateId, 'ja'))
             .rejects.toThrow(`Failed to load JSON template ${dummyTemplateId}: Unexpected network error`);
@@ -219,14 +239,14 @@ describe('JsonTemplateLoader', () => {
 
   describe('templateExists', () => { // Corrected indentation
     it('should return true if JSON template file exists', async () => {
-      mockFileSystemService.fileExists.calledWith(jsonTemplatePath).mockResolvedValue(true);
+      (mockFileSystemService.fileExists as Mock).mockResolvedValue(true); // as Mock に修正
       const exists = await templateLoader.templateExists(dummyTemplateId);
       expect(exists).toBe(true);
       expect(mockFileSystemService.fileExists).toHaveBeenCalledWith(jsonTemplatePath);
     });
 
     it('should return false if JSON template file does not exist', async () => {
-      mockFileSystemService.fileExists.calledWith(jsonTemplatePath).mockResolvedValue(false);
+      (mockFileSystemService.fileExists as Mock).mockResolvedValue(false); // as Mock に修正
       const exists = await templateLoader.templateExists(dummyTemplateId);
       expect(exists).toBe(false);
       expect(mockFileSystemService.fileExists).toHaveBeenCalledWith(jsonTemplatePath);

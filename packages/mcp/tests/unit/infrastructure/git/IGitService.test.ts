@@ -1,14 +1,16 @@
-import type { IGitService } from '../../../../src/infrastructure/git/IGitService';
+import { vi } from 'vitest'; // vi をインポート
+// import type { IGitService } from '../../../../src/infrastructure/git/IGitService.js'; // 再度未使用なので削除 (コメントアウト済み)
 
 // IGitService のモック実装を作成
-const mockGitService: jest.Mocked<IGitService> = {
-  getCurrentBranchName: jest.fn(),
+// jest.Mocked を削除し、型推論に任せる
+const mockGitService = {
+  getCurrentBranchName: vi.fn(), // jest -> vi
 };
 
 describe('IGitService Interface', () => {
   beforeEach(() => {
     // 各テストの前にモックをリセット
-    jest.clearAllMocks();
+    vi.clearAllMocks(); // jest -> vi
   });
 
   it('should define the getCurrentBranchName method that resolves with the branch name', async () => {

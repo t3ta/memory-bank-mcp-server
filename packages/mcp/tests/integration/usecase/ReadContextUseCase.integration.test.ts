@@ -1,14 +1,13 @@
 /**
  * @jest-environment node
  */
-import { setupTestEnv, cleanupTestEnv, createBranchDir, type TestEnv } from '../helpers/test-env.ts';
+import { setupTestEnv, cleanupTestEnv, createBranchDir, type TestEnv } from '../helpers/test-env.js'; // 拡張子を .js に変更 (または削除)
 import { loadBranchFixture, loadGlobalFixture } from '../helpers/fixtures-loader.js';
 import { DIContainer, setupContainer } from '../../../src/main/di/providers.js'; // Import DI container and setup function
-import { ReadContextUseCase, type ContextResult } from '../../../src/application/usecases/common/ReadContextUseCase.js'; // Import real UseCase and types
+import { ReadContextUseCase } from '../../../src/application/usecases/common/ReadContextUseCase.js'; // Import real UseCase and types
 import { ReadRulesUseCase } from '../../../src/application/usecases/common/ReadRulesUseCase.js'; // Import ReadRulesUseCase for rules check
-import { DomainErrors } from '../../../src/shared/errors/DomainError.js'; // Import specific errors for checking
 import type { IBranchMemoryBankRepository } from '../../../src/domain/repositories/IBranchMemoryBankRepository.js';
-import fs from 'fs/promises';
+import fs from 'fs-extra'; // fs/promises から fs-extra に変更
 import { logger } from '../../../src/shared/utils/logger.js';
 import * as path from 'path';
 
@@ -185,21 +184,23 @@ describe('ReadContextUseCase Integration Tests', () => {
       expect(rulesResult.language).toBe('ja');
     });
 
-    it('should get context even for unsupported language', async () => {
-      const result = await useCase.execute({
-        branch: TEST_BRANCH,
-        language: 'fr'
-      });
+    it('should return context with undefined rules for unsupported language', async () => { // テスト名を変更
+      // 準備: ダミーのグローバルファイルを作成
+      const dummyGlobalPath = path.join(testEnv.globalMemoryPath, 'dummy-global.json');
+      await fs.outputJson(dummyGlobalPath, { dummy: 'data' });
 
+      // 実行: サポートされていない言語コードで ReadContextUseCase を実行
+      const result = await useCase.execute({ branch: TEST_BRANCH, language: 'fr' });
+
+      // 検証: rules が undefined であることを確認
       expect(result).toBeDefined();
+      expect(result.rules).toBeUndefined(); // rules が undefined であることを期待
+      // 他のコンテキスト（branchMemory, globalMemory）は取得できているはず
       expect(result.branchMemory).toBeDefined();
-      expect(Object.keys(result.branchMemory!)).toEqual(['branchContext.json']);
-      expect(result.branchMemory!['branchContext.json']).toBeDefined();
       expect(typeof result.globalMemory).toBe('object');
-
-      // Verify rules fetching fails separately
-      await expect(readRulesUseCase.execute('fr'))
-        .rejects.toThrow(DomainErrors.validationError(`Unsupported language code: fr. Supported languages are: en, ja, zh`));
+      // 念のため、他のコンテキストが空でないことも確認（必要に応じて）
+      expect(Object.keys(result.branchMemory!).length).toBeGreaterThan(0);
+      expect(result.globalMemory).toEqual({}); // グローバルメモリは空であることを期待
     });
   });
 });

@@ -1,4 +1,4 @@
-import { JsonPath } from '../../../../src/domain/jsonpatch/JsonPath';
+import { JsonPath } from '../../../../src/domain/jsonpatch/JsonPath.js'; // .js 追加 (再確認)
 // import { DomainError, DomainErrorCodes } from '../../../../src/shared/errors/DomainError'; // 必要に応じてコメント解除
 
 describe('JsonPath', () => {

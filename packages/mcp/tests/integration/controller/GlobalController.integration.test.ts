@@ -2,14 +2,10 @@
  * @jest-environment node
  */
 import { setupTestEnv, cleanupTestEnv, type TestEnv } from '../helpers/test-env.js';
-import { loadGlobalFixture, getFixtureContent } from '../helpers/fixtures-loader.js';
+import { loadGlobalFixture } from '../helpers/fixtures-loader.js';
 // import { Application } from '../mocks/Application'; // Removed mock application
-import * as path from 'path';
 import { DIContainer, setupContainer } from '../../../src/main/di/providers.js'; // Import DI container and setup function
 import { GlobalController } from '../../../src/interface/controllers/GlobalController.js'; // Import real controller
-import type { DocumentDTO } from '../../../src/application/dtos/DocumentDTO.js'; // Import DTO type
-import type { MCPResponse } from '../../../src/interface/presenters/types/MCPResponse.js'; // Import response types
-import { DomainError } from '../../../src/shared/errors/DomainError.js';
 
 describe('GlobalController Integration Tests', () => {
   let testEnv: TestEnv;

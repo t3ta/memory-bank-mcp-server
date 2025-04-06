@@ -12,10 +12,10 @@ import {
   ApplicationErrors, // Use this for error creation
 } from '../../../shared/errors/ApplicationError.js';
 import { logger } from '../../../shared/utils/logger.js'; // Import logger
-import type { IGitService } from '@/infrastructure/git/IGitService.js';
-import type { IConfigProvider } from '@/infrastructure/config/interfaces/IConfigProvider.js';
+import type { IGitService } from '../../../infrastructure/git/IGitService.js';
+import type { IConfigProvider } from '../../../infrastructure/config/interfaces/IConfigProvider.js';
 import { DocumentWriterService, DocumentWriterInput } from '../../services/DocumentWriterService.js'; // Import the new service
-import type { IDocumentRepository } from '@/domain/repositories/IDocumentRepository.js'; // Import the common repository interface
+import type { IDocumentRepository } from '../../../domain/repositories/IDocumentRepository.js'; // Import the common repository interface
 
 /**
  * Input data for write branch document use case

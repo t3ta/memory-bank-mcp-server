@@ -1,10 +1,19 @@
-import { mock } from 'jest-mock-extended';
-import { TemplateRenderer } from '../../../../src/infrastructure/templates/TeplateRenderer';
-import { II18nProvider } from '../../../../src/infrastructure/i18n/interfaces/II18nProvider';
+import { vi } from 'vitest'; // vi をインポート
+import type { Mock } from 'vitest'; // Mock 型をインポート
+// import { mock } from 'jest-mock-extended'; // jest-mock-extended を削除
+import { TemplateRenderer } from '../../../../src/infrastructure/templates/TeplateRenderer.js'; // .js 追加
+import { II18nProvider } from '../../../../src/infrastructure/i18n/interfaces/II18nProvider.js'; // .js 追加
 import { Language } from '@memory-bank/schemas/v2';
 
 // Mocks
-const mockI18nProvider = mock<II18nProvider>();
+// jest-mock-extended の代わりに vi.fn() で手動モックを作成する
+const mockI18nProvider: II18nProvider = {
+  translate: vi.fn(),
+  loadTranslations: vi.fn(),
+  isLanguageSupported: vi.fn(),
+  getSupportedLanguages: vi.fn(), // 不足していたメソッドを追加
+  getDefaultLanguage: vi.fn(), // 不足していたメソッドを追加
+};
 
 // Test target instance
 const renderer = new TemplateRenderer(mockI18nProvider);
@@ -56,10 +65,10 @@ const dummyBaseTemplate = {
 
 describe('TemplateRenderer', () => {
   beforeEach(() => {
-    jest.resetAllMocks();
+    vi.clearAllMocks(); // jest -> vi
 
     // Setup mock for i18nProvider.translate to handle both string and object arguments
-    mockI18nProvider.translate.mockImplementation((arg: string | { key: string; language: Language; params?: Record<string, string> }) => {
+    (mockI18nProvider.translate as Mock).mockImplementation((arg: string | { key: string; language: Language; params?: Record<string, string> }) => { // as Mock を追加
       let key: string;
       let language: Language | undefined;
       if (typeof arg === 'string') {
@@ -147,7 +156,7 @@ describe('TemplateRenderer', () => {
     it('should render a base template correctly for ja', () => {
       const variables = { VAR_1: '変数壱' };
       // Setup specific mocks for Japanese translations for this test case
-      mockI18nProvider.translate.mockImplementation((arg: string | { key: string; language: Language; params?: Record<string, string> }) => {
+      (mockI18nProvider.translate as Mock).mockImplementation((arg: string | { key: string; language: Language; params?: Record<string, string> }) => { // as Mock を追加
         let key: string;
         let lang: Language | undefined;
         if (typeof arg === 'string') { key = arg; lang = 'ja'; } else { key = arg.key; lang = arg.language; }
@@ -202,7 +211,7 @@ describe('TemplateRenderer', () => {
 
     it('should use generic placeholder comment if specific translation is missing', () => {
       // Setup mock to return the key for the specific placeholder comment key
-      mockI18nProvider.translate.mockImplementation((arg: string | { key: string; language: Language; params?: Record<string, string> }) => {
+      (mockI18nProvider.translate as Mock).mockImplementation((arg: string | { key: string; language: Language; params?: Record<string, string> }) => { // as Mock を追加
         let key: string;
         if (typeof arg === 'string') key = arg; else key = arg.key;
         // Return the key itself ONLY for the specific placeholder key

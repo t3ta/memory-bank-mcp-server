@@ -1,5 +1,5 @@
-import { DocumentId } from '../../../../src/domain/entities/DocumentId';
-import { DomainError, DomainErrorCodes } from '../../../../src/shared/errors/DomainError';
+import { DocumentId } from '../../../../src/domain/entities/DocumentId.js'; // .js 追加
+import { DomainError, DomainErrorCodes } from '../../../../src/shared/errors/DomainError.js'; // .js 追加
 import { validate as uuidValidate } from 'uuid';
 
 describe('DocumentId', () => {

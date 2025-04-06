@@ -1,4 +1,4 @@
-import { Language, LanguageCode } from '../../../../src/domain/i18n/Language';
+import { Language } from '../../../../src/domain/i18n/Language.js'; // 未使用の LanguageCode を削除し、.js を追加
 
 describe('Language Domain Model', () => {
   describe('Creation and Validation', () => {

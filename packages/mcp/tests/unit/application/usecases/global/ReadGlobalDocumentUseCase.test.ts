@@ -1,31 +1,33 @@
-import { ReadGlobalDocumentUseCase, ReadGlobalDocumentInput, ReadGlobalDocumentOutput } from '../../../../../src/application/usecases/global/ReadGlobalDocumentUseCase';
-import { IGlobalMemoryBankRepository } from '../../../../../src/domain/repositories/IGlobalMemoryBankRepository'; // Changed repository type
-import { MemoryDocument } from '../../../../../src/domain/entities/MemoryDocument'; // Use MemoryDocument
-import { DocumentPath } from '../../../../../src/domain/entities/DocumentPath';
+import { vi } from 'vitest'; // vi をインポート
+import type { Mock } from 'vitest'; // Mock 型をインポート
+import { ReadGlobalDocumentUseCase, ReadGlobalDocumentInput } from '../../../../../src/application/usecases/global/ReadGlobalDocumentUseCase.js'; // .js 追加
+import { IGlobalMemoryBankRepository } from '../../../../../src/domain/repositories/IGlobalMemoryBankRepository.js'; // .js 追加
+import { MemoryDocument } from '../../../../../src/domain/entities/MemoryDocument.js'; // .js 追加
+import { DocumentPath } from '../../../../../src/domain/entities/DocumentPath.js'; // .js 追加
 // import { DocumentId } from '../../../../../src/domain/entities/DocumentId'; // Not directly used in output DTO
-import { Tag } from '../../../../../src/domain/entities/Tag';
+import { Tag } from '../../../../../src/domain/entities/Tag.js'; // .js 追加
 // import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo'; // Not directly used by this use case input/output
 // import { DocumentVersionInfo } from '../../../../../src/domain/entities/DocumentVersionInfo'; // Not directly used in output DTO
 // import { IDocumentValidator } from '../../../../../src/domain/validation/IDocumentValidator'; // Not needed for this test setup
-import { DomainError, DomainErrorCodes } from '../../../../../src/shared/errors/DomainError';
-import { ApplicationError, ApplicationErrorCodes } from '../../../../../src/shared/errors/ApplicationError';
-import { jest } from '@jest/globals';
-import { DocumentDTO } from '../../../../../src/application/dtos/DocumentDTO'; // Import the DTO used in output
+import { DomainError, DomainErrorCodes } from '../../../../../src/shared/errors/DomainError.js'; // .js 追加
+import { ApplicationError, ApplicationErrorCodes } from '../../../../../src/shared/errors/ApplicationError.js'; // .js 追加
+// import { jest } from '@jest/globals'; // jest インポート削除
 
 // Mocks
 // Mock for IGlobalMemoryBankRepository
-const mockGlobalMemoryBankRepository: jest.Mocked<IGlobalMemoryBankRepository> = {
-  initialize: jest.fn<() => Promise<void>>(),
-  getDocument: jest.fn<() => Promise<MemoryDocument | null>>(), // Use getDocument
-  saveDocument: jest.fn<() => Promise<void>>(),
-  deleteDocument: jest.fn<() => Promise<boolean>>(),
-  listDocuments: jest.fn<() => Promise<DocumentPath[]>>(),
-  findDocumentsByTags: jest.fn<() => Promise<MemoryDocument[]>>(),
-  updateTagsIndex: jest.fn<() => Promise<void>>(),
-  saveTagIndex: jest.fn<() => Promise<void>>(),
-  getTagIndex: jest.fn<() => Promise<any>>(), // Adjust 'any' if GlobalTagIndex type is available
-  findDocumentPathsByTagsUsingIndex: jest.fn<() => Promise<DocumentPath[]>>(),
-  validateStructure: jest.fn<() => Promise<boolean>>(),
+// jest.Mocked を削除し、手動モックの型を指定
+const mockGlobalMemoryBankRepository: IGlobalMemoryBankRepository = {
+  initialize: vi.fn(), // 型引数を削除
+  getDocument: vi.fn(), // 型引数を削除
+  saveDocument: vi.fn(), // 型引数を削除
+  deleteDocument: vi.fn(), // 型引数を削除
+  listDocuments: vi.fn(), // 型引数を削除
+  findDocumentsByTags: vi.fn(), // 型引数を削除
+  updateTagsIndex: vi.fn(), // 型引数を削除
+  saveTagIndex: vi.fn(), // 型引数を削除
+  getTagIndex: vi.fn(), // 型引数を削除
+  findDocumentPathsByTagsUsingIndex: vi.fn(), // 型引数を削除
+  validateStructure: vi.fn(), // 型引数を削除
 };
 
 // Mock validator is not needed anymore as we use MemoryDocument directly
@@ -58,7 +60,7 @@ const createMockMemoryDocument = (pathVal: string, tagsVal: string[], contentStr
         tags: props.tags,
         lastModified: props.lastModified,
         // Add other methods/properties if the use case calls them
-        toJSON: jest.fn(() => ({ // Mock toJSON as the use case likely calls it
+        toJSON: vi.fn(() => ({ // jest -> vi
              schema: 'memory_document_v2',
              metadata: {
                  id: 'mock-id-' + Math.random(), // Generate mock ID
@@ -82,7 +84,7 @@ describe('ReadGlobalDocumentUseCase', () => {
   let useCase: ReadGlobalDocumentUseCase;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks(); // jest -> vi
     // JsonDocument.setValidator(mockValidator); // Validator not needed directly here
     useCase = new ReadGlobalDocumentUseCase(mockGlobalMemoryBankRepository); // Use the correct repository mock
   });
@@ -98,7 +100,7 @@ describe('ReadGlobalDocumentUseCase', () => {
     // Mock getDocument to return the MemoryDocument
     const mockContent = JSON.stringify({ setting: true });
     const mockDoc = createMockMemoryDocument(docPathStr, ['global', 'config'], mockContent);
-    mockGlobalMemoryBankRepository.getDocument.mockResolvedValue(mockDoc);
+    (mockGlobalMemoryBankRepository.getDocument as Mock).mockResolvedValue(mockDoc); // as Mock 追加
 
     const result = await useCase.execute(input);
 
@@ -131,7 +133,7 @@ describe('ReadGlobalDocumentUseCase', () => {
     const expectedDocPath = DocumentPath.create(docPathStr);
 
     // Mock getDocument to return null
-    mockGlobalMemoryBankRepository.getDocument.mockResolvedValue(null);
+    (mockGlobalMemoryBankRepository.getDocument as Mock).mockResolvedValue(null); // as Mock 追加
     // Expect the use case to reject with a DomainError and check the code
     expect.assertions(3); // Expect three assertions in this test (instanceof, code, and getDocument call)
     try {
@@ -154,7 +156,7 @@ describe('ReadGlobalDocumentUseCase', () => {
     const repositoryError = new Error('Database connection failed');
 
     // Mock getDocument to reject with an error
-    mockGlobalMemoryBankRepository.getDocument.mockRejectedValue(repositoryError);
+    (mockGlobalMemoryBankRepository.getDocument as Mock).mockRejectedValue(repositoryError); // as Mock 追加
     // Expect the use case to reject with an ApplicationError and check the code and cause
     expect.assertions(4); // Expect four assertions in this test (instanceof, code, cause, and getDocument call)
     try {

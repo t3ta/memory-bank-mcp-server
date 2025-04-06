@@ -6,11 +6,11 @@
 import { v4 as uuidv4 } from 'uuid';
 import { BaseConverter } from './BaseConverter.js';
 import { parseMarkdownForMigration } from '../utils/MarkdownParser.js';
-import { JsonDocument } from '@/domain/entities/JsonDocument.js';
-import { DocumentPath } from '@/domain/entities/DocumentPath.js';
-import { DocumentId } from '@/domain/entities/DocumentId.js';
-import { DocumentVersionInfo } from '@/domain/entities/DocumentVersionInfo.js';
-import { Tag } from '@/domain/entities/Tag.js';
+import { JsonDocument } from '../../domain/entities/JsonDocument.js';
+import { DocumentPath } from '../../domain/entities/DocumentPath.js';
+import { DocumentId } from '../../domain/entities/DocumentId.js';
+import { DocumentVersionInfo } from '../../domain/entities/DocumentVersionInfo.js';
+import { Tag } from '../../domain/entities/Tag.js';
 import { ActiveContextContentV2 } from '@memory-bank/schemas';
 
 

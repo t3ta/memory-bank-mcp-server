@@ -1,0 +1,43 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "migrate-to-vitest-branch-context",
+    "title": "Vitestへの移行ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context",
+      "vitest",
+      "migration"
+    ],
+    "lastModified": "2025-04-06T19:15:35.497Z",
+    "createdAt": "2025-04-06T19:15:35.497Z",
+    "version": 1
+  },
+  "content": {
+    "branchName": "feature/migrate-to-vitest",
+    "purpose": "ESMプロジェクトの問題を解決するため、JestからVitestへのテスト環境移行を行う",
+    "createdAt": "2025-04-06T19:15:35.497Z",
+    "userStories": [
+      {
+        "id": "84c15a72-833d-44cf-abae-0b0eae24e22b",
+        "description": "ESMプロジェクトでのテスト実行におけるNode.js実験的フラグの使用を削減したい",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "d39d424a-2886-4839-ad99-4344f69344f9",
+        "description": "より簡単で高速なテスト環境でデベロッパー体験を向上したい",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "a39822ae-e857-413f-80ec-61ae344222ed",
+        "description": "EcmaScriptモジュール方式の採用を一貫させ、CommonJSとESMの混在による問題を解消したい",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": "Vitestは最初からESM対応が強く、Jestの互換APIも備えているため、移行の労力が最小限に抑えられる可能性が高い。ただし、Jestの特定機能に強く依存するテストコードがある場合は注意が必要。"
+  }
+}

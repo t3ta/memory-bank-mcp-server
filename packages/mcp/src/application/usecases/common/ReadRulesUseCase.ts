@@ -5,8 +5,7 @@ import { DomainError, DomainErrorCodes } from "../../../shared/errors/DomainErro
 import { logger } from "../../../shared/utils/logger.js";
 import { TemplateService } from '../../templates/TemplateService.js'; // Import TemplateService
 import { Language } from '../../../domain/i18n/Language.js'; // Import Language class from domain
-import { getSafeLanguage } from '@memory-bank/schemas';
-
+import { getSafeLanguage } from '@memory-bank/schemas'; // Use package name import
 
 export type RulesResult = {
   content: string;
@@ -39,8 +38,8 @@ constructor(
    * @param language Language code ('en', 'ja', 'zh')
    * @returns Rules content and metadata
    * @throws If language is not supported or file is not found
- */
-async execute(language: string): Promise<RulesResult> {
+  */
+ async execute(language: string): Promise<RulesResult> {
   logger.debug(`Executing ReadRulesUseCase for language: ${language}`); // Log execution start
   // Validate language code
   if (!this.supportedLanguages.includes(language)) {

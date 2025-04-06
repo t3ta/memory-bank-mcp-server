@@ -4,11 +4,11 @@ import {
   SchemaVersion,
   isKnownSchemaVersion,
   migrateDocumentToLatest,
-} from '../../src/versioning'; // Adjust path as needed
-import { jest } from '@jest/globals';
+} from '../../src/versioning.js'; // Adjust path as needed
+import { vi } from 'vitest'; // jest -> vi
 
 // Mock console.warn for migrateDocumentToLatest tests
-const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {}); // jest -> vi
 
 describe('Schema Versioning', () => {
 

@@ -1,15 +1,32 @@
+import { vi } from 'vitest'; // vi をインポート
+import type { Mock } from 'vitest'; // Mock 型をインポート
 import { CreateBranchCoreFilesUseCase } from '../../../../../src/application/usecases/common/CreateBranchCoreFilesUseCase.js';
 import { IBranchMemoryBankRepository } from '../../../../../src/domain/repositories/IBranchMemoryBankRepository.js';
 import { CoreFilesDTO } from '../../../../../src/application/dtos/CoreFilesDTO.js';
 import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo.js';
-import { mock } from 'jest-mock-extended';
+// import { mock } from 'jest-mock-extended'; // jest-mock-extended を削除
 
 describe('CreateBranchCoreFilesUseCase', () => {
   let useCase: CreateBranchCoreFilesUseCase;
-  let mockMemoryBankRepository: jest.Mocked<IBranchMemoryBankRepository>;
+  // jest.Mocked を削除し、手動モックの型を指定
+  let mockMemoryBankRepository: IBranchMemoryBankRepository;
 
   beforeEach(() => {
-    mockMemoryBankRepository = mock<IBranchMemoryBankRepository>();
+    // jest-mock-extended の代わりに vi.fn() で手動モックを作成する
+    mockMemoryBankRepository = {
+      initialize: vi.fn(),
+      exists: vi.fn(),
+      getDocument: vi.fn(),
+      saveDocument: vi.fn(),
+      deleteDocument: vi.fn(),
+      getRecentBranches: vi.fn(),
+      listDocuments: vi.fn(),
+      findDocumentsByTags: vi.fn(),
+      validateStructure: vi.fn(),
+      saveTagIndex: vi.fn(),
+      getTagIndex: vi.fn(),
+      findDocumentPathsByTagsUsingIndex: vi.fn(),
+    };
     useCase = new CreateBranchCoreFilesUseCase(mockMemoryBankRepository);
   });
 
@@ -23,7 +40,7 @@ describe('CreateBranchCoreFilesUseCase', () => {
       progress: {},      // ProgressDTO の最低限
       systemPatterns: { technicalDecisions: [{ title: 'dummy', context: 'dummy', decision: 'dummy', consequences: [] }] }
     };
-    mockMemoryBankRepository.exists.mockResolvedValue(true);
+    (mockMemoryBankRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
 
     // Act
     await useCase.execute({ branchName, files });
@@ -102,7 +119,7 @@ describe('CreateBranchCoreFilesUseCase', () => {
     // Arrange
     const branchName = 'feature/non-existent';
     const files: CoreFilesDTO = { branchContext: 'test' };
-    mockMemoryBankRepository.exists.mockResolvedValue(false); // ブランチが存在しないケース
+    (mockMemoryBankRepository.exists as Mock).mockResolvedValue(false); // as Mock 追加
 
     // Act & Assert
     try {
@@ -119,11 +136,11 @@ describe('CreateBranchCoreFilesUseCase', () => {
    it('should throw ApplicationError if repository throws error during saveDocument', async () => {
     // Arrange
     const branchName = 'feature/save-error';
-     const branchInfo = BranchInfo.create(branchName);
+     BranchInfo.create(branchName);
     const files: CoreFilesDTO = { branchContext: 'test context' }; // branchContextだけあればsaveDocumentが呼ばれる
-    mockMemoryBankRepository.exists.mockResolvedValue(true);
+    (mockMemoryBankRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
     const saveError = new Error('Failed to save');
-    mockMemoryBankRepository.saveDocument.mockRejectedValue(saveError); // saveDocumentでエラー
+    (mockMemoryBankRepository.saveDocument as Mock).mockRejectedValue(saveError); // as Mock 追加
 
     // Act & Assert
     try {
