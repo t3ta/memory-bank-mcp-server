@@ -25,15 +25,6 @@
     "skipLibCheck": true,
     "outDir": "./dist",
     // "rootDir": "./src", // テストファイルがrootDir外になるため削除
-    "baseUrl": "./",
-    "paths": {
-      "@/*": [
-        "src/*"
-      ],
-      "@memory-bank/schemas": [
-        "../schemas/src"
-      ]
-    },
     "isolatedModules": true
   },
   "include": [
