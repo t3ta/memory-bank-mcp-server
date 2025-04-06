@@ -417,15 +417,15 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
         if (tagValuesToSearch.length === 0) return [];
 
         // Initialize with the first tag
-        const firstTagEntry = tagIndex.index.find(entry => entry.tag === tagValuesToSearch[0]);
+        const firstTagEntry = tagIndex.index.find((entry: TagEntry) => entry.tag === tagValuesToSearch[0]);
         if (!firstTagEntry) return []; // If first tag not found, result is empty
-        resultPathSet = new Set(firstTagEntry.documents.map(doc => doc.path));
+        resultPathSet = new Set(firstTagEntry.documents.map((doc: DocumentReference) => doc.path));
 
         // Filter by remaining tags
         for (let i = 1; i < tagValuesToSearch.length; i++) {
           const currentTag = tagValuesToSearch[i];
-          const currentTagEntry = tagIndex.index.find(entry => entry.tag === currentTag);
-          const currentPaths = new Set(currentTagEntry ? currentTagEntry.documents.map(doc => doc.path) : []);
+          const currentTagEntry = tagIndex.index.find((entry: TagEntry) => entry.tag === currentTag);
+          const currentPaths = new Set(currentTagEntry ? currentTagEntry.documents.map((doc: DocumentReference) => doc.path) : []);
 
           // Intersect sets
           resultPathSet = new Set([...resultPathSet].filter(path => currentPaths.has(path)));
@@ -435,9 +435,9 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
       } else {
         // OR search
         for (const tagValue of tagValuesToSearch) {
-          const tagEntry = tagIndex.index.find(entry => entry.tag === tagValue);
+          const tagEntry = tagIndex.index.find((entry: TagEntry) => entry.tag === tagValue);
           if (tagEntry) {
-            tagEntry.documents.forEach(doc => resultPathSet.add(doc.path));
+            tagEntry.documents.forEach((doc: DocumentReference) => resultPathSet.add(doc.path));
           }
         }
       }

@@ -28,8 +28,8 @@
       "@memory-bank/mcp": ["packages/mcp/src"],
       "@memory-bank/mcp/*": ["packages/mcp/src/*"],
       // schemas パッケージの参照先を src から dist に変更
-      "@memory-bank/schemas": ["packages/schemas/dist"],
-      "@memory-bank/schemas/*": ["packages/schemas/dist/*"]
+      "@memory-bank/schemas": ["packages/schemas/src"],
+      "@memory-bank/schemas/*": ["packages/schemas/src/*"]
     },
   },
   "references": [

@@ -8,7 +8,7 @@ import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo.js';
 import { DocumentPath } from '../../../../../src/domain/entities/DocumentPath.js';
 import { MemoryDocument } from '../../../../../src/domain/entities/MemoryDocument.js';
 import { Tag } from '../../../../../src/domain/entities/Tag.js';
-import { BranchTagIndex, GlobalTagIndex } from '@memory-bank/schemas'; // Import index types
+import { BranchTagIndex, GlobalTagIndex, TagEntry } from '@memory-bank/schemas'; // Import index types and TagEntry
 
 describe('UpdateTagIndexUseCaseV2', () => {
   let useCase: UpdateTagIndexUseCaseV2;
@@ -94,9 +94,9 @@ describe('UpdateTagIndexUseCaseV2', () => {
         expect.objectContaining({ tag: 'tagy', documents: expect.arrayContaining([expect.objectContaining({ path: mockDoc1Path.value }), expect.objectContaining({ path: mockDoc2Path.value })]) }),
         expect.objectContaining({ tag: 'tagz', documents: expect.arrayContaining([expect.objectContaining({ path: mockDoc2Path.value })]) }),
       ]));
-      expect(savedIndex.index.find(i => i.tag === 'tagx')?.documents).toHaveLength(1);
-      expect(savedIndex.index.find(i => i.tag === 'tagy')?.documents).toHaveLength(2);
-      expect(savedIndex.index.find(i => i.tag === 'tagz')?.documents).toHaveLength(1);
+      expect(savedIndex.index.find((i: TagEntry) => i.tag === 'tagx')?.documents).toHaveLength(1);
+      expect(savedIndex.index.find((i: TagEntry) => i.tag === 'tagy')?.documents).toHaveLength(2);
+      expect(savedIndex.index.find((i: TagEntry) => i.tag === 'tagz')?.documents).toHaveLength(1);
 
 
       // Verify the output
