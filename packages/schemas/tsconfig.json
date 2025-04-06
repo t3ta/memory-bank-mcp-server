@@ -31,8 +31,7 @@
     "isolatedModules": true
   },
   "include": [
-    "src/**/*",
-    "tests/**/*" // tests ディレクトリも include に追加
+    "src/**/*"
   ],
   "exclude": [
     "node_modules",
