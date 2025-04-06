@@ -27,6 +27,10 @@ jobs:
           cache: 'yarn'
       - run: yarn install --frozen-lockfile
 
+      # Build schemas package first
+      - name: Build schemas package
+        run: yarn workspace @memory-bank/schemas build
+
       # Build the entire project using TypeScript project references
       - name: Build project
         run: yarn build
