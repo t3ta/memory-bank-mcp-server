@@ -733,69 +733,7 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
       expect(readResult.document.tags).toEqual([]); // Empty file has no tags
     });
 
-    it('should throw error when writing invalid JSON content to branchContext.json', async () => {
-      const documentPath = 'branchContext.json';
-      const invalidJson = '{"schema": "v2", "metadata": {';
-      await expect(writeUseCase.execute({
-        branchName: TEST_BRANCH,
-        document: { path: documentPath, content: invalidJson }
-      })).rejects.toThrow(/Invalid JSON content for branchContext.json/);
-    });
-
-    it('should throw error when writing JSON content missing required keys to branchContext.json', async () => {
-      const documentPath = 'branchContext.json';
-      const missingKeysJson = JSON.stringify({
-        schema: "memory_document_v2",
-        // metadata is missing
-        content: { value: "test" }
-      }, null, 2);
-      await expect(writeUseCase.execute({
-        branchName: TEST_BRANCH,
-        document: { path: documentPath, content: missingKeysJson }
-      })).rejects.toThrow(/Invalid JSON content for branchContext.json: Missing required key: metadata/);
-    });
-
-    it('should throw error when attempting to use patches on branchContext.json', async () => {
-      // ★★★ branchContext.json に書き込む内容は正しいスキーマ構造にする ★★★
-      const initialDocument = {
-        schema: "memory_document_v2",
-        metadata: {
-          id: `${BranchInfo.create(TEST_BRANCH).safeName}-context`, // IDも合わせる
-          title: "Test Branch Context",
-          documentType: "branch_context",
-          path: "branchContext.json",
-          tags: ["context"], // ★ tags を追加 ★
-          createdAt: new Date().toISOString(),
-          lastModified: new Date().toISOString(),
-          version: 1
-        },
-        content: { initial: "content" } // ★ テストの期待値に合わせる ★
-      };
-      const documentPath = 'branchContext.json';
-      const initialContentString = JSON.stringify(initialDocument, null, 2);
-
-      // 1. Create initial document with valid structure and tags
-      await writeUseCase.execute({
-        branchName: TEST_BRANCH,
-        document: {
-          path: documentPath,
-          content: initialContentString,
-          tags: initialDocument.metadata.tags // ★ tags を渡す ★
-        }
-      });
-
-      // ★★★ デバッグコードは削除 ★★★
-
-      // 2. Attempt to update using patches (should fail with specific error)
-      const patches = [{ op: 'replace', path: '/content/initial', value: 'patched' }]; // ★ path も修正 ★
-      await expect(writeUseCase.execute({
-        branchName: TEST_BRANCH,
-        // content は省略し、as any でキャスト
-        document: { path: 'branchContext.json', tags: ["context", "patched"] } as any, // ★★★ tags も渡すように修正 ★★★
-        patches: patches
-      // ★★★ 期待するエラーを ApplicationErrors.invalidInput のメッセージ文字列に変更 ★★★
-      })).rejects.toThrow('Patch operations are currently not allowed for branchContext.json');
-    });
+    // --- Tests related to branchContext.json special validation removed as per user request ---
     // [削除] Issue #75 用のテストケースは新しい仕様で不要になったため削除
 
     // [追加] content も patches も指定しない場合にエラーになるテスト
@@ -851,12 +789,12 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
 
         // Verify using the detected branch name
         const readResult = await readUseCase.execute({ branchName: TEST_BRANCH, path: documentPath });
-        // --- みらい：content をパースして中身を比較 ---
+
         const readContentParsed = JSON.parse(readResult?.document?.content ?? '{}');
         const expectedContentParsed = JSON.parse(contentString);
         expect(readContentParsed.schema).toBe(expectedContentParsed.schema);
         expect(readContentParsed.content).toEqual(expectedContentParsed.content); // content はオブジェクトなので toEqual
-        // --- みらい：ここまで ---
+
         expect(readResult?.document?.tags).toEqual(["auto"]); // タグのチェックはそのまま
       });
 

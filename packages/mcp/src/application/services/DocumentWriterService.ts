@@ -12,7 +12,7 @@ import type { IDocumentRepository } from '../../domain/repositories/IDocumentRep
  */
 export interface DocumentWriterInput {
   path: DocumentPath;
-  content?: string; // Full content (exclusive with patches)
+  content?: Record<string, unknown> | string;
   patches?: any[]; // JSON Patch operations (exclusive with content)
   tags?: Tag[]; // Tags to associate (optional, repository handles indexing)
 }
@@ -144,16 +144,36 @@ export class DocumentWriterService {
     // 4. Handle Content Update/Creation
     else if (hasContent) {
       this.componentLogger.debug('Processing write request with content.', { path: input.path.value });
-      const contentToWrite = input.content ?? ''; // Use empty string if content is null/undefined (shouldn't happen due to validation, but safe)
+      const contentInput = input.content ?? ''; // Use empty string if content is null/undefined
       const tagsToApply = input.tags ?? []; // Use provided tags or empty array
 
+      // Convert content to string if it's an object
+      let contentToSaveAsString: string;
+      if (typeof contentInput === 'string') {
+        contentToSaveAsString = contentInput;
+        // Optional: Validate if it's valid JSON string?
+        try {
+          JSON.parse(contentToSaveAsString);
+        } catch (e) {
+          this.componentLogger.warn(`Content provided as string is not valid JSON: ${input.path.value}`);
+          // Decide if we should throw or allow non-JSON strings
+          // For now, let's allow it, but log a warning.
+        }
+      } else if (typeof contentInput === 'object' && contentInput !== null) {
+        contentToSaveAsString = JSON.stringify(contentInput, null, 2); // Pretty print JSON
+      } else {
+        // Should not happen due to earlier checks, but defensively handle
+         throw ApplicationErrors.invalidInput(`Invalid content type: ${typeof contentInput}`);
+      }
+
+
       if (existingDocument) {
-        documentToSave = existingDocument.updateContent(contentToWrite);
+        documentToSave = existingDocument.updateContent(contentToSaveAsString);
         documentToSave = documentToSave.updateTags(tagsToApply); // Always update tags based on input
       } else {
         documentToSave = MemoryDocument.create({
           path: input.path,
-          content: contentToWrite,
+          content: contentToSaveAsString,
           tags: tagsToApply,
           lastModified: new Date(),
         });

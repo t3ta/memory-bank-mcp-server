@@ -58,7 +58,7 @@ export class BranchController {
   async writeDocument(params: {
     branchName?: string;
     path: string;
-    content?: string; // Explicitly define content as string
+    content?: Record<string, unknown> | string; // Allow object or string
     tags?: string[];
     patches?: any[]; // Add patches parameter
   }) {
