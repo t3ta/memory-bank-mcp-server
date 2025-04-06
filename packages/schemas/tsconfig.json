@@ -9,10 +9,6 @@
     "sourceMap": true,
     "outDir": "./dist",
     // "rootDir": "./src", // rootDir を削除
-    "baseUrl": "./", // baseUrl を追加
-    "paths": { // paths を追加
-      "@/*": ["src/*"]
-    },
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
