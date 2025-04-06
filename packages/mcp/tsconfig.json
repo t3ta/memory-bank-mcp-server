@@ -3,7 +3,7 @@
     "composite": true,
     "target": "ES2022",
     "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "bundler", // Issue #218 を参考に bundler に変更
     "esModuleInterop": true,
     "sourceMap": true,
     "declaration": true,
@@ -37,13 +37,14 @@
     "isolatedModules": true
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "tests/**/*" // testsディレクトリもコンパイル対象に追加
   ],
   "exclude": [
     "node_modules",
     "**/*.test.ts",
-    "dist",
-    "tests"
+    "dist"
+    // "tests" // testsディレクトリを除外対象から削除
   ],
   "references": [
     {
