@@ -9,6 +9,10 @@
     "sourceMap": true,
     "outDir": "./dist",
     // "rootDir": "./src", // rootDir を削除
+    "baseUrl": "./", // baseUrl を復活
+    "paths": { // paths を復活
+      "@/*": ["src/*"]
+    },
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,

@@ -23,6 +23,13 @@
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "resolveJsonModule": true,
+    "baseUrl": ".", // baseUrl を復活
+    "paths": { // paths を復活
+      "@memory-bank/mcp": ["packages/mcp/src"],
+      "@memory-bank/mcp/*": ["packages/mcp/src/*"],
+      "@memory-bank/schemas": ["packages/schemas/src"],
+      "@memory-bank/schemas/*": ["packages/schemas/src/*"]
+    },
   },
   "references": [
     { "path": "./packages/mcp" },
