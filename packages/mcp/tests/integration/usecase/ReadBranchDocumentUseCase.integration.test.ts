@@ -285,8 +285,14 @@ describe('ReadBranchDocumentUseCase Integration Tests', () => {
         await loadBranchFixture(path.join(testEnv.branchMemoryPath, safeBranchName), 'basic');
 
         // 実行＆検証：branchName を省略するとエラーになることを確認
-        await expect(useCase.execute({ path: 'branchContext.json' }))
-          .rejects.toThrow(ApplicationErrors.invalidInput('Branch name is required when not running in project mode.'));
+        try {
+          await useCase.execute({ path: 'branchContext.json' });
+          throw new Error('Expected ApplicationError but no error was thrown.');
+        } catch (error) {
+          expect(error).toBeInstanceOf(ApplicationError);
+          expect((error as ApplicationError).code).toBe(ApplicationErrors.invalidInput('Branch name is required when not running in project mode.').code); // Compare code
+          expect((error as ApplicationError).message).toBe('Branch name is required when not running in project mode.'); // Compare message
+        }
 
         // 検証：GitService は呼ばれないはず
         expect(mockGitService.getCurrentBranchName).not.toHaveBeenCalled();
