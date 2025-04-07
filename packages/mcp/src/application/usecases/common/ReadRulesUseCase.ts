@@ -6,7 +6,6 @@ import { logger } from "../../../shared/utils/logger.js";
 import { TemplateService } from '../../templates/TemplateService.js'; // Import TemplateService
 import { Language } from '../../../domain/i18n/Language.js'; // Import Language class from domain
 import { getSafeLanguage } from '@memory-bank/schemas'; // Use package name import
-
 export type RulesResult = {
   content: string;
   language: string;
@@ -40,7 +39,7 @@ constructor(
    * @throws If language is not supported or file is not found
   */
  async execute(language: string): Promise<RulesResult> {
-  logger.debug(`Executing ReadRulesUseCase for language: ${language}`); // Log execution start
+   logger.debug(`Executing ReadRulesUseCase for language: ${language}`); // Log execution start
   // Validate language code
   if (!this.supportedLanguages.includes(language)) {
       throw new DomainError(
@@ -58,6 +57,7 @@ constructor(
     let jsonFilePath = ''; // Declare jsonFilePath here
 
     try {
+
       // Use template loader if provided
       if (this.templateLoader) {
         try {
@@ -68,28 +68,25 @@ constructor(
 
           const langObject = new Language(safeLanguageCode); // Instantiate Language class
 
-          const templateContent = await this.templateLoader.getTemplateAsMarkdown(
+          const templateJsonObject = await this.templateLoader.getTemplateAsJsonObject(
             'rules',
             langObject // Pass Language object
           );
 
-          // Template loader returns Markdown content, use it directly
-          // const jsonData = JSON.parse(templateContent); // Removed JSON parsing
-          // const content = JSON.stringify(jsonData, null, 2); // Removed stringify
+          const content = JSON.stringify(templateJsonObject, null, 2);
 
           return {
-            content: templateContent, // Use Markdown content directly
+            content: content,
             language
           };
         } catch (templateError) {
-          logger.warn(`Failed to load rules using template loader: ${templateError instanceof Error ? templateError.message : 'Unknown error'}`);
-          logger.debug('Falling back to direct file loading');
+          logger.warn(`Failed to load rules using template loader: ${templateError instanceof Error ? templateError.message : 'Unknown error'}`); // Keep warning
+          // logger.debug('Falling back to direct file loading'); // Remove debug log
           // Fallback to direct file loading if template loader fails
         }
       }
 
-      // Load JSON file directly (fallback or primary method)
-      // Find the existing path and read content using standard fs.readFile
+      // Load JSON file directly (fallback or primary method) - This fallback might still be needed if template service fails catastrophically
       for (const p of possiblePaths) {
         const absolutePath = path.resolve(p); // Resolve to absolute path
         logger.debug(`[ReadRules] Attempting path: ${absolutePath}`);
@@ -121,10 +118,10 @@ constructor(
         throw new Error(`Rules file not found for language: ${language}`);
       }
 
-      // Parse the content after reading
+      // Parse the content after reading (fallback path)
       const jsonData = JSON.parse(jsonContent);
 
-      // No need to convert JSON to Markdown, return JSON string directly
+      // Return JSON string directly (fallback path)
       // (Markdown support was removed)
       const content = JSON.stringify(jsonData, null, 2);
 

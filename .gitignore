@@ -59,3 +59,4 @@ docs/global-memory-bank/tags/index.json
 .github/PR.md
 
 .turbo/
+.ts-morph-cache/

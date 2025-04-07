@@ -108,7 +108,6 @@ this.container = await setupContainer(this.options);
         }
 
         const method = message.method;
-        const params = message.params || {}; // Ensure params exist
 
         if (method === 'initialize') { // Handle initialize method
            // Respond with basic server info (can be expanded later)
@@ -126,8 +125,9 @@ this.container = await setupContainer(this.options);
              };
         } else if (method === 'read_context' && this.contextController) {
            logger.debug(`Routing to contextController.${method}`);
-           // TODO: Implement actual controller call
-           response = { jsonrpc: '2.0', id: message.id, error: { code: -32601, message: `Method not implemented yet: ${method}` } };
+           const params = message.params || {};
+           const controllerResult = await this.contextController.readContext(params);
+           response = { jsonrpc: '2.0', id: message.id, result: controllerResult }; // Return the controller result directly
         } else if (method.startsWith('read_global') && this.globalController) {
            logger.debug(`Routing to globalController.${method}`);
            // TODO: Implement actual controller call

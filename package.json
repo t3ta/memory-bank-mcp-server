@@ -36,7 +36,8 @@
     "test:integration": "yarn workspace @memory-bank/mcp test:integration",
     "prepublishOnly": "yarn build",
     "check:deps": "depcheck",
-    "release": "semantic-release"
+    "release": "semantic-release",
+    "inspect": "npx @modelcontextprotocol/inspector node ./packages/mcp/dist/server.js --docs ./docs --project"
   },
   "keywords": [
     "mcp",

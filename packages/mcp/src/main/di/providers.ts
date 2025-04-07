@@ -261,8 +261,8 @@ export async function registerApplicationServices(container: DIContainer): Promi
     const configProvider = await container.get<IConfigProvider>('configProvider'); // Get configProvider within the factory scope
     const config = configProvider.getConfig();
     const rulesDir = config.docsRoot; // Keep fallback path for now
-    const templateLoader = await container.get<TemplateService>('templateService'); // Get TemplateService
-    return new ReadRulesUseCase(rulesDir, templateLoader); // Pass templateLoader
+    const templateLoader = await container.get<TemplateService>('templateService'); // Get TemplateService ★コメント解除★
+    return new ReadRulesUseCase(rulesDir, templateLoader); // Pass templateLoader ★引数に追加★
   });
 
   container.registerFactory('readContextUseCase', async () => {
