@@ -15,13 +15,13 @@
     "memory-bank-mcp-server": "./dist/server.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -p tsconfig.json",
     "clean": "rm -rf dist",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "start": "node dist/index.js",
     "test:unit": "vitest run",
     "test:integration": "vitest run -c tests/integration/vitest.config.ts",
-    "test:e2e": "NODE_OPTIONS='--experimental-vm-modules --no-warnings' vitest run --config tests/e2e/vitest.config.ts",
+    "test:e2e": "LOG_LEVEL=debug NODE_OPTIONS='--experimental-vm-modules --no-warnings' vitest run --config tests/e2e/vitest.config.ts",
     "test": "yarn test:unit && yarn test:integration && yarn test:e2e",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",

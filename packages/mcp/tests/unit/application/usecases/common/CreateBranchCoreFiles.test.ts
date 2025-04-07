@@ -6,7 +6,7 @@ import { CoreFilesDTO } from '../../../../../src/application/dtos/CoreFilesDTO.j
 import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo.js';
 // import { mock } from 'jest-mock-extended'; // jest-mock-extended を削除
 
-describe('CreateBranchCoreFilesUseCase', () => {
+describe('CreateBranchCoreFilesUseCase Unit Tests', () => {
   let useCase: CreateBranchCoreFilesUseCase;
   // jest.Mocked を削除し、手動モックの型を指定
   let mockMemoryBankRepository: IBranchMemoryBankRepository;
@@ -30,24 +30,23 @@ describe('CreateBranchCoreFilesUseCase', () => {
     useCase = new CreateBranchCoreFilesUseCase(mockMemoryBankRepository);
   });
 
-  it('should call branchRepository.saveDocument 4 times when creating core files for a new branch', async () => {
+  it('should call branchRepository.saveDocument 4 times when creating core files', async () => {
     // Arrange
     const branchName = 'feature/new-branch';
     const branchInfo = BranchInfo.create(branchName);
-    const files: CoreFilesDTO = { // CoreFilesDTO の最低限のモック
+    const files: CoreFilesDTO = {
       branchContext: 'test branch context',
-      activeContext: {}, // ActiveContextDTO の最低限
-      progress: {},      // ProgressDTO の最低限
+      activeContext: {},
+      progress: {},
       systemPatterns: { technicalDecisions: [{ title: 'dummy', context: 'dummy', decision: 'dummy', consequences: [] }] }
     };
-    (mockMemoryBankRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
+    (mockMemoryBankRepository.exists as Mock).mockResolvedValue(true);
 
     // Act
     await useCase.execute({ branchName, files });
 
     // Assert
-    // expect(mockMemoryBankRepository.saveDocument).toHaveBeenCalledTimes(4); // 回数チェックをやめて個別チェックにする
-    // 各ファイルが正しい引数で保存されようとしたかチェック
+    // Check that each core file was attempted to be saved with the correct arguments
     expect(mockMemoryBankRepository.saveDocument).toHaveBeenCalledWith(
       branchInfo,
       expect.objectContaining({
@@ -60,7 +59,7 @@ describe('CreateBranchCoreFilesUseCase', () => {
       branchInfo,
       expect.objectContaining({
         path: expect.objectContaining({ value: 'activeContext.json' }),
-        content: expect.any(String), // 中身は生成されるので型だけチェック
+        content: expect.any(String), // Content is generated, so just check the type
         tags: expect.arrayContaining([expect.objectContaining({ value: 'core' }), expect.objectContaining({ value: 'active-context' })])
       })
     );
@@ -68,7 +67,7 @@ describe('CreateBranchCoreFilesUseCase', () => {
       branchInfo,
       expect.objectContaining({
         path: expect.objectContaining({ value: 'progress.json' }),
-        content: expect.any(String), // 中身は生成されるので型だけチェック
+        content: expect.any(String), // Content is generated, so just check the type
         tags: expect.arrayContaining([expect.objectContaining({ value: 'core' }), expect.objectContaining({ value: 'progress' })])
       })
     );
@@ -76,7 +75,7 @@ describe('CreateBranchCoreFilesUseCase', () => {
       branchInfo,
       expect.objectContaining({
         path: expect.objectContaining({ value: 'systemPatterns.json' }),
-        content: expect.any(String), // 中身は生成されるので型だけチェック
+        content: expect.any(String), // Content is generated, so just check the type
         tags: expect.arrayContaining([expect.objectContaining({ value: 'core' }), expect.objectContaining({ value: 'system-patterns' })])
       })
     );
@@ -84,7 +83,7 @@ describe('CreateBranchCoreFilesUseCase', () => {
 
   it('should throw ApplicationError if branchName is missing', async () => {
     // Arrange
-    const files: CoreFilesDTO = { branchContext: 'test' }; // filesは何か必要
+    const files: CoreFilesDTO = { branchContext: 'test' }; // files is required
 
     // Act & Assert
     try {
@@ -92,7 +91,7 @@ describe('CreateBranchCoreFilesUseCase', () => {
       throw new Error('Expected ApplicationError to be thrown');
     } catch (error) {
       expect(error).toBeInstanceOf(Error);
-      expect(error).toHaveProperty('code', 'APP_ERROR.INVALID_INPUT'); // プレフィックス付きで比較
+      expect(error).toHaveProperty('code', 'APP_ERROR.INVALID_INPUT');
       expect((error as Error).message).toBe('Branch name is required');
     }
     expect(mockMemoryBankRepository.saveDocument).not.toHaveBeenCalled();
@@ -109,7 +108,7 @@ describe('CreateBranchCoreFilesUseCase', () => {
       throw new Error('Expected ApplicationError to be thrown');
     } catch (error) {
        expect(error).toBeInstanceOf(Error);
-       expect(error).toHaveProperty('code', 'APP_ERROR.INVALID_INPUT'); // プレフィックス付きで比較
+       expect(error).toHaveProperty('code', 'APP_ERROR.INVALID_INPUT');
        expect((error as Error).message).toBe('Core files data is required');
     }
      expect(mockMemoryBankRepository.saveDocument).not.toHaveBeenCalled();
@@ -119,7 +118,7 @@ describe('CreateBranchCoreFilesUseCase', () => {
     // Arrange
     const branchName = 'feature/non-existent';
     const files: CoreFilesDTO = { branchContext: 'test' };
-    (mockMemoryBankRepository.exists as Mock).mockResolvedValue(false); // as Mock 追加
+    (mockMemoryBankRepository.exists as Mock).mockResolvedValue(false);
 
     // Act & Assert
     try {
@@ -127,7 +126,7 @@ describe('CreateBranchCoreFilesUseCase', () => {
       throw new Error('Expected DomainError to be thrown');
     } catch (error) {
         expect(error).toBeInstanceOf(Error);
-        expect(error).toHaveProperty('code', 'DOMAIN_ERROR.BRANCH_NOT_FOUND'); // プレフィックス付きで比較
+        expect(error).toHaveProperty('code', 'DOMAIN_ERROR.BRANCH_NOT_FOUND');
         expect((error as Error).message).toBe(`Branch "${branchName}" not found`);
     }
      expect(mockMemoryBankRepository.saveDocument).not.toHaveBeenCalled();
@@ -137,10 +136,10 @@ describe('CreateBranchCoreFilesUseCase', () => {
     // Arrange
     const branchName = 'feature/save-error';
      BranchInfo.create(branchName);
-    const files: CoreFilesDTO = { branchContext: 'test context' }; // branchContextだけあればsaveDocumentが呼ばれる
-    (mockMemoryBankRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
+    const files: CoreFilesDTO = { branchContext: 'test context' }; // Only branchContext is needed for saveDocument to be called
+    (mockMemoryBankRepository.exists as Mock).mockResolvedValue(true);
     const saveError = new Error('Failed to save');
-    (mockMemoryBankRepository.saveDocument as Mock).mockRejectedValue(saveError); // as Mock 追加
+    (mockMemoryBankRepository.saveDocument as Mock).mockRejectedValue(saveError);
 
     // Act & Assert
     try {
@@ -148,10 +147,10 @@ describe('CreateBranchCoreFilesUseCase', () => {
       throw new Error('Expected ApplicationError to be thrown');
     } catch (error) {
         expect(error).toBeInstanceOf(Error);
-        expect(error).toHaveProperty('code', 'APP_ERROR.USE_CASE_EXECUTION_FAILED'); // プレフィックス付きで比較
+        expect(error).toHaveProperty('code', 'APP_ERROR.USE_CASE_EXECUTION_FAILED');
         expect((error as Error).message).toContain('Failed to create/update core files: Failed to save');
-        // originalError のチェックも追加した方がより確実だけど、一旦省略
+        // Checking originalError might be more robust, but omitted for now
     }
-     expect(mockMemoryBankRepository.saveDocument).toHaveBeenCalledTimes(1); // 1回は呼ばれるはず
+     expect(mockMemoryBankRepository.saveDocument).toHaveBeenCalledTimes(1); // Should be called once
   });
 });

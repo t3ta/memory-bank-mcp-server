@@ -80,7 +80,7 @@ const createMockMemoryDocument = (pathVal: string, tagsVal: string[], contentStr
 };
 
 
-describe('ReadGlobalDocumentUseCase', () => {
+describe('ReadGlobalDocumentUseCase Unit Tests', () => {
   let useCase: ReadGlobalDocumentUseCase;
 
   beforeEach(() => {
@@ -100,7 +100,7 @@ describe('ReadGlobalDocumentUseCase', () => {
     // Mock getDocument to return the MemoryDocument
     const mockContent = JSON.stringify({ setting: true });
     const mockDoc = createMockMemoryDocument(docPathStr, ['global', 'config'], mockContent);
-    (mockGlobalMemoryBankRepository.getDocument as Mock).mockResolvedValue(mockDoc); // as Mock 追加
+    (mockGlobalMemoryBankRepository.getDocument as Mock).mockResolvedValue(mockDoc);
 
     const result = await useCase.execute(input);
 
@@ -133,7 +133,7 @@ describe('ReadGlobalDocumentUseCase', () => {
     const expectedDocPath = DocumentPath.create(docPathStr);
 
     // Mock getDocument to return null
-    (mockGlobalMemoryBankRepository.getDocument as Mock).mockResolvedValue(null); // as Mock 追加
+    (mockGlobalMemoryBankRepository.getDocument as Mock).mockResolvedValue(null);
     // Expect the use case to reject with a DomainError and check the code
     expect.assertions(3); // Expect three assertions in this test (instanceof, code, and getDocument call)
     try {
@@ -156,7 +156,7 @@ describe('ReadGlobalDocumentUseCase', () => {
     const repositoryError = new Error('Database connection failed');
 
     // Mock getDocument to reject with an error
-    (mockGlobalMemoryBankRepository.getDocument as Mock).mockRejectedValue(repositoryError); // as Mock 追加
+    (mockGlobalMemoryBankRepository.getDocument as Mock).mockRejectedValue(repositoryError);
     // Expect the use case to reject with an ApplicationError and check the code and cause
     expect.assertions(4); // Expect four assertions in this test (instanceof, code, cause, and getDocument call)
     try {
@@ -172,4 +172,4 @@ describe('ReadGlobalDocumentUseCase', () => {
 
   // TODO: Add test cases for:
   // - Input validation (missing path)
-}); // Correct closing bracket for describe block
+});

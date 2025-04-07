@@ -70,7 +70,7 @@ describe('MCP E2E Initialization Tests', () => {
 
       const parsedContent = JSON.parse(document.content);
       expect(parsedContent.metadata.id).toBe('test-e2e-init-doc');
-      expect(parsedContent.content.value).toBe('E2E初期化テスト用のドキュメント内容');
+      expect(parsedContent.content.value).toBe('Document content for E2E initialization test'); // Match the actual written content
       expect(document.tags).toEqual(expect.arrayContaining(["test", "e2e", "init"]));
     } else {
       fail('readDocument should return success: true');

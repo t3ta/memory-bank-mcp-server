@@ -1,29 +1,29 @@
 import { DocumentPath } from '../../../../src/domain/entities/DocumentPath.js'; // .js 追加
 import { DomainError, DomainErrorCodes } from '../../../../src/shared/errors/DomainError.js'; // .js 追加
 
-describe('DocumentPath', () => {
+describe('DocumentPath Unit Tests', () => {
   describe('create', () => {
-    it('有効なパス文字列でインスタンスを作成できること', () => {
+    it('should create an instance with a valid path string', () => {
       const validPath = 'core/document.json';
       const docPath = DocumentPath.create(validPath);
       expect(docPath).toBeInstanceOf(DocumentPath);
       expect(docPath.value).toBe(validPath);
     });
 
-    it('空のパス文字列でエラーが発生すること', () => {
-      // エラーオブジェクト全体ではなく、code と message で比較
+    it('should throw an error for an empty path string', () => {
+      // Compare code and message instead of the whole error object
       const expectedError = new DomainError(DomainErrorCodes.INVALID_DOCUMENT_PATH, 'Document path cannot be empty');
       expect(() => DocumentPath.create('')).toThrow(
           expect.objectContaining({ code: expectedError.code, message: expectedError.message })
       );
     });
 
-    // 無効文字チェックのテストを有効化し、実際のエラーメッセージに合わせる
-    it('無効な文字 (*, ?, <, >, |, :) を含むパス文字列でエラーが発生すること', () => {
+    // Enable invalid character check test and match the actual error message
+    it('should throw an error for path strings containing invalid characters (*, ?, <, >, |, :)', () => {
       const invalidChars = ['*', '?', '<', '>', '|', ':'];
       for (const char of invalidChars) {
         const invalidPath = `core/docu${char}ment.json`;
-        // エラーオブジェクト全体ではなく、code と message で比較
+        // Compare code and message instead of the whole error object
         const expectedError = new DomainError(
             DomainErrorCodes.INVALID_DOCUMENT_PATH,
             'Document path contains invalid characters (<, >, :, ", |, ?, *)'
@@ -32,8 +32,8 @@ describe('DocumentPath', () => {
             expect.objectContaining({ code: expectedError.code, message: expectedError.message })
         );
       }
-      // ダブルクォーテーション " もチェック
-       // エラーオブジェクト全体ではなく、code と message で比較
+      // Also check for double quotes "
+       // Compare code and message instead of the whole error object
        const expectedErrorDoubleQuote = new DomainError(
            DomainErrorCodes.INVALID_DOCUMENT_PATH,
            'Document path contains invalid characters (<, >, :, ", |, ?, *)'
@@ -43,9 +43,9 @@ describe('DocumentPath', () => {
        );
     });
 
-     // パス区切り文字チェックのテストを有効化し、実際のエラーメッセージに合わせる
-     it('バックスラッシュを含むパス文字列でエラーが発生すること', () => {
-      const invalidPath = 'core\\document.json'; // Windows style separator
+     // Enable path separator check test and match the actual error message
+     it('should throw an error for path strings containing backslashes', () => {
+      const invalidPath = 'core\\document.json';
        // エラーオブジェクト全体ではなく、code と message で比較
        const expectedErrorBackslash = new DomainError(
            DomainErrorCodes.INVALID_DOCUMENT_PATH,
@@ -56,19 +56,19 @@ describe('DocumentPath', () => {
        );
      });
 
-     it('先頭がスラッシュの場合にエラーが発生すること', () => {
+     it('should throw an error if the path starts with a slash', () => {
        const invalidPath = '/core/document.json';
-       // エラーオブジェクト全体ではなく、code と message で比較
+       // Compare code and message instead of the whole error object
        const expectedErrorAbsolute = new DomainError(DomainErrorCodes.INVALID_DOCUMENT_PATH, 'Document path cannot be absolute');
        expect(() => DocumentPath.create(invalidPath)).toThrow(
            expect.objectContaining({ code: expectedErrorAbsolute.code, message: expectedErrorAbsolute.message })
        );
      });
 
-     // 末尾スラッシュチェックのテストを有効化し、実際のエラーメッセージに合わせる
-     it('末尾がスラッシュの場合にエラーが発生すること', () => {
+     // Enable trailing slash check test and match the actual error message
+     it('should throw an error if the path ends with a slash', () => {
        const invalidPath = 'core/document.json/';
-       // エラーオブジェクト全体ではなく、code と message で比較
+       // Compare code and message instead of the whole error object
        const expectedErrorTrailingSlash = new DomainError(
            DomainErrorCodes.INVALID_DOCUMENT_PATH,
            'Document path cannot end with a slash'
@@ -83,28 +83,28 @@ describe('DocumentPath', () => {
     const path = 'dir1/dir2/file.ext';
     const docPath = DocumentPath.create(path);
 
-    it('directory プロパティが正しいディレクトリ名を返すこと', () => {
+    it('should return the correct directory name for the directory property', () => {
       expect(docPath.directory).toBe('dir1/dir2');
     });
 
-    it('filename プロパティが正しいファイル名を返すこと', () => {
+    it('should return the correct filename for the filename property', () => {
       expect(docPath.filename).toBe('file.ext');
     });
 
-    it('extension プロパティが正しい拡張子を返すこと', () => {
-      expect(docPath.extension).toBe('ext'); // ピリオドなしの拡張子を期待
+    it('should return the correct extension for the extension property', () => {
+      expect(docPath.extension).toBe('ext'); // Expect extension without the dot
     });
 
-    it('basename プロパティが正しいベース名を返すこと', () => {
+    it('should return the correct basename for the basename property', () => {
       expect(docPath.basename).toBe('file');
     });
 
-     it('ディレクトリがない場合に directory が空文字列を返すこと', () => {
+     it('should return an empty string for directory when there is no directory', () => {
        const rootPath = DocumentPath.create('file.ext');
        expect(rootPath.directory).toBe('');
      });
 
-     it('拡張子がない場合に extension が空文字列を返すこと', () => {
+     it('should return an empty string for extension when there is no extension', () => {
        const noExtPath = DocumentPath.create('dir/file');
        expect(noExtPath.extension).toBe('');
        expect(noExtPath.basename).toBe('file');
@@ -112,7 +112,7 @@ describe('DocumentPath', () => {
   });
 
   describe('inferDocumentType', () => {
-    it('ファイル名に基づいて正しいドキュメントタイプを推測すること', () => {
+    it('should infer the correct document type based on the filename', () => {
       expect(DocumentPath.create('branchContext.json').inferDocumentType()).toBe('branch_context');
       expect(DocumentPath.create('feature/branch-context.json').inferDocumentType()).toBe('branch_context');
       expect(DocumentPath.create('activeContext.json').inferDocumentType()).toBe('active_context');
@@ -122,11 +122,11 @@ describe('DocumentPath', () => {
       expect(DocumentPath.create('systemPatterns.json').inferDocumentType()).toBe('system_patterns');
       expect(DocumentPath.create('design/system-patterns-v2.json').inferDocumentType()).toBe('system_patterns');
       expect(DocumentPath.create('generic-doc.json').inferDocumentType()).toBe('generic');
-      expect(DocumentPath.create('other/file.txt').inferDocumentType()).toBe('generic'); // JSON以外もgeneric
+      expect(DocumentPath.create('other/file.txt').inferDocumentType()).toBe('generic');
       expect(DocumentPath.create('no-extension').inferDocumentType()).toBe('generic');
     });
 
-    it('大文字小文字を区別せずに推測すること', () => {
+    it('should infer type case-insensitively', () => {
       expect(DocumentPath.create('BRANCHCONTEXT.JSON').inferDocumentType()).toBe('branch_context');
       expect(DocumentPath.create('Active-Context.json').inferDocumentType()).toBe('active_context');
     });
@@ -135,29 +135,29 @@ describe('DocumentPath', () => {
   describe('withExtension', () => {
     const docPath = DocumentPath.create('dir/file.txt');
 
-    it('指定された拡張子で新しい DocumentPath インスタンスを作成すること', () => {
+    it('should create a new DocumentPath instance with the specified extension', () => {
       const newPath = docPath.withExtension('json');
       expect(newPath).toBeInstanceOf(DocumentPath);
       expect(newPath.value).toBe('dir/file.json');
       expect(newPath.extension).toBe('json');
-      expect(newPath).not.toBe(docPath); // Should be a new instance
+      expect(newPath).not.toBe(docPath);
     });
 
-    it('拡張子がないパスでも正しく動作すること', () => {
+    it('should work correctly for paths without an extension', () => {
       const noExtPath = DocumentPath.create('dir/anotherfile');
       const newPath = noExtPath.withExtension('md');
       expect(newPath.value).toBe('dir/anotherfile.md');
       expect(newPath.extension).toBe('md');
     });
 
-     it('ルートレベルのパスでも正しく動作すること', () => {
+     it('should work correctly for root-level paths', () => {
       const rootPath = DocumentPath.create('rootfile.log');
       const newPath = rootPath.withExtension('txt');
       expect(newPath.value).toBe('rootfile.txt');
       expect(newPath.extension).toBe('txt');
     });
 
-    it('空の拡張子を指定するとエラーが発生すること', () => {
+    it('should throw an error if an empty extension is provided', () => {
       // エラーオブジェクト全体ではなく、code と message で比較
       const expectedErrorEmptyExt = new DomainError(DomainErrorCodes.INVALID_DOCUMENT_PATH, 'Extension cannot be empty');
       expect(() => docPath.withExtension('')).toThrow(
@@ -165,24 +165,24 @@ describe('DocumentPath', () => {
       );
     });
 
-     it('拡張子にドットが含まれていてもそのまま使用されること', () => {
-       // This might be unexpected, but based on current implementation, it seems dots are allowed.
+     it('should use the extension as is, even if it contains dots', () => {
+       // Based on current implementation, it seems dots are allowed.
        const newPath = docPath.withExtension('tar.gz');
        expect(newPath.value).toBe('dir/file.tar.gz');
-       expect(newPath.extension).toBe('gz'); // extension getter returns only the part after the last dot
+       expect(newPath.extension).toBe('gz'); // extension getter returns only the part after the last dot.
      });
   });
 
   describe('toAlternateFormat', () => {
-    it('.md パスを .json パスに変換すること', () => {
+    it('should convert .md path to .json path', () => {
       const mdPath = DocumentPath.create('docs/guide.md');
       const jsonPath = mdPath.toAlternateFormat();
       expect(jsonPath).toBeInstanceOf(DocumentPath);
       expect(jsonPath.value).toBe('docs/guide.json');
-      expect(jsonPath).not.toBe(mdPath); // Should be a new instance
+      expect(jsonPath).not.toBe(mdPath);
     });
 
-    it('.json パスを .md パスに変換すること', () => {
+    it('should convert .json path to .md path', () => {
       const jsonPath = DocumentPath.create('data/config.json');
       const mdPath = jsonPath.toAlternateFormat();
       expect(mdPath).toBeInstanceOf(DocumentPath);
@@ -190,7 +190,7 @@ describe('DocumentPath', () => {
       expect(mdPath).not.toBe(jsonPath);
     });
 
-    it('大文字の拡張子でも正しく変換すること', () => {
+    it('should convert correctly regardless of extension case', () => {
       const mdPathUpper = DocumentPath.create('README.MD');
       const jsonPath = mdPathUpper.toAlternateFormat();
       expect(jsonPath.value).toBe('README.json');
@@ -200,7 +200,7 @@ describe('DocumentPath', () => {
       expect(mdPath.value).toBe('SETTINGS.md');
     });
 
-    it('.md または .json 以外の拡張子の場合は同じパスを返すこと', () => {
+    it('should return the same path for extensions other than .md or .json', () => {
       const txtPath = DocumentPath.create('notes.txt');
       const altPath = txtPath.toAlternateFormat();
       expect(altPath).toBeInstanceOf(DocumentPath);
@@ -209,7 +209,7 @@ describe('DocumentPath', () => {
       expect(altPath).not.toBe(txtPath);
     });
 
-     it('拡張子がない場合は同じパスを返すこと', () => {
+     it('should return the same path if there is no extension', () => {
       const noExtPath = DocumentPath.create('dir/file');
       const altPath = noExtPath.toAlternateFormat();
       expect(altPath).toBeInstanceOf(DocumentPath);
@@ -218,34 +218,33 @@ describe('DocumentPath', () => {
     });
   });
 
-  // Add tests for equals and clone
   describe('equals', () => {
     const path1 = DocumentPath.create('a/b/c.txt');
     const path2 = DocumentPath.create('a/b/c.txt');
     const path3 = DocumentPath.create('a/b/d.txt');
 
-    it('同じ値を持つインスタンスに対して true を返すこと', () => {
+    it('should return true for instances with the same value', () => {
       expect(path1.equals(path2)).toBe(true);
     });
 
-    it('異なる値を持つインスタンスに対して false を返すこと', () => {
+    it('should return false for instances with different values', () => {
       expect(path1.equals(path3)).toBe(false);
     });
 
-     it('null や undefined と比較した場合に false を返すこと', () => {
+     it('should return false when compared with null or undefined', () => {
        expect(path1.equals(null!)).toBe(false);
        expect(path1.equals(undefined!)).toBe(false);
      });
   });
 
   describe('clone', () => {
-     it('同じ値を持つ新しいインスタンスを作成すること', () => {
+     it('should create a new instance with the same value', () => {
        const originalPath = DocumentPath.create('original/path.doc');
        const clonedPath = originalPath.clone();
 
        expect(clonedPath).toBeInstanceOf(DocumentPath);
        expect(clonedPath.value).toBe(originalPath.value);
-       expect(clonedPath).not.toBe(originalPath); // Should be a different instance
+       expect(clonedPath).not.toBe(originalPath);
        expect(clonedPath.equals(originalPath)).toBe(true);
      });
   });

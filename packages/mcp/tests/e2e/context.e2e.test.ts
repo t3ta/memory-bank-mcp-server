@@ -1,4 +1,4 @@
-import { setupE2ETestEnv } from './helpers/e2e-test-env.js';
+import { setupE2ETestEnv } from './helpers/e2e-test-env'; // Remove .js extension
 import type { Application } from '../../src/main/Application.js';
 // DocumentDTO and MCPSuccessResponse are not used
 import type { ContextResult } from '../../src/application/usecases/types.js'; // Remove unused RulesResult

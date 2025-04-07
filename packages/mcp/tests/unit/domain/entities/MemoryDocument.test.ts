@@ -15,7 +15,7 @@ const mockLogger: IDocumentLogger = {
   error: vi.fn(), // jest -> vi
 };
 
-describe('MemoryDocument', () => {
+describe('MemoryDocument Unit Tests', () => {
   // --- Test Setup ---
   const validPath = DocumentPath.create('test/document.json');
   const validTags = [Tag.create('test'), Tag.create('unit')];
@@ -26,57 +26,56 @@ describe('MemoryDocument', () => {
   // Helper to create a valid JsonDocumentV2 object for testing fromJSON
   const createValidJsonDocV2 = (overrides: { metadata?: Partial<JsonDocumentV2['metadata']>, content?: any } = {}): JsonDocumentV2 => {
     // JsonDocumentV2['metadata'] の型から documentType を除外する必要がある
-    // 一旦 any で回避するか、正確な型を定義する
-    const baseMetadata: Omit<JsonDocumentV2['metadata'], 'documentType'> & { documentType?: string } = { // documentType を削除し、オーバーライド用にオプショナルで追加
+    // Use 'any' for now or define a more precise type
+    const baseMetadata: Omit<JsonDocumentV2['metadata'], 'documentType'> & { documentType?: string } = {
       id: DocumentId.generate().value,
       title: 'Test Title from JSON',
-      // documentType: 'branch_context', // ここから削除
+      // documentType: 'branch_context',
       path: validPath.value,
       tags: validTags.map(t => t.value),
       createdAt: new Date().toISOString(),
       lastModified: new Date().toISOString(),
       version: 1,
-      ...(overrides.metadata || {}), // metadata内の部分的な上書きを適用
+      ...(overrides.metadata || {}),
     };
-    const baseContent = overrides.content || { text: 'Content from JSON' }; // content 全体を上書き or デフォルト
+    const baseContent = overrides.content || { text: 'Content from JSON' };
 
-    // documentType は metadata の override で上書きされる可能性があるため、ここで再取得
-    // documentType は metadata からではなく、overrides.metadata またはデフォルト値から取得
-    // documentType は metadata からではなく、overrides.metadata またはデフォルト値から取得 -> metadata からは取得しない
-    // TODO: overrides のトップレベルから documentType を取得できるように修正する
-    const finalDocumentType = 'branch_context'; // 一旦デフォルト値に固定
+    // documentType might be overridden in overrides.metadata, so retrieve it here
+    // Get documentType from overrides.metadata or default, not from baseMetadata
+    // TODO: Modify to get documentType from the top level of overrides if needed
+    const finalDocumentType = 'branch_context'; // Fixed to default for now
 
-    // JsonDocumentV2 は documentType によって必須プロパティが変わるため、型アサーションを使う
-    // (より厳密にするなら、documentType ごとに分岐して型を組み立てる)
+    // Use type assertion as required properties of JsonDocumentV2 change based on documentType
+    // (For stricter typing, branch based on documentType to construct the type)
     return {
       schema: 'memory_document_v2',
-      documentType: finalDocumentType, // documentType をトップレベルにも追加
+      documentType: finalDocumentType,
       metadata: baseMetadata,
       content: baseContent,
-    } as JsonDocumentV2; // 型アサーションで対応
+    } as JsonDocumentV2;
   };
 
 
   beforeAll(() => {
-    // テスト全体でモックロガーを設定
+    // Set mock logger for all tests
     setDocumentLogger(mockLogger);
   });
 
   beforeEach(() => {
-    // 各テストの前にモックの呼び出し履歴をリセット
-    vi.clearAllMocks(); // jest -> vi
+    // Reset mock call history before each test
+    vi.clearAllMocks();
   });
 
   describe('create', () => {
-    it('有効なプロパティでインスタンスを作成できること', () => {
+    it('should create an instance with valid properties', () => {
       const doc = MemoryDocument.create(docProps);
       expect(doc).toBeInstanceOf(MemoryDocument);
       expect(doc.path).toBe(validPath);
       expect(doc.content).toBe(validContent);
-      expect(doc.tags).toEqual(validTags); // 配列は toEqual
-      expect(doc.tags).not.toBe(docProps.tags); // タグ配列がコピーされていること
-      expect(doc.lastModified).toEqual(lastModified); // DateはtoEqual
-      expect(doc.lastModified).not.toBe(lastModified); // Dateオブジェクトがコピーされていること
+      expect(doc.tags).toEqual(validTags);
+      expect(doc.tags).not.toBe(docProps.tags); // Check if tag array is copied
+      expect(doc.lastModified).toEqual(lastModified);
+      expect(doc.lastModified).not.toBe(lastModified); // Check if Date object is copied
     });
 
     // 必須プロパティ不足はTypeScriptの型チェックで防がれるため、
@@ -88,13 +87,13 @@ describe('MemoryDocument', () => {
     const existingTag = validTags[0];
     const nonExistentTag = Tag.create('non-existent');
 
-    it('指定されたタグを持っている場合に true を返すこと', () => {
+    it('should return true if the specified tag exists', () => {
       expect(doc.hasTag(existingTag)).toBe(true);
-      // ロガーが呼ばれているかも確認（任意）
+      // Optionally check if logger was called
       expect(mockLogger.debug).toHaveBeenCalled();
     });
 
-    it('指定されたタグを持っていない場合に false を返すこと', () => {
+    it('should return false if the specified tag does not exist', () => {
       expect(doc.hasTag(nonExistentTag)).toBe(false);
     });
   });
@@ -103,16 +102,16 @@ describe('MemoryDocument', () => {
     const doc = MemoryDocument.create(docProps);
     const newContent = 'Updated content';
 
-    it('コンテントを正しく更新し、新しいインスタンスを返すこと', () => {
+    it('should update the content correctly and return a new instance', () => {
       const updatedDoc = doc.updateContent(newContent);
-      expect(updatedDoc).not.toBe(doc); // イミュータブル
+      expect(updatedDoc).not.toBe(doc); // Immutability check
       expect(updatedDoc.content).toBe(newContent);
-      expect(updatedDoc.path).toBe(doc.path); // 他のプロパティは不変
+      expect(updatedDoc.path).toBe(doc.path); // Other properties should remain unchanged
       expect(updatedDoc.tags).toEqual(doc.tags);
-      expect(updatedDoc.lastModified.getTime()).toBeGreaterThan(doc.lastModified.getTime()); // 更新日時が進んでいる
+      expect(updatedDoc.lastModified.getTime()).toBeGreaterThan(doc.lastModified.getTime()); // lastModified should be updated
     });
 
-    it('同じコンテントで更新しても同じインスタンスを返すこと', () => {
+    it('should return the same instance if updated with the same content', () => {
       const updatedDoc = doc.updateContent(validContent);
       expect(updatedDoc).toBe(doc);
       expect(updatedDoc.lastModified).toEqual(doc.lastModified);
@@ -124,7 +123,7 @@ describe('MemoryDocument', () => {
     const newTag = Tag.create('new-tag');
     const existingTag = validTags[0];
 
-    it('タグを正しく追加し、新しいインスタンスを返すこと', () => {
+    it('should add a tag correctly and return a new instance', () => {
       const updatedDoc = doc.addTag(newTag);
       expect(updatedDoc).not.toBe(doc);
       expect(updatedDoc.tags).toContainEqual(newTag);
@@ -132,7 +131,7 @@ describe('MemoryDocument', () => {
       expect(updatedDoc.lastModified.getTime()).toBeGreaterThan(doc.lastModified.getTime());
     });
 
-    it('既に存在するタグを追加しても同じインスタンスを返すこと', () => {
+    it('should return the same instance if adding an existing tag', () => {
       const updatedDoc = doc.addTag(existingTag);
       expect(updatedDoc).toBe(doc);
       expect(updatedDoc.tags.length).toBe(validTags.length);
@@ -145,7 +144,7 @@ describe('MemoryDocument', () => {
     const tagToRemove = validTags[0];
     const nonExistentTag = Tag.create('non-existent');
 
-    it('存在するタグを正しく削除し、新しいインスタンスを返すこと', () => {
+    it('should remove an existing tag correctly and return a new instance', () => {
       const updatedDoc = doc.removeTag(tagToRemove);
       expect(updatedDoc).not.toBe(doc);
       expect(updatedDoc.tags).not.toContainEqual(tagToRemove);
@@ -153,7 +152,7 @@ describe('MemoryDocument', () => {
       expect(updatedDoc.lastModified.getTime()).toBeGreaterThan(doc.lastModified.getTime());
     });
 
-    it('存在しないタグを削除しようとしても同じインスタンスを返すこと', () => {
+    it('should return the same instance if trying to remove a non-existent tag', () => {
       const updatedDoc = doc.removeTag(nonExistentTag);
       expect(updatedDoc).toBe(doc);
       expect(updatedDoc.tags.length).toBe(validTags.length);
@@ -165,7 +164,7 @@ describe('MemoryDocument', () => {
     const doc = MemoryDocument.create(docProps);
     const newTags = [Tag.create('brand-new'), Tag.create('tags')];
 
-    it('タグリストを正しく更新し、新しいインスタンスを返すこと', () => {
+    it('should update the tag list correctly and return a new instance', () => {
       const updatedDoc = doc.updateTags(newTags);
       expect(updatedDoc).not.toBe(doc);
       expect(updatedDoc.tags).toEqual(newTags);
@@ -174,25 +173,25 @@ describe('MemoryDocument', () => {
   });
 
   describe('title getter', () => {
-    it('コンテントの最初のH1見出しからタイトルを正しく取得できること', () => {
+    it('should correctly get the title from the first H1 heading in the content', () => {
       const contentWithTitle = '# Actual Title\nContent here.';
       const doc = MemoryDocument.create({ ...docProps, content: contentWithTitle });
       expect(doc.title).toBe('Actual Title');
     });
 
-    it('H1見出しがない場合に undefined を返すこと', () => {
+    it('should return undefined if there is no H1 heading', () => {
       const contentWithoutTitle = 'Just content, no title.';
       const doc = MemoryDocument.create({ ...docProps, content: contentWithoutTitle });
       expect(doc.title).toBeUndefined();
     });
 
-     it('H1見出しが複数あっても最初のものだけを取得すること', () => {
+     it('should only get the first H1 heading if multiple exist', () => {
        const contentWithMultipleTitles = '# First Title\n# Second Title\nContent.';
        const doc = MemoryDocument.create({ ...docProps, content: contentWithMultipleTitles });
        expect(doc.title).toBe('First Title');
      });
 
-     it('H1見出しの前後にスペースがあっても正しく取得できること', () => {
+     it('should get the title correctly even with spaces around the H1 heading', () => {
        const contentWithSpaces = '  # Spaced Title \nContent.';
        const doc = MemoryDocument.create({ ...docProps, content: contentWithSpaces });
        expect(doc.title).toBe('Spaced Title');
@@ -200,20 +199,20 @@ describe('MemoryDocument', () => {
   });
 
   describe('toObject', () => {
-    it('正しいプレーンオブジェクト構造を返すこと', () => {
+    it('should return the correct plain object structure', () => {
       const doc = MemoryDocument.create(docProps);
       const obj = doc.toObject();
       expect(obj).toEqual({
         path: validPath.value,
         content: validContent,
         tags: validTags.map(t => t.value),
-        lastModified: lastModified.toISOString(), // ISO文字列に変換される
+        lastModified: lastModified.toISOString(), // Converted to ISO string
       });
     });
   });
 
   describe('toJSON', () => {
-    it('JSONファイルの場合、パースしてそのまま返すこと', () => {
+    it('should parse and return the content directly for JSON files', () => {
       const jsonContent = JSON.stringify(createValidJsonDocV2());
       const jsonPath = DocumentPath.create('data.json');
       const doc = MemoryDocument.create({ ...docProps, path: jsonPath, content: jsonContent });
@@ -221,80 +220,80 @@ describe('MemoryDocument', () => {
       expect(jsonObj).toEqual(JSON.parse(jsonContent));
     });
 
-     it('無効なJSONファイルの場合、エラーログを出力し、推論された構造を返すこと', () => {
+     it('should log an error and return an inferred structure for invalid JSON files', () => {
        const invalidJsonContent = '{"invalid": json}';
        const jsonPath = DocumentPath.create('invalid.json');
        const doc = MemoryDocument.create({ ...docProps, path: jsonPath, content: invalidJsonContent });
        const jsonObj = doc.toJSON();
 
        expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining('Failed to parse JSON document'), expect.anything());
-       // 推論された構造が返ることを確認（ここでは generic タイプ）
+       // Check that the inferred structure is returned (generic type here)
        expect(jsonObj.schema).toBe('memory_document_v2');
-       expect(jsonObj.documentType).toBe('branch_context'); // metadata を削除してトップレベルをチェック
-       // determineDocumentType が 'branch_context' を返すため、期待値もそれに合わせる
-       // フォールバックロジックは content を { text: ... } 形式で返すように変更されたため、期待値も修正
+       expect(jsonObj.documentType).toBe('branch_context'); // Check top-level after removing metadata
+       // Since determineDocumentType returns 'branch_context', adjust expectation
+       // Fallback logic changed to return content as { text: ... }, so adjust expectation
        expect(jsonObj.content).toEqual({ text: invalidJsonContent });
      });
 
-    it('非JSONファイルの場合、パスからタイプを推論し、JsonDocumentV2 形式に変換できること (generic)', () => {
+    it('should infer type from path and convert to JsonDocumentV2 format for non-JSON files (generic)', () => {
       const doc = MemoryDocument.create({ ...docProps, path: DocumentPath.create('notes.txt') });
       const jsonObj = doc.toJSON();
       expect(jsonObj.schema).toBe('memory_document_v2');
       expect(jsonObj.metadata.title).toBe('Test Title'); // content から取得
-      expect(jsonObj.documentType).toBe('branch_context'); // metadata を削除してトップレベルをチェック
+      expect(jsonObj.documentType).toBe('branch_context'); // Check top-level after removing metadata
       expect(jsonObj.metadata.path).toBe('notes.txt');
       expect(jsonObj.metadata.tags).toEqual(validTags.map(t => t.value));
       expect(jsonObj.metadata.lastModified).toBe(lastModified.toISOString());
       expect(jsonObj.metadata.createdAt).toBeDefined();
-      expect(jsonObj.metadata.version).toBe(1); // デフォルトバージョン
-      expect(jsonObj.metadata.id).toBeDefined(); // UUIDが生成される
-      // determineDocumentType が 'branch_context' を返すため、期待値もそれに合わせる
-      // フォールバックロジックは content を { text: ... } 形式で返すように変更されたため、期待値も修正
+      expect(jsonObj.metadata.version).toBe(1); // Default version
+      expect(jsonObj.metadata.id).toBeDefined(); // UUID is generated
+      // Since determineDocumentType returns 'branch_context', adjust expectation
+      // Fallback logic changed to return content as { text: ... }, so adjust expectation
       expect(jsonObj.content).toEqual({ text: validContent });
     });
 
-     it('パスに基づいて progress タイプを正しく推論できること', () => {
+     it('should correctly infer progress type based on path', () => {
        const doc = MemoryDocument.create({ ...docProps, path: DocumentPath.create('progress.md') });
        const jsonObj = doc.toJSON();
-       expect(jsonObj.documentType).toBe('progress'); // metadata を削除してトップレベルをチェック
-       // content の構造も確認（簡易的に）
-       // フォールバックロジックは content を { text: ... } 形式で返すため、'text' プロパティをチェック
+       expect(jsonObj.documentType).toBe('progress'); // Check top-level after removing metadata
+       // Also check content structure (simply)
+       // Fallback logic returns content as { text: ... }, so check for 'text' property
        expect(jsonObj.content).toHaveProperty('text');
      });
 
-     // 他のドキュメントタイプ（branch_context, active_context, system_patterns）も同様にテスト
-     it('パスに基づいて branch_context タイプを正しく推論できること', () => {
+     // Test other document types (branch_context, active_context, system_patterns) similarly
+     it('should correctly infer branch_context type based on path', () => {
         const doc = MemoryDocument.create({ ...docProps, path: DocumentPath.create('branchContext.txt') });
         const jsonObj = doc.toJSON();
-        expect(jsonObj.documentType).toBe('branch_context'); // metadata を削除してトップレベルをチェック
-        // フォールバックロジックは content を { text: ... } 形式で返すため、'text' プロパティをチェック
+        expect(jsonObj.documentType).toBe('branch_context'); // Check top-level after removing metadata
+        // Fallback logic returns content as { text: ... }, so check for 'text' property
         expect(jsonObj.content).toHaveProperty('text');
      });
   });
 
   describe('fromJSON', () => {
-    it('有効な JsonDocumentV2 からインスタンスを作成できること', () => {
+    it('should create an instance from a valid JsonDocumentV2', () => {
       const jsonObj = createValidJsonDocV2();
       const doc = MemoryDocument.fromJSON(jsonObj, validPath);
 
       expect(doc).toBeInstanceOf(MemoryDocument);
       expect(doc.path).toBe(validPath);
-      expect(doc.content).toBe(JSON.stringify(jsonObj, null, 2)); // content は JSON 文字列になる
+      expect(doc.content).toBe(JSON.stringify(jsonObj, null, 2)); // content becomes a JSON string
       expect(doc.tags).toEqual(validTags);
       expect(doc.lastModified).toEqual(new Date(jsonObj.metadata.lastModified));
-      expect(mockLogger.debug).toHaveBeenCalled(); // ロガー呼び出し確認
+      expect(mockLogger.debug).toHaveBeenCalled(); // Check logger call
     });
 
-    it('タグがない場合も正しく処理できること', () => {
-       const jsonObj = createValidJsonDocV2({ metadata: { tags: undefined } }); // 呼び出し方は変わらないはず
+    it('should handle cases with no tags correctly', () => {
+       const jsonObj = createValidJsonDocV2({ metadata: { tags: undefined } });
        const doc = MemoryDocument.fromJSON(jsonObj, validPath);
        expect(doc.tags).toEqual([]);
     });
 
-     it('不正な形式のタグが含まれている場合、サニタイズして作成できること', () => {
-       const invalidTag = 'Invalid Tag'; // 末尾の ! を削除
-       const sanitizedTag = 'invalid-tag'; // サニタイズ後の期待値も修正
-       const jsonObj = createValidJsonDocV2({ metadata: { tags: [validTags[0].value, invalidTag] } }); // 呼び出し方は変わらないはず
+     it('should sanitize and create instance when invalid tag formats are included', () => {
+       const invalidTag = 'Invalid Tag';
+       const sanitizedTag = 'invalid-tag';
+       const jsonObj = createValidJsonDocV2({ metadata: { tags: [validTags[0].value, invalidTag] } });
        const doc = MemoryDocument.fromJSON(jsonObj, validPath);
 
        expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringContaining(`Sanitized tag '${invalidTag}' to '${sanitizedTag}'`));
@@ -303,10 +302,10 @@ describe('MemoryDocument', () => {
        expect(doc.tags.length).toBe(2);
      });
 
-     // 無効な JsonDocumentV2 (スキーマ違反など) は、入力側の責務とするか、
-     // MemoryDocument.fromJSON がエラーを投げるべきかによる。
-     // 現状の実装では、必須フィールド欠けなどは実行時エラーになる可能性がある。
-     // ここでは正常系とタグのサニタイズを中心にテスト。
+     // Invalid JsonDocumentV2 (schema violations, etc.) might be the responsibility of the input,
+     // or MemoryDocument.fromJSON should throw an error.
+     // Current implementation might lead to runtime errors for missing required fields.
+     // Focusing on normal cases and tag sanitization here.
   });
 
   // determineDocumentType は private なので toJSON のテストで間接的に検証済み

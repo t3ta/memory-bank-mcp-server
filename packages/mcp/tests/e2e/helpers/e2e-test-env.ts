@@ -71,14 +71,30 @@ export async function setupE2ETestEnv(): Promise<{
   cleanup: () => Promise<void>;
 }> {
   const testEnv = await setupBaseTestEnv();
+  // Add logging around Application instantiation
+  console.log('[setupE2ETestEnv] Creating Application instance...');
   const app = new Application({ docsRoot: testEnv.docRoot });
+  console.log('[setupE2ETestEnv] Application instance created.');
 
   const [clientTransport, _serverTransport] = InMemoryTransport.createLinkedPair(); // serverTransport is not used, prefix with _
 
-  const client = new MCPInMemoryClient({ name: 'E2E Test Client', version: '1.0.0' });
+  // Initialize the application first
+  console.log('[setupE2ETestEnv] Initializing application...'); // Keep existing log
   await app.initialize();
+  console.log('[setupE2ETestEnv] Application initialized.');
 
+  // Handle the server-side connection using the Application instance
+  console.log('[setupE2ETestEnv] Setting up server connection handler...');
+  await app.handleConnection(_serverTransport); // Pass the server transport to the app
+  console.log('[setupE2ETestEnv] Server connection handler set up.');
+
+  // Then create and initialize the client
+  // Pass an empty options object as the second argument
+  console.log('[setupE2ETestEnv] Creating client...');
+  const client = new MCPInMemoryClient({ name: 'E2E Test Client', version: '1.0.0' }, {});
+  console.log('[setupE2ETestEnv] Initializing client...');
   await client.initialize(clientTransport);
+  console.log('[setupE2ETestEnv] Client initialized.');
 
   const cleanup = async () => {
     await client.close(); // Close the client as well

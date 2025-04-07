@@ -4,7 +4,7 @@ import { createConsoleLogger, logger as defaultLogger } from '../../../../src/sh
 // import { jest } from '@jest/globals'; // jest インポート削除
 
 // Mock console.log
-const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {}); // jest -> vi
+const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
 describe('Console Logger', () => {
   beforeEach(() => {
@@ -92,7 +92,7 @@ describe('Console Logger', () => {
       const message = 'Test info message';
       logger.info(message);
       expect(consoleLogSpy).toHaveBeenCalledTimes(1);
-      const logEntry = JSON.parse((consoleLogSpy as Mock).mock.calls[0][0]); // as Mock 追加
+      const logEntry = JSON.parse((consoleLogSpy as Mock).mock.calls[0][0]);
 
       expect(logEntry).toHaveProperty('level', 'info');
       expect(logEntry).toHaveProperty('message', message);
@@ -105,7 +105,7 @@ describe('Console Logger', () => {
       const context = { userId: 123, component: 'AuthService' };
       logger.info(message, context);
       expect(consoleLogSpy).toHaveBeenCalledTimes(1);
-      const logEntry = JSON.parse((consoleLogSpy as Mock).mock.calls[0][0]); // as Mock 追加
+      const logEntry = JSON.parse((consoleLogSpy as Mock).mock.calls[0][0]);
 
       expect(logEntry).toHaveProperty('level', 'info');
       expect(logEntry).toHaveProperty('message', message);
@@ -118,7 +118,7 @@ describe('Console Logger', () => {
         const loggerMulti = createConsoleLogger('debug');
         loggerMulti.info('Multiple args test', 1, 'two', { three: 3 });
         expect(consoleLogSpy).toHaveBeenCalledTimes(1);
-        const logEntry = JSON.parse((consoleLogSpy as Mock).mock.calls[0][0]); // as Mock 追加
+        const logEntry = JSON.parse((consoleLogSpy as Mock).mock.calls[0][0]);
 
         expect(logEntry).toHaveProperty('level', 'info');
         expect(logEntry).toHaveProperty('message', 'Multiple args test');
@@ -133,7 +133,7 @@ describe('Console Logger', () => {
 
       logger.error(message, error);
       expect(consoleLogSpy).toHaveBeenCalledTimes(1);
-      const logEntry = JSON.parse((consoleLogSpy as Mock).mock.calls[0][0]); // as Mock 追加
+      const logEntry = JSON.parse((consoleLogSpy as Mock).mock.calls[0][0]);
 
       expect(logEntry).toHaveProperty('level', 'error');
       expect(logEntry).toHaveProperty('message', message);
@@ -152,7 +152,7 @@ describe('Console Logger', () => {
 
         logger.error(message, context, error); // Pass context and error
         expect(consoleLogSpy).toHaveBeenCalledTimes(1);
-        const logEntry = JSON.parse((consoleLogSpy as Mock).mock.calls[0][0]); // as Mock 追加
+        const logEntry = JSON.parse((consoleLogSpy as Mock).mock.calls[0][0]);
 
         expect(logEntry).toHaveProperty('level', 'error');
         expect(logEntry).toHaveProperty('message', message);
@@ -177,7 +177,7 @@ describe('Console Logger', () => {
     it('should include parent context in child logs', () => {
       childLogger.info('Child message');
       expect(consoleLogSpy).toHaveBeenCalledTimes(1);
-      const logEntry = JSON.parse((consoleLogSpy as Mock).mock.calls[0][0]); // as Mock 追加
+      const logEntry = JSON.parse((consoleLogSpy as Mock).mock.calls[0][0]);
 
       expect(logEntry).toHaveProperty('component', 'Parent');
       expect(logEntry).toHaveProperty('requestId', 'req-abc');
@@ -188,7 +188,7 @@ describe('Console Logger', () => {
       const childContext = { component: 'Child', userId: 456 };
       childLogger.info('Child message with context', childContext);
       expect(consoleLogSpy).toHaveBeenCalledTimes(1);
-      const logEntry = JSON.parse((consoleLogSpy as Mock).mock.calls[0][0]); // as Mock 追加
+      const logEntry = JSON.parse((consoleLogSpy as Mock).mock.calls[0][0]);
 
       expect(logEntry).toHaveProperty('component', 'Child'); // Child overrides parent
       expect(logEntry).toHaveProperty('requestId', 'req-abc'); // Parent context preserved
@@ -202,7 +202,7 @@ describe('Console Logger', () => {
 
         grandChildLogger.warn('Grandchild message');
         expect(consoleLogSpy).toHaveBeenCalledTimes(1);
-        const logEntry = JSON.parse((consoleLogSpy as Mock).mock.calls[0][0]); // as Mock 追加
+        const logEntry = JSON.parse((consoleLogSpy as Mock).mock.calls[0][0]);
 
         expect(logEntry).toHaveProperty('component', 'Parent'); // From parent
         expect(logEntry).toHaveProperty('requestId', 'req-abc'); // From parent

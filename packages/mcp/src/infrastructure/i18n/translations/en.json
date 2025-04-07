@@ -33,7 +33,7 @@
     "template.content.file_editing_rules": "When editing memory bank files, follow these rules:\n\n1. Use CLI commands instead of editing files directly\n2. Ensure that the JSON syntax is correct\n3. Do not remove required fields\n4. Do not change the schema version",
     "template.section.finally": "Finally",
     "template.content.finally": "The memory bank is a powerful tool for managing project knowledge. By using it appropriately, you can improve team productivity and collaboration.",
-    "template.section.footer": "",
+    "template.section.footer": "(Footer)",
     "template.content.footer": "---\n\n_This document explains the basic rules and structure of the memory bank_",
 
     "template.title.active_context": "Active Context Template",

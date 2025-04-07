@@ -13,20 +13,20 @@ const mockI18nProvider: II18nProvider = {
   getDefaultLanguage: vi.fn(), // jest -> vi
 };
 
-describe('II18nProvider Interface', () => {
+describe('II18nProvider Interface Unit Tests', () => {
   beforeEach(() => {
-    // 各テストの前にモックをリセット
-    vi.clearAllMocks(); // jest -> vi
+    // Reset mocks before each test
+    vi.clearAllMocks();
   });
 
   it('should define the translate method', () => {
     const params = {
-      key: 'greeting' as TranslationKey, // 型アサーションが必要な場合
+      key: 'greeting' as TranslationKey,
       language: 'ja' as Language,
       params: { name: 'みらい' },
     };
     const expectedTranslation = 'こんにちは、みらいさん！';
-    (mockI18nProvider.translate as Mock).mockReturnValue(expectedTranslation); // as Mock 追加
+    (mockI18nProvider.translate as Mock).mockReturnValue(expectedTranslation);
 
     const translation = mockI18nProvider.translate(params);
     expect(mockI18nProvider.translate).toHaveBeenCalledWith(params);
@@ -39,7 +39,7 @@ describe('II18nProvider Interface', () => {
       language: 'en' as Language,
     };
     const expectedTranslation = 'Goodbye!';
-    (mockI18nProvider.translate as Mock).mockReturnValue(expectedTranslation); // as Mock 追加
+    (mockI18nProvider.translate as Mock).mockReturnValue(expectedTranslation);
 
     const translation = mockI18nProvider.translate(params);
     expect(mockI18nProvider.translate).toHaveBeenCalledWith(params);
@@ -48,7 +48,7 @@ describe('II18nProvider Interface', () => {
 
   it('should define the loadTranslations method that resolves true', async () => {
     const language: Language = 'ja';
-    (mockI18nProvider.loadTranslations as Mock).mockResolvedValue(true); // as Mock 追加
+    (mockI18nProvider.loadTranslations as Mock).mockResolvedValue(true);
 
     const result = await mockI18nProvider.loadTranslations(language);
     expect(mockI18nProvider.loadTranslations).toHaveBeenCalledWith(language);
@@ -56,9 +56,9 @@ describe('II18nProvider Interface', () => {
   });
 
    it('should define the loadTranslations method that resolves false', async () => {
-    // サポートされている言語だがロードに失敗するケースを想定
+    // Assume a case where loading fails even for a supported language
     const language: Language = 'ja';
-    (mockI18nProvider.loadTranslations as Mock).mockResolvedValue(false); // as Mock 追加
+    (mockI18nProvider.loadTranslations as Mock).mockResolvedValue(false);
 
     const result = await mockI18nProvider.loadTranslations(language);
     expect(mockI18nProvider.loadTranslations).toHaveBeenCalledWith(language);
@@ -68,7 +68,7 @@ describe('II18nProvider Interface', () => {
   it('should define the isLanguageSupported method', () => {
     const supportedLang = 'ja';
     const unsupportedLang = 'kr';
-    (mockI18nProvider.isLanguageSupported as Mock).mockImplementation((lang) => lang === supportedLang); // as Mock 追加
+    (mockI18nProvider.isLanguageSupported as Mock).mockImplementation((lang) => lang === supportedLang);
 
     expect(mockI18nProvider.isLanguageSupported(supportedLang)).toBe(true);
     expect(mockI18nProvider.isLanguageSupported(unsupportedLang)).toBe(false);
@@ -78,7 +78,7 @@ describe('II18nProvider Interface', () => {
 
   it('should define the getSupportedLanguages method', () => {
     const expectedLanguages: Language[] = ['en', 'ja', 'zh'];
-    (mockI18nProvider.getSupportedLanguages as Mock).mockReturnValue(expectedLanguages); // as Mock 追加
+    (mockI18nProvider.getSupportedLanguages as Mock).mockReturnValue(expectedLanguages);
 
     const languages = mockI18nProvider.getSupportedLanguages();
     expect(mockI18nProvider.getSupportedLanguages).toHaveBeenCalled();
@@ -87,7 +87,7 @@ describe('II18nProvider Interface', () => {
 
   it('should define the getDefaultLanguage method', () => {
     const expectedLanguage: Language = 'en';
-    (mockI18nProvider.getDefaultLanguage as Mock).mockReturnValue(expectedLanguage); // as Mock 追加
+    (mockI18nProvider.getDefaultLanguage as Mock).mockReturnValue(expectedLanguage);
 
     const language = mockI18nProvider.getDefaultLanguage();
     expect(mockI18nProvider.getDefaultLanguage).toHaveBeenCalled();

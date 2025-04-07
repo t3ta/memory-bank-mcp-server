@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "prepare": "husky",
-    "build": "tsc -b",
+    "build": "tsc -b && node scripts/copy-assets.js",
     "build:mcp": "yarn workspace @memory-bank/mcp build",
     "build:schemas": "yarn workspace @memory-bank/schemas build",
     "copy-assets": "node scripts/copy-assets.js",
@@ -36,7 +36,8 @@
     "test:integration": "yarn workspace @memory-bank/mcp test:integration",
     "prepublishOnly": "yarn build",
     "check:deps": "depcheck",
-    "release": "semantic-release"
+    "release": "semantic-release",
+    "inspect": "npx @modelcontextprotocol/inspector node ./packages/mcp/dist/server.js --docs ./docs --project"
   },
   "keywords": [
     "mcp",

@@ -56,24 +56,24 @@ const useCase = new ReadBranchDocumentUseCase(
   mockConfigProvider
 );
 
-describe('ReadBranchDocumentUseCase', () => {
+describe('ReadBranchDocumentUseCase Unit Tests', () => {
   beforeEach(() => {
-    // 各テストの前にモックをリセット
-    vi.clearAllMocks(); // jest -> vi
+    // Reset mocks before each test
+    vi.clearAllMocks();
   });
 
-  it('存在するドキュメントを正しく読み込めること', async () => {
+  it('should read an existing document correctly', async () => {
     const branchName = 'feature/test-branch';
     const docPath = DocumentPath.create('test.json');
     const mockDocument = MemoryDocument.create({ path: docPath, content: '{"key":"value"}', tags: [Tag.create('test')], lastModified: new Date() });
     const branchInfo = BranchInfo.create(branchName);
-    const mockConfig: WorkspaceConfig = { isProjectMode: true, language: 'en' as const, docsRoot: '/mock/docs', verbose: false }; // 型を WorkspaceConfig に変更
+    const mockConfig: WorkspaceConfig = { isProjectMode: true, language: 'en' as const, docsRoot: '/mock/docs', verbose: false };
 
     // モックの設定
-    (mockConfigProvider.getConfig as Mock).mockReturnValue(mockConfig); // as Mock 追加
-    (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${branchName}`); // as Mock 追加
-    (mockBranchRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
-    (mockBranchRepository.getDocument as Mock).mockResolvedValue(mockDocument); // as Mock 追加
+    (mockConfigProvider.getConfig as Mock).mockReturnValue(mockConfig);
+    (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${branchName}`);
+    (mockBranchRepository.exists as Mock).mockResolvedValue(true);
+    (mockBranchRepository.getDocument as Mock).mockResolvedValue(mockDocument);
 
     // 実行
     const result = await useCase.execute({ branchName, path: docPath.value });
@@ -83,22 +83,22 @@ describe('ReadBranchDocumentUseCase', () => {
     expect(result.document.path).toBe(docPath.value);
     expect(result.document.content).toBe('{"key":"value"}');
     expect(result.document.tags).toEqual(['test']);
-    expect(mockBranchRepository.exists).toHaveBeenCalledWith(branchInfo.safeName); // safeName でチェック
+    expect(mockBranchRepository.exists).toHaveBeenCalledWith(branchInfo.safeName);
     expect(mockBranchRepository.getDocument).toHaveBeenCalledWith(branchInfo, docPath);
-    expect(mockGitService.getCurrentBranchName).not.toHaveBeenCalled(); // branchName 指定時は呼ばれない
+    expect(mockGitService.getCurrentBranchName).not.toHaveBeenCalled();
   });
 
-  it('ドキュメントが存在しない場合にエラー (DocumentNotFound) が発生すること', async () => {
+  it('should throw DocumentNotFound error when the document does not exist', async () => {
     const branchName = 'feature/another-branch';
     const docPath = DocumentPath.create('non-existent.json');
     const branchInfo = BranchInfo.create(branchName);
     const mockConfig: WorkspaceConfig = { isProjectMode: true, language: 'en' as const, docsRoot: '/mock/docs', verbose: false };
 
     // モックの設定
-    (mockConfigProvider.getConfig as Mock).mockReturnValue(mockConfig); // as Mock 追加
-    (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${branchName}`); // as Mock 追加
-    (mockBranchRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
-    (mockBranchRepository.getDocument as Mock).mockResolvedValue(null); // as Mock 追加
+    (mockConfigProvider.getConfig as Mock).mockReturnValue(mockConfig);
+    (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${branchName}`);
+    (mockBranchRepository.exists as Mock).mockResolvedValue(true);
+    (mockBranchRepository.getDocument as Mock).mockResolvedValue(null);
 
     // 実行＆検証
     // エラーオブジェクト全体ではなく、code と message で比較
@@ -113,7 +113,7 @@ describe('ReadBranchDocumentUseCase', () => {
     expect(mockBranchRepository.getDocument).toHaveBeenCalledWith(branchInfo, docPath);
   });
 
-  it('リポジトリで予期せぬエラーが発生した場合にエラーが伝播すること', async () => {
+  it('should propagate unexpected repository errors', async () => {
     const branchName = 'feature/error-branch';
     const docPath = DocumentPath.create('error.json');
     const repositoryError = new Error('Database connection failed');
@@ -121,10 +121,10 @@ describe('ReadBranchDocumentUseCase', () => {
     const mockConfig: WorkspaceConfig = { isProjectMode: true, language: 'en' as const, docsRoot: '/mock/docs', verbose: false };
 
     // モックの設定
-    (mockConfigProvider.getConfig as Mock).mockReturnValue(mockConfig); // as Mock 追加
-    (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${branchName}`); // as Mock 追加
-    (mockBranchRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
-    (mockBranchRepository.getDocument as Mock).mockRejectedValue(repositoryError); // as Mock 追加
+    (mockConfigProvider.getConfig as Mock).mockReturnValue(mockConfig);
+    (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${branchName}`);
+    (mockBranchRepository.exists as Mock).mockResolvedValue(true);
+    (mockBranchRepository.getDocument as Mock).mockRejectedValue(repositoryError);
 
     // 実行＆検証
     // 実行＆検証 (toMatchObject で message のみを比較)
@@ -136,7 +136,7 @@ describe('ReadBranchDocumentUseCase', () => {
     expect(mockBranchRepository.getDocument).toHaveBeenCalledWith(branchInfo, docPath);
   });
 
-  it('branchName が省略された場合 (プロジェクトモード) に、現在のブランチからドキュメントを読み込めること', async () => {
+  it('should read document from the current branch when branchName is omitted (in project mode)', async () => {
     const detectedBranchName = 'feature/detected';
     const docPath = DocumentPath.create('auto-detect.json');
     const mockDocument = MemoryDocument.create({ path: docPath, content: '{"auto":"detected"}', tags: [], lastModified: new Date() });
@@ -144,11 +144,11 @@ describe('ReadBranchDocumentUseCase', () => {
     const mockConfig: WorkspaceConfig = { isProjectMode: true, language: 'en' as const, docsRoot: '/mock/docs', verbose: false };
 
     // モックの設定
-    (mockConfigProvider.getConfig as Mock).mockReturnValue(mockConfig); // as Mock 追加
-    (mockGitService.getCurrentBranchName as Mock).mockResolvedValue(detectedBranchName); // as Mock 追加
-    (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${detectedBranchName}`); // as Mock 追加
-    (mockBranchRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
-    (mockBranchRepository.getDocument as Mock).mockResolvedValue(mockDocument); // as Mock 追加
+    (mockConfigProvider.getConfig as Mock).mockReturnValue(mockConfig);
+    (mockGitService.getCurrentBranchName as Mock).mockResolvedValue(detectedBranchName);
+    (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${detectedBranchName}`);
+    (mockBranchRepository.exists as Mock).mockResolvedValue(true);
+    (mockBranchRepository.getDocument as Mock).mockResolvedValue(mockDocument);
 
     // 実行 (branchName を省略)
     const result = await useCase.execute({ path: docPath.value });
@@ -156,19 +156,19 @@ describe('ReadBranchDocumentUseCase', () => {
     // 検証
     expect(result).toBeDefined();
     expect(result.document.content).toBe('{"auto":"detected"}');
-    expect(mockGitService.getCurrentBranchName).toHaveBeenCalledTimes(1); // ブランチ名検出が呼ばれたか
-    expect(mockConfigProvider.getConfig).toHaveBeenCalledTimes(1); // 設定が読み込まれたか
+    expect(mockGitService.getCurrentBranchName).toHaveBeenCalledTimes(1);
+    expect(mockConfigProvider.getConfig).toHaveBeenCalledTimes(1);
     expect(mockBranchRepository.getDocument).toHaveBeenCalledWith(branchInfo, docPath);
   });
 
-  it('branchName が省略された場合 (プロジェクトモード) でブランチ名検出に失敗した場合にエラーが発生すること', async () => {
+  it('should throw an error when branch name detection fails (in project mode)', async () => {
     const docPath = DocumentPath.create('any.json');
     const gitError = new Error('Not a git repository');
     const mockConfig: WorkspaceConfig = { isProjectMode: true, language: 'en' as const, docsRoot: '/mock/docs', verbose: false };
 
     // モックの設定
-    (mockConfigProvider.getConfig as Mock).mockReturnValue(mockConfig); // as Mock 追加
-    (mockGitService.getCurrentBranchName as Mock).mockRejectedValue(gitError); // as Mock 追加
+    (mockConfigProvider.getConfig as Mock).mockReturnValue(mockConfig);
+    (mockGitService.getCurrentBranchName as Mock).mockRejectedValue(gitError);
 
     // 実行＆検証
     // エラーオブジェクト全体ではなく、code と message で比較
@@ -179,15 +179,15 @@ describe('ReadBranchDocumentUseCase', () => {
     // モック呼び出し検証
     expect(mockGitService.getCurrentBranchName).toHaveBeenCalledTimes(1);
     expect(mockConfigProvider.getConfig).toHaveBeenCalledTimes(1);
-    expect(mockBranchRepository.getDocument).not.toHaveBeenCalled(); // ドキュメント取得は呼ばれない
+    expect(mockBranchRepository.getDocument).not.toHaveBeenCalled();
   });
 
-  it('branchName が省略された場合 (非プロジェクトモード) にエラーが発生すること', async () => {
+  it('should throw an error when branchName is omitted (not in project mode)', async () => {
     const docPath = DocumentPath.create('any.json');
-    const mockConfig: WorkspaceConfig = { isProjectMode: false, language: 'en' as const, docsRoot: '/mock/docs', verbose: false }; // プロジェクトモードOFF
+    const mockConfig: WorkspaceConfig = { isProjectMode: false, language: 'en' as const, docsRoot: '/mock/docs', verbose: false };
 
     // モックの設定
-    (mockConfigProvider.getConfig as Mock).mockReturnValue(mockConfig); // as Mock 追加
+    (mockConfigProvider.getConfig as Mock).mockReturnValue(mockConfig);
 
     // 実行＆検証
     // エラーオブジェクト全体ではなく、code と message で比較
@@ -196,12 +196,12 @@ describe('ReadBranchDocumentUseCase', () => {
       .rejects.toMatchObject({ code: expectedError.code, message: expectedError.message });
 
     // モック呼び出し検証
-    expect(mockGitService.getCurrentBranchName).not.toHaveBeenCalled(); // ブランチ名検出は呼ばれない
+    expect(mockGitService.getCurrentBranchName).not.toHaveBeenCalled();
     expect(mockConfigProvider.getConfig).toHaveBeenCalledTimes(1);
     expect(mockBranchRepository.getDocument).not.toHaveBeenCalled();
   });
 
-  it('path が指定されていない場合にエラーが発生すること', async () => {
+  it('should throw an error when path is not specified', async () => {
     const branchName = 'feature/test';
 
     // 実行＆検証 (path を undefined で渡す)
@@ -214,16 +214,16 @@ describe('ReadBranchDocumentUseCase', () => {
     expect(mockBranchRepository.getDocument).not.toHaveBeenCalled();
   });
 
-  it('ブランチが存在しない場合にエラー (BranchNotFound) が発生すること', async () => {
-    const branchName = 'feature/non-existent'; // `/` を含む名前に修正
+  it('should throw BranchNotFound error when the branch does not exist', async () => {
+    const branchName = 'feature/non-existent';
     const docPath = DocumentPath.create('any.json');
     const branchInfo = BranchInfo.create(branchName);
     const mockConfig: WorkspaceConfig = { isProjectMode: true, language: 'en' as const, docsRoot: '/mock/docs', verbose: false };
 
     // モックの設定
-    (mockConfigProvider.getConfig as Mock).mockReturnValue(mockConfig); // as Mock 追加
-    (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${branchName}`); // as Mock 追加
-    (mockBranchRepository.exists as Mock).mockResolvedValue(false); // as Mock 追加
+    (mockConfigProvider.getConfig as Mock).mockReturnValue(mockConfig);
+    (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${branchName}`);
+    (mockBranchRepository.exists as Mock).mockResolvedValue(false);
 
     // 実行＆検証
     // エラーオブジェクト全体ではなく、code と message で比較
@@ -232,28 +232,28 @@ describe('ReadBranchDocumentUseCase', () => {
       .rejects.toMatchObject({ code: expectedError.code, message: expectedError.message });
 
     // モック呼び出し検証
-    expect(mockBranchRepository.exists).toHaveBeenCalledWith(branchInfo.safeName); // safeName でチェックされたか
-    expect(mockBranchRepository.getDocument).not.toHaveBeenCalled(); // ドキュメント取得は呼ばれない
+    expect(mockBranchRepository.exists).toHaveBeenCalledWith(branchInfo.safeName);
+    expect(mockBranchRepository.getDocument).not.toHaveBeenCalled();
   });
 
-  it('リポジトリで Error インスタンスではないエラーが発生した場合にエラーが伝播すること', async () => {
+  it('should propagate non-Error instance errors from the repository', async () => {
     const branchName = 'feature/non-error-throw';
     const docPath = DocumentPath.create('non-error.json');
-    const nonError = 'Just a string error'; // Error インスタンスではないエラー
+    const nonError = 'Just a string error';
     const branchInfo = BranchInfo.create(branchName);
     const mockConfig: WorkspaceConfig = { isProjectMode: true, language: 'en' as const, docsRoot: '/mock/docs', verbose: false };
 
     // モックの設定
-    (mockConfigProvider.getConfig as Mock).mockReturnValue(mockConfig); // as Mock 追加
-    (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${branchName}`); // as Mock 追加
-    (mockBranchRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
-    (mockBranchRepository.getDocument as Mock).mockRejectedValue(nonError); // as Mock 追加
+    (mockConfigProvider.getConfig as Mock).mockReturnValue(mockConfig);
+    (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${branchName}`);
+    (mockBranchRepository.exists as Mock).mockResolvedValue(true);
+    (mockBranchRepository.getDocument as Mock).mockRejectedValue(nonError);
 
     // 実行＆検証
     // エラーオブジェクト全体ではなく、code と message で比較
     const expectedError = ApplicationErrors.executionFailed('ReadBranchDocumentUseCase');
     await expect(useCase.execute({ branchName, path: docPath.value }))
-      .rejects.toMatchObject({ code: expectedError.code, message: expectedError.message }); // ApplicationError でラップされる
+      .rejects.toMatchObject({ code: expectedError.code, message: expectedError.message });
 
     // モック呼び出し検証
     expect(mockBranchRepository.exists).toHaveBeenCalledWith(branchInfo.safeName);
