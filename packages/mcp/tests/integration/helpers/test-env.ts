@@ -43,7 +43,7 @@ export async function setupTestEnv(): Promise<TestEnv> {
   const projectRoot = path.resolve(path.dirname(currentFilePath), '../../../../');
   logger.debug(`[setupTestEnv] Resolved project root: ${projectRoot}`); // Log resolved project root
   const sourceTranslationsDir = path.join(projectRoot, 'docs/translations');
-  const sourceTemplatesJsonDir = path.join(projectRoot, 'packages/mcp/tests/integration/fixtures/templates/json'); // Path updated
+  const sourceTemplatesJsonDir = path.join(projectRoot, 'docs/templates/json'); // Correct path to actual templates
 
   // Define target paths within temp docRoot
   const targetTranslationsDir = path.join(docRoot, 'translations');
@@ -56,39 +56,7 @@ export async function setupTestEnv(): Promise<TestEnv> {
   await fs.ensureDir(globalMemoryPath);
   // target dirs will be created by fs.copy if they don't exist
 
-  // --- Start: Create dummy files instead of copying ---
-  try {
-    // Ensure target directories exist
-    await fs.ensureDir(targetTranslationsDir);
-    await fs.ensureDir(targetTemplatesJsonDir);
-
-    // Create dummy rules files
-    const dummyRulesContent = JSON.stringify({ schema: "rules_v1", content: "Dummy rule content" }, null, 2);
-    await fs.outputFile(path.join(targetTemplatesJsonDir, 'rules.json'), dummyRulesContent, 'utf-8');
-    await fs.outputFile(path.join(targetTemplatesJsonDir, 'rules-ja.json'), dummyRulesContent, 'utf-8');
-    await fs.outputFile(path.join(targetTemplatesJsonDir, 'rules-en.json'), dummyRulesContent, 'utf-8');
-    await fs.outputFile(path.join(targetTemplatesJsonDir, 'rules-zh.json'), dummyRulesContent, 'utf-8');
-    logger.debug(`Created dummy rules files in ${targetTemplatesJsonDir}`);
-
-    // Create dummy branch context file for ReadBranchDocumentUseCase test
-    const dummyBranchContext = {
-      schema: "memory_document_v2",
-      metadata: { id: "test-branch-context", documentType: "branch_context", path: "branchContext.json" },
-      content: { value: "Dummy branch context" }
-    };
-    // Ensure the specific branch directory exists before writing the file
-    const testBranchDir = path.join(branchMemoryPath, 'feature-test-branch'); // Use safe name convention
-    await fs.ensureDir(testBranchDir);
-    const jsonContent = JSON.stringify(dummyBranchContext, null, 2);
-    await fs.outputFile(path.join(testBranchDir, 'branchContext.json'), jsonContent, 'utf-8');
-    logger.debug(`Created dummy branchContext.json in ${testBranchDir}`);
-
-  } catch (createError) {
-    logger.error('Error creating dummy files in temp directory:', createError);
-    await cleanup();
-    throw createError;
-  }
-  // --- End: Create dummy files instead of copying ---
+  // Removed dummy file creation logic to use actual copied files
 
   // --- Start: Initialize Git Repository ---
   try {
