@@ -61,7 +61,7 @@ const mockDocumentWriterService = {
 // --- モックの準備ここまで ---
 
 
-describe('WriteBranchDocumentUseCase', () => {
+describe('WriteBranchDocumentUseCase Unit Tests', () => {
   let useCase: WriteBranchDocumentUseCase;
 
   beforeEach(() => {
@@ -76,7 +76,7 @@ describe('WriteBranchDocumentUseCase', () => {
   });
 
   describe('execute', () => {
-    it('新しいドキュメントを content で作成できること', async () => {
+    it('should create a new document with content', async () => {
       const branchName = 'feature/new-doc';
       const docPath = DocumentPath.create('newDoc.txt');
       const content = 'This is a new document.';
@@ -117,7 +117,7 @@ describe('WriteBranchDocumentUseCase', () => {
       expect(result.document.tags).toEqual(tags.map(t => t.value));
       expect(result.document.lastModified).toBeDefined(); // lastModified があることを確認
     });
-    it('既存のドキュメントを content で上書きできること', async () => {
+    it('should overwrite an existing document with content', async () => {
       const branchName = 'feature/existing-doc';
       const docPath = DocumentPath.create('existingDoc.txt');
       const existingContent = 'This is the original content.';
@@ -157,7 +157,7 @@ describe('WriteBranchDocumentUseCase', () => {
       expect(result.document.lastModified).toBeDefined();
       // expect(new Date(result.document.lastModified)).toBeGreaterThan(existingDoc.lastModified); // 必要なら日付比較
     });
-    it('既存のドキュメントを patches で更新できること', async () => {
+    it('should update an existing document with patches', async () => {
       const branchName = 'feature/patch-doc';
       const docPath = DocumentPath.create('data.json');
       const existingContent = JSON.stringify({ name: 'old name', value: 10 });
@@ -196,7 +196,7 @@ describe('WriteBranchDocumentUseCase', () => {
       expect(result.document.tags).toEqual(tags.map(t => t.value)); // write が返したタグ
       expect(result.document.lastModified).toBeDefined();
     });
-    it('content と tags を指定してドキュメントを作成/上書きできること', async () => {
+    it('should create/overwrite a document with content and tags', async () => {
       const branchName = 'feature/content-tags';
       const docPath = DocumentPath.create('docWithTags.md');
       const existingContent = '# Old Title';
@@ -236,7 +236,7 @@ describe('WriteBranchDocumentUseCase', () => {
       expect(result.document.tags).toEqual(newTags.map(t => t.value)); // タグが更新されている
       expect(result.document.lastModified).toBeDefined();
     });
-    it('patches と tags を指定してドキュメントを更新できること', async () => {
+    it('should update a document with patches and tags', async () => {
       const branchName = 'feature/patch-tags';
       const docPath = DocumentPath.create('patchTags.json');
       const existingContent = JSON.stringify({ value: 1, status: 'old' });
@@ -278,7 +278,7 @@ describe('WriteBranchDocumentUseCase', () => {
       expect(result.document.lastModified).toBeDefined();
     });
 
-    it('ブランチ名が指定されない場合に自動検出されること (プロジェクトモード)', async () => {
+    it('should auto-detect branch name when not specified (in project mode)', async () => {
       const detectedBranchName = 'feature/auto-detect'; // Gitから検出される想定のブランチ名
       const docPath = DocumentPath.create('autoDetect.txt');
       const content = 'Content for auto-detected branch.';
@@ -306,7 +306,7 @@ describe('WriteBranchDocumentUseCase', () => {
       );
       expect(result.document.path).toBe(docPath.value);
     });
-    it('ブランチ名が指定されない場合にエラーが発生すること (非プロジェクトモード)', async () => {
+    it('should throw an error when branch name is not specified (not in project mode)', async () => {
       const docPath = DocumentPath.create('someDoc.txt');
       const content = 'Some content.';
       const documentInput = { path: docPath.value, content };
@@ -332,7 +332,7 @@ describe('WriteBranchDocumentUseCase', () => {
       expect(mockDocumentWriterService.write).not.toHaveBeenCalled(); // 書き込みもしないはず
     });
 
-    it('必須パラメータ (path) が不足している場合にエラーが発生すること', async () => {
+    it('should throw an error when required parameter (path) is missing', async () => {
       const branchName = 'feature/missing-path';
       // documentInput から path を意図的に除外
       const documentInput = { content: 'Some content' } as any; // path がないので any でキャスト
@@ -354,7 +354,7 @@ describe('WriteBranchDocumentUseCase', () => {
       expect(mockBranchRepository.exists).not.toHaveBeenCalled();
       expect(mockDocumentWriterService.write).not.toHaveBeenCalled();
     });
-    it('content と patches が同時に指定された場合にエラーが発生すること', async () => {
+    it('should throw an error when both content and patches are specified', async () => {
       const branchName = 'feature/content-and-patches';
       const docPath = DocumentPath.create('invalid.json');
       const content = '{"key":"value"}';
@@ -367,14 +367,18 @@ describe('WriteBranchDocumentUseCase', () => {
       (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${branchName}`); // as Mock 追加
 
       // 実行＆検証 (content と patches を両方渡す)
+      // Check code and message individually instead of the whole error object
       await expect(useCase.execute({ branchName, document: documentInput, patches }))
-        .rejects.toThrow(expectedError);
+        .rejects.toMatchObject({
+          code: expectedError.code,
+          message: expectedError.message,
+        });
 
       // 検証 (主要な処理が呼ばれていないことを確認)
       expect(mockBranchRepository.exists).not.toHaveBeenCalled();
       expect(mockDocumentWriterService.write).not.toHaveBeenCalled();
     });
-    it('patches が指定されたが、対象ドキュメントがJSONでない場合にエラーが発生すること', async () => {
+    it('should throw an error when patches are specified but the target document is not JSON', async () => {
       const branchName = 'feature/patch-non-json';
       const docPath = DocumentPath.create('notJson.txt');
       const patches = [{ op: 'add', path: '/someKey', value: 'someValue' }];
@@ -391,8 +395,12 @@ describe('WriteBranchDocumentUseCase', () => {
       (mockDocumentWriterService.write as Mock).mockRejectedValue(expectedError); // as Mock 追加
 
       // 実行＆検証
+      // Check code and message individually
       await expect(useCase.execute({ branchName, document: documentInput, patches }))
-        .rejects.toThrow(expectedError);
+        .rejects.toMatchObject({
+          code: expectedError.code,
+          message: expectedError.message,
+        });
 
       // 検証 (write が呼ばれたことを確認)
       expect(mockDocumentWriterService.write).toHaveBeenCalledWith(
@@ -402,7 +410,7 @@ describe('WriteBranchDocumentUseCase', () => {
       // saveDocument は呼ばれないはず
       // (write の中でエラーになるため)
     });
-    it('patches が指定されたが、対象ドキュメントが存在しない場合にエラーが発生すること', async () => {
+    it('should throw an error when patches are specified but the target document does not exist', async () => {
       const branchName = 'feature/patch-non-existent';
       const docPath = DocumentPath.create('nonExistent.json');
       const patches = [{ op: 'add', path: '/key', value: 'value' }];
@@ -419,8 +427,12 @@ describe('WriteBranchDocumentUseCase', () => {
       (mockDocumentWriterService.write as Mock).mockRejectedValue(expectedError); // as Mock 追加
 
       // 実行＆検証
+      // Check code and message individually
       await expect(useCase.execute({ branchName, document: documentInput, patches }))
-        .rejects.toThrow(expectedError);
+        .rejects.toMatchObject({
+          code: expectedError.code,
+          message: expectedError.message,
+        });
 
       // 検証 (write が呼ばれたことを確認)
       expect(mockDocumentWriterService.write).toHaveBeenCalledWith(
@@ -429,7 +441,7 @@ describe('WriteBranchDocumentUseCase', () => {
       );
     });
 
-    it('存在しないブランチに書き込もうとした場合にエラーが発生すること', async () => {
+    it('should throw an error when trying to write to a non-existent branch', async () => {
       const branchName = 'feature/non-existent-branch';
       const docPath = DocumentPath.create('someDoc.txt');
       const content = 'Content for non-existent branch.';
@@ -455,7 +467,7 @@ describe('WriteBranchDocumentUseCase', () => {
       expect(mockBranchRepository.initialize).toHaveBeenCalledWith(branchInfo); // initialize は呼ばれるが失敗する
       expect(mockDocumentWriterService.write).not.toHaveBeenCalled(); // write は呼ばれない
     });
-    it('リポジトリ (saveDocument) でエラーが発生した場合にエラーが伝播すること', async () => {
+    it('should propagate error if repository (saveDocument) throws an error', async () => {
       const branchName = 'feature/repo-save-error';
       const docPath = DocumentPath.create('saveError.txt');
       const content = 'This content will fail to save.';
@@ -474,8 +486,12 @@ describe('WriteBranchDocumentUseCase', () => {
       (mockDocumentWriterService.write as Mock).mockRejectedValue(expectedError); // as Mock 追加
 
       // 実行＆検証
+      // Check code and message individually
       await expect(useCase.execute({ branchName, document: documentInput }))
-        .rejects.toThrow(expectedError);
+        .rejects.toMatchObject({
+          code: expectedError.code,
+          message: expectedError.message,
+        });
 
       // 検証 (write が呼ばれたことを確認)
       expect(mockDocumentWriterService.write).toHaveBeenCalledWith(
@@ -483,7 +499,7 @@ describe('WriteBranchDocumentUseCase', () => {
         expect.objectContaining({ path: docPath, content }) // writerInput
       );
     });
-    it.todo('タグ更新 (UpdateTagIndexUseCase) でエラーが発生した場合にエラーが伝播すること');
-    it.todo('JSON Patch適用 (JsonPatchService) でエラーが発生した場合にエラーが伝播すること');
+    it.todo('should propagate error if tag update (UpdateTagIndexUseCase) throws an error');
+    it.todo('should propagate error if JSON Patch application (JsonPatchService) throws an error');
   });
 });
