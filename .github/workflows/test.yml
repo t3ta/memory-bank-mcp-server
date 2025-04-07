@@ -41,9 +41,9 @@ jobs:
       - name: Build schemas package explicitly
         run: yarn workspace @memory-bank/schemas build
 
-      # Build the project using tsc -b directly (for debugging CI issues)
-      - name: Build project using tsc -b
-        run: yarn tsc -b
+      # Build the project using the build script (which includes copying assets)
+      - name: Build project
+        run: yarn build
 
       - name: Check Dependencies
         run: yarn check:deps
