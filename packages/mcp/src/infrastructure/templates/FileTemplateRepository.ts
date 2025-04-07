@@ -86,8 +86,8 @@ export class FileTemplateRepository implements ITemplateRepository {
    */
   async initialize(): Promise<void> {
     try {
-      // Ensure templates directory exists
-      await fs.mkdir(this.basePath, { recursive: true });
+      // Directory creation is handled externally or assumed to exist.
+      // await fs.mkdir(this.basePath, { recursive: true }); // Removed directory creation
 
       // Load all templates into cache
       await this.loadAllTemplates();

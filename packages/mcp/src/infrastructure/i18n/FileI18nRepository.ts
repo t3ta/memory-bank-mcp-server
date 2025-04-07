@@ -47,8 +47,11 @@ export class FileI18nRepository implements II18nRepository {
    */
   async initialize(): Promise<void> {
     try {
-      await fs.mkdir(this.basePath, { recursive: true });
+      // this.componentLogger.debug(`Initializing with basePath: ${this.basePath}`); // Removed debug log
+      // Directory creation is handled externally or assumed to exist.
+      // await fs.mkdir(this.basePath, { recursive: true }); // Removed directory creation
       await this.loadAllTranslations();
+      // this.componentLogger.debug('Initialization complete.'); // Removed debug log
     } catch (error) {
       throw new Error(`Failed to initialize I18n repository: ${(error as Error).message}`);
     }
@@ -208,42 +211,48 @@ export class FileI18nRepository implements II18nRepository {
 
     return Array.from(this.translationCache.keys())
       .map(code => new Language(code));
-  }
+  } // End of getSupportedLanguages
 
+  // Private methods should be part of the class definition
   /**
    * Loads all translations into cache
    *
    * @private
    */
-  private async loadAllTranslations(): Promise<void> {
-    try {
-      this.translationCache.clear();
+   private async loadAllTranslations(): Promise<void> {
+     try {
+       // this.componentLogger.debug('Loading all translations...'); // Removed debug log
+       this.translationCache.clear();
 
-      try {
-        await fs.access(this.basePath);
-      } catch (error) {
-        await fs.mkdir(this.basePath, { recursive: true });
-        this.cacheDirty = false;
-        return;
-      }
+       try {
+         await fs.access(this.basePath);
+       } catch (error) {
+         // If directory doesn't exist, log and return (don't create it here)
+         this.componentLogger.warn(`Translation directory not found: ${this.basePath}. No translations loaded.`);
+         // await fs.mkdir(this.basePath, { recursive: true }); // Removed directory creation
+         this.cacheDirty = false;
+         return;
+       }
 
-      const files = await fs.readdir(this.basePath);
-      const translationFiles = files.filter(file =>
-        file.endsWith('.json') &&
-        Language.supportedLanguages().some(lang => file === `${lang}.json`)
-      );
+       const files = await fs.readdir(this.basePath);
+       const translationFiles = files.filter(file =>
+         file.endsWith('.json') &&
+         Language.supportedLanguages().some(lang => file === `${lang}.json`)
+       );
+       // this.componentLogger.debug(`Found ${translationFiles.length} translation files.`); // Removed debug log
 
-      for (const file of translationFiles) {
-        const langCode = path.basename(file, '.json') as LanguageCode;
-        await this.loadTranslationsForLanguage(langCode);
-      }
+       for (const file of translationFiles) {
+         const langCode = path.basename(file, '.json') as LanguageCode;
+         await this.loadTranslationsForLanguage(langCode);
+       }
 
-      this.cacheDirty = false;
-    } catch (error) {
-      this.componentLogger.error('Failed to load translations', { error }); // Use componentLogger
-      throw new Error(`Failed to load translations: ${(error as Error).message}`);
-    }
-  }
+       this.cacheDirty = false;
+       // this.componentLogger.debug('Finished loading all translations.'); // Removed debug log
+     } catch (error) {
+       this.componentLogger.error('Failed to load translations', { error }); // Use componentLogger
+       throw new Error(`Failed to load translations: ${(error as Error).message}`);
+     }
+   } // End of loadAllTranslations
 
   /**
    * Loads translations for a specific language
@@ -251,35 +260,38 @@ export class FileI18nRepository implements II18nRepository {
    * @param langCode Language code
    * @private
    */
-  private async loadTranslationsForLanguage(langCode: LanguageCode): Promise<void> {
-    try {
-      const filePath = path.join(this.basePath, `${langCode}.json`);
+   private async loadTranslationsForLanguage(langCode: LanguageCode): Promise<void> {
+     const filePath = path.join(this.basePath, `${langCode}.json`);
+     // this.componentLogger.debug(`Loading translations for ${langCode} from ${filePath}`); // Removed debug log
+     try {
+       try {
+         await fs.access(filePath);
+       } catch (error) {
+         // this.componentLogger.warn(`Translation file not found for ${langCode}: ${filePath}`); // Removed debug log
+         return; // ファイルが存在しない場合は何もしない
+       }
 
-      try {
-        await fs.access(filePath);
-      } catch (error) {
-        return;
-      }
+       const content = await fs.readFile(filePath, 'utf-8');
+       const data = JSON.parse(content) as TranslationFile;
 
-      const content = await fs.readFile(filePath, 'utf-8');
-      const data = JSON.parse(content) as TranslationFile;
+       if (data.language !== langCode) {
+         throw new Error(`Language mismatch in file ${filePath}: expected ${langCode}, got ${data.language}`);
+       }
 
-      if (data.language !== langCode) {
-        throw new Error(`Language mismatch in file ${filePath}: expected ${langCode}, got ${data.language}`);
-      }
+       const langCache = new Map<TranslationKey, string>();
 
-      const langCache = new Map<TranslationKey, string>();
+       for (const [key, text] of Object.entries(data.translations)) {
+         langCache.set(key, text);
+       }
 
-      for (const [key, text] of Object.entries(data.translations)) {
-        langCache.set(key, text);
-      }
-
-      this.translationCache.set(langCode, langCache);
-    } catch (error) {
-      this.componentLogger.error(`Failed to load translations for ${langCode}`, { error }); // Use componentLogger
-      throw new Error(`Failed to load translations for ${langCode}: ${(error as Error).message}`);
-    }
-  }
+       this.translationCache.set(langCode, langCache);
+       // this.componentLogger.debug(`Loaded ${langCache.size} translations for ${langCode}`); // Removed debug log
+     } catch (error) {
+       this.componentLogger.error(`Failed to load translations for ${langCode}`, { error }); // Use componentLogger
+       // エラーが発生しても処理を続行させるため、ここでは throw しない（キャッシュが空になるだけ）
+       // throw new Error(`Failed to load translations for ${langCode}: ${(error as Error).message}`);
+     }
+   } // End of loadTranslationsForLanguage
 
   /**
    * Saves translations for a specific language
@@ -312,6 +324,6 @@ export class FileI18nRepository implements II18nRepository {
     } catch (error) {
       this.componentLogger.error(`Failed to save translations for ${language.code}`, { error }); // Use componentLogger
       throw new Error(`Failed to save translations for ${language.code}: ${(error as Error).message}`);
-    }
+    } // saveTranslationsForLanguage の閉じ括弧
   }
 }

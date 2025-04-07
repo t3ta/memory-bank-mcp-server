@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "prepare": "husky",
-    "build": "tsc -b",
+    "build": "tsc -b && node scripts/copy-assets.js",
     "build:mcp": "yarn workspace @memory-bank/mcp build",
     "build:schemas": "yarn workspace @memory-bank/schemas build",
     "copy-assets": "node scripts/copy-assets.js",

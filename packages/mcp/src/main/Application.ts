@@ -5,6 +5,7 @@ import { IContextController } from '../interface/controllers/interfaces/IContext
 import { Constants } from './config/constants.js';
 import { logger } from '../shared/utils/logger.js'; // パスエイリアスを相対パスに修正
 import type { Language } from '@memory-bank/schemas';
+import { LATEST_PROTOCOL_VERSION } from '@modelcontextprotocol/sdk/types.js'; // Keep the correct import
 
 // Minimal options interface needed by the Application
 interface MinimalAppOptions {
@@ -40,8 +41,7 @@ export class Application {
   async initialize(): Promise<void> {
     try {
       logger.info('Initializing application..');
-
-      this.container = await setupContainer(this.options);
+this.container = await setupContainer(this.options);
 
       this.globalController = await this.container.get('globalController') as IGlobalController;
       this.branchController = await this.container.get('branchController') as IBranchController;
@@ -88,5 +88,90 @@ export class Application {
     }
 
     return this.contextController;
+  }
+
+  /**
+   * Handles incoming connections from a client transport.
+   * @param transport The server-side transport for communication.
+   */
+  async handleConnection(transport: any): Promise<void> { // Use 'any' for Transport type initially
+    logger.info('[Application.handleConnection] Handling new connection...');
+
+    transport.onmessage = async (message: any) => { // Use 'any' for JSONRPCRequest type initially
+      let response: any | null = null; // Use 'any' for JSONRPCResponse type initially
+
+      try {
+        // TODO: Implement message routing based on message.method
+        // e.g., call appropriate controller method (global, branch, context)
+        if (!message || typeof message.method !== 'string') {
+           throw new Error('Invalid JSON-RPC message received');
+        }
+
+        const method = message.method;
+        const params = message.params || {}; // Ensure params exist
+
+        if (method === 'initialize') { // Handle initialize method
+           // Respond with basic server info (can be expanded later)
+           response = {
+               jsonrpc: '2.0',
+               id: message.id,
+               result: {
+                 protocolVersion: LATEST_PROTOCOL_VERSION,
+                 serverInfo: {
+                   name: Constants.APP_NAME,
+                   version: Constants.VERSION,
+                 },
+                 capabilities: {}
+               }
+             };
+        } else if (method === 'read_context' && this.contextController) {
+           logger.debug(`Routing to contextController.${method}`);
+           // TODO: Implement actual controller call
+           response = { jsonrpc: '2.0', id: message.id, error: { code: -32601, message: `Method not implemented yet: ${method}` } };
+        } else if (method.startsWith('read_global') && this.globalController) {
+           logger.debug(`Routing to globalController.${method}`);
+           // TODO: Implement actual controller call
+           response = { jsonrpc: '2.0', id: message.id, error: { code: -32601, message: `Method not implemented yet: ${method}` } };
+        } else if (method.startsWith('write_branch') && this.branchController) {
+           logger.debug(`Routing to branchController.${method}`);
+           // TODO: Implement actual controller call
+           response = { jsonrpc: '2.0', id: message.id, error: { code: -32601, message: `Method not implemented yet: ${method}` } };
+         } else if (method.startsWith('read_branch') && this.branchController) {
+            logger.debug(`Routing to branchController.${method}`);
+            // TODO: Implement actual controller call
+            response = { jsonrpc: '2.0', id: message.id, error: { code: -32601, message: `Method not implemented yet: ${method}` } };
+         } else if (method.startsWith('search_documents') && (this.globalController || this.branchController)) {
+             logger.debug(`Routing to searchDocumentsByTagsUseCase via controller`);
+             // TODO: Implement actual controller call
+             response = { jsonrpc: '2.0', id: message.id, error: { code: -32601, message: `Method not implemented yet: ${method}` } };
+        } else {
+          logger.warn(`Method not found or controller not available: ${method}`);
+          response = { jsonrpc: '2.0', id: message.id, error: { code: -32601, message: `Method not found: ${method}` } };
+        }
+
+      } catch (error: any) {
+        // Keep error log, but maybe simplify context if needed
+        logger.error('[Application.handleConnection] Error processing message:', { error: error.message });
+        response = {
+          jsonrpc: '2.0',
+          id: message?.id ?? null, // Use null id if message.id is missing
+          error: { code: -32000, message: error.message || 'Internal server error' },
+        };
+      }
+
+      if (response) {
+        await transport.send(response);
+      }
+    };
+
+    transport.onclose = () => {
+      logger.info('[Application.handleConnection] Connection closed.'); // Restore info log
+      // Perform any necessary cleanup for this connection
+    };
+
+    // Start the transport if it's not already started (optional, depends on transport impl)
+    // await transport.start(); // Assuming transport starts automatically or is started elsewhere
+
+    logger.info('[Application.handleConnection] Connection handler set up.'); // Restore info log
   }
 }

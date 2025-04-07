@@ -49,17 +49,10 @@ constructor(
       );
     }
 
-    // Define possiblePaths outside the try block to access it in catch
-    const possiblePaths = [
-      // New single template path
-      path.join(this.rulesDir, 'templates', 'json', 'rules.json'),
-      // New path (domain/templates replaced templates/json)
-      path.join(this.rulesDir, 'domain', 'templates', `rules-${language}.json`),
-      // Previous path (for compatibility with older systems)
-      path.join(this.rulesDir, 'templates', 'json', `rules-${language}.json`),
-      // Fallback path
-      path.join(this.rulesDir, `rules-${language}.json`)
-    ];
+    // Define the primary path for the rules file
+    // Older paths were removed as they are deprecated.
+    const primaryRulesPath = path.join(this.rulesDir, 'domain', 'templates', `rules-${language}.json`);
+    const possiblePaths = [primaryRulesPath]; // Keep as array for loop logic, but only contain the primary path
 
     let jsonContent = ''; // Declare jsonContent here to be accessible in the outer scope
     let jsonFilePath = ''; // Declare jsonFilePath here
@@ -80,12 +73,12 @@ constructor(
             langObject // Pass Language object
           );
 
-          // Assuming template loader returns JSON string that needs parsing
-          const jsonData = JSON.parse(templateContent);
-          const content = JSON.stringify(jsonData, null, 2);
+          // Template loader returns Markdown content, use it directly
+          // const jsonData = JSON.parse(templateContent); // Removed JSON parsing
+          // const content = JSON.stringify(jsonData, null, 2); // Removed stringify
 
           return {
-            content,
+            content: templateContent, // Use Markdown content directly
             language
           };
         } catch (templateError) {

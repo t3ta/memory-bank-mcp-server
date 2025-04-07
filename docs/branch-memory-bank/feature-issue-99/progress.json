@@ -1,0 +1,19 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-issue-99-progress",
+    "title": "Progress for feature/issue-99",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "createdAt": "2025-04-07T01:52:08.681Z",
+    "lastModified": "2025-04-07T07:06:53.025Z"
+  },
+  "content": {
+    "summary": "Initial progress for branch: feature/issue-99",
+    "status": "initialized",
+    "steps": [],
+    "next_steps": [],
+    "findings": []
+  }
+}

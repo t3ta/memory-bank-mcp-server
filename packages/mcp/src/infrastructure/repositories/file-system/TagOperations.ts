@@ -317,13 +317,21 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
       const documents: MemoryDocument[] = [];
 
       logger.debug('Starting document read loop...'); // Log loop start
-      for (const docPath of paths) {
-        const doc = await documentRepository.findByPath(docPath);
+      let docReadCounter = 0; // Add counter
+      const startTime = Date.now(); // Record start time
+      for (const docPath of paths) { // Loop through each path
+        docReadCounter++; // Increment counter
+        const loopStartTime = Date.now(); // Loop start time
+        logger.debug(`[generateGlobalTagIndex] Processing doc ${docReadCounter}/${paths.length}: ${docPath.value}`); // Add processing log
+        const doc = await documentRepository.findByPath(docPath); // Read document
         if (doc) {
           documents.push(doc);
         }
+        const loopEndTime = Date.now(); // Loop end time
+        logger.debug(`[generateGlobalTagIndex] Finished processing doc ${docPath.value} in ${loopEndTime - loopStartTime}ms`); // Add processing time log
       }
-      logger.debug('Finished document read loop.'); // Log loop end
+      const endTime = Date.now(); // Record end time
+      logger.debug(`Finished document read loop in ${endTime - startTime}ms.`); // Log total time
 
       // Create tag index (compliant with schema definition)
       const tagEntriesMap = new Map<string, { tag: Tag; documents: DocumentReference[] }>();

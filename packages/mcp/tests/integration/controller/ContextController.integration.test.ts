@@ -22,6 +22,9 @@ describe('ContextController Integration Tests', () => {
     await createBranchDir(testEnv, TEST_BRANCH);
     // Initialize DI container with test configuration
     container = await setupContainer({ docsRoot: testEnv.docRoot });
+    // Set log level to debug for testing
+    const { logger } = await import('../../../src/shared/utils/logger.js');
+    logger.setLevel('debug');
     // Removed mock application initialization
     // app = new Application({ docsRoot: testEnv.docRoot });
   });

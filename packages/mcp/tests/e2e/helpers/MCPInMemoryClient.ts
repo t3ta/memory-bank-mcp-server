@@ -81,8 +81,9 @@ export class MCPInMemoryClient {
     logger.debug(`[MCPInMemoryClient] Calling tool: ${toolName}`, { args });
     try {
       const params = { name: toolName, arguments: args }; // Removed type annotation CallToolParams
+      // logger.debug(`[MCPInMemoryClient] Calling tool: ${toolName}`, { args }); // Remove duplicate log
       const result = await this.client.callTool(params);
-      logger.debug(`[MCPInMemoryClient] Tool call successful: ${toolName}`, { result });
+      logger.debug(`[MCPInMemoryClient] Tool call successful: ${toolName}`, { result }); // Restore original log
       return result as TResult;
     } catch (error) {
       logger.error(`[MCPInMemoryClient] Tool call failed: ${toolName}`, { error, args });

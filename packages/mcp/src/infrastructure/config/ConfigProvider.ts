@@ -24,10 +24,9 @@ export class ConfigProvider implements IConfigProvider {
   async initialize(options?: CliOptions): Promise<WorkspaceConfig> {
     try {
       if (this.config) return this.config;
-
-      // resolveDocsRoot がパスと解決方法を返すように変更
-      const { resolvedPath: docsRoot, resolvedBy } = await this.resolveDocsRoot(options);
-      const language = await this.resolveLanguage(options);
+// resolveDocsRoot がパスと解決方法を返すように変更
+const { resolvedPath: docsRoot, resolvedBy } = await this.resolveDocsRoot(options);
+const language = await this.resolveLanguage(options);
 
       // 解決方法が 'default' 以外ならプロジェクトモードと判断
       const isProjectMode = resolvedBy !== 'default';

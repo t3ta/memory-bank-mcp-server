@@ -24,6 +24,7 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "outDir": "./dist",
+    "rootDir": "./src", // Add rootDir explicitly
     "baseUrl": "./",
     "paths": {
       "@/*": [
@@ -55,7 +56,6 @@
   },
   "include": [
     "src/**/*",
-    "tests/**/*.ts"
   ],
   "exclude": [
     "node_modules",

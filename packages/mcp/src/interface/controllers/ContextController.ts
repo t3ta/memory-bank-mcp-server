@@ -91,7 +91,8 @@ export class ContextController implements IContextController {
         logger.debug(`Rules retrieved successfully for language: ${request.language}`);
       } catch (error) {
         logger.error(`Failed to read rules for language ${request.language}:`, error);
-        // Failure to read rules is not fatal, return other context information
+        // Propagate the error to be handled by the outer catch block
+        throw error;
       }
 
       return {

@@ -33,7 +33,7 @@
     "template.content.file_editing_rules": "メモリバンクのファイルを編集する際は、以下のルールに従ってください：\n\n1. 直接ファイルを編集するのではなく、CLIコマンドを使用する\n2. JSONの構文が正しいことを確認する\n3. 必須フィールドを削除しない\n4. スキーマバージョンを変更しない",
     "template.section.finally": "最後に",
     "template.content.finally": "メモリバンクは、プロジェクトの知識を管理するための強力なツールです。適切に使用することで、チームの生産性と協力を向上させることができます。",
-    "template.section.footer": "",
+    "template.section.footer": "(フッター)",
     "template.content.footer": "---\n\n_このドキュメントはメモリーバンクの基本的なルールと構造を説明するものです_",
 
     "template.title.active_context": "アクティブコンテキストテンプレート",

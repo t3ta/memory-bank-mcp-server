@@ -1,0 +1,17 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-issue-99-active-context",
+    "title": "Active Context for feature/issue-99",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [],
+    "createdAt": "2025-04-07T01:52:08.681Z",
+    "lastModified": "2025-04-07T01:52:08.681Z"
+  },
+  "content": {
+    "current_task": "Initial active context for branch: feature/issue-99",
+    "relevant_files": [],
+    "recent_decisions": []
+  }
+}

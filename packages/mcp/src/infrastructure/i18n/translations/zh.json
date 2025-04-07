@@ -33,7 +33,7 @@
     "template.content.file_editing_rules": "编辑记忆库文件时，请遵循以下规则：\n\n1. 使用CLI命令而不是直接编辑文件\n2. 确保JSON语法正确\n3. 不要删除必需字段\n4. 不要更改架构版本",
     "template.section.finally": "最后",
     "template.content.finally": "记忆库是管理项目知识的强大工具。通过适当使用它，可以提高团队生产力和协作。",
-    "template.section.footer": "",
+    "template.section.footer": "(页脚)",
     "template.content.footer": "---\n\n_此文档解释了记忆库的基本规则和结构_",
 
     "template.title.active_context": "活动上下文",

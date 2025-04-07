@@ -252,6 +252,11 @@ export class FileSystemService implements IFileSystemService {
                   this.componentLogger.debug(`Found file`, { filePath: fullPath });
                   return [fullPath];
                 } else if (entry.isDirectory()) {
+                  // Ignore .git and node_modules directories
+                  if (entry.name === '.git' || entry.name === 'node_modules') {
+                    this.componentLogger.debug(`Ignoring directory`, { dirPath: fullPath });
+                    return [];
+                  }
                   this.componentLogger.debug(`Found directory, recursing...`, { dirPath: fullPath });
                   try {
                     const subFiles = await this.listFiles(fullPath);
