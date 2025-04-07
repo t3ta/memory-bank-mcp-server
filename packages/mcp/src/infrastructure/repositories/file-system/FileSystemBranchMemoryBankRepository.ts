@@ -113,6 +113,7 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
         await this.documentIO.saveDocument(branchInfo, tempDoc);
         logger.debug(`[initialize] Created core file: ${fileInfo.fileName}`); // Add log for confirmation
       }
+      logger.info(`[initialize] Finished creating all core files for branch: ${safeBranchName}`); // Add log to confirm loop completion
 
     } catch (error: unknown) {
       logger.error('Failed to initialize branch memory bank or create core files:', {
