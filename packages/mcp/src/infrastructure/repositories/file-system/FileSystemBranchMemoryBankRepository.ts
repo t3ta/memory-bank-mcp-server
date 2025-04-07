@@ -101,16 +101,18 @@ export class FileSystemBranchMemoryBankRepository implements IBranchMemoryBankRe
         }
       ];
 
-      await Promise.all(coreFilesToCreate.map(async (fileInfo) => {
-          const docPath = DocumentPath.create(fileInfo.fileName);
-          const tempDoc = MemoryDocument.create({
-              path: docPath,
-              content: JSON.stringify(fileInfo.content, null, 2),
-              tags: fileInfo.content.metadata.tags.map((t: string) => Tag.create(t)),
-              lastModified: new Date(fileInfo.content.metadata.lastModified)
-          });
-          await this.documentIO.saveDocument(branchInfo, tempDoc);
-      }));
+      // Use for...of loop for sequential creation to ensure files exist before listDocuments might be called
+      for (const fileInfo of coreFilesToCreate) {
+        const docPath = DocumentPath.create(fileInfo.fileName);
+        const tempDoc = MemoryDocument.create({
+            path: docPath,
+            content: JSON.stringify(fileInfo.content, null, 2),
+            tags: fileInfo.content.metadata.tags.map((t: string) => Tag.create(t)),
+            lastModified: new Date(fileInfo.content.metadata.lastModified)
+        });
+        await this.documentIO.saveDocument(branchInfo, tempDoc);
+        logger.debug(`[initialize] Created core file: ${fileInfo.fileName}`); // Add log for confirmation
+      }
 
     } catch (error: unknown) {
       logger.error('Failed to initialize branch memory bank or create core files:', {
