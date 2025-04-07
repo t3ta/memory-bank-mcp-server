@@ -17,7 +17,7 @@ describe('DocumentId', () => {
         fail('Expected DomainError to be thrown'); // エラーがスローされなかったらテスト失敗
       } catch (error) {
         expect(error).toBeInstanceOf(DomainError);
-        expect((error as DomainError).code).toBe(DomainErrorCodes.INVALID_DOCUMENT_ID);
+        expect((error as DomainError).code).toBe(`DOMAIN_ERROR.${DomainErrorCodes.INVALID_DOCUMENT_ID}`); // Add prefix
         expect((error as DomainError).message).toBe('Document ID cannot be empty');
       }
     });
@@ -29,7 +29,7 @@ describe('DocumentId', () => {
         fail('Expected DomainError to be thrown'); // エラーがスローされなかったらテスト失敗
       } catch (error) {
         expect(error).toBeInstanceOf(DomainError);
-        expect((error as DomainError).code).toBe(DomainErrorCodes.INVALID_DOCUMENT_ID);
+        expect((error as DomainError).code).toBe(`DOMAIN_ERROR.${DomainErrorCodes.INVALID_DOCUMENT_ID}`); // Add prefix
         expect((error as DomainError).message).toBe('Document ID must be a valid UUID');
       }
     });
