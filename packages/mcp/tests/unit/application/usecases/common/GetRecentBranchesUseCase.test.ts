@@ -5,7 +5,7 @@ import { IBranchMemoryBankRepository } from '../../../../../src/domain/repositor
 // import { mock } from 'jest-mock-extended'; // jest-mock-extended を削除
 import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo.js';
 
-describe('GetRecentBranchesUseCase', () => {
+describe('GetRecentBranchesUseCase Unit Tests', () => {
   let useCase: GetRecentBranchesUseCase;
   // jest.Mocked を削除し、手動モックの型を指定
   let mockBranchRepository: IBranchMemoryBankRepository;
@@ -35,7 +35,7 @@ describe('GetRecentBranchesUseCase', () => {
       { branchInfo: BranchInfo.create('feature/branch-1'), lastModified: new Date(), summary: { currentWork: 'Task 1', recentChanges: [] } },
       { branchInfo: BranchInfo.create('feature/branch-2'), lastModified: new Date(), summary: { currentWork: 'Task 2', recentChanges: [] } },
     ];
-    (mockBranchRepository.getRecentBranches as Mock).mockResolvedValue(mockRecentBranches); // as Mock 追加
+    (mockBranchRepository.getRecentBranches as Mock).mockResolvedValue(mockRecentBranches);
 
     // Act
     const result = await useCase.execute({ limit: 5 });
@@ -44,12 +44,12 @@ describe('GetRecentBranchesUseCase', () => {
     expect(result.branches).toHaveLength(2);
     expect(result.branches[0].name).toBe('feature/branch-1');
     expect(result.branches[1].name).toBe('feature/branch-2');
-    expect(mockBranchRepository.getRecentBranches).toHaveBeenCalledWith(5); // limit が渡されることを確認
+    expect(mockBranchRepository.getRecentBranches).toHaveBeenCalledWith(5); // Check if limit was passed
   });
 
   it('should return an empty list if no recent branches found', async () => {
     // Arrange
-    (mockBranchRepository.getRecentBranches as Mock).mockResolvedValue([]); // as Mock 追加
+    (mockBranchRepository.getRecentBranches as Mock).mockResolvedValue([]);
 
     // Act
     const result = await useCase.execute({ limit: 5 });
@@ -61,13 +61,13 @@ describe('GetRecentBranchesUseCase', () => {
 
   it('should use default limit (10) if limit is not provided', async () => {
     // Arrange
-    (mockBranchRepository.getRecentBranches as Mock).mockResolvedValue([]); // as Mock 追加
+    (mockBranchRepository.getRecentBranches as Mock).mockResolvedValue([]);
 
     // Act
-    await useCase.execute({}); // limit を指定しない
+    await useCase.execute({}); // Do not specify limit
 
     // Assert
-    expect(mockBranchRepository.getRecentBranches).toHaveBeenCalledWith(10); // デフォルト値10が使われるはず
+    expect(mockBranchRepository.getRecentBranches).toHaveBeenCalledWith(10); // Default value 10 should be used
   });
 
   it('should throw ApplicationError if limit is less than 1', async () => {
@@ -77,7 +77,7 @@ describe('GetRecentBranchesUseCase', () => {
       throw new Error('Expected ApplicationError for limit 0');
     } catch (error) {
       expect(error).toBeInstanceOf(Error);
-      expect(error).toHaveProperty('code', 'APP_ERROR.INVALID_INPUT'); // プレフィックス付きで比較
+      expect(error).toHaveProperty('code', 'APP_ERROR.INVALID_INPUT');
       expect((error as Error).message).toBe('Limit must be a positive number');
     }
     try {
@@ -85,7 +85,7 @@ describe('GetRecentBranchesUseCase', () => {
       throw new Error('Expected ApplicationError for limit -1');
     } catch (error) {
        expect(error).toBeInstanceOf(Error);
-       expect(error).toHaveProperty('code', 'APP_ERROR.INVALID_INPUT'); // プレフィックス付きで比較
+       expect(error).toHaveProperty('code', 'APP_ERROR.INVALID_INPUT');
        expect((error as Error).message).toBe('Limit must be a positive number');
     }
     expect(mockBranchRepository.getRecentBranches).not.toHaveBeenCalled();
@@ -94,7 +94,7 @@ describe('GetRecentBranchesUseCase', () => {
    it('should throw ApplicationError if repository throws error', async () => {
     // Arrange
     const repoError = new Error('Database connection failed');
-    (mockBranchRepository.getRecentBranches as Mock).mockRejectedValue(repoError); // as Mock 追加
+    (mockBranchRepository.getRecentBranches as Mock).mockRejectedValue(repoError);
 
     // Act & Assert
     try {
@@ -102,10 +102,10 @@ describe('GetRecentBranchesUseCase', () => {
       throw new Error('Expected ApplicationError to be thrown');
     } catch (error) {
         expect(error).toBeInstanceOf(Error);
-        expect(error).toHaveProperty('code', 'APP_ERROR.USE_CASE_EXECUTION_FAILED'); // プレフィックス付きで比較
+        expect(error).toHaveProperty('code', 'APP_ERROR.USE_CASE_EXECUTION_FAILED');
         expect((error as Error).message).toContain('Failed to get recent branches: Database connection failed');
-        // originalError のチェックも追加した方がより確実だけど、一旦省略
+        // Checking originalError might be more robust, but omitted for now
     }
-     expect(mockBranchRepository.getRecentBranches).toHaveBeenCalledWith(5); // リポジトリは呼ばれるはず
+     expect(mockBranchRepository.getRecentBranches).toHaveBeenCalledWith(5); // Repository should have been called
   });
 });

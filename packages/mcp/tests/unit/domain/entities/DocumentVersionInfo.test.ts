@@ -1,13 +1,13 @@
 import { DocumentVersionInfo } from '../../../../src/domain/entities/DocumentVersionInfo.js'; // .js 追加
 
-describe('DocumentVersionInfo', () => {
+describe('DocumentVersionInfo Unit Tests', () => {
   const initialVersion = 1;
   const initialDate = new Date('2024-01-01T00:00:00.000Z');
   const initialModifier = 'user1';
   const initialReason = 'Initial creation';
 
   describe('constructor', () => {
-    it('指定された値でインスタンスを作成できること', () => {
+    it('should create an instance with specified values', () => {
       const versionInfo = new DocumentVersionInfo({
         version: initialVersion,
         lastModified: initialDate,
@@ -16,27 +16,27 @@ describe('DocumentVersionInfo', () => {
       });
 
       expect(versionInfo.version).toBe(initialVersion);
-      // Date オブジェクトは新しいインスタンスで比較
+      // Compare Date objects using getTime()
       expect(versionInfo.lastModified.getTime()).toBe(initialDate.getTime());
       expect(versionInfo.modifiedBy).toBe(initialModifier);
       expect(versionInfo.updateReason).toBe(initialReason);
     });
 
-    it('オプションのパラメータがデフォルト値で設定されること', () => {
+    it('should set default values for optional parameters', () => {
       const versionInfo = new DocumentVersionInfo({ version: initialVersion });
 
       expect(versionInfo.version).toBe(initialVersion);
-      // lastModified は現在時刻に近い値になるはず
-      expect(versionInfo.lastModified.getTime()).toBeCloseTo(new Date().getTime(), -2); // 100ms以内の誤差を許容
-      expect(versionInfo.modifiedBy).toBe('system'); // デフォルト値
-      expect(versionInfo.updateReason).toBeUndefined(); // デフォルト値
+      // lastModified should be close to the current time
+      expect(versionInfo.lastModified.getTime()).toBeCloseTo(new Date().getTime(), -2); // Allow 100ms difference
+      expect(versionInfo.modifiedBy).toBe('system'); // Default value
+      expect(versionInfo.updateReason).toBeUndefined(); // Default value
     });
 
-    it('lastModified が Date オブジェクトのコピーであること', () => {
+    it('should store a copy of the lastModified Date object', () => {
         const originalDate = new Date();
         const versionInfo = new DocumentVersionInfo({ version: 1, lastModified: originalDate });
-        originalDate.setFullYear(2000); // 元の Date オブジェクトを変更
-        expect(versionInfo.lastModified.getFullYear()).not.toBe(2000); // コピーなので影響を受けない
+        originalDate.setFullYear(2000); // Modify the original Date object
+        expect(versionInfo.lastModified.getFullYear()).not.toBe(2000); // The copy should not be affected
       });
   });
 
@@ -48,27 +48,27 @@ describe('DocumentVersionInfo', () => {
       updateReason: initialReason,
     });
 
-    it('version getter が正しい値を返すこと', () => {
+    it('should return the correct value for the version getter', () => {
       expect(versionInfo.version).toBe(initialVersion);
     });
 
-    it('lastModified getter が正しい Date オブジェクトのコピーを返すこと', () => {
+    it('should return a copy of the correct Date object for the lastModified getter', () => {
       const retrievedDate = versionInfo.lastModified;
       expect(retrievedDate.getTime()).toBe(initialDate.getTime());
-      // 取得した Date オブジェクトを変更しても元の値は変わらないことを確認
+      // Verify that modifying the retrieved Date object does not affect the original value
       retrievedDate.setFullYear(2000);
       expect(versionInfo.lastModified.getTime()).toBe(initialDate.getTime());
     });
 
-    it('modifiedBy getter が正しい値を返すこと', () => {
+    it('should return the correct value for the modifiedBy getter', () => {
       expect(versionInfo.modifiedBy).toBe(initialModifier);
     });
 
-    it('updateReason getter が正しい値を返すこと', () => {
+    it('should return the correct value for the updateReason getter', () => {
       expect(versionInfo.updateReason).toBe(initialReason);
     });
 
-     it('updateReason が未定義の場合に undefined を返すこと', () => {
+     it('should return undefined for updateReason when it is not defined', () => {
        const versionInfoNoReason = new DocumentVersionInfo({ version: 1 });
        expect(versionInfoNoReason.updateReason).toBeUndefined();
      });
@@ -83,25 +83,25 @@ describe('DocumentVersionInfo', () => {
     });
     const nextReason = 'Updated content';
 
-    it('バージョンがインクリメントされた新しいインスタンスを返すこと', () => {
+    it('should return a new instance with an incremented version', () => {
       const nextVersionInfo = versionInfo.nextVersion();
       expect(nextVersionInfo).toBeInstanceOf(DocumentVersionInfo);
       expect(nextVersionInfo.version).toBe(initialVersion + 1);
-      expect(nextVersionInfo.modifiedBy).toBe(initialModifier); // modifiedBy は引き継がれる
-      // lastModified は新しくなる
+      expect(nextVersionInfo.modifiedBy).toBe(initialModifier); // modifiedBy should be carried over
+      // lastModified should be updated
       expect(nextVersionInfo.lastModified.getTime()).toBeGreaterThan(initialDate.getTime());
       expect(nextVersionInfo.lastModified.getTime()).toBeCloseTo(new Date().getTime(), -2);
-      // updateReason は指定がなければ引き継がれる
+      // updateReason should be carried over if not specified
       expect(nextVersionInfo.updateReason).toBe(initialReason);
     });
 
-    it('updateReason を指定した場合、それが設定されること', () => {
+    it('should set the specified updateReason', () => {
       const nextVersionInfo = versionInfo.nextVersion(nextReason);
       expect(nextVersionInfo.version).toBe(initialVersion + 1);
       expect(nextVersionInfo.updateReason).toBe(nextReason);
     });
 
-     it('元のインスタンスは変更されないこと', () => {
+     it('should not modify the original instance', () => {
        versionInfo.nextVersion();
        expect(versionInfo.version).toBe(initialVersion);
        expect(versionInfo.lastModified.getTime()).toBe(initialDate.getTime());
@@ -109,7 +109,7 @@ describe('DocumentVersionInfo', () => {
   });
 
   describe('toObject', () => {
-    it('正しいプレーンオブジェクトを返すこと (updateReason あり)', () => {
+    it('should return the correct plain object (with updateReason)', () => {
       const versionInfo = new DocumentVersionInfo({
         version: initialVersion,
         lastModified: initialDate,
@@ -119,13 +119,13 @@ describe('DocumentVersionInfo', () => {
       const obj = versionInfo.toObject();
       expect(obj).toEqual({
         version: initialVersion,
-        lastModified: initialDate, // Date オブジェクトがそのまま入る
+        lastModified: initialDate, // Date object is included as is
         modifiedBy: initialModifier,
         updateReason: initialReason,
       });
     });
 
-    it('正しいプレーンオブジェクトを返すこと (updateReason なし)', () => {
+    it('should return the correct plain object (without updateReason)', () => {
       const versionInfo = new DocumentVersionInfo({
         version: initialVersion,
         lastModified: initialDate,
@@ -136,7 +136,7 @@ describe('DocumentVersionInfo', () => {
         version: initialVersion,
         lastModified: initialDate,
         modifiedBy: initialModifier,
-        // updateReason は含まれない
+        // updateReason should not be included
       });
       expect(obj).not.toHaveProperty('updateReason');
     });

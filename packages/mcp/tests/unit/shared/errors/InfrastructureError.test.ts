@@ -1,7 +1,7 @@
 import { InfrastructureError, InfrastructureErrorCodes, InfrastructureErrors } from '../../../../src/shared/errors/InfrastructureError.js'; // .js 追加
 import { BaseError } from '../../../../src/shared/errors/BaseError.js'; // .js 追加
 
-describe('InfrastructureError', () => {
+describe('InfrastructureError Unit Tests', () => {
   it('should create an InfrastructureError instance with correct properties', () => {
     const code = InfrastructureErrorCodes.FILE_READ_ERROR;
     const message = 'Failed to read the file.';
@@ -62,7 +62,7 @@ describe('InfrastructureError', () => {
       expect(error.getHttpStatusCode()).toBe(500);
       const gitError = new InfrastructureError(InfrastructureErrorCodes.GIT_COMMAND_FAILED, '');
       expect(gitError.getHttpStatusCode()).toBe(500);
-      // 他のデフォルト500を返すコードもテスト
+      // Test other codes that default to 500
       const configError = new InfrastructureError(InfrastructureErrorCodes.CONFIGURATION_ERROR, '');
       expect(configError.getHttpStatusCode()).toBe(500);
       const fileReadError = new InfrastructureError(InfrastructureErrorCodes.FILE_READ_ERROR, '');
@@ -85,7 +85,7 @@ describe('InfrastructureError', () => {
       expect(invalidArgumentError.getHttpStatusCode()).toBe(500);
       const persistenceError = new InfrastructureError(InfrastructureErrorCodes.PERSISTENCE_ERROR, '');
       expect(persistenceError.getHttpStatusCode()).toBe(500);
-      // 存在しない templateNotFoundError の参照を削除
+      // Removed reference to non-existent templateNotFoundError
     });
   });
 
@@ -225,7 +225,7 @@ it('should use factory function InfrastructureErrors.invalidFileContent correctl
   expect(error.code).toBe(InfrastructureErrorCodes.INVALID_FILE_CONTENT);
   expect(error.message).toBe(message);
   expect(error.details).toEqual(details);
-  expect(error.getHttpStatusCode()).toBe(500); // Or maybe 400 Bad Request? Let's stick to 500 for now.
+  expect(error.getHttpStatusCode()).toBe(500);
 });
 
 it('should use factory function InfrastructureErrors.gitCommandFailed correctly', () => {
@@ -264,4 +264,4 @@ it('should create a new error with updated message using withMessage', () => {
 });
 
 // withDetails does not exist, so tests for it are removed.
-}); // Add closing bracket for describe block
+});

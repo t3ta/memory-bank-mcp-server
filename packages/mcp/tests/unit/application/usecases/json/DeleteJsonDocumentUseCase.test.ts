@@ -60,7 +60,7 @@ const mockValidator: IDocumentValidator = {
   validateMetadata: vi.fn().mockReturnValue(true), // jest -> vi, 型引数削除
 };
 
-describe('DeleteJsonDocumentUseCase', () => {
+describe('DeleteJsonDocumentUseCase Unit Tests', () => {
   let useCase: DeleteJsonDocumentUseCase;
   let useCaseWithGlobal: DeleteJsonDocumentUseCase;
 
@@ -78,46 +78,46 @@ describe('DeleteJsonDocumentUseCase', () => {
 
     const input: DeleteJsonDocumentInput = {
       branchName: branchName,
-      path: docPathStr, // Delete by path
+      path: docPathStr,
     };
 
     const expectedBranchInfo = BranchInfo.create(branchName);
     const expectedDocPath = DocumentPath.create(docPathStr);
 
     // Mock repository exists to return true
-    (mockJsonDocumentRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
+    (mockJsonDocumentRepository.exists as Mock).mockResolvedValue(true);
     // Mock repository delete to return true (success)
-    (mockJsonDocumentRepository.delete as Mock).mockResolvedValue(true); // as Mock 追加
+    (mockJsonDocumentRepository.delete as Mock).mockResolvedValue(true);
     // Mock index service removeFromIndex to succeed
-    (mockIndexService.removeFromIndex as Mock).mockResolvedValue(undefined); // as Mock 追加
+    (mockIndexService.removeFromIndex as Mock).mockResolvedValue(undefined);
 
     const result = await useCase.execute(input);
 
     // Verify repository delete was called correctly
     expect(mockJsonDocumentRepository.delete).toHaveBeenCalledWith(
       expectedBranchInfo,
-      expectedDocPath // Should pass the DocumentPath object
+      expectedDocPath
     );
-    expect(mockGlobalRepository.delete).not.toHaveBeenCalled(); // Global repo shouldn't be called
+    expect(mockGlobalRepository.delete).not.toHaveBeenCalled();
 
     // Verify index service was called correctly
     expect(mockIndexService.removeFromIndex).toHaveBeenCalledWith(
       expectedBranchInfo,
-      expectedDocPath // Should pass the DocumentPath object
+      expectedDocPath
     );
 
     // Verify the output indicates success
     expect(result).toEqual({
-      success: true, // deleted -> success
+      success: true,
       location: branchName,
-      details: { // Add details object check
+      details: {
         identifier: docPathStr,
-        timestamp: expect.any(String), // Timestamp will vary
+        timestamp: expect.any(String),
       }
     });
   });
 
-  it('should return deleted: false if repository delete fails', async () => {
+  it('should return success: false if repository delete fails', async () => {
     const branchName = 'feature/delete-fail';
     const docPathStr = 'fail/delete.json';
 
@@ -130,11 +130,11 @@ describe('DeleteJsonDocumentUseCase', () => {
     const expectedDocPath = DocumentPath.create(docPathStr);
 
     // Mock repository exists to return true (even if delete fails later)
-    (mockJsonDocumentRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
+    (mockJsonDocumentRepository.exists as Mock).mockResolvedValue(true);
     // Mock repository delete to return false (failure)
-    (mockJsonDocumentRepository.delete as Mock).mockResolvedValue(false); // as Mock 追加
+    (mockJsonDocumentRepository.delete as Mock).mockResolvedValue(false);
     // Index service should not be called if repo delete fails
-    (mockIndexService.removeFromIndex as Mock).mockResolvedValue(undefined); // as Mock 追加
+    (mockIndexService.removeFromIndex as Mock).mockResolvedValue(undefined);
 
     const result = await useCase.execute(input);
 
@@ -145,13 +145,13 @@ describe('DeleteJsonDocumentUseCase', () => {
     );
 
     // Verify index service was NOT called
-    // expect(mockIndexService.removeFromIndex).not.toHaveBeenCalled(); // Temporarily comment out to check use case logic
+    // expect(mockIndexService.removeFromIndex).not.toHaveBeenCalled();
 
     // Verify the output indicates failure
     expect(result).toEqual({
-      success: false, // deleted -> success
+      success: false,
       location: branchName,
-      details: { // Add details object check even for failure
+      details: {
         identifier: docPathStr,
         timestamp: expect.any(String),
       }
@@ -171,20 +171,20 @@ describe('DeleteJsonDocumentUseCase', () => {
     const expectedDocPath = DocumentPath.create(docPathStr);
 
     // Mock GLOBAL repository exists to return true
-    (mockGlobalRepository.exists as Mock).mockResolvedValue(true); // as Mock 追加
+    (mockGlobalRepository.exists as Mock).mockResolvedValue(true);
     // Mock GLOBAL repository delete to return true
-    (mockGlobalRepository.delete as Mock).mockResolvedValue(true); // as Mock 追加
-    (mockIndexService.removeFromIndex as Mock).mockResolvedValue(undefined); // as Mock 追加
+    (mockGlobalRepository.delete as Mock).mockResolvedValue(true);
+    (mockIndexService.removeFromIndex as Mock).mockResolvedValue(undefined);
 
     // Use the useCase instance configured with the global repository
     const result = await useCaseWithGlobal.execute(input);
 
     // Verify delete was called on the GLOBAL repository
     expect(mockGlobalRepository.delete).toHaveBeenCalledWith(
-      expectedBranchInfo, // Still uses BranchInfo internally
+      expectedBranchInfo,
       expectedDocPath
     );
-    expect(mockJsonDocumentRepository.delete).not.toHaveBeenCalled(); // Default repo shouldn't be called
+    expect(mockJsonDocumentRepository.delete).not.toHaveBeenCalled();
 
     // Verify index service was called
     expect(mockIndexService.removeFromIndex).toHaveBeenCalledWith(
@@ -194,9 +194,9 @@ describe('DeleteJsonDocumentUseCase', () => {
 
     // Verify output
     expect(result).toEqual({
-      success: true, // deleted -> success
+      success: true,
       location: 'global',
-      details: { // Add details object check
+      details: {
         identifier: docPathStr,
         timestamp: expect.any(String),
       }

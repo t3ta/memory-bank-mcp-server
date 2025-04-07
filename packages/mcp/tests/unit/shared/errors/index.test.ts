@@ -11,20 +11,20 @@ import { logger } from '../../../../src/shared/utils/logger.js'; // .js 拡張�
 
 // jest.mock を削除し、spyOn を使う方式に変更
 
-describe('ErrorUtils', () => {
+describe('ErrorUtils Unit Tests', () => {
   let errorSpy: ReturnType<typeof vi.spyOn>; // より正確な型推論を使うか、シンプルに型指定を削除
 
   beforeEach(() => {
-    // 各テスト前に logger.error の呼び出し履歴をクリアし、実装を空にする
-    errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {}); // jest -> vi
+    // Clear logger.error call history and mock implementation before each test
+    errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
-    // 各テスト後にスパイをリストア
+    // Restore spy after each test
     errorSpy.mockRestore();
   });
 
-  // wrapAsync のテスト
+  // Tests for wrapAsync
   describe('wrapAsync', () => {
     it('should resolve successfully if the promise resolves', async () => {
       const promise = Promise.resolve('success');
@@ -34,8 +34,8 @@ describe('ErrorUtils', () => {
       const baseError = new DomainError(DomainErrorCodes.INVALID_DOCUMENT_FORMAT, 'Test BaseError'); // エラーコード修正
       const promise = Promise.reject(baseError);
       await expect(ErrorUtils.wrapAsync(promise)).rejects.toThrow(baseError);
-      // logger.error が呼ばれないことも確認（BaseError はラップしないため）
-      expect(errorSpy).not.toHaveBeenCalled(); // spy をチェック
+      // Check that logger.error was not called (BaseError is not wrapped)
+      expect(errorSpy).not.toHaveBeenCalled();
     });
     it('should map unknown errors using the errorMapper if provided', async () => {
       const originalError = new Error('Original error');
@@ -45,40 +45,40 @@ describe('ErrorUtils', () => {
 
       await expect(ErrorUtils.wrapAsync(promise, errorMapper)).rejects.toThrow(mappedError);
       expect(errorMapper).toHaveBeenCalledWith(originalError);
-      // logger.error は呼ばれるはず
-      expect(errorSpy).toHaveBeenCalledWith('Error caught in wrapAsync', { error: originalError }); // spy をチェック
+      // logger.error should be called
+      expect(errorSpy).toHaveBeenCalledWith('Error caught in wrapAsync', { error: originalError });
     });
     it('should wrap standard Errors in InfrastructureError if no mapper is provided', async () => {
       const originalError = new Error('Standard error');
       const promise = Promise.reject(originalError);
 
       await expect(ErrorUtils.wrapAsync(promise)).rejects.toThrow(InfrastructureError);
-      // 期待値を修正: code からプレフィックスを削除し、message を確認、cause は details の中
+      // Corrected expectation: remove prefix from code, check message, cause is in details
       await expect(ErrorUtils.wrapAsync(promise)).rejects.toMatchObject({
         code: InfrastructureErrorCodes.MCP_SERVER_ERROR,
         message: originalError.message,
         details: expect.objectContaining({ cause: originalError }),
       });
-      // logger.error は呼ばれるはず
-      expect(errorSpy).toHaveBeenCalledWith('Error caught in wrapAsync', { error: originalError }); // spy をチェック
+      // logger.error should be called
+      expect(errorSpy).toHaveBeenCalledWith('Error caught in wrapAsync', { error: originalError });
     });
     it('should wrap non-Error throws in InfrastructureError if no mapper is provided', async () => {
       const originalError = 'Just a string error';
       const promise = Promise.reject(originalError);
 
       await expect(ErrorUtils.wrapAsync(promise)).rejects.toThrow(InfrastructureError);
-      // 期待値を修正: code からプレフィックスを削除し、message を確認
+      // Corrected expectation: remove prefix from code, check message
       await expect(ErrorUtils.wrapAsync(promise)).rejects.toMatchObject({
         code: InfrastructureErrorCodes.MCP_SERVER_ERROR,
         message: 'An unknown error occurred',
-        details: { originalError: String(originalError) }, // cause は含まれない
+        details: { originalError: String(originalError) }, // cause is not included
       });
-      // logger.error は呼ばれるはず
-      expect(errorSpy).toHaveBeenCalledWith('Error caught in wrapAsync', { error: originalError }); // spy をチェック
+      // logger.error should be called
+      expect(errorSpy).toHaveBeenCalledWith('Error caught in wrapAsync', { error: originalError });
     });
   });
 
-  // isErrorOfType のテスト
+  // Tests for isErrorOfType
   describe('isErrorOfType', () => {
     it('should return true for BaseError instances with matching name', () => {
       const domainError = new DomainError(DomainErrorCodes.INVALID_DOCUMENT_FORMAT, 'Test');
@@ -105,20 +105,20 @@ describe('ErrorUtils', () => {
       expect(ErrorUtils.isErrorOfType(domainError, 'ApplicationError')).toBe(false); // BaseError だが名前が違う
 
       const standardError = new Error('Test');
-      expect(ErrorUtils.isErrorOfType(standardError, 'TypeError')).toBe(false); // 標準エラーだが名前が違う
+      expect(ErrorUtils.isErrorOfType(standardError, 'TypeError')).toBe(false);
     });
     it('should handle BaseError subclasses correctly', () => {
       const domainError = new DomainError(DomainErrorCodes.INVALID_DOCUMENT_FORMAT, 'Test');
-      // DomainError は BaseError のサブクラスなので true になるはず
+      // DomainError is a subclass of BaseError, so this should be true
       expect(ErrorUtils.isErrorOfType(domainError, 'BaseError')).toBe(true);
 
       const appError = new ApplicationError(ApplicationErrorCodes.INVALID_INPUT, 'Test');
-      // ApplicationError も BaseError のサブクラスなので true になるはず
+      // ApplicationError is also a subclass of BaseError, so this should be true
       expect(ErrorUtils.isErrorOfType(appError, 'BaseError')).toBe(true);
     });
   });
 
-  // getErrorCode のテスト
+  // Tests for getErrorCode
   describe('getErrorCode', () => {
     it('should return the code for BaseError instances', () => {
       const domainError = new DomainError(DomainErrorCodes.INVALID_TAG_FORMAT, 'Test');
@@ -142,7 +142,7 @@ describe('ErrorUtils', () => {
     });
   });
 
-  // formatForLogging のテスト
+  // Tests for formatForLogging
   describe('formatForLogging', () => {
     it('should call toJSON for BaseError instances', () => {
       const baseError = new DomainError(DomainErrorCodes.REPOSITORY_ERROR, 'DB Error', { table: 'users' });
@@ -151,7 +151,7 @@ describe('ErrorUtils', () => {
 
       expect(jsonSpy).toHaveBeenCalledTimes(1);
       expect(result).toEqual(baseError.toJSON());
-      jsonSpy.mockRestore(); // スパイを元に戻す
+      jsonSpy.mockRestore();
     });
     it('should format standard Errors correctly', () => {
       const standardError = new Error('Standard Test Error');
@@ -163,10 +163,10 @@ describe('ErrorUtils', () => {
 
       expect(result).toHaveProperty('name', 'Error');
       expect(result).toHaveProperty('message', 'Standard Test Error');
-      expect(result).toHaveProperty('stack', expect.any(String)); // スタックトレースは存在することだけ確認
+      expect(result).toHaveProperty('stack', expect.any(String)); // Just check that stack trace exists
       expect(result).toHaveProperty('timestamp', mockDate.toISOString());
 
-      toISOStringSpy.mockRestore(); // モックを元に戻す
+      toISOStringSpy.mockRestore();
     });
     it('should format non-Error types (string) correctly', () => {
       const nonError = 'Just a string';
