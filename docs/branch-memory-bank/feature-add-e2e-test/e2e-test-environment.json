@@ -1,0 +1,213 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "e2e-test-environment",
+    "title": "E2Eテスト環境設定",
+    "documentType": "configuration",
+    "path": "e2e-test-environment.json",
+    "tags": [],
+    "lastModified": "2025-04-06T17:04:10.591Z",
+    "createdAt": "2025-04-06T11:45:00.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": "MemoryBank MCPサーバーのE2Eテスト環境設定に関する情報です。インメモリテストとDocker環境でのテスト実行方法をカバーしています。",
+    "localEnvironment": {
+      "setup": {
+        "description": "ローカル環境でのテストセットアップ手順",
+        "steps": [
+          {
+            "step": 1,
+            "title": "テスト用ディレクトリを作成",
+            "command": "mkdir -p packages/mcp/tests/e2e"
+          },
+          {
+            "step": 2,
+            "title": "依存パッケージのインストール確認",
+            "command": "yarn install"
+          },
+          {
+            "step": 3,
+            "title": "一時テスト環境の初期化",
+            "command": "yarn workspace @memory-bank/mcp test:e2e"
+          }
+        ],
+        "notes": "ローカル環境でのテストはtmp-promiseパッケージを使用して一時ディレクトリに環境を作成します。テスト終了後は自動的にクリーンアップされます。"
+      },
+      "runTests": {
+        "description": "ローカル環境でテストを実行する手順",
+        "commands": [
+          {
+            "name": "全E2Eテスト実行",
+            "command": "yarn workspace @memory-bank/mcp test:e2e"
+          },
+          {
+            "name": "特定のテストのみ実行",
+            "command": "yarn workspace @memory-bank/mcp test:e2e -- -t \"should establish connection\""
+          },
+          {
+            "name": "デバッグモードでテスト実行",
+            "command": "NODE_OPTIONS='--inspect' yarn workspace @memory-bank/mcp test:e2e"
+          }
+        ]
+      }
+    },
+    "dockerEnvironment": {
+      "dockerfile": {
+        "description": "E2Eテスト用Dockerfileの内容",
+        "content": [
+          "FROM node:20-alpine",
+          "",
+          "WORKDIR /app",
+          "",
+          "# 必要なツールのインストール",
+          "RUN apk add --no-cache git",
+          "",
+          "# 依存関係のコピーとインストール（レイヤーキャッシュの最適化）",
+          "COPY package.json yarn.lock ./",
+          "COPY packages/mcp/package.json ./packages/mcp/",
+          "COPY packages/schemas/package.json ./packages/schemas/",
+          "RUN yarn install",
+          "",
+          "# ソースコードのコピー",
+          "COPY . .",
+          "",
+          "# ビルド",
+          "RUN yarn build",
+          "",
+          "# テスト実行",
+          "CMD [\"yarn\", \"workspace\", \"@memory-bank/mcp\", \"test:e2e\"]"
+        ]
+      },
+      "dockerCompose": {
+        "description": "E2Eテスト用Docker Compose設定",
+        "content": [
+          "version: '3'",
+          "",
+          "services:",
+          "  e2e-tests:",
+          "    build:",
+          "      context: .",
+          "      dockerfile: Dockerfile.test",
+          "    volumes:",
+          "      - ./test-results:/app/test-results",
+          "    environment:",
+          "      - NODE_ENV=test",
+          "      - TEST_RESULTS_PATH=/app/test-results",
+          "    command: yarn workspace @memory-bank/mcp test:e2e"
+        ],
+        "notes": "Docker Compose設定を使用すると、コンテナ内でテストを実行し、テスト結果をホストマシンにマウントされたボリュームに保存できます。これは継続的インテグレーションや開発チーム間のテスト結果共有に役立ちます。"
+      },
+      "usage": {
+        "description": "Docker環境でのテスト実行方法",
+        "steps": [
+          {
+            "step": 1,
+            "title": "Dockerfileの作成",
+            "command": "cat > Dockerfile.test << 'EOF'\n# 上記のDockerfile内容をここに\nEOF"
+          },
+          {
+            "step": 2,
+            "title": "Docker Compose設定ファイルの作成",
+            "command": "cat > docker-compose.test.yml << 'EOF'\n# 上記のDocker Compose内容をここに\nEOF"
+          },
+          {
+            "step": 3,
+            "title": "テスト用コンテナのビルドと実行",
+            "command": "docker-compose -f docker-compose.test.yml up --build"
+          }
+        ]
+      }
+    },
+    "ciConfiguration": {
+      "description": "CI環境でのE2Eテスト設定",
+      "githubActions": {
+        "description": "GitHub Actions用のワークフロー設定",
+        "content": [
+          "name: E2E Tests",
+          "",
+          "on:",
+          "  push:",
+          "    branches: [ main, develop ]",
+          "  pull_request:",
+          "    branches: [ main, develop ]",
+          "",
+          "jobs:",
+          "  e2e-tests:",
+          "    runs-on: ubuntu-latest",
+          "    steps:",
+          "      - uses: actions/checkout@v3",
+          "      - name: Use Node.js",
+          "        uses: actions/setup-node@v3",
+          "        with:",
+          "          node-version: '20'",
+          "          cache: 'yarn'",
+          "      - name: Install dependencies",
+          "        run: yarn install",
+          "      - name: Build packages",
+          "        run: yarn build",
+          "      - name: Run E2E tests",
+          "        run: yarn workspace @memory-bank/mcp test:e2e",
+          "      - name: Upload test results",
+          "        if: always()",
+          "        uses: actions/upload-artifact@v3",
+          "        with:",
+          "          name: e2e-test-results",
+          "          path: packages/mcp/coverage",
+          "          retention-days: 5"
+        ],
+        "notes": "このワークフローは、メインブランチへのプッシュやプルリクエスト時にE2Eテストを実行します。テスト結果はGitHub Actionsのアーティファクトとして保存されます。"
+      }
+    },
+    "bestPractices": {
+      "description": "E2Eテスト環境に関するベストプラクティス",
+      "recommendations": [
+        {
+          "title": "テストの分離",
+          "details": "各テストケースは完全に分離され、他のテストに依存しないようにする必要があります。テスト環境のセットアップとティアダウンを各テストで適切に行いましょう。"
+        },
+        {
+          "title": "タイムアウト設定",
+          "details": "E2Eテストは時間がかかる場合があります。Vitestのタイムアウト設定を適切に行い、特に重いテストには個別のタイムアウト値を設定することを検討してください。"
+        },
+        {
+          "title": "テスト並列実行の注意点",
+          "details": "インメモリテストは並列実行が可能ですが、共有リソースを使用するテストの場合は注意が必要です。`--runInBand`オプションを使用して順次実行することも検討してください。"
+        },
+        {
+          "title": "CI環境でのデバッグ",
+          "details": "CI環境でテストが失敗した場合のデバッグを容易にするため、詳細なログ出力を有効にしましょう。Vitest の `--verbose` オプションや、カスタムレポーターの使用を検討してください。"
+        },
+        {
+          "title": "テストカバレッジの追跡",
+          "details": "E2Eテストもカバレッジレポートに含めることで、全体的なテスト戦略の有効性を評価できます。`--coverage` オプションを使用して、E2Eテストのカバレッジも計測しましょう。"
+        }
+      ]
+    },
+    "troubleshooting": {
+      "description": "E2Eテスト実行時のよくある問題と解決策",
+      "commonIssues": [
+        {
+          "issue": "テストがタイムアウトする",
+          "solution": "Vitest設定ファイルでタイムアウト値を増やす（例：`testTimeout: 30000`）またはテスト内で`vi.setTimeout(30000)`を使用する"
+        },
+        {
+          "issue": "InMemoryTransportの接続問題",
+          "solution": "トランスポートが適切に初期化され、`start()`メソッドが呼び出されていることを確認する"
+        },
+        {
+          "issue": "テスト環境のクリーンアップ失敗",
+          "solution": "afterEach/afterAllブロック内で明示的に`cleanup()`関数を呼び出し、try-catchで囲んでエラーハンドリングする"
+        },
+        {
+          "issue": "テスト間の干渉",
+          "solution": "各テストが独立した環境で実行されるよう、beforeEach内で新しいテスト環境をセットアップする"
+        },
+        {
+          "issue": "非同期処理が完了しない",
+          "solution": "すべてのPromiseが解決されていることを確認し、必要に応じてawaitを使用する"
+        }
+      ]
+    }
+  }
+}

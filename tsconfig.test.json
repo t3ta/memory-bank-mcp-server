@@ -6,8 +6,8 @@
       "jest",
       "node"
     ],
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext", // bundler と組み合わせるなら ESNext が推奨されることが多い
+    "moduleResolution": "bundler", // packages/mcp/tsconfig.json と合わせる
     "esModuleInterop": true,
     "isolatedModules": true,
     "preserveConstEnums": true,

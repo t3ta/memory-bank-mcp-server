@@ -177,7 +177,7 @@ export class BranchController {
   }) {
     try {
       const { tags, branchName, match } = params; // Remove docs from destructuring
-      this.componentLogger.info('Searching branch documents by tags', { operation: 'searchByTags', branchName, tags, match });
+      this.componentLogger.info('Searching branch documents by tags', { operation: 'searchByTags', branchName, tags, match }); // 元のログに戻す
       // Get docs path from injected configProvider
       const docsPath = this.configProvider.getConfig().docsRoot; // Use a different variable name
       if (!docsPath) {

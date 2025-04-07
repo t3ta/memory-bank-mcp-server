@@ -50,4 +50,5 @@ jobs:
       - name: Run ESLint
         run: yarn lint
       - name: Run Integration Tests # Change to run integration tests
-        run: yarn test:integration --reporter verbose
+        run: yarn test:integration
+
