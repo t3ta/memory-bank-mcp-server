@@ -5,13 +5,8 @@
     "title": "E2Eテスト環境設定",
     "documentType": "configuration",
     "path": "e2e-test-environment.json",
-    "tags": [
-      "e2e-test",
-      "configuration",
-      "docker",
-      "ci"
-    ],
-    "lastModified": "2025-04-06T11:45:00.000Z",
+    "tags": [],
+    "lastModified": "2025-04-06T17:04:10.591Z",
     "createdAt": "2025-04-06T11:45:00.000Z",
     "version": 1
   },
@@ -173,7 +168,7 @@
         },
         {
           "title": "タイムアウト設定",
-          "details": "E2Eテストは時間がかかる場合があります。Jestのタイムアウト設定を適切に行い、特に重いテストには個別のタイムアウト値を設定することを検討してください。"
+          "details": "E2Eテストは時間がかかる場合があります。Vitestのタイムアウト設定を適切に行い、特に重いテストには個別のタイムアウト値を設定することを検討してください。"
         },
         {
           "title": "テスト並列実行の注意点",
@@ -181,7 +176,7 @@
         },
         {
           "title": "CI環境でのデバッグ",
-          "details": "CI環境でテストが失敗した場合のデバッグを容易にするため、詳細なログ出力を有効にしましょう。Jest の `--verbose` オプションや、カスタムレポーターの使用を検討してください。"
+          "details": "CI環境でテストが失敗した場合のデバッグを容易にするため、詳細なログ出力を有効にしましょう。Vitest の `--verbose` オプションや、カスタムレポーターの使用を検討してください。"
         },
         {
           "title": "テストカバレッジの追跡",
@@ -194,7 +189,7 @@
       "commonIssues": [
         {
           "issue": "テストがタイムアウトする",
-          "solution": "Jest設定ファイルでタイムアウト値を増やす（例：`testTimeout: 30000`）またはテスト内で`jest.setTimeout(30000)`を使用する"
+          "solution": "Vitest設定ファイルでタイムアウト値を増やす（例：`testTimeout: 30000`）またはテスト内で`vi.setTimeout(30000)`を使用する"
         },
         {
           "issue": "InMemoryTransportの接続問題",

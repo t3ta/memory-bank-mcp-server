@@ -5,12 +5,8 @@
     "title": "E2E テスト実装ステップ",
     "documentType": "implementation_plan",
     "path": "implementation-steps.json",
-    "tags": [
-      "e2e-test",
-      "implementation",
-      "step-by-step"
-    ],
-    "lastModified": "2025-04-06T10:55:20.000Z",
+    "tags": [],
+    "lastModified": "2025-04-06T17:03:55.283Z",
     "createdAt": "2025-04-06T09:45:20.000Z",
     "version": 3
   },
@@ -106,7 +102,7 @@
             "file": "packages/mcp/package.json",
             "update": {
               "scripts": {
-                "test:e2e": "NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest --runInBand --detectOpenHandles --forceExit --config tests/e2e/jest.config.ts",
+                "test:e2e": "NODE_OPTIONS='--experimental-vm-modules --no-warnings' vitest run --config tests/e2e/vitest.config.ts",
                 "test": "yarn test:unit && yarn test:integration && yarn test:e2e"
               }
             }

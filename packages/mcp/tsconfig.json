@@ -34,6 +34,21 @@
       ],
       "@memory-bank/schemas/*": [
         "../schemas/src/*"
+      ],
+      // "@modelcontextprotocol/sdk/*": [ // ワイルドカードは一旦削除して個別に指定
+      //   "../../node_modules/@modelcontextprotocol/sdk/dist/*"
+      // ],
+      "@modelcontextprotocol/sdk/inMemory": [ // .js なしで指定
+        "../../node_modules/@modelcontextprotocol/sdk/dist/inMemory"
+      ],
+      "@modelcontextprotocol/sdk/server": [ // index なしでディレクトリを指定
+        "../../node_modules/@modelcontextprotocol/sdk/dist/server"
+      ],
+      "@modelcontextprotocol/sdk/client": [ // client パスを追加 (.js なし)
+        "../../node_modules/@modelcontextprotocol/sdk/dist/client"
+      ],
+      "@modelcontextprotocol/sdk/types": [ // types パスを追加 (.js なし)
+        "../../node_modules/@modelcontextprotocol/sdk/dist/types"
       ]
     },
     "isolatedModules": true

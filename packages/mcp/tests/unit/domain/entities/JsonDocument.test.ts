@@ -8,7 +8,7 @@ import { IDocumentValidator } from '../../../../src/domain/validation/IDocumentV
 import { DocumentId } from '../../../../src/domain/entities/DocumentId.js'; // .js 追加
 import { DocumentVersionInfo } from '../../../../src/domain/entities/DocumentVersionInfo.js'; // .js 追加
 
-// モックバリデーター
+// Mock validator
 const mockValidator: IDocumentValidator = {
   validateDocument: vi.fn(), // jest -> vi
   validateMetadata: vi.fn(), // jest -> vi
@@ -26,13 +26,11 @@ describe('JsonDocument', () => {
   const branch = 'feature/test-branch';
   const versionInfo = new DocumentVersionInfo({ version: 1 });
 
-  // beforeAll(() => {
-  //   // テスト全体でモックバリデーターを設定 -> beforeEach に移動
-  //   JsonDocument.setValidator(mockValidator);
+  // beforeAll(() => { // Moved validator setup to beforeEach
   // });
 
   beforeEach(() => {
-    // 各テストの前にバリデーターを再設定し、モックの呼び出し履歴をリセット
+    // Reset validator and mock history before each test
     JsonDocument.setValidator(mockValidator);
     vi.clearAllMocks(); // jest -> vi
   });
@@ -40,16 +38,15 @@ describe('JsonDocument', () => {
   // --- Static Factory Methods ---
 
   describe('fromString', () => {
-    // validJsonString は各テストケースで定義する方が柔軟性が高い場合があるが、
-    // ここでは describe ブロック内で共通のものを定義
-    // スキーマ変更に合わせて documentType をトップレベルに移動
+    // Define a common valid JSON string within the describe block
+    // Moved documentType to top level according to schema changes
     const validJsonString = JSON.stringify({
       schema: SCHEMA_VERSION,
-      documentType: documentType, // documentType をトップレベルに
+      documentType: documentType, // documentType at top level
       metadata: {
         id: docId.value,
         title: title,
-        // documentType: documentType, // metadata から削除
+        // documentType: documentType, // Removed from metadata
         path: validPath.value,
         tags: tags.map(t => t.value),
         lastModified: new Date().toISOString(),
@@ -60,7 +57,7 @@ describe('JsonDocument', () => {
       content: content,
     });
 
-    it('有効なJSON文字列からインスタンスを作成できること', () => {
+    it('should create an instance from a valid JSON string', () => {
       const doc = JsonDocument.fromString(validJsonString, validPath);
       expect(doc).toBeInstanceOf(JsonDocument);
       expect(doc.id.equals(docId)).toBe(true);
@@ -71,31 +68,31 @@ describe('JsonDocument', () => {
       expect(doc.content).toEqual(content);
       expect(doc.branch).toBe(branch);
       expect(doc.version).toBe(1);
-      // バリデーターが呼ばれたことを確認
+      // Check if validator was called
       expect(mockValidator.validateDocument).toHaveBeenCalledTimes(1);
     });
 
-    it('無効なJSON文字列でエラーが発生すること', () => {
+    it('should throw an error for invalid JSON string', () => {
       const invalidJsonString = '{"invalid json';
-      // toThrow にエラークラスとメッセージの部分一致チェックを渡す (正規表現を使用)
+      // Check for DomainError with partial message match (using regex)
       expect(() => JsonDocument.fromString(invalidJsonString, validPath)).toThrow(DomainError);
       expect(() => JsonDocument.fromString(invalidJsonString, validPath)).toThrow(/Failed to parse JSON document/);
       expect(mockValidator.validateDocument).not.toHaveBeenCalled();
     });
 
-    it('スキーマバージョンが不正な場合にバリデーションエラーが発生すること', () => {
-       // バリデーターがエラーを投げるようにモックを設定
+    it('should throw a validation error for invalid schema version', () => {
+       // Mock validator to throw an error
        (mockValidator.validateDocument as Mock).mockImplementationOnce(() => { // as Mock に修正
          throw new DomainError(DomainErrorCodes.VALIDATION_ERROR, 'Invalid schema version');
        });
-       // スキーマ変更に合わせて documentType をトップレベルに移動
+       // Moved documentType to top level according to schema changes
        const jsonWithInvalidSchema = JSON.stringify({
          schema: 'invalid_version',
          documentType: documentType, // documentType をトップレベルに
-         metadata: { id: docId.value, title, path: validPath.value, tags: [], lastModified: new Date(), createdAt: new Date(), version: 1 }, // metadata から documentType を削除
+         metadata: { id: docId.value, title, path: validPath.value, tags: [], lastModified: new Date(), createdAt: new Date(), version: 1 }, // Removed documentType from metadata
          content: {},
        });
-       // toThrow にエラークラスとメッセージの完全一致チェックを渡す (モックで投げてるエラーなので完全一致でOK)
+       // Check for exact error class and message (since it's thrown by the mock)
        expect(() => JsonDocument.fromString(jsonWithInvalidSchema, validPath)).toThrow(
          new DomainError(DomainErrorCodes.VALIDATION_ERROR, 'Invalid schema version')
        );
@@ -104,14 +101,14 @@ describe('JsonDocument', () => {
   });
 
   describe('fromObject', () => {
-     // スキーマ変更に合わせて documentType をトップレベルに移動
+     // Moved documentType to top level according to schema changes
      const validObject = {
        schema: SCHEMA_VERSION,
-       documentType: documentType, // documentType をトップレベルに
+       documentType: documentType, // documentType at top level
        metadata: {
          id: docId.value,
          title: title,
-         // documentType: documentType, // metadata から削除
+         // documentType: documentType, // Removed from metadata
          path: validPath.value,
          tags: tags.map(t => t.value),
          lastModified: new Date().toISOString(),
@@ -122,22 +119,22 @@ describe('JsonDocument', () => {
        content: content,
      };
 
-    it('有効なオブジェクトからインスタンスを作成できること', () => {
+    it('should create an instance from a valid object', () => {
       const doc = JsonDocument.fromObject(validObject, validPath);
       expect(doc).toBeInstanceOf(JsonDocument);
       expect(doc.id.equals(docId)).toBe(true);
-      // ... 他のプロパティも同様にチェック ...
+      // ... check other properties similarly ...
       expect(mockValidator.validateDocument).toHaveBeenCalledWith(validObject);
       expect(mockValidator.validateDocument).toHaveBeenCalledTimes(1);
     });
 
-    it('無効なオブジェクト構造でバリデーションエラーが発生すること', () => {
+    it('should throw a validation error for invalid object structure', () => {
       const invalidObject = { invalid: 'structure' };
-      // バリデーターがエラーを投げるようにモックを設定
+      // Mock validator to throw an error
       (mockValidator.validateDocument as Mock).mockImplementationOnce(() => { // as Mock に修正
         throw new DomainError(DomainErrorCodes.VALIDATION_ERROR, 'Invalid structure');
       });
-      // toThrow にエラークラスとメッセージの完全一致チェックを渡す (モックで投げてるエラーなので完全一致でOK)
+      // Check for exact error class and message (since it's thrown by the mock)
       expect(() => JsonDocument.fromObject(invalidObject, validPath)).toThrow(
          new DomainError(DomainErrorCodes.VALIDATION_ERROR, 'Invalid structure')
       );
@@ -147,7 +144,7 @@ describe('JsonDocument', () => {
   });
 
   describe('create', () => {
-    it('指定されたプロパティで新しいインスタンスを作成できること', () => {
+    it('should create a new instance with specified properties', () => {
       const doc = JsonDocument.create({
         id: docId,
         path: validPath,
@@ -164,18 +161,18 @@ describe('JsonDocument', () => {
       expect(doc.path).toBe(validPath);
       expect(doc.title).toBe(title);
       expect(doc.documentType).toBe(documentType);
-      expect(doc.tags).toEqual(tags); // 配列は toEqual で比較
-      expect(doc.content).toEqual(content); // オブジェクトは toEqual で比較
+      expect(doc.tags).toEqual(tags); // Use toEqual for arrays
+      expect(doc.content).toEqual(content); // Use toEqual for objects
       expect(doc.branch).toBe(branch);
       expect(doc.versionInfo).toBe(versionInfo);
       expect(doc.version).toBe(1);
-      expect(doc.lastModified).toEqual(versionInfo.lastModified); // Date は toEqual で比較
-      // コンテンツバリデーションが呼ばれたことを確認
+      expect(doc.lastModified).toEqual(versionInfo.lastModified); // Use toEqual for Dates
+      // Check if content validation was called
       expect(mockValidator.validateContent).toHaveBeenCalledWith(documentType, content);
       expect(mockValidator.validateContent).toHaveBeenCalledTimes(1);
     });
 
-     it('ID、タグ、ブランチ、バージョン情報がなくてもデフォルト値で作成できること', () => {
+     it('should create with default values if ID, tags, branch, versionInfo are omitted', () => {
        const doc = JsonDocument.create({
          path: validPath,
          title: title,
@@ -186,13 +183,13 @@ describe('JsonDocument', () => {
        expect(doc.tags).toEqual([]);
        expect(doc.branch).toBeUndefined();
        expect(doc.versionInfo).toBeInstanceOf(DocumentVersionInfo);
-       expect(doc.version).toBe(1); // デフォルトバージョン
+       expect(doc.version).toBe(1); // Default version
        expect(mockValidator.validateContent).toHaveBeenCalledWith(documentType, content);
      });
 
-    it('不正なコンテンツでバリデーションエラーが発生すること', () => {
+    it('should throw a validation error for invalid content', () => {
       const invalidContent = { wrong: 'structure' };
-      // バリデーターがエラーを投げるようにモックを設定
+      // Mock validator to throw an error
       (mockValidator.validateContent as Mock).mockImplementationOnce(() => { // as Mock に修正
         throw new DomainError(DomainErrorCodes.VALIDATION_ERROR, 'Invalid content');
       });
@@ -202,7 +199,7 @@ describe('JsonDocument', () => {
         title: title,
         documentType: documentType,
         content: invalidContent,
-      // toThrow にエラークラスとメッセージの完全一致チェックを渡す (モックで投げてるエラーなので完全一致)
+      // Check for exact error class and message (since it's thrown by the mock)
       })).toThrow(
         new DomainError(DomainErrorCodes.VALIDATION_ERROR, 'Invalid content')
       );
@@ -210,8 +207,9 @@ describe('JsonDocument', () => {
       expect(mockValidator.validateContent).toHaveBeenCalledTimes(1);
     });
 
-    // 必須プロパティ（path, title, documentType, content）がない場合のテストはTypeScriptの型チェックに依存するため、
-    // ランタイムでのエラーというよりはコンパイルエラーになる。ここでは主にバリデーションエラーをテストする。
+    // Tests for missing required properties (path, title, documentType, content)
+    // rely on TypeScript type checking and would result in compile errors rather than runtime errors.
+    // Therefore, we primarily test validation errors here.
   });
 
   // --- Instance Methods ---
@@ -222,21 +220,21 @@ describe('JsonDocument', () => {
       doc = JsonDocument.create({ path: validPath, title, documentType, content });
     });
 
-    it('パスを正しく更新し、新しいインスタンスを返すこと', () => {
+    it('should update the path correctly and return a new instance', () => {
       const newPath = DocumentPath.create('new/path.json');
       const updatedDoc = doc.updatePath(newPath);
 
-      expect(updatedDoc).not.toBe(doc); // イミュータブルであること
+      expect(updatedDoc).not.toBe(doc); // Check for immutability
       expect(updatedDoc.path).toBe(newPath);
-      expect(updatedDoc.id.equals(doc.id)).toBe(true); // IDは変わらない
-      expect(updatedDoc.title).toBe(doc.title); // 他のプロパティは変わらない
-      expect(updatedDoc.version).toBe(doc.version + 1); // バージョンがインクリメントされる
-      expect(updatedDoc.lastModified.getTime()).toBeGreaterThanOrEqual(doc.lastModified.getTime()); // 更新日時が同じか進んでいることを確認
+      expect(updatedDoc.id.equals(doc.id)).toBe(true); // ID should not change
+      expect(updatedDoc.title).toBe(doc.title); // Other properties should not change
+      expect(updatedDoc.version).toBe(doc.version + 1); // Version should increment
+      expect(updatedDoc.lastModified.getTime()).toBeGreaterThanOrEqual(doc.lastModified.getTime()); // lastModified should be updated or stay the same
     });
 
-    it('同じパスで更新しても同じインスタンスを返すこと', () => {
+    it('should return the same instance if updated with the same path', () => {
       const updatedDoc = doc.updatePath(validPath);
-      expect(updatedDoc).toBe(doc); // 同じインスタンスが返る
+      expect(updatedDoc).toBe(doc); // Should return the same instance
       expect(updatedDoc.version).toBe(doc.version);
     });
   });
@@ -247,7 +245,7 @@ describe('JsonDocument', () => {
       doc = JsonDocument.create({ path: validPath, title, documentType, content });
     });
 
-    it('タイトルを正しく更新し、新しいインスタンスを返すこと', () => {
+    it('should update the title correctly and return a new instance', () => {
       const newTitle = 'New Title';
       const updatedDoc = doc.updateTitle(newTitle);
 
@@ -255,10 +253,10 @@ describe('JsonDocument', () => {
       expect(updatedDoc.title).toBe(newTitle);
       expect(updatedDoc.path.equals(doc.path)).toBe(true);
       expect(updatedDoc.version).toBe(doc.version + 1);
-      expect(updatedDoc.lastModified.getTime()).toBeGreaterThanOrEqual(doc.lastModified.getTime()); // 更新日時が同じか進んでいることを確認
+      expect(updatedDoc.lastModified.getTime()).toBeGreaterThanOrEqual(doc.lastModified.getTime()); // lastModified should be updated or stay the same
     });
 
-     it('同じタイトルで更新しても同じインスタンスを返すこと', () => {
+     it('should return the same instance if updated with the same title', () => {
        const updatedDoc = doc.updateTitle(title);
        expect(updatedDoc).toBe(doc);
        expect(updatedDoc.version).toBe(doc.version);
@@ -271,34 +269,33 @@ describe('JsonDocument', () => {
       doc = JsonDocument.create({ path: validPath, title, documentType, content });
     });
 
-    it('コンテントを正しく更新し、新しいインスタンスを返すこと', () => {
+    it('should update the content correctly and return a new instance', () => {
       const newContent = { newKey: 'newValue' };
-      // この行は重複しているので削除
 
-      vi.clearAllMocks(); // jest -> vi, モック呼び出し履歴をクリアしてから updateContent を呼ぶ
-      const updatedDoc = doc.updateContent(newContent); // updateContent を呼び出す
+      vi.clearAllMocks(); // Clear mock history before calling updateContent
+      const updatedDoc = doc.updateContent(newContent);
 
-      // コンテンツバリデーションが呼ばれたことを確認
-      expect(mockValidator.validateContent).toHaveBeenCalledWith(documentType, newContent); // 正しい引数で呼ばれたか
-      expect(mockValidator.validateContent).toHaveBeenCalledTimes(1); // 1回だけ呼ばれたか
+      // Check if content validation was called
+      expect(mockValidator.validateContent).toHaveBeenCalledWith(documentType, newContent); // Check arguments
+      expect(mockValidator.validateContent).toHaveBeenCalledTimes(1); // Check call count
 
-      // 他のプロパティチェック
-      expect(updatedDoc).not.toBe(doc); // イミュータブルであること
+      // Check other properties
+      expect(updatedDoc).not.toBe(doc); // Check for immutability
       expect(updatedDoc.content).toEqual(newContent);
       expect(updatedDoc.title).toBe(doc.title);
       expect(updatedDoc.version).toBe(doc.version + 1);
-      expect(updatedDoc.lastModified.getTime()).toBeGreaterThanOrEqual(doc.lastModified.getTime()); // 更新日時が同じか進んでいることを確認
+      expect(updatedDoc.lastModified.getTime()).toBeGreaterThanOrEqual(doc.lastModified.getTime()); // lastModified should be updated or stay the same
     });
 
-    it('不正なコンテンツで更新しようとするとエラーが発生すること', () => {
+    it('should throw an error when updating with invalid content', () => {
        const invalidContent = { wrong: 'structure' };
-       // バリデーターがエラーを投げるようにモックを設定
+       // Mock validator to throw an error
        (mockValidator.validateContent as Mock).mockImplementationOnce(() => { // as Mock に修正
          throw new DomainError(DomainErrorCodes.VALIDATION_ERROR, 'Invalid content');
        });
 
-       vi.clearAllMocks(); // jest -> vi, モック呼び出し履歴をクリア
-       // toThrow 内で updateContent が呼ばれる
+       vi.clearAllMocks(); // Clear mock history
+       // updateContent should throw within expect
        expect(() => doc.updateContent(invalidContent)).toThrow(
          new DomainError(DomainErrorCodes.VALIDATION_ERROR, 'Invalid content')
        );
@@ -307,25 +304,25 @@ describe('JsonDocument', () => {
 
   describe('addTag', () => {
     let doc: JsonDocument;
-    const newTag = Tag.create('new-tag'); // 小文字とハイフンのみに修正
+    const newTag = Tag.create('new-tag');
     beforeEach(() => {
-      // 念のため、ここで全てのバリデーターモックを再設定して true を返すようにする
+      // Reset all validator mocks to return true just in case
       (mockValidator.validateDocument as Mock).mockReturnValue(true);
       (mockValidator.validateMetadata as Mock).mockReturnValue(true);
       (mockValidator.validateContent as Mock).mockReturnValue(true);
       doc = JsonDocument.create({ path: validPath, title, documentType, content, tags });
     });
 
-    it('タグを正しく追加し、新しいインスタンスを返すこと', () => {
+    it('should add a tag correctly and return a new instance', () => {
       const updatedDoc = doc.addTag(newTag);
       expect(updatedDoc).not.toBe(doc);
       expect(updatedDoc.tags).toContainEqual(newTag);
       expect(updatedDoc.tags.length).toBe(tags.length + 1);
       expect(updatedDoc.version).toBe(doc.version + 1);
-      expect(updatedDoc.lastModified.getTime()).toBeGreaterThanOrEqual(doc.lastModified.getTime()); // 更新日時が同じか進んでいることを確認
+      expect(updatedDoc.lastModified.getTime()).toBeGreaterThanOrEqual(doc.lastModified.getTime()); // lastModified should be updated or stay the same
     });
 
-    it('既に存在するタグを追加しても同じインスタンスを返すこと', () => {
+    it('should return the same instance if adding an existing tag', () => {
       const existingTag = tags[0];
       const updatedDoc = doc.addTag(existingTag);
       expect(updatedDoc).toBe(doc);
@@ -337,21 +334,21 @@ describe('JsonDocument', () => {
   describe('removeTag', () => {
     let doc: JsonDocument;
     const tagToRemove = tags[0];
-    const nonExistentTag = Tag.create('non-existent'); // 小文字に修正
+    const nonExistentTag = Tag.create('non-existent');
     beforeEach(() => {
       doc = JsonDocument.create({ path: validPath, title, documentType, content, tags });
     });
 
-    it('存在するタグを正しく削除し、新しいインスタンスを返すこと', () => {
+    it('should remove an existing tag correctly and return a new instance', () => {
       const updatedDoc = doc.removeTag(tagToRemove);
       expect(updatedDoc).not.toBe(doc);
       expect(updatedDoc.tags).not.toContainEqual(tagToRemove);
       expect(updatedDoc.tags.length).toBe(tags.length - 1);
       expect(updatedDoc.version).toBe(doc.version + 1);
-      expect(updatedDoc.lastModified.getTime()).toBeGreaterThanOrEqual(doc.lastModified.getTime()); // 更新日時が同じか進んでいることを確認
+      expect(updatedDoc.lastModified.getTime()).toBeGreaterThanOrEqual(doc.lastModified.getTime()); // lastModified should be updated or stay the same
     });
 
-    it('存在しないタグを削除しようとしても同じインスタンスを返すこと', () => {
+    it('should return the same instance if trying to remove a non-existent tag', () => {
       const updatedDoc = doc.removeTag(nonExistentTag);
       expect(updatedDoc).toBe(doc);
       expect(updatedDoc.tags.length).toBe(tags.length);
@@ -366,36 +363,36 @@ describe('JsonDocument', () => {
        doc = JsonDocument.create({ path: validPath, title, documentType, content, tags });
      });
 
-    it('タグリストを正しく更新し、新しいインスタンスを返すこと', () => {
+    it('should update the tag list correctly and return a new instance', () => {
       const updatedDoc = doc.updateTags(newTags);
       expect(updatedDoc).not.toBe(doc);
       expect(updatedDoc.tags).toEqual(newTags);
       expect(updatedDoc.version).toBe(doc.version + 1);
-      expect(updatedDoc.lastModified.getTime()).toBeGreaterThanOrEqual(doc.lastModified.getTime()); // 更新日時が同じか進んでいることを確認
+      expect(updatedDoc.lastModified.getTime()).toBeGreaterThanOrEqual(doc.lastModified.getTime()); // lastModified should be updated or stay the same
     });
   });
 
   describe('toObject', () => {
-    it('正しい BaseJsonDocumentV2 構造のオブジェクトを返すこと', () => {
+    it('should return an object with the correct BaseJsonDocumentV2 structure', () => {
       const doc = JsonDocument.create({ id: docId, path: validPath, title, documentType, content, tags, branch, versionInfo });
       const obj = doc.toObject();
 
-      // スキーマ変更に合わせて期待値を修正
+      // Adjust expectations according to schema changes
       expect(obj.schema).toBe(SCHEMA_VERSION);
-      expect(obj.documentType).toBe(documentType); // documentType がトップレベルにあることを確認
+      expect(obj.documentType).toBe(documentType); // Check documentType is at top level
       expect(obj.metadata.id).toBe(docId.value);
       expect(obj.metadata.title).toBe(title);
-      // expect(obj.metadata.documentType).toBe(documentType); // metadata にはない
+      // expect(obj.metadata.documentType).toBe(documentType); // Not in metadata
       expect(obj.metadata.path).toBe(validPath.value);
       expect(obj.metadata.tags).toEqual(tags.map(t => t.value));
-      expect(obj.metadata.lastModified).toEqual(versionInfo.lastModified.toISOString()); // ISO文字列で比較
+      expect(obj.metadata.lastModified).toEqual(versionInfo.lastModified.toISOString()); // Compare as ISO strings
       expect(obj.metadata.version).toBe(versionInfo.version);
       expect(obj.metadata.branch).toBe(branch);
-      expect(obj.metadata.createdAt).toBeDefined(); // createdAt が存在することを確認
+      expect(obj.metadata.createdAt).toBeDefined(); // Check createdAt exists
       expect(obj.content).toEqual(content);
     });
 
-     it('ブランチがない場合、metadata に branch が含まれないこと', () => {
+     it('should not include branch in metadata if branch is undefined', () => {
        const doc = JsonDocument.create({ path: validPath, title, documentType, content });
        const obj = doc.toObject();
        expect(obj.metadata.branch).toBeUndefined();
@@ -403,23 +400,23 @@ describe('JsonDocument', () => {
   });
 
   describe('toString', () => {
-    it('正しいJSON文字列を返すこと', () => {
+    it('should return a correct JSON string', () => {
        const doc = JsonDocument.create({ id: docId, path: validPath, title, documentType, content, tags, branch, versionInfo });
        const jsonString = doc.toString();
-       const parsed = JSON.parse(jsonString); // 再度パースして確認
+       const parsed = JSON.parse(jsonString); // Parse back to verify
 
        expect(parsed.schema).toBe(SCHEMA_VERSION);
        expect(parsed.metadata.id).toBe(docId.value);
-       // ... toObject と同様のチェック ...
+       // ... similar checks as toObject ...
        expect(parsed.content).toEqual(content);
     });
 
-    it('pretty=true の場合、整形されたJSON文字列を返すこと', () => {
+    it('should return a formatted JSON string when pretty=true', () => {
       const doc = JsonDocument.create({ path: validPath, title, documentType, content });
       const prettyJsonString = doc.toString(true);
-      // 整形されているか（インデントや改行があるか）を簡易的にチェック
+      // Simple check for formatting (presence of newline and indentation)
       expect(prettyJsonString).toContain('\n');
-      expect(prettyJsonString).toContain('  '); // インデント（スペース2つ）
+      expect(prettyJsonString).toContain('  '); // Indentation (two spaces)
     });
   });
 
@@ -429,17 +426,17 @@ describe('JsonDocument', () => {
     let doc3: JsonDocument;
 
     beforeEach(() => {
-      // 各テストの前にインスタンスを生成（この時点では validator は設定済み）
+      // Create instances before each test (validator is set at this point)
       doc1 = JsonDocument.create({ id: docId, path: validPath, title, documentType, content });
       doc2 = JsonDocument.create({ id: docId, path: DocumentPath.create('other.json'), title: 'Other', documentType, content }); // 同じID、違う内容
-      doc3 = JsonDocument.create({ path: validPath, title, documentType, content }); // 違うID
+      doc3 = JsonDocument.create({ path: validPath, title, documentType, content }); // Different ID
     });
 
-    it('同じIDを持つインスタンスは true を返すこと', () => {
+    it('should return true for instances with the same ID', () => {
       expect(doc1.equals(doc2)).toBe(true);
     });
 
-    it('異なるIDを持つインスタンスは false を返すこと', () => {
+    it('should return false for instances with different IDs', () => {
       expect(doc1.equals(doc3)).toBe(false);
     });
   });
@@ -449,17 +446,17 @@ describe('JsonDocument', () => {
      let existingTag: Tag;
      let nonExistentTag: Tag;
      beforeEach(() => {
-       // 各テストの前にインスタンスとタグを生成
+       // Create instance and tags before each test
        doc = JsonDocument.create({ path: validPath, title, documentType, content, tags });
        existingTag = tags[0];
-       nonExistentTag = Tag.create('non-existent'); // ここも小文字に修正済みのはず
+       nonExistentTag = Tag.create('non-existent');
      });
 
-     it('存在するタグに対して true を返すこと', () => {
+     it('should return true for an existing tag', () => {
        expect(doc.hasTag(existingTag)).toBe(true);
      });
 
-     it('存在しないタグに対して false を返すこと', () => {
+     it('should return false for a non-existent tag', () => {
        expect(doc.hasTag(nonExistentTag)).toBe(false);
      });
    });
@@ -467,11 +464,11 @@ describe('JsonDocument', () => {
    describe('getters', () => {
       let doc: JsonDocument;
       beforeEach(() => {
-        // 各テストの前にインスタンスを生成
+        // Create instance before each test
         doc = JsonDocument.create({ id: docId, path: validPath, title, documentType, content, tags, branch, versionInfo });
       });
 
-      it('各ゲッターが正しい値を返すこと', () => {
+      it('should return correct values from getters', () => {
         expect(doc.id).toBe(docId);
         expect(doc.path).toBe(validPath);
         expect(doc.title).toBe(title);
@@ -480,7 +477,7 @@ describe('JsonDocument', () => {
         expect(doc.content).toEqual(content);
         expect(doc.branch).toBe(branch);
         expect(doc.versionInfo).toBe(versionInfo);
-        expect(doc.lastModified).toEqual(versionInfo.lastModified); // Date は toEqual で比較
+        expect(doc.lastModified).toEqual(versionInfo.lastModified); // Use toEqual for Dates
         expect(doc.version).toBe(versionInfo.version);
       });
    });

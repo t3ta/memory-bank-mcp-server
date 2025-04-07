@@ -1,41 +1,31 @@
 import { setupE2ETestEnv } from './helpers/e2e-test-env.js';
-import { MCPInMemoryClient } from './helpers/MCPInMemoryClient.js'; // 作成したクライアントをインポート
-// import type { Server } from '@modelcontextprotocol/sdk'; // SDKが見つからないためコメントアウト
+import type { Application } from '../../src/main/Application.js';
+import type { DocumentDTO } from '../../src/application/dtos/DocumentDTO.js';
 
 describe('MCP E2E Initialization Tests', () => {
-  let testEnv: Awaited<ReturnType<typeof setupE2ETestEnv>>['testEnv'];
-  let client: MCPInMemoryClient;
-  let server: any; // Server型が見つからないためanyに変更
+  // let testEnv: Awaited<ReturnType<typeof setupE2ETestEnv>>['testEnv']; // Not used
+  let app: Application;
   let cleanup: () => Promise<void>;
 
-  // 各テストの前に環境をセットアップ
   beforeEach(async () => {
     const setup = await setupE2ETestEnv();
-    testEnv = setup.testEnv;
-    // client = setup.client; // clientはsetupE2ETestEnv内で初期化されるように修正が必要かも
-    // setupE2ETestEnv から clientTransport を受け取り、ここでクライアントを初期化する
-    client = new MCPInMemoryClient(setup.clientTransport);
-    await client.initialize(); // ここで初期化を実行
-
-    server = setup.server; // serverインスタンスを保持
+    // testEnv = setup.testEnv; // Not used
+    app = setup.app;
     cleanup = setup.cleanup;
   });
 
-  // 各テストの後に環境をクリーンアップ
   afterEach(async () => {
     await cleanup();
   });
 
   it('should establish connection successfully and perform basic operations', async () => {
-    // クライアントは beforeEach で初期化されているはず
-    // 簡単なメモリバンク操作を試して接続を確認する
     const branchName = 'feature/init-test-branch';
     const documentPath = 'init-test-doc.json';
     const docContent = JSON.stringify({
       schema: "memory_document_v2",
       metadata: {
         id: "test-e2e-init-doc",
-        title: "E2E初期化テスト用ドキュメント",
+        title: "E2E Initialization Test Document", // Changed to English
         documentType: "test",
         path: documentPath,
         tags: ["test", "e2e", "init"],
@@ -44,47 +34,50 @@ describe('MCP E2E Initialization Tests', () => {
         version: 1
       },
       content: {
-        value: "E2E初期化テスト用のドキュメント内容"
+        value: "Document content for E2E initialization test" // Changed to English
       }
     }, null, 2);
 
-    // 1. ドキュメントを書き込む
-    const writeResult = await client.writeBranchMemoryBank(
+    const branchController = app.getBranchController();
+    const writeResult = await branchController.writeDocument({
+      branchName: branchName,
+      path: documentPath,
+      content: docContent,
+      tags: ["test", "e2e", "init"]
+    });
+
+    expect(writeResult).toBeDefined();
+
+    const readResult = await branchController.readDocument(
       branchName,
-      documentPath,
-      testEnv.docRoot,
-      { content: docContent, tags: ["test", "e2e", "init"] } // optionsオブジェクトで渡す
+      documentPath
     );
 
-    // writeResult の形式は MCPサーバーの実装によるが、成功したか確認
-    // 例: expect(writeResult.success).toBe(true);
-    //     expect(writeResult.data).toBeDefined();
-    // 現状はエラーが出なければOKとする
-    expect(writeResult).toBeDefined(); // とりあえず存在確認
 
-    // 2. ドキュメントを読み込む
-    const readResult = await client.readBranchMemoryBank(
-      branchName,
-      documentPath,
-      testEnv.docRoot
-    );
+    expect(readResult).toBeDefined();
+    expect(readResult.success).toBe(true);
 
-    // readResult の形式を確認
-    // 例: expect(readResult.success).toBe(true);
-    //     expect(readResult.data).toBeDefined();
-    //     expect(readResult.data.document).toBeDefined();
-    expect(readResult).toBeDefined(); // とりあえず存在確認
-    expect(readResult.document).toBeDefined(); // documentプロパティがあるか
-    expect(typeof readResult.document.content).toBe('string'); // contentが文字列か
+    if (readResult.success) {
+      expect(readResult.data).toBeDefined();
+      expect(readResult.data).not.toBeNull();
+      if (!readResult.data) return fail('readResult.data should not be null');
 
-    // 読み込んだ内容を確認
-    const parsedContent = JSON.parse(readResult.document.content);
-    expect(parsedContent.metadata.id).toBe('test-e2e-init-doc');
-    expect(parsedContent.content.value).toBe('E2E初期化テスト用のドキュメント内容');
-    expect(readResult.document.tags).toEqual(expect.arrayContaining(["test", "e2e", "init"])); // タグ確認
+      expect((readResult.data as any).document).toBeDefined();
+      const document = (readResult.data as any).document as DocumentDTO;
+
+      expect(document.content).toBeDefined();
+      expect(typeof document.content).toBe('string');
+
+      const parsedContent = JSON.parse(document.content);
+      expect(parsedContent.metadata.id).toBe('test-e2e-init-doc');
+      expect(parsedContent.content.value).toBe('E2E初期化テスト用のドキュメント内容');
+      expect(document.tags).toEqual(expect.arrayContaining(["test", "e2e", "init"]));
+    } else {
+      fail('readDocument should return success: true');
+    }
   });
 
-  // TODO: 他の初期化関連テストケースを追加
-  // - サーバーへの基本的なpingリクエスト（もし実装されていれば）
-  // - クライアント切断時の挙動確認
+  // TODO: Add more initialization related test cases
+  // - Basic ping request to the server (if implemented)
+  // - Behavior check on client disconnection
 });

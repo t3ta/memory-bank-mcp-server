@@ -1,11 +1,11 @@
 import { setupE2ETestEnv } from './helpers/e2e-test-env.js';
-import { MCPInMemoryClient } from './helpers/MCPInMemoryClient.js';
-// import type { Server } from '@modelcontextprotocol/sdk'; // SDKが見つからないためコメントアウト
+import type { Application } from '../../src/main/Application.js';
+// DocumentDTO and MCPSuccessResponse are not used
+import type { ContextResult } from '../../src/application/usecases/types.js'; // Remove unused RulesResult
 
 describe('MCP E2E Context Tests', () => {
-  let testEnv: Awaited<ReturnType<typeof setupE2ETestEnv>>['testEnv'];
-  let client: MCPInMemoryClient;
-  let server: any; // Server型が見つからないためanyに変更
+  // let testEnv: Awaited<ReturnType<typeof setupE2ETestEnv>>['testEnv']; // Not used
+  let app: Application;
   let cleanup: () => Promise<void>;
 
   const testBranchName = 'feature/e2e-context-test';
@@ -25,24 +25,23 @@ describe('MCP E2E Context Tests', () => {
 
   beforeEach(async () => {
     const setup = await setupE2ETestEnv();
-    testEnv = setup.testEnv;
-    client = new MCPInMemoryClient(setup.clientTransport);
-    await client.initialize();
-    server = setup.server;
+    // testEnv = setup.testEnv; // Not used
+    app = setup.app;
     cleanup = setup.cleanup;
 
-    // Write test documents before each test
-    await client.writeBranchMemoryBank(
-      testBranchName,
-      branchDocPath,
-      testEnv.docRoot,
-      { content: JSON.stringify(branchDocContent, null, 2), tags: ["context", "branch"] }
-    );
-    await client.writeGlobalMemoryBank(
-      globalDocPath,
-      testEnv.docRoot,
-      { content: JSON.stringify(globalDocContent, null, 2), tags: ["context", "global"] }
-    );
+    const branchController = app.getBranchController();
+    const globalController = app.getGlobalController();
+    await branchController.writeDocument({
+      branchName: testBranchName,
+      path: branchDocPath,
+      content: JSON.stringify(branchDocContent, null, 2),
+      tags: ["context", "branch"]
+    });
+    await globalController.writeDocument({
+      path: globalDocPath,
+      content: JSON.stringify(globalDocContent, null, 2),
+      tags: ["context", "global"]
+    });
   });
 
   afterEach(async () => {
@@ -50,70 +49,76 @@ describe('MCP E2E Context Tests', () => {
   });
 
   it('should read context including branch, global memory, and rules (ja)', async () => {
-    const contextResult = await client.readContext(
-      testBranchName,
-      'ja', // 日本語ルールを指定
-      testEnv.docRoot
-    );
+    const contextController = app.getContextController();
+    const contextResult = await contextController.readContext({ branch: testBranchName, language: 'ja' });
 
     expect(contextResult).toBeDefined();
-    // ルールの確認 (ダミールールがセットアップされている前提)
-    expect(contextResult.rules).toBeDefined();
-    expect(contextResult.rules.schema).toBe('rules_v1'); // ダミールールのスキーマを確認
+    expect(contextResult.success).toBe(true);
+    expect(contextResult.data).toBeDefined();
 
-    // ブランチメモリバンクの確認
-    expect(contextResult.branchMemory).toBeDefined();
-    expect(Array.isArray(contextResult.branchMemory)).toBe(true);
-    const foundBranchDoc = contextResult.branchMemory.find((doc: any) => doc.path === branchDocPath);
-    expect(foundBranchDoc).toBeDefined();
-    expect(foundBranchDoc.tags).toEqual(expect.arrayContaining(["context", "branch"]));
-    const parsedBranchContent = JSON.parse(foundBranchDoc.content);
-    expect(parsedBranchContent.metadata.id).toBe("context-branch-1");
+    if (contextResult.success && contextResult.data) {
+      const data = contextResult.data as ContextResult;
+      expect(data.rules).toBeDefined();
+      expect(data.rules?.content).toBeDefined();
 
-    // グローバルメモリバンクの確認
-    expect(contextResult.globalMemory).toBeDefined();
-    expect(Array.isArray(contextResult.globalMemory)).toBe(true);
-    const foundGlobalDoc = contextResult.globalMemory.find((doc: any) => doc.path === globalDocPath);
-    expect(foundGlobalDoc).toBeDefined();
-    expect(foundGlobalDoc.tags).toEqual(expect.arrayContaining(["context", "global"]));
-    const parsedGlobalContent = JSON.parse(foundGlobalDoc.content);
-    expect(parsedGlobalContent.metadata.id).toBe("context-global-1");
+      expect(data.branchMemory).toBeDefined();
+      expect(typeof data.branchMemory).toBe('object');
+      expect(data.branchMemory?.[branchDocPath]).toBeDefined();
+      const branchDocContentString = data.branchMemory?.[branchDocPath];
+      expect(typeof branchDocContentString).toBe('string');
+      const parsedBranchContent = JSON.parse(branchDocContentString ?? '{}');
+      expect(parsedBranchContent.metadata.id).toBe("context-branch-1");
+
+      expect(data.globalMemory).toBeDefined();
+      expect(typeof data.globalMemory).toBe('object');
+      expect(data.globalMemory?.[globalDocPath]).toBeDefined();
+      const globalDocContentString = data.globalMemory?.[globalDocPath];
+      expect(typeof globalDocContentString).toBe('string');
+      const parsedGlobalContent = JSON.parse(globalDocContentString ?? '{}');
+      expect(parsedGlobalContent.metadata.id).toBe("context-global-1");
+    } else {
+      fail('readContext should return success: true with data');
+    }
   });
 
   it('should read context with English rules (en)', async () => {
-    const contextResult = await client.readContext(
-      testBranchName,
-      'en', // 英語ルールを指定
-      testEnv.docRoot
-    );
+    const contextController = app.getContextController();
+    const contextResult = await contextController.readContext({ branch: testBranchName, language: 'en' });
     expect(contextResult).toBeDefined();
-    expect(contextResult.rules).toBeDefined();
-    expect(contextResult.rules.schema).toBe('rules_v1'); // ダミールールのスキーマを確認 (内容は言語ごとに違うはずだが、ダミーなのでスキーマだけ確認)
-    // メモリバンクの内容は前のテストと同じはずなので省略
+    expect(contextResult.success).toBe(true);
+    if (contextResult.success && contextResult.data) {
+      const data = contextResult.data as ContextResult;
+      expect(data.rules).toBeDefined();
+      expect(data.rules?.content).toBeDefined();
+    } else {
+      fail('readContext should return success: true with data');
+    }
   });
 
    it('should read context with Chinese rules (zh)', async () => {
-    const contextResult = await client.readContext(
-      testBranchName,
-      'zh', // 中国語ルールを指定
-      testEnv.docRoot
-    );
+    const contextController = app.getContextController();
+    const contextResult = await contextController.readContext({ branch: testBranchName, language: 'zh' });
     expect(contextResult).toBeDefined();
-    expect(contextResult.rules).toBeDefined();
-    expect(contextResult.rules.schema).toBe('rules_v1'); // ダミールールのスキーマを確認
+    expect(contextResult.success).toBe(true);
+    if (contextResult.success && contextResult.data) {
+      const data = contextResult.data as ContextResult;
+      expect(data.rules).toBeDefined();
+      expect(data.rules?.content).toBeDefined();
+    } else {
+      fail('readContext should return success: true with data');
+    }
   });
 
   it('should return error when reading context for non-existent branch', async () => {
     try {
-      await client.readContext(
-        'feature/non-existent-context-branch',
-        'ja',
-        testEnv.docRoot
-      );
+      const contextController = app.getContextController();
+      await contextController.readContext({
+        branch: 'feature/non-existent-context-branch',
+        language: 'ja'
+      });
       fail('Expected readContext to throw an error for non-existent branch, but it did not.');
     } catch (error: any) {
       expect(error).toBeDefined();
-      // Example check: expect(error.message).toContain('Branch not found');
     }
   });
 

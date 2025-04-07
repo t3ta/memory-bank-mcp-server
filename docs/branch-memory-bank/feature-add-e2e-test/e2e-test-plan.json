@@ -5,12 +5,8 @@
     "title": "E2E テスト導入計画",
     "documentType": "technical_plan",
     "path": "e2e-test-plan.json",
-    "tags": [
-      "e2e-test",
-      "technical-plan",
-      "implementation"
-    ],
-    "lastModified": "2025-04-06T09:35:15.000Z",
+    "tags": [],
+    "lastModified": "2025-04-06T17:04:28.622Z",
     "createdAt": "2025-04-06T09:35:15.000Z",
     "version": 1
   },
@@ -49,9 +45,9 @@
           "details": "packages/mcp/tests/integration/helpers/test-env.tsを参考に、インメモリ通信用の環境設定を追加します"
         },
         {
-          "name": "jest.config.e2e.ts",
-          "purpose": "E2Eテスト用のJest設定ファイル",
-          "details": "既存のインテグレーションテスト設定をベースに、E2Eテスト用の最適化を行います"
+          "name": "vitest.config.e2e.ts",
+          "purpose": "E2Eテスト用のVitest設定ファイル",
+          "details": "既存のインテグレーションテスト設定をベースに、E2Eテスト用の最適化を行います（Vitest用）"
         },
         {
           "name": "MCPInMemoryClient.ts",
@@ -99,8 +95,8 @@
       "sequence": [
         {
           "step": 1,
-          "task": "E2Eテスト用のディレクトリ構造とJest設定を作成",
-          "details": "packages/mcp/tests/e2e ディレクトリを作成し、Jest設定ファイルを作成します"
+          "task": "E2Eテスト用のディレクトリ構造とVitest設定を作成",
+          "details": "packages/mcp/tests/e2e ディレクトリを作成し、Vitest設定ファイルを作成します"
         },
         {
           "step": 2,
@@ -170,7 +166,7 @@
         },
         {
           "challenge": "非同期処理のテスト",
-          "solution": "Jest の非同期テスト機能を活用し、Promise の解決を適切に待機します"
+          "solution": "Vitest の非同期テスト機能を活用し、Promise の解決を適切に待機します"
         }
       ]
     },

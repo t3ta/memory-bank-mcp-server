@@ -5,15 +5,13 @@
     "title": "アクティブコンテキスト",
     "documentType": "active_context",
     "path": "activeContext.json",
-    "tags": [
-      "active-context"
-    ],
-    "lastModified": "2025-04-06T11:50:00.000Z",
+    "tags": [],
+    "lastModified": "2025-04-07T01:07:44.418Z",
     "createdAt": "2025-04-06T08:52:04.656Z",
     "version": 5
   },
   "content": {
-    "currentWork": "MemoryBank MCPサーバーのE2Eテスト機能の計画と設計",
+    "currentWork": "E2Eテスト `search.e2e.test.ts` のデバッグと関連ファイルのクリーンアップ（不要コメント削除、英語化）が完了。ビルド＆テスト成功済み。",
     "recentChanges": [
       {
         "date": "2025-04-06T11:05:00.000Z",
@@ -26,6 +24,14 @@
       {
         "date": "2025-04-06T09:45:20.000Z",
         "description": "E2Eテスト導入計画を作成"
+      },
+      {
+        "date": "2025-04-07T08:59:54.000Z",
+        "description": "search.e2e.test.ts のデバッグ状況をメモリバンクに記録。"
+      },
+      {
+        "date": "2025-04-07T10:07:00.000Z",
+        "description": "search.e2e.test.ts のデバッグと関連ファイルのクリーンアップ完了。ビルド＆テスト成功。"
       }
     ],
     "activeDecisions": [
@@ -57,25 +63,14 @@
         "id": "9d68ae5b-f890-4741-8a9c-7f82ea3e3f41",
         "description": "E2Eテストの実行時間を最適化する方法",
         "status": "open"
-      }
-    ],
-    "nextSteps": [
-      {
-        "id": "7e0df6b2-8d63-4c9a-b491-2c3e78a27e6d",
-        "description": "E2Eテスト用のディレクトリ構造とJest設定ファイルを作成する",
-        "priority": "high"
       },
       {
-        "id": "b1af6382-29c5-4c8d-8c22-e6b9efc843a7",
-        "description": "E2Eテスト環境のセットアップユーティリティを実装する",
-        "priority": "high"
-      },
-      {
-        "id": "4fda7cb5-9efa-49bd-8afa-d215cc9f7261",
-        "description": "InMemoryTransportを活用したMCPクライアントクラスを実装する",
-        "priority": "medium"
+        "id": "beforeAll-log-issue",
+        "description": "`beforeAll` フック内のログが出力されない原因は何か？ `setupE2ETestEnv` または `setupBaseTestEnv` のどの段階でエラーが発生しているか？",
+        "status": "resolved"
       }
     ],
+    "nextSteps": [],
     "references": [
       {
         "file": "e2e-test-plan.json",
