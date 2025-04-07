@@ -101,7 +101,7 @@ export class ReadContextUseCase {
     const branchInfo = BranchInfo.create(branchName);
     logger.debug('Calling branchRepository.listDocuments...'); // Added log
 
-    await new Promise(resolve => setTimeout(resolve, 100)); // 100ms待機に増やしてみる
+    await new Promise(resolve => setTimeout(resolve, 200)); // さらに待機時間を増やしてみる (200ms)
 
     const paths = await this.branchRepository.listDocuments(branchInfo);
     logger.debug('Finished branchRepository.listDocuments'); // Added log
