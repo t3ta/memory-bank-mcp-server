@@ -1,17 +1,21 @@
 import { ReadRulesUseCase } from '../../../../../src/application/usecases/common/ReadRulesUseCase.js';
-import { DomainError } from '../../../../../src/shared/errors/DomainError.js'; // DomainError もインポート
+import { TemplateService } from '../../../../../src/application/templates/TemplateService.js'; // ★追加
+import { Language } from '../../../../../src/domain/i18n/Language.js'; // ★追加
+import { DomainError, DomainErrorCodes } from '../../../../../src/shared/errors/DomainError.js'; // DomainError もインポート
 import fs from 'fs/promises';
 import path from 'path';
+import { vi } from 'vitest'; // ★★★ vi をインポート ★★★
 import tmp from 'tmp-promise'; // tmp-promise をインポート
 
 describe('ReadRulesUseCase', () => {
   let useCase: ReadRulesUseCase;
   let tmpDir: tmp.DirectoryResult; // 一時ディレクトリ情報を保持する変数
   let rulesDir: string;
+  let mockTemplateService: vi.Mocked<TemplateService>; // ★モックを追加
 
-  const language = 'ja';
-  const mockRulesData = { general: ['Rule 1'], specific: { 'feature/test': ['Specific Rule'] } };
-  const mockRulesContent = JSON.stringify(mockRulesData, null, 2);
+  const language = new Language('ja'); // Language オブジェクトを使う
+  const mockRulesData = { id: 'rules', type: 'system', name: 'テストルール', sections: [{ id: 'sec1', title: 'セクション1', content: '内容1', isOptional: false }] }; // ダミーJSONオブジェクト
+  const mockRulesContent = JSON.stringify(mockRulesData, null, 2); // 比較用JSON文字列
 
   // 各テストの前に一時ディレクトリとファイルを作成
   beforeEach(async () => {
@@ -19,7 +23,12 @@ describe('ReadRulesUseCase', () => {
     // unsafeCleanup: true でディレクトリが空でなくても削除できるようにする
     tmpDir = await tmp.dir({ unsafeCleanup: true, keep: false }); // keep: false でテスト後に自動削除しないようにする（手動でやる）
     rulesDir = tmpDir.path;
-    useCase = new ReadRulesUseCase(rulesDir);
+    // TemplateService のモックを作成
+    mockTemplateService = {
+      getTemplateAsJsonObject: vi.fn(),
+      // 他の TemplateService メソッドのモックが必要ならここに追加
+    } as unknown as vi.Mocked<TemplateService>;
+    useCase = new ReadRulesUseCase(rulesDir, mockTemplateService); // モックを注入
   });
 
   // 各テストの後に一時ディレクトリをクリーンアップ
@@ -27,75 +36,38 @@ describe('ReadRulesUseCase', () => {
     await tmpDir.cleanup(); // 手動でクリーンアップ
   });
 
-  it('should return rules content when rules file is found in default path', async () => {
+  it('should return rules content as JSON string when template is found', async () => {
     // Arrange
-    const defaultPath = path.join(rulesDir, `rules-${language}.json`);
-    await fs.writeFile(defaultPath, mockRulesContent); // デフォルトパスにファイル作成
+    // モックの設定: getTemplateAsJsonObject が呼ばれたら mockRulesData を返す
+    mockTemplateService.getTemplateAsJsonObject.mockResolvedValue(mockRulesData);
 
     // Act
-    const result = await useCase.execute(language);
+    const result = await useCase.execute(language.code);
 
     // Assert
-    expect(result).toEqual({ content: mockRulesContent, language });
+    expect(mockTemplateService.getTemplateAsJsonObject).toHaveBeenCalledWith('rules', language); // モックが正しく呼ばれたか
+    expect(result).toEqual({ content: mockRulesContent, language: language.code }); // JSON文字列と比較
   });
 
-  it('should return rules content when rules file is found in templates/json path', async () => {
+  // --- 以下のファイルパス依存のテストは不要になるため削除 ---
+  // it('should return rules content when rules file is found in default path', async () => { ... });
+
+  // it('should return rules content when rules file is found in templates/json path', async () => { ... });
+
+  // it('should return rules content when rules file is found in domain/templates path', async () => { ... });
+
+  // it('should return rules content when rules file is found in templates/json/rules.json (common path)', async () => { ... });
+
+
+  it('should throw DomainError if template service throws an error', async () => {
     // Arrange
-    const templateJsonDir = path.join(rulesDir, 'templates', 'json');
-    await fs.mkdir(templateJsonDir, { recursive: true }); // ディレクトリ作成
-    const templateJsonPath = path.join(templateJsonDir, `rules-${language}.json`);
-    await fs.writeFile(templateJsonPath, mockRulesContent); // templates/json パスにファイル作成
-
-    // Act
-    const result = await useCase.execute(language);
-
-    // Assert
-    expect(result).toEqual({ content: mockRulesContent, language });
-  });
-
-   it('should return rules content when rules file is found in domain/templates path', async () => {
-    // Arrange
-    const domainTemplatesDir = path.join(rulesDir, 'domain', 'templates');
-    await fs.mkdir(domainTemplatesDir, { recursive: true }); // ディレクトリ作成
-    const domainTemplatesPath = path.join(domainTemplatesDir, `rules-${language}.json`);
-    await fs.writeFile(domainTemplatesPath, mockRulesContent); // domain/templates パスにファイル作成
-
-    // Act
-    const result = await useCase.execute(language);
-
-    // Assert
-    expect(result).toEqual({ content: mockRulesContent, language });
-  });
-
-   it('should return rules content when rules file is found in templates/json/rules.json (common path)', async () => {
-    // Arrange
-    const commonRulesDir = path.join(rulesDir, 'templates', 'json');
-    await fs.mkdir(commonRulesDir, { recursive: true }); // ディレクトリ作成
-    const commonRulesPath = path.join(commonRulesDir, 'rules.json'); // 共通パス
-    await fs.writeFile(commonRulesPath, mockRulesContent);
-
-    // Act
-    const result = await useCase.execute(language); // 言語指定しても共通パスが優先されるはず
-
-    // Assert
-    expect(result).toEqual({ content: mockRulesContent, language });
-  });
-
-
-  it('should throw DomainError if rules file is not found in any path', async () => {
-    // Arrange: ファイルを作成しない
+    const expectedError = new DomainError(DomainErrorCodes.DOCUMENT_NOT_FOUND, 'Template not found');
+    // モックの設定: getTemplateAsJsonObject が呼ばれたらエラーを投げる
+    mockTemplateService.getTemplateAsJsonObject.mockRejectedValue(expectedError);
 
     // Act & Assert
-    try {
-      await useCase.execute(language);
-      // エラーが投げられなかったらテスト失敗
-      throw new Error('Expected DomainError to be thrown');
-    } catch (error) {
-      expect(error).toBeInstanceOf(DomainError); // まずDomainErrorインスタンスか確認
-      // エラーコードとメッセージの先頭部分をチェック
-      expect(error).toHaveProperty('code', 'DOMAIN_ERROR.DOCUMENT_NOT_FOUND'); // 実際のコード値に合わせる (再確認)
-      expect((error as Error).message).toContain(`Rules file not found for language: ${language}. Attempted paths:`);
-    }
+    await expect(useCase.execute(language.code)).rejects.toThrow(expectedError);
+    expect(mockTemplateService.getTemplateAsJsonObject).toHaveBeenCalledWith('rules', language); // モックが正しく呼ばれたか
   });
 
   it('should throw DomainError if language is not supported', async () => {

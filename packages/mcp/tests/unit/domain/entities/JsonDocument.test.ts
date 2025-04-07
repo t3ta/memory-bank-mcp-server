@@ -200,9 +200,11 @@ describe('JsonDocument', () => {
         documentType: documentType,
         content: invalidContent,
       // Check for exact error class and message (since it's thrown by the mock)
-      })).toThrow(
-        new DomainError(DomainErrorCodes.VALIDATION_ERROR, 'Invalid content')
-      );
+      // Check only for error code and message, ignore timestamp differences
+      })).toThrow(expect.objectContaining({
+        code: DomainErrorCodes.VALIDATION_ERROR,
+        message: 'Invalid content',
+      }));
       expect(mockValidator.validateContent).toHaveBeenCalledWith(documentType, invalidContent);
       expect(mockValidator.validateContent).toHaveBeenCalledTimes(1);
     });

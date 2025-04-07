@@ -47,9 +47,11 @@ describe('Tag', () => {
 
      it('無効な文字（アンダースコア）を含む場合にエラーが発生すること', () => {
        const invalidTag = 'invalid_tag';
-       expect(() => Tag.create(invalidTag)).toThrow(
-         new DomainError(DomainErrorCodes.INVALID_TAG_FORMAT, 'Tag must contain only lowercase letters, numbers, and hyphens')
-       );
+       // Check only for error code and message, ignore timestamp differences
+       expect(() => Tag.create(invalidTag)).toThrow(expect.objectContaining({
+         code: DomainErrorCodes.INVALID_TAG_FORMAT,
+         message: 'Tag must contain only lowercase letters, numbers, and hyphens',
+       }));
      });
 
      // Tag.ts にハイフンで始まるチェックの実装がないためスキップ
