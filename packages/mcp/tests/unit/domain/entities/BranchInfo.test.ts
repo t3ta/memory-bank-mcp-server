@@ -38,11 +38,9 @@ describe('BranchInfo', () => {
 
      it('プレフィックスの後に名前がないブランチ名でエラーが発生すること', () => {
        const invalidBranchName = 'feature/';
-       expect(() => BranchInfo.create(invalidBranchName)).toThrow(
-         new DomainError(
-           DomainErrorCodes.INVALID_BRANCH_NAME,
-           'Branch name must have a name after the prefix'
-         )
+       // Check only the error message string
+       expect(() => BranchInfo.create(invalidBranchName)).toThrowError(
+         'Branch name must have a name after the prefix'
        );
      });
   });
@@ -121,4 +119,4 @@ describe('BranchInfo', () => {
       expect(branchInfo.toString()).toBe(branchName);
     });
 });
-}); // <- これを追加！
+}); // ★一番外側の describe を閉じる括弧を追加★

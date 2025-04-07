@@ -14,6 +14,8 @@ echo "Running dependency check..."
 yarn check:deps || exit 1 # Exit if depcheck fails
 
 echo "Running integration tests..."
-yarn test:integration || exit 1 # Exit if tests fail
+yarn workspace @memory-bank/mcp test:unit || exit 1 # Add unit tests ★追加★
+yarn workspace @memory-bank/mcp test:integration || exit 1 # Add workspace specifier ★修正★
+yarn workspace @memory-bank/mcp test:e2e || exit 1 # Add e2e tests ★追加★
 
 echo "Pre-push checks passed!"

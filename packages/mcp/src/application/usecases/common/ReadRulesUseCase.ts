@@ -1,6 +1,6 @@
-import fs from "fs/promises"; // Use standard fs/promises
+// import fs from "fs/promises"; // ★削除 (使わなくなった)
 // import fsExtra from "fs-extra"; // Remove fs-extra import for readJson
-import path from "path";
+import path from "path"; // ★元に戻す★
 import { DomainError, DomainErrorCodes } from "../../../shared/errors/DomainError.js";
 import { logger } from "../../../shared/utils/logger.js";
 import { TemplateService } from '../../templates/TemplateService.js'; // Import TemplateService
@@ -50,11 +50,11 @@ constructor(
 
     // Define the primary path for the rules file
     // Older paths were removed as they are deprecated.
-    const primaryRulesPath = path.join(this.rulesDir, 'domain', 'templates', `rules-${language}.json`);
-    const possiblePaths = [primaryRulesPath]; // Keep as array for loop logic, but only contain the primary path
+    // const primaryRulesPath = path.join(this.rulesDir, 'domain', 'templates', `rules-${language}.json`); // ★削除 (使わなくなった)
+    // const possiblePaths = [primaryRulesPath]; // ★削除 (使わなくなった)
 
-    let jsonContent = ''; // Declare jsonContent here to be accessible in the outer scope
-    let jsonFilePath = ''; // Declare jsonFilePath here
+    // let jsonContent = ''; // ★削除 (使わなくなった)
+    // let jsonFilePath = ''; // ★削除 (使わなくなった)
 
     try {
 
@@ -80,63 +80,20 @@ constructor(
             language
           };
         } catch (templateError) {
-          logger.warn(`Failed to load rules using template loader: ${templateError instanceof Error ? templateError.message : 'Unknown error'}`); // Keep warning
-          // logger.debug('Falling back to direct file loading'); // Remove debug log
-          // Fallback to direct file loading if template loader fails
+          // TemplateService でエラーが発生したら、そのままエラーを投げる
+          logger.error(`Failed to load rules using template loader: ${templateError instanceof Error ? templateError.message : 'Unknown error'}`);
+          throw templateError; // エラーを再スロー
         }
+      } else {
+        // templateLoader がない場合はエラー (DI設定ミスなど)
+        throw new Error('TemplateService (templateLoader) is not provided to ReadRulesUseCase.');
       }
-
-      // Load JSON file directly (fallback or primary method) - This fallback might still be needed if template service fails catastrophically
-      for (const p of possiblePaths) {
-        const absolutePath = path.resolve(p); // Resolve to absolute path
-        logger.debug(`[ReadRules] Attempting path: ${absolutePath}`);
-        try {
-          // Check file existence explicitly before reading
-          await fs.access(absolutePath);
-          logger.debug(`[ReadRules] File exists at: ${absolutePath}`);
-          try {
-            jsonContent = await fs.readFile(absolutePath, 'utf-8'); // Use standard fs.readFile
-            jsonFilePath = absolutePath; // Assign value here
-            logger.debug('[ReadRules] Successfully read file content', { path: jsonFilePath });
-            break; // Exit loop once file is found and read
-          } catch (readError: any) {
-            logger.error(`[ReadRules] File exists but failed to read: ${absolutePath}`, { error: readError.message });
-            // Continue to next path if read fails even if file exists
-          }
-        } catch (accessError: any) {
-          if (accessError.code === 'ENOENT') {
-            logger.debug(`[ReadRules] File does not exist at: ${absolutePath}`);
-          } else {
-            logger.warn(`[ReadRules] Error checking file access for ${absolutePath}: ${accessError.message}`);
-          }
-          // Continue to the next path if access fails (e.g., file not found)
-        }
-      }
-
-      if (!jsonContent) {
-        // If no file was found after trying all paths, throw the specific error
-        throw new Error(`Rules file not found for language: ${language}`);
-      }
-
-      // Parse the content after reading (fallback path)
-      const jsonData = JSON.parse(jsonContent);
-
-      // Return JSON string directly (fallback path)
-      // (Markdown support was removed)
-      const content = JSON.stringify(jsonData, null, 2);
-
-      return {
-        content,
-        language
-      };
-    } catch (error: any) {
-      const attemptedPaths = possiblePaths.join(', ');
-      logger.error(`Failed to find or read rules file for language ${language}. Attempted paths: ${attemptedPaths}`, { originalError: error });
-      throw new DomainError(
-        DomainErrorCodes.DOCUMENT_NOT_FOUND,
-        `Rules file not found for language: ${language}. Attempted paths: ${attemptedPaths}`,
-        { originalError: error, attemptedPaths }
-      );
-    }
+      // --- Fallback 処理は削除 ---
+  } catch (error: any) {
+    // TemplateService からのエラーはそのまま再スローする
+    // (エラーメッセージの書き換えはしない)
+    logger.error(`Error executing ReadRulesUseCase for language ${language}:`, { originalError: error });
+    throw error; // ★エラーをそのまま再スロー★
   }
 }
+} // ★クラスを閉じる括弧を追加★

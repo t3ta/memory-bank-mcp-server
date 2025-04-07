@@ -343,8 +343,12 @@ describe('WriteBranchDocumentUseCase', () => {
       (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${branchName}`); // as Mock 追加
 
       // 実行＆検証
+      // Check only code and message using toMatchObject
       await expect(useCase.execute({ branchName, document: documentInput }))
-        .rejects.toThrow(expectedError);
+        .rejects.toThrow(expect.objectContaining({
+          code: ApplicationErrors.invalidInput('').code, // Get code from factory
+          message: 'Document path is required',
+        }));
 
       // 検証 (主要な処理が呼ばれていないことを確認)
       expect(mockBranchRepository.exists).not.toHaveBeenCalled();
