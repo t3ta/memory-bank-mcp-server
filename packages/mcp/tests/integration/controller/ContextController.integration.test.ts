@@ -18,8 +18,9 @@ describe('ContextController Integration Tests', () => {
   beforeEach(async () => {
     // Setup test environment
     testEnv = await setupTestEnv();
-    // Create test branch directory (needed for some tests)
-    await createBranchDir(testEnv, TEST_BRANCH);
+    // beforeEach でブランチディレクトリを作成しないように変更
+    // (自動初期化のテストのため)
+    // await createBranchDir(testEnv, TEST_BRANCH);
     // Initialize DI container with test configuration
     container = await setupContainer({ docsRoot: testEnv.docRoot });
     // Set log level to debug for testing
@@ -45,7 +46,8 @@ describe('ContextController Integration Tests', () => {
       expect(result.data).toBeDefined();
       expect(result.data?.rules).toBeDefined();
       expect(result.data?.branchMemory?.['branchContext.json']).toBeDefined();
-      expect(Object.keys(result.data?.branchMemory || {}).length).toBe(1);
+      // 自動初期化では4つのコアファイルが作成されるはず
+      expect(Object.keys(result.data?.branchMemory || {}).length).toBe(4);
       expect(result.data?.globalMemory).toBeDefined();
     });
 
