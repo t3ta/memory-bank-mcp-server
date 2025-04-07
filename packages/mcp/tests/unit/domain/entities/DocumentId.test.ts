@@ -12,16 +12,26 @@ describe('DocumentId', () => {
     });
 
     it('空の文字列でエラーが発生すること', () => {
-      expect(() => DocumentId.create('')).toThrow(
-        new DomainError(DomainErrorCodes.INVALID_DOCUMENT_ID, 'Document ID cannot be empty')
-      );
+      try {
+        DocumentId.create('');
+        fail('Expected DomainError to be thrown'); // エラーがスローされなかったらテスト失敗
+      } catch (error) {
+        expect(error).toBeInstanceOf(DomainError);
+        expect((error as DomainError).code).toBe(DomainErrorCodes.INVALID_DOCUMENT_ID);
+        expect((error as DomainError).message).toBe('Document ID cannot be empty');
+      }
     });
 
     it('無効なUUID文字列でエラーが発生すること', () => {
       const invalidUuid = 'not-a-uuid';
-      expect(() => DocumentId.create(invalidUuid)).toThrow(
-        new DomainError(DomainErrorCodes.INVALID_DOCUMENT_ID, 'Document ID must be a valid UUID')
-      );
+      try {
+        DocumentId.create(invalidUuid);
+        fail('Expected DomainError to be thrown'); // エラーがスローされなかったらテスト失敗
+      } catch (error) {
+        expect(error).toBeInstanceOf(DomainError);
+        expect((error as DomainError).code).toBe(DomainErrorCodes.INVALID_DOCUMENT_ID);
+        expect((error as DomainError).message).toBe('Document ID must be a valid UUID');
+      }
     });
   });
 
