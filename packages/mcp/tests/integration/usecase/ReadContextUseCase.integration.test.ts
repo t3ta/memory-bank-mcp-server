@@ -23,9 +23,9 @@ describe('ReadContextUseCase Integration Tests', () => {
     // Setup test environment
     testEnv = await setupTestEnv();
 
-    // Create test branch directory
-    await createBranchDir(testEnv, TEST_BRANCH);
-
+    // beforeEach でブランチディレクトリを作成しないように変更
+    // (自動初期化のテストのため)
+    // await createBranchDir(testEnv, TEST_BRANCH);
     // Initialize DI container
     container = await setupContainer({ docsRoot: testEnv.docRoot });
 
@@ -54,7 +54,9 @@ describe('ReadContextUseCase Integration Tests', () => {
 
       expect(result).toBeDefined();
       expect(result.branchMemory).toBeDefined();
-      expect(Object.keys(result.branchMemory!)).toEqual(['branchContext.json']);
+      // initialize で複数のコアファイルが作られるはずなので、toEqualではなく length > 0 をチェック
+      expect(Object.keys(result.branchMemory!).length).toBeGreaterThan(0);
+      expect(result.branchMemory!['branchContext.json']).toBeDefined(); // branchContext.json の存在は確認
       expect(result.branchMemory!['branchContext.json']).toBeDefined();
       expect(typeof result.globalMemory).toBe('object');
 
@@ -101,7 +103,9 @@ describe('ReadContextUseCase Integration Tests', () => {
 
       expect(resultEn).toBeDefined();
       expect(resultEn.branchMemory).toBeDefined();
-      expect(Object.keys(resultEn.branchMemory!)).toEqual(['branchContext.json']);
+      // initialize で複数のコアファイルが作られるはずなので、toEqualではなく length > 0 をチェック
+      expect(Object.keys(resultEn.branchMemory!).length).toBeGreaterThan(0);
+      expect(resultEn.branchMemory!['branchContext.json']).toBeDefined(); // branchContext.json の存在は確認
       expect(resultEn.branchMemory!['branchContext.json']).toBeDefined();
       expect(typeof resultEn.globalMemory).toBe('object');
 
@@ -116,7 +120,9 @@ describe('ReadContextUseCase Integration Tests', () => {
 
       expect(resultZh).toBeDefined();
       expect(resultZh.branchMemory).toBeDefined();
-      expect(Object.keys(resultZh.branchMemory!)).toEqual(['branchContext.json']);
+      // initialize で複数のコアファイルが作られるはずなので、toEqualではなく length > 0 をチェック
+      expect(Object.keys(resultZh.branchMemory!).length).toBeGreaterThan(0);
+      expect(resultZh.branchMemory!['branchContext.json']).toBeDefined(); // branchContext.json の存在は確認
       expect(resultZh.branchMemory!['branchContext.json']).toBeDefined();
       expect(typeof resultZh.globalMemory).toBe('object');
 
@@ -132,7 +138,8 @@ describe('ReadContextUseCase Integration Tests', () => {
 
       // const { BranchInfo } = await import('../../../src/domain/entities/BranchInfo.js'); // ← ダブりなので削除
       const branchInfo = BranchInfo.create(nonExistentBranch);
-      await branchRepo.initialize(branchInfo); // initialize を呼ぶ
+      // useCase.execute に自動初期化を任せるため、ここでの initialize 呼び出しは削除
+      // await branchRepo.initialize(branchInfo);
 
 
       const { toSafeBranchName } = await import('../../../src/shared/utils/branchNameUtils.js');
