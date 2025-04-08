@@ -28,12 +28,16 @@ describe('BranchInfo Unit Tests', () => {
 
     it('should throw an error for a branch name without a prefix', () => {
       const invalidBranchName = 'my-cool-feature';
-      expect(() => BranchInfo.create(invalidBranchName)).toThrow(
-        new DomainError(
-          DomainErrorCodes.INVALID_BRANCH_NAME,
-          'Branch name must include a namespace prefix with slash (e.g. "feature/my-branch")'
-        )
-      );
+      const expectedMessage = 'Branch name must include a namespace prefix with slash (e.g. "feature/my-branch")';
+      const expectedCode = "DOMAIN_ERROR.INVALID_BRANCH_NAME"; // Use the actual string value including prefix
+      try {
+        BranchInfo.create(invalidBranchName);
+        throw new Error('Expected DomainError but no error was thrown.'); // Should not reach here
+      } catch (error) {
+        expect(error).toBeInstanceOf(DomainError);
+        expect((error as DomainError).message).toBe(expectedMessage);
+        expect((error as DomainError).code).toBe(expectedCode);
+      }
     });
 
      it('should throw an error for a branch name with only a prefix', () => {
