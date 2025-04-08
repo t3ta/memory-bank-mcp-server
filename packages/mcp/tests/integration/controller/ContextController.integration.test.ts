@@ -3,35 +3,24 @@
  */
 import { setupTestEnv, cleanupTestEnv, createBranchDir, type TestEnv } from '../helpers/test-env.js';
 import { loadBranchFixture, loadGlobalFixture } from '../helpers/fixtures-loader.js';
-// import { Application } from '../mocks/Application'; // Removed mock application
 import * as path from 'path';
-import { DIContainer, setupContainer } from '../../../src/main/di/providers.js'; // Import DI container and setup function
-import { ContextController } from '../../../src/interface/controllers/ContextController.js'; // Import real controller
-import type { ContextRequest } from '../../../src/application/usecases/types.js'; // Import request type if needed
+import { DIContainer, setupContainer } from '../../../src/main/di/providers.js';
+import { ContextController } from '../../../src/interface/controllers/ContextController.js';
+import type { ContextRequest } from '../../../src/application/usecases/types.js';
 
 describe('ContextController Integration Tests', () => {
   let testEnv: TestEnv;
-  // let app: Application; // Removed mock application instance
-  let container: DIContainer; // Use DI container
+  let container: DIContainer;
   const TEST_BRANCH = 'feature/test-branch';
 
   beforeEach(async () => {
-    // Setup test environment
     testEnv = await setupTestEnv();
-    // beforeEach でブランチディレクトリを作成しないように変更
-    // (自動初期化のテストのため)
-    // await createBranchDir(testEnv, TEST_BRANCH);
-    // Initialize DI container with test configuration
     container = await setupContainer({ docsRoot: testEnv.docRoot });
-    // Set log level to debug for testing
     const { logger } = await import('../../../src/shared/utils/logger.js');
     logger.setLevel('debug');
-    // Removed mock application initialization
-    // app = new Application({ docsRoot: testEnv.docRoot });
   });
 
   afterEach(async () => {
-    // Cleanup test environment
     await cleanupTestEnv(testEnv);
   });
 
@@ -45,15 +34,14 @@ describe('ContextController Integration Tests', () => {
       expect(result.success).toBe(true);
       expect(result.data).toBeDefined();
       expect(result.data?.rules).toBeDefined();
-      expect(result.data?.branchMemory?.['branchContext.json']).toBeDefined();
-      // 自動初期化では4つのコアファイルが作成されるはず
-      expect(Object.keys(result.data?.branchMemory || {}).length).toBe(4);
+      expect(result.data?.branchMemory?.coreFiles?.['branchContext.json']).toBeDefined();
+      expect(result.data?.branchMemory?.availableFiles).toHaveLength(4);
       expect(result.data?.globalMemory).toBeDefined();
     });
 
     it('正常系: ブランチとグローバルの両方のメモリバンクからコンテキストを読み取れること', async () => {
       const { toSafeBranchName } = await import('../../../src/shared/utils/branchNameUtils.js');
-      await loadBranchFixture(path.join(testEnv.branchMemoryPath, toSafeBranchName(TEST_BRANCH)), 'basic'); // safeBranchName を使用
+      await loadBranchFixture(path.join(testEnv.branchMemoryPath, toSafeBranchName(TEST_BRANCH)), 'basic');
       await loadGlobalFixture(testEnv.globalMemoryPath, 'minimal');
 
       const controller = await container.get<ContextController>('contextController');
@@ -63,11 +51,11 @@ describe('ContextController Integration Tests', () => {
 
       expect(result.success).toBe(true);
       expect(result.data).toBeDefined();
-      expect(Object.keys(result.data?.branchMemory || {}).length).toBeGreaterThan(0);
-      expect(Object.keys(result.data?.globalMemory || {}).length).toBeGreaterThan(0);
+      expect(Object.keys(result.data?.branchMemory?.coreFiles || {}).length).toBeGreaterThan(0);
+      expect(Object.keys(result.data?.globalMemory?.coreFiles || {}).length).toBeGreaterThan(0);
       expect(result.data?.rules).toBeDefined();
-      expect(result.data?.globalMemory?.['core/glossary.json']).toBeDefined();
-      expect(result.data?.branchMemory?.['activeContext.json']).toBeDefined();
+      expect(result.data?.globalMemory?.coreFiles?.['core/glossary.json']).toBeDefined();
+      expect(result.data?.branchMemory?.coreFiles?.['activeContext.json']).toBeDefined();
     });
 
     it('正常系: 存在しないブランチでも自動初期化されたブランチメモリが返されること', async () => {
@@ -78,15 +66,15 @@ describe('ContextController Integration Tests', () => {
 
       expect(result.success).toBe(true);
       expect(result.data).toBeDefined();
-      expect(result.data?.branchMemory?.['branchContext.json']).toBeDefined();
-      expect(Object.keys(result.data?.branchMemory || {}).length).toBe(4); // ★ 期待値を4に変更 ★
+      expect(result.data?.branchMemory?.coreFiles?.['branchContext.json']).toBeDefined();
+      expect(result.data?.branchMemory?.availableFiles).toHaveLength(4);
       expect(result.data?.rules).toBeDefined();
       expect(result.data?.globalMemory).toBeDefined();
     });
 
     it('正常系: ファイルが存在するブランチメモリバンクからコンテキストを読み取れること', async () => {
       const { toSafeBranchName } = await import('../../../src/shared/utils/branchNameUtils.js');
-      await loadBranchFixture(path.join(testEnv.branchMemoryPath, toSafeBranchName(TEST_BRANCH)), 'basic'); // safeBranchName を使用
+      await loadBranchFixture(path.join(testEnv.branchMemoryPath, toSafeBranchName(TEST_BRANCH)), 'basic');
 
       const controller = await container.get<ContextController>('contextController');
 
@@ -95,21 +83,21 @@ describe('ContextController Integration Tests', () => {
 
       expect(result.success).toBe(true);
       expect(result.data).toBeDefined();
-      expect(Object.keys(result.data?.branchMemory || {}).length).toBeGreaterThan(0);
-      expect(result.data?.branchMemory?.['activeContext.json']).toBeDefined();
-      expect(result.data?.branchMemory?.['branchContext.json']).toBeDefined();
+      expect(Object.keys(result.data?.branchMemory?.coreFiles || {}).length).toBeGreaterThan(0);
+      expect(result.data?.branchMemory?.coreFiles?.['activeContext.json']).toBeDefined();
+      expect(result.data?.branchMemory?.coreFiles?.['branchContext.json']).toBeDefined();
 
-      const branchContext = result.data?.branchMemory?.['branchContext.json']; // Content is already an object
+      const branchContext = result.data?.branchMemory?.coreFiles?.['branchContext.json'];
       expect(branchContext).toBeDefined();
-      expect(typeof branchContext).toBe('object'); // Verify it's an object
-      // Assert properties on the object directly
+      expect(typeof branchContext).toBe('object');
       expect(branchContext).toHaveProperty('schema');
       expect(branchContext).toHaveProperty('documentType');
       expect(branchContext).toHaveProperty('metadata');
       expect(branchContext).toHaveProperty('content');
-      expect((branchContext as any).documentType).toBe('branch_context'); // Assert type for property access
+      expect((branchContext as any).documentType).toBe('branch_context');
     });
   });
+
   describe('readRules', () => {
     it('正常系: 日本語のルールを取得できること', async () => {
       const controller = await container.get<ContextController>('contextController');
@@ -119,8 +107,8 @@ describe('ContextController Integration Tests', () => {
       expect(result.data).toBeDefined();
       expect(result.data!.language).toBe('ja');
       expect(result.data!.content).toBeDefined();
-      expect(typeof result.data!.content).toBe('object'); // Check if content is an object
-      expect(result.data!.content).toHaveProperty('id', 'rules'); // Check for a known property like 'id'
+      expect(typeof result.data!.content).toBe('object');
+      expect(result.data!.content).toHaveProperty('id', 'rules');
       expect(result.error).toBeUndefined();
     });
 
@@ -128,13 +116,12 @@ describe('ContextController Integration Tests', () => {
       const controller = await container.get<ContextController>('contextController');
 
       const result = await controller.readRules('en');
-
       expect(result.success).toBe(true);
       expect(result.data).toBeDefined();
       expect(result.data!.language).toBe('en');
       expect(result.data!.content).toBeDefined();
-      expect(typeof result.data!.content).toBe('object'); // Check if content is an object
-      expect(result.data!.content).toHaveProperty('id', 'rules'); // Check for a known property like 'id'
+      expect(typeof result.data!.content).toBe('object');
+      expect(result.data!.content).toHaveProperty('id', 'rules');
       expect(result.error).toBeUndefined();
     });
 
@@ -142,7 +129,6 @@ describe('ContextController Integration Tests', () => {
       const controller = await container.get<ContextController>('contextController');
 
       const result = await controller.readRules('fr');
-
       expect(result.success).toBe(false);
       expect(result.data).toBeUndefined();
       expect(result.error).toBeDefined();
@@ -153,13 +139,12 @@ describe('ContextController Integration Tests', () => {
       const controller = await container.get<ContextController>('contextController');
 
       const result = await controller.readRules('zh');
-
       expect(result.success).toBe(true);
       expect(result.data).toBeDefined();
       expect(result.data!.language).toBe('zh');
       expect(result.data!.content).toBeDefined();
-      expect(typeof result.data!.content).toBe('object'); // Check if content is an object
-      expect(result.data!.content).toHaveProperty('id', 'rules'); // Check for a known property like 'id'
+      expect(typeof result.data!.content).toBe('object');
+      expect(result.data!.content).toHaveProperty('id', 'rules');
       expect(result.error).toBeUndefined();
     });
   });
