@@ -96,14 +96,15 @@ describe('ReadContextUseCase Unit Tests', () => {
 
     // Assert
     expect(result.rules).toBeUndefined(); // rules should be undefined
+    // Expect parsed objects instead of strings
     expect(result.branchMemory).toEqual({
-      'progress.json': mockProgress.content,
-      'activeContext.json': mockActiveContext.content,
-      'branchContext.json': mockBranchContext.content,
-      'systemPatterns.json': mockSystemPatterns.content,
+      'progress.json': JSON.parse(mockProgress.content),
+      'activeContext.json': JSON.parse(mockActiveContext.content),
+      'branchContext.json': JSON.parse(mockBranchContext.content),
+      'systemPatterns.json': JSON.parse(mockSystemPatterns.content),
     });
     expect(result.globalMemory).toEqual({
-      [mockGlobalDocPath.value]: mockGlobalDoc.content,
+      [mockGlobalDocPath.value]: JSON.parse(mockGlobalDoc.content),
     });
 
     // expect(mockRulesRepo.getRules).toHaveBeenCalledWith(language, docsPath);

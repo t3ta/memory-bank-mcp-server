@@ -2,7 +2,7 @@
  * Rules result type
  */
 export type RulesResult = {
-  content: string;
+  content: Record<string, unknown>; // Allow object
   language: string;
 };
 
@@ -19,6 +19,6 @@ export type ContextRequest = {
  */
 export type ContextResult = {
   rules?: RulesResult;
-  branchMemory?: Record<string, string>;
-  globalMemory?: Record<string, string>;
+  branchMemory?: Record<string, string | object>; // Allow object
+  globalMemory?: Record<string, string | object>; // Allow object
 };

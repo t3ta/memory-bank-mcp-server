@@ -37,16 +37,16 @@ describe('ReadGlobalDocumentUseCase Integration Tests', () => {
       expect(result).toBeDefined();
       expect(result.document).toBeDefined();
       expect(result.document.path).toBe('core/glossary.json');
-      expect(typeof result.document.content).toBe('string');
+      expect(typeof result.document.content).toBe('object'); // Expect object directly
 
-      const document = JSON.parse(result.document.content);
+      const document = result.document.content; // No need to parse
       expect(document).toHaveProperty('schema', 'memory_document_v2');
       // expect(document).toHaveProperty('documentType'); // documentType はトップレベルにはない
-      expect(document).toHaveProperty('metadata');
+      expect(document).toHaveProperty('metadata'); // Check property exists
       expect(document).toHaveProperty('content');
       // expect(document.documentType).toBe('core'); // トップレベルの documentType はチェックしない
-      expect(document.metadata).toHaveProperty('id', 'core-glossary-test'); // Update expected ID
-      expect(document.metadata).toHaveProperty('documentType', 'core'); // metadata 内の documentType をチェック
+      expect((document as any).metadata).toHaveProperty('id', 'core-glossary-test'); // Update expected ID & assert type
+      expect((document as any).metadata).toHaveProperty('documentType', 'core'); // metadata 内の documentType をチェック & assert type
     });
 
     it('should return an error if the document does not exist', async () => {
@@ -67,16 +67,18 @@ describe('ReadGlobalDocumentUseCase Integration Tests', () => {
       expect(planResult).toBeDefined();
       expect(planResult.document).toBeDefined();
       expect(planResult.document.path).toBe('plan-document.json');
-      const planDocument = JSON.parse(planResult.document.content);
-      expect(planDocument.metadata).toHaveProperty('documentType', 'plan'); // metadata 内の documentType をチェック
+      expect(typeof planResult.document.content).toBe('object'); // Expect object
+      const planDocument = planResult.document.content; // No need to parse
+      expect((planDocument as any).metadata).toHaveProperty('documentType', 'plan'); // metadata 内の documentType をチェック & assert type
 
       const guideResult = await useCase.execute({ path: 'guide-document.json' });
 
       expect(guideResult).toBeDefined();
       expect(guideResult.document).toBeDefined();
       expect(guideResult.document.path).toBe('guide-document.json');
-      const guideDocument = JSON.parse(guideResult.document.content);
-      expect(guideDocument.metadata).toHaveProperty('documentType', 'guide'); // metadata 内の documentType をチェック
+      expect(typeof guideResult.document.content).toBe('object'); // Expect object
+      const guideDocument = guideResult.document.content; // No need to parse
+      expect((guideDocument as any).metadata).toHaveProperty('documentType', 'guide'); // metadata 内の documentType をチェック & assert type
     });
   });
 });

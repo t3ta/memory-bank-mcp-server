@@ -39,8 +39,9 @@ describe('Tag Unit Tests', () => {
 
     it('should throw an error for strings containing invalid characters (space)', () => {
       const invalidTag = 'invalid tag';
-      expect(() => Tag.create(invalidTag)).toThrow(
-        new DomainError(DomainErrorCodes.INVALID_TAG_FORMAT, 'Tag must contain only lowercase letters, numbers, and hyphens')
+      // Check only the error message string
+      expect(() => Tag.create(invalidTag)).toThrowError(
+        'Tag must contain only lowercase letters, numbers, and hyphens'
       );
     });
 

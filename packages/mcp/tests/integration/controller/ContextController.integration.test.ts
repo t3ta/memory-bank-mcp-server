@@ -99,14 +99,15 @@ describe('ContextController Integration Tests', () => {
       expect(result.data?.branchMemory?.['activeContext.json']).toBeDefined();
       expect(result.data?.branchMemory?.['branchContext.json']).toBeDefined();
 
-      const branchContextContent = result.data?.branchMemory?.['branchContext.json'];
-      expect(branchContextContent).toBeDefined();
-      const branchContext = JSON.parse(branchContextContent!);
+      const branchContext = result.data?.branchMemory?.['branchContext.json']; // Content is already an object
+      expect(branchContext).toBeDefined();
+      expect(typeof branchContext).toBe('object'); // Verify it's an object
+      // Assert properties on the object directly
       expect(branchContext).toHaveProperty('schema');
-      expect(branchContext).toHaveProperty('documentType'); // documentType がトップレベルにあることを確認
+      expect(branchContext).toHaveProperty('documentType');
       expect(branchContext).toHaveProperty('metadata');
       expect(branchContext).toHaveProperty('content');
-      expect(branchContext.documentType).toBe('branch_context'); // トップレベルの documentType をチェック
+      expect((branchContext as any).documentType).toBe('branch_context'); // Assert type for property access
     });
   });
   describe('readRules', () => {
@@ -118,7 +119,8 @@ describe('ContextController Integration Tests', () => {
       expect(result.data).toBeDefined();
       expect(result.data!.language).toBe('ja');
       expect(result.data!.content).toBeDefined();
-      expect(result.data!.content.length).toBeGreaterThan(0);
+      expect(typeof result.data!.content).toBe('object'); // Check if content is an object
+      expect(result.data!.content).toHaveProperty('id', 'rules'); // Check for a known property like 'id'
       expect(result.error).toBeUndefined();
     });
 
@@ -131,7 +133,8 @@ describe('ContextController Integration Tests', () => {
       expect(result.data).toBeDefined();
       expect(result.data!.language).toBe('en');
       expect(result.data!.content).toBeDefined();
-      expect(result.data!.content.length).toBeGreaterThan(0);
+      expect(typeof result.data!.content).toBe('object'); // Check if content is an object
+      expect(result.data!.content).toHaveProperty('id', 'rules'); // Check for a known property like 'id'
       expect(result.error).toBeUndefined();
     });
 
@@ -155,7 +158,8 @@ describe('ContextController Integration Tests', () => {
       expect(result.data).toBeDefined();
       expect(result.data!.language).toBe('zh');
       expect(result.data!.content).toBeDefined();
-      expect(result.data!.content.length).toBeGreaterThan(0);
+      expect(typeof result.data!.content).toBe('object'); // Check if content is an object
+      expect(result.data!.content).toHaveProperty('id', 'rules'); // Check for a known property like 'id'
       expect(result.error).toBeUndefined();
     });
   });

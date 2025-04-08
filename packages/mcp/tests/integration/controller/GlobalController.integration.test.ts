@@ -56,9 +56,9 @@ describe('GlobalController Integration Tests', () => {
       if (!result.success) fail('Expected success but got error'); // Add type guard
       expect(result.data).toBeDefined();
       expect(result.data.path).toBe('core/glossary.json');
-      expect(typeof result.data.content).toBe('string');
+      expect(typeof result.data.content).toBe('object'); // Expect object
 
-      const parsed = JSON.parse(result.data.content);
+      const parsed = result.data.content as any; // Content is already an object
       expect(parsed).toHaveProperty('schema');
       expect(parsed).toHaveProperty('metadata');
       expect(parsed).toHaveProperty('content');
@@ -97,11 +97,12 @@ describe('GlobalController Integration Tests', () => {
           value: "簡単なテストドキュメント"
         }
       };
-      const documentContentString = JSON.stringify(testDoc, null, 2);
+      // Pass the object directly to test formatting on write
+      // const documentContentString = JSON.stringify(testDoc, null, 2);
 
       const writeResult = await controller.writeDocument({
         path: documentPath,
-        content: documentContentString
+        content: testDoc // Pass the object directly
       });
 
       expect(writeResult.success).toBe(true);
@@ -112,7 +113,8 @@ describe('GlobalController Integration Tests', () => {
       expect(readResult.success).toBe(true);
       if (!readResult.success) fail('Expected success but got error on read'); // Add type guard
       expect(readResult.data).toBeDefined();
-      const parsedRead = JSON.parse(readResult.data.content);
+      // readResult.data.content is already an object
+      const parsedRead = readResult.data.content as any;
       // Use testDoc for comparison
       expect(parsedRead.metadata.id).toBe(testDoc.metadata.id);
       expect(parsedRead.content.value).toBe(testDoc.content.value);
@@ -180,16 +182,17 @@ describe('GlobalController Integration Tests', () => {
         metadata: { ...simpleDocument.metadata, id: "update-test-updated", title: "Updated Global Title", path: documentPath, version: 2 }, // metadata から documentType 削除
         content: { value: "Updated global content" }
       };
-      const updatedContentString = JSON.stringify(updatedDoc, null, 2);
+      // Pass objects directly
+      // const updatedContentString = JSON.stringify(updatedDoc, null, 2);
 
-      // 1. Write initial document
-      const initialWriteResult = await controller.writeDocument({ path: documentPath, content: initialContentString });
+      // 1. Write initial document (pass object)
+      const initialWriteResult = await controller.writeDocument({ path: documentPath, content: initialDoc });
       expect(initialWriteResult.success).toBe(true);
       if (!initialWriteResult.success) fail('Expected success but got error on initial write');
       expect(initialWriteResult.data).toBeDefined();
 
-      // 2. Write updated document (overwrite)
-      const updateResult = await controller.writeDocument({ path: documentPath, content: updatedContentString });
+      // 2. Write updated document (overwrite, pass object)
+      const updateResult = await controller.writeDocument({ path: documentPath, content: updatedDoc });
       expect(updateResult.success).toBe(true);
       if (!updateResult.success) fail('Expected success but got error on update write');
       expect(updateResult.data).toBeDefined(); // Remove message check
@@ -199,7 +202,8 @@ describe('GlobalController Integration Tests', () => {
       expect(readResult.success).toBe(true);
       if (!readResult.success) fail('Expected success but got error on read after update');
       expect(readResult.data).toBeDefined();
-      const parsed = JSON.parse(readResult.data.content);
+      // readResult.data.content is already an object
+      const parsed = readResult.data.content as any;
 
       expect(parsed.metadata.id).toBe(updatedDoc.metadata.id);
       expect(parsed.metadata.title).toBe(updatedDoc.metadata.title);

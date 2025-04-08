@@ -95,12 +95,12 @@ describe('BranchController Integration Tests', () => {
       expect(readResult.success).toBe(true);
       if (!readResult.success) throw new Error('Expected success but got error'); // Use throw new Error
       expect(readResult.data).toBeDefined();
-      // readResult.data の型ガードも追加 (readDocument は DocumentDTO を返す想定)
-      if (!readResult.data || !readResult.data.document || typeof readResult.data.document.content !== 'string') {
-          logger.error("--- Assertion Error: readResult.data.document.content was not a string.", { actualData: readResult.data, component: 'BranchController.integration.test' });
-          throw new Error('Expected readResult.data.document.content to be a string');
+      // Check if content is an object (since ReadUseCase now parses JSON)
+      if (!readResult.data || !readResult.data.document || typeof readResult.data.document.content !== 'object') {
+          logger.error("--- Assertion Error: readResult.data.document.content was not an object.", { actualData: readResult.data, component: 'BranchController.integration.test' });
+          throw new Error('Expected readResult.data.document.content to be an object');
       }
-      const parsed = JSON.parse(readResult.data.document.content);
+      const parsed = readResult.data.document.content as any; // Content is already an object
 
       // Use testDoc for comparison as it has the correct path
       expect(parsed.metadata.id).toBe(testDoc.metadata.id);
@@ -165,12 +165,12 @@ describe('BranchController Integration Tests', () => {
       expect(readResult.success).toBe(true);
       if (!readResult.success) throw new Error('Expected success but got error'); // Use throw new Error
       expect(readResult.data).toBeDefined();
-      // readResult.data の型ガードも追加
-      if (!readResult.data || !readResult.data.document || typeof readResult.data.document.content !== 'string') {
-          logger.error("--- Assertion Error: readResult.data.document.content was not a string.", { actualData: readResult.data, component: 'BranchController.integration.test' });
-          throw new Error('Expected readResult.data.document.content to be a string');
+      // Check if content is an object
+      if (!readResult.data || !readResult.data.document || typeof readResult.data.document.content !== 'object') {
+          logger.error("--- Assertion Error: readResult.data.document.content was not an object.", { actualData: readResult.data, component: 'BranchController.integration.test' });
+          throw new Error('Expected readResult.data.document.content to be an object');
       }
-      const parsed = JSON.parse(readResult.data.document.content);
+      const parsed = readResult.data.document.content as any; // Content is already an object
       // Use newBranchDoc for comparison
       expect(parsed.metadata.id).toBe(newBranchDoc.metadata.id);
       expect(parsed.content.value).toBe(newBranchDoc.content.value);
@@ -233,12 +233,12 @@ describe('BranchController Integration Tests', () => {
       expect(readResult.success).toBe(true);
       if (!readResult.success) throw new Error('Expected success but got error on read after update'); // Use throw new Error
       expect(readResult.data).toBeDefined();
-      // readResult.data の型ガードも追加
-      if (!readResult.data || !readResult.data.document || typeof readResult.data.document.content !== 'string') {
-          logger.error("--- Assertion Error: readResult.data.document.content was not a string.", { actualData: readResult.data, component: 'BranchController.integration.test' });
-          throw new Error('Expected readResult.data.document.content to be a string');
+      // Check if content is an object
+      if (!readResult.data || !readResult.data.document || typeof readResult.data.document.content !== 'object') {
+          logger.error("--- Assertion Error: readResult.data.document.content was not an object.", { actualData: readResult.data, component: 'BranchController.integration.test' });
+          throw new Error('Expected readResult.data.document.content to be an object');
       }
-      const parsed = JSON.parse(readResult.data.document.content);
+      const parsed = readResult.data.document.content as any; // Content is already an object
 
       expect(parsed.metadata.id).toBe(updatedDoc.metadata.id);
       expect(parsed.metadata.title).toBe(updatedDoc.metadata.title);

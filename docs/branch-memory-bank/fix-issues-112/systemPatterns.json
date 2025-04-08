@@ -1,0 +1,15 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "fix-issues-112-system-patterns",
+    "title": "System Patterns for fix/issues-112",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [],
+    "createdAt": "2025-04-08T05:21:35.543Z",
+    "lastModified": "2025-04-08T05:21:35.543Z"
+  },
+  "content": {
+    "patterns": []
+  }
+}

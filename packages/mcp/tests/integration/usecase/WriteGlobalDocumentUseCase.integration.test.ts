@@ -77,12 +77,13 @@ describe('WriteGlobalDocumentUseCase Integration Tests', () => {
         }
       };
       const documentPath = 'test/new-document.json';
-      const documentContentString = JSON.stringify(newDocument, null, 2);
+      // Pass the object directly instead of stringifying it first
+      // const documentContentString = JSON.stringify(newDocument, null, 2);
 
       const result = await writeUseCase.execute({
         document: {
           path: documentPath,
-          content: documentContentString,
+          content: newDocument, // Pass the object directly
           tags: newDocument.metadata.tags
         }
       });
@@ -95,10 +96,17 @@ describe('WriteGlobalDocumentUseCase Integration Tests', () => {
       expect(readResult).toBeDefined();
       expect(readResult.document).toBeDefined();
 
-      const readDocument = JSON.parse(readResult.document.content);
+      // Verify the content read back (already parsed by ReadUseCase)
+      const readDocument = readResult.document.content as any; // Content is already an object
       expect(readDocument.schema).toBe('memory_document_v2');
       expect(readDocument.metadata.id).toBe('test-new-document');
       expect(readDocument.documentType).toBe('test'); // トップレベルの documentType をチェック
+
+      // Additionally, verify the actual file content is formatted JSON
+      const writtenFilePath = path.join(testEnv.globalMemoryPath, documentPath);
+      const writtenContent = await fs.readFile(writtenFilePath, 'utf-8');
+      const expectedFormattedString = JSON.stringify(newDocument, null, 2);
+      expect(writtenContent).toBe(expectedFormattedString);
     });
 
     it('should update an existing document', async () => {
@@ -163,7 +171,8 @@ describe('WriteGlobalDocumentUseCase Integration Tests', () => {
       expect(readResult).toBeDefined();
       expect(readResult.document).toBeDefined();
 
-      const readDocument = JSON.parse(readResult.document.content);
+      // readResult.document.content is already an object
+      const readDocument = readResult.document.content as any;
       expect(readDocument.metadata.title).toBe('更新後ドキュメント');
       expect(readDocument.metadata.version).toBe(2); // Version should be updated
       expect(readDocument.content.value).toBe('更新後の内容');
@@ -273,7 +282,8 @@ describe('WriteGlobalDocumentUseCase Integration Tests', () => {
       expect(readResult).toBeDefined();
       expect(readResult.document).toBeDefined();
 
-      const readDocument = JSON.parse(readResult.document.content);
+      // readResult.document.content is already an object
+      const readDocument = readResult.document.content as any;
       // Check that the file is saved at 'actualPath', metadata path might be ignored/overwritten.
       expect(readDocument.metadata.id).toBe("test-path-mismatch");
     });
@@ -368,11 +378,21 @@ describe('WriteGlobalDocumentUseCase Integration Tests', () => {
 
       // 念のため readUseCase でも確認
       const readResult = await readUseCase.execute({ path: documentPath });
-      // content が undefined でないことを確認してから比較
-      if (result.document.content === undefined) {
-        throw new Error('Expected document content to be defined when returnContent is true for comparison');
-      }
-      expect(readResult.document.content.trim()).toBe(result.document.content.trim());
+      // Compare the object read back with the original object structure
+      // (excluding dynamic fields like lastModified, createdAt)
+      const expectedDocumentStructureForReturnTrue = { // Rename variable
+          schema: newDocument.schema,
+          documentType: newDocument.documentType,
+          metadata: {
+              id: newDocument.metadata.id,
+              title: newDocument.metadata.title,
+              path: newDocument.metadata.path,
+              tags: newDocument.metadata.tags,
+              version: newDocument.metadata.version
+          },
+          content: newDocument.content
+      };
+      expect(readResult.document.content).toEqual(expectedDocumentStructureForReturnTrue); // Use renamed variable
       expect(readResult.document.tags).toEqual(result.document.tags);
       expect(readResult.document.lastModified).toEqual(expect.any(String));
     });
@@ -517,7 +537,8 @@ describe('WriteGlobalDocumentUseCase Integration Tests', () => {
       // 5. Verify with readUseCase
       const readResult = await readUseCase.execute({ path: documentPath });
       expect(readResult.document.content).toBeDefined();
-      const finalDocRead = JSON.parse(readResult.document.content!);
+      // readResult.document.content is already an object
+      const finalDocRead = readResult.document.content as any;
       expect(finalDocRead.content.value).toBe('Patched Value');
       expect(finalDocRead.metadata.tags).toEqual(finalTags);
       expect(readResult.document.tags).toEqual(finalTags); // Check top-level tags from read

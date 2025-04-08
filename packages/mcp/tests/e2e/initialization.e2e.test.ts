@@ -66,9 +66,9 @@ describe('MCP E2E Initialization Tests', () => {
       const document = (readResult.data as any).document as DocumentDTO;
 
       expect(document.content).toBeDefined();
-      expect(typeof document.content).toBe('string');
+      expect(typeof document.content).toBe('object'); // Expect object
 
-      const parsedContent = JSON.parse(document.content);
+      const parsedContent = document.content as any; // Content is already an object
       expect(parsedContent.metadata.id).toBe('test-e2e-init-doc');
       expect(parsedContent.content.value).toBe('Document content for E2E initialization test'); // Match the actual written content
       expect(document.tags).toEqual(expect.arrayContaining(["test", "e2e", "init"]));

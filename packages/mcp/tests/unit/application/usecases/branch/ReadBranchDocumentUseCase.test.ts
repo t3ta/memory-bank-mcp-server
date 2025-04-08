@@ -81,7 +81,9 @@ describe('ReadBranchDocumentUseCase Unit Tests', () => {
     // 検証
     expect(result).toBeDefined();
     expect(result.document.path).toBe(docPath.value);
-    expect(result.document.content).toBe('{"key":"value"}');
+    // Expect the content to be the parsed object
+    const expectedContentObject = JSON.parse('{"key":"value"}');
+    expect(result.document.content).toEqual(expectedContentObject);
     expect(result.document.tags).toEqual(['test']);
     expect(mockBranchRepository.exists).toHaveBeenCalledWith(branchInfo.safeName);
     expect(mockBranchRepository.getDocument).toHaveBeenCalledWith(branchInfo, docPath);
@@ -155,7 +157,9 @@ describe('ReadBranchDocumentUseCase Unit Tests', () => {
 
     // 検証
     expect(result).toBeDefined();
-    expect(result.document.content).toBe('{"auto":"detected"}');
+    // Expect the content to be the parsed object
+    const expectedContentObjectDetected = JSON.parse('{"auto":"detected"}');
+    expect(result.document.content).toEqual(expectedContentObjectDetected);
     expect(mockGitService.getCurrentBranchName).toHaveBeenCalledTimes(1);
     expect(mockConfigProvider.getConfig).toHaveBeenCalledTimes(1);
     expect(mockBranchRepository.getDocument).toHaveBeenCalledWith(branchInfo, docPath);

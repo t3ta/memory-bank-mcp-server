@@ -113,7 +113,9 @@ describe('ReadGlobalDocumentUseCase Unit Tests', () => {
     expect(result).not.toBeNull();
     expect(result?.document).toBeDefined();
     expect(result?.document?.path).toBe(mockDoc.path.value); // Check path from mock MemoryDocument
-    expect(result?.document?.content).toBe(mockDoc.content); // Check content from mock MemoryDocument
+    // Expect the content to be the parsed object, not the original string
+    const expectedContentObject = JSON.parse(mockDoc.content);
+    expect(result?.document?.content).toEqual(expectedContentObject); // Check parsed content object
     expect(result?.document?.tags).toEqual(mockDoc.tags.map(t => t.value)); // Check tags from mock MemoryDocument
     expect(result?.document?.lastModified).toBe(mockDoc.lastModified.toISOString()); // Check lastModified from mock MemoryDocument
     // Verify properties NOT included in DocumentDTO are undefined

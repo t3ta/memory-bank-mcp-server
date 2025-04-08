@@ -62,10 +62,19 @@ export class ReadGlobalDocumentUseCase
         );
       }
 
+      let parsedContent: string | object;
+      try {
+        // Attempt to parse the content as JSON
+        parsedContent = JSON.parse(document.content);
+      } catch (parseError) {
+        // If parsing fails, keep the original string content
+        parsedContent = document.content;
+      }
+
       return {
         document: {
           path: document.path.value,
-          content: document.content,
+          content: parsedContent, // Return parsed object or original string
           tags: document.tags.map((tag) => tag.value),
           lastModified: document.lastModified.toISOString(),
         },

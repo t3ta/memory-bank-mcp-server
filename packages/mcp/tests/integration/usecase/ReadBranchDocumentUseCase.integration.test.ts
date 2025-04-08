@@ -110,11 +110,11 @@ describe('ReadBranchDocumentUseCase Integration Tests', () => {
       expect(result).toBeDefined();
       expect(result.document).toBeDefined();
       expect(result.document.path).toBe('branchContext.json');
-      expect(typeof result.document.content).toBe('string');
+      expect(typeof result.document.content).toBe('object'); // Expect object
 
-      // console.log を復活させて、パース直前の文字列を確認！
-      console.log('### Raw content before parse:', result.document.content);
-      const document = JSON.parse(result.document.content);
+      // console.log は不要になったので削除
+      // console.log('### Raw content before parse:', result.document.content);
+      const document = result.document.content as any; // Use content directly and assert type
       // console.log('### Parsed document:', JSON.stringify(document, null, 2)); // パース後のログは一旦不要
       expect(document).toHaveProperty('schema', 'memory_document_v2');
       // Check if documentType exists at the top level after parsing
@@ -208,9 +208,9 @@ describe('ReadBranchDocumentUseCase Integration Tests', () => {
       expect(result).toBeDefined();
       expect(result.document).toBeDefined();
       expect(result.document.path).toBe('subdir/test-document.json');
-      expect(typeof result.document.content).toBe('string');
+      expect(typeof result.document.content).toBe('object'); // Expect object
 
-      const document = JSON.parse(result.document.content);
+      const document = result.document.content as any; // Use content directly and assert type
       // このテストケースの期待値はこれで合ってるはず
       expect(document.metadata.id).toBe('subdirectory-document');
       expect(document.metadata.path).toBe('subdir/test-document.json');
@@ -242,7 +242,8 @@ describe('ReadBranchDocumentUseCase Integration Tests', () => {
         expect(mockGitService.getCurrentBranchName).toHaveBeenCalledTimes(1); // GitService が呼ばれる
         expect(result).toBeDefined();
         expect(result.document.path).toBe('branchContext.json');
-        const document = JSON.parse(result.document.content);
+        expect(typeof result.document.content).toBe('object'); // Expect object
+        const document = result.document.content as any; // Use content directly and assert type
         // 期待値をフィクスチャの ID に合わせる
         expect(document.metadata.id).toBe('basic-branch-context');
       });
