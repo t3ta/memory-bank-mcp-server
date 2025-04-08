@@ -1,0 +1,320 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-spec-review-entity-relationships",
+    "title": "MCPパッケージのエンティティ関係分析",
+    "documentType": "analysis",
+    "path": "entity-relationships.json",
+    "tags": [
+      "analysis",
+      "entity-relationships",
+      "architecture",
+      "mcp-package"
+    ],
+    "createdAt": "2025-04-08T03:45:00.000Z",
+    "lastModified": "2025-04-08T03:45:00.000Z"
+  },
+  "content": {
+    "summary": "MCPパッケージにおけるエンティティの関係性と依存関係の分析",
+    "primary_entities": [
+      {
+        "name": "MemoryDocument",
+        "relationships": [
+          {
+            "related_entity": "DocumentPath",
+            "relationship_type": "has-a",
+            "direction": "depends_on",
+            "cardinality": "1",
+            "description": "各MemoryDocumentは1つのDocumentPathを持つ"
+          },
+          {
+            "related_entity": "Tag",
+            "relationship_type": "has-many",
+            "direction": "depends_on",
+            "cardinality": "0..*",
+            "description": "MemoryDocumentは0個以上のTagを持つことができる"
+          }
+        ],
+        "description": "メモリバンク内のドキュメントを表す中核エンティティ。イミュータブルであり、更新操作は新しいインスタンスを返す。"
+      },
+      {
+        "name": "JsonDocument",
+        "relationships": [
+          {
+            "related_entity": "DocumentId",
+            "relationship_type": "has-a",
+            "direction": "depends_on",
+            "cardinality": "1",
+            "description": "各JsonDocumentは1つのDocumentIdを持つ"
+          },
+          {
+            "related_entity": "DocumentPath",
+            "relationship_type": "has-a",
+            "direction": "depends_on",
+            "cardinality": "1",
+            "description": "各JsonDocumentは1つのDocumentPathを持つ"
+          },
+          {
+            "related_entity": "Tag",
+            "relationship_type": "has-many",
+            "direction": "depends_on",
+            "cardinality": "0..*",
+            "description": "JsonDocumentは0個以上のTagを持つことができる"
+          },
+          {
+            "related_entity": "DocumentVersionInfo",
+            "relationship_type": "has-a",
+            "direction": "depends_on",
+            "cardinality": "1",
+            "description": "各JsonDocumentは1つのDocumentVersionInfoを持つ"
+          }
+        ],
+        "description": "JsonDocumentV2スキーマに準拠した構造化ドキュメント。MemoryDocumentを拡張し、ID、タイトル、ドキュメントタイプ、バージョン情報などを追加している。"
+      }
+    ],
+    "value_objects": [
+      {
+        "name": "DocumentPath",
+        "relationships": [],
+        "validation_rules": [
+          "空ではない",
+          "無効な文字（<, >, :, \", |, ?, *）を含まない",
+          "バックスラッシュを含まない",
+          "絶対パスではない（/で始まらない）",
+          "スラッシュで終わらない",
+          "区切り文字としてフォワードスラッシュを使用"
+        ],
+        "description": "ドキュメントのパスを表す値オブジェクト。パス形式のバリデーションやパスコンポーネント（ディレクトリ、ファイル名、拡張子）の解析機能を提供する。"
+      },
+      {
+        "name": "Tag",
+        "relationships": [],
+        "validation_rules": [
+          "空ではない",
+          "小文字 (a-z)、数字 (0-9)、ハイフン (-)のみ含む",
+          "大文字、スペース、アンダースコア、その他の特殊文字を含まない"
+        ],
+        "description": "ドキュメントのタグを表す値オブジェクト。特定のフォーマットルールを強制する。"
+      },
+      {
+        "name": "DocumentId",
+        "relationships": [],
+        "description": "ドキュメントの一意識別子（UUID v4）を表す値オブジェクト。"
+      },
+      {
+        "name": "DocumentVersionInfo",
+        "relationships": [],
+        "description": "ドキュメントのバージョン情報（バージョン番号、最終更新日、変更者、更新理由）を保持する値オブジェクト。"
+      },
+      {
+        "name": "JsonPatchOperation",
+        "relationships": [
+          {
+            "related_entity": "JsonPath",
+            "relationship_type": "has-a",
+            "direction": "depends_on",
+            "cardinality": "1",
+            "description": "各JsonPatchOperationは1つのJsonPathを持つ"
+          },
+          {
+            "related_entity": "JsonPath",
+            "relationship_type": "has-a",
+            "direction": "depends_on",
+            "cardinality": "0..1",
+            "description": "move/copy操作の場合、fromとしてJSONPathを持つ",
+            "attribute": "from"
+          }
+        ],
+        "description": "単一のJSON Patch操作（RFC 6902）を表す値オブジェクト。操作タイプ、パス、値、ソースパスなどを保持する。"
+      },
+      {
+        "name": "JsonPath",
+        "relationships": [],
+        "description": "JSON内の特定の場所を指すJSONポインタ（RFC 6901）を表す値オブジェクト。"
+      },
+      {
+        "name": "BranchInfo",
+        "relationships": [],
+        "validation_rules": [
+          "空ではない",
+          "スラッシュを含む名前空間プレフィックスが必要（例: 'feature/'）",
+          "プレフィックスの後に名前が必要"
+        ],
+        "description": "ブランチ情報を保持する値オブジェクト。命名規則を強制する。"
+      },
+      {
+        "name": "Language",
+        "relationships": [],
+        "supported_codes": [
+          "en",
+          "ja",
+          "zh"
+        ],
+        "description": "サポートされている言語コードを表す値オブジェクト。"
+      }
+    ],
+    "use_case_dependencies": [
+      {
+        "use_case": "WriteBranchDocumentUseCase",
+        "dependencies": [
+          {
+            "entity": "MemoryDocument",
+            "operation": "create/update",
+            "description": "ドキュメントの作成・更新"
+          },
+          {
+            "entity": "DocumentPath",
+            "operation": "validation",
+            "description": "パスのバリデーション"
+          },
+          {
+            "entity": "JsonPatchOperation",
+            "operation": "apply",
+            "description": "パッチ操作適用（オプション）"
+          }
+        ],
+        "description": "特定ブランチのメモリバンクにドキュメントを書き込む。完全な上書きまたはパッチ適用が可能。"
+      },
+      {
+        "use_case": "ReadContextUseCase",
+        "dependencies": [
+          {
+            "entity": "MemoryDocument",
+            "operation": "read",
+            "description": "ブランチとグローバルのドキュメント読み取り"
+          },
+          {
+            "entity": "BranchInfo",
+            "operation": "validation",
+            "description": "ブランチ名のバリデーション"
+          }
+        ],
+        "description": "ブランチのコアファイルとすべてのグローバルファイルを一度に読み取る。"
+      },
+      {
+        "use_case": "JsonPatchUseCase",
+        "dependencies": [
+          {
+            "entity": "JsonDocument",
+            "operation": "update",
+            "description": "JSONドキュメントの更新"
+          },
+          {
+            "entity": "JsonPatchOperation",
+            "operation": "validation/apply",
+            "description": "パッチ操作のバリデーションと適用"
+          },
+          {
+            "entity": "DocumentVersionInfo",
+            "operation": "increment",
+            "description": "ドキュメントバージョンのインクリメント"
+          }
+        ],
+        "description": "既存のJSONドキュメントにJSON Patch操作を適用する。"
+      }
+    ],
+    "repository_pattern_implementation": {
+      "description": "リポジトリパターンを採用して、永続化の詳細をドメインロジックから分離",
+      "repositories": [
+        {
+          "name": "IBranchMemoryBankRepository",
+          "responsibility": "ブランチ固有のメモリバンクに対する操作（例: getDocument, saveDocument）",
+          "operations": [
+            "getDocument",
+            "saveDocument",
+            "listDocuments",
+            "deleteDocument"
+          ]
+        },
+        {
+          "name": "IGlobalMemoryBankRepository",
+          "responsibility": "グローバルメモリバンクに対する操作（例: getDocument, saveDocument）",
+          "operations": [
+            "getDocument",
+            "saveDocument",
+            "listDocuments",
+            "deleteDocument"
+          ]
+        },
+        {
+          "name": "IJsonDocumentRepository",
+          "responsibility": "JsonDocument型のドキュメントの永続化と取得",
+          "operations": [
+            "findById",
+            "findByPath",
+            "findByTags",
+            "findByType",
+            "save",
+            "delete"
+          ]
+        }
+      ],
+      "persistence_strategy": "ファイルシステムベースの実装。各リポジトリインターフェイスに対応するファイルシステム実装クラスが存在していると推測される。"
+    },
+    "entity_lifecycle_patterns": {
+      "description": "エンティティの作成、更新、削除における一貫したパターン",
+      "patterns": [
+        {
+          "name": "イミュータブルパターン",
+          "entities": [
+            "MemoryDocument",
+            "JsonDocument",
+            "DocumentVersionInfo"
+          ],
+          "description": "更新操作は常に新しいインスタンスを返し、元のインスタンスは変更されない。状態の不整合やマルチスレッド環境での問題を回避するための設計。"
+        },
+        {
+          "name": "ファクトリメソッドパターン",
+          "entities": [
+            "DocumentPath",
+            "Tag",
+            "DocumentId",
+            "JsonPatchOperation",
+            "JsonPath",
+            "BranchInfo",
+            "Language"
+          ],
+          "description": "create()などの静的ファクトリメソッドを通じてインスタンスを作成し、バリデーションを行う。create()メソッドは不正な値に対して例外をスローする。"
+        },
+        {
+          "name": "ビルダー/ウィズパターン",
+          "entities": [
+            "MemoryDocument",
+            "JsonDocument"
+          ],
+          "description": "updateContent()、addTag()などのメソッドは、変更を加えた新しいインスタンスを返す。メソッドチェーンが可能で、イミュータブル性を維持しながら複数の変更を適用できる。"
+        },
+        {
+          "name": "バージョン管理パターン",
+          "entities": [
+            "JsonDocument",
+            "DocumentVersionInfo"
+          ],
+          "description": "ドキュメントの更新時にバージョン番号をインクリメントし、最終更新日を更新する。変更履歴の追跡と楽観的ロックのための基盤となる。"
+        }
+      ]
+    },
+    "potential_improvements": [
+      {
+        "area": "エラー処理の統一",
+        "description": "エラー型とエラーハンドリングのアプローチが整理されているが、より一貫性を持たせることが可能かもしれない。特にインターフェース間で返却されるエラー型の統一性。",
+        "suggestion": "エラータイプのマッピングとエラーハンドリングの共通パターンを確立し、すべてのレイヤーで一貫して適用する。"
+      },
+      {
+        "area": "エンティティ間の関係の明示化",
+        "description": "エンティティ間の関係が暗黙的であり、コードを読む人がそれを理解するのに時間がかかる可能性がある。",
+        "suggestion": "関係を明示的にするためのドキュメントや図の作成。可能であればコード内でも関係を明示するコメントやタイプ定義の追加。"
+      },
+      {
+        "area": "バリデーションロジックの一元化",
+        "description": "複数のエンティティで重複するバリデーションロジックが存在する可能性がある。",
+        "suggestion": "共通のバリデーションユーティリティの作成、または、バリデータパターンの導入。"
+      },
+      {
+        "area": "イベント駆動アーキテクチャの拡充",
+        "description": "一部の操作（JsonPatchUseCase）でイベント発行が行われているが、全体的なイベント駆動アーキテクチャの一貫性は不明。",
+        "suggestion": "すべての重要な操作でのイベント発行と、イベントリスナーによる副作用処理の明確な分離。"
+      }
+    ]
+  }
+}

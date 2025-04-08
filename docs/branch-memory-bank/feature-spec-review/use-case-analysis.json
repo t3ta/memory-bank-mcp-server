@@ -1,0 +1,194 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-spec-review-use-case-analysis",
+    "title": "MCPパッケージのユースケース分析",
+    "documentType": "analysis",
+    "path": "use-case-analysis.json",
+    "tags": [
+      "analysis",
+      "use-cases",
+      "architecture",
+      "mcp-package"
+    ],
+    "createdAt": "2025-04-08T04:15:00.000Z",
+    "lastModified": "2025-04-08T04:15:00.000Z"
+  },
+  "content": {
+    "summary": "MCPパッケージにおけるユースケースの詳細分析と相互関係の把握",
+    "use_case_groups": [
+      {
+        "group_name": "ドキュメント操作系",
+        "description": "基本的なドキュメントのCRUD操作を提供するユースケース群",
+        "use_cases": [
+          {
+            "name": "WriteBranchDocumentUseCase",
+            "responsibility": "特定ブランチのメモリバンクにドキュメントを書き込む",
+            "importance": "高",
+            "data_flow": [
+              "入力: branchName, document(path, content), patches?, returnContent?",
+              "1. 入力バリデーション（必須項目チェック、contentとpatchesの排他チェック）",
+              "2. ブランチの存在確認/自動初期化",
+              "3. パス形式のバリデーション",
+              "4. 既存ドキュメントの取得（パッチ適用時のみ）",
+              "5. コンテンツの更新またはパッチ適用",
+              "6. リポジトリへの保存",
+              "7. 出力: returnContentがtrueの場合、更新されたドキュメントを返却"
+            ],
+            "error_scenarios": [
+              "入力不足・競合 → ApplicationErrors.invalidInput",
+              "ブランチ初期化失敗 → ApplicationErrors.branchInitializationFailed",
+              "無効なパス → DomainErrors.invalidDocumentPath",
+              "パッチ対象ドキュメント未発見 → ApplicationErrors.notFound",
+              "パッチ適用エラー → ApplicationErrors.executionFailed",
+              "リポジトリエラー → ApplicationErrors.executionFailed"
+            ],
+            "usage_patterns": [
+              "新規ドキュメント作成: content指定で呼び出し",
+              "ドキュメント全体更新: 既存ドキュメントのパスとcontentで呼び出し",
+              "部分更新: 既存ドキュメントのパスとpatchesで呼び出し"
+            ],
+            "notes": [
+              "ドキュメントの内容や形式に対するバリデーションは最小限（パスの検証のみ）",
+              "タグは配列で渡され、その形式のチェックはパス以降で実施されると推測"
+            ]
+          },
+          {
+            "name": "ReadBranchDocumentUseCase",
+            "responsibility": "特定ブランチのメモリバンクから特定のドキュメントを読み取る",
+            "importance": "高",
+            "data_flow": [
+              "入力: branchName, path",
+              "1. 入力バリデーション（必須項目チェック）",
+              "2. ブランチ名検証",
+              "3. パス形式の検証",
+              "4. リポジトリからのドキュメント取得",
+              "5. 出力: { document: DocumentDTO }"
+            ],
+            "error_scenarios": [
+              "入力不足 → ApplicationErrors.invalidInput",
+              "無効なブランチ名 → DomainErrors.invalidBranchName",
+              "ブランチ未発見 → DomainErrors.branchNotFound",
+              "無効なパス → DomainErrors.invalidDocumentPath",
+              "ドキュメント未発見 → DomainErrors.documentNotFound",
+              "リポジトリエラー → ApplicationErrors.executionFailed"
+            ],
+            "usage_patterns": [
+              "単一ドキュメントの取得（編集前の確認など）",
+              "ドキュメント存在確認"
+            ]
+          },
+          {
+            "name": "WriteGlobalDocumentUseCase",
+            "responsibility": "グローバルメモリバンクにドキュメントを書き込む",
+            "importance": "高",
+            "data_flow": [
+              "WriteBranchDocumentUseCaseと類似の流れだが、ブランチ関連の処理はなし",
+              "入力: document(path, content), patches?, returnContent?",
+              "処理: バリデーション → 更新/パッチ適用 → リポジトリ保存",
+              "出力: returnContentがtrueの場合、更新されたドキュメントを返却"
+            ],
+            "error_scenarios": [
+              "入力不足・競合 → ApplicationErrors.invalidInput",
+              "無効なパス → DomainErrors.invalidDocumentPath",
+              "パッチ対象ドキュメント未発見 → ApplicationErrors.notFound",
+              "パッチ適用エラー → ApplicationErrors.executionFailed",
+              "リポジトリエラー → ApplicationErrors.executionFailed"
+            ],
+            "notes": [
+              "DocumentWriterServiceを内部使用",
+              "プレーンテキストや無効なJSONも書き込み可能（タグは失われる可能性あり）",
+              "パス走査試行を処理（DomainErrorをスロー）"
+            ]
+          },
+          {
+            "name": "ReadGlobalDocumentUseCase",
+            "responsibility": "グローバルメモリバンクから特定のドキュメントを読み取る",
+            "importance": "高",
+            "data_flow": [
+              "入力: path",
+              "1. パス形式の検証",
+              "2. リポジトリからのドキュメント取得",
+              "3. 出力: { document: DocumentDTO }"
+            ],
+            "error_scenarios": [
+              "ドキュメント未発見 → DomainErrors.documentNotFound",
+              "リポジトリエラー → ApplicationErrors.executionFailed"
+            ]
+          }
+        ]
+      }
+    ],
+    "use_case_interdependencies": [],
+    "controller_use_case_mapping": [],
+    "missing_controller_methods": [
+      {
+        "controller": "BranchController",
+        "missing_methods": [
+          "readDocument - ReadBranchDocumentUseCaseに対応するメソッドが見当たらない",
+          "writeDocument - WriteBranchDocumentUseCaseに対応するメソッドが見当たらない"
+        ],
+        "potential_impact": "ブランチドキュメントのCRUD操作が限定的になる可能性あり"
+      },
+      {
+        "controller": "JsonDocumentController",
+        "missing_controller": "複数のJSONドキュメント特化系ユースケースがあるが、対応するコントローラが見当たらない",
+        "missing_methods": [
+          "ReadJsonDocumentUseCase",
+          "WriteJsonDocumentUseCase",
+          "DeleteJsonDocumentUseCase",
+          "JsonPatchUseCase",
+          "SearchJsonDocumentsUseCase",
+          "UpdateJsonIndexUseCase"
+        ],
+        "potential_impact": "JSONドキュメント特化のAPIエンドポイントが不足している可能性あり"
+      }
+    ],
+    "potential_improvements": [
+      {
+        "area": "ユースケース命名の一貫性",
+        "description": "一部のユースケースでは動詞（Read, Write）から始まるが、他では名詞（JsonPatch）から始まるなど、命名に一貫性がない",
+        "suggestion": "すべてのユースケースを動詞から始める命名規則に統一する（例: ApplyJsonPatchUseCase）"
+      },
+      {
+        "area": "エラーハンドリングの標準化",
+        "description": "各ユースケースでエラーの種類や返却方法が異なり、クライアント側での一貫したエラーハンドリングが難しい",
+        "suggestion": "すべてのユースケースで共通のエラー型と返却パターンを使用する"
+      },
+      {
+        "area": "入力バリデーションの共通化",
+        "description": "各ユースケースで類似の入力パラメータに対して個別にバリデーションを実装している可能性がある",
+        "suggestion": "共通の入力バリデーションユーティリティを作成し、重複コードを削減する"
+      },
+      {
+        "area": "ユースケース間の依存関係の明確化",
+        "description": "あるユースケースが内部で他のユースケースを使用する場合の依存関係が明示的でない",
+        "suggestion": "依存関係を明示的に宣言し、循環依存を避ける設計にする"
+      },
+      {
+        "area": "レスポンス形式の統一",
+        "description": "各ユースケースの出力形式が異なり、クライアント側での処理が複雑になる可能性がある",
+        "suggestion": "すべてのユースケースでの標準的なレスポンス形式を定義し、一貫性を持たせる"
+      },
+      {
+        "area": "コントローラーとユースケースのマッピングの完全化",
+        "description": "一部のユースケースに対応するコントローラーメソッドが不足している",
+        "suggestion": "すべてのユースケースに対応するAPIエンドポイントを提供するか、意図的に提供しない場合はその理由を文書化する"
+      }
+    ],
+    "conclusion": {
+      "key_insights": [
+        "MCPパッケージは、Clean Architecture原則に基づいて設計されており、ドメインロジックとインフラストラクチャの分離が徹底されている",
+        "ユースケースは機能的に分類すると、基本的なドキュメント操作、コンテキスト管理、検索・インデックス管理、JSONドキュメント特化の4つのグループに分けられる",
+        "ReadContextUseCaseは、AIとの対話の起点となる重要なユースケースであり、特に注力されている",
+        "JSONドキュメント関連のユースケースが充実しているが、対応するコントローラが不足している可能性がある"
+      ],
+      "recommendations": [
+        "ユースケースの命名規則とエラーハンドリングの標準化",
+        "JSONドキュメント特化系ユースケースに対応するコントローラの実装",
+        "BranchControllerの機能拡充（readDocumentとwriteDocumentメソッドの追加）",
+        "ユースケース間の依存関係の明示的な宣言と文書化"
+      ]
+    }
+  }
+}

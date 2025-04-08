@@ -5,11 +5,48 @@
     "title": "Branch Context for feature/spec-review",
     "documentType": "branch_context",
     "path": "branchContext.json",
-    "tags": [],
+    "tags": [
+      "core",
+      "branch-context"
+    ],
     "createdAt": "2025-04-07T11:29:28.986Z",
-    "lastModified": "2025-04-07T11:29:28.986Z"
+    "lastModified": "2025-04-08T03:25:00.000Z"
   },
   "content": {
-    "description": "Context for branch: feature/spec-review"
+    "description": "MCPサーバーの仕様レビューと設計ドキュメント整理のためのブランチ",
+    "purpose": "現在の実装と仕様の整合性を確認し、必要に応じて改善提案を行う",
+    "scope": [
+      "mcp-package-specification.json の検証",
+      "エンティティの整合性チェック",
+      "ユースケースの整合性チェック",
+      "欠落仕様の特定",
+      "設計ドキュメントの改善提案"
+    ],
+    "related_resources": [
+      {
+        "type": "document",
+        "name": "コーディング規約",
+        "path": "core/coding-standards.json",
+        "scope": "global"
+      },
+      {
+        "type": "document",
+        "name": "システムアーキテクチャ基本情報",
+        "path": "core/architecture.json",
+        "scope": "global"
+      },
+      {
+        "type": "document",
+        "name": "用語集",
+        "path": "core/glossary.json",
+        "scope": "global"
+      }
+    ],
+    "branch_details": {
+      "name": "feature/spec-review",
+      "created": "2025-04-07T11:29:28.986Z",
+      "author": "t3ta",
+      "status": "active"
+    }
   }
 }

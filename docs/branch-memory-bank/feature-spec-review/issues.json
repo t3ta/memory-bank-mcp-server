@@ -1,0 +1,285 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-spec-review-issues",
+    "title": "Proposed Issues for Memory Bank MCP Server Improvements",
+    "documentType": "issues",
+    "path": "issues.json",
+    "tags": [
+      "issues",
+      "improvements",
+      "spec-review"
+    ],
+    "createdAt": "2025-04-08T05:50:00.000Z",
+    "lastModified": "2025-04-08T05:50:00.000Z"
+  },
+  "content": {
+    "summary": "List of proposed issues extracted from spec review and user feedback discussions, prioritized for implementation",
+    "issues": [
+      {
+        "title": "Auto-parse JSON responses for improved developer experience",
+        "description": "Currently, read_context and other similar operations return JSON-formatted files as strings. This requires developers to manually parse them, leading to extra code and potential errors. We should automatically parse JSON-formatted files into objects when returning responses.",
+        "priority": "high",
+        "affected_usecases": [
+          "ReadContextUseCase",
+          "ReadBranchDocumentUseCase"
+        ],
+        "proposed_solution": "Implement a detection mechanism for JSON-formatted files and automatically parse them into objects before returning in the response. Files that aren't valid JSON would still be returned as strings.",
+        "acceptance_criteria": [
+          "JSON-formatted files are automatically parsed into objects in responses",
+          "Non-JSON files continue to be returned as strings",
+          "Invalid JSON files are handled gracefully with appropriate error information",
+          "Documentation is updated to reflect this behavior change"
+        ],
+        "estimated_effort": "medium",
+        "related_files": [
+          "src/application/use-cases/ReadContextUseCase.ts",
+          "src/application/use-cases/ReadBranchDocumentUseCase.ts"
+        ]
+      },
+      {
+        "title": "Improve JSON Patch error messages with detailed information",
+        "description": "Current error messages for JSON Patch operations are not user-friendly and lack detailed information about the failure. This makes debugging difficult as users only know that the operation failed but not why or how to fix it.",
+        "priority": "high",
+        "affected_usecases": [
+          "JsonPatchUseCase",
+          "WriteBranchDocumentUseCase",
+          "WriteGlobalDocumentUseCase"
+        ],
+        "proposed_solution": "Enhance error messages to include specific details about the failure, such as the type of error, the location in the document where the failure occurred, and suggestions for resolving the issue.",
+        "acceptance_criteria": [
+          "Error messages include the specific error type (e.g., path not found, invalid value type)",
+          "Error messages identify the exact location of the failure (which patch operation, which path)",
+          "Error messages provide suggestions for resolving the issue when possible",
+          "Error handling maintains backward compatibility",
+          "Comprehensive tests for various error scenarios are implemented"
+        ],
+        "estimated_effort": "medium",
+        "related_files": [
+          "src/application/use-cases/JsonPatchUseCase.ts",
+          "src/domain/services/JsonPatchService.ts"
+        ]
+      },
+      {
+        "title": "Optimize read_context response for large memory banks",
+        "description": "Currently, read_context retrieves all files in a branch memory bank, which can lead to performance issues and excessive data transfer when the memory bank is large. A more optimized approach is needed.",
+        "priority": "high",
+        "affected_usecases": [
+          "ReadContextUseCase"
+        ],
+        "proposed_solution": "Modify read_context to return only core files and a list of available files. Individual files can then be retrieved on demand as needed.",
+        "acceptance_criteria": [
+          "read_context response includes core files (branchContext.json, activeContext.json, etc.) as parsed objects",
+          "read_context response includes a list of all available files in the memory bank",
+          "Individual non-core files can be retrieved separately on demand",
+          "Performance is significantly improved for large memory banks",
+          "Documentation is updated to reflect the new response format"
+        ],
+        "estimated_effort": "medium",
+        "related_files": [
+          "src/application/use-cases/ReadContextUseCase.ts",
+          "src/interfaces/controllers/ContextController.ts"
+        ]
+      },
+      {
+        "title": "Implement branchMetadata.json for improved branch relationship tracking",
+        "description": "Currently, there's no easy way to track relationships between branches (such as parent branch information) in the memory bank. This makes it difficult to share relevant information between related branches.",
+        "priority": "medium",
+        "affected_usecases": [
+          "Branch initialization process"
+        ],
+        "proposed_solution": "Design and implement a branchMetadata.json file that stores information about the branch's lineage, creation date, purpose, and relationship to other branches. This file should be automatically generated during branch initialization.",
+        "acceptance_criteria": [
+          "branchMetadata.json schema is designed with fields for parent branch, creation date, purpose, etc.",
+          "Branch initialization process automatically generates the metadata file",
+          "Git integration to automatically detect the parent branch information",
+          "API to query branch relationships based on metadata",
+          "Documentation for the new metadata structure and its usage"
+        ],
+        "estimated_effort": "medium",
+        "related_files": [
+          "src/application/services/BranchInitializationService.ts",
+          "src/infrastructure/services/GitService.ts"
+        ]
+      },
+      {
+        "title": "Expand GitService functionality for branch relationship operations",
+        "description": "The current GitService has limited functionality, only providing basic branch information. Enhancing it would improve branch relationship management and enable better data sharing between branches.",
+        "priority": "medium",
+        "affected_usecases": [
+          "Branch initialization",
+          "Memory bank operations"
+        ],
+        "proposed_solution": "Expand GitService to include functions for retrieving branch ancestry, generating diff summaries, and extracting relevant information from commit history.",
+        "acceptance_criteria": [
+          "GitService can retrieve a branch's parent/ancestor branches",
+          "GitService can generate diff summaries between branches",
+          "GitService can extract relevant information from commit history",
+          "Integration with branchMetadata.json for automatic metadata updates",
+          "Comprehensive tests for all new functionality"
+        ],
+        "estimated_effort": "medium",
+        "related_files": [
+          "src/infrastructure/services/GitService.ts",
+          "src/domain/interfaces/IGitService.ts"
+        ]
+      },
+      {
+        "title": "Optimize directory structure initialization and make it customizable",
+        "description": "Currently, branch initialization creates unnecessary directories like docs/templates and docs/translations that are rarely used. This creates clutter and confusion for users.",
+        "priority": "low",
+        "affected_usecases": [
+          "Branch initialization process"
+        ],
+        "proposed_solution": "Make the directory structure created during initialization customizable and optimized by default to only include necessary directories.",
+        "acceptance_criteria": [
+          "Default initialization creates only necessary directories",
+          "Configuration option to specify which directories to create",
+          "Documentation for the initialization configuration options",
+          "Backward compatibility with existing branches"
+        ],
+        "estimated_effort": "low",
+        "related_files": [
+          "src/application/services/BranchInitializationService.ts",
+          "src/infrastructure/services/FileSystemService.ts"
+        ]
+      },
+      {
+        "title": "Implement external resource references in documents",
+        "description": "Currently, there's no standardized way to reference external resources (like Notion pages) in memory bank documents. Having a standard format would improve cross-reference capabilities.",
+        "priority": "medium",
+        "affected_usecases": [
+          "All document-related use cases"
+        ],
+        "proposed_solution": "Define a standard format for external resource references in documents (e.g., an 'externals' field) and implement support for it in document processing.",
+        "acceptance_criteria": [
+          "Standard format for external references is defined",
+          "Document processing respects and preserves external references",
+          "API to query documents by external references",
+          "Documentation for the external reference format and its usage"
+        ],
+        "estimated_effort": "medium",
+        "related_files": [
+          "src/domain/entities/JsonDocument.ts",
+          "src/domain/entities/MemoryDocument.ts"
+        ]
+      },
+      {
+        "title": "Support patch operations on non-existent documents (auto-creation)",
+        "description": "Currently, applying patch operations to non-existent documents results in an error. In some cases, it would be useful to automatically create the document if it doesn't exist before applying the patch.",
+        "priority": "low",
+        "affected_usecases": [
+          "JsonPatchUseCase",
+          "WriteBranchDocumentUseCase",
+          "WriteGlobalDocumentUseCase"
+        ],
+        "proposed_solution": "Implement an option to automatically create empty documents when patch operations are attempted on non-existent documents.",
+        "acceptance_criteria": [
+          "API includes an option to enable auto-creation of documents",
+          "When enabled, patch operations on non-existent documents create the document first",
+          "Default behavior remains unchanged (error on non-existent documents)",
+          "Security considerations are addressed (limiting which paths can be auto-created)",
+          "Documentation for the new option and its usage"
+        ],
+        "estimated_effort": "low",
+        "related_files": [
+          "src/application/use-cases/JsonPatchUseCase.ts",
+          "src/domain/services/JsonPatchService.ts"
+        ]
+      },
+      {
+        "title": "Implement Smart Memory Bank mode to reduce AI context window pressure",
+        "description": "Current memory bank operations require multiple steps (read, then write/patch) which consume valuable AI context window space. A smarter mode that handles these operations with minimal context usage would improve AI assistance.",
+        "priority": "high",
+        "affected_usecases": [
+          "All memory bank operations when used with AI"
+        ],
+        "proposed_solution": "Design and implement a 'Smart Memory Bank' mode (MemoPilot) that can process high-level AI instructions and perform the necessary memory bank operations with minimal context window usage.",
+        "acceptance_criteria": [
+          "AI can issue high-level instructions without detailed memory bank operation logs",
+          "Smart mode handles read operations, validation, and write/patch operations automatically",
+          "Results are summarized concisely to minimize context usage",
+          "Direct memory bank access for retrieving previous records",
+          "Documentation for the smart mode and its usage patterns"
+        ],
+        "estimated_effort": "high",
+        "related_files": [
+          "New files for the MemoPilot implementation"
+        ],
+        "notes": "See memopilot-concept.json for detailed design considerations"
+      },
+      {
+        "title": "Expand file operation API with create, delete, list, and partial read",
+        "description": "The current file operation API is focused on read/write/patch operations, but lacks comprehensive file management capabilities such as explicit create, delete, list, and partial reading.",
+        "priority": "medium",
+        "affected_usecases": [
+          "All file-related operations"
+        ],
+        "proposed_solution": "Expand the file operation API to include explicit create, delete, list, and partial read operations for more complete file management capabilities.",
+        "acceptance_criteria": [
+          "New create_document API for explicit document creation",
+          "Delete_document API for document removal",
+          "List_documents API for directory content listing",
+          "Read_partial API for reading large documents in parts",
+          "Consistent error handling across all operations",
+          "Comprehensive documentation for all new APIs"
+        ],
+        "estimated_effort": "medium",
+        "related_files": [
+          "src/application/use-cases/",
+          "src/interfaces/controllers/"
+        ]
+      },
+      {
+        "title": "Implement ubiquitous language extraction capability from memory bank",
+        "description": "There's currently no way to automatically extract common terminology (ubiquitous language) from memory bank documents. This would be valuable for ensuring consistent terminology usage across the project.",
+        "priority": "medium",
+        "affected_usecases": [
+          "New feature proposal"
+        ],
+        "proposed_solution": "Implement a capability to analyze memory bank documents and extract frequently used terms and patterns, generating a ubiquitous language dictionary.",
+        "acceptance_criteria": [
+          "Analysis of document content to identify terminology patterns",
+          "Extraction of key terms with their contexts and definitions",
+          "Generation of a ubiquitous language dictionary",
+          "API to query and update the dictionary",
+          "Documentation for the extraction process and dictionary usage"
+        ],
+        "estimated_effort": "high",
+        "related_files": [
+          "New files for the language extraction implementation"
+        ]
+      },
+      {
+        "title": "Clarify branch parameter behavior with project option enabled",
+        "description": "When project option is enabled, the branch parameter becomes optional as it can be auto-detected from the Git context. However, this behavior is not clearly communicated in tool definitions (list/tools), causing inconsistent usage patterns and confusion for AI interfaces.",
+        "priority": "medium",
+        "affected_usecases": [
+          "WriteBranchDocumentUseCase",
+          "ReadBranchDocumentUseCase",
+          "ReadContextUseCase"
+        ],
+        "proposed_solution": "Update tool definitions and documentation to clearly indicate that branch parameters are optional when project option is enabled, and describe the automatic branch detection behavior.",
+        "acceptance_criteria": [
+          "Tool definitions explicitly mention the optional nature of branch parameters when project option is enabled",
+          "Documentation clarifies the auto-detection behavior",
+          "Examples show both explicit branch specification and auto-detection usage patterns",
+          "AI interfaces can properly understand when to omit branch parameters"
+        ],
+        "estimated_effort": "low",
+        "related_files": [
+          "src/interfaces/controllers/",
+          "src/application/use-cases/",
+          "docs/api-reference.md"
+        ]
+      }
+    ],
+    "next_steps": [
+      "Review and prioritize these issues with the team",
+      "Create GitHub issues for the high-priority items",
+      "Assign initial developers to start working on the top priority issues",
+      "Schedule regular review meetings to track progress and adjust priorities if needed",
+      "Consider implementing MemoPilot as a long-term goal after addressing immediate issues"
+    ]
+  }
+}

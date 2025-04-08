@@ -1,0 +1,239 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-spec-review-spec-analysis",
+    "title": "MCPパッケージ仕様の分析",
+    "documentType": "analysis",
+    "path": "spec-analysis.json",
+    "tags": [
+      "analysis",
+      "specification",
+      "mcp-package"
+    ],
+    "createdAt": "2025-04-08T03:35:00.000Z",
+    "lastModified": "2025-04-08T03:35:00.000Z"
+  },
+  "content": {
+    "summary": "mcp-package-specification.json の内容分析と主要コンポーネントの特定",
+    "key_observations": [
+      {
+        "category": "ドキュメント生成方法",
+        "observation": "仕様ドキュメントがテストから自動生成されている",
+        "details": "ドキュメント内の警告文から、実装時のテストコードを解析して仕様情報を抽出・生成していると推測される",
+        "implications": [
+          "実装とドキュメントの整合性が高い可能性がある",
+          "テストの網羅性がドキュメントの品質に直結する",
+          "テストされていない機能は仕様に記載されない可能性がある"
+        ]
+      },
+      {
+        "category": "アーキテクチャ設計",
+        "observation": "クリーンアーキテクチャの採用",
+        "details": "エンティティ、ユースケース、コントローラー、インフラストラクチャの明確な分離が見られる",
+        "implications": [
+          "関心の分離が徹底されている",
+          "ビジネスロジックとインフラの独立性が確保されている",
+          "テスト容易性が高い設計になっている"
+        ]
+      }
+    ],
+    "core_entities": [
+      {
+        "name": "MemoryDocument",
+        "importance": "高",
+        "description": "メモリバンク内のドキュメントを表す中核エンティティ",
+        "key_features": [
+          "イミュータブル設計",
+          "パス、コンテンツ、タグ、最終更新日を持つ",
+          "JSON変換機能を持つ"
+        ],
+        "dependencies": [
+          "DocumentPath",
+          "Tag"
+        ]
+      },
+      {
+        "name": "DocumentPath",
+        "importance": "高",
+        "description": "ドキュメントのパスを表す値オブジェクト",
+        "key_features": [
+          "パス形式の厳密なバリデーション",
+          "ディレクトリ、ファイル名、拡張子の分解機能",
+          "ドキュメントタイプの推論機能"
+        ],
+        "validation_rules": [
+          "空ではない",
+          "無効な文字（<, >, :, \", |, ?, *）を含まない",
+          "バックスラッシュを含まない",
+          "絶対パスではない",
+          "スラッシュで終わらない",
+          "区切り文字としてフォワードスラッシュを使用"
+        ]
+      },
+      {
+        "name": "Tag",
+        "importance": "中",
+        "description": "ドキュメントのタグを表す値オブジェクト",
+        "key_features": [
+          "厳格なフォーマットバリデーション",
+          "小文字、数字、ハイフンのみ許可"
+        ],
+        "validation_rules": [
+          "空ではない",
+          "小文字 (a-z)、数字 (0-9)、ハイフン (-)のみ含む",
+          "大文字、スペース、アンダースコア、その他の特殊文字を含まない"
+        ]
+      },
+      {
+        "name": "JsonDocument",
+        "importance": "高",
+        "description": "JsonDocumentV2スキーマに準拠した構造化ドキュメント",
+        "key_features": [
+          "イミュータブル設計",
+          "バージョン管理機能",
+          "スキーマバリデーション"
+        ],
+        "properties": [
+          "id (DocumentId)",
+          "path (DocumentPath)",
+          "title (string)",
+          "documentType (DocumentType)",
+          "tags (Tag[])",
+          "content (object)",
+          "branch? (string)",
+          "versionInfo (DocumentVersionInfo)"
+        ]
+      }
+    ],
+    "key_use_cases": [
+      {
+        "name": "WriteBranchDocumentUseCase",
+        "importance": "高",
+        "description": "特定ブランチのメモリバンクにドキュメントを書き込む",
+        "input": [
+          "branchName: string (オプション、プロジェクトモードでは不要)",
+          "document: { path: string (必須), content?: string, tags?: string[] }",
+          "patches?: JsonPatchOperation[] (document.contentと同時使用不可)",
+          "returnContent?: boolean (デフォルトはfalse)"
+        ],
+        "output": "{ document: DocumentDTO } (returnContentがtrueの場合のみ)",
+        "errors": [
+          "ApplicationErrors.invalidInput (パス不足、ブランチ名不足、contentとpatchesの競合)",
+          "ApplicationErrors.branchInitializationFailed",
+          "ApplicationErrors.executionFailed (非JSONのパッチ、存在しないドキュメントへのパッチ、リポジトリエラー)",
+          "ApplicationErrors.notFound (存在しないドキュメントへのパッチ)",
+          "DomainErrors.invalidDocumentPath (パスに'..'が含まれるなど)"
+        ]
+      },
+      {
+        "name": "ReadContextUseCase",
+        "importance": "高",
+        "description": "ブランチのコアファイルとすべてのグローバルファイルを一度に読み取る",
+        "input": [
+          "branch: string (必須)",
+          "language: string (必須、ただし現在ルールには未使用)"
+        ],
+        "output": "{ branchMemory: { [filePath: string]: string }, globalMemory: { [filePath: string]: string }, rules?: any (現在は未定義) }",
+        "notes": [
+          "現在はテストに基づくとルールを返さないようだ",
+          "存在しないブランチは自動的に初期化される（4つのコアファイルを作成）"
+        ]
+      },
+      {
+        "name": "JsonPatchUseCase",
+        "importance": "中",
+        "description": "既存のJSONドキュメントにJSON Patch操作（RFC 6902）を適用する",
+        "input": [
+          "docPath: string (必須)",
+          "patches: JsonPatchOperation[] (必須)",
+          "branchName?: string (指定時はブランチドキュメント、未指定時はグローバルドキュメントにパッチ適用)"
+        ],
+        "output": "JsonDocument (更新されたドキュメントインスタンス)",
+        "errors": [
+          "ドキュメント未発見エラー",
+          "パッチ適用エラー（無効な操作など）",
+          "リポジトリ保存エラー"
+        ],
+        "notes": [
+          "JsonDocumentRepositoryを使用してドキュメントを検索・保存",
+          "パッチ適用後にドキュメントバージョンをインクリメント",
+          "成功時にDocumentEventEmitter経由でDOCUMENT_UPDATEDイベントを発行"
+        ]
+      }
+    ],
+    "error_handling_approach": {
+      "error_types": [
+        {
+          "name": "DomainError",
+          "description": "ビジネスルールや不変条件の違反",
+          "http_status": "主に400 Bad Request"
+        },
+        {
+          "name": "ApplicationError",
+          "description": "ユースケース実行やインフラストラクチャー操作における問題",
+          "http_status": "400, 401, 403, 404, 409, 500 など状況に応じて"
+        },
+        {
+          "name": "InfrastructureError",
+          "description": "インフラストラクチャー操作（ファイルシステム、Git など）関連のエラー",
+          "http_status": "404, 403, 409, 500 など状況に応じて"
+        },
+        {
+          "name": "SharedUtilsError",
+          "description": "共有ユーティリティ関数内のエラー（解析、検証など）",
+          "http_status": "デフォルトは500 Internal Server Error"
+        }
+      ],
+      "error_handling_utilities": {
+        "name": "ErrorUtils",
+        "description": "エラー処理とフォーマットのための静的ユーティリティクラス",
+        "key_methods": [
+          "wrapAsync: 非同期関数/プロミスをラップしてエラーハンドリング",
+          "isErrorOfType: エラーが特定のエラークラス名のインスタンスかチェック",
+          "getErrorCode: 標準化されたエラーコード文字列の取得",
+          "formatForLogging: エラー（または任意の値）をログ用にフォーマット"
+        ]
+      }
+    },
+    "potential_issues": [
+      {
+        "issue": "仕様と実装の乖離可能性",
+        "description": "自動生成された仕様が実際の実装と完全に一致しているか検証が必要",
+        "impact": "高",
+        "mitigation": "実装コードとの手動比較、または自動検証ツールの開発"
+      },
+      {
+        "issue": "テスト作成のガイドライン",
+        "description": "仕様が自動生成される場合、テスト作成のガイドラインが重要",
+        "impact": "中",
+        "mitigation": "仕様抽出を考慮したテスト作成ガイドラインの策定"
+      },
+      {
+        "issue": "仕様ドキュメントの網羅性",
+        "description": "テストされていない機能は仕様に記載されない可能性がある",
+        "impact": "高",
+        "mitigation": "テストカバレッジの向上、仕様の手動レビューによる補完"
+      }
+    ],
+    "recommendations": [
+      {
+        "title": "仕様自動生成プロセスの文書化",
+        "description": "テストからの仕様抽出方法と制約を明示的に文書化する",
+        "reasoning": "仕様ドキュメントの生成方法を理解することで、より適切なテスト作成とドキュメント利用が可能になる",
+        "priority": "高"
+      },
+      {
+        "title": "仕様ドキュメントの拡充",
+        "description": "テストから自動抽出できない情報（設計背景や意図など）を手動で補完する",
+        "reasoning": "技術的詳細だけでなく、設計上の意図や背景も理解できるようにする",
+        "priority": "中"
+      },
+      {
+        "title": "仕様検証プロセスの確立",
+        "description": "仕様ドキュメントと実装の整合性を定期的に検証するプロセスを確立する",
+        "reasoning": "自動生成された仕様が最新の実装を正確に反映していることを確保する",
+        "priority": "高"
+      }
+    ]
+  }
+}
