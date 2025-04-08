@@ -227,10 +227,9 @@ export async function registerApplicationServices(container: DIContainer): Promi
 
   // Register JsonPatchService implementation (using the refactored adapter)
   container.registerFactory('jsonPatchService', async () => {
-      // Import the adapter class directly (assuming file rename to Rfc6902JsonPatchAdapter.ts)
-      // Use the correct class name and ensure the path matches the renamed file
-      const { Rfc6902JsonPatchAdapter } = await import('../../domain/jsonpatch/Rfc6902JsonPatchAdapter.js');
-      return new Rfc6902JsonPatchAdapter();
+      // Import the NEW adapter class
+      const { FastJsonPatchAdapter } = await import('../../domain/jsonpatch/FastJsonPatchAdapter.js'); // Use the new adapter
+      return new FastJsonPatchAdapter(); // Instantiate the new adapter
   });
 
   // Make the factory async and await the repository and patch service
