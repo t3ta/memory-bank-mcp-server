@@ -88,11 +88,11 @@ describe('ReadContextUseCase Integration Tests', () => {
       expect(Object.keys(result.globalMemory!).length).toBeGreaterThan(0);
       expect(result.globalMemory!['core/glossary.json']).toBeDefined();
 
-      const branchContextContent = result.branchMemory!['branchContext.json'];
-      expect(branchContextContent).toBeDefined();
-      const branchContext = JSON.parse(branchContextContent);
-      expect(branchContext.schema).toBe('memory_document_v2');
-      expect(branchContext.documentType).toBe('branch_context'); // トップレベルの documentType をチェック
+      const branchContext = result.branchMemory!['branchContext.json']; // Content is already an object
+      expect(branchContext).toBeDefined();
+      expect(typeof branchContext).toBe('object'); // Verify it's an object
+      expect((branchContext as any).schema).toBe('memory_document_v2');
+      expect((branchContext as any).documentType).toBe('branch_context'); // トップレベルの documentType をチェック
     });
 
     it('should get context regardless of language', async () => {
@@ -175,9 +175,10 @@ describe('ReadContextUseCase Integration Tests', () => {
       for (const coreFile of expectedCoreFiles) {
         expect(result.branchMemory![coreFile]).toBeDefined();
         try {
-          const content = JSON.parse(result.branchMemory![coreFile]);
-          expect(content.schema).toBe('memory_document_v2'); // スキーマ確認
-          expect(content.metadata.path).toBe(coreFile); // パス確認
+          const content = result.branchMemory![coreFile]; // Content is already an object
+          expect(typeof content).toBe('object'); // Verify it's an object
+          expect((content as any).schema).toBe('memory_document_v2'); // スキーマ確認
+          expect((content as any).metadata.path).toBe(coreFile); // パス確認
         } catch (e) {
           throw new Error(`Failed to parse JSON for ${coreFile}: ${e}`);
         }

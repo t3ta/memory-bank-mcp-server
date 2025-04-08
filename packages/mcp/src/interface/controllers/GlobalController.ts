@@ -20,7 +20,7 @@ import type { IConfigProvider } from "../../infrastructure/config/interfaces/ICo
  */
 interface WriteGlobalDocumentParams {
   path: string;
-  content?: string;
+  content?: string | Record<string, unknown>; // Allow object
   patches?: rfc6902.Operation[];
   tags?: string[];
 }

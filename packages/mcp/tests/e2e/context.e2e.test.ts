@@ -64,18 +64,16 @@ describe('MCP E2E Context Tests', () => {
       expect(data.branchMemory).toBeDefined();
       expect(typeof data.branchMemory).toBe('object');
       expect(data.branchMemory?.[branchDocPath]).toBeDefined();
-      const branchDocContentString = data.branchMemory?.[branchDocPath];
-      expect(typeof branchDocContentString).toBe('string');
-      const parsedBranchContent = JSON.parse(branchDocContentString ?? '{}');
-      expect(parsedBranchContent.metadata.id).toBe("context-branch-1");
+      const parsedBranchContent = data.branchMemory?.[branchDocPath]; // Content is already an object
+      expect(typeof parsedBranchContent).toBe('object'); // Verify it's an object
+      expect((parsedBranchContent as any)?.metadata?.id).toBe("context-branch-1"); // Add optional chaining and type assertion
 
       expect(data.globalMemory).toBeDefined();
       expect(typeof data.globalMemory).toBe('object');
       expect(data.globalMemory?.[globalDocPath]).toBeDefined();
-      const globalDocContentString = data.globalMemory?.[globalDocPath];
-      expect(typeof globalDocContentString).toBe('string');
-      const parsedGlobalContent = JSON.parse(globalDocContentString ?? '{}');
-      expect(parsedGlobalContent.metadata.id).toBe("context-global-1");
+      const parsedGlobalContent = data.globalMemory?.[globalDocPath]; // Content is already an object
+      expect(typeof parsedGlobalContent).toBe('object'); // Verify it's an object
+      expect((parsedGlobalContent as any)?.metadata?.id).toBe("context-global-1"); // Add optional chaining and type assertion
     } else {
       fail('readContext should return success: true with data');
     }

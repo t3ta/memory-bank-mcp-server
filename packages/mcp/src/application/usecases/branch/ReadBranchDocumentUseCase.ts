@@ -136,11 +136,21 @@ export class ReadBranchDocumentUseCase
       documentType: (document as any).determineDocumentType()
     });
 
-    // MemoryDocument から生の content 文字列を取得する
+    // Attempt to parse the content as JSON
+    let parsedContent: string | object;
+    try {
+      parsedContent = JSON.parse(document.content);
+      this.useCaseLogger.debug('Successfully parsed document content as JSON', { documentPath: input.path });
+    } catch (parseError) {
+      // If parsing fails, keep the original string content
+      parsedContent = document.content;
+      this.useCaseLogger.debug('Failed to parse document content as JSON, returning as string', { documentPath: input.path });
+    }
+
     return {
       document: {
         path: document.path.value,
-        content: document.content, // ★ 生の content 文字列をそのまま返す ★
+        content: parsedContent, // Return parsed object or original string
         tags: document.tags.map((tag) => tag.value),
         lastModified: document.lastModified.toISOString(),
       },

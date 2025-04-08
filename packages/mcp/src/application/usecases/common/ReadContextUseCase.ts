@@ -12,8 +12,8 @@ export type ContextRequest = {
 
 export type ContextResult = {
   rules?: RulesResult;
-  branchMemory?: Record<string, string>;
-  globalMemory?: Record<string, string>;
+  branchMemory?: Record<string, string | object>; // Allow object
+  globalMemory?: Record<string, string | object>; // Allow object
 };
 
 /**
@@ -97,7 +97,7 @@ export class ReadContextUseCase {
    * @param branchName Branch name
    * @returns Object with document paths as keys and content as values
    */
-  private async readBranchMemory(branchName: string): Promise<Record<string, string>> {
+  private async readBranchMemory(branchName: string): Promise<Record<string, string | object>> { // Update return type
     const branchInfo = BranchInfo.create(branchName);
     logger.debug('Calling branchRepository.listDocuments...'); // Added log
 
@@ -106,7 +106,7 @@ export class ReadContextUseCase {
     const paths = await this.branchRepository.listDocuments(branchInfo);
     logger.debug('Finished branchRepository.listDocuments'); // Added log
     // Debug log removed by Mirai
-    const result: Record<string, string> = {};
+    const result: Record<string, string | object> = {}; // Update result type
     logger.debug(`Reading branch memory paths: ${paths.map(p => p.value).join(', ')}`);
 
     for (const path of paths) {
@@ -117,7 +117,16 @@ export class ReadContextUseCase {
         logger.debug('Finished branchRepository.getDocument'); // Added log
         if (document) {
           logger.debug(`Document found: ${path.value}`);
-          result[path.value] = document.content;
+          // Attempt to parse content as JSON
+          let content: string | object;
+          try {
+            content = JSON.parse(document.content);
+            logger.debug(`Parsed branch document: ${path.value}`);
+          } catch (e) {
+            logger.debug(`Failed to parse branch document as JSON, keeping as string: ${path.value}`);
+            content = document.content; // Keep original string if parsing fails
+          }
+          result[path.value] = content;
         } else {
           logger.warn(`Document not found: ${path.value}`);
         }
@@ -134,11 +143,11 @@ export class ReadContextUseCase {
    * Read global memory (core files only)
    * @returns Object with document paths as keys and content as values
    */
-  private async readGlobalMemory(): Promise<Record<string, string>> {
+  private async readGlobalMemory(): Promise<Record<string, string | object>> { // Update return type
     logger.debug('Calling globalRepository.listDocuments...'); // Added log
     let paths = await this.globalRepository.listDocuments();
     logger.debug('Finished globalRepository.listDocuments'); // Added log
-    const result: Record<string, string> = {};
+    const result: Record<string, string | object> = {}; // Update result type
 
     // Filter for core files only
     logger.debug('Filtering for core files only');
@@ -154,7 +163,16 @@ export class ReadContextUseCase {
         logger.debug('Finished globalRepository.getDocument'); // Added log
         if (document) {
           logger.debug(`Document found: ${path.value}`);
-          result[path.value] = document.content;
+          // Attempt to parse content as JSON
+          let content: string | object;
+          try {
+            content = JSON.parse(document.content);
+            logger.debug(`Parsed global document: ${path.value}`);
+          } catch (e) {
+            logger.debug(`Failed to parse global document as JSON, keeping as string: ${path.value}`);
+            content = document.content; // Keep original string if parsing fails
+          }
+          result[path.value] = content;
         } else {
           logger.warn(`Document not found: ${path.value}`);
         }

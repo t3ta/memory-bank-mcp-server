@@ -51,7 +51,9 @@ describe('MCP E2E Global Memory Bank Tests', () => {
       expect(document.path).toBe(testDocPath);
       // TODO: tags プロパティ確認 (DocumentDTO に tags が追加されたらコメント解除)
       // expect(document.tags).toEqual(expect.arrayContaining(["global", "initial", "write-test"]));
-      const parsedContent = JSON.parse(document.content);
+      // document.content should already be an object
+      expect(typeof document.content).toBe('object');
+      const parsedContent = document.content as any; // Assert type
       expect(parsedContent.content.message).toBe("Initial global content");
     } else {
       fail('readDocument should return success: true');

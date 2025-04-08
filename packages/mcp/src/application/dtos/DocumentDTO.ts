@@ -10,7 +10,7 @@ export interface DocumentDTO {
   /**
    * Document content
    */
-  content: string;
+  content: string | object;
 
   /**
    * Document tags

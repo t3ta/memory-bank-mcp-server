@@ -4,14 +4,14 @@ import { Language } from '../../../../../src/domain/i18n/Language.js'; // ★追
 import { DomainError, DomainErrorCodes } from '../../../../../src/shared/errors/DomainError.js'; // DomainError もインポート
 import fs from 'fs/promises';
 import path from 'path';
-import { vi } from 'vitest'; // ★★★ vi をインポート ★★★
+import { vi, type Mocked } from 'vitest'; // ★★★ vi と Mocked をインポート ★★★
 import tmp from 'tmp-promise'; // tmp-promise をインポート
 
 describe('ReadRulesUseCase', () => {
   let useCase: ReadRulesUseCase;
   let tmpDir: tmp.DirectoryResult; // 一時ディレクトリ情報を保持する変数
   let rulesDir: string;
-  let mockTemplateService: vi.Mocked<TemplateService>; // ★モックを追加
+  let mockTemplateService: Mocked<TemplateService>; // ★モックを追加 (vi. を削除)
 
   const language = new Language('ja'); // Language オブジェクトを使う
   const mockRulesData = { id: 'rules', type: 'system', name: 'テストルール', sections: [{ id: 'sec1', title: 'セクション1', content: '内容1', isOptional: false }] }; // ダミーJSONオブジェクト
@@ -27,7 +27,7 @@ describe('ReadRulesUseCase', () => {
     mockTemplateService = {
       getTemplateAsJsonObject: vi.fn(),
       // 他の TemplateService メソッドのモックが必要ならここに追加
-    } as unknown as vi.Mocked<TemplateService>;
+    } as unknown as Mocked<TemplateService>; // (vi. を削除)
     useCase = new ReadRulesUseCase(rulesDir, mockTemplateService); // モックを注入
   });
 
@@ -36,7 +36,7 @@ describe('ReadRulesUseCase', () => {
     await tmpDir.cleanup(); // 手動でクリーンアップ
   });
 
-  it('should return rules content as JSON string when template is found', async () => {
+  it('should return rules content as object when template is found', async () => { // Test description updated
     // Arrange
     // モックの設定: getTemplateAsJsonObject が呼ばれたら mockRulesData を返す
     mockTemplateService.getTemplateAsJsonObject.mockResolvedValue(mockRulesData);
@@ -46,7 +46,7 @@ describe('ReadRulesUseCase', () => {
 
     // Assert
     expect(mockTemplateService.getTemplateAsJsonObject).toHaveBeenCalledWith('rules', language); // モックが正しく呼ばれたか
-    expect(result).toEqual({ content: mockRulesContent, language: language.code }); // JSON文字列と比較
+    expect(result).toEqual({ content: mockRulesData, language: language.code }); // Compare with object
   });
 
   // --- 以下のファイルパス依存のテストは不要になるため削除 ---

@@ -7,7 +7,7 @@ import { TemplateService } from '../../templates/TemplateService.js'; // Import 
 import { Language } from '../../../domain/i18n/Language.js'; // Import Language class from domain
 import { getSafeLanguage } from '@memory-bank/schemas'; // Use package name import
 export type RulesResult = {
-  content: string;
+  content: Record<string, unknown>; // Change type to object
   language: string;
 };
 
@@ -73,10 +73,9 @@ constructor(
             langObject // Pass Language object
           );
 
-          const content = JSON.stringify(templateJsonObject, null, 2);
-
+          // Return the object directly
           return {
-            content: content,
+            content: templateJsonObject, // Return the object
             language
           };
         } catch (templateError) {

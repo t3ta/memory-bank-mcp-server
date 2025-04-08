@@ -133,13 +133,14 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
         }
       };
       const documentPath = 'test/new-document.json';
-      const documentContentString = JSON.stringify(newDocument, null, 2);
+      // Pass the object directly instead of stringifying it first
+      // const documentContentString = JSON.stringify(newDocument, null, 2);
 
       const result = await writeUseCase.execute({
         branchName: TEST_BRANCH,
         document: {
           path: documentPath,
-          content: documentContentString,
+          content: newDocument, // Pass the object directly
           tags: newDocument.metadata.tags
         }
       });
@@ -152,10 +153,38 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
       expect(readResult).toBeDefined();
       expect(readResult.document).toBeDefined();
 
-      const readDocument = JSON.parse(readResult.document.content);
+      // Verify the content read back (already parsed by ReadUseCase)
+      const readDocument = readResult.document.content as any; // Content is already an object
       expect(readDocument.schema).toBe('memory_document_v2');
       expect(readDocument.metadata.id).toBe('test-new-branch-document');
       expect(readDocument.documentType).toBe('test'); // トップレベルの documentType をチェック
+      // Additionally, verify the actual file content is formatted JSON
+      const SAFE_TEST_BRANCH = BranchInfo.create(TEST_BRANCH).safeName;
+      const writtenFilePath = path.join(testEnv.branchMemoryPath, SAFE_TEST_BRANCH, documentPath);
+      const writtenContent = await fs.readFile(writtenFilePath, 'utf-8');
+      // Re-create the expected object without dynamic fields for stringify comparison
+      const expectedDocumentForStringify = {
+        schema: newDocument.schema,
+        documentType: newDocument.documentType,
+        metadata: {
+          id: newDocument.metadata.id,
+          title: newDocument.metadata.title,
+          path: newDocument.metadata.path,
+          tags: newDocument.metadata.tags,
+          // lastModified and createdAt are dynamic, exclude them
+          version: newDocument.metadata.version
+        },
+        content: newDocument.content
+      };
+      const expectedFormattedString = JSON.stringify(expectedDocumentForStringify, null, 2);
+      // Read the written file again to get the actual saved content string
+      const actualWrittenDoc = JSON.parse(writtenContent);
+      // Remove dynamic fields from actual written doc for comparison
+      delete actualWrittenDoc.metadata.lastModified;
+      delete actualWrittenDoc.metadata.createdAt;
+      const actualFormattedString = JSON.stringify(actualWrittenDoc, null, 2);
+
+      expect(actualFormattedString).toBe(expectedFormattedString);
     });
 
     it('should update an existing branch document', async () => {
@@ -222,7 +251,8 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
       expect(readResult).toBeDefined();
       expect(readResult.document).toBeDefined();
 
-      const readDocument = JSON.parse(readResult.document.content);
+      // readResult.document.content is already an object
+      const readDocument = readResult.document.content as any;
       expect(readDocument.metadata.title).toBe('更新後ブランチドキュメント');
       expect(readDocument.content.value).toBe('更新後の内容');
     });
@@ -332,7 +362,8 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
       expect(readResult).toBeDefined();
       expect(readResult.document).toBeDefined();
 
-      const readDocument = JSON.parse(readResult.document.content);
+      // readResult.document.content is already an object
+      const readDocument = readResult.document.content as any;
       expect(readDocument.metadata.id).toBe('test-new-branch');
       expect(readDocument.content.value).toBe('新規ブランチのテストドキュメント');
     });
@@ -426,7 +457,8 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
       // Log the raw content string read from the file before parsing
       logger.error('--- Raw content after patch read from file:', { content: readResult.document.content, component: 'WriteBranchDocumentUseCase.integration.test' });
 
-      const readDocument = JSON.parse(readResult.document.content);
+      // readResult.document.content is already an object
+      const readDocument = readResult.document.content as any;
       // Log the parsed document object for debugging
       logger.error('--- Parsed document object:', { document: readDocument, component: 'WriteBranchDocumentUseCase.integration.test' });
       expect(readDocument.items).toEqual(["apple", "banana"]); // Verify patch applied correctly
@@ -579,7 +611,8 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
         throw new Error('Expected document content to be defined for comparison');
       }
       // パースして lastModified を除いて比較
-      const parsedReadResult = JSON.parse(readResult.document.content);
+      // readResult.document.content is already an object
+      const parsedReadResult = readResult.document.content as any;
       const { lastModified: readLastModified, ...readMeta } = parsedReadResult.metadata;
       expect(readMeta).toEqual(expectedMetadataStructure); // 正しい期待値と比較
       expect(parsedReadResult.content).toEqual(newDocument.content); // 正しい期待値と比較
@@ -715,7 +748,8 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
       const readResult = await readUseCase.execute({ branchName: TEST_BRANCH, path: documentPath });
       expect(readResult).toBeDefined();
       expect(readResult.document).toBeDefined();
-      const readContent = JSON.parse(readResult.document.content);
+      // readResult.document.content is already an object
+      const readContent = readResult.document.content as any;
       expect(readContent.content.description).toBe("This is a valid branch context.");
       expect(readContent.metadata.tags).toEqual(["valid", "context"]);
     });
@@ -805,7 +839,8 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
         // Verify using the detected branch name
         const readResult = await readUseCase.execute({ branchName: TEST_BRANCH, path: documentPath });
 
-        const readContentParsed = JSON.parse(readResult?.document?.content ?? '{}');
+        // readResult?.document?.content is already an object or undefined
+        const readContentParsed = readResult?.document?.content as any ?? {}; // Use as any and provide default object
         const expectedContentParsed = JSON.parse(contentString);
         expect(readContentParsed.schema).toBe(expectedContentParsed.schema);
         expect(readContentParsed.content).toEqual(expectedContentParsed.content); // content はオブジェクトなので toEqual
@@ -829,7 +864,8 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
         expect(result.document.path).toBe(docPath);
 
         const readResult = await readUseCase.execute({ branchName: TEST_BRANCH, path: docPath });
-        const finalDoc = JSON.parse(readResult!.document!.content);
+        // readResult!.document!.content is already an object
+        const finalDoc = readResult!.document!.content as any;
         expect(finalDoc.items).toEqual(["a", "b"]);
         expect(readResult!.document!.tags).toEqual(["patched"]);
       });

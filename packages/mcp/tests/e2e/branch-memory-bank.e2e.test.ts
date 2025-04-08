@@ -60,7 +60,9 @@ describe('MCP E2E Branch Memory Bank Tests', () => {
       const document = (readResult.data as any).document as DocumentDTO;
       expect(document.path).toBe(testDocPath);
       expect(document.tags).toEqual(expect.arrayContaining(['initial', 'write-test']));
-      const parsedContent = JSON.parse(document.content);
+      // document.content should already be an object
+      expect(typeof document.content).toBe('object');
+      const parsedContent = document.content as any; // Assert type
       expect(parsedContent.content.message).toBe('Initial content');
     } else {
       fail('readDocument should return success: true');
@@ -102,7 +104,9 @@ describe('MCP E2E Branch Memory Bank Tests', () => {
 
       const document = (readResult.data as any).document as DocumentDTO;
       expect(document.tags).toEqual(expect.arrayContaining(['patch-test', 'patched']));
-      const parsedContent = JSON.parse(document.content);
+      // document.content should already be an object
+      expect(typeof document.content).toBe('object');
+      const parsedContent = document.content as any; // Assert type
       expect(parsedContent.content.newField).toBe(true);
     } else {
       fail('readDocument should return success: true');
