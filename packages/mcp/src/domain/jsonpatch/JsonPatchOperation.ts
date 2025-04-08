@@ -1,3 +1,4 @@
+import * as fastJsonPatch from 'fast-json-patch'; // fast-json-patch の型をインポート
 import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
 import { JsonPath } from './JsonPath.js';
 
@@ -181,7 +182,8 @@ export class JsonPatchOperation {
    * Convert to fast-json-patch format operation object
    * @returns fast-json-patch compatible object
    */
-  toFastJsonPatchOperation(): any {
-    return this.toJSON();
+  toFastJsonPatchOperation(): fastJsonPatch.Operation { // 戻り値の型を修正
+    // toJSON() が返すオブジェクトは fast-json-patch の Operation 型と互換性があるはず
+    return this.toJSON() as fastJsonPatch.Operation; // 型アサーションを追加
   }
 }
