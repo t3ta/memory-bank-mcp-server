@@ -1,0 +1,17 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-spec-review-active-context",
+    "title": "Active Context for feature/spec-review",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [],
+    "createdAt": "2025-04-07T11:29:28.986Z",
+    "lastModified": "2025-04-07T11:29:28.986Z"
+  },
+  "content": {
+    "current_task": "Initial active context for branch: feature/spec-review",
+    "relevant_files": [],
+    "recent_decisions": []
+  }
+}

@@ -1,0 +1,1228 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "mcp-package-specification-from-tests",
+    "title": "MCP Package Specification (Extracted from Tests)",
+    "documentType": "specification",
+    "path": "mcp-package-specification.json",
+    "tags": [],
+    "createdAt": "2025-04-07T11:34:56.000Z",
+    "lastModified": "2025-04-07T12:55:09.603Z"
+  },
+  "content": {
+    "description": "Specifications for the @memory-bank/mcp package, extracted automatically from unit tests. This document helps AI understand the package's functionalities.",
+    "entities": {
+      "MemoryDocument": {
+        "description": "Core entity representing a document in the memory bank. Immutable.",
+        "properties": [
+          "path (DocumentPath)",
+          "content (string)",
+          "tags (Tag[])",
+          "lastModified (Date)"
+        ],
+        "methods": [
+          {
+            "name": "create",
+            "description": "Creates a new instance."
+          },
+          {
+            "name": "fromJSON",
+            "description": "Creates an instance from a JsonDocumentV2 object."
+          },
+          {
+            "name": "toJSON",
+            "description": "Converts the document to JsonDocumentV2 format. Infers document type from path, handles non-JSON content, and logs errors for invalid JSON."
+          },
+          {
+            "name": "updateContent",
+            "description": "Updates content and returns a new instance."
+          },
+          {
+            "name": "addTag",
+            "description": "Adds a tag and returns a new instance."
+          },
+          {
+            "name": "removeTag",
+            "description": "Removes a tag and returns a new instance."
+          },
+          {
+            "name": "updateTags",
+            "description": "Updates the entire tag list and returns a new instance."
+          },
+          {
+            "name": "hasTag",
+            "description": "Checks if a specific tag exists."
+          },
+          {
+            "name": "toObject",
+            "description": "Converts the document to a plain JavaScript object."
+          },
+          {
+            "name": "title (getter)",
+            "description": "Extracts the title from the first H1 heading ('# Title') in the content string."
+          }
+        ],
+        "notes": [
+          "Designed to be immutable.",
+          "toJSON method includes logic for type inference and error handling."
+        ]
+      },
+      "DocumentPath": {
+        "description": "Value object representing the document's path within the memory bank. Enforces path rules and provides utility methods.",
+        "rules": [
+          "Cannot be empty.",
+          "Cannot contain invalid characters (<, >, :, \", |, ?, *).",
+          "Cannot contain backslashes (\\).",
+          "Cannot be an absolute path (cannot start with '/').",
+          "Cannot end with a slash (/).",
+          "Must use forward slashes (/) as separators."
+        ],
+        "properties": [
+          "value (string): The full path string.",
+          "directory (string): The directory part of the path.",
+          "filename (string): The filename part (including extension).",
+          "extension (string): The file extension (without the dot).",
+          "basename (string): The filename without the extension."
+        ],
+        "methods": [
+          {
+            "name": "create",
+            "description": "Creates a DocumentPath instance from a valid string. Throws DomainError if format is invalid."
+          },
+          {
+            "name": "inferDocumentType",
+            "description": "Infers the DocumentType based on the filename."
+          },
+          {
+            "name": "withExtension",
+            "description": "Returns a new instance with the specified extension."
+          },
+          {
+            "name": "toAlternateFormat",
+            "description": "Returns a new instance with the extension swapped between .md and .json (or unchanged for others)."
+          },
+          {
+            "name": "equals",
+            "description": "Compares two DocumentPath instances based on their string value."
+          },
+          {
+            "name": "clone",
+            "description": "Creates a new instance with the same value."
+          }
+        ]
+      },
+      "Tag": {
+        "description": "Value object representing a document tag. Enforces specific formatting rules.",
+        "rules": [
+          "Cannot be empty.",
+          "Must contain only lowercase letters (a-z), numbers (0-9), and hyphens (-).",
+          "Cannot contain uppercase letters, spaces, underscores, or other special characters."
+        ],
+        "methods": [
+          {
+            "name": "create",
+            "description": "Creates a Tag instance from a valid string. Throws DomainError if format is invalid."
+          },
+          {
+            "name": "equals",
+            "description": "Compares two Tag instances based on their string value."
+          }
+        ],
+        "properties": [
+          "value (string)"
+        ],
+        "notes": [
+          "Length limits and hyphen start/end checks might not be currently enforced (based on skipped tests)."
+        ]
+      },
+      "BranchInfo": {
+        "description": "Value object holding branch information. Enforces naming conventions.",
+        "rules": [
+          "Cannot be empty.",
+          "Must include a namespace prefix with a slash (e.g., 'feature/', 'fix/').",
+          "Must have a name after the prefix."
+        ],
+        "properties": [
+          "name (string): The original full branch name (e.g., 'feature/my-feature').",
+          "displayName (string): The name without the prefix (e.g., 'my-feature').",
+          "type (string): The prefix part (e.g., 'feature', 'fix').",
+          "safeName (string): A filesystem-safe version of the name (e.g., 'feature-my-feature')."
+        ],
+        "methods": [
+          {
+            "name": "create",
+            "description": "Creates a BranchInfo instance from a valid string. Throws DomainError if format is invalid."
+          },
+          {
+            "name": "equals",
+            "description": "Compares two BranchInfo instances based on their full name."
+          },
+          {
+            "name": "toString",
+            "description": "Returns the original full branch name."
+          }
+        ]
+      },
+      "JsonDocument": {
+        "description": "Entity representing a structured JSON document adhering to the JsonDocumentV2 schema. Immutable.",
+        "properties": [
+          "id (DocumentId)",
+          "path (DocumentPath)",
+          "title (string)",
+          "documentType (DocumentType)",
+          "tags (Tag[])",
+          "content (object)",
+          "branch? (string)",
+          "versionInfo (DocumentVersionInfo)"
+        ],
+        "methods": [
+          {
+            "name": "create",
+            "description": "Creates a new instance with validation."
+          },
+          {
+            "name": "fromString",
+            "description": "Creates an instance from a JSON string with validation."
+          },
+          {
+            "name": "fromObject",
+            "description": "Creates an instance from a JS object with validation."
+          },
+          {
+            "name": "updatePath",
+            "description": "Updates path, increments version, returns new instance."
+          },
+          {
+            "name": "updateTitle",
+            "description": "Updates title, increments version, returns new instance."
+          },
+          {
+            "name": "updateContent",
+            "description": "Updates content with validation, increments version, returns new instance."
+          },
+          {
+            "name": "addTag",
+            "description": "Adds a tag, increments version, returns new instance."
+          },
+          {
+            "name": "removeTag",
+            "description": "Removes a tag, increments version, returns new instance."
+          },
+          {
+            "name": "updateTags",
+            "description": "Updates tags, increments version, returns new instance."
+          },
+          {
+            "name": "toObject",
+            "description": "Returns a plain object conforming to JsonDocumentV2 schema."
+          },
+          {
+            "name": "toString",
+            "description": "Returns a JSON string representation (pretty format optional)."
+          },
+          {
+            "name": "equals",
+            "description": "Compares documents based on ID."
+          },
+          {
+            "name": "hasTag",
+            "description": "Checks if a specific tag exists."
+          }
+        ],
+        "notes": [
+          "Relies on an IDocumentValidator for schema and content validation.",
+          "Immutable: Update methods return new instances with incremented versions."
+        ]
+      },
+      "DocumentId": {
+        "description": "Value object representing a unique document identifier (UUID v4).",
+        "methods": [
+          {
+            "name": "create",
+            "description": "Creates a DocumentId instance from a valid UUID v4 string. Throws DomainError if format is invalid or empty."
+          },
+          {
+            "name": "generate",
+            "description": "Generates a new DocumentId instance with a random UUID v4."
+          },
+          {
+            "name": "equals",
+            "description": "Compares two DocumentId instances based on their UUID value."
+          },
+          {
+            "name": "toString",
+            "description": "Returns the UUID string value."
+          }
+        ],
+        "properties": [
+          "value (string): The UUID v4 string."
+        ]
+      },
+      "DocumentVersionInfo": {
+        "description": "Value object holding document version information (version number, last modified date, modifier, update reason).",
+        "constructor": {
+          "input": "{ version: number, lastModified?: Date, modifiedBy?: string, updateReason?: string }",
+          "notes": [
+            "version is required.",
+            "lastModified defaults to current time.",
+            "modifiedBy defaults to 'system'.",
+            "updateReason defaults to undefined.",
+            "Stores a copy of the lastModified Date."
+          ]
+        },
+        "properties": [
+          "version (number)",
+          "lastModified (Date): Returns a copy.",
+          "modifiedBy (string)",
+          "updateReason? (string)"
+        ],
+        "methods": [
+          {
+            "name": "nextVersion",
+            "description": "Returns a new instance with incremented version, updated lastModified, and optional new updateReason. Original instance remains unchanged."
+          },
+          {
+            "name": "toObject",
+            "description": "Returns a plain JS object representation (omits updateReason if undefined)."
+          }
+        ],
+        "notes": [
+          "Immutable: nextVersion returns a new instance."
+        ]
+      },
+      "JsonPatchOperation": {
+        "description": "Value object representing a single JSON Patch operation (RFC 6902).",
+        "properties": [
+          "op ('add' | 'remove' | 'replace' | 'move' | 'copy' | 'test')",
+          "path (JsonPath)",
+          "value? (any)",
+          "from? (JsonPath)"
+        ],
+        "methods": [
+          {
+            "name": "create",
+            "description": "Creates an instance, validating required fields based on 'op'. Throws error for invalid op or path/from format."
+          },
+          {
+            "name": "fromJSON",
+            "description": "Creates an instance from a JSON object or string, performing validation."
+          },
+          {
+            "name": "validate",
+            "description": "Performs additional validation (e.g., 'move' target cannot be descendant of source)."
+          },
+          {
+            "name": "toJSON",
+            "description": "Returns a plain JS object representation suitable for JSON Patch."
+          }
+        ],
+        "notes": [
+          "Ensures required fields (value, from) are present based on the operation type.",
+          "Ignores unnecessary fields for a given operation type during creation."
+        ]
+      },
+      "JsonPath": {
+        "description": "Value object representing a JSON Pointer (RFC 6901) used to target specific locations within a JSON document.",
+        "properties": [
+          "segments (string[]): The decoded path segments."
+        ],
+        "methods": [
+          {
+            "name": "parse",
+            "description": "Creates a JsonPath instance from a valid JSON Pointer string (e.g., '/foo/bar'). Handles tilde escapes (~0, ~1). Throws error for invalid format."
+          },
+          {
+            "name": "fromSegments",
+            "description": "Creates a JsonPath instance from an array of segments, automatically escaping special characters."
+          },
+          {
+            "name": "toString",
+            "description": "Returns the JSON Pointer string representation."
+          },
+          {
+            "name": "parent",
+            "description": "Returns the parent path. Throws error for root path."
+          },
+          {
+            "name": "child",
+            "description": "Returns a new JsonPath instance representing a child path."
+          },
+          {
+            "name": "isArrayElement",
+            "description": "Checks if the last segment represents an array index (number or '-')."
+          }
+        ],
+        "notes": [
+          "Root path is represented by an empty string ('')."
+        ]
+      },
+      "Language": {
+        "description": "Value object representing a supported language code.",
+        "supportedCodes": [
+          "en",
+          "ja",
+          "zh"
+        ],
+        "methods": [
+          {
+            "name": "create",
+            "description": "Creates a Language instance from a supported code ('en', 'ja', 'zh'). Throws error for unsupported codes."
+          },
+          {
+            "name": "default",
+            "description": "Returns the default language instance ('en')."
+          },
+          {
+            "name": "supportedLanguages",
+            "description": "Returns an array of supported language codes."
+          },
+          {
+            "name": "equals",
+            "description": "Compares two Language instances based on their code."
+          },
+          {
+            "name": "toString",
+            "description": "Returns the language code string."
+          }
+        ],
+        "properties": [
+          "code ('en' | 'ja' | 'zh')"
+        ]
+      }
+    },
+    "useCases": {
+      "WriteBranchDocumentUseCase": {
+        "description": "Handles writing documents (create, overwrite, patch) to a specific branch's memory bank.",
+        "input": [
+          "branchName: string (optional if running in project mode, otherwise required)",
+          "document: { path: string (required), content?: string, tags?: string[] }",
+          "patches?: JsonPatchOperation[] (cannot be used with document.content)",
+          "returnContent?: boolean (defaults to false)"
+        ],
+        "output": "{ document: DocumentDTO } (only if returnContent is true)",
+        "errors": [
+          "ApplicationErrors.invalidInput (missing path, missing branchName, content and patches conflict)",
+          "ApplicationErrors.branchInitializationFailed",
+          "ApplicationErrors.executionFailed (patching non-JSON, patching non-existent doc, repository errors)",
+          "ApplicationErrors.notFound (patching non-existent doc)",
+          "DomainErrors.invalidDocumentPath (e.g., path contains '..')"
+        ]
+      },
+      "ReadBranchDocumentUseCase": {
+        "description": "Handles reading a specific document from a branch's memory bank.",
+        "input": [
+          "branchName: string (optional if running in project mode, otherwise required)",
+          "path: string (required)"
+        ],
+        "output": "{ document: DocumentDTO }",
+        "errors": [
+          "ApplicationErrors.invalidInput (missing path, missing branchName, failed branch detection)",
+          "DomainErrors.branchNotFound",
+          "DomainErrors.documentNotFound",
+          "ApplicationErrors.executionFailed (repository errors)",
+          "DomainErrors.invalidDocumentPath (e.g., path contains '..')",
+          "DomainErrors.invalidBranchName (e.g., missing prefix)"
+        ]
+      },
+      "WriteGlobalDocumentUseCase": {
+        "description": "Handles writing documents to the global memory bank.",
+        "status": "Integration tests exist, confirming basic create/overwrite/patch functionality similar to WriteBranchDocumentUseCase, but operating on the global scope.",
+        "notes": [
+          "Uses DocumentWriterService internally.",
+          "Can write plain text or invalid JSON, but tags might be lost.",
+          "Handles path traversal attempts (throws DomainError)."
+        ],
+        "errors": [
+          "ApplicationErrors.invalidInput (content and patches conflict, or neither provided)",
+          "ApplicationErrors.notFound (patching non-existent doc)",
+          "ApplicationErrors.executionFailed (patching non-JSON, patch test fails, repository errors)",
+          "DomainErrors.invalidDocumentPath (e.g., path contains '..')"
+        ]
+      },
+      "ReadGlobalDocumentUseCase": {
+        "description": "Handles reading a specific document from the global memory bank.",
+        "input": [
+          "path: string (required)"
+        ],
+        "output": "{ document: DocumentDTO }",
+        "errors": [
+          "DomainErrors.documentNotFound",
+          "ApplicationErrors.executionFailed (repository errors)"
+        ]
+      },
+      "ReadContextUseCase": {
+        "description": "Handles reading context information (branch core files + all global files) at once.",
+        "input": [
+          "branch: string (required)",
+          "language: string (required, but currently unused for rules)"
+        ],
+        "output": "{ branchMemory: { [filePath: string]: string }, globalMemory: { [filePath: string]: string }, rules?: any (currently undefined) }",
+        "errors": [
+          "Repository errors (TODO from test)"
+        ],
+        "notes": [
+          "Currently does not seem to return rules based on tests.",
+          "Integration tests confirm auto-initialization of non-existent branches (creating 4 core files).",
+          "Integration tests confirm auto-initialization of non-existent branches (creating 4 core files).",
+          "Integration tests confirm auto-initialization of non-existent branches (creating 4 core files).",
+          "Integration tests confirm auto-initialization of non-existent branches (creating 4 core files)."
+        ]
+      },
+      "SearchDocumentsByTagsUseCase": {
+        "description": "Searches documents by tags using index files (_index.json) in specified scopes.",
+        "input": [
+          "tags: string[] (required)",
+          "docs: string (required, path to docs root)",
+          "branchName?: string (required if scope is 'branch' or 'all')",
+          "scope?: 'branch' | 'global' | 'all' (defaults to 'all')",
+          "match?: 'and' | 'or' (defaults to 'or')"
+        ],
+        "output": "{ results: SearchResultDTO[] } where SearchResultDTO = { path: string, title: string, scope: 'branch' | 'global', lastModified: string }",
+        "errors": [
+          "File system errors when reading index files (TODO from test)"
+        ],
+        "notes": [
+          "Relies on pre-generated _index.json files in branch and global memory bank directories.",
+          "Returns empty array if no matches found.",
+          "E2E tests confirm this use case relies on pre-generated _index.json files."
+        ]
+      },
+      "CreateBranchCoreFilesUseCase": {
+        "description": "Creates or overwrites the four core files (branchContext.json, activeContext.json, progress.json, systemPatterns.json) in a specified branch.",
+        "input": [
+          "branchName: string (required)",
+          "files: CoreFilesDTO (required, contains content for each core file)"
+        ],
+        "output": "void",
+        "errors": [
+          "ApplicationErrors.invalidInput (missing branchName or files)",
+          "DomainErrors.branchNotFound",
+          "ApplicationErrors.executionFailed (repository save error)"
+        ],
+        "notes": [
+          "Checks if the branch exists before saving.",
+          "Automatically adds 'core' tag and specific document type tag (e.g., 'active-context') to each file."
+        ]
+      },
+      "GetRecentBranchesUseCase": {
+        "description": "Retrieves a list of recently accessed branches.",
+        "input": [
+          "limit?: number (optional, defaults to 10)"
+        ],
+        "output": "{ branches: RecentBranchDTO[] } where RecentBranchDTO = { name: string, lastModified: string, summary: object }",
+        "errors": [
+          "ApplicationErrors.invalidInput (limit < 1)",
+          "ApplicationErrors.executionFailed (repository error)"
+        ],
+        "notes": [
+          "Calls IBranchMemoryBankRepository.getRecentBranches.",
+          "Returns empty array if no recent branches found."
+        ]
+      },
+      "ReadBranchCoreFilesUseCase": {
+        "description": "Reads the four core files (progress.json, activeContext.json, branchContext.json, systemPatterns.json) from a specified branch.",
+        "input": [
+          "branchName: string (required)"
+        ],
+        "output": "{ files: CoreFilesDTO } where CoreFilesDTO contains the content of each core file (or undefined if missing, except systemPatterns which defaults to { technicalDecisions: [] })",
+        "errors": [
+          "ApplicationErrors.invalidInput (missing branchName)",
+          "DomainErrors.branchInitializationFailed (if auto-init fails)",
+          "ApplicationErrors.executionFailed (repository read error)"
+        ],
+        "notes": [
+          "Attempts to auto-initialize the branch if it doesn't exist.",
+          "Returns undefined for missing core files (except systemPatterns)."
+        ]
+      },
+      "ReadRulesUseCase": {
+        "description": "Reads the rules file (rules.json) for a specified language.",
+        "input": [
+          "languageCode: 'en' | 'ja' | 'zh' (required)"
+        ],
+        "output": "{ content: string (JSON content of the rules file), language: string }",
+        "errors": [
+          "DomainError (unsupported language)",
+          "DomainError.DOCUMENT_NOT_FOUND (if TemplateService fails to find the template)"
+        ],
+        "notes": [
+          "Uses TemplateService internally to retrieve the rules template."
+        ]
+      },
+      "UpdateTagIndexUseCase": {
+        "description": "Calculates the current tag index for a specified scope (branch or global) by reading all documents and collecting their tags.",
+        "input": [
+          "branchName?: string (If provided, calculates for the branch; otherwise calculates for global)",
+          "fullRebuild?: boolean (Effect unclear from tests)"
+        ],
+        "output": "{ tags: string[], documentCount: number, updateInfo: { updateLocation: string, fullRebuild: boolean, timestamp: string } }",
+        "errors": [
+          "Repository errors during listDocuments or getDocument (TODO from test)"
+        ],
+        "notes": [
+          "Despite the name, this use case *calculates* the tag index information but does not seem to *save* it based on the tests.",
+          "Reads all documents in the specified scope to gather tags.",
+          "Returns unique tags and the total document count."
+        ]
+      },
+      "UpdateTagIndexUseCaseV2": {
+        "description": "Builds and *saves* the tag index file (_index.json) for a specified scope (branch or global).",
+        "input": [
+          "branchName?: string (If provided, updates the branch index; otherwise updates the global index)",
+          "fullRebuild?: boolean (If true, ignores existing index and rebuilds from scratch; defaults to false)"
+        ],
+        "output": "{ tags: string[], documentCount: number, updateInfo: { updateLocation: string, fullRebuild: boolean, timestamp: string } } (Returns the calculated index info, similar to V1)",
+        "errors": [
+          "DomainErrors.branchNotFound",
+          "Repository errors during listDocuments, getDocument, or saveTagIndex (TODO from test)"
+        ],
+        "notes": [
+          "Unlike V1, this use case *saves* the generated index to `_index.json` in the corresponding scope.",
+          "Reads all documents in the specified scope to gather tags.",
+          "If fullRebuild is false, it reads the existing index first (though tests don't show diff logic)."
+        ]
+      },
+      "ReadJsonDocumentUseCase": {
+        "description": "Reads a specific JSON document from either a branch or the global scope.",
+        "input": [
+          "path: string (required)",
+          "branchName?: string (If provided, reads from the branch; otherwise reads from global)"
+        ],
+        "output": "{ document: JsonDocumentDTO } (Contains id, path, title, documentType, tags, content, version, lastModified)",
+        "errors": [
+          "DomainErrors.DOCUMENT_NOT_FOUND",
+          "Repository errors (TODO from test)",
+          "Input validation errors (e.g., missing path) (TODO from test)"
+        ],
+        "notes": [
+          "Uses IJsonDocumentRepository for branch reads and optionally IGlobalMemoryBankRepository for global reads.",
+          "Returns the full JSON document structure."
+        ]
+      },
+      "WriteJsonDocumentUseCase": {
+        "description": "Writes (creates or updates) a JSON document to either a branch or the global scope.",
+        "input": [
+          "document: WriteJsonDocumentInputDTO (required, contains path, title, documentType, tags, content, optional id)",
+          "branchName?: string (If provided, writes to the branch; otherwise writes to global)"
+        ],
+        "output": "{ isNew: boolean, location: string, document: JsonDocumentDTO }",
+        "errors": [
+          "Repository errors (findByPath, save) (TODO from test)",
+          "Index service errors (addToIndex) (TODO from test)",
+          "Input validation errors (missing required fields) (TODO from test)"
+        ],
+        "notes": [
+          "Uses IJsonDocumentRepository for branch writes and optionally IGlobalMemoryBankRepository for global writes.",
+          "If document.id is provided, it attempts to update; otherwise, it creates a new document.",
+          "Updates the tag index via IIndexService after successful save."
+        ]
+      },
+      "DeleteJsonDocumentUseCase": {
+        "description": "Deletes a specific JSON document from either a branch or the global scope, identified by path or ID.",
+        "input": [
+          "path?: string (required if id is not provided)",
+          "id?: string (required if path is not provided)",
+          "branchName?: string (If provided, deletes from the branch; otherwise deletes from global)"
+        ],
+        "output": "{ success: boolean, location: string, details: { identifier: string, timestamp: string } }",
+        "errors": [
+          "Repository errors (delete) (TODO from test)",
+          "Index service errors (removeFromIndex) (TODO from test)",
+          "Input validation errors (missing path and id) (TODO from test)"
+        ],
+        "notes": [
+          "Uses IJsonDocumentRepository for branch deletes and optionally IGlobalMemoryBankRepository for global deletes.",
+          "Removes the document entry from the tag index via IIndexService after successful deletion.",
+          "Returns success: false if repository delete fails."
+        ]
+      },
+      "JsonPatchUseCase": {
+        "description": "Applies JSON Patch operations (RFC 6902) to an existing JSON document in a branch or global scope.",
+        "input": [
+          "docPath: string (required)",
+          "patches: JsonPatchOperation[] (required)",
+          "branchName?: string (If provided, patches the branch document; otherwise patches the global document)"
+        ],
+        "output": "JsonDocument (The updated document instance)",
+        "errors": [
+          "Document not found error",
+          "Patch application error (e.g., invalid operation)",
+          "Repository save error"
+        ],
+        "notes": [
+          "Uses JsonDocumentRepository to find and save the document.",
+          "Increments the document version after applying the patch.",
+          "Emits a DOCUMENT_UPDATED event via DocumentEventEmitter on success."
+        ]
+      },
+      "SearchJsonDocumentsUseCase": {
+        "description": "Searches JSON documents by tags within a specified branch or the global scope.",
+        "input": [
+          "tags: string[] (required)",
+          "branchName?: string (If provided, searches the branch; otherwise searches global)",
+          "matchAllTags?: boolean (If true, performs AND match; otherwise OR match (default))"
+        ],
+        "output": "{ documents: JsonDocumentDTO[] }",
+        "errors": [
+          "Repository errors (findByTags) (TODO from test)",
+          "Input validation errors (e.g., missing tags) (TODO from test)"
+        ],
+        "notes": [
+          "Uses IJsonDocumentRepository for branch searches and optionally IGlobalMemoryBankRepository for global searches.",
+          "Returns an empty array if no documents match."
+        ]
+      },
+      "UpdateJsonIndexUseCase": {
+        "description": "Updates the JSON document index (managed by IIndexService) for a specified branch or the global scope.",
+        "input": [
+          "branchName?: string (If provided, updates the branch index; otherwise updates global)",
+          "fullRebuild?: boolean (If true, rebuilds the entire index; otherwise updates incrementally (default))"
+        ],
+        "output": "{ tags: string[], documentCount: number, updateInfo: { updateLocation: string, fullRebuild: boolean, timestamp: string } } (Returns summary info)",
+        "errors": [
+          "Repository errors (listAll) (TODO from test)",
+          "Index service errors (addToIndex, buildIndex) (TODO from test)",
+          "Input validation errors (TODO from test)"
+        ],
+        "notes": [
+          "Reads all JSON documents from the target scope using IJsonDocumentRepository.",
+          "Calls IIndexService.addToIndex for each document (incremental) or IIndexService.buildIndex with all documents (full rebuild)."
+        ]
+      }
+    },
+    "repositories": {
+      "IBranchMemoryBankRepository": {
+        "description": "Interface defining operations for branch-specific memory banks (e.g., getDocument, saveDocument)."
+      },
+      "IGlobalMemoryBankRepository": {
+        "description": "Interface defining operations for the global memory bank (e.g., getDocument, saveDocument)."
+      }
+    },
+    "errorHandling": {
+      "types": [
+        "DomainError",
+        "ApplicationError"
+      ],
+      "description": "Utilizes distinct error types: DomainError for violations of business rules or invariants, and ApplicationError for issues during use case execution or infrastructure interactions."
+    },
+    "warning": "⚠️注意：このファイルはテストから自動生成されました。手動で編集しないでください！",
+    "infrastructure": {
+      "interfaces": {
+        "II18nProvider": {
+          "description": "Interface defining methods for internationalization (i18n) functionalities.",
+          "methods": [
+            {
+              "name": "translate",
+              "description": "Translates a given key into the specified language, optionally interpolating parameters."
+            },
+            {
+              "name": "loadTranslations",
+              "description": "Loads translation data for a specific language. Returns true on success, false on failure."
+            },
+            {
+              "name": "isLanguageSupported",
+              "description": "Checks if a given language code is supported."
+            },
+            {
+              "name": "getSupportedLanguages",
+              "description": "Returns a list of all supported language codes."
+            },
+            {
+              "name": "getDefaultLanguage",
+              "description": "Returns the default language code."
+            }
+          ]
+        },
+        "IFileSystemService": {
+          "description": "Interface defining methods for interacting with the file system.",
+          "methods": [
+            {
+              "name": "readFile",
+              "description": "Reads the entire content of a file as a string."
+            },
+            {
+              "name": "readFileChunk",
+              "description": "Reads a specific chunk of a file (optional method)."
+            },
+            {
+              "name": "writeFile",
+              "description": "Writes content to a file, overwriting if it exists."
+            },
+            {
+              "name": "fileExists",
+              "description": "Checks if a file exists."
+            },
+            {
+              "name": "deleteFile",
+              "description": "Deletes a file. Returns true on success."
+            },
+            {
+              "name": "createDirectory",
+              "description": "Creates a directory (including parent directories)."
+            },
+            {
+              "name": "directoryExists",
+              "description": "Checks if a directory exists."
+            },
+            {
+              "name": "listFiles",
+              "description": "Lists files and directories within a given directory."
+            },
+            {
+              "name": "getFileStats",
+              "description": "Gets file metadata (size, type, dates)."
+            },
+            {
+              "name": "getBranchMemoryPath",
+              "description": "Gets the absolute path for a branch's memory bank (optional method)."
+            },
+            {
+              "name": "getConfig",
+              "description": "Gets configuration settings (optional method)."
+            }
+          ]
+        },
+        "IConfigProvider": {
+          "description": "Interface defining methods for accessing workspace configuration.",
+          "methods": [
+            {
+              "name": "initialize",
+              "description": "Initializes the configuration based on options (e.g., CLI options) and returns the WorkspaceConfig."
+            },
+            {
+              "name": "getConfig",
+              "description": "Returns the current WorkspaceConfig."
+            },
+            {
+              "name": "getGlobalMemoryPath",
+              "description": "Returns the absolute path to the global memory bank."
+            },
+            {
+              "name": "getBranchMemoryPath",
+              "description": "Returns the absolute path to a specific branch's memory bank."
+            },
+            {
+              "name": "getLanguage",
+              "description": "Returns the currently configured language."
+            }
+          ]
+        },
+        "IGitService": {
+          "description": "Interface defining methods for interacting with Git.",
+          "methods": [
+            {
+              "name": "getCurrentBranchName",
+              "description": "Gets the name of the current Git branch. Throws error if not in a Git repository."
+            }
+          ]
+        },
+        "IIndexService": {
+          "description": "Interface defining methods for managing and querying document indexes (e.g., tag index, JSON document index).",
+          "methods": [
+            {
+              "name": "initializeIndex",
+              "description": "Initializes the index for a given scope."
+            },
+            {
+              "name": "buildIndex",
+              "description": "Builds the index from a list of documents."
+            },
+            {
+              "name": "addToIndex",
+              "description": "Adds or updates a document in the index."
+            },
+            {
+              "name": "removeFromIndex",
+              "description": "Removes a document from the index by document, ID, or path."
+            },
+            {
+              "name": "findById",
+              "description": "Finds a document reference by ID."
+            },
+            {
+              "name": "findByPath",
+              "description": "Finds a document reference by path."
+            },
+            {
+              "name": "findByTags",
+              "description": "Finds document references by tags (supports AND/OR matching)."
+            },
+            {
+              "name": "findByType",
+              "description": "Finds document references by document type."
+            },
+            {
+              "name": "listAll",
+              "description": "Lists all document references in the index for a scope."
+            },
+            {
+              "name": "saveIndex",
+              "description": "Saves the current index state."
+            },
+            {
+              "name": "loadIndex",
+              "description": "Loads the index state."
+            }
+          ]
+        },
+        "ITemplateLoader": {
+          "description": "Interface defining methods for loading and rendering templates.",
+          "methods": [
+            {
+              "name": "loadJsonTemplate",
+              "description": "Loads and parses a JSON template file by ID."
+            },
+            {
+              "name": "getMarkdownTemplate",
+              "description": "Loads a template (JSON) and renders it to Markdown using the specified language and variables."
+            },
+            {
+              "name": "templateExists",
+              "description": "Checks if a template file exists for the given ID."
+            }
+          ]
+        }
+      },
+      "TemplateRenderer": {
+        "description": "Renders template data (JSON or Base format) into a Markdown string.",
+        "dependencies": [
+          "II18nProvider"
+        ],
+        "methods": [
+          {
+            "name": "renderToMarkdown",
+            "description": "Renders the provided template object (JSON or Base) into Markdown using the specified language and variables. Handles language fallbacks and optional sections."
+          }
+        ],
+        "internalMethods": [
+          {
+            "name": "replaceVariables",
+            "description": "Replaces placeholders like {{VAR_NAME}} in text with provided variable values."
+          }
+        ],
+        "notes": [
+          "Distinguishes between JSON templates (schema-based) and Base templates (key-based).",
+          "Uses II18nProvider for translating keys in Base templates and generating placeholder comments."
+        ]
+      }
+    },
+    "shared": {
+      "utilities": {
+        "ErrorUtils": {
+          "description": "Static utility class for handling and formatting errors.",
+          "methods": [
+            {
+              "name": "wrapAsync",
+              "description": "Wraps an async function/promise to handle errors. Re-throws BaseErrors, maps or wraps other errors (logging the original), and returns the result on success."
+            },
+            {
+              "name": "isErrorOfType",
+              "description": "Checks if an error is an instance of a specific error class name (including BaseError subclasses)."
+            },
+            {
+              "name": "getErrorCode",
+              "description": "Gets a standardized error code string (e.g., 'DOMAIN_ERROR.CODE', 'GENERAL_ERROR.TYPE', 'UNKNOWN_ERROR')."
+            },
+            {
+              "name": "formatForLogging",
+              "description": "Formats an error (or any value) into a plain object suitable for logging."
+            }
+          ]
+        },
+        "branchNameUtils": {
+          "description": "Provides utility functions for handling branch names.",
+          "functions": [
+            {
+              "name": "toSafeBranchName",
+              "description": "Converts a branch name into a filesystem-safe string by replacing slashes ('/') with hyphens ('-')."
+            },
+            {
+              "name": "isValidBranchName",
+              "description": "Checks if a branch name is valid (must not be empty, must contain a '/' prefix, and must have content after the first '/')."
+            }
+          ]
+        },
+        "ConsoleLogger": {
+          "description": "Provides structured JSON logging to the console with configurable levels.",
+          "creation": [
+            {
+              "function": "createConsoleLogger(initialLevel?)",
+              "description": "Creates a new logger instance. initialLevel defaults to 'info'."
+            },
+            {
+              "instance": "defaultLogger",
+              "description": "A pre-configured instance with default level 'warn'."
+            }
+          ],
+          "levels": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ],
+          "methods": [
+            {
+              "name": "debug | info | warn | error",
+              "description": "Logs a message at the specified level. Accepts message (string) and optional context (object) or Error."
+            },
+            {
+              "name": "log",
+              "description": "Logs a message at a dynamically specified level. Accepts level, message, and additional arguments."
+            },
+            {
+              "name": "setLevel",
+              "description": "Changes the current logging level."
+            },
+            {
+              "name": "getLevel",
+              "description": "Returns the current logging level."
+            },
+            {
+              "name": "withContext",
+              "description": "Creates a child logger instance that inherits and merges context."
+            }
+          ],
+          "outputFormat": {
+            "type": "JSON",
+            "fields": [
+              "level",
+              "message",
+              "timestamp",
+              "context? (merged)",
+              "error? (name, message, stack)",
+              "args? (for log method)"
+            ]
+          }
+        }
+      },
+      "errors": {
+        "ApplicationError": {
+          "description": "Represents errors related to application logic or flow. Inherits from BaseError.",
+          "constructor": "new ApplicationError(code, message, details?, options?)",
+          "properties": [
+            "name: 'ApplicationError'",
+            "code: `APP_ERROR.${ApplicationErrorCodes}`",
+            "message: string",
+            "details?: object",
+            "cause?: Error",
+            "timestamp: Date"
+          ],
+          "methods": [
+            {
+              "name": "getHttpStatusCode",
+              "description": "Returns the corresponding HTTP status code (400, 401, 403, 404, 409, 500)."
+            },
+            {
+              "name": "withMessage",
+              "description": "Returns a new ApplicationError instance with an updated message and merged details."
+            }
+          ],
+          "factories": [
+            "ApplicationErrors.invalidInput",
+            "ApplicationErrors.notFound",
+            "ApplicationErrors.unauthorized",
+            "ApplicationErrors.forbidden",
+            "ApplicationErrors.conflict",
+            "ApplicationErrors.executionFailed",
+            "ApplicationErrors.configurationError",
+            "ApplicationErrors.validationFailed",
+            "ApplicationErrors.branchInitializationFailed"
+          ]
+        },
+        "DomainError": {
+          "description": "Represents errors related to domain logic or business rule violations. Inherits from BaseError.",
+          "constructor": "new DomainError(code, message, details?, options?)",
+          "properties": [
+            "name: 'DomainError'",
+            "code: `DOMAIN_ERROR.${DomainErrorCodes}`",
+            "message: string",
+            "details?: object",
+            "cause?: Error",
+            "timestamp: Date"
+          ],
+          "methods": [
+            {
+              "name": "getHttpStatusCode",
+              "description": "Returns the corresponding HTTP status code (defaults to 400)."
+            },
+            {
+              "name": "withMessage",
+              "description": "Returns a new DomainError instance with an updated message and merged details."
+            }
+          ],
+          "factories": [
+            "DomainErrors.documentNotFound",
+            "DomainErrors.branchNotFound",
+            "DomainErrors.validationError",
+            "DomainErrors.invalidTagFormat",
+            "DomainErrors.unexpectedError",
+            "DomainErrors.invalidOperation",
+            "DomainErrors.repositoryError",
+            "DomainErrors.branchInitializationFailed",
+            "DomainErrors.invalidDocumentFormat",
+            "DomainErrors.invalidDocumentPath",
+            "DomainErrors.invalidDocumentId"
+          ]
+        },
+        "InfrastructureError": {
+          "description": "Represents errors related to infrastructure operations (file system, Git, etc.). Inherits from BaseError.",
+          "constructor": "new InfrastructureError(code, message, details?)",
+          "properties": [
+            "name: 'InfrastructureError'",
+            "code: InfrastructureErrorCodes (enum value, no prefix)",
+            "message: string",
+            "details?: object",
+            "cause?: Error (inherited but not set by constructor)",
+            "timestamp: Date"
+          ],
+          "methods": [
+            {
+              "name": "getHttpStatusCode",
+              "description": "Returns the corresponding HTTP status code (404, 403, 409, 500)."
+            },
+            {
+              "name": "withMessage",
+              "description": "Returns a new InfrastructureError instance with an updated message and merged details."
+            }
+          ],
+          "factories": [
+            "InfrastructureErrors.fileNotFound",
+            "InfrastructureErrors.directoryNotFound",
+            "InfrastructureErrors.filePermissionDenied",
+            "InfrastructureErrors.fileAlreadyExists",
+            "InfrastructureErrors.fileReadError",
+            "InfrastructureErrors.fileWriteError",
+            "InfrastructureErrors.fileDeleteError",
+            "InfrastructureErrors.directoryCreateError",
+            "InfrastructureErrors.fileSystemError",
+            "InfrastructureErrors.indexUpdateError",
+            "InfrastructureErrors.initializationError",
+            "InfrastructureErrors.mcpServerError",
+            "InfrastructureErrors.invalidFileContent",
+            "InfrastructureErrors.gitCommandFailed",
+            "InfrastructureErrors.invalidArgument",
+            "InfrastructureErrors.persistenceError"
+          ]
+        },
+        "SharedUtilsError": {
+          "description": "Represents errors occurring within shared utility functions (e.g., parsing, validation). Inherits from BaseError.",
+          "constructor": "new SharedUtilsError(code, message, details?, options?)",
+          "properties": [
+            "name: 'SharedUtilsError'",
+            "code: `SHARED_UTILS_${SharedUtilsErrorCodes}`",
+            "message: string",
+            "details?: object",
+            "cause?: Error",
+            "timestamp: Date"
+          ],
+          "methods": [
+            {
+              "name": "getHttpStatusCode",
+              "description": "Returns the corresponding HTTP status code (defaults to 500)."
+            },
+            {
+              "name": "withMessage",
+              "description": "Returns a new SharedUtilsError instance with an updated message and merged details."
+            }
+          ],
+          "factories": [
+            "SharedUtilsErrors.validationError",
+            "SharedUtilsErrors.parsingError",
+            "SharedUtilsErrors.invalidArgument",
+            "SharedUtilsErrors.conversionError",
+            "SharedUtilsErrors.unknownError"
+          ]
+        }
+      }
+    },
+    "controllers": {
+      "ContextController": {
+        "description": "Handles requests related to retrieving context information (branch memory, global memory, rules).",
+        "dependencies": [
+          "ReadContextUseCase",
+          "ReadRulesUseCase"
+        ],
+        "methods": [
+          {
+            "name": "readContext",
+            "input": "{ branch: string, language: string }",
+            "output": "{ success: boolean, data?: { branchMemory, globalMemory, rules }, error?: string }",
+            "notes": [
+              "Calls ReadContextUseCase.",
+              "Automatically initializes the branch if it doesn't exist.",
+              "Wraps the result in a standard success/error structure."
+            ]
+          },
+          {
+            "name": "readRules",
+            "input": "languageCode: string",
+            "output": "{ success: boolean, data?: { content: string, language: string }, error?: string }",
+            "notes": [
+              "Calls ReadRulesUseCase.",
+              "Wraps the result in a standard success/error structure."
+            ]
+          }
+        ]
+      },
+      "GlobalController": {
+        "description": "Handles requests related to the global memory bank.",
+        "dependencies": [
+          "ReadGlobalDocumentUseCase",
+          "WriteGlobalDocumentUseCase"
+        ],
+        "methods": [
+          {
+            "name": "readDocument",
+            "input": "path: string",
+            "output": "{ success: boolean, data?: DocumentDTO, error?: string }",
+            "notes": [
+              "Calls ReadGlobalDocumentUseCase.",
+              "Wraps the result in a standard success/error structure."
+            ]
+          },
+          {
+            "name": "writeDocument",
+            "input": "{ path: string, content?: string, tags?: string[] }",
+            "output": "{ success: boolean, data?: WriteGlobalDocumentOutput['document'], error?: string }",
+            "notes": [
+              "Calls WriteGlobalDocumentUseCase.",
+              "Wraps the result in a standard success/error structure.",
+              "Integration tests show content should likely be a JSON string.",
+              "Tags parameter might not be directly used by this controller method based on tests."
+            ]
+          },
+          {
+            "name": "searchDocumentsByTags",
+            "input": "{ tags: string[], scope?: 'global', match?: 'and' | 'or', docs: string }",
+            "output": "{ success: boolean, data?: { results: SearchResultItem[] }, error?: string }",
+            "notes": [
+              "Calls SearchDocumentsByTagsUseCase, likely intended for global scope.",
+              "Requires 'docs' path input.",
+              "Wraps the result in a standard success/error structure."
+            ]
+          }
+        ]
+      },
+      "BranchController": {
+        "description": "Handles requests related to a specific branch's memory bank.",
+        "dependencies": [
+          "ReadBranchDocumentUseCase",
+          "WriteBranchDocumentUseCase",
+          "SearchDocumentsByTagsUseCase"
+        ],
+        "methods": [
+          {
+            "name": "searchByTags",
+            "input": "{ tags: string[], branchName: string, match?: 'and' | 'or' }",
+            "output": "{ success: boolean, data?: { results: SearchResultItem[] }, error?: string }",
+            "notes": [
+              "Calls SearchDocumentsByTagsUseCase with scope implicitly set to 'branch'.",
+              "Wraps the result in a standard success/error structure.",
+              "Requires branchName."
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

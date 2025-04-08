@@ -1,0 +1,19 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-spec-review-progress",
+    "title": "Progress for feature/spec-review",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "createdAt": "2025-04-07T11:29:28.986Z",
+    "lastModified": "2025-04-07T11:29:28.986Z"
+  },
+  "content": {
+    "summary": "Initial progress for branch: feature/spec-review",
+    "status": "initialized",
+    "steps": [],
+    "next_steps": [],
+    "findings": []
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-spec-review-context",
+    "title": "Branch Context for feature/spec-review",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [],
+    "createdAt": "2025-04-07T11:29:28.986Z",
+    "lastModified": "2025-04-07T11:29:28.986Z"
+  },
+  "content": {
+    "description": "Context for branch: feature/spec-review"
+  }
+}
