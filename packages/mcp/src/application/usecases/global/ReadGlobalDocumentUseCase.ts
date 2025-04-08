@@ -63,11 +63,16 @@ export class ReadGlobalDocumentUseCase
       }
 
       let parsedContent: string | object;
-      try {
-        // Attempt to parse the content as JSON
-        parsedContent = JSON.parse(document.content);
-      } catch (parseError) {
-        // If parsing fails, keep the original string content
+      if (typeof document.content === 'string') {
+        try {
+          // Attempt to parse the content as JSON
+          parsedContent = JSON.parse(document.content);
+        } catch (parseError) {
+          // If parsing fails, keep the original string content
+          parsedContent = document.content;
+        }
+      } else {
+        // If content is already an object, use it directly
         parsedContent = document.content;
       }
 
