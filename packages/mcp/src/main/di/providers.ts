@@ -271,7 +271,11 @@ export async function registerApplicationServices(container: DIContainer): Promi
     const globalRepository = await container.get<FileSystemGlobalMemoryBankRepository>(
       'globalMemoryBankRepository'
     );
-    return new ReadContextUseCase(branchRepository, globalRepository);
+    // --- Resolve additional dependencies ---
+    const gitService = await container.get<IGitService>('gitService');
+    const configProvider = await container.get<IConfigProvider>('configProvider');
+    // --- Pass all dependencies to the constructor ---
+    return new ReadContextUseCase(branchRepository, globalRepository, gitService, configProvider);
   });
 
   // Register the updated SearchDocumentsByTagsUseCase

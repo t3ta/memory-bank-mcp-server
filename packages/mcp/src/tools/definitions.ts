@@ -25,7 +25,7 @@ export function createBranchProperties() {
     },
     branch: {
       type: 'string',
-      description: 'Branch name - must include namespace prefix with slash (e.g. "feature/my-branch"). Optional if running in project mode (branch name will be auto-detected).',
+      description: 'Branch name (e.g., "feature/my-branch"). Optional: If not provided in project mode, it will be auto-detected from the current Git branch.',
     },
     docs: {
       type: 'string',
@@ -192,7 +192,7 @@ function createReadContextTool(): ToolDefinition {
       properties: {
         branch: {
           type: 'string',
-          description: 'Branch name',
+          description: 'Branch name. Optional: If not provided in project mode, it will be auto-detected.',
         },
         language: {
           type: 'string',
@@ -204,7 +204,7 @@ function createReadContextTool(): ToolDefinition {
           description: 'Path to docs directory',
         },
       },
-      required: ['branch', 'docs', 'language'],
+      required: ['docs', 'language'], // Removed 'branch' as it's optional in project mode
     },
   };
 }
@@ -238,7 +238,7 @@ function createSearchDocumentsByTagsTool(): ToolDefinition {
         },
         branch: {
           type: 'string',
-          description: 'Branch name (required if scope is "branch" or "all")',
+          description: 'Branch name. Required if scope is "branch" or "all", but optional in project mode (will be auto-detected).',
         },
         docs: {
           type: 'string',

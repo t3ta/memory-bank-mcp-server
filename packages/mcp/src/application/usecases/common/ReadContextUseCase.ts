@@ -3,11 +3,16 @@ import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
 import type { IBranchMemoryBankRepository } from "../../../domain/repositories/IBranchMemoryBankRepository.js";
 import type { IGlobalMemoryBankRepository } from "../../../domain/repositories/IGlobalMemoryBankRepository.js";
 import { DomainError, DomainErrorCodes } from "../../../shared/errors/DomainError.js";
+import { ApplicationError, ApplicationErrors } from "../../../shared/errors/ApplicationError.js"; // Import ApplicationError class and ApplicationErrors factory
 import { logger } from "../../../shared/utils/logger.js";
 import type { RulesResult } from "./ReadRulesUseCase.js";
+// --- Add dependencies for auto-detection ---
+import type { IGitService } from "../../../infrastructure/git/IGitService.js";
+import type { IConfigProvider } from "../../../infrastructure/config/interfaces/IConfigProvider.js";
+// --- End added dependencies ---
 
 export type ContextRequest = {
-  branch: string;
+  branch?: string; // Make branch optional in the request type
   language: string;
 };
 
@@ -34,11 +39,48 @@ export type ContextResult = {
 export class ReadContextUseCase {
   constructor(
     private readonly branchRepository: IBranchMemoryBankRepository,
-    private readonly globalRepository: IGlobalMemoryBankRepository
+    private readonly globalRepository: IGlobalMemoryBankRepository,
+    // --- Add dependencies to constructor ---
+    private readonly gitService: IGitService,
+    private readonly configProvider: IConfigProvider
+    // --- End added dependencies ---
   ) { }
 
   async execute(request: ContextRequest): Promise<ContextResult> {
-    const { branch } = request;
+    let branchNameToUse = request.branch;
+    // const { language } = request; // language は現在未使用のためコメントアウト (将来的に使う可能性は残す)
+
+    // --- Branch Auto-Detection Logic ---
+    if (!branchNameToUse) {
+      const config = this.configProvider.getConfig();
+      if (config.isProjectMode) {
+        logger.info('[ReadContextUseCase] Branch name omitted in project mode, detecting...');
+        try {
+          branchNameToUse = await this.gitService.getCurrentBranchName();
+          logger.info(`[ReadContextUseCase] Detected branch: ${branchNameToUse}`);
+        } catch (gitError) {
+          logger.error('[ReadContextUseCase] Failed to detect branch', { gitError });
+          throw ApplicationErrors.executionFailed(
+            'Branch name is required but could not be automatically determined. Please provide it explicitly or ensure you are in a Git repository.',
+            gitError instanceof Error ? gitError : undefined
+          );
+        }
+      } else {
+        // Not in project mode, branch is required
+        logger.warn('[ReadContextUseCase] Branch name omitted outside project mode.');
+        throw ApplicationErrors.invalidInput('Branch name is required when not running in project mode.');
+      }
+    }
+    // --- End Branch Auto-Detection Logic ---
+
+    // --- Validate final branch name ---
+    if (!branchNameToUse || typeof branchNameToUse !== 'string' || branchNameToUse.trim() === '') {
+       // This case should ideally not be reached if auto-detection or initial validation works, but as a safeguard:
+       throw ApplicationErrors.invalidInput('Invalid branch name determined.');
+    }
+    // --- End Validation ---
+
+    const branch = branchNameToUse; // Use the determined name
     const result: ContextResult = {
       branchMemory: {
         coreFiles: {
@@ -62,7 +104,9 @@ export class ReadContextUseCase {
         try {
           const branchInfo = BranchInfo.create(branch);
           await this.branchRepository.initialize(branchInfo);
+          logger.info(`[ReadContextUseCase] Auto-initialized branch: ${branch}`);
         } catch (initError) {
+          logger.error(`[ReadContextUseCase] Failed to auto-initialize branch: ${branch}`, { initError });
           throw new DomainError(
             DomainErrorCodes.BRANCH_INITIALIZATION_FAILED,
             `Failed to auto-initialize branch: ${branch}`
@@ -86,7 +130,8 @@ export class ReadContextUseCase {
               JSON.parse(doc.content);
           }
         } catch (error) {
-          logger.error(`Error reading ${file}: ${error}`);
+          // Log error but continue, as some core files might be optional or missing initially
+          logger.warn(`[ReadContextUseCase] Error reading core branch file ${file}: ${error}`);
         }
       }
 
@@ -102,14 +147,18 @@ export class ReadContextUseCase {
             result.globalMemory.coreFiles[path.value] = JSON.parse(doc.content);
           }
         } catch (error) {
-          logger.error(`Error reading ${path.value}: ${error}`);
+          logger.warn(`[ReadContextUseCase] Error reading core global file ${path.value}: ${error}`);
         }
       }
 
       return result;
     } catch (error) {
       logger.error(`ReadContextUseCase error: ${error}`);
-      throw error;
+      // Re-throw application or domain errors directly, wrap others
+      if (error instanceof DomainError || error instanceof ApplicationError) { // Use ApplicationError class here
+          throw error;
+      }
+      throw ApplicationErrors.executionFailed(`Unexpected error in ReadContextUseCase: ${(error as Error).message}`, error instanceof Error ? error : undefined);
     }
   }
 }
