@@ -114,13 +114,14 @@ export class MemoryBankExplorerProvider implements vscode.TreeDataProvider<Memor
             }
           }
           break;
-        case 'directory':
+        case 'directory': {
           // Calculate relative path from workspace root and 'docs' folder
           const memoryBankRoot = path.join(this.workspaceRoot, 'docs'); // workspaceRoot is guaranteed non-null here
           if (element.resourceUri) {
             relativePath = path.relative(memoryBankRoot, element.resourceUri.fsPath);
           }
           break;
+        }
         case 'file':
         default:
           return []; // Files have no children

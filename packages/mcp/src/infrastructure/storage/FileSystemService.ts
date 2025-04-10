@@ -244,7 +244,7 @@ export class FileSystemService implements IFileSystemService {
 
           const files: string[] = [];
 
-          const processEntries = async (batchEntries: Dirent[]) => {
+          const processEntries = async (batchEntries: Dirent[]): Promise<string[]> => {
             const results = await Promise.all(
               batchEntries.map(async (entry) => {
                 const fullPath = path.join(dirPath, entry.name);

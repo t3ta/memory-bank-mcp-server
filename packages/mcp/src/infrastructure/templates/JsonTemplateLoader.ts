@@ -5,7 +5,7 @@
 import path from 'node:path';
 // Use 'any' for now due to persistent import issues
 type JsonTemplate = any;
-const validateJsonTemplate = (data: any) => data; // Dummy validator
+const validateJsonTemplate = (data: any): any => data; // Dummy validator
 type Language = 'en' | 'ja' | 'zh';
 import { IFileSystemService } from '../storage/interfaces/IFileSystemService.js';
 import { II18nProvider } from '../i18n/interfaces/II18nProvider.js';

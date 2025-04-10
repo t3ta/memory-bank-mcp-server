@@ -118,7 +118,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case 'read_global_memory_bank':
         response = await app.getGlobalController().readDocument(params.path); // これは変更なし
         break;
-      case 'read_context':
+      case 'read_context': {
         // ContextRequest オブジェクトを作成して渡す
         // language は main 関数でチェック済みのものを渡す
         // docs は ContextRequest に不要なので削除
@@ -128,7 +128,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
         response = await app.getContextController().readContext(contextRequest);
         break;
-      case 'search_documents_by_tags':
+      }
+      case 'search_documents_by_tags': {
          // SearchDocumentsByTagsInput オブジェクトを作成して渡す
          // branch を branchName に修正
          const searchInput: SearchDocumentsByTagsInput = {
@@ -140,6 +141,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
          };
          response = await app.getGlobalController().searchDocumentsByTags(searchInput);
          break;
+      }
       // 他のツールも同様に修正...
       default:
         throw new Error(`Unknown tool: ${name}`);

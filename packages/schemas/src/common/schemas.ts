@@ -8,7 +8,7 @@
 import { z } from 'zod';
 
 // Utility for flexible date parsing
-export const dateStringToDate = (val: string, ctx: z.RefinementCtx) => {
+export const dateStringToDate = (val: string, ctx: z.RefinementCtx): Date | typeof z.NEVER => {
   try {
     const date = new Date(val);
     if (isNaN(date.getTime())) {
