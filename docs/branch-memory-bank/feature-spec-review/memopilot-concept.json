@@ -1,0 +1,347 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-spec-review-memopilot-concept",
+    "title": "MemoPilot: AIオーケストレーションによるメモリバンク・ブランチ管理システム構想",
+    "documentType": "concept",
+    "path": "memopilot-concept.json",
+    "tags": [
+      "concept",
+      "ai-orchestration",
+      "memopilot",
+      "feature-proposal"
+    ],
+    "createdAt": "2025-04-08T05:40:00.000Z",
+    "lastModified": "2025-04-08T05:40:00.000Z"
+  },
+  "content": {
+    "summary": "MemoPilotはAIインターフェースからの指示を受け、ブランチ作成やメモリバンク初期化などの開発準備作業を自動化するAIオーケストレーションシステムの構想",
+    "overview": {
+      "concept": "AIインターフェース（例：ChatGPTやClaude）のコンテキストウィンドウを圧迫せずに、効率的にブランチ作成からメモリバンク初期化までを自動化するAIオーケストレーションシステム",
+      "name": "MemoPilot（メモパイロット）",
+      "tagline": "AIがあなたの開発フローをパイロットする",
+      "problem_statement": "現状では、AIとの会話から開発タスクを特定した後、実際の開発環境セットアップ（ブランチ作成、メモリバンク初期化、タスク管理）は手動で行う必要があり、また複数回のメモリバンク操作がAIのコンテキストウィンドウを圧迫している"
+    },
+    "core_features": [
+      {
+        "name": "スマートブランチ作成",
+        "description": "AIからの指示に基づいて、適切な命名規則に沿ったブランチを自動作成",
+        "capabilities": [
+          "ブランチ命名規則の自動適用",
+          "親ブランチの適切な選択",
+          "ブランチ作成目的のメタデータ記録"
+        ]
+      },
+      {
+        "name": "インテリジェントメモリバンク初期化",
+        "description": "新しいブランチに対して、最適なメモリバンク構造を自動的に初期化",
+        "capabilities": [
+          "必要なディレクトリのみの作成（不要なテンプレート/翻訳ディレクトリの省略）",
+          "branchContext.jsonの自動生成と目的の記録",
+          "親ブランチからの関連情報の継承"
+        ]
+      },
+      {
+        "name": "タスク依存関係分析",
+        "description": "会話から抽出したタスクの依存関係を分析し、最適な作業順序を提案",
+        "capabilities": [
+          "タスク間の依存関係の自動検出",
+          "DAG（有向非巡回グラフ）形式でのタスク可視化",
+          "優先度と難易度に基づく作業計画の提案"
+        ]
+      },
+      {
+        "name": "作業コンテキスト生成",
+        "description": "タスクに関連するコード、ドキュメント、参考情報をまとめたコンテキスト情報の自動生成",
+        "capabilities": [
+          "関連コードファイルの特定と参照",
+          "必要なドキュメントの収集",
+          "影響範囲の予測"
+        ]
+      }
+    ],
+    "architecture": {
+      "components": [
+        {
+          "name": "インターフェースAI",
+          "description": "ユーザーと直接対話し、MemoPilotへの指示を生成するAI（例：Claude, ChatGPT）",
+          "responsibilities": [
+            "ユーザーとの自然言語対話",
+            "タスクの特定と整理",
+            "MemoPilotへの構造化された指示の生成"
+          ]
+        },
+        {
+          "name": "MemoPilotオーケストレーター",
+          "description": "mastraベースのオーケストレーションエンジン。全体のフロー制御を担当",
+          "technologies": [
+            "mastra",
+            "TypeScript"
+          ],
+          "responsibilities": [
+            "AIからの指示の解析と検証",
+            "タスクの分解と実行順序の決定",
+            "各エージェントへの作業分配",
+            "エラーハンドリングとリカバリー"
+          ]
+        },
+        {
+          "name": "専門エージェント群",
+          "description": "langchainベースの特定タスクに特化したエージェント",
+          "technologies": [
+            "langchain",
+            "TypeScript"
+          ],
+          "agents": [
+            {
+              "name": "GitOperationAgent",
+              "role": "Gitリポジトリ操作の実行",
+              "capabilities": [
+                "ブランチ作成・切替",
+                "コミット履歴分析",
+                "差分表示・分析"
+              ]
+            },
+            {
+              "name": "MemoryBankAgent",
+              "role": "メモリバンク操作の実行",
+              "capabilities": [
+                "メモリバンク初期化",
+                "コアファイル生成",
+                "既存ファイルの読み取りと分析"
+              ]
+            },
+            {
+              "name": "TaskAnalysisAgent",
+              "role": "タスク分析とプランニング",
+              "capabilities": [
+                "タスク依存関係の解析",
+                "優先順位付け",
+                "スケジュール生成"
+              ]
+            },
+            {
+              "name": "CodeAnalysisAgent",
+              "role": "コードベース分析",
+              "capabilities": [
+                "関連コードの特定",
+                "影響範囲の予測",
+                "コード品質アドバイス"
+              ]
+            }
+          ]
+        }
+      ],
+      "data_flow": [
+        "ユーザー → インターフェースAI → MemoPilot指示",
+        "MemoPilot指示 → mastraオーケストレーター → タスク分解",
+        "タスク分解 → 専門エージェント群 → 実行",
+        "実行結果 → オーケストレーター → 結果集約",
+        "結果集約 → インターフェースAI → ユーザーへのレポート"
+      ]
+    },
+    "implementation_plan": {
+      "phases": [
+        {
+          "name": "フェーズ1: 基本機能の実装",
+          "scope": "基本的なブランチ作成とメモリバンク初期化の自動化",
+          "tasks": [
+            "指示フォーマット（JSON）の定義",
+            "基本GitOperationAgentの実装",
+            "基本MemoryBankAgentの実装",
+            "mastraによる基本フロー制御の実装"
+          ],
+          "expected_duration": "2-3週間",
+          "success_criteria": "AIからのJSONフォーマット指示でブランチ作成とメモリバンク初期化が自動実行できること"
+        },
+        {
+          "name": "フェーズ2: タスク分析機能の追加",
+          "scope": "会話から抽出したタスクの依存関係分析と優先順位付け",
+          "tasks": [
+            "TaskAnalysisAgentの実装",
+            "タスク依存関係図の生成機能",
+            "タスク優先度の自動計算アルゴリズム",
+            "タスク情報のメモリバンクへの記録"
+          ],
+          "expected_duration": "2-3週間",
+          "success_criteria": "複数タスクの依存関係を自動分析し、最適な作業順序を提案できること"
+        },
+        {
+          "name": "フェーズ3: コード分析と作業コンテキスト生成",
+          "scope": "関連コードの特定と作業コンテキスト情報の自動生成",
+          "tasks": [
+            "CodeAnalysisAgentの実装",
+            "コードベースのインデックス化",
+            "作業コンテキスト生成アルゴリズム",
+            "RAGベースの関連ドキュメント検索"
+          ],
+          "expected_duration": "3-4週間",
+          "success_criteria": "タスクに関連するコードファイルと参考情報を自動的に特定し、作業コンテキストとして提供できること"
+        }
+      ]
+    },
+    "interface_example": {
+      "input_format": {
+        "description": "インターフェースAIから送られる指示フォーマット例",
+        "example": {
+          "create_branch": {
+            "name": "feature/improve-error-messages",
+            "description": "JSONパッチエラーメッセージの改善",
+            "base_branch": "develop"
+          },
+          "task_management": {
+            "tasks": [
+              {
+                "title": "エラーの種類と原因を明確にするメッセージ設計",
+                "description": "パッチ操作の種類やエラー状況に応じて具体的なエラーメッセージを設計する",
+                "priority": "high"
+              },
+              {
+                "title": "パッチ適用失敗位置の特定機能実装",
+                "description": "JSONパッチ適用時に問題が発生した正確な位置を特定する機能の実装",
+                "priority": "medium",
+                "depends_on": [
+                  "エラーの種類と原因を明確にするメッセージ設計"
+                ]
+              }
+            ]
+          },
+          "memory_bank_options": {
+            "initialize_core_files": true,
+            "copy_global_files": [
+              "core/coding-standards.json"
+            ],
+            "create_directories": [
+              "error-messages"
+            ]
+          }
+        }
+      },
+      "output_format": {
+        "description": "MemoPilotからの応答フォーマット例",
+        "example": {
+          "status": "success",
+          "operations": {
+            "branch_creation": {
+              "name": "feature/improve-error-messages",
+              "base": "develop",
+              "created_at": "2025-04-08T05:45:00.000Z"
+            },
+            "memory_bank_initialization": {
+              "core_files_created": [
+                "branchContext.json",
+                "activeContext.json",
+                "progress.json",
+                "systemPatterns.json"
+              ],
+              "directories_created": [
+                "error-messages"
+              ],
+              "global_files_copied": [
+                "core/coding-standards.json"
+              ]
+            },
+            "task_analysis": {
+              "task_count": 2,
+              "execution_order": [
+                "エラーの種類と原因を明確にするメッセージ設計",
+                "パッチ適用失敗位置の特定機能実装"
+              ],
+              "dependencies_found": 1
+            }
+          },
+          "recommendations": [
+            "このタスクはJsonPatchUseCase.tsファイルの修正が中心になります",
+            "エラーメッセージテスト自動化も検討すると良いでしょう"
+          ]
+        }
+      }
+    },
+    "usage_workflow": {
+      "description": "MemoPilotの典型的な利用ワークフロー",
+      "steps": [
+        {
+          "step": "問題分析とタスク特定",
+          "actor": "ユーザーとインターフェースAI",
+          "description": "ユーザーとAIが対話し、解決すべき問題の分析とタスクの特定を行う"
+        },
+        {
+          "step": "MemoPilot指示の生成",
+          "actor": "インターフェースAI",
+          "description": "インターフェースAIが会話内容を分析し、構造化されたMemoPilot指示を生成"
+        },
+        {
+          "step": "ブランチとメモリバンクの準備",
+          "actor": "MemoPilot",
+          "description": "指示に基づいて新ブランチを作成し、メモリバンクを初期化"
+        },
+        {
+          "step": "タスク分析と計画",
+          "actor": "MemoPilot",
+          "description": "タスクの依存関係を分析し、作業順序と計画を生成"
+        },
+        {
+          "step": "作業コンテキストの提供",
+          "actor": "MemoPilot",
+          "description": "タスクに関連するコードと情報を収集し、作業コンテキストとして提供"
+        },
+        {
+          "step": "開発作業の実行",
+          "actor": "ユーザーとインターフェースAI",
+          "description": "準備された環境でユーザーとAIが協力して実際の開発作業を実行"
+        }
+      ]
+    },
+    "benefits": [
+      {
+        "benefit": "AIコンテキストウィンドウの効率化",
+        "description": "AIチャットのコンテキストウィンドウを開発準備作業の詳細で圧迫せず、本質的な会話に集中できる"
+      },
+      {
+        "benefit": "開発準備作業の自動化",
+        "description": "ブランチ作成、メモリバンク初期化、タスク管理などの準備作業を自動化し、開発の立ち上げを高速化"
+      },
+      {
+        "benefit": "一貫した作業環境の提供",
+        "description": "プロジェクト規約に沿った一貫性のある作業環境を自動的に用意し、品質の標準化を促進"
+      },
+      {
+        "benefit": "タスク依存関係の明確化",
+        "description": "タスク間の依存関係を自動的に分析し、効率的な作業順序を提案することで、開発効率を向上"
+      },
+      {
+        "benefit": "作業コンテキストの自動生成",
+        "description": "タスクに関連するコード、ドキュメント、参考情報を自動的に収集し、開発者の学習コストを削減"
+      }
+    ],
+    "technical_considerations": [
+      {
+        "consideration": "セキュリティ",
+        "description": "Gitリポジトリとメモリバンクへのアクセス権限の適切な管理が必要。機密情報の漏洩防止措置を実装すべき。"
+      },
+      {
+        "consideration": "拡張性",
+        "description": "新しいエージェントやツールを容易に追加できるプラグイン式アーキテクチャを採用するべき。"
+      },
+      {
+        "consideration": "エラー処理",
+        "description": "Git操作など外部要因による失敗に対して、適切なリトライ機構とロールバック機能を実装する必要がある。"
+      },
+      {
+        "consideration": "パフォーマンス",
+        "description": "大規模リポジトリやメモリバンクでも高速に動作するよう、インデックス化やキャッシュ機構の検討が必要。"
+      },
+      {
+        "consideration": "ローカル実行",
+        "description": "クラウドへの情報送信を最小限に抑え、可能な限りローカル実行することでプライバシーを確保。"
+      }
+    ],
+    "next_steps": [
+      "詳細な機能仕様書の作成",
+      "プロトタイプ開発の計画立案",
+      "mastraとlangchainを用いた基本アーキテクチャの検証",
+      "AIインターフェースからの指示フォーマットの標準化",
+      "プロジェクト内での検証実験計画の立案"
+    ]
+  }
+}
