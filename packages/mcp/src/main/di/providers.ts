@@ -207,23 +207,6 @@ export async function registerApplicationServices(container: DIContainer): Promi
    return new WriteGlobalDocumentUseCase(globalRepository, documentWriterService); // Inject DocumentWriterService
   });
 
-  container.registerFactory('markdownMigrationService', async () => {
-    const mockTemplateRepository = {
-      getTemplate: async () => null,
-      getTemplateAsMarkdown: async () => '',
-      getTemplatesByType: async () => [],
-      saveTemplate: async () => false,
-      templateExists: async () => false,
-      getAllTemplateIds: async () => [],
-      getAllTemplateTypes: async () => []
-    };
-    const configProvider = await container.get<IConfigProvider>('configProvider');
-    const config = configProvider.getConfig();
-    const markdownDir = path.join(config.docsRoot, 'templates', 'markdown');
-    const backupDir = path.join(config.docsRoot, 'templates', 'backup');
-    const { MarkdownMigrationService } = await import('../../migration/MarkdownMigrationService.js');
-    return new MarkdownMigrationService(mockTemplateRepository, markdownDir, backupDir);
-  });
 
   // Register JsonPatchService implementation (using rfc6902)
   container.registerFactory('jsonPatchService', async () => {
