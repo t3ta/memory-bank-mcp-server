@@ -225,11 +225,11 @@ export async function registerApplicationServices(container: DIContainer): Promi
     return new MarkdownMigrationService(mockTemplateRepository, markdownDir, backupDir);
   });
 
-  // Register JsonPatchService implementation (using the refactored adapter)
+  // Register JsonPatchService implementation (using rfc6902)
   container.registerFactory('jsonPatchService', async () => {
-      // Import the NEW adapter class
-      const { FastJsonPatchAdapter } = await import('../../domain/jsonpatch/FastJsonPatchAdapter.js'); // Use the new adapter
-      return new FastJsonPatchAdapter(); // Instantiate the new adapter
+      // Import the Rfc6902JsonPatchAdapter class
+      const { Rfc6902JsonPatchAdapter } = await import('../../domain/jsonpatch/Rfc6902JsonPatchAdapter.js');
+      return new Rfc6902JsonPatchAdapter(); // Use rfc6902 adapter
   });
 
   // Make the factory async and await the repository and patch service
