@@ -7,10 +7,10 @@
     "path": "activeContext.json",
     "tags": [],
     "createdAt": "2025-04-10T14:20:00.000Z",
-    "lastModified": "2025-04-10T16:26:02.694Z"
+    "lastModified": "2025-04-10T16:59:53.388Z"
   },
   "content": {
-    "current_task": "実装とテスト完了、PRの準備",
+    "current_task": "E2Eテストの実装と修正",
     "relevant_files": [
       "../feature/refactor-api/design/api-refactoring-plan.json",
       "../feature/refactor-api/design/api-refactoring-implementation-plan.json",
@@ -66,6 +66,21 @@
         "date": "2025-04-11",
         "description": "E2Eテストを追加し、write_document/read_documentコマンドの動作確認を強化",
         "rationale": "実運用環境に近い形でのテストを追加することで、コマンドの信頼性を向上させるため"
+      },
+      {
+        "date": "2025-04-11",
+        "description": "read_document.e2e.test.tsを実装し、読み込み機能の全テストケースを網羅",
+        "rationale": "新しいコントローラーとAPIの完全性を確保するため"
+      },
+      {
+        "date": "2025-04-11",
+        "description": "DocumentControllerに直接依存関係を渡す実装に変更",
+        "rationale": "IBranchControllerインターフェースには期待していたメソッドが実装されていなかったため"
+      },
+      {
+        "date": "2025-04-11",
+        "description": "E2Eテストを例外ベースからエラーオブジェクトベースに修正",
+        "rationale": "実装が例外を投げるんじゃなく、エラーオブジェクトを返す再設計に対応するため"
       }
     ]
   }

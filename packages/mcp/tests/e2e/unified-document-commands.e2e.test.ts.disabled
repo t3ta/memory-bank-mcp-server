@@ -440,5 +440,4 @@ describe('MCP E2E Unified Document Commands Tests', () => {
       expect(result.data.tags).toEqual(expect.arrayContaining(['global', 'method-test']));
     });
   });
-  });
 });

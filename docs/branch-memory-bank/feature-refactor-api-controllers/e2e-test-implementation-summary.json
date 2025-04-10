@@ -1,0 +1,44 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "e2e-test-implementation-summary",
+    "title": "E2Eテスト実装のまとめ",
+    "documentType": "implementation_summary",
+    "path": "e2e-test-implementation-summary.json",
+    "tags": [],
+    "createdAt": "2025-04-11T16:40:00.000Z",
+    "lastModified": "2025-04-10T17:00:27.325Z"
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "概要",
+        "content": "write_documentとread_documentコマンドのEnd-to-Endテストを実装しました。これらのテストは実際のMCPクライアントからのリクエストをシミュレートし、APIの全体的な動作が期待通りであることを確認します。"
+      },
+      {
+        "title": "実装したテスト",
+        "content": "2つのE2Eテストファイルを作成しました：\n\n1. **write_document.e2e.test.ts**\n   - ドキュメントをブランチメモリバンクに書き込むテスト\n   - ドキュメントをグローバルメモリバンクに書き込むテスト\n   - JSONパッチを使ったドキュメント更新テスト\n   - プレーンテキストコンテンツの書き込みテスト\n   - returnContentオプションのテスト\n   - エラー処理のテスト（content/patchesの両方指定、どちらも未指定、存在しないドキュメントへのパッチ適用）\n\n2. **read_document.e2e.test.ts**\n   - ドキュメントをブランチメモリバンクから読み込むテスト\n   - ドキュメントをグローバルメモリバンクから読み込むテスト\n   - プレーンテキストコンテンツの読み込みテスト\n   - 無効なJSONの取り扱いテスト\n   - 大きなドキュメントの読み込みテスト\n   - ブランチ名の自動検出テスト\n   - エラー処理のテスト（存在しないドキュメント、無効なスコープ）"
+      },
+      {
+        "title": "テスト環境",
+        "content": "- **MCPInMemoryClient**: テスト用のクライアントクラスで、`@modelcontextprotocol/sdk`のClient実装とInMemoryTransportを使用\n- **e2e-test-env.js**: E2Eテスト環境をセットアップするヘルパー、一時的なGitリポジトリと必要なディレクトリ構造を作成\n- **vitest.config.ts**: E2Eテスト用のVitest設定"
+      },
+      {
+        "title": "検証内容",
+        "content": "これらのテストでは以下の点を検証しています：\n\n1. コマンドが適切なリクエストを受け付け、正しく処理できること\n2. DocumentControllerが適切なリポジトリとユースケースを選択できること\n3. メモリバンクに実際にファイルが作成/更新されること\n4. 内容が期待通りであること（JSONパース、タグの処理など）\n5. エラー処理が適切に機能すること\n6. プロジェクトモードでのブランチ名自動検出が機能すること"
+      },
+      {
+        "title": "実行方法",
+        "content": "以下のコマンドでE2Eテストを実行できます：\n\n```bash\ncd packages/mcp\nyarn test:e2e\n```\n\nまたは、プロジェクトルートから以下を実行：\n\n```bash\nyarn workspace @memory-bank/mcp test:e2e\n```\n\n個別のテストファイルを実行する場合は、以下のようにパターンを指定できます：\n\n```bash\nyarn workspace @memory-bank/mcp test:e2e --testNamePattern=\"read_document\"\n```"
+      },
+      {
+        "title": "次のステップ",
+        "content": "1. テストの実行と結果の確認\n2. 必要に応じて追加のテストケースの追加\n3. CIパイプラインでのテスト実行確認\n4. PRの作成"
+      },
+      {
+        "title": "実装上の課題と対応",
+        "content": "E2Eテストの実装中にいくつかの課題が発生しました：\n\n1. **インターフェースの除外問題**\n   - 当初は`app.getBranchController().getWriteUseCase()`のようなメソッドを使用しようとしたが、`IBranchController`インターフェースにこのメソッドが存在しなかった\n   - 対応策：DIコンテナから直接必要な依存関係を取得し、DocumentControllerを自分でインスタンス化する方式に変更\n\n2. **エラーハンドリングの方式**\n   - 当初のテストは例外が投げられることを想定していたが、実装ではエラーオブジェクトを返す方式になっていた\n   - 対応策：テストケースを`await expect(...).rejects.toThrow()`から、`expect(result.success).toBe(false)`などのエラー対応に変更\n\n3. **ファイル操作の問題**\n   - 書き込みは完了しているように見えるが、実際にファイルが生成されていないか、pathなどの情報が正しく渡されていない\n   - 対応策：まだ修正中、単体テストの実行パスやディレクトリ構造の調査が必要"
+      }
+    ]
+  }
+}
