@@ -146,7 +146,7 @@ export class PackageAnalyzer {
         continue;
       }
       
-      files.push(this.analyzeSourceFile(sourceFile, (_options));
+      files.push(this.analyzeSourceFile(sourceFile, options));
     }
     
     // サブディレクトリを解析
@@ -163,7 +163,7 @@ export class PackageAnalyzer {
           continue;
         }
         
-        subdirectories.push(this.analyzeDirectoryPath(subdirPath, project, (_options));
+        subdirectories.push(this.analyzeDirectoryPath(subdirPath, project, options));
       }
     }
     
