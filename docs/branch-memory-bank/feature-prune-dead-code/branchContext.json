@@ -1,0 +1,15 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-prune-dead-code-context",
+    "title": "Branch Context for feature/prune-dead-code",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [],
+    "createdAt": "2025-04-10T09:34:59.972Z",
+    "lastModified": "2025-04-10T09:34:59.972Z"
+  },
+  "content": {
+    "description": "Context for branch: feature/prune-dead-code"
+  }
+}
