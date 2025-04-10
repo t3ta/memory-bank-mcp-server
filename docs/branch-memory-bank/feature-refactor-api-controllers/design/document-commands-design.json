@@ -1,0 +1,48 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-refactor-api-controllers-document-commands-design",
+    "title": "write_document/read_documentコマンド設計",
+    "documentType": "design",
+    "path": "design/document-commands-design.json",
+    "tags": [],
+    "createdAt": "2025-04-11T00:00:00.000Z",
+    "lastModified": "2025-04-10T15:41:46.177Z"
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "概要",
+        "content": "write_documentとread_documentコマンドは、ブランチとグローバル両方のメモリバンクに対する統一的なインターフェースを提供します。スコープパラメータを使用して操作対象を選択し、DocumentControllerを通じて処理を行います。"
+      },
+      {
+        "title": "write_documentコマンド",
+        "content": "### 機能概要\nメモリバンクにドキュメントを書き込むコマンド。スコープパラメータによってブランチまたはグローバルを選択できます。\n\n### パラメータ定義\n```typescript\nexport interface WriteDocumentParams {\n  // 必須パラメータ\n  scope: 'branch' | 'global';\n  path: string;\n  docs: string;\n  \n  // ブランチ関連パラメータ\n  branch?: string;  // scope=branchの場合に使用、プロジェクトモードならオプショナル\n  \n  // コンテンツ関連パラメータ (contentとpatchesは排他的)\n  content?: string | Record<string, unknown>;  // ドキュメント内容\n  patches?: Record<string, unknown>[];  // JSON Patchオペレーション\n  \n  // オプションパラメータ\n  tags?: string[];  // ドキュメントに設定するタグ\n  returnContent?: boolean;  // レスポンスにコンテンツを含めるかのフラグ\n}\n```\n\n### 使用例\n```bash\n# グローバルメモリバンクに書き込み\nmcp write_document --scope=global --path=\"core/config.json\" --content='{\"key\":\"value\"}' --docs=\"./docs\"\n\n# ブランチメモリバンクに書き込み\nmcp write_document --scope=branch --branch=\"feature/example\" --path=\"data.json\" --content='{\"key\":\"value\"}' --docs=\"./docs\"\n\n# パッチで更新\nmcp write_document --scope=branch --path=\"data.json\" --patches='[{\"op\":\"replace\",\"path\":\"/key\",\"value\":\"new-value\"}]' --docs=\"./docs\"\n\n# タグ付きで書き込み\nmcp write_document --scope=global --path=\"core/config.json\" --content='{\"key\":\"value\"}' --tags=\"config,core\" --docs=\"./docs\"\n```"
+      },
+      {
+        "title": "read_documentコマンド",
+        "content": "### 機能概要\nメモリバンクからドキュメントを読み込むコマンド。スコープパラメータによってブランチまたはグローバルを選択できます。\n\n### パラメータ定義\n```typescript\nexport interface ReadDocumentParams {\n  // 必須パラメータ\n  scope: 'branch' | 'global';\n  path: string;\n  docs: string;\n  \n  // ブランチ関連パラメータ\n  branch?: string;  // scope=branchの場合に使用、プロジェクトモードならオプショナル\n}\n```\n\n### 使用例\n```bash\n# グローバルメモリバンクから読み込み\nmcp read_document --scope=global --path=\"core/config.json\" --docs=\"./docs\"\n\n# ブランチメモリバンクから読み込み\nmcp read_document --scope=branch --branch=\"feature/example\" --path=\"data.json\" --docs=\"./docs\"\n\n# 現在のブランチから自動検出して読み込み（プロジェクトモード）\nmcp read_document --scope=branch --path=\"data.json\" --docs=\"./docs\"\n```"
+      },
+      {
+        "title": "コマンド定義",
+        "content": "### write_documentコマンド定義\n```typescript\n// packages/mcp/src/tools/definitions.ts に追加\nexport const WRITE_DOCUMENT_COMMAND: ToolDefinition = {\n  name: 'write_document',\n  description: 'Write a document to a branch or global memory bank',\n  parameters: {\n    type: 'object',\n    properties: {\n      scope: {\n        type: 'string',\n        enum: ['branch', 'global'],\n        description: 'Scope to write to (branch or global)'\n      },\n      branch: {\n        type: 'string',\n        description: 'Branch name (required if scope is \"branch\", auto-detected in project mode)'\n      },\n      path: {\n        type: 'string',\n        description: 'Document path (e.g. \"config.json\")'\n      },\n      content: {\n        description: 'Document content (JSON string, object, or plain text, cannot be used with patches)'\n      },\n      patches: {\n        type: 'array',\n        description: 'JSON Patch operations (RFC 6902) - cannot be used with content',\n        items: {\n          type: 'object'\n        }\n      },\n      tags: {\n        type: 'array',\n        items: {\n          type: 'string'\n        },\n        description: 'Tags to assign to the document'\n      },\n      docs: {\n        type: 'string',\n        description: 'Path to docs directory'\n      },\n      returnContent: {\n        type: 'boolean',\n        description: 'If true, return the full document content in output',\n        default: false\n      }\n    },\n    required: ['scope', 'path', 'docs']\n  }\n};\n\n// packages/mcp/src/tools/definitions.ts に追加\nexport const READ_DOCUMENT_COMMAND: ToolDefinition = {\n  name: 'read_document',\n  description: 'Read a document from a branch or global memory bank',\n  parameters: {\n    type: 'object',\n    properties: {\n      scope: {\n        type: 'string',\n        enum: ['branch', 'global'],\n        description: 'Scope to read from (branch or global)'\n      },\n      branch: {\n        type: 'string',\n        description: 'Branch name (required if scope is \"branch\", auto-detected in project mode)'\n      },\n      path: {\n        type: 'string',\n        description: 'Document path (e.g. \"config.json\")'\n      },\n      docs: {\n        type: 'string',\n        description: 'Path to docs directory'\n      }\n    },\n    required: ['scope', 'path', 'docs']\n  }\n};\n```"
+      },
+      {
+        "title": "コマンド実装",
+        "content": "### write_documentコマンド実装\n```typescript\n// packages/mcp/src/interface/tools/document-tools.ts\nexport const write_document: Tool<WriteDocumentParams> = async (params) => {\n  const { scope, branch, path, content, patches, tags, docs, returnContent } = params;\n  \n  const documentController = DIContainer.resolve<DocumentController>('documentController');\n  \n  return await documentController.writeDocument({\n    scope,\n    branchName: branch,\n    path,\n    content,\n    patches,\n    tags,\n    returnContent\n  });\n};\n\n// packages/mcp/src/interface/tools/document-tools.ts\nexport const read_document: Tool<ReadDocumentParams> = async (params) => {\n  const { scope, branch, path, docs } = params;\n  \n  const documentController = DIContainer.resolve<DocumentController>('documentController');\n  \n  return await documentController.readDocument({\n    scope,\n    branchName: branch,\n    path\n  });\n};\n```"
+      },
+      {
+        "title": "エラーハンドリング",
+        "content": "コマンドは以下のエラーケースを適切に処理します：\n\n1. 必須パラメータの欠落\n2. スコープの不正な値\n3. branchスコープ指定時のブランチ名の欠落（非プロジェクトモード時）\n4. contentとpatchesの同時指定\n5. パス指定の問題\n6. ドキュメント存在/不在による操作不能\n7. その他のリポジトリ操作エラー\n\nすべてのエラーは適切なエラーメッセージと共に返されます。"
+      },
+      {
+        "title": "テスト方針",
+        "content": "### テスト観点\n- 各コマンドのパラメータバリデーション\n- DocumentControllerとの連携\n- 実際のファイルシステム操作の結果確認\n- エラーケースの処理\n\n### テスト例（write_document）\n```typescript\ndescribe('write_document tool', () => {\n  it('should write to global memory bank with content', async () => {\n    // テスト実装\n  });\n  \n  it('should write to branch memory bank with content', async () => {\n    // テスト実装\n  });\n  \n  it('should update document with patches', async () => {\n    // テスト実装\n  });\n  \n  it('should fail when both content and patches are provided', async () => {\n    // テスト実装\n  });\n  \n  // 他のテストケース\n});\n```"
+      },
+      {
+        "title": "既存コマンドとの互換性",
+        "content": "新しいwrite_document/read_documentコマンドは既存のwrite_branch_memory_bank, read_branch_memory_bank, write_global_memory_bank, read_global_memory_bankコマンドと並行して存在します。\n\n既存コマンドは後方互換性のために維持され、新しいコマンドは統一インターフェースとしての利便性を提供します。将来的には既存コマンドを新コマンドのエイリアスとして再実装するか、非推奨化することも検討できます。"
+      }
+    ]
+  }
+}

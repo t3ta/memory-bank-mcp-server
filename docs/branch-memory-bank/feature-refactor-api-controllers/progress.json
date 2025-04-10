@@ -1,0 +1,245 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-refactor-api-controllers-progress",
+    "title": "Progress for feature/refactor-api-controllers",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "createdAt": "2025-04-10T14:20:00.000Z",
+    "lastModified": "2025-04-10T15:40:02.600Z"
+  },
+  "content": {
+    "summary": "統合APIコントローラーとコマンド実装の準備開始",
+    "status": "in-progress",
+    "steps": [
+      {
+        "id": "step-1",
+        "status": "completed",
+        "completedAt": "2025-04-10T14:13:00Z",
+        "description": "feature/refactor-api-controllersブランチの作成とメモリバンクの初期化"
+      },
+      {
+        "id": "step-2",
+        "status": "in-progress",
+        "completedAt": "",
+        "description": "受け入れ条件の定義と詳細仕様の作成"
+      }
+    ],
+    "next_steps": [
+      {
+        "id": "step-3",
+        "priority": "high",
+        "description": "DocumentControllerクラスの実装と単体テスト作成",
+        "estimatedCompletion": "2025-04-11"
+      },
+      {
+        "id": "step-4",
+        "priority": "high",
+        "description": "DocumentRepositorySelectorヘルパークラスの実装",
+        "estimatedCompletion": "2025-04-11"
+      },
+      {
+        "id": "step-5",
+        "priority": "high",
+        "description": "write_document/read_documentコマンド実装",
+        "estimatedCompletion": "2025-04-11"
+      },
+      {
+        "id": "step-6",
+        "priority": "medium",
+        "description": "コントローラー・コマンドの統合テスト作成",
+        "estimatedCompletion": "2025-04-12"
+      },
+      {
+        "id": "step-7",
+        "priority": "low",
+        "description": "プルリクエストの作成と親ブランチへのマージ",
+        "estimatedCompletion": "2025-04-12"
+      }
+    ],
+    "findings": [
+      {
+        "id": "finding-1",
+        "impact": "medium",
+        "description": "feature/refactor-api-helpersブランチに依存するため、そのブランチのPRがマージされるまでは実装が完了できない可能性がある"
+      },
+      {
+        "id": "finding-2",
+        "impact": "high",
+        "description": "--no-verify フラグの使用は絶対に避ける（例外はない）という重要なプロジェクトルールがあります。gitのoperationは必ずverifyを含めて実施する。"
+      },
+      {
+        "id": "finding-3",
+        "impact": "medium",
+        "description": "ESLintエラーの修正は理想的だが、このブランチの受け入れ条件としては含めない。既存のLintエラーは許容するが、新たなエラーを増やさないよう注意する。"
+      }
+    ],
+    "acceptance_criteria": {
+      "document_controller": [
+        {
+          "description": "DocumentControllerクラスが作成されている",
+          "status": "pending"
+        },
+        {
+          "description": "writeDocumentメソッドが実装されており、スコープパラメータによってブランチまたはグローバルリポジトリを選択できる",
+          "status": "pending"
+        },
+        {
+          "description": "readDocumentメソッドが実装されており、スコープパラメータによってブランチまたはグローバルリポジトリを選択できる",
+          "status": "pending"
+        },
+        {
+          "description": "writeDocumentメソッドはcontent指定とpatches指定の両方に対応している",
+          "status": "pending"
+        },
+        {
+          "description": "コントローラーは適切なユースケースとリポジトリを選択するためのヘルパーサービスを使用している",
+          "status": "pending"
+        },
+        {
+          "description": "ブランチ指定時に値がない場合は、プロジェクトモードではGitから自動検出する",
+          "status": "pending"
+        },
+        {
+          "description": "各メソッドは適切なエラーハンドリングを実装している",
+          "status": "pending"
+        },
+        {
+          "description": "単体テストが実装されている",
+          "status": "pending"
+        }
+      ],
+      "write_document_command": [
+        {
+          "description": "write_documentコマンドが作成されている",
+          "status": "pending"
+        },
+        {
+          "description": "スコープパラメータ（branch/global）を受け取る",
+          "status": "pending"
+        },
+        {
+          "description": "branchスコープの場合はブランチ名パラメータを受け取る（オプショナル、自動検出対応）",
+          "status": "pending"
+        },
+        {
+          "description": "contentとpatchesの両方の書き込み方法をサポートする",
+          "status": "pending"
+        },
+        {
+          "description": "tagsパラメータをサポートする",
+          "status": "pending"
+        },
+        {
+          "description": "pathパラメータで書き込み先を指定できる",
+          "status": "pending"
+        },
+        {
+          "description": "returnContentオプションをサポートする",
+          "status": "pending"
+        },
+        {
+          "description": "適切なエラーメッセージを表示する",
+          "status": "pending"
+        },
+        {
+          "description": "統合テストが実装されている",
+          "status": "pending"
+        }
+      ],
+      "read_document_command": [
+        {
+          "description": "read_documentコマンドが作成されている",
+          "status": "pending"
+        },
+        {
+          "description": "スコープパラメータ（branch/global）を受け取る",
+          "status": "pending"
+        },
+        {
+          "description": "branchスコープの場合はブランチ名パラメータを受け取る（オプショナル、自動検出対応）",
+          "status": "pending"
+        },
+        {
+          "description": "pathパラメータで読み込み先を指定できる",
+          "status": "pending"
+        },
+        {
+          "description": "JSONコンテンツの場合は自動的にパースして返す",
+          "status": "pending"
+        },
+        {
+          "description": "適切なエラーメッセージを表示する",
+          "status": "pending"
+        },
+        {
+          "description": "統合テストが実装されている",
+          "status": "pending"
+        }
+      ],
+      "helper_classes": [
+        {
+          "description": "DocumentRepositorySelectorクラスが実装されている",
+          "status": "pending"
+        },
+        {
+          "description": "スコープとブランチ名に基づいて適切なリポジトリインスタンスを返す",
+          "status": "pending"
+        },
+        {
+          "description": "ブランチ名が未指定の場合、プロジェクトモードではGitからブランチ名を自動検出する",
+          "status": "pending"
+        },
+        {
+          "description": "単体テストが実装されている",
+          "status": "pending"
+        }
+      ],
+      "quality_requirements": [
+        {
+          "description": "DocumentControllerの単体テストが存在する",
+          "status": "pending"
+        },
+        {
+          "description": "DocumentRepositorySelectorの単体テストが存在する",
+          "status": "pending"
+        },
+        {
+          "description": "write_documentコマンドの統合テストが存在する",
+          "status": "pending"
+        },
+        {
+          "description": "read_documentコマンドの統合テストが存在する",
+          "status": "pending"
+        },
+        {
+          "description": "テストカバレッジが80%以上である",
+          "status": "pending"
+        },
+        {
+          "description": "すべてのテストが成功する（--no-verifyスキップなし！）",
+          "status": "pending"
+        }
+      ],
+      "documentation_requirements": [
+        {
+          "description": "DocumentControllerのJSDocが完成している",
+          "status": "pending"
+        },
+        {
+          "description": "write_documentコマンドの使用例がドキュメント化されている",
+          "status": "pending"
+        },
+        {
+          "description": "read_documentコマンドの使用例がドキュメント化されている",
+          "status": "pending"
+        },
+        {
+          "description": "既存コマンドとの互換性についての説明がある",
+          "status": "pending"
+        }
+      ]
+    }
+  }
+}

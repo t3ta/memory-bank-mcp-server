@@ -1,0 +1,52 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-refactor-api-controllers-document-controller-design",
+    "title": "DocumentController設計",
+    "documentType": "design",
+    "path": "design/document-controller-design.json",
+    "tags": [],
+    "createdAt": "2025-04-11T00:00:00.000Z",
+    "lastModified": "2025-04-10T15:41:02.263Z"
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "概要",
+        "content": "DocumentControllerは、ブランチメモリバンクとグローバルメモリバンク両方に対応した統合インターフェースを提供するコントローラーです。スコープパラメータによって適切なリポジトリとユースケースを選択し、ドキュメントの読み書き操作を行います。"
+      },
+      {
+        "title": "目的",
+        "content": "- 単一コントローラーでブランチとグローバル両方のドキュメント操作をサポート\n- スコープパラメータによる適切なリポジトリ選択\n- リファクタリングしやすい責務分離設計\n- コマンドラインインターフェースの簡素化"
+      },
+      {
+        "title": "クラス構造",
+        "content": "```typescript\nexport class DocumentController {\n  constructor(\n    private readonly readBranchDocumentUseCase: ReadBranchDocumentUseCase,\n    private readonly writeBranchDocumentUseCase: WriteBranchDocumentUseCase,\n    private readonly readGlobalDocumentUseCase: ReadGlobalDocumentUseCase,\n    private readonly writeGlobalDocumentUseCase: WriteGlobalDocumentUseCase,\n    private readonly repositorySelector: DocumentRepositorySelector,\n    private readonly presenter: MCPResponsePresenter,\n    private readonly configProvider: IConfigProvider\n  ) {}\n\n  async readDocument(params: {\n    scope: 'branch' | 'global';\n    branchName?: string;\n    path: string;\n  }): Promise<MCPResponse>;\n\n  async writeDocument(params: {\n    scope: 'branch' | 'global';\n    branchName?: string;\n    path: string;\n    content?: Record<string, unknown> | string;\n    tags?: string[];\n    patches?: Record<string, unknown>[];\n    returnContent?: boolean;\n  }): Promise<MCPResponse>;\n}\n```"
+      },
+      {
+        "title": "ヘルパークラス：DocumentRepositorySelector",
+        "content": "DocumentRepositorySelectorはスコープとブランチ名に基づいて適切なリポジトリを選択するヘルパークラスです。\n\n```typescript\nexport class DocumentRepositorySelector {\n  constructor(\n    private readonly branchRepository: IBranchMemoryBankRepository,\n    private readonly globalRepository: IGlobalMemoryBankRepository,\n    private readonly gitService: IGitService,\n    private readonly configProvider: IConfigProvider\n  ) {}\n\n  async getRepository(scope: 'branch' | 'global', branchName?: string): Promise<{\n    repository: IDocumentRepository;\n    branchInfo?: BranchInfo;\n  }> {\n    // 実装内容\n  }\n\n  private async resolveBranchName(branchName?: string): Promise<string> {\n    // ブランチ名の解決ロジック\n  }\n}\n```"
+      },
+      {
+        "title": "インターフェース：IDocumentRepository",
+        "content": "DocumentControllerがブランチリポジトリとグローバルリポジトリを統一的に扱うためのインターフェースです。\n\n```typescript\nexport interface IDocumentRepository {\n  getDocument(path: DocumentPath): Promise<MemoryDocument | null>;\n  saveDocument(document: MemoryDocument): Promise<void>;\n  exists?(identifier: string): Promise<boolean>;\n  initialize?(identifier: any): Promise<void>;\n}\n```"
+      },
+      {
+        "title": "エラーハンドリング",
+        "content": "- スコープパラメータの検証エラー\n- ブランチ名が必要な場合の検証エラー\n- ブランチ存在チェックエラー\n- ドキュメント存在チェックエラー\n- content/patchesの排他的検証エラー\n- その他のリポジトリ操作エラー\n\nすべてのエラーは適切に捕捉され、MCPResponsePresenterを通じてフォーマットされます。"
+      },
+      {
+        "title": "ブランチ名の自動検出",
+        "content": "プロジェクトモードが有効で、branchNameパラメータが未指定の場合、現在のGitブランチから自動検出します。\n\n```typescript\nprivate async resolveBranchName(branchName?: string): Promise<string> {\n  if (branchName) {\n    return branchName;\n  }\n  \n  const config = this.configProvider.getConfig();\n  if (config.isProjectMode) {\n    try {\n      const currentBranch = await this.gitService.getCurrentBranchName();\n      return currentBranch;\n    } catch (error) {\n      throw ApplicationErrors.invalidInput(\n        'Branch name is required but could not be automatically determined.'\n      );\n    }\n  }\n  \n  throw ApplicationErrors.invalidInput(\n    'Branch name is required when not running in project mode.'\n  );\n}\n```"
+      },
+      {
+        "title": "拡張性と保守性",
+        "content": "- 将来的なドキュメント操作の追加が容易な設計\n- 明確な責務分離によるテスト容易性\n- スコープベースのリポジトリ選択をヘルパークラスに分離\n- 共通インターフェースによるコード重複の最小化"
+      },
+      {
+        "title": "テスト方針",
+        "content": "- DocumentControllerのユニットテスト\n  - 各スコープに対する正常系テスト\n  - 各種エラーケースのテスト\n  - ブランチ名自動解決のテスト\n\n- DocumentRepositorySelectorのユニットテスト\n  - リポジトリ選択の正常系テスト\n  - ブランチ名解決の各パターンテスト\n  - エラー発生時の処理テスト\n\n- 統合テスト\n  - コマンドからコントローラー、リポジトリまでの結合テスト\n  - 実際のファイルシステムとの連携テスト"
+      }
+    ]
+  }
+}
