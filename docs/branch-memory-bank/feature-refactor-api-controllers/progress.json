@@ -7,7 +7,7 @@
     "path": "progress.json",
     "tags": [],
     "createdAt": "2025-04-10T14:20:00.000Z",
-    "lastModified": "2025-04-10T16:21:55.217Z"
+    "lastModified": "2025-04-10T16:25:53.496Z"
   },
   "content": {
     "summary": "統合APIコントローラーとコマンド実装の完了",
@@ -237,7 +237,7 @@
         },
         {
           "description": "すべてのテストが成功する（--no-verifyスキップなし！）",
-          "status": "pending"
+          "status": "completed"
         }
       ],
       "documentation_requirements": [
