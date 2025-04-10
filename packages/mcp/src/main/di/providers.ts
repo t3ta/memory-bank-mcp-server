@@ -4,6 +4,7 @@ export { DIContainer };
 import { fileURLToPath } from 'node:url'; // Import fileURLToPath
 import { MCPResponsePresenter } from '../../interface/presenters/MCPResponsePresenter.js';
 import { IBranchMemoryBankRepository } from '../../domain/repositories/IBranchMemoryBankRepository.js'; // Import interface
+import { IGlobalMemoryBankRepository } from '../../domain/repositories/IGlobalMemoryBankRepository.js'; // Import interface
 import { JsonPatchService } from '../../domain/jsonpatch/JsonPatchService.js'; // Import interface
 import { ReadGlobalDocumentUseCase } from '../../application/usecases/global/ReadGlobalDocumentUseCase.js';
 import { WriteGlobalDocumentUseCase } from '../../application/usecases/global/WriteGlobalDocumentUseCase.js';

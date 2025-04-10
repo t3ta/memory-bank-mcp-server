@@ -6,7 +6,6 @@ import { ApplicationErrors } from '../../../shared/errors/ApplicationError.js';
 import { logger } from '../../../shared/utils/logger.js';
 import { DocumentRepositorySelector } from '../../services/DocumentRepositorySelector.js';
 import { DocumentWriterService, DocumentWriterInput } from '../../services/DocumentWriterService.js';
-import type { JsonPatchOperation } from '../../../domain/jsonpatch/JsonPatchOperation.js';
 
 /**
  * Input data for write document use case
@@ -35,7 +34,7 @@ export interface WriteDocumentInput {
   /**
    * Document content (mutually exclusive with patches)
    */
-  content?: string | object;
+  content?: string | Record<string, unknown>;
 
   /**
    * JSON Patch operations (mutually exclusive with content)
@@ -105,7 +104,7 @@ export class WriteDocumentUseCase
       });
 
       // Get appropriate repository based on scope
-      const { repository, branchInfo } = await this.repositorySelector.getRepository(
+      const { repository } = await this.repositorySelector.getRepository(
         input.scope,
         input.branch
       );
