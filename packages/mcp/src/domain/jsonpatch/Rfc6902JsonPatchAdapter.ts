@@ -34,7 +34,16 @@ export class Rfc6902JsonPatchAdapter implements JsonPatchService {
         throw new DomainError(
           DomainErrorCodes.JSON_PATCH_FAILED,
           `JSON patch operation failed: ${firstError.message || 'Unknown error'}`,
-          { operation: firstError.operation, index: firstError.index }
+          { 
+            errorType: firstError.constructor.name,
+            // MissingError has path property
+            ...(firstError instanceof Error && 'path' in firstError && { path: (firstError as any).path }),
+            // TestError has actual and expected properties
+            ...(firstError instanceof Error && 'actual' in firstError && { 
+              actual: (firstError as any).actual,
+              expected: (firstError as any).expected
+            })
+          }
         );
       }
       
