@@ -1,4 +1,5 @@
-import { Tool } from '../../tools/index.js';
+// Define Tool type if not exported from tools/index.js
+type Tool<T> = (params: T) => Promise<any>;
 import { DocumentController } from '../controllers/DocumentController.js';
 import { Application } from '../../main/Application.js';
 import { setupContainer } from '../../main/di/providers.js';
@@ -144,7 +145,7 @@ export interface ReadDocumentParams {
  *   docs: './docs'
  * });
  */
-export const write_document: Tool<WriteDocumentParams> = async (params) => {
+export const write_document: Tool<WriteDocumentParams> = async (params: WriteDocumentParams) => {
   const { scope, branch, path, content, patches, tags, returnContent, docs } = params;
   
   try {
