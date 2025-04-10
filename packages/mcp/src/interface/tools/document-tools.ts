@@ -318,8 +318,8 @@ export const write_document: Tool<WriteDocumentParams> = async (params) => {
     
     console.log(`[write_document] Returning original result:`, {
       success: result.success,
-      hasError: !!result.error,
-      errorMessage: result.error?.message
+      hasError: !result.success,
+      errorMessage: !result.success ? 'Error occurred' : undefined
     });
     return result;
   } catch (error) {
@@ -529,8 +529,8 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
     
     console.log(`[read_document] Returning original result:`, {
       success: result.success,
-      hasError: !!result.error,
-      errorMessage: result.error?.message
+      hasError: !result.success,
+      errorMessage: !result.success ? 'Error occurred' : undefined
     });
     return result;
   } catch (error) {
