@@ -7,7 +7,7 @@
     "path": "progress.json",
     "tags": [],
     "createdAt": "2025-04-10T14:20:00.000Z",
-    "lastModified": "2025-04-10T15:40:02.600Z"
+    "lastModified": "2025-04-10T15:49:48.126Z"
   },
   "content": {
     "summary": "統合APIコントローラーとコマンド実装の準備開始",
@@ -24,6 +24,24 @@
         "status": "in-progress",
         "completedAt": "",
         "description": "受け入れ条件の定義と詳細仕様の作成"
+      },
+      {
+        "id": "step-3",
+        "status": "completed",
+        "completedAt": "2025-04-11T00:00:00Z",
+        "description": "DocumentRepositorySelectorの実装"
+      },
+      {
+        "id": "step-4",
+        "status": "completed",
+        "completedAt": "2025-04-11T00:00:00Z",
+        "description": "DocumentControllerの実装"
+      },
+      {
+        "id": "step-5",
+        "status": "completed",
+        "completedAt": "2025-04-11T00:00:00Z",
+        "description": "write_document/read_documentコマンドの実装"
       }
     ],
     "next_steps": [
@@ -79,31 +97,31 @@
       "document_controller": [
         {
           "description": "DocumentControllerクラスが作成されている",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "writeDocumentメソッドが実装されており、スコープパラメータによってブランチまたはグローバルリポジトリを選択できる",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "readDocumentメソッドが実装されており、スコープパラメータによってブランチまたはグローバルリポジトリを選択できる",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "writeDocumentメソッドはcontent指定とpatches指定の両方に対応している",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "コントローラーは適切なユースケースとリポジトリを選択するためのヘルパーサービスを使用している",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "ブランチ指定時に値がない場合は、プロジェクトモードではGitから自動検出する",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "各メソッドは適切なエラーハンドリングを実装している",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "単体テストが実装されている",
@@ -113,35 +131,35 @@
       "write_document_command": [
         {
           "description": "write_documentコマンドが作成されている",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "スコープパラメータ（branch/global）を受け取る",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "branchスコープの場合はブランチ名パラメータを受け取る（オプショナル、自動検出対応）",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "contentとpatchesの両方の書き込み方法をサポートする",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "tagsパラメータをサポートする",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "pathパラメータで書き込み先を指定できる",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "returnContentオプションをサポートする",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "適切なエラーメッセージを表示する",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "統合テストが実装されている",
@@ -151,27 +169,27 @@
       "read_document_command": [
         {
           "description": "read_documentコマンドが作成されている",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "スコープパラメータ（branch/global）を受け取る",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "branchスコープの場合はブランチ名パラメータを受け取る（オプショナル、自動検出対応）",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "pathパラメータで読み込み先を指定できる",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "JSONコンテンツの場合は自動的にパースして返す",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "適切なエラーメッセージを表示する",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "統合テストが実装されている",
@@ -181,15 +199,15 @@
       "helper_classes": [
         {
           "description": "DocumentRepositorySelectorクラスが実装されている",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "スコープとブランチ名に基づいて適切なリポジトリインスタンスを返す",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "ブランチ名が未指定の場合、プロジェクトモードではGitからブランチ名を自動検出する",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "単体テストが実装されている",

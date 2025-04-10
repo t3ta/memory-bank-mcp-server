@@ -19,6 +19,7 @@ import { ReadContextUseCase } from '../../application/usecases/common/ReadContex
 import { ReadBranchDocumentUseCase } from '../../application/usecases/branch/ReadBranchDocumentUseCase.js';
 import { WriteBranchDocumentUseCase } from '../../application/usecases/branch/WriteBranchDocumentUseCase.js';
 import { DocumentWriterService } from '../../application/services/DocumentWriterService.js'; // Import DocumentWriterService
+import { DocumentRepositorySelector } from '../../application/services/DocumentRepositorySelector.js'; // Import DocumentRepositorySelector
 import { SearchDocumentsByTagsUseCase } from '../../application/usecases/common/SearchDocumentsByTagsUseCase.js';
 import { UpdateTagIndexUseCase } from '../../application/usecases/common/UpdateTagIndexUseCase.js';
 import { UpdateTagIndexUseCaseV2 } from '../../application/usecases/common/UpdateTagIndexUseCaseV2.js';
@@ -44,6 +45,7 @@ import { JsonResponsePresenter } from '../../interface/presenters/JsonResponsePr
 import { GlobalController } from '../../interface/controllers/GlobalController.js';
 import { BranchController } from '../../interface/controllers/BranchController.js';
 import { JsonBranchController } from '../../interface/controllers/json/JsonBranchController.js';
+import { DocumentController } from '../../interface/controllers/DocumentController.js';
 
 import { CliOptions } from '../../infrastructure/config/WorkspaceConfig.js';
 // Removed unused import: import { UseCaseFactory } from '../../factory/use-case-factory.js';
@@ -190,6 +192,20 @@ export async function registerInfrastructureServices(
  * @param container DI Container
  */
 export async function registerApplicationServices(container: DIContainer): Promise<void> {
+  // Register DocumentRepositorySelector
+  container.registerFactory('documentRepositorySelector', async () => {
+    const branchRepository = await container.get<IBranchMemoryBankRepository>('branchMemoryBankRepository');
+    const globalRepository = await container.get<IGlobalMemoryBankRepository>('globalMemoryBankRepository');
+    const gitService = await container.get<IGitService>('gitService');
+    const configProvider = await container.get<IConfigProvider>('configProvider');
+    
+    return new DocumentRepositorySelector(
+      branchRepository,
+      globalRepository,
+      gitService,
+      configProvider
+    );
+  });
   container.registerFactory('readGlobalDocumentUseCase', async () => {
     const globalRepository = await container.get<FileSystemGlobalMemoryBankRepository>(
       'globalMemoryBankRepository'
@@ -385,6 +401,25 @@ export async function registerApplicationServices(container: DIContainer): Promi
 export async function registerInterfaceServices(container: DIContainer): Promise<void> {
   container.register('mcpResponsePresenter', new MCPResponsePresenter());
   container.register('jsonResponsePresenter', new JsonResponsePresenter());
+
+  // Register DocumentController
+  container.registerFactory('documentController', async () => {
+    const readBranchDocumentUseCase = await container.get<ReadBranchDocumentUseCase>('readBranchDocumentUseCase');
+    const writeBranchDocumentUseCase = await container.get<WriteBranchDocumentUseCase>('writeBranchDocumentUseCase');
+    const readGlobalDocumentUseCase = await container.get<ReadGlobalDocumentUseCase>('readGlobalDocumentUseCase');
+    const writeGlobalDocumentUseCase = await container.get<WriteGlobalDocumentUseCase>('writeGlobalDocumentUseCase');
+    const repositorySelector = await container.get<DocumentRepositorySelector>('documentRepositorySelector');
+    const presenter = await container.get<MCPResponsePresenter>('mcpResponsePresenter');
+    
+    return new DocumentController(
+      readBranchDocumentUseCase,
+      writeBranchDocumentUseCase,
+      readGlobalDocumentUseCase,
+      writeGlobalDocumentUseCase,
+      repositorySelector,
+      presenter
+    );
+  });
 
   container.registerFactory('contextController', async () => {
     const readContextUseCase = await container.get<ReadContextUseCase>('readContextUseCase');

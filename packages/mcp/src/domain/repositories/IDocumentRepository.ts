@@ -3,7 +3,8 @@ import type { MemoryDocument } from '../entities/MemoryDocument.js';
 
 /**
  * Common interface for document repositories (Branch and Global).
- * Defines the essential methods required by the DocumentWriterService.
+ * This interface abstracts the common operations between branch and global memory banks.
+ * Used by the DocumentWriterService and DocumentController to provide a unified interface.
  */
 export interface IDocumentRepository {
   /**
@@ -22,8 +23,17 @@ export interface IDocumentRepository {
    */
   saveDocument(document: MemoryDocument): Promise<void>;
 
-  // Add other common methods if needed by DocumentWriterService or future shared services.
-  // For example:
-  // exists(path: DocumentPath): Promise<boolean>;
-  // deleteDocument(path: DocumentPath): Promise<void>;
+  /**
+   * Check if a specific identifier exists in the repository
+   * @param identifier The identifier to check (branch name for branch repos, any string for global)
+   * @returns Promise resolving to boolean indicating if the identifier exists
+   */
+  exists?(identifier: string): Promise<boolean>;
+
+  /**
+   * Initialize repository or repository section
+   * @param identifier Optional identifier for initialization (like branch info)
+   * @returns Promise resolving when initialization is complete
+   */
+  initialize?(identifier?: any): Promise<void>;
 }

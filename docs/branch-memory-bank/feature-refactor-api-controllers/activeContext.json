@@ -7,10 +7,10 @@
     "path": "activeContext.json",
     "tags": [],
     "createdAt": "2025-04-10T14:20:00.000Z",
-    "lastModified": "2025-04-10T15:42:44.710Z"
+    "lastModified": "2025-04-10T15:50:35.201Z"
   },
   "content": {
-    "current_task": "受け入れ条件の定義と実装計画の作成",
+    "current_task": "テスト作成とドキュメント作成",
     "relevant_files": [
       "../feature/refactor-api/design/api-refactoring-plan.json",
       "../feature/refactor-api/design/api-refactoring-implementation-plan.json",
@@ -51,6 +51,16 @@
         "date": "2025-04-10",
         "description": "feature/refactor-api-helpersブランチの実装を参照しながら設計する方針を決定",
         "rationale": "最新の統合APIの仕様を反映するため"
+      },
+      {
+        "date": "2025-04-11",
+        "description": "DocumentControllerとDocumentRepositorySelectorを実装し、軽量なアダプターパターンを用いた",
+        "rationale": "全く新しいコントローラーとリポジトリ選択ロジックを実装し、元のクラスとミックスした際の変更を最小化できるようにするため"
+      },
+      {
+        "date": "2025-04-11",
+        "description": "write_documentとread_documentコマンドを実装し、統合API用のインターフェースを提供",
+        "rationale": "既存のコマンドを残しつつ、新しいシンプルなインターフェースを提供し、後方互換性を保ちつつ改善するため"
       }
     ]
   }
