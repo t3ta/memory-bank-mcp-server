@@ -52,7 +52,7 @@ describe('Direct read_document E2E Tests', () => {
   });
 
   // Helper to create test documents for reading
-  async function createTestDocument(scope: 'branch' | 'global', branch: string | undefined, filePath: string, content: any, tags: string[] = []) {
+  async function createTestDocument(scope: 'branch' | 'global', branch: string | undefined, filePath: string, content: Record<string, unknown> | string, tags: string[] = []): Promise<ReturnType<typeof write_document>> {
     return write_document({
       scope,
       branch,

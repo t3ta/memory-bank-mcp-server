@@ -201,28 +201,38 @@ describe('MCP E2E Unified Document Commands Tests', () => {
     });
 
     it('should fail when neither content nor patches are provided', async () => {
-      // Act & Assert
-      await expect(client.callTool('write_document', {
+      // Act
+      const result = await client.callTool('write_document', {
         scope: 'branch',
         branch: testBranchName,
         path: 'missing-data-doc.json',
         docs: 'docs',
-      })).rejects.toThrow(/content.*patches/i);
+      });
+      
+      // Assert
+      expect(result.success).toBe(false);
+      expect(result.error).toBeDefined();
+      expect(result.error?.message).toMatch(/content.*patches/i);
     });
 
     it('should fail when both content and patches are provided', async () => {
       // Arrange
       const patches = [{ op: 'replace', path: '/content/message', value: 'test' }];
 
-      // Act & Assert
-      await expect(client.callTool('write_document', {
+      // Act
+      const result = await client.callTool('write_document', {
         scope: 'branch',
         branch: testBranchName,
         path: testDocPath,
         content: initialDocContent,
         patches: patches,
         docs: 'docs',
-      })).rejects.toThrow(/Cannot provide both/i);
+      });
+      
+      // Assert
+      expect(result.success).toBe(false);
+      expect(result.error).toBeDefined();
+      expect(result.error?.message).toMatch(/Cannot provide both/i);
     });
   });
 
@@ -310,24 +320,34 @@ describe('MCP E2E Unified Document Commands Tests', () => {
     });
 
     it('should fail when reading non-existent document', async () => {
-      // Act & Assert
-      await expect(client.callTool('read_document', {
+      // Act
+      const result = await client.callTool('read_document', {
         scope: 'branch',
         branch: testBranchName,
         path: 'non-existent-document.json',
         docs: 'docs',
-      })).rejects.toThrow(/not found/i);
+      });
+      
+      // Assert
+      expect(result.success).toBe(false);
+      expect(result.error).toBeDefined();
+      expect(result.error?.message).toMatch(/not found/i);
     });
 
     it('should fail when scope is invalid', async () => {
-      // Act & Assert
-      await expect(client.callTool('read_document', {
+      // Act
+      const result = await client.callTool('read_document', {
         // @ts-ignore - Testing invalid scope
         scope: 'invalid-scope',
         branch: testBranchName,
         path: testDocPath,
         docs: 'docs',
-      })).rejects.toThrow(/Invalid scope/i);
+      });
+      
+      // Assert
+      expect(result.success).toBe(false);
+      expect(result.error).toBeDefined();
+      expect(result.error?.message).toMatch(/Invalid scope/i);
     });
 
     it('should auto-detect branch in project mode', async () => {
@@ -337,32 +357,33 @@ describe('MCP E2E Unified Document Commands Tests', () => {
 
       // This test checks that we can call read_document without specifying a branch
       // But since this is a test environment, we'd need to mock the Git service
-      // For now, we'll check that an error is thrown since there's likely no branch detected
+      // For now, we'll check the error response since there's likely no branch detected
 
       // An implementation that properly tests this would require setting up the Git service
       // to return a specific branch when getCurrentBranchName is called
 
-      try {
-        await client.callTool('read_document', {
-          scope: 'branch',
-          // No branch specified - should be auto-detected in project mode
-          path: testDocPath,
-          docs: 'docs',
-        });
-        
-        // If we got here, it might be working with auto-detection
-        // Verify the content to make sure
-        // This might not be reliable in all test environments
-      } catch (error: any) {
-        // This should either succeed (if branch detection works in test env)
-        // or fail with a specific error about branch detection
-        // Different environments might behave differently
-        if (error.message && error.message.includes('auto')) {
-          // This is expected if branch auto-detection attempted but failed
-          expect(error.message).toMatch(/branch/i);
-        } else {
-          throw error; // Unexpected error
-        }
+      // Act
+      const result = await client.callTool('read_document', {
+        scope: 'branch',
+        // No branch specified - should be auto-detected in project mode
+        path: testDocPath,
+        docs: 'docs',
+      });
+      
+      // Test passes if either:
+      // 1. It returns success (means branch detection worked - rare in test environment)
+      // 2. It returns the right kind of error (branch not detected, not validation error)
+      if (result.success) {
+        // If this works, it means branch auto-detection actually worked
+        // Verify the content
+        expect(result.data).toBeDefined();
+        expect(result.data.path).toBe(testDocPath);
+      } else {
+        // More likely in test environment - branch detection failed
+        expect(result.error).toBeDefined();
+        // Should be a branch detection error, not a validation error
+        expect(result.error?.message).toMatch(/branch.*not.*detected|found/i);
+        expect(result.error?.message).not.toMatch(/invalid.*parameter/i);
       }
     });
   });

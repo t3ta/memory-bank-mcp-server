@@ -7,7 +7,7 @@
     "path": "e2e-test-implementation-next-steps.json",
     "tags": [],
     "createdAt": "2025-04-11T17:05:00.000Z",
-    "lastModified": "2025-04-10T17:01:39.986Z"
+    "lastModified": "2025-04-10T18:34:09.809Z"
   },
   "content": {
     "summary": "統合APIコントローラーのE2Eテスト実装の次のステップを定義するドキュメントです。",
@@ -30,7 +30,7 @@
       },
       {
         "title": "完了チェックリスト",
-        "content": "## 完了チェックリスト\n- [x] write_document.e2e.test.tsのエラーハンドリング修正\n- [x] read_document.e2e.test.tsの実装完了\n- [x] document-tools.tsのDI問題修正\n- [ ] テスト実行と結果の確認\n- [ ] 書き込みと読み取りのファイル操作問題の解決\n- [ ] 既存のunified-document-commands.e2e.test.tsの処理決定（削除または有効化）\n- [ ] CIでのテスト実行確認\n- [x] メモリバンクドキュメントの更新\n- [ ] ESLintエラーのチェック（新たなエラーを増やさないこと）\n- [ ] PRの作成準備"
+        "content": "## 完了チェックリスト\n- [x] write_document.e2e.test.tsのエラーハンドリング修正\n- [x] read_document.e2e.test.tsの実装完了\n- [x] document-tools.tsのDI問題修正\n- [x] テスト実行と結果の確認\n- [x] 書き込みと読み取りのファイル操作問題の解決\n- [x] 既存のunified-document-commands.e2e.test.tsの処理決定（削除または有効化）\n- [x] ESLintエラーのチェック（新たなエラーを増やさないこと）\n- [x] メモリバンクドキュメントの更新\n- [ ] CIでのテスト実行確認\n- [ ] PRの作成準備"
       }
     ]
   }
