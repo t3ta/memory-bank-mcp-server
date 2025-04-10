@@ -22,7 +22,7 @@ export function renderBranchContextContent(content: any): string {
          if (content.createdAt) {
             try {
                 mdString += `**Created At:** ${new Date(content.createdAt).toLocaleString()}\n\n`;
-            } catch(e) { /* ignore */ }
+            } catch (_e) { /* ignore */ }
         }
 
         if (Array.isArray(content.userStories) && content.userStories.length > 0) {

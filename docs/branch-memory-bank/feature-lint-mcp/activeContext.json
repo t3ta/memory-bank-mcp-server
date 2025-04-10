@@ -1,0 +1,17 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-lint-mcp-active-context",
+    "title": "Active Context for feature/lint-mcp",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [],
+    "createdAt": "2025-04-10T10:03:36.638Z",
+    "lastModified": "2025-04-10T10:03:36.638Z"
+  },
+  "content": {
+    "current_task": "Initial active context for branch: feature/lint-mcp",
+    "relevant_files": [],
+    "recent_decisions": []
+  }
+}

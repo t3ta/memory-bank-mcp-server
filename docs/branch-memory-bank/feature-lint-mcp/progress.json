@@ -1,0 +1,19 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-lint-mcp-progress",
+    "title": "Progress for feature/lint-mcp",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "createdAt": "2025-04-10T10:03:36.638Z",
+    "lastModified": "2025-04-10T10:03:36.638Z"
+  },
+  "content": {
+    "summary": "Initial progress for branch: feature/lint-mcp",
+    "status": "initialized",
+    "steps": [],
+    "next_steps": [],
+    "findings": []
+  }
+}

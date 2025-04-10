@@ -40,7 +40,7 @@ export function renderSystemPatternsContent(content: any): string {
                     if (decision.date) {
                      try {
                         mdString += `   - **Date:** ${new Date(decision.date).toLocaleDateString()}\n`;
-                     } catch(e) { /* ignore */ }
+                     } catch (_e) { /* ignore */ }
                     }
 
                     try {

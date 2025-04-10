@@ -1,5 +1,5 @@
 import * as cp from 'child_process';
-import * as vscode from 'vscode';
+import * as _vscode from 'vscode';
 
 /**
  * Gets the current Git branch name for the given workspace folder.

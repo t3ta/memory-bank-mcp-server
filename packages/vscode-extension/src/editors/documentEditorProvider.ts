@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import * as micromatch from 'micromatch'; // ★ micromatch をインポート
+// import * as micromatch from 'micromatch'; // 現在は使用していないのでコメントアウト
 import MarkdownIt from 'markdown-it';
 import hljs from 'highlight.js';
 import { generateMarkdownFromData } from '../markdown/renderers';
@@ -15,7 +15,7 @@ const md = new MarkdownIt({
         return '<pre><code class="hljs ' + lang + '">' +
           hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
           '</code></pre>';
-      } catch (__) {/* ignore */ }
+      } catch {/* ignore */ }
     }
     return '<pre><code class="hljs">' + md.utils.escapeHtml(str) + '</code></pre>';
   }

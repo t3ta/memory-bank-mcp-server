@@ -63,7 +63,7 @@ export class PackageAnalyzer {
             try {
               const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
               packagePaths.set(packageJson.name, packagePath);
-            } catch (e) {
+            } catch (_e) {
               console.error(`Invalid package.json in ${packagePath}`);
             }
           }
@@ -129,7 +129,7 @@ export class PackageAnalyzer {
           description: packageJson.description,
           dependencies: packageJson.dependencies
         };
-      } catch (e) {
+      } catch (_e) {
         console.error(`Invalid package.json in ${dirPath}`);
       }
     }
@@ -146,7 +146,7 @@ export class PackageAnalyzer {
         continue;
       }
       
-      files.push(this.analyzeSourceFile(sourceFile, options));
+      files.push(this.analyzeSourceFile(sourceFile, (_options));
     }
     
     // サブディレクトリを解析
@@ -163,7 +163,7 @@ export class PackageAnalyzer {
           continue;
         }
         
-        subdirectories.push(this.analyzeDirectoryPath(subdirPath, project, options));
+        subdirectories.push(this.analyzeDirectoryPath(subdirPath, project, (_options));
       }
     }
     

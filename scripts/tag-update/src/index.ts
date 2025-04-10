@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
-import fs from 'fs-extra';
-import path from 'path';
+// fs-extraとpathは他のモジュールで使用されています
 import minimist from 'minimist';
 import chalk from 'chalk';
 import { Logger, LogLevel } from './logger';
@@ -217,17 +216,17 @@ async function main() {
     } else {
       logger.info(chalk.yellow('タグ更新プロセスのドライランが正常に完了しました'));
     }
-  } catch (error) {
+  } catch (err) {
     // エラーハンドリング
     console.error(chalk.red('エラーが発生しました:'));
-    console.error(error);
+    console.error(err);
     process.exit(1);
   }
 }
 
 // スクリプトを実行
-main().catch(error => {
+main().catch(err => {
   console.error(chalk.red('致命的なエラーが発生しました:'));
-  console.error(error);
+  console.error(err);
   process.exit(1);
 });
