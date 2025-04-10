@@ -1,8 +1,8 @@
 {
   "schema": "memory_document_v2",
+  "documentType": "branch_context",
   "metadata": {
     "id": "basic-branch-context",
-    "documentType": "branch_context",
     "path": "branchContext.json"
   },
   "content": {

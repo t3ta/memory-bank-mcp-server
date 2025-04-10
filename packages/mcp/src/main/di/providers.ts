@@ -1,6 +1,7 @@
 // Import DIContainer for both type and value usage, then re-export it.
 import { DIContainer } from './DIContainer.js';
 export { DIContainer };
+import { fileURLToPath } from 'node:url'; // Import fileURLToPath
 import { MCPResponsePresenter } from '../../interface/presenters/MCPResponsePresenter.js';
 import { IBranchMemoryBankRepository } from '../../domain/repositories/IBranchMemoryBankRepository.js'; // Import interface
 import { JsonPatchService } from '../../domain/jsonpatch/JsonPatchService.js'; // Import interface
@@ -17,6 +18,7 @@ import { ReadRulesUseCase } from '../../application/usecases/common/ReadRulesUse
 import { ReadContextUseCase } from '../../application/usecases/common/ReadContextUseCase.js';
 import { ReadBranchDocumentUseCase } from '../../application/usecases/branch/ReadBranchDocumentUseCase.js';
 import { WriteBranchDocumentUseCase } from '../../application/usecases/branch/WriteBranchDocumentUseCase.js';
+import { DocumentWriterService } from '../../application/services/DocumentWriterService.js'; // Import DocumentWriterService
 import { SearchDocumentsByTagsUseCase } from '../../application/usecases/common/SearchDocumentsByTagsUseCase.js';
 import { UpdateTagIndexUseCase } from '../../application/usecases/common/UpdateTagIndexUseCase.js';
 import { UpdateTagIndexUseCaseV2 } from '../../application/usecases/common/UpdateTagIndexUseCaseV2.js';
@@ -28,6 +30,7 @@ import { DeleteJsonDocumentUseCase } from '../../application/usecases/json/Delet
 import { SearchJsonDocumentsUseCase } from '../../application/usecases/json/SearchJsonDocumentsUseCase.js';
 import { UpdateJsonIndexUseCase } from '../../application/usecases/json/UpdateJsonIndexUseCase.js';
 import { TemplateService } from '../../application/templates/TemplateService.js'; // Added import
+import { I18nService } from '../../application/i18n/I18nService.js'; // Import I18nService
 import { IFileSystemService } from '../../infrastructure/storage/interfaces/IFileSystemService.js';
 import { FileSystemService } from '../../infrastructure/storage/FileSystemService.js';
 import { IConfigProvider } from '../../infrastructure/config/interfaces/IConfigProvider.js';
@@ -117,14 +120,17 @@ export async function registerInfrastructureServices(
 
 
   container.registerFactory('i18nRepository', async () => {
-    const configProvider = await container.get<IConfigProvider>('configProvider');
-    const config = configProvider.getConfig();
-    const translationsDir = path.join(config.docsRoot, 'translations');
+    // Resolve absolute path from project root for built files
+    const __filename_i18n = fileURLToPath(import.meta.url);
+    const __dirname_i18n = path.dirname(__filename_i18n);
+    // Assuming providers.ts is in dist/main/di after build
+    // Assuming providers.ts is in dist/main/di after build, go up 5 levels
+    const projectRoot_i18n = path.resolve(__dirname_i18n, '../../../../../'); // Corrected path depth
+    const translationsDir = path.join(projectRoot_i18n, 'packages/mcp/dist/infrastructure/i18n/translations');
+    logger.debug(`[DI] Initializing i18nRepository with translationsDir: ${translationsDir}`);
     const { FileI18nRepository } = await import('../../infrastructure/i18n/FileI18nRepository.js');
     const i18nRepository = new FileI18nRepository(translationsDir);
-    await i18nRepository.initialize().catch(error => {
-      logger.error('Failed to initialize i18n repository', { error }); // Use logger.error with context
-    });
+    await i18nRepository.initialize(); // Let errors propagate
     return i18nRepository;
   });
 
@@ -154,17 +160,24 @@ export async function registerInfrastructureServices(
     return new FileSystemJsonDocumentRepository(fileSystemService, indexService, globalJsonRoot);
   });
   // Register FileTemplateRepository
-  container.registerFactory('templateRepository', async () => {
-    logger.debug('Resolving dependencies for templateRepository...');
-    const currentFileURL = import.meta.url;
-    const currentDirPath = path.dirname(new URL(currentFileURL).pathname);
-    const templateBasePath = path.resolve(currentDirPath, '../../templates/json');
-    logger.debug(`Template base path resolved to: ${templateBasePath}`);
-    const templateRepository = new FileTemplateRepository(templateBasePath, undefined);
-    await templateRepository.initialize();
-    logger.debug('templateRepository initialized.');
-    return templateRepository;
-  });
+  // Register TemplateRepository using registerFactory (it behaves as singleton)
+  // container.registerFactory('templateRepository', async () => {
+  //   logger.debug('Resolving dependencies for templateRepository...');
+  //   // Resolve absolute path from project root for built files
+  //   const __filename_tmpl = fileURLToPath(import.meta.url); // Use different variable names
+  //   const __dirname_tmpl = path.dirname(__filename_tmpl);
+  //   // Assuming providers.ts is in dist/main/di after build
+  //   // Assuming providers.ts is in dist/main/di after build, go up 5 levels
+  //   // Assuming providers.ts is in dist/main/di after build, go up 5 levels
+  //   const projectRoot_tmpl = path.resolve(__dirname_tmpl, '../../../../../'); // Corrected path depth (already correct here, but ensure consistency)
+  //   const templateBasePath = path.join(projectRoot_tmpl, 'packages/mcp/dist/templates/json');
+  //   logger.debug(`Template base path resolved to: ${templateBasePath}`);
+  //   const i18nService = await container.get<I18nService>('i18nService');
+  //   const templateRepository = new FileTemplateRepository(templateBasePath, i18nService);
+  //   await templateRepository.initialize();
+  //   logger.debug('templateRepository initialized.');
+  //   return templateRepository;
+  // });
 
 
 
@@ -187,9 +200,11 @@ export async function registerApplicationServices(container: DIContainer): Promi
   // Add missing registration for writeGlobalDocumentUseCase
   container.registerFactory('writeGlobalDocumentUseCase', async () => {
     const globalRepository = await container.get<FileSystemGlobalMemoryBankRepository>(
-      'globalMemoryBankRepository'
-    );
-    return new WriteGlobalDocumentUseCase(globalRepository);
+     'globalMemoryBankRepository'
+   );
+   const patchService = await container.get<JsonPatchService>('jsonPatchService'); // Resolve JsonPatchService
+   const documentWriterService = new DocumentWriterService(patchService); // Instantiate DocumentWriterService
+   return new WriteGlobalDocumentUseCase(globalRepository, documentWriterService); // Inject DocumentWriterService
   });
 
   container.registerFactory('markdownMigrationService', async () => {
@@ -212,10 +227,9 @@ export async function registerApplicationServices(container: DIContainer): Promi
 
   // Register JsonPatchService implementation (using the refactored adapter)
   container.registerFactory('jsonPatchService', async () => {
-      // Import the adapter class directly (assuming file rename to Rfc6902JsonPatchAdapter.ts)
-      // Use the correct class name and ensure the path matches the renamed file
-      const { Rfc6902JsonPatchAdapter } = await import('../../domain/jsonpatch/Rfc6902JsonPatchAdapter.js');
-      return new Rfc6902JsonPatchAdapter();
+      // Import the NEW adapter class
+      const { FastJsonPatchAdapter } = await import('../../domain/jsonpatch/FastJsonPatchAdapter.js'); // Use the new adapter
+      return new FastJsonPatchAdapter(); // Instantiate the new adapter
   });
 
   // Make the factory async and await the repository and patch service
@@ -223,11 +237,13 @@ export async function registerApplicationServices(container: DIContainer): Promi
     const branchRepository = await container.get<IBranchMemoryBankRepository>( // Use interface type
       'branchMemoryBankRepository'
     );
-    const patchService = await container.get<JsonPatchService>('jsonPatchService'); // Get the patch service
-    const gitService = await container.get<IGitService>('gitService');
-    const configProvider = await container.get<IConfigProvider>('configProvider');
-    // Directly instantiate the use case with dependencies
-    return new WriteBranchDocumentUseCase(branchRepository, patchService, gitService, configProvider);
+   const patchService = await container.get<JsonPatchService>('jsonPatchService'); // Resolve JsonPatchService
+   const gitService = await container.get<IGitService>('gitService');
+   const configProvider = await container.get<IConfigProvider>('configProvider');
+   // Instantiate DocumentWriterService
+   const documentWriterService = new DocumentWriterService(patchService);
+   // Instantiate the use case with DocumentWriterService
+   return new WriteBranchDocumentUseCase(branchRepository, documentWriterService, gitService, configProvider);
   });
 
   // Add missing registration for readBranchDocumentUseCase
@@ -244,8 +260,8 @@ export async function registerApplicationServices(container: DIContainer): Promi
     const configProvider = await container.get<IConfigProvider>('configProvider'); // Get configProvider within the factory scope
     const config = configProvider.getConfig();
     const rulesDir = config.docsRoot; // Keep fallback path for now
-    const templateLoader = await container.get<TemplateService>('templateService'); // Get TemplateService
-    return new ReadRulesUseCase(rulesDir, templateLoader); // Pass templateLoader
+    const templateLoader = await container.get<TemplateService>('templateService'); // Get TemplateService ★コメント解除★
+    return new ReadRulesUseCase(rulesDir, templateLoader); // Pass templateLoader ★引数に追加★
   });
 
   container.registerFactory('readContextUseCase', async () => {
@@ -255,7 +271,11 @@ export async function registerApplicationServices(container: DIContainer): Promi
     const globalRepository = await container.get<FileSystemGlobalMemoryBankRepository>(
       'globalMemoryBankRepository'
     );
-    return new ReadContextUseCase(branchRepository, globalRepository);
+    // --- Resolve additional dependencies ---
+    const gitService = await container.get<IGitService>('gitService');
+    const configProvider = await container.get<IConfigProvider>('configProvider');
+    // --- Pass all dependencies to the constructor ---
+    return new ReadContextUseCase(branchRepository, globalRepository, gitService, configProvider);
   });
 
   // Register the updated SearchDocumentsByTagsUseCase
@@ -340,11 +360,31 @@ export async function registerApplicationServices(container: DIContainer): Promi
     return new CreateBranchCoreFilesUseCase(branchRepository);
   });
 
+  // Register I18nService using registerFactory (it behaves as singleton)
   container.registerFactory('i18nService', async () => {
-    const i18nRepository = await container.get<II18nRepository>('i18nRepository'); // Await repository
-    const { I18nService } = await import('../../application/i18n/I18nService.js'); // Corrected path
-    return new I18nService(i18nRepository);
+    const i18nRepository = await container.get<II18nRepository>('i18nRepository');
+    const { I18nService } = await import('../../application/i18n/I18nService.js');
+    const i18nService = new I18nService(i18nRepository);
+    await i18nService.loadAllTranslations();
+    return i18nService;
   });
+  // Register TemplateRepository after I18nService is initialized
+  container.registerFactory('templateRepository', async () => {
+    logger.debug('Resolving dependencies for templateRepository...');
+    // Resolve absolute path from project root for built files
+    const __filename_tmpl = fileURLToPath(import.meta.url); // Use different variable names
+    const __dirname_tmpl = path.dirname(__filename_tmpl);
+    // Assuming providers.ts is in dist/main/di after build, go up 5 levels
+    const projectRoot_tmpl = path.resolve(__dirname_tmpl, '../../../../../'); // Corrected path depth
+    const templateBasePath = path.join(projectRoot_tmpl, 'packages/mcp/dist/templates/json');
+    logger.debug(`Template base path resolved to: ${templateBasePath}`);
+    const i18nService = await container.get<I18nService>('i18nService'); // i18nService is now guaranteed to be initialized
+    const templateRepository = new FileTemplateRepository(templateBasePath, i18nService);
+    await templateRepository.initialize(); // Initialize after getting i18nService
+    logger.debug('templateRepository initialized.');
+    return templateRepository;
+  });
+
 
   // Register TemplateService
   container.registerFactory('templateService', async () => {
@@ -482,28 +522,26 @@ export async function initializeRepositories(container: DIContainer): Promise<vo
 import { logger } from '../../shared/utils/logger.js';
 
 export async function setupContainer(options?: CliOptions): Promise<DIContainer> {
-  logger.debug('[setupContainer] Starting setupContainer', { options }); // Use logger.debug
-  logger.debug('Setting up DI container...'); // Log start
+  logger.info('Setting up DI container...'); // Restore original log level and message
+
   const container = new DIContainer();
 
   logger.debug('Registering infrastructure services...');
-  logger.debug('[setupContainer] Calling registerInfrastructureServices...'); // Use logger.debug
   await registerInfrastructureServices(container, options);
-  logger.debug('[setupContainer] Finished registerInfrastructureServices.'); // Use logger.debug
   logger.debug('Infrastructure services registered.');
 
   logger.debug('Registering application services...');
-  registerApplicationServices(container); // This is synchronous
+  await registerApplicationServices(container); // Restore await
   logger.debug('Application services registered.');
 
   logger.debug('Registering interface services...');
-  registerInterfaceServices(container); // This is synchronous
+  await registerInterfaceServices(container); // Restore await
   logger.debug('Interface services registered.');
 
   logger.debug('Initializing repositories...');
-  // await initializeRepositories(container); // Temporarily disable repository initialization
-  logger.debug('Repositories initialization skipped.'); // Log skip
+  await initializeRepositories(container); // Restore await and call
+  logger.debug('Repositories initialized.'); // Restore log
 
-  logger.debug('DI container setup complete.'); // Log end
+  logger.info('DI container setup complete'); // Restore original log level and message
   return container;
 }

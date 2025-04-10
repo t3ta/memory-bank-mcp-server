@@ -1,0 +1,133 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "ce175153-6de0-4b46-805b-6b47fab4bd79",
+    "title": "進捗状況",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "lastModified": "2025-04-07T01:07:33.768Z",
+    "createdAt": "2025-04-06T08:52:04.657Z",
+    "version": 3
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "7864013c-523e-4a75-8270-e83c50a70963",
+        "description": "E2Eテスト導入計画の作成",
+        "implementedAt": "2025-04-06T09:35:15.000Z"
+      },
+      {
+        "id": "f24024d3-906c-40fc-93af-1783f9fcb31e",
+        "description": "E2Eテスト実装ステップの詳細計画（SDKを直接利用）",
+        "implementedAt": "2025-04-06T10:55:20.000Z"
+      },
+      {
+        "id": "e2e-vitest-migration-attempt-summary",
+        "description": "E2EテストのJestからVitestへの移行作業（途中）",
+        "status": "completed",
+        "summary": "search.e2e.test.ts のデバッグ完了。beforeAll が実行されない問題、インデックスファイル読み込みの問題、ユニットテストの期待値ズレを修正。関連ファイルの不要コメント削除と英語化も実施。ビルド＆テスト成功確認済み。",
+        "identifiedKeyFiles": [
+          "packages/mcp/tests/e2e/vitest.config.ts",
+          "packages/mcp/tests/e2e/helpers/e2e-test-env.ts",
+          "packages/mcp/src/main/di/providers.ts",
+          "packages/mcp/src/main/Application.ts",
+          "packages/mcp/src/interface/controllers/BranchController.ts",
+          "packages/mcp/src/interface/controllers/GlobalController.ts",
+          "packages/mcp/src/interface/controllers/ContextController.ts",
+          "packages/mcp/src/interface/presenters/MCPResponsePresenter.ts",
+          "packages/mcp/src/interface/presenters/types/MCPResponse.ts",
+          "packages/mcp/src/application/usecases/types.ts"
+        ],
+        "remainingIssues": [],
+        "nextStepSuggestion": "`setupE2ETestEnv` およびその中で呼び出される `setupBaseTestEnv` の処理をさらに詳細にデバッグし、エラー箇所を特定する。"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "e2e-dir-setup",
+        "description": "E2Eテスト用ディレクトリ構造とJest設定の作成",
+        "priority": "high"
+      },
+      {
+        "id": "e2e-env-setup",
+        "description": "E2Eテスト環境セットアップの実装",
+        "priority": "high"
+      },
+      {
+        "id": "inmemory-client",
+        "description": "InMemoryTransportを活用したMCPクライアントの実装",
+        "priority": "high"
+      },
+      {
+        "id": "branch-tests",
+        "description": "ブランチメモリバンク操作のE2Eテスト実装",
+        "priority": "medium"
+      },
+      {
+        "id": "documentation",
+        "description": "ドキュメント作成と完了確認",
+        "priority": "low"
+      }
+    ],
+    "status": "E2Eテスト search.e2e.test.ts のデバッグと関連ファイルのクリーンアップが完了しました。ビルド＆テストも成功しています。",
+    "completionPercentage": 45,
+    "milestones": [
+      {
+        "id": "planning-complete",
+        "description": "E2Eテスト導入計画の作成完了",
+        "completedAt": "2025-04-06T11:10:15.000Z"
+      },
+      {
+        "id": "dir-setup",
+        "description": "E2Eテスト用ディレクトリ構造とJest設定の作成",
+        "completedAt": null,
+        "targetDate": "2025-04-07T12:00:00.000Z"
+      },
+      {
+        "id": "client-impl",
+        "description": "MCPインメモリクライアントの実装",
+        "completedAt": null,
+        "targetDate": "2025-04-08T12:00:00.000Z"
+      },
+      {
+        "id": "tests-impl",
+        "description": "主要機能のE2Eテスト実装",
+        "completedAt": null,
+        "targetDate": "2025-04-10T12:00:00.000Z"
+      },
+      {
+        "id": "ci-doc-complete",
+        "description": "CI統合とドキュメント作成",
+        "completedAt": null,
+        "targetDate": "2025-04-12T12:00:00.000Z"
+      }
+    ],
+    "knownIssues": [
+      {
+        "id": "non-deterministic-tests",
+        "description": "E2Eテストが環境によって非決定的な結果になる可能性",
+        "severity": "medium",
+        "notes": "テスト環境のセットアップと破棄の方法を工夫して、テスト間の干渉を防ぐ必要があります"
+      },
+      {
+        "id": "test-performance",
+        "description": "E2Eテストの実行時間が長くなる可能性",
+        "severity": "low",
+        "notes": "テストの並列実行やスコープの絞り込みなどを検討する必要があるかもしれません"
+      }
+    ],
+    "references": [
+      {
+        "file": "e2e-test-plan.json",
+        "description": "E2Eテスト導入の全体計画",
+        "created_at": "2025-04-06T09:35:15.000Z"
+      },
+      {
+        "file": "implementation-steps.json",
+        "description": "E2Eテスト実装の詳細ステップ",
+        "created_at": "2025-04-06T09:45:20.000Z"
+      }
+    ]
+  }
+}

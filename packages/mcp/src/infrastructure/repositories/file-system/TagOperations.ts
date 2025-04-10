@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { BranchTagIndex, GlobalTagIndex, TAG_INDEX_VERSION, DocumentReference, TagEntry } from '@memory-bank/schemas'; // Import DocumentReference, TagEntry
+import { BranchTagIndex, GlobalTagIndex, TAG_INDEX_VERSION, DocumentReference, TagEntry } from '@memory-bank/schemas'; // Use package name
 
 import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
 import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
@@ -317,13 +317,21 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
       const documents: MemoryDocument[] = [];
 
       logger.debug('Starting document read loop...'); // Log loop start
-      for (const docPath of paths) {
-        const doc = await documentRepository.findByPath(docPath);
+      let docReadCounter = 0; // Add counter
+      const startTime = Date.now(); // Record start time
+      for (const docPath of paths) { // Loop through each path
+        docReadCounter++; // Increment counter
+        const loopStartTime = Date.now(); // Loop start time
+        logger.debug(`[generateGlobalTagIndex] Processing doc ${docReadCounter}/${paths.length}: ${docPath.value}`); // Add processing log
+        const doc = await documentRepository.findByPath(docPath); // Read document
         if (doc) {
           documents.push(doc);
         }
+        const loopEndTime = Date.now(); // Loop end time
+        logger.debug(`[generateGlobalTagIndex] Finished processing doc ${docPath.value} in ${loopEndTime - loopStartTime}ms`); // Add processing time log
       }
-      logger.debug('Finished document read loop.'); // Log loop end
+      const endTime = Date.now(); // Record end time
+      logger.debug(`Finished document read loop in ${endTime - startTime}ms.`); // Log total time
 
       // Create tag index (compliant with schema definition)
       const tagEntriesMap = new Map<string, { tag: Tag; documents: DocumentReference[] }>();
@@ -417,15 +425,15 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
         if (tagValuesToSearch.length === 0) return [];
 
         // Initialize with the first tag
-        const firstTagEntry = tagIndex.index.find(entry => entry.tag === tagValuesToSearch[0]);
+        const firstTagEntry = tagIndex.index.find((entry: TagEntry) => entry.tag === tagValuesToSearch[0]);
         if (!firstTagEntry) return []; // If first tag not found, result is empty
-        resultPathSet = new Set(firstTagEntry.documents.map(doc => doc.path));
+        resultPathSet = new Set(firstTagEntry.documents.map((doc: DocumentReference) => doc.path));
 
         // Filter by remaining tags
         for (let i = 1; i < tagValuesToSearch.length; i++) {
           const currentTag = tagValuesToSearch[i];
-          const currentTagEntry = tagIndex.index.find(entry => entry.tag === currentTag);
-          const currentPaths = new Set(currentTagEntry ? currentTagEntry.documents.map(doc => doc.path) : []);
+          const currentTagEntry = tagIndex.index.find((entry: TagEntry) => entry.tag === currentTag);
+          const currentPaths = new Set(currentTagEntry ? currentTagEntry.documents.map((doc: DocumentReference) => doc.path) : []);
 
           // Intersect sets
           resultPathSet = new Set([...resultPathSet].filter(path => currentPaths.has(path)));
@@ -435,9 +443,9 @@ export class TagOperations extends FileSystemMemoryBankRepositoryBase {
       } else {
         // OR search
         for (const tagValue of tagValuesToSearch) {
-          const tagEntry = tagIndex.index.find(entry => entry.tag === tagValue);
+          const tagEntry = tagIndex.index.find((entry: TagEntry) => entry.tag === tagValue);
           if (tagEntry) {
-            tagEntry.documents.forEach(doc => resultPathSet.add(doc.path));
+            tagEntry.documents.forEach((doc: DocumentReference) => resultPathSet.add(doc.path));
           }
         }
       }

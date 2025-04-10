@@ -69,7 +69,6 @@ export class ContextController implements IContextController {
         logger.debug('All context components are always included regardless of include options.');
 
         // Get all context information in one call
-        logger.debug(`Requesting all context information in one call`);
         const allData = await this.readContextUseCase.execute({
           branch: request.branch,
           language: request.language
@@ -78,7 +77,6 @@ export class ContextController implements IContextController {
         // Set branch and global memory
         contextResult.branchMemory = allData.branchMemory;
         contextResult.globalMemory = allData.globalMemory;
-        logger.debug(`Context data retrieved successfully for branch: ${request.branch}`);
       } catch (error) {
         logger.error(`Failed to read context for branch ${request.branch}:`, error);
         throw error;
@@ -86,12 +84,13 @@ export class ContextController implements IContextController {
 
       // Get rules (using a separate use case)
       try {
-        logger.debug(`Requesting rules for language: ${request.language}`);
-        contextResult.rules = await this.readRulesUseCase.execute(request.language);
-        logger.debug(`Rules retrieved successfully for language: ${request.language}`);
+        // Assign the result of readRulesUseCase to contextResult.rules
+        const rulesResult = await this.readRulesUseCase.execute(request.language);
+        contextResult.rules = rulesResult; // Assign the result here
       } catch (error) {
         logger.error(`Failed to read rules for language ${request.language}:`, error);
-        // Failure to read rules is not fatal, return other context information
+        // Propagate the error to be handled by the outer catch block
+        throw error;
       }
 
       return {

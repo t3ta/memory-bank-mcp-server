@@ -1,0 +1,432 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "e2e-implementation-steps",
+    "title": "E2E テスト実装ステップ",
+    "documentType": "implementation_plan",
+    "path": "implementation-steps.json",
+    "tags": [],
+    "lastModified": "2025-04-06T17:03:55.283Z",
+    "createdAt": "2025-04-06T09:45:20.000Z",
+    "version": 3
+  },
+  "content": {
+    "overview": "MemoryBank MCPサーバー向けのE2Eテスト実装の詳細ステップです。@modelcontextprotocol/sdkのInMemoryTransportを活用し、MCPサーバーとクライアント間の通信をテストする環境を段階的に構築していきます。",
+    "sdkImportNotes": {
+      "overview": "@modelcontextprotocol/sdkが既にプロジェクトにインストールされており、直接インポートできます",
+      "benefitsAndUsage": [
+        {
+          "benefit": "既存のSDKクラスとインターフェースを直接再利用できる",
+          "details": "typescript-sdkのInMemoryTransportを再実装する必要がなく、直接インポートして使用できます"
+        },
+        {
+          "benefit": "型の一貫性が保たれる",
+          "details": "JSONRPCMessageなどの型定義をSDKから直接使用することで、型の不一致を防げます"
+        },
+        {
+          "benefit": "メンテナンス性の向上",
+          "details": "SDKが更新された場合も、依存部分が自動的に最新化されます"
+        }
+      ],
+      "importExamples": [
+        {
+          "purpose": "InMemoryTransportのインポート",
+          "code": "import { InMemoryTransport } from '@modelcontextprotocol/sdk';",
+          "usageLocation": "packages/mcp/tests/e2e/helpers/setup-mcp-server.ts"
+        },
+        {
+          "purpose": "JSONRPCMessage型のインポート",
+          "code": "import { JSONRPCMessage } from '@modelcontextprotocol/sdk';",
+          "usageLocation": "packages/mcp/tests/e2e/helpers/MCPInMemoryClient.ts"
+        },
+        {
+          "purpose": "ClientとServerクラスのインポート",
+          "code": "import { Client, Server } from '@modelcontextprotocol/sdk';",
+          "usageLocation": "packages/mcp/tests/e2e/helpers/e2e-test-env.ts"
+        }
+      ]
+    },
+    "steps": [
+      {
+        "number": 1,
+        "title": "E2Eテスト用ディレクトリ構造とJest設定の作成",
+        "tasks": [
+          {
+            "description": "packages/mcp/tests/e2e ディレクトリを作成",
+            "commands": [
+              "mkdir -p packages/mcp/tests/e2e",
+              "mkdir -p packages/mcp/tests/e2e/helpers",
+              "mkdir -p packages/mcp/tests/e2e/fixtures"
+            ]
+          },
+          {
+            "description": "Jest設定ファイルの作成",
+            "file": "packages/mcp/tests/e2e/jest.config.ts",
+            "content": {
+              "preset": "ts-jest",
+              "testEnvironment": "node",
+              "transform": {
+                "^.+\\.tsx?$": [
+                  "ts-jest",
+                  {
+                    "useESM": true
+                  }
+                ]
+              },
+              "extensionsToTreatAsEsm": [
+                ".ts"
+              ],
+              "moduleNameMapper": {
+                "^(\\.\\.?\\/.+)\\.js$": "$1"
+              },
+              "testMatch": [
+                "**/tests/e2e/**/*.e2e.test.ts"
+              ],
+              "setupFilesAfterEnv": [
+                "<rootDir>/tests/setupTests.ts"
+              ],
+              "collectCoverageFrom": [
+                "src/**/*.ts",
+                "!src/**/*.d.ts",
+                "!src/**/index.ts"
+              ],
+              "globals": {
+                "ts-jest": {
+                  "useESM": true
+                }
+              }
+            }
+          },
+          {
+            "description": "package.jsonにE2Eテスト用スクリプトを追加",
+            "file": "packages/mcp/package.json",
+            "update": {
+              "scripts": {
+                "test:e2e": "NODE_OPTIONS='--experimental-vm-modules --no-warnings' vitest run --config tests/e2e/vitest.config.ts",
+                "test": "yarn test:unit && yarn test:integration && yarn test:e2e"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "number": 2,
+        "title": "E2Eテスト環境セットアップの実装",
+        "tasks": [
+          {
+            "description": "E2Eテスト環境のセットアップヘルパーを作成",
+            "file": "packages/mcp/tests/e2e/helpers/e2e-test-env.ts",
+            "comments": "existing/test-env.tsをベースに、インメモリ通信用のセットアップを追加します"
+          },
+          {
+            "description": "MCPサーバーを初期化するヘルパー関数の作成",
+            "file": "packages/mcp/tests/e2e/helpers/setup-mcp-server.ts",
+            "comments": "E2Eテスト用にMCPサーバーをインメモリトランスポートで初期化するヘルパー関数を実装します"
+          }
+        ]
+      },
+      {
+        "number": 3,
+        "title": "InMemoryTransportを活用したMCPクライアントの実装",
+        "tasks": [
+          {
+            "description": "E2Eテスト用MCPクライアントクラスの作成",
+            "file": "packages/mcp/tests/e2e/helpers/MCPInMemoryClient.ts",
+            "comments": "@modelcontextprotocol/sdkからInMemoryTransportを直接インポートし、MCPサーバーと通信するクライアントクラスを実装します"
+          },
+          {
+            "description": "クライアント側のリクエストヘルパー関数の実装",
+            "details": "read_branch_memory_bank, write_branch_memory_bank などの操作を行うメソッドを実装します"
+          }
+        ]
+      },
+      {
+        "number": 4,
+        "title": "初期化テストの実装",
+        "tasks": [
+          {
+            "description": "基本的な接続確立テストの実装",
+            "file": "packages/mcp/tests/e2e/initialization.e2e.test.ts",
+            "testCases": [
+              "MCPサーバーとクライアントの接続確立",
+              "サーバーへの基本的なpingリクエスト",
+              "クライアント切断時の挙動"
+            ]
+          }
+        ]
+      },
+      {
+        "number": 5,
+        "title": "ブランチメモリバンク操作のE2Eテスト実装",
+        "tasks": [
+          {
+            "description": "ブランチメモリバンク操作のテスト実装",
+            "file": "packages/mcp/tests/e2e/branch-memory-bank.e2e.test.ts",
+            "testCases": [
+              "ドキュメントの読み込み (read_branch_memory_bank)",
+              "ドキュメントの書き込み (write_branch_memory_bank)",
+              "JSON Patchによるドキュメント更新",
+              "存在しないドキュメントのエラー処理",
+              "存在しないブランチのエラー処理"
+            ]
+          }
+        ]
+      },
+      {
+        "number": 6,
+        "title": "グローバルメモリバンク操作のE2Eテスト実装",
+        "tasks": [
+          {
+            "description": "グローバルメモリバンク操作のテスト実装",
+            "file": "packages/mcp/tests/e2e/global-memory-bank.e2e.test.ts",
+            "testCases": [
+              "ドキュメントの読み込み (read_global_memory_bank)",
+              "ドキュメントの書き込み (write_global_memory_bank)",
+              "JSON Patchによるドキュメント更新",
+              "存在しないドキュメントのエラー処理"
+            ]
+          }
+        ]
+      },
+      {
+        "number": 7,
+        "title": "コンテキスト操作とその他機能のE2Eテスト実装",
+        "tasks": [
+          {
+            "description": "コンテキスト読み込みのテスト実装",
+            "file": "packages/mcp/tests/e2e/context.e2e.test.ts",
+            "testCases": [
+              "read_context 機能のテスト",
+              "異なる言語（ja, en, zh）でのルール読み込み",
+              "存在しないブランチのエラー処理"
+            ]
+          },
+          {
+            "description": "ドキュメント検索のテスト実装",
+            "file": "packages/mcp/tests/e2e/search.e2e.test.ts",
+            "testCases": [
+              "タグによるドキュメント検索（AND条件）",
+              "タグによるドキュメント検索（OR条件）",
+              "存在しないタグでの検索結果確認"
+            ]
+          }
+        ]
+      },
+      {
+        "number": 8,
+        "title": "CI/CD統合",
+        "tasks": [
+          {
+            "description": "CIパイプラインへのE2Eテスト組み込み",
+            "details": "GitHub Actionsのワークフローにtest:e2eジョブを追加し、E2Eテストを自動実行するよう設定します"
+          },
+          {
+            "description": "テスト結果レポート生成の設定",
+            "details": "JestのテストレポートをCI環境で生成し、結果を可視化できるよう設定します"
+          }
+        ]
+      },
+      {
+        "number": 9,
+        "title": "ドキュメント作成と完了確認",
+        "tasks": [
+          {
+            "description": "E2Eテストのドキュメント作成",
+            "file": "packages/mcp/tests/e2e/README.md",
+            "contents": [
+              "E2Eテストの目的と概要",
+              "テスト環境のセットアップ方法",
+              "テストの実行方法",
+              "テストケースの追加方法",
+              "トラブルシューティング"
+            ]
+          },
+          {
+            "description": "テストカバレッジの確認と報告",
+            "details": "実装したE2Eテストが主要機能をカバーしているか確認し、カバレッジレポートを作成します"
+          },
+          {
+            "description": "最終チェックとレビュー準備",
+            "details": "すべてのテストが正常に実行できることを確認し、コードレビュー準備を完了します"
+          }
+        ]
+      }
+    ],
+    "keyTechnicalDetails": {
+      "inMemoryTransport": {
+        "description": "@modelcontextprotocol/sdkからInMemoryTransportを直接インポートし、サーバーとクライアント間の通信をメモリ内でシミュレートします",
+        "importantMethods": [
+          {
+            "name": "createLinkedPair()",
+            "purpose": "クライアントとサーバー用の接続されたトランスポートペアを作成します"
+          },
+          {
+            "name": "start()",
+            "purpose": "トランスポートを開始し、キューに入っているメッセージの処理を開始します"
+          },
+          {
+            "name": "send(message)",
+            "purpose": "相手側のトランスポートにメッセージを送信します"
+          },
+          {
+            "name": "close()",
+            "purpose": "トランスポート接続を閉じます"
+          }
+        ]
+      },
+      "testEnvironment": {
+        "description": "テスト環境のセットアップと破棄を行うユーティリティ",
+        "components": [
+          {
+            "name": "setupE2ETestEnv()",
+            "purpose": "E2Eテスト用の一時ディレクトリ、必要なファイル、InMemoryTransportペアを作成します"
+          },
+          {
+            "name": "cleanupE2ETestEnv()",
+            "purpose": "テスト後にトランスポート接続を閉じ、一時ディレクトリを削除します"
+          }
+        ]
+      },
+      "mcpInMemoryClient": {
+        "description": "InMemoryTransportを使用したテスト用MCPクライアント",
+        "methods": [
+          {
+            "name": "initialize()",
+            "purpose": "クライアント初期化とサーバーへの接続を確立します"
+          },
+          {
+            "name": "readBranchMemoryBank(branch, path)",
+            "purpose": "ブランチメモリバンクからドキュメントを読み込みます"
+          },
+          {
+            "name": "writeBranchMemoryBank(branch, path, content, tags)",
+            "purpose": "ブランチメモリバンクにドキュメントを書き込みます"
+          },
+          {
+            "name": "readGlobalMemoryBank(path)",
+            "purpose": "グローバルメモリバンクからドキュメントを読み込みます"
+          },
+          {
+            "name": "writeGlobalMemoryBank(path, content, tags)",
+            "purpose": "グローバルメモリバンクにドキュメントを書き込みます"
+          },
+          {
+            "name": "readContext(branch, language)",
+            "purpose": "指定されたブランチと言語のコンテキスト情報を読み込みます"
+          },
+          {
+            "name": "searchDocumentsByTags(tags, match, scope, branch)",
+            "purpose": "タグに基づいてドキュメントを検索します"
+          }
+        ]
+      }
+    },
+    "sampleImplementation": {
+      "mcpInMemoryClient": {
+        "overview": "MCPクライアントの実装例（@modelcontextprotocol/sdkを直接使用）",
+        "code": [
+          "import { InMemoryTransport, Client, JSONRPCMessage } from '@modelcontextprotocol/sdk';",
+          "",
+          "/**",
+          " * MCPサーバーと通信するためのインメモリクライアント",
+          " */",
+          "export class MCPInMemoryClient {",
+          "  private client: Client;",
+          "  private transport: InMemoryTransport;",
+          "  private isConnected: boolean = false;",
+          "",
+          "  /**",
+          "   * クライアントを作成する",
+          "   * @param serverTransport サーバー側のトランスポート",
+          "   */",
+          "  constructor(serverTransport: InMemoryTransport) {",
+          "    const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();",
+          "    this.transport = clientTransport;",
+          "    this.client = new Client(this.transport);",
+          "  }",
+          "",
+          "  /**",
+          "   * クライアントを初期化し、サーバーに接続する",
+          "   */",
+          "  async initialize(): Promise<void> {",
+          "    if (this.isConnected) {",
+          "      return;",
+          "    }",
+          "",
+          "    await this.transport.start();",
+          "    await this.client.initialize({",
+          "      protocolVersion: '2024-11-05',",
+          "      capabilities: {},",
+          "      clientInfo: {",
+          "        name: 'MCPInMemoryClient',",
+          "        version: '1.0.0'",
+          "      }",
+          "    });",
+          "",
+          "    this.isConnected = true;",
+          "  }",
+          "",
+          "  /**",
+          "   * サーバーとの接続を閉じる",
+          "   */",
+          "  async close(): Promise<void> {",
+          "    await this.transport.close();",
+          "    this.isConnected = false;",
+          "  }",
+          "",
+          "  // MCPサーバーの各種操作メソッドを実装",
+          "  // ...",
+          "}"
+        ]
+      },
+      "testSetup": {
+        "overview": "E2Eテスト環境セットアップの実装例",
+        "code": [
+          "import { InMemoryTransport, Server } from '@modelcontextprotocol/sdk';",
+          "import { setupTestEnv, TestEnv } from './test-env';",
+          "import { MCPInMemoryClient } from './MCPInMemoryClient';",
+          "",
+          "/**",
+          " * E2Eテスト環境をセットアップする",
+          " */",
+          "export async function setupE2ETestEnv(): Promise<{",
+          "  testEnv: TestEnv;",
+          "  client: MCPInMemoryClient;",
+          "  cleanup: () => Promise<void>;",
+          "}> {",
+          "  // テスト環境のセットアップ",
+          "  const testEnv = await setupTestEnv();",
+          "",
+          "  // InMemoryTransportのペアを作成",
+          "  const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();",
+          "",
+          "  // MCPサーバーをインメモリトランスポートで初期化",
+          "  const server = new Server(serverTransport, {",
+          "    protocolVersion: '2024-11-05',",
+          "    capabilities: {},",
+          "    serverInfo: {",
+          "      name: 'MemoryBankMCPServer',",
+          "      version: '2.4.0'",
+          "    }",
+          "  });",
+          "",
+          "  // トランスポートを開始",
+          "  await serverTransport.start();",
+          "",
+          "  // MCPクライアントを作成して初期化",
+          "  const client = new MCPInMemoryClient(clientTransport);",
+          "  await client.initialize();",
+          "",
+          "  // クリーンアップ関数",
+          "  const cleanup = async () => {",
+          "    await client.close();",
+          "    await testEnv.cleanup();",
+          "  };",
+          "",
+          "  return { testEnv, client, cleanup };",
+          "}"
+        ]
+      }
+    }
+  }
+}

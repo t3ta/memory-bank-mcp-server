@@ -1,0 +1,82 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "migrate-to-vitest-active-context",
+    "title": "Vitest移行アクティブコンテキスト",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [
+      "active-context",
+      "vitest",
+      "test-migration"
+    ],
+    "lastModified": "2025-04-06T19:15:35.497Z",
+    "createdAt": "2025-04-06T19:15:35.497Z",
+    "version": 1
+  },
+  "content": {
+    "currentWork": "JestからVitestへの移行計画と実装戦略策定",
+    "recentChanges": [
+      {
+        "date": "2025-04-06T22:00:00.000Z",
+        "description": "すべてのパッケージでのテスト実行と確認"
+      },
+      {
+        "date": "2025-04-06T22:35:00.000Z",
+        "description": "Vitest移行の最終確認とレポート作成"
+      },
+      {
+        "date": "2025-04-06T19:15:35.497Z",
+        "description": "現在のJest設定とテスト環境の把握"
+      }
+    ],
+    "activeDecisions": [
+      {
+        "id": "0a5056e8-a97e-49a3-b077-25b98de163cd",
+        "description": "JestからVitestへの移行を行う"
+      },
+      {
+        "id": "fb3a41b5-5d10-468e-a425-7ddbe757c9da",
+        "description": "Vitestの設定は最小限にし、既存テストコードの変更を最小化する"
+      },
+      {
+        "id": "175bfe55-9d2b-4d3c-86eb-bb93b240a082",
+        "description": "段階的な移行アプローチで進め、各ステップでテスト実行を確認する"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "b5e4df61-3844-4296-b63d-814896daec69",
+        "description": "Jest特有の機能（例：jest.spyOn, jest.mock）の互換性確保",
+        "status": "open"
+      },
+      {
+        "id": "e5108740-ac40-4259-9601-538887959258",
+        "description": "ts-jestからVitestのTypeScript処理への移行方法",
+        "status": "open"
+      },
+      {
+        "id": "f716f7b0-f691-460e-b7ee-f21712205763",
+        "description": "テスト実行速度の向上と並列実行の可能性",
+        "status": "open"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "3c9f8b47-9f6d-44fc-a9d0-c6d8284838ff",
+        "description": "Vitestのインストールと基本設定の実装",
+        "priority": "high"
+      },
+      {
+        "id": "b148fdd9-738d-46a4-b604-61a2b1c8b10c",
+        "description": "モノレポのWorkspace設定をVitestで再構築",
+        "priority": "high"
+      },
+      {
+        "id": "d250ef7f-b523-4d28-b733-4cfa2d6e5173",
+        "description": "ユニットテスト実行の確認と必要な修正",
+        "priority": "high"
+      }
+    ]
+  }
+}

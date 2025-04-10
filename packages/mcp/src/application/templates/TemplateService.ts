@@ -4,7 +4,7 @@
  * Application service for managing templates and template operations.
  * Provides high-level functionality for working with templates.
  */
-import { Language } from '../../domain/i18n/Language.js'; // Removed unused LanguageCode
+import { Language } from '../../domain/i18n/Language.js'; // ★★★ 追加 ★★★
 import { ITemplateRepository } from '../../domain/templates/ITemplateRepository.js';
 import { Section, LanguageTextMap } from '../../domain/templates/Section.js';
 import { Template } from '../../domain/templates/Template.js';
@@ -35,20 +35,22 @@ export class TemplateService {
   }
 
   /**
-   * Gets a template as Markdown for a specific language
+   * Gets a template as a JSON object for a specific language
    *
    * @param id Template ID
    * @param language Language to get template for
    * @param variables Optional variables for template substitution
-   * @returns Promise resolving to Markdown content
+   * @returns Promise resolving to the template content as a JSON object
    * @throws Error if template not found
    */
-  async getTemplateAsMarkdown(
+  async getTemplateAsJsonObject(
     id: string,
     language: Language,
     variables?: Record<string, string>
-  ): Promise<string> {
-    return this.repository.getTemplateAsMarkdown(id, language, variables);
+  ): Promise<Record<string, any>> {
+    // Ensure Language is imported if not already
+    // import { Language } from '../../domain/i18n/Language.js';
+    return this.repository.getTemplateAsJsonObject(id, language, variables);
   }
 
   /**

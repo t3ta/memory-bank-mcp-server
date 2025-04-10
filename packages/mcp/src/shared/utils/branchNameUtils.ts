@@ -19,20 +19,31 @@ export function toSafeBranchName(branchName: string): string {
  */
 export function isValidBranchName(branchName: string): boolean {
   if (!branchName || branchName.trim() === '') {
+    return false; // Empty or whitespace only is invalid
+  }
+
+  // Split by slash and check each part
+  const parts = branchName.split('/');
+
+  // Must contain at least one slash (meaning at least two parts)
+  if (parts.length < 2) {
     return false;
   }
-  
-  // Branch name should include a namespace prefix with slash
-  if (!branchName.includes('/')) {
-    return false;
+
+  // Check if any part is empty (handles leading/trailing/consecutive slashes)
+  if (parts.some(part => part.trim() === '')) {
+     // Allow leading slash (empty first part) but not others being empty
+     // Example: '/feature/name' is allowed by current tests, parts[0] is ""
+     // Example: 'feature//name' is not allowed, parts[1] is ""
+     // Example: 'feature/name/' is not allowed, last part is ""
+     // Example: '//name' is not allowed, parts[1] is ""
+     if (parts[0] !== '' || parts.slice(1).some(part => part.trim() === '')) {
+        return false;
+     }
   }
-  
-  const displayName = branchName.substring(branchName.indexOf('/') + 1);
-  
-  // The name after the prefix shouldn't be empty
-  if (!displayName || displayName.trim() === '') {
-    return false;
-  }
-  
+
+  // Optional: Add more checks based on git branch naming rules if needed
+  // (e.g., cannot contain '..', cannot end with '.', etc.)
+
   return true;
 }

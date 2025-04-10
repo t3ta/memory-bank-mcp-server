@@ -1,0 +1,32 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-unit-test-domain-entities-others-progress",
+    "title": "Progress for feature/unit-test-domain-entities-others",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "createdAt": "2025-04-04T12:55:21.330Z",
+    "lastModified": "2025-04-04T13:42:39.624Z"
+  },
+  "content": {
+    "summary": "Completed unit tests for JsonDocument and MemoryDocument. All tests passed.",
+    "status": "done",
+    "steps": [
+      {
+        "name": "Implement tests for JsonDocument",
+        "status": "done",
+        "details": "Implemented and passed tests for JsonDocument.",
+        "timestamp": "2025-04-04T13:42:18.000Z"
+      },
+      {
+        "name": "Implement tests for MemoryDocument",
+        "status": "done",
+        "details": "Implemented and passed tests for MemoryDocument.",
+        "timestamp": "2025-04-04T13:42:18.000Z"
+      }
+    ],
+    "next_steps": [],
+    "findings": []
+  }
+}

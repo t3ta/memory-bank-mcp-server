@@ -62,10 +62,24 @@ export class ReadGlobalDocumentUseCase
         );
       }
 
+      let parsedContent: string | object;
+      if (typeof document.content === 'string') {
+        try {
+          // Attempt to parse the content as JSON
+          parsedContent = JSON.parse(document.content);
+        } catch (parseError) {
+          // If parsing fails, keep the original string content
+          parsedContent = document.content;
+        }
+      } else {
+        // If content is already an object, use it directly
+        parsedContent = document.content;
+      }
+
       return {
         document: {
           path: document.path.value,
-          content: document.content,
+          content: parsedContent, // Return parsed object or original string
           tags: document.tags.map((tag) => tag.value),
           lastModified: document.lastModified.toISOString(),
         },
@@ -75,10 +89,12 @@ export class ReadGlobalDocumentUseCase
         throw error;
       }
 
+      // Pass the original error as the 'cause' for better error chaining
       throw new ApplicationError(
         ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
         `Failed to read document: ${(error as Error).message}`,
-        { originalError: error }
+        undefined, // No additional details needed here
+        { cause: error as Error } // Pass the original error as cause
       );
     }
   }

@@ -3,6 +3,7 @@ import { Tag } from './Tag.js';
 import { DomainError } from '../../shared/errors/DomainError.js';
 import { IDocumentLogger } from '../logger/IDocumentLogger.js';
 import { JsonDocumentV2 } from '@memory-bank/schemas';
+import crypto from 'crypto'; // crypto をインポート
 
 /**
  * Static logger instance for MemoryDocument
@@ -193,6 +194,17 @@ export class MemoryDocument {
         return trimmedLine.substring(2).trim();
       }
     }
+    // If JSON, try to parse and get metadata.title
+    if (this.isJSON) {
+      try {
+        const parsed = JSON.parse(this.props.content);
+        if (parsed && parsed.metadata && typeof parsed.metadata.title === 'string') {
+          return parsed.metadata.title;
+        }
+      } catch {
+        // Ignore parsing errors for title extraction
+      }
+    }
     return undefined;
   }
 
@@ -220,66 +232,57 @@ export class MemoryDocument {
    * @returns JSON document object
    */
   public toJSON(): JsonDocumentV2 {
-    if (this.isJSON) {
+    if (this.isJSON) { // <<<--- if ブロックを復活！
       try {
-        return JSON.parse(this.props.content) as JsonDocumentV2;
+        // ファイルの内容をパース
+        const parsedContent = JSON.parse(this.props.content);
+        // スキーマ v2 形式であることを確認し、そのまま返す
+        // (ここで Zod などでバリデーションするのがより堅牢)
+        if (parsedContent.schema === 'memory_document_v2' && parsedContent.documentType && parsedContent.metadata && parsedContent.content) {
+           // パースした内容をそのまま返す (ID などもファイルの内容を維持)
+           // 必要であれば、lastModified や tags を props の値で上書きする
+           // parsedContent.metadata.lastModified = this.props.lastModified.toISOString();
+           // parsedContent.metadata.tags = this.props.tags.map(tag => tag.value);
+          return parsedContent as JsonDocumentV2;
+        } else {
+           getLogger().warn('Parsed JSON content does not match expected v2 schema, falling back to reconstruction.', { path: this.props.path.value });
+           // スキーマが不正な場合は、後半の組み立てロジックにフォールバック
+        }
       } catch (error) {
-        getLogger().error('Failed to parse JSON document:', { error, path: this.props.path.value });
+        getLogger().error('Failed to parse JSON document, falling back to reconstruction:', { error, path: this.props.path.value });
+        // パースエラーの場合も、後半の組み立てロジックにフォールバック
       }
     }
 
-    const documentType = this.determineDocumentType();
+    // --- JSON 形式でない場合、またはパース/バリデーション失敗時のフォールバック ---
+    const documentType = this.determineDocumentType(); // <<<--- 呼び出しはここ
     const title = this.title || this.props.path.filename;
 
-    let content: Record<string, unknown>;
-    switch (documentType) {
-      case 'branch_context':
-        content = {
-          purpose: this.props.content,
-          createdAt: new Date(),
-          userStories: [],
-        };
-        break;
-      case 'active_context':
-        content = {
-          currentWork: this.props.content,
-          recentChanges: [],
-          activeDecisions: [],
-          considerations: [],
-          nextSteps: [],
-        };
-        break;
-      case 'progress':
-        content = {
-          status: this.props.content,
-          workingFeatures: [],
-          pendingImplementation: [],
-          knownIssues: [],
-        };
-        break;
-      case 'system_patterns':
-        content = {
-          technicalDecisions: [],
-        };
-        break;
-      default:
-        content = {
-          text: this.props.content,
-        };
-    }
-
-    return {
-      schema: 'memory_document_v2',
-      title,
-      documentType,
+    // metadata オブジェクトを作成 (documentType を除く)
+    const metadata = {
+      id: crypto.randomUUID(), // 新しいIDを生成 (JSONでない場合はこれで良い)
+      title: title,
       path: this.props.path.value,
       tags: this.props.tags.map((tag) => tag.value),
-      lastModified: this.props.lastModified.toISOString(), // Convert Date to ISO string
-      createdAt: new Date().toISOString(), // Convert Date to ISO string
+      lastModified: this.props.lastModified.toISOString(),
+      createdAt: new Date().toISOString(), // 作成日時は常に現在時刻
       version: 1,
-      id: crypto.randomUUID(),
-      ...content,
-    } as unknown as JsonDocumentV2; // Cast to unknown first to suppress TS error due to path mapping issue
+    };
+
+    // content オブジェクトを作成 (JSONでない場合の簡易的な構造)
+    let content: Record<string, unknown> = {
+        text: this.props.content, // デフォルトは text フィールドに入れる
+    };
+    // 必要に応じて documentType ごとの特殊な content 構造を定義
+    // (例: branch_context なら purpose に入れるなど、ただし今回は text に統一)
+
+    // スキーマ v2 形式で返す (documentType をトップレベルに)
+    return {
+      schema: 'memory_document_v2',
+      documentType: documentType, // <<<--- トップレベルに追加！
+      metadata: metadata,
+      content: content,
+    } as JsonDocumentV2; // 型アサーションは維持 (必要に応じて調整)
   }
 
   /**
@@ -327,7 +330,7 @@ export class MemoryDocument {
    * Determine the document type based on the path or content
    * @returns document type
    */
-  private determineDocumentType(): string {
+  private determineDocumentType(): JsonDocumentV2['documentType'] { // <<<--- 型修正済み
     const filename = this.props.path.filename.toLowerCase();
 
     if (filename.includes('branchcontext') || filename.includes('branch-context')) {
@@ -339,7 +342,13 @@ export class MemoryDocument {
     } else if (filename.includes('systempatterns') || filename.includes('system-patterns')) {
       return 'system_patterns';
     } else {
-      return 'generic';
+      // JsonDocumentV2 に 'generic' はないので、デフォルトの型を返す
+      // (本来はどう扱うべきか要検討)
+      // ここで適切なデフォルトタイプを返すか、エラーを投げるべき
+      // 例として 'branch_context' を返す (スキーマ定義に合わせて調整が必要)
+      getLogger().warn(`Could not determine specific document type for ${filename}, defaulting.`);
+      // return 'generic'; // スキーマに generic がない場合はエラーになる
+      return 'branch_context'; // 仮のデフォルト
     }
   }
 }

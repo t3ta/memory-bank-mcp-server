@@ -6,8 +6,8 @@ import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
 import { DomainErrors } from '../../../shared/errors/DomainError.js';
 import { ApplicationErrors, ErrorUtils } from '../../../shared/errors/index.js';
 import { logger } from '../../../shared/utils/logger.js';
-import type { IGitService } from '@/infrastructure/git/IGitService.js';
-import type { IConfigProvider } from '@/infrastructure/config/interfaces/IConfigProvider.js';
+import type { IGitService } from '../../../infrastructure/git/IGitService.js';
+import type { IConfigProvider } from '../../../infrastructure/config/interfaces/IConfigProvider.js';
 
 /**
  * Input data for read branch document use case
@@ -136,10 +136,21 @@ export class ReadBranchDocumentUseCase
       documentType: (document as any).determineDocumentType()
     });
 
+    // Attempt to parse the content as JSON
+    let parsedContent: string | object;
+    try {
+      parsedContent = JSON.parse(document.content);
+      this.useCaseLogger.debug('Successfully parsed document content as JSON', { documentPath: input.path });
+    } catch (parseError) {
+      // If parsing fails, keep the original string content
+      parsedContent = document.content;
+      this.useCaseLogger.debug('Failed to parse document content as JSON, returning as string', { documentPath: input.path });
+    }
+
     return {
       document: {
         path: document.path.value,
-        content: document.content,
+        content: parsedContent, // Return parsed object or original string
         tags: document.tags.map((tag) => tag.value),
         lastModified: document.lastModified.toISOString(),
       },

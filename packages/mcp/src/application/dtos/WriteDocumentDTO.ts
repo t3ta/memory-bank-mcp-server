@@ -8,9 +8,9 @@ export interface WriteDocumentDTO {
   path: string;
 
   /**
-   * Document content
+   * Document content (optional if patches are provided)
    */
-  content: string;
+  content?: Record<string, unknown> | string;
 
   /**
    * Document tags (optional)

@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "66496bff-80d2-4e68-8627-e5aded479842",
+    "title": "ブランチコンテキスト",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [
+      "branch-context"
+    ],
+    "lastModified": "2025-04-06T09:30:10.000Z",
+    "createdAt": "2025-04-06T08:52:04.656Z",
+    "version": 2
+  },
+  "content": {
+    "branchName": "feature/add-e2e-test",
+    "purpose": "MemoryBank MCPサーバーにe2eテスト機能を追加するためのブランチです。特にtypescript-sdkを参考にしたインメモリテストを導入し、MCPサーバーとクライアント間の通信をエンドツーエンドでテストします。",
+    "createdAt": "2025-04-06T08:52:04.656Z",
+    "userStories": [
+      {
+        "id": "7864013c-523e-4a75-8270-e83c50a70963",
+        "description": "InMemoryTransportを使用したMCPサーバーのe2eテスト機能を実装する",
+        "completed": false,
+        "priority": 1
+      },
+      {
+        "id": "f24024d3-906c-40fc-93af-1783f9fcb31e",
+        "description": "MCPサーバーの主要機能（read/write操作）をe2eテストでカバーする",
+        "completed": false,
+        "priority": 2
+      },
+      {
+        "id": "a94e2f19-59c3-418e-8b38-2a90932ec1de",
+        "description": "CIパイプラインにe2eテストを統合し、継続的に品質を確保する",
+        "completed": false,
+        "priority": 3
+      }
+    ],
+    "additionalNotes": "typescript-sdk/src/inMemory.ts のクラスを参考に、MCPサーバー向けのe2eテスト環境を構築していきます。既存のインテグレーションテストの知見も活用します。"
+  }
+}

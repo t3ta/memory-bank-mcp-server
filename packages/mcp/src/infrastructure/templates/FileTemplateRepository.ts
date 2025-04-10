@@ -10,7 +10,7 @@ import { logger } from '../../shared/utils/logger.js'; // Import logger
 import { ITemplateRepository } from '../../domain/templates/ITemplateRepository.js';
 import { Template } from '../../domain/templates/Template.js';
 import { Section, LanguageTextMap } from '../../domain/templates/Section.js';
-import { Language } from '../../domain/i18n/Language.js'; // Removed unused LanguageCode
+import { Language } from '../../domain/i18n/Language.js'; // ★★★ 追加 ★★★
 
 /**
  * Type representing the structure of a template file
@@ -86,8 +86,8 @@ export class FileTemplateRepository implements ITemplateRepository {
    */
   async initialize(): Promise<void> {
     try {
-      // Ensure templates directory exists
-      await fs.mkdir(this.basePath, { recursive: true });
+      // Directory creation is handled externally or assumed to exist.
+      // await fs.mkdir(this.basePath, { recursive: true }); // Removed directory creation
 
       // Load all templates into cache
       await this.loadAllTemplates();
@@ -111,50 +111,39 @@ export class FileTemplateRepository implements ITemplateRepository {
   }
 
   /**
-   * Gets a template by ID in Markdown format
+   * Gets a template by ID as a JSON object with resolved translations
    *
    * @param id Template ID
    * @param language Language to get template for
-   * @param variables Optional variables for template substitution
-   * @returns Promise resolving to Markdown content
-   * @throws Error if template not found
+   * @param _variables Optional variables for template substitution (currently not used for JSON)
+   * @returns Promise resolving to the template content as a JSON object
+   * @throws Error if template not found or cannot be parsed as JSON
    */
-  async getTemplateAsMarkdown(
+  async getTemplateAsJsonObject(
     id: string,
     language: Language,
-    variables?: Record<string, string>
-  ): Promise<string> {
+    _variables?: Record<string, string> // Keep variables for interface consistency
+  ): Promise<Record<string, any>> { // Return type is a generic JSON object
     const template = await this.getTemplate(id);
 
     if (!template) {
       throw new Error(`Template not found: ${id}`);
     }
 
-    // Convert template to Markdown
-    let markdown = `# ${template.getName(language)}\n\n`;
+    // Construct the JSON object with resolved translations
+    const jsonObject: Record<string, any> = {
+      id: template.id,
+      type: template.type,
+      name: template.getName(language), // Get translated name
+      sections: template.sections.map(section => ({
+        id: section.id,
+        title: section.getTitle(language), // Get translated title
+        content: section.getContent(language), // Get translated content
+        isOptional: section.isOptional,
+      })),
+    };
 
-    for (const section of template.sections) {
-      const title = section.getTitle(language);
-      const content = section.getContent(language);
-
-      if (title) {
-        markdown += `## ${title}\n\n`;
-      }
-
-      if (content) {
-        markdown += `${content}\n\n`;
-      }
-    }
-
-    // Replace variables if provided
-    if (variables && Object.keys(variables).length > 0) {
-      Object.entries(variables).forEach(([name, value]) => {
-        const pattern = new RegExp(`\\{\\{${name}\\}\\}`, 'g');
-        markdown = markdown.replace(pattern, value);
-      });
-    }
-
-    return markdown;
+    return jsonObject;
   }
 
   /**

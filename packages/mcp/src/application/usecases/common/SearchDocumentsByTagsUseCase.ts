@@ -2,12 +2,31 @@ import { BranchInfo } from "../../../domain/entities/BranchInfo.js";
 import { ApplicationError, ApplicationErrorCodes } from "../../../shared/errors/ApplicationError.js";
 import { logger } from "../../../shared/utils/logger.js";
 
-type TagsIndex = any;
-type DocumentsMetaIndex = any;
-type SearchResultItem = any;
-type SearchResults = any;
-import type { IFileSystemService } from '@/infrastructure/storage/interfaces/IFileSystemService.js';
+// type TagsIndex = any; // 使わないので削除
+// type DocumentsMetaIndex = any; // 使わないので削除
+// type SearchResultItem = any; // 下で定義
+// type SearchResults = any; // 下で定義
+
+// ★ 検索結果の型定義を追加 (export する)
+export interface SearchResultItem { // ★ export を追加
+  path: string;
+  title: string;
+  lastModified: string;
+  scope: 'branch' | 'global';
+}
+
+// ★ インデックスから取得するドキュメント情報の型
+interface IndexedDocumentInfo {
+  path: string;
+  scope: 'branch' | 'global';
+  // title や lastModified もインデックスにあれば追加できる
+}
+
+// ★ マージされたインデックスの型 (tag -> ドキュメント情報配列)
+type MergedTagIndex = Record<string, IndexedDocumentInfo[]>;
+import type { IFileSystemService } from '../../../infrastructure/storage/interfaces/IFileSystemService.js';
 import type { IUseCase } from "../../interfaces/IUseCase.js";
+import { BranchTagIndex, GlobalTagIndex } from '@memory-bank/schemas'; // ★ スキーマ型をインポート (TagIndexDocument削除)
 import path from 'path';
 
 /**
@@ -49,7 +68,7 @@ export interface SearchDocumentsByTagsOutput {
   /**
    * Matching documents metadata
    */
-  results: SearchResultItem[];
+  results: SearchResultItem[]; // ★ 上で定義した型を使用
 }
 
 /**
@@ -70,7 +89,7 @@ export class SearchDocumentsByTagsUseCase
    * @param input Input data
    * @returns Promise resolving to output data
    */
-  async execute(input: SearchDocumentsByTagsInput): Promise<SearchResults> {
+  async execute(input: SearchDocumentsByTagsInput): Promise<SearchDocumentsByTagsOutput> { // ★ 戻り値の型を修正
     logger.info('Executing SearchDocumentsByTagsUseCase:', input);
 
     // --- Input Validation ---
@@ -93,40 +112,65 @@ export class SearchDocumentsByTagsUseCase
 
 
     // --- Load Indices ---
-    let combinedTagsIndex: TagsIndex = {};
-    let combinedDocumentsMeta: DocumentsMetaIndex = {};
+    let combinedTagsIndex: MergedTagIndex = {}; // ★ 型を MergedTagIndex に変更
+    // let combinedDocumentsMeta: DocumentsMetaIndex = {}; // metaは使わないので削除
 
     try {
       // Load Global Indices if needed
       if (effectiveScope === 'global' || effectiveScope === 'all') {
-        const globalTagsPath = path.join(input.docs, 'global-memory-bank', '.index', 'tags_index.json');
-        const globalMetaPath = path.join(input.docs, 'global-memory-bank', '.index', 'documents_meta.json');
-        logger.debug(`Loading global indices: ${globalTagsPath}, ${globalMetaPath}`);
-        const [globalTags, globalMeta] = await Promise.all([
-          this.readIndexFile<TagsIndex>(globalTagsPath),
-          this.readIndexFile<DocumentsMetaIndex>(globalMetaPath)
-        ]);
+        // ★★★ インデックスファイル名を修正 ★★★
+        const globalIndexPath = path.join(input.docs, 'global-memory-bank', '_index.json'); // .index ディレクトリではなく、ファイル名を _index.json に
+        // const globalMetaPath = path.join(input.docs, 'global-memory-bank', '.index', 'documents_meta.json'); // metaファイルは一旦使わない想定
+        logger.debug(`Loading global index: ${globalIndexPath}`); // ログ修正 (metaPath削除)
+        // ★★★ インデックスファイル読み込みを修正 ★★★
+        const globalIndex = await this.readIndexFile<GlobalTagIndex>(globalIndexPath); // ★ 型を GlobalTagIndex に変更
+        // const globalMeta = await this.readIndexFile<DocumentsMetaIndex>(globalMetaPath); // metaファイルは一旦使わない想定
         // Ensure nulls are handled correctly when merging
-        if (globalTags) combinedTagsIndex = { ...combinedTagsIndex, ...globalTags };
-        if (globalMeta) combinedDocumentsMeta = { ...combinedDocumentsMeta, ...globalMeta };
-        logger.debug(`Loaded ${Object.keys(globalTags || {}).length} global tags, ${Object.keys(globalMeta || {}).length} global meta entries.`);
+        // ★★★ 読み込んだインデックスをマージ (metaは一旦無視) ★★★
+        // combinedTagsIndex は tag -> path[] のマップを期待している
+        // globalIndex.index は { tag: string, documents: { path: string }[] }[] の形式
+        if (globalIndex?.index) {
+          for (const entry of globalIndex.index) {
+            // ★ scope情報を追加してマージ
+            combinedTagsIndex[entry.tag] = entry.documents.map((doc: { path: string }) => ({
+              path: doc.path,
+              scope: 'global'
+            }));
+          }
+        }
+        // if (globalMeta) combinedDocumentsMeta = { ...combinedDocumentsMeta, ...globalMeta }; // metaは使わない
+        logger.debug(`Loaded ${Object.keys(combinedTagsIndex || {}).length} global tags from index.`); // ログ修正
       }
 
       // Load Branch Indices if needed
       if ((effectiveScope === 'branch' || effectiveScope === 'all') && input.branchName) {
         const branchInfo = BranchInfo.create(input.branchName); // Validate branch name format
-        const branchIndexPath = path.join(input.docs, 'branch-memory-bank', branchInfo.safeName, '.index');
-        const branchTagsPath = path.join(branchIndexPath, 'tags_index.json');
-        const branchMetaPath = path.join(branchIndexPath, 'documents_meta.json');
-        logger.debug(`Loading branch indices: ${branchTagsPath}, ${branchMetaPath}`);
-        const [branchTags, branchMeta] = await Promise.all([
-          this.readIndexFile<TagsIndex>(branchTagsPath).catch(() => null), // Return null if not found
-          this.readIndexFile<DocumentsMetaIndex>(branchMetaPath).catch(() => null) // Return null if not found
-        ]);
+        // ★★★ インデックスファイル名を修正 ★★★
+        const branchIndexPath = path.join(input.docs, 'branch-memory-bank', branchInfo.safeName, '_index.json'); // .index ディレクトリではなく、ファイル名を _index.json に
+        // const branchMetaPath = path.join(branchIndexPath, 'documents_meta.json'); // metaファイルは一旦使わない想定
+        logger.debug(`Loading branch index: ${branchIndexPath}`); // ログ修正 (metaPath削除)
+        // ★★★ インデックスファイル読み込みを修正 ★★★
+        const branchIndex = await this.readIndexFile<BranchTagIndex>(branchIndexPath).catch(() => null); // ★ 型を BranchTagIndex に変更
+        // const branchMeta = await this.readIndexFile<DocumentsMetaIndex>(branchMetaPath).catch(() => null); // metaファイルは一旦使わない想定
         // Ensure nulls are handled correctly when merging
-        if (branchTags) combinedTagsIndex = { ...combinedTagsIndex, ...branchTags };
-        if (branchMeta) combinedDocumentsMeta = { ...combinedDocumentsMeta, ...branchMeta };
-        logger.debug(`Loaded ${Object.keys(branchTags || {}).length} branch tags, ${Object.keys(branchMeta || {}).length} branch meta entries.`);
+        // ★★★ 読み込んだインデックスをマージ (metaは一旦無視) ★★★
+        // combinedTagsIndex は tag -> path[] のマップを期待している
+        // branchIndex.index は { tag: string, documents: { path: string }[] }[] の形式
+        if (branchIndex?.index) {
+          for (const entry of branchIndex.index) {
+            // 同じタグがグローバルにも存在する場合、パスをマージする（重複はSetで防ぐ）
+            const existingDocs = new Map<string, IndexedDocumentInfo>();
+            // 既存のドキュメントをMapに入れる (パスをキーに)
+            (combinedTagsIndex[entry.tag] || []).forEach(doc => existingDocs.set(doc.path, doc));
+            // 新しいドキュメントを追加または上書き (ブランチ優先)
+            entry.documents.forEach((doc: { path: string }) => {
+              existingDocs.set(doc.path, { path: doc.path, scope: 'branch' }); // ★ scope情報を追加
+            });
+            combinedTagsIndex[entry.tag] = Array.from(existingDocs.values());
+          }
+        }
+        // if (branchMeta) combinedDocumentsMeta = { ...combinedDocumentsMeta, ...branchMeta }; // metaは使わない
+        logger.debug(`Loaded ${Object.keys(branchIndex?.index || {}).length} branch tags entries. Total unique tags: ${Object.keys(combinedTagsIndex).length}`); // ログ修正
       }
     } catch (error) {
       logger.error('Error loading index files:', error);
@@ -135,58 +179,56 @@ export class SearchDocumentsByTagsUseCase
 
     // --- Perform Search ---
     logger.debug(`Performing search with match type: ${match}`);
-    let matchingPaths: Set<string> = new Set();
+    let matchingDocs: Map<string, IndexedDocumentInfo> = new Map(); // ★ パスをキーにしたMapに変更
 
     if (match === 'or') {
       // OR match: Add paths from any matching tag
       for (const tag of input.tags) {
-        const paths: string[] = combinedTagsIndex[tag] || [];
-        paths.forEach(p => matchingPaths.add(p));
+        const docsForTag: IndexedDocumentInfo[] = combinedTagsIndex[tag] || [];
+        docsForTag.forEach(doc => matchingDocs.set(doc.path, doc)); // ★ Mapに追加
       }
-      logger.debug(`Found ${matchingPaths.size} paths with OR match.`);
+      logger.debug(`Found ${matchingDocs.size} docs with OR match.`); // ★ size を使う
     } else { // 'and' match
       // AND match: Start with paths from the first tag, then intersect with subsequent tags
       let firstTag = true;
       for (const tag of input.tags) {
-        const pathsForTag = new Set<string>(combinedTagsIndex[tag] || []);
+        const docsForTag = new Map<string, IndexedDocumentInfo>(); // ★ Mapに変更
+        (combinedTagsIndex[tag] || []).forEach(doc => docsForTag.set(doc.path, doc)); // ★ Mapに追加
         if (firstTag) {
-          matchingPaths = pathsForTag;
+          matchingDocs = docsForTag; // ★ Mapを代入
           firstTag = false;
         } else {
           // Intersect current matching paths with paths for this tag
-          matchingPaths = new Set([...matchingPaths].filter(p => pathsForTag.has(p)));
+          // Mapのキーで積集合を取る
+          const intersectionPaths = new Set([...matchingDocs.keys()].filter(p => docsForTag.has(p)));
+          // 新しいMapを作成
+          const intersectionDocs = new Map<string, IndexedDocumentInfo>();
+          intersectionPaths.forEach(p => {
+            const doc = matchingDocs.get(p) ?? docsForTag.get(p); // どちらかのMapから取得
+            if (doc) {
+              intersectionDocs.set(p, doc);
+            }
+          });
+          matchingDocs = intersectionDocs; // ★ Mapを更新
         }
         // Early exit if intersection results in empty set
-        if (matchingPaths.size === 0) break;
+        if (matchingDocs.size === 0) break; // ★ size を使う
       }
-      logger.debug(`Found ${matchingPaths.size} paths with AND match.`);
+      logger.debug(`Found ${matchingDocs.size} docs with AND match.`); // ★ size を使う
     }
 
     // --- Retrieve Metadata and Format Results ---
     const results: SearchResultItem[] = [];
-    for (const docPath of matchingPaths) {
-      const meta = combinedDocumentsMeta[docPath];
-      if (meta) {
-        // Ensure scope is correctly assigned based on where the meta came from
-        // (This assumes meta includes scope, which it should based on schema)
+    for (const docInfo of matchingDocs.values()) { // ★ matchingDocs の値 (IndexedDocumentInfo) をループ
+        // ★★★ meta ファイルを使わないように修正し、保持したscope情報を使う ★★★
+        logger.warn(`Metadata not currently used for search results, creating fallback title/date for: ${docInfo.path}`);
         results.push({
-          path: docPath,
-          title: meta.title,
-          lastModified: meta.lastModified,
-          scope: meta.scope,
+          path: docInfo.path,
+          title: path.basename(docInfo.path), // Fallback title using path
+          lastModified: new Date(0).toISOString(), // Default/fallback date - TODO: Get actual lastModified if needed
+          scope: docInfo.scope, // ★ インデックスから取得したscopeを使用
         });
-      } else {
-        // Log warning if metadata is missing for a path found in tags index
-        logger.warn(`Metadata not found for path found in tags index: ${docPath}`);
-        // Optionally, create a fallback result item
-        results.push({
-          path: docPath,
-          title: path.basename(docPath), // Fallback title using path
-          lastModified: new Date(0).toISOString(), // Default/fallback date
-          scope: docPath.includes('/global-memory-bank/') ? 'global' : 'branch', // Infer scope from path
-        });
-      }
-    }
+      } // 外側の for ループの閉じ括弧
 
     // Sort results (e.g., by lastModified date descending)
     results.sort((a, b) => new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime());
@@ -201,14 +243,15 @@ export class SearchDocumentsByTagsUseCase
   private async readIndexFile<T>(filePath: string): Promise<T | null> {
     try {
       const content = await this.fileSystemService.readFile(filePath);
-      return JSON.parse(content) as T;
+      const parsed = JSON.parse(content) as T;
+      return parsed;
     } catch (error) {
       // If file not found, return null, otherwise rethrow
       if (error instanceof Error && (error as NodeJS.ErrnoException).code === 'ENOENT') {
-        logger.warn(`Index file not found: ${filePath}`);
+        logger.warn(`Index file not found: ${filePath}`); // 元のログに戻す
         return null;
       }
-      logger.error(`Failed to read or parse index file ${filePath}:`, error);
+      logger.error(`Failed to read or parse index file ${filePath}:`, error); // 元のログに戻す
       throw error; // Rethrow other errors
     }
   }

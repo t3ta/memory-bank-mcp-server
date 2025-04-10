@@ -130,9 +130,10 @@ export interface Logger {
  * @param level Minimum log level to display
  * @returns Logger instance
  */
-export function createConsoleLogger(level: LogLevel = 'info'): Logger {
+// Allow passing initial default context
+export function createConsoleLogger(level: LogLevel = 'info', initialDefaultContext?: LogContext): Logger {
   let currentLevel = level;
-  let defaultContext: LogContext = {};
+  let defaultContext: LogContext = initialDefaultContext || {}; // Use initial context if provided
 
   /**
    * Check if a log level should be displayed
@@ -146,9 +147,7 @@ export function createConsoleLogger(level: LogLevel = 'info'): Logger {
   /**
    * Format the log entry with level prefix and timestamp
    */
-  function formatLogEntry(level: LogLevel, message: string): string {
-    return `[${level.toUpperCase()}] ${message}`;
-  }
+  // Removed: formatLogEntry as we now output JSON
 
   /**
    * Prepare context with defaults and auto-populated fields
@@ -165,45 +164,73 @@ export function createConsoleLogger(level: LogLevel = 'info'): Logger {
   const logger: Logger = {
     debug(message: string, ...args: unknown[]): void {
       if (shouldLog('debug')) {
+        let context: LogContext = {};
         if (args.length === 1 && typeof args[0] === 'object' && args[0] !== null && !Array.isArray(args[0])) {
-          const context = prepareContext(args[0] as LogContext);
-          console.debug(formatLogEntry('debug', message), context);
-        } else {
-          console.debug(formatLogEntry('debug', message), ...args);
+          context = args[0] as LogContext;
+        } else if (args.length > 0) {
+          // Treat multiple arguments as an array in the context
+          context = { args };
         }
+        const logEntry = { level: 'debug', message, ...prepareContext(context) };
+        // Output JSON string to stdout
+        console.log(JSON.stringify(logEntry));
       }
     },
 
     info(message: string, ...args: unknown[]): void {
       if (shouldLog('info')) {
+        let context: LogContext = {};
         if (args.length === 1 && typeof args[0] === 'object' && args[0] !== null && !Array.isArray(args[0])) {
-          const context = prepareContext(args[0] as LogContext);
-          console.info(formatLogEntry('info', message), context);
-        } else {
-          console.info(formatLogEntry('info', message), ...args);
+          context = args[0] as LogContext;
+        } else if (args.length > 0) {
+          context = { args };
         }
+        const logEntry = { level: 'info', message, ...prepareContext(context) };
+        // Output JSON string to stdout
+        console.log(JSON.stringify(logEntry));
       }
     },
 
     warn(message: string, ...args: unknown[]): void {
       if (shouldLog('warn')) {
+        let context: LogContext = {};
         if (args.length === 1 && typeof args[0] === 'object' && args[0] !== null && !Array.isArray(args[0])) {
-          const context = prepareContext(args[0] as LogContext);
-          console.warn(formatLogEntry('warn', message), context);
-        } else {
-          console.warn(formatLogEntry('warn', message), ...args);
+          context = args[0] as LogContext;
+        } else if (args.length > 0) {
+          context = { args };
         }
+        const logEntry = { level: 'warn', message, ...prepareContext(context) };
+        // Output JSON string to stdout
+        console.log(JSON.stringify(logEntry));
       }
     },
 
     error(message: string, ...args: unknown[]): void {
       if (shouldLog('error')) {
-        if (args.length === 1 && typeof args[0] === 'object' && args[0] !== null && !Array.isArray(args[0])) {
-          const context = prepareContext(args[0] as LogContext);
-          console.error(formatLogEntry('error', message), context);
-        } else {
-          console.error(formatLogEntry('error', message), ...args);
+        let context: LogContext = {};
+        // Ensure error details are captured correctly in context
+        const errorArg = args.find(arg => arg instanceof Error);
+        if (errorArg) {
+           context.error = {
+             message: (errorArg as Error).message,
+             stack: (errorArg as Error).stack,
+             name: (errorArg as Error).name,
+           };
+           // Filter out the error object from args if it exists
+           args = args.filter(arg => arg !== errorArg);
         }
+
+        if (args.length === 1 && typeof args[0] === 'object' && args[0] !== null && !Array.isArray(args[0])) {
+           // Merge remaining args[0] if it's an object context
+           context = { ...context, ...(args[0] as LogContext) };
+        } else if (args.length > 0) {
+           // Add remaining args if any
+           context.args = args;
+        }
+
+        const logEntry = { level: 'error', message, ...prepareContext(context) };
+        // Output JSON string to stdout
+        console.log(JSON.stringify(logEntry));
       }
     },
 
@@ -233,25 +260,14 @@ export function createConsoleLogger(level: LogLevel = 'info'): Logger {
     },
 
     withContext(context: LogContext): Logger {
-      const childLogger = createConsoleLogger(currentLevel);
-
+      // Create child logger passing the combined context
       const combinedContext = { ...defaultContext, ...context };
-
-      Object.defineProperty(childLogger, '_defaultContext', {
-        value: combinedContext,
-        writable: true,
-        enumerable: false
-      });
-
+      const childLogger = createConsoleLogger(currentLevel, combinedContext);
       return childLogger;
     }
   };
 
-  Object.defineProperty(logger, '_defaultContext', {
-    value: defaultContext,
-    writable: true,
-    enumerable: false
-  });
+  // Remove the Object.defineProperty for _defaultContext as it's handled internally now
 
   return logger;
 }

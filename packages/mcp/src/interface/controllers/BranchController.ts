@@ -58,7 +58,7 @@ export class BranchController {
   async writeDocument(params: {
     branchName?: string;
     path: string;
-    content?: string; // Explicitly define content as string
+    content?: Record<string, unknown> | string; // Allow object or string
     tags?: string[];
     patches?: any[]; // Add patches parameter
   }) {
@@ -72,26 +72,26 @@ export class BranchController {
 
       // branchName が undefined でもログにはそのまま記録される
       this.componentLogger.info('Writing branch document', { operation: 'writeDocument', branchName, path, hasContent, hasPatches });
-      // console.error(`--- BranchController: Checking conditions - hasPatches: ${hasPatches}, content type: ${typeof content}, content value: "${content}", hasContent: ${hasContent}`); // DEBUG LOG REMOVED
+
 
       if (hasPatches) {
-        // console.error("--- BranchController: Entering 'patches' block"); // DEBUG LOG REMOVED
+
         // Call WriteBranchDocumentUseCase with patches
         const result = await this.writeBranchDocumentUseCase.execute({
           branchName, // undefined の可能性あり
           document: { // Pass path and tags from the document object
             path: path,
             tags: tags,
-            content: '' // Pass empty string to satisfy the type when using patches
+
+            content: undefined // Pass undefined when using patches
           },
           patches: patches // Pass the patches array
         });
         // Log the result from the use case and the data being presented
-        // console.error("--- BranchController: UseCase result:", JSON.stringify(result, null, 2)); // DEBUG LOG REMOVED
-        // console.error("--- BranchController: Presenting data:", JSON.stringify(result.document, null, 2)); // DEBUG LOG REMOVED
+
        return this.presenter.presentSuccess(result.document);
       } else if (hasContent) {
-        // console.error("--- BranchController: Entering 'content' block"); // DEBUG LOG REMOVED
+
         // If content is provided (and no patches), call the existing UseCase
         // Content is already known to be a non-empty string here due to hasContent check
         const result = await this.writeBranchDocumentUseCase.execute({
@@ -106,7 +106,7 @@ export class BranchController {
          // Return the document DTO directly from the use case result
         return this.presenter.presentSuccess(result.document);
       } else {
-        // console.error("--- BranchController: Entering 'else' (init) block"); // DEBUG LOG REMOVED
+
         // Handle the case where neither content nor patches are provided (or patches is an empty array)
         // This might need a dedicated initialization UseCase or logic.
         // For now, return the initialization message similar to routes.ts logic.
@@ -177,7 +177,7 @@ export class BranchController {
   }) {
     try {
       const { tags, branchName, match } = params; // Remove docs from destructuring
-      this.componentLogger.info('Searching branch documents by tags', { operation: 'searchByTags', branchName, tags, match });
+      this.componentLogger.info('Searching branch documents by tags', { operation: 'searchByTags', branchName, tags, match }); // 元のログに戻す
       // Get docs path from injected configProvider
       const docsPath = this.configProvider.getConfig().docsRoot; // Use a different variable name
       if (!docsPath) {

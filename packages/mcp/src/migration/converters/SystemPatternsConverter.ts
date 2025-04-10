@@ -44,6 +44,7 @@ export class SystemPatternsConverter implements BaseConverter {
 
     const content: SystemPatternsContentV2 = {
       technicalDecisions,
+      implementationPatterns: [], // Add default value for required field
     };
 
     const tags = parsed.tags.map((tag) => Tag.create(tag));

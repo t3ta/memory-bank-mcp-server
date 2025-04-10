@@ -1,0 +1,15 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-unit-test-domain-entities-others-system-patterns",
+    "title": "System Patterns for feature/unit-test-domain-entities-others",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [],
+    "createdAt": "2025-04-04T12:55:21.330Z",
+    "lastModified": "2025-04-04T12:55:21.330Z"
+  },
+  "content": {
+    "patterns": []
+  }
+}

@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "prepare": "husky",
-    "build": "tsc -b",
+    "build": "tsc -b && node scripts/copy-assets.js",
     "build:mcp": "yarn workspace @memory-bank/mcp build",
     "build:schemas": "yarn workspace @memory-bank/schemas build",
     "copy-assets": "node scripts/copy-assets.js",
@@ -28,15 +28,16 @@
     "lint": "eslint . --ext .ts --max-warnings 1000 || true",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write 'packages/*/src/**/*.ts'",
-    "test": "yarn workspaces run test",
+    "test": "vitest run",
     "test:mcp": "yarn workspace @memory-bank/mcp test",
     "test:schemas": "yarn workspace @memory-bank/schemas test",
-    "test:watch": "yarn workspace @memory-bank/mcp test:watch",
-    "test:coverage": "yarn workspaces run test:coverage",
+    "test:watch": "vitest --config vitest.workspace.ts",
+    "test:coverage": "vitest run --coverage",
     "test:integration": "yarn workspace @memory-bank/mcp test:integration",
     "prepublishOnly": "yarn build",
     "check:deps": "depcheck",
-    "release": "semantic-release"
+    "release": "semantic-release",
+    "inspect": "npx @modelcontextprotocol/inspector node ./packages/mcp/dist/server.js --docs ./docs --project"
   },
   "keywords": [
     "mcp",
@@ -58,7 +59,7 @@
     "@semantic-release/github": "^11.0.1",
     "@semantic-release/npm": "^12.0.1",
     "@semantic-release/release-notes-generator": "^14.0.3",
-    "@types/jest": "^29.5.0",
+    "@types/jest": "^29.5.14",
     "@types/node": "^22.13.10",
     "@typescript-eslint/eslint-plugin": "^8.27.0",
     "@typescript-eslint/parser": "^8.27.0",
@@ -68,12 +69,16 @@
     "eslint-plugin-import": "^2.31.0",
     "globals": "^16.0.0",
     "husky": "^9.1.7",
+    "jest-mock-extended": "^4.0.0-beta1",
     "lint-staged": "^15.5.0",
     "madge": "^7.0.0",
     "prettier": "^3.5.3",
     "semantic-release": "^24.2.3",
     "semver": "^7.7.1",
-    "typescript": "^5.8.2"
+    "turbo": "^2.5.0",
+    "typescript": "^5.8.2",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.1.1"
   },
   "resolutions": {
     "@memory-bank/schemas": "1.0.0"
@@ -93,7 +98,7 @@
   "lint-staged": {
     "*.ts": [
       "tsc --noEmit",
-      "jest --bail --findRelatedTests"
+      "vitest related --run"
     ]
   }
 }

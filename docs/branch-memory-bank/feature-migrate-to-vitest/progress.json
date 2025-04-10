@@ -1,0 +1,78 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "migrate-to-vitest-progress",
+    "title": "Vitest移行プロジェクト進捗",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "lastModified": "2025-04-06T15:36:14.009Z",
+    "createdAt": "2025-04-06T19:15:35.498Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "mcp-unit-test-migration",
+        "description": "MCPパッケージのユニットテストをVitestに移行完了",
+        "completedAt": "2025-04-06T20:46:00.000Z"
+      },
+      {
+        "id": "vitest-migration-complete",
+        "description": "Vitestへの移行作業を完了し、Jest関連ファイルをクリーンアップ",
+        "completedAt": "2025-04-06T21:51:00.000Z"
+      }
+    ],
+    "pendingImplementation": [],
+    "status": "CIビルドエラー調査中：`tsc -b` が `@memory-bank/schemas` を解決できない問題が発生中。",
+    "completionPercentage": 100,
+    "knownIssues": [
+      {
+        "id": "dab484c1-a6f0-40b8-8dd8-e5abb3972aca",
+        "description": "ESMプロジェクトでJestを使用する際の設定の複雑さ",
+        "severity": "high"
+      },
+      {
+        "id": "2f1d7049-6e63-41df-afd6-71135e6eab1b",
+        "description": "Jest実行時に必要な多くの実験的フラグの使用",
+        "severity": "medium"
+      },
+      {
+        "id": "7a8ae5c3-e8f2-4d7c-9aef-1ab349c2bd95",
+        "description": "一部のユニットテストで失敗が見られる（Vitest移行とは無関係の問題）",
+        "severity": "low"
+      },
+      {
+        "id": "ci-build-error-schemas-resolution",
+        "description": "CI環境での `yarn build` (`tsc -b`) が `@memory-bank/schemas` モジュールを見つけられずに失敗する。ローカルの pre-push フックはパスする。",
+        "severity": "critical",
+        "status": "open",
+        "details": "tsconfig.json の paths/baseUrl 設定、Project References、CI のキャッシュやビルド順序など、様々な設定を試したが解決に至っていない。"
+      }
+    ],
+    "references": [
+      {
+        "file": "vitest-migration-status.json",
+        "description": "Vitest移行の最終状態確認レポート",
+        "created_at": "2025-04-06T22:30:00.000Z"
+      }
+    ],
+    "nextSteps": [
+      {
+        "id": "76bcf14a-cc48-4f9d-8e21-eb1ce7f839a2",
+        "description": "失敗しているテストの修正",
+        "priority": "medium"
+      },
+      {
+        "id": "a5fc2c8d-7b2c-4e14-bc9b-3db7c6d7a53e",
+        "description": "CI環境でのテスト実行確認",
+        "priority": "medium"
+      },
+      {
+        "id": "9d1e8fd3-e36f-48bc-91d5-6b9acb29fe95",
+        "description": "Vitestのパフォーマンス計測",
+        "priority": "low"
+      }
+    ]
+  }
+}

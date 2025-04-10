@@ -172,14 +172,7 @@ export class DocumentIO {
       await fs.writeFile(filePath, contentToSave, 'utf-8');
       logger.debug('[DocumentIO] Successfully wrote file:', { filePath });
 
-      // Write .md version if the main file is .json (for test compatibility)
-      if (isJsonFile) {
-        const mdFilePath = filePath.replace('.json', '.md');
-        const mdParentDir = path.dirname(mdFilePath);
-        await fs.mkdir(mdParentDir, { recursive: true });
-        await fs.writeFile(mdFilePath, contentToSave, 'utf-8');
-        logger.debug('[DocumentIO] Successfully wrote MD version:', { path: mdFilePath });
-      }
+
 
     } catch (error: unknown) {
       logger.error('[DocumentIO] Failed to save document:', { filePath, error });

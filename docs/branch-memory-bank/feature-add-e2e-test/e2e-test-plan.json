@@ -1,0 +1,175 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "e2e-test-plan",
+    "title": "E2E テスト導入計画",
+    "documentType": "technical_plan",
+    "path": "e2e-test-plan.json",
+    "tags": [],
+    "lastModified": "2025-04-06T17:04:28.622Z",
+    "createdAt": "2025-04-06T09:35:15.000Z",
+    "version": 1
+  },
+  "content": {
+    "overview": "MemoryBank MCPサーバー向けのEnd-to-Endテスト実装計画です。このドキュメントでは、typescript-sdkのInMemoryTransportを活用したインメモリベースのE2Eテスト導入方法について詳細に解説します。",
+    "background": {
+      "currentState": "現在、MCPサーバーはユニットテストとインテグレーションテストを実装していますが、クライアントとサーバー間の通信を含めたエンドツーエンドのテストは実装されていません。",
+      "problemStatement": "MCPサーバーとクライアント間のJSONRPC通信において、メッセージの送受信や全体的なワークフローを包括的にテストする仕組みが必要です。",
+      "references": [
+        {
+          "description": "typescript-sdk/src/inMemory.ts のInMemoryTransport実装",
+          "importance": "このクラスを活用して、メモリ内でサーバー・クライアント間通信をシミュレートします"
+        },
+        {
+          "description": "packages/mcp/tests/integration/controller のインテグレーションテスト",
+          "importance": "既存のコントローラーテストをベースにE2Eテストを拡張できます"
+        }
+      ]
+    },
+    "goals": [
+      "MCPサーバーの主要機能をEnd-to-Endでテストする仕組みを構築する",
+      "InMemoryTransportを活用したクライアント-サーバー間通信のテストを実装する",
+      "重要なMCP操作（特にメモリバンク関連）のE2Eテストケースを開発する",
+      "テスト環境のセットアップとティアダウンを効率的に行う仕組みを作る",
+      "CIパイプラインにE2Eテストを統合する"
+    ],
+    "implementation": {
+      "directory": {
+        "path": "packages/mcp/tests/e2e",
+        "description": "E2Eテスト用の新しいディレクトリを作成し、必要なファイルを配置します"
+      },
+      "components": [
+        {
+          "name": "e2e-test-env.ts",
+          "purpose": "E2Eテスト環境のセットアップと破棄を行うユーティリティ",
+          "details": "packages/mcp/tests/integration/helpers/test-env.tsを参考に、インメモリ通信用の環境設定を追加します"
+        },
+        {
+          "name": "vitest.config.e2e.ts",
+          "purpose": "E2Eテスト用のVitest設定ファイル",
+          "details": "既存のインテグレーションテスト設定をベースに、E2Eテスト用の最適化を行います（Vitest用）"
+        },
+        {
+          "name": "MCPInMemoryClient.ts",
+          "purpose": "テスト用のMCPクライアント実装",
+          "details": "InMemoryTransportを使用してMCPサーバーと通信するクライアントクラスを実装します"
+        },
+        {
+          "name": "*/**.e2e.test.ts",
+          "purpose": "各機能のE2Eテストファイル",
+          "details": "ブランチメモリバンク操作、グローバルメモリバンク操作、コンテキスト読み込みなど、主要機能ごとのテストファイル"
+        }
+      ],
+      "testCases": [
+        {
+          "category": "初期化テスト",
+          "cases": [
+            "MCPサーバーの初期化と接続確立",
+            "クライアント-サーバー間の基本的な通信確認"
+          ]
+        },
+        {
+          "category": "ブランチメモリバンク操作",
+          "cases": [
+            "ドキュメント読み込み (read_branch_memory_bank)",
+            "ドキュメント書き込み (write_branch_memory_bank)",
+            "存在しないドキュメント/ブランチのエラー処理"
+          ]
+        },
+        {
+          "category": "グローバルメモリバンク操作",
+          "cases": [
+            "ドキュメント読み込み (read_global_memory_bank)",
+            "ドキュメント書き込み (write_global_memory_bank)"
+          ]
+        },
+        {
+          "category": "コンテキスト操作",
+          "cases": [
+            "コンテキスト読み込み (read_context)",
+            "様々な言語でのルール読み込み",
+            "タグによるドキュメント検索"
+          ]
+        }
+      ],
+      "sequence": [
+        {
+          "step": 1,
+          "task": "E2Eテスト用のディレクトリ構造とVitest設定を作成",
+          "details": "packages/mcp/tests/e2e ディレクトリを作成し、Vitest設定ファイルを作成します"
+        },
+        {
+          "step": 2,
+          "task": "E2Eテスト環境のセットアップユーティリティを実装",
+          "details": "既存のtest-env.tsを拡張して、インメモリ通信用の環境設定を追加します"
+        },
+        {
+          "step": 3,
+          "task": "InMemoryTransportを活用したMCPクライアント実装",
+          "details": "テスト用のMCPクライアントクラスを実装し、サーバーとの通信をシミュレートします"
+        },
+        {
+          "step": 4,
+          "task": "初期化とブランチメモリバンク操作のE2Eテスト実装",
+          "details": "基本的な接続確立とブランチメモリバンク操作のテストを実装します"
+        },
+        {
+          "step": 5,
+          "task": "グローバルメモリバンク操作のE2Eテスト実装",
+          "details": "グローバルメモリバンク操作のテストを実装します"
+        },
+        {
+          "step": 6,
+          "task": "コンテキスト操作のE2Eテスト実装",
+          "details": "コンテキスト読み込みと関連機能のテストを実装します"
+        },
+        {
+          "step": 7,
+          "task": "package.jsonにE2Eテスト用のスクリプトを追加",
+          "details": "yarn test:e2e コマンドを追加し、CI/CDパイプラインと統合できるようにします"
+        }
+      ]
+    },
+    "technicalConsiderations": {
+      "inMemoryTransport": {
+        "overview": "typescript-sdk の InMemoryTransport クラスを活用して、メモリ内でクライアント-サーバー間通信をシミュレートします",
+        "implementation": {
+          "clientTransport": "クライアント側のトランスポート実装",
+          "serverTransport": "サーバー側のトランスポート実装",
+          "communication": "メッセージの送受信はメモリ内で直接行われ、実際のネットワーク通信は発生しません"
+        },
+        "advantages": [
+          "ネットワーク依存のないテスト環境を構築できる",
+          "テスト実行が高速で効率的",
+          "テスト環境のセットアップが比較的容易"
+        ]
+      },
+      "testSetup": {
+        "overview": "各テストケース実行前に、テスト用のMCPサーバーとクライアントをインメモリで初期化します",
+        "steps": [
+          "テスト用の一時ディレクトリを作成（既存のtest-env.tsと同様）",
+          "InMemoryTransportのペアを作成（クライアント用とサーバー用）",
+          "MCPサーバーをインメモリトランスポートでセットアップ",
+          "MCPクライアントをインメモリトランスポートでセットアップ",
+          "テスト実行",
+          "テスト環境のクリーンアップ"
+        ]
+      },
+      "potentialChallenges": [
+        {
+          "challenge": "MCPサーバーをインメモリトランスポートで実行するための適応",
+          "solution": "MCPサーバーのトランスポート初期化部分を拡張し、InMemoryTransportをサポートするようにします"
+        },
+        {
+          "challenge": "テスト環境のアイソレーション",
+          "solution": "各テストケースは独立した環境で実行され、テスト間の干渉が発生しないようにします"
+        },
+        {
+          "challenge": "非同期処理のテスト",
+          "solution": "Vitest の非同期テスト機能を活用し、Promise の解決を適切に待機します"
+        }
+      ]
+    },
+    "conclusion": "このE2Eテスト導入により、MCPサーバーの品質と信頼性が向上します。typescript-sdkのInMemoryTransportを活用することで、効率的かつ包括的なテスト環境を構築できます。各機能の正確な動作を検証し、リグレッションを防止するための強固な基盤となります。"
+  }
+}

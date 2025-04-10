@@ -1,7 +1,7 @@
 import { JsonDocumentRepository } from '../../../domain/repositories/JsonDocumentRepository.js';
 import { JsonPatchOperation } from '../../../domain/jsonpatch/JsonPatchOperation.js';
 import { JsonPatchService } from '../../../domain/jsonpatch/JsonPatchService.js';
-import { Rfc6902JsonPatchAdapter } from '../../../domain/jsonpatch/Rfc6902JsonPatchAdapter.js'; // Correct file path casing
+import { FastJsonPatchAdapter } from '../../../domain/jsonpatch/FastJsonPatchAdapter.js'; // Use the new adapter
 import { DomainError, DomainErrorCodes } from '../../../shared/errors/DomainError.js';
 import { JsonDocument } from '../../../domain/entities/JsonDocument.js';
 import { DocumentVersionInfo } from '../../../domain/entities/DocumentVersionInfo.js';
@@ -29,7 +29,7 @@ export class JsonPatchUseCase {
   ) {
     this.repository = repository;
     this.eventEmitter = eventEmitter;
-    this.patchService = patchService ?? new Rfc6902JsonPatchAdapter(); // Use the refactored adapter
+    this.patchService = patchService ?? new FastJsonPatchAdapter(); // Use the new adapter as default
   }
 
   /**

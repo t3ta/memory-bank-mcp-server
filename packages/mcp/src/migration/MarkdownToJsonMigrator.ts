@@ -6,9 +6,9 @@
  */
 import path from 'node:path';
 import { promises as fs } from 'node:fs';
-import { DocumentPath } from '@/domain/entities/DocumentPath.js';
-import { JsonDocument, DocumentType } from '@/domain/entities/JsonDocument.js';
-import { DomainError, DomainErrorCodes } from '@/shared/errors/DomainError.js';
+import { DocumentPath } from '../domain/entities/DocumentPath.js';
+import { JsonDocument, DocumentType } from '../domain/entities/JsonDocument.js';
+import { DomainError, DomainErrorCodes } from '../shared/errors/DomainError.js';
 import { MigrationBackup } from './MigrationBackup.js';
 import { MigrationValidator } from './MigrationValidator.js';
 import { ConverterFactory } from './converters/ConverterFactory.js';
