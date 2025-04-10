@@ -4,6 +4,9 @@
  * This script handles the interactive behavior of the Memory Bank document editor webview.
  */
 
+/* eslint-env browser */
+/* global acquireVsCodeApi, mermaid */
+
 (function () {
   const vscode = acquireVsCodeApi();
   let editor, previewContentDiv, errorMessageDiv;

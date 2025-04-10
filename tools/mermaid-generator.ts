@@ -2,7 +2,6 @@ import * as path from 'path';
 import {
   ProjectStructure,
   DirectoryStructure,
-  FileStructure,
   ClassInfo,
   InterfaceInfo,
   DiagramOptions
@@ -45,7 +44,7 @@ export class MermaidGenerator {
     lines.push('  class root directory;');
     
     // パッケージに対してpackageクラスを適用
-    structure.packagePaths.forEach((packagePath, packageName) => {
+    structure.packagePaths.forEach((packagePath) => {
       const safePackageName = this.sanitizeId(path.basename(packagePath));
       lines.push(`  class ${safePackageName} package;`);
     });
@@ -75,9 +74,9 @@ export class MermaidGenerator {
     }
     
     // クラスとインターフェースの定義を生成
-    classesAndInterfaces.forEach((data, packageName) => {
+    classesAndInterfaces.forEach((data, _packageName) => {
       if (data.classes.length > 0 || data.interfaces.length > 0) {
-        lines.push(`  %% パッケージ: ${packageName}`);
+        lines.push(`  %% パッケージ: ${_packageName}`);
         lines.push('');
         
         // インターフェース定義
@@ -138,16 +137,16 @@ export class MermaidGenerator {
     const packageDependencies = new Map<string, Set<string>>();
     
     // パッケージ定義
-    structure.packagePaths.forEach((packagePath, packageName) => {
-      const safePackageName = this.sanitizeId(packageName);
-      lines.push(`  ${safePackageName}["${packageName}"]`);
-      packageDependencies.set(packageName, new Set<string>());
+    structure.packagePaths.forEach((packagePath, _packageName) => {
+      const safePackageName = this.sanitizeId(_packageName);
+      lines.push(`  ${safePackageName}["${_packageName}"]`);
+      packageDependencies.set(_packageName, new Set<string>());
     });
     
     lines.push('');
     
     // パッケージの依存関係を解析
-    structure.packagePaths.forEach((packagePath, packageName) => {
+    structure.packagePaths.forEach((packagePath, _packageName) => {
       const packageJsonPath = path.join(packagePath, 'package.json');
       try {
         const packageJson = require(packageJsonPath);
@@ -156,20 +155,20 @@ export class MermaidGenerator {
         for (const dep in dependencies) {
           // 同じプロジェクト内のパッケージへの依存関係のみ表示
           if (structure.packagePaths.has(dep)) {
-            const deps = packageDependencies.get(packageName);
+            const deps = packageDependencies.get(_packageName);
             if (deps) {
               deps.add(dep);
             }
           }
         }
-      } catch (e) {
+      } catch {
         // package.jsonが読めない場合は無視
       }
     });
     
     // 依存関係の矢印を追加
-    packageDependencies.forEach((deps, packageName) => {
-      const safePackageName = this.sanitizeId(packageName);
+    packageDependencies.forEach((deps, _packageName) => {
+      const safePackageName = this.sanitizeId(_packageName);
       
       deps.forEach(dep => {
         const safeDepName = this.sanitizeId(dep);
@@ -185,8 +184,8 @@ export class MermaidGenerator {
     // クラス定義の適用
     lines.push('');
     lines.push('  %% クラス定義の適用');
-    structure.packagePaths.forEach((packagePath, packageName) => {
-      const safePackageName = this.sanitizeId(packageName);
+    structure.packagePaths.forEach((packagePath, _packageName) => {
+      const safePackageName = this.sanitizeId(_packageName);
       lines.push(`  class ${safePackageName} package;`);
     });
     

@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitest/config';
-import { resolve } from 'path';
+// import { resolve } from 'path'; // 現在は使用していないのでコメントアウト
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({

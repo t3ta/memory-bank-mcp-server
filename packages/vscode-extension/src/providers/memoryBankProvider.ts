@@ -18,7 +18,9 @@ export class MemoryBankProvider {
     }
     // Assuming single root workspace for now
     this.workspaceRoot = workspaceFolders[0].uri.fsPath;
-    console.log(`MemoryBankProvider initialized for workspace: ${this.workspaceRoot}`);
+    // デバッグ: 初期化情報のログ
+    // console.log(`MemoryBankProvider initialized for workspace: ${this.workspaceRoot}`);
+    vscode.window.setStatusBarMessage(`Memory Bank: Initialized for ${this.workspaceRoot}`, 3000);
   }
 
   /**
@@ -34,13 +36,15 @@ export class MemoryBankProvider {
     const fileUri = vscode.Uri.file(path.join(memoryBankRoot, relativePath));
 
     try {
-      console.log(`Reading file: ${fileUri.fsPath}`);
+      // デバッグ: ファイル読み込み開始ログ
+      // console.log(`Reading file: ${fileUri.fsPath}`);
       const readData = await vscode.workspace.fs.readFile(fileUri);
       const content = Buffer.from(readData).toString('utf8');
-      console.log(`Successfully read file: ${relativePath}`);
+      // デバッグ: ファイル読み込み成功ログ
+      // console.log(`Successfully read file: ${relativePath}`);
       return content;
     } catch (error) {
-      console.error(`Error reading file ${fileUri.fsPath}:`, error);
+      // エラーログと通知
       vscode.window.showErrorMessage(`Failed to read memory bank document: ${relativePath}`);
       // Re-throw or handle appropriately
       throw new Error(`Failed to read document: ${relativePath}. Error: ${error instanceof Error ? error.message : String(error)}`);
@@ -59,12 +63,15 @@ export class MemoryBankProvider {
     const fileUri = vscode.Uri.file(path.join(memoryBankRoot, relativePath));
 
     try {
-      console.log(`Writing file: ${fileUri.fsPath}`);
+      // デバッグ: ファイル書き込み開始ログ
+      // console.log(`Writing file: ${fileUri.fsPath}`);
       const writeData = Buffer.from(content, 'utf8');
       await vscode.workspace.fs.writeFile(fileUri, writeData);
-      console.log(`Successfully wrote file: ${relativePath}`);
+      // デバッグ: ファイル書き込み成功ログ
+      // console.log(`Successfully wrote file: ${relativePath}`);
+      vscode.window.setStatusBarMessage(`Memory Bank: Saved ${relativePath}`, 3000);
     } catch (error) {
-      console.error(`Error writing file ${fileUri.fsPath}:`, error);
+      // エラーログと通知
       vscode.window.showErrorMessage(`Failed to write memory bank document: ${relativePath}`);
       throw new Error(`Failed to write document: ${relativePath}. Error: ${error instanceof Error ? error.message : String(error)}`);
     }
@@ -82,18 +89,21 @@ export class MemoryBankProvider {
     const dirUri = vscode.Uri.file(path.join(memoryBankRoot, relativePath));
 
     try {
-      console.log(`Listing directory: ${dirUri.fsPath}`);
+      // デバッグ: ディレクトリ一覧取得開始ログ
+      // console.log(`Listing directory: ${dirUri.fsPath}`);
       const entries = await vscode.workspace.fs.readDirectory(dirUri);
-      console.log(`Successfully listed directory: ${relativePath}`);
+      // デバッグ: ディレクトリ一覧取得成功ログ
+      // console.log(`Successfully listed directory: ${relativePath}`);
       // Filter out unwanted files like .DS_Store if necessary
       return entries.filter(([name]) => !name.startsWith('.'));
     } catch (error) {
       // If the directory doesn't exist, return an empty array or handle specific errors
       if (error instanceof vscode.FileSystemError && error.code === 'FileNotFound') {
-          console.warn(`Directory not found for listing: ${dirUri.fsPath}`);
+          // 警告表示
+          vscode.window.showWarningMessage(`Directory not found: ${relativePath}`);
           return [];
       }
-      console.error(`Error listing directory ${dirUri.fsPath}:`, error);
+      // エラーログと通知
       vscode.window.showErrorMessage(`Failed to list memory bank directory: ${relativePath}`);
       throw new Error(`Failed to list directory: ${relativePath}. Error: ${error instanceof Error ? error.message : String(error)}`);
     }

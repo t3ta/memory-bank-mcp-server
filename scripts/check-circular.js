@@ -51,7 +51,7 @@ async function main() {
     try {
       const modules = Object.keys(result.obj()).length;
       console.log(`- モジュール総数: ${modules}`);
-    } catch (error) {
+    } catch {
       console.log('- モジュール情報の取得に失敗しました');
     }
 

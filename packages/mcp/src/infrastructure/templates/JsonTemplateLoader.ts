@@ -3,9 +3,9 @@
  * Loads and processes JSON templates with internationalization support
  */
 import path from 'node:path';
-// Use 'any' for now due to persistent import issues
-type JsonTemplate = any;
-const validateJsonTemplate = (data: any) => data; // Dummy validator
+// 具体的な型が定義されるまでの暫定対応としてRecordを使用
+type JsonTemplate = Record<string, unknown>;
+const validateJsonTemplate = (data: Record<string, unknown>): Record<string, unknown> => data; // Dummy validator
 type Language = 'en' | 'ja' | 'zh';
 import { IFileSystemService } from '../storage/interfaces/IFileSystemService.js';
 import { II18nProvider } from '../i18n/interfaces/II18nProvider.js';

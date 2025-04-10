@@ -244,7 +244,7 @@ export class FileSystemService implements IFileSystemService {
 
           const files: string[] = [];
 
-          const processEntries = async (batchEntries: Dirent[]) => {
+          const processEntries = async (batchEntries: Dirent[]): Promise<string[]> => {
             const results = await Promise.all(
               batchEntries.map(async (entry) => {
                 const fullPath = path.join(dirPath, entry.name);
@@ -330,7 +330,7 @@ export class FileSystemService implements IFileSystemService {
    * Get configuration
    * @returns Configuration object
    */
-  getConfig(): { memoryBankRoot: string;[key: string]: any } {
+  getConfig(): { memoryBankRoot: string;[key: string]: unknown } {
     return { memoryBankRoot: 'docs' };
   }
 

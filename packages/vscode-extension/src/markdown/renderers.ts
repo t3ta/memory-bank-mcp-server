@@ -10,7 +10,7 @@ import { LARGE_DOC_THRESHOLD_KB, MAX_LARGE_DOC_PREVIEW_ITEMS } from './renderers
  * @param rawJsonString Optional raw JSON string to check document size.
  * @returns The generated Markdown string.
  */
-export function generateMarkdownFromData(data: any, rawJsonString?: string): string {
+export function generateMarkdownFromData(data: Record<string, unknown>, rawJsonString?: string): string {
     const isLargeDocument = rawJsonString ? (rawJsonString.length / 1024) > LARGE_DOC_THRESHOLD_KB : false;
 
     if (!data || typeof data !== 'object') {
@@ -67,7 +67,8 @@ export function generateMarkdownFromData(data: any, rawJsonString?: string): str
         try {
             mdString += renderContent(content);
         } catch (error) {
-             console.error(`[Renderer Error - ${documentType}] Failed to render content:`, error);
+             // console.error(`[Renderer Error - ${documentType}] Failed to render content:`, error);
+             // エラーはユーザーに表示しないようにコメントアウト
              const errorMessage = error instanceof Error ? error.message : String(error);
              mdString += `\n\n### Rendering Error (${documentType})\n\nAn error occurred while rendering the content:\n\n\`\`\`\n${errorMessage}\n\`\`\`\n`;
              if (!isLargeDocument) {

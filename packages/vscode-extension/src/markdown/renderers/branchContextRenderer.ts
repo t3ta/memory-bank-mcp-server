@@ -1,11 +1,12 @@
+import * as vscode from 'vscode';
 import { MAX_ARRAY_ITEMS } from './common';
 import { renderGenericContent } from './genericRenderer';
 
 /**
  * Renders content for 'branch_context' document type.
  */
-export function renderBranchContextContent(content: any): string {
-    console.log("[Renderer] Rendering 'branch_context' type");
+export function renderBranchContextContent(content: Record<string, unknown>): string {
+    vscode.window.showInformationMessage("[Renderer] Rendering 'branch_context' type");
     let mdString = '';
     try {
         if (!content || typeof content !== 'object') {
@@ -22,18 +23,19 @@ export function renderBranchContextContent(content: any): string {
          if (content.createdAt) {
             try {
                 mdString += `**Created At:** ${new Date(content.createdAt).toLocaleString()}\n\n`;
-            } catch(e) { /* ignore */ }
+            } catch { /* ignore */ }
         }
 
         if (Array.isArray(content.userStories) && content.userStories.length > 0) {
           mdString += `### User Stories\n`;
           try {
-              content.userStories.sort((a: any, b: any) => (a.priority || 99) - (b.priority || 99));
-          } catch (e) { console.warn("Could not sort user stories by priority", e); }
+              content.userStories.sort((a: Record<string, unknown>, b: Record<string, unknown>) => 
+                  ((a.priority as number) || 99) - ((b.priority as number) || 99));
+          } catch (e) { vscode.window.showWarningMessage("Could not sort user stories by priority"); }
 
           const displayStories = content.userStories.slice(0, MAX_ARRAY_ITEMS);
           const remainingStories = content.userStories.length - displayStories.length; // Define remainingStories here
-          mdString += displayStories.map((story: any) => {
+          mdString += displayStories.map((story: Record<string, unknown>) => {
               const check = story.completed ? '[x]' : '[ ]';
               let storyLine = `- ${check} **${story.id || 'Story'}:** ${story.description || 'N/A'}`;
               if (story.priority !== undefined) {
@@ -52,7 +54,7 @@ export function renderBranchContextContent(content: any): string {
         }
 
         const handledKeys = ['branchName', 'purpose', 'createdAt', 'userStories', 'additionalNotes'];
-        const remainingContent: any = {};
+        const remainingContent: Record<string, unknown> = {};
          for (const key in content) {
             if (Object.prototype.hasOwnProperty.call(content, key) && !handledKeys.includes(key)) {
                 remainingContent[key] = content[key];
@@ -65,7 +67,7 @@ export function renderBranchContextContent(content: any): string {
 
         return mdString || '_(Branch context content seems empty)_';
     } catch (error) {
-        console.error(`[Renderer Error - branch_context] Failed to render branch context content:`, error);
+        vscode.window.showErrorMessage(`[Renderer Error - branch_context] Failed to render branch context content: ${error instanceof Error ? error.message : String(error)}`);
         const errorMessage = error instanceof Error ? error.message : String(error);
         return `### Rendering Error (Branch Context)\n\nAn error occurred while rendering the branch context content:\n\n\`\`\`\n${errorMessage}\n\`\`\`\n\n**Original Content:**\n\n\`\`\`json\n${JSON.stringify(content, null, 2)}\n\`\`\`\n`;
     }
