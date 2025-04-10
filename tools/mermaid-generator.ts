@@ -161,7 +161,7 @@ export class MermaidGenerator {
             }
           }
         }
-      } catch (_error) {
+      } catch {
         // package.jsonが読めない場合は無視
       }
     });

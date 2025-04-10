@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 // import * as micromatch from 'micromatch'; // 現在は使用していないのでコメントアウト
 import MarkdownIt from 'markdown-it';
+import * as markdown_it from 'markdown-it';  // 型定義のために追加
 import hljs from 'highlight.js';
 import { generateMarkdownFromData } from '../markdown/renderers';
 
@@ -21,24 +22,25 @@ const md = new MarkdownIt({
   }
 });
 
-const defaultFenceRenderer = md.renderer.rules.fence || function (tokens: any[], idx: number, options: any, env: any, self: any): string {
+const defaultFenceRenderer = md.renderer.rules.fence || function (tokens: markdown_it.Token[], idx: number, options: markdown_it.Options, _env: unknown, _self: unknown): string {
   const token = tokens[idx];
   const info = token.info ? token.info.trim() : '';
   const langName = info ? ` class="${options.langPrefix}${info}"` : '';
   return `<pre><code${langName}>${escapeHtml(token.content)}</code></pre>\n`;
 };
 
-md.renderer.rules.fence = (tokens, idx, options, env, self) => {
+md.renderer.rules.fence = (tokens: markdown_it.Token[], idx: number, options: markdown_it.Options, _env: unknown, _self: unknown): string => {
   const token = tokens[idx];
   const info = token.info ? token.info.trim() : '';
 
   if (info === 'mermaid') {
     const mermaidContent = token.content.trim();
-    console.log(`[Provider] Rendering Mermaid block via custom renderer. Content:\n${mermaidContent}`);
+    // console.log() -> デバッグ用の出力なのでコメントアウト
+    // console.log(`[Provider] Rendering Mermaid block via custom renderer. Content:\n${mermaidContent}`);
     return `<div class="mermaid">${mermaidContent}</div>`;
   }
 
-  return defaultFenceRenderer(tokens, idx, options, env, self);
+  return defaultFenceRenderer(tokens, idx, options, _env, _self);
 };
 
 
@@ -72,7 +74,8 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
    * Mermaid rendering uses a custom fence renderer and CDN library.
    */
   private initializeMarkdownIt(): void {
-    console.log('[Provider] Markdown-it initialized. Using custom fence renderer for Mermaid.');
+    // デバッグ用のログなのでコメントアウト
+    // console.log('[Provider] Markdown-it initialized. Using custom fence renderer for Mermaid.');
     // No dynamic plugin loading needed here as custom renderer is used.
   }
 
@@ -85,15 +88,17 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
     webviewPanel: vscode.WebviewPanel,
     _token: vscode.CancellationToken
   ): Promise<void> {
-    console.log(`[Provider] resolveCustomTextEditor started for: ${document.uri.fsPath}`);
+    // デバッグ用のログなのでコメントアウト
+    // console.log(`[Provider] resolveCustomTextEditor started for: ${document.uri.fsPath}`);
 
     // カスタムエディタの登録パターンが一致するか特別なチェックは必要ない（VSCodeが既にfilename patternに基づいて選択している）
     // 設定されたパターンはログ出力だけしておく（デバッグ用）
     const config = vscode.workspace.getConfiguration('memory-bank');
-    const patterns = config.get<string[]>('documentPathPatterns', []);
-    const filePath = document.uri.fsPath;
-    console.log(`[Provider Debug] Editor activated for file: ${filePath}`);
-    console.log(`[Provider Debug] Configuration patterns (not used for filtering): ${JSON.stringify(patterns)}`);
+    const _patterns = config.get<string[]>('documentPathPatterns', []);
+    const _filePath = document.uri.fsPath;
+    // デバッグ用のログなのでコメントアウト
+    // console.log(`[Provider Debug] Editor activated for file: ${_filePath}`);
+    // console.log(`[Provider Debug] Configuration patterns (not used for filtering): ${JSON.stringify(_patterns)}`);
 
     // VSCode自体のカスタムエディタセレクタで既にフィルタリングされているため、
     // 追加のパスチェック処理は不要（削除）
@@ -103,39 +108,47 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
       localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, 'media')]
     };
     webviewPanel.webview.html = this.getHtmlForWebview(webviewPanel.webview, document);
-    console.log(`[Provider] Webview HTML set for: ${document.uri.fsPath}`);
+    // デバッグ用のログなのでコメントアウト
+    // console.log(`[Provider] Webview HTML set for: ${document.uri.fsPath}`);
 
     webviewPanel.webview.onDidReceiveMessage(e => {
       switch (e.type) {
         case 'update':
-          console.log(`Received update from webview for ${document.uri.fsPath}`);
+          // デバッグ用のログなのでコメントアウト
+          // console.log(`Received update from webview for ${document.uri.fsPath}`);
           this._updateTextDocument(document, e.payload);
           this.updatePreview(document, webviewPanel);
           return;
         case 'requestPreview':
-          console.log(`[Provider] Received 'requestPreview' from webview for ${document.uri.fsPath}`);
+          // デバッグ用のログなのでコメントアウト
+          // console.log(`[Provider] Received 'requestPreview' from webview for ${document.uri.fsPath}`);
           this.updatePreview(document, webviewPanel);
           return;
         case 'error':
+          // console.errorは許可されているのでそのまま残す（エラー表示は重要）
           console.error(`Error message from webview: ${e.payload}`);
           return;
       }
     }, null, this.context.subscriptions);
-    console.log(`[Provider] onDidReceiveMessage listener set for: ${document.uri.fsPath}`);
+    // デバッグ用のログなのでコメントアウト
+    // console.log(`[Provider] onDidReceiveMessage listener set for: ${document.uri.fsPath}`);
 
     const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument(e => {
       if (e.document.uri.toString() === document.uri.toString()) {
         if (webviewPanel.visible) {
-          console.log(`Document changed externally, updating webview editor and preview for ${document.uri.fsPath}`);
+          // デバッグ用のログなのでコメントアウト
+          // console.log(`Document changed externally, updating webview editor and preview for ${document.uri.fsPath}`);
           webviewPanel.webview.postMessage({ type: 'update', text: document.getText() });
           this.updatePreview(document, webviewPanel);
         }
       }
     });
-    console.log(`[Provider] onDidChangeTextDocument listener set for: ${document.uri.fsPath}`);
+    // デバッグ用のログなのでコメントアウト
+    // console.log(`[Provider] onDidChangeTextDocument listener set for: ${document.uri.fsPath}`);
 
     webviewPanel.onDidDispose(() => {
-      console.log(`Webview panel disposed for ${document.uri.fsPath}`);
+      // デバッグ用のログなのでコメントアウト
+      // console.log(`Webview panel disposed for ${document.uri.fsPath}`);
       changeDocumentSubscription.dispose();
     });
 
@@ -151,7 +164,7 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
 
     const stylesUri = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'media', 'editor.css'));
     const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'media', 'js', 'editor.js'));
-    const mermaidCdnUrl = 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js'; // Mermaid loaded from CDN
+    const _mermaidCdnUrl = 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js'; // Mermaid loaded from CDN
 
     const themeKind = vscode.window.activeColorTheme.kind;
     let themeClass = 'vscode-light';
@@ -239,16 +252,18 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
    * Converts document content to Markdown and sends the rendered HTML to the webview.
    */
   private updatePreview(document: vscode.TextDocument, webviewPanel: vscode.WebviewPanel): void {
-    console.log(`[Provider] updatePreview called for ${document.uri.fsPath}`);
+    // デバッグ用のログなのでコメントアウト
+    // console.log(`[Provider] updatePreview called for ${document.uri.fsPath}`);
     const jsonString = document.getText();
     let markdown = '';
-    let parsedData: any;
+    let parsedData: Record<string, unknown>;
 
     try {
       parsedData = JSON.parse(jsonString);
       markdown = generateMarkdownFromData(parsedData, jsonString);
 
-    } catch (error: unknown) { // ★ エラーハンドリング修正
+    } catch (error: unknown) { // エラーハンドリング
+      // console.errorは許可されているのでそのまま残す（エラー表示は重要）
       console.error(`[Provider] Error parsing JSON for ${document.uri.fsPath}:`, error);
       // エラー情報をWebviewに送信
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -259,17 +274,20 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
       });
       // プレビューは更新しないか、エラー表示用のHTMLを送る
       // 今回はエラーメッセージをエディタ下部に表示するので、プレビューは空にする
-       webviewPanel.webview.postMessage({ type: 'updatePreview', html: '<p>Error parsing JSON. See details below the editor.</p>' });
-       console.log(`[Provider] Sent 'error' message to webview due to JSON parse error.`);
+      webviewPanel.webview.postMessage({ type: 'updatePreview', html: '<p>Error parsing JSON. See details below the editor.</p>' });
+      // デバッグ用のログなのでコメントアウト
+      // console.log(`[Provider] Sent 'error' message to webview due to JSON parse error.`);
       return; // エラーがあった場合はここで処理を終了
     }
 
-    // ★ JSONパース成功時のみプレビューを更新
+    // JSONパース成功時のみプレビューを更新
     if (parsedData) {
         const html = md.render(markdown);
-        console.log(`[Provider] Generated HTML for preview.`); // HTML内容はログに出さない方が良いかも
+        // デバッグ用のログなのでコメントアウト
+        // console.log(`[Provider] Generated HTML for preview.`);
         webviewPanel.webview.postMessage({ type: 'updatePreview', html: html });
-        console.log(`[Provider] Sent 'updatePreview' message to webview.`);
+        // デバッグ用のログなのでコメントアウト
+        // console.log(`[Provider] Sent 'updatePreview' message to webview.`);
         // エラーが解消されたらエラーメッセージをクリアするメッセージも送る
         webviewPanel.webview.postMessage({ type: 'clearError' });
     }
@@ -289,19 +307,22 @@ export class DocumentEditorProvider implements vscode.CustomTextEditorProvider {
     );
     vscode.workspace.applyEdit(edit).then(success => {
       if (!success) {
+        // console.errorは許可されているのでそのまま残す（エラー表示は重要）
         console.error(`Failed to apply edit to ${document.uri.fsPath}`);
         vscode.window.showErrorMessage(`Failed to save changes to ${path.basename(document.uri.fsPath)}.`);
       } else {
-        console.log(`Successfully applied edit to ${document.uri.fsPath}`);
+        // デバッグ用のログなのでコメントアウト
+        // console.log(`Successfully applied edit to ${document.uri.fsPath}`);
       }
     }, failureReason => {
+      // console.errorは許可されているのでそのまま残す（エラー表示は重要）
       console.error(`Error applying edit to ${document.uri.fsPath}:`, failureReason);
       vscode.window.showErrorMessage(`Error saving changes to ${path.basename(document.uri.fsPath)}.`);
     });
   }
 }
 
-function getNonce() {
+function getNonce(): string {
   let text = '';
   const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   for (let i = 0; i < 32; i++) {

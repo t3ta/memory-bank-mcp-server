@@ -109,7 +109,7 @@ export class MemoryBankExplorerProvider implements vscode.TreeDataProvider<Memor
                 // Construct path using the converted branch name
                 relativePath = path.join('branch-memory-bank', branchDirName);
             } else {
-                console.warn(`Could not extract branch name from label: ${element.label}`);
+                vscode.window.showWarningMessage(`Could not extract branch name from label: ${element.label}`);
                 return []; // Prevent listing if branch name extraction fails
             }
           }
@@ -173,10 +173,10 @@ export class MemoryBankExplorerProvider implements vscode.TreeDataProvider<Memor
         } catch (error) {
             // Handle cases where the branch directory might not exist yet
             if (error instanceof vscode.FileSystemError && error.code === 'FileNotFound') {
-                console.warn(`Directory not found for listing children: ${relativePath}`);
+                vscode.window.showWarningMessage(`Directory not found for listing children: ${relativePath}`);
                 return []; // Return empty if directory doesn't exist
             }
-            console.error(`Failed to list children for ${relativePath}:`, error);
+            vscode.window.showErrorMessage(`Failed to list children for ${relativePath}: ${error instanceof Error ? error.message : 'Unknown error'}`);
             vscode.window.showErrorMessage(`Error listing directory: ${relativePath}`);
             return []; // Return empty on other errors
         }

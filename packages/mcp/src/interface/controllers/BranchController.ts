@@ -61,7 +61,7 @@ export class BranchController {
     path: string;
     content?: Record<string, unknown> | string; // Allow object or string
     tags?: string[];
-    patches?: any[]; // Add patches parameter
+    patches?: Record<string, unknown>[]; // パッチオペレーションの配列
   }): Promise<MCPResponse> {
     // Destructure params
     const { branchName, path, content, tags, patches } = params;
@@ -148,7 +148,7 @@ export class BranchController {
   /**
    * Create core files for a branch
    */
-  async createCoreFiles(branchName: string, files: Record<string, any>): Promise<MCPResponse> {
+  async createCoreFiles(branchName: string, files: Record<string, unknown>): Promise<MCPResponse> {
     try {
       this.validateFiles(files);
       this.componentLogger.info('Creating branch core files', { operation: 'createCoreFiles', branchName });
@@ -230,7 +230,7 @@ export class BranchController {
   /**
    * Validate files input
    */
-  private validateFiles(files: any): void {
+  private validateFiles(files: Record<string, unknown>): void {
     if (!files || typeof files !== 'object') {
       throw DomainErrors.validationError('Files must be provided as an object');
     }

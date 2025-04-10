@@ -330,7 +330,7 @@ export class FileSystemService implements IFileSystemService {
    * Get configuration
    * @returns Configuration object
    */
-  getConfig(): { memoryBankRoot: string;[key: string]: any } {
+  getConfig(): { memoryBankRoot: string;[key: string]: unknown } {
     return { memoryBankRoot: 'docs' };
   }
 

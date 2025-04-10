@@ -63,7 +63,7 @@ export class PackageAnalyzer {
             try {
               const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
               packagePaths.set(packageJson.name, packagePath);
-            } catch (_error) {
+            } catch {
               console.error(`Invalid package.json in ${packagePath}`);
             }
           }
@@ -129,7 +129,7 @@ export class PackageAnalyzer {
           description: packageJson.description,
           dependencies: packageJson.dependencies
         };
-      } catch (_error) {
+      } catch {
         console.error(`Invalid package.json in ${dirPath}`);
       }
     }
@@ -180,7 +180,7 @@ export class PackageAnalyzer {
   /**
    * ソースファイルを解析し、構造情報を取得
    */
-  public analyzeSourceFile(sourceFile: SourceFile, _options: AnalyzeOptions): FileStructure {
+  public analyzeSourceFile(sourceFile: SourceFile): FileStructure {
     const filePath = sourceFile.getFilePath();
     const fileName = path.basename(filePath);
     

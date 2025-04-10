@@ -20,7 +20,7 @@ export const dateStringToDate = (val: string, ctx: z.RefinementCtx): Date | type
     }
     return date;
   } catch (err) {
-    console.error(`Failed to parse date: ${err}`);
+    // エラーメッセージはctx.addIssueで既に記録されるので、console.errorは不要
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: `Failed to parse date: ${val}`,

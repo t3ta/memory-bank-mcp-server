@@ -11,10 +11,12 @@ import { AIService } from './services/aiService';
  * @param context The extension context provided by VS Code.
  */
 export function activate(context: vscode.ExtensionContext): void {
-  console.log('--- Activating Memory Bank Editor ---');
+  // 初期化ログはコメントアウト
+  // vscode.window.showInformationMessage('--- Activating Memory Bank Editor ---');
   vscode.window.showInformationMessage('Memory Bank Editor is activating...');
 
-  console.log('Congratulations, your extension "memory-bank-editor" is now active!');
+  // デバッグ用のログなのでコメントアウト
+  // vscode.window.showInformationMessage('Congratulations, your extension \"memory-bank-editor\" is now active!');
 
   let memoryProvider: MemoryBankProvider | undefined;
   let schemaProvider: SchemaProvider | undefined;
@@ -22,24 +24,30 @@ export function activate(context: vscode.ExtensionContext): void {
 
   try {
     memoryProvider = new MemoryBankProvider();
-    console.log('MemoryBankProvider instantiated successfully.');
+    // デバッグ用のログなのでコメントアウト
+    // vscode.window.showInformationMessage('MemoryBankProvider instantiated successfully.');
   } catch (error) {
+    // console.errorは許可されているのでそのまま残す（エラー表示は重要）
     console.error('Failed to instantiate MemoryBankProvider:', error);
     vscode.window.showErrorMessage(`Failed to initialize Memory Bank Provider: ${error instanceof Error ? error.message : String(error)}`);
   }
 
   try {
     schemaProvider = new SchemaProvider();
-    console.log('SchemaProvider instantiated successfully.');
+    // デバッグ用のログなのでコメントアウト
+    // vscode.window.showInformationMessage('SchemaProvider instantiated successfully.');
   } catch (error) {
+    // console.errorは許可されているのでそのまま残す（エラー表示は重要）
     console.error('Failed to instantiate SchemaProvider:', error);
     vscode.window.showErrorMessage(`Failed to initialize Schema Provider: ${error instanceof Error ? error.message : String(error)}`);
   }
 
   try {
     aiService = new AIService();
-    console.log('AIService instantiated successfully.');
+    // デバッグ用のログなのでコメントアウト
+    // vscode.window.showInformationMessage('AIService instantiated successfully.');
   } catch (error) {
+    // console.errorは許可されているのでそのまま残す（エラー表示は重要）
     console.error('Failed to instantiate AIService:', error);
     vscode.window.showErrorMessage(`Failed to initialize AI Service: ${error instanceof Error ? error.message : String(error)}`);
   }
@@ -55,10 +63,12 @@ export function activate(context: vscode.ExtensionContext): void {
     const testFilePath = 'global-memory-bank/core/architecture.json';
     try {
       const content = await memoryProvider.getDocumentContent(testFilePath);
-      console.log(`Read content length: ${content.length}`);
-      vscode.window.showInformationMessage(`Successfully read ${testFilePath}! Check console for content length.`);
+      // デバッグ情報はステータスバーに表示する
+      // vscode.window.showInformationMessage(`Read content length: ${content.length}`);
+      vscode.window.showInformationMessage(`Successfully read ${testFilePath}! Content length: ${content.length}`);
     } catch (error) {
-      vscode.window.showErrorMessage(`Failed to read test file ${testFilePath}. See console for details.`);
+      vscode.window.showErrorMessage(`Failed to read test file ${testFilePath}.`);
+      // console.errorは許可されているのでそのまま残す（エラー表示は重要）
       console.error(`Error in memoryBank.testRead command:`, error);
     }
   });
@@ -78,7 +88,8 @@ export function activate(context: vscode.ExtensionContext): void {
       await memoryProvider.updateDocumentContent(testFilePath, testContent);
       vscode.window.showInformationMessage(`Successfully wrote test file: ${testFilePath}`);
     } catch (error) {
-      vscode.window.showErrorMessage(`Failed to write test file ${testFilePath}. See console for details.`);
+      vscode.window.showErrorMessage(`Failed to write test file ${testFilePath}.`);
+      // console.errorは許可されているのでそのまま残す（エラー表示は重要）
       console.error(`Error in memoryBank.testWrite command:`, error);
     }
   });
@@ -130,26 +141,35 @@ export function activate(context: vscode.ExtensionContext): void {
     const validResult = schemaProvider.validateDocument(validTestData);
     if (validResult.success) {
         vscode.window.showInformationMessage(`Validation successful for valid test data against schema '${documentTypeToTest}'.`);
-        console.log("Valid data validation result:", validResult.data);
+        // デバッグ用のログなのでコメントアウト
+        // vscode.window.showInformationMessage("Valid data validation result:", validResult.data);
     } else {
-        vscode.window.showErrorMessage(`Validation FAILED for valid test data against schema '${documentTypeToTest}'. See console.`);
+        vscode.window.showErrorMessage(`Validation FAILED for valid test data against schema '${documentTypeToTest}'.`);
+        // console.errorは許可されているのでそのまま残す（エラー表示は重要）
         console.error("Valid data validation error:", validResult.error.errors);
     }
 
     const invalidResult = schemaProvider.validateDocument(invalidTestData);
     if (!invalidResult.success) {
-        vscode.window.showInformationMessage(`Validation correctly failed for invalid test data against schema '${documentTypeToTest}'. See console.`);
-        console.log("Invalid data validation errors:", invalidResult.error.errors);
+        vscode.window.showInformationMessage(`Validation correctly failed for invalid test data against schema '${documentTypeToTest}'.`);
+        // デバッグ用のログなのでコメントアウト
+        // vscode.window.showInformationMessage("Invalid data validation errors:", invalidResult.error.errors);
     } else {
         vscode.window.showErrorMessage(`Validation INCORRECTLY passed for invalid test data against schema '${documentTypeToTest}'.`);
+        // console.errorは許可されているのでそのまま残す（エラー表示は重要）
         console.error("Invalid data validation passed unexpectedly:", invalidResult.data);
     }
 
      const retrievedSchema = schemaProvider.getSchema(documentTypeToTest);
      if (retrievedSchema) {
-         console.log(`Successfully retrieved schema object for '${documentTypeToTest}'.`);
+         // デバッグ用のログなのでコメントアウト
+         // vscode.window.showInformationMessage(`Successfully retrieved schema object for '${documentTypeToTest}'.`);
+         // ステータスバーに表示する
+         vscode.window.showInformationMessage(`Retrieved schema object for '${documentTypeToTest}'.`);
      } else {
+         // console.errorは許可されているのでそのまま残す（エラー表示は重要）
          console.error(`Failed to retrieve schema object for '${documentTypeToTest}'.`);
+         vscode.window.showErrorMessage(`Failed to retrieve schema object for '${documentTypeToTest}'.`);
      }
   });
 
@@ -162,7 +182,7 @@ export function activate(context: vscode.ExtensionContext): void {
   if (workspaceRoot && memoryProvider) {
       explorerProvider = new MemoryBankExplorerProvider(workspaceRoot, memoryProvider);
       vscode.window.registerTreeDataProvider('memoryBankDocuments', explorerProvider);
-      console.log('MemoryBankExplorerProvider registered for view: memoryBankDocuments');
+      vscode.window.showInformationMessage('MemoryBankExplorerProvider registered for view: memoryBankDocuments');
 
       const refreshCommand = vscode.commands.registerCommand('memoryBank.refreshExplorer', () => {
           explorerProvider?.refresh();
@@ -171,12 +191,12 @@ export function activate(context: vscode.ExtensionContext): void {
       context.subscriptions.push(refreshCommand);
 
   } else {
-      console.warn("Memory Bank Explorer cannot be initialized because no workspace root is defined.");
+      vscode.window.showWarningMessage("Memory Bank Explorer cannot be initialized because no workspace root is defined.");
   }
 
   // --- Register Custom Editor ---
   context.subscriptions.push(DocumentEditorProvider.register(context));
-  console.log('DocumentEditorProvider registered.');
+  vscode.window.showInformationMessage('DocumentEditorProvider registered.');
 
 
   // --- Register Test Commands ---
@@ -223,5 +243,5 @@ export function activate(context: vscode.ExtensionContext): void {
  * This method is called when your extension is deactivated.
  */
 export function deactivate(): void {
-  console.log('Your extension "memory-bank-editor" is now deactivated.');
+  vscode.window.showInformationMessage('Your extension \"memory-bank-editor\" is now deactivated.');
 }

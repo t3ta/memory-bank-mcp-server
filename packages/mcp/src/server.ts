@@ -17,6 +17,7 @@ import { Language, isValidLanguage } from '@memory-bank/schemas'; // Language �
 import type { ContextRequest } from './application/usecases/types.js'; // 正しいパスからインポート
 import type { SearchDocumentsByTagsInput } from './application/usecases/common/SearchDocumentsByTagsUseCase.js'; // 正しいパスからインポート
 import type { DocumentDTO } from './application/dtos/DocumentDTO.js'; // DocumentDTO をインポート
+import type { MCPResponse } from './interface/presenters/types/MCPResponse.js'; // MCPResponse をインポート
 // import { applyPatch } from './tools/patch-utils.js'; // 不要なインポートを削除
 
 // Parse command line arguments
@@ -85,11 +86,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     logger.error('Invalid arguments:', { name, args });
     throw new Error(`No arguments provided for tool: ${name}`);
   }
-  const params = args as Record<string, any>;
+  const params = args as Record<string, unknown>;
   logger.debug('Parsed params:', params);
 
   try {
-    let response: any; // コントローラーからのレスポンスを格納する変数
+    let response: MCPResponse; // コントローラーからのレスポンスを格納する変数
 
     // ツール名に応じて適切なコントローラーを呼び出す
     switch (name) {
@@ -97,46 +98,50 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         // tags は params にあれば渡す (なければ undefined)
         // patches はインターフェースにないので削除
         response = await app.getBranchController().writeDocument({
-          branchName: params.branch, // インターフェースに合わせて branchName に
-          path: params.path,
-          content: params.content,
-          tags: params.tags, // tags を追加 (オプション)
-          patches: params.patches // patches を追加！
+          branchName: params.branch as string, // 型を明示的に指定
+          path: params.path as string, // 型を明示的に指定
+          content: params.content as any, // IBranchController では any とされているのでそれに合わせる
+          tags: params.tags as string[] | undefined, // 型を明示的に指定
+          patches: params.patches as Record<string, unknown>[] | undefined // 型を明示的に指定
         });
         break;
       case 'read_branch_memory_bank':
-        response = await app.getBranchController().readDocument(params.branch, params.path); // これは変更なし
+        response = await app.getBranchController().readDocument(
+          params.branch as string, 
+          params.path as string
+        ); // パラメータの型を明示的に指定
         break;
       case 'write_global_memory_bank':
         // patches はインターフェースにないので削除
         response = await app.getGlobalController().writeDocument({
-          path: params.path,
-          content: params.content,
-          tags: params.tags // tags を追加 (オプション)
+          path: params.path as string, // 型を明示的に指定
+          content: params.content as string, // 型を明示的に指定（文字列のみ）
+          tags: params.tags as string[] | undefined // 型を明示的に指定
         });
         break;
       case 'read_global_memory_bank':
-        response = await app.getGlobalController().readDocument(params.path); // これは変更なし
+        response = await app.getGlobalController().readDocument(params.path as string); // 型を明示的に指定
         break;
       case 'read_context': {
         // ContextRequest オブジェクトを作成して渡す
         // language は main 関数でチェック済みのものを渡す
         // docs は ContextRequest に不要なので削除
         const contextRequest: ContextRequest = {
-          branch: params.branch,
-          language: params.language, // main でチェック済みの language を渡す想定
+          branch: params.branch as string, // 型を明示的に指定
+          language: params.language as string, // 型を明示的に指定
         };
-        response = await app.getContextController().readContext(contextRequest);
+        // 戻り値の型が MCPResponse と互換性を持つように適切な型変換が必要
+        response = await app.getContextController().readContext(contextRequest) as MCPResponse;
         break;
       }
       case 'search_documents_by_tags': {
          // SearchDocumentsByTagsInput オブジェクトを作成して渡す
          // branch を branchName に修正
          const searchInput: SearchDocumentsByTagsInput = {
-           tags: params.tags,
-           match: params.match, // 'and' or 'or'
-           scope: params.scope, // 'branch', 'global', 'all'
-           branchName: params.branch, // branch を branchName に修正
+           tags: params.tags as string[], // 型を明示的に指定
+           match: params.match as 'and' | 'or' | undefined, // 型を明示的に指定
+           scope: params.scope as 'branch' | 'global' | 'all' | undefined, // 型を明示的に指定
+           branchName: params.branch as string, // 型を明示的に指定
            docs: argv.docs // Changed from docsRoot
          };
          response = await app.getGlobalController().searchDocumentsByTags(searchInput);
@@ -156,7 +161,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
            return { content: [{ type: 'text', text: response.data }] };
        } else if (typeof response.data === 'object' && response.data !== null) { // null チェック追加
            // DocumentDTO など、lastModified を持つ可能性のあるオブジェクト
-           const meta = (response.data as any).lastModified ? { lastModified: (response.data as any).lastModified } : undefined;
+           const meta = (response.data as Record<string, unknown>).lastModified ? 
+             { lastModified: (response.data as Record<string, unknown>).lastModified } 
+             : undefined;
            // content プロパティがあるか、なければ全体をJSON化
            let contentText: string;
            const documentData = response.data as DocumentDTO; // 型アサーション
@@ -198,9 +205,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return { content: [{ type: 'text', text: 'Operation completed with unexpected result' }] };
     }
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(`Error executing tool ${name}:`, error);
-    throw new Error(`Tool execution failed: ${error.message}`);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    throw new Error(`Tool execution failed: ${errorMessage}`);
   }
 });
 

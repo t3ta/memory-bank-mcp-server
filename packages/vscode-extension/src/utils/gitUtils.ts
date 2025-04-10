@@ -10,16 +10,18 @@ import * as _vscode from 'vscode';
 export async function getCurrentGitBranch(workspaceFolderPath: string): Promise<string | null> {
   return new Promise((resolve) => {
     // Execute git command in the workspace root
-    cp.exec('git rev-parse --abbrev-ref HEAD', { cwd: workspaceFolderPath }, (err, stdout, stderr) => {
+    cp.exec('git rev-parse --abbrev-ref HEAD', { cwd: workspaceFolderPath }, (err, stdout, _stderr) => {
       if (err) {
-        console.warn(`Failed to get current git branch in ${workspaceFolderPath}: ${stderr || err.message}`);
+        // エラーをUIに表示するほどではないが、console.warnの代わりに
+        // vscode.window.showWarningMessage('Could not determine current Git branch.'); 
+        // のようにUIに表示することも可能
         // Don't show error message to user unless necessary, just log warning
         // vscode.window.showWarningMessage('Could not determine current Git branch.');
         resolve(null); // Resolve with null if not a git repo or error
         return;
       }
       const branchName = stdout.trim();
-      console.log(`Current git branch: ${branchName}`);
+      // デバッグ用のログなのでコメントアウト
       resolve(branchName);
     });
   });
