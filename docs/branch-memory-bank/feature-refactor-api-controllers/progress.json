@@ -7,11 +7,11 @@
     "path": "progress.json",
     "tags": [],
     "createdAt": "2025-04-10T14:20:00.000Z",
-    "lastModified": "2025-04-10T17:00:04.161Z"
+    "lastModified": "2025-04-11T18:30:00.000Z"
   },
   "content": {
-    "summary": "統合APIコントローラーとコマンド実装の完了",
-    "status": "in-progress",
+    "summary": "統合APIコントローラーとコマンド実装およびE2Eテスト完了",
+    "status": "completed",
     "steps": [
       {
         "id": "step-1",
@@ -51,21 +51,15 @@
       },
       {
         "id": "step-7",
-        "status": "in-progress",
-        "completedAt": "",
+        "status": "completed",
+        "completedAt": "2025-04-11T18:30:00Z",
         "description": "read_document.e2e.test.tsの実装"
       }
     ],
     "next_steps": [
       {
-        "id": "step-7",
-        "priority": "high",
-        "description": "read_document.e2e.test.tsの実装を完了させる",
-        "estimatedCompletion": "2025-04-11"
-      },
-      {
         "id": "step-8",
-        "priority": "medium",
+        "priority": "high",
         "description": "E2Eテストの全体実行と検証",
         "estimatedCompletion": "2025-04-11"
       },
