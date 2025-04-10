@@ -1,63 +1,18 @@
 import { vi } from 'vitest'; // vi をインポート
 import type { Mock } from 'vitest'; // Mock 型をインポート
 import { WriteBranchDocumentUseCase } from '../../../../../src/application/usecases/branch/WriteBranchDocumentUseCase.js'; // .js 追加
-import { IBranchMemoryBankRepository } from '../../../../../src/domain/repositories/IBranchMemoryBankRepository.js'; // .js 追加
+import { WriteDocumentUseCase, WriteDocumentOutput } from '../../../../../src/application/usecases/common/WriteDocumentUseCase.js';
 import { DocumentPath } from '../../../../../src/domain/entities/DocumentPath.js'; // .js 追加
 import { MemoryDocument } from '../../../../../src/domain/entities/MemoryDocument.js'; // .js 追加
 import { Tag } from '../../../../../src/domain/entities/Tag.js'; // .js 追加
-import type { IGitService } from '../../../../../src/infrastructure/git/IGitService.js'; // .js 追加
-import type { IConfigProvider } from '../../../../../src/infrastructure/config/interfaces/IConfigProvider.js'; // .js 追加
 import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo.js'; // .js 追加
 import { ApplicationError, ApplicationErrors } from '../../../../../src/shared/errors/index.js'; // ApplicationError を追加
 
 // --- モックの準備 ---
-// jest.Mocked と satisfies を削除し、手動モックの型を指定
-const mockBranchRepository: IBranchMemoryBankRepository = {
-  exists: vi.fn(), // jest -> vi
-  initialize: vi.fn(), // jest -> vi
-  getDocument: vi.fn(), // jest -> vi
-  saveDocument: vi.fn(), // jest -> vi
-  deleteDocument: vi.fn(), // jest -> vi
-  listDocuments: vi.fn(), // jest -> vi
-  findDocumentsByTags: vi.fn(), // jest -> vi
-  getRecentBranches: vi.fn(), // jest -> vi
-  validateStructure: vi.fn(), // jest -> vi
-  saveTagIndex: vi.fn(), // jest -> vi
-  getTagIndex: vi.fn(), // jest -> vi
-  findDocumentPathsByTagsUsingIndex: vi.fn(), // jest -> vi
-};
-
-// jest.Mocked と satisfies を削除し、手動モックの型を指定
-
-// jest.Mocked と satisfies を削除し、手動モックの型を指定
-
-// jest.Mocked と satisfies を削除し、手動モックの型を指定
-
-// jest.Mocked を削除し、手動モックの型を指定
-const mockGitService: IGitService = {
-  getCurrentBranchName: vi.fn(), // jest -> vi
-};
-
-// jest.Mocked を削除し、手動モックの型を指定
-const mockConfigProvider: IConfigProvider = {
-  initialize: vi.fn(), // jest -> vi
-  getConfig: vi.fn(), // jest -> vi
-  getGlobalMemoryPath: vi.fn(), // jest -> vi
-  getBranchMemoryPath: vi.fn(), // jest -> vi
-  getLanguage: vi.fn(), // jest -> vi
-};
-
-// UpdateTagIndexUseCaseV2 のモック (execute のみモック)
-
-// DocumentWriterService のモック (write メソッドのみ)
-const mockDocumentWriterService = {
-  write: vi.fn(), // jest -> vi
-  // patchService は DocumentWriterService のコンストラクタ引数なので、
-  // UseCase のテストでは直接モックする必要はないことが多い。
-  // UseCase が内部で patchService を直接使っている場合は必要。
-  // 今回は DocumentWriterService の write をモックするので不要と判断。
-};
-// --- モックの準備ここまで ---
+// Mock for WriteDocumentUseCase
+const mockWriteDocumentUseCase = {
+  execute: vi.fn()
+} as unknown as WriteDocumentUseCase;
 // --- モックの準備ここまで ---
 
 
@@ -65,57 +20,52 @@ describe('WriteBranchDocumentUseCase Unit Tests', () => {
   let useCase: WriteBranchDocumentUseCase;
 
   beforeEach(() => {
-    vi.clearAllMocks(); // jest -> vi
-    // WriteBranchDocumentUseCase のインスタンス化 (正しい引数で)
-    useCase = new WriteBranchDocumentUseCase(
-      mockBranchRepository,
-      mockDocumentWriterService as any, // private プロパティのエラー回避のため as any を使用
-      mockGitService,
-      mockConfigProvider
-    );
+    vi.clearAllMocks();
+    // WriteBranchDocumentUseCase のインスタンス化
+    useCase = new WriteBranchDocumentUseCase(mockWriteDocumentUseCase);
   });
 
   describe('execute', () => {
     it('should create a new document with content', async () => {
       const branchName = 'feature/new-doc';
-      const docPath = DocumentPath.create('newDoc.txt');
+      const docPath = 'newDoc.txt';
       const content = 'This is a new document.';
-      const tags = [Tag.create('new'), Tag.create('test')];
-      const branchInfo = BranchInfo.create(branchName); // BranchInfo を使う
-      const documentInput = { path: docPath.value, content, tags: tags.map(t => t.value) };
-      const expectedSavedDoc = MemoryDocument.create({ path: docPath, content, tags, lastModified: new Date() });
+      const tags = ['new', 'test'];
+      const documentInput = { path: docPath, content, tags };
+      const lastModifiedDate = new Date().toISOString();
 
-      // モックの設定
-      (mockGitService.getCurrentBranchName as Mock).mockResolvedValue(branchName); // as Mock 追加
-      (mockConfigProvider.getBranchMemoryPath as Mock).mockReturnValue(`/mock/path/to/${branchName}`); // as Mock 追加
-      (mockBranchRepository.exists as Mock).mockResolvedValue(false); // as Mock 追加
-      (mockBranchRepository.initialize as Mock).mockResolvedValue(undefined); // as Mock 追加
-      // documentWriterService.write は、渡されたリポジトリアダプタ経由で saveDocument を呼ぶはず
-      // ここでは write が成功し、保存されたドキュメントを返すようにモック
-      (mockDocumentWriterService.write as Mock).mockResolvedValue(expectedSavedDoc); // as Mock 追加
+      // Create mock response from WriteDocumentUseCase
+      const mockResponse: WriteDocumentOutput = {
+        document: {
+          path: docPath,
+          content,
+          tags,
+          lastModified: lastModifiedDate
+        }
+      };
+
+      // Setup the mock to return our expected response
+      (mockWriteDocumentUseCase.execute as Mock).mockResolvedValue(mockResponse);
 
       // 実行
       const result = await useCase.execute({ branchName, document: documentInput, returnContent: true });
 
-      // 検証
-      expect(mockBranchRepository.exists).toHaveBeenCalledWith(branchInfo.safeName);
-      expect(mockBranchRepository.initialize).toHaveBeenCalledWith(branchInfo);
-      expect(mockDocumentWriterService.write).toHaveBeenCalledWith(
-        expect.objectContaining({ // リポジトリアダプタの検証 (部分的に)
-          // getDocument: expect.any(Function), // 必要なら追加
-          saveDocument: expect.any(Function),
-        }),
-        expect.objectContaining({ // writerInput の検証
-          path: docPath,
-          content: content,
-          patches: undefined, // content を指定したので patches は undefined
-          tags: expect.arrayContaining(tags),
-        })
-      );
-      expect(result.document.path).toBe(docPath.value);
+      // Verify WriteDocumentUseCase was called correctly with scope='branch'
+      expect(mockWriteDocumentUseCase.execute).toHaveBeenCalledWith({
+        scope: 'branch',
+        branch: branchName,
+        path: docPath,
+        content,
+        patches: undefined,
+        tags,
+        returnContent: true
+      });
+
+      // Verify the output matches the expected response
+      expect(result.document.path).toBe(docPath);
       expect(result.document.content).toBe(content);
-      expect(result.document.tags).toEqual(tags.map(t => t.value));
-      expect(result.document.lastModified).toBeDefined(); // lastModified があることを確認
+      expect(result.document.tags).toEqual(tags);
+      expect(result.document.lastModified).toBe(lastModifiedDate);
     });
     it('should overwrite an existing document with content', async () => {
       const branchName = 'feature/existing-doc';
