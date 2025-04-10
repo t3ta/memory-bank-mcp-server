@@ -9,7 +9,7 @@ import { DomainError } from '../../../src/shared/errors/DomainError.js'; // Impo
 import { ApplicationError } from '../../../src/shared/errors/ApplicationError.js';
 // Removed direct import of rfc6902
 import { JsonPatchService } from '../../../src/domain/jsonpatch/JsonPatchService.js'; // Import JsonPatchService interface
-import { FastJsonPatchAdapter } from '../../../src/domain/jsonpatch/FastJsonPatchAdapter.js'; // Use the new adapter
+import { Rfc6902JsonPatchAdapter } from '../../../src/domain/jsonpatch/Rfc6902JsonPatchAdapter.js'; // Use the rfc6902 adapter
 import { DocumentWriterService } from '../../../src/application/services/DocumentWriterService.js'; // Import DocumentWriterService
 import { IGlobalMemoryBankRepository } from '../../../src/domain/repositories/IGlobalMemoryBankRepository.js'; // Import repository interface
 
@@ -30,7 +30,7 @@ describe('WriteGlobalDocumentUseCase Integration Tests', () => {
     container = await setupContainer({ docsRoot: testEnv.docRoot });
 
    // Register JsonPatchService and DocumentWriterService for the test
-   const jsonPatchService = new FastJsonPatchAdapter(); // Use the new adapter
+   const jsonPatchService = new Rfc6902JsonPatchAdapter(); // Use the rfc6902 adapter
    container.register<JsonPatchService>('jsonPatchService', jsonPatchService);
    const documentWriterService = new DocumentWriterService(jsonPatchService);
    container.register<DocumentWriterService>('documentWriterService', documentWriterService);

@@ -1,4 +1,5 @@
-import * as fastJsonPatch from 'fast-json-patch'; // fast-json-patch の型をインポート
+// Import Operation type from rfc6902 for the adapter method
+import { Operation as Rfc6902Operation } from 'rfc6902';
 import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
 import { JsonPath } from './JsonPath.js';
 
@@ -179,11 +180,20 @@ export class JsonPatchOperation {
   }
 
   /**
-   * Convert to fast-json-patch format operation object
-   * @returns fast-json-patch compatible object
+   * Convert to rfc6902 format operation object
+   * @returns rfc6902 compatible object
    */
-  toFastJsonPatchOperation(): fastJsonPatch.Operation { // 戻り値の型を修正
-    // toJSON() が返すオブジェクトは fast-json-patch の Operation 型と互換性があるはず
-    return this.toJSON() as fastJsonPatch.Operation; // 型アサーションを追加
+  toRfc6902Operation(): Rfc6902Operation {
+    // toJSON() already returns an object that is compatible with rfc6902 Operation
+    return this.toJSON() as Rfc6902Operation;
+  }
+  
+  /**
+   * @deprecated Use toRfc6902Operation instead
+   * Legacy adapter method - kept for compatibility with existing code
+   */
+  toFastJsonPatchOperation(): any {
+    // Just delegates to toJSON for backward compatibility
+    return this.toJSON();
   }
 }
