@@ -7,10 +7,10 @@
     "path": "progress.json",
     "tags": [],
     "createdAt": "2025-04-10T14:20:00.000Z",
-    "lastModified": "2025-04-10T15:49:48.126Z"
+    "lastModified": "2025-04-10T16:21:55.217Z"
   },
   "content": {
-    "summary": "統合APIコントローラーとコマンド実装の準備開始",
+    "summary": "統合APIコントローラーとコマンド実装の完了",
     "status": "in-progress",
     "steps": [
       {
@@ -217,23 +217,23 @@
       "quality_requirements": [
         {
           "description": "DocumentControllerの単体テストが存在する",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "DocumentRepositorySelectorの単体テストが存在する",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "write_documentコマンドの統合テストが存在する",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "read_documentコマンドの統合テストが存在する",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "テストカバレッジが80%以上である",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "すべてのテストが成功する（--no-verifyスキップなし！）",
@@ -243,19 +243,19 @@
       "documentation_requirements": [
         {
           "description": "DocumentControllerのJSDocが完成している",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "write_documentコマンドの使用例がドキュメント化されている",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "read_documentコマンドの使用例がドキュメント化されている",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "description": "既存コマンドとの互換性についての説明がある",
-          "status": "pending"
+          "status": "completed"
         }
       ]
     }
