@@ -1,10 +1,7 @@
-import { DocumentPath } from "../../../domain/entities/DocumentPath.js";
-import type { IGlobalMemoryBankRepository } from "../../../domain/repositories/IGlobalMemoryBankRepository.js";
-import { ApplicationError, ApplicationErrorCodes } from "../../../shared/errors/ApplicationError.js";
-import { DomainError, DomainErrorCodes } from "../../../shared/errors/DomainError.js";
-import type { DocumentDTO } from "../../dtos/DocumentDTO.js";
-import type { IUseCase } from "../../interfaces/IUseCase.js";
-
+import { IUseCase } from '../../interfaces/IUseCase.js';
+import { DocumentDTO } from '../../dtos/DocumentDTO.js';
+import { logger } from '../../../shared/utils/logger.js';
+import { ReadDocumentUseCase } from '../common/ReadDocumentUseCase.js';
 
 /**
  * Input data for read global document use case
@@ -31,11 +28,17 @@ export interface ReadGlobalDocumentOutput {
  */
 export class ReadGlobalDocumentUseCase
   implements IUseCase<ReadGlobalDocumentInput, ReadGlobalDocumentOutput> {
+  private readonly useCaseLogger = logger.withContext({
+    component: 'ReadGlobalDocumentUseCase'
+  });
+
   /**
    * Constructor
-   * @param globalRepository Global memory bank repository
+   * @param readDocumentUseCase Unified document read use case
    */
-  constructor(private readonly globalRepository: IGlobalMemoryBankRepository) { }
+  constructor(
+    private readonly readDocumentUseCase: ReadDocumentUseCase
+  ) {}
 
   /**
    * Execute the use case
@@ -43,59 +46,14 @@ export class ReadGlobalDocumentUseCase
    * @returns Promise resolving to output data
    */
   async execute(input: ReadGlobalDocumentInput): Promise<ReadGlobalDocumentOutput> {
-    try {
-      if (!input.path) {
-        throw new ApplicationError(
-          ApplicationErrorCodes.INVALID_INPUT,
-          'Document path is required'
-        );
-      }
+    this.useCaseLogger.info('Delegating to ReadDocumentUseCase', {
+      path: input.path
+    });
 
-      const documentPath = DocumentPath.create(input.path);
-
-      const document = await this.globalRepository.getDocument(documentPath);
-
-      if (!document) {
-        throw new DomainError(
-          DomainErrorCodes.DOCUMENT_NOT_FOUND,
-          `Document "${input.path}" not found in global memory bank`
-        );
-      }
-
-      let parsedContent: string | object;
-      if (typeof document.content === 'string') {
-        try {
-          // Attempt to parse the content as JSON
-          parsedContent = JSON.parse(document.content);
-        } catch (parseError) {
-          // If parsing fails, keep the original string content
-          parsedContent = document.content;
-        }
-      } else {
-        // If content is already an object, use it directly
-        parsedContent = document.content;
-      }
-
-      return {
-        document: {
-          path: document.path.value,
-          content: parsedContent, // Return parsed object or original string
-          tags: document.tags.map((tag) => tag.value),
-          lastModified: document.lastModified.toISOString(),
-        },
-      };
-    } catch (error) {
-      if (error instanceof DomainError || error instanceof ApplicationError) {
-        throw error;
-      }
-
-      // Pass the original error as the 'cause' for better error chaining
-      throw new ApplicationError(
-        ApplicationErrorCodes.USE_CASE_EXECUTION_FAILED,
-        `Failed to read document: ${(error as Error).message}`,
-        undefined, // No additional details needed here
-        { cause: error as Error } // Pass the original error as cause
-      );
-    }
+    // Delegate to the new use case with scope set to 'global'
+    return await this.readDocumentUseCase.execute({
+      scope: 'global',
+      path: input.path
+    });
   }
 }
