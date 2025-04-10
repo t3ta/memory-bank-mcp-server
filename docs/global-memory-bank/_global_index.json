@@ -2,22 +2,22 @@
   "schema": "tag_index_v1",
   "metadata": {
     "indexType": "global",
-    "lastUpdated": "2025-04-08T09:17:25.047Z",
-    "documentCount": 38,
-    "tagCount": 56
+    "lastUpdated": "2025-04-10T09:06:24.336Z",
+    "documentCount": 39,
+    "tagCount": 58
   },
   "index": [
     {
       "tag": "project",
       "documents": [
         {
-          "id": "8517fcda-c9ba-424c-a50f-8bd07f9755e0",
+          "id": "9123a0e1-f274-4431-be65-b9648a50319f",
           "path": "01-project/README.json",
           "title": "Project Directory README",
           "lastModified": "2025-04-05T05:55:52.846Z"
         },
         {
-          "id": "4f37d406-3574-4426-a83f-3dd38881cb6a",
+          "id": "943e6f44-f697-4cab-8984-6e214cdfee18",
           "path": "01-project/project-overview.json",
           "title": "プロジェクト概要",
           "lastModified": "2025-04-05T05:55:52.846Z"
@@ -28,85 +28,85 @@
       "tag": "documentation",
       "documents": [
         {
-          "id": "8517fcda-c9ba-424c-a50f-8bd07f9755e0",
+          "id": "9123a0e1-f274-4431-be65-b9648a50319f",
           "path": "01-project/README.json",
           "title": "Project Directory README",
           "lastModified": "2025-04-05T05:55:52.846Z"
         },
         {
-          "id": "98602092-3a63-4a76-82e5-cfbd0842b937",
+          "id": "afe238cc-c326-43fb-9283-304c3600168d",
           "path": "02-architecture/README.json",
           "title": "Architecture Directory README",
           "lastModified": "2025-04-05T05:55:52.846Z"
         },
         {
-          "id": "f9d032fd-1f7e-4f7e-91cf-da92a11d8041",
+          "id": "f5139be9-bf65-402b-92f7-8197d21a02f8",
           "path": "03-implementation/README.json",
           "title": "Implementation Directory README",
           "lastModified": "2025-04-05T05:55:52.847Z"
         },
         {
-          "id": "408c4f81-7969-4b6e-921e-aff7d85b2ec2",
+          "id": "f36827bd-eb76-468b-a5ff-30e94dcabd15",
           "path": "04-guides/README.json",
           "title": "Guides Directory README",
           "lastModified": "2025-04-05T05:55:52.847Z"
         },
         {
-          "id": "0bbf2896-c3a2-4dab-8022-967376e0d803",
+          "id": "83599653-e862-448b-8558-bb496a721cdf",
           "path": "05-testing/README.json",
           "title": "Testing Directory README",
           "lastModified": "2025-04-05T05:55:52.848Z"
         },
         {
-          "id": "b37b7ef9-10f5-418e-a17b-c592b00a4ff5",
+          "id": "67285a54-6c6e-476c-adb9-4c60cb32ea4a",
           "path": "06-releases/README.json",
           "title": "Releases Directory README",
           "lastModified": "2025-04-05T05:55:52.848Z"
         },
         {
-          "id": "eba312ed-2800-477b-8e48-b9007bcf3e7c",
+          "id": "7c763ad7-9906-4e1d-9354-09b6d6a09471",
           "path": "06-releases/release-v2.2.0.json",
           "title": "リリースノート v2.2.0",
           "lastModified": "2025-04-05T05:55:52.848Z"
         },
         {
-          "id": "31bd49f2-3ce1-496e-a72c-01351f0334e0",
+          "id": "45c63aae-8d4a-4d74-b2ab-f00bf86a84d9",
           "path": "07-infrastructure/README.json",
           "title": "Infrastructure Directory README",
           "lastModified": "2025-04-05T05:55:52.849Z"
         },
         {
-          "id": "d4971830-a760-47b4-9e52-81ed3bcc6657",
+          "id": "bdc4436a-5868-4860-b8ae-d1abc7bb1112",
           "path": "08-i18n/README.json",
           "title": "Internationalization Directory README",
           "lastModified": "2025-04-05T05:55:52.849Z"
         },
         {
-          "id": "032c5324-d28a-4382-a7b1-22f537458b67",
+          "id": "02552821-5444-48b5-a17c-3a3734acaaa0",
           "path": "09-refactoring/README.json",
           "title": "Refactoring Directory README",
           "lastModified": "2025-04-05T05:55:52.849Z"
         },
         {
-          "id": "42dc1830-9d0a-4b28-bab7-c265c2b5c902",
+          "id": "d1b94179-1222-4b15-bde7-bda63200cb7b",
           "path": "meta/README.json",
           "title": "Meta Directory README",
           "lastModified": "2025-04-05T05:55:52.850Z"
         },
         {
-          "id": "8e62510f-211e-4ee8-b7fa-184092a5824b",
+          "id": "c6d0ad6d-9d2f-4b64-a4b1-da1c15d5074e",
           "path": "meta/consolidated-memory-bank-meta.json",
           "title": "Consolidated Memory Bank Meta Information",
           "lastModified": "2025-04-05T05:55:52.850Z"
         },
         {
-          "id": "67f4adab-9008-4f42-8047-82fc76a623f7",
+          "id": "f5b3bc6b-9fdd-44d4-bacb-2ca1f792661c",
           "path": "meta/document-type-standards.json",
           "title": "標準ドキュメントタイプ定義",
           "lastModified": "2025-04-05T05:55:52.850Z"
         },
         {
-          "id": "c2a6fd45-74c4-4a3f-8ac8-86946089cdfa",
+          "id": "c5cc1232-1123-4a54-9879-b5afc7069cc9",
           "path": "tags/README.json",
           "title": "Tags Directory README",
           "lastModified": "2025-04-05T05:55:52.851Z"
@@ -117,79 +117,85 @@
       "tag": "guide",
       "documents": [
         {
-          "id": "8517fcda-c9ba-424c-a50f-8bd07f9755e0",
+          "id": "9123a0e1-f274-4431-be65-b9648a50319f",
           "path": "01-project/README.json",
           "title": "Project Directory README",
           "lastModified": "2025-04-05T05:55:52.846Z"
         },
         {
-          "id": "98602092-3a63-4a76-82e5-cfbd0842b937",
+          "id": "afe238cc-c326-43fb-9283-304c3600168d",
           "path": "02-architecture/README.json",
           "title": "Architecture Directory README",
           "lastModified": "2025-04-05T05:55:52.846Z"
         },
         {
-          "id": "f9d032fd-1f7e-4f7e-91cf-da92a11d8041",
+          "id": "f5139be9-bf65-402b-92f7-8197d21a02f8",
           "path": "03-implementation/README.json",
           "title": "Implementation Directory README",
           "lastModified": "2025-04-05T05:55:52.847Z"
         },
         {
-          "id": "408c4f81-7969-4b6e-921e-aff7d85b2ec2",
+          "id": "f36827bd-eb76-468b-a5ff-30e94dcabd15",
           "path": "04-guides/README.json",
           "title": "Guides Directory README",
           "lastModified": "2025-04-05T05:55:52.847Z"
         },
         {
-          "id": "0bbf2896-c3a2-4dab-8022-967376e0d803",
+          "id": "83599653-e862-448b-8558-bb496a721cdf",
           "path": "05-testing/README.json",
           "title": "Testing Directory README",
           "lastModified": "2025-04-05T05:55:52.848Z"
         },
         {
-          "id": "b37b7ef9-10f5-418e-a17b-c592b00a4ff5",
+          "id": "67285a54-6c6e-476c-adb9-4c60cb32ea4a",
           "path": "06-releases/README.json",
           "title": "Releases Directory README",
           "lastModified": "2025-04-05T05:55:52.848Z"
         },
         {
-          "id": "31bd49f2-3ce1-496e-a72c-01351f0334e0",
+          "id": "45c63aae-8d4a-4d74-b2ab-f00bf86a84d9",
           "path": "07-infrastructure/README.json",
           "title": "Infrastructure Directory README",
           "lastModified": "2025-04-05T05:55:52.849Z"
         },
         {
-          "id": "d4971830-a760-47b4-9e52-81ed3bcc6657",
+          "id": "bdc4436a-5868-4860-b8ae-d1abc7bb1112",
           "path": "08-i18n/README.json",
           "title": "Internationalization Directory README",
           "lastModified": "2025-04-05T05:55:52.849Z"
         },
         {
-          "id": "032c5324-d28a-4382-a7b1-22f537458b67",
+          "id": "02552821-5444-48b5-a17c-3a3734acaaa0",
           "path": "09-refactoring/README.json",
           "title": "Refactoring Directory README",
           "lastModified": "2025-04-05T05:55:52.849Z"
         },
         {
-          "id": "5747f2ef-9aca-4803-ad85-1464bd7fcfb8",
+          "id": "d60d5752-3619-4e36-8939-0d910e466e3e",
           "path": "core/mcp-tool-manual.json",
           "title": "MCP Tool Manual (English)",
           "lastModified": "2025-04-05T05:55:52.850Z"
         },
         {
-          "id": "42dc1830-9d0a-4b28-bab7-c265c2b5c902",
+          "id": "2714a7c7-880d-4894-8f5e-66da51cd3e62",
+          "path": "core/release-workflow.json",
+          "title": "リリースワークフロー手順書",
+          "lastModified": "2025-04-10T09:06:24.320Z"
+        },
+        {
+          "id": "d1b94179-1222-4b15-bde7-bda63200cb7b",
           "path": "meta/README.json",
           "title": "Meta Directory README",
           "lastModified": "2025-04-05T05:55:52.850Z"
         },
         {
-          "id": "8e62510f-211e-4ee8-b7fa-184092a5824b",
+          "id": "c6d0ad6d-9d2f-4b64-a4b1-da1c15d5074e",
           "path": "meta/consolidated-memory-bank-meta.json",
           "title": "Consolidated Memory Bank Meta Information",
           "lastModified": "2025-04-05T05:55:52.850Z"
         },
         {
-          "id": "c2a6fd45-74c4-4a3f-8ac8-86946089cdfa",
+          "id": "c5cc1232-1123-4a54-9879-b5afc7069cc9",
           "path": "tags/README.json",
           "title": "Tags Directory README",
           "lastModified": "2025-04-05T05:55:52.851Z"
@@ -200,13 +206,13 @@
       "tag": "best-practices",
       "documents": [
         {
-          "id": "dedb59d6-b7fb-4f05-9f7e-621e32eb77fb",
+          "id": "3b59715b-5d54-42c8-bff5-de366140a408",
           "path": "01-project/coding-standards.json",
           "title": "Coding Standards",
           "lastModified": "2025-04-05T05:55:52.846Z"
         },
         {
-          "id": "47cf100a-7343-4ef0-962e-86117238c8bd",
+          "id": "e4d632db-ece2-44b8-a2af-046915cbb652",
           "path": "core/coding-standards.json",
           "title": "コーディング規約",
           "lastModified": "2025-04-05T05:55:52.850Z"
@@ -217,13 +223,13 @@
       "tag": "typescript",
       "documents": [
         {
-          "id": "dedb59d6-b7fb-4f05-9f7e-621e32eb77fb",
+          "id": "3b59715b-5d54-42c8-bff5-de366140a408",
           "path": "01-project/coding-standards.json",
           "title": "Coding Standards",
           "lastModified": "2025-04-05T05:55:52.846Z"
         },
         {
-          "id": "47cf100a-7343-4ef0-962e-86117238c8bd",
+          "id": "e4d632db-ece2-44b8-a2af-046915cbb652",
           "path": "core/coding-standards.json",
           "title": "コーディング規約",
           "lastModified": "2025-04-05T05:55:52.850Z"
@@ -234,13 +240,13 @@
       "tag": "clean-code",
       "documents": [
         {
-          "id": "dedb59d6-b7fb-4f05-9f7e-621e32eb77fb",
+          "id": "3b59715b-5d54-42c8-bff5-de366140a408",
           "path": "01-project/coding-standards.json",
           "title": "Coding Standards",
           "lastModified": "2025-04-05T05:55:52.846Z"
         },
         {
-          "id": "47cf100a-7343-4ef0-962e-86117238c8bd",
+          "id": "e4d632db-ece2-44b8-a2af-046915cbb652",
           "path": "core/coding-standards.json",
           "title": "コーディング規約",
           "lastModified": "2025-04-05T05:55:52.850Z"
@@ -251,7 +257,7 @@
       "tag": "overview",
       "documents": [
         {
-          "id": "4f37d406-3574-4426-a83f-3dd38881cb6a",
+          "id": "943e6f44-f697-4cab-8984-6e214cdfee18",
           "path": "01-project/project-overview.json",
           "title": "プロジェクト概要",
           "lastModified": "2025-04-05T05:55:52.846Z"
@@ -262,49 +268,49 @@
       "tag": "v2",
       "documents": [
         {
-          "id": "4f37d406-3574-4426-a83f-3dd38881cb6a",
+          "id": "943e6f44-f697-4cab-8984-6e214cdfee18",
           "path": "01-project/project-overview.json",
           "title": "プロジェクト概要",
           "lastModified": "2025-04-05T05:55:52.846Z"
         },
         {
-          "id": "be13302e-a06a-49d5-b0db-1375243c6101",
+          "id": "a9d45907-f14a-43f6-b29e-c93cdd92807d",
           "path": "02-architecture/consolidated-architecture.json",
           "title": "統合アーキテクチャドキュメント",
           "lastModified": "2025-04-05T05:55:52.847Z"
         },
         {
-          "id": "1620a305-47d3-48e8-8c1c-3866d2455079",
+          "id": "9fef8f32-2f6d-4212-882c-021f7404b698",
           "path": "03-implementation/read-context-command-design.json",
           "title": "`read_context`コマンド設計書",
           "lastModified": "2025-04-05T05:55:52.847Z"
         },
         {
-          "id": "fb85f28b-3631-407f-8734-c88ea3b01c13",
+          "id": "2cb2322c-76a4-4407-9071-995f52e4931d",
           "path": "03-implementation/read-context-command-implementation.json",
           "title": "`read_context`コマンド実装ガイド",
           "lastModified": "2025-04-05T05:55:52.847Z"
         },
         {
-          "id": "6b7a972b-de83-4b52-9efe-1bbf236dc4c1",
+          "id": "401d7b6f-af0d-4a23-8c51-e73ea66c2963",
           "path": "06-releases/consolidated-v2-release.json",
           "title": "Memory Bank 2.0 統合リリース情報",
           "lastModified": "2025-04-05T05:55:52.848Z"
         },
         {
-          "id": "8a71fdc9-6bb4-42ec-b27b-6037f1c3c455",
+          "id": "de76ad98-644d-4280-8eca-c92c9ae49bf2",
           "path": "06-releases/release-v2.0.0.json",
           "title": "リリース v2.0.0",
           "lastModified": "2025-04-05T05:55:52.848Z"
         },
         {
-          "id": "1756acf8-e8ea-4f01-8d2f-f4b4106a6033",
+          "id": "dad99f84-3126-4478-b1a1-edd6676fdcbb",
           "path": "06-releases/v2-design-decisions.json",
           "title": "v2.0 設計上の決定事項",
           "lastModified": "2025-04-05T05:55:52.848Z"
         },
         {
-          "id": "9d77c845-e2a6-42cd-9a61-abdfdaaf033a",
+          "id": "7a9f5a29-e7b6-4579-8ba2-14a62f8b2510",
           "path": "06-releases/v2-implementation-plan.json",
           "title": "Memory Bank 2.0: 実装計画",
           "lastModified": "2025-04-05T05:55:52.848Z"
@@ -315,7 +321,7 @@
       "tag": "tech-stack",
       "documents": [
         {
-          "id": "6535d258-d834-4f37-8031-379bb3aabf0e",
+          "id": "620ba935-b922-4c42-851d-4ceb7eb67470",
           "path": "01-project/tech-stack.json",
           "title": "Technology Stack",
           "lastModified": "2025-04-05T05:55:52.846Z"
@@ -326,13 +332,13 @@
       "tag": "infrastructure",
       "documents": [
         {
-          "id": "6535d258-d834-4f37-8031-379bb3aabf0e",
+          "id": "620ba935-b922-4c42-851d-4ceb7eb67470",
           "path": "01-project/tech-stack.json",
           "title": "Technology Stack",
           "lastModified": "2025-04-05T05:55:52.846Z"
         },
         {
-          "id": "31bd49f2-3ce1-496e-a72c-01351f0334e0",
+          "id": "45c63aae-8d4a-4d74-b2ab-f00bf86a84d9",
           "path": "07-infrastructure/README.json",
           "title": "Infrastructure Directory README",
           "lastModified": "2025-04-05T05:55:52.849Z"
@@ -343,25 +349,25 @@
       "tag": "architecture",
       "documents": [
         {
-          "id": "98602092-3a63-4a76-82e5-cfbd0842b937",
+          "id": "afe238cc-c326-43fb-9283-304c3600168d",
           "path": "02-architecture/README.json",
           "title": "Architecture Directory README",
           "lastModified": "2025-04-05T05:55:52.846Z"
         },
         {
-          "id": "be13302e-a06a-49d5-b0db-1375243c6101",
+          "id": "a9d45907-f14a-43f6-b29e-c93cdd92807d",
           "path": "02-architecture/consolidated-architecture.json",
           "title": "統合アーキテクチャドキュメント",
           "lastModified": "2025-04-05T05:55:52.847Z"
         },
         {
-          "id": "1756acf8-e8ea-4f01-8d2f-f4b4106a6033",
+          "id": "dad99f84-3126-4478-b1a1-edd6676fdcbb",
           "path": "06-releases/v2-design-decisions.json",
           "title": "v2.0 設計上の決定事項",
           "lastModified": "2025-04-05T05:55:52.848Z"
         },
         {
-          "id": "b32805a0-15cc-4ca4-a3ad-e5b40338485d",
+          "id": "77db41a0-2f5e-4c6f-be0f-5d999277377c",
           "path": "core/architecture.json",
           "title": "システムアーキテクチャ基本情報",
           "lastModified": "2025-04-05T05:55:52.850Z"
@@ -372,31 +378,31 @@
       "tag": "design",
       "documents": [
         {
-          "id": "98602092-3a63-4a76-82e5-cfbd0842b937",
+          "id": "afe238cc-c326-43fb-9283-304c3600168d",
           "path": "02-architecture/README.json",
           "title": "Architecture Directory README",
           "lastModified": "2025-04-05T05:55:52.846Z"
         },
         {
-          "id": "be13302e-a06a-49d5-b0db-1375243c6101",
+          "id": "a9d45907-f14a-43f6-b29e-c93cdd92807d",
           "path": "02-architecture/consolidated-architecture.json",
           "title": "統合アーキテクチャドキュメント",
           "lastModified": "2025-04-05T05:55:52.847Z"
         },
         {
-          "id": "1620a305-47d3-48e8-8c1c-3866d2455079",
+          "id": "9fef8f32-2f6d-4212-882c-021f7404b698",
           "path": "03-implementation/read-context-command-design.json",
           "title": "`read_context`コマンド設計書",
           "lastModified": "2025-04-05T05:55:52.847Z"
         },
         {
-          "id": "1756acf8-e8ea-4f01-8d2f-f4b4106a6033",
+          "id": "dad99f84-3126-4478-b1a1-edd6676fdcbb",
           "path": "06-releases/v2-design-decisions.json",
           "title": "v2.0 設計上の決定事項",
           "lastModified": "2025-04-05T05:55:52.848Z"
         },
         {
-          "id": "16201e3f-bf87-4d9d-ad6f-c59132eb83f3",
+          "id": "555dc375-3743-4bca-9897-26641efae923",
           "path": "09-refactoring/json-global-design-issues.json",
           "title": "json-global-design-issues.json",
           "lastModified": "2025-04-05T05:55:52.849Z"
@@ -407,13 +413,13 @@
       "tag": "decision",
       "documents": [
         {
-          "id": "be13302e-a06a-49d5-b0db-1375243c6101",
+          "id": "a9d45907-f14a-43f6-b29e-c93cdd92807d",
           "path": "02-architecture/consolidated-architecture.json",
           "title": "統合アーキテクチャドキュメント",
           "lastModified": "2025-04-05T05:55:52.847Z"
         },
         {
-          "id": "1756acf8-e8ea-4f01-8d2f-f4b4106a6033",
+          "id": "dad99f84-3126-4478-b1a1-edd6676fdcbb",
           "path": "06-releases/v2-design-decisions.json",
           "title": "v2.0 設計上の決定事項",
           "lastModified": "2025-04-05T05:55:52.848Z"
@@ -424,13 +430,13 @@
       "tag": "json",
       "documents": [
         {
-          "id": "be13302e-a06a-49d5-b0db-1375243c6101",
+          "id": "a9d45907-f14a-43f6-b29e-c93cdd92807d",
           "path": "02-architecture/consolidated-architecture.json",
           "title": "統合アーキテクチャドキュメント",
           "lastModified": "2025-04-05T05:55:52.847Z"
         },
         {
-          "id": "9d77c845-e2a6-42cd-9a61-abdfdaaf033a",
+          "id": "7a9f5a29-e7b6-4579-8ba2-14a62f8b2510",
           "path": "06-releases/v2-implementation-plan.json",
           "title": "Memory Bank 2.0: 実装計画",
           "lastModified": "2025-04-05T05:55:52.848Z"
@@ -441,13 +447,13 @@
       "tag": "analysis",
       "documents": [
         {
-          "id": "81fa4828-8a7c-4c91-86da-0cd9115da273",
+          "id": "600f5e83-c26a-4aba-b04d-dff5f529f4df",
           "path": "02-architecture/global-memory-bank-organized-analysis.json",
           "title": "グローバルメモリバンク 整理分析",
           "lastModified": "2025-04-05T05:55:52.847Z"
         },
         {
-          "id": "8e62510f-211e-4ee8-b7fa-184092a5824b",
+          "id": "c6d0ad6d-9d2f-4b64-a4b1-da1c15d5074e",
           "path": "meta/consolidated-memory-bank-meta.json",
           "title": "Consolidated Memory Bank Meta Information",
           "lastModified": "2025-04-05T05:55:52.850Z"
@@ -458,37 +464,37 @@
       "tag": "memory-bank",
       "documents": [
         {
-          "id": "81fa4828-8a7c-4c91-86da-0cd9115da273",
+          "id": "600f5e83-c26a-4aba-b04d-dff5f529f4df",
           "path": "02-architecture/global-memory-bank-organized-analysis.json",
           "title": "グローバルメモリバンク 整理分析",
           "lastModified": "2025-04-05T05:55:52.847Z"
         },
         {
-          "id": "c76ddefc-529f-444f-abe1-c39a2761530f",
+          "id": "dbdb8674-a7d3-4a5d-95b1-da971fae0b85",
           "path": "07-infrastructure/ci-cd/memory-bank-errors.json",
           "title": "Memory Bank Error Troubleshooting",
           "lastModified": "2025-04-05T05:55:52.849Z"
         },
         {
-          "id": "16201e3f-bf87-4d9d-ad6f-c59132eb83f3",
+          "id": "555dc375-3743-4bca-9897-26641efae923",
           "path": "09-refactoring/json-global-design-issues.json",
           "title": "json-global-design-issues.json",
           "lastModified": "2025-04-05T05:55:52.849Z"
         },
         {
-          "id": "8e62510f-211e-4ee8-b7fa-184092a5824b",
+          "id": "c6d0ad6d-9d2f-4b64-a4b1-da1c15d5074e",
           "path": "meta/consolidated-memory-bank-meta.json",
           "title": "Consolidated Memory Bank Meta Information",
           "lastModified": "2025-04-05T05:55:52.850Z"
         },
         {
-          "id": "855fbfaf-af3b-467d-911a-9bdc73157c97",
+          "id": "56e9857c-78b9-4a21-906a-e2b3a6b03432",
           "path": "tags/tag_categorization.json",
           "title": "タグカテゴリ定義",
           "lastModified": "2025-04-05T05:55:52.851Z"
         },
         {
-          "id": "b7808059-2fa5-4c7c-9e5a-7a7fb6d30420",
+          "id": "acc38c6f-f92d-4d95-920e-fcd5977bbb0e",
           "path": "tags/tag_index_update_plan.json",
           "title": "タグインデックス更新計画",
           "lastModified": "2025-04-05T05:55:52.851Z"
@@ -499,7 +505,7 @@
       "tag": "organization",
       "documents": [
         {
-          "id": "81fa4828-8a7c-4c91-86da-0cd9115da273",
+          "id": "600f5e83-c26a-4aba-b04d-dff5f529f4df",
           "path": "02-architecture/global-memory-bank-organized-analysis.json",
           "title": "グローバルメモリバンク 整理分析",
           "lastModified": "2025-04-05T05:55:52.847Z"
@@ -510,49 +516,49 @@
       "tag": "meta",
       "documents": [
         {
-          "id": "81fa4828-8a7c-4c91-86da-0cd9115da273",
+          "id": "600f5e83-c26a-4aba-b04d-dff5f529f4df",
           "path": "02-architecture/global-memory-bank-organized-analysis.json",
           "title": "グローバルメモリバンク 整理分析",
           "lastModified": "2025-04-05T05:55:52.847Z"
         },
         {
-          "id": "42dc1830-9d0a-4b28-bab7-c265c2b5c902",
+          "id": "d1b94179-1222-4b15-bde7-bda63200cb7b",
           "path": "meta/README.json",
           "title": "Meta Directory README",
           "lastModified": "2025-04-05T05:55:52.850Z"
         },
         {
-          "id": "8e62510f-211e-4ee8-b7fa-184092a5824b",
+          "id": "c6d0ad6d-9d2f-4b64-a4b1-da1c15d5074e",
           "path": "meta/consolidated-memory-bank-meta.json",
           "title": "Consolidated Memory Bank Meta Information",
           "lastModified": "2025-04-05T05:55:52.850Z"
         },
         {
-          "id": "67f4adab-9008-4f42-8047-82fc76a623f7",
+          "id": "f5b3bc6b-9fdd-44d4-bacb-2ca1f792661c",
           "path": "meta/document-type-standards.json",
           "title": "標準ドキュメントタイプ定義",
           "lastModified": "2025-04-05T05:55:52.850Z"
         },
         {
-          "id": "c2a6fd45-74c4-4a3f-8ac8-86946089cdfa",
+          "id": "c5cc1232-1123-4a54-9879-b5afc7069cc9",
           "path": "tags/README.json",
           "title": "Tags Directory README",
           "lastModified": "2025-04-05T05:55:52.851Z"
         },
         {
-          "id": "cb5d3de9-0e5a-4cc7-91f6-f4d4f0fc7ff7",
+          "id": "67d0f28a-2151-4b42-8c56-4bd4f2a506d9",
           "path": "tags/index.json",
           "title": "タグインデックス",
           "lastModified": "2025-04-08T04:44:04.926Z"
         },
         {
-          "id": "855fbfaf-af3b-467d-911a-9bdc73157c97",
+          "id": "56e9857c-78b9-4a21-906a-e2b3a6b03432",
           "path": "tags/tag_categorization.json",
           "title": "タグカテゴリ定義",
           "lastModified": "2025-04-05T05:55:52.851Z"
         },
         {
-          "id": "b7808059-2fa5-4c7c-9e5a-7a7fb6d30420",
+          "id": "acc38c6f-f92d-4d95-920e-fcd5977bbb0e",
           "path": "tags/tag_index_update_plan.json",
           "title": "タグインデックス更新計画",
           "lastModified": "2025-04-05T05:55:52.851Z"
@@ -563,25 +569,25 @@
       "tag": "implementation",
       "documents": [
         {
-          "id": "f9d032fd-1f7e-4f7e-91cf-da92a11d8041",
+          "id": "f5139be9-bf65-402b-92f7-8197d21a02f8",
           "path": "03-implementation/README.json",
           "title": "Implementation Directory README",
           "lastModified": "2025-04-05T05:55:52.847Z"
         },
         {
-          "id": "fb85f28b-3631-407f-8734-c88ea3b01c13",
+          "id": "2cb2322c-76a4-4407-9071-995f52e4931d",
           "path": "03-implementation/read-context-command-implementation.json",
           "title": "`read_context`コマンド実装ガイド",
           "lastModified": "2025-04-05T05:55:52.847Z"
         },
         {
-          "id": "6b7a972b-de83-4b52-9efe-1bbf236dc4c1",
+          "id": "401d7b6f-af0d-4a23-8c51-e73ea66c2963",
           "path": "06-releases/consolidated-v2-release.json",
           "title": "Memory Bank 2.0 統合リリース情報",
           "lastModified": "2025-04-05T05:55:52.848Z"
         },
         {
-          "id": "9d77c845-e2a6-42cd-9a61-abdfdaaf033a",
+          "id": "7a9f5a29-e7b6-4579-8ba2-14a62f8b2510",
           "path": "06-releases/v2-implementation-plan.json",
           "title": "Memory Bank 2.0: 実装計画",
           "lastModified": "2025-04-05T05:55:52.848Z"
@@ -592,19 +598,19 @@
       "tag": "mcp",
       "documents": [
         {
-          "id": "1620a305-47d3-48e8-8c1c-3866d2455079",
+          "id": "9fef8f32-2f6d-4212-882c-021f7404b698",
           "path": "03-implementation/read-context-command-design.json",
           "title": "`read_context`コマンド設計書",
           "lastModified": "2025-04-05T05:55:52.847Z"
         },
         {
-          "id": "fb85f28b-3631-407f-8734-c88ea3b01c13",
+          "id": "2cb2322c-76a4-4407-9071-995f52e4931d",
           "path": "03-implementation/read-context-command-implementation.json",
           "title": "`read_context`コマンド実装ガイド",
           "lastModified": "2025-04-05T05:55:52.847Z"
         },
         {
-          "id": "5747f2ef-9aca-4803-ad85-1464bd7fcfb8",
+          "id": "d60d5752-3619-4e36-8939-0d910e466e3e",
           "path": "core/mcp-tool-manual.json",
           "title": "MCP Tool Manual (English)",
           "lastModified": "2025-04-05T05:55:52.850Z"
@@ -615,13 +621,13 @@
       "tag": "command",
       "documents": [
         {
-          "id": "1620a305-47d3-48e8-8c1c-3866d2455079",
+          "id": "9fef8f32-2f6d-4212-882c-021f7404b698",
           "path": "03-implementation/read-context-command-design.json",
           "title": "`read_context`コマンド設計書",
           "lastModified": "2025-04-05T05:55:52.847Z"
         },
         {
-          "id": "fb85f28b-3631-407f-8734-c88ea3b01c13",
+          "id": "2cb2322c-76a4-4407-9071-995f52e4931d",
           "path": "03-implementation/read-context-command-implementation.json",
           "title": "`read_context`コマンド実装ガイド",
           "lastModified": "2025-04-05T05:55:52.847Z"
@@ -632,13 +638,13 @@
       "tag": "context",
       "documents": [
         {
-          "id": "1620a305-47d3-48e8-8c1c-3866d2455079",
+          "id": "9fef8f32-2f6d-4212-882c-021f7404b698",
           "path": "03-implementation/read-context-command-design.json",
           "title": "`read_context`コマンド設計書",
           "lastModified": "2025-04-05T05:55:52.847Z"
         },
         {
-          "id": "fb85f28b-3631-407f-8734-c88ea3b01c13",
+          "id": "2cb2322c-76a4-4407-9071-995f52e4931d",
           "path": "03-implementation/read-context-command-implementation.json",
           "title": "`read_context`コマンド実装ガイド",
           "lastModified": "2025-04-05T05:55:52.847Z"
@@ -649,13 +655,13 @@
       "tag": "testing",
       "documents": [
         {
-          "id": "0bbf2896-c3a2-4dab-8022-967376e0d803",
+          "id": "83599653-e862-448b-8558-bb496a721cdf",
           "path": "05-testing/README.json",
           "title": "Testing Directory README",
           "lastModified": "2025-04-05T05:55:52.848Z"
         },
         {
-          "id": "12be397d-0c69-4ec0-8266-909a0166b031",
+          "id": "f023a89a-effe-4561-8ca4-14c8a5f7cb2b",
           "path": "05-testing/consolidated-test-strategy.json",
           "title": "Memory Bank テスト戦略統合ドキュメント",
           "lastModified": "2025-04-05T05:55:52.848Z"
@@ -666,7 +672,7 @@
       "tag": "e2e",
       "documents": [
         {
-          "id": "12be397d-0c69-4ec0-8266-909a0166b031",
+          "id": "f023a89a-effe-4561-8ca4-14c8a5f7cb2b",
           "path": "05-testing/consolidated-test-strategy.json",
           "title": "Memory Bank テスト戦略統合ドキュメント",
           "lastModified": "2025-04-05T05:55:52.848Z"
@@ -677,13 +683,13 @@
       "tag": "integration-test",
       "documents": [
         {
-          "id": "12be397d-0c69-4ec0-8266-909a0166b031",
+          "id": "f023a89a-effe-4561-8ca4-14c8a5f7cb2b",
           "path": "05-testing/consolidated-test-strategy.json",
           "title": "Memory Bank テスト戦略統合ドキュメント",
           "lastModified": "2025-04-05T05:55:52.848Z"
         },
         {
-          "id": "16201e3f-bf87-4d9d-ad6f-c59132eb83f3",
+          "id": "555dc375-3743-4bca-9897-26641efae923",
           "path": "09-refactoring/json-global-design-issues.json",
           "title": "json-global-design-issues.json",
           "lastModified": "2025-04-05T05:55:52.849Z"
@@ -694,7 +700,7 @@
       "tag": "tdd",
       "documents": [
         {
-          "id": "12be397d-0c69-4ec0-8266-909a0166b031",
+          "id": "f023a89a-effe-4561-8ca4-14c8a5f7cb2b",
           "path": "05-testing/consolidated-test-strategy.json",
           "title": "Memory Bank テスト戦略統合ドキュメント",
           "lastModified": "2025-04-05T05:55:52.848Z"
@@ -705,7 +711,7 @@
       "tag": "qa",
       "documents": [
         {
-          "id": "12be397d-0c69-4ec0-8266-909a0166b031",
+          "id": "f023a89a-effe-4561-8ca4-14c8a5f7cb2b",
           "path": "05-testing/consolidated-test-strategy.json",
           "title": "Memory Bank テスト戦略統合ドキュメント",
           "lastModified": "2025-04-05T05:55:52.848Z"
@@ -716,34 +722,40 @@
       "tag": "release",
       "documents": [
         {
-          "id": "b37b7ef9-10f5-418e-a17b-c592b00a4ff5",
+          "id": "67285a54-6c6e-476c-adb9-4c60cb32ea4a",
           "path": "06-releases/README.json",
           "title": "Releases Directory README",
           "lastModified": "2025-04-05T05:55:52.848Z"
         },
         {
-          "id": "6b7a972b-de83-4b52-9efe-1bbf236dc4c1",
+          "id": "401d7b6f-af0d-4a23-8c51-e73ea66c2963",
           "path": "06-releases/consolidated-v2-release.json",
           "title": "Memory Bank 2.0 統合リリース情報",
           "lastModified": "2025-04-05T05:55:52.848Z"
         },
         {
-          "id": "8a71fdc9-6bb4-42ec-b27b-6037f1c3c455",
+          "id": "de76ad98-644d-4280-8eca-c92c9ae49bf2",
           "path": "06-releases/release-v2.0.0.json",
           "title": "リリース v2.0.0",
           "lastModified": "2025-04-05T05:55:52.848Z"
         },
         {
-          "id": "eba312ed-2800-477b-8e48-b9007bcf3e7c",
+          "id": "7c763ad7-9906-4e1d-9354-09b6d6a09471",
           "path": "06-releases/release-v2.2.0.json",
           "title": "リリースノート v2.2.0",
           "lastModified": "2025-04-05T05:55:52.848Z"
         },
         {
-          "id": "41ce1278-ba46-4056-8c29-edff40ae8d48",
+          "id": "c18a5b2c-4639-4300-9f9a-3f96f58017da",
           "path": "06-releases/v2.1.0-release-plan.json",
           "title": "Memory Bank v2.1.0 リリース計画",
           "lastModified": "2025-04-05T05:55:52.848Z"
+        },
+        {
+          "id": "2714a7c7-880d-4894-8f5e-66da51cd3e62",
+          "path": "core/release-workflow.json",
+          "title": "リリースワークフロー手順書",
+          "lastModified": "2025-04-10T09:06:24.320Z"
         }
       ]
     },
@@ -751,7 +763,7 @@
       "tag": "version",
       "documents": [
         {
-          "id": "b37b7ef9-10f5-418e-a17b-c592b00a4ff5",
+          "id": "67285a54-6c6e-476c-adb9-4c60cb32ea4a",
           "path": "06-releases/README.json",
           "title": "Releases Directory README",
           "lastModified": "2025-04-05T05:55:52.848Z"
@@ -762,13 +774,13 @@
       "tag": "planning",
       "documents": [
         {
-          "id": "6b7a972b-de83-4b52-9efe-1bbf236dc4c1",
+          "id": "401d7b6f-af0d-4a23-8c51-e73ea66c2963",
           "path": "06-releases/consolidated-v2-release.json",
           "title": "Memory Bank 2.0 統合リリース情報",
           "lastModified": "2025-04-05T05:55:52.848Z"
         },
         {
-          "id": "41ce1278-ba46-4056-8c29-edff40ae8d48",
+          "id": "c18a5b2c-4639-4300-9f9a-3f96f58017da",
           "path": "06-releases/v2.1.0-release-plan.json",
           "title": "Memory Bank v2.1.0 リリース計画",
           "lastModified": "2025-04-05T05:55:52.848Z"
@@ -779,13 +791,13 @@
       "tag": "changelog",
       "documents": [
         {
-          "id": "6b7a972b-de83-4b52-9efe-1bbf236dc4c1",
+          "id": "401d7b6f-af0d-4a23-8c51-e73ea66c2963",
           "path": "06-releases/consolidated-v2-release.json",
           "title": "Memory Bank 2.0 統合リリース情報",
           "lastModified": "2025-04-05T05:55:52.848Z"
         },
         {
-          "id": "8a71fdc9-6bb4-42ec-b27b-6037f1c3c455",
+          "id": "de76ad98-644d-4280-8eca-c92c9ae49bf2",
           "path": "06-releases/release-v2.0.0.json",
           "title": "リリース v2.0.0",
           "lastModified": "2025-04-05T05:55:52.848Z"
@@ -796,7 +808,7 @@
       "tag": "pr",
       "documents": [
         {
-          "id": "8a71fdc9-6bb4-42ec-b27b-6037f1c3c455",
+          "id": "de76ad98-644d-4280-8eca-c92c9ae49bf2",
           "path": "06-releases/release-v2.0.0.json",
           "title": "リリース v2.0.0",
           "lastModified": "2025-04-05T05:55:52.848Z"
@@ -807,7 +819,7 @@
       "tag": "v2-2-0",
       "documents": [
         {
-          "id": "eba312ed-2800-477b-8e48-b9007bcf3e7c",
+          "id": "7c763ad7-9906-4e1d-9354-09b6d6a09471",
           "path": "06-releases/release-v2.2.0.json",
           "title": "リリースノート v2.2.0",
           "lastModified": "2025-04-05T05:55:52.848Z"
@@ -818,7 +830,7 @@
       "tag": "json-patch",
       "documents": [
         {
-          "id": "eba312ed-2800-477b-8e48-b9007bcf3e7c",
+          "id": "7c763ad7-9906-4e1d-9354-09b6d6a09471",
           "path": "06-releases/release-v2.2.0.json",
           "title": "リリースノート v2.2.0",
           "lastModified": "2025-04-05T05:55:52.848Z"
@@ -829,13 +841,13 @@
       "tag": "plan",
       "documents": [
         {
-          "id": "9d77c845-e2a6-42cd-9a61-abdfdaaf033a",
+          "id": "7a9f5a29-e7b6-4579-8ba2-14a62f8b2510",
           "path": "06-releases/v2-implementation-plan.json",
           "title": "Memory Bank 2.0: 実装計画",
           "lastModified": "2025-04-05T05:55:52.848Z"
         },
         {
-          "id": "b7808059-2fa5-4c7c-9e5a-7a7fb6d30420",
+          "id": "acc38c6f-f92d-4d95-920e-fcd5977bbb0e",
           "path": "tags/tag_index_update_plan.json",
           "title": "タグインデックス更新計画",
           "lastModified": "2025-04-05T05:55:52.851Z"
@@ -846,7 +858,7 @@
       "tag": "v2-1-0",
       "documents": [
         {
-          "id": "41ce1278-ba46-4056-8c29-edff40ae8d48",
+          "id": "c18a5b2c-4639-4300-9f9a-3f96f58017da",
           "path": "06-releases/v2.1.0-release-plan.json",
           "title": "Memory Bank v2.1.0 リリース計画",
           "lastModified": "2025-04-05T05:55:52.848Z"
@@ -857,7 +869,7 @@
       "tag": "json-migration",
       "documents": [
         {
-          "id": "41ce1278-ba46-4056-8c29-edff40ae8d48",
+          "id": "c18a5b2c-4639-4300-9f9a-3f96f58017da",
           "path": "06-releases/v2.1.0-release-plan.json",
           "title": "Memory Bank v2.1.0 リリース計画",
           "lastModified": "2025-04-05T05:55:52.848Z"
@@ -868,7 +880,7 @@
       "tag": "operations",
       "documents": [
         {
-          "id": "31bd49f2-3ce1-496e-a72c-01351f0334e0",
+          "id": "45c63aae-8d4a-4d74-b2ab-f00bf86a84d9",
           "path": "07-infrastructure/README.json",
           "title": "Infrastructure Directory README",
           "lastModified": "2025-04-05T05:55:52.849Z"
@@ -879,7 +891,7 @@
       "tag": "troubleshooting",
       "documents": [
         {
-          "id": "c76ddefc-529f-444f-abe1-c39a2761530f",
+          "id": "dbdb8674-a7d3-4a5d-95b1-da971fae0b85",
           "path": "07-infrastructure/ci-cd/memory-bank-errors.json",
           "title": "Memory Bank Error Troubleshooting",
           "lastModified": "2025-04-05T05:55:52.849Z"
@@ -890,7 +902,7 @@
       "tag": "ci-cd",
       "documents": [
         {
-          "id": "87db60f9-61d1-4326-994e-9433f8850d5b",
+          "id": "175428e0-762a-47eb-9b97-bc343210b713",
           "path": "07-infrastructure/ci-cd/workflows.json",
           "title": "CI/CD Workflows",
           "lastModified": "2025-04-05T05:55:52.849Z"
@@ -901,7 +913,7 @@
       "tag": "i18n",
       "documents": [
         {
-          "id": "d4971830-a760-47b4-9e52-81ed3bcc6657",
+          "id": "bdc4436a-5868-4860-b8ae-d1abc7bb1112",
           "path": "08-i18n/README.json",
           "title": "Internationalization Directory README",
           "lastModified": "2025-04-05T05:55:52.849Z"
@@ -912,7 +924,7 @@
       "tag": "l10n",
       "documents": [
         {
-          "id": "d4971830-a760-47b4-9e52-81ed3bcc6657",
+          "id": "bdc4436a-5868-4860-b8ae-d1abc7bb1112",
           "path": "08-i18n/README.json",
           "title": "Internationalization Directory README",
           "lastModified": "2025-04-05T05:55:52.849Z"
@@ -923,13 +935,13 @@
       "tag": "refactoring",
       "documents": [
         {
-          "id": "032c5324-d28a-4382-a7b1-22f537458b67",
+          "id": "02552821-5444-48b5-a17c-3a3734acaaa0",
           "path": "09-refactoring/README.json",
           "title": "Refactoring Directory README",
           "lastModified": "2025-04-05T05:55:52.849Z"
         },
         {
-          "id": "16201e3f-bf87-4d9d-ad6f-c59132eb83f3",
+          "id": "555dc375-3743-4bca-9897-26641efae923",
           "path": "09-refactoring/json-global-design-issues.json",
           "title": "json-global-design-issues.json",
           "lastModified": "2025-04-05T05:55:52.849Z"
@@ -940,13 +952,13 @@
       "tag": "tech-debt",
       "documents": [
         {
-          "id": "032c5324-d28a-4382-a7b1-22f537458b67",
+          "id": "02552821-5444-48b5-a17c-3a3734acaaa0",
           "path": "09-refactoring/README.json",
           "title": "Refactoring Directory README",
           "lastModified": "2025-04-05T05:55:52.849Z"
         },
         {
-          "id": "16201e3f-bf87-4d9d-ad6f-c59132eb83f3",
+          "id": "555dc375-3743-4bca-9897-26641efae923",
           "path": "09-refactoring/json-global-design-issues.json",
           "title": "json-global-design-issues.json",
           "lastModified": "2025-04-05T05:55:52.849Z"
@@ -957,7 +969,7 @@
       "tag": "system-design",
       "documents": [
         {
-          "id": "b32805a0-15cc-4ca4-a3ad-e5b40338485d",
+          "id": "77db41a0-2f5e-4c6f-be0f-5d999277377c",
           "path": "core/architecture.json",
           "title": "システムアーキテクチャ基本情報",
           "lastModified": "2025-04-05T05:55:52.850Z"
@@ -968,28 +980,34 @@
       "tag": "core",
       "documents": [
         {
-          "id": "b32805a0-15cc-4ca4-a3ad-e5b40338485d",
+          "id": "77db41a0-2f5e-4c6f-be0f-5d999277377c",
           "path": "core/architecture.json",
           "title": "システムアーキテクチャ基本情報",
           "lastModified": "2025-04-05T05:55:52.850Z"
         },
         {
-          "id": "47cf100a-7343-4ef0-962e-86117238c8bd",
+          "id": "e4d632db-ece2-44b8-a2af-046915cbb652",
           "path": "core/coding-standards.json",
           "title": "コーディング規約",
           "lastModified": "2025-04-05T05:55:52.850Z"
         },
         {
-          "id": "5d5aff3c-5322-4dff-a07b-f4b303262a71",
+          "id": "0e51e0df-d485-40eb-bc32-17412bc63240",
           "path": "core/glossary.json",
           "title": "用語集",
           "lastModified": "2025-04-05T05:55:52.850Z"
         },
         {
-          "id": "5747f2ef-9aca-4803-ad85-1464bd7fcfb8",
+          "id": "d60d5752-3619-4e36-8939-0d910e466e3e",
           "path": "core/mcp-tool-manual.json",
           "title": "MCP Tool Manual (English)",
           "lastModified": "2025-04-05T05:55:52.850Z"
+        },
+        {
+          "id": "2714a7c7-880d-4894-8f5e-66da51cd3e62",
+          "path": "core/release-workflow.json",
+          "title": "リリースワークフロー手順書",
+          "lastModified": "2025-04-10T09:06:24.320Z"
         }
       ]
     },
@@ -997,13 +1015,13 @@
       "tag": "standards",
       "documents": [
         {
-          "id": "47cf100a-7343-4ef0-962e-86117238c8bd",
+          "id": "e4d632db-ece2-44b8-a2af-046915cbb652",
           "path": "core/coding-standards.json",
           "title": "コーディング規約",
           "lastModified": "2025-04-05T05:55:52.850Z"
         },
         {
-          "id": "67f4adab-9008-4f42-8047-82fc76a623f7",
+          "id": "f5b3bc6b-9fdd-44d4-bacb-2ca1f792661c",
           "path": "meta/document-type-standards.json",
           "title": "標準ドキュメントタイプ定義",
           "lastModified": "2025-04-05T05:55:52.850Z"
@@ -1014,7 +1032,7 @@
       "tag": "glossary",
       "documents": [
         {
-          "id": "5d5aff3c-5322-4dff-a07b-f4b303262a71",
+          "id": "0e51e0df-d485-40eb-bc32-17412bc63240",
           "path": "core/glossary.json",
           "title": "用語集",
           "lastModified": "2025-04-05T05:55:52.850Z"
@@ -1025,7 +1043,7 @@
       "tag": "terminology",
       "documents": [
         {
-          "id": "5d5aff3c-5322-4dff-a07b-f4b303262a71",
+          "id": "0e51e0df-d485-40eb-bc32-17412bc63240",
           "path": "core/glossary.json",
           "title": "用語集",
           "lastModified": "2025-04-05T05:55:52.850Z"
@@ -1036,7 +1054,7 @@
       "tag": "definitions",
       "documents": [
         {
-          "id": "5d5aff3c-5322-4dff-a07b-f4b303262a71",
+          "id": "0e51e0df-d485-40eb-bc32-17412bc63240",
           "path": "core/glossary.json",
           "title": "用語集",
           "lastModified": "2025-04-05T05:55:52.850Z"
@@ -1047,7 +1065,7 @@
       "tag": "manual",
       "documents": [
         {
-          "id": "5747f2ef-9aca-4803-ad85-1464bd7fcfb8",
+          "id": "d60d5752-3619-4e36-8939-0d910e466e3e",
           "path": "core/mcp-tool-manual.json",
           "title": "MCP Tool Manual (English)",
           "lastModified": "2025-04-05T05:55:52.850Z"
@@ -1058,7 +1076,7 @@
       "tag": "en",
       "documents": [
         {
-          "id": "5747f2ef-9aca-4803-ad85-1464bd7fcfb8",
+          "id": "d60d5752-3619-4e36-8939-0d910e466e3e",
           "path": "core/mcp-tool-manual.json",
           "title": "MCP Tool Manual (English)",
           "lastModified": "2025-04-05T05:55:52.850Z"
@@ -1066,10 +1084,32 @@
       ]
     },
     {
+      "tag": "workflow",
+      "documents": [
+        {
+          "id": "2714a7c7-880d-4894-8f5e-66da51cd3e62",
+          "path": "core/release-workflow.json",
+          "title": "リリースワークフロー手順書",
+          "lastModified": "2025-04-10T09:06:24.320Z"
+        }
+      ]
+    },
+    {
+      "tag": "ci",
+      "documents": [
+        {
+          "id": "2714a7c7-880d-4894-8f5e-66da51cd3e62",
+          "path": "core/release-workflow.json",
+          "title": "リリースワークフロー手順書",
+          "lastModified": "2025-04-10T09:06:24.320Z"
+        }
+      ]
+    },
+    {
       "tag": "navigation",
       "documents": [
         {
-          "id": "8e62510f-211e-4ee8-b7fa-184092a5824b",
+          "id": "c6d0ad6d-9d2f-4b64-a4b1-da1c15d5074e",
           "path": "meta/consolidated-memory-bank-meta.json",
           "title": "Consolidated Memory Bank Meta Information",
           "lastModified": "2025-04-05T05:55:52.850Z"
@@ -1080,19 +1120,19 @@
       "tag": "reference",
       "documents": [
         {
-          "id": "8e62510f-211e-4ee8-b7fa-184092a5824b",
+          "id": "c6d0ad6d-9d2f-4b64-a4b1-da1c15d5074e",
           "path": "meta/consolidated-memory-bank-meta.json",
           "title": "Consolidated Memory Bank Meta Information",
           "lastModified": "2025-04-05T05:55:52.850Z"
         },
         {
-          "id": "67f4adab-9008-4f42-8047-82fc76a623f7",
+          "id": "f5b3bc6b-9fdd-44d4-bacb-2ca1f792661c",
           "path": "meta/document-type-standards.json",
           "title": "標準ドキュメントタイプ定義",
           "lastModified": "2025-04-05T05:55:52.850Z"
         },
         {
-          "id": "855fbfaf-af3b-467d-911a-9bdc73157c97",
+          "id": "56e9857c-78b9-4a21-906a-e2b3a6b03432",
           "path": "tags/tag_categorization.json",
           "title": "タグカテゴリ定義",
           "lastModified": "2025-04-05T05:55:52.851Z"
@@ -1103,31 +1143,31 @@
       "tag": "index",
       "documents": [
         {
-          "id": "8e62510f-211e-4ee8-b7fa-184092a5824b",
+          "id": "c6d0ad6d-9d2f-4b64-a4b1-da1c15d5074e",
           "path": "meta/consolidated-memory-bank-meta.json",
           "title": "Consolidated Memory Bank Meta Information",
           "lastModified": "2025-04-05T05:55:52.850Z"
         },
         {
-          "id": "c2a6fd45-74c4-4a3f-8ac8-86946089cdfa",
+          "id": "c5cc1232-1123-4a54-9879-b5afc7069cc9",
           "path": "tags/README.json",
           "title": "Tags Directory README",
           "lastModified": "2025-04-05T05:55:52.851Z"
         },
         {
-          "id": "cb5d3de9-0e5a-4cc7-91f6-f4d4f0fc7ff7",
+          "id": "67d0f28a-2151-4b42-8c56-4bd4f2a506d9",
           "path": "tags/index.json",
           "title": "タグインデックス",
           "lastModified": "2025-04-08T04:44:04.926Z"
         },
         {
-          "id": "855fbfaf-af3b-467d-911a-9bdc73157c97",
+          "id": "56e9857c-78b9-4a21-906a-e2b3a6b03432",
           "path": "tags/tag_categorization.json",
           "title": "タグカテゴリ定義",
           "lastModified": "2025-04-05T05:55:52.851Z"
         },
         {
-          "id": "b7808059-2fa5-4c7c-9e5a-7a7fb6d30420",
+          "id": "acc38c6f-f92d-4d95-920e-fcd5977bbb0e",
           "path": "tags/tag_index_update_plan.json",
           "title": "タグインデックス更新計画",
           "lastModified": "2025-04-05T05:55:52.851Z"
@@ -1138,25 +1178,25 @@
       "tag": "tag",
       "documents": [
         {
-          "id": "8e62510f-211e-4ee8-b7fa-184092a5824b",
+          "id": "c6d0ad6d-9d2f-4b64-a4b1-da1c15d5074e",
           "path": "meta/consolidated-memory-bank-meta.json",
           "title": "Consolidated Memory Bank Meta Information",
           "lastModified": "2025-04-05T05:55:52.850Z"
         },
         {
-          "id": "c2a6fd45-74c4-4a3f-8ac8-86946089cdfa",
+          "id": "c5cc1232-1123-4a54-9879-b5afc7069cc9",
           "path": "tags/README.json",
           "title": "Tags Directory README",
           "lastModified": "2025-04-05T05:55:52.851Z"
         },
         {
-          "id": "855fbfaf-af3b-467d-911a-9bdc73157c97",
+          "id": "56e9857c-78b9-4a21-906a-e2b3a6b03432",
           "path": "tags/tag_categorization.json",
           "title": "タグカテゴリ定義",
           "lastModified": "2025-04-05T05:55:52.851Z"
         },
         {
-          "id": "b7808059-2fa5-4c7c-9e5a-7a7fb6d30420",
+          "id": "acc38c6f-f92d-4d95-920e-fcd5977bbb0e",
           "path": "tags/tag_index_update_plan.json",
           "title": "タグインデックス更新計画",
           "lastModified": "2025-04-05T05:55:52.851Z"
