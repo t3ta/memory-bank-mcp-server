@@ -44,6 +44,7 @@ tests/.temp
 
 # Memory Bank specific files
 docs/global-memory-bank/tags/index.json
+docs/global-memory-bank/_global_index.json
 
 # VS Code Extension Packages
 *.vsix

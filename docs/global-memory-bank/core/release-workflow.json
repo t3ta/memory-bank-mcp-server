@@ -1,0 +1,41 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "release-workflow-guide",
+    "title": "リリースワークフロー手順書",
+    "documentType": "system_guide",
+    "path": "core/release-workflow.json",
+    "tags": ["core", "release", "workflow", "ci", "guide"],
+    "version": 1,
+    "lastModified": "2025-04-10T08:42:00Z"
+  },
+  "content": {
+    "overview": "memory-bank-mcp-serverのリリースワークフローについての正式な手順書です。リリース時の作業手順とCIの発火条件などを記載しています。",
+    "sections": [
+      {
+        "title": "リリースワークフローの基本手順",
+        "content": "リリースワークフローは以下の手順で行います：\n\n1. release/vX.X.X ブランチをdevelopから作成\n2. バージョン更新などの準備をして「chore(release): prepare release vX.X.X」というメッセージでコミット\n3. release/vX.X.X ブランチからdevelopブランチへPRを作成\n4. PRがレビューされて承認されたらdevelopにマージ\n5. develop上のコミットが検出されると自動的にdevelopからmasterへのPRが作られる（develop-to-master-pr.yml CIが発火）\n6. そのPRがレビューされて承認されるとmasterにマージされる\n7. masterへのマージでrelease-publish.ymlワークフローが発火して、タグ付けとGitHubリリースが自動的に行われる"
+      },
+      {
+        "title": "バージョン更新手順",
+        "content": "バージョン更新は以下のファイルを対象に行います：\n\n1. packages/mcp/package.json - versionフィールドを更新\n2. packages/mcp/src/main/config/constants.ts - VERSION定数を更新\n3. CHANGELOG.md - 新バージョンのエントリを追加\n\n※ルートのpackage.jsonにはバージョン情報はありません（monorepoのため）"
+      },
+      {
+        "title": "CIワークフローの概要",
+        "content": "以下の主要なCIワークフローがあります：\n\n1. release-prepare.yml - 手動実行用。developブランチから次のバージョンを決定し、release/vX.X.Xブランチを作成してPRを作成します。\n2. develop-to-master-pr.yml - developブランチへのプッシュをトリガーに、masterへのPRを自動的に作成します。\n3. release-publish.yml - masterブランチへのプッシュをトリガーに、タグ作成とGitHubリリースを行います。特定の条件（package.jsonのパス変更、コミットメッセージに「chore(release): prepare release v」を含む）が揃った場合のみ発火します。"
+      },
+      {
+        "title": "release-publish.ymlの発火条件",
+        "content": "masterブランチへのプッシュで以下の条件を満たした場合にrelease-publish.ymlが発火します：\n\n1. package.jsonが変更されている\n2. コミットメッセージに「chore(release): prepare release v」が含まれている\n\nこれらの条件を満たさない場合、CIは発火せず手動でリリース作業を行う必要があります。"
+      },
+      {
+        "title": "手動リリース手順（CIが失敗した場合）",
+        "content": "CIが発火しない場合は以下の手順で手動リリースを行います：\n\n1. masterブランチをチェックアウト\n2. バージョンタグを作成：`git tag -a vX.X.X -m \"Release vX.X.X\"`\n3. タグをプッシュ：`git push origin vX.X.X`\n4. GitHubのリリースページで新規リリースを作成\n5. タグを選択し、リリースノートを記入（CHANGELOG.mdから抜粋）\n6. 「Publish release」をクリック"
+      },
+      {
+        "title": "注意事項",
+        "content": "- リリースブランチは必ずdevelopから作成してください\n- コミットメッセージは正確に「chore(release): prepare release vX.X.X」としてください\n- リリースブランチは必ずdevelopにマージしてから、developからmasterにマージする流れを守ってください\n- 直接masterブランチにマージするのは避けてください"
+      }
+    ]
+  }
+}

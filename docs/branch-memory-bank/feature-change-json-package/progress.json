@@ -1,0 +1,28 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-change-json-package-progress",
+    "title": "Progress for feature/change-json-package",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "createdAt": "2025-04-10T07:56:20.623Z",
+    "lastModified": "2025-04-10T08:26:22.573Z"
+  },
+  "content": {
+    "summary": "JSON Patchライブラリをfast-json-patchからrfc6902に戻す修正を実施し、不要な依存も削除。テストエラーも対応完了。",
+    "status": "completed",
+    "completionPercentage": 100,
+    "workingFeatures": [
+      "Rfc6902JsonPatchAdapter.tsの再実装",
+      "JsonPatchOperation.tsの修正（toRfc6902Operation追加とtoFastJsonPatchOperation互換保持）",
+      "DIコンテナの設定変更（rfc6902アダプターを使用するように変更）",
+      "JsonPatchUseCaseの修正（rfc6902アダプターを使用するように変更）",
+      "FastJsonPatchAdapter.tsの削除",
+      "package.jsonからfast-json-patchの依存関係を削除",
+      "FastJsonPatchAdapter.test.tsの削除（テストエラー解消）"
+    ],
+    "pendingImplementation": [],
+    "knownIssues": []
+  }
+}
