@@ -5,13 +5,13 @@ import { setupTestEnv, cleanupTestEnv, type TestEnv } from '../helpers/test-env.
 import { DIContainer, setupContainer } from '../../../src/main/di/providers.js'; // Import DI container and setup function
 import { WriteGlobalDocumentUseCase } from '../../../src/application/usecases/global/WriteGlobalDocumentUseCase.js'; // Import real UseCase and types
 import { ReadGlobalDocumentUseCase } from '../../../src/application/usecases/global/ReadGlobalDocumentUseCase.js'; // Keep Read UseCase for verification
+import { WriteDocumentUseCase } from '../../../src/application/usecases/common/WriteDocumentUseCase.js'; // Import common write document use case
 import { DomainError } from '../../../src/shared/errors/DomainError.js'; // Import specific errors for checking
 import { ApplicationError } from '../../../src/shared/errors/ApplicationError.js';
 // Removed direct import of rfc6902
 import { JsonPatchService } from '../../../src/domain/jsonpatch/JsonPatchService.js'; // Import JsonPatchService interface
 import { Rfc6902JsonPatchAdapter } from '../../../src/domain/jsonpatch/Rfc6902JsonPatchAdapter.js'; // Use the rfc6902 adapter
 import { DocumentWriterService } from '../../../src/application/services/DocumentWriterService.js'; // Import DocumentWriterService
-import { IGlobalMemoryBankRepository } from '../../../src/domain/repositories/IGlobalMemoryBankRepository.js'; // Import repository interface
 
 import fs from 'fs-extra'; // Use default import for fs-extra
 import * as path from 'path';
@@ -35,11 +35,12 @@ describe('WriteGlobalDocumentUseCase Integration Tests', () => {
    const documentWriterService = new DocumentWriterService(jsonPatchService);
    container.register<DocumentWriterService>('documentWriterService', documentWriterService);
 
-   // Manually instantiate WriteGlobalDocumentUseCase with mocks and real services for integration test
-   const globalRepository = await container.get<IGlobalMemoryBankRepository>('globalMemoryBankRepository');
+   // Import the WriteDocumentUseCase from container
+   const writeDocumentUseCase = await container.get<any>('writeDocumentUseCase');
+
+   // Manually instantiate WriteGlobalDocumentUseCase with the WriteDocumentUseCase 
    writeUseCase = new WriteGlobalDocumentUseCase(
-       globalRepository,
-       documentWriterService // Inject the real service instance
+       writeDocumentUseCase
    );
 
    // Get ReadUseCase from container as before

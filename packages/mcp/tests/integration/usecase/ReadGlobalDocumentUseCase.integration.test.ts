@@ -51,7 +51,7 @@ describe('ReadGlobalDocumentUseCase Integration Tests', () => {
 
     it('should return an error if the document does not exist', async () => {
       await expect(useCase.execute({ path: 'non-existent/document.json' }))
-        .rejects.toThrow('Document "non-existent/document.json" not found in global memory bank');
+        .rejects.toThrow('Document with ID non-existent/document.json was not found');
     });
 
     it('should return an error for an invalid path', async () => {

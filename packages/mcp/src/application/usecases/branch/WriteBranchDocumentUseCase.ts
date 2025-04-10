@@ -1,21 +1,8 @@
 import { IUseCase } from '../../interfaces/IUseCase.js';
 import { DocumentDTO } from '../../dtos/DocumentDTO.js';
 import { WriteDocumentDTO } from '../../dtos/WriteDocumentDTO.js';
-import { IBranchMemoryBankRepository } from '../../../domain/repositories/IBranchMemoryBankRepository.js';
-import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
-import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
-import { MemoryDocument } from '../../../domain/entities/MemoryDocument.js';
-import { Tag } from '../../../domain/entities/Tag.js';
-import { DomainError } from '../../../shared/errors/DomainError.js';
-import {
-  ApplicationError,
-  ApplicationErrors, // Use this for error creation
-} from '../../../shared/errors/ApplicationError.js';
-import { logger } from '../../../shared/utils/logger.js'; // Import logger
-import type { IGitService } from '../../../infrastructure/git/IGitService.js';
-import type { IConfigProvider } from '../../../infrastructure/config/interfaces/IConfigProvider.js';
-import { DocumentWriterService, DocumentWriterInput } from '../../services/DocumentWriterService.js'; // Import the new service
-import type { IDocumentRepository } from '../../../domain/repositories/IDocumentRepository.js'; // Import the common repository interface
+import { logger } from '../../../shared/utils/logger.js';
+import { WriteDocumentUseCase } from '../common/WriteDocumentUseCase.js';
 
 /**
  * Input data for write branch document use case
@@ -29,7 +16,7 @@ export interface WriteBranchDocumentInput {
   /**
    * Document data
    */
-  document: WriteDocumentDTO; // Keep this for content-based writes
+  document: WriteDocumentDTO;
 
   /**
    * JSON Patch operations (optional, use instead of document.content)
@@ -62,25 +49,17 @@ export interface WriteBranchDocumentOutput {
  */
 export class WriteBranchDocumentUseCase
   implements IUseCase<WriteBranchDocumentInput, WriteBranchDocumentOutput> {
+  private readonly componentLogger = logger.withContext({ 
+    component: 'WriteBranchDocumentUseCase' 
+  });
 
-  private readonly componentLogger = logger.withContext({ component: 'WriteBranchDocumentUseCase' }); // Add logger instance
-private readonly documentWriterService: DocumentWriterService; // Inject DocumentWriterService
-
-/**
- * Constructor
-* @param branchRepository Branch memory bank repository
-* @param documentWriterService Service for writing/patching documents
-* @param gitService Git service
-* @param configProvider Configuration provider
-*/
-constructor(
- private readonly branchRepository: IBranchMemoryBankRepository,
- documentWriterService: DocumentWriterService, // Inject DocumentWriterService
- private readonly gitService: IGitService,
- private readonly configProvider: IConfigProvider
-) {
- this.documentWriterService = documentWriterService;
-}
+  /**
+   * Constructor
+   * @param writeDocumentUseCase Unified document write use case
+   */
+  constructor(
+    private readonly writeDocumentUseCase: WriteDocumentUseCase
+  ) {}
 
   /**
    * Execute the use case
@@ -88,137 +67,22 @@ constructor(
    * @returns Promise resolving to output data
    */
   async execute(input: WriteBranchDocumentInput): Promise<WriteBranchDocumentOutput> {
-    try {
-     // documentToSave is now handled within DocumentWriterService
+    this.componentLogger.info('Delegating to WriteDocumentUseCase', {
+      path: input.document?.path,
+      branchName: input.branchName,
+      hasContent: input.document?.content !== undefined && input.document?.content !== null,
+      hasPatches: input.patches && Array.isArray(input.patches) && input.patches.length > 0
+    });
 
-      // --- Determine Branch Name ---
-      let branchNameToUse = input.branchName;
-
-      if (!branchNameToUse) {
-        const config = this.configProvider.getConfig(); // ConfigProviderから設定取得
-        if (config.isProjectMode) { // プロジェクトモードかチェック
-          this.componentLogger.info('Branch name not provided in project mode, attempting to detect current branch...');
-          try {
-            branchNameToUse = await this.gitService.getCurrentBranchName();
-            this.componentLogger.info(`Current branch name automatically detected: ${branchNameToUse}`);
-          } catch (error) {
-            this.componentLogger.error('Failed to get current branch name', { error });
-            // ★★★ cause に元のエラーオブジェクトを渡す ★★★
-            throw ApplicationErrors.executionFailed(
-              'Branch name is required but could not be automatically determined. Please provide it explicitly or ensure you are in a Git repository.',
-              error instanceof Error ? error : undefined // cause に Error オブジェクトを渡す
-            );
-          }
-        } else {
-          // プロジェクトモードでない場合は、ブランチ名の省略はエラー
-          this.componentLogger.warn('Branch name omitted outside of project mode.');
-          throw ApplicationErrors.invalidInput('Branch name is required when not running in project mode.');
-        }
-      }
-
-      // --- Input Validation (using determined branch name) ---
-      this.componentLogger.info('Executing write branch document use case', {
-        branchName: branchNameToUse, // Use determined branch name for logging
-        documentPath: input.document?.path, // Use optional chaining for safety
-        hasContent: input.document?.content !== undefined && input.document?.content !== null,
-        hasPatches: input.patches && Array.isArray(input.patches) && input.patches.length > 0,
-      });
-
-     // --- Input Validation (Basic checks in UseCase) ---
-     if (!input.document) {
-       throw ApplicationErrors.invalidInput('Document object is required');
-     }
-     if (!input.document.path) {
-       throw ApplicationErrors.invalidInput('Document path is required');
-     }
-     // ★★★ content と patches の同時指定チェックを追加 ★★★
-     const hasContent = input.document.content !== undefined && input.document.content !== null;
-     const hasPatches = input.patches && Array.isArray(input.patches) && input.patches.length > 0;
-     if (hasContent && hasPatches) {
-       throw ApplicationErrors.invalidInput('Cannot provide both document content and patches simultaneously');
-     }
-
-// --- Prepare Domain Objects ---
-   const branchInfo = BranchInfo.create(branchNameToUse!);
-   const documentPath = DocumentPath.create(input.document.path);
-   const tags = (input.document.tags ?? []).map((tag) => Tag.create(tag));
-
-   // --- Guard for branchContext.json removed as per user request ---
-
-// --- Ensure Branch Exists ---
-const branchExists = await this.branchRepository.exists(branchInfo.safeName); // Use safeName here
-if (!branchExists) {
-  this.componentLogger.info(`Branch '${branchInfo.safeName}' does not exist. Initializing...`); // Use safeName
-  try {
-    await this.branchRepository.initialize(branchInfo); // Pass BranchInfo object
-    this.componentLogger.info(`Branch '${branchInfo.safeName}' initialized successfully.`); // Use safeName
-  } catch (initError) {
-    this.componentLogger.error(`Failed to initialize branch '${branchInfo.safeName}'`, { originalError: initError }); // Use safeName
-    // ★★★ ApplicationErrors.branchInitializationFailed の引数を修正 ★★★
-    throw ApplicationErrors.branchInitializationFailed(
-      branchInfo.name, // branchName
-      initError instanceof Error ? initError : undefined, // cause
-      // details はオプションなので省略可能、またはメッセージを含める
-      { message: `Failed to initialize branch '${branchInfo.name}': ${(initError as Error).message}` }
-    );
-  }
-}
-
-   // --- Create Repository Adapter ---
-   // This adapter provides the simple IDocumentRepository interface expected by DocumentWriterService,
-   // while internally using the branch-specific repository and the determined branchInfo.
-   const repositoryAdapter: IDocumentRepository = {
-     getDocument: async (path: DocumentPath): Promise<MemoryDocument | null> => {
-       // Use the specific branch repository and branchInfo
-       return this.branchRepository.getDocument(branchInfo, path);
-     },
-     saveDocument: async (doc: MemoryDocument): Promise<void> => {
-       // Use the specific branch repository and branchInfo
-       await this.branchRepository.saveDocument(branchInfo, doc);
-       // Note: Tag indexing for branches is handled within BranchFileSystemRepository.saveDocument
-     },
-   };
-
-   // --- Prepare Input for DocumentWriterService ---
-   const writerInput: DocumentWriterInput = {
-     path: documentPath,
-     content: input.document.content, // Pass content or patches
-     patches: input.patches,
-     tags: tags, // Pass tags (WriterService puts them on MemoryDocument, repo handles indexing)
-   };
-
-   // --- Call DocumentWriterService ---
-   // The core logic of validation, patching, or content writing happens here.
-   const savedDocument = await this.documentWriterService.write(repositoryAdapter, writerInput);
-
-     // Document is already saved by the documentWriterService call above
-
-      // --- Return Output ---
-      // returnContent フラグ (デフォルトは false) を見てレスポンスを構築
-      const shouldReturnContent = input.returnContent === true; // 明示的に true の場合のみ
-
-     const outputDocument: WriteBranchDocumentOutput['document'] = {
-       path: savedDocument.path.value, // Use the document returned by the service
-       lastModified: savedDocument.lastModified.toISOString(),
-       // Include content and tags only if requested
-       ...(shouldReturnContent && {
-         content: savedDocument.content,
-         tags: savedDocument.tags.map((tag) => tag.value),
-       }),
-     };
-
-      return {
-        document: outputDocument,
-      };
-    } catch (error) {
-      // --- Error Handling ---
-      if (error instanceof DomainError || error instanceof ApplicationError) {
-        throw error;
-      }
-      this.componentLogger.error('Unexpected error in WriteBranchDocumentUseCase:', { error });
-      // Wrap unexpected errors
-      // ★★★ cause に元のエラーオブジェクトを渡す ★★★
-      throw ApplicationErrors.executionFailed(`Unexpected error: ${(error as Error).message}`, error instanceof Error ? error : undefined);
-    }
+    // Delegate to the new use case with scope set to 'branch'
+    return await this.writeDocumentUseCase.execute({
+      scope: 'branch',
+      branch: input.branchName,
+      path: input.document.path,
+      content: input.document.content,
+      patches: input.patches,
+      tags: input.document.tags,
+      returnContent: input.returnContent
+    });
   }
 }
