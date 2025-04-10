@@ -16,7 +16,7 @@ import { vi, Mocked } from 'vitest'; // jest -> vi, Mocked をインポート
 import { execSync } from 'child_process';
 import { logger } from '../../../src/shared/utils/logger.js';
 import { JsonPatchService } from '../../../src/domain/jsonpatch/JsonPatchService.js'; // Import JsonPatchService interface
-import { FastJsonPatchAdapter } from '../../../src/domain/jsonpatch/FastJsonPatchAdapter.js'; // Use the new adapter
+import { Rfc6902JsonPatchAdapter } from '../../../src/domain/jsonpatch/Rfc6902JsonPatchAdapter.js'; // Use the rfc6902 adapter
 import { DocumentWriterService } from '../../../src/application/services/DocumentWriterService.js'; // Import DocumentWriterService
 
 import * as path from 'path';
@@ -83,7 +83,7 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
     container.register<IConfigProvider>('configProvider', mockConfigProvider); // コンテナにConfigProviderモックを登録
 
    // Register JsonPatchService and DocumentWriterService for the test
-   const jsonPatchService = new FastJsonPatchAdapter(); // Use the new adapter
+   const jsonPatchService = new Rfc6902JsonPatchAdapter(); // Use the rfc6902 adapter
    container.register<JsonPatchService>('jsonPatchService', jsonPatchService);
    const documentWriterService = new DocumentWriterService(jsonPatchService);
    container.register<DocumentWriterService>('documentWriterService', documentWriterService);

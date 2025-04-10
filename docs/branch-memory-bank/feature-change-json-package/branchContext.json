@@ -1,0 +1,30 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-change-json-package-context",
+    "title": "Branch Context for feature/change-json-package",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [],
+    "createdAt": "2025-04-10T07:56:20.623Z",
+    "lastModified": "2025-04-10T08:18:14.464Z"
+  },
+  "content": {
+    "purpose": "JSON Patchライブラリをfast-json-patchからrfc6902に戻して、パッチ処理の機能を修復する。さらに不要な依存関係を清掃する。",
+    "background": "以前は正常に動作していたrfc6902ライブラリからfast-json-patchに移行したところ、JSON Patchの機能が正しく動作しなくなった。元のrfc6902ライブラリに戻して機能を復元し、不要になったfast-json-patchの依存関係を削除する必要がある。",
+    "userStories": [
+      {
+        "description": "開発者として、JSON Patchが正しく機能するように、ライブラリをrfc6902に戻したい",
+        "completed": true
+      },
+      {
+        "description": "開発者として、パッチ適用時にエラーが発生しないように、アダプターを適切に実装したい",
+        "completed": true
+      },
+      {
+        "description": "開発者として、不要な依存関係を削除し、パッケージをクリーンな状態に保ちたい",
+        "completed": true
+      }
+    ]
+  }
+}

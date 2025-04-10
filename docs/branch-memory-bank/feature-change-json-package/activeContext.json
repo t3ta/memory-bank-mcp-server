@@ -1,0 +1,49 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-change-json-package-active-context",
+    "title": "Active Context for feature/change-json-package",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [],
+    "createdAt": "2025-04-10T07:56:20.623Z",
+    "lastModified": "2025-04-10T08:26:10.924Z"
+  },
+  "content": {
+    "current_task": "JSON PatchライブラリをFastJsonPatchからRfc6902に戻す実装作業が完了し、テストエラーも修正",
+    "relevant_files": [
+      "packages/mcp/src/domain/jsonpatch/Rfc6902JsonPatchAdapter.ts",
+      "packages/mcp/src/domain/jsonpatch/JsonPatchOperation.ts",
+      "packages/mcp/src/main/di/providers.ts",
+      "packages/mcp/src/application/usecases/json/JsonPatchUseCase.ts",
+      "packages/mcp/package.json",
+      "packages/mcp/tests/unit/domain/jsonpatch/FastJsonPatchAdapter.test.ts"
+    ],
+    "recent_changes": [
+      "Rfc6902JsonPatchAdapter.tsを新規作成（RFC 6902規格互換）",
+      "JsonPatchOperation.tsを修正（toRfc6902Operationメソッド追加、互換性維持）",
+      "providers.tsでRfc6902JsonPatchAdapterをDIに登録",
+      "JsonPatchUseCase.tsでRfc6902JsonPatchAdapterをデフォルトアダプターとして設定",
+      "FastJsonPatchAdapter.tsを削除",
+      "package.jsonからfast-json-patchの依存関係を削除",
+      "FastJsonPatchAdapter.test.tsを削除（不要になったテストファイルの処理）"
+    ],
+    "activeDecisions": [
+      "rfc6902を使用するようにライブラリを元に戻す",
+      "既存の依存関係を壊さないように、toFastJsonPatchOperationメソッドは残す",
+      "JsonPatchOperation.tsには両方のアダプターに対応できるコードを実装",
+      "package.jsonから使用しなくなったfast-json-patch依存関係を削除",
+      "削除したアダプターに対応するテストファイルも削除し、テストエラーを解消"
+    ],
+    "considerations": [
+      "本番環境に適用する前に、テストを実行して機能の正常性を確認する必要あり",
+      "今後ライブラリを変更する際は、コード修正だけでなく依存関係の管理も忘れないようにする",
+      "テストファイルの整合性も含めて変更管理することが重要"
+    ],
+    "nextSteps": [
+      "Pull Request作成",
+      "レビュー依頼",
+      "マージ後、実際の環境でパッチ機能が正常に動作するか確認"
+    ]
+  }
+}
