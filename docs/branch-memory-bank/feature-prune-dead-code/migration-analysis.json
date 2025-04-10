@@ -1,0 +1,32 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "migration-analysis",
+    "title": "マークダウンマイグレーション関連コード分析",
+    "documentType": "analysis",
+    "path": "migration-analysis.json",
+    "tags": [],
+    "createdAt": "2025-04-10T10:00:00.000Z",
+    "lastModified": "2025-04-10T09:41:34.982Z"
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "概要",
+        "content": "ts-pruneによる使用されていないコードの分析過程で、`migration`ディレクトリ内のコードが現在のコードベースから参照されていない可能性が発見されました。"
+      },
+      {
+        "title": "対象ファイル",
+        "content": "以下のファイルが削除候補です：\n\n- `src/migration/MarkdownMigrationService.ts`\n- `src/migration/MarkdownToJsonMigrator.ts`\n- `src/migration/MigrationBackup.ts`\n- `src/migration/MigrationReport.ts`\n- `src/migration/MigrationValidator.ts`\n- `src/migration/converters/` ディレクトリ全体\n- `src/migration/utils/` ディレクトリ全体"
+      },
+      {
+        "title": "根拠",
+        "content": "- `grep`コマンドで検索した結果、これらのクラスやファイルがプロジェクト内の他の場所から参照されていないことが確認できました\n- migrationディレクトリのファイルは、マークダウンからJSONへの移行プロセスをサポートするためのもので、移行が完了すれば不要になる可能性があります\n- プロジェクトの履歴から判断すると、この移行は既に完了している可能性があります"
+      },
+      {
+        "title": "確認事項",
+        "content": "以下の点を確認する必要があります：\n\n1. マークダウンからJSONへの移行は完了しているか？\n2. 今後も再度移行を行う可能性があるか？\n3. これらのコードを削除しても問題ないか？"
+      }
+    ]
+  }
+}

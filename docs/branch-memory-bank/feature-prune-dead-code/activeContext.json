@@ -1,0 +1,17 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-prune-dead-code-active-context",
+    "title": "Active Context for feature/prune-dead-code",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [],
+    "createdAt": "2025-04-10T09:34:59.972Z",
+    "lastModified": "2025-04-10T09:34:59.972Z"
+  },
+  "content": {
+    "current_task": "Initial active context for branch: feature/prune-dead-code",
+    "relevant_files": [],
+    "recent_decisions": []
+  }
+}
