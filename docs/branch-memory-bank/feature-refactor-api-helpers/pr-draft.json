@@ -1,0 +1,60 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-refactor-api-helpers-pr-draft",
+    "title": "API ヘルパー実装プルリクエスト下書き",
+    "documentType": "pr_draft",
+    "path": "pr-draft.json",
+    "tags": [],
+    "createdAt": "2025-04-10T13:30:00.000Z",
+    "lastModified": "2025-04-10T13:38:00.557Z"
+  },
+  "content": {
+    "title": "API 統合のためのヘルパークラス実装",
+    "base_branch": "feature/refactor-api",
+    "description": "# API統合用ヘルパークラスと統合APIの実装\n\nこのPRでは、API統合（write_document/read_document）のための基盤となるヘルパークラスおよび新しい統合APIユースケースを実装しました。\n\n## 実装内容\n\n### 1. ヘルパークラス\n- **BranchResolverService**: ブランチ名の解決と検証を担当するサービス\n- **DocumentRepositorySelector**: スコープ（branch/global）に基づいた適切なリポジトリを選択するサービス\n\n### 2. 統合APIユースケース\n- **ReadDocumentUseCase**: ブランチ/グローバルの区別をスコープで切り替える統合読み取りAPI\n- **WriteDocumentUseCase**: ブランチ/グローバルの区別をスコープで切り替える統合書き込みAPI\n\n### 3. 既存APIの姉妹化\n- 既存のReadBranch/WriteGlobalユースケースを新しい統合ユースケースに依存するように改修\n- 互換性を柔軟に保ったまま、内部実装を新ユースケースに姉妹化\n\n### 4. DI登録\n- 新しいヘルパークラスとユースケースをDIコンテナに登録\n- 既存ユースケースの依存関係を更新\n\n## テスト\n- ヘルパークラスの単体テスト・統合テストを開発\n- エラーケースも含めた完全なテストカバレッジ\n\n## 今後の展開\n- 新しい統合APIをコマンドとして実装する専用コントローラーの実装\n- write_document/read_documentコマンドの実装\n\n## 参考資料\n- [API リファクタリング設計](docs/branch-memory-bank/feature-refactor-api/design/api-refactoring-plan.json)\n- [API リファクタリング実装計画](docs/branch-memory-bank/feature-refactor-api/design/api-refactoring-implementation-plan.json)\n- [API リファクタリングテスト戦略](docs/branch-memory-bank/feature-refactor-api/design/api-refactoring-test-strategy.json)",
+    "notes_for_reviewers": "- 既存APIは新しい統合APIに姉妹化され、インターフェース互換性は保たれています\n- DIコンテナに全てのコンポーネントが登録済みです\n- 今後のコントローラー実装の際は、この統合APIを利用するだけで実装できます",
+    "checklist": [
+      {
+        "item": "BranchResolverServiceのコード実装",
+        "completed": true
+      },
+      {
+        "item": "BranchResolverServiceの単体テスト",
+        "completed": true
+      },
+      {
+        "item": "DocumentRepositorySelectorのコード実装",
+        "completed": true
+      },
+      {
+        "item": "DocumentRepositorySelectorの単体テスト",
+        "completed": true
+      },
+      {
+        "item": "統合テストの実装",
+        "completed": true
+      },
+      {
+        "item": "コードスタイルとベストプラクティスの準拠確認",
+        "completed": true
+      },
+      {
+        "item": "ReadDocumentUseCaseの実装",
+        "completed": true
+      },
+      {
+        "item": "WriteDocumentUseCaseの実装",
+        "completed": true
+      },
+      {
+        "item": "既存ユースケースの姉妹化",
+        "completed": true
+      },
+      {
+        "item": "DIコンテナ登録設定",
+        "completed": true
+      }
+    ]
+  }
+}

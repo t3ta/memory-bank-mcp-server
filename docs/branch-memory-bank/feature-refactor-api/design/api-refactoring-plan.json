@@ -1,0 +1,48 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "api-refactoring-plan",
+    "title": "API リファクタリング設計: write_document / read_document",
+    "documentType": "design",
+    "path": "design/api-refactoring-plan.json",
+    "tags": [],
+    "createdAt": "2025-04-10T12:50:00Z",
+    "lastModified": "2025-04-10T12:36:58.513Z"
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "概要",
+        "content": "現在の4つのメモリバンク操作コマンド（write_branch_memory_bank, read_branch_memory_bank, write_global_memory_bank, read_global_memory_bank）を2つのコマンド（write_document, read_document）に整理・統合する設計計画です。この変更により、APIの一貫性が向上し、使いやすさが改善されます。"
+      },
+      {
+        "title": "現在の構造",
+        "content": "### write_branch_memory_bank\n- **主要パラメータ**: branch, path, docs, content/patches\n- **オプション**: tags, returnContent\n\n### read_branch_memory_bank\n- **主要パラメータ**: branch, path, docs\n\n### write_global_memory_bank\n- **主要パラメータ**: path, docs, content/patches\n- **オプション**: tags, returnContent\n\n### read_global_memory_bank\n- **主要パラメータ**: path, docs"
+      },
+      {
+        "title": "新API設計: write_document",
+        "content": "```typescript\n{\n  scope: \"branch\" | \"global\",  // スコープ指定（必須）\n  branch?: string,            // 条件付き必須：\n                              //   - scope=\"branch\"の場合、\n                              //   - プロジェクトモード以外では必須\n                              //   - プロジェクトモードでは省略可（カレントブランチ自動検出）\n  path: string,               // ドキュメントパス（必須）\n  docs?: string,              // ドキュメントルートパス\n                              //   - プロジェクトモード時は省略可能\n                              //   - それ以外は必須\n  content?: string | object,  // 内容（patchesと排他）\n  patches?: JsonPatchOp[],    // パッチ操作（contentと排他）\n  tags?: string[],            // タグ（オプション）\n  returnContent?: boolean     // 内容を返すかどうか（デフォルトfalse）\n}\n```"
+      },
+      {
+        "title": "新API設計: read_document",
+        "content": "```typescript\n{\n  scope: \"branch\" | \"global\",  // スコープ指定（必須）\n  branch?: string,            // 条件付き必須：\n                              //   - scope=\"branch\"の場合、\n                              //   - プロジェクトモード以外では必須\n                              //   - プロジェクトモードでは省略可（カレントブランチ自動検出）\n  path: string,               // ドキュメントパス（必須）\n  docs?: string               // ドキュメントルートパス\n                              //   - プロジェクトモード時は省略可能\n                              //   - それ以外は必須\n}\n```"
+      },
+      {
+        "title": "検証ルール",
+        "content": "以下の検証ルールを実装する必要があります：\n\n1. `scope`は\"branch\"または\"global\"のどちらかであることを検証\n2. `scope`が\"branch\"かつプロジェクトモードでない場合は、`branch`パラメータが必須\n3. プロジェクトモードでない場合は、`docs`パラメータが必須\n4. `content`と`patches`は排他的（同時指定不可）"
+      },
+      {
+        "title": "使用例",
+        "content": "### プロジェクトモードでカレントブランチに書き込む\n```javascript\nwrite_document({\n  scope: \"branch\",\n  path: \"design/api-specs.json\", \n  content: { ... }\n})\n```\n\n### 非プロジェクトモードでブランチに書き込む\n```javascript\nwrite_document({\n  scope: \"branch\",\n  branch: \"feature/new-api\",\n  path: \"design/api-specs.json\",\n  docs: \"./docs\",\n  content: { ... }\n})\n```\n\n### プロジェクトモードでグローバルに書き込む\n```javascript\nwrite_document({\n  scope: \"global\",\n  path: \"core/architecture.json\",\n  content: { ... }\n})\n```\n\n### 非プロジェクトモードでグローバルに書き込む\n```javascript\nwrite_document({\n  scope: \"global\",\n  path: \"core/architecture.json\",\n  docs: \"./docs\",\n  content: { ... }\n})\n```"
+      },
+      {
+        "title": "メリット",
+        "content": "- グローバルとブランチのスコープを明示的に分けることで、誤った操作を防止\n- `scope`パラメータの明示的な指定により、特にグローバルメモリバンクへの意図しない書き込みを防止\n- 既存の4つのコマンドの機能をすべてカバーしつつ、よりシンプルなインターフェースを提供\n- プロジェクトモードでは`branch`と`docs`パラメータが省略可能になり、使いやすさが向上\n- APIの一貫性が向上し、ドキュメントとコードの保守性が改善"
+      },
+      {
+        "title": "考慮事項",
+        "content": "- 既存のAPIを使用しているコードはすべて新しいAPIに移行する必要がある\n- 移行期間中は両方のAPIをサポートすることも検討する価値がある\n- エラーメッセージは明確で具体的なものにし、特に必須パラメータの欠如に関するものは分かりやすくする\n- 特にグローバルメモリバンクへの書き込み時にはログ出力を強化し、操作の追跡を容易にする"
+      }
+    ]
+  }
+}

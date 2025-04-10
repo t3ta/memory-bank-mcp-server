@@ -1,0 +1,15 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-refactor-api-context",
+    "title": "Branch Context for feature/refactor-api",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [],
+    "createdAt": "2025-04-10T12:32:28.730Z",
+    "lastModified": "2025-04-10T12:37:15.593Z"
+  },
+  "content": {
+    "description": "feature/refactor-apiブランチでは、メモリバンク操作用APIのリファクタリングを行います。現在の4つのコマンド（write_branch_memory_bank、read_branch_memory_bank、write_global_memory_bank、read_global_memory_bank）をよりシンプルな2つのコマンド（write_document、read_document）に統合します。これによりAPIの一貫性が向上し、保守性が改善されます。"
+  }
+}

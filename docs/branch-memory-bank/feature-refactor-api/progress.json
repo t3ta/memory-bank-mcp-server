@@ -1,0 +1,69 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-refactor-api-progress",
+    "title": "Progress for feature/refactor-api",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "createdAt": "2025-04-10T12:32:28.730Z",
+    "lastModified": "2025-04-10T12:48:50.232Z"
+  },
+  "content": {
+    "summary": "APIリファクタリングを進行中: メモリバンク操作用コマンドを統合",
+    "status": "in-progress",
+    "steps": [
+      {
+        "id": "step-1",
+        "status": "completed",
+        "completedAt": "2025-04-10T12:37:00Z",
+        "description": "API設計の検討と決定"
+      },
+      {
+        "id": "step-2",
+        "status": "completed",
+        "completedAt": "2025-04-10T12:49:00Z",
+        "description": "テスト戦略と実装計画の策定"
+      }
+    ],
+    "next_steps": [
+      {
+        "id": "step-2",
+        "priority": "high",
+        "description": "BranchResolverServiceの実装とテスト"
+      },
+      {
+        "id": "step-3",
+        "priority": "high",
+        "description": "DocumentRepositorySelectorの実装とテスト"
+      },
+      {
+        "id": "step-4",
+        "priority": "medium",
+        "description": "WriteDocumentUseCaseの実装とテスト"
+      },
+      {
+        "id": "step-5",
+        "priority": "medium",
+        "description": "ReadDocumentUseCaseの実装とテスト"
+      },
+      {
+        "id": "step-6",
+        "priority": "low",
+        "description": "既存APIの統合APIへの移行"
+      }
+    ],
+    "findings": [
+      {
+        "id": "finding-1",
+        "description": "グローバルメモリバンクへの書き込みは特に安全性を考慮する必要がある",
+        "impact": "high"
+      },
+      {
+        "id": "finding-2",
+        "description": "プロジェクトモードと非プロジェクトモードでは必要パラメータが異なる",
+        "impact": "medium"
+      }
+    ]
+  }
+}

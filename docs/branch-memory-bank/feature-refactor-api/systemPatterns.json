@@ -1,0 +1,48 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-refactor-api-system-patterns",
+    "title": "System Patterns for feature/refactor-api",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [],
+    "createdAt": "2025-04-10T12:32:28.730Z",
+    "lastModified": "2025-04-10T12:49:29.773Z"
+  },
+  "content": {
+    "patterns": [
+      {
+        "id": "api-pattern-1",
+        "title": "ドキュメントアクセスにおけるスコープ明示パターン",
+        "description": "メモリバンク操作APIではスコープ（branch/global）を明示的に指定することで、安全性と意図の明確化を図る",
+        "context": "現在のAPIではブランチとグローバルで別々のコマンドを使用しているが、統一インターフェースに移行する際の設計パターン",
+        "consequences": [
+          "グローバルメモリバンクへの誤操作を防止できる",
+          "APIが統一されシンプルになる",
+          "意図が明確になりコードの可読性が向上する"
+        ],
+        "status": "proposed",
+        "relatedDecisions": [
+          "write_document/read_documentの設計"
+        ]
+      },
+      {
+        "id": "api-pattern-2",
+        "title": "ヘルパークラスを使った関心の分離パターン",
+        "status": "proposed",
+        "context": "APIリファクタリングでの共通ロジックの抜き出し方",
+        "description": "ブランチ名の解決やリポジトリ選択などの共通ロジックを専用ヘルパークラスに抜き出し、ユースケース自体はシンプルに保つ",
+        "consequences": [
+          "コードの重複が減り保守性が向上する",
+          "テストがしやすくなる",
+          "依存性注入がより柔軟になる",
+          "専門性の高いクラスが増えるが、逆にレイヤー分割が明確になる"
+        ],
+        "relatedDecisions": [
+          "BranchResolverServiceの実装",
+          "DocumentRepositorySelectorの実装"
+        ]
+      }
+    ]
+  }
+}
