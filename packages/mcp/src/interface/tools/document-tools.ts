@@ -224,9 +224,9 @@ export const write_document: Tool<WriteDocumentParams> = async (params) => {
     // Log the result from the controller
     console.log(`[write_document] DocumentController result:`, {
       success: result.success,
-      hasData: !!result.data,
-      dataContent: result.data?.content ? typeof result.data.content : 'undefined',
-      dataTags: result.data?.tags ? result.data.tags.join(',') : 'undefined'
+      hasData: result.success && !!result.data,
+      dataContent: result.success && result.data?.content ? typeof result.data.content : 'undefined',
+      dataTags: result.success && result.data?.tags ? result.data.tags.join(',') : 'undefined'
     });
     
     // Transform the response to match what E2E tests expect
@@ -436,9 +436,9 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
     // Log the result from the controller
     console.log(`[read_document] DocumentController result:`, {
       success: result.success,
-      hasData: !!result.data,
-      dataContent: result.data?.content ? typeof result.data.content : 'undefined',
-      dataTags: result.data?.tags ? result.data.tags.join(',') : 'undefined'
+      hasData: result.success && !!result.data,
+      dataContent: result.success && result.data?.content ? typeof result.data.content : 'undefined',
+      dataTags: result.success && result.data?.tags ? result.data.tags.join(',') : 'undefined'
     });
     
     // Transform the response to match what E2E tests expect
