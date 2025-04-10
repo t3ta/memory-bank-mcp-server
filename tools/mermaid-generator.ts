@@ -2,7 +2,6 @@ import * as path from 'path';
 import {
   ProjectStructure,
   DirectoryStructure,
-  _FileStructure,
   ClassInfo,
   InterfaceInfo,
   DiagramOptions
@@ -45,7 +44,7 @@ export class MermaidGenerator {
     lines.push('  class root directory;');
     
     // パッケージに対してpackageクラスを適用
-    structure.packagePaths.forEach((packagePath, _packageName) => {
+    structure.packagePaths.forEach((packagePath) => {
       const safePackageName = this.sanitizeId(path.basename(packagePath));
       lines.push(`  class ${safePackageName} package;`);
     });
@@ -140,7 +139,7 @@ export class MermaidGenerator {
     // パッケージ定義
     structure.packagePaths.forEach((packagePath, _packageName) => {
       const safePackageName = this.sanitizeId(_packageName);
-      lines.push(`  ${safePackageName}[\"${_packageName}\"]`);
+      lines.push(`  ${safePackageName}["${_packageName}"]`);
       packageDependencies.set(_packageName, new Set<string>());
     });
     
@@ -162,7 +161,7 @@ export class MermaidGenerator {
             }
           }
         }
-      } catch (e) {
+      } catch (_error) {
         // package.jsonが読めない場合は無視
       }
     });
@@ -202,9 +201,9 @@ export class MermaidGenerator {
     // ディレクトリノードの定義
     if (dir.isPackage) {
       const packageName = dir.packageInfo?.name || dir.name;
-      lines.push(`  ${dirId}[\"📦 ${packageName}\"]`);
+      lines.push(`  ${dirId}["📦 ${packageName}"]`);
     } else {
-      lines.push(`  ${dirId}[\"📁 ${dir.name}\"]`);
+      lines.push(`  ${dirId}["📁 ${dir.name}"]`);
     }
     
     // サブディレクトリの処理
@@ -219,7 +218,7 @@ export class MermaidGenerator {
     if (options.detailLevel === 'standard' || options.detailLevel === 'full') {
       for (const file of dir.files) {
         const fileId = `${dirId}_${this.sanitizeId(file.name)}`;
-        lines.push(`  ${fileId}[\"📄 ${file.name}\"]`);
+        lines.push(`  ${fileId}["📄 ${file.name}"]`);
         lines.push(`  ${dirId} --> ${fileId}`);
         
         // ファイルクラスを適用
