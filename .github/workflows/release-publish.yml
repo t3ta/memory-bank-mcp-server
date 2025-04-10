@@ -8,7 +8,8 @@ on:
     # Only run on pushes that include the release commit message
     # This prevents running on every push to master
     paths:
-      - 'package.json' # Assuming version bump always changes package.json
+      - 'package.json' # Root package.json
+      - 'packages/*/package.json' # Workspace package.json files
 
 permissions:
   contents: write # Needed to create releases and tags
@@ -45,10 +46,21 @@ jobs:
 
       # No build needed if artifacts are not required for release assets
 
-      - name: Get Version from package.json
+      - name: Get Version from MCP package.json
         id: get_version
         run: |
-          VERSION=$(node -p "require('./package.json').version")
+          # Try to get version from root package.json first
+          ROOT_VERSION=$(node -p "try { require('./package.json').version } catch (e) { '' }" || echo "")
+          
+          # If root version is empty, get from MCP package
+          if [ -z "$ROOT_VERSION" ]; then
+            echo "Root package.json does not have version, getting from MCP package..."
+            VERSION=$(node -p "require('./packages/mcp/package.json').version")
+          else
+            VERSION=$ROOT_VERSION
+          fi
+          
+          echo "Using version: ${VERSION}"
           echo "PACKAGE_VERSION=${VERSION}" >> $GITHUB_OUTPUT
 
       - name: Create Git Tag
