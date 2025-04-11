@@ -36,11 +36,100 @@ async function setupBaseTestEnv(): Promise<TestEnv> {
   await fs.remove(targetTemplatesJsonDir);
   await fs.ensureDir(targetTemplatesJsonDir);
 
-  const dummyRulesContent = JSON.stringify({ schema: "rules_v1", content: "Dummy rule content" }, null, 2);
+  // テンプレートv1形式で正しいIDを持つダミールールファイル
+  const dummyRulesContent = JSON.stringify({
+    schema: "template_v1",
+    metadata: {
+      id: "rules",
+      titleKey: "template.title.rules",
+      descriptionKey: "template.description.rules",
+      type: "system",
+      lastModified: new Date().toISOString()
+    },
+    content: {
+      sections: [
+        {
+          id: "dummySection",
+          titleKey: "template.section.dummy",
+          contentKey: "template.content.dummy",
+          isOptional: false
+        }
+      ],
+      placeholders: {}
+    }
+  }, null, 2);
+
+  // 言語別ファイルの場合も同様にIDが必要
+  const dummyRulesEnContent = JSON.stringify({
+    schema: "template_v1",
+    metadata: {
+      id: "rules-en", // 言語別IDをここで指定
+      titleKey: "template.title.rules",
+      descriptionKey: "template.description.rules",
+      type: "system",
+      lastModified: new Date().toISOString()
+    },
+    content: {
+      sections: [
+        {
+          id: "dummySection",
+          titleKey: "template.section.dummy",
+          contentKey: "template.content.dummy",
+          isOptional: false
+        }
+      ],
+      placeholders: {}
+    }
+  }, null, 2);
+
+  const dummyRulesJaContent = JSON.stringify({
+    schema: "template_v1",
+    metadata: {
+      id: "rules-ja", // 日本語IDをここで指定
+      titleKey: "template.title.rules",
+      descriptionKey: "template.description.rules",
+      type: "system",
+      lastModified: new Date().toISOString()
+    },
+    content: {
+      sections: [
+        {
+          id: "dummySection",
+          titleKey: "template.section.dummy",
+          contentKey: "template.content.dummy",
+          isOptional: false
+        }
+      ],
+      placeholders: {}
+    }
+  }, null, 2);
+
+  const dummyRulesZhContent = JSON.stringify({
+    schema: "template_v1",
+    metadata: {
+      id: "rules-zh", // 中国語IDをここで指定
+      titleKey: "template.title.rules",
+      descriptionKey: "template.description.rules",
+      type: "system",
+      lastModified: new Date().toISOString()
+    },
+    content: {
+      sections: [
+        {
+          id: "dummySection",
+          titleKey: "template.section.dummy",
+          contentKey: "template.content.dummy",
+          isOptional: false
+        }
+      ],
+      placeholders: {}
+    }
+  }, null, 2);
+
   await fs.outputFile(path.join(targetTemplatesJsonDir, 'rules.json'), dummyRulesContent, 'utf-8');
-  await fs.outputFile(path.join(targetTemplatesJsonDir, 'rules-ja.json'), dummyRulesContent, 'utf-8');
-  await fs.outputFile(path.join(targetTemplatesJsonDir, 'rules-en.json'), dummyRulesContent, 'utf-8');
-  await fs.outputFile(path.join(targetTemplatesJsonDir, 'rules-zh.json'), dummyRulesContent, 'utf-8');
+  await fs.outputFile(path.join(targetTemplatesJsonDir, 'rules-en.json'), dummyRulesEnContent, 'utf-8');
+  await fs.outputFile(path.join(targetTemplatesJsonDir, 'rules-ja.json'), dummyRulesJaContent, 'utf-8');
+  await fs.outputFile(path.join(targetTemplatesJsonDir, 'rules-zh.json'), dummyRulesZhContent, 'utf-8');
 
   try {
     execSync('git init', { cwd: tempDir, stdio: 'ignore' });
