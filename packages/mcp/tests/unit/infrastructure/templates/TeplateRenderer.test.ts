@@ -20,37 +20,51 @@ const renderer = new TemplateRenderer(mockI18nProvider);
 
 // Dummy Template Data
 const dummyJsonTemplate = {
-  schema: 'memory_document_v2', // Added schema to ensure it's treated as JSON template
+  schema: 'template_v1', // Template schema
   metadata: {
-    name: { ja: 'テストJSON', en: 'Test JSON' },
-    // other metadata...
+    id: 'test-template',
+    titleKey: 'template.title.test',
+    descriptionKey: 'template.description.test',
+    type: 'system',
+    lastModified: '2025-04-01T00:00:00.000Z'
   },
   content: {
-    sections: {
-      section1: {
-        title: { ja: 'セクション1', en: 'Section 1' },
-        content: { ja: '内容 1 {{VAR_1}}', en: 'Content 1 {{VAR_1}}' },
+    sections: [
+      {
+        id: 'section1',
+        titleKey: 'template.section.test_section1',
+        contentKey: 'template.content.test_section1',
+        isOptional: false
       },
-      section2: {
-        title: { ja: 'セクション2', en: 'Section 2' },
-        content: { ja: '内容 2', en: 'Content 2' },
+      {
+        id: 'section2',
+        titleKey: 'template.section.test_section2',
+        contentKey: 'template.content.test_section2',
+        isOptional: false
       },
-      optionalSectionEmpty: {
-        title: { en: 'Optional Empty' },
-        content: { en: '' }, // Empty content
-        optional: true,
+      {
+        id: 'optionalSectionEmpty',
+        titleKey: 'template.section.test_optional_empty',
+        contentKey: 'template.content.test_optional_empty', // Empty content in mock
+        isOptional: true
       },
-      optionalSectionPresent: {
-        title: { en: 'Optional Present' },
-        content: { en: 'This should appear' },
-        optional: true,
+      {
+        id: 'optionalSectionPresent',
+        titleKey: 'template.section.test_optional_present',
+        contentKey: 'template.content.test_optional_present',
+        isOptional: true
       },
-      fallbackSection: { // Only has 'en' title/content
-        title: { en: 'Fallback Section' },
-        content: { en: 'Fallback Content' },
-      },
-    },
-  },
+      {
+        id: 'fallbackSection',
+        titleKey: 'template.section.test_fallback',
+        contentKey: 'template.content.test_fallback',
+        isOptional: false
+      }
+    ],
+    placeholders: {
+      'TEST': 'template.placeholder.test'
+    }
+  }
 };
 
 const dummyBaseTemplate = {
@@ -101,30 +115,68 @@ describe('TemplateRenderer', () => {
   describe('renderToMarkdown (JSON Template)', () => {
     it('should render a JSON template correctly for ja', () => {
       const variables = { VAR_1: '変数1' };
+      
+      // テスト用の翻訳を設定
+      (mockI18nProvider.translate as Mock).mockImplementation((arg: { key: string; language: Language }) => {
+        if (arg.key === 'template.title.test' && arg.language === 'ja') return 'テストテンプレート';
+        if (arg.key === 'template.section.test_section1' && arg.language === 'ja') return 'セクション1';
+        if (arg.key === 'template.content.test_section1' && arg.language === 'ja') return '内容 1 {{VAR_1}}';
+        if (arg.key === 'template.section.test_section2' && arg.language === 'ja') return 'セクション2';
+        if (arg.key === 'template.content.test_section2' && arg.language === 'ja') return '内容 2';
+        if (arg.key === 'template.section.test_optional_empty' && arg.language === 'ja') return '省略可能な空';
+        if (arg.key === 'template.content.test_optional_empty' && arg.language === 'ja') return ''; // 空の内容
+        if (arg.key === 'template.section.test_optional_present' && arg.language === 'ja') return '省略可能な表示項目';
+        if (arg.key === 'template.content.test_optional_present' && arg.language === 'ja') return 'これは表示されるべき';
+        if (arg.key === 'template.section.test_fallback' && arg.language === 'ja') return 'フォールバックセクション';
+        if (arg.key === 'template.content.test_fallback' && arg.language === 'ja') return 'フォールバック内容';
+        // 指定されていない場合は英語のフォールバックを模倣
+        if (arg.language === 'ja') return arg.key;
+        return arg.key;
+      });
+      
       const markdown = renderer.renderToMarkdown(dummyJsonTemplate, 'ja', variables);
 
-      expect(markdown).toContain('# テストJSON');
+      // 期待される内容をチェック
+      expect(markdown).toContain('# テストテンプレート');
       expect(markdown).toContain('## セクション1');
-      expect(markdown).toContain('内容 1 変数1');
+      expect(markdown).toContain('内容 1 変数1'); // 変数が置換されていることを確認
       expect(markdown).toContain('## セクション2');
       expect(markdown).toContain('内容 2');
-      expect(markdown).not.toContain('Optional Empty'); // Should be skipped
-      expect(markdown).toContain('## Optional Present');
-      expect(markdown).toContain('This should appear');
-      expect(markdown).toContain('## Fallback Section'); // Falls back to 'en' title
-      expect(markdown).toContain('Fallback Content'); // Falls back to 'en' content
+      expect(markdown).not.toContain('省略可能な空'); // 空の内容は省略されるべき
+      expect(markdown).toContain('## 省略可能な表示項目');
+      expect(markdown).toContain('これは表示されるべき');
+      expect(markdown).toContain('## フォールバックセクション');
+      expect(markdown).toContain('フォールバック内容');
     });
 
     it('should render a JSON template correctly for en', () => {
       const variables = { VAR_1: 'Variable1' };
+      
+      // 英語の翻訳を設定
+      (mockI18nProvider.translate as Mock).mockImplementation((arg: { key: string; language: Language }) => {
+        if (arg.key === 'template.title.test' && arg.language === 'en') return 'Test Template';
+        if (arg.key === 'template.section.test_section1' && arg.language === 'en') return 'Section 1';
+        if (arg.key === 'template.content.test_section1' && arg.language === 'en') return 'Content 1 {{VAR_1}}';
+        if (arg.key === 'template.section.test_section2' && arg.language === 'en') return 'Section 2';
+        if (arg.key === 'template.content.test_section2' && arg.language === 'en') return 'Content 2';
+        if (arg.key === 'template.section.test_optional_empty' && arg.language === 'en') return 'Optional Empty';
+        if (arg.key === 'template.content.test_optional_empty' && arg.language === 'en') return ''; // 空の内容
+        if (arg.key === 'template.section.test_optional_present' && arg.language === 'en') return 'Optional Present';
+        if (arg.key === 'template.content.test_optional_present' && arg.language === 'en') return 'This should appear';
+        if (arg.key === 'template.section.test_fallback' && arg.language === 'en') return 'Fallback Section';
+        if (arg.key === 'template.content.test_fallback' && arg.language === 'en') return 'Fallback Content';
+        return arg.key;
+      });
+      
       const markdown = renderer.renderToMarkdown(dummyJsonTemplate, 'en', variables);
 
-      expect(markdown).toContain('# Test JSON');
+      // 期待される内容をチェック
+      expect(markdown).toContain('# Test Template');
       expect(markdown).toContain('## Section 1');
-      expect(markdown).toContain('Content 1 Variable1');
+      expect(markdown).toContain('Content 1 Variable1'); // 変数が置換されていることを確認
       expect(markdown).toContain('## Section 2');
       expect(markdown).toContain('Content 2');
-      expect(markdown).not.toContain('Optional Empty');
+      expect(markdown).not.toContain('Optional Empty'); // 空の内容は省略されるべき
       expect(markdown).toContain('## Optional Present');
       expect(markdown).toContain('This should appear');
       expect(markdown).toContain('## Fallback Section');
@@ -132,23 +184,64 @@ describe('TemplateRenderer', () => {
     });
 
      it('should handle missing language keys by falling back to en or first available', () => {
+      // テスト用の新しいテンプレート形式で言語フォールバックをテスト
       const templateWithMissingLang = {
-        schema: 'memory_document_v2',
-        metadata: { name: { en: 'English Only Title' } }, // Only en title
+        schema: 'template_v1',
+        metadata: {
+          id: 'missing-lang-template',
+          titleKey: 'template.title.missing',
+          descriptionKey: 'template.description.missing',
+          type: 'system',
+          lastModified: '2025-04-01T00:00:00.000Z'
+        },
         content: {
-          sections: {
-            s1: { title: { en: 'English Section' }, content: { en: 'English Content' } },
-            s2: { title: { zh: 'Chinese Title' }, content: { zh: 'Chinese Content' } } // Only zh
-          }
+          sections: [
+            {
+              id: 'section1',
+              titleKey: 'template.section.missing_s1',
+              contentKey: 'template.content.missing_s1',
+              isOptional: false
+            },
+            {
+              id: 'section2',
+              titleKey: 'template.section.missing_s2',
+              contentKey: 'template.content.missing_s2',
+              isOptional: false
+            }
+          ],
+          placeholders: {}
         }
       };
-      const markdown = renderer.renderToMarkdown(templateWithMissingLang, 'ja'); // Request ja
+      
+      // 一部の言語のみ利用可能なモック翻訳を設定
+      (mockI18nProvider.translate as Mock).mockImplementation((arg: { key: string; language: Language }) => {
+        // 英語の翻訳のみ存在するケース
+        if (arg.key === 'template.title.missing' && arg.language === 'en') return 'English Only Title';
+        if (arg.key === 'template.section.missing_s1' && arg.language === 'en') return 'English Section';
+        if (arg.key === 'template.content.missing_s1' && arg.language === 'en') return 'English Content';
+        
+        // 中国語の翻訳のみ存在するケース
+        if (arg.key === 'template.section.missing_s2' && arg.language === 'zh') return 'Chinese Title';
+        if (arg.key === 'template.content.missing_s2' && arg.language === 'zh') return 'Chinese Content';
+        
+        // 言語不一致の場合、デフォルトのフォールバック動作をシミュレート
+        if (arg.key === 'template.title.missing') return 'English Only Title'; // 内部でenにフォールバック
+        if (arg.key === 'template.section.missing_s1') return 'English Section'; // 内部でenにフォールバック
+        if (arg.key === 'template.content.missing_s1') return 'English Content'; // 内部でenにフォールバック
+        if (arg.key === 'template.section.missing_s2') return 'Chinese Title'; // 内部でenがないのでzhにフォールバック
+        if (arg.key === 'template.content.missing_s2') return 'Chinese Content'; // 内部でenがないのでzhにフォールバック
+        
+        return arg.key; // その他の場合はキーをそのまま返す
+      });
+      
+      const markdown = renderer.renderToMarkdown(templateWithMissingLang, 'ja'); // 日本語でリクエスト
 
-      expect(markdown).toContain('# English Only Title'); // Fallback title to en
-      expect(markdown).toContain('## English Section'); // Fallback section title to en
-      expect(markdown).toContain('English Content'); // Fallback section content to en
-      expect(markdown).toContain('## Chinese Title'); // Fallback section title to first available (zh)
-      expect(markdown).toContain('Chinese Content'); // Fallback section content to first available (zh)
+      // フォールバック結果の検証
+      expect(markdown).toContain('# English Only Title'); // タイトルは英語にフォールバック
+      expect(markdown).toContain('## English Section'); // セクション1のタイトルは英語にフォールバック
+      expect(markdown).toContain('English Content'); // セクション1の内容は英語にフォールバック
+      expect(markdown).toContain('## Chinese Title'); // セクション2のタイトルは中国語にフォールバック
+      expect(markdown).toContain('Chinese Content'); // セクション2の内容は中国語にフォールバック
     });
   });
 

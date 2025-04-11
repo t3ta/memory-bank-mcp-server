@@ -1,0 +1,109 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-template-ts-active-context",
+    "title": "Active Context for feature/template-ts",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [],
+    "createdAt": "2025-04-11T11:46:58.120Z",
+    "lastModified": "2025-04-11T12:12:05.840Z"
+  },
+  "content": {
+    "current_task": "テンプレート定義ディレクトリの作成とテンプレート実装",
+    "relevant_files": [
+      "/packages/mcp/src/templates/json/*.json",
+      "/packages/mcp/src/templates/types.ts",
+      "/packages/schemas/src/**/*",
+      "/packages/mcp/src/infrastructure/templates/JsonTemplateLoader.ts",
+      "/packages/mcp/src/infrastructure/templates/interfaces/ITemplateLoader.ts",
+      "/packages/mcp/src/infrastructure/templates/TeplateRenderer.ts"
+    ],
+    "recent_decisions": [
+      {
+        "id": "ts-template-strategy",
+        "description": "テンプレートをTypeScriptに移行し、メモリ内定義を優先して読み込む戦略を採用する",
+        "rationale": "CI環境でのテストパス解決問題を解消し、型安全性を向上させるため",
+        "date": "2025-04-11T12:00:00.000Z"
+      },
+      {
+        "id": "template-naming-convention",
+        "description": "テンプレート変数名は[templateId]Templateとする（例：rulesTemplate）",
+        "rationale": "IDからの変換ロジックを明確にし、一貫性を保つため",
+        "date": "2025-04-11T12:30:00.000Z"
+      },
+      {
+        "id": "backward-compatibility",
+        "description": "TypeScript定義優先だが、従来のJSONファイル読み込みもフォールバックとして残す",
+        "rationale": "既存コードとの互換性を保ち、段階的な移行を可能にするため",
+        "date": "2025-04-11T12:45:00.000Z"
+      },
+      {
+        "id": "schema-integration",
+        "description": "テンプレート型定義を@memory-bank/schemasパッケージに移動し、一元管理する",
+        "rationale": "スキーマとテンプレートの型定義を一元管理し、二重管理のリスクを低減するため",
+        "date": "2025-04-11T14:10:00.000Z"
+      },
+      {
+        "id": "language-type-dual-location",
+        "description": "Language型は両方のパッケージに定義し、循環参照を避ける",
+        "rationale": "スキーマパッケージに定義しつつ、MCPパッケージ内で独立しても使えるようにするため",
+        "date": "2025-04-11T12:28:00.000Z"
+      }
+    ],
+    "considerations": [
+      {
+        "id": "filename-typo",
+        "description": "TeplateRenderer.ts のファイル名にタイポがあるが、今回の変更スコープでは修正せず型定義のみ更新する",
+        "status": "deferred"
+      },
+      {
+        "id": "json-file-cleanup",
+        "description": "TypeScript移行完了後、不要になったJSONファイルの扱いをどうするか",
+        "status": "open"
+      },
+      {
+        "id": "template-id-conversion",
+        "description": "テンプレートIDからTypeScript変数名への変換ロジックのエッジケース対応",
+        "status": "resolved"
+      },
+      {
+        "id": "language-type-location",
+        "description": "Language型の定義場所をどうするか（スキーマパッケージに移動するか、MCPパッケージに残すか）",
+        "status": "resolved"
+      },
+      {
+        "id": "schema-versioning",
+        "description": "テンプレート型定義のバージョニング戦略をどうするか",
+        "status": "open"
+      }
+    ],
+    "next_steps": [
+      {
+        "id": "build-schema-package",
+        "description": "スキーマパッケージのビルドとテンプレート型定義の動作確認",
+        "priority": "high"
+      },
+      {
+        "id": "build-mcp-package",
+        "description": "MCPパッケージのビルドと型参照の動作確認",
+        "priority": "high"
+      },
+      {
+        "id": "setup-template-directory",
+        "description": "テンプレート定義ディレクトリの作成と初期セットアップ",
+        "priority": "high"
+      },
+      {
+        "id": "implement-rules-template",
+        "description": "rulesテンプレートのTypeScript実装",
+        "priority": "medium"
+      },
+      {
+        "id": "extend-template-loader",
+        "description": "JsonTemplateLoaderの拡張実装",
+        "priority": "medium"
+      }
+    ]
+  }
+}

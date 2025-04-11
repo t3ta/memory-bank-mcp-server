@@ -124,7 +124,7 @@ export class FileTemplateRepository implements ITemplateRepository {
     language: Language,
     _variables?: Record<string, string> // Keep variables for interface consistency
   ): Promise<Record<string, any>> { // Return type is a generic JSON object
-    const template = await this.getTemplate(id);
+    let template = await this.getTemplate(id);
 
     if (!template) {
       throw new Error(`Template not found: ${id}`);

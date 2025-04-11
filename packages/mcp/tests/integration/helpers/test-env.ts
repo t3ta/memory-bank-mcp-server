@@ -37,13 +37,27 @@ export async function setupTestEnv(): Promise<TestEnv> {
   const branchMemoryPath = path.join(docRoot, 'branch-memory-bank');
   const globalMemoryPath = path.join(docRoot, 'global-memory-bank');
 
-  // Define source paths relative to this file's location using import.meta.url
+  // Use absolute path based on this file's location
   const currentFilePath = fileURLToPath(import.meta.url);
-  // Go up 4 levels from packages/mcp/tests/integration/helpers to reach the project root
+  // Current file is at: packages/mcp/tests/integration/helpers/test-env.ts
+  // So we need to go up 4 levels to reach the project root
   const projectRoot = path.resolve(path.dirname(currentFilePath), '../../../../');
-  logger.debug(`[setupTestEnv] Resolved project root: ${projectRoot}`); // Log resolved project root
+  logger.debug(`[setupTestEnv] Resolved project root: ${projectRoot}`);
+  logger.debug(`[setupTestEnv] Current file path: ${currentFilePath}`);
+  logger.debug(`[setupTestEnv] Current directory: ${path.dirname(currentFilePath)}`);
+  
+  // We know our templates are at packages/mcp/src/templates/json
+  // But based on our projectRoot, we need to figure out if that's already included
+  // Let's create the path directly from our current file location
+  const srcTemplatesJsonDir = path.resolve(path.dirname(currentFilePath), '../../../src/templates/json');
+  logger.debug(`[setupTestEnv] Template source path: ${srcTemplatesJsonDir}`);
+  
+  // Original paths for copying from actual docs directory
   const sourceTranslationsDir = path.join(projectRoot, 'docs/translations');
-  const sourceTemplatesJsonDir = path.join(projectRoot, 'docs/templates/json'); // Correct path to actual templates
+  
+  // Set NODE_ENV to 'test' for proper environment configuration
+  process.env.NODE_ENV = 'test';
+  logger.debug(`[setupTestEnv] Set NODE_ENV to: ${process.env.NODE_ENV}`);
 
   // Define target paths within temp docRoot
   const targetTranslationsDir = path.join(docRoot, 'translations');
@@ -87,20 +101,141 @@ export async function setupTestEnv(): Promise<TestEnv> {
       logger.warn(`Source translations directory not found: ${sourceTranslationsDir}`);
     }
 
-    // Copy templates/json files (likely contains rules.json or rules-*.json)
-    if (await fs.pathExists(sourceTemplatesJsonDir)) {
-      logger.debug(`Source templates/json directory exists: ${sourceTemplatesJsonDir}`);
-      await fs.copy(sourceTemplatesJsonDir, targetTemplatesJsonDir);
-      logger.debug(`Copied templates/json from ${sourceTemplatesJsonDir} to ${targetTemplatesJsonDir}`);
-      // Verify copy by listing target directory contents
-      try {
-        const copiedFiles = await fs.readdir(targetTemplatesJsonDir);
-        logger.debug(`Contents of target templates/json directory: ${copiedFiles.join(', ')}`);
-      } catch (listError) {
-        logger.error(`Failed to list target templates/json directory: ${targetTemplatesJsonDir}`, listError);
-      }
+    // Create target directory and set path variables
+    await fs.ensureDir(targetTemplatesJsonDir);
+    const targetRulesPath = path.join(targetTemplatesJsonDir, 'rules.json');
+    
+    // Copy from src/templates/json directory only (as requested)
+    if (await fs.pathExists(srcTemplatesJsonDir)) {
+      logger.debug(`Source src/templates/json directory exists: ${srcTemplatesJsonDir}`);
+      await fs.copy(srcTemplatesJsonDir, targetTemplatesJsonDir);
+      logger.debug(`Copied templates/json from src ${srcTemplatesJsonDir} to ${targetTemplatesJsonDir}`);
     } else {
-      logger.warn(`Source templates/json directory not found: ${sourceTemplatesJsonDir}`);
+      logger.error(`Source src/templates/json directory not found: ${srcTemplatesJsonDir}. This is required for tests.`);
+      throw new Error(`Source templates directory not found: ${srcTemplatesJsonDir}`);
+    }
+    
+    // Create template files if they don't exist
+  if (!await fs.pathExists(targetRulesPath)) {
+    logger.debug('Creating dummy rules files for testing');
+    
+    // Generate dummy rules in template_v1 format
+    const dummyRulesContent = JSON.stringify({
+      schema: "template_v1",
+      metadata: {
+        id: "rules",
+        titleKey: "template.title.rules",
+        descriptionKey: "template.description.rules",
+        type: "system",
+        lastModified: new Date().toISOString()
+      },
+      content: {
+        sections: [
+          {
+            id: "dummySection",
+            titleKey: "template.section.dummy",
+            contentKey: "template.content.dummy",
+            isOptional: false
+          }
+        ],
+        placeholders: {}
+      }
+    }, null, 2);
+
+    // Generate language-specific rule files
+    const dummyRulesEnContent = JSON.stringify({
+      schema: "template_v1",
+      metadata: {
+        id: "rules-en",
+        titleKey: "template.title.rules",
+        descriptionKey: "template.description.rules",
+        type: "system",
+        lastModified: new Date().toISOString()
+      },
+      content: {
+        sections: [
+          {
+            id: "dummySection",
+            titleKey: "template.section.dummy",
+            contentKey: "template.content.dummy",
+            isOptional: false
+          }
+        ],
+        placeholders: {}
+      }
+    }, null, 2);
+
+    const dummyRulesJaContent = JSON.stringify({
+      schema: "template_v1",
+      metadata: {
+        id: "rules-ja",
+        titleKey: "template.title.rules",
+        descriptionKey: "template.description.rules",
+        type: "system",
+        lastModified: new Date().toISOString()
+      },
+      content: {
+        sections: [
+          {
+            id: "dummySection",
+            titleKey: "template.section.dummy",
+            contentKey: "template.content.dummy",
+            isOptional: false
+          }
+        ],
+        placeholders: {}
+      }
+    }, null, 2);
+
+    const dummyRulesZhContent = JSON.stringify({
+      schema: "template_v1",
+      metadata: {
+        id: "rules-zh",
+        titleKey: "template.title.rules",
+        descriptionKey: "template.description.rules",
+        type: "system",
+        lastModified: new Date().toISOString()
+      },
+      content: {
+        sections: [
+          {
+            id: "dummySection",
+            titleKey: "template.section.dummy",
+            contentKey: "template.content.dummy",
+            isOptional: false
+          }
+        ],
+        placeholders: {}
+      }
+    }, null, 2);
+
+    // Create the files
+    await fs.outputFile(path.join(targetTemplatesJsonDir, 'rules.json'), dummyRulesContent, 'utf-8');
+    await fs.outputFile(path.join(targetTemplatesJsonDir, 'rules-en.json'), dummyRulesEnContent, 'utf-8');
+    await fs.outputFile(path.join(targetTemplatesJsonDir, 'rules-ja.json'), dummyRulesJaContent, 'utf-8');
+    await fs.outputFile(path.join(targetTemplatesJsonDir, 'rules-zh.json'), dummyRulesZhContent, 'utf-8');
+    
+    // Duplicate in translations directory for good measure
+    await fs.ensureDir(targetTranslationsDir);
+    await fs.outputFile(path.join(targetTranslationsDir, 'rules.json'), dummyRulesContent, 'utf-8');
+    await fs.outputFile(path.join(targetTranslationsDir, 'rules-en.json'), dummyRulesEnContent, 'utf-8');
+    await fs.outputFile(path.join(targetTranslationsDir, 'rules-ja.json'), dummyRulesJaContent, 'utf-8');
+    await fs.outputFile(path.join(targetTranslationsDir, 'rules-zh.json'), dummyRulesZhContent, 'utf-8');
+    
+    logger.debug('Dummy rules files created successfully');
+  }
+    
+    // Verify final contents of the templates directory
+    try {
+      const copiedFiles = await fs.readdir(targetTemplatesJsonDir);
+      logger.debug(`Final contents of target templates/json directory: ${copiedFiles.join(', ')}`);
+      
+      // Check specifically for rules.json which is required for tests
+      if (!copiedFiles.includes('rules.json')) {
+        logger.error('Critical template file rules.json is missing!');
+      }
+    } catch (listError) {
+      logger.error(`Failed to list target templates/json directory: ${targetTemplatesJsonDir}`, listError);
     }
   } catch (copyError) {
     logger.error('Error copying initial docs files to temp directory:', copyError);
