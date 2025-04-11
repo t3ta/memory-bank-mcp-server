@@ -1,15 +1,15 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import type { Mock } from 'vitest';
-import { DocumentController } from '../../../../../src/interface/controllers/DocumentController.js';
-import { ReadBranchDocumentUseCase } from '../../../../../src/application/usecases/branch/ReadBranchDocumentUseCase.js';
-import { WriteBranchDocumentUseCase } from '../../../../../src/application/usecases/branch/WriteBranchDocumentUseCase.js';
-import { ReadGlobalDocumentUseCase } from '../../../../../src/application/usecases/global/ReadGlobalDocumentUseCase.js';
-import { WriteGlobalDocumentUseCase } from '../../../../../src/application/usecases/global/WriteGlobalDocumentUseCase.js';
-import { DocumentRepositorySelector } from '../../../../../src/application/services/DocumentRepositorySelector.js';
-import { MCPResponsePresenter } from '../../../../../src/interface/presenters/MCPResponsePresenter.js';
-import { BranchInfo } from '../../../../../src/domain/entities/BranchInfo.js';
-import { ApplicationError } from '../../../../../src/shared/errors/ApplicationError.js';
-import { BaseError } from '../../../../../src/shared/errors/BaseError.js';
+import { DocumentController } from '../../../../src/interface/controllers/DocumentController.js';
+import { ReadBranchDocumentUseCase } from '../../../../src/application/usecases/branch/ReadBranchDocumentUseCase.js';
+import { WriteBranchDocumentUseCase } from '../../../../src/application/usecases/branch/WriteBranchDocumentUseCase.js';
+import { ReadGlobalDocumentUseCase } from '../../../../src/application/usecases/global/ReadGlobalDocumentUseCase.js';
+import { WriteGlobalDocumentUseCase } from '../../../../src/application/usecases/global/WriteGlobalDocumentUseCase.js';
+// import { DocumentRepositorySelector } from '../../../../src/application/services/DocumentRepositorySelector.js';
+import { MCPResponsePresenter } from '../../../../src/interface/presenters/MCPResponsePresenter.js';
+import { BranchInfo } from '../../../../src/domain/entities/BranchInfo.js';
+import { ApplicationError } from '../../../../src/shared/errors/ApplicationError.js';
+import { BaseError } from '../../../../src/shared/errors/BaseError.js';
 
 describe('DocumentController', () => {
   // Mock use cases
@@ -29,10 +29,10 @@ describe('DocumentController', () => {
     execute: vi.fn(),
   } as unknown as WriteGlobalDocumentUseCase;
 
-  // Mock repository selector
-  const mockRepositorySelector = {
-    getRepository: vi.fn(),
-  } as unknown as DocumentRepositorySelector;
+  // // Mock repository selector
+  // const mockRepositorySelector = {
+  //   getRepository: vi.fn(),
+  // } as unknown as DocumentRepositorySelector;
 
   // Mock presenter
   const mockPresenter = {
@@ -50,7 +50,7 @@ describe('DocumentController', () => {
       mockWriteBranchDocumentUseCase,
       mockReadGlobalDocumentUseCase,
       mockWriteGlobalDocumentUseCase,
-      mockRepositorySelector,
+      // mockRepositorySelector,
       mockPresenter
     );
   });

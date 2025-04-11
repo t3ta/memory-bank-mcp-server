@@ -140,11 +140,20 @@ export class DocumentController {
         return this.presenter.presentSuccess(result.document);
       } else if (scope === 'branch') {
         // Check if branch name is required but not provided
-        // For integration test compatibility: we always throw directly here
-        // The test explicitly expects an error to be thrown
+        // For integration test compatibility: we should throw directly here
+        // But only when isProjectMode is false (auto-detect should work in project mode)
         if (!branchName) {
-          // Always throw for test consistency
-          throw new Error('Branch name is required when not running in project mode');
+          if (this.configProvider) {
+            // Get the config to check if we're in project mode
+            const config = this.configProvider.getConfig();
+            if (!config.isProjectMode) {
+              // Only throw if we're not in project mode
+              throw new Error('Branch name is required when not running in project mode');
+            }
+          } else {
+            // If configProvider is not available, always throw error for missing branch name
+            throw new Error('Branch name is required when not running in project mode');
+          }
         }
         
         // Write to branch memory bank
