@@ -4,15 +4,21 @@
  */
 import path from 'node:path';
 import * as fs from 'fs';
-// 具体的な型が定義されるまでの暫定対応としてRecordを使用
-type JsonTemplate = Record<string, unknown>;
-const validateJsonTemplate = (data: Record<string, unknown>): Record<string, unknown> => data; // Dummy validator
-type Language = 'en' | 'ja' | 'zh';
+
+// 型定義を更新
+import { Template } from '@memory-bank/schemas/templates';
+// テンプレート定義をインポート
+import * as templateDefinitions from '../../templates/definitions/index.js';
+
 import { IFileSystemService } from '../storage/interfaces/IFileSystemService.js';
 import { II18nProvider } from '../i18n/interfaces/II18nProvider.js';
 import { TemplateRenderer } from './TeplateRenderer.js';
 import { ITemplateLoader } from './interfaces/ITemplateLoader.js';
 import { logger } from '../../shared/utils/logger.js';
+
+// 型エイリアスの更新
+type JsonTemplate = Template;
+const validateJsonTemplate = (data: Record<string, unknown>): Template => data as Template; // 暫定対応を継続
 
 /**
  * Implementation of ITemplateLoader for JSON templates
@@ -62,13 +68,31 @@ export class JsonTemplateLoader implements ITemplateLoader {
     return defaultPath;
   }
 
-  // Legacy directory method removed
+  /**
+   * テンプレートIDをTypeScript変数名に変換
+   * 例: 'rules' → 'rulesTemplate'
+   * 例: 'active-context' → 'activeContextTemplate'
+   */
+  private getTypeScriptTemplateName(templateId: string): string {
+    return `${templateId.replace(/-+/g, '').replace(/([a-z])-([a-z])/g, (_, p1, p2) => p1 + p2.toUpperCase())}Template`;
+  }
 
   /**
    * Implements ITemplateLoader.loadJsonTemplate
    */
   async loadJsonTemplate(templateId: string): Promise<JsonTemplate> {
-    // Get template path from src directory only
+    // 1. メモリ内の定義をチェック
+    const tsTemplateName = this.getTypeScriptTemplateName(templateId);
+    
+    // @ts-ignore - インデックスシグネチャが型システム上は定義されていないため
+    if (templateDefinitions[tsTemplateName]) {
+      // @ts-ignore
+      logger.debug(`Found in-memory template '${templateId}' as '${tsTemplateName}'`);
+      // @ts-ignore
+      return templateDefinitions[tsTemplateName];
+    }
+    
+    // 2. 次にファイルシステムをチェック (後方互換性のため)
     const templatePath = path.join(this.getJsonTemplatesDirectory(), `${templateId}.json`);
     
     logger.debug(`Trying to load template '${templateId}' from path: ${templatePath}`);
@@ -103,7 +127,7 @@ export class JsonTemplateLoader implements ITemplateLoader {
    */
   async getMarkdownTemplate(
     templateId: string,
-    language: Language,
+    language: string,
     variables?: Record<string, string>
   ): Promise<string> {
     // Check if language is supported
@@ -124,13 +148,18 @@ export class JsonTemplateLoader implements ITemplateLoader {
     }
   }
 
-  // loadLegacyTemplate method removed
-
   /**
    * Implements ITemplateLoader.templateExists
    */
   async templateExists(templateId: string): Promise<boolean> {
-    // Only check in src directory
+    // 1. メモリ内テンプレートをチェック
+    const tsTemplateName = this.getTypeScriptTemplateName(templateId);
+    // @ts-ignore
+    if (templateDefinitions[tsTemplateName]) {
+      return true;
+    }
+    
+    // 2. JSONファイルをチェック
     const templatePath = path.join(this.getJsonTemplatesDirectory(), `${templateId}.json`);
     
     try {
@@ -140,6 +169,4 @@ export class JsonTemplateLoader implements ITemplateLoader {
       return false;
     }
   }
-// getLegacyTemplatePath method removed
 }
-// Remove extra closing bracket
