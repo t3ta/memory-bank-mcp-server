@@ -143,7 +143,6 @@ export async function registerInfrastructureServices(
       translationsDir = path.join(projectRoot, 'packages/mcp/dist/infrastructure/i18n/translations');
       logger.debug(`Using standard path for translations: ${translationsDir}`);
     }
-    logger.debug(`Using standard path for translations: ${translationsDir}`);
     
     logger.debug(`[DI] Initializing i18nRepository with translationsDir: ${translationsDir}`);
     const { FileI18nRepository } = await import('../../infrastructure/i18n/FileI18nRepository.js');
