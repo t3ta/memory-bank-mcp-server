@@ -3,6 +3,7 @@
  * Loads and processes JSON templates with internationalization support
  */
 import path from 'node:path';
+import * as fs from 'fs';
 // 具体的な型が定義されるまでの暫定対応としてRecordを使用
 type JsonTemplate = Record<string, unknown>;
 const validateJsonTemplate = (data: Record<string, unknown>): Record<string, unknown> => data; // Dummy validator
@@ -38,14 +39,27 @@ export class JsonTemplateLoader implements ITemplateLoader {
    * Gets the JSON templates directory path
    */
   private getJsonTemplatesDirectory(): string {
-    // Get from current file's location for more consistent results
-    const currentFilePath = __dirname;
-    // 上の階層に上がって src/templates/json を見つける
-    const srcPath = path.resolve(currentFilePath, '../../../templates/json');
+    // For CI and test compatibility, we need to check multiple paths
+    const possiblePaths = [
+      // Development path for src directory
+      path.join(process.cwd(), 'packages/mcp/src/templates/json'),
+      // Test environment often uses docRoot/templates/json
+      path.join(process.cwd(), 'src/templates/json'),
+      // Direct path for tests or when running in dist
+      path.join(process.cwd(), 'templates/json')
+    ];
     
-    logger.debug(`Using template path (from __dirname): ${srcPath}`);
-    
-    return srcPath;
+    for (const pathToCheck of possiblePaths) {
+      if (fs.existsSync(pathToCheck)) {
+        logger.debug(`Found valid template path: ${pathToCheck}`);
+        return pathToCheck;
+      }
+    }
+
+    // Default to the primary path if none found
+    const defaultPath = path.join(process.cwd(), 'packages/mcp/src/templates/json');
+    logger.debug(`Using default template path: ${defaultPath}`);
+    return defaultPath;
   }
 
   // Legacy directory method removed

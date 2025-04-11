@@ -12,6 +12,7 @@ import { WriteDocumentUseCase } from '../../application/usecases/common/WriteDoc
 import { BranchResolverService } from '../../application/services/BranchResolverService.js';
 import { DocumentRepositorySelector } from '../../application/services/DocumentRepositorySelector.js';
 import path from 'node:path';
+import * as fs from 'fs';
 import { IndexService } from '../../infrastructure/index/IndexService.js';
 import { IIndexService } from '../../infrastructure/index/interfaces/IIndexService.js';
 import { FileSystemJsonDocumentRepository } from '../../infrastructure/repositories/file-system/FileSystemJsonDocumentRepository.js';
@@ -393,9 +394,29 @@ export async function registerApplicationServices(container: DIContainer): Promi
     // const configProvider = await container.get<IConfigProvider>('configProvider');
     let templateBasePath: string;
     
-    // Only use dist path for templates
-    const projectRoot = process.cwd();
-    templateBasePath = path.join(projectRoot, 'packages/mcp/dist/templates/json');
+    // For CI and test compatibility, we need to check multiple paths
+    const possiblePaths = [
+      // Development path for src directory 
+      path.join(process.cwd(), 'packages/mcp/src/templates/json'),
+      // Test environment often uses docRoot/templates/json
+      path.join(process.cwd(), 'src/templates/json'),
+      // Direct path for tests (docRoot/templates/json)
+      path.join(process.cwd(), 'templates/json')
+    ];
+    
+    // Try to find a valid path that exists
+    for (const pathToCheck of possiblePaths) {
+      if (fs.existsSync(pathToCheck)) {
+        templateBasePath = pathToCheck;
+        logger.debug(`Found valid template path: ${templateBasePath}`);
+        break;
+      }
+    }
+    
+    // If no valid path found, use the default
+    if (!templateBasePath) {
+      templateBasePath = path.join(process.cwd(), 'packages/mcp/src/templates/json');
+    }
     logger.debug(`Using standard path for templates: ${templateBasePath}`);
     
     logger.debug(`Template base path resolved to: ${templateBasePath}`);
