@@ -1,0 +1,31 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "template-ts-implementation-log",
+    "title": "テンプレートTS化の実装ステップログ",
+    "documentType": "implementation_log",
+    "path": "implementation-steps-log.json",
+    "tags": [],
+    "lastModified": "2025-04-11T12:10:36.282Z"
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "実装開始",
+        "content": "テンプレートのTypeScript化とスキーマパッケージへの型定義移行を開始します。\n\n実施時刻: 2025-04-11T12:10:00.000Z"
+      },
+      {
+        "title": "Step 1: スキーマパッケージにテンプレート型定義モジュールを追加",
+        "content": "### 作業内容\n\n1. `@memory-bank/schemas/src/templates` ディレクトリを作成\n2. `@memory-bank/schemas/src/templates/index.ts` ファイルを作成して型定義を移植\n3. `@memory-bank/schemas/src/index.ts` を更新してテンプレートモジュールをエクスポート\n4. `@memory-bank/schemas/package.json` のexportsを更新してテンプレートモジュールを公開\n\n### 作業結果\n\n新しいファイル構造：\n```\n/packages/schemas/src/\n  ├── templates/\n  │   └── index.ts  (新規: テンプレート型定義)\n  ├── index.ts     (更新: テンプレートモジュールのエクスポート追加)\n```\n\npackage.json exports追加：\n```json\n\"./templates\": {\n  \"import\": \"./dist/templates/index.js\",\n  \"types\": \"./dist/templates/index.d.ts\"\n}\n```\n\n### 作業完了\n- 時刻: 2025-04-11T12:22:00.000Z"
+      },
+      {
+        "title": "Step 2: MCPパッケージでスキーマパッケージの型定義を参照するよう更新",
+        "content": "### 作業内容\n\n1. `@memory-bank/mcp/src/templates/types.ts` を更新して、スキーマパッケージから型定義をインポート\n2. 既存の型定義を削除し、代わりにリダイレクトとして実装\n\n### 作業結果\n\n`@memory-bank/mcp/src/templates/types.ts` の更新内容：\n```typescript\n/**\n * テンプレート関連の型定義\n * @deprecated この型定義は@memory-bank/schemasパッケージに移動しました。今後は@memory-bank/schemas/templatesを使用してください。\n */\n\n// スキーマパッケージからの型定義をエクスポート\nexport * from '@memory-bank/schemas/templates';\n\n// 以下は過去互換性のために残しているが、非推奨\n// @deprecated 上記のimportを使用してください\n\n// Language型はドメイン固有のためここに残す\n// (schemasパッケージにも同一の定義があるが、循環参照を避けるためここにも定義)\nexport type Language = 'en' | 'ja' | 'zh';\n```\n\n### 作業完了\n- 時刻: 2025-04-11T12:25:00.000Z"
+      },
+      {
+        "title": "次のステップ",
+        "content": "### Step 3: スキーマパッケージのビルドと動作確認\n\n1. スキーマパッケージをビルドして、新しい型定義が正しく生成されることを確認\n2. MCPパッケージをビルドして、型参照が正常に機能することを確認\n\n### Step 4: テンプレート定義ディレクトリの作成\n\n1. `@memory-bank/mcp/src/templates/definitions` ディレクトリの作成\n2. `@memory-bank/mcp/src/templates/definitions/index.ts` の実装\n\n### Step 5: rulesテンプレートのTS実装\n\n1. `@memory-bank/mcp/src/templates/definitions/rules.ts` の実装\n2. スキーマパッケージからの型定義を使用したテンプレート定義"
+      }
+    ]
+  }
+}

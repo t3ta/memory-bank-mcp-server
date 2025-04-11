@@ -1,0 +1,24 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "template-ts-code-changes",
+    "title": "テンプレートTS化のコード変更詳細分析",
+    "documentType": "analysis",
+    "path": "template-ts-code-changes.json",
+    "tags": [],
+    "createdAt": "2025-04-11T13:00:00.000Z",
+    "lastModified": "2025-04-11T12:03:42.083Z"
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "概要",
+        "content": "テンプレートのTS化に関するコード変更の詳細分析です。スキーマパッケージとの統合を考慮した新しいアプローチについては「template-ts-schema-integration-plan.json」を参照してください。"
+      },
+      {
+        "title": "廃止情報",
+        "content": "⚠️ この文書は廃止されました ⚠️\n\n代わりに以下の文書を参照してください：\n- `template-ts-schema-integration-plan.json` - スキーマパッケージとの統合を考慮した新しい実装計画"
+      }
+    ]
+  }
+}
