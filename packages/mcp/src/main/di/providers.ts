@@ -128,8 +128,8 @@ export async function registerInfrastructureServices(
 
   container.registerFactory('i18nRepository', async () => {
     // Resolve absolute path from project root for built files
-    const __filename_i18n = fileURLToPath(import.meta.url);
-    const __dirname_i18n = path.dirname(__filename_i18n);
+    // Use process.cwd() instead of import.meta.url for CommonJS compatibility
+    const __dirname_i18n = process.cwd();
     // Assuming providers.ts is in dist/main/di after build
     // Assuming providers.ts is in dist/main/di after build, go up 5 levels
     const projectRoot_i18n = path.resolve(__dirname_i18n, '../../../../../'); // Corrected path depth
@@ -380,8 +380,8 @@ export async function registerApplicationServices(container: DIContainer): Promi
   container.registerFactory('templateRepository', async () => {
     logger.debug('Resolving dependencies for templateRepository...');
     // Resolve absolute path from project root for built files
-    const __filename_tmpl = fileURLToPath(import.meta.url); // Use different variable names
-    const __dirname_tmpl = path.dirname(__filename_tmpl);
+    // Use process.cwd() instead of import.meta.url for CommonJS compatibility
+    const __dirname_tmpl = process.cwd();
     // Assuming providers.ts is in dist/main/di after build, go up 5 levels
     const projectRoot_tmpl = path.resolve(__dirname_tmpl, '../../../../../'); // Corrected path depth
     const templateBasePath = path.join(projectRoot_tmpl, 'packages/mcp/dist/templates/json');
