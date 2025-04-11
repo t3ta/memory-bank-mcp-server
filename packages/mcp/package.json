@@ -1,1 +1,64 @@
-{\n  \"name\": \"@memory-bank/mcp\",\n  \"version\": \"2.4.2\",\n  \"description\": \"Memory-enabled Co-Pilot (MCP) server for managing project documentation and context\",\n  \"main\": \"dist/index.js\",\n  \"module\": \"dist/index.js\",\n  \"types\": \"dist/index.d.ts\",\n  \"type\": \"module\",\n  \"files\": [\n    \"dist\",\n    \"README.md\",\n    \"LICENSE\"\n  ],\n  \"bin\": {\n    \"memory-bank-mcp-server\": \"./dist/server.js\"\n  },\n  \"scripts\": {\n    \"build\": \"rm -f tsconfig.tsbuildinfo && tsc -p tsconfig.json\",\n    \"clean\": \"rm -rf dist\",\n    \"dev\": \"ts-node-dev --respawn --transpile-only src/index.ts\",\n    \"start\": \"node dist/index.js\",\n    \"test:unit\": \"vitest run\",\n    \"test:integration\": \"vitest run -c tests/integration/vitest.config.ts\",\n    \"test:e2e\": \"LOG_LEVEL=debug NODE_OPTIONS='--experimental-vm-modules --no-warnings' vitest run --config tests/e2e/vitest.config.ts\",\n    \"test\": \"yarn test:unit && yarn test:integration && yarn test:e2e\",\n    \"test:watch\": \"vitest\",\n    \"test:coverage\": \"vitest run --coverage\",\n    \"lint\": \"eslint . --ext .ts\",\n    \"lint:fix\": \"eslint . --ext .ts --fix\",\n    \"format\": \"prettier --write 'src/**/*.ts'\"\n  },\n  \"keywords\": [\n    \"memory-bank\",\n    \"mcp\",\n    \"co-pilot\",\n    \"documentation\",\n    \"context-management\"\n  ],\n  \"author\": \"\",\n  \"license\": \"MIT\",\n  \"dependencies\": {\n    \"@memory-bank/schemas\": \"1.0.0\",\n    \"fs-extra\": \"^11.3.0\",\n    \"rfc6902\": \"^5.1.2\",\n    \"uuid\": \"^11.1.0\",\n    \"yargs\": \"^17.7.2\",\n    \"zod\": \"^3.24.2\",\n    \"@modelcontextprotocol/sdk\": \"^0.5.0\"\n  },\n  \"devDependencies\": {\n    \"@types/fs-extra\": \"^11.0.4\",\n    \"@types/node\": \"^22.13.10\",\n    \"@types/tmp\": \"^0.2.6\",\n    \"@types/uuid\": \"^9.0.8\",\n    \"@types/yargs\": \"^17.0.33\",\n    \"tmp-promise\": \"^3.0.3\",\n    \"ts-node-dev\": \"^2.0.0\",\n    \"typescript\": \"^5.8.2\",\n    \"awilix\": \"^10.0.2\"\n  },\n  \"publishConfig\": {\n    \"access\": \"public\"\n  }\n}
+{
+  "name": "@memory-bank/mcp",
+  "version": "2.4.2",
+  "description": "Memory-enabled Co-Pilot (MCP) server for managing project documentation and context",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "bin": {
+    "memory-bank-mcp-server": "./dist/server.js"
+  },
+  "scripts": {
+    "build": "rm -f tsconfig.tsbuildinfo && tsc -p tsconfig.json",
+    "clean": "rm -rf dist",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "start": "node dist/index.js",
+    "test:unit": "vitest run",
+    "test:integration": "vitest run -c tests/integration/vitest.config.ts",
+    "test:e2e": "LOG_LEVEL=debug NODE_OPTIONS='--experimental-vm-modules --no-warnings' vitest run --config tests/e2e/vitest.config.ts",
+    "test": "yarn test:unit && yarn test:integration && yarn test:e2e",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "format": "prettier --write 'src/**/*.ts'"
+  },
+  "keywords": [
+    "memory-bank",
+    "mcp",
+    "co-pilot",
+    "documentation",
+    "context-management"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@memory-bank/schemas": "1.0.0",
+    "fs-extra": "^11.3.0",
+    "rfc6902": "^5.1.2",
+    "uuid": "^11.1.0",
+    "yargs": "^17.7.2",
+    "zod": "^3.24.2",
+    "@modelcontextprotocol/sdk": "^0.5.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^22.13.10",
+    "@types/tmp": "^0.2.6",
+    "@types/uuid": "^9.0.8",
+    "@types/yargs": "^17.0.33",
+    "tmp-promise": "^3.0.3",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.8.2",
+    "awilix": "^10.0.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
