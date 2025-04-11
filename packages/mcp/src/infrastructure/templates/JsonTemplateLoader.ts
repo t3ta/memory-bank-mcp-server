@@ -84,7 +84,7 @@ export class JsonTemplateLoader implements ITemplateLoader {
    * 例: 'active-context' → 'activeContextTemplate'
    */
   private getTypeScriptTemplateName(templateId: string): string {
-    return `${templateId.replace(/-+/g, '').replace(/([a-z])-([a-z])/g, (_, p1, p2) => p1 + p2.toUpperCase())}Template`;
+    return `${templateId.replace(/-([a-z])/g, (_, p1) => p1.toUpperCase())}Template`;
   }
 
   /**
