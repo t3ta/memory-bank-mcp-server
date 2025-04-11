@@ -1,0 +1,23 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-refactor-api-controllers-context",
+    "title": "Branch Context for feature/refactor-api-controllers",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [],
+    "createdAt": "2025-04-10T14:20:00.000Z",
+    "lastModified": "2025-04-10T14:13:31.113Z"
+  },
+  "content": {
+    "description": "feature/refactor-api-controllersブランチでは、API統合のためのコントローラーとコマンドを実装します。feature/refactor-api-helpersで実装した統合API（WriteDocumentUseCase/ReadDocumentUseCase）を使用して、write_document/read_documentコマンドを実装します。",
+    "purpose": "統合APIコントローラーの実装とwrite_document/read_documentコマンドの実装",
+    "objectives": [
+      "DocumentControllerの実装",
+      "write_documentコマンドの実装",
+      "read_documentコマンドの実装",
+      "統合コントローラー・コマンド向けのテスト作成"
+    ],
+    "additionalNotes": "このブランチは親ブランチfeature/refactor-apiの計画に基づいて作業を進めます。feature/refactor-api-helpersブランチで実装されたヘルパークラス（BranchResolverService, DocumentRepositorySelector）と統合API（WriteDocumentUseCase, ReadDocumentUseCase）を活用します。"
+  }
+}

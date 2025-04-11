@@ -1,0 +1,44 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "helpers-implementation-plan",
+    "title": "ヘルパークラス実装計画",
+    "documentType": "design",
+    "path": "design/helpers-implementation-plan.json",
+    "tags": [],
+    "createdAt": "2025-04-10T13:05:00Z",
+    "lastModified": "2025-04-10T12:53:21.986Z"
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "概要",
+        "content": "API統合（write_document、read_document）のためのヘルパークラスの実装計画を定義します。このドキュメントでは、BranchResolverServiceとDocumentRepositorySelectorの詳細な設計と実装ステップを記述します。"
+      },
+      {
+        "title": "BranchResolverService",
+        "content": "### 責務\n- ブランチ名の解決（自動検出も含む）\n- ブランチ名の検証\n- プロジェクトモードに応じた挙動の切り替え\n\n### インターフェース\n```typescript\nexport class BranchResolverService {\n  constructor(\n    private readonly gitService: IGitService,\n    private readonly configProvider: IConfigProvider\n  ) {}\n\n  /**\n   * 与えられたブランチ名を検証し、必要に応じて現在のブランチを自動検出します\n   * @param providedBranchName オプショナルなブランチ名\n   * @returns 検証済みのブランチ名\n   * @throws ApplicationError ブランチ名が無効または検出できない場合\n   */\n  async resolveBranchName(providedBranchName?: string): Promise<string>;\n}\n```\n\n### 内部実装の流れ\n1. providedBranchNameがない場合：\n   - configProviderからisProjectModeを取得\n   - プロジェクトモードの場合はgitServiceを使って現在のブランチを取得\n   - 非プロジェクトモードの場合はエラーをスロー\n2. providedBranchNameがある場合：\n   - BranchInfo.createを使用して検証\n   - 無効な場合はエラーをスロー\n3. 検証済みのブランチ名を返却\n\n### テスト計画\n- モック化するもの：IGitService、IConfigProvider\n- テストケース：\n  1. ブランチ名が提供されている場合は検証して返す\n  2. プロジェクトモードでブランチ名が省略された場合は自動検出\n  3. 非プロジェクトモードでブランチ名が省略された場合はエラー\n  4. GitServiceがエラーを投げる場合\n  5. 無効なブランチ名が提供された場合はエラー"
+      },
+      {
+        "title": "DocumentRepositorySelector",
+        "content": "### 責務\n- スコープに基づいたリポジトリの選択\n- ブランチ名の解決（BranchResolverServiceを使用）\n- 選択したリポジトリ用のアダプタの提供\n\n### インターフェース\n```typescript\nexport class DocumentRepositorySelector {\n  constructor(\n    private readonly branchRepository: IBranchMemoryBankRepository,\n    private readonly globalRepository: IGlobalMemoryBankRepository,\n    private readonly branchResolver: BranchResolverService\n  ) {}\n\n  /**\n   * スコープとブランチ名に基づいて適切なリポジトリを返します\n   * @param scope 'branch' または 'global'\n   * @param branchName ブランチスコープの場合に使用されるブランチ名（オプション）\n   * @returns リポジトリアダプタとブランチ情報（該当する場合）\n   * @throws ApplicationError スコープが無効な場合\n   */\n  async getRepository(scope: 'branch' | 'global', branchName?: string): Promise<{\n    repository: IDocumentRepository;\n    branchInfo?: BranchInfo;\n  }>;\n}\n```\n\n### 内部実装の流れ\n1. scopeの検証（'branch'または'global'）\n2. 'branch'の場合：\n   - branchResolverを使ってブランチ名を解決\n   - BranchInfo.createでブランチ情報を作成\n   - branchRepositoryを使用するアダプタを作成\n3. 'global'の場合：\n   - globalRepositoryを使用するアダプタを作成\n4. アダプタと必要に応じてブランチ情報を返却\n\n### アダプタの実装\n```typescript\nconst repository: IDocumentRepository = {\n  getDocument: async (path: DocumentPath) => {\n    // スコープに応じたrepositoryのメソッドを呼び出す\n  },\n  saveDocument: async (doc: MemoryDocument) => {\n    // スコープに応じたrepositoryのメソッドを呼び出す\n  }\n};\n```\n\n### テスト計画\n- モック化するもの：IBranchMemoryBankRepository、IGlobalMemoryBankRepository、BranchResolverService\n- テストケース：\n  1. 'branch'スコープで正しいリポジトリとブランチ情報が返却される\n  2. 'global'スコープで正しいリポジトリが返却される\n  3. 無効なスコープでエラーがスローされる\n  4. BranchResolverServiceがエラーを投げる場合は伝搬される\n  5. 返却されたアダプタが正しくリポジトリのメソッドを呼び出す"
+      },
+      {
+        "title": "IDocumentRepository インターフェース",
+        "content": "このインターフェースは既存コードにあるものを使用します。確認のために内容を記載します：\n\n```typescript\n/**\n * Common interface for document repositories (Branch and Global).\n * Defines the essential methods required by the DocumentWriterService.\n */\nexport interface IDocumentRepository {\n  /**\n   * Retrieves a document by its path.\n   * @param path The path of the document to retrieve.\n   * @returns A promise resolving to the MemoryDocument or null if not found.\n   */\n  getDocument(path: DocumentPath): Promise<MemoryDocument | null>;\n\n  /**\n   * Saves a document to the repository.\n   * Implementations should handle creation or update as necessary.\n   * Implementations are also responsible for updating any relevant indexes (like tags).\n   * @param document The MemoryDocument to save.\n   * @returns A promise resolving when the save operation is complete.\n   */\n  saveDocument(document: MemoryDocument): Promise<void>;\n}\n```"
+      },
+      {
+        "title": "テスト実装計画",
+        "content": "### 基本方針\n- Vitest（Jestと互換性のあるテストフレームワーク）を使用\n- 単体テストを先に実装し、設計の問題点を早期発見\n- モックを活用して依存コンポーネントを分離\n\n### ディレクトリ構造\n```\nsrc/application/services/\n  ├── BranchResolverService.ts\n  ├── DocumentRepositorySelector.ts\ntests/unit/application/services/\n  ├── BranchResolverService.test.ts\n  ├── DocumentRepositorySelector.test.ts\n```\n\n### テスト実装手順\n1. モックの準備（GitService、ConfigProvider、リポジトリなど）\n2. 各メソッドの正常系テストケース実装\n3. エラーケースのテスト実装\n4. エッジケースの考慮\n\n### モック作成例\n```typescript\n// GitService のモック\nconst mockGitService = {\n  getCurrentBranchName: vi.fn<() => Promise<string>>()\n};\nmockGitService.getCurrentBranchName.mockResolvedValue('feature/test');\n\n// ConfigProvider のモック\nconst mockConfigProvider = {\n  getConfig: vi.fn<() => WorkspaceConfig>()\n};\nmockConfigProvider.getConfig.mockReturnValue({\n  docsRoot: '/test/docs',\n  verbose: false,\n  language: 'en',\n  isProjectMode: true\n});\n```"
+      },
+      {
+        "title": "実装スケジュール",
+        "content": "### Day 1\n1. BranchResolverService のテスト作成\n2. BranchResolverService の実装\n3. テストの実行と修正\n\n### Day 2\n1. DocumentRepositorySelector のテスト作成\n2. DocumentRepositorySelector の実装\n3. テストの実行と修正\n\n### Day 3\n1. 両クラスの統合テスト\n2. コードレビューと修正\n3. プルリクエストの作成"
+      },
+      {
+        "title": "今後の課題",
+        "content": "1. **依存関係の考慮**: BranchResolverServiceは、DocumentRepositorySelectorに依存するが逆は不可（循環依存を避ける）\n2. **エラーハンドリングの統一**: 一貫したエラーメッセージとコードを使用\n3. **パフォーマンス**: 無駄なリポジトリ操作やブランチ名解決を避ける\n4. **テスト容易性**: モックが簡単に作成できるようにインターフェースを設計"
+      }
+    ]
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-refactor-api-helpers-progress",
+    "title": "Progress for feature/refactor-api-helpers",
+    "documentType": "progress",
+    "path": "progress.json",
+    "tags": [],
+    "createdAt": "2025-04-10T13:00:00.000Z",
+    "lastModified": "2025-04-10T13:36:36.054Z"
+  },
+  "content": {
+    "summary": "API統合に向けたヘルパークラスおよび統合APIの実装を完了し、コミットしました",
+    "status": "completed",
+    "steps": [
+      {
+        "id": "step-1",
+        "status": "completed",
+        "completedAt": "2025-04-10T12:52:00Z",
+        "description": "サブブランチの作成とメモリバンクの初期化"
+      },
+      {
+        "id": "step-2",
+        "status": "completed",
+        "completedAt": "2025-04-10T12:57:10Z",
+        "description": "BranchResolverServiceの実装と単体テスト作成"
+      },
+      {
+        "id": "step-3",
+        "status": "completed",
+        "completedAt": "2025-04-10T13:10:15Z",
+        "description": "DocumentRepositorySelectorの実装と単体テスト作成"
+      },
+      {
+        "id": "step-4",
+        "status": "completed",
+        "completedAt": "2025-04-10T13:15:00Z",
+        "description": "両ヘルパークラスの統合テスト作成と実行"
+      }
+    ],
+    "next_steps": [
+      {
+        "id": "step-5",
+        "priority": "high",
+        "description": "プルリクエストの作成と親ブランチへのマージ",
+        "estimatedCompletion": "2025-04-11"
+      }
+    ],
+    "findings": [
+      {
+        "id": "finding-3",
+        "impact": "medium",
+        "description": "BranchResolverServiceの実装では、空文字列の扱いに注意が必要。自動検出処理のバグになりうる"
+      },
+      {
+        "id": "finding-4",
+        "impact": "low",
+        "description": "DocumentRepositorySelectorのテストではモックの設定に注意が必要。as unknown asを用いたタイプキャストが必要"
+      },
+      {
+        "id": "finding-5",
+        "impact": "medium",
+        "description": "新しいヘルパークラスはDIコンテナに登録する必要がある。providers.tsに正式に登録するべき"
+      }
+    ]
+  }
+}

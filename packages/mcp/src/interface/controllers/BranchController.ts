@@ -11,6 +11,7 @@ import { DomainErrors } from '../../shared/errors/DomainError.js';
 import type { IConfigProvider } from '../../infrastructure/config/interfaces/IConfigProvider.js';
 import { ApplicationErrors } from '../../shared/errors/ApplicationError.js';
 import { BaseError } from '../../shared/errors/BaseError.js';
+import type { MCPResponse } from '../presenters/types/MCPResponse.js';
 
 /**
  * Controller for branch related operations
@@ -34,7 +35,7 @@ export class BranchController {
    * Read a branch document
    */
 
-  async readDocument(branchName: string | undefined, path: string) {
+  async readDocument(branchName: string | undefined, path: string): Promise<MCPResponse> {
     try {
       // branchName が undefined でもログにはそのまま記録される
       this.componentLogger.info('Reading branch document', { operation: 'readDocument', branchName, path });
@@ -60,8 +61,8 @@ export class BranchController {
     path: string;
     content?: Record<string, unknown> | string; // Allow object or string
     tags?: string[];
-    patches?: any[]; // Add patches parameter
-  }) {
+    patches?: Record<string, unknown>[]; // パッチオペレーションの配列
+  }): Promise<MCPResponse> {
     // Destructure params
     const { branchName, path, content, tags, patches } = params;
     try {
@@ -133,7 +134,7 @@ export class BranchController {
   /**
    * Read core files for a branch
    */
-  async readCoreFiles(branchName: string) {
+  async readCoreFiles(branchName: string): Promise<MCPResponse> {
     try {
       this.componentLogger.info('Reading branch core files', { operation: 'readCoreFiles', branchName });
       const result = await this.readBranchCoreFilesUseCase.execute({ branchName });
@@ -147,7 +148,7 @@ export class BranchController {
   /**
    * Create core files for a branch
    */
-  async createCoreFiles(branchName: string, files: Record<string, any>) {
+  async createCoreFiles(branchName: string, files: Record<string, unknown>): Promise<MCPResponse> {
     try {
       this.validateFiles(files);
       this.componentLogger.info('Creating branch core files', { operation: 'createCoreFiles', branchName });
@@ -174,7 +175,7 @@ export class BranchController {
     branchName: string;
     match?: 'and' | 'or';
     // Removed 'docs' from params type
-  }) {
+  }): Promise<MCPResponse> {
     try {
       const { tags, branchName, match } = params; // Remove docs from destructuring
       this.componentLogger.info('Searching branch documents by tags', { operation: 'searchByTags', branchName, tags, match }); // 元のログに戻す
@@ -201,7 +202,7 @@ export class BranchController {
   /**
    * Update tag index for a branch
    */
-  async updateTagIndex(branchName: string) {
+  async updateTagIndex(branchName: string): Promise<MCPResponse> {
     try {
       this.componentLogger.info('Updating tag index', { operation: 'updateTagIndex', branchName });
       await this.updateTagIndexUseCase.execute({ branchName });
@@ -215,7 +216,7 @@ export class BranchController {
   /**
    * Get recent branches
    */
-  async getRecentBranches() {
+  async getRecentBranches(): Promise<MCPResponse> {
     try {
       this.componentLogger.info('Getting recent branches', { operation: 'getRecentBranches' });
       const branches = await this.getRecentBranchesUseCase.execute({});
@@ -229,7 +230,7 @@ export class BranchController {
   /**
    * Validate files input
    */
-  private validateFiles(files: any): void {
+  private validateFiles(files: Record<string, unknown>): void {
     if (!files || typeof files !== 'object') {
       throw DomainErrors.validationError('Files must be provided as an object');
     }
@@ -238,7 +239,7 @@ export class BranchController {
   /**
    * Handle errors
    */
-  private handleError(error: unknown) {
+  private handleError(error: unknown): MCPResponse {
     if (error instanceof BaseError) {
       return this.presenter.presentError(error);
     }

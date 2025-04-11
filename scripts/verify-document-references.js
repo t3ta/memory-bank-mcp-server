@@ -51,7 +51,7 @@ function getAllJsonFiles(dir, fileList = []) {
 function fileExists(filePath) {
   try {
     return fs.existsSync(filePath);
-  } catch (err) {
+  } catch {
     return false;
   }
 }

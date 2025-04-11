@@ -5,6 +5,7 @@ import { setupTestEnv, cleanupTestEnv, createBranchDir, type TestEnv } from '../
 import { DIContainer, setupContainer } from '../../../src/main/di/providers.js'; // Import DI container and setup function
 import { WriteBranchDocumentUseCase } from '../../../src/application/usecases/branch/WriteBranchDocumentUseCase.js'; // Import real UseCase and types
 import { ReadBranchDocumentUseCase } from '../../../src/application/usecases/branch/ReadBranchDocumentUseCase.js'; // Keep Read UseCase for verification
+import { WriteDocumentUseCase } from '../../../src/application/usecases/common/WriteDocumentUseCase.js'; // Import common write document use case
 import { DomainError } from '../../../src/shared/errors/DomainError.js'; // Import specific errors for checking
 import { ApplicationError } from '../../../src/shared/errors/ApplicationError.js'; // Import specific errors for checking
 import { IGitService } from '../../../src/infrastructure/git/IGitService.js';
@@ -88,12 +89,12 @@ describe('WriteBranchDocumentUseCase Integration Tests', () => {
    const documentWriterService = new DocumentWriterService(jsonPatchService);
    container.register<DocumentWriterService>('documentWriterService', documentWriterService);
 
-   // Manually instantiate WriteBranchDocumentUseCase with mocks and real services for integration test
-   // This bypasses the potentially complex factory setup in providers.ts for focused testing
-   const branchRepository = await container.get<IBranchMemoryBankRepository>('branchMemoryBankRepository');
+   // Import the WriteDocumentUseCase from container
+   const writeDocumentUseCase = await container.get<any>('writeDocumentUseCase');
+
+   // Manually instantiate WriteBranchDocumentUseCase with the WriteDocumentUseCase
    writeUseCase = new WriteBranchDocumentUseCase(
-       branchRepository,
-       documentWriterService, // Inject the real service instance
+       writeDocumentUseCase,
        mockGitService,
        mockConfigProvider
    );

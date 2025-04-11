@@ -8,7 +8,7 @@
 import { z } from 'zod';
 
 // Utility for flexible date parsing
-export const dateStringToDate = (val: string, ctx: z.RefinementCtx) => {
+export const dateStringToDate = (val: string, ctx: z.RefinementCtx): Date | typeof z.NEVER => {
   try {
     const date = new Date(val);
     if (isNaN(date.getTime())) {
@@ -20,7 +20,7 @@ export const dateStringToDate = (val: string, ctx: z.RefinementCtx) => {
     }
     return date;
   } catch (err) {
-    console.error(`Failed to parse date: ${err}`);
+    // エラーメッセージはctx.addIssueで既に記録されるので、console.errorは不要
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: `Failed to parse date: ${val}`,

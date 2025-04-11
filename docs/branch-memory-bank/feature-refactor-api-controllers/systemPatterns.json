@@ -1,0 +1,67 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-refactor-api-controllers-system-patterns",
+    "title": "System Patterns for feature/refactor-api-controllers",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [],
+    "createdAt": "2025-04-10T14:20:00.000Z",
+    "lastModified": "2025-04-10T15:42:55.935Z"
+  },
+  "content": {
+    "patterns": [
+      {
+        "id": "pattern-1",
+        "title": "統合APIを活用したコントローラーパターン",
+        "status": "planned",
+        "context": "APIを統合する際のユースケースとコントローラーの分離設計",
+        "description": "DocumentControllerは、WriteDocumentUseCase/ReadDocumentUseCaseを利用して、スコープ（branch/global）を適切に処理するインターフェースを提供する。コマンドラインからのパラメータ解析とユースケースへの委譲を担当し、結果のフォーマットも行う。",
+        "consequences": [
+          "コマンドラインインターフェースがシンプルになる",
+          "スコープごとに異なるコマンドを使い分ける必要がなくなる",
+          "パラメータ検証とビジネスロジックの関心が分離される",
+          "テストが容易になる"
+        ],
+        "relatedDecisions": [
+          "feature/refactor-api-helpersブランチで実装されたヘルパークラスと統合APIの活用",
+          "write_document/read_documentコマンドの共通パラメータ設計"
+        ]
+      },
+      {
+        "id": "pattern-2",
+        "title": "コマンドラインパラメータのスコープ解決パターン",
+        "status": "planned",
+        "context": "ユーザーがコマンドラインからブランチかグローバルのどちらにアクセスするかを指定する際の設計",
+        "description": "コマンドラインパラメータで'scope'として明示的に「branch」または「global」を指定させる。これにより意図しないスコープへの操作を防止し、特にグローバルメモリバンクへの誤った書き込みリスクを低減する。",
+        "consequences": [
+          "意図しないスコープへの操作が防止される",
+          "コマンドは減るが必須パラメータが増える",
+          "ユーザーが明示的にスコープを意識するようになる",
+          "エラーメッセージがより具体的になる"
+        ],
+        "relatedDecisions": [
+          "スコープを必須パラメータとする設計",
+          "エラーハンドリングの設計"
+        ]
+      },
+      {
+        "id": "pattern-3",
+        "title": "スコープベースのドキュメントリポジトリ選択パターン",
+        "status": "planned",
+        "context": "ブランチとグローバルの両方のメモリバンクを統一的なインターフェースで操作する必要がある",
+        "description": "スコープパラメータ（'branch'または'global'）に基づいて適切なリポジトリを選択するヘルパークラス（DocumentRepositorySelector）を用意し、共通インターフェース（IDocumentRepository）を通じてリポジトリを操作する。これにより、コントローラーはスコープの違いを意識せずに統一的な操作が可能になる。",
+        "consequences": [
+          "コントローラーのコードが簡潔になる",
+          "新しいスコープの追加が容易になる",
+          "リポジトリ選択ロジックのテストが分離できる",
+          "コントローラーとリポジトリの依存関係が緩和される"
+        ],
+        "relatedDecisions": [
+          "DocumentRepositorySelectorクラスの作成",
+          "IDocumentRepositoryインターフェースの定義"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-refactor-api-controllers-active-context",
+    "title": "Active Context for feature/refactor-api-controllers",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [],
+    "createdAt": "2025-04-10T14:20:00.000Z",
+    "lastModified": "2025-04-10T16:59:53.388Z"
+  },
+  "content": {
+    "current_task": "E2Eテストの実装と修正",
+    "relevant_files": [
+      "../feature/refactor-api/design/api-refactoring-plan.json",
+      "../feature/refactor-api/design/api-refactoring-implementation-plan.json",
+      "../feature/refactor-api/design/api-refactoring-test-strategy.json",
+      "../feature/refactor-api-helpers/progress.json",
+      "design/document-controller-design.json",
+      "design/document-commands-design.json",
+      "implementation-plan.json",
+      "no-verify-reflections.json"
+    ],
+    "recent_decisions": [
+      {
+        "date": "2025-04-11",
+        "description": "ESLintエラーなしは受け入れ条件から除外し、代わりに「新たなエラーを増やさない」方針を採用",
+        "rationale": "既存のコードベースで多数のESLintエラーが存在するため、すべて修正するのは現実的でない"
+      },
+      {
+        "date": "2025-04-11",
+        "description": "DocumentControllerとDocumentRepositorySelectorという明確な責務分離を採用",
+        "rationale": "単一責任の原則に基づき、リポジトリ選択ロジックを専用クラスに分離することでテスト容易性と再利用性を向上させる"
+      },
+      {
+        "date": "2025-04-11",
+        "description": "write_document/read_documentコマンドではscope必須パラメータを採用",
+        "rationale": "明示的にスコープを指定することで、意図しない操作を防止し、ユーザーに選択を意識させる"
+      },
+      {
+        "date": "2025-04-10",
+        "description": "feature/refactor-api-helpersブランチの成果物を参照し、コントローラーとコマンド実装のブランチを開始",
+        "rationale": "APIリファクタリングの次のステップとして、コントローラーとコマンドの実装を行うため"
+      },
+      {
+        "date": "2025-04-10",
+        "description": "developベースでブランチを作成",
+        "rationale": "feature/refactor-api-helpersのPRがマージされる前に先行して開発を始めるため"
+      },
+      {
+        "date": "2025-04-10",
+        "description": "feature/refactor-api-helpersブランチの実装を参照しながら設計する方針を決定",
+        "rationale": "最新の統合APIの仕様を反映するため"
+      },
+      {
+        "date": "2025-04-11",
+        "description": "DocumentControllerとDocumentRepositorySelectorを実装し、軽量なアダプターパターンを用いた",
+        "rationale": "全く新しいコントローラーとリポジトリ選択ロジックを実装し、元のクラスとミックスした際の変更を最小化できるようにするため"
+      },
+      {
+        "date": "2025-04-11",
+        "description": "write_documentとread_documentコマンドを実装し、統合API用のインターフェースを提供",
+        "rationale": "既存のコマンドを残しつつ、新しいシンプルなインターフェースを提供し、後方互換性を保ちつつ改善するため"
+      },
+      {
+        "date": "2025-04-11",
+        "description": "E2Eテストを追加し、write_document/read_documentコマンドの動作確認を強化",
+        "rationale": "実運用環境に近い形でのテストを追加することで、コマンドの信頼性を向上させるため"
+      },
+      {
+        "date": "2025-04-11",
+        "description": "read_document.e2e.test.tsを実装し、読み込み機能の全テストケースを網羅",
+        "rationale": "新しいコントローラーとAPIの完全性を確保するため"
+      },
+      {
+        "date": "2025-04-11",
+        "description": "DocumentControllerに直接依存関係を渡す実装に変更",
+        "rationale": "IBranchControllerインターフェースには期待していたメソッドが実装されていなかったため"
+      },
+      {
+        "date": "2025-04-11",
+        "description": "E2Eテストを例外ベースからエラーオブジェクトベースに修正",
+        "rationale": "実装が例外を投げるんじゃなく、エラーオブジェクトを返す再設計に対応するため"
+      }
+    ]
+  }
+}

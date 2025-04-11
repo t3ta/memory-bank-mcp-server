@@ -4,8 +4,9 @@ import { renderGenericContent } from './genericRenderer';
 /**
  * Renders content for 'progress' document type.
  */
-export function renderProgressContent(content: any): string {
-    console.log("[Renderer] Rendering 'progress' type");
+export function renderProgressContent(content: Record<string, unknown>): string {
+    // Renderer trace logging
+    // console.log("[Renderer] Rendering 'progress' type");
     let mdString = '';
     try {
         if (!content || typeof content !== 'object') {
@@ -19,14 +20,14 @@ export function renderProgressContent(content: any): string {
         if (content.completionPercentage !== undefined && typeof content.completionPercentage === 'number') {
           const percentage = Math.max(0, Math.min(100, content.completionPercentage));
           const filledCount = Math.round(percentage / 10);
-          const emptyCount = 10 - filledCount;
+          const _emptyCount = 10 - filledCount; // 未使用変数
         }
 
         if (Array.isArray(content.workingFeatures) && content.workingFeatures.length > 0) {
           mdString += `### Working Features\n`;
           const displayFeatures = content.workingFeatures.slice(0, MAX_ARRAY_ITEMS);
           const remainingFeatures = content.workingFeatures.length - displayFeatures.length;
-          mdString += displayFeatures.map((feature: any) => {
+          mdString += displayFeatures.map((feature: Record<string, unknown>) => {
               const status = feature.status || 'in-progress';
               const check = status === 'completed' ? '[x]' : '[ ]';
               return `- ${check} ${feature.description || feature.id || 'N/A'} _(${status})_`;
@@ -39,8 +40,8 @@ export function renderProgressContent(content: any): string {
 
         if (Array.isArray(content.pendingImplementation) && content.pendingImplementation.length > 0) {
           mdString += `### Pending Implementation\n`;
-          const grouped: { [key: string]: any[] } = {};
-          content.pendingImplementation.forEach((item: any) => {
+          const grouped: { [key: string]: Record<string, unknown>[] } = {};
+          content.pendingImplementation.forEach((item: Record<string, unknown>) => {
               const priority = item.priority || 'medium';
               if (!grouped[priority]) grouped[priority] = [];
               grouped[priority].push(item);
@@ -51,7 +52,7 @@ export function renderProgressContent(content: any): string {
                   mdString += `**Priority: ${priority.toUpperCase()}**\n`;
                   const displayItems = grouped[priority].slice(0, MAX_ARRAY_ITEMS);
                   const remainingItems = grouped[priority].length - displayItems.length;
-                  mdString += displayItems.map((item: any) => `- ${item.description || item.id || 'N/A'}`).join('\n');
+                  mdString += displayItems.map((item: Record<string, unknown>) => `- ${item.description || item.id || 'N/A'}`).join('\n');
                    if (remainingItems > 0) {
                       mdString += `\n- ... (${remainingItems} more items)`;
                   }
@@ -65,7 +66,7 @@ export function renderProgressContent(content: any): string {
           mdString += `### Known Issues\n`;
           const displayIssues = content.knownIssues.slice(0, MAX_ARRAY_ITEMS);
           const remainingIssues = content.knownIssues.length - displayIssues.length;
-          mdString += displayIssues.map((issue: any) => {
+          mdString += displayIssues.map((issue: Record<string, unknown>) => {
               let issueStr = `- **${issue.id || 'Issue'}:** ${issue.description || 'No description'} _(Status: ${issue.status || 'open'})_`;
               if (issue.solution) {
                   issueStr += `\n  - **Solution:** ${issue.solution}`;
@@ -79,7 +80,7 @@ export function renderProgressContent(content: any): string {
         }
 
         const handledKeys = ['status', 'completionPercentage', 'workingFeatures', 'pendingImplementation', 'knownIssues'];
-        const remainingContent: any = {};
+        const remainingContent: Record<string, unknown> = {};
         for (const key in content) {
             if (Object.prototype.hasOwnProperty.call(content, key) && !handledKeys.includes(key)) {
                 remainingContent[key] = content[key];
@@ -92,7 +93,8 @@ export function renderProgressContent(content: any): string {
 
         return mdString || '_(Progress content seems empty)_';
     } catch (error) {
-        console.error(`[Renderer Error - progress] Failed to render progress content:`, error);
+        // エラーログ（デバッガーやテスト時に役立つ）
+        // console.error(`[Renderer Error - progress] Failed to render progress content:`, error);
         const errorMessage = error instanceof Error ? error.message : String(error);
         return `### Rendering Error (Progress)\n\nAn error occurred while rendering the progress content:\n\n\`\`\`\n${errorMessage}\n\`\`\`\n\n**Original Content:**\n\n\`\`\`json\n${JSON.stringify(content, null, 2)}\n\`\`\`\n`;
     }

@@ -141,5 +141,55 @@ export class MCPInMemoryClient {
       ...options
     });
   }
+
+  /**
+   * Calls the unified write_document tool to write to either branch or global memory bank.
+   * @param scope 'branch' or 'global' scope
+   * @param path Document path
+   * @param docs Path to docs directory
+   * @param options Additional options including content, patches, tags, branch, returnContent
+   */
+  async writeDocument(
+    scope: 'branch' | 'global',
+    path: string,
+    docs: string,
+    options: { 
+      content?: Record<string, unknown> | string; 
+      patches?: any[]; 
+      tags?: string[]; 
+      branch?: string;
+      returnContent?: boolean 
+    }
+  ): Promise<any> {
+    return this.callTool('write_document', {
+      scope,
+      path,
+      docs,
+      ...options
+    });
+  }
+
+  /**
+   * Calls the unified read_document tool to read from either branch or global memory bank.
+   * @param scope 'branch' or 'global' scope
+   * @param path Document path
+   * @param docs Path to docs directory
+   * @param options Additional options including branch
+   */
+  async readDocument(
+    scope: 'branch' | 'global',
+    path: string,
+    docs: string,
+    options: {
+      branch?: string;
+    } = {}
+  ): Promise<any> {
+    return this.callTool('read_document', {
+      scope,
+      path,
+      docs,
+      ...options
+    });
+  }
 }
 

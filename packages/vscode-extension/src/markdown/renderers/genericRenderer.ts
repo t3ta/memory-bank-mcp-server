@@ -1,15 +1,16 @@
+import * as vscode from 'vscode';
 import { MAX_ARRAY_ITEMS } from './common';
 
 /**
  * Renders generic content or content of unknown types.
  * Handles basic object iteration and array limiting.
  */
-export function renderGenericContent(content: any): string {
+export function renderGenericContent(content: Record<string, unknown>): string {
     let mdString = '';
     try {
         if (content && typeof content === 'object') {
             if (Array.isArray(content.sections)) {
-                content.sections.forEach((section: any) => {
+                content.sections.forEach((section: Record<string, unknown>) => {
                     if (section && typeof section === 'object' && section.title && section.content) {
                         mdString += `### ${section.title}\n\n${section.content}\n\n`;
                     }

@@ -65,7 +65,7 @@ describe('Language Domain Model', () => {
     it('should correctly compare equality using equals()', () => {
       expect(langEn1.equals(langEn2)).toBe(true); // Same language code
       expect(langEn1.equals(langJa)).toBe(false); // Different language code
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+       
       expect(langEn1.equals(null!)).toBe(false); // Comparing with null
     });
 

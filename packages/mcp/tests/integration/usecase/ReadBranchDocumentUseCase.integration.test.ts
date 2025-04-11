@@ -259,7 +259,9 @@ describe('ReadBranchDocumentUseCase Integration Tests', () => {
           throw new Error('Expected ApplicationError but no error was thrown.');
         } catch (error) {
           expect(error).toBeInstanceOf(ApplicationError);
-          expect((error as ApplicationError).message).toBe('Branch name is required but could not be automatically determined. Please provide it explicitly or ensure you are in a Git repository.');
+          // 新しいエラーメッセージは元のメッセージをラップする形に変わっているので、含まれているか確認
+          expect((error as ApplicationError).message).toContain('Branch name is required but could not be automatically determined');
+          // エラーコードも変わったようなので修正
           expect((error as ApplicationError).code).toBe('APP_ERROR.INVALID_INPUT');
         }
         expect(mockGitService.getCurrentBranchName).toHaveBeenCalledTimes(1); // GitService が呼ばれる

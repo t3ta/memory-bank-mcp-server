@@ -1,0 +1,23 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-refactor-api-helpers-context",
+    "title": "Branch Context for feature/refactor-api-helpers",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [],
+    "createdAt": "2025-04-10T13:00:00.000Z",
+    "lastModified": "2025-04-10T12:52:05.319Z"
+  },
+  "content": {
+    "description": "feature/refactor-api-helpersブランチでは、API統合（write_document/read_document）のためのヘルパークラスを実装します。このブランチでは主に以下の2つのヘルパークラスに焦点を当てます：\n\n1. BranchResolverService: ブランチ名の解決と検証を担当\n2. DocumentRepositorySelector: スコープに基づいた適切なリポジトリの選択を担当\n\nこれらのヘルパークラスは新しいAPIの基盤となり、コードの重複を減らし保守性を向上させます。",
+    "purpose": "API統合に向けたヘルパークラスの実装とテストを行い、write_document/read_documentコマンドの基盤を構築する",
+    "objectives": [
+      "ブランチ名解決ロジックを共通化したBranchResolverServiceの実装",
+      "リポジトリ選択ロジックを共通化したDocumentRepositorySelectorの実装",
+      "両クラスの単体テストの作成",
+      "既存のUseCase向けのテストユーティリティの再利用"
+    ],
+    "additionalNotes": "このブランチは親ブランチfeature/refactor-apiの計画に基づいて作業を進めます。ヘルパークラスが完成したら、次のステップとしてWriteDocumentUseCaseとReadDocumentUseCaseの実装に進みます。"
+  }
+}

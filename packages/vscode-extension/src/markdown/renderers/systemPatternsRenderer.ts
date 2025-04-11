@@ -4,8 +4,9 @@ import { renderGenericContent } from './genericRenderer';
 /**
  * Renders content for 'system_patterns' document type.
  */
-export function renderSystemPatternsContent(content: any): string {
-    console.log("[Renderer] Rendering 'system_patterns' type");
+export function renderSystemPatternsContent(content: Record<string, unknown>): string {
+    // Renderer trace logging
+    // console.log("[Renderer] Rendering 'system_patterns' type");
     let mdString = '';
     try {
          if (!content || typeof content !== 'object') {
@@ -19,7 +20,7 @@ export function renderSystemPatternsContent(content: any): string {
             const displayDecisions = content.technicalDecisions.slice(0, MAX_ARRAY_ITEMS);
             const remainingDecisions = content.technicalDecisions.length - displayDecisions.length;
 
-            displayDecisions.forEach((decision: any, index: number) => {
+            displayDecisions.forEach((decision: Record<string, unknown>, index: number) => {
                 try {
                     mdString += `**${index + 1}. ${decision.title || decision.id || 'Decision'}**\n\n`;
 
@@ -40,7 +41,7 @@ export function renderSystemPatternsContent(content: any): string {
                     if (decision.date) {
                      try {
                         mdString += `   - **Date:** ${new Date(decision.date).toLocaleDateString()}\n`;
-                     } catch(e) { /* ignore */ }
+                     } catch { /* ignore */ }
                     }
 
                     try {
@@ -58,7 +59,7 @@ export function renderSystemPatternsContent(content: any): string {
 
                     try {
                          if (Array.isArray(decision.alternatives) && decision.alternatives.length > 0) {
-                             mdString += `   - **Alternatives Considered:**\n` + decision.alternatives.map((alt: any) => `     - ${typeof alt === 'string' ? String(alt).replace(/\n/g, ' ') : JSON.stringify(alt)}`).join('\n') + '\n';
+                             mdString += `   - **Alternatives Considered:**\n` + decision.alternatives.map((alt: unknown) => `     - ${typeof alt === 'string' ? String(alt).replace(/\n/g, ' ') : JSON.stringify(alt)}`).join('\n') + '\n';
                           }
                     } catch (e) {
                          mdString += `   - **Alternatives Considered:** _Error rendering alternatives: ${e instanceof Error ? e.message : String(e)}_\n`;
@@ -79,7 +80,7 @@ export function renderSystemPatternsContent(content: any): string {
             const displayPatterns = content.implementationPatterns.slice(0, MAX_ARRAY_ITEMS);
             const remainingPatterns = content.implementationPatterns.length - displayPatterns.length;
 
-             displayPatterns.forEach((pattern: any, index: number) => {
+             displayPatterns.forEach((pattern: Record<string, unknown>, index: number) => {
                  mdString += `**${index + 1}. ${pattern.name || pattern.id || 'Pattern'}**\n\n`;
                  if (pattern.description) mdString += `   > ${pattern.description.replace(/\n/g, '\n   > ')}\n\n`;
                  mdString += '\n';
@@ -91,7 +92,7 @@ export function renderSystemPatternsContent(content: any): string {
 
         // Add any other top-level keys using generic rendering
         const handledKeys = ['technicalDecisions', 'implementationPatterns'];
-        const remainingContent: any = {};
+        const remainingContent: Record<string, unknown> = {};
          for (const key in content) {
             if (Object.prototype.hasOwnProperty.call(content, key) && !handledKeys.includes(key)) {
                 remainingContent[key] = content[key];
@@ -105,7 +106,8 @@ export function renderSystemPatternsContent(content: any): string {
 
         return mdString || '_(System patterns content seems empty)_';
     } catch (error) {
-        console.error(`[Renderer Error - system_patterns] Failed to render system patterns content:`, error);
+        // エラーログ（デバッガーやテスト時に役立つ）
+        // console.error(`[Renderer Error - system_patterns] Failed to render system patterns content:`, error);
         const errorMessage = error instanceof Error ? error.message : String(error);
         return `### Rendering Error (System Patterns)\n\nAn error occurred while rendering the system patterns content:\n\n\`\`\`\n${errorMessage}\n\`\`\`\n\n**Original Content:**\n\n\`\`\`json\n${JSON.stringify(content, null, 2)}\n\`\`\`\n`;
     }

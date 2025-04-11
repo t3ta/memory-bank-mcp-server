@@ -14,32 +14,32 @@ export class AIService {
         if (this.apiKey) {
             try {
                 this.genAI = new GoogleGenerativeAI(this.apiKey);
-                console.log('GoogleGenerativeAI client initialized successfully.');
+                vscode.window.showInformationMessage('Gemini API client initialized successfully.');
             } catch (error) {
-                console.error('Failed to initialize GoogleGenerativeAI client:', error);
+                // ユーザーにはエラーメッセージが表示されるので、console.errorは不要
                 vscode.window.showErrorMessage(`Failed to initialize Gemini API client: ${error instanceof Error ? error.message : String(error)}`);
             }
         } else {
-            console.warn('Gemini API key not found. AI features will be disabled.');
+            vscode.window.showWarningMessage('Gemini API key not found. AI features will be disabled.');
         }
 
         vscode.workspace.onDidChangeConfiguration(event => {
             if (event.affectsConfiguration('memory-bank.ai.apiKey')) {
-                console.log('Gemini API key configuration changed. Reloading key and client.');
+                // 設定変更を検出、キーをリロード
                 this.loadApiKey();
                 if (this.apiKey) {
                     try {
                         this.genAI = new GoogleGenerativeAI(this.apiKey);
-                        console.log('GoogleGenerativeAI client re-initialized successfully.');
+                        // クライアント再初期化成功、UIにもメッセージを表示
                         vscode.window.showInformationMessage('Gemini API client updated.');
                     } catch (error) {
-                        console.error('Failed to re-initialize GoogleGenerativeAI client:', error);
+                        // ユーザーにはエラーメッセージを表示済み
                         vscode.window.showErrorMessage(`Failed to update Gemini API client: ${error instanceof Error ? error.message : String(error)}`);
                         this.genAI = undefined;
                     }
                 } else {
                     this.genAI = undefined;
-                    console.warn('Gemini API key removed or invalid. AI features disabled.');
+                    vscode.window.showWarningMessage('Gemini API key removed or invalid. AI features disabled.');
                 }
             }
         });
@@ -52,9 +52,11 @@ export class AIService {
         const configuration = vscode.workspace.getConfiguration('memory-bank.ai');
         this.apiKey = configuration.get<string>('apiKey');
         if (!this.apiKey) {
-            console.warn("Configuration 'memory-bank.ai.apiKey' not found or empty.");
+            // APIキーが設定されていないため警告メッセージを表示する必要がある場合は
+            // ここでvscode.window.showWarningMessageを呼び出せるが、
+            // 他の場所で同様のメッセージが表示されるので省略
         } else {
-            console.log("Gemini API key loaded from settings.");
+            // APIキーのロード成功はログに残す必要なし（初期化成功メッセージが表示される）
         }
     }
 
@@ -79,7 +81,8 @@ export class AIService {
             return null;
         }
 
-        console.log(`Generating content with model: ${modelName}`);
+        // UI上のステータスバーなどに表示するとよいかもしれないが、
+        // コンソール出力は必要ない
         try {
             const model = this.genAI.getGenerativeModel({ model: modelName });
 
@@ -100,24 +103,25 @@ export class AIService {
 
             const response = result.response;
             if (!response) {
-                 console.error('Gemini API call failed: No response received.');
+                 // エラーメッセージはUI上に表示されるのでコンソール出力は不要
                  vscode.window.showErrorMessage('Gemini API call failed: No response received.');
                  return null;
             }
 
            if (!response.candidates || response.candidates.length === 0 || !response.candidates[0].content) {
                const blockReason = response.promptFeedback?.blockReason;
-               const safetyRatings = response.promptFeedback?.safetyRatings ?? [];
-                console.warn(`Content generation blocked. Reason: ${blockReason || 'Unknown'}. Ratings: ${JSON.stringify(safetyRatings)}`);
+               // 現在は使用していないがデバッグ時に必要かもしれないので変数名を_で始める
+               const _safetyRatings = response.promptFeedback?.safetyRatings ?? [];
+                // 詳細な理由はデバッグ時のみ必要なため、UI上のメッセージには単純化した情報のみを表示
                 vscode.window.showWarningMessage(`Content generation blocked due to safety settings. Reason: ${blockReason || 'Check Logs'}`);
                 return null;
             }
 
             const text = response.text();
-            console.log('Content generated successfully.');
+            // 成功メッセージはUI上に表示してもいいが今回は省略（テキストが戻ってくるので成功は明らか）
             return text;
         } catch (error) {
-            console.error(`Error generating content with model ${modelName}:`, error);
+            // エラーはUI上に表示されるため、コンソール出力は不要
             vscode.window.showErrorMessage(`Gemini API error: ${error instanceof Error ? error.message : String(error)}`);
             return null;
         }

@@ -1,13 +1,7 @@
 import { IUseCase } from '../../interfaces/IUseCase.js';
 import { DocumentDTO } from '../../dtos/DocumentDTO.js';
-import { IBranchMemoryBankRepository } from '../../../domain/repositories/IBranchMemoryBankRepository.js';
-import { DocumentPath } from '../../../domain/entities/DocumentPath.js';
-import { BranchInfo } from '../../../domain/entities/BranchInfo.js';
-import { DomainErrors } from '../../../shared/errors/DomainError.js';
-import { ApplicationErrors, ErrorUtils } from '../../../shared/errors/index.js';
 import { logger } from '../../../shared/utils/logger.js';
-import type { IGitService } from '../../../infrastructure/git/IGitService.js';
-import type { IConfigProvider } from '../../../infrastructure/config/interfaces/IConfigProvider.js';
+import { ReadDocumentUseCase } from '../common/ReadDocumentUseCase.js';
 
 /**
  * Input data for read branch document use case
@@ -45,14 +39,10 @@ export class ReadBranchDocumentUseCase
 
   /**
    * Constructor
-   * @param branchRepository Branch memory bank repository
-   * @param gitService Git service
-   * @param configProvider Configuration provider
+   * @param readDocumentUseCase Unified document read use case
    */
   constructor(
-    private readonly branchRepository: IBranchMemoryBankRepository,
-    private readonly gitService: IGitService,
-    private readonly configProvider: IConfigProvider
+    private readonly readDocumentUseCase: ReadDocumentUseCase
   ) {}
 
   /**
@@ -61,99 +51,16 @@ export class ReadBranchDocumentUseCase
    * @returns Promise resolving to output data
    */
   async execute(input: ReadBranchDocumentInput): Promise<ReadBranchDocumentOutput> {
-    let branchNameToUse = input.branchName;
-
-
-    if (!branchNameToUse) {
-      const config = this.configProvider.getConfig(); // ConfigProviderから設定取得
-      if (config.isProjectMode) { // プロジェクトモードかチェック
-        this.useCaseLogger.info('Branch name not provided in project mode, attempting to detect current branch...');
-        try {
-          branchNameToUse = await this.gitService.getCurrentBranchName();
-          this.useCaseLogger.info(`Current branch name automatically detected: ${branchNameToUse}`);
-        } catch (error) {
-          this.useCaseLogger.error('Failed to get current branch name', { error });
-          throw ApplicationErrors.invalidInput('Branch name is required but could not be automatically determined. Please provide it explicitly or ensure you are in a Git repository.');
-        }
-      } else {
-        // プロジェクトモードでない場合は、ブランチ名の省略はエラー
-        this.useCaseLogger.warn('Branch name omitted outside of project mode.');
-        throw ApplicationErrors.invalidInput('Branch name is required when not running in project mode.');
-      }
-    }
-
-    this.useCaseLogger.info('Executing read branch document use case', {
-      branchName: branchNameToUse,
-      documentPath: input.path
+    this.useCaseLogger.info('Delegating to ReadDocumentUseCase', {
+      path: input.path,
+      branchName: input.branchName
     });
 
-    // pathのチェックはそのまま
-    if (!input.path) {
-      throw ApplicationErrors.invalidInput('Document path is required');
-    }
-
-    return await ErrorUtils.wrapAsync(
-
-
-      this.executeInternal({ ...input, branchName: branchNameToUse! }),
-      (error) => ApplicationErrors.executionFailed(
-        'ReadBranchDocumentUseCase',
-        error instanceof Error ? error : undefined,
-
-        { input: { ...input, branchName: branchNameToUse } }
-      )
-    );
-  }
-
-  /**
-   * Internal execution logic wrapped with error handling
-   */
-
-  private async executeInternal(input: Required<ReadBranchDocumentInput>): Promise<ReadBranchDocumentOutput> {
-    const branchInfo = BranchInfo.create(input.branchName);
-    const documentPath = DocumentPath.create(input.path);
-
-    // Use branchInfo.safeName for the existence check to match filesystem structure
-    const branchExists = await this.branchRepository.exists(branchInfo.safeName);
-
-    if (!branchExists) {
-      this.useCaseLogger.warn('Branch not found', { branchName: input.branchName });
-      throw DomainErrors.branchNotFound(input.branchName);
-    }
-
-    const document = await this.branchRepository.getDocument(branchInfo, documentPath);
-
-    if (!document) {
-      this.useCaseLogger.warn('Document not found', {
-        branchName: input.branchName,
-        documentPath: input.path
-      });
-      throw DomainErrors.documentNotFound(input.path, { branchName: input.branchName });
-    }
-
-    this.useCaseLogger.debug('Document retrieved successfully', {
-      documentPath: input.path,
-      documentType: (document as any).determineDocumentType()
+    // Delegate to the new use case with scope set to 'branch'
+    return await this.readDocumentUseCase.execute({
+      scope: 'branch',
+      branch: input.branchName,
+      path: input.path
     });
-
-    // Attempt to parse the content as JSON
-    let parsedContent: string | object;
-    try {
-      parsedContent = JSON.parse(document.content);
-      this.useCaseLogger.debug('Successfully parsed document content as JSON', { documentPath: input.path });
-    } catch (parseError) {
-      // If parsing fails, keep the original string content
-      parsedContent = document.content;
-      this.useCaseLogger.debug('Failed to parse document content as JSON, returning as string', { documentPath: input.path });
-    }
-
-    return {
-      document: {
-        path: document.path.value,
-        content: parsedContent, // Return parsed object or original string
-        tags: document.tags.map((tag) => tag.value),
-        lastModified: document.lastModified.toISOString(),
-      },
-    };
   }
 }

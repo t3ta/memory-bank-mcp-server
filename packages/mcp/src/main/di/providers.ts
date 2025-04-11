@@ -4,9 +4,14 @@ export { DIContainer };
 import { fileURLToPath } from 'node:url'; // Import fileURLToPath
 import { MCPResponsePresenter } from '../../interface/presenters/MCPResponsePresenter.js';
 import { IBranchMemoryBankRepository } from '../../domain/repositories/IBranchMemoryBankRepository.js'; // Import interface
+import { IGlobalMemoryBankRepository } from '../../domain/repositories/IGlobalMemoryBankRepository.js'; // Import interface
 import { JsonPatchService } from '../../domain/jsonpatch/JsonPatchService.js'; // Import interface
 import { ReadGlobalDocumentUseCase } from '../../application/usecases/global/ReadGlobalDocumentUseCase.js';
 import { WriteGlobalDocumentUseCase } from '../../application/usecases/global/WriteGlobalDocumentUseCase.js';
+import { ReadDocumentUseCase } from '../../application/usecases/common/ReadDocumentUseCase.js';
+import { WriteDocumentUseCase } from '../../application/usecases/common/WriteDocumentUseCase.js';
+import { BranchResolverService } from '../../application/services/BranchResolverService.js';
+import { DocumentRepositorySelector } from '../../application/services/DocumentRepositorySelector.js';
 import path from 'node:path';
 import { IndexService } from '../../infrastructure/index/IndexService.js';
 import { IIndexService } from '../../infrastructure/index/interfaces/IIndexService.js';
@@ -19,6 +24,7 @@ import { ReadContextUseCase } from '../../application/usecases/common/ReadContex
 import { ReadBranchDocumentUseCase } from '../../application/usecases/branch/ReadBranchDocumentUseCase.js';
 import { WriteBranchDocumentUseCase } from '../../application/usecases/branch/WriteBranchDocumentUseCase.js';
 import { DocumentWriterService } from '../../application/services/DocumentWriterService.js'; // Import DocumentWriterService
+// import { DocumentRepositorySelector } from '../../application/services/DocumentRepositorySelector.js'; // Already imported above
 import { SearchDocumentsByTagsUseCase } from '../../application/usecases/common/SearchDocumentsByTagsUseCase.js';
 import { UpdateTagIndexUseCase } from '../../application/usecases/common/UpdateTagIndexUseCase.js';
 import { UpdateTagIndexUseCaseV2 } from '../../application/usecases/common/UpdateTagIndexUseCaseV2.js';
@@ -44,6 +50,7 @@ import { JsonResponsePresenter } from '../../interface/presenters/JsonResponsePr
 import { GlobalController } from '../../interface/controllers/GlobalController.js';
 import { BranchController } from '../../interface/controllers/BranchController.js';
 import { JsonBranchController } from '../../interface/controllers/json/JsonBranchController.js';
+import { DocumentController } from '../../interface/controllers/DocumentController.js';
 
 import { CliOptions } from '../../infrastructure/config/WorkspaceConfig.js';
 // Removed unused import: import { UseCaseFactory } from '../../factory/use-case-factory.js';
@@ -190,40 +197,31 @@ export async function registerInfrastructureServices(
  * @param container DI Container
  */
 export async function registerApplicationServices(container: DIContainer): Promise<void> {
-  container.registerFactory('readGlobalDocumentUseCase', async () => {
-    const globalRepository = await container.get<FileSystemGlobalMemoryBankRepository>(
-      'globalMemoryBankRepository'
+  // Register DocumentRepositorySelector - new version with GitService
+  container.registerFactory('documentRepositorySelector', async () => {
+    const branchRepository = await container.get<IBranchMemoryBankRepository>('branchMemoryBankRepository');
+    const globalRepository = await container.get<IGlobalMemoryBankRepository>('globalMemoryBankRepository');
+    const gitService = await container.get<IGitService>('gitService');
+    const configProvider = await container.get<IConfigProvider>('configProvider');
+    
+    return new DocumentRepositorySelector(
+      branchRepository,
+      globalRepository,
+      gitService,
+      configProvider
     );
-    return new ReadGlobalDocumentUseCase(globalRepository);
+  });
+  container.registerFactory('readGlobalDocumentUseCase', async () => {
+    const readDocumentUseCase = await container.get<ReadDocumentUseCase>('readDocumentUseCase');
+    return new ReadGlobalDocumentUseCase(readDocumentUseCase);
   });
 
   // Add missing registration for writeGlobalDocumentUseCase
   container.registerFactory('writeGlobalDocumentUseCase', async () => {
-    const globalRepository = await container.get<FileSystemGlobalMemoryBankRepository>(
-     'globalMemoryBankRepository'
-   );
-   const patchService = await container.get<JsonPatchService>('jsonPatchService'); // Resolve JsonPatchService
-   const documentWriterService = new DocumentWriterService(patchService); // Instantiate DocumentWriterService
-   return new WriteGlobalDocumentUseCase(globalRepository, documentWriterService); // Inject DocumentWriterService
+    const writeDocumentUseCase = await container.get<WriteDocumentUseCase>('writeDocumentUseCase');
+    return new WriteGlobalDocumentUseCase(writeDocumentUseCase);
   });
 
-  container.registerFactory('markdownMigrationService', async () => {
-    const mockTemplateRepository = {
-      getTemplate: async () => null,
-      getTemplateAsMarkdown: async () => '',
-      getTemplatesByType: async () => [],
-      saveTemplate: async () => false,
-      templateExists: async () => false,
-      getAllTemplateIds: async () => [],
-      getAllTemplateTypes: async () => []
-    };
-    const configProvider = await container.get<IConfigProvider>('configProvider');
-    const config = configProvider.getConfig();
-    const markdownDir = path.join(config.docsRoot, 'templates', 'markdown');
-    const backupDir = path.join(config.docsRoot, 'templates', 'backup');
-    const { MarkdownMigrationService } = await import('../../migration/MarkdownMigrationService.js');
-    return new MarkdownMigrationService(mockTemplateRepository, markdownDir, backupDir);
-  });
 
   // Register JsonPatchService implementation (using rfc6902)
   container.registerFactory('jsonPatchService', async () => {
@@ -231,29 +229,39 @@ export async function registerApplicationServices(container: DIContainer): Promi
       const { Rfc6902JsonPatchAdapter } = await import('../../domain/jsonpatch/Rfc6902JsonPatchAdapter.js');
       return new Rfc6902JsonPatchAdapter(); // Use rfc6902 adapter
   });
+  
+  // Register ヘルパークラス
+  container.registerFactory('branchResolverService', async () => {
+    const gitService = await container.get<IGitService>('gitService');
+    const configProvider = await container.get<IConfigProvider>('configProvider');
+    return new BranchResolverService(gitService, configProvider);
+  });
+  
+  // Remove old version - already registered with new structure
+  
+  // Register 新しいユースケース
+  container.registerFactory('readDocumentUseCase', async () => {
+    const repositorySelector = await container.get<DocumentRepositorySelector>('documentRepositorySelector');
+    return new ReadDocumentUseCase(repositorySelector);
+  });
+  
+  container.registerFactory('writeDocumentUseCase', async () => {
+    const repositorySelector = await container.get<DocumentRepositorySelector>('documentRepositorySelector');
+    const patchService = await container.get<JsonPatchService>('jsonPatchService');
+    const documentWriterService = new DocumentWriterService(patchService);
+    return new WriteDocumentUseCase(repositorySelector, documentWriterService);
+  });
 
   // Make the factory async and await the repository and patch service
   container.registerFactory('writeBranchDocumentUseCase', async () => {
-    const branchRepository = await container.get<IBranchMemoryBankRepository>( // Use interface type
-      'branchMemoryBankRepository'
-    );
-   const patchService = await container.get<JsonPatchService>('jsonPatchService'); // Resolve JsonPatchService
-   const gitService = await container.get<IGitService>('gitService');
-   const configProvider = await container.get<IConfigProvider>('configProvider');
-   // Instantiate DocumentWriterService
-   const documentWriterService = new DocumentWriterService(patchService);
-   // Instantiate the use case with DocumentWriterService
-   return new WriteBranchDocumentUseCase(branchRepository, documentWriterService, gitService, configProvider);
+    const writeDocumentUseCase = await container.get<WriteDocumentUseCase>('writeDocumentUseCase');
+    return new WriteBranchDocumentUseCase(writeDocumentUseCase);
   });
 
   // Add missing registration for readBranchDocumentUseCase
   container.registerFactory('readBranchDocumentUseCase', async () => {
-    const branchRepository = await container.get<FileSystemBranchMemoryBankRepository>(
-      'branchMemoryBankRepository'
-    );
-    const gitService = await container.get<IGitService>('gitService');
-    const configProvider = await container.get<IConfigProvider>('configProvider');
-    return new ReadBranchDocumentUseCase(branchRepository, gitService, configProvider);
+    const readDocumentUseCase = await container.get<ReadDocumentUseCase>('readDocumentUseCase');
+    return new ReadBranchDocumentUseCase(readDocumentUseCase);
   });
 
   container.registerFactory('readRulesUseCase', async () => {
@@ -402,6 +410,28 @@ export async function registerApplicationServices(container: DIContainer): Promi
 export async function registerInterfaceServices(container: DIContainer): Promise<void> {
   container.register('mcpResponsePresenter', new MCPResponsePresenter());
   container.register('jsonResponsePresenter', new JsonResponsePresenter());
+
+  // Register DocumentController
+  container.registerFactory('documentController', async () => {
+    const readBranchDocumentUseCase = await container.get<ReadBranchDocumentUseCase>('readBranchDocumentUseCase');
+    const writeBranchDocumentUseCase = await container.get<WriteBranchDocumentUseCase>('writeBranchDocumentUseCase');
+    const readGlobalDocumentUseCase = await container.get<ReadGlobalDocumentUseCase>('readGlobalDocumentUseCase');
+    const writeGlobalDocumentUseCase = await container.get<WriteGlobalDocumentUseCase>('writeGlobalDocumentUseCase');
+    // const repositorySelector = await container.get<DocumentRepositorySelector>('documentRepositorySelector'); // Not used in the current implementation
+    const presenter = await container.get<MCPResponsePresenter>('mcpResponsePresenter');
+    
+    const configProvider = await container.get<IConfigProvider>('configProvider');
+    
+    return new DocumentController(
+      readBranchDocumentUseCase,
+      writeBranchDocumentUseCase,
+      readGlobalDocumentUseCase,
+      writeGlobalDocumentUseCase,
+      // repositorySelector, // Not used in the current implementation
+      presenter,
+      configProvider
+    );
+  });
 
   container.registerFactory('contextController', async () => {
     const readContextUseCase = await container.get<ReadContextUseCase>('readContextUseCase');

@@ -1,0 +1,36 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "handover-notes",
+    "title": "ブランチ引継ぎ情報＆今後の作業メモ",
+    "documentType": "notes",
+    "path": "notes/handover-notes.json",
+    "tags": [],
+    "createdAt": "2025-04-10T13:00:00Z",
+    "lastModified": "2025-04-10T13:04:30.593Z"
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "現在の状態",
+        "content": "ブランチ `feature/refactor-api-helpers` では以下のタスクを完了しました：\n\n1. ブランチを作成し、メモリバンクを初期化\n2. `BranchResolverService` の設計と実装\n3. `BranchResolverService` のテスト作成と実行\n\n現在のコミット状態：\n- 最新コミット: 「feat(api): implement BranchResolverService - common class for branch name resolution」"
+      },
+      {
+        "title": "ブランチ戦略",
+        "content": "親ブランチ（`feature/refactor-api`）からの分割戦略が確定しました：\n\n1. **`feature/refactor-api-helpers`** (現在のブランチ)\n   - **目的**: APIリファクタリングの共通ヘルパークラスの実装\n   - **対象**: BranchResolverService, DocumentRepositorySelector\n   - **完結条件**: 両方のクラス実装・テスト完了\n\n2. **`feature/refactor-api-write-document`** (今後作成)\n   - **目的**: 書き込み統合API実装\n   - **対象**: WriteDocumentUseCase\n   - **完結条件**: UseCase実装・テスト完了\n\n3. **`feature/refactor-api-read-document`** (今後作成)\n   - **目的**: 読み取り統合API実装\n   - **対象**: ReadDocumentUseCase\n   - **完結条件**: UseCase実装・テスト完了\n\n4. **`feature/refactor-api-migration`** (今後作成)\n   - **目的**: 既存APIを新APIに移行\n   - **対象**: 既存のBranch/Global UseCase\n   - **完結条件**: 移行完了・全テスト通過"
+      },
+      {
+        "title": "次のタスク",
+        "content": "次回のセッションで行うべきことは以下の通りです：\n\n1. **DocumentRepositorySelector の実装**\n   - テストファイルの作成\n   - 実装コードの作成\n   - テストの実行と検証\n   - メモリバンクへの進捗記録\n\n2. **両ヘルパークラスの統合テスト**\n   - BranchResolverServiceとDocumentRepositorySelectorが連携して動作するかのテスト\n   - エッジケースの確認\n\n3. **プルリクエスト準備**\n   - コードレビュー準備\n   - PRの作成"
+      },
+      {
+        "title": "実装時の注意点",
+        "content": "DocumentRepositorySelector 実装時の注意点：\n\n1. **BranchResolverService を依存関係として使用**\n   - BranchResolverServiceをコンストラクタで受け取る\n   - ブランチ名の解決はすべてBranchResolverServiceに任せる\n\n2. **リポジトリアダプタの作成**\n   - IDocumentRepositoryインターフェースに適合したアダプタを作成する\n   - スコープに応じて適切なリポジトリメソッドを呼び出す\n\n3. **グローバルリポジトリ特有の処理**\n   - グローバルリポジトリでは、saveDocument後にupdateTagsIndexを呼び出す必要あり\n\n4. **エラーハンドリング**\n   - 無効なスコープ値のチェック\n   - ブランチ名解決時のエラーを適切に伝播させる"
+      },
+      {
+        "title": "参考ドキュメント",
+        "content": "1. **親ブランチの設計ドキュメント**\n   - `../feature/refactor-api/design/api-refactoring-plan.json`\n   - `../feature/refactor-api/design/api-refactoring-test-strategy.json`\n   - `../feature/refactor-api/design/api-refactoring-implementation-plan.json`\n\n2. **サブブランチの設計ドキュメント**\n   - `design/helpers-implementation-plan.json`"
+      }
+    ]
+  }
+}
