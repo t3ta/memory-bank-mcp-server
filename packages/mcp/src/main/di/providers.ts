@@ -392,7 +392,6 @@ export async function registerApplicationServices(container: DIContainer): Promi
     logger.debug('Resolving dependencies for templateRepository...');
     // Note: We used to use configProvider to get docsRoot, but now we always use a fixed path
     // const configProvider = await container.get<IConfigProvider>('configProvider');
-    let templateBasePath: string;
     
     // For CI and test compatibility, we need to check multiple paths
     const possiblePaths = [
@@ -404,6 +403,9 @@ export async function registerApplicationServices(container: DIContainer): Promi
       path.join(process.cwd(), 'templates/json')
     ];
     
+    // デフォルトのパスを事前に設定（有効なパスが見つからない場合のフォールバック）
+    let templateBasePath = path.join(process.cwd(), 'packages/mcp/src/templates/json');
+    
     // Try to find a valid path that exists
     for (const pathToCheck of possiblePaths) {
       if (fs.existsSync(pathToCheck)) {
@@ -413,11 +415,7 @@ export async function registerApplicationServices(container: DIContainer): Promi
       }
     }
     
-    // If no valid path found, use the default
-    if (!templateBasePath) {
-      templateBasePath = path.join(process.cwd(), 'packages/mcp/src/templates/json');
-    }
-    logger.debug(`Using standard path for templates: ${templateBasePath}`);
+    logger.debug(`Using template path: ${templateBasePath}`);
     
     logger.debug(`Template base path resolved to: ${templateBasePath}`);
     const i18nService = await container.get<I18nService>('i18nService'); // i18nService is now guaranteed to be initialized

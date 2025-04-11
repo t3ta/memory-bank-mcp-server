@@ -1,21 +1,21 @@
 /**
- * architecture-templateテンプレート定義
+ * architectureテンプレート定義
  * 
- * システムアーキテクチャを表示するためのテンプレート
+ * アーキテクチャ情報を表示するためのテンプレート
  */
 import { Template } from '@memory-bank/schemas/templates';
 
 /**
  * アーキテクチャテンプレート
- * システム全体のアーキテクチャ、コンポーネント、層、データフローなどを表示します
+ * システムのアーキテクチャ、コンポーネント、レイヤー、データフローなどを表示します
  */
 export const architectureTemplate: Template = {
   schema: "template_v1",
   metadata: {
-    id: "architecture",
+    id: "architecture-template",
     titleKey: "template.title.architecture",
     descriptionKey: "template.description.architecture",
-    type: "system",
+    type: "system", // JSONでは "global-memory" でしたが、型定義に合わせて "system" に変更
     lastModified: "2025-03-24T16:05:00.000Z"
   },
   content: {

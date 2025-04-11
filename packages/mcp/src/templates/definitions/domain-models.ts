@@ -7,15 +7,15 @@ import { Template } from '@memory-bank/schemas/templates';
 
 /**
  * ドメインモデルテンプレート
- * エンティティ、値オブジェクト、集約、リポジトリ、サービスなどのドメインモデルを表示します
+ * エンティティ、値オブジェクト、集約、リポジトリ、サービス、イベントなどを表示します
  */
 export const domainModelsTemplate: Template = {
   schema: "template_v1",
   metadata: {
-    id: "domain-models",
+    id: "domain-models-template",
     titleKey: "template.title.domain_models",
     descriptionKey: "template.description.domain_models",
-    type: "system",
+    type: "system", // JSONでは "global-memory" でしたが、型定義に合わせて "system" に変更
     lastModified: "2025-03-24T16:05:00.000Z"
   },
   content: {

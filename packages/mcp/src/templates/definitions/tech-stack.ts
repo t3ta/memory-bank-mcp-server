@@ -1,21 +1,21 @@
 /**
  * tech-stackテンプレート定義
  * 
- * テクノロジースタックを表示するためのテンプレート
+ * 技術スタックを表示するためのテンプレート
  */
 import { Template } from '@memory-bank/schemas/templates';
 
 /**
- * テクノロジースタックテンプレート
- * フロントエンド、バックエンド、データベース、インフラなどの技術スタックを表示します
+ * 技術スタックテンプレート
+ * フロントエンド、バックエンド、データベース、インフラ、開発ツールなどを表示します
  */
 export const techStackTemplate: Template = {
   schema: "template_v1",
   metadata: {
-    id: "tech-stack",
+    id: "tech-stack-template",
     titleKey: "template.title.tech_stack",
     descriptionKey: "template.description.tech_stack",
-    type: "system",
+    type: "system", // JSONでは "global-memory" でしたが、型定義に合わせて "system" に変更
     lastModified: "2025-03-24T16:06:00.000Z"
   },
   content: {

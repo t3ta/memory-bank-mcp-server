@@ -4,9 +4,10 @@
  */
 import { Language, Template } from '@memory-bank/schemas/templates';
 // 簡単のため型をanyのままにしておく - 将来的にはTemplate型にリファクタリングすべき
-type BaseTemplate = any;
-type TemplateSection = any;
-type JsonTemplate = Template;
+// TypeScript化に伴う型定義の整理
+type BaseTemplate = any; // 将来的に廃止予定
+type TemplateSection = any; // 将来的に廃止予定
+type JsonTemplate = Template; // Template型へのエイリアス
 import { II18nProvider } from '../i18n/interfaces/II18nProvider.js';
 
 /**
@@ -60,8 +61,11 @@ export class TemplateRenderer {
     const lines: string[] = [];
 
     // Add title
-    // Assuming translate takes only the key
-    const title = this.i18nProvider.translate(template.titleKey);
+    // i18nProviderの形式に合わせて変換
+    const title = this.i18nProvider.translate({
+      key: template.titleKey,
+      language: language
+    });
     lines.push(`# ${title}\n`);
 
     // Add sections
@@ -97,7 +101,11 @@ export class TemplateRenderer {
     // Add title
     // Template.metadata.titleKey を使用
     const titleKey = template.metadata.titleKey;
-    const title = this.i18nProvider.translate(titleKey);
+    // i18nProviderの形式に合わせて変換
+    const title = this.i18nProvider.translate({
+      key: titleKey,
+      language: language
+    });
     lines.push(`# ${title}\n`);
 
     // Add sections
@@ -130,7 +138,10 @@ export class TemplateRenderer {
     const lines: string[] = [];
 
     // Translate content first to check if it's effectively empty
-    let content = section.contentKey ? this.i18nProvider.translate(section.contentKey) : '';
+    let content = section.contentKey ? this.i18nProvider.translate({
+      key: section.contentKey,
+      language: language
+    }) : '';
     if (variables && content) {
       content = this.replaceVariables(content, variables);
     }
@@ -141,7 +152,10 @@ export class TemplateRenderer {
     }
 
     // Add section title if content is not empty
-    const title = this.i18nProvider.translate(section.titleKey);
+    const title = this.i18nProvider.translate({
+      key: section.titleKey,
+      language: language
+    });
     if (title.trim() && content.trim() !== '') {
       lines.push(`## ${title}\n`);
     }
@@ -170,7 +184,10 @@ export class TemplateRenderer {
     const lines: string[] = [];
 
     // Translate content first to check if it's effectively empty after translation/variable replacement
-    let content = section.contentKey ? this.i18nProvider.translate(section.contentKey) : '';
+    let content = section.contentKey ? this.i18nProvider.translate({
+      key: section.contentKey,
+      language: language
+    }) : '';
     if (variables && content) {
       content = this.replaceVariables(content, variables);
     }
@@ -184,7 +201,10 @@ export class TemplateRenderer {
     }
 
     // Add section title if content is not empty OR if there's a placeholder
-    const title = this.i18nProvider.translate(section.titleKey);
+    const title = this.i18nProvider.translate({
+      key: section.titleKey,
+      language: language
+    });
     if (title.trim() && (content.trim() !== '' || section.placeholder)) {
       lines.push(`## ${title}\n`);
     }

@@ -41,21 +41,33 @@ const templateLoader = new JsonTemplateLoader(mockFileSystemService, mockI18nPro
 
 // Dummy template data
 const dummyTemplateId = 'test-template';
-// Corrected dummy template to match expected structure with language keys
+// テンプレート構造を検証ルールに合わせる（schema, metadata, content必須）
 const dummyJsonTemplate = {
-  metadata: { // Assuming metadata structure based on renderer logic
-    name: { ja: 'テストテンプレート', en: 'Test Template' }
+  schema: "template_v1",
+  metadata: {
+    id: "test-template",
+    titleKey: "template.title.test",
+    descriptionKey: "template.description.test",
+    type: "system",
+    lastModified: "2025-04-01T00:00:00.000Z"
   },
   content: {
-    sections: { // Assuming sections are under content and keyed by ID
-      section1: {
-        title: { ja: 'セクション1', en: 'Section 1' },
-        content: { ja: '内容 1 {{var1}}', en: 'Content 1 {{var1}}' } // Content per language
+    sections: [
+      {
+        id: "section1",
+        titleKey: "template.section.test_section1",
+        contentKey: "template.content.test_section1",
+        isOptional: false
       },
-      section2: {
-        title: { ja: 'セクション2', en: 'Section 2' },
-        content: { ja: '内容 2', en: 'Content 2' } // Content per language
+      {
+        id: "section2",
+        titleKey: "template.section.test_section2",
+        contentKey: "template.content.test_section2",
+        isOptional: false
       }
+    ],
+    placeholders: {
+      "TEST": "template.placeholder.test"
     }
   }
 };
@@ -162,20 +174,31 @@ describe('JsonTemplateLoader', () => {
       (mockFileSystemService.fileExists as Mock).mockResolvedValue(true); // as Mock に修正
       (mockFileSystemService.readFile as Mock).mockResolvedValue(dummyJsonTemplateString); // as Mock に修正
 
-      // Note: TemplateRenderer uses translate differently now, adjust expectations if needed
-      // For now, just check if the method runs without the previous TypeError
+      // テスト用の翻訳を設定
+      (mockI18nProvider.translate as Mock).mockImplementation((arg: { key: string; language: Language }) => {
+        if (arg.key === 'template.title.test' && arg.language === 'ja') return 'テストテンプレート';
+        if (arg.key === 'template.section.test_section1' && arg.language === 'ja') return 'テストセクション1';
+        if (arg.key === 'template.content.test_section1' && arg.language === 'ja') return 'テスト内容1 {{var1}}';
+        if (arg.key === 'template.section.test_section2' && arg.language === 'ja') return 'テストセクション2';
+        if (arg.key === 'template.content.test_section2' && arg.language === 'ja') return 'テスト内容2';
+        return arg.key; // デフォルト: キーをそのまま返す
+      });
+
       const markdown = await templateLoader.getMarkdownTemplate(dummyTemplateId, 'ja', variables);
 
-      // Check basic rendering based on the corrected mock translate
-      // Check rendering based on corrected template structure and mock translate
-      expect(markdown).toContain('# テストテンプレート'); // Expect Japanese title from template data
-      expect(markdown).toContain('内容 1 VariableValue'); // Expect Japanese content with variable replaced
-      expect(markdown).toContain('内容 2'); // Expect Japanese content
+      // 期待される内容をチェック
+      expect(markdown).toContain('# テストテンプレート');
+      expect(markdown).toContain('## テストセクション1');
+      expect(markdown).toContain('テスト内容1 VariableValue'); // 変数が置換されていることを確認
+      expect(markdown).toContain('## テストセクション2');
+      expect(markdown).toContain('テスト内容2');
+      
+      // ファイルアクセスの確認
       expect(mockFileSystemService.fileExists).toHaveBeenCalledWith(jsonTemplatePath);
       expect(mockFileSystemService.readFile).toHaveBeenCalledWith(jsonTemplatePath);
-      // Verify translate was called (TemplateRenderer calls with object for title)
-      // Translate should not be called for content/title as they are directly in the template now
-      expect(mockI18nProvider.translate).not.toHaveBeenCalled();
+      
+      // 翻訳が呼び出されたことを確認
+      expect(mockI18nProvider.translate).toHaveBeenCalled();
     });
 
     it('should throw an error for an unsupported language', async () => {

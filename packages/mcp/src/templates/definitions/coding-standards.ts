@@ -12,10 +12,10 @@ import { Template } from '@memory-bank/schemas/templates';
 export const codingStandardsTemplate: Template = {
   schema: "template_v1",
   metadata: {
-    id: "coding-standards",
+    id: "coding-standards-template",
     titleKey: "template.title.coding_standards",
     descriptionKey: "template.description.coding_standards",
-    type: "system",
+    type: "system", // JSONでは "global-memory" でしたが、型定義に合わせて "system" に変更
     lastModified: "2025-03-24T16:05:00.000Z"
   },
   content: {

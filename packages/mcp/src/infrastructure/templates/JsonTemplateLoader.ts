@@ -6,7 +6,7 @@ import path from 'node:path';
 import * as fs from 'fs';
 
 // 型定義を更新
-import { Template } from '@memory-bank/schemas/templates';
+import { Template, Language } from '@memory-bank/schemas/templates';
 // テンプレート定義をインポート
 import * as templateDefinitions from '../../templates/definitions/index.js';
 
@@ -18,7 +18,17 @@ import { logger } from '../../shared/utils/logger.js';
 
 // 型エイリアスの更新
 type JsonTemplate = Template;
-const validateJsonTemplate = (data: Record<string, unknown>): Template => data as Template; // 暫定対応を継続
+// unknown型を経由して型変換することで安全に変換する
+const validateJsonTemplate = (data: Record<string, unknown>): Template => {
+  // 基本的な検証（最低限のプロパティが存在するか）
+  if (typeof data !== 'object' || data === null) {
+    throw new Error('Invalid template: data must be an object');
+  }
+  if (!('schema' in data) || !('metadata' in data) || !('content' in data)) {
+    throw new Error('Invalid template: missing required properties (schema, metadata, or content)');
+  }
+  return data as unknown as Template;
+};
 
 /**
  * Implementation of ITemplateLoader for JSON templates
@@ -84,12 +94,11 @@ export class JsonTemplateLoader implements ITemplateLoader {
     // 1. メモリ内の定義をチェック
     const tsTemplateName = this.getTypeScriptTemplateName(templateId);
     
-    // @ts-ignore - インデックスシグネチャが型システム上は定義されていないため
-    if (templateDefinitions[tsTemplateName]) {
-      // @ts-ignore
+        // インデックスシグネチャの代わりに、型安全にアクセスする
+    const template = (templateDefinitions as Record<string, Template | undefined>)[tsTemplateName];
+    if (template) {
       logger.debug(`Found in-memory template '${templateId}' as '${tsTemplateName}'`);
-      // @ts-ignore
-      return templateDefinitions[tsTemplateName];
+      return template;
     }
     
     // 2. 次にファイルシステムをチェック (後方互換性のため)
@@ -139,8 +148,8 @@ export class JsonTemplateLoader implements ITemplateLoader {
       // Load the JSON template
       const template = await this.loadJsonTemplate(templateId);
 
-      // Render to Markdown
-      return this.templateRenderer.renderToMarkdown(template, language, variables);
+      // Render to Markdown - Language型にキャスト
+      return this.templateRenderer.renderToMarkdown(template, language as unknown as Language, variables);
     } catch (error) {
       // Legacy fallback removed, rethrow the original error
       logger.error(`Failed to load or render JSON template ${templateId}`, { error });
@@ -154,8 +163,8 @@ export class JsonTemplateLoader implements ITemplateLoader {
   async templateExists(templateId: string): Promise<boolean> {
     // 1. メモリ内テンプレートをチェック
     const tsTemplateName = this.getTypeScriptTemplateName(templateId);
-    // @ts-ignore
-    if (templateDefinitions[tsTemplateName]) {
+    const template = (templateDefinitions as Record<string, Template | undefined>)[tsTemplateName];
+    if (template) {
       return true;
     }
     

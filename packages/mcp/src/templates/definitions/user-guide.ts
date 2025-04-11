@@ -7,15 +7,15 @@ import { Template } from '@memory-bank/schemas/templates';
 
 /**
  * ユーザーガイドテンプレート
- * 導入、開始方法、インストール、基本的な使い方、高度な機能などを表示します
+ * 導入、はじめ方、インストール、基本使用法、高度な機能、トラブルシューティングなどを表示します
  */
 export const userGuideTemplate: Template = {
   schema: "template_v1",
   metadata: {
-    id: "user-guide",
+    id: "user-guide-template",
     titleKey: "template.title.user_guide",
     descriptionKey: "template.description.user_guide",
-    type: "system",
+    type: "system", // JSONでは "global-memory" でしたが、型定義に合わせて "system" に変更
     lastModified: "2025-03-24T16:06:00.000Z"
   },
   content: {

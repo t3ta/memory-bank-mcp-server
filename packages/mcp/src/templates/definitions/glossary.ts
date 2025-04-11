@@ -7,15 +7,15 @@ import { Template } from '@memory-bank/schemas/templates';
 
 /**
  * 用語集テンプレート
- * ドメイン用語、技術用語、略語などのプロジェクト用語集を表示します
+ * ドメイン用語、技術用語、略語、命名規則などを表示します
  */
 export const glossaryTemplate: Template = {
   schema: "template_v1",
   metadata: {
-    id: "glossary",
+    id: "glossary-template",
     titleKey: "template.title.glossary",
     descriptionKey: "template.description.glossary",
-    type: "system",
+    type: "system", // JSONでは "global-memory" でしたが、型定義に合わせて "system" に変更
     lastModified: "2025-03-24T16:06:00.000Z"
   },
   content: {
