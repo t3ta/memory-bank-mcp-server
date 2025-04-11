@@ -127,12 +127,10 @@ export async function registerInfrastructureServices(
 
 
   container.registerFactory('i18nRepository', async () => {
-    // Resolve absolute path from project root for built files
-    // Use process.cwd() instead of import.meta.url for CommonJS compatibility
+    // Use process.cwd() to get project root directly
     const __dirname_i18n = process.cwd();
-    // Assuming providers.ts is in dist/main/di after build
-    // Assuming providers.ts is in dist/main/di after build, go up 5 levels
-    const projectRoot_i18n = path.resolve(__dirname_i18n, '../../../../../'); // Corrected path depth
+    // No need for relative path calculation anymore
+    const projectRoot_i18n = __dirname_i18n;
     const translationsDir = path.join(projectRoot_i18n, 'packages/mcp/dist/infrastructure/i18n/translations');
     logger.debug(`[DI] Initializing i18nRepository with translationsDir: ${translationsDir}`);
     const { FileI18nRepository } = await import('../../infrastructure/i18n/FileI18nRepository.js');
@@ -379,11 +377,10 @@ export async function registerApplicationServices(container: DIContainer): Promi
   // Register TemplateRepository after I18nService is initialized
   container.registerFactory('templateRepository', async () => {
     logger.debug('Resolving dependencies for templateRepository...');
-    // Resolve absolute path from project root for built files
-    // Use process.cwd() instead of import.meta.url for CommonJS compatibility
+    // Use process.cwd() to get project root directly
     const __dirname_tmpl = process.cwd();
-    // Assuming providers.ts is in dist/main/di after build, go up 5 levels
-    const projectRoot_tmpl = path.resolve(__dirname_tmpl, '../../../../../'); // Corrected path depth
+    // No need for relative path calculation anymore
+    const projectRoot_tmpl = __dirname_tmpl;
     const templateBasePath = path.join(projectRoot_tmpl, 'packages/mcp/dist/templates/json');
     logger.debug(`Template base path resolved to: ${templateBasePath}`);
     const i18nService = await container.get<I18nService>('i18nService'); // i18nService is now guaranteed to be initialized
