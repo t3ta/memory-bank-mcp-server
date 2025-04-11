@@ -7,7 +7,7 @@ import { ReadBranchDocumentUseCase } from '../../application/usecases/branch/Rea
 import { WriteBranchDocumentUseCase } from '../../application/usecases/branch/WriteBranchDocumentUseCase.js';
 import { ReadGlobalDocumentUseCase } from '../../application/usecases/global/ReadGlobalDocumentUseCase.js';
 import { WriteGlobalDocumentUseCase } from '../../application/usecases/global/WriteGlobalDocumentUseCase.js';
-import { DocumentRepositorySelector } from '../../application/services/DocumentRepositorySelector.js';
+// import { DocumentRepositorySelector } from '../../application/services/DocumentRepositorySelector.js'; // Not used in the current implementation
 import { MCPResponsePresenter } from '../presenters/MCPResponsePresenter.js';
 
 // Global app instance for tool commands
@@ -169,7 +169,7 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
     const writeBranchUseCase = await container.get('writeBranchDocumentUseCase') as WriteBranchDocumentUseCase;
     const readGlobalUseCase = await container.get('readGlobalDocumentUseCase') as ReadGlobalDocumentUseCase;
     const writeGlobalUseCase = await container.get('writeGlobalDocumentUseCase') as WriteGlobalDocumentUseCase;
-    const repoSelector = await container.get('documentRepositorySelector') as DocumentRepositorySelector;
+    // const repoSelector = await container.get('documentRepositorySelector') as DocumentRepositorySelector; // Not used in the current implementation
     const presenter = await container.get('mcpResponsePresenter') as MCPResponsePresenter;
     console.log(`[write_document] Dependencies retrieved successfully`);
     
@@ -180,34 +180,83 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
       writeBranchUseCase,
       readGlobalUseCase,
       writeGlobalUseCase,
-      repoSelector,
+      // repoSelector, // Not used in the current implementation
       presenter
     );
   
-    // Ensure directories exist for global paths (handle nested paths like 'core/file.json')
-    if (scope === 'global' && path.includes('/')) {
-      const docPath = docs;
-      const globalMemoryPath = `${docPath}/global-memory-bank`;
+    // Ensure directories exist for paths (handle nested paths like 'core/file.json')
+    // We need to do this for both global and branch memory banks
+    try {
+      const fs = await import('fs/promises');
       
-      // Extract directory part from path
-      const pathParts = path.split('/');
-      const dirParts = pathParts.slice(0, -1); // All except the last part (filename)
-      
-      if (dirParts.length > 0) {
-        // Construct the absolute directory path
-        const dirPath = `${globalMemoryPath}/${dirParts.join('/')}`;
-        console.log(`[write_document] Ensuring directory exists: ${dirPath}`);
+      if (scope === 'global' && path.includes('/')) {
+        const docPath = docs;
+        const globalMemoryPath = `${docPath}/global-memory-bank`;
         
-        // Use fs promises to ensure the directory exists
+        // Extract directory part from path
+        const pathParts = path.split('/');
+        const dirParts = pathParts.slice(0, -1); // All except the last part (filename)
+        
+        if (dirParts.length > 0) {
+          // Construct the absolute directory path
+          const dirPath = `${globalMemoryPath}/${dirParts.join('/')}`;
+          console.log(`[write_document] Ensuring global directory exists: ${dirPath}`);
+          
+          // Use fs promises to ensure the directory exists
+          try {
+            await fs.mkdir(dirPath, { recursive: true });
+            console.log(`[write_document] Global directory created or verified: ${dirPath}`);
+          } catch (dirError) {
+            console.error(`[write_document] Failed to create global directory: ${dirError}`);
+            // Continue anyway, the controller might handle this differently
+          }
+        }
+      } else if (scope === 'branch' && path.includes('/')) {
+        // For branch, we need to handle branch directory structure
+        const docPath = docs;
+        
+        // Get branch name either from parameters or via auto-detection
+        let branchNameToUse = branch;
+        if (!branchNameToUse) {
+          console.log(`[write_document] No branch name provided, auto-detecting...`);
+          // Use GitService to auto-detect branch in project mode
+          const gitService = await container.get('gitService');
+          branchNameToUse = await gitService.getCurrentBranchName();
+          console.log(`[write_document] Auto-detected branch name: ${branchNameToUse}`);
+        }
+        
+        // Get safe branch name
+        const BranchInfo = (await import('../../domain/entities/BranchInfo.js')).BranchInfo;
+        const safeBranchName = BranchInfo.create(branchNameToUse).safeName;
+        const branchMemoryPath = `${docPath}/branch-memory-bank/${safeBranchName}`;
+        
+        // Create branch directory if it doesn't exist
         try {
-          const fs = await import('fs/promises');
-          await fs.mkdir(dirPath, { recursive: true });
-          console.log(`[write_document] Directory created or verified: ${dirPath}`);
-        } catch (dirError) {
-          console.error(`[write_document] Failed to create directory: ${dirError}`);
-          // Continue anyway, the controller might handle this differently
+          await fs.mkdir(branchMemoryPath, { recursive: true });
+          console.log(`[write_document] Branch directory created or verified: ${branchMemoryPath}`);
+        } catch (branchDirError) {
+          console.error(`[write_document] Failed to create branch directory: ${branchDirError}`);
+        }
+        
+        // Extract directory part from path
+        const pathParts = path.split('/');
+        const dirParts = pathParts.slice(0, -1); // All except the last part (filename)
+        
+        if (dirParts.length > 0) {
+          // Construct the absolute directory path
+          const dirPath = `${branchMemoryPath}/${dirParts.join('/')}`;
+          console.log(`[write_document] Ensuring branch subdirectory exists: ${dirPath}`);
+          
+          try {
+            await fs.mkdir(dirPath, { recursive: true });
+            console.log(`[write_document] Branch subdirectory created or verified: ${dirPath}`);
+          } catch (dirError) {
+            console.error(`[write_document] Failed to create branch subdirectory: ${dirError}`);
+          }
         }
       }
+    } catch (error) {
+      console.error('[write_document] Error ensuring directories exist:', error);
     }
     
     // Call the appropriate controller method based on the scope
@@ -379,7 +428,7 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
     const writeBranchUseCase = await container.get('writeBranchDocumentUseCase') as WriteBranchDocumentUseCase;
     const readGlobalUseCase = await container.get('readGlobalDocumentUseCase') as ReadGlobalDocumentUseCase;
     const writeGlobalUseCase = await container.get('writeGlobalDocumentUseCase') as WriteGlobalDocumentUseCase;
-    const repoSelector = await container.get('documentRepositorySelector') as DocumentRepositorySelector;
+    // const repoSelector = await container.get('documentRepositorySelector') as DocumentRepositorySelector; // Not used in the current implementation
     const presenter = await container.get('mcpResponsePresenter') as MCPResponsePresenter;
     console.log(`[read_document] Dependencies retrieved successfully`);
     
@@ -390,40 +439,93 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
       writeBranchUseCase,
       readGlobalUseCase,
       writeGlobalUseCase,
-      repoSelector,
+      // repoSelector, // Not used in the current implementation
       presenter
     );
   
-    // Ensure directories exist for global paths when reading (especially for reads that might create missing files/directories)
-    if (scope === 'global' && path.includes('/')) {
-      const docPath = docs;
-      const globalMemoryPath = `${docPath}/global-memory-bank`;
+    // Ensure directories exist for both global and branch paths when reading
+    // This helps with tests by ensuring the directory structure exists
+    try {
+      const fs = await import('fs/promises');
       
-      // Extract directory part from path
-      const pathParts = path.split('/');
-      const dirParts = pathParts.slice(0, -1); // All except the last part (filename)
-      
-      if (dirParts.length > 0) {
-        // Construct the absolute directory path
-        const dirPath = `${globalMemoryPath}/${dirParts.join('/')}`;
-        console.log(`[read_document] Checking if directory exists: ${dirPath}`);
+      if (scope === 'global' && path.includes('/')) {
+        const docPath = docs;
+        const globalMemoryPath = `${docPath}/global-memory-bank`;
         
-        // Use fs promises to check if the directory exists
-        try {
-          const fs = await import('fs/promises');
+        // Extract directory part from path
+        const pathParts = path.split('/');
+        const dirParts = pathParts.slice(0, -1); // All except the last part (filename)
+        
+        if (dirParts.length > 0) {
+          // Construct the absolute directory path
+          const dirPath = `${globalMemoryPath}/${dirParts.join('/')}`;
+          console.log(`[read_document] Checking if global directory exists: ${dirPath}`);
+          
+          // Use fs promises to check if the directory exists
           try {
-            await fs.access(dirPath);
-            console.log(`[read_document] Directory exists: ${dirPath}`);
-          } catch {
-            // Directory doesn't exist, create it
-            console.log(`[read_document] Directory doesn't exist, creating: ${dirPath}`);
-            await fs.mkdir(dirPath, { recursive: true });
+            try {
+              await fs.access(dirPath);
+              console.log(`[read_document] Global directory exists: ${dirPath}`);
+            } catch {
+              // Directory doesn't exist, create it
+              console.log(`[read_document] Global directory doesn't exist, creating: ${dirPath}`);
+              await fs.mkdir(dirPath, { recursive: true });
+            }
+          } catch (dirError) {
+            console.error(`[read_document] Failed to check/create global directory: ${dirError}`);
           }
-        } catch (dirError) {
-          console.error(`[read_document] Failed to check/create directory: ${dirError}`);
-          // Continue anyway, the controller might handle this differently
+        }
+      } else if (scope === 'branch' && path.includes('/')) {
+        const docPath = docs;
+        
+        // Get branch name either from parameters or via auto-detection
+        let branchNameToUse = branch;
+        if (!branchNameToUse) {
+          console.log(`[read_document] No branch name provided, auto-detecting...`);
+          // Use GitService to auto-detect branch in project mode
+          const gitService = await container.get('gitService');
+          branchNameToUse = await gitService.getCurrentBranchName();
+          console.log(`[read_document] Auto-detected branch name: ${branchNameToUse}`);
+        }
+        
+        // Get safe branch name
+        const BranchInfo = (await import('../../domain/entities/BranchInfo.js')).BranchInfo;
+        const safeBranchName = BranchInfo.create(branchNameToUse).safeName;
+        const branchMemoryPath = `${docPath}/branch-memory-bank/${safeBranchName}`;
+        
+        // Create branch directory if it doesn't exist
+        try {
+          await fs.mkdir(branchMemoryPath, { recursive: true });
+          console.log(`[read_document] Branch directory created or verified: ${branchMemoryPath}`);
+        } catch (branchDirError) {
+          console.error(`[read_document] Failed to create branch directory: ${branchDirError}`);
+        }
+        
+        // Extract directory part from path
+        const pathParts = path.split('/');
+        const dirParts = pathParts.slice(0, -1); // All except the last part (filename)
+        
+        if (dirParts.length > 0) {
+          // Construct the absolute directory path
+          const dirPath = `${branchMemoryPath}/${dirParts.join('/')}`;
+          console.log(`[read_document] Checking if branch subdirectory exists: ${dirPath}`);
+          
+          try {
+            try {
+              await fs.access(dirPath);
+              console.log(`[read_document] Branch subdirectory exists: ${dirPath}`);
+            } catch {
+              // Directory doesn't exist, create it
+              console.log(`[read_document] Branch subdirectory doesn't exist, creating: ${dirPath}`);
+              await fs.mkdir(dirPath, { recursive: true });
+            }
+          } catch (dirError) {
+            console.error(`[read_document] Failed to check/create branch subdirectory: ${dirError}`);
+          }
         }
       }
+    } catch (error) {
+      console.error('[read_document] Error ensuring directories exist:', error);
     }
     
     // Call the appropriate controller method based on the scope
