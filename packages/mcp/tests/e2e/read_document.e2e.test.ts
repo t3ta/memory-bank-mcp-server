@@ -1,11 +1,10 @@
 import { setupE2ETestEnv } from './helpers/e2e-test-env.js';
 import type { Application } from '../../src/main/Application.js';
 import { MCPInMemoryClient } from './helpers/MCPInMemoryClient.js';
+import { unified_read_document, unified_write_document } from './helpers/unified-e2e-api.js';
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import { BranchInfo } from '../../src/domain/entities/BranchInfo.js';
-import { DocumentController } from '../../src/interface/controllers/DocumentController.js';
-import { read_document, write_document } from '../../src/interface/tools/document-tools.js';
 
 describe('Direct read_document E2E Tests', () => {
   let testEnv: Awaited<ReturnType<typeof setupE2ETestEnv>>['testEnv'];
@@ -51,15 +50,15 @@ describe('Direct read_document E2E Tests', () => {
     await cleanup();
   });
 
-  // Helper to create test documents for reading
-  async function createTestDocument(scope: 'branch' | 'global', branch: string | undefined, filePath: string, content: Record<string, unknown> | string, tags: string[] = []): Promise<ReturnType<typeof write_document>> {
-    return write_document({
+  // Helper to create test documents for reading - Now using unified_write_document
+  async function createTestDocument(scope: 'branch' | 'global', branch: string | undefined, filePath: string, content: Record<string, unknown> | string, tags: string[] = []): Promise<any> {
+    return unified_write_document(client, {
       scope,
       branch,
       path: filePath,
       content,
-      docs: testEnv.docRoot,
-      tags
+      tags,
+      docs: testEnv.docRoot
     });
   }
 
@@ -67,8 +66,8 @@ describe('Direct read_document E2E Tests', () => {
     // Arrange - Create a document first
     await createTestDocument('branch', testBranchName, testDocPath, initialDocContent);
 
-    // Act - Read the document
-    const result = await read_document({
+    // Act - Read the document using unified_read_document
+    const result = await unified_read_document(client, {
       scope: 'branch',
       branch: testBranchName,
       path: testDocPath,
@@ -151,8 +150,8 @@ describe('Direct read_document E2E Tests', () => {
     // Create global document
     await createTestDocument('global', undefined, globalDocPath, globalContent);
 
-    // Act
-    const result = await read_document({
+    // Act - Using unified_read_document
+    const result = await unified_read_document(client, {
       scope: 'global',
       path: globalDocPath,
       docs: testEnv.docRoot
@@ -223,8 +222,8 @@ describe('Direct read_document E2E Tests', () => {
     // Create plain text document
     await createTestDocument('branch', testBranchName, textFilePath, textContent, ['text', 'plain']);
 
-    // Act
-    const result = await read_document({
+    // Act - Using unified_read_document
+    const result = await unified_read_document(client, {
       scope: 'branch',
       branch: testBranchName,
       path: textFilePath,
@@ -284,11 +283,11 @@ describe('Direct read_document E2E Tests', () => {
     // The auto-detection will only work if we mock the Git service properly
     // For this test, we'll focus on ensuring the API accepts a request without branch name
     // We expect an error since in the test env there's no git repo to detect from
-    const result = await read_document({
+    const result = await unified_read_document(client, {
       scope: 'branch',
-      // No branch parameter
       path: docPath,
       docs: testEnv.docRoot
+      // No branch parameter
     });
     
     // Test passes if either:
@@ -318,7 +317,7 @@ describe('Direct read_document E2E Tests', () => {
 
   it('should properly handle non-existent documents', async () => {
     // The new API returns an error object instead of rejecting the promise
-    const result = await read_document({
+    const result = await unified_read_document(client, {
       scope: 'branch',
       branch: testBranchName,
       path: 'non-existent.json',
@@ -337,7 +336,9 @@ describe('Direct read_document E2E Tests', () => {
   it('should handle invalid scope parameter', async () => {
     // Act - Try to read with invalid scope
     try {
-      const result = await read_document({
+      // Using unified_read_document with an invalid scope string
+      // @ts-ignore - intentionally testing invalid scope
+      const result = await unified_read_document(client, {
         // @ts-ignore - intentionally testing invalid scope
         scope: 'invalid',
         branch: testBranchName,
@@ -365,8 +366,8 @@ describe('Direct read_document E2E Tests', () => {
     await fs.ensureDir(path.dirname(filePath));
     await fs.writeFile(filePath, '{ this is not valid JSON', 'utf-8');
     
-    // Act - Attempt to read the broken JSON
-    const result = await read_document({
+    // Act - Attempt to read the broken JSON with unified_read_document
+    const result = await unified_read_document(client, {
       scope: 'branch',
       branch: testBranchName,
       path: brokenJsonPath,
@@ -414,8 +415,8 @@ describe('Direct read_document E2E Tests', () => {
     // Create the large document
     await createTestDocument('branch', testBranchName, largeDocPath, largeObject);
     
-    // Act
-    const result = await read_document({
+    // Act - Using unified_read_document
+    const result = await unified_read_document(client, {
       scope: 'branch',
       branch: testBranchName,
       path: largeDocPath,
