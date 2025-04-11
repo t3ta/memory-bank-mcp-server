@@ -1,7 +1,6 @@
 // Import DIContainer for both type and value usage, then re-export it.
 import { DIContainer } from './DIContainer.js';
 export { DIContainer };
-import { fileURLToPath } from 'node:url'; // Import fileURLToPath
 import { MCPResponsePresenter } from '../../interface/presenters/MCPResponsePresenter.js';
 import { IBranchMemoryBankRepository } from '../../domain/repositories/IBranchMemoryBankRepository.js'; // Import interface
 import { IGlobalMemoryBankRepository } from '../../domain/repositories/IGlobalMemoryBankRepository.js'; // Import interface
@@ -13,6 +12,7 @@ import { WriteDocumentUseCase } from '../../application/usecases/common/WriteDoc
 import { BranchResolverService } from '../../application/services/BranchResolverService.js';
 import { DocumentRepositorySelector } from '../../application/services/DocumentRepositorySelector.js';
 import path from 'node:path';
+// fs は削除されたため、不要になりました
 import { IndexService } from '../../infrastructure/index/IndexService.js';
 import { IIndexService } from '../../infrastructure/index/interfaces/IIndexService.js';
 import { FileSystemJsonDocumentRepository } from '../../infrastructure/repositories/file-system/FileSystemJsonDocumentRepository.js';
@@ -127,13 +127,23 @@ export async function registerInfrastructureServices(
 
 
   container.registerFactory('i18nRepository', async () => {
-    // Resolve absolute path from project root for built files
-    const __filename_i18n = fileURLToPath(import.meta.url);
-    const __dirname_i18n = path.dirname(__filename_i18n);
-    // Assuming providers.ts is in dist/main/di after build
-    // Assuming providers.ts is in dist/main/di after build, go up 5 levels
-    const projectRoot_i18n = path.resolve(__dirname_i18n, '../../../../../'); // Corrected path depth
-    const translationsDir = path.join(projectRoot_i18n, 'packages/mcp/dist/infrastructure/i18n/translations');
+    // Get the config provider to determine whether we need to use a custom path
+    const configProvider = await container.get<IConfigProvider>('configProvider');
+    const config = configProvider.getConfig();
+    let translationsDir: string;
+    
+    // Check if we have a custom docsRoot path (for tests)
+    if (config.docsRoot) {
+      // For tests, we use a path relative to docsRoot
+      translationsDir = path.join(config.docsRoot, 'translations');
+      logger.debug(`Using docsRoot-based path for translations: ${translationsDir}`);
+    } else {
+      // For regular operation, use the dist path
+      const projectRoot = process.cwd();
+      translationsDir = path.join(projectRoot, 'packages/mcp/dist/infrastructure/i18n/translations');
+      logger.debug(`Using standard path for translations: ${translationsDir}`);
+    }
+    
     logger.debug(`[DI] Initializing i18nRepository with translationsDir: ${translationsDir}`);
     const { FileI18nRepository } = await import('../../infrastructure/i18n/FileI18nRepository.js');
     const i18nRepository = new FileI18nRepository(translationsDir);
@@ -166,25 +176,8 @@ export async function registerInfrastructureServices(
     const globalJsonRoot = path.join(config.docsRoot, 'global-json');
     return new FileSystemJsonDocumentRepository(fileSystemService, indexService, globalJsonRoot);
   });
-  // Register FileTemplateRepository
-  // Register TemplateRepository using registerFactory (it behaves as singleton)
-  // container.registerFactory('templateRepository', async () => {
-  //   logger.debug('Resolving dependencies for templateRepository...');
-  //   // Resolve absolute path from project root for built files
-  //   const __filename_tmpl = fileURLToPath(import.meta.url); // Use different variable names
-  //   const __dirname_tmpl = path.dirname(__filename_tmpl);
-  //   // Assuming providers.ts is in dist/main/di after build
-  //   // Assuming providers.ts is in dist/main/di after build, go up 5 levels
-  //   // Assuming providers.ts is in dist/main/di after build, go up 5 levels
-  //   const projectRoot_tmpl = path.resolve(__dirname_tmpl, '../../../../../'); // Corrected path depth (already correct here, but ensure consistency)
-  //   const templateBasePath = path.join(projectRoot_tmpl, 'packages/mcp/dist/templates/json');
-  //   logger.debug(`Template base path resolved to: ${templateBasePath}`);
-  //   const i18nService = await container.get<I18nService>('i18nService');
-  //   const templateRepository = new FileTemplateRepository(templateBasePath, i18nService);
-  //   await templateRepository.initialize();
-  //   logger.debug('templateRepository initialized.');
-  //   return templateRepository;
-  // });
+  // 古いJSON依存のテンプレートローダーは完全に削除
+  // TS定義のみを使用する新しい実装に変更
 
 
 
@@ -377,18 +370,19 @@ export async function registerApplicationServices(container: DIContainer): Promi
     return i18nService;
   });
   // Register TemplateRepository after I18nService is initialized
+  // TS定義を最優先し、jsonディレクトリが存在しなくても問題ないよう修正
   container.registerFactory('templateRepository', async () => {
     logger.debug('Resolving dependencies for templateRepository...');
-    // Resolve absolute path from project root for built files
-    const __filename_tmpl = fileURLToPath(import.meta.url); // Use different variable names
-    const __dirname_tmpl = path.dirname(__filename_tmpl);
-    // Assuming providers.ts is in dist/main/di after build, go up 5 levels
-    const projectRoot_tmpl = path.resolve(__dirname_tmpl, '../../../../../'); // Corrected path depth
-    const templateBasePath = path.join(projectRoot_tmpl, 'packages/mcp/dist/templates/json');
-    logger.debug(`Template base path resolved to: ${templateBasePath}`);
-    const i18nService = await container.get<I18nService>('i18nService'); // i18nService is now guaranteed to be initialized
+    
+    // TS定義ディレクトリへの直接パス参照
+    // プロジェクトルートからの相対パスを使用（環境に依存しない）
+    const templateBasePath = path.join(process.cwd(), 'packages/mcp/src/templates/definitions');
+    
+    logger.debug(`Using TypeScript template definitions path: ${templateBasePath}`);
+    
+    const i18nService = await container.get<I18nService>('i18nService');
     const templateRepository = new FileTemplateRepository(templateBasePath, i18nService);
-    await templateRepository.initialize(); // Initialize after getting i18nService
+    await templateRepository.initialize();
     logger.debug('templateRepository initialized.');
     return templateRepository;
   });

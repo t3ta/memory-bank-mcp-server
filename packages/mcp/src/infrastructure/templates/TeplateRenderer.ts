@@ -2,11 +2,12 @@
  * Template Renderer
  * Converts JSON templates to markdown format
  */
-// Use 'any' for now due to persistent import issues
-type BaseTemplate = any;
-type TemplateSection = any;
-type JsonTemplate = any;
-type Language = any;
+import { Language, Template } from '@memory-bank/schemas/templates';
+// 簡単のため型をanyのままにしておく - 将来的にはTemplate型にリファクタリングすべき
+// TypeScript化に伴う型定義の整理
+type BaseTemplate = any; // 将来的に廃止予定
+type TemplateSection = any; // 将来的に廃止予定
+type JsonTemplate = Template; // Template型へのエイリアス
 import { II18nProvider } from '../i18n/interfaces/II18nProvider.js';
 
 /**
@@ -60,8 +61,11 @@ export class TemplateRenderer {
     const lines: string[] = [];
 
     // Add title
-    // Assuming translate takes only the key
-    const title = this.i18nProvider.translate(template.titleKey);
+    // i18nProviderの形式に合わせて変換
+    const title = this.i18nProvider.translate({
+      key: template.titleKey,
+      language: language
+    });
     lines.push(`# ${title}\n`);
 
     // Add sections
@@ -95,35 +99,70 @@ export class TemplateRenderer {
     const lines: string[] = [];
 
     // Add title
-    const title =
-      template.metadata.name[language] ||
-      template.metadata.name['en'] ||
-      Object.values(template.metadata.name)[0];
+    // Template.metadata.titleKey を使用
+    const titleKey = template.metadata.titleKey;
+    // i18nProviderの形式に合わせて変換
+    const title = this.i18nProvider.translate({
+      key: titleKey,
+      language: language
+    });
     lines.push(`# ${title}\n`);
 
     // Add sections
-    // Loop through section values, sectionId is not needed
-    for (const section of Object.values(template.content.sections)) {
-      // Use type assertion for section (assuming structure is known)
-      const sectionTyped = section as {
-        title: Record<string, string>;
-        content?: Record<string, string>;
-        optional?: boolean;
-      };
-      const sectionContent = this.renderJsonSection(
-        sectionTyped,
+    for (const section of template.content.sections) {
+      const sectionContent = this.renderTemplateSection(
+        section,
         language,
-        variables,
+        variables
       );
 
       // Skip empty optional sections
-      // Use the typed variable
-      // Ensure sectionTyped is properly typed before accessing optional
-      if (sectionTyped && sectionTyped.optional && sectionContent.trim() === '') {
+      if (section.isOptional && sectionContent.trim() === '') {
         continue;
       }
 
       lines.push(sectionContent);
+    }
+
+    return lines.join('\n');
+  }
+
+  /**
+   * Renders a template section from our new Template type
+   */
+  private renderTemplateSection(
+    section: Template['content']['sections'][0],
+    language: Language,
+    variables?: Record<string, string>
+  ): string {
+    const lines: string[] = [];
+
+    // Translate content first to check if it's effectively empty
+    let content = section.contentKey ? this.i18nProvider.translate({
+      key: section.contentKey,
+      language: language
+    }) : '';
+    if (variables && content) {
+      content = this.replaceVariables(content, variables);
+    }
+
+    // If the section is optional and content is empty, return empty string
+    if (section.isOptional && content.trim() === '') {
+      return '';
+    }
+
+    // Add section title if content is not empty
+    const title = this.i18nProvider.translate({
+      key: section.titleKey,
+      language: language
+    });
+    if (title.trim() && content.trim() !== '') {
+      lines.push(`## ${title}\n`);
+    }
+
+    // Add section content if available
+    if (content.trim() !== '') {
+      lines.push(content);
     }
 
     return lines.join('\n');
@@ -145,7 +184,10 @@ export class TemplateRenderer {
     const lines: string[] = [];
 
     // Translate content first to check if it's effectively empty after translation/variable replacement
-    let content = section.contentKey ? this.i18nProvider.translate(section.contentKey) : '';
+    let content = section.contentKey ? this.i18nProvider.translate({
+      key: section.contentKey,
+      language: language
+    }) : '';
     if (variables && content) {
       content = this.replaceVariables(content, variables);
     }
@@ -158,9 +200,11 @@ export class TemplateRenderer {
         }
     }
 
-
     // Add section title if content is not empty OR if there's a placeholder
-    const title = this.i18nProvider.translate(section.titleKey);
+    const title = this.i18nProvider.translate({
+      key: section.titleKey,
+      language: language
+    });
     if (title.trim() && (content.trim() !== '' || section.placeholder)) {
       lines.push(`## ${title}\n`);
     }
@@ -188,58 +232,6 @@ export class TemplateRenderer {
       }
 
       lines.push(section.placeholder);
-    }
-
-    return lines.join('\n');
-  }
-
-  /**
-   * Renders a JSON template section
-   *
-   * @param section The section to render
-   * @param language The target language
-   * @param variables Optional variables for substitution
-   * @param placeholders Optional placeholders mapping
-   * @returns Markdown formatted string for the section
-   */
-  private renderJsonSection(
-    section: {
-      title: Record<string, string>;
-      content?: Record<string, string>;
-      optional?: boolean;
-    },
-    language: Language,
-    variables?: Record<string, string>
-  ): string {
-    const lines: string[] = [];
-
-    // Get content first to check if it's effectively empty
-    let content = '';
-    if (section.content) {
-      content = section.content[language] || section.content['en'] || Object.values(section.content)[0] || '';
-    }
-    let processedContent = content;
-    if (variables && processedContent) {
-      processedContent = this.replaceVariables(processedContent, variables);
-    }
-
-    // If the section is optional and content is empty, return empty string
-    if (section.optional && processedContent.trim() === '') {
-      return '';
-    }
-
-    // Get title for this language, fall back to English or first available language
-    const title = section.title[language] || section.title['en'] || Object.values(section.title)[0];
-
-    // Only add title if it's not empty AND content is not empty
-    if (title && title.trim() && processedContent.trim() !== '') {
-      lines.push(`## ${title}\n`);
-    }
-
-    // Add section content if available for this language
-    // Add processed content if it's not empty
-    if (processedContent.trim() !== '') {
-        lines.push(processedContent);
     }
 
     return lines.join('\n');
