@@ -5,6 +5,7 @@ import { IGlobalMemoryBankRepository } from '../../domain/repositories/IGlobalMe
 import type { IGitService } from '../../infrastructure/git/IGitService.js';
 import type { IConfigProvider } from '../../infrastructure/config/interfaces/IConfigProvider.js';
 import { ApplicationErrors } from '../../shared/errors/ApplicationError.js';
+import { DomainError } from '../../shared/errors/DomainError.js';
 import { logger } from '../../shared/utils/logger.js';
 
 /**
@@ -48,7 +49,7 @@ export class DocumentRepositorySelector {
     } else if (scope === 'branch') {
       const resolvedBranchName = await this.resolveBranchName(branchName);
       const branchInfo = BranchInfo.create(resolvedBranchName);
-      
+
       // Check if branch exists
       const exists = await this.branchRepository.exists(branchInfo.safeName);
       if (!exists) {
@@ -114,10 +115,19 @@ export class DocumentRepositorySelector {
    * @throws ApplicationError if branch name cannot be determined
    */
   private async resolveBranchName(branchName?: string): Promise<string> {
+    // Check for empty string
+    if (branchName === '') {
+      this.componentLogger.warn('Empty branch name provided.');
+      throw new DomainError(
+        'DOMAIN_ERROR.INVALID_BRANCH_NAME',
+        'Branch name cannot be empty'
+      );
+    }
+
     if (branchName) {
       return branchName;
     }
-    
+
     const config = this.configProvider.getConfig();
     if (config.isProjectMode) {
       try {
@@ -133,7 +143,7 @@ export class DocumentRepositorySelector {
         );
       }
     }
-    
+
     this.componentLogger.warn('Branch name omitted outside of project mode.');
     throw ApplicationErrors.invalidInput(
       'Branch name is required when not running in project mode.'

@@ -1,0 +1,53 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-refactor-api-helpers-system-patterns",
+    "title": "System Patterns for feature/refactor-api-helpers",
+    "documentType": "system_patterns",
+    "path": "systemPatterns.json",
+    "tags": [],
+    "createdAt": "2025-04-10T13:00:00.000Z",
+    "lastModified": "2025-04-10T13:37:08.620Z"
+  },
+  "content": {
+    "patterns": [
+      {
+        "id": "pattern-1",
+        "title": "ヘルパークラスによる共通ロジックの抽出パターン",
+        "status": "implemented",
+        "context": "メモリバンク操作APIで複数のユースケースにまたがる共通ロジックが存在する状況",
+        "description": "ブランチ名の解決やリポジトリ選択などの共通処理を専用のヘルパークラスに抽出し、単一責任の原則に従って設計する",
+        "consequences": [
+          "コードの重複が減少する",
+          "ユースケースがよりシンプルになる",
+          "テストが容易になる",
+          "依存性注入が明確になる",
+          "変更時の影響範囲が限定される",
+          "テストが更に容易になる"
+        ],
+        "relatedDecisions": [
+          "BranchResolverServiceの責務範囲の決定",
+          "DocumentRepositorySelectorの責務範囲の決定",
+          "DIコンテナにサービス登録が必要"
+        ]
+      },
+      {
+        "id": "pattern-2",
+        "title": "サービス層でのアダプタパターンの活用",
+        "status": "implemented",
+        "context": "異なるリポジトリ実装（ブランチ/グローバル）を統一的に扱う必要がある状況",
+        "description": "DocumentRepositorySelectorは、リポジトリの違いを吸収するアダプタを提供し、同一インターフェース（IDocumentRepository）を通じたアクセスを可能にする",
+        "consequences": [
+          "リポジトリの切り替えが透過的になる",
+          "新しいリポジトリ種類の追加が容易になる",
+          "UseCase側のコードがシンプルになる",
+          "テストでのモック作成が簡単になる"
+        ],
+        "relatedDecisions": [
+          "IDocumentRepositoryインターフェースの適用",
+          "リポジトリアダプタの実装方法"
+        ]
+      }
+    ]
+  }
+}

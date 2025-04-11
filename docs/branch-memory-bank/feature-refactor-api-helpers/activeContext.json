@@ -1,0 +1,57 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-refactor-api-helpers-active-context",
+    "title": "Active Context for feature/refactor-api-helpers",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [],
+    "createdAt": "2025-04-10T13:00:00.000Z",
+    "lastModified": "2025-04-10T13:36:54.425Z"
+  },
+  "content": {
+    "current_task": "統合APIの実装とすべてのテストが完了、プルリクエスト作成準備完了",
+    "relevant_files": [
+      "../feature/refactor-api/design/api-refactoring-plan.json",
+      "../feature/refactor-api/design/api-refactoring-test-strategy.json",
+      "../feature/refactor-api/design/api-refactoring-implementation-plan.json"
+    ],
+    "recent_decisions": [
+      {
+        "date": "2025-04-10",
+        "description": "親ブランチ（feature/refactor-api）から機能別に分割したサブブランチを作成することを決定",
+        "rationale": "効率的な開発とレビューを容易にするため"
+      },
+      {
+        "date": "2025-04-10",
+        "description": "最初のサブブランチとしてヘルパークラス実装用のfeature/refactor-api-helpersを作成",
+        "rationale": "基盤となるヘルパークラスを先に実装することで、後続の実装をスムーズにするため"
+      },
+      {
+        "date": "2025-04-10",
+        "description": "BranchResolverServiceで空文字列の場合は適切なドメインエラーをスローするように実装",
+        "rationale": "自動検出ロジックと空の検証エラーが競合しないようにするため"
+      },
+      {
+        "date": "2025-04-10",
+        "description": "DocumentRepositorySelectorにロギングを追加し、エラーハンドリングを強化",
+        "rationale": "外部からの入力に対してデバッグ情報を充実させ、問題発生時の追跡を容易にするため"
+      },
+      {
+        "date": "2025-04-10",
+        "description": "統合テストではクラスを手動でDIコンテナに登録",
+        "rationale": "新しいクラスなのでサービス登録がまだないため"
+      },
+      {
+        "date": "2025-04-10",
+        "description": "実装したヘルパークラスをコミット",
+        "rationale": "単体テストと統合テストの実行で動作確認が取れたため"
+      },
+      {
+        "date": "2025-04-10",
+        "rationale": "計画通りに実装が進んだため",
+        "description": "新しい統合API (ReadDocumentUseCase / WriteDocumentUseCase) も実装完了"
+      }
+    ]
+  }
+}

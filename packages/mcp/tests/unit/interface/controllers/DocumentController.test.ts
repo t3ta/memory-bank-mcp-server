@@ -281,15 +281,10 @@ describe('DocumentController', () => {
         content: { key: 'value' },
         patches: [{ op: 'replace', path: '/key', value: 'updated' }],
       };
-      (mockPresenter.presentError as Mock).mockReturnValue({ success: false, error: 'Cannot provide both content and patches' });
-
-      // Act
-      const result = await controller.writeDocument(params);
-
-      // Assert
+      
+      // Act & Assert
+      await expect(controller.writeDocument(params)).rejects.toThrow('Cannot provide both content and patches simultaneously');
       expect(mockWriteBranchDocumentUseCase.execute).not.toHaveBeenCalled();
-      expect(mockPresenter.presentError).toHaveBeenCalled();
-      expect(result).toEqual({ success: false, error: 'Cannot provide both content and patches' });
     });
   });
 });

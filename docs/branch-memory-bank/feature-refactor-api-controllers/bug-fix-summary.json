@@ -1,0 +1,63 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "bug-fix-summary",
+    "title": "Build/Test エラー修正サマリー",
+    "documentType": "technical_note",
+    "path": "bug-fix-summary.json",
+    "tags": [],
+    "createdAt": "2025-04-11T12:00:00.000Z",
+    "lastModified": "2025-04-11T04:24:36.426Z"
+  },
+  "content": {
+    "summary": "APIコントローラーリファクタリングブランチでのビルドとテストの問題を修正しました。",
+    "issuesFixed": [
+      {
+        "issue": "ビルドエラー: document-tools.ts で fast-json-patch ライブラリが使用されていた",
+        "cause": "プロジェクトで使われていないfast-json-patchライブラリがimportされていて、型の不一致が発生していた",
+        "solution": "プロジェクトの依存関係に含まれているrfc6902ライブラリを使用するようにコードを修正し、型変換のためのフォーマット処理も追加",
+        "files": [
+          "packages/mcp/src/interface/tools/document-tools.ts"
+        ]
+      },
+      {
+        "issue": "テストエラー: DocumentController.test.tsのバリデーションテストが失敗",
+        "cause": "コードでエラーをthrowしていたが、テストではpresenter.presentErrorの呼び出しを期待していた",
+        "solution": "DocumentController.tsのバリデーションロジックを修正して、Errorをthrowする代わりにpresenter.presentErrorを返すように変更",
+        "files": [
+          "packages/mcp/src/interface/controllers/DocumentController.ts"
+        ]
+      }
+    ],
+    "implementationNotes": [
+      "依存関係のないライブラリを使わないことを意識する",
+      "テストと実装のエラーハンドリング方法を一致させることが重要",
+      "異なるパターンのJSONパッチライブラリ間での型変換に注意する"
+    ],
+    "codeChanges": [
+      {
+        "file": "packages/mcp/src/interface/tools/document-tools.ts",
+        "change": "fast-json-patchの代わりにrfc6902を使用するよう変更",
+        "details": "パッチ適用時に型変換のためのフォーマット処理を追加し、rfc6902の期待する形式に合わせた"
+      },
+      {
+        "file": "packages/mcp/src/interface/controllers/DocumentController.ts",
+        "change": "バリデーションエラー時の処理方法変更",
+        "details": "直接Errorをthrowする代わりに、presenter.presentError(error)を返すように変更してテストと一致させた"
+      }
+    ],
+    "testResults": {
+      "initialStatus": "ビルドエラーとテスト失敗",
+      "finalStatus": "ビルド成功・テスト成功",
+      "improvements": [
+        "TypeScriptコンパイラエラーの解消",
+        "エラーハンドリングの一貫性向上"
+      ]
+    },
+    "nextSteps": [
+      "統合テスト（E2Eテスト）も実行して検証する",
+      "document-tools.tsの全体的なリファクタリングを検討する（長すぎる、責務が多い）",
+      "エラーハンドリングパターンの標準化を検討する"
+    ]
+  }
+}

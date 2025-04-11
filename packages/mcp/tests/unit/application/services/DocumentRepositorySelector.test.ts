@@ -2,9 +2,9 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import type { Mock } from 'vitest';
 // Mock BranchInfo module
 const mockBranchInfoCreate = vi.fn();
-const mockBranchInfo = { 
-  name: '', 
-  safeName: '', 
+const mockBranchInfo = {
+  name: '',
+  safeName: '',
   displayName: '',
   type: '',
   equals: vi.fn().mockReturnValue(false),
@@ -112,10 +112,10 @@ class DocumentRepositorySelector {
     } else if (scope === 'branch') {
       const resolvedBranchName = await this.resolveBranchName(branchName);
       const branchInfo = BranchInfo.create(resolvedBranchName);
-      
+
       // ここでexistsを呼び出す - テストスパイを設定
       await this.branchRepository.exists(branchInfo.safeName);
-      
+
       return {
         repository: this.createBranchRepositoryAdapter(branchInfo),
         branchInfo,
@@ -163,7 +163,7 @@ class DocumentRepositorySelector {
     if (branchName) {
       return branchName;
     }
-    
+
     const config = this.configProvider.getConfig();
     if (config.isProjectMode) {
       try {
@@ -173,7 +173,7 @@ class DocumentRepositorySelector {
         throw new ApplicationError('APP_ERROR.INVALID_INPUT', 'Branch name is required');
       }
     }
-    
+
     throw new ApplicationError('APP_ERROR.INVALID_INPUT', 'Branch name is required');
   }
 }

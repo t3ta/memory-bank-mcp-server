@@ -1,0 +1,52 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "api-refactoring-test-strategy",
+    "title": "API リファクタリング テスト戦略と実装計画",
+    "documentType": "design",
+    "path": "design/api-refactoring-test-strategy.json",
+    "tags": [],
+    "createdAt": "2025-04-10T13:15:00Z",
+    "lastModified": "2025-04-10T12:47:16.980Z"
+  },
+  "content": {
+    "sections": [
+      {
+        "title": "概要",
+        "content": "新しい統合API（`write_document`、`read_document`）の実装に向けたテスト戦略と実装計画を定義します。既存のテストケースを最大限に活用しながら、新APIの品質を確保するためのアプローチを示します。"
+      },
+      {
+        "title": "テスト戦略の方針",
+        "content": "1. **既存テストの活用**: すでに存在する充実したテストケースを最大限に活用\n2. **ヘルパークラスの優先実装**: 共通ロジックを抽出したヘルパークラスをまず実装・テスト\n3. **段階的なアプローチ**: 基本機能→エラー処理→特殊ケースの順で実装・テスト\n4. **並行運用の考慮**: 移行期間中は新旧APIが並存することを想定したテスト"
+      },
+      {
+        "title": "リファクタリングしたいファイル",
+        "content": "既存コードを分析した結果、以下のファイルをリファクタリングの対象とします：\n\n### 核となるUseCaseファイル\n- `packages/mcp/src/application/usecases/branch/ReadBranchDocumentUseCase.ts`\n- `packages/mcp/src/application/usecases/branch/WriteBranchDocumentUseCase.ts`\n- `packages/mcp/src/application/usecases/global/ReadGlobalDocumentUseCase.ts`\n- `packages/mcp/src/application/usecases/global/WriteGlobalDocumentUseCase.ts`\n\n### 統合テストファイル\n- `packages/mcp/tests/integration/usecase/ReadBranchDocumentUseCase.integration.test.ts`\n- `packages/mcp/tests/integration/usecase/WriteBranchDocumentUseCase.integration.test.ts`\n- `packages/mcp/tests/integration/usecase/ReadGlobalDocumentUseCase.integration.test.ts`\n- `packages/mcp/tests/integration/usecase/WriteGlobalDocumentUseCase.integration.test.ts`"
+      },
+      {
+        "title": "新しく作成するファイル",
+        "content": "### ヘルパークラス\n1. `BranchResolverService.ts` - ブランチ名の解決・検証を担当\n2. `DocumentRepositorySelector.ts` - スコープに基づいたリポジトリ選択を担当\n\n### UseCase\n1. `WriteDocumentUseCase.ts` - 統合された書き込みAPI\n2. `ReadDocumentUseCase.ts` - 統合された読み取りAPI\n\n### テスト\n1. `BranchResolverService.test.ts` - ブランチ名解決サービスのユニットテスト\n2. `DocumentRepositorySelector.test.ts` - リポジトリセレクタのユニットテスト\n3. `WriteDocumentUseCase.integration.test.ts` - 統合された書き込みAPIのテスト\n4. `ReadDocumentUseCase.integration.test.ts` - 統合された読み取りAPIのテスト"
+      },
+      {
+        "title": "ヘルパークラスのテスト設計",
+        "content": "### `BranchResolverService.test.ts`\n\n```typescript\ndescribe('BranchResolverService Tests', () => {\n  // セットアップ\n  \n  describe('resolveBranchName', () => {\n    it('should return provided branch name when valid', async () => {/*...*/});\n    it('should auto-detect current branch in project mode when not provided', async () => {/*...*/});\n    it('should throw in non-project mode when branch name is not provided', async () => {/*...*/});\n    it('should throw when GitService fails to get current branch', async () => {/*...*/});\n    it('should validate the branch name format', async () => {/*...*/});\n  });\n});\n```\n\n### `DocumentRepositorySelector.test.ts`\n\n```typescript\ndescribe('DocumentRepositorySelector Tests', () => {\n  // セットアップ\n  \n  describe('getRepository', () => {\n    it('should return branch repository for branch scope', async () => {/*...*/});\n    it('should return global repository for global scope', async () => {/*...*/});\n    it('should throw for invalid scope', async () => {/*...*/});\n    it('should resolve branch name for branch scope', async () => {/*...*/});\n    it('should create adapter that forwards to correct repository', async () => {/*...*/});\n  });\n});\n```"
+      },
+      {
+        "title": "新しいユースケースのテスト設計",
+        "content": "### `WriteDocumentUseCase.integration.test.ts`\n\n```typescript\ndescribe('WriteDocumentUseCase Integration Tests', () => {\n  // 基本セットアップ\n  \n  describe('scope: \"branch\" tests', () => {\n    // ブランチスコープでの基本テスト\n    it('should create a document in branch scope with explicit branch name', async () => {/*...*/});\n    it('should create a document in branch scope with auto-detected branch in project mode', async () => {/*...*/});\n    it('should throw when branch is omitted outside project mode', async () => {/*...*/});\n    \n    // 既存のWriteBranchDocumentUseCase.integration.testからコピーしたテスト\n    it('should update an existing document in branch scope', async () => {/*...*/});\n    it('should apply patches to a document in branch scope', async () => {/*...*/});\n    // エラーケースもコピー\n  });\n  \n  describe('scope: \"global\" tests', () => {\n    // グローバルスコープでの基本テスト\n    it('should create a document in global scope', async () => {/*...*/});\n    \n    // 既存のWriteGlobalDocumentUseCase.integration.testからコピーしたテスト\n    it('should update an existing document in global scope', async () => {/*...*/});\n    it('should apply patches to a document in global scope', async () => {/*...*/});\n    // エラーケースもコピー\n  });\n  \n  describe('scope validation', () => {\n    it('should throw when scope is invalid', async () => {/*...*/});\n    it('should throw when scope is missing', async () => {/*...*/});\n    // その他のバリデーションテスト\n  });\n});\n```\n\n### `ReadDocumentUseCase.integration.test.ts`\n\n```typescript\ndescribe('ReadDocumentUseCase Integration Tests', () => {\n  // 基本セットアップ\n  \n  describe('scope: \"branch\" tests', () => {\n    // ブランチスコープでの基本テスト\n    it('should read a document from branch scope with explicit branch name', async () => {/*...*/});\n    it('should read a document from branch scope with auto-detected branch in project mode', async () => {/*...*/});\n    it('should throw when branch is omitted outside project mode', async () => {/*...*/});\n    \n    // 既存のReadBranchDocumentUseCase.integration.testからコピーしたテスト\n    // エラーケースもコピー\n  });\n  \n  describe('scope: \"global\" tests', () => {\n    // グローバルスコープでの基本テスト\n    it('should read a document from global scope', async () => {/*...*/});\n    \n    // 既存のReadGlobalDocumentUseCase.integration.testからコピーしたテスト\n    // エラーケースもコピー\n  });\n  \n  describe('scope validation', () => {\n    it('should throw when scope is invalid', async () => {/*...*/});\n    it('should throw when scope is missing', async () => {/*...*/});\n    // その他のバリデーションテスト\n  });\n});\n```"
+      },
+      {
+        "title": "実装計画",
+        "content": "### フェーズ1：ヘルパークラス実装\n1. `BranchResolverService` の実装とテスト\n2. `DocumentRepositorySelector` の実装とテスト\n\n### フェーズ2：新API実装\n1. `WriteDocumentUseCase` のスケルトン実装と基本テスト\n2. `ReadDocumentUseCase` のスケルトン実装と基本テスト\n3. 各スコープ（branch/global）のロジック実装とテスト\n4. エラー処理と特殊ケースの実装とテスト\n\n### フェーズ3：既存API改修\n1. 既存APIが新APIを呼び出すように改修\n2. 既存のテストで動作確認\n\n### フェーズ4：ドキュメント更新と総合テスト\n1. APIドキュメントの更新\n2. エンドツーエンドテストの実施"
+      },
+      {
+        "title": "テスト実施のポイント",
+        "content": "1. **重複を避ける**: 既存テストから必要最小限のケースだけをコピーし、重複を避ける\n2. **テストヘルパーの活用**: 既存のヘルパー関数（`setupTestEnv`、`loadBranchFixture`等）を再利用する\n3. **DI管理**: 依存性注入を活用して柔軟なテスト構成を実現する\n4. **境界値のテスト**: スコープの切り替え、エラー条件など、境界ケースを重点的にテストする\n5. **段階的な実行**: 単純なケースから複雑なケースへと段階的にテストを実行する"
+      },
+      {
+        "title": "考慮すべき課題",
+        "content": "1. **既存APIの互換性**: 既存の呼び出し元に影響を与えないように注意する\n2. **エラーメッセージの一貫性**: 新APIと既存APIでエラーメッセージの一貫性を保つ\n3. **パフォーマンス**: 不要なオーバーヘッドが生じないようにする\n4. **並行運用期間**: APIの段階的な移行を考慮し、古いAPIと新しいAPIが並存する期間を想定する\n5. **コントローラーへの影響**: APIの変更がコントローラーレイヤーに与える影響を検討する"
+      }
+    ]
+  }
+}

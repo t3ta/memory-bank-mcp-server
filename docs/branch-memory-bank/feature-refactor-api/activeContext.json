@@ -1,0 +1,42 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-refactor-api-active-context",
+    "title": "Active Context for feature/refactor-api",
+    "documentType": "active_context",
+    "path": "activeContext.json",
+    "tags": [],
+    "createdAt": "2025-04-10T12:32:28.730Z",
+    "lastModified": "2025-04-10T12:49:14.105Z"
+  },
+  "content": {
+    "current_task": "テスト戦略と実装計画の策定",
+    "relevant_files": [
+      "design/api-refactoring-plan.json",
+      "design/api-refactoring-test-strategy.json",
+      "design/api-refactoring-implementation-plan.json"
+    ],
+    "recent_decisions": [
+      {
+        "date": "2025-04-10",
+        "description": "write_branch_memory_bank/read_branch_memory_bank/write_global_memory_bank/read_global_memory_bankの4つのコマンドをwrite_document/read_documentの2つに統合する方針を決定",
+        "rationale": "APIの一貫性向上と保守性改善のため"
+      },
+      {
+        "date": "2025-04-10",
+        "description": "新APIではスコープ（branch/global）を明示的に指定する設計を採用",
+        "rationale": "特にグローバルメモリバンクへの誤った書き込みを防止するため"
+      },
+      {
+        "date": "2025-04-10",
+        "description": "プロジェクトモードではbranch/docsパラメータを省略可能にする設計を採用",
+        "rationale": "使いやすさ向上のため"
+      },
+      {
+        "date": "2025-04-10",
+        "description": "新API実装のためのヘルパークラスを作成する設計を采用",
+        "rationale": "重複を減らし、コードの保守性を向上させるため"
+      }
+    ]
+  }
+}

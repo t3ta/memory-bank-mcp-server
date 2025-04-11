@@ -123,6 +123,7 @@ export class DocumentController {
       // Validate that either content or patches are provided
       if (!hasContent && !hasPatches) {
         const error = ApplicationErrors.invalidInput('Either document content or patches must be provided');
+        // Important: Throw the error directly for integration tests compatibility
         throw new Error(error.message);
       }
       

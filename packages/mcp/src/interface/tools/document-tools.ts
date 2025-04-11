@@ -270,6 +270,10 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
           branchNameToUse = await gitService.getCurrentBranchName();
           console.log(`[write_document] Auto-detected branch name: ${branchNameToUse}`);
         }
+        // 念のため未定義でないことを確認
+        if (!branchNameToUse) {
+          throw new Error('Branch name is required but could not be determined automatically');
+        }
         const BranchInfo = (await import('../../domain/entities/BranchInfo.js')).BranchInfo;
         const safeBranchName = BranchInfo.create(branchNameToUse).safeName;
         const branchMemoryPath = `${docPath}/branch-memory-bank/${safeBranchName}`;
@@ -301,9 +305,32 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
               const existingContent = await fsExtra.readFile(fullPath, 'utf-8');
               const jsonContent = JSON.parse(existingContent);
               
-              // Apply patches using jsonpatch library (most commonly used for testing)
-              const jsonpatch = await import('fast-json-patch');
-              const patchedContent = jsonpatch.applyPatch(jsonContent, patches).newDocument;
+              // Apply patches using rfc6902 library (project dependency)
+              const rfc6902Module = await import('rfc6902');
+              
+              // Format patches to ensure they match the rfc6902 format
+              const formattedPatches = patches.map(p => {
+                const operation: any = {
+                  op: p.op,
+                  path: p.path
+                };
+                
+                // Add value for operations that need it
+                if (['add', 'replace', 'test'].includes(operation.op)) {
+                  operation.value = p.value;
+                }
+                
+                // Add from for operations that need it
+                if (['move', 'copy'].includes(operation.op)) {
+                  operation.from = p.from;
+                }
+                
+                return operation;
+              });
+              
+              // Clone the content and apply patches
+              const patchedContent = JSON.parse(JSON.stringify(jsonContent));
+              rfc6902Module.applyPatch(patchedContent, formattedPatches);
               
               // Update metadata tags if original tags exist and params.tags is provided
               if (patchedContent.metadata && params.tags) {
@@ -327,26 +354,27 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
     
     // Call the appropriate controller method based on the scope
     console.log(`[write_document] Calling documentController.writeDocument...`);
-    const result = await documentController.writeDocument({
-      scope,
-      branchName: branch,
-      path,
-      content,
-      patches,
-      tags,
-      returnContent
-    });
-    
-    // Log the result from the controller
-    console.log(`[write_document] DocumentController result:`, {
-      success: result.success,
-      hasData: result.success && !!result.data,
-      dataContent: result.success && result.data?.content ? typeof result.data.content : 'undefined',
-      dataTags: result.success && result.data?.tags ? result.data.tags.join(',') : 'undefined'
-    });
-    
-    // Transform the response to match what E2E tests expect
-    if (result.success && result.data) {
+    try {
+      const result = await documentController.writeDocument({
+        scope,
+        branchName: branch,
+        path,
+        content,
+        patches,
+        tags,
+        returnContent
+      });
+      
+      // Log the result from the controller
+      console.log(`[write_document] DocumentController result:`, {
+        success: result.success,
+        hasData: result.success && !!result.data,
+        dataContent: result.success && result.data?.content ? typeof result.data.content : 'undefined',
+        dataTags: result.success && result.data?.tags ? result.data.tags.join(',') : 'undefined'
+      });
+      
+      // Transform the response to match what E2E tests expect
+      if (result.success && result.data) {
       // Log the actual structure of the result data for debugging
       console.log(`[write_document] Raw result.data structure:`, JSON.stringify(result.data, null, 2));
       
@@ -381,6 +409,10 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
               const gitService = await container.get('gitService');
               branchNameToUse = await gitService.getCurrentBranchName();
               console.log(`[write_document] Auto-detected branch name for file creation: ${branchNameToUse}`);
+            }
+            // 念のため未定義でないことを確認
+            if (!branchNameToUse) {
+              throw new Error('Branch name is required but could not be determined automatically');
             }
             const BranchInfo = (await import('../../domain/entities/BranchInfo.js')).BranchInfo;
             const safeBranchName = BranchInfo.create(branchNameToUse).safeName;
@@ -494,12 +526,19 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
       return response;
     }
     
-    console.log(`[write_document] Returning original result:`, {
-      success: result.success,
-      hasError: !result.success,
-      errorMessage: !result.success ? 'Error occurred' : undefined
-    });
-    return result;
+    // If we get here, it means the result wasn't returned in the try block
+    // which normally shouldn't happen, but we'll handle it gracefully
+    console.log(`[write_document] Result was not properly processed, returning error`);
+    return {
+      success: false,
+      error: {
+        message: 'Failed to process document operation'
+      }
+    };
+    } catch (error) {
+      console.error('Error in write_document controller call:', error);
+      throw error;
+    }
   } catch (error) {
     console.error('Error in write_document:', error);
     throw error;
@@ -650,6 +689,11 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
           console.log(`[read_document] Auto-detected branch name: ${branchNameToUse}`);
         }
         
+        // 念のため未定義でないことを確認
+        if (!branchNameToUse) {
+          throw new Error('Branch name is required but could not be determined automatically');
+        }
+        
         // Get safe branch name
         const BranchInfo = (await import('../../domain/entities/BranchInfo.js')).BranchInfo;
         const safeBranchName = BranchInfo.create(branchNameToUse).safeName;
@@ -699,7 +743,11 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
         let filePath;
         if (scope === 'branch') {
           const BranchInfo = (await import('../../domain/entities/BranchInfo.js')).BranchInfo;
-          const branchNameToUse = branch || await container.get('gitService').getCurrentBranchName();
+          let branchNameToUse = branch || await container.get('gitService').getCurrentBranchName();
+          // 念のため未定義でないことを確認
+          if (!branchNameToUse) {
+            throw new Error('Branch name is required but could not be determined automatically');
+          }
           const safeBranchName = BranchInfo.create(branchNameToUse).safeName;
           filePath = `${docs}/branch-memory-bank/${safeBranchName}/${path}`;
         } else {
@@ -859,3 +907,4 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
     throw error;
   }
 };
+
