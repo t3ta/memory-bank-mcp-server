@@ -1,0 +1,18 @@
+yarn workspace v1.22.22
+yarn run v1.22.22
+$ tsc -p tsconfig.json
+src/interface/tools/document-tools.ts(317,72): error TS2345: Argument of type '{ op: unknown; path: unknown; value: unknown; from: unknown; }[]' is not assignable to parameter of type 'readonly Operation[]'.
+  Type '{ op: unknown; path: unknown; value: unknown; from: unknown; }' is not assignable to type 'Operation'.
+    Type '{ op: unknown; path: unknown; value: unknown; from: unknown; }' is not assignable to type 'GetOperation<any>'.
+      Types of property 'op' are incompatible.
+        Type 'unknown' is not assignable to type '"_get"'.
+error Command failed with exit code 2.
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.
+error Command failed.
+Exit code: 2
+Command: /Users/tmita/.asdf/installs/nodejs/23.10.0/bin/node
+Arguments: /Users/tmita/.asdf/installs/nodejs/23.10.0/lib/node_modules/yarn/lib/cli.js build
+Directory: /Users/tmita/workspace/memory-bank-mcp-server/packages/mcp
+Output:
+
+info Visit https://yarnpkg.com/en/docs/cli/workspace for documentation about this command.

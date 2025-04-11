@@ -5,7 +5,13 @@
     "title": "MCP Tool Manual (English)",
     "documentType": "guide",
     "path": "core/mcp-tool-manual.json",
-    "tags": ["guide", "mcp", "manual", "en", "core"],
+    "tags": [
+      "guide",
+      "mcp",
+      "manual",
+      "en",
+      "core"
+    ],
     "lastModified": "",
     "createdAt": "",
     "version": 1
@@ -17,12 +23,30 @@
         "tool_name": "write_branch_memory_bank",
         "description": "Creates or overwrites a document in a specific branch.",
         "arguments": [
-          {"name": "`branch`", "description": "Target branch name (required, e.g., `feature/my-branch`)"},
-          {"name": "`path`", "description": "Target document path (required, e.g., `data/config.json`)"},
-          {"name": "`docs`", "description": "Path to the document root (required)"},
-          {"name": "`content`", "description": "The complete content of the document (optional, JSON string, object, or plain text, mutually exclusive with `patches`)"},
-          {"name": "`patches`", "description": "Array of JSON Patch operation objects (optional, mutually exclusive with `content`, RFC 6902)"},
-          {"name": "`tags`", "description": "Array of tags to assign to the document (optional)"}
+          {
+            "name": "`branch`",
+            "description": "Target branch name (required, e.g., `feature/my-branch`)"
+          },
+          {
+            "name": "`path`",
+            "description": "Target document path (required, e.g., `data/config.json`)"
+          },
+          {
+            "name": "`docs`",
+            "description": "Path to the document root (required)"
+          },
+          {
+            "name": "`content`",
+            "description": "The complete content of the document (optional, JSON string, object, or plain text, mutually exclusive with `patches`)"
+          },
+          {
+            "name": "`patches`",
+            "description": "Array of JSON Patch operation objects (optional, mutually exclusive with `content`, RFC 6902)"
+          },
+          {
+            "name": "`tags`",
+            "description": "Array of tags to assign to the document (optional)"
+          }
         ],
         "details": [
           "Use `content` to create a new document or completely overwrite an existing one.",
@@ -36,9 +60,18 @@
         "tool_name": "read_branch_memory_bank",
         "description": "Reads the content of a document from a specified branch.",
         "arguments": [
-          {"name": "`branch`", "description": "Target branch name (required, e.g., `feature/my-branch`)"},
-          {"name": "`path`", "description": "Target document path (required, e.g., `data/config.json`)"},
-          {"name": "`docs`", "description": "Path to the document root (required)"}
+          {
+            "name": "`branch`",
+            "description": "Target branch name (required, e.g., `feature/my-branch`)"
+          },
+          {
+            "name": "`path`",
+            "description": "Target document path (required, e.g., `data/config.json`)"
+          },
+          {
+            "name": "`docs`",
+            "description": "Path to the document root (required)"
+          }
         ],
         "return_value": {
           "description": "Returns an object containing the document details.",
@@ -56,11 +89,26 @@
         "tool_name": "write_global_memory_bank",
         "description": "Creates, overwrites, or patches a document in the global memory bank.",
         "arguments": [
-          {"name": "`path`", "description": "Target document path (required, e.g., `core/config.json`)"},
-          {"name": "`docs`", "description": "Path to the document root (required)"},
-          {"name": "`content`", "description": "The complete content of the document (optional, JSON string, object, or plain text, mutually exclusive with `patches`)"},
-          {"name": "`patches`", "description": "Array of JSON Patch operation objects (optional, mutually exclusive with `content`, RFC 6902)"},
-          {"name": "`tags`", "description": "Array of tags to assign to the document (optional)"}
+          {
+            "name": "`path`",
+            "description": "Target document path (required, e.g., `core/config.json`)"
+          },
+          {
+            "name": "`docs`",
+            "description": "Path to the document root (required)"
+          },
+          {
+            "name": "`content`",
+            "description": "The complete content of the document (optional, JSON string, object, or plain text, mutually exclusive with `patches`)"
+          },
+          {
+            "name": "`patches`",
+            "description": "Array of JSON Patch operation objects (optional, mutually exclusive with `content`, RFC 6902)"
+          },
+          {
+            "name": "`tags`",
+            "description": "Array of tags to assign to the document (optional)"
+          }
         ],
         "details": [
           "Functionality is similar to `write_branch_memory_bank` but operates on the global memory bank.",
@@ -74,8 +122,14 @@
         "tool_name": "read_global_memory_bank",
         "description": "Reads the content of a document from the global memory bank.",
         "arguments": [
-          {"name": "`path`", "description": "Target document path (required, e.g., `core/config.json`)"},
-          {"name": "`docs`", "description": "Path to the document root (required)"}
+          {
+            "name": "`path`",
+            "description": "Target document path (required, e.g., `core/config.json`)"
+          },
+          {
+            "name": "`docs`",
+            "description": "Path to the document root (required)"
+          }
         ],
         "return_value": {
           "description": "Returns an object containing the document details.",
@@ -93,9 +147,18 @@
         "tool_name": "read_context",
         "description": "Reads rules, branch memory bank, and global memory bank information at once.",
         "arguments": [
-          {"name": "`branch`", "description": "Current branch name (required, e.g., `feature/my-branch`)"},
-          {"name": "`language`", "description": "Language code for rules (required, `en`, `ja`, or `zh`)"},
-          {"name": "`docs`", "description": "Path to the document root (required)"}
+          {
+            "name": "`branch`",
+            "description": "Current branch name (required, e.g., `feature/my-branch`)"
+          },
+          {
+            "name": "`language`",
+            "description": "Language code for rules (required, `en`, `ja`, or `zh`)"
+          },
+          {
+            "name": "`docs`",
+            "description": "Path to the document root (required)"
+          }
         ],
         "return_value": {
           "description": "Returns an object containing rules and memory bank contents.",
@@ -112,11 +175,26 @@
         "tool_name": "search_documents_by_tags",
         "description": "Searches for documents by tags in branch and/or global memory banks.",
         "arguments": [
-          {"name": "`tags`", "description": "Array of tag names to search for (required, e.g., `[\"feature\", \"refactoring\"]`)"},
-          {"name": "`match`", "description": "Tag matching condition (optional, `and` or `or`, defaults to `or`)"},
-          {"name": "`scope`", "description": "Search scope (optional, `branch`, `global`, `all`, defaults to `all`)"},
-          {"name": "`branch`", "description": "Branch name (optional, required if `scope` is `branch` or `all`)"},
-          {"name": "`docs`", "description": "Path to the document root (required)"}
+          {
+            "name": "`tags`",
+            "description": "Array of tag names to search for (required, e.g., `[\"feature\", \"refactoring\"]`)"
+          },
+          {
+            "name": "`match`",
+            "description": "Tag matching condition (optional, `and` or `or`, defaults to `or`)"
+          },
+          {
+            "name": "`scope`",
+            "description": "Search scope (optional, `branch`, `global`, `all`, defaults to `all`)"
+          },
+          {
+            "name": "`branch`",
+            "description": "Branch name (optional, required if `scope` is `branch` or `all`)"
+          },
+          {
+            "name": "`docs`",
+            "description": "Path to the document root (required)"
+          }
         ],
         "details": [
           "`match: 'or'` finds documents with any of the specified tags.",
@@ -128,6 +206,112 @@
           "note": "Returns an empty array `[]` if no documents match."
         },
         "testing_notes": "Test by creating documents with various tags in a test branch and globally. Perform searches with different `tags`, `match`, and `scope` combinations and verify the results."
+      },
+      {
+        "tool_name": "write_document",
+        "description": "Writes a document to either branch or global memory bank based on the scope parameter.",
+        "arguments": [
+          {
+            "name": "`scope`",
+            "description": "Scope to write to (`branch` or `global`, required)"
+          },
+          {
+            "name": "`branch`",
+            "description": "Branch name (required if scope is \"branch\", auto-detected in project mode)"
+          },
+          {
+            "name": "`path`",
+            "description": "Document path (required, e.g., `data/config.json`)"
+          },
+          {
+            "name": "`docs`",
+            "description": "Path to the document root (required)"
+          },
+          {
+            "name": "`content`",
+            "description": "The complete content of the document (optional, JSON string, object, or plain text, mutually exclusive with `patches`)"
+          },
+          {
+            "name": "`patches`",
+            "description": "Array of JSON Patch operation objects (optional, mutually exclusive with `content`, RFC 6902)"
+          },
+          {
+            "name": "`tags`",
+            "description": "Array of tags to assign to the document (optional)"
+          },
+          {
+            "name": "`returnContent`",
+            "description": "If true, return the full document content in the output (optional, default: false)"
+          }
+        ],
+        "details": [
+          "This is a unified interface for writing to both branch and global memory banks based on the `scope` parameter.",
+          "For `scope: 'branch'`, the `branch` parameter can be omitted in project mode (it will be auto-detected from Git).",
+          "Use `content` to create a new document or completely overwrite an existing one.",
+          "Use `patches` to partially update an existing document. The document must exist and its content must be valid JSON.",
+          "`content` and `patches` cannot be specified simultaneously.",
+          "If `tags` is specified, the document's tags will be set to the provided array.",
+          "When `returnContent` is true, the response includes the complete document content. When false or omitted, only metadata is returned."
+        ],
+        "examples": [
+          "// Writing to branch memory bank\nconst result = await write_document({\n  scope: 'branch',\n  branch: 'feature/my-branch',\n  path: 'data/config.json',\n  content: { key: 'value' },\n  tags: ['config', 'feature'],\n  docs: './docs'\n});",
+          "// Writing to global memory bank\nconst result = await write_document({\n  scope: 'global',\n  path: 'core/config.json',\n  content: { key: 'value' },\n  tags: ['config', 'core'],\n  docs: './docs'\n});",
+          "// Using JSON patch\nconst result = await write_document({\n  scope: 'branch',\n  branch: 'feature/my-branch',\n  path: 'data/config.json',\n  patches: [{ op: 'replace', path: '/key', value: 'new-value' }],\n  docs: './docs'\n});"
+        ],
+        "return_value": {
+          "description": "Returns an object containing the document details.",
+          "properties": [
+            "`document.path`: Document path (string)",
+            "`document.content`: Document content if returnContent is true (string or object, otherwise undefined)",
+            "`document.tags`: Array of tags if returnContent is true (string[], otherwise undefined)",
+            "`document.lastModified`: Last modified timestamp (ISO 8601 string)"
+          ],
+          "note": "Returns an error if the document cannot be written or if there are parameter validation issues."
+        },
+        "testing_notes": "Test with both branch and global scopes. Test content and patches operations. Verify auto-detection of branch name in project mode. Test returnContent behavior."
+      },
+      {
+        "tool_name": "read_document",
+        "description": "Reads a document from either branch or global memory bank based on the scope parameter.",
+        "arguments": [
+          {
+            "name": "`scope`",
+            "description": "Scope to read from (`branch` or `global`, required)"
+          },
+          {
+            "name": "`branch`",
+            "description": "Branch name (required if scope is \"branch\", auto-detected in project mode)"
+          },
+          {
+            "name": "`path`",
+            "description": "Document path (required, e.g., `data/config.json`)"
+          },
+          {
+            "name": "`docs`",
+            "description": "Path to the document root (required)"
+          }
+        ],
+        "details": [
+          "This is a unified interface for reading from both branch and global memory banks based on the `scope` parameter.",
+          "For `scope: 'branch'`, the `branch` parameter can be omitted in project mode (it will be auto-detected from Git).",
+          "JSON documents will be automatically parsed and returned as structured content. Plain text documents will be returned as strings."
+        ],
+        "examples": [
+          "// Reading from branch memory bank\nconst result = await read_document({\n  scope: 'branch',\n  branch: 'feature/my-branch',\n  path: 'data/config.json',\n  docs: './docs'\n});",
+          "// Reading from global memory bank\nconst result = await read_document({\n  scope: 'global',\n  path: 'core/config.json',\n  docs: './docs'\n});",
+          "// Auto-detecting branch name in project mode\nconst result = await read_document({\n  scope: 'branch',\n  // No branch name needed if in project mode\n  path: 'data/config.json',\n  docs: './docs'\n});"
+        ],
+        "return_value": {
+          "description": "Returns an object containing the document details.",
+          "properties": [
+            "`document.path`: Document path (string)",
+            "`document.content`: Document content (string for plain text, object for JSON)",
+            "`document.tags`: Array of tags (string[], empty for plain text files)",
+            "`document.lastModified`: Last modified timestamp (ISO 8601 string)"
+          ],
+          "note": "Returns an error if the document or branch does not exist, or if there are parameter validation issues."
+        },
+        "testing_notes": "Test with both branch and global scopes. Test reading JSON and plain text documents. Verify auto-detection of branch name in project mode."
       }
     ]
   }

@@ -90,7 +90,8 @@ describe('DocumentRepositorySelector and BranchResolverService Integration Tests
     documentRepositorySelector = new DocumentRepositorySelector(
       branchRepository,
       globalRepository,
-      branchResolverService
+      mockGitService,
+      mockConfigProvider
     );
     container.register<DocumentRepositorySelector>('documentRepositorySelector', documentRepositorySelector);
   });

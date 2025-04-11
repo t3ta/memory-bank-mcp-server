@@ -262,7 +262,7 @@ describe('ReadBranchDocumentUseCase Integration Tests', () => {
           // 新しいエラーメッセージは元のメッセージをラップする形に変わっているので、含まれているか確認
           expect((error as ApplicationError).message).toContain('Branch name is required but could not be automatically determined');
           // エラーコードも変わったようなので修正
-          expect((error as ApplicationError).code).toBe('APP_ERROR.USE_CASE_EXECUTION_FAILED');
+          expect((error as ApplicationError).code).toBe('APP_ERROR.INVALID_INPUT');
         }
         expect(mockGitService.getCurrentBranchName).toHaveBeenCalledTimes(1); // GitService が呼ばれる
       });

@@ -1,0 +1,190 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "feature-refactor-api-controllers-implementation-plan",
+    "title": "統合APIコントローラーとコマンド実装計画",
+    "documentType": "implementation_plan",
+    "path": "implementation-plan.json",
+    "tags": [],
+    "createdAt": "2025-04-11T00:00:00.000Z",
+    "lastModified": "2025-04-10T15:42:20.022Z"
+  },
+  "content": {
+    "overview": "この実装計画では、feature/refactor-api-controllersブランチで行うべき作業の詳細な手順と優先順位を定義します。統合APIコントローラーとそれを使用するコマンドの実装に焦点を当てています。",
+    "phases": [
+      {
+        "name": "基盤クラスの実装",
+        "description": "ヘルパークラスと共通インターフェースを先に実装し、後続の作業の基盤を築きます。",
+        "tasks": [
+          {
+            "id": "task-1",
+            "description": "IDocumentRepositoryインターフェースの作成",
+            "priority": "high",
+            "status": "pending",
+            "details": "ブランチとグローバルリポジトリの共通操作を定義するインターフェースを作成します。",
+            "path": "packages/mcp/src/domain/repositories/IDocumentRepository.ts",
+            "dependencies": []
+          },
+          {
+            "id": "task-2",
+            "description": "DocumentRepositorySelectorクラスの実装",
+            "priority": "high",
+            "status": "pending",
+            "details": "スコープとブランチ名に基づいて適切なリポジトリを選択するヘルパークラスを実装します。",
+            "path": "packages/mcp/src/application/services/DocumentRepositorySelector.ts",
+            "dependencies": [
+              "task-1"
+            ]
+          },
+          {
+            "id": "task-3",
+            "description": "DocumentRepositorySelectorの単体テスト作成",
+            "priority": "high",
+            "status": "pending",
+            "details": "ヘルパークラスの動作を検証するテストを作成します。",
+            "path": "packages/mcp/tests/unit/application/services/DocumentRepositorySelector.test.ts",
+            "dependencies": [
+              "task-2"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "コントローラーの実装",
+        "description": "統合APIコントローラーを実装し、単体テストで検証します。",
+        "tasks": [
+          {
+            "id": "task-4",
+            "description": "DocumentControllerクラスの実装",
+            "priority": "high",
+            "status": "pending",
+            "details": "ブランチとグローバルの統合インターフェースを提供するコントローラーを実装します。",
+            "path": "packages/mcp/src/interface/controllers/DocumentController.ts",
+            "dependencies": [
+              "task-2"
+            ]
+          },
+          {
+            "id": "task-5",
+            "description": "DocumentControllerの単体テスト作成",
+            "priority": "high",
+            "status": "pending",
+            "details": "コントローラーの各メソッドのテストを作成します。",
+            "path": "packages/mcp/tests/unit/interface/controllers/DocumentController.test.ts",
+            "dependencies": [
+              "task-4"
+            ]
+          },
+          {
+            "id": "task-6",
+            "description": "DIコンテナへのDocumentControllerの登録",
+            "priority": "medium",
+            "status": "pending",
+            "details": "DIコンテナにDocumentControllerを登録して依存関係を解決できるようにします。",
+            "path": "packages/mcp/src/main/di/providers.ts",
+            "dependencies": [
+              "task-4"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "コマンドの実装",
+        "description": "write_documentとread_documentコマンドを実装します。",
+        "tasks": [
+          {
+            "id": "task-7",
+            "description": "コマンド定義の追加",
+            "priority": "high",
+            "status": "pending",
+            "details": "WRITE_DOCUMENT_COMMANDとREAD_DOCUMENT_COMMANDの定義を追加します。",
+            "path": "packages/mcp/src/tools/definitions.ts",
+            "dependencies": []
+          },
+          {
+            "id": "task-8",
+            "description": "document-tools.tsの作成",
+            "priority": "high",
+            "status": "pending",
+            "details": "write_documentとread_documentの実装を含むファイルを作成します。",
+            "path": "packages/mcp/src/interface/tools/document-tools.ts",
+            "dependencies": [
+              "task-4"
+            ]
+          },
+          {
+            "id": "task-9",
+            "description": "コマンドのインデックスへの追加",
+            "priority": "medium",
+            "status": "pending",
+            "details": "コマンドをインデックスファイルにエクスポートして利用可能にします。",
+            "path": "packages/mcp/src/interface/tools/index.ts",
+            "dependencies": [
+              "task-8"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "テスト・ドキュメント",
+        "description": "統合テストとドキュメントを作成します。",
+        "tasks": [
+          {
+            "id": "task-10",
+            "description": "write_documentコマンドの統合テスト作成",
+            "priority": "medium",
+            "status": "pending",
+            "details": "write_documentコマンドの動作を検証する統合テストを作成します。",
+            "path": "packages/mcp/tests/integration/tools/write_document.integration.test.ts",
+            "dependencies": [
+              "task-8"
+            ]
+          },
+          {
+            "id": "task-11",
+            "description": "read_documentコマンドの統合テスト作成",
+            "priority": "medium",
+            "status": "pending",
+            "details": "read_documentコマンドの動作を検証する統合テストを作成します。",
+            "path": "packages/mcp/tests/integration/tools/read_document.integration.test.ts",
+            "dependencies": [
+              "task-8"
+            ]
+          },
+          {
+            "id": "task-12",
+            "description": "コマンド使用例のドキュメント作成",
+            "priority": "low",
+            "status": "pending",
+            "details": "新しいコマンドの使用方法と例を説明するドキュメントを作成します。",
+            "path": "packages/mcp/README.md",
+            "dependencies": [
+              "task-8"
+            ]
+          }
+        ]
+      }
+    ],
+    "risks": [
+      {
+        "id": "risk-1",
+        "description": "feature/refactor-api-helpersブランチへの依存",
+        "impact": "high",
+        "mitigation": "必要なクラス（特にWriteDocumentUseCase, ReadDocumentUseCase）の実装状況を確認し、必要に応じて修正や拡張を行う。"
+      },
+      {
+        "id": "risk-2",
+        "description": "既存コマンドとの互換性",
+        "impact": "medium",
+        "mitigation": "既存コマンドと新コマンドの動作に矛盾がないことを確認する。必要に応じて既存コマンドにも修正を加える。"
+      },
+      {
+        "id": "risk-3",
+        "description": "テストカバレッジ",
+        "impact": "medium",
+        "mitigation": "単体テストと統合テストでコードパスをカバーし、80%以上のカバレッジを確保する。"
+      }
+    ],
+    "completion_criteria": "すべてのタスクが完了し、すべてのテストが成功（--no-verifyなし）すること。受け入れ条件のチェックリストで合格すること。"
+  }
+}
