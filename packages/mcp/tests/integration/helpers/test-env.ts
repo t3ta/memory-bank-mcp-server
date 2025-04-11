@@ -46,9 +46,8 @@ export async function setupTestEnv(): Promise<TestEnv> {
   // Original paths for copying from actual docs directory
   const sourceTranslationsDir = path.join(projectRoot, 'docs/translations');
   
-  // Only use src/templates/json as source (as requested)
-  // packages/mcp/ ディレクトリは既にprojectRootの中に含まれているので不要
-  const srcTemplatesJsonDir = path.join(projectRoot, 'src/templates/json');
+  // Use packages/mcp/src/templates/json as source (as requested)
+  const srcTemplatesJsonDir = path.join(projectRoot, 'packages/mcp/src/templates/json');
   logger.debug(`[setupTestEnv] Template source path: ${srcTemplatesJsonDir}`);
   
   // Set NODE_ENV to 'test' for proper environment configuration
