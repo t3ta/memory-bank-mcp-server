@@ -126,13 +126,22 @@ export async function registerInfrastructureServices(
 
 
   container.registerFactory('i18nRepository', async () => {
-    // Note: We used to use configProvider to get docsRoot, but now we always use a fixed path
-    // const configProvider = await container.get<IConfigProvider>('configProvider');
+    // Get the config provider to determine whether we need to use a custom path
+    const configProvider = await container.get<IConfigProvider>('configProvider');
+    const config = configProvider.getConfig();
     let translationsDir: string;
     
-    // Only use dist path for translations
-    const projectRoot = process.cwd();
-    translationsDir = path.join(projectRoot, 'packages/mcp/dist/infrastructure/i18n/translations');
+    // Check if we have a custom docsRoot path (for tests)
+    if (config.docsRoot) {
+      // For tests, we use a path relative to docsRoot
+      translationsDir = path.join(config.docsRoot, 'translations');
+      logger.debug(`Using docsRoot-based path for translations: ${translationsDir}`);
+    } else {
+      // For regular operation, use the dist path
+      const projectRoot = process.cwd();
+      translationsDir = path.join(projectRoot, 'packages/mcp/dist/infrastructure/i18n/translations');
+      logger.debug(`Using standard path for translations: ${translationsDir}`);
+    }
     logger.debug(`Using standard path for translations: ${translationsDir}`);
     
     logger.debug(`[DI] Initializing i18nRepository with translationsDir: ${translationsDir}`);
