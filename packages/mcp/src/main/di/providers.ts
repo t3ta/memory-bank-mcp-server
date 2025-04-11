@@ -1,7 +1,7 @@
 // Import DIContainer for both type and value usage, then re-export it.
 import { DIContainer } from './DIContainer.js';
 export { DIContainer };
-import { fileURLToPath } from 'node:url'; // Import fileURLToPath
+// import { fileURLToPath } from 'node:url'; // Not used anymore - using process.cwd() instead
 import { MCPResponsePresenter } from '../../interface/presenters/MCPResponsePresenter.js';
 import { IBranchMemoryBankRepository } from '../../domain/repositories/IBranchMemoryBankRepository.js'; // Import interface
 import { IGlobalMemoryBankRepository } from '../../domain/repositories/IGlobalMemoryBankRepository.js'; // Import interface
