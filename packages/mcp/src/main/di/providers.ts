@@ -127,11 +127,22 @@ export async function registerInfrastructureServices(
 
 
   container.registerFactory('i18nRepository', async () => {
-    // Use process.cwd() to get project root directly
-    const __dirname_i18n = process.cwd();
-    // No need for relative path calculation anymore
-    const projectRoot_i18n = __dirname_i18n;
-    const translationsDir = path.join(projectRoot_i18n, 'packages/mcp/dist/infrastructure/i18n/translations');
+    // Create path for translations based on docsRoot if specified, otherwise use current location
+    const config = container.get<IConfigProvider>('configProvider').getConfig();
+    let translationsDir: string;
+    
+    if (config.docsRoot) {
+      // If docsRoot is provided (typically in tests), use it directly to find translations
+      translationsDir = path.join(config.docsRoot, 'translations');
+      logger.debug(`Using docsRoot for translations: ${translationsDir}`);
+    } else {
+      // Otherwise, use process.cwd() as a fallback for production
+      const __dirname_i18n = process.cwd();
+      const projectRoot_i18n = __dirname_i18n;
+      translationsDir = path.join(projectRoot_i18n, 'packages/mcp/dist/infrastructure/i18n/translations');
+      logger.debug(`Using default path for translations: ${translationsDir}`);
+    }
+    
     logger.debug(`[DI] Initializing i18nRepository with translationsDir: ${translationsDir}`);
     const { FileI18nRepository } = await import('../../infrastructure/i18n/FileI18nRepository.js');
     const i18nRepository = new FileI18nRepository(translationsDir);
@@ -377,11 +388,22 @@ export async function registerApplicationServices(container: DIContainer): Promi
   // Register TemplateRepository after I18nService is initialized
   container.registerFactory('templateRepository', async () => {
     logger.debug('Resolving dependencies for templateRepository...');
-    // Use process.cwd() to get project root directly
-    const __dirname_tmpl = process.cwd();
-    // No need for relative path calculation anymore
-    const projectRoot_tmpl = __dirname_tmpl;
-    const templateBasePath = path.join(projectRoot_tmpl, 'packages/mcp/dist/templates/json');
+    // Create path for templates based on docsRoot if specified, otherwise use current location
+    const config = container.get<IConfigProvider>('configProvider').getConfig();
+    let templateBasePath: string;
+    
+    if (config.docsRoot) {
+      // If docsRoot is provided (typically in tests), use it directly to find templates
+      templateBasePath = path.join(config.docsRoot, 'templates/json');
+      logger.debug(`Using docsRoot for templates: ${templateBasePath}`);
+    } else {
+      // Otherwise, use process.cwd() as a fallback for production
+      const __dirname_tmpl = process.cwd();
+      const projectRoot_tmpl = __dirname_tmpl;
+      templateBasePath = path.join(projectRoot_tmpl, 'packages/mcp/dist/templates/json');
+      logger.debug(`Using default path for templates: ${templateBasePath}`);
+    }
+    
     logger.debug(`Template base path resolved to: ${templateBasePath}`);
     const i18nService = await container.get<I18nService>('i18nService'); // i18nService is now guaranteed to be initialized
     const templateRepository = new FileTemplateRepository(templateBasePath, i18nService);
