@@ -126,9 +126,8 @@ export async function registerInfrastructureServices(
 
 
   container.registerFactory('i18nRepository', async () => {
-    // Create path for translations based on docsRoot if specified, otherwise use current location
-    const configProvider = await container.get<IConfigProvider>('configProvider');
-    // Note: We're not directly using config here as we're always using a fixed path for translations
+    // Note: We used to use configProvider to get docsRoot, but now we always use a fixed path
+    // const configProvider = await container.get<IConfigProvider>('configProvider');
     let translationsDir: string;
     
     // Only use dist path for translations
@@ -381,9 +380,8 @@ export async function registerApplicationServices(container: DIContainer): Promi
   // Register TemplateRepository after I18nService is initialized
   container.registerFactory('templateRepository', async () => {
     logger.debug('Resolving dependencies for templateRepository...');
-    // Create path for templates based on docsRoot if specified, otherwise use current location
-    const configProvider = await container.get<IConfigProvider>('configProvider');
-    // Note: We're not directly using config here as we're always using a fixed path for templates
+    // Note: We used to use configProvider to get docsRoot, but now we always use a fixed path
+    // const configProvider = await container.get<IConfigProvider>('configProvider');
     let templateBasePath: string;
     
     // Only use dist path for templates
