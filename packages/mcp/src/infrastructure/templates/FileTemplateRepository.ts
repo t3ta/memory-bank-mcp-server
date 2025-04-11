@@ -126,41 +126,7 @@ export class FileTemplateRepository implements ITemplateRepository {
   ): Promise<Record<string, any>> { // Return type is a generic JSON object
     let template = await this.getTemplate(id);
 
-    // Special case for 'rules' template which is critical for tests
-    if (!template && id === 'rules') {
-      this.componentLogger.warn(`Template '${id}' not found in cache, creating fallback template for tests`);
-      
-      // Create a minimal template for testing purposes
-      const fallbackSections = [
-        new Section(
-          'fallbackSection',
-          { en: 'Fallback Section', ja: 'フォールバックセクション', zh: '后备部分' },
-          { en: 'This is a fallback template created for testing.', 
-            ja: 'これはテスト用に作成されたフォールバックテンプレートです。',
-            zh: '这是为测试创建的后备模板。' },
-          false
-        )
-      ];
-      
-      template = new Template(
-        id,
-        'system',
-        { en: 'Rules', ja: 'ルール', zh: '规则' },
-        fallbackSections
-      );
-      
-      // Save to cache so it will be found on subsequent calls
-      this.templateCache.set(id, template);
-      
-      try {
-        // Try to save the template permanently
-        await this.saveTemplate(template);
-        this.componentLogger.info(`Saved fallback '${id}' template to disk`);
-      } catch (saveError) {
-        this.componentLogger.warn(`Could not save fallback '${id}' template to disk: ${saveError}`);
-        // Continue anyway since we've already added it to the cache
-      }
-    } else if (!template) {
+    if (!template) {
       throw new Error(`Template not found: ${id}`);
     }
 

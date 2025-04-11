@@ -1,7 +1,6 @@
 // Import DIContainer for both type and value usage, then re-export it.
 import { DIContainer } from './DIContainer.js';
 export { DIContainer };
-// import { fileURLToPath } from 'node:url'; // Not used anymore - using process.cwd() instead
 import { MCPResponsePresenter } from '../../interface/presenters/MCPResponsePresenter.js';
 import { IBranchMemoryBankRepository } from '../../domain/repositories/IBranchMemoryBankRepository.js'; // Import interface
 import { IGlobalMemoryBankRepository } from '../../domain/repositories/IGlobalMemoryBankRepository.js'; // Import interface
@@ -132,17 +131,10 @@ export async function registerInfrastructureServices(
     const config = configProvider.getConfig();
     let translationsDir: string;
     
-    if (config.docsRoot) {
-      // If docsRoot is provided (typically in tests), use it directly to find translations
-      translationsDir = path.join(config.docsRoot, 'translations');
-      logger.debug(`Using docsRoot for translations: ${translationsDir}`);
-    } else {
-      // Otherwise, use process.cwd() as a fallback for production
-      const __dirname_i18n = process.cwd();
-      const projectRoot_i18n = __dirname_i18n;
-      translationsDir = path.join(projectRoot_i18n, 'packages/mcp/dist/infrastructure/i18n/translations');
-      logger.debug(`Using default path for translations: ${translationsDir}`);
-    }
+    // Only use dist path for translations
+    const projectRoot = process.cwd();
+    translationsDir = path.join(projectRoot, 'packages/mcp/dist/infrastructure/i18n/translations');
+    logger.debug(`Using standard path for translations: ${translationsDir}`);
     
     logger.debug(`[DI] Initializing i18nRepository with translationsDir: ${translationsDir}`);
     const { FileI18nRepository } = await import('../../infrastructure/i18n/FileI18nRepository.js');
@@ -394,17 +386,10 @@ export async function registerApplicationServices(container: DIContainer): Promi
     const config = configProvider.getConfig();
     let templateBasePath: string;
     
-    if (config.docsRoot) {
-      // If docsRoot is provided (typically in tests), use it directly to find templates
-      templateBasePath = path.join(config.docsRoot, 'templates/json');
-      logger.debug(`Using docsRoot for templates: ${templateBasePath}`);
-    } else {
-      // Otherwise, use process.cwd() as a fallback for production
-      const __dirname_tmpl = process.cwd();
-      const projectRoot_tmpl = __dirname_tmpl;
-      templateBasePath = path.join(projectRoot_tmpl, 'packages/mcp/dist/templates/json');
-      logger.debug(`Using default path for templates: ${templateBasePath}`);
-    }
+    // Only use dist path for templates
+    const projectRoot = process.cwd();
+    templateBasePath = path.join(projectRoot, 'packages/mcp/dist/templates/json');
+    logger.debug(`Using standard path for templates: ${templateBasePath}`);
     
     logger.debug(`Template base path resolved to: ${templateBasePath}`);
     const i18nService = await container.get<I18nService>('i18nService'); // i18nService is now guaranteed to be initialized

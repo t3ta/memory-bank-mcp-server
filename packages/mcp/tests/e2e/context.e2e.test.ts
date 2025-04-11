@@ -31,9 +31,12 @@ describe('MCP E2E Context Tests', () => {
   };
 
   beforeEach(async () => {
+    // Debug log for test
+    console.log('Setting up context e2e test environment...');
     const setup = await setupE2ETestEnv();
     app = setup.app;
     cleanup = setup.cleanup;
+    console.log('Context e2e test setup complete');
 
     const branchController = app.getBranchController();
 
@@ -65,12 +68,41 @@ describe('MCP E2E Context Tests', () => {
   });
 
   it('should read context including branch, global memory, and rules (ja)', async () => {
+    console.log('Starting context test with language ja');
     const contextController = app.getContextController();
+    
+    // First test rules API directly to see if it works
+    try {
+      console.log('Testing readRules API directly...');
+      const rulesResult = await contextController.readRules('ja');
+      console.log('Rules API result success:', rulesResult.success);
+      console.log('Rules API error:', rulesResult.error);
+    } catch (rulesError) {
+      console.error('Error in direct rules test:', rulesError);
+    }
+    
+    // Then test context API
+    try {
+      console.log('Testing readContext API...');
+      const contextResult = await contextController.readContext({
+        branch: testBranchName,
+        language: 'ja'
+      });
+      
+      // Debug output
+      console.log('Context result success:', contextResult.success);
+      console.log('Context result error:', contextResult.error);
+      console.log('Context result has rules:', contextResult.data?.rules !== undefined);
+    } catch (error) {
+      console.error('Error in context test:', error);
+      throw error;
+    }
+
     const contextResult = await contextController.readContext({
       branch: testBranchName,
       language: 'ja'
     });
-
+    
     expect(contextResult).toBeDefined();
     expect(contextResult.success).toBe(true);
     expect(contextResult.data).toBeDefined();

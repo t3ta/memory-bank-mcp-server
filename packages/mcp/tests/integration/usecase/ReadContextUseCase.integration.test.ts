@@ -25,14 +25,7 @@ describe('ReadContextUseCase Integration Tests', () => {
     useCase = await container.get<ReadContextUseCase>('readContextUseCase');
     readRulesUseCase = await container.get<ReadRulesUseCase>('readRulesUseCase');
     branchRepo = await container.get<IBranchMemoryBankRepository>('branchMemoryBankRepository');
-    logger.setLevel('trace'); // Use trace level for maximum logging
-    
-    // Extra debugging - check if rules.json actually exists
-    console.log('TEST - docRoot:', testEnv.docRoot);
-    
-    // Extra debugging - check the structure of the templateRepository
-    const templateRepository = await container.get('templateRepository');
-    console.log('TEST - Template IDs:', await templateRepository.getAllTemplateIds());
+    logger.setLevel('debug');
   });
 
   afterEach(async () => {
