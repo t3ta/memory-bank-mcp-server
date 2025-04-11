@@ -63,7 +63,7 @@ const dummyJsonTemplateString = JSON.stringify(dummyJsonTemplate);
 // const dummyLegacyTemplateContent = '# Legacy {{title_placeholder}}\n\nLegacy content {{var1}}.'; // 未使用なので削除
 
 // Mock paths (assuming test runs from project root)
-const jsonTemplatesDir = path.join(process.cwd(), 'src/templates/json');
+const jsonTemplatesDir = path.join(process.cwd(), 'packages/mcp/src/templates/json');
 // const legacyTemplatesDir = path.join(process.cwd(), 'src/templates/markdown'); // 未使用なので削除
 const jsonTemplatePath = path.join(jsonTemplatesDir, `${dummyTemplateId}.json`);
 // const legacyTemplatePathEn = path.join(legacyTemplatesDir, `${dummyTemplateId}-en.md`); // 未使用なので削除
@@ -72,6 +72,9 @@ const jsonTemplatePath = path.join(jsonTemplatesDir, `${dummyTemplateId}.json`);
 describe('JsonTemplateLoader', () => {
   beforeEach(() => {
     vi.clearAllMocks(); // jest -> vi
+
+    // Mock getJsonTemplatesDirectory method to return predictable path
+    vi.spyOn(JsonTemplateLoader.prototype, 'getJsonTemplatesDirectory' as any).mockReturnValue(jsonTemplatesDir);
 
     // Default mock implementations
     (mockI18nProvider.isLanguageSupported as Mock).mockImplementation((lang: string) => ['en', 'ja'].includes(lang)); // as Mock と型注釈を追加
