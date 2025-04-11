@@ -62,7 +62,7 @@
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "rm -f tsconfig.tsbuildinfo && tsc -p tsconfig.json",
     "clean": "rm -rf dist",
     "test": "vitest run",
     "test:watch": "vitest",
