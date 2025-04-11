@@ -42,12 +42,16 @@ export async function setupTestEnv(): Promise<TestEnv> {
   // Go up 4 levels from packages/mcp/tests/integration/helpers to reach the project root
   const projectRoot = path.resolve(path.dirname(currentFilePath), '../../../../');
   logger.debug(`[setupTestEnv] Resolved project root: ${projectRoot}`); // Log resolved project root
+  
   // Original paths for copying from actual docs directory
   const sourceTranslationsDir = path.join(projectRoot, 'docs/translations');
-  const sourceTemplatesJsonDir = path.join(projectRoot, 'docs/templates/json'); // Correct path to actual templates
   
-  // Additional source for templates - from src directory for built-in templates
+  // Only use packages/mcp/src/templates/json as source (as requested)
   const srcTemplatesJsonDir = path.join(projectRoot, 'packages/mcp/src/templates/json');
+  
+  // Set NODE_ENV to 'test' for proper environment configuration
+  process.env.NODE_ENV = 'test';
+  logger.debug(`[setupTestEnv] Set NODE_ENV to: ${process.env.NODE_ENV}`);
 
   // Define target paths within temp docRoot
   const targetTranslationsDir = path.join(docRoot, 'translations');
@@ -94,23 +98,25 @@ export async function setupTestEnv(): Promise<TestEnv> {
     // First ensure the target templates directory exists
     await fs.ensureDir(targetTemplatesJsonDir);
     
-    // Copy templates/json files from docs directory (if it exists)
-    if (await fs.pathExists(sourceTemplatesJsonDir)) {
-      logger.debug(`Source templates/json directory exists: ${sourceTemplatesJsonDir}`);
-      await fs.copy(sourceTemplatesJsonDir, targetTemplatesJsonDir);
-      logger.debug(`Copied templates/json from ${sourceTemplatesJsonDir} to ${targetTemplatesJsonDir}`);
-    } else {
-      logger.warn(`Source templates/json directory not found: ${sourceTemplatesJsonDir}`);
-    }
-    
-    // Now copy built-in templates from src directory (crucial for tests)
+    // Copy from src/templates/json directory only (as requested)
     if (await fs.pathExists(srcTemplatesJsonDir)) {
       logger.debug(`Source src/templates/json directory exists: ${srcTemplatesJsonDir}`);
-      // Use mergeDirectories option to ensure we don't overwrite existing files but add missing ones
-      await fs.copy(srcTemplatesJsonDir, targetTemplatesJsonDir, { overwrite: false });
+      await fs.copy(srcTemplatesJsonDir, targetTemplatesJsonDir);
       logger.debug(`Copied templates/json from src ${srcTemplatesJsonDir} to ${targetTemplatesJsonDir}`);
     } else {
-      logger.error(`Source src/templates/json directory not found: ${srcTemplatesJsonDir}`);
+      logger.error(`Source src/templates/json directory not found: ${srcTemplatesJsonDir}. This is required for tests.`);
+      throw new Error(`Source templates directory not found: ${srcTemplatesJsonDir}`);
+    }
+    
+    // Verify rules.json exists
+    const srcRulesPath = path.join(srcTemplatesJsonDir, 'rules.json');
+    const targetRulesPath = path.join(targetTemplatesJsonDir, 'rules.json');
+    
+    if (await fs.pathExists(srcRulesPath)) {
+      logger.debug(`Confirmed rules.json exists at ${srcRulesPath}`);
+    } else {
+      logger.error(`Critical template file rules.json is missing from source: ${srcRulesPath}`);
+      throw new Error(`Critical template file rules.json is missing`);
     }
     
     // Verify final contents of the templates directory

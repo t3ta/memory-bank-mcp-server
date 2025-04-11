@@ -38,8 +38,12 @@ export class JsonTemplateLoader implements ITemplateLoader {
    * Gets the JSON templates directory path
    */
   private getJsonTemplatesDirectory(): string {
-    // Use project-relative paths instead of import.meta.url
-    return path.join(process.cwd(), 'src/templates/json');
+    // Always use the src path as requested
+    const srcPath = path.join(process.cwd(), 'packages/mcp/src/templates/json');
+    
+    logger.debug(`Using template path: ${srcPath}`);
+    
+    return srcPath;
   }
 
   // Legacy directory method removed
@@ -48,28 +52,32 @@ export class JsonTemplateLoader implements ITemplateLoader {
    * Implements ITemplateLoader.loadJsonTemplate
    */
   async loadJsonTemplate(templateId: string): Promise<JsonTemplate> {
+    // Get template path from src directory only
     const templatePath = path.join(this.getJsonTemplatesDirectory(), `${templateId}.json`);
+    
+    logger.debug(`Trying to load template '${templateId}' from path: ${templatePath}`);
 
     try {
       // Check if file exists
       const exists = await this.fileSystemService.fileExists(templatePath);
       if (!exists) {
+        logger.error(`Template '${templateId}' not found at: ${templatePath}`);
         throw new Error(`Template not found: ${templateId}`);
       }
 
       // Read template file
       const content = await this.fileSystemService.readFile(templatePath);
-
+      
       // Parse and validate template
       const template = JSON.parse(content);
       return validateJsonTemplate(template);
     } catch (error) {
       // If it's a SyntaxError (JSON parse error), rethrow it directly
-      // so the caller can potentially identify it specifically.
       if (error instanceof SyntaxError) {
         throw error;
       }
-      // Otherwise, wrap it in a generic load error message.
+      // Otherwise, wrap in generic load error message
+      logger.error(`Failed to load template '${templateId}': ${error.message}`);
       throw new Error(`Failed to load JSON template ${templateId}: ${(error as Error).message}`);
     }
   }
@@ -106,8 +114,15 @@ export class JsonTemplateLoader implements ITemplateLoader {
    * Implements ITemplateLoader.templateExists
    */
   async templateExists(templateId: string): Promise<boolean> {
-    const jsonPath = path.join(this.getJsonTemplatesDirectory(), `${templateId}.json`);
-    return this.fileSystemService.fileExists(jsonPath);
+    // Only check in src directory
+    const templatePath = path.join(this.getJsonTemplatesDirectory(), `${templateId}.json`);
+    
+    try {
+      return await this.fileSystemService.fileExists(templatePath);
+    } catch (error) {
+      logger.debug(`Error checking if template exists: ${error.message}`);
+      return false;
+    }
   }
 // getLegacyTemplatePath method removed
 }
