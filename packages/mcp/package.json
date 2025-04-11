@@ -15,7 +15,7 @@
     "memory-bank-mcp-server": "./dist/server.js"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "rm -f tsconfig.tsbuildinfo && tsc -p tsconfig.json",
     "clean": "rm -rf dist",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "start": "node dist/index.js",
