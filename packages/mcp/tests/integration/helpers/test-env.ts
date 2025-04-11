@@ -37,18 +37,23 @@ export async function setupTestEnv(): Promise<TestEnv> {
   const branchMemoryPath = path.join(docRoot, 'branch-memory-bank');
   const globalMemoryPath = path.join(docRoot, 'global-memory-bank');
 
-  // Define source paths relative to this file's location using import.meta.url
+  // Use absolute path based on this file's location
   const currentFilePath = fileURLToPath(import.meta.url);
-  // Go up 4 levels from packages/mcp/tests/integration/helpers to reach the project root
+  // Current file is at: packages/mcp/tests/integration/helpers/test-env.ts
+  // So we need to go up 4 levels to reach the project root
   const projectRoot = path.resolve(path.dirname(currentFilePath), '../../../../');
-  logger.debug(`[setupTestEnv] Resolved project root: ${projectRoot}`); // Log resolved project root
+  logger.debug(`[setupTestEnv] Resolved project root: ${projectRoot}`);
+  logger.debug(`[setupTestEnv] Current file path: ${currentFilePath}`);
+  logger.debug(`[setupTestEnv] Current directory: ${path.dirname(currentFilePath)}`);
+  
+  // We know our templates are at packages/mcp/src/templates/json
+  // But based on our projectRoot, we need to figure out if that's already included
+  // Let's create the path directly from our current file location
+  const srcTemplatesJsonDir = path.resolve(path.dirname(currentFilePath), '../../../src/templates/json');
+  logger.debug(`[setupTestEnv] Template source path: ${srcTemplatesJsonDir}`);
   
   // Original paths for copying from actual docs directory
   const sourceTranslationsDir = path.join(projectRoot, 'docs/translations');
-  
-  // Use packages/mcp/src/templates/json as source (as requested)
-  const srcTemplatesJsonDir = path.join(projectRoot, 'packages/mcp/src/templates/json');
-  logger.debug(`[setupTestEnv] Template source path: ${srcTemplatesJsonDir}`);
   
   // Set NODE_ENV to 'test' for proper environment configuration
   process.env.NODE_ENV = 'test';
