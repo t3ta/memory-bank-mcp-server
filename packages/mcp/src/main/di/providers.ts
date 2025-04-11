@@ -128,7 +128,8 @@ export async function registerInfrastructureServices(
 
   container.registerFactory('i18nRepository', async () => {
     // Create path for translations based on docsRoot if specified, otherwise use current location
-    const config = container.get<IConfigProvider>('configProvider').getConfig();
+    const configProvider = await container.get<IConfigProvider>('configProvider');
+    const config = configProvider.getConfig();
     let translationsDir: string;
     
     if (config.docsRoot) {
@@ -389,7 +390,8 @@ export async function registerApplicationServices(container: DIContainer): Promi
   container.registerFactory('templateRepository', async () => {
     logger.debug('Resolving dependencies for templateRepository...');
     // Create path for templates based on docsRoot if specified, otherwise use current location
-    const config = container.get<IConfigProvider>('configProvider').getConfig();
+    const configProvider = await container.get<IConfigProvider>('configProvider');
+    const config = configProvider.getConfig();
     let templateBasePath: string;
     
     if (config.docsRoot) {

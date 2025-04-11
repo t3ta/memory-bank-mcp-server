@@ -79,8 +79,8 @@ export class JsonTemplateLoader implements ITemplateLoader {
         throw error;
       }
       // Otherwise, wrap in generic load error message
-      logger.error(`Failed to load template '${templateId}': ${error.message}`);
-      throw new Error(`Failed to load JSON template ${templateId}: ${(error as Error).message}`);
+      logger.error(`Failed to load template '${templateId}': ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(`Failed to load JSON template ${templateId}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -122,7 +122,7 @@ export class JsonTemplateLoader implements ITemplateLoader {
     try {
       return await this.fileSystemService.fileExists(templatePath);
     } catch (error) {
-      logger.debug(`Error checking if template exists: ${error.message}`);
+      logger.debug(`Error checking if template exists: ${error instanceof Error ? error.message : String(error)}`);
       return false;
     }
   }
