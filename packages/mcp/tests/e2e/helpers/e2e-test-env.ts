@@ -24,17 +24,17 @@ async function setupBaseTestEnv(): Promise<TestEnv> {
   const docRoot = path.join(tempDir, 'docs');
   const branchMemoryPath = path.join(docRoot, 'branch-memory-bank');
   const globalMemoryPath = path.join(docRoot, 'global-memory-bank');
-
-  // const currentFilePath = fileURLToPath(import.meta.url); // Not used
-  // const projectRoot = path.resolve(path.dirname(currentFilePath), '../../../../'); // Not used
-  // const sourceTemplatesJsonDir = path.join(projectRoot, 'packages/mcp/tests/integration/fixtures/templates/json'); // Not used
-  const targetTemplatesJsonDir = path.join(docRoot, 'templates/json');
-
+  
+  // Create all required directories
+  const translationsDir = path.join(docRoot, 'translations');
+  // Create the templates directory too - this is where the rules are expected to be found
+  const templatesDir = path.join(docRoot, 'templates');
+  
   await fs.ensureDir(docRoot);
   await fs.ensureDir(branchMemoryPath);
   await fs.ensureDir(globalMemoryPath);
-  await fs.remove(targetTemplatesJsonDir);
-  await fs.ensureDir(targetTemplatesJsonDir);
+  await fs.ensureDir(translationsDir);
+  await fs.ensureDir(templatesDir);
 
   // テンプレートv1形式で正しいIDを持つダミールールファイル
   const dummyRulesContent = JSON.stringify({
@@ -126,10 +126,17 @@ async function setupBaseTestEnv(): Promise<TestEnv> {
     }
   }, null, 2);
 
-  await fs.outputFile(path.join(targetTemplatesJsonDir, 'rules.json'), dummyRulesContent, 'utf-8');
-  await fs.outputFile(path.join(targetTemplatesJsonDir, 'rules-en.json'), dummyRulesEnContent, 'utf-8');
-  await fs.outputFile(path.join(targetTemplatesJsonDir, 'rules-ja.json'), dummyRulesJaContent, 'utf-8');
-  await fs.outputFile(path.join(targetTemplatesJsonDir, 'rules-zh.json'), dummyRulesZhContent, 'utf-8');
+  // Save rules in both translationsDir and templatesDir to ensure they are found
+  await fs.outputFile(path.join(translationsDir, 'rules.json'), dummyRulesContent, 'utf-8');
+  await fs.outputFile(path.join(translationsDir, 'rules-en.json'), dummyRulesEnContent, 'utf-8');
+  await fs.outputFile(path.join(translationsDir, 'rules-ja.json'), dummyRulesJaContent, 'utf-8');
+  await fs.outputFile(path.join(translationsDir, 'rules-zh.json'), dummyRulesZhContent, 'utf-8');
+  
+  // Add the same files to templates directory as well
+  await fs.outputFile(path.join(templatesDir, 'rules.json'), dummyRulesContent, 'utf-8');
+  await fs.outputFile(path.join(templatesDir, 'rules-en.json'), dummyRulesEnContent, 'utf-8');
+  await fs.outputFile(path.join(templatesDir, 'rules-ja.json'), dummyRulesJaContent, 'utf-8');
+  await fs.outputFile(path.join(templatesDir, 'rules-zh.json'), dummyRulesZhContent, 'utf-8');
 
   try {
     execSync('git init', { cwd: tempDir, stdio: 'ignore' });
