@@ -38,10 +38,12 @@ export class JsonTemplateLoader implements ITemplateLoader {
    * Gets the JSON templates directory path
    */
   private getJsonTemplatesDirectory(): string {
-    // Always use the src path as requested
-    const srcPath = path.join(process.cwd(), 'packages/mcp/src/templates/json');
+    // Get from current file's location for more consistent results
+    const currentFilePath = __dirname;
+    // 上の階層に上がって src/templates/json を見つける
+    const srcPath = path.resolve(currentFilePath, '../../../templates/json');
     
-    logger.debug(`Using template path: ${srcPath}`);
+    logger.debug(`Using template path (from __dirname): ${srcPath}`);
     
     return srcPath;
   }
