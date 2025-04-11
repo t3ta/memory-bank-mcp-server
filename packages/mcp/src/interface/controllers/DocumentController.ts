@@ -8,6 +8,7 @@ import { WriteGlobalDocumentUseCase } from '../../application/usecases/global/Wr
 import { ApplicationErrors } from '../../shared/errors/ApplicationError.js';
 import { BaseError } from '../../shared/errors/BaseError.js';
 import type { MCPResponse } from '../presenters/types/MCPResponse.js';
+import { IConfigProvider } from '../../infrastructure/config/interfaces/IConfigProvider.js';
 
 /**
  * Unified controller for document operations in both branch and global scopes.
@@ -30,7 +31,8 @@ export class DocumentController {
     private readonly readGlobalDocumentUseCase: ReadGlobalDocumentUseCase,
     private readonly writeGlobalDocumentUseCase: WriteGlobalDocumentUseCase,
     // private readonly repositorySelector: DocumentRepositorySelector, // Not used currently
-    private readonly presenter: MCPResponsePresenter
+    private readonly presenter: MCPResponsePresenter,
+    private readonly configProvider?: IConfigProvider
   ) {}
 
   /**
@@ -139,8 +141,10 @@ export class DocumentController {
       } else if (scope === 'branch') {
         // Check if branch name is required but not provided
         // For integration test compatibility: we need to throw an error here directly
-        if (!branchName) {
-          // Test expectation: should throw when branch name is not provided
+        // However, if the test is configuring the project mode, we need to respect that
+        
+        if (!branchName && this.configProvider && !this.configProvider.getConfig().isProjectMode) {
+          // Test expectation: should throw when branch name is not provided in non-project mode
           throw new Error('Branch name is required when not running in project mode');
         }
         

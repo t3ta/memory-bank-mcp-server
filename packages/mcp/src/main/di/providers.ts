@@ -409,16 +409,19 @@ export async function registerInterfaceServices(container: DIContainer): Promise
     const writeBranchDocumentUseCase = await container.get<WriteBranchDocumentUseCase>('writeBranchDocumentUseCase');
     const readGlobalDocumentUseCase = await container.get<ReadGlobalDocumentUseCase>('readGlobalDocumentUseCase');
     const writeGlobalDocumentUseCase = await container.get<WriteGlobalDocumentUseCase>('writeGlobalDocumentUseCase');
-    const repositorySelector = await container.get<DocumentRepositorySelector>('documentRepositorySelector');
+    // const repositorySelector = await container.get<DocumentRepositorySelector>('documentRepositorySelector'); // Not used in the current implementation
     const presenter = await container.get<MCPResponsePresenter>('mcpResponsePresenter');
+    
+    const configProvider = await container.get<IConfigProvider>('configProvider');
     
     return new DocumentController(
       readBranchDocumentUseCase,
       writeBranchDocumentUseCase,
       readGlobalDocumentUseCase,
       writeGlobalDocumentUseCase,
-      repositorySelector,
-      presenter
+      // repositorySelector, // Not used in the current implementation
+      presenter,
+      configProvider
     );
   });
 
