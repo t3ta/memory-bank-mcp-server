@@ -1,11 +1,10 @@
 import { setupE2ETestEnv } from './helpers/e2e-test-env.js';
-import type { Application } from '../../src/main/Application.js';
+import { Application } from '../../src/main/Application.js';
 import { MCPInMemoryClient } from './helpers/MCPInMemoryClient.js';
+import { unified_read_document, unified_write_document } from './helpers/unified-e2e-api.js';
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import { BranchInfo } from '../../src/domain/entities/BranchInfo.js';
-import { DocumentController } from '../../src/interface/controllers/DocumentController.js';
-import { read_document, write_document } from '../../src/interface/tools/document-tools.js';
 
 describe('Direct write_document/read_document E2E Tests', () => {
   let testEnv: Awaited<ReturnType<typeof setupE2ETestEnv>>['testEnv'];
@@ -61,8 +60,8 @@ describe('Direct write_document/read_document E2E Tests', () => {
   });
 
   it('should write a document to branch memory bank using direct API', async () => {
-    // Act - Using the API directly
-    const result = await write_document({
+    // Act - Using the unified API
+    const result = await unified_write_document(client, {
       scope: 'branch',
       branch: testBranchName,
       path: testDocPath,
@@ -125,8 +124,8 @@ describe('Direct write_document/read_document E2E Tests', () => {
       content: { message: 'Global content' },
     };
 
-    // Act - Using the API directly
-    const result = await write_document({
+    // Act - Using the unified API
+    const result = await unified_write_document(client, {
       scope: 'global',
       path: globalDocPath,
       content: globalContent,
@@ -211,7 +210,7 @@ describe('Direct write_document/read_document E2E Tests', () => {
     console.log('🔧 Initial file content (raw):', initialFileContent);
     
     // First, try reading the document through the API to verify it's accessible
-    const initialContent = await read_document({
+    const initialContent = await unified_read_document(client, {
       scope: 'branch',
       branch: testBranchName,
       path: testDocPath,
@@ -228,7 +227,7 @@ describe('Direct write_document/read_document E2E Tests', () => {
     if (!initialContent.success) {
       console.warn('🔧 WARNING: Could not read document through API before patching');
       // Rather than failing, we'll create the document again through the API
-      const createResult = await write_document({
+      const createResult = await unified_write_document(client, {
         scope: 'branch',
         branch: testBranchName,
         path: testDocPath,
@@ -249,8 +248,8 @@ describe('Direct write_document/read_document E2E Tests', () => {
     ];
 
     console.log('🔧 Applying patches:', JSON.stringify(patches));
-    // Apply patches through the API
-    const result = await write_document({
+    // Apply patches through the unified API
+    const result = await unified_write_document(client, {
       scope: 'branch',
       branch: testBranchName,
       path: testDocPath,
@@ -358,7 +357,7 @@ describe('Direct write_document/read_document E2E Tests', () => {
 
   it('should read a document from branch memory bank using direct API', async () => {
     // Arrange - Create a document first
-    await write_document({
+    await unified_write_document(client, {
       scope: 'branch',
       branch: testBranchName,
       path: testDocPath,
@@ -367,8 +366,8 @@ describe('Direct write_document/read_document E2E Tests', () => {
       tags: ['read-test']
     });
 
-    // Act - Using the API directly
-    const result = await read_document({
+    // Act - Using the unified API
+    const result = await unified_read_document(client, {
       scope: 'branch',
       branch: testBranchName,
       path: testDocPath,
@@ -424,7 +423,7 @@ describe('Direct write_document/read_document E2E Tests', () => {
       content: { message: 'Global content for reading' },
     };
     
-    await write_document({
+    await unified_write_document(client, {
       scope: 'global',
       path: globalDocPath,
       content: globalContent,
@@ -432,8 +431,8 @@ describe('Direct write_document/read_document E2E Tests', () => {
       tags: globalContent.metadata.tags
     });
 
-    // Act - Using the API directly
-    const result = await read_document({
+    // Act - Using the unified API
+    const result = await unified_read_document(client, {
       scope: 'global',
       path: globalDocPath,
       docs: testEnv.docRoot
@@ -477,8 +476,8 @@ describe('Direct write_document/read_document E2E Tests', () => {
     const plainTextPath = 'text-file.txt';
     const plainTextContent = 'This is plain text content without JSON structure';
 
-    // Act - Write plain text
-    const writeResult = await write_document({
+    // Act - Write plain text with unified API
+    const writeResult = await unified_write_document(client, {
       scope: 'branch',
       branch: testBranchName,
       path: plainTextPath,
@@ -491,8 +490,8 @@ describe('Direct write_document/read_document E2E Tests', () => {
     expect(writeResult).toBeDefined();
     expect(writeResult.success).toBe(true);
     
-    // Act - Read plain text
-    const readResult = await read_document({
+    // Act - Read plain text with unified API
+    const readResult = await unified_read_document(client, {
       scope: 'branch',
       branch: testBranchName,
       path: plainTextPath,
@@ -548,9 +547,9 @@ describe('Direct write_document/read_document E2E Tests', () => {
   });
 
   it('should fail with validation errors using direct API', async () => {
-    // Test missing content and patches
+    // Test missing content and patches with unified API
     try {
-      const result = await write_document({
+      const result = await unified_write_document(client, {
         scope: 'branch',
         branch: testBranchName,
         path: testDocPath,
@@ -558,19 +557,34 @@ describe('Direct write_document/read_document E2E Tests', () => {
         // No content or patches
       });
       
-      // New API returns error objects instead of throwing exceptions
-      expect(result.success).toBe(false);
-      expect(result.error?.message).toMatch(/content|patches/i);
+      // APIが成功しなかった場合は失敗を確認
+      if (result && typeof result === 'object') {
+        if ('success' in result && result.success === false) {
+          // 標準のエラーオブジェクト形式
+          expect(result.success).toBe(false);
+          expect(result.error?.message).toMatch(/content|patches/i);
+        } else if ('error' in result) {
+          // JSONRPCレスポンス形式
+          expect(result.error).toBeDefined();
+          expect(result.error.message).toMatch(/content|patches/i);
+        } else {
+          // 予期しない成功レスポンス
+          fail('Expected error but got success response');
+        }
+      } else {
+        // 予期しない形式
+        fail('Invalid response format');
+      }
     } catch (error) {
       // Old API may still throw exceptions in some cases
       // We'll accept either approach
       expect(error.message).toMatch(/content|patches/i);
     }
 
-    // Test both content and patches
+    // Test both content and patches with unified API
     const patches = [{ op: 'add', path: '/content/test', value: true }];
     try {
-      const result = await write_document({
+      const result = await unified_write_document(client, {
         scope: 'branch',
         branch: testBranchName,
         path: testDocPath,
@@ -579,36 +593,66 @@ describe('Direct write_document/read_document E2E Tests', () => {
         docs: testEnv.docRoot
       });
       
-      // New API returns error objects instead of throwing exceptions
-      expect(result.success).toBe(false);
-      expect(result.error?.message).toMatch(/both content and patches/i);
+      // APIが成功しなかった場合は失敗を確認
+      if (result && typeof result === 'object') {
+        if ('success' in result && result.success === false) {
+          // 標準のエラーオブジェクト形式
+          expect(result.success).toBe(false);
+          expect(result.error?.message).toMatch(/both content and patches/i);
+        } else if ('error' in result) {
+          // JSONRPCレスポンス形式
+          expect(result.error).toBeDefined();
+          expect(result.error.message).toMatch(/both content and patches/i);
+        } else {
+          // 予期しない成功レスポンス
+          fail('Expected error but got success response');
+        }
+      } else {
+        // 予期しない形式
+        fail('Invalid response format');
+      }
     } catch (error) {
       // Old API may still throw exceptions in some cases
       // We'll accept either approach 
       expect(error.message).toMatch(/both content and patches/i);
     }
 
-    // Test reading non-existent document
+    // Test reading non-existent document with unified API
     try {
-      const result = await read_document({
+      const result = await unified_read_document(client, {
         scope: 'branch',
         branch: testBranchName,
         path: 'non-existent.json',
         docs: testEnv.docRoot
       });
       
-      // New API returns error objects instead of throwing exceptions
-      expect(result.success).toBe(false); 
-      expect(result.error?.message).toMatch(/not found|does not exist/i);
+      // APIが成功しなかった場合は失敗を確認
+      if (result && typeof result === 'object') {
+        if ('success' in result && result.success === false) {
+          // 標準のエラーオブジェクト形式
+          expect(result.success).toBe(false);
+          expect(result.error?.message).toMatch(/not found|does not exist/i);
+        } else if ('error' in result) {
+          // JSONRPCレスポンス形式
+          expect(result.error).toBeDefined();
+          expect(result.error.message).toMatch(/not found|does not exist/i);
+        } else {
+          // 予期しない成功レスポンス
+          fail('Expected error but got success response');
+        }
+      } else {
+        // 予期しない形式
+        fail('Invalid response format');
+      }
     } catch (error) {
       // Old API may still throw exceptions in some cases
       // We'll accept either approach
       expect(error.message).toMatch(/not found|does not exist/i);
     }
 
-    // Test invalid scope
+    // Test invalid scope with unified API
     try {
-      const result = await read_document({
+      const result = await unified_read_document(client, {
         // @ts-ignore - intentionally passing invalid scope
         scope: 'invalid',
         branch: testBranchName,
@@ -616,9 +660,24 @@ describe('Direct write_document/read_document E2E Tests', () => {
         docs: testEnv.docRoot
       });
       
-      // New API returns error objects instead of throwing exceptions
-      expect(result.success).toBe(false);
-      expect(result.error?.message).toMatch(/invalid scope/i);
+      // APIが成功しなかった場合は失敗を確認
+      if (result && typeof result === 'object') {
+        if ('success' in result && result.success === false) {
+          // 標準のエラーオブジェクト形式
+          expect(result.success).toBe(false);
+          expect(result.error?.message).toMatch(/invalid scope/i);
+        } else if ('error' in result) {
+          // JSONRPCレスポンス形式
+          expect(result.error).toBeDefined();
+          expect(result.error.message).toMatch(/invalid scope/i);
+        } else {
+          // 予期しない成功レスポンス
+          fail('Expected error but got success response');
+        }
+      } else {
+        // 予期しない形式
+        fail('Invalid response format');
+      }
     } catch (error) {
       // Old API may still throw exceptions in some cases
       // We'll accept either approach
