@@ -88,9 +88,9 @@ export class MCPInMemoryClient {
         }
       } as unknown as TResult;
     }
-    
+
     logger.debug(`[MCPInMemoryClient] Calling tool: ${toolName}`, { args });
-    
+
     // タイムアウト処理を追加
     return new Promise<TResult>(async (resolve, reject) => {
       // 20秒のタイムアウト設定（より大きなドキュメント用に延長）
@@ -103,14 +103,14 @@ export class MCPInMemoryClient {
           }
         } as unknown as TResult);
       }, 20000);
-      
+
       try {
         const params = { name: toolName, arguments: args };
         const result = await this.client.callTool(params);
         clearTimeout(timeoutId); // タイムアウトをクリア
-        
+
         logger.debug(`[MCPInMemoryClient] Tool call successful: ${toolName}`, { result });
-        
+
         // 返り値が undefined の場合、成功レスポンスを生成
         if (result === undefined) {
           resolve({
@@ -119,17 +119,17 @@ export class MCPInMemoryClient {
           } as unknown as TResult);
           return;
         }
-        
+
         // 既に標準形式なら、そのまま返す
         if (typeof result === 'object' && result !== null && 'success' in result) {
           resolve(result as TResult);
           return;
         }
-        
+
         // JSONRPCレスポンスの場合は変換
         if (typeof result === 'object' && result !== null && 'result' in result) {
           const jsonrpcResult = result as any;
-          
+
           // まずJSONRPCレスポンスのresultプロパティがnullまたはundefinedでないことを確認
           if (jsonrpcResult.result === null || jsonrpcResult.result === undefined) {
             // nullまたはundefinedの場合は空のデータで成功レスポンスを返す
@@ -139,7 +139,7 @@ export class MCPInMemoryClient {
             } as unknown as TResult);
             return;
           }
-          
+
           // E2Eテスト用メソッドのレスポンス処理 - デバッグ用にタイプを記録
           logger.debug(`JSONRPC result type: ${typeof jsonrpcResult.result}`, {
             resultIsArray: Array.isArray(jsonrpcResult.result),
@@ -147,18 +147,18 @@ export class MCPInMemoryClient {
             resultContentIsArray: jsonrpcResult.result && jsonrpcResult.result.content && Array.isArray(jsonrpcResult.result.content),
             toolName
           });
-          
+
           // JSONRPCレスポンスには、result: { content: [{ type: 'text', text: '...' }], _meta: ... } の形式が含まれる可能性がある
           if (jsonrpcResult.result && jsonrpcResult.result.content && Array.isArray(jsonrpcResult.result.content)) {
             // コンテンツを抽出
             const contentItems = jsonrpcResult.result.content;
-            
+
             // text型のコンテンツアイテムを探す
             const textItem = contentItems.find(item => item && item.type === 'text');
-            
+
             if (textItem && textItem.text) {
               let extractedData;
-              
+
               // JSONかどうかをチェック
               try {
                 // JSONとして解析を試みる
@@ -172,11 +172,59 @@ export class MCPInMemoryClient {
                 // JSONパースに失敗したらプレーンテキストとして扱う
                 extractedData = textItem.text;
               }
-              
+
               // documentオブジェクトが期待される場合 - read_document, read_branch_memory_bank, read_global_memory_bank
               if ((toolName.includes('read_document') || toolName.includes('read_branch_memory_bank') || toolName.includes('read_global_memory_bank'))) {
+                logger.debug(`[MCPInMemoryClient] Processing read operation response for ${toolName}`, {
+                  extractedDataType: typeof extractedData,
+                  extractedDataKeys: extractedData && typeof extractedData === 'object' ? Object.keys(extractedData) : 'non-object',
+                  resultObject: jsonrpcResult.result
+                });
+
+                // JSONRPC結果が標準形式に変換されたかどうかを確認
+                if (jsonrpcResult.result && typeof jsonrpcResult.result === 'object' &&
+                    'success' in jsonrpcResult.result && jsonrpcResult.result.success === true &&
+                    'data' in jsonrpcResult.result && jsonrpcResult.result.data) {
+
+                  logger.debug(`[MCPInMemoryClient] Found pre-processed success result format, returning as-is`);
+                  resolve(jsonrpcResult.result as TResult);
+                  return;
+                }
+
+                // extractedDataが既にdocumentを含んでいる場合（改善されたApplication.tsの形式）
+                if (extractedData && typeof extractedData === 'object' && 'document' in extractedData) {
+                  logger.debug(`[MCPInMemoryClient] Found document structure in extractedData`);
+                  const doc = extractedData.document;
+                  resolve({
+                    success: true,
+                    data: {
+                      path: doc.path || args.path || '',
+                      content: doc.content || {},
+                      tags: doc.tags || [],
+                      lastModified: doc.lastModified || new Date().toISOString()
+                    }
+                  } as unknown as TResult);
+                  return;
+                }
+
+                // Application.tsの新しい形式の場合（改良版）
+                if (extractedData && typeof extractedData === 'object' && extractedData.path && extractedData.content) {
+                  logger.debug(`[MCPInMemoryClient] Found path/content structure in extractedData`);
+                  resolve({
+                    success: true,
+                    data: {
+                      path: extractedData.path,
+                      content: extractedData.content,
+                      tags: extractedData.tags || [],
+                      lastModified: extractedData.lastModified || new Date().toISOString()
+                    }
+                  } as unknown as TResult);
+                  return;
+                }
+
                 // documentオブジェクトを構築
                 // 明示的にすべてのプロパティを設定し、undefinedの可能性を排除
+                logger.debug(`[MCPInMemoryClient] Creating standard response from raw data`);
                 resolve({
                   success: true,
                   data: {
@@ -188,7 +236,7 @@ export class MCPInMemoryClient {
                 } as unknown as TResult);
                 return;
               }
-              
+
               // その他の場合は単純な成功レスポンス
               resolve({
                 success: true,
@@ -197,7 +245,7 @@ export class MCPInMemoryClient {
               return;
             }
           }
-          
+
           // E2Eテスト用メソッドの特別処理
           const e2eTestMethods = [
             'write_document', 'read_document',
@@ -205,23 +253,57 @@ export class MCPInMemoryClient {
             'write_global_memory_bank', 'read_global_memory_bank',
             'search_documents_by_tags', 'tools/call'
           ];
-          
+
           if (e2eTestMethods.includes(toolName)) {
-            // E2Eテスト用メソッドの場合、resultプロパティがsuccessプロパティを持っている可能性がある
-            if (typeof jsonrpcResult.result === 'object' && jsonrpcResult.result !== null && 'success' in jsonrpcResult.result) {
-              // すでに標準形式になっているのでそのまま返す
+            // デバッグのために詳細なレスポンス形式を記録
+            logger.debug(`[MCPInMemoryClient] E2E test method response structure for ${toolName}:`, {
+              isObject: typeof jsonrpcResult.result === 'object' && jsonrpcResult.result !== null,
+              hasSuccessProperty: jsonrpcResult.result && typeof jsonrpcResult.result === 'object' && 'success' in jsonrpcResult.result,
+              hasDataProperty: jsonrpcResult.result && typeof jsonrpcResult.result === 'object' && 'data' in jsonrpcResult.result,
+              resultKeys: jsonrpcResult.result && typeof jsonrpcResult.result === 'object' ? Object.keys(jsonrpcResult.result) : []
+            });
+
+            // Application.tsの新しい形式に対応 - success/dataプロパティをチェック
+            if (typeof jsonrpcResult.result === 'object' && jsonrpcResult.result !== null &&
+                'success' in jsonrpcResult.result && 'data' in jsonrpcResult.result) {
+              // すでにApplication.tsで標準形式に変換されているのでそのまま返す
+              logger.debug(`[MCPInMemoryClient] Found pre-processed success/data format from Application.ts, returning as-is`);
               resolve(jsonrpcResult.result as TResult);
               return;
             }
-            
+
+            // 従来の形式（successプロパティのみ持つ）にも対応
+            if (typeof jsonrpcResult.result === 'object' && jsonrpcResult.result !== null && 'success' in jsonrpcResult.result) {
+              // すでに標準形式になっているのでそのまま返す
+              logger.debug(`[MCPInMemoryClient] Found object with success property, returning as-is`);
+              resolve(jsonrpcResult.result as TResult);
+              return;
+            }
+
+            // 特にread操作の場合、コンテンツを直接含むオブジェクトが返る可能性がある
+            if (toolName.includes('read') && typeof jsonrpcResult.result === 'object' && jsonrpcResult.result !== null) {
+              logger.debug(`[MCPInMemoryClient] Creating standard response for read operation`);
+              resolve({
+                success: true,
+                data: {
+                  path: args.path || '',
+                  content: jsonrpcResult.result,
+                  tags: jsonrpcResult.result.tags || [],
+                  lastModified: jsonrpcResult.result.lastModified || new Date().toISOString()
+                }
+              } as unknown as TResult);
+              return;
+            }
+
             // そうでない場合は標準形式に変換
+            logger.debug(`[MCPInMemoryClient] Creating generic success response`);
             resolve({
               success: true,
               data: jsonrpcResult.result || {} // undefinedの場合は空オブジェクト
             } as unknown as TResult);
             return;
           }
-          
+
           // 通常のJSONRPCレスポンス変換
           resolve({
             success: true,
@@ -229,13 +311,13 @@ export class MCPInMemoryClient {
           } as unknown as TResult);
           return;
         }
-        
+
         // その他の場合はそのまま返す
         resolve(result as TResult);
       } catch (error) {
         clearTimeout(timeoutId); // タイムアウトをクリア
         logger.error(`[MCPInMemoryClient] Tool call failed: ${toolName}`, { error, args });
-        
+
         // E2Eテスト用のエラーレスポンスを返す
         resolve({
           success: false,
@@ -310,16 +392,16 @@ export class MCPInMemoryClient {
     scope: 'branch' | 'global',
     path: string,
     docs: string,
-    options: { 
-      content?: Record<string, unknown> | string; 
-      patches?: any[]; 
-      tags?: string[]; 
+    options: {
+      content?: Record<string, unknown> | string;
+      patches?: any[];
+      tags?: string[];
       branch?: string;
-      returnContent?: boolean 
+      returnContent?: boolean
     }
   ): Promise<any> {
     logger.debug(`[MCPInMemoryClient] writeDocument scope=${scope}, path=${path}`);
-    
+
     // APIに合わせてパラメータを適切に組み立て
     const toolParams: Record<string, any> = {
       scope,
@@ -327,10 +409,10 @@ export class MCPInMemoryClient {
       docs,
       ...options
     };
-    
+
     // 使用するツール名を決定
     let toolName: string;
-    
+
     // 従来のAPIとE2E用統一APIの両方に対応
     if (scope === 'branch') {
       // ブランチスコープの場合
@@ -345,7 +427,7 @@ export class MCPInMemoryClient {
       // 統一APIの場合
       toolName = 'write_document';
     }
-    
+
     return this.callTool(toolName, toolParams);
   }
 
@@ -365,7 +447,7 @@ export class MCPInMemoryClient {
     } = {}
   ): Promise<any> {
     logger.debug(`[MCPInMemoryClient] readDocument scope=${scope}, path=${path}`);
-    
+
     // APIに合わせてパラメータを適切に組み立て
     const toolParams: Record<string, any> = {
       scope,
@@ -373,10 +455,10 @@ export class MCPInMemoryClient {
       docs,
       ...options
     };
-    
+
     // 使用するツール名を決定
     let toolName: string;
-    
+
     // 従来のAPIとE2E用統一APIの両方に対応
     if (scope === 'branch') {
       // ブランチスコープの場合
@@ -391,7 +473,7 @@ export class MCPInMemoryClient {
       // 統一APIの場合
       toolName = 'read_document';
     }
-    
+
     // callToolには既にタイムアウト処理が含まれている
     return this.callTool(toolName, toolParams);
   }
