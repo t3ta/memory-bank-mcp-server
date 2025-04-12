@@ -42,57 +42,75 @@ function generateToolDefinitions(configProvider: IConfigProvider | null = null) 
 
   return [
     {
-      name: 'read_branch_memory_bank',
-      description: 'Read a document from the current branch\'s memory bank',
+      name: 'read_document',
+      description: 'Read a document from a branch or global memory bank',
       parameters: {
         type: 'object',
         properties: {
-          path: { type: 'string' },
-          branch: { type: 'string' },
-          docs: { type: 'string' }
+          scope: {
+            type: 'string',
+            enum: ['branch', 'global'],
+            description: 'Scope to read from (branch or global)'
+          },
+          branch: {
+            type: 'string',
+            description: 'Branch name (required if scope is "branch", auto-detected in project mode)'
+          },
+          path: {
+            type: 'string',
+            description: 'Document path (e.g. "config.json")'
+          },
+          docs: {
+            type: 'string',
+            description: 'Path to docs directory'
+          }
         },
-        required: ['path', ...(branchRequired ? ['branch'] : []), ...(docsRequired ? ['docs'] : [])]
+        required: ['scope', 'path', ...(docsRequired ? ['docs'] : [])]
       }
     },
     {
-      name: 'write_branch_memory_bank',
-      description: 'Write a document to the current branch\'s memory bank',
+      name: 'write_document',
+      description: 'Write a document to a branch or global memory bank',
       parameters: {
         type: 'object',
         properties: {
-          path: { type: 'string' },
-          content: { type: 'string' },
-          patches: { type: 'array' },
-          branch: { type: 'string' },
-          docs: { type: 'string' }
+          scope: {
+            type: 'string',
+            enum: ['branch', 'global'],
+            description: 'Scope to write to (branch or global)'
+          },
+          branch: {
+            type: 'string',
+            description: 'Branch name (required if scope is "branch", auto-detected in project mode)'
+          },
+          path: {
+            type: 'string',
+            description: 'Document path (e.g. "config.json")'
+          },
+          content: {
+            type: 'string',
+            description: 'Document content (mutually exclusive with patches)'
+          },
+          patches: {
+            type: 'array',
+            description: 'JSON Patch operations (RFC 6902, mutually exclusive with content)'
+          },
+          tags: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Tags to assign to the document'
+          },
+          docs: {
+            type: 'string',
+            description: 'Path to docs directory'
+          },
+          returnContent: {
+            type: 'boolean',
+            description: 'If true, return the full document content in output',
+            default: false
+          }
         },
-        required: ['path', ...(branchRequired ? ['branch'] : []), ...(docsRequired ? ['docs'] : [])]
-      }
-    },
-    {
-      name: 'read_global_memory_bank',
-      description: 'Read a document from the global memory bank',
-      parameters: {
-        type: 'object',
-        properties: {
-          path: { type: 'string' },
-          docs: { type: 'string' }
-        },
-        required: ['path', ...(docsRequired ? ['docs'] : [])]
-      }
-    },
-    {
-      name: 'write_global_memory_bank',
-      description: 'Write a document to the global memory bank',
-      parameters: {
-        type: 'object',
-        properties: {
-          path: { type: 'string' },
-          content: { type: 'string' },
-          patches: { type: 'array' },
-          docs: { type: 'string' }
-        },
-        required: [...(docsRequired ? ['docs'] : [])]
+        required: ['scope', 'path', ...(docsRequired ? ['docs'] : [])]
       }
     },
     {
@@ -106,6 +124,41 @@ function generateToolDefinitions(configProvider: IConfigProvider | null = null) 
           language: { type: 'string', enum: ['en', 'ja', 'zh'] }
         },
         required: readContextRequired
+      }
+    },
+    {
+      name: 'search_documents_by_tags',
+      description: 'Search documents in memory banks by tags',
+      parameters: {
+        type: 'object',
+        properties: {
+          tags: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Array of tags to search for (e.g., ["architecture", "refactoring"])'
+          },
+          match: {
+            type: 'string',
+            enum: ['and', 'or'],
+            default: 'or',
+            description: 'Match type: "and" requires all tags, "or" requires any tag'
+          },
+          scope: {
+            type: 'string',
+            enum: ['branch', 'global', 'all'],
+            default: 'all',
+            description: 'Search scope: "branch", "global", or "all"'
+          },
+          branch: {
+            type: 'string',
+            description: 'Branch name. Required if scope is "branch" or "all", but optional in project mode (will be auto-detected).'
+          },
+          docs: {
+            type: 'string',
+            description: 'Path to docs directory'
+          }
+        },
+        required: ['tags', ...(docsRequired ? ['docs'] : [])]
       }
     }
   ];
@@ -175,85 +228,34 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
     logger.debug('Parsed params:', params);
 
     switch (name) {
-      case 'write_branch_memory_bank': {
-        // Add logging here to inspect params
-        logger.debug(`Executing write_branch_memory_bank with params: ${JSON.stringify(params)}`);
+      // 旧APIのケースハンドラは削除済み - v3.0.0から統合APIのみサポート
+
+      case 'read_document': {
+        const scope = params.scope as 'branch' | 'global';
         const path = params.path as string;
-        const content = params.content as string | undefined;
-        const patches = params.patches as any[] | undefined;
-        // Log the value of patches right after extraction
-        logger.debug(`Extracted patches value: ${JSON.stringify(patches)}`);
-        const branch = params.branch as string;
+        const branch = params.branch as string | undefined;
         const docs = params.docs as string | undefined;
 
-        if (!path || !branch) {
-          throw new Error('Invalid arguments for write_branch_memory_bank: path and branch are required');
-        }
-        if (!branch.includes('/')) {
-          throw new Error('Branch name must include a namespace prefix with slash (e.g. "feature/my-branch")');
-        }
-        if (content && patches) {
-          throw new Error('Content and patches cannot be provided at the same time');
-        }
-        if (!content && !patches) {
-          // Return debug info in the response when this unexpected branch is taken
-          const patchesType = typeof patches;
-          const patchesValue = JSON.stringify(patches);
-          const paramsKeys = JSON.stringify(Object.keys(params));
-          // デバッグ情報をレスポンスに含める
-          return { content: [{ type: 'text', text: `DEBUG: Entered init branch unexpectedly. params keys: ${paramsKeys}, patches type: ${patchesType}, patches value: ${patchesValue}` }] };
-        }
-        if (!app) {
-          throw new Error('Application not initialized');
+        if (!path || !scope) {
+          throw new Error('Invalid arguments for read_document: path and scope are required');
         }
 
-        const docsRoot = docs || resolveDocsRoot();
-        let branchApp = app;
-        if (docs) {
-          logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
-          const appOptions = getMergedApplicationOptions(app, docsRoot, 'ja');
-          logger.debug(`Using merged application options: ${JSON.stringify(appOptions)}`);
-          // Normally create a new app instance here, using existing for simplicity
-        }
-
-        // Check if content is provided (not undefined and not null)
-        if (content !== undefined && content !== null) {
-          logger.debug(`Writing branch memory bank (branch: ${branch}, path: ${path}, docsRoot: ${docsRoot})`);
-          // content がオブジェクトだったら stringify する！
-          const contentToWrite = typeof content === 'object' ? JSON.stringify(content, null, 2) : content;
-          // Corrected call to writeDocument (Object argument is correct)
-          const response = await branchApp.getBranchController().writeDocument({ branchName: branch, path, content: contentToWrite });
-          if (!response.success) {
-            throw new Error((response as any).error?.message || 'Failed to write document');
+        // ブランチスコープの場合のみブランチ名が必要（プロジェクトモードでは自動検出可能）
+        if (scope === 'branch' && !branch) {
+          const isProjectMode = app?.configProvider.getConfig().isProjectMode || false;
+          if (!isProjectMode) {
+            throw new Error('Branch name is required when not running in project mode');
           }
-          return { content: [{ type: 'text', text: 'Document written successfully' }] };
+          // プロジェクトモードの場合は、ブランチ名はコントローラー内で自動検出される
+          logger.debug('Branch name not provided but in project mode, will use auto-detection');
         }
 
-        if (patches) {
-          // Simplified implementation for patches
-          return { content: [{ type: 'text', text: 'Document patched successfully' }] };
-        }
-
-        throw new Error('Invalid state: neither content nor patches were provided');
-      }
-
-      case 'read_branch_memory_bank': {
-        const path = params.path as string;
-        const branch = params.branch as string;
-        const docs = params.docs as string | undefined;
-
-        if (!path || !branch) {
-          throw new Error('Invalid arguments for read_branch_memory_bank: path and branch are required');
-        }
-        if (!branch.includes('/')) {
-          throw new Error('Branch name must include a namespace prefix with slash (e.g. "feature/my-branch")');
-        }
         if (!app) {
           throw new Error('Application not initialized');
         }
 
         const docsRoot = docs || resolveDocsRoot();
-        let branchApp = app;
+        let controllerApp = app;
         if (docs) {
           logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
           const appOptions = getMergedApplicationOptions(app, docsRoot, 'ja');
@@ -261,7 +263,23 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
           // Normally create a new app instance here, using existing for simplicity
         }
 
-        const response = await branchApp.getBranchController().readDocument(branch, path);
+        // scopeに応じて適切なコントローラーを呼び出す
+        let response;
+        if (scope === 'branch') {
+          response = await controllerApp.getDocumentController().readDocument({
+            scope,
+            branchName: branch,
+            path
+          });
+        } else if (scope === 'global') {
+          response = await controllerApp.getDocumentController().readDocument({
+            scope,
+            path
+          });
+        } else {
+          throw new Error(`Invalid scope: ${scope}, must be 'branch' or 'global'`);
+        }
+
         if (!response.success) {
           throw new Error((response as any).error?.message || 'Failed to read document');
         }
@@ -272,58 +290,40 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
         };
       }
 
-      case 'read_global_memory_bank': {
+      case 'write_document': {
+        const scope = params.scope as 'branch' | 'global';
         const path = params.path as string;
-        const docs = params.docs as string | undefined;
-
-        if (!path) {
-          throw new Error('Invalid arguments for read_global_memory_bank: path is required');
-        }
-        if (!app) {
-          throw new Error('Application not initialized');
-        }
-
-        const docsRoot = docs || resolveDocsRoot();
-        let globalApp = app;
-        if (docs) {
-          logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
-          const appOptions = getMergedApplicationOptions(app, docsRoot, 'ja');
-          logger.debug(`Using merged application options: ${JSON.stringify(appOptions)}`);
-          // Normally create a new app instance here, using existing for simplicity
-        }
-
-        const response = await globalApp.getGlobalController().readDocument(path);
-        if (!response.success) {
-          throw new Error((response as any).error?.message || 'Failed to read document');
-        }
-
-        return {
-          content: [{ type: 'text', text: response.data }],
-          _meta: { lastModified: new Date().toISOString() }
-        };
-      }
-
-      case 'write_global_memory_bank': {
-        const path = params.path as string;
+        const branch = params.branch as string | undefined;
         const content = params.content as string | undefined;
         const patches = params.patches as any[] | undefined;
+        const tags = params.tags as string[] | undefined;
+        const returnContent = params.returnContent as boolean | undefined;
         const docs = params.docs as string | undefined;
 
-        if (!path) {
-          throw new Error('Invalid arguments for write_global_memory_bank: path is required');
+        if (!path || !scope) {
+          throw new Error('Invalid arguments for write_document: path and scope are required');
         }
+
+        // ブランチスコープの場合のみブランチ名が必要（プロジェクトモードでは自動検出可能）
+        if (scope === 'branch' && !branch) {
+          const isProjectMode = app?.configProvider.getConfig().isProjectMode || false;
+          if (!isProjectMode) {
+            throw new Error('Branch name is required when not running in project mode');
+          }
+          // プロジェクトモードの場合は、ブランチ名はコントローラー内で自動検出される
+          logger.debug('Branch name not provided but in project mode, will use auto-detection');
+        }
+
         if (content && patches) {
           throw new Error('Content and patches cannot be provided at the same time');
         }
-        if (!content && !patches) {
-          return { content: [{ type: 'text', text: 'Global memory bank initialized successfully' }] };
-        }
+
         if (!app) {
           throw new Error('Application not initialized');
         }
 
         const docsRoot = docs || resolveDocsRoot();
-        let globalApp = app;
+        let controllerApp = app;
         if (docs) {
           logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
           const appOptions = getMergedApplicationOptions(app, docsRoot, 'ja');
@@ -331,22 +331,24 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
           // Normally create a new app instance here, using existing for simplicity
         }
 
-        if (content) {
-          logger.debug(`Writing global memory bank (path: ${path}, docsRoot: ${docsRoot})`);
-          // Corrected call to writeDocument
-          const response = await globalApp.getGlobalController().writeDocument({ path, content });
-          if (!response.success) {
-            throw new Error((response as any).error?.message || 'Failed to write document');
-          }
-          return { content: [{ type: 'text', text: 'Document written successfully' }] };
+        const response = await controllerApp.getDocumentController().writeDocument({
+          scope,
+          branchName: branch,
+          path,
+          content,
+          patches,
+          tags,
+          returnContent
+        });
+
+        if (!response.success) {
+          throw new Error((response as any).error?.message || 'Failed to write document');
         }
 
-        if (patches) {
-          // Simplified implementation for patches
-          return { content: [{ type: 'text', text: 'Document patched successfully' }] };
-        }
-
-        throw new Error('Invalid state: neither content nor patches were provided');
+        return {
+          content: [{ type: 'text', text: response.data ? JSON.stringify(response.data, null, 2) : 'Document written successfully' }],
+          _meta: { lastModified: new Date().toISOString() }
+        };
       }
 
       case 'read_context': {
