@@ -12,10 +12,8 @@ export default defineConfig({
     testTimeout: 60000, // より長く設定して対応
     hookTimeout: 60000, // より長く設定して対応
     // テスト実行数を制限して重要なものから確認
-    maxWorkers: 1,
-    pool: 'threads',
-    maxThreads: 1,
-    minThreads: 1,
+    threads: false, // threadsを使わないように変更
+    pool: 'forks', // threads→forksに変更
     sequence: {
       concurrent: false
     },

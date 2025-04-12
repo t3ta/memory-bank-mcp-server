@@ -29,7 +29,7 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write 'packages/*/src/**/*.ts'",
     "test": "vitest run",
-    "test:mcp": "yarn workspace @memory-bank/mcp test",
+    "test:e2e": "yarn workspace @memory-bank/mcp test:e2e",
     "test:schemas": "yarn workspace @memory-bank/schemas test",
     "test:watch": "vitest --config vitest.workspace.ts",
     "test:coverage": "vitest run --coverage",

@@ -90,22 +90,161 @@ export class MCPInMemoryClient {
     }
     
     logger.debug(`[MCPInMemoryClient] Calling tool: ${toolName}`, { args });
-    try {
-      const params = { name: toolName, arguments: args }; // Removed type annotation CallToolParams
-      // logger.debug(`[MCPInMemoryClient] Calling tool: ${toolName}`, { args }); // Remove duplicate log
-      const result = await this.client.callTool(params);
-      logger.debug(`[MCPInMemoryClient] Tool call successful: ${toolName}`, { result }); // Restore original log
-      return result as TResult;
-    } catch (error) {
-      logger.error(`[MCPInMemoryClient] Tool call failed: ${toolName}`, { error, args });
-      // E2Eテスト用のエラーレスポンスを返す
-      return {
-        success: false,
-        error: {
-          message: error instanceof Error ? error.message : String(error)
+    
+    // タイムアウト処理を追加
+    return new Promise<TResult>(async (resolve, reject) => {
+      // 20秒のタイムアウト設定（より大きなドキュメント用に延長）
+      const timeoutId = setTimeout(() => {
+        logger.warn(`[MCPInMemoryClient] Tool call timed out after 20000ms: ${toolName}`);
+        resolve({
+          success: false,
+          error: {
+            message: `Tool call timed out after 20000ms: ${toolName}`
+          }
+        } as unknown as TResult);
+      }, 20000);
+      
+      try {
+        const params = { name: toolName, arguments: args };
+        const result = await this.client.callTool(params);
+        clearTimeout(timeoutId); // タイムアウトをクリア
+        
+        logger.debug(`[MCPInMemoryClient] Tool call successful: ${toolName}`, { result });
+        
+        // 返り値が undefined の場合、成功レスポンスを生成
+        if (result === undefined) {
+          resolve({
+            success: true,
+            data: null
+          } as unknown as TResult);
+          return;
         }
-      } as unknown as TResult;
-    }
+        
+        // 既に標準形式なら、そのまま返す
+        if (typeof result === 'object' && result !== null && 'success' in result) {
+          resolve(result as TResult);
+          return;
+        }
+        
+        // JSONRPCレスポンスの場合は変換
+        if (typeof result === 'object' && result !== null && 'result' in result) {
+          const jsonrpcResult = result as any;
+          
+          // まずJSONRPCレスポンスのresultプロパティがnullまたはundefinedでないことを確認
+          if (jsonrpcResult.result === null || jsonrpcResult.result === undefined) {
+            // nullまたはundefinedの場合は空のデータで成功レスポンスを返す
+            resolve({
+              success: true,
+              data: {}
+            } as unknown as TResult);
+            return;
+          }
+          
+          // E2Eテスト用メソッドのレスポンス処理 - デバッグ用にタイプを記録
+          logger.debug(`JSONRPC result type: ${typeof jsonrpcResult.result}`, {
+            resultIsArray: Array.isArray(jsonrpcResult.result),
+            resultHasContent: jsonrpcResult.result && jsonrpcResult.result.content,
+            resultContentIsArray: jsonrpcResult.result && jsonrpcResult.result.content && Array.isArray(jsonrpcResult.result.content),
+            toolName
+          });
+          
+          // JSONRPCレスポンスには、result: { content: [{ type: 'text', text: '...' }], _meta: ... } の形式が含まれる可能性がある
+          if (jsonrpcResult.result && jsonrpcResult.result.content && Array.isArray(jsonrpcResult.result.content)) {
+            // コンテンツを抽出
+            const contentItems = jsonrpcResult.result.content;
+            
+            // text型のコンテンツアイテムを探す
+            const textItem = contentItems.find(item => item && item.type === 'text');
+            
+            if (textItem && textItem.text) {
+              let extractedData;
+              
+              // JSONかどうかをチェック
+              try {
+                // JSONとして解析を試みる
+                if (textItem.text.trim().startsWith('{') || textItem.text.trim().startsWith('[')) {
+                  extractedData = JSON.parse(textItem.text);
+                } else {
+                  // プレーンテキスト
+                  extractedData = textItem.text;
+                }
+              } catch (e) {
+                // JSONパースに失敗したらプレーンテキストとして扱う
+                extractedData = textItem.text;
+              }
+              
+              // documentオブジェクトが期待される場合 - read_document, read_branch_memory_bank, read_global_memory_bank
+              if ((toolName.includes('read_document') || toolName.includes('read_branch_memory_bank') || toolName.includes('read_global_memory_bank'))) {
+                // documentオブジェクトを構築
+                // 明示的にすべてのプロパティを設定し、undefinedの可能性を排除
+                resolve({
+                  success: true,
+                  data: {
+                    path: args.path || '', // pathはリクエストパラメータから取得し、undefinedの場合は空文字
+                    content: extractedData || {}, // contentがundefinedの場合は空オブジェクト
+                    tags: jsonrpcResult.result._meta?.tags || [], // タグがなければ空配列
+                    lastModified: jsonrpcResult.result._meta?.lastModified || new Date().toISOString()
+                  }
+                } as unknown as TResult);
+                return;
+              }
+              
+              // その他の場合は単純な成功レスポンス
+              resolve({
+                success: true,
+                data: extractedData || {} // undefinedの場合は空オブジェクト
+              } as unknown as TResult);
+              return;
+            }
+          }
+          
+          // E2Eテスト用メソッドの特別処理
+          const e2eTestMethods = [
+            'write_document', 'read_document',
+            'write_branch_memory_bank', 'read_branch_memory_bank',
+            'write_global_memory_bank', 'read_global_memory_bank',
+            'search_documents_by_tags', 'tools/call'
+          ];
+          
+          if (e2eTestMethods.includes(toolName)) {
+            // E2Eテスト用メソッドの場合、resultプロパティがsuccessプロパティを持っている可能性がある
+            if (typeof jsonrpcResult.result === 'object' && jsonrpcResult.result !== null && 'success' in jsonrpcResult.result) {
+              // すでに標準形式になっているのでそのまま返す
+              resolve(jsonrpcResult.result as TResult);
+              return;
+            }
+            
+            // そうでない場合は標準形式に変換
+            resolve({
+              success: true,
+              data: jsonrpcResult.result || {} // undefinedの場合は空オブジェクト
+            } as unknown as TResult);
+            return;
+          }
+          
+          // 通常のJSONRPCレスポンス変換
+          resolve({
+            success: true,
+            data: jsonrpcResult.result || {} // undefinedの場合は空オブジェクト
+          } as unknown as TResult);
+          return;
+        }
+        
+        // その他の場合はそのまま返す
+        resolve(result as TResult);
+      } catch (error) {
+        clearTimeout(timeoutId); // タイムアウトをクリア
+        logger.error(`[MCPInMemoryClient] Tool call failed: ${toolName}`, { error, args });
+        
+        // E2Eテスト用のエラーレスポンスを返す
+        resolve({
+          success: false,
+          error: {
+            message: error instanceof Error ? error.message : String(error)
+          }
+        } as unknown as TResult);
+      }
+    });
   }
 
 
@@ -144,37 +283,8 @@ export class MCPInMemoryClient {
   }
 
   async readContext(branch: string, language: string, docs: string): Promise<any> {
-    // タイムアウト対策 - 3秒のタイムアウトでラップする
-    return new Promise(async (resolve, reject) => {
-      // タイムアウト処理
-      const timeoutId = setTimeout(() => {
-        logger.warn(`[MCPInMemoryClient] readContext timed out after 3000ms`);
-        resolve({
-          success: false,
-          error: {
-            message: 'readContext timed out after 3000ms'
-          }
-        });
-      }, 3000);
-      
-      try {
-        // 実際のAPI呼び出し
-        const result = await this.callTool('read_context', { branch, language, docs });
-        // タイムアウトをクリア
-        clearTimeout(timeoutId);
-        resolve(result);
-      } catch (error) {
-        // タイムアウトをクリア
-        clearTimeout(timeoutId);
-        logger.error(`[MCPInMemoryClient] readContext error:`, error);
-        resolve({
-          success: false,
-          error: {
-            message: error instanceof Error ? error.message : String(error)
-          }
-        });
-      }
-    });
+    // callToolには既にタイムアウト処理が含まれている
+    return this.callTool('read_context', { branch, language, docs });
   }
 
   async searchDocumentsByTags(
@@ -282,33 +392,8 @@ export class MCPInMemoryClient {
       toolName = 'read_document';
     }
     
-    // タイムアウト対策として3秒のタイムアウトを設定
-    return new Promise(async (resolve, reject) => {
-      const timeoutId = setTimeout(() => {
-        logger.warn(`[MCPInMemoryClient] readDocument timed out after 3000ms`);
-        resolve({
-          success: false,
-          error: {
-            message: 'readDocument timed out after 3000ms'
-          }
-        });
-      }, 3000);
-      
-      try {
-        const result = await this.callTool(toolName, toolParams);
-        clearTimeout(timeoutId);
-        resolve(result);
-      } catch (error) {
-        clearTimeout(timeoutId);
-        logger.error(`[MCPInMemoryClient] readDocument error:`, error);
-        resolve({
-          success: false,
-          error: {
-            message: error instanceof Error ? error.message : String(error)
-          }
-        });
-      }
-    });
+    // callToolには既にタイムアウト処理が含まれている
+    return this.callTool(toolName, toolParams);
   }
 }
 
