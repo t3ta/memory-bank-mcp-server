@@ -71,11 +71,13 @@ describe('MCP E2E Tools List Tests', () => {
 
         // inputSchemaの構造をチェック
         expect(tool.inputSchema).toHaveProperty('type', 'object');
-        expect(tool.inputSchema).toHaveProperty('properties');
+        expect(tool.inputSchema).toHaveProperty('schema');
+        expect(tool.inputSchema.schema).toHaveProperty('type', 'object');
+        expect(tool.inputSchema.schema).toHaveProperty('properties');
 
         // もしrequiredがある場合は配列であることを確認
-        if (tool.inputSchema.required) {
-          expect(Array.isArray(tool.inputSchema.required)).toBe(true);
+        if (tool.inputSchema.schema.required) {
+          expect(Array.isArray(tool.inputSchema.schema.required)).toBe(true);
         }
 
         // parametersの構造をチェック
