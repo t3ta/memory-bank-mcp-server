@@ -219,6 +219,9 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
       }
     }));
 
+    // Log the tools being returned for debugging
+    logger.debug(`[setupRoutes] Returning ${toolsWithSchema.length} tools via MCP SDK`);
+
     return {
       tools: toolsWithSchema,
     };

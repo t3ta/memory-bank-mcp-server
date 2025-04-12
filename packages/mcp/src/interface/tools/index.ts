@@ -1,5 +1,6 @@
 // Export tools from this directory
 export * from './document-tools.js';
+export * from './list-tools.js';
 
 export interface SearchDocumentsByTagsParams {
   /**
@@ -28,14 +29,15 @@ export interface SearchDocumentsByTagsParams {
   docs: string;
 }
 
-// Export additional tools function stubs for tools/list to work
+// Export additional tools function stubs for backward compatibility, but actual implementation
+// is now handled via the MCP SDK
 export const search_documents_by_tags = async (params: SearchDocumentsByTagsParams) => {
   console.log(`[search_documents_by_tags] Called with params:`, params);
-  throw new Error('Not implemented yet');
+  throw new Error('Please use the MCP SDK implementation instead');
 };
 
 export const read_context = async (params: any) => {
   console.log(`[read_context] Called with params:`, params);
-  throw new Error('Not implemented yet');
+  throw new Error('Please use the MCP SDK implementation instead');
 };
 
