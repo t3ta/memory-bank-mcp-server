@@ -490,21 +490,50 @@ export async function setupMcpTestEnv(): Promise<{
       }
 
       case 'read_context': {
+        // branchパラメータは省略可能
         const { branch, language } = params;
 
+        // プロジェクトモードでのブランチ自動検出をシミュレート
+        // process.env.MEMORY_BANK_PROJECT_MODEが'true'ならテストブランチを返す
+        let branchToUse = branch;
+        if (!branchToUse && process.env.MEMORY_BANK_PROJECT_MODE === 'true') {
+          // 最初のブランチをデフォルトとして使用 (実際のシステムではGitから取得)
+          for (const key of documentStore.keys()) {
+            if (key.startsWith('branch:')) {
+              const parts = key.split(':');
+              if (parts.length >= 2) {
+                branchToUse = parts[1];
+                logger.debug(`[MCPTestClient] Auto-detected branch: ${branchToUse}`);
+                break;
+              }
+            }
+          }
+
+          // ストアに何もなければテスト用にデフォルトブランチを設定
+          if (!branchToUse) {
+            branchToUse = 'feature-context-test';
+            logger.debug(`[MCPTestClient] Using default branch: ${branchToUse}`);
+          }
+        }
+
+        // この時点でブランチが特定できなければエラー
+        if (!branchToUse) {
+          throw new Error('Branch name is required when not running in project mode');
+        }
+
         // 存在しないブランチの場合はエラーを投げる
-        if (branch.includes('non-existent')) {
+        if (branchToUse.includes('non-existent')) {
           throw new Error('Branch not found');
         }
 
         // branchContextとactiveContextのキーでストアを確認
-        const branchContextKey = `branch:${branch}:branchContext.json`;
-        const activeContextKey = `branch:${branch}:activeContext.json`;
+        const branchContextKey = `branch:${branchToUse}:branchContext.json`;
+        const activeContextKey = `branch:${branchToUse}:activeContext.json`;
 
         // デフォルトのコンテキスト情報
         const contextData: any = {
           branch: {
-            name: branch,
+            name: branchToUse,
             description: "Test branch for context",
             createdAt: new Date().toISOString()
           },

@@ -26,6 +26,14 @@ export class Application {
   private branchController?: IBranchController;
   private contextController?: IContextController;
 
+  // Expose configProvider for tools to check project mode
+  public get configProvider() {
+    if (!this.container) {
+      throw new Error('Application not initialized. Call initialize() first.');
+    }
+    return this.container.get('configProvider');
+  }
+
   /**
    * Constructor
    * @param options Minimal application options
