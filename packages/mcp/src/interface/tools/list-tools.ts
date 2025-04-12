@@ -40,8 +40,11 @@ export const tools_list = async (params: ListToolsParams): Promise<ListToolsResu
         description: tool.description,
         inputSchema: {
           type: "object" as const,
-          properties: tool.inputSchema.properties,
-          required: tool.inputSchema.required
+          schema: {
+            type: "object",
+            properties: tool.inputSchema.properties,
+            required: tool.inputSchema.required
+          }
         },
         parameters: {
           type: "object",
