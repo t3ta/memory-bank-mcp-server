@@ -1,7 +1,8 @@
-import { setupMcpTestEnv, createTestDocument } from './helpers/mcp-test-helper.js';
+import { setupMcpTestEnv, createTestDocument, callToolWithLegacySupport } from './helpers/mcp-test-helper.js';
 import type { Application } from '../../src/main/Application.js';
 import type { MCPTestClient } from '@t3ta/mcp-test';
 import type { DocumentDTO } from '../../src/application/dtos/DocumentDTO.js';
+import type { fail } from 'assert';
 
 describe('MCP E2E Global Memory Bank Tests (using mcp-test)', () => {
   let app: Application;
@@ -30,7 +31,7 @@ describe('MCP E2E Global Memory Bank Tests (using mcp-test)', () => {
 
   it('should write and read a document in global memory bank', async () => {
     // クライアントを使ってグローバルメモリバンクにドキュメントを書き込み
-    const writeResult = await client.callTool('write_global_memory_bank', {
+    const writeResult = await callToolWithLegacySupport(client, 'write_global_memory_bank', {
       path: testDocPath,
       docs: app.options.docsRoot,
       content: initialDocContentString,
@@ -42,7 +43,7 @@ describe('MCP E2E Global Memory Bank Tests (using mcp-test)', () => {
     expect(writeResult.success).toBe(true);
 
     // 書き込んだドキュメントを読み取り
-    const readResult = await client.callTool('read_global_memory_bank', {
+    const readResult = await callToolWithLegacySupport(client, 'read_global_memory_bank', {
       path: testDocPath,
       docs: app.options.docsRoot
     });
@@ -53,7 +54,7 @@ describe('MCP E2E Global Memory Bank Tests (using mcp-test)', () => {
     if (readResult.success) {
       expect(readResult.data).toBeDefined();
       expect(readResult.data).not.toBeNull();
-      if (!readResult.data) return fail('readResult.data should not be null');
+      if (!readResult.data) throw new Error('readResult.data should not be null');
 
       const document = readResult.data as DocumentDTO;
       expect(document.path).toBe(testDocPath);
@@ -68,19 +69,19 @@ describe('MCP E2E Global Memory Bank Tests (using mcp-test)', () => {
       // タグのチェック (将来的にタグが公開APIに追加されたら有効化)
       // expect(document.tags).toEqual(expect.arrayContaining(["global", "initial", "write-test"]));
     } else {
-      fail('readDocument should return success: true');
+      throw new Error('readDocument should return success: true');
     }
   });
 
   it('should fail when reading non-existent document', async () => {
     try {
       // 存在しないドキュメントの読み取りを試みる
-      await client.callTool('read_global_memory_bank', {
+      await callToolWithLegacySupport(client, 'read_global_memory_bank', {
         path: 'core/non-existent-doc.json',
         docs: app.options.docsRoot
       });
 
-      fail('Expected read_global_memory_bank to throw for non-existent document');
+      throw new Error('Expected read_global_memory_bank to throw for non-existent document');
     } catch (error: any) {
       // エラーが発生することを期待
       expect(error).toBeDefined();
@@ -89,7 +90,7 @@ describe('MCP E2E Global Memory Bank Tests (using mcp-test)', () => {
 
   it('should update existing document with new content', async () => {
     // まず初期ドキュメントを作成
-    await client.callTool('write_global_memory_bank', {
+    await callToolWithLegacySupport(client, 'write_global_memory_bank', {
       path: testDocPath,
       docs: app.options.docsRoot,
       content: initialDocContentString,
@@ -105,7 +106,7 @@ describe('MCP E2E Global Memory Bank Tests (using mcp-test)', () => {
     );
 
     // ドキュメント更新
-    const updateResult = await client.callTool('write_global_memory_bank', {
+    const updateResult = await callToolWithLegacySupport(client, 'write_global_memory_bank', {
       path: testDocPath,
       docs: app.options.docsRoot,
       content: JSON.stringify(updatedDoc, null, 2),
@@ -117,7 +118,7 @@ describe('MCP E2E Global Memory Bank Tests (using mcp-test)', () => {
     expect(updateResult.success).toBe(true);
 
     // 更新されたドキュメントを読み取り
-    const readResult = await client.callTool('read_global_memory_bank', {
+    const readResult = await callToolWithLegacySupport(client, 'read_global_memory_bank', {
       path: testDocPath,
       docs: app.options.docsRoot
     });
@@ -132,7 +133,7 @@ describe('MCP E2E Global Memory Bank Tests (using mcp-test)', () => {
 
       expect(content.content.message).toBe("Updated global content");
     } else {
-      fail('Failed to read updated document');
+      throw new Error('Failed to read updated document');
     }
   });
 

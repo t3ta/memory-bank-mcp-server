@@ -1,4 +1,4 @@
-import { setupMcpTestEnv, createTestDocument, createBranchDir } from './helpers/mcp-test-helper.js';
+import { setupMcpTestEnv, createTestDocument, createBranchDir, callToolWithLegacySupport } from './helpers/mcp-test-helper.js';
 import type { Application } from '../../src/main/Application.js';
 import type { MCPTestClient } from '@t3ta/mcp-test';
 import type { DocumentDTO } from '../../src/application/dtos/DocumentDTO.js';
@@ -50,7 +50,7 @@ describe('MCP E2E Context Tests (using mcp-test)', () => {
     );
 
     // ブランチコンテキストファイル作成
-    await client.callTool('write_branch_memory_bank', {
+    await callToolWithLegacySupport(client, 'write_branch_memory_bank', {
       branch: testBranch,
       path: 'branchContext.json',
       docs: app.options.docsRoot,
@@ -59,7 +59,7 @@ describe('MCP E2E Context Tests (using mcp-test)', () => {
     });
 
     // アクティブコンテキストファイル作成
-    await client.callTool('write_branch_memory_bank', {
+    await callToolWithLegacySupport(client, 'write_branch_memory_bank', {
       branch: testBranch,
       path: 'activeContext.json',
       docs: app.options.docsRoot,
@@ -75,7 +75,7 @@ describe('MCP E2E Context Tests (using mcp-test)', () => {
   describe('read_context command', () => {
     it('should read context from branch', async () => {
       // コンテキスト読み取りテスト
-      const readResult = await client.callTool('read_context', {
+      const readResult = await callToolWithLegacySupport(client, 'read_context', {
         branch: testBranch,
         language: 'en',
         docs: app.options.docsRoot
@@ -98,13 +98,13 @@ describe('MCP E2E Context Tests (using mcp-test)', () => {
         expect(contextData.activeTasks.length).toBeGreaterThan(0);
         expect(contextData.activeTasks[0]).toBe("test context functionality");
       } else {
-        fail('Failed to read context with context command');
+        throw new Error('Failed to read context with context command');
       }
     });
 
     it('should read context with specific language parameter', async () => {
       // 日本語コンテキスト読み取りテスト
-      const readResult = await client.callTool('read_context', {
+      const readResult = await callToolWithLegacySupport(client, 'read_context', {
         branch: testBranch,
         language: 'ja',
         docs: app.options.docsRoot
@@ -119,20 +119,20 @@ describe('MCP E2E Context Tests (using mcp-test)', () => {
         expect(contextData.branch).toBeDefined();
         expect(contextData.branch.name).toBe(testBranch);
       } else {
-        fail('Failed to read context with language parameter');
+        throw new Error('Failed to read context with language parameter');
       }
     });
 
     it('should return error when reading context from non-existent branch', async () => {
       try {
         // 存在しないブランチからのコンテキスト読み取り試行
-        await client.callTool('read_context', {
+        await callToolWithLegacySupport(client, 'read_context', {
           branch: 'non-existent-branch',
           language: 'en',
           docs: app.options.docsRoot
         });
 
-        fail('Expected read_context to throw an error for non-existent branch');
+        throw new Error('Expected read_context to throw an error for non-existent branch');
       } catch (error: any) {
         // エラーが発生することを確認
         expect(error).toBeDefined();

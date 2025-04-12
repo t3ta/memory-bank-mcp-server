@@ -16,10 +16,41 @@ export interface TestEnv {
 }
 
 // MCPTestClientのcallToolの戻り値の型を定義
-interface MockMCPToolResponse<T = any> {
+// 注意: 実際のMCPToolResponseとは異なるが、テスト互換性のために維持
+export interface MockMCPToolResponse<T = any> {
   success: boolean;
   data: T;
-  // statusプロパティはないので実際のSDKの型とは異なる
+  // 実際のSDKのMCPToolResponse型との互換性のため、オプションでstatusなどを追加
+  status?: 'success' | 'error' | 'accepted';
+  result?: T;
+  error?: string;
+}
+
+/**
+ * MCPTestClientのcallToolメソッドをラップし、互換性のあるレスポンスを返す
+ * @param client MCPTestClient
+ * @param toolName ツール名
+ * @param params パラメータ
+ * @returns 拡張されたMCPToolResponse (success/data プロパティ付き)
+ */
+export async function callToolWithLegacySupport<T = any>(
+  client: MCPTestClient,
+  toolName: string,
+  params: any
+): Promise<MockMCPToolResponse<T>> {
+  const response = await client.callTool<T>(toolName, params);
+
+  // 互換性のために古いプロパティを追加
+  if (response && typeof response === 'object') {
+    if (!('success' in response)) {
+      (response as any).success = response.status === 'success';
+    }
+    if (!('data' in response) && 'result' in response) {
+      (response as any).data = response.result;
+    }
+  }
+
+  return response as MockMCPToolResponse<T>;
 }
 
 // 検索結果の型を定義
@@ -166,6 +197,8 @@ export async function setupMcpTestEnv(): Promise<{
   // ダミー実装：クライアントのメソッドを差し替え
   // @ts-ignore - 型エラーを抑制（実際の型とモック実装の型が異なるため）
   client.callTool = async (toolName: string, params: any): Promise<MockMCPToolResponse<any>> => {
+    // 実際のSDK型(status/result)と互換性のある形式で返すが、
+    // 古いテスト(success/data)との互換性も維持
     logger.debug(`[MCPTestClient] [DUMMY] Calling tool: ${toolName}`, { params });
 
     // 各ツールの呼び出しをモックする
@@ -179,6 +212,12 @@ export async function setupMcpTestEnv(): Promise<{
         const storeKey = `global:${params.path}`;
         if (documentStore.has(storeKey)) {
           return {
+            // 両方の形式でプロパティを持たせる
+            status: 'success',
+            result: {
+              path: params.path,
+              content: documentStore.get(storeKey)
+            },
             success: true,
             data: {
               path: params.path,
@@ -188,25 +227,29 @@ export async function setupMcpTestEnv(): Promise<{
         }
 
         // デフォルトの初期ドキュメントを返す
-        return {
-          success: true,
-          data: {
-            path: params.path,
+        const result = {
+          path: params.path,
+          content: {
+            schema: "memory_document_v2",
+            metadata: {
+              id: "global-test-1",
+              title: "Test Document",
+              documentType: "test",
+              path: params.path,
+              tags: ["global", "initial", "write-test"],
+              version: 1
+            },
             content: {
-              schema: "memory_document_v2",
-              metadata: {
-                id: "global-test-1",
-                title: "Test Document",
-                documentType: "test",
-                path: params.path,
-                tags: ["global", "initial", "write-test"],
-                version: 1
-              },
-              content: {
-                message: "Initial global content"
-              }
+              message: "Initial global content"
             }
           }
+        };
+
+        return {
+          status: 'success',
+          result: result,
+          success: true,
+          data: result
         };
       }
 
@@ -221,11 +264,15 @@ export async function setupMcpTestEnv(): Promise<{
           documentStore.set(storeKey, content);
         }
 
+        const result = {
+          path: params.path
+        };
+
         return {
+          status: 'success',
+          result: result,
           success: true,
-          data: {
-            path: params.path
-          }
+          data: result
         };
       }
 
@@ -238,6 +285,12 @@ export async function setupMcpTestEnv(): Promise<{
         const storeKey = `branch:${params.branch}:${params.path}`;
         if (documentStore.has(storeKey)) {
           return {
+            // 両方の形式でプロパティを持たせる
+            status: 'success',
+            result: {
+              path: params.path,
+              content: documentStore.get(storeKey)
+            },
             success: true,
             data: {
               path: params.path,
@@ -280,11 +333,15 @@ export async function setupMcpTestEnv(): Promise<{
           documentStore.set(storeKey, content);
         }
 
+        const result = {
+          path: params.path
+        };
+
         return {
+          status: 'success',
+          result: result,
           success: true,
-          data: {
-            path: params.path
-          }
+          data: result
         };
       }
 
@@ -301,6 +358,12 @@ export async function setupMcpTestEnv(): Promise<{
         // 保存されたドキュメントがあればそれを返す
         if (documentStore.has(storeKey)) {
           return {
+            // 両方の形式でプロパティを持たせる
+            status: 'success',
+            result: {
+              path: params.path,
+              content: documentStore.get(storeKey)
+            },
             success: true,
             data: {
               path: params.path,
@@ -348,11 +411,15 @@ export async function setupMcpTestEnv(): Promise<{
           documentStore.set(storeKey, content);
         }
 
+        const result = {
+          path: params.path
+        };
+
         return {
+          status: 'success',
+          result: result,
           success: true,
-          data: {
-            path: params.path
-          }
+          data: result
         };
       }
 

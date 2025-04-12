@@ -1,4 +1,4 @@
-import { setupMcpTestEnv, createTestDocument, createBranchDir } from './helpers/mcp-test-helper.js';
+import { setupMcpTestEnv, createTestDocument, createBranchDir, callToolWithLegacySupport } from './helpers/mcp-test-helper.js';
 import type { Application } from '../../src/main/Application.js';
 import type { MCPTestClient } from '@t3ta/mcp-test';
 
@@ -72,10 +72,10 @@ describe('MCP E2E Search Tests (using mcp-test)', () => {
   ];
 
   // テストデータをセットアップ
-  async function setupTestDocuments() {
+  async function setupTestDocuments(): Promise<void> {
     // グローバルドキュメントをセットアップ
     for (const doc of globalDocs) {
-      await client.callTool('write_global_memory_bank', {
+      await callToolWithLegacySupport(client, 'write_global_memory_bank', {
         path: doc.path,
         docs: app.options.docsRoot,
         content: JSON.stringify(doc.content, null, 2),
@@ -86,7 +86,7 @@ describe('MCP E2E Search Tests (using mcp-test)', () => {
 
     // ブランチドキュメントをセットアップ
     for (const doc of branchDocs) {
-      await client.callTool('write_branch_memory_bank', {
+      await callToolWithLegacySupport(client, 'write_branch_memory_bank', {
         branch: testBranch,
         path: doc.path,
         docs: app.options.docsRoot,
@@ -116,7 +116,7 @@ describe('MCP E2E Search Tests (using mcp-test)', () => {
   });
 
   it('should search global documents by single tag', async () => {
-    const searchResult = await client.callTool('search_documents_by_tags', {
+    const searchResult = await callToolWithLegacySupport(client, 'search_documents_by_tags', {
       tags: ["guide"],
       docs: app.options.docsRoot,
       scope: 'global'
@@ -133,7 +133,7 @@ describe('MCP E2E Search Tests (using mcp-test)', () => {
   });
 
   it('should search branch documents by single tag', async () => {
-    const searchResult = await client.callTool('search_documents_by_tags', {
+    const searchResult = await callToolWithLegacySupport(client, 'search_documents_by_tags', {
       tags: ["design"],
       docs: app.options.docsRoot,
       scope: 'branch',
@@ -151,7 +151,7 @@ describe('MCP E2E Search Tests (using mcp-test)', () => {
   });
 
   it('should search documents by multiple tags with AND logic', async () => {
-    const searchResult = await client.callTool('search_documents_by_tags', {
+    const searchResult = await callToolWithLegacySupport(client, 'search_documents_by_tags', {
       tags: ["global", "test"],
       docs: app.options.docsRoot,
       scope: 'global',
@@ -176,7 +176,7 @@ describe('MCP E2E Search Tests (using mcp-test)', () => {
   });
 
   it('should search documents by multiple tags with OR logic', async () => {
-    const searchResult = await client.callTool('search_documents_by_tags', {
+    const searchResult = await callToolWithLegacySupport(client, 'search_documents_by_tags', {
       tags: ["high-priority", "medium-priority"],
       docs: app.options.docsRoot,
       scope: 'global',
@@ -201,7 +201,7 @@ describe('MCP E2E Search Tests (using mcp-test)', () => {
   });
 
   it('should search documents across all scopes', async () => {
-    const searchResult = await client.callTool('search_documents_by_tags', {
+    const searchResult = await callToolWithLegacySupport(client, 'search_documents_by_tags', {
       tags: ["feature"],
       docs: app.options.docsRoot,
       scope: 'all',
@@ -226,7 +226,7 @@ describe('MCP E2E Search Tests (using mcp-test)', () => {
   });
 
   it('should return empty array when no documents match search criteria', async () => {
-    const searchResult = await client.callTool('search_documents_by_tags', {
+    const searchResult = await callToolWithLegacySupport(client, 'search_documents_by_tags', {
       tags: ["non-existent-tag"],
       docs: app.options.docsRoot,
       scope: 'all',

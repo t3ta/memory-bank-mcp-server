@@ -1,4 +1,4 @@
-import { setupMcpTestEnv, createTestDocument, createBranchDir } from './helpers/mcp-test-helper.js';
+import { setupMcpTestEnv, createTestDocument, createBranchDir, MockMCPToolResponse, callToolWithLegacySupport } from './helpers/mcp-test-helper.js';
 import type { Application } from '../../src/main/Application.js';
 import type { MCPTestClient } from '@t3ta/mcp-test';
 import type { DocumentDTO } from '../../src/application/dtos/DocumentDTO.js';
@@ -39,7 +39,7 @@ describe('MCP E2E Branch Memory Bank Tests (using mcp-test)', () => {
 
   it('should write and read a document in branch memory bank', async () => {
     // ブランチメモリバンクにドキュメントを書き込み
-    const writeResult = await client.callTool('write_branch_memory_bank', {
+    const writeResult = await callToolWithLegacySupport(client, 'write_branch_memory_bank', {
       branch: testBranch,
       path: testDocPath,
       docs: app.options.docsRoot,
@@ -52,7 +52,7 @@ describe('MCP E2E Branch Memory Bank Tests (using mcp-test)', () => {
     expect(writeResult.success).toBe(true);
 
     // 書き込んだドキュメントを読み取り
-    const readResult = await client.callTool('read_branch_memory_bank', {
+    const readResult = await callToolWithLegacySupport(client, 'read_branch_memory_bank', {
       branch: testBranch,
       path: testDocPath,
       docs: app.options.docsRoot
@@ -63,7 +63,7 @@ describe('MCP E2E Branch Memory Bank Tests (using mcp-test)', () => {
 
     if (readResult.success) {
       expect(readResult.data).toBeDefined();
-      if (!readResult.data) return fail('readResult.data should not be null');
+      if (!readResult.data) throw new Error('readResult.data should not be null');
 
       const document = readResult.data as DocumentDTO;
       expect(document.path).toBe(testDocPath);
@@ -75,20 +75,20 @@ describe('MCP E2E Branch Memory Bank Tests (using mcp-test)', () => {
 
       expect(content.content.message).toBe("Initial branch content");
     } else {
-      fail('read_branch_memory_bank should return success: true');
+      throw new Error('read_branch_memory_bank should return success: true');
     }
   });
 
   it('should fail when reading non-existent branch document', async () => {
     try {
       // 存在しないドキュメントの読み取りを試みる
-      await client.callTool('read_branch_memory_bank', {
+      await callToolWithLegacySupport(client, 'read_branch_memory_bank', {
         branch: testBranch,
         path: 'non-existent-doc.json',
         docs: app.options.docsRoot
       });
 
-      fail('Expected read_branch_memory_bank to throw for non-existent document');
+      throw new Error('Expected read_branch_memory_bank to throw for non-existent document');
     } catch (error: any) {
       // エラーが発生することを期待
       expect(error).toBeDefined();
@@ -97,7 +97,7 @@ describe('MCP E2E Branch Memory Bank Tests (using mcp-test)', () => {
 
   it('should update existing branch document with new content', async () => {
     // まず初期ドキュメントを作成
-    await client.callTool('write_branch_memory_bank', {
+    await callToolWithLegacySupport(client, 'write_branch_memory_bank', {
       branch: testBranch,
       path: testDocPath,
       docs: app.options.docsRoot,
@@ -114,7 +114,7 @@ describe('MCP E2E Branch Memory Bank Tests (using mcp-test)', () => {
     );
 
     // ドキュメント更新
-    const updateResult = await client.callTool('write_branch_memory_bank', {
+    const updateResult = await callToolWithLegacySupport(client, 'write_branch_memory_bank', {
       branch: testBranch,
       path: testDocPath,
       docs: app.options.docsRoot,
@@ -127,7 +127,7 @@ describe('MCP E2E Branch Memory Bank Tests (using mcp-test)', () => {
     expect(updateResult.success).toBe(true);
 
     // 更新されたドキュメントを読み取り
-    const readResult = await client.callTool('read_branch_memory_bank', {
+    const readResult = await callToolWithLegacySupport(client, 'read_branch_memory_bank', {
       branch: testBranch,
       path: testDocPath,
       docs: app.options.docsRoot
@@ -143,7 +143,7 @@ describe('MCP E2E Branch Memory Bank Tests (using mcp-test)', () => {
 
       expect(content.content.message).toBe("Updated branch content");
     } else {
-      fail('Failed to read updated document');
+      throw new Error('Failed to read updated document');
     }
   });
 
@@ -152,7 +152,7 @@ describe('MCP E2E Branch Memory Bank Tests (using mcp-test)', () => {
     const safeBranchName = toSafeBranchName(newBranch);
 
     // 新しいブランチにドキュメントを書き込み（ブランチディレクトリが自動的に作成される）
-    await client.callTool('write_branch_memory_bank', {
+    await callToolWithLegacySupport(client, 'write_branch_memory_bank', {
       branch: newBranch,
       path: testDocPath,
       docs: app.options.docsRoot,
@@ -161,7 +161,7 @@ describe('MCP E2E Branch Memory Bank Tests (using mcp-test)', () => {
     });
 
     // branchContext.jsonとactiveContext.jsonが作成されたことを確認
-    const branchContextResult = await client.callTool('read_branch_memory_bank', {
+    const branchContextResult = await callToolWithLegacySupport(client, 'read_branch_memory_bank', {
       branch: newBranch,
       path: 'branchContext.json',
       docs: app.options.docsRoot
@@ -169,7 +169,7 @@ describe('MCP E2E Branch Memory Bank Tests (using mcp-test)', () => {
 
     expect(branchContextResult.success).toBe(true);
 
-    const activeContextResult = await client.callTool('read_branch_memory_bank', {
+    const activeContextResult = await callToolWithLegacySupport(client, 'read_branch_memory_bank', {
       branch: newBranch,
       path: 'activeContext.json',
       docs: app.options.docsRoot

@@ -1,7 +1,8 @@
-import { setupMcpTestEnv, createTestDocument, createBranchDir } from './helpers/mcp-test-helper.js';
+import { setupMcpTestEnv, createTestDocument, createBranchDir, callToolWithLegacySupport } from './helpers/mcp-test-helper.js';
 import type { Application } from '../../src/main/Application.js';
 import type { MCPTestClient } from '@t3ta/mcp-test';
 import type { DocumentDTO } from '../../src/application/dtos/DocumentDTO.js';
+import type { fail } from 'assert';
 
 describe('MCP E2E Unified Document Commands Tests (using mcp-test)', () => {
   let app: Application;
@@ -39,7 +40,7 @@ describe('MCP E2E Unified Document Commands Tests (using mcp-test)', () => {
       );
 
       // グローバルドキュメントを書き込み
-      await client.callTool('write_global_memory_bank', {
+      await callToolWithLegacySupport(client, 'write_global_memory_bank', {
         path: testGlobalDocPath,
         docs: app.options.docsRoot,
         content: JSON.stringify(globalDoc, null, 2),
@@ -47,7 +48,7 @@ describe('MCP E2E Unified Document Commands Tests (using mcp-test)', () => {
       });
 
       // 統一コマンドでドキュメントを読み取り
-      const readResult = await client.callTool('read_document', {
+      const readResult = await callToolWithLegacySupport(client, 'read_document', {
         scope: 'global',
         path: testGlobalDocPath,
         docs: app.options.docsRoot
@@ -66,7 +67,7 @@ describe('MCP E2E Unified Document Commands Tests (using mcp-test)', () => {
 
         expect(content.content.message).toBe("Unified global content");
       } else {
-        fail('Failed to read global document with unified command');
+        throw new Error('Failed to read global document with unified command');
       }
     });
 
@@ -80,7 +81,7 @@ describe('MCP E2E Unified Document Commands Tests (using mcp-test)', () => {
       );
 
       // ブランチドキュメントを書き込み
-      await client.callTool('write_branch_memory_bank', {
+      await callToolWithLegacySupport(client, 'write_branch_memory_bank', {
         branch: testBranch,
         path: testBranchDocPath,
         docs: app.options.docsRoot,
@@ -89,7 +90,7 @@ describe('MCP E2E Unified Document Commands Tests (using mcp-test)', () => {
       });
 
       // 統一コマンドでドキュメントを読み取り
-      const readResult = await client.callTool('read_document', {
+      const readResult = await callToolWithLegacySupport(client, 'read_document', {
         scope: 'branch',
         path: testBranchDocPath,
         docs: app.options.docsRoot,
@@ -109,7 +110,7 @@ describe('MCP E2E Unified Document Commands Tests (using mcp-test)', () => {
 
         expect(content.content.message).toBe("Unified branch content");
       } else {
-        fail('Failed to read branch document with unified command');
+        throw new Error('Failed to read branch document with unified command');
       }
     });
   });
@@ -125,7 +126,7 @@ describe('MCP E2E Unified Document Commands Tests (using mcp-test)', () => {
       );
 
       // 統一コマンドでドキュメントを書き込み
-      const writeResult = await client.callTool('write_document', {
+      const writeResult = await callToolWithLegacySupport(client, 'write_document', {
         scope: 'global',
         path: testGlobalDocPath,
         docs: app.options.docsRoot,
@@ -138,7 +139,7 @@ describe('MCP E2E Unified Document Commands Tests (using mcp-test)', () => {
       expect(writeResult.success).toBe(true);
 
       // 書き込まれたドキュメントを読み取り
-      const readResult = await client.callTool('read_global_memory_bank', {
+      const readResult = await callToolWithLegacySupport(client, 'read_global_memory_bank', {
         path: testGlobalDocPath,
         docs: app.options.docsRoot
       });
@@ -153,7 +154,7 @@ describe('MCP E2E Unified Document Commands Tests (using mcp-test)', () => {
 
         expect(content.content.message).toBe("Unified global write content");
       } else {
-        fail('Failed to read document written with unified command');
+        throw new Error('Failed to read document written with unified command');
       }
     });
 
@@ -167,7 +168,7 @@ describe('MCP E2E Unified Document Commands Tests (using mcp-test)', () => {
       );
 
       // 統一コマンドでドキュメントを書き込み
-      const writeResult = await client.callTool('write_document', {
+      const writeResult = await callToolWithLegacySupport(client, 'write_document', {
         scope: 'branch',
         path: testBranchDocPath,
         docs: app.options.docsRoot,
@@ -181,7 +182,7 @@ describe('MCP E2E Unified Document Commands Tests (using mcp-test)', () => {
       expect(writeResult.success).toBe(true);
 
       // 書き込まれたドキュメントを読み取り
-      const readResult = await client.callTool('read_branch_memory_bank', {
+      const readResult = await callToolWithLegacySupport(client, 'read_branch_memory_bank', {
         branch: testBranch,
         path: testBranchDocPath,
         docs: app.options.docsRoot
@@ -197,7 +198,7 @@ describe('MCP E2E Unified Document Commands Tests (using mcp-test)', () => {
 
         expect(content.content.message).toBe("Unified branch write content");
       } else {
-        fail('Failed to read document written with unified command');
+        throw new Error('Failed to read document written with unified command');
       }
     });
 
@@ -211,7 +212,7 @@ describe('MCP E2E Unified Document Commands Tests (using mcp-test)', () => {
       );
 
       // 最初のドキュメントを書き込み
-      await client.callTool('write_document', {
+      await callToolWithLegacySupport(client, 'write_document', {
         scope: 'global',
         path: testGlobalDocPath,
         docs: app.options.docsRoot,
@@ -228,7 +229,7 @@ describe('MCP E2E Unified Document Commands Tests (using mcp-test)', () => {
       );
 
       // 統一コマンドでドキュメントを更新
-      const updateResult = await client.callTool('write_document', {
+      const updateResult = await callToolWithLegacySupport(client, 'write_document', {
         scope: 'global',
         path: testGlobalDocPath,
         docs: app.options.docsRoot,
@@ -241,7 +242,7 @@ describe('MCP E2E Unified Document Commands Tests (using mcp-test)', () => {
       expect(updateResult.success).toBe(true);
 
       // 更新されたドキュメントを読み取り
-      const readResult = await client.callTool('read_document', {
+      const readResult = await callToolWithLegacySupport(client, 'read_document', {
         scope: 'global',
         path: testGlobalDocPath,
         docs: app.options.docsRoot
@@ -257,7 +258,7 @@ describe('MCP E2E Unified Document Commands Tests (using mcp-test)', () => {
 
         expect(content.content.message).toBe("Updated content");
       } else {
-        fail('Failed to read updated document');
+        throw new Error('Failed to read updated document');
       }
     });
   });
