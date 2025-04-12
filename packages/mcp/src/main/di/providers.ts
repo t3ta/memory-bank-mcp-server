@@ -44,7 +44,8 @@ import { ConfigProvider } from '../../infrastructure/config/ConfigProvider.js';
 import { FileSystemGlobalMemoryBankRepository } from '../../infrastructure/repositories/file-system/FileSystemGlobalMemoryBankRepository.js';
 import { FileSystemBranchMemoryBankRepository } from '../../infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.js';
 import { FileSystemTagIndexRepositoryV1Bridge } from '../../infrastructure/repositories/file-system/FileSystemTagIndexRepositoryV1Bridge.js';
-import { FileTemplateRepository } from '../../infrastructure/templates/FileTemplateRepository.js'; // Added import
+// JsonTemplateLoaderRepositoryはdynamic importで使用するため、staticインポートはしない
+import { I18nServiceAdapter } from '../../infrastructure/i18n/I18nServiceAdapter.js'; // I18nService adapter for II18nProvider
 import { ContextController } from '../../interface/controllers/ContextController.js';
 import { JsonResponsePresenter } from '../../interface/presenters/JsonResponsePresenter.js';
 import { GlobalController } from '../../interface/controllers/GlobalController.js';
@@ -131,7 +132,7 @@ export async function registerInfrastructureServices(
     const configProvider = await container.get<IConfigProvider>('configProvider');
     const config = configProvider.getConfig();
     let translationsDir: string;
-    
+
     // Check if we have a custom docsRoot path (for tests)
     if (config.docsRoot) {
       // For tests, we use a path relative to docsRoot
@@ -143,7 +144,7 @@ export async function registerInfrastructureServices(
       translationsDir = path.join(projectRoot, 'packages/mcp/dist/infrastructure/i18n/translations');
       logger.debug(`Using standard path for translations: ${translationsDir}`);
     }
-    
+
     logger.debug(`[DI] Initializing i18nRepository with translationsDir: ${translationsDir}`);
     const { FileI18nRepository } = await import('../../infrastructure/i18n/FileI18nRepository.js');
     const i18nRepository = new FileI18nRepository(translationsDir);
@@ -196,7 +197,7 @@ export async function registerApplicationServices(container: DIContainer): Promi
     const globalRepository = await container.get<IGlobalMemoryBankRepository>('globalMemoryBankRepository');
     const gitService = await container.get<IGitService>('gitService');
     const configProvider = await container.get<IConfigProvider>('configProvider');
-    
+
     return new DocumentRepositorySelector(
       branchRepository,
       globalRepository,
@@ -222,22 +223,22 @@ export async function registerApplicationServices(container: DIContainer): Promi
       const { Rfc6902JsonPatchAdapter } = await import('../../domain/jsonpatch/Rfc6902JsonPatchAdapter.js');
       return new Rfc6902JsonPatchAdapter(); // Use rfc6902 adapter
   });
-  
+
   // Register ヘルパークラス
   container.registerFactory('branchResolverService', async () => {
     const gitService = await container.get<IGitService>('gitService');
     const configProvider = await container.get<IConfigProvider>('configProvider');
     return new BranchResolverService(gitService, configProvider);
   });
-  
+
   // Remove old version - already registered with new structure
-  
+
   // Register 新しいユースケース
   container.registerFactory('readDocumentUseCase', async () => {
     const repositorySelector = await container.get<DocumentRepositorySelector>('documentRepositorySelector');
     return new ReadDocumentUseCase(repositorySelector);
   });
-  
+
   container.registerFactory('writeDocumentUseCase', async () => {
     const repositorySelector = await container.get<DocumentRepositorySelector>('documentRepositorySelector');
     const patchService = await container.get<JsonPatchService>('jsonPatchService');
@@ -373,17 +374,20 @@ export async function registerApplicationServices(container: DIContainer): Promi
   // TS定義を最優先し、jsonディレクトリが存在しなくても問題ないよう修正
   container.registerFactory('templateRepository', async () => {
     logger.debug('Resolving dependencies for templateRepository...');
-    
-    // TS定義ディレクトリへの直接パス参照
-    // プロジェクトルートからの相対パスを使用（環境に依存しない）
-    const templateBasePath = path.join(process.cwd(), 'packages/mcp/src/templates/definitions');
-    
-    logger.debug(`Using TypeScript template definitions path: ${templateBasePath}`);
-    
+
+    // JsonTemplateLoaderRepositoryを使用する
+    // 直接TypeScript定義からテンプレートをロードするため、ディレクトリパスは不要
     const i18nService = await container.get<I18nService>('i18nService');
-    const templateRepository = new FileTemplateRepository(templateBasePath, i18nService);
+
+    // I18nServiceAdapterを使用してII18nProviderのインターフェースを満たす
+    const i18nProvider = new I18nServiceAdapter(i18nService);
+
+    // 新しいRepositoryクラスをインポート
+    const { JsonTemplateLoaderRepository } = await import('../../infrastructure/templates/JsonTemplateLoaderRepository.js');
+
+    const templateRepository = new JsonTemplateLoaderRepository(i18nProvider);
     await templateRepository.initialize();
-    logger.debug('templateRepository initialized.');
+    logger.debug('templateRepository (JsonTemplateLoaderRepository) initialized.');
     return templateRepository;
   });
 
@@ -413,9 +417,9 @@ export async function registerInterfaceServices(container: DIContainer): Promise
     const writeGlobalDocumentUseCase = await container.get<WriteGlobalDocumentUseCase>('writeGlobalDocumentUseCase');
     // const repositorySelector = await container.get<DocumentRepositorySelector>('documentRepositorySelector'); // Not used in the current implementation
     const presenter = await container.get<MCPResponsePresenter>('mcpResponsePresenter');
-    
+
     const configProvider = await container.get<IConfigProvider>('configProvider');
-    
+
     return new DocumentController(
       readBranchDocumentUseCase,
       writeBranchDocumentUseCase,

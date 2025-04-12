@@ -1,10 +1,9 @@
-import { vi } from 'vitest'; // vi をインポート
-import type { Mock } from 'vitest'; // Mock 型をインポート
-import { createConsoleLogger, logger as defaultLogger } from '../../../../src/shared/utils/logger.js'; // 未使用の LogLevel, LOG_LEVEL_PRIORITY を削除
-// import { jest } from '@jest/globals'; // jest インポート削除
+import { vi } from 'vitest';
+import type { Mock } from 'vitest';
+import { createConsoleLogger, logger as defaultLogger } from '../../../../src/shared/utils/logger.js';
 
-// Mock console.log
-const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+// Mock console.error (実際のログ出力はconsole.error()を使用)
+const consoleLogSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
 describe('Console Logger', () => {
   beforeEach(() => {
