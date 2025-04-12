@@ -210,8 +210,16 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
   const dynamicTools = generateToolDefinitions(configProvider);
 
   server.setRequestHandler(ListToolsRequestSchema, async () => {
+    // Convert parameters to inputSchema for MCP compatibility
+    const toolsWithSchema = dynamicTools.map(tool => ({
+      ...tool,
+      inputSchema: {
+        schema: tool.parameters
+      }
+    }));
+
     return {
-      tools: dynamicTools,
+      tools: toolsWithSchema,
     };
   });
 
