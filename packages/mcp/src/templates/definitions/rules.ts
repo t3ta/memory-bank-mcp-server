@@ -1,6 +1,6 @@
 /**
  * rulesテンプレート定義
- * 
+ *
  * Memory Bankシステムのルールを定義するテンプレート
  */
 import { Template } from '@memory-bank/schemas/templates';
@@ -16,7 +16,7 @@ export const rulesTemplate: Template = {
     titleKey: "template.title.rules",
     descriptionKey: "template.description.rules",
     type: "system",
-    lastModified: "2025-04-11T12:45:00.000Z"
+    lastModified: "2025-04-12T12:30:00.000Z"
   },
   content: {
     sections: [

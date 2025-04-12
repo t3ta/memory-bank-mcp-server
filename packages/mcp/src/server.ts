@@ -13,8 +13,8 @@ import { hideBin } from 'yargs/helpers';
 import { createApplication, Application } from './main/index.js';
 import { logger } from './shared/utils/logger.js'; // logger もインポート
 import { getToolDefinitions } from './tools/definitions.js'; // 関数をインポート
-import { Language, isValidLanguage } from '@memory-bank/schemas'; // Language 型とヘルパーをインポート
-import type { ContextRequest } from './application/usecases/types.js'; // 正しいパスからインポート
+import { Language, isValidLanguage } from '@memory-bank/schemas/v2/i18n-schema'; // Language 型とヘルパーを正しいパスからインポート
+import type { ContextRequest } from './application/usecases/types.js'; // 共通型定義のContextRequestをインポート
 import type { SearchDocumentsByTagsInput } from './application/usecases/common/SearchDocumentsByTagsUseCase.js'; // 正しいパスからインポート
 import type { DocumentDTO } from './application/dtos/DocumentDTO.js'; // DocumentDTO をインポート
 import type { MCPResponse } from './interface/presenters/types/MCPResponse.js'; // MCPResponse をインポート
@@ -107,7 +107,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         break;
       case 'read_branch_memory_bank':
         response = await app.getBranchController().readDocument(
-          params.branch as string, 
+          params.branch as string,
           params.path as string
         ); // パラメータの型を明示的に指定
         break;
@@ -123,13 +123,25 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         response = await app.getGlobalController().readDocument(params.path as string); // 型を明示的に指定
         break;
       case 'read_context': {
-        // ContextRequest オブジェクトを作成して渡す
-        // language は main 関数でチェック済みのものを渡す
-        // docs は ContextRequest に不要なので削除
+        // languageの検証を行い有効なLanguage型に変換
+        const language = params.language as string;
+        if (!isValidLanguage(language)) {
+          logger.error(`Invalid language: ${language}`);
+          throw new Error(`Invalid language: ${language}. Supported languages are: en, ja, zh`);
+        }
+
+        // branchの検証
+        if (!params.branch || typeof params.branch !== 'string' || params.branch.trim() === '') {
+          logger.error(`Missing or invalid branch name: ${params.branch}`);
+          throw new Error('Branch name is required for read_context');
+        }
+
+        // 検証済みの値でContextRequest オブジェクトを作成
         const contextRequest: ContextRequest = {
-          branch: params.branch as string, // 型を明示的に指定
-          language: params.language as string, // 型を明示的に指定
+          branch: params.branch as string,
+          language: language as Language, // 検証済みの値なのでLanguage型として安全
         };
+
         // 戻り値の型が MCPResponse と互換性を持つように適切な型変換が必要
         response = await app.getContextController().readContext(contextRequest) as MCPResponse;
         break;
@@ -161,8 +173,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
            return { content: [{ type: 'text', text: response.data }] };
        } else if (typeof response.data === 'object' && response.data !== null) { // null チェック追加
            // DocumentDTO など、lastModified を持つ可能性のあるオブジェクト
-           const meta = (response.data as Record<string, unknown>).lastModified ? 
-             { lastModified: (response.data as Record<string, unknown>).lastModified } 
+           const meta = (response.data as Record<string, unknown>).lastModified ?
+             { lastModified: (response.data as Record<string, unknown>).lastModified }
              : undefined;
            // content プロパティがあるか、なければ全体をJSON化
            let contentText: string;
