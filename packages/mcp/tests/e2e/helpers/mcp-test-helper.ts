@@ -578,12 +578,14 @@ export async function setupMcpTestEnv(): Promise<{
 
       case 'tools/list':
         // tools/list のモック実装
-        const listToolsResult = await app.execCommand('tools/list', {
+        // ここで直接tools_listメソッドを探してみる
+        const { tools_list } = await import('../../../src/interface/tools/list-tools.js');
+        const result = await tools_list({
           docs: params.docs || testEnv.docRoot
         });
         return {
           success: true,
-          data: listToolsResult
+          data: result
         };
 
       default:
