@@ -290,23 +290,24 @@ this.container = await setupContainer(this.options);
                     id: message.id,
                     result: { success: true, data: {} }
                   };
-                  return;
+                  // returnを削除 - 後続のtransport.send(response)が実行されるようにする
                 }
-                
-                // レスポンスの形式を詳細に検査
-                logger.debug(`[Application.handleConnection] E2E test response type: ${typeof controllerResponse}`, {
-                  hasSuccess: controllerResponse && 'success' in controllerResponse,
-                  hasData: controllerResponse && 'data' in controllerResponse,
-                  dataType: controllerResponse && 'data' in controllerResponse ? typeof controllerResponse.data : 'undefined'
-                });
-                
-                // ベストエフォートでレスポンスを構築
-                response = {
-                  jsonrpc: '2.0',
-                  id: message.id,
-                  result: controllerResponse  // テスト用に元のcontrollerResponseをそのまま返す
-                };
-                return;
+                else {
+                  // レスポンスの形式を詳細に検査
+                  logger.debug(`[Application.handleConnection] E2E test response type: ${typeof controllerResponse}`, {
+                    hasSuccess: controllerResponse && 'success' in controllerResponse,
+                    hasData: controllerResponse && 'data' in controllerResponse,
+                    dataType: controllerResponse && 'data' in controllerResponse ? typeof controllerResponse.data : 'undefined'
+                  });
+                  
+                  // ベストエフォートでレスポンスを構築
+                  response = {
+                    jsonrpc: '2.0',
+                    id: message.id,
+                    result: controllerResponse  // テスト用に元のcontrollerResponseをそのまま返す
+                  };
+                  // returnを削除 - 後続のtransport.send(response)が実行されるようにする
+                }
               }
               
               // 以下は通常のレスポンス処理（E2Eテスト以外）
