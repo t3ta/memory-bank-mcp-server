@@ -1,0 +1,118 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "remove-old-api-progress",
+    "title": "旧API削除プロジェクト進捗管理",
+    "documentType": "core",
+    "path": "progress.json",
+    "tags": [],
+    "lastModified": "2025-04-12T14:58:38.436Z",
+    "createdAt": "2025-04-12T12:00:00Z",
+    "version": 1
+  },
+  "content": {
+    "workingFeatures": [
+      {
+        "id": "1",
+        "description": "プロジェクト計画の作成",
+        "implementedAt": "2025-04-12T12:00:00Z"
+      }
+    ],
+    "pendingImplementation": [
+      {
+        "id": "2",
+        "description": "packages/mcp/src/tools/definitions.ts から旧APIツール定義を削除",
+        "priority": "high",
+        "estimatedCompletion": "2025-04-13"
+      },
+      {
+        "id": "3",
+        "description": "packages/mcp/src/server.ts から旧APIハンドラケースを削除",
+        "priority": "high",
+        "estimatedCompletion": "2025-04-13"
+      },
+      {
+        "id": "4",
+        "description": "packages/mcp/src/interface/tools/document-tools.ts の不要な関数削除",
+        "priority": "medium",
+        "estimatedCompletion": "2025-04-14"
+      },
+      {
+        "id": "5",
+        "description": "旧API関連のテストファイル更新または削除",
+        "priority": "high",
+        "estimatedCompletion": "2025-04-14"
+      },
+      {
+        "id": "6",
+        "description": "README.mdなどのドキュメントから旧API記述削除",
+        "priority": "medium",
+        "estimatedCompletion": "2025-04-15"
+      },
+      {
+        "id": "7",
+        "description": "mcp-tool-manual.jsonからの旧API項目削除",
+        "priority": "medium",
+        "estimatedCompletion": "2025-04-15"
+      },
+      {
+        "id": "8",
+        "description": "バージョン番号更新（v3.0.0準備）",
+        "priority": "low",
+        "estimatedCompletion": "2025-04-16"
+      },
+      {
+        "id": "9",
+        "description": "CHANGELOG.md更新",
+        "priority": "low",
+        "estimatedCompletion": "2025-04-16"
+      },
+      {
+        "id": "10",
+        "description": "単体テスト実行確認",
+        "priority": "high",
+        "estimatedCompletion": "2025-04-17"
+      },
+      {
+        "id": "11",
+        "description": "統合テスト実行確認",
+        "priority": "high",
+        "estimatedCompletion": "2025-04-17"
+      },
+      {
+        "id": "12",
+        "description": "VSCode拡張機能との互換性確認テスト",
+        "priority": "high",
+        "estimatedCompletion": "2025-04-18"
+      },
+      {
+        "id": "13",
+        "description": "CLIツールとの互換性確認テスト",
+        "priority": "high",
+        "estimatedCompletion": "2025-04-18"
+      },
+      {
+        "id": "14",
+        "description": "プルリクエスト作成とレビュー依頼",
+        "priority": "medium",
+        "estimatedCompletion": "2025-04-19"
+      }
+    ],
+    "status": "in-development",
+    "completionPercentage": 5,
+    "knownIssues": [
+      {
+        "id": "issue-1",
+        "description": "統合APIのパフォーマンステストが十分でない可能性あり",
+        "severity": "medium",
+        "workaround": "実装完了後に負荷テストを追加して確認する"
+      },
+      {
+        "id": "issue-2",
+        "description": "未知の外部クライアントが古いAPIを使用している可能性",
+        "severity": "medium",
+        "workaround": "リリース前に広範な告知と移行ガイドの配布"
+      }
+    ]
+  }
+}
