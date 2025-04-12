@@ -1,6 +1,6 @@
 import { setupMcpTestEnv } from './helpers/mcp-test-helper.js';
 import type { Application } from '../../src/main/Application.js';
-import type { MCPTestClient } from 'mcp-test';
+import type { MCPTestClient } from '@t3ta/mcp-test';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 

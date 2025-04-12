@@ -1,6 +1,6 @@
 import { setupMcpTestEnv, createTestDocument, createBranchDir } from './helpers/mcp-test-helper.js';
 import type { Application } from '../../src/main/Application.js';
-import type { MCPTestClient } from 'mcp-test';
+import type { MCPTestClient } from '@t3ta/mcp-test';
 
 describe('MCP E2E Search Tests (using mcp-test)', () => {
   let app: Application;

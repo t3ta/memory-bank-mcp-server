@@ -1,6 +1,6 @@
 import { setupMcpTestEnv, createTestDocument } from './helpers/mcp-test-helper.js';
 import type { Application } from '../../src/main/Application.js';
-import type { MCPTestClient } from 'mcp-test';
+import type { MCPTestClient } from '@t3ta/mcp-test';
 import type { DocumentDTO } from '../../src/application/dtos/DocumentDTO.js';
 
 describe('MCP E2E Global Memory Bank Tests (using mcp-test)', () => {

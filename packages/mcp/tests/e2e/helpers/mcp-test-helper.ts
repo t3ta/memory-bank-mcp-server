@@ -2,7 +2,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import tmp from 'tmp-promise';
 import { execSync } from 'child_process';
-import { MCPTestClient } from 'mcp-test';
+import { MCPTestClient } from '@t3ta/mcp-test';
 import { toSafeBranchName } from '../../../src/shared/utils/branchNameUtils.js';
 import { Application } from '../../../src/main/Application.js';
 import { logger } from '../../../src/shared/utils/logger.js';
