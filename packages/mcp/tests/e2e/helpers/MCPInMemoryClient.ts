@@ -208,12 +208,35 @@ export class MCPInMemoryClient {
       returnContent?: boolean 
     }
   ): Promise<any> {
-    return this.callTool('write_document', {
+    logger.debug(`[MCPInMemoryClient] writeDocument scope=${scope}, path=${path}`);
+    
+    // APIに合わせてパラメータを適切に組み立て
+    const toolParams: Record<string, any> = {
       scope,
       path,
       docs,
       ...options
-    });
+    };
+    
+    // 使用するツール名を決定
+    let toolName: string;
+    
+    // 従来のAPIとE2E用統一APIの両方に対応
+    if (scope === 'branch') {
+      // ブランチスコープの場合
+      toolName = 'write_branch_memory_bank';
+      toolParams.branch = options.branch;
+    } else if (scope === 'global') {
+      // グローバルスコープの場合
+      toolName = 'write_global_memory_bank';
+      // branchパラメータは不要なので削除
+      delete toolParams.branch;
+    } else {
+      // 統一APIの場合
+      toolName = 'write_document';
+    }
+    
+    return this.callTool(toolName, toolParams);
   }
 
   /**
@@ -231,11 +254,60 @@ export class MCPInMemoryClient {
       branch?: string;
     } = {}
   ): Promise<any> {
-    return this.callTool('read_document', {
+    logger.debug(`[MCPInMemoryClient] readDocument scope=${scope}, path=${path}`);
+    
+    // APIに合わせてパラメータを適切に組み立て
+    const toolParams: Record<string, any> = {
       scope,
       path,
       docs,
       ...options
+    };
+    
+    // 使用するツール名を決定
+    let toolName: string;
+    
+    // 従来のAPIとE2E用統一APIの両方に対応
+    if (scope === 'branch') {
+      // ブランチスコープの場合
+      toolName = 'read_branch_memory_bank';
+      toolParams.branch = options.branch;
+    } else if (scope === 'global') {
+      // グローバルスコープの場合
+      toolName = 'read_global_memory_bank';
+      // branchパラメータは不要なので削除
+      delete toolParams.branch;
+    } else {
+      // 統一APIの場合
+      toolName = 'read_document';
+    }
+    
+    // タイムアウト対策として3秒のタイムアウトを設定
+    return new Promise(async (resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        logger.warn(`[MCPInMemoryClient] readDocument timed out after 3000ms`);
+        resolve({
+          success: false,
+          error: {
+            message: 'readDocument timed out after 3000ms'
+          }
+        });
+      }, 3000);
+      
+      try {
+        const result = await this.callTool(toolName, toolParams);
+        clearTimeout(timeoutId);
+        resolve(result);
+      } catch (error) {
+        clearTimeout(timeoutId);
+        logger.error(`[MCPInMemoryClient] readDocument error:`, error);
+        resolve({
+          success: false,
+          error: {
+            message: error instanceof Error ? error.message : String(error)
+          }
+        });
+      }
     });
   }
 }

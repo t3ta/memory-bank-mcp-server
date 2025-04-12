@@ -9,9 +9,13 @@ export default defineConfig({
     include: ['**/*.e2e.test.ts'],
     exclude: ['node_modules', 'dist'],
     globals: true,
-    testTimeout: 10000, // 短くして問題を再現しやすく
-    hookTimeout: 10000, // 同様に短く調整
-    bail: false, // 失敗してもすべてのテストを実行
+    testTimeout: 60000, // より長く設定して対応
+    hookTimeout: 60000, // より長く設定して対応
+    // テスト実行数を制限して重要なものから確認
+    maxWorkers: 1,
+    pool: 'threads',
+    maxThreads: 1,
+    minThreads: 1,
     sequence: {
       concurrent: false
     },

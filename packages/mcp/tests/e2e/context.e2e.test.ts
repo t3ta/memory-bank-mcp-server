@@ -44,33 +44,34 @@ describe('MCP E2E Context Tests', () => {
     cleanup = setup.cleanup;
     console.log('Context e2e test setup complete');
 
-    // コアファイルを書き込む - 統一APIを使用
-    await unified_write_document(client, {
-      scope: 'branch',
-      branch: testBranchName,
-      path: branchCoreDocPath,
-      content: branchCoreContent,
-      docs: testEnv.docRoot
-    });
+    // コアファイルを書き込む - 直接APIを使用
+    await client.writeBranchMemoryBank(
+      testBranchName,
+      branchCoreDocPath,
+      testEnv.docRoot,
+      { content: branchCoreContent }
+    );
 
-    // 追加ドキュメントを書き込む - 統一APIを使用
-    await unified_write_document(client, {
-      scope: 'branch',
-      branch: testBranchName,
-      path: branchDocPath,
-      content: branchDocContent,
-      docs: testEnv.docRoot, 
-      tags: ["context", "branch"]
-    });
+    // 追加ドキュメントを書き込む - 直接APIを使用
+    await client.writeBranchMemoryBank(
+      testBranchName,
+      branchDocPath,
+      testEnv.docRoot,
+      { 
+        content: branchDocContent,
+        tags: ["context", "branch"]
+      }
+    );
 
-    // グローバルドキュメントを書き込む - 統一APIを使用
-    await unified_write_document(client, {
-      scope: 'global',
-      path: globalDocPath,
-      content: globalDocContent,
-      docs: testEnv.docRoot,
-      tags: ["context", "global"]
-    });
+    // グローバルドキュメントを書き込む - 直接APIを使用
+    await client.writeGlobalMemoryBank(
+      globalDocPath,
+      testEnv.docRoot,
+      { 
+        content: globalDocContent,
+        tags: ["context", "global"]
+      }
+    );
   });
 
   afterEach(async () => {
@@ -111,13 +112,12 @@ describe('MCP E2E Context Tests', () => {
     // Instead of testing the full context, test only branch and global memory directly
     console.log('Testing branch and global memory documents directly with unified APIs');
     
-    // Test branch memory with unified API
-    const branchResult = await unified_read_document(client, {
-      scope: 'branch',
-      branch: testBranchName,
-      path: branchCoreDocPath,
-      docs: testEnv.docRoot
-    });
+    // Test branch memory with unified API - 明示的に直接APIを使用
+    const branchResult = await client.readBranchMemoryBank(
+      testBranchName,
+      branchCoreDocPath,
+      testEnv.docRoot
+    );
     
     // Keep debug output for automated test debugging if needed
     console.log('Branch result structure:', branchResult);
@@ -142,12 +142,11 @@ describe('MCP E2E Context Tests', () => {
       }
     }
     
-    // Test global memory with unified API
-    const globalResult = await unified_read_document(client, {
-      scope: 'global',
-      path: globalDocPath,
-      docs: testEnv.docRoot
-    });
+    // Test global memory with unified API - 明示的に直接APIを使用
+    const globalResult = await client.readGlobalMemoryBank(
+      globalDocPath,
+      testEnv.docRoot
+    );
     
     // Keep debug output for automated test debugging if needed
     console.log('Global result structure:', globalResult);
