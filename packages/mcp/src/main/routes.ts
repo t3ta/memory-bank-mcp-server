@@ -5,7 +5,6 @@ import { logger } from '../shared/utils/logger.js';
 import { Language, isValidLanguage } from '@memory-bank/schemas';
 import type { CliOptions } from '../infrastructure/config/WorkspaceConfig.js'; // Use relative path
 import type { IConfigProvider } from '../infrastructure/config/interfaces/IConfigProvider.js';
-import type { IConfigProvider } from '@/infrastructure/config/index.js';
 
 /**
  * Generates tool definitions based on current environment settings
@@ -387,7 +386,7 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
           let contextApp = app;
           if (providedDocs) {
             logger.debug(`Creating new application instance with docsRoot: ${docsRoot}`);
-            const appOptions = getMergedApplicationOptions(app, docsRoot, isValidLanguage(language) ? language : 'en');
+            const appOptions = getMergedApplicationOptions(app, docsRoot, isValidLanguage(language as Language) ? (language as Language) : 'en');
             logger.debug(`Using merged application options: ${JSON.stringify(appOptions)}`);
             // Normally create a new app instance here, using existing for simplicity
           }
@@ -396,7 +395,7 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
           // The ContextController and ReadContextUseCase will handle auto-detection
           const response = await contextApp.getContextController().readContext({
             branch,  // This might be undefined, which is OK for auto-detection
-            language
+            language: language || 'en' // Provide default language if undefined
           });
 
           if (!response.success) {
