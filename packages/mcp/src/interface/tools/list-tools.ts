@@ -1,5 +1,5 @@
 // Use SDK import for tool typing
-import { getToolDefinitions } from '../../tools/definitions.js';
+import { generateToolDefinitions } from '../../tools/dynamic-definitions.js';
 import { logger } from '../../shared/utils/logger.js';
 import type { ListToolsResult } from '@modelcontextprotocol/sdk/types.js';
 
@@ -30,8 +30,9 @@ export const tools_list = async (params: ListToolsParams): Promise<ListToolsResu
   logger.debug(`[tools/list] Called with params:`, params);
 
   try {
-    // Get dynamic tool definitions with their inputSchema
-    const toolDefinitions = getToolDefinitions();
+    // Get dynamically generated tool definitions
+    // This ensures tool definitions are consistent between list-tools and routes
+    const toolDefinitions = generateToolDefinitions();
 
     // Format tools to match MCP SDK's expected structure
     const formattedTools = toolDefinitions.map(tool => {
@@ -40,13 +41,8 @@ export const tools_list = async (params: ListToolsParams): Promise<ListToolsResu
         description: tool.description,
         inputSchema: {
           type: "object" as const,
-          schema: {
-            type: "object",
-            properties: tool.inputSchema.properties,
-            required: tool.inputSchema.required
-          }
+          schema: tool.parameters
         }
-        // parametersフィールドを削除 - MCPの標準形式に合わせる
       };
     });
 
