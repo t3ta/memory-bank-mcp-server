@@ -159,38 +159,63 @@ describe('ReadContextUseCase Unit Tests', () => {
   }); // End of 'should return empty global memory...' test case
 
   // --- New Test Cases for Branch Auto-Detection ---
-  // Note: ReadContextUseCase itself doesn't handle auto-detection logic directly.
-  // It expects a branch name. The auto-detection happens *before* calling this use case,
-  // typically in the controller or a higher-level service that uses ConfigProvider and GitService.
-  // Therefore, testing the "branch omitted" scenario directly on ReadContextUseCase
-  // doesn't reflect the intended workflow where auto-detection provides the branch name.
-  // The tests below simulate scenarios where the *caller* might fail to provide the branch.
+  it('should auto-detect branch name when in project mode and branch is not provided', async () => {
+    // Setup mocks for project mode and Git service
+    (mockConfigProvider.getConfig as Mock).mockReturnValue({
+      isProjectMode: true,
+      // Other config values if needed
+    });
 
-  it('should throw error if branch name is missing in input', async () => {
-    // ReadContextUseCase strictly requires the branch name in its input type.
-    // We test the scenario where the caller incorrectly provides undefined.
-    const expectedError = ApplicationErrors.invalidInput('Branch name is required'); // Or similar validation error
+    // Mock Git service to return a branch name
+    (mockGitService.getCurrentBranchName as Mock).mockResolvedValue('feature/auto-detected-branch');
 
-    // We expect the use case (or underlying logic like BranchInfo.create) to fail early
-    // because the 'branch' property is missing or invalid according to ContextRequest type.
-    // The exact error might vary based on implementation details (e.g., if BranchInfo.create throws).
-    // Let's assume a validation error occurs within the use case or entity creation.
+    // Set branch repo to return true for exists check
+    (mockBranchRepo.exists as Mock).mockResolvedValue(true);
 
-    // We need to adjust the expectation based on how the code handles a missing 'branch'.
-    // Since BranchInfo.create(undefined) would likely throw, let's expect that.
-    // However, the execute method itself might not be called if type checking fails earlier.
-    // For this unit test, let's assume the call proceeds and BranchInfo creation fails.
-    await expect(useCase.execute({ branch: undefined as any, language }))
-       .rejects.toThrow(); // Expect *some* error due to invalid input
+    // Execute with undefined branch - this should trigger auto-detection
+    const result = await useCase.execute({ language });
 
-    // Verify that repository methods were not called because input validation failed early
-    expect(mockBranchRepo.exists).not.toHaveBeenCalled();
-    expect(mockBranchRepo.listDocuments).not.toHaveBeenCalled();
-    expect(mockGlobalRepo.listDocuments).not.toHaveBeenCalled();
+    // Verify Git service was called to get branch name
+    expect(mockGitService.getCurrentBranchName).toHaveBeenCalled();
+
+    // Verify branch repo was checked with the auto-detected name
+    expect(mockBranchRepo.exists).toHaveBeenCalledWith('feature/auto-detected-branch');
+
+    // Usual result checks
+    expect(result.branchMemory).toBeDefined();
+    expect(result.globalMemory).toBeDefined();
   });
 
-  // The following tests related to project mode and git failure are removed
-  // because ReadContextUseCase doesn't directly interact with ConfigProvider or GitService
-  // for branch auto-detection. That logic resides elsewhere (e.g., Controller/Server layer).
+  it('should throw error if branch is not provided and not in project mode', async () => {
+    // Setup mock for non-project mode
+    (mockConfigProvider.getConfig as Mock).mockReturnValue({
+      isProjectMode: false,
+    });
+
+    // Execute with undefined branch - this should throw an error
+    await expect(useCase.execute({ language }))
+      .rejects.toThrow(/Branch name is required/);
+
+    // Verify Git service was not called
+    expect(mockGitService.getCurrentBranchName).not.toHaveBeenCalled();
+  });
+
+  it('should throw error if branch auto-detection fails', async () => {
+    // Setup mocks for project mode and Git service failure
+    (mockConfigProvider.getConfig as Mock).mockReturnValue({
+      isProjectMode: true,
+    });
+
+    // Mock Git service to throw an error
+    const gitError = new Error('Git command failed');
+    (mockGitService.getCurrentBranchName as Mock).mockRejectedValue(gitError);
+
+    // Execute with undefined branch - this should throw an error
+    await expect(useCase.execute({ language }))
+      .rejects.toThrow(/Branch name is required but could not be automatically determined/);
+
+    // Verify Git service was called
+    expect(mockGitService.getCurrentBranchName).toHaveBeenCalled();
+  });
 
 }); // End of describe block

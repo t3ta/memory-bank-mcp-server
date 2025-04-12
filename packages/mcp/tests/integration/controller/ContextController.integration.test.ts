@@ -58,43 +58,77 @@ describe('ContextController Integration Tests', () => {
       expect(result.data?.branchMemory?.coreFiles?.['activeContext.json']).toBeDefined();
     });
 
-    it.skip('正常系: 存在しないブランチでも自動初期化されたブランチメモリが返されること', async () => {
-      const controller = await container.get<ContextController>('contextController');
+    // ブランチ名自動検出のテスト（プロジェクトモード）
+    it.skip('プロジェクトモードではブランチ名が省略できること', async () => {
+      // GitServiceをモックして実際のブランチ検出をテスト
+      const originalConfig = process.env.MEMORY_BANK_PROJECT_MODE;
+      process.env.MEMORY_BANK_PROJECT_MODE = 'true';
 
-      const request: ContextRequest = { branch: 'feature/non-existent-branch-for-test', language: 'ja' };
-      const result = await controller.readContext(request);
+      try {
+        // コンテナを再作成（プロジェクトモード設定を反映するため）
+        container = await setupContainer({ docsRoot: testEnv.docRoot });
+        const controller = await container.get<ContextController>('contextController');
 
-      expect(result.success).toBe(true);
-      expect(result.data).toBeDefined();
-      expect(result.data?.branchMemory?.coreFiles?.['branchContext.json']).toBeDefined();
-      expect(result.data?.branchMemory?.availableFiles).toHaveLength(4);
-      expect(result.data?.rules).toBeDefined();
-      expect(result.data?.globalMemory).toBeDefined();
+        // GitServiceにモックブランチ名をセット
+        const gitService = await container.get('gitService');
+        const originalGetCurrentBranch = gitService.getCurrentBranchName;
+        gitService.getCurrentBranchName = async () => TEST_BRANCH;
+
+        try {
+          // ブランチ名省略のリクエスト
+          const request: ContextRequest = { language: 'ja' };
+          const result = await controller.readContext(request);
+
+          // 自動検出で正しく動作していることを確認
+          expect(result.success).toBe(true);
+          expect(result.data).toBeDefined();
+          expect(result.data?.branchMemory).toBeDefined();
+
+          // 自動検出されたブランチが使われたことを検証
+          expect(gitService.getCurrentBranchName).toHaveBeenCalled();
+
+        } finally {
+          // GitServiceを元に戻す
+          gitService.getCurrentBranchName = originalGetCurrentBranch;
+        }
+      } finally {
+        // 環境変数を元に戻す
+        if (originalConfig) {
+          process.env.MEMORY_BANK_PROJECT_MODE = originalConfig;
+        } else {
+          delete process.env.MEMORY_BANK_PROJECT_MODE;
+        }
+      }
     });
 
-    it.skip('正常系: ファイルが存在するブランチメモリバンクからコンテキストを読み取れること', async () => {
-      const { toSafeBranchName } = await import('../../../src/shared/utils/branchNameUtils.js');
-      await loadBranchFixture(path.join(testEnv.branchMemoryPath, toSafeBranchName(TEST_BRANCH)), 'basic');
+    // 言語設定の環境変数からの取得テスト
+    it.skip('環境変数で言語が設定されている場合はリクエストパラメータが省略できること', async () => {
+      const originalLang = process.env.LANGUAGE;
+      process.env.LANGUAGE = 'ja';
 
-      const controller = await container.get<ContextController>('contextController');
+      try {
+        // コンテナを再作成（言語設定を反映するため）
+        container = await setupContainer({ docsRoot: testEnv.docRoot });
+        const controller = await container.get<ContextController>('contextController');
 
-      const request: ContextRequest = { branch: TEST_BRANCH, language: 'ja' };
-      const result = await controller.readContext(request);
+        // 言語パラメータ省略のリクエスト
+        const request: ContextRequest = { branch: TEST_BRANCH };
+        const result = await controller.readContext(request);
 
-      expect(result.success).toBe(true);
-      expect(result.data).toBeDefined();
-      expect(Object.keys(result.data?.branchMemory?.coreFiles || {}).length).toBeGreaterThan(0);
-      expect(result.data?.branchMemory?.coreFiles?.['activeContext.json']).toBeDefined();
-      expect(result.data?.branchMemory?.coreFiles?.['branchContext.json']).toBeDefined();
+        // 環境変数の言語が使われて正しく動作していることを確認
+        expect(result.success).toBe(true);
+        expect(result.data).toBeDefined();
+        expect(result.data?.rules).toBeDefined();
+        expect(result.data?.rules?.language).toBe('ja');
 
-      const branchContext = result.data?.branchMemory?.coreFiles?.['branchContext.json'];
-      expect(branchContext).toBeDefined();
-      expect(typeof branchContext).toBe('object');
-      expect(branchContext).toHaveProperty('schema');
-      expect(branchContext).toHaveProperty('documentType');
-      expect(branchContext).toHaveProperty('metadata');
-      expect(branchContext).toHaveProperty('content');
-      expect((branchContext as any).documentType).toBe('branch_context');
+      } finally {
+        // 環境変数を元に戻す
+        if (originalLang) {
+          process.env.LANGUAGE = originalLang;
+        } else {
+          delete process.env.LANGUAGE;
+        }
+      }
     });
   });
 
