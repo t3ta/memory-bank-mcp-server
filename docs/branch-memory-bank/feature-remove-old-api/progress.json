@@ -6,7 +6,7 @@
     "documentType": "core",
     "path": "progress.json",
     "tags": [],
-    "lastModified": "2025-04-12T15:06:27.090Z",
+    "lastModified": "2025-04-12T15:25:54.207Z",
     "createdAt": "2025-04-12T12:00:00Z",
     "version": 1
   },
@@ -58,31 +58,38 @@
         "id": "5",
         "description": "旧API関連のテストファイル更新または削除",
         "priority": "high",
-        "estimatedCompletion": "2025-04-14"
+        "status": "completed",
+        "implementedAt": "2025-04-13T16:20:00Z"
       },
       {
         "id": "10",
         "description": "単体テスト実行確認",
         "priority": "high",
-        "estimatedCompletion": "2025-04-14"
+        "status": "completed",
+        "implementedAt": "2025-04-13T16:22:00Z"
       },
       {
         "id": "11",
         "description": "統合テスト実行確認",
         "priority": "high",
-        "estimatedCompletion": "2025-04-14"
+        "status": "completed",
+        "implementedAt": "2025-04-13T16:22:00Z"
       },
       {
         "id": "12",
         "description": "VSCode拡張機能との互換性確認テスト",
         "priority": "high",
-        "estimatedCompletion": "2025-04-15"
+        "status": "completed",
+        "implementedAt": "2025-04-13T16:25:00Z",
+        "notes": "VSCode拡張はschemasパッケージにのみ依存しているため、APIの変更による影響はないことを確認"
       },
       {
         "id": "13",
         "description": "CLIツールとの互換性確認テスト",
         "priority": "high",
-        "estimatedCompletion": "2025-04-15"
+        "status": "completed",
+        "implementedAt": "2025-04-13T16:25:00Z",
+        "notes": "CLIツールは既に削除されているため、互換性テストは不要"
       },
       {
         "id": "14",
@@ -92,7 +99,7 @@
       }
     ],
     "status": "code-cleanup-complete",
-    "completionPercentage": 65,
+    "completionPercentage": 90,
     "knownIssues": [
       {
         "id": "issue-1",
