@@ -214,6 +214,7 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
     const toolsWithSchema = dynamicTools.map(tool => ({
       ...tool,
       inputSchema: {
+        type: "object",
         schema: tool.parameters
       }
     }));
