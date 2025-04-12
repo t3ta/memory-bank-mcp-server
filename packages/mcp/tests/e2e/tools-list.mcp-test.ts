@@ -1,4 +1,4 @@
-import { setupMcpTestEnv } from './helpers/mcp-test-helper.js';
+import { setupMcpTestEnv, callToolWithLegacySupport } from './helpers/mcp-test-helper.js';
 import type { Application } from '../../src/main/Application.js';
 import type { MCPTestClient } from '@t3ta/mcp-test';
 import * as fs from 'fs';
@@ -53,17 +53,16 @@ describe('MCP E2E Tools List Tests', () => {
   describe('tools/list API response format', () => {
     it('should return properly formatted tools in MCP format', async () => {
       // tools/list を呼び出す
-      const response = await client.request({
-        method: 'tools/list',
-        params: {}
+      const response = await callToolWithLegacySupport(client, 'tools/list', {
+        docs: testEnv.docRoot
       });
 
       // レスポンスの基本構造を検証
-      expect(response).toHaveProperty('tools');
-      expect(Array.isArray(response.tools)).toBe(true);
+      expect(response.data).toHaveProperty('tools');
+      expect(Array.isArray(response.data.tools)).toBe(true);
 
       // 各ツールにMCP SDKが期待する形式の属性があるか検証
-      for (const tool of response.tools) {
+      for (const tool of response.data.tools) {
         // 必須プロパティのチェック
         expect(tool).toHaveProperty('name');
         expect(tool).toHaveProperty('description');
