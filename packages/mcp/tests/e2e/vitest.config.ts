@@ -9,12 +9,13 @@ export default defineConfig({
     include: ['**/*.e2e.test.ts'],
     exclude: ['node_modules', 'dist'],
     globals: true,
-    testTimeout: 60000, // Restore original test timeout
-    hookTimeout: 60000, // Restore original hook timeout
+    testTimeout: 10000, // 短くして問題を再現しやすく
+    hookTimeout: 10000, // 同様に短く調整
+    bail: false, // 失敗してもすべてのテストを実行
     sequence: {
       concurrent: false
     },
-    setupFiles: ['./tests/setupTests.ts'],
+    // setupFiles: ['../../tests/setupTests.ts'], // Temporarily commented out
     resolveSnapshotPath: (testPath, snapExt) => testPath + snapExt,
     deps: {
       inline: [
