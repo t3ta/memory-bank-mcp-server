@@ -152,9 +152,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
            let contentText: string;
            const documentData = response.data as DocumentDTO; // 型アサーション
 
-           // read_branch_memory_bank または read_global_memory_bank の場合のみJSONパースを試みる
-           if ((name === 'read_branch_memory_bank' || name === 'read_global_memory_bank') &&
-               documentData && typeof documentData.path === 'string' && documentData.path.endsWith('.json') && typeof documentData.content === 'string') {
+           // JSON形式のドキュメントの場合はパースを試みる
+           if (documentData && typeof documentData.path === 'string' && documentData.path.endsWith('.json') && typeof documentData.content === 'string') {
              try {
                // JSON 文字列をパースしてオブジェクトにする
                const parsedContent = JSON.parse(documentData.content);
