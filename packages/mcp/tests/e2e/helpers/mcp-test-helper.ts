@@ -576,6 +576,16 @@ export async function setupMcpTestEnv(): Promise<{
         };
       }
 
+      case 'tools/list':
+        // tools/list のモック実装
+        const listToolsResult = await app.execCommand('tools/list', {
+          docs: params.docs || testEnv.docRoot
+        });
+        return {
+          success: true,
+          data: listToolsResult
+        };
+
       default:
         throw new Error(`Unsupported tool: ${toolName}`);
     }
