@@ -1747,6 +1747,13 @@
   dependencies:
     "@sinonjs/commons" "^3.0.0"
 
+"@t3ta/mcp-test@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@t3ta/mcp-test/-/mcp-test-0.1.0.tgz#d431e24c570527b94c49c667f006b86629be9a51"
+  integrity sha512-ifhS315TrtdQJr+LS5Mg5G8eiQWlPpDHhZh+mx2Q1ReYzaWjyr++O9yTWwxnR7oEIfh3P/YonE00fzYwlLCESA==
+  dependencies:
+    sass "^1.70.0"
+
 "@tsconfig/node10@^1.0.7":
   version "1.0.11"
   resolved "https://registry.yarnpkg.com/@tsconfig/node10/-/node10-1.0.11.tgz#6ee46400685f130e278128c7b38b7e031ff5b2f2"
@@ -7530,11 +7537,6 @@ math-intrinsics@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/math-intrinsics/-/math-intrinsics-1.1.0.tgz#a0dd74be81e2aa5c2f27e65ce283605ee4e2b7f9"
   integrity sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==
-
-"mcp-test@file:../mcp-test":
-  version "0.1.0"
-  dependencies:
-    sass "^1.70.0"
 
 mdurl@^2.0.0:
   version "2.0.0"
