@@ -45,12 +45,8 @@ export const tools_list = async (params: ListToolsParams): Promise<ListToolsResu
             properties: tool.inputSchema.properties,
             required: tool.inputSchema.required
           }
-        },
-        parameters: {
-          type: "object",
-          properties: tool.inputSchema.properties,
-          required: tool.inputSchema.required
         }
+        // parametersフィールドを削除 - MCPの標準形式に合わせる
       };
     });
 
