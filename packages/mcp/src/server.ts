@@ -55,7 +55,7 @@ let app: Application;
 const server = new Server(
   {
     name: 'memory-bank-mcp-server',
-    version: '2.3.0', // package.json のバージョンと合わせる
+    version: '3.0.0', // package.json のバージョンと合わせる
   },
   {
     capabilities: {
@@ -94,34 +94,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
     // ツール名に応じて適切なコントローラーを呼び出す
     switch (name) {
-      case 'write_branch_memory_bank':
-        // tags は params にあれば渡す (なければ undefined)
-        // patches はインターフェースにないので削除
-        response = await app.getBranchController().writeDocument({
-          branchName: params.branch as string, // 型を明示的に指定
-          path: params.path as string, // 型を明示的に指定
-          content: params.content as any, // IBranchController では any とされているのでそれに合わせる
-          tags: params.tags as string[] | undefined, // 型を明示的に指定
-          patches: params.patches as Record<string, unknown>[] | undefined // 型を明示的に指定
-        });
-        break;
-      case 'read_branch_memory_bank':
-        response = await app.getBranchController().readDocument(
-          params.branch as string,
-          params.path as string
-        ); // パラメータの型を明示的に指定
-        break;
-      case 'write_global_memory_bank':
-        // patches はインターフェースにないので削除
-        response = await app.getGlobalController().writeDocument({
-          path: params.path as string, // 型を明示的に指定
-          content: params.content as string, // 型を明示的に指定（文字列のみ）
-          tags: params.tags as string[] | undefined // 型を明示的に指定
-        });
-        break;
-      case 'read_global_memory_bank':
-        response = await app.getGlobalController().readDocument(params.path as string); // 型を明示的に指定
-        break;
       case 'read_context': {
         // languageの検証を行い有効なLanguage型に変換
         const language = params.language as string;
