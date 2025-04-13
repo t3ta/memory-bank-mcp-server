@@ -1,4 +1,4 @@
-# @memory-bank/mcp (v3.0.0)
+# @memory-bank/mcp (v2.5.0)
 
 This package provides the core implementation of the Memory-enabled Co-Pilot (MCP) server for managing project documentation and context.
 
