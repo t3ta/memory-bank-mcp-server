@@ -138,7 +138,27 @@ yarn workspace @memory-bank/mcp dev --docs /path/to/test/docs
 # Run tests
 yarn workspace @memory-bank/mcp test # Unit tests (if any)
 yarn workspace @memory-bank/mcp test:integration # Integration tests
+yarn workspace @memory-bank/mcp test:e2e # End-to-end tests
 ```
+
+## Troubleshooting
+
+### Module Resolution Issues in E2E Tests
+
+If you encounter errors like the following when running E2E tests:
+
+```
+Error: No "exports" main defined in /path/to/node_modules/@modelcontextprotocol/sdk/package.json imported from /path/to/node_modules/@t3ta/mcp-test/dist/index.mjs
+```
+
+This is due to a compatibility issue between `@t3ta/mcp-test` and `@modelcontextprotocol/sdk`. The fix implemented in Issue #160 uses a mock implementation to bypass this dependency issue.
+
+The solution involves:
+1. A custom mock of `MCPTestClient` in `tests/e2e/mocks/mcp-test-mock.ts`
+2. Using this mock instead of the actual SDK in the E2E tests
+3. Simplifying the Vitest configuration to avoid complex module resolution
+
+If you need to modify the E2E tests, be aware of this workaround and maintain the mock implementation as needed.
 
 ## License
 
