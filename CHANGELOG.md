@@ -125,6 +125,7 @@
 * Fix TypeScript errors related to async/await and error handling ([9958bc7](https://github.com/t3ta/memory-bank-mcp-server/commit/9958bc7260ffcc51ae7e1be52400988fda6d404a))
 * Force rebuild by removing tsbuildinfo files before build ([cd94988](https://github.com/t3ta/memory-bank-mcp-server/commit/cd949880775e443ed1fb59612751353915274628))
 * Handle JSON object in write_branch_memory_bank content ([68643f6](https://github.com/t3ta/memory-bank-mcp-server/commit/68643f632cdf246ade235fb2f0ac0f6d8fef3299))
+* improve version retrieval and configure git user for tagging ([c4c0502](https://github.com/t3ta/memory-bank-mcp-server/commit/c4c0502508b6f2b789d54bd84524d40b83158e4f))
 * improve write_document and read_document implementations for test compatibility ([2f9fbfb](https://github.com/t3ta/memory-bank-mcp-server/commit/2f9fbfb46f21bbaf826ea679b2bd0268eba19ad4))
 * Keep empty json directory for path resolution ([3d92fe0](https://github.com/t3ta/memory-bank-mcp-server/commit/3d92fe016c6a3ed07c3a33575e416eebf3ea435d))
 * **logging:** replace console.error with logger/componentLogger ([f9fbc11](https://github.com/t3ta/memory-bank-mcp-server/commit/f9fbc111525703de94fb3e7c5b1ee65e55e176ab))
