@@ -3,49 +3,51 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 /**
- * Recursively copy a directory
- * @param {string} src - Source directory path
- * @param {string} dest - Destination directory path
+ * 再帰的にディレクトリをコピーする関数
+ * @param {string} src - コピー元ディレクトリのパス
+ * @param {string} dest - コピー先ディレクトリのパス
  */
 async function copyDir(src, dest) {
-  // Create directory if it doesn't exist
+  // ディレクトリがなければ作成
   await fs.mkdir(dest, { recursive: true });
 
-  // Get all entries in the directory
+  // ディレクトリ内の全エントリを取得
   const entries = await fs.readdir(src, { withFileTypes: true });
 
-  // Process each entry
+  // 各エントリに対して処理
   for (const entry of entries) {
     const srcPath = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
 
-    // Recursively copy directories
+    // ディレクトリなら再帰的にコピー
     if (entry.isDirectory()) {
       await copyDir(srcPath, destPath);
     } else {
-      // Copy files
+      // ファイルならコピー
       await fs.copyFile(srcPath, destPath);
     }
   }
 }
 
-// Main process
+// メイン処理
 async function main() {
   try {
-    console.log('🔍 Starting asset copy...');
+    console.log('🔍 コピー開始...');
 
-    // Copy translation files
+    // 翻訳ファイルをコピー
     await copyDir(
       'packages/mcp/src/infrastructure/i18n/translations',
       'packages/mcp/dist/infrastructure/i18n/translations'
     );
-    console.log('✅ Translation files copied successfully!');
+    console.log('✅ 翻訳ファイルをコピーしました！');
 
-    // Template copying has been removed as they are now TS-based and compiled automatically
+    // テンプレートをコピー
+    await copyDir('packages/mcp/src/templates', 'packages/mcp/dist/templates');
+    console.log('✅ テンプレートをコピーしました！');
 
-    console.log('✨ All assets copied successfully!');
+    console.log('✨ すべてのアセットを正常にコピーしました！');
   } catch (error) {
-    console.error('❌ Error occurred:', error);
+    console.error('❌ エラーが発生しました:', error);
     process.exit(1);
   }
 }

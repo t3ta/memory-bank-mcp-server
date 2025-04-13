@@ -55,6 +55,10 @@ export function createGlobalProperties() {
  */
 export function getToolDefinitions(): ToolDefinition[] {
   return [
+    createWriteBranchMemoryBankTool(),
+    createReadBranchMemoryBankTool(),
+    createWriteGlobalMemoryBankTool(),
+    createReadGlobalMemoryBankTool(),
     createReadContextTool(),
     createSearchDocumentsByTagsTool(),
     createWriteDocumentTool(),
@@ -62,7 +66,121 @@ export function getToolDefinitions(): ToolDefinition[] {
   ];
 }
 
-// 旧APIの定義関数を削除（write/read_branch_memory_bank, write/read_global_memory_bank）
+/**
+ * Definition for the write_branch_memory_bank tool
+ */
+function createWriteBranchMemoryBankTool(): ToolDefinition {
+  const branchProps = createBranchProperties();
+  const patchProps = createEnhancedPatchProperties(); // Use enhanced patch properties
+
+  return {
+    name: 'write_branch_memory_bank',
+    description: "Write a document to the current branch's memory bank. If using JSON Patch, follow RFC 6902 strictly.",
+    inputSchema: {
+      type: 'object',
+      properties: {
+        ...branchProps,
+        ...patchProps,
+        returnContent: {
+          type: 'boolean',
+          description: 'If true, return the full document content in the output. Defaults to false.',
+          default: false,
+        },
+        _patchNotes: {
+          type: 'string',
+          description: 'JSON Patch Implementation Notes (RFC 6902)',
+          notes: [
+            '1. Paths MUST start with "/"',
+            '2. Cannot specify both content and patches simultaneously',
+            '3. "add"/"replace"/"test" operations require a value property',
+            '4. "move"/"copy" operations require a from property',
+            '5. Special characters in paths need escaping: "/" → "~1", "~" → "~0"',
+            '6. Use "/array/-" to append to an array (adds to the end)',
+            '7. "remove" operation on a non-existent path will result in an error'
+          ]
+        }
+      },
+      required: ['path', 'docs'],
+    },
+  };
+}
+
+/**
+ * Definition for the read_branch_memory_bank tool
+ */
+function createReadBranchMemoryBankTool(): ToolDefinition {
+  const branchProps = createBranchProperties();
+
+  return {
+    name: 'read_branch_memory_bank',
+    description: "Read a document from the current branch's memory bank",
+    inputSchema: {
+      type: 'object',
+      properties: {
+        ...branchProps
+      },
+      required: ['path', 'docs'],
+    },
+  };
+}
+
+/**
+ * Definition for the write_global_memory_bank tool
+ */
+function createWriteGlobalMemoryBankTool(): ToolDefinition {
+  const globalProps = createGlobalProperties();
+  const patchProps = createEnhancedPatchProperties();
+
+  return {
+    name: 'write_global_memory_bank',
+    description: 'Write a document to the global memory bank',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        ...globalProps,
+        ...patchProps,
+        returnContent: {
+          type: 'boolean',
+          description: 'If true, return the full document content in the output. Defaults to false.',
+          default: false,
+        },
+        _patchNotes: {
+          type: 'string',
+          description: 'JSON Patch Implementation Notes (RFC 6902)',
+          notes: [
+            '1. Paths MUST start with "/"',
+            '2. Cannot specify both content and patches simultaneously',
+            '3. "add"/"replace"/"test" operations require a value property',
+            '4. "move"/"copy" operations require a from property',
+            '5. Special characters in paths need escaping: "/" → "~1", "~" → "~0"',
+            '6. Use "/array/-" to append to an array (adds to the end)',
+            '7. "remove" operation on a non-existent path will result in an error'
+          ]
+        }
+      },
+      required: ['docs'],
+    },
+  };
+}
+
+/**
+ * Definition for the read_global_memory_bank tool
+ */
+function createReadGlobalMemoryBankTool(): ToolDefinition {
+  const globalProps = createGlobalProperties();
+
+  return {
+    name: 'read_global_memory_bank',
+    description: 'Read a document from the global memory bank',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        ...globalProps
+      },
+      required: ['path', 'docs'],
+    },
+  };
+}
 
 /**
  * Definition for the read_context tool
