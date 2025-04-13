@@ -2,7 +2,9 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import tmp from 'tmp-promise';
 import { execSync } from 'child_process';
-import { MCPTestClient, MCPToolResponse } from '@t3ta/mcp-test';
+// Issue #160対応：モジュールの互換性問題を解決するためにモックを使用
+// import { MCPTestClient, MCPToolResponse } from '@t3ta/mcp-test';
+import { MCPTestClient, MCPToolResponse } from '../mocks/mcp-test-mock.js';
 import { toSafeBranchName } from '../../../src/shared/utils/branchNameUtils.js';
 import { Application } from '../../../src/main/Application.js';
 import { logger } from '../../../src/shared/utils/logger.js';
@@ -25,6 +27,7 @@ export interface LegacyCompatibleToolResponse<T = any> extends MCPToolResponse<T
 
 /**
  * MCPTestClientのcallToolメソッドをラップし、互換性のあるレスポンスを返す
+ * 注: Issue #160対応でモック実装を使用しているため、この関数はほぼ透過的
  * @param client MCPTestClient
  * @param toolName ツール名
  * @param params パラメータ
@@ -35,27 +38,22 @@ export async function callToolWithLegacySupport<T = any>(
   toolName: string,
   params: any
 ): Promise<LegacyCompatibleToolResponse<T>> {
-  const response = await client.callTool<T>(toolName, params);
+  try {
+    const response = await client.callTool<T>(toolName, params);
 
-  // 互換性のために古いプロパティを追加
-  if (response && typeof response === 'object') {
-    // 既存のsdkレスポンスをLegacyCompatibleToolResponse型に拡張
-    const legacyResponse = response as LegacyCompatibleToolResponse<T>;
-    // success は status から判断
-    legacyResponse.success = response.status === 'success';
-    // data は result を割り当て
-    legacyResponse.data = response.result as T;
+    // モック実装では既にsuccess/dataプロパティが含まれているはず
+    return response as LegacyCompatibleToolResponse<T>;
+  } catch (error) {
+    // エラーが発生した場合はエラーレスポンスを返す
+    logger.error(`Error calling tool ${toolName}:`, error);
 
-    return legacyResponse;
+    return {
+      status: 'error',
+      error: error instanceof Error ? error.message : String(error),
+      success: false,
+      data: null as unknown as T
+    };
   }
-
-  // 型チェックを通すための代替返却（通常はここには到達しない）
-  return {
-    status: 'error',
-    error: 'Invalid response structure',
-    success: false,
-    data: null as unknown as T
-  };
 }
 
 // 検索結果の型を定義
