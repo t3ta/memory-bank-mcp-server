@@ -52,14 +52,20 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
   const dynamicTools = generateToolDefinitions(configProvider);
 
   server.setRequestHandler(ListToolsRequestSchema, async () => {
-    // Convert parameters to inputSchema for MCP compatibility
-    const toolsWithSchema = dynamicTools.map(tool => ({
-      ...tool,
-      inputSchema: {
-        type: "object",
-        schema: tool.parameters
-      }
-    }));
+    // Convert parameters to inputSchema for MCP compatibility and remove parameters field
+    const toolsWithSchema = dynamicTools.map(tool => {
+      const { parameters, ...restTool } = tool;
+      return {
+        ...restTool,
+        inputSchema: {
+          type: "object",
+          properties: parameters.properties || {},
+          required: parameters.required || [],
+          additionalProperties: parameters.additionalProperties !== undefined ? parameters.additionalProperties : false,
+          $schema: "http://json-schema.org/draft-07/schema#"
+        }
+      };
+    });
 
     // Log the tools being returned for debugging
     logger.debug(`[setupRoutes] Returning ${toolsWithSchema.length} tools via MCP SDK`);

@@ -129,13 +129,13 @@ describe('MCP E2E Tools List Tests', () => {
 
         // inputSchemaの構造をチェック
         expect(tool.inputSchema).toHaveProperty('type', 'object');
-        expect(tool.inputSchema).toHaveProperty('schema');
-        expect(tool.inputSchema.schema).toHaveProperty('type', 'object');
-        expect(tool.inputSchema.schema).toHaveProperty('properties');
+        expect(tool.inputSchema).toHaveProperty('properties');
+        expect(tool.inputSchema).toHaveProperty('additionalProperties');
+        expect(tool.inputSchema).toHaveProperty('$schema');
 
         // もしrequiredがある場合は配列であることを確認
-        if (tool.inputSchema.schema.required) {
-          expect(Array.isArray(tool.inputSchema.schema.required)).toBe(true);
+        if (tool.inputSchema.required) {
+          expect(Array.isArray(tool.inputSchema.required)).toBe(true);
         }
       }
     });
@@ -203,9 +203,9 @@ describe('MCP E2E Tools List Tests', () => {
 
       // 動的スキーマが環境変数を反映しているか確認
       // docsとlanguageが環境変数でセットされているので、必須パラメータから除外されているはず
-      if (readContextTool?.inputSchema?.schema?.required) {
-        expect(readContextTool.inputSchema.schema.required).not.toContain('docs');
-        expect(readContextTool.inputSchema.schema.required).not.toContain('language');
+      if (readContextTool?.inputSchema?.required) {
+        expect(readContextTool.inputSchema.required).not.toContain('docs');
+        expect(readContextTool.inputSchema.required).not.toContain('language');
       }
 
       // クリーンアップ
@@ -248,24 +248,24 @@ describe('MCP E2E Tools List Tests', () => {
         }
 
         // スキーマプロパティを検証
-        const schema = tool.inputSchema.schema;
+        // const schema = tool.inputSchema.schema;
 
         // 必須プロパティの存在と型
         expect(typeof tool.name).toBe('string');
         expect(tool.inputSchema).toHaveProperty('type', 'object');
-        expect(tool.inputSchema).toHaveProperty('schema');
+        expect(tool.inputSchema).toHaveProperty('properties');
 
         // スキーマの内部構造
-        expect(schema).toHaveProperty('type', 'object');
+        // expect(schema).toHaveProperty('type', 'object');
 
         // プロパティと必須項目の型チェック
-        if (schema.properties) {
-          expect(typeof schema.properties).toBe('object');
+        if (tool.inputSchema.properties) {
+          expect(typeof tool.inputSchema.properties).toBe('object');
         }
 
-        if (schema.required) {
-          expect(Array.isArray(schema.required)).toBe(true);
-          schema.required.forEach(req => {
+        if (tool.inputSchema.required) {
+          expect(Array.isArray(tool.inputSchema.required)).toBe(true);
+          tool.inputSchema.required.forEach(req => {
             expect(typeof req).toBe('string');
           });
         }
@@ -330,13 +330,13 @@ describe('MCP E2E Tools List Tests', () => {
       expect(envVarReadContext).toBeDefined();
 
       // 環境変数設定時に必須パラメータが正しく調整されているか確認
-      if (standardReadContext?.inputSchema?.schema?.required && envVarReadContext?.inputSchema?.schema?.required) {
+      if (standardReadContext?.inputSchema?.required && envVarReadContext?.inputSchema?.required) {
         // 標準設定では、これらのパラメータは必須であるべき
-        expect(standardReadContext.inputSchema.schema.required).toContain('branch');
+        expect(standardReadContext.inputSchema.required).toContain('branch');
 
         // 環境変数設定時には、docs と language は必須でなくなるべき
-        expect(envVarReadContext.inputSchema.schema.required).not.toContain('docs');
-        expect(envVarReadContext.inputSchema.schema.required).not.toContain('language');
+        expect(envVarReadContext.inputSchema.required).not.toContain('docs');
+        expect(envVarReadContext.inputSchema.required).not.toContain('language');
       }
 
       // 異なる引数で呼び出した場合の動作検証
@@ -394,11 +394,10 @@ describe('MCP E2E Tools List Tests', () => {
 
         // read_contextツールは環境変数のため必須パラメータが変わっているはず
         if (tool.name === 'read_context') {
-          const schema = tool.inputSchema.schema;
-          if (schema.required) {
+          if (tool.inputSchema.required) {
             // 環境変数でセットされた項目は必須でないはず
-            expect(schema.required).not.toContain('docs');
-            expect(schema.required).not.toContain('language');
+            expect(tool.inputSchema.required).not.toContain('docs');
+            expect(tool.inputSchema.required).not.toContain('language');
           }
         }
       }
