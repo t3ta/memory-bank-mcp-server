@@ -1,4 +1,4 @@
-import { setupMcpTestEnv, createTestDocument, callToolWithLegacySupport } from './helpers/mcp-test-helper.js';
+import { setupMcpTestEnv, createTestDocument, LegacyCompatibleToolResponse, callToolWithLegacySupport } from './helpers/mcp-test-helper.js';
 import type { Application } from '../../src/main/Application.js';
 import type { MCPTestClient } from '@t3ta/mcp-test';
 import type { DocumentDTO } from '../../src/application/dtos/DocumentDTO.js';
@@ -41,6 +41,8 @@ describe('MCP E2E Global Memory Bank Tests (using mcp-test)', () => {
 
     expect(writeResult).toBeDefined();
     expect(writeResult.success).toBe(true);
+    // 新しいAPIの形式でも検証
+    expect(writeResult.status).toBe('success');
 
     // 書き込んだドキュメントを読み取り
     const readResult = await callToolWithLegacySupport(client, 'read_global_memory_bank', {
@@ -50,6 +52,8 @@ describe('MCP E2E Global Memory Bank Tests (using mcp-test)', () => {
 
     expect(readResult).toBeDefined();
     expect(readResult.success).toBe(true);
+    // 新しいAPIの形式でも検証
+    expect(readResult.status).toBe('success');
 
     if (readResult.success) {
       expect(readResult.data).toBeDefined();
@@ -116,6 +120,8 @@ describe('MCP E2E Global Memory Bank Tests (using mcp-test)', () => {
 
     expect(updateResult).toBeDefined();
     expect(updateResult.success).toBe(true);
+    // 新しいAPIの形式でも検証
+    expect(updateResult.status).toBe('success');
 
     // 更新されたドキュメントを読み取り
     const readResult = await callToolWithLegacySupport(client, 'read_global_memory_bank', {
@@ -124,6 +130,8 @@ describe('MCP E2E Global Memory Bank Tests (using mcp-test)', () => {
     });
 
     expect(readResult.success).toBe(true);
+    // 新しいAPIの形式でも検証
+    expect(readResult.status).toBe('success');
 
     if (readResult.success && readResult.data) {
       const document = readResult.data as DocumentDTO;
