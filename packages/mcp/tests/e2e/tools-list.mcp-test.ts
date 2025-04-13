@@ -4,8 +4,13 @@ import type { MCPTestClient } from '@t3ta/mcp-test';
 import * as fs from 'fs';
 import * as path from 'path';
 
-// SDK型をインポート
-import { ListToolsResult, Tool, ToolSchema } from '@modelcontextprotocol/sdk/types.js';
+// SDK型とスキーマをインポート
+import {
+  ListToolsResult,
+  Tool,
+  ListToolsResultSchema,
+  ToolSchema
+} from '@modelcontextprotocol/sdk/types.js';
 
 describe('MCP E2E Tools List Tests', () => {
   let app: Application;
@@ -54,7 +59,7 @@ describe('MCP E2E Tools List Tests', () => {
   });
 
   describe('tools/list API response format', () => {
-    it('should return properly formatted tools in MCP format', async () => {
+    it('should return properly formatted tools in MCP format with Zod validation', async () => {
       // tools/list を呼び出す
       const response = await callToolWithLegacySupport(client, 'tools/list', {
         docs: testEnv.docRoot
@@ -64,11 +69,36 @@ describe('MCP E2E Tools List Tests', () => {
       expect(response.data).toHaveProperty('tools');
       expect(Array.isArray(response.data.tools)).toBe(true);
 
+      // SDKのZodスキーマを使用してレスポンス全体を検証
+      try {
+        const validationResult = ListToolsResultSchema.safeParse(response.data);
+        expect(validationResult.success).toBe(true,
+          `ListToolsResultSchema validation failed: ${
+            !validationResult.success ? JSON.stringify(validationResult.error.format()) : ''
+          }`
+        );
+      } catch (error) {
+        console.error('ListToolsResultSchema validation error:', error);
+        throw error;
+      }
+
       // 各ツールにMCP SDKが期待する形式の属性があるか検証
       for (const tool of response.data.tools) {
-        // 必須プロパティのチェック
+        try {
+          // ToolSchemaを使って各ツールを検証
+          const toolValidation = ToolSchema.safeParse(tool);
+          expect(toolValidation.success).toBe(true,
+            `Tool schema validation failed for tool '${tool.name}': ${
+              !toolValidation.success ? JSON.stringify(toolValidation.error.format()) : ''
+            }`
+          );
+        } catch (error) {
+          console.error(`Tool schema validation error for tool '${tool.name}':`, error);
+          throw error;
+        }
+
+        // 追加の型チェック
         expect(tool).toHaveProperty('name');
-        expect(tool).toHaveProperty('description');
         expect(tool).toHaveProperty('inputSchema');
 
         // inputSchemaの構造をチェック
@@ -122,7 +152,7 @@ describe('MCP E2E Tools List Tests', () => {
       delete process.env.LANGUAGE;
     });
 
-    it('should return response compatible with SDK ListToolsResult type', async () => {
+    it('should return response compatible with SDK ListToolsResult type using Zod schema', async () => {
       // tools/list を呼び出す
       const response = await callToolWithLegacySupport(client, 'tools/list', {
         docs: testEnv.docRoot
@@ -131,38 +161,52 @@ describe('MCP E2E Tools List Tests', () => {
       // レスポンスがListToolsResult型と互換性があるか検証
       expect(response.success).toBe(true);
 
-      // SDKが期待する構造になっているか詳細に検証
-      const result = response.data as ListToolsResult;
-      expect(Array.isArray(result.tools)).toBe(true);
+      // Zodスキーマを使ってレスポンスを検証
+      const result = response.data;
 
-      // 各ツールの構造とプロパティタイプを検証
-      for (const tool of result.tools) {
-        // スキーマプロパティへのアクセスを行う
-        const schema = tool.inputSchema.schema;
-        // 必須プロパティの存在と型
-        expect(typeof tool.name).toBe('string');
-        if (tool.description !== undefined) {
-          expect(typeof tool.description).toBe('string');
+      // SDKのListToolsResultSchemaでバリデーション
+      const validationResult = ListToolsResultSchema.safeParse(result);
+      expect(validationResult.success).toBe(true);
+
+      if (!validationResult.success) {
+        // エラーが発生した場合はエラーの詳細を表示
+        console.error('Validation error:', validationResult.error.format());
+      }
+
+      // 追加の型安全性検証
+      const toolsResult = result as ListToolsResult;
+      expect(Array.isArray(toolsResult.tools)).toBe(true);
+
+      // 各ツールがToolSchemaに準拠しているか確認
+      for (const tool of toolsResult.tools) {
+        const toolValidation = ToolSchema.safeParse(tool);
+        expect(toolValidation.success).toBe(true);
+
+        if (!toolValidation.success) {
+          console.error(`Tool validation error for tool '${tool.name}':`, toolValidation.error.format());
         }
 
-        // inputSchemaの構造
-        expect(tool.inputSchema).toHaveProperty('type');
-        expect(tool.inputSchema.type).toBe('object');
-        expect(tool.inputSchema).toHaveProperty('schema');
-        expect(schema).toHaveProperty('type');
-        expect(schema.type).toBe('object');
+        // スキーマプロパティを検証
+        const schema = tool.inputSchema.schema;
 
-        // プロパティの検証
+        // 必須プロパティの存在と型
+        expect(typeof tool.name).toBe('string');
+        expect(tool.inputSchema).toHaveProperty('type', 'object');
+        expect(tool.inputSchema).toHaveProperty('schema');
+
+        // スキーマの内部構造
+        expect(schema).toHaveProperty('type', 'object');
+
+        // プロパティと必須項目の型チェック
         if (schema.properties) {
           expect(typeof schema.properties).toBe('object');
         }
 
-        // 必須フィールドが配列の場合
         if (schema.required) {
           expect(Array.isArray(schema.required)).toBe(true);
-          for (const req of schema.required) {
+          schema.required.forEach(req => {
             expect(typeof req).toBe('string');
-          }
+          });
         }
       }
     });
@@ -205,6 +249,44 @@ describe('MCP E2E Tools List Tests', () => {
 
       // ツールの総数が一致することを確認
       expect(customDocsResponse.data.tools.length).toBe(standardResponse.data.tools.length);
+
+      // クリーンアップ
+      delete process.env.MEMORY_BANK_ROOT;
+      delete process.env.LANGUAGE;
+    });
+
+    it('should validate tool schemas with Zod when environment variables are set', async () => {
+      // 環境変数を設定
+      process.env.MEMORY_BANK_ROOT = testEnv.docRoot;
+      process.env.LANGUAGE = 'en';
+
+      const response = await callToolWithLegacySupport(client, 'tools/list', {
+        docs: testEnv.docRoot
+      });
+
+      expect(response.success).toBe(true);
+
+      // SDKのZodスキーマを使用して検証
+      const validationResult = ListToolsResultSchema.safeParse(response.data);
+      expect(validationResult.success).toBe(true);
+
+      // 各ツールのバリデーション
+      const toolsResult = response.data as ListToolsResult;
+      for (const tool of toolsResult.tools) {
+        // 個別のツールをToolSchemaで検証
+        const toolValidation = ToolSchema.safeParse(tool);
+        expect(toolValidation.success).toBe(true);
+
+        // read_contextツールは環境変数のため必須パラメータが変わっているはず
+        if (tool.name === 'read_context') {
+          const schema = tool.inputSchema.schema;
+          if (schema.required) {
+            // 環境変数でセットされた項目は必須でないはず
+            expect(schema.required).not.toContain('docs');
+            expect(schema.required).not.toContain('language');
+          }
+        }
+      }
 
       // クリーンアップ
       delete process.env.MEMORY_BANK_ROOT;

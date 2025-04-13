@@ -1,7 +1,7 @@
 // Use SDK import for tool typing
 import { generateToolDefinitions } from '../../tools/dynamic-definitions.js';
 import { logger } from '../../shared/utils/logger.js';
-import type { ListToolsResult } from '@modelcontextprotocol/sdk/types.js';
+import type { ListToolsResult, Tool } from '@modelcontextprotocol/sdk/types.js';
 
 /**
  * Interface for list tool parameters
@@ -34,9 +34,10 @@ export const tools_list = async (params: ListToolsParams): Promise<ListToolsResu
     // This ensures tool definitions are consistent between list-tools and routes
     const toolDefinitions = generateToolDefinitions();
 
-    // Format tools to match MCP SDK's expected structure
+    // Format tools to match MCP SDK's expected structure with Tool type
     const formattedTools = toolDefinitions.map(tool => {
-      return {
+      // Make sure the structure strictly follows the Tool interface from SDK
+      const sdkTool: Tool = {
         name: tool.name,
         description: tool.description,
         inputSchema: {
@@ -44,6 +45,7 @@ export const tools_list = async (params: ListToolsParams): Promise<ListToolsResu
           schema: tool.parameters
         }
       };
+      return sdkTool;
     });
 
     // Return formatted tools in the expected response structure
