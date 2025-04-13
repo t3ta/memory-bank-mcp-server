@@ -46,6 +46,8 @@ jobs:
         id: get_version
         # Run semantic-release in dry-run mode to get info without publishing
         # Redirect stderr to stdout to capture all output
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           npx semantic-release --dry-run --branches ${{ github.event.inputs.branch }} > semantic_output.log 2>&1 || true
           echo "--- Semantic Release Output ---"
