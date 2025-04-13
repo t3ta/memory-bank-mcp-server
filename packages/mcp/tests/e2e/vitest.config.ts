@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
     environment: 'node',
-    include: ['**/*.mcp-test.ts'],
+    include: ['**/*.e2e.test.ts'],
     exclude: ['node_modules', 'dist'],
     globals: true,
     testTimeout: 60000, // Restore original test timeout
@@ -19,8 +19,7 @@ export default defineConfig({
     deps: {
       inline: [
         // Match the root package and any submodules starting with the name
-        /^@modelcontextprotocol\/sdk/,
-        /^@modelcontextprotocol\/test/
+        /^@modelcontextprotocol\/sdk/
       ]
     }
   },

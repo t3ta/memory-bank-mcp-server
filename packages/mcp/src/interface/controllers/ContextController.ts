@@ -89,8 +89,8 @@ export class ContextController implements IContextController {
         contextResult.rules = rulesResult; // Assign the result here
       } catch (error) {
         logger.error(`Failed to read rules for language ${request.language}:`, error);
-        // Instead of using a fallback, propagate the error as it should be handled properly
-        throw error; // Re-throw the error instead of silently using fallback content
+        // Propagate the error to be handled by the outer catch block
+        throw error;
       }
 
       return {

@@ -1,6 +1,7 @@
 // Import DIContainer for both type and value usage, then re-export it.
 import { DIContainer } from './DIContainer.js';
 export { DIContainer };
+import { fileURLToPath } from 'node:url'; // Import fileURLToPath
 import { MCPResponsePresenter } from '../../interface/presenters/MCPResponsePresenter.js';
 import { IBranchMemoryBankRepository } from '../../domain/repositories/IBranchMemoryBankRepository.js'; // Import interface
 import { IGlobalMemoryBankRepository } from '../../domain/repositories/IGlobalMemoryBankRepository.js'; // Import interface
@@ -12,7 +13,6 @@ import { WriteDocumentUseCase } from '../../application/usecases/common/WriteDoc
 import { BranchResolverService } from '../../application/services/BranchResolverService.js';
 import { DocumentRepositorySelector } from '../../application/services/DocumentRepositorySelector.js';
 import path from 'node:path';
-// fs は削除されたため、不要になりました
 import { IndexService } from '../../infrastructure/index/IndexService.js';
 import { IIndexService } from '../../infrastructure/index/interfaces/IIndexService.js';
 import { FileSystemJsonDocumentRepository } from '../../infrastructure/repositories/file-system/FileSystemJsonDocumentRepository.js';
@@ -44,8 +44,7 @@ import { ConfigProvider } from '../../infrastructure/config/ConfigProvider.js';
 import { FileSystemGlobalMemoryBankRepository } from '../../infrastructure/repositories/file-system/FileSystemGlobalMemoryBankRepository.js';
 import { FileSystemBranchMemoryBankRepository } from '../../infrastructure/repositories/file-system/FileSystemBranchMemoryBankRepository.js';
 import { FileSystemTagIndexRepositoryV1Bridge } from '../../infrastructure/repositories/file-system/FileSystemTagIndexRepositoryV1Bridge.js';
-// JsonTemplateLoaderRepositoryはdynamic importで使用するため、staticインポートはしない
-import { I18nServiceAdapter } from '../../infrastructure/i18n/I18nServiceAdapter.js'; // I18nService adapter for II18nProvider
+import { FileTemplateRepository } from '../../infrastructure/templates/FileTemplateRepository.js'; // Added import
 import { ContextController } from '../../interface/controllers/ContextController.js';
 import { JsonResponsePresenter } from '../../interface/presenters/JsonResponsePresenter.js';
 import { GlobalController } from '../../interface/controllers/GlobalController.js';
@@ -128,23 +127,13 @@ export async function registerInfrastructureServices(
 
 
   container.registerFactory('i18nRepository', async () => {
-    // Get the config provider to determine whether we need to use a custom path
-    const configProvider = await container.get<IConfigProvider>('configProvider');
-    const config = configProvider.getConfig();
-    let translationsDir: string;
-
-    // Check if we have a custom docsRoot path (for tests)
-    if (config.docsRoot) {
-      // For tests, we use a path relative to docsRoot
-      translationsDir = path.join(config.docsRoot, 'translations');
-      logger.debug(`Using docsRoot-based path for translations: ${translationsDir}`);
-    } else {
-      // For regular operation, use the dist path
-      const projectRoot = process.cwd();
-      translationsDir = path.join(projectRoot, 'packages/mcp/dist/infrastructure/i18n/translations');
-      logger.debug(`Using standard path for translations: ${translationsDir}`);
-    }
-
+    // Resolve absolute path from project root for built files
+    const __filename_i18n = fileURLToPath(import.meta.url);
+    const __dirname_i18n = path.dirname(__filename_i18n);
+    // Assuming providers.ts is in dist/main/di after build
+    // Assuming providers.ts is in dist/main/di after build, go up 5 levels
+    const projectRoot_i18n = path.resolve(__dirname_i18n, '../../../../../'); // Corrected path depth
+    const translationsDir = path.join(projectRoot_i18n, 'packages/mcp/dist/infrastructure/i18n/translations');
     logger.debug(`[DI] Initializing i18nRepository with translationsDir: ${translationsDir}`);
     const { FileI18nRepository } = await import('../../infrastructure/i18n/FileI18nRepository.js');
     const i18nRepository = new FileI18nRepository(translationsDir);
@@ -177,8 +166,25 @@ export async function registerInfrastructureServices(
     const globalJsonRoot = path.join(config.docsRoot, 'global-json');
     return new FileSystemJsonDocumentRepository(fileSystemService, indexService, globalJsonRoot);
   });
-  // 古いJSON依存のテンプレートローダーは完全に削除
-  // TS定義のみを使用する新しい実装に変更
+  // Register FileTemplateRepository
+  // Register TemplateRepository using registerFactory (it behaves as singleton)
+  // container.registerFactory('templateRepository', async () => {
+  //   logger.debug('Resolving dependencies for templateRepository...');
+  //   // Resolve absolute path from project root for built files
+  //   const __filename_tmpl = fileURLToPath(import.meta.url); // Use different variable names
+  //   const __dirname_tmpl = path.dirname(__filename_tmpl);
+  //   // Assuming providers.ts is in dist/main/di after build
+  //   // Assuming providers.ts is in dist/main/di after build, go up 5 levels
+  //   // Assuming providers.ts is in dist/main/di after build, go up 5 levels
+  //   const projectRoot_tmpl = path.resolve(__dirname_tmpl, '../../../../../'); // Corrected path depth (already correct here, but ensure consistency)
+  //   const templateBasePath = path.join(projectRoot_tmpl, 'packages/mcp/dist/templates/json');
+  //   logger.debug(`Template base path resolved to: ${templateBasePath}`);
+  //   const i18nService = await container.get<I18nService>('i18nService');
+  //   const templateRepository = new FileTemplateRepository(templateBasePath, i18nService);
+  //   await templateRepository.initialize();
+  //   logger.debug('templateRepository initialized.');
+  //   return templateRepository;
+  // });
 
 
 
@@ -197,7 +203,7 @@ export async function registerApplicationServices(container: DIContainer): Promi
     const globalRepository = await container.get<IGlobalMemoryBankRepository>('globalMemoryBankRepository');
     const gitService = await container.get<IGitService>('gitService');
     const configProvider = await container.get<IConfigProvider>('configProvider');
-
+    
     return new DocumentRepositorySelector(
       branchRepository,
       globalRepository,
@@ -223,22 +229,22 @@ export async function registerApplicationServices(container: DIContainer): Promi
       const { Rfc6902JsonPatchAdapter } = await import('../../domain/jsonpatch/Rfc6902JsonPatchAdapter.js');
       return new Rfc6902JsonPatchAdapter(); // Use rfc6902 adapter
   });
-
+  
   // Register ヘルパークラス
   container.registerFactory('branchResolverService', async () => {
     const gitService = await container.get<IGitService>('gitService');
     const configProvider = await container.get<IConfigProvider>('configProvider');
     return new BranchResolverService(gitService, configProvider);
   });
-
+  
   // Remove old version - already registered with new structure
-
+  
   // Register 新しいユースケース
   container.registerFactory('readDocumentUseCase', async () => {
     const repositorySelector = await container.get<DocumentRepositorySelector>('documentRepositorySelector');
     return new ReadDocumentUseCase(repositorySelector);
   });
-
+  
   container.registerFactory('writeDocumentUseCase', async () => {
     const repositorySelector = await container.get<DocumentRepositorySelector>('documentRepositorySelector');
     const patchService = await container.get<JsonPatchService>('jsonPatchService');
@@ -371,23 +377,19 @@ export async function registerApplicationServices(container: DIContainer): Promi
     return i18nService;
   });
   // Register TemplateRepository after I18nService is initialized
-  // TS定義を最優先し、jsonディレクトリが存在しなくても問題ないよう修正
   container.registerFactory('templateRepository', async () => {
     logger.debug('Resolving dependencies for templateRepository...');
-
-    // JsonTemplateLoaderRepositoryを使用する
-    // 直接TypeScript定義からテンプレートをロードするため、ディレクトリパスは不要
-    const i18nService = await container.get<I18nService>('i18nService');
-
-    // I18nServiceAdapterを使用してII18nProviderのインターフェースを満たす
-    const i18nProvider = new I18nServiceAdapter(i18nService);
-
-    // 新しいRepositoryクラスをインポート
-    const { JsonTemplateLoaderRepository } = await import('../../infrastructure/templates/JsonTemplateLoaderRepository.js');
-
-    const templateRepository = new JsonTemplateLoaderRepository(i18nProvider);
-    await templateRepository.initialize();
-    logger.debug('templateRepository (JsonTemplateLoaderRepository) initialized.');
+    // Resolve absolute path from project root for built files
+    const __filename_tmpl = fileURLToPath(import.meta.url); // Use different variable names
+    const __dirname_tmpl = path.dirname(__filename_tmpl);
+    // Assuming providers.ts is in dist/main/di after build, go up 5 levels
+    const projectRoot_tmpl = path.resolve(__dirname_tmpl, '../../../../../'); // Corrected path depth
+    const templateBasePath = path.join(projectRoot_tmpl, 'packages/mcp/dist/templates/json');
+    logger.debug(`Template base path resolved to: ${templateBasePath}`);
+    const i18nService = await container.get<I18nService>('i18nService'); // i18nService is now guaranteed to be initialized
+    const templateRepository = new FileTemplateRepository(templateBasePath, i18nService);
+    await templateRepository.initialize(); // Initialize after getting i18nService
+    logger.debug('templateRepository initialized.');
     return templateRepository;
   });
 
@@ -417,9 +419,9 @@ export async function registerInterfaceServices(container: DIContainer): Promise
     const writeGlobalDocumentUseCase = await container.get<WriteGlobalDocumentUseCase>('writeGlobalDocumentUseCase');
     // const repositorySelector = await container.get<DocumentRepositorySelector>('documentRepositorySelector'); // Not used in the current implementation
     const presenter = await container.get<MCPResponsePresenter>('mcpResponsePresenter');
-
+    
     const configProvider = await container.get<IConfigProvider>('configProvider');
-
+    
     return new DocumentController(
       readBranchDocumentUseCase,
       writeBranchDocumentUseCase,

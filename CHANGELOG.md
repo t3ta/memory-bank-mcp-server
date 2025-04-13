@@ -5,18 +5,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.0.0] - 2025-04-13 (@memory-bank/mcp)
-
-### Breaking Changes
-- 旧APIの削除: `write_branch_memory_bank`, `read_branch_memory_bank`, `write_global_memory_bank`, `read_global_memory_bank`は削除されました
-- 代わりに統合APIの `write_document` と `read_document` を使用してください
-
-### 移行ガイド
-- `write_branch_memory_bank` → `write_document` with `scope: "branch"`
-- `read_branch_memory_bank` → `read_document` with `scope: "branch"`
-- `write_global_memory_bank` → `write_document` with `scope: "global"`
-- `read_global_memory_bank` → `read_document` with `scope: "global"`
-
 ## [2.4.1] - 2025-04-10 (@memory-bank/mcp)
 
 ### Fixed

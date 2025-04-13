@@ -172,8 +172,8 @@ export function createConsoleLogger(level: LogLevel = 'info', initialDefaultCont
           context = { args };
         }
         const logEntry = { level: 'debug', message, ...prepareContext(context) };
-        // Output JSON string to stderr to avoid interfering with MCP communication
-        console.error(JSON.stringify(logEntry));
+        // Output JSON string to stdout
+        console.log(JSON.stringify(logEntry));
       }
     },
 
@@ -186,8 +186,8 @@ export function createConsoleLogger(level: LogLevel = 'info', initialDefaultCont
           context = { args };
         }
         const logEntry = { level: 'info', message, ...prepareContext(context) };
-        // Output JSON string to stderr to avoid interfering with MCP communication
-        console.error(JSON.stringify(logEntry));
+        // Output JSON string to stdout
+        console.log(JSON.stringify(logEntry));
       }
     },
 
@@ -200,8 +200,8 @@ export function createConsoleLogger(level: LogLevel = 'info', initialDefaultCont
           context = { args };
         }
         const logEntry = { level: 'warn', message, ...prepareContext(context) };
-        // Output JSON string to stderr to avoid interfering with MCP communication
-        console.error(JSON.stringify(logEntry));
+        // Output JSON string to stdout
+        console.log(JSON.stringify(logEntry));
       }
     },
 
@@ -229,8 +229,8 @@ export function createConsoleLogger(level: LogLevel = 'info', initialDefaultCont
         }
 
         const logEntry = { level: 'error', message, ...prepareContext(context) };
-        // Output JSON string to stderr to avoid interfering with MCP communication
-        console.error(JSON.stringify(logEntry));
+        // Output JSON string to stdout
+        console.log(JSON.stringify(logEntry));
       }
     },
 
@@ -283,4 +283,4 @@ export function createConsoleLogger(level: LogLevel = 'info', initialDefaultCont
  * componentLogger.info('User data retrieved', { userId: 123 });
  * ```
  */
-export const logger = createConsoleLogger('error');
+export const logger = createConsoleLogger('warn');

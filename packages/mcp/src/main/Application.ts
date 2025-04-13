@@ -2,7 +2,6 @@ import { setupContainer } from './di/providers.js';
 import { IGlobalController } from '../interface/controllers/interfaces/IGlobalController.js';
 import { IBranchController } from '../interface/controllers/interfaces/IBranchController.js';
 import { IContextController } from '../interface/controllers/interfaces/IContextController.js';
-import { DocumentController } from '../interface/controllers/DocumentController.js';
 import { Constants } from './config/constants.js';
 import { logger } from '../shared/utils/logger.js'; // パスエイリアスを相対パスに修正
 import type { Language } from '@memory-bank/schemas';
@@ -26,15 +25,6 @@ export class Application {
   private globalController?: IGlobalController;
   private branchController?: IBranchController;
   private contextController?: IContextController;
-  private documentController?: DocumentController;
-
-  // Expose configProvider for tools to check project mode
-  public get configProvider() {
-    if (!this.container) {
-      throw new Error('Application not initialized. Call initialize() first.');
-    }
-    return this.container.get('configProvider');
-  }
 
   /**
    * Constructor
@@ -56,7 +46,6 @@ this.container = await setupContainer(this.options);
       this.globalController = await this.container.get('globalController') as IGlobalController;
       this.branchController = await this.container.get('branchController') as IBranchController;
       this.contextController = await this.container.get('contextController') as IContextController;
-      this.documentController = await this.container.get('documentController') as DocumentController;
 
       logger.info('Application initialized successfully');
     } catch (error) {
@@ -99,18 +88,6 @@ this.container = await setupContainer(this.options);
     }
 
     return this.contextController;
-  }
-
-  /**
-   * Get document controller
-   * @returns Document controller
-   */
-  getDocumentController(): DocumentController {
-    if (!this.documentController) {
-      throw new Error('Application not initialized. Call initialize() first.');
-    }
-
-    return this.documentController;
   }
 
   /**

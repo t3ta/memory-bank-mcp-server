@@ -1,0 +1,51 @@
+{
+  "schema": "template_v1",
+  "metadata": {
+    "id": "rules",
+    "titleKey": "template.title.rules",
+    "descriptionKey": "template.description.rules",
+    "type": "system",
+    "lastModified": "2025-04-01T01:36:00.000Z"
+  },
+  "content": {
+    "sections": [
+      {
+        "id": "branchMemoryGuidelines",
+        "titleKey": "template.section.branchMemoryGuidelines",
+        "contentKey": "template.content.branchMemoryGuidelines",
+        "isOptional": false
+      },
+      {
+        "id": "branchContextJson",
+        "titleKey": "template.section.branchContextJson",
+        "contentKey": "template.content.branchContextJson",
+        "isOptional": false
+      },
+      {
+        "id": "activeContextJson",
+        "titleKey": "template.section.activeContextJson",
+        "contentKey": "template.content.activeContextJson",
+        "isOptional": false
+      },
+      {
+        "id": "progressJson",
+        "titleKey": "template.section.progressJson",
+        "contentKey": "template.content.progressJson",
+        "isOptional": false
+      },
+      {
+        "id": "systemPatternsJson",
+        "titleKey": "template.section.systemPatternsJson",
+        "contentKey": "template.content.systemPatternsJson",
+        "isOptional": false
+      },
+      {
+        "id": "bestPractices",
+        "titleKey": "template.section.bestPractices",
+        "contentKey": "template.content.bestPractices",
+        "isOptional": false
+      }
+    ],
+    "placeholders": {}
+  }
+}

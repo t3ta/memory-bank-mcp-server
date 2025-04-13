@@ -48,10 +48,6 @@
       "import": "./dist/types/index.js",
       "types": "./dist/types/index.d.ts"
     },
-    "./templates": {
-      "import": "./dist/templates/index.js",
-      "types": "./dist/templates/index.d.ts"
-    },
     "./validation-helpers": {
       "import": "./dist/validation-helpers.js",
       "types": "./dist/validation-helpers.d.ts"
