@@ -49,7 +49,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
-          npx semantic-release --dry-run --branches ${{ github.event.inputs.branch }} --no-ci > semantic_output.log 2>&1 || true
+          if ! npx semantic-release --dry-run --branches ${{ github.event.inputs.branch }} --no-ci > semantic_output.log 2>&1; then
+            echo "Error: semantic-release failed during dry-run."
+            cat semantic_output.log
+            exit 1
+          fi
           echo "--- Semantic Release Output ---"
           cat semantic_output.log
           echo "-------------------------------"
