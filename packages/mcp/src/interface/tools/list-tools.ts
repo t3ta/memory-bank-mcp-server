@@ -45,7 +45,8 @@ export const tools_list = async (params: ListToolsParams): Promise<ListToolsResu
           type: "object" as const,
           properties: parameters.properties || {},
           required: parameters.required || [],
-          additionalProperties: parameters.additionalProperties !== undefined ? parameters.additionalProperties : false,
+          // MCP SDK形式に合わせてadditionalPropertiesとschemaを追加
+          additionalProperties: false,
           $schema: "http://json-schema.org/draft-07/schema#"
         }
       };

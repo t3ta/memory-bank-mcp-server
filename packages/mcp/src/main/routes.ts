@@ -61,7 +61,8 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
           type: "object",
           properties: parameters.properties || {},
           required: parameters.required || [],
-          additionalProperties: parameters.additionalProperties !== undefined ? parameters.additionalProperties : false,
+          // MCP SDK形式に合わせて固定値を設定
+          additionalProperties: false,
           $schema: "http://json-schema.org/draft-07/schema#"
         }
       };
