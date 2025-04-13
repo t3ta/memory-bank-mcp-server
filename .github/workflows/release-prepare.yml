@@ -49,7 +49,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
-          npx semantic-release --dry-run --branches ${{ github.event.inputs.branch }} > semantic_output.log 2>&1 || true
+          npx semantic-release --dry-run --branches ${{ github.event.inputs.branch }} --no-ci > semantic_output.log 2>&1 || true
           echo "--- Semantic Release Output ---"
           cat semantic_output.log
           echo "-------------------------------"
