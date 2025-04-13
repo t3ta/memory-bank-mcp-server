@@ -37,7 +37,7 @@
     "prepublishOnly": "yarn build",
     "check:deps": "depcheck",
     "release": "semantic-release",
-    "inspect": "cd packages/mcp && node dist/server.js --docs ../../docs --project"
+    "inspect": "npx @modelcontextprotocol/inspector node ./packages/mcp/dist/server.js --docs ./docs --project"
   },
   "keywords": [
     "mcp",
@@ -81,8 +81,7 @@
     "vitest": "^3.1.1"
   },
   "resolutions": {
-    "@memory-bank/schemas": "1.0.0",
-    "node-sass": "npm:sass@^1.70.0"
+    "@memory-bank/schemas": "1.0.0"
   },
   "engines": {
     "node": "^18.18.0 || ^20.9.0 || >=21.1.0"

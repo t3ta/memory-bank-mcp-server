@@ -57,8 +57,6 @@ constructor(
     // let jsonFilePath = ''; // ★削除 (使わなくなった)
 
     try {
-      // Add explicit log showing if templateLoader is available
-      logger.debug(`ReadRulesUseCase: templateLoader available: ${!!this.templateLoader}`);
 
       // Use template loader if provided
       if (this.templateLoader) {

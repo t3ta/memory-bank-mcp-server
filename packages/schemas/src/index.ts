@@ -16,9 +16,6 @@ export * from './v2/index.js';
 // Re-export types
 export * from './types/index.js';
 
-// Re-export template definitions
-export * from './templates/index.js';
-
 // Export validation helpers
 export * from './validation-helpers.js';
 
