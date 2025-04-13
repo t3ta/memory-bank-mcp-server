@@ -12,6 +12,8 @@ import type { IConfigProvider } from '../infrastructure/config/interfaces/IConfi
  * This function dynamically creates tool definitions for the MCP server,
  * taking into account environment variables and configuration settings.
  * It allows hiding parameters that are already defined via CLI options.
+ *
+ * Note: Uses inputSchema instead of parameters to comply with MCP SDK 1.9.0+ requirements
  */
 function generateToolDefinitions(configProvider: IConfigProvider | null = null) {
   // Determine which parameters should be required vs. optional
@@ -44,7 +46,7 @@ function generateToolDefinitions(configProvider: IConfigProvider | null = null) 
     {
       name: 'read_document',
       description: 'Read a document from a branch or global memory bank',
-      parameters: {
+      inputSchema: {
         type: 'object',
         properties: {
           scope: {
@@ -71,7 +73,7 @@ function generateToolDefinitions(configProvider: IConfigProvider | null = null) 
     {
       name: 'write_document',
       description: 'Write a document to a branch or global memory bank',
-      parameters: {
+      inputSchema: {
         type: 'object',
         properties: {
           scope: {
@@ -116,7 +118,7 @@ function generateToolDefinitions(configProvider: IConfigProvider | null = null) 
     {
       name: 'read_context',
       description: 'Read all context information (rules, branch memory bank, global memory bank) at once',
-      parameters: {
+      inputSchema: {
         type: 'object',
         properties: {
           branch: { type: 'string' },
@@ -129,7 +131,7 @@ function generateToolDefinitions(configProvider: IConfigProvider | null = null) 
     {
       name: 'search_documents_by_tags',
       description: 'Search documents in memory banks by tags',
-      parameters: {
+      inputSchema: {
         type: 'object',
         properties: {
           tags: {
@@ -210,17 +212,17 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
   const dynamicTools = generateToolDefinitions(configProvider);
 
   server.setRequestHandler(ListToolsRequestSchema, async () => {
-    // MCP 1.9.0+では、toolsオブジェクトにinputSchemaが必須になったため
-    // dynamicToolsを変換して返却する
-    const toolsWithInputSchema = dynamicTools.map(tool => ({
-      ...tool,
-      // parametersをinputSchemaにコピー
-      inputSchema: tool.parameters,
-    }));
-
-    return {
-      tools: toolsWithInputSchema,
+    // ツール定義はすでにinputSchemaを使用するように更新済み
+    const result = {
+      tools: dynamicTools,
+      // PaginatedResultSchemaの必須プロパティを追加
+      _meta: {}  // 空のオブジェクトでも良い
     };
+
+    // デバッグ用のログ出力（JSON-RPCの外部に出力されるので注意）
+    logger.debug('ListToolsRequestSchema response:', JSON.stringify(result, null, 2));
+
+    return result;
   });
 
   server.setRequestHandler(CallToolRequestSchema, async (request: any) => {

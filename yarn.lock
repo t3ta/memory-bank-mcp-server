@@ -1012,9 +1012,9 @@
   dependencies:
     langium "3.3.1"
 
-"@modelcontextprotocol/sdk@^1.9.0":
+"@modelcontextprotocol/sdk@1.9.0", "@modelcontextprotocol/sdk@^1.9.0":
   version "1.9.0"
-  resolved "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.9.0.tgz"
+  resolved "https://registry.yarnpkg.com/@modelcontextprotocol/sdk/-/sdk-1.9.0.tgz#1bf7a4843870b81da26983b8e69bf398d87055f1"
   integrity sha512-Jq2EUCQpe0iyO5FGpzVYDNFR6oR53AIrwph9yWl7uSc7IWUMsrmpmSaTGra5hQNunXpM+9oit85p924jWuHzUA==
   dependencies:
     content-type "^1.0.5"
@@ -8710,7 +8710,7 @@ pirates@^4.0.4:
 
 pkce-challenge@^5.0.0:
   version "5.0.0"
-  resolved "https://registry.npmjs.org/pkce-challenge/-/pkce-challenge-5.0.0.tgz"
+  resolved "https://registry.yarnpkg.com/pkce-challenge/-/pkce-challenge-5.0.0.tgz#c3a405cb49e272094a38e890a2b51da0228c4d97"
   integrity sha512-ueGLflrrnvwB3xuo/uGob5pd5FN7l0MsLf0Z87o/UQmRtwjvfylfc9MurIxRAWywCYTgrvpXBcqjV4OfCYGCIQ==
 
 pkg-conf@^2.1.0:

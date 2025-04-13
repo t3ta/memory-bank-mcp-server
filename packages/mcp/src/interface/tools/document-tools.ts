@@ -311,28 +311,8 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
               // Apply patches using rfc6902 library (project dependency)
               const rfc6902Module = await import('rfc6902');
 
-              // Define type aliases for RFC6902 operations
-              // RFC6902 operations types (minimally defined based on the standard)
-              type AddOperation = { op: 'add', path: string, value: any };
-              type RemoveOperation = { op: 'remove', path: string };
-              type ReplaceOperation = { op: 'replace', path: string, value: any };
-              type MoveOperation = { op: 'move', path: string, from: string };
-              type CopyOperation = { op: 'copy', path: string, from: string };
-              type TestOperation = { op: 'test', path: string, value: any };
-
-              // Union type of all operations
-              type JsonPatchOperation =
-                | AddOperation
-                | RemoveOperation
-                | ReplaceOperation
-                | MoveOperation
-                | CopyOperation
-                | TestOperation;
-
-              // Operation type is defined above
-
               // Format patches to ensure they match the rfc6902 format
-              const formattedPatches: JsonPatchOperation[] = patches.map(p => {
+              const formattedPatches = patches.map(p => {
                 const op = p.op as string;
                 const path = p.path as string;
 
