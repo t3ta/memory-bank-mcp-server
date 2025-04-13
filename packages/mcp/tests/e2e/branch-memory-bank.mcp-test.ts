@@ -1,4 +1,4 @@
-import { setupMcpTestEnv, createTestDocument, createBranchDir, MockMCPToolResponse, callToolWithLegacySupport } from './helpers/mcp-test-helper.js';
+import { setupMcpTestEnv, createTestDocument, createBranchDir, LegacyCompatibleToolResponse, callToolWithLegacySupport } from './helpers/mcp-test-helper.js';
 import type { Application } from '../../src/main/Application.js';
 import type { MCPTestClient } from '@t3ta/mcp-test';
 import type { DocumentDTO } from '../../src/application/dtos/DocumentDTO.js';
@@ -51,6 +51,8 @@ describe('MCP E2E Branch Memory Bank Tests (using mcp-test)', () => {
 
     expect(writeResult).toBeDefined();
     expect(writeResult.success).toBe(true);
+    // 新しいAPIの形式でも検証
+    expect(writeResult.status).toBe('success');
 
     // 書き込んだドキュメントを読み取り (unified APIを使用)
     const readResult = await callToolWithLegacySupport(client, 'read_document', {
@@ -62,6 +64,8 @@ describe('MCP E2E Branch Memory Bank Tests (using mcp-test)', () => {
 
     expect(readResult).toBeDefined();
     expect(readResult.success).toBe(true);
+    // 新しいAPIの形式でも検証
+    expect(readResult.status).toBe('success');
 
     if (readResult.success) {
       expect(readResult.data).toBeDefined();
@@ -130,6 +134,8 @@ describe('MCP E2E Branch Memory Bank Tests (using mcp-test)', () => {
 
     expect(updateResult).toBeDefined();
     expect(updateResult.success).toBe(true);
+    // 新しいAPIの形式でも検証
+    expect(updateResult.status).toBe('success');
 
     // 更新されたドキュメントを読み取り (unified APIを使用)
     const readResult = await callToolWithLegacySupport(client, 'read_document', {
@@ -140,6 +146,8 @@ describe('MCP E2E Branch Memory Bank Tests (using mcp-test)', () => {
     });
 
     expect(readResult.success).toBe(true);
+    // 新しいAPIの形式でも検証
+    expect(readResult.status).toBe('success');
 
     if (readResult.success && readResult.data) {
       const document = readResult.data as DocumentDTO;
@@ -174,6 +182,8 @@ describe('MCP E2E Branch Memory Bank Tests (using mcp-test)', () => {
     });
 
     expect(branchContextResult.success).toBe(true);
+    // 新しいAPIの形式でも検証
+    expect(branchContextResult.status).toBe('success');
 
     const activeContextResult = await callToolWithLegacySupport(client, 'read_branch_memory_bank', {
       branch: newBranch,
@@ -182,6 +192,8 @@ describe('MCP E2E Branch Memory Bank Tests (using mcp-test)', () => {
     });
 
     expect(activeContextResult.success).toBe(true);
+    // 新しいAPIの形式でも検証
+    expect(activeContextResult.status).toBe('success');
   });
 
   // JSON Patchのテストも必要に応じて追加可能

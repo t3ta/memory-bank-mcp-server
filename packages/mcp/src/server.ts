@@ -63,7 +63,7 @@ const server = new Server(
 // ここでは、リクエストハンドラの設定は routes.ts に委譲する
 
 // Error handling
-server.onerror = (error) => {
+server.onerror = (error: unknown) => {
   logger.error('[MCP Server Error]', error);
 };
 
