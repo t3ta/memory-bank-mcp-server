@@ -37,12 +37,13 @@ export const tools_list = async (params: ListToolsParams): Promise<ListToolsResu
     // Format tools to match MCP SDK's expected structure with Tool type
     const formattedTools = toolDefinitions.map(tool => {
       // Make sure the structure strictly follows the Tool interface from SDK
+      // parametersフィールドを明示的に除外してSDK形式に変換
+      const { parameters, ...rest } = tool;
       const sdkTool: Tool = {
-        name: tool.name,
-        description: tool.description,
+        ...rest,
         inputSchema: {
           type: "object" as const,
-          schema: tool.parameters
+          schema: parameters
         }
       };
       return sdkTool;
