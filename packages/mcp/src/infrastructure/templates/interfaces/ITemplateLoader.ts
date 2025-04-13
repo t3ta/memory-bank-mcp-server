@@ -2,10 +2,10 @@
  * Template Loader Interface
  * Defines the contract for loading and processing templates
  */
-// Use 'any' for now due to persistent import issues
-type Language = any;
-// BaseTemplate is unused
-type JsonTemplate = any;
+import { Language, Template } from '@memory-bank/schemas/templates';
+
+// 型エイリアスの更新
+type JsonTemplate = Template;
 
 /**
  * Interface for template loading and rendering functionality
@@ -35,7 +35,6 @@ export interface ITemplateLoader {
     variables?: Record<string, string>
   ): Promise<string>;
 
-  // loadLegacyTemplate removed as per user request
   /**
    * Checks if a template with the given ID exists
    *

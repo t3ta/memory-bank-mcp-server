@@ -1,4 +1,4 @@
-# @memory-bank/mcp (v2.4.0)
+# @memory-bank/mcp (v3.0.0)
 
 This package provides the core implementation of the Memory-enabled Co-Pilot (MCP) server for managing project documentation and context.
 
@@ -55,27 +55,26 @@ yarn workspace @memory-bank/mcp dev --docs /path/to/your/docs
 
 ### Interacting via MCP Tools
 
-Once the server is running, clients interact with it using the defined MCP tools. Refer to the core tool manual (`docs/global-memory-bank/core/mcp-tool-manual.json`) for details on available tools like:
+Once the server is running, clients interact with it using the defined MCP tools. Refer to the core tool manual (`docs/global-memory-bank/core/mcp-tool-manual.json`) for details on available tools:
 
-- `write_branch_memory_bank`: Writes a document to a branch. The `branch` parameter is optional in Project Mode (uses current Git branch).
-- `read_branch_memory_bank`: Reads a document from a branch. The `branch` parameter is optional in Project Mode (uses current Git branch).
-- `write_global_memory_bank`: Writes a document to the global memory bank.
-- `read_global_memory_bank`: Reads a document from the global memory bank.
+- `write_document`: Writes a document to either branch or global memory bank based on the `scope` parameter.
+- `read_document`: Reads a document from either branch or global memory bank based on the `scope` parameter.
 - `read_context`: Reads rules, branch memory bank, and global memory bank information at once.
 - `search_documents_by_tags`: Searches for documents by tags in branch and/or global memory banks.
 
-### New Unified Document Commands (v2.4.0+)
+### Document Operations
 
-As of v2.4.0, new unified commands are available that provide a simpler interface for working with both branch and global memory banks:
+The server provides a unified interface for working with both branch and global memory banks:
 
 - `write_document`: Writes a document to either branch or global memory bank based on the `scope` parameter.
 - `read_document`: Reads a document from either branch or global memory bank based on the `scope` parameter.
 
-These commands provide several advantages:
+These unified commands provide several advantages:
 - Single interface for both branch and global operations
 - Explicit scope selection (`scope: 'branch'` or `scope: 'global'`)
 - Automatic branch detection in project mode
 - Support for JSON patches when updating documents
+- Cleaner API design and less redundancy
 
 Examples:
 
