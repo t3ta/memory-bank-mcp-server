@@ -50,7 +50,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@t3ta/mcp-test": "^0.2.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
