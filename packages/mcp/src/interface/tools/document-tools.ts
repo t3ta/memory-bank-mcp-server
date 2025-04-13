@@ -10,6 +10,9 @@ import { WriteGlobalDocumentUseCase } from '../../application/usecases/global/Wr
 // import { DocumentRepositorySelector } from '../../application/services/DocumentRepositorySelector.js'; // Not used in the current implementation
 import { MCPResponsePresenter } from '../presenters/MCPResponsePresenter.js';
 import { IConfigProvider } from '../../infrastructure/config/interfaces/IConfigProvider.js';
+// These imports are dynamically loaded in the code when needed
+// import path from 'path';
+// import fsExtra from 'fs-extra/esm';
 
 // Global app instance for tool commands
 // This is a simplified approach for tests - in a real environment
@@ -26,10 +29,10 @@ async function getOrCreateApp(docsRoot: string): Promise<Application> {
   if (!globalApp) {
     console.log(`[getOrCreateApp] Creating new Application instance with docsRoot: ${docsRoot}`);
     globalApp = new Application({ docsRoot });
-    
+
     console.log(`[getOrCreateApp] Initializing Application...`);
     await globalApp.initialize();
-    
+
     console.log(`[getOrCreateApp] Setting up container...`);
     container = await setupContainer({ docsRoot });
     console.log(`[getOrCreateApp] Container setup complete`);
@@ -48,37 +51,37 @@ export interface WriteDocumentParams {
    * Scope to write to (either 'branch' or 'global')
    */
   scope: 'branch' | 'global';
-  
+
   /**
    * Branch name (required if scope is 'branch', auto-detected in project mode)
    */
   branch?: string;
-  
+
   /**
    * Document path (e.g., "data/config.json")
    */
   path: string;
-  
+
   /**
    * Document content to write (object or string, mutually exclusive with patches)
    */
   content?: Record<string, unknown> | string;
-  
+
   /**
    * JSON Patch operations (RFC 6902, mutually exclusive with content)
    */
   patches?: Record<string, unknown>[];
-  
+
   /**
    * Tags to assign to the document
    */
   tags?: string[];
-  
+
   /**
    * Path to docs directory
    */
   docs: string;
-  
+
   /**
    * If true, return the full document content in the output (default: false)
    */
@@ -94,17 +97,17 @@ export interface ReadDocumentParams {
    * Scope to read from (either 'branch' or 'global')
    */
   scope: 'branch' | 'global';
-  
+
   /**
    * Branch name (required if scope is 'branch', auto-detected in project mode)
    */
   branch?: string;
-  
+
   /**
    * Document path (e.g., "data/config.json")
    */
   path: string;
-  
+
   /**
    * Path to docs directory
    */
@@ -114,7 +117,7 @@ export interface ReadDocumentParams {
 /**
  * Implementation of write_document tool
  * Unified interface for writing to both branch and global memory banks
- * 
+ *
  * @example
  * // Writing to branch memory bank
  * const result = await write_document({
@@ -125,7 +128,7 @@ export interface ReadDocumentParams {
  *   tags: ['config', 'feature'],
  *   docs: './docs'
  * });
- * 
+ *
  * @example
  * // Writing to global memory bank
  * const result = await write_document({
@@ -135,7 +138,7 @@ export interface ReadDocumentParams {
  *   tags: ['config', 'core'],
  *   docs: './docs'
  * });
- * 
+ *
  * @example
  * // Using JSON patch
  * const result = await write_document({
@@ -148,7 +151,7 @@ export interface ReadDocumentParams {
  */
 export const write_document: Tool<WriteDocumentParams> = async (params: WriteDocumentParams) => {
   const { scope, branch, path, content, patches, tags, returnContent, docs } = params;
-  
+
   console.log(`[write_document] Starting write_document operation:`, {
     scope,
     branch,
@@ -159,13 +162,13 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
     returnContent,
     docs
   });
-  
+
   // Validate scope parameter
   if (scope !== 'branch' && scope !== 'global') {
     console.error(`[write_document] Invalid scope: ${scope}, must be 'branch' or 'global'`);
     throw new Error(`Invalid scope: ${scope}, must be 'branch' or 'global'`);
   }
-  
+
   // Early branch name check for test compatibility - before any async operation
   if (scope === 'branch' && !branch) {
     try {
@@ -173,7 +176,7 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
       const localContainer = await setupContainer({ docsRoot: docs });
       const configProvider = await localContainer.get('configProvider') as IConfigProvider;
       const config = configProvider.getConfig();
-      
+
       if (!config.isProjectMode) {
         console.log('[write_document] Branch name missing in non-project mode, throwing error immediately');
         // Make sure the error message is exactly what the test expects to find
@@ -191,7 +194,7 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
       console.warn('[write_document] Error during early branch check:', error);
     }
   }
-  
+
   try {
     console.log(`[write_document] Starting write_document operation:`, {
       scope,
@@ -203,10 +206,10 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
       returnContent,
       docs
     });
-    
+
     // Get the app and container
     await getOrCreateApp(docs);
-    
+
     console.log(`[write_document] Getting dependencies from container...`);
     // Get necessary dependencies from container
     const readBranchUseCase = await container.get('readBranchDocumentUseCase') as ReadBranchDocumentUseCase;
@@ -216,7 +219,7 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
     // const repoSelector = await container.get('documentRepositorySelector') as DocumentRepositorySelector; // Not used in the current implementation
     const presenter = await container.get('mcpResponsePresenter') as MCPResponsePresenter;
     console.log(`[write_document] Dependencies retrieved successfully`);
-    
+
     // Create document controller with direct dependencies
     console.log(`[write_document] Creating DocumentController...`);
     const configProvider = await container.get('configProvider') as IConfigProvider;
@@ -229,28 +232,28 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
       presenter,
       configProvider
     );
-  
+
     // Create direct file writing to handle test cases properly
     try {
       const fsExtra = await import('fs-extra');
       const docPath = docs;
-      
+
       // Handle global scope first for test setup
       if (scope === 'global') {
         // Create global memory bank directory and file, needed for test
         const globalMemoryPath = `${docPath}/global-memory-bank`;
         await fsExtra.ensureDir(globalMemoryPath);
         console.log(`[write_document] Direct test: Ensured global directory exists: ${globalMemoryPath}`);
-        
+
         // Ensure subdirectories exist for nested paths
         if (path.includes('/')) {
           const pathDir = path.split('/').slice(0, -1).join('/');
           await fsExtra.ensureDir(`${globalMemoryPath}/${pathDir}`);
         }
-        
+
         // Full path for the document
         const fullPath = `${globalMemoryPath}/${path}`;
-        
+
         // Write file based on content type
         if (typeof content === 'string') {
           await fsExtra.writeFile(fullPath, content);
@@ -277,7 +280,7 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
         const BranchInfo = (await import('../../domain/entities/BranchInfo.js')).BranchInfo;
         const safeBranchName = BranchInfo.create(branchNameToUse).safeName;
         const branchMemoryPath = `${docPath}/branch-memory-bank/${safeBranchName}`;
-        
+
         // Make sure branch directory exists
         await fsExtra.ensureDir(branchMemoryPath);
         console.log(`[write_document] Direct test: Ensured branch directory exists: ${branchMemoryPath}`);
@@ -289,7 +292,7 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
           const pathDir = path.split('/').slice(0, -1).join('/');
           await fsExtra.ensureDir(`${branchMemoryPath}/${pathDir}`);
         }
-        
+
         // Write file based on content type
         if (typeof content === 'string') {
           await fsExtra.writeFile(fullPath, content);
@@ -304,39 +307,54 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
               // Read existing content
               const existingContent = await fsExtra.readFile(fullPath, 'utf-8');
               const jsonContent = JSON.parse(existingContent);
-              
+
               // Apply patches using rfc6902 library (project dependency)
               const rfc6902Module = await import('rfc6902');
-              
+
               // Format patches to ensure they match the rfc6902 format
               const formattedPatches = patches.map(p => {
-                const operation: any = {
-                  op: p.op,
-                  path: p.path
-                };
-                
-                // Add value for operations that need it
-                if (['add', 'replace', 'test'].includes(operation.op)) {
-                  operation.value = p.value;
+                const op = p.op as string;
+                const path = p.path as string;
+
+                // Create properly typed operation objects based on operation type
+                if (op === 'add' || op === 'replace' || op === 'test') {
+                  return {
+                    op: op as 'add' | 'replace' | 'test',
+                    path,
+                    value: p.value
+                  };
+                } else if (op === 'move' || op === 'copy') {
+                  return {
+                    op: op as 'move' | 'copy',
+                    path,
+                    from: p.from as string
+                  };
+                } else if (op === 'remove') {
+                  return {
+                    op: 'remove' as const,
+                    path
+                  };
+                } else {
+                  // Fallback for any unrecognized operations - shouldn't happen with valid JSON Patch
+                  console.error(`[write_document] Unknown operation type: ${op}`);
+                  // Return a minimal valid operation to prevent crashes
+                  return {
+                    op: 'test' as const,
+                    path,
+                    value: null
+                  };
                 }
-                
-                // Add from for operations that need it
-                if (['move', 'copy'].includes(operation.op)) {
-                  operation.from = p.from;
-                }
-                
-                return operation;
               });
-              
+
               // Clone the content and apply patches
               const patchedContent = JSON.parse(JSON.stringify(jsonContent));
               rfc6902Module.applyPatch(patchedContent, formattedPatches);
-              
+
               // Update metadata tags if original tags exist and params.tags is provided
               if (patchedContent.metadata && params.tags) {
                 patchedContent.metadata.tags = params.tags;
               }
-              
+
               // Write back patched content
               await fsExtra.writeFile(fullPath, JSON.stringify(patchedContent, null, 2));
               console.log(`[write_document] Direct test: Applied patches to file: ${fullPath}`);
@@ -349,9 +367,9 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
     } catch (err) {
       console.error('[write_document] Error in direct test file writing:', err);
     }
-    
+
     // NOTE: Early branch name check is now done at the top of the function
-    
+
     // Call the appropriate controller method based on the scope
     console.log(`[write_document] Calling documentController.writeDocument...`);
     try {
@@ -364,7 +382,7 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
         tags,
         returnContent
       });
-      
+
       // Log the result from the controller
       console.log(`[write_document] DocumentController result:`, {
         success: result.success,
@@ -372,31 +390,31 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
         dataContent: result.success && result.data?.content ? typeof result.data.content : 'undefined',
         dataTags: result.success && result.data?.tags ? result.data.tags.join(',') : 'undefined'
       });
-      
+
       // Transform the response to match what E2E tests expect
       if (result.success && result.data) {
       // Log the actual structure of the result data for debugging
       console.log(`[write_document] Raw result.data structure:`, JSON.stringify(result.data, null, 2));
-      
+
       // Extract data from the result
       let finalResult;
-      
+
       // Check if the result has a document property structure
       if (result.data.document) {
         console.log(`[write_document] Result has document property structure, extracting directly`);
         // The document property contains the actual data structure we want to return
-        
+
         // Check if the content is nested in another level
         let content = result.data.document.content;
         // Try to use original tags from params, or extract from response
         let tags = params.tags || result.data.document.tags || [];
-        
+
         // Specifically for memory documents, extract tags from metadata if available
         if (content && content.metadata && Array.isArray(content.metadata.tags) && content.metadata.tags.length > 0) {
           console.log(`[write_document] Extracting tags from content.metadata`, content.metadata.tags);
           tags = content.metadata.tags;
         }
-        
+
         // Make sure the file exists for tests - テストの為にファイルを直接作っちゃう！
         try {
           const fsExtra = await import('fs-extra');
@@ -417,14 +435,14 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
             const BranchInfo = (await import('../../domain/entities/BranchInfo.js')).BranchInfo;
             const safeBranchName = BranchInfo.create(branchNameToUse).safeName;
             const filePath = `${docPath}/branch-memory-bank/${safeBranchName}/${path}`;
-            
+
             // Ensure parent directory exists - 親ディレクトリも確実に作成！
             const pathParts = path.split('/');
             if (pathParts.length > 1) {
               const dirPath = `${docPath}/branch-memory-bank/${safeBranchName}/${pathParts.slice(0, -1).join('/')}`;
               await fsExtra.ensureDir(dirPath); // fs-extraのensureDirを使って確実に作成
             }
-            
+
             // Always create the file for tests - テスト用に常にファイルを作成
             if (typeof content === 'string') {
               await fsExtra.writeFile(filePath, content);
@@ -442,14 +460,14 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
           } else if (scope === 'global') {
             // Handle global scope
             const filePath = `${docPath}/global-memory-bank/${path}`;
-            
+
             // Ensure parent directory exists
             const pathParts = path.split('/');
             if (pathParts.length > 1) {
               const dirPath = `${docPath}/global-memory-bank/${pathParts.slice(0, -1).join('/')}`;
               await fsExtra.ensureDir(dirPath);
             }
-            
+
             // Write file content
             if (typeof content === 'string') {
               await fsExtra.writeFile(filePath, content);
@@ -462,7 +480,7 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
         } catch (err) {
           console.error('[write_document] Error ensuring file exists:', err);
         }
-        
+
         finalResult = {
           success: true,
           data: {
@@ -478,7 +496,7 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
         let content = result.data.content;
         // Default to the original requested tags when possible
         let tags = params.tags || [];
-        
+
         // Try to extract tags from various possible locations
         if (!tags.length && Array.isArray(result.data.tags)) {
           tags = result.data.tags;
@@ -487,10 +505,10 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
         } else if (!tags.length && content && content.metadata && Array.isArray(content.metadata.tags)) {
           tags = content.metadata.tags;
         }
-        
-        const lastModified = result.data.lastModified || 
+
+        const lastModified = result.data.lastModified ||
           (result.data.metadata ? result.data.metadata.lastModified : new Date().toISOString());
-        
+
         finalResult = {
           success: true,
           data: {
@@ -501,7 +519,7 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
           }
         };
       }
-      
+
       // Debugging the final result structure
       console.log(`[write_document] Final result structure:`, {
         success: finalResult.success,
@@ -512,20 +530,20 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
         tagCount: Array.isArray(finalResult.data.tags) ? finalResult.data.tags.length : 0,
         hasLastModified: !!finalResult.data.lastModified
       });
-      
+
       const response = finalResult;
-      
+
       console.log(`[write_document] Response structure:`, {
         hasContent: !!response.data.content,
         contentType: typeof response.data.content,
         tagsExist: Array.isArray(response.data.tags),
         tagCount: Array.isArray(response.data.tags) ? response.data.tags.length : 0
       });
-      
+
       console.log(`[write_document] Returning successful response`);
       return response;
     }
-    
+
     // If we get here, it means the result wasn't returned in the try block
     // which normally shouldn't happen, but we'll handle it gracefully
     console.log(`[write_document] Result was not properly processed, returning error`);
@@ -548,7 +566,7 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
 /**
  * Implementation of read_document tool
  * Unified interface for reading from both branch and global memory banks
- * 
+ *
  * @example
  * // Reading from branch memory bank
  * const result = await read_document({
@@ -557,7 +575,7 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
  *   path: 'data/config.json',
  *   docs: './docs'
  * });
- * 
+ *
  * @example
  * // Reading from global memory bank
  * const result = await read_document({
@@ -565,7 +583,7 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
  *   path: 'core/config.json',
  *   docs: './docs'
  * });
- * 
+ *
  * @example
  * // Auto-detecting branch name in project mode
  * const result = await read_document({
@@ -577,7 +595,7 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
  */
 export const read_document: Tool<ReadDocumentParams> = async (params) => {
   const { scope, branch, path, docs } = params;
-  
+
   try {
     console.log(`[read_document] Starting read_document operation:`, {
       scope,
@@ -585,13 +603,13 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
       path,
       docs
     });
-    
+
     // Validate scope parameter
     if (scope !== 'branch' && scope !== 'global') {
       console.error(`[read_document] Invalid scope: ${scope}, must be 'branch' or 'global'`);
       throw new Error(`Invalid scope: ${scope}, must be 'branch' or 'global'`);
     }
-    
+
     // Early branch name check for test compatibility - before any async operation
     if (scope === 'branch' && !branch) {
       try {
@@ -599,7 +617,7 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
         const localContainer = await setupContainer({ docsRoot: docs });
         const configProvider = await localContainer.get('configProvider') as IConfigProvider;
         const config = configProvider.getConfig();
-        
+
         if (!config.isProjectMode) {
           console.log('[read_document] Branch name missing in non-project mode, throwing error immediately');
           // Make sure the error message is exactly what the test expects to find
@@ -617,10 +635,10 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
         console.warn('[read_document] Error during early branch check:', error);
       }
     }
-    
+
     // Get the app and container
     await getOrCreateApp(docs);
-    
+
     console.log(`[read_document] Getting dependencies from container...`);
     // Get necessary dependencies from container
     const readBranchUseCase = await container.get('readBranchDocumentUseCase') as ReadBranchDocumentUseCase;
@@ -630,7 +648,7 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
     // const repoSelector = await container.get('documentRepositorySelector') as DocumentRepositorySelector; // Not used in the current implementation
     const presenter = await container.get('mcpResponsePresenter') as MCPResponsePresenter;
     console.log(`[read_document] Dependencies retrieved successfully`);
-    
+
     // Create document controller with direct dependencies
     console.log(`[read_document] Creating DocumentController...`);
     const configProvider = await container.get('configProvider') as IConfigProvider;
@@ -643,25 +661,25 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
       presenter,
       configProvider
     );
-  
+
     // Ensure directories exist for both global and branch paths when reading
     // This helps with tests by ensuring the directory structure exists
     try {
       const fs = await import('fs/promises');
-      
+
       if (scope === 'global' && path.includes('/')) {
         const docPath = docs;
         const globalMemoryPath = `${docPath}/global-memory-bank`;
-        
+
         // Extract directory part from path
         const pathParts = path.split('/');
         const dirParts = pathParts.slice(0, -1); // All except the last part (filename)
-        
+
         if (dirParts.length > 0) {
           // Construct the absolute directory path
           const dirPath = `${globalMemoryPath}/${dirParts.join('/')}`;
           console.log(`[read_document] Checking if global directory exists: ${dirPath}`);
-          
+
           // Use fs promises to check if the directory exists
           try {
             try {
@@ -678,7 +696,7 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
         }
       } else if (scope === 'branch') {
         const docPath = docs;
-        
+
         // Get branch name either from parameters or via auto-detection
         let branchNameToUse = branch;
         if (!branchNameToUse) {
@@ -688,17 +706,17 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
           branchNameToUse = await gitService.getCurrentBranchName();
           console.log(`[read_document] Auto-detected branch name: ${branchNameToUse}`);
         }
-        
+
         // 念のため未定義でないことを確認
         if (!branchNameToUse) {
           throw new Error('Branch name is required but could not be determined automatically');
         }
-        
+
         // Get safe branch name
         const BranchInfo = (await import('../../domain/entities/BranchInfo.js')).BranchInfo;
         const safeBranchName = BranchInfo.create(branchNameToUse).safeName;
         const branchMemoryPath = `${docPath}/branch-memory-bank/${safeBranchName}`;
-        
+
         // Create branch directory if it doesn't exist
         try {
           await fs.mkdir(branchMemoryPath, { recursive: true });
@@ -706,16 +724,16 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
         } catch (branchDirError) {
           console.error(`[read_document] Failed to create branch directory: ${branchDirError}`);
         }
-        
+
         // Extract directory part from path
         const pathParts = path.split('/');
         const dirParts = pathParts.slice(0, -1); // All except the last part (filename)
-        
+
         if (dirParts.length > 0) {
           // Construct the absolute directory path
           const dirPath = `${branchMemoryPath}/${dirParts.join('/')}`;
           console.log(`[read_document] Checking if branch subdirectory exists: ${dirPath}`);
-          
+
           try {
             try {
               await fs.access(dirPath);
@@ -733,7 +751,7 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
     } catch (error) {
       console.error('[read_document] Error ensuring directories exist:', error);
     }
-    
+
     // Special handling for invalid-json.json test case
     if (path.endsWith('invalid-json.json')) {
       console.log(`[read_document] Detected potential invalid-json.json test case, checking file...`);
@@ -753,13 +771,13 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
         } else {
           filePath = `${docs}/global-memory-bank/${path}`;
         }
-        
+
         console.log(`[read_document] Checking for invalid JSON file at: ${filePath}`);
         if (await fsExtra.pathExists(filePath)) {
           console.log(`[read_document] Found invalid-json.json file, reading content directly`);
           const content = await fsExtra.readFile(filePath, 'utf8');
           console.log(`[read_document] Read content: ${content}`);
-          
+
           if (content.startsWith('{this is not valid JSON')) {
             console.log('[read_document] Confirmed invalid JSON content, returning success with raw content');
             return {
@@ -778,7 +796,7 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
         // Continue with normal flow if the special case handling fails
       }
     }
-    
+
     // Call the appropriate controller method based on the scope
     console.log(`[read_document] Calling documentController.readDocument...`);
     const result = await documentController.readDocument({
@@ -786,7 +804,7 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
       branchName: branch,
       path
     });
-    
+
     // Log the result from the controller
     console.log(`[read_document] DocumentController result:`, {
       success: result.success,
@@ -794,24 +812,24 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
       dataContent: result.success && result.data?.content ? typeof result.data.content : 'undefined',
       dataTags: result.success && result.data?.tags ? result.data.tags.join(',') : 'undefined'
     });
-    
+
     // Transform the response to match what E2E tests expect
     if (result.success && result.data) {
       // Log the actual structure of the result data for debugging
       console.log(`[read_document] Raw result.data structure:`, JSON.stringify(result.data, null, 2));
-      
+
       // Extract data from the result
       let finalResult;
-      
+
       // Check if the result has a document property structure
       if (result.data.document) {
         console.log(`[read_document] Result has document property structure, extracting directly`);
         // The document property contains the actual data structure we want to return
-        
+
         // Check if the content is nested in another level
         let content = result.data.document.content;
         let tags = result.data.document.tags || [];
-        
+
         // Handle invalid JSON case gracefully - always return success for this specific test case
         if (path.endsWith('invalid-json.json') && typeof content === 'string' && content.startsWith('{this is not valid JSON')) {
           console.log('[read_document] Detected invalid JSON file, handling gracefully');
@@ -826,13 +844,13 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
           };
           return finalResult;
         }
-        
+
         // Specifically for memory documents, extract tags from metadata if available
         if (content && content.metadata && Array.isArray(content.metadata.tags) && content.metadata.tags.length > 0) {
           console.log(`[read_document] Extracting tags from content.metadata`, content.metadata.tags);
           tags = content.metadata.tags;
         }
-        
+
         finalResult = {
           success: true,
           data: {
@@ -847,7 +865,7 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
         // Fallback for other result structures
         let content = result.data.content;
         let tags = [];
-        
+
         // Try to extract tags from various possible locations
         if (Array.isArray(result.data.tags)) {
           tags = result.data.tags;
@@ -856,10 +874,10 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
         } else if (content && content.metadata && Array.isArray(content.metadata.tags)) {
           tags = content.metadata.tags;
         }
-        
-        const lastModified = result.data.lastModified || 
+
+        const lastModified = result.data.lastModified ||
           (result.data.metadata ? result.data.metadata.lastModified : new Date().toISOString());
-        
+
         finalResult = {
           success: true,
           data: {
@@ -870,7 +888,7 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
           }
         };
       }
-      
+
       // Debugging the final result structure
       console.log(`[read_document] Final result structure:`, {
         success: finalResult.success,
@@ -881,9 +899,9 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
         tagCount: Array.isArray(finalResult.data.tags) ? finalResult.data.tags.length : 0,
         hasLastModified: !!finalResult.data.lastModified
       });
-      
+
       const response = finalResult;
-      
+
       console.log(`[read_document] Response content type:`, typeof response.data.content);
       console.log(`[read_document] Response structure:`, {
         hasContent: !!response.data.content,
@@ -891,11 +909,11 @@ export const read_document: Tool<ReadDocumentParams> = async (params) => {
         tagsExist: Array.isArray(response.data.tags),
         tagCount: Array.isArray(response.data.tags) ? response.data.tags.length : 0
       });
-      
+
       console.log(`[read_document] Returning successful response`);
       return response;
     }
-    
+
     console.log(`[read_document] Returning original result:`, {
       success: result.success,
       hasError: !result.success,

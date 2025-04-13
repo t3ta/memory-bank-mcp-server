@@ -12,6 +12,7 @@
     "semantic-release",
     "jest-mock-extended",
     "vite-tsconfig-paths",
-    "turbo"
+    "turbo",
+    "@t3ta/mcp-test"
   ]
 }

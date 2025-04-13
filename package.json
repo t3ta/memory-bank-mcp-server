@@ -37,7 +37,7 @@
     "prepublishOnly": "yarn build",
     "check:deps": "depcheck",
     "release": "semantic-release",
-    "inspect": "npx @modelcontextprotocol/inspector node ./packages/mcp/dist/server.js --docs ./docs --project"
+    "inspect": "cd packages/mcp && node dist/server.js --docs ../../docs --project"
   },
   "keywords": [
     "mcp",
@@ -49,7 +49,9 @@
   ],
   "author": "",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "@t3ta/mcp-test": "^0.2.0"
+  },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
     "@semantic-release/changelog": "^6.0.3",
@@ -81,7 +83,9 @@
     "vitest": "^3.1.1"
   },
   "resolutions": {
-    "@memory-bank/schemas": "1.0.0"
+    "@memory-bank/schemas": "1.0.0",
+    "node-sass": "npm:sass@^1.70.0",
+    "@modelcontextprotocol/sdk": "1.9.0"
   },
   "engines": {
     "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
@@ -100,6 +104,5 @@
       "tsc --noEmit",
       "vitest related --run"
     ]
-  },
-  "version": "2.4.0"
+  }
 }

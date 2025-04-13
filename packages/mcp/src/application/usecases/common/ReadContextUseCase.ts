@@ -11,8 +11,13 @@ import type { IGitService } from "../../../infrastructure/git/IGitService.js";
 import type { IConfigProvider } from "../../../infrastructure/config/interfaces/IConfigProvider.js";
 // --- End added dependencies ---
 
+// このファイル内で使われる独自のContextRequest型。
+// メインの型定義（../../../types.ts）とは異なり、branchをオプショナルにしている
+// 内部処理ではこれを使いつつ、インターフェースでは必須としている
+
+// ローカルの拡張型 - 内部実装用
 export type ContextRequest = {
-  branch?: string; // Make branch optional in the request type
+  branch?: string; // Make branch optional for internal implementation
   language: string;
 };
 
@@ -47,8 +52,11 @@ export class ReadContextUseCase {
   ) { }
 
   async execute(request: ContextRequest): Promise<ContextResult> {
+    // 内部実装ではbranchがオプショナルですが、外部からは必須です
+    // ここではオプショナルとして扱い、空の場合は自動検出を行います
     let branchNameToUse = request.branch;
-    // const { language } = request; // language は現在未使用のためコメントアウト (将来的に使う可能性は残す)
+    // この時点ではlanguageは使用しないが、将来的に使う可能性もある
+    // const { language } = request;
 
     // --- Branch Auto-Detection Logic ---
     if (!branchNameToUse) {

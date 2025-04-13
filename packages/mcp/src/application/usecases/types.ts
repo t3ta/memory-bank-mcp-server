@@ -10,7 +10,7 @@ export type RulesResult = {
  * Context request type
  */
 export type ContextRequest = {
-  branch: string;
+  branch?: string; // Make branch optional to allow auto-detection
   language: string;
 };
 

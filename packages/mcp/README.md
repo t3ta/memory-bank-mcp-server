@@ -1,4 +1,4 @@
-# @memory-bank/mcp (v2.4.0)
+# @memory-bank/mcp (v3.0.0)
 
 This package provides the core implementation of the Memory-enabled Co-Pilot (MCP) server for managing project documentation and context.
 
@@ -55,27 +55,26 @@ yarn workspace @memory-bank/mcp dev --docs /path/to/your/docs
 
 ### Interacting via MCP Tools
 
-Once the server is running, clients interact with it using the defined MCP tools. Refer to the core tool manual (`docs/global-memory-bank/core/mcp-tool-manual.json`) for details on available tools like:
+Once the server is running, clients interact with it using the defined MCP tools. Refer to the core tool manual (`docs/global-memory-bank/core/mcp-tool-manual.json`) for details on available tools:
 
-- `write_branch_memory_bank`: Writes a document to a branch. The `branch` parameter is optional in Project Mode (uses current Git branch).
-- `read_branch_memory_bank`: Reads a document from a branch. The `branch` parameter is optional in Project Mode (uses current Git branch).
-- `write_global_memory_bank`: Writes a document to the global memory bank.
-- `read_global_memory_bank`: Reads a document from the global memory bank.
+- `write_document`: Writes a document to either branch or global memory bank based on the `scope` parameter.
+- `read_document`: Reads a document from either branch or global memory bank based on the `scope` parameter.
 - `read_context`: Reads rules, branch memory bank, and global memory bank information at once.
 - `search_documents_by_tags`: Searches for documents by tags in branch and/or global memory banks.
 
-### New Unified Document Commands (v2.4.0+)
+### Document Operations
 
-As of v2.4.0, new unified commands are available that provide a simpler interface for working with both branch and global memory banks:
+The server provides a unified interface for working with both branch and global memory banks:
 
 - `write_document`: Writes a document to either branch or global memory bank based on the `scope` parameter.
 - `read_document`: Reads a document from either branch or global memory bank based on the `scope` parameter.
 
-These commands provide several advantages:
+These unified commands provide several advantages:
 - Single interface for both branch and global operations
 - Explicit scope selection (`scope: 'branch'` or `scope: 'global'`)
 - Automatic branch detection in project mode
 - Support for JSON patches when updating documents
+- Cleaner API design and less redundancy
 
 Examples:
 
@@ -139,7 +138,27 @@ yarn workspace @memory-bank/mcp dev --docs /path/to/test/docs
 # Run tests
 yarn workspace @memory-bank/mcp test # Unit tests (if any)
 yarn workspace @memory-bank/mcp test:integration # Integration tests
+yarn workspace @memory-bank/mcp test:e2e # End-to-end tests
 ```
+
+## Troubleshooting
+
+### Module Resolution Issues in E2E Tests
+
+If you encounter errors like the following when running E2E tests:
+
+```
+Error: No "exports" main defined in /path/to/node_modules/@modelcontextprotocol/sdk/package.json imported from /path/to/node_modules/@t3ta/mcp-test/dist/index.mjs
+```
+
+This is due to a compatibility issue between `@t3ta/mcp-test` and `@modelcontextprotocol/sdk`. The fix implemented in Issue #160 uses a mock implementation to bypass this dependency issue.
+
+The solution involves:
+1. A custom mock of `MCPTestClient` in `tests/e2e/mocks/mcp-test-mock.ts`
+2. Using this mock instead of the actual SDK in the E2E tests
+3. Simplifying the Vitest configuration to avoid complex module resolution
+
+If you need to modify the E2E tests, be aware of this workaround and maintain the mock implementation as needed.
 
 ## License
 
