@@ -104,5 +104,6 @@
       "tsc --noEmit",
       "vitest related --run"
     ]
-  }
+  },
+  "version": "2.5.0"
 }
