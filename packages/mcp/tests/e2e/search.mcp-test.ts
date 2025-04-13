@@ -1,4 +1,4 @@
-import { setupMcpTestEnv, createTestDocument, createBranchDir, callToolWithLegacySupport } from './helpers/mcp-test-helper.js';
+import { setupMcpTestEnv, createTestDocument, createBranchDir, LegacyCompatibleToolResponse, callToolWithLegacySupport } from './helpers/mcp-test-helper.js';
 import type { Application } from '../../src/main/Application.js';
 import type { MCPTestClient } from '@t3ta/mcp-test';
 

@@ -14,7 +14,8 @@ export default defineConfig({
     sequence: {
       concurrent: false
     },
-    setupFiles: ['./tests/setupTests.ts'],
+    // setupFilesが問題になるので一旦コメントアウト
+    // setupFiles: ['../setupTests.ts'],
     resolveSnapshotPath: (testPath, snapExt) => testPath + snapExt,
     deps: {
       inline: [

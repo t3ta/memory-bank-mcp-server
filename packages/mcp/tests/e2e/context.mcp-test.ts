@@ -1,13 +1,8 @@
-import { setupMcpTestEnv, createTestDocument, createBranchDir, callToolWithLegacySupport } from './helpers/mcp-test-helper.js';
+import { setupMcpTestEnv, createTestDocument, createBranchDir, LegacyCompatibleToolResponse, callToolWithLegacySupport } from './helpers/mcp-test-helper.js';
 import type { Application } from '../../src/main/Application.js';
 import type { MCPTestClient } from '@t3ta/mcp-test';
 import type { DocumentDTO } from '../../src/application/dtos/DocumentDTO.js';
-
-// テスト用のツールレスポンス型
-interface MockToolResponse<T = any> {
-  success: boolean;
-  data: T;
-}
+import { expect } from 'vitest';
 
 describe('MCP E2E Context Tests (using mcp-test)', () => {
   let app: Application;
@@ -79,10 +74,12 @@ describe('MCP E2E Context Tests (using mcp-test)', () => {
         branch: testBranch,
         language: 'en',
         docs: app.options.docsRoot
-      }) as MockToolResponse;
+      });
 
       expect(readResult).toBeDefined();
       expect(readResult.success).toBe(true);
+      // 新しいAPIの形式でも検証
+      expect(readResult.status).toBe('success');
 
       if (readResult.success && readResult.data) {
         // コンテキストの内容を確認
@@ -125,10 +122,12 @@ describe('MCP E2E Context Tests (using mcp-test)', () => {
             // branch パラメータは省略
             language: 'en',
             docs: app.options.docsRoot
-          }) as MockToolResponse;
+          });
 
           expect(readResult).toBeDefined();
           expect(readResult.success).toBe(true);
+          // 新しいAPIの形式でも検証
+          expect(readResult.status).toBe('success');
 
           if (readResult.success && readResult.data) {
             // コンテキストの内容を確認
@@ -160,10 +159,12 @@ describe('MCP E2E Context Tests (using mcp-test)', () => {
         branch: testBranch,
         language: 'ja',
         docs: app.options.docsRoot
-      }) as MockToolResponse;
+      });
 
       expect(readResult).toBeDefined();
       expect(readResult.success).toBe(true);
+      // 新しいAPIの形式でも検証
+      expect(readResult.status).toBe('success');
 
       // 言語が指定されていても基本的なコンテキスト情報が取得できること
       if (readResult.success && readResult.data) {
@@ -186,10 +187,12 @@ describe('MCP E2E Context Tests (using mcp-test)', () => {
           branch: testBranch,
           // language パラメータは省略
           docs: app.options.docsRoot
-        }) as MockToolResponse;
+        });
 
         expect(readResult).toBeDefined();
         expect(readResult.success).toBe(true);
+        // 新しいAPIの形式でも検証
+        expect(readResult.status).toBe('success');
 
         if (readResult.success && readResult.data) {
           // コンテキストの内容を確認
@@ -218,10 +221,12 @@ describe('MCP E2E Context Tests (using mcp-test)', () => {
           branch: testBranch,
           language: 'en',
           // docs パラメータは省略
-        }) as MockToolResponse;
+        });
 
         expect(readResult).toBeDefined();
         expect(readResult.success).toBe(true);
+        // 新しいAPIの形式でも検証
+        expect(readResult.status).toBe('success');
 
         if (readResult.success && readResult.data) {
           // コンテキストの内容を確認

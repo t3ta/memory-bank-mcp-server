@@ -210,8 +210,16 @@ export function setupRoutes(server: Server, app: Application | null = null): voi
   const dynamicTools = generateToolDefinitions(configProvider);
 
   server.setRequestHandler(ListToolsRequestSchema, async () => {
+    // MCP 1.9.0+では、toolsオブジェクトにinputSchemaが必須になったため
+    // dynamicToolsを変換して返却する
+    const toolsWithInputSchema = dynamicTools.map(tool => ({
+      ...tool,
+      // parametersをinputSchemaにコピー
+      inputSchema: tool.parameters,
+    }));
+
     return {
-      tools: dynamicTools,
+      tools: toolsWithInputSchema,
     };
   });
 
