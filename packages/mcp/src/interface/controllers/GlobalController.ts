@@ -33,6 +33,9 @@ interface WriteGlobalDocumentParams {
 /**
  * Controller for global memory bank operations
  * Handles incoming requests related to global memory bank
+ *
+ * @deprecated Use DocumentController instead. This controller is maintained for backward compatibility.
+ * This controller will be removed in a future version.
  */
 export class GlobalController implements IGlobalController {
   readonly _type = 'controller' as const;

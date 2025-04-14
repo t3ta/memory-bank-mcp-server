@@ -18,6 +18,9 @@ import { convertDomainToAdapter } from '../../adapters/domain/DomainAdapter.js';
 
 /**
  * Controller for branch related operations
+ *
+ * @deprecated Use DocumentController instead. This controller is maintained for backward compatibility.
+ * This controller will be removed in a future version.
  */
 export class BranchController {
   private readonly componentLogger = logger.withContext({ component: 'BranchController' });
