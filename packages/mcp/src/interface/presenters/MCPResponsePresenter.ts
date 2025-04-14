@@ -3,6 +3,7 @@ import { logger } from "../../shared/utils/logger.js";
 import type { MCPErrorResponse, MCPResponse } from "./types/MCPResponse.js";
 import { convertDomainToAdapter } from "../../adapters/domain/DomainAdapter.js";
 import { convertAdapterToMCPResponse } from "../../adapters/mcp/MCPProtocolAdapter.js";
+import type { MCPToolResponse } from "../../types/protocol/MCPProtocolTypes.js";
 
 /**
  * Presenter for MCP responses
@@ -102,5 +103,34 @@ export class MCPResponsePresenter {
     }
 
     return errorResponse;
+  }
+
+  /**
+   * Present raw MCP protocol response
+   * @param response Raw MCP protocol response
+   * @returns MCP response formatted for output
+   */
+  presentRawResponse(response: MCPToolResponse): MCPResponse {
+    logger.debug('MCPResponsePresenter: Presenting raw MCP response', {
+      status: response.status,
+      hasResult: !!response.result,
+      hasError: !!response.error,
+    });
+
+    if (response.status === 'error') {
+      return {
+        success: false,
+        error: {
+          code: 'MCP_ERROR',
+          message: response.error || 'An error occurred',
+          details: response._meta,
+        },
+      };
+    }
+
+    return {
+      success: true,
+      data: response.result,
+    };
   }
 }
