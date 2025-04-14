@@ -1,21 +1,62 @@
 import { BaseError } from "../../shared/errors/BaseError.js";
 import { logger } from "../../shared/utils/logger.js";
 import type { MCPErrorResponse, MCPResponse } from "./types/MCPResponse.js";
+import { convertDomainToAdapter } from "../../adapters/domain/DomainAdapter.js";
+import { convertAdapterToMCPResponse } from "../../adapters/mcp/MCPProtocolAdapter.js";
 
 /**
  * Presenter for MCP responses
+ * Handles transformation of domain data to MCP protocol format
  */
 export class MCPResponsePresenter {
   /**
    * Present successful response
-   * @param result Result data
+   * @param result Result data from domain layer
    * @returns MCP response object
    */
   presentSuccess<T>(result: T): MCPResponse<T> {
-    return {
-      success: true,
-      data: result,
-    };
+    try {
+      // Check if result is likely a domain model (has documentType, content, and metadata)
+      if (
+        result !== null &&
+        typeof result === 'object' &&
+        'documentType' in result &&
+        'content' in result &&
+        'metadata' in result
+      ) {
+        logger.debug('MCPResponsePresenter: Converting domain model to MCP response');
+
+        // Convert domain model to adapter format
+        const adapterResult = convertDomainToAdapter(result as any);
+
+        // Convert adapter format to MCP protocol format
+        const mcpResponse = convertAdapterToMCPResponse(adapterResult);
+
+        // Return successful response with converted data
+        return {
+          success: true,
+          data: mcpResponse.result as unknown as T,
+        };
+      }
+
+      // For non-domain models, return as is
+      logger.debug('MCPResponsePresenter: Returning non-domain result directly');
+      return {
+        success: true,
+        data: result,
+      };
+    } catch (error) {
+      // Log conversion error but return original data
+      logger.error('MCPResponsePresenter: Error converting result', {
+        error,
+        resultType: typeof result
+      });
+
+      return {
+        success: true,
+        data: result,
+      };
+    }
   }
 
   /**
