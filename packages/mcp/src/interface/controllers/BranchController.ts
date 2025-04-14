@@ -18,6 +18,7 @@ import { convertDomainToAdapter } from '../../adapters/domain/DomainAdapter.js';
 
 /**
  * Controller for branch related operations
+ * @deprecated Use DocumentControllerModified with scope=branch instead for better adapter layer integration
  *
  * @deprecated Use DocumentController instead. This controller is maintained for backward compatibility.
  * This controller will be removed in a future version.

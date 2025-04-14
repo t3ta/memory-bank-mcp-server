@@ -2,7 +2,11 @@
  * MCP Protocol Adapter
  *
  * This adapter is responsible for converting between MCP protocol formats and internal formats.
- * It handles the transformation of external communication formats to domain-compatible formats.
+ * It handles the transformation of external communication formats to domain-compatible formats
+ * and serves as a bridge between the protocol layer and the adapter layer.
+ *
+ * @module MCPProtocolAdapter
+ * @description Handles conversion between MCP protocol and adapter layer formats
  */
 
 import { MCPToolResponse, ToolContent, LegacyToolResponse } from '../../types/protocol/MCPProtocolTypes.js';
@@ -10,11 +14,12 @@ import { MCPResultAdapter } from '../../types/adapter/AdapterTypes.js';
 import { logger } from '../../shared/utils/logger.js';
 
 /**
- * MCPToolResponseからMCPResultAdapterへの変換
- * プロトコル層からアダプター層への橋渡しを担当
+ * Converts MCPToolResponse to MCPResultAdapter format
+ * This function serves as a bridge from protocol layer to adapter layer,
+ * handling the transformation of external MCP server responses.
  *
- * @param response MCPサーバーからのレスポンス
- * @returns アダプター層の標準形式
+ * @param {MCPToolResponse} response - Response from MCP server
+ * @returns {MCPResultAdapter} Standardized adapter layer format
  */
 export function convertMCPResponseToAdapter(response: MCPToolResponse): MCPResultAdapter {
   // エラー状態の確認
@@ -78,10 +83,12 @@ export function convertMCPResponseToAdapter(response: MCPToolResponse): MCPResul
 }
 
 /**
- * 旧型式のLegacyToolResponseからMCPResultAdapterへの変換
+ * Converts legacy format LegacyToolResponse to MCPResultAdapter
+ * This function handles backward compatibility with older response formats,
+ * transforming them into the standardized adapter layer format.
  *
- * @param response 旧型式のレスポンス
- * @returns アダプター層の標準形式
+ * @param {LegacyToolResponse} response - Legacy format response
+ * @returns {MCPResultAdapter} Standardized adapter layer format
  */
 function convertLegacyResponseToAdapter(response: LegacyToolResponse): MCPResultAdapter {
   logger.debug('MCPResponseAdapter: Converting legacy response', {
@@ -119,11 +126,12 @@ function convertLegacyResponseToAdapter(response: LegacyToolResponse): MCPResult
 }
 
 /**
- * MCPResultAdapterからMCPToolResponseへの変換
- * アダプター層からプロトコル層への変換を担当
+ * Converts MCPResultAdapter to MCPToolResponse
+ * This function handles the transformation from adapter layer to protocol layer,
+ * creating properly formatted MCP protocol responses.
  *
- * @param adapter アダプター層のデータ
- * @returns MCPプロトコル形式のレスポンス
+ * @param {MCPResultAdapter} adapter - Adapter layer data
+ * @returns {MCPToolResponse} MCP protocol formatted response
  */
 export function convertAdapterToMCPResponse(adapter: MCPResultAdapter): MCPToolResponse {
   logger.debug('MCPResponseAdapter: Converting adapter to MCP response', {

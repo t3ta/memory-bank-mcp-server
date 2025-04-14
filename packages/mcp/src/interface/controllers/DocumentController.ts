@@ -13,6 +13,9 @@ import { IConfigProvider } from '../../infrastructure/config/interfaces/IConfigP
 /**
  * Unified controller for document operations in both branch and global scopes.
  * Uses scope parameter to determine which repository and use case to use.
+ *
+ * @deprecated Use DocumentControllerModified instead for better adapter layer integration.
+ * This controller will be removed in a future version.
  */
 export class DocumentController {
   private readonly componentLogger = logger.withContext({ component: 'DocumentController' });
@@ -49,10 +52,10 @@ export class DocumentController {
     path: string;
   }): Promise<MCPResponse> {
     const { scope, branchName, path } = params;
-    
+
     try {
       this.componentLogger.info('Reading document', { operation: 'readDocument', scope, branchName, path });
-      
+
       if (scope === 'global') {
         // Read from global memory bank
         const document = await this.readGlobalDocumentUseCase.execute({
@@ -97,36 +100,36 @@ export class DocumentController {
     returnContent?: boolean;
   }): Promise<MCPResponse> {
     const { scope, branchName, path, content, patches, tags, returnContent } = params;
-    
+
     try {
       // Determine content conditions
       const hasPatches = patches && Array.isArray(patches) && patches.length > 0;
       const hasContent = content !== undefined && content !== null && content !== '';
-      
-      this.componentLogger.info('Writing document', { 
-        operation: 'writeDocument', 
-        scope, 
-        branchName, 
-        path, 
-        hasContent, 
+
+      this.componentLogger.info('Writing document', {
+        operation: 'writeDocument',
+        scope,
+        branchName,
+        path,
+        hasContent,
         hasPatches,
         hasTags: tags && tags.length > 0
       });
-      
+
       // Validate content/patches exclusivity
       if (hasContent && hasPatches) {
         const error = ApplicationErrors.invalidInput('Cannot provide both content and patches simultaneously');
         // Important: Throw the error directly for integration tests compatibility
         throw new Error(error.message);
       }
-      
+
       // Validate that either content or patches are provided
       if (!hasContent && !hasPatches) {
         const error = ApplicationErrors.invalidInput('Either document content or patches must be provided');
         // Important: Throw the error directly for integration tests compatibility
         throw new Error(error.message);
       }
-      
+
       if (scope === 'global') {
         // Write to global memory bank
         const result = await this.writeGlobalDocumentUseCase.execute({
@@ -156,7 +159,7 @@ export class DocumentController {
             throw new Error('Branch name is required when not running in project mode');
           }
         }
-        
+
         // Write to branch memory bank
         const result = await this.writeBranchDocumentUseCase.execute({
           branchName,
@@ -173,19 +176,19 @@ export class DocumentController {
         throw ApplicationErrors.invalidInput(`Invalid scope: ${scope}. Must be 'branch' or 'global'.`);
       }
     } catch (error) {
-      this.componentLogger.error('Failed to write document', { 
-        operation: 'writeDocument', 
-        scope, 
-        branchName, 
-        path, 
-        error 
+      this.componentLogger.error('Failed to write document', {
+        operation: 'writeDocument',
+        scope,
+        branchName,
+        path,
+        error
       });
-      
+
       // If it's already an Error instance with a message, rethrow it directly for test compatibility
       if (error instanceof Error) {
         throw error;
       }
-      
+
       return this.handleError(error);
     }
   }
