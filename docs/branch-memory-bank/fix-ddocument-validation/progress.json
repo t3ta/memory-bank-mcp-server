@@ -1,0 +1,56 @@
+{
+  "schema": "memory_document_v2",
+  "documentType": "progress",
+  "metadata": {
+    "id": "fix-ddocument-validation-progress",
+    "title": "Progress for fix/ddocument-validation",
+    "path": "progress.json",
+    "tags": [],
+    "createdAt": "2025-04-14T05:50:02.449Z",
+    "lastModified": "2025-04-14T06:11:32.399Z"
+  },
+  "content": {
+    "summary": "JSON documentTypeスキーマ変更に伴うバリデーション問題のシンプルな修正",
+    "status": "in_progress",
+    "steps": [
+      {
+        "title": "問題分析",
+        "status": "completed",
+        "details": "メモリバンクドキュメントのJSONバリデーションが失敗し、Markdownが書き込まれる事象を調査。スキーマ変更（documentTypeフィールドがmetadataからトップレベルに移動）によるバリデーションエラーが原因と判明。"
+      },
+      {
+        "title": "解決方針の決定",
+        "status": "completed",
+        "details": "シンプルな解決策に焦点を絞る：1)読み取り互換性の確保、2)書き込み・更新時の自動変換。複雑なマイグレーションツールや警告機能は不要。"
+      }
+    ],
+    "next_steps": [
+      {
+        "title": "MemoryDocument.toJSONのフォールバック処理修正",
+        "description": "JSONパース失敗時にMarkdownへのフォールバックを行わず、適切なエラーを返すよう修正"
+      },
+      {
+        "title": "読み取り互換性の実装",
+        "description": "古い形式のドキュメント（metadata内にdocumentType）も読み取れるよう修正"
+      },
+      {
+        "title": "書き込み・更新時の自動変換実装",
+        "description": "古い形式のドキュメントを新形式に自動変換する処理を追加"
+      },
+      {
+        "title": "テストケースの追加",
+        "description": "古い形式と新形式の両方をテストするユニットテストを追加"
+      }
+    ],
+    "findings": [
+      {
+        "title": "ドキュメント構造の変更",
+        "details": "v2.5.0でドキュメント構造が変更され、documentTypeフィールドがmetadata内からトップレベルに移動された"
+      },
+      {
+        "title": "Markdownサポート終了",
+        "details": "v2.5.0以降はMarkdownサポートが削除されており、フォールバック処理ではなくエラーを返すべき"
+      }
+    ]
+  }
+}

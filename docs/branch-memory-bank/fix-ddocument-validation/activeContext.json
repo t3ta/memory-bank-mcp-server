@@ -1,0 +1,27 @@
+{
+  "schema": "memory_document_v2",
+  "documentType": "active_context",
+  "metadata": {
+    "id": "fix-ddocument-validation-active-context",
+    "title": "Active Context for fix/ddocument-validation",
+    "path": "activeContext.json",
+    "tags": [],
+    "createdAt": "2025-04-14T05:50:02.449Z",
+    "lastModified": "2025-04-14T06:11:15.757Z"
+  },
+  "content": {
+    "current_task": "Fix document validation for schema v2.5.0 changes with simple solution",
+    "relevant_files": [
+      "/packages/mcp/src/domain/entities/MemoryDocument.ts",
+      "/packages/mcp/src/infrastructure/validation/ZodDocumentValidator.ts"
+    ],
+    "recent_decisions": [
+      {
+        "title": "シンプルな互換性ソリューション",
+        "context": "v2.5.0でスキーマが変更され、documentTypeフィールドがmetadata内からトップレベルに移動された",
+        "decision": "2つのシンプルな対応策を実装する：1) 読み取り互換性の確保、2) 書き込み・更新時の自動変換",
+        "reasoning": "複雑なマイグレーション機能や警告機能などは不要。シンプルかつ必要最小限の対応で解決する。"
+      }
+    ]
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "schema": "memory_document_v2",
+  "documentType": "system_patterns",
+  "metadata": {
+    "id": "fix-ddocument-validation-system-patterns",
+    "title": "System Patterns for fix/ddocument-validation",
+    "path": "systemPatterns.json",
+    "tags": [],
+    "createdAt": "2025-04-14T05:50:02.449Z",
+    "lastModified": "2025-04-14T06:15:59.336Z"
+  },
+  "content": {
+    "technicalDecisions": [
+      {
+        "title": "documentType位置のスキーマ互換性確保",
+        "context": "v2.5.0からdocumentTypeフィールドがmetadataからトップレベルに移動されたが、この変更によりバリデーションエラーが発生し、一部ドキュメントが不正な形式で保存される事象が発生している。",
+        "decision": "Zodを活用したスマートな互換性確保と検証機能強化を実装する。具体的には：1) 読み取り互換性、2) 書き込み時自動変換、3) 詳細なZodバリデーションエラー表示を組み合わせる。",
+        "consequences": [
+          "既存の古い形式のドキュメントが正しく読み込まれるようになる",
+          "更新時に自動的に新形式に変換される",
+          "エラーメッセージが詳細になり、問題箇所が明確になる",
+          "余計な警告やマイグレーションツールが不要になる"
+        ]
+      }
+    ],
+    "implementationPatterns": [
+      {
+        "title": "Zodバリデーション強化パターン",
+        "description": "Zodを活用した柔軟かつ詳細なバリデーション機能",
+        "implementation": [
+          "format-validator.tsに新たなZodスキーマを定義",
+          "DocumentFormatSchema: 古い形式と新形式の両方を受け入れるスキーマ",
+          "NewFormatSchema: 新形式のみを厳格に検証するスキーマ",
+          "refineを使用した複合条件の検証（両形式のいずれかに準拠していることの確認）",
+          "safeParse結果からの詳細なエラー情報の活用"
+        ],
+        "benefits": [
+          "型安全性の強化",
+          "具体的なエラーメッセージによる問題の特定が容易",
+          "スキーマの宣言的な定義による保守性向上"
+        ]
+      },
+      {
+        "title": "透過的な形式変換パターン",
+        "description": "ユーザーに意識させることなく、古い形式と新形式の間で透過的に変換する機能",
+        "implementation": [
+          "MemoryDocument.fromJSONでの読み取り互換性実装",
+          "古い形式検出時の新形式への自動変換ロジック",
+          "MemoryDocument.toJSONでの書き込み時形式正規化",
+          "変換前後のバリデーション"
+        ],
+        "benefits": [
+          "既存ドキュメントの互換性維持",
+          "シームレスな移行体験",
+          "手動変換の手間削減"
+        ]
+      },
+      {
+        "title": "詳細なエラー報告パターン",
+        "description": "Zodのエラー形式化機能を活用した具体的なエラーメッセージ生成",
+        "implementation": [
+          "error.format()メソッドでの構造化エラー情報の取得",
+          "JSON.stringify(formattedError)による詳細なエラー内容の提供",
+          "エラーの型と原因を明確に区別したメッセージング"
+        ],
+        "benefits": [
+          "デバッグの容易さ向上",
+          "エラー原因の迅速な特定",
+          "よりユーザーフレンドリーなエラーメッセージ"
+        ]
+      }
+    ]
+  }
+}
