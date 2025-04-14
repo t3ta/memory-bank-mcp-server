@@ -311,6 +311,12 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
               // Apply patches using rfc6902 library (project dependency)
               const rfc6902Module = await import('rfc6902');
 
+              // Define the correct Operation type structure for RFC6902
+              type PatchOperation =
+                | { op: 'add' | 'replace' | 'test'; path: string; value: any }
+                | { op: 'remove'; path: string }
+                | { op: 'move' | 'copy'; path: string; from: string };
+
               // Format patches to ensure they match the rfc6902 format
               const formattedPatches = patches.map(p => {
                 const op = p.op as string;
@@ -348,7 +354,7 @@ export const write_document: Tool<WriteDocumentParams> = async (params: WriteDoc
 
               // Clone the content and apply patches
               const patchedContent = JSON.parse(JSON.stringify(jsonContent));
-              rfc6902Module.applyPatch(patchedContent, formattedPatches);
+              rfc6902Module.applyPatch(patchedContent, formattedPatches as PatchOperation[]);
 
               // Update metadata tags if original tags exist and params.tags is provided
               if (patchedContent.metadata && params.tags) {

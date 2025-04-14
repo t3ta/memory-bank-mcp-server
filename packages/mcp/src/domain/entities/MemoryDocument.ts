@@ -330,19 +330,23 @@ export class MemoryDocument {
 
     // documentType フィールドの位置を確認（古い形式か新形式か）
     const hasTopLevelDocumentType = 'documentType' in jsonDoc && typeof jsonDoc.documentType === 'string';
-    const hasMetadataDocumentType = jsonDoc.metadata?.documentType && typeof jsonDoc.metadata.documentType === 'string';
+
+    // 型安全なアクセスのために、`as any`を一時的に使用して型チェックを迂回
+    // これは移行期間中の互換性のためだけの措置
+    const metadata = jsonDoc.metadata as any;
+    const hasMetadataDocumentType = metadata?.documentType && typeof metadata.documentType === 'string';
 
     if (!hasTopLevelDocumentType && hasMetadataDocumentType) {
       // 古い形式を検出: documentType が metadata 内にあるケース
       getLogger().info('Detected legacy document format with documentType in metadata.', {
         path: path.value,
-        documentType: jsonDoc.metadata.documentType
+        documentType: metadata.documentType
       });
 
       // v2.5.0 以降の新形式に変換（トップレベルに documentType を移動）
       jsonDoc = {
         ...jsonDoc,
-        documentType: jsonDoc.metadata.documentType, // トップレベルに追加
+        documentType: metadata.documentType, // トップレベルに追加
       } as JsonDocumentV2;
     }
 
