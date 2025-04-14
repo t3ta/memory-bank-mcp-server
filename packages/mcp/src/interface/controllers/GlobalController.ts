@@ -34,7 +34,7 @@ interface WriteGlobalDocumentParams {
  * Controller for global memory bank operations
  * Handles incoming requests related to global memory bank
  *
- * @deprecated Use DocumentControllerModified with scope=global instead for better adapter layer integration.
+ * @deprecated Use DocumentController with scope=global instead for better adapter layer integration.
  * This controller will be removed in a future version.
  */
 export class GlobalController implements IGlobalController {
