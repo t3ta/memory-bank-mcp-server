@@ -95,22 +95,58 @@ describe('BranchController Integration Tests', () => {
       expect(readResult.success).toBe(true);
       if (!readResult.success) throw new Error('Expected success but got error'); // Use throw new Error
       expect(readResult.data).toBeDefined();
-      // Check if content is an object (since ReadUseCase now parses JSON)
-      if (!readResult.data || !readResult.data.document || typeof readResult.data.document.content !== 'object') {
-          logger.error("--- Assertion Error: readResult.data.document.content was not an object.", { actualData: readResult.data, component: 'BranchController.integration.test' });
-          throw new Error('Expected readResult.data.document.content to be an object');
-      }
-      const parsed = readResult.data.document.content as any; // Content is already an object
 
-      // Use testDoc for comparison as it has the correct path
-      expect(parsed.metadata.id).toBe(testDoc.metadata.id);
-      expect(parsed.metadata.title).toBe(testDoc.metadata.title);
-      expect(parsed.documentType).toBe(testDoc.documentType); // documentType はトップレベル
-      expect(parsed.metadata.path).toBe(testDoc.metadata.path);
-      expect(parsed.metadata.tags).toEqual(testDoc.metadata.tags);
-      expect(readResult.data.document.lastModified).toEqual(expect.any(String));
-      expect(parsed.metadata.version).toBe(testDoc.metadata.version);
-      expect(parsed.content.value).toBe(testDoc.content.value);
+      // デバッグ用のログ出力
+      logger.debug('readResult structure:', {
+        readResult: JSON.stringify(readResult.data, null, 2),
+        component: 'BranchController.integration.test'
+      });
+
+      // MCPレスポンス形式で返却される（配列形式、type: 'text'）
+      // アダプターレイヤーによる変換後の形式をチェック
+      if (!Array.isArray(readResult.data) || !readResult.data[0] || readResult.data[0].type !== 'text') {
+          logger.error("--- Assertion Error: readResult.data is not in expected format.", {
+            actualData: readResult.data,
+            component: 'BranchController.integration.test'
+          });
+          throw new Error('Expected readResult.data to be an array with text item');
+      }
+
+      // コンテンツは最初の要素のtext属性に格納される
+      const textContent = readResult.data[0].text;
+      if (typeof textContent !== 'object') {
+          // textContentが文字列の場合、JSON.parseを試みる
+          try {
+              const parsed = typeof textContent === 'string' ? JSON.parse(textContent) : textContent;
+
+              // テストされる項目をチェック
+              expect(parsed.metadata.id).toBe(testDoc.metadata.id);
+              expect(parsed.metadata.title).toBe(testDoc.metadata.title);
+              expect(parsed.documentType).toBe(testDoc.documentType); // documentType はトップレベル
+              expect(parsed.metadata.path).toBe(testDoc.metadata.path);
+              expect(parsed.metadata.tags).toEqual(testDoc.metadata.tags);
+              expect(parsed.metadata.lastModified).toEqual(expect.any(String));
+              expect(parsed.metadata.version).toBe(testDoc.metadata.version);
+              expect(parsed.content.value).toBe(testDoc.content.value);
+          } catch (e) {
+              logger.error("--- Assertion Error: Failed to parse textContent as JSON", {
+                  textContent,
+                  error: e,
+                  component: 'BranchController.integration.test'
+              });
+              throw new Error('Failed to parse readResult.data[0].text as JSON');
+          }
+      } else {
+          // オブジェクトの場合は直接アクセス
+          expect(textContent.metadata.id).toBe(testDoc.metadata.id);
+          expect(textContent.metadata.title).toBe(testDoc.metadata.title);
+          expect(textContent.documentType).toBe(testDoc.documentType); // documentType はトップレベル
+          expect(textContent.metadata.path).toBe(testDoc.metadata.path);
+          expect(textContent.metadata.tags).toEqual(testDoc.metadata.tags);
+          expect(textContent.metadata.lastModified).toEqual(expect.any(String));
+          expect(textContent.metadata.version).toBe(testDoc.metadata.version);
+          expect(textContent.content.value).toBe(testDoc.content.value);
+      }
     });
 
     it('should return an error when reading from a non-existent branch', async () => {
@@ -165,15 +201,46 @@ describe('BranchController Integration Tests', () => {
       expect(readResult.success).toBe(true);
       if (!readResult.success) throw new Error('Expected success but got error'); // Use throw new Error
       expect(readResult.data).toBeDefined();
-      // Check if content is an object
-      if (!readResult.data || !readResult.data.document || typeof readResult.data.document.content !== 'object') {
-          logger.error("--- Assertion Error: readResult.data.document.content was not an object.", { actualData: readResult.data, component: 'BranchController.integration.test' });
-          throw new Error('Expected readResult.data.document.content to be an object');
+
+      // デバッグ用のログ出力
+      logger.debug('readResult structure (new branch test):', {
+        readResult: JSON.stringify(readResult.data, null, 2),
+        component: 'BranchController.integration.test'
+      });
+
+      // MCPレスポンス形式で返却される（配列形式、type: 'text'）
+      // アダプターレイヤーによる変換後の形式をチェック
+      if (!Array.isArray(readResult.data) || !readResult.data[0] || readResult.data[0].type !== 'text') {
+          logger.error("--- Assertion Error: readResult.data is not in expected format.", {
+            actualData: readResult.data,
+            component: 'BranchController.integration.test'
+          });
+          throw new Error('Expected readResult.data to be an array with text item');
       }
-      const parsed = readResult.data.document.content as any; // Content is already an object
-      // Use newBranchDoc for comparison
-      expect(parsed.metadata.id).toBe(newBranchDoc.metadata.id);
-      expect(parsed.content.value).toBe(newBranchDoc.content.value);
+
+      // コンテンツは最初の要素のtext属性に格納される
+      const textContent = readResult.data[0].text;
+      if (typeof textContent !== 'object') {
+          // textContentが文字列の場合、JSON.parseを試みる
+          try {
+              const parsed = typeof textContent === 'string' ? JSON.parse(textContent) : textContent;
+
+              // 新規ブランチでのシンプルなチェック
+              expect(parsed.metadata.id).toBe(newBranchDoc.metadata.id);
+              expect(parsed.content.value).toBe(newBranchDoc.content.value);
+          } catch (e) {
+              logger.error("--- Assertion Error: Failed to parse textContent as JSON", {
+                  textContent,
+                  error: e,
+                  component: 'BranchController.integration.test'
+              });
+              throw new Error('Failed to parse readResult.data[0].text as JSON');
+          }
+      } else {
+          // オブジェクトの場合は直接アクセス
+          expect(textContent.metadata.id).toBe(newBranchDoc.metadata.id);
+          expect(textContent.content.value).toBe(newBranchDoc.content.value);
+      }
     });
     it('should update (overwrite) an existing document successfully', async () => {
       const controller = await container.get<BranchController>('branchController');
@@ -233,17 +300,50 @@ describe('BranchController Integration Tests', () => {
       expect(readResult.success).toBe(true);
       if (!readResult.success) throw new Error('Expected success but got error on read after update'); // Use throw new Error
       expect(readResult.data).toBeDefined();
-      // Check if content is an object
-      if (!readResult.data || !readResult.data.document || typeof readResult.data.document.content !== 'object') {
-          logger.error("--- Assertion Error: readResult.data.document.content was not an object.", { actualData: readResult.data, component: 'BranchController.integration.test' });
-          throw new Error('Expected readResult.data.document.content to be an object');
-      }
-      const parsed = readResult.data.document.content as any; // Content is already an object
 
-      expect(parsed.metadata.id).toBe(updatedDoc.metadata.id);
-      expect(parsed.metadata.title).toBe(updatedDoc.metadata.title);
-      expect(parsed.metadata.version).toBe(updatedDoc.metadata.version); // Check version increment (or update logic)
-      expect(parsed.content.value).toBe(updatedDoc.content.value);
+      // デバッグ用のログ出力
+      logger.debug('readResult structure (update test):', {
+        readResult: JSON.stringify(readResult.data, null, 2),
+        component: 'BranchController.integration.test'
+      });
+
+      // MCPレスポンス形式で返却される（配列形式、type: 'text'）
+      // アダプターレイヤーによる変換後の形式をチェック
+      if (!Array.isArray(readResult.data) || !readResult.data[0] || readResult.data[0].type !== 'text') {
+          logger.error("--- Assertion Error: readResult.data is not in expected format.", {
+            actualData: readResult.data,
+            component: 'BranchController.integration.test'
+          });
+          throw new Error('Expected readResult.data to be an array with text item');
+      }
+
+      // コンテンツは最初の要素のtext属性に格納される
+      const textContent = readResult.data[0].text;
+      if (typeof textContent !== 'object') {
+          // textContentが文字列の場合、JSON.parseを試みる
+          try {
+              const parsed = typeof textContent === 'string' ? JSON.parse(textContent) : textContent;
+
+              // 更新後のコンテンツを検証
+              expect(parsed.metadata.id).toBe(updatedDoc.metadata.id);
+              expect(parsed.metadata.title).toBe(updatedDoc.metadata.title);
+              expect(parsed.metadata.version).toBe(updatedDoc.metadata.version);
+              expect(parsed.content.value).toBe(updatedDoc.content.value);
+          } catch (e) {
+              logger.error("--- Assertion Error: Failed to parse textContent as JSON", {
+                  textContent,
+                  error: e,
+                  component: 'BranchController.integration.test'
+              });
+              throw new Error('Failed to parse readResult.data[0].text as JSON');
+          }
+      } else {
+          // オブジェクトの場合は直接アクセス
+          expect(textContent.metadata.id).toBe(updatedDoc.metadata.id);
+          expect(textContent.metadata.title).toBe(updatedDoc.metadata.title);
+          expect(textContent.metadata.version).toBe(updatedDoc.metadata.version);
+          expect(textContent.content.value).toBe(updatedDoc.content.value);
+      }
     });
   });
 });

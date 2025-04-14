@@ -12,6 +12,7 @@ import { DocumentController } from '../../../src/interface/controllers/DocumentC
 import { read_document, write_document } from '../../../src/interface/tools/document-tools.js';
 import type { WorkspaceConfig } from '../../../src/infrastructure/config/WorkspaceConfig.js';
 import { ApplicationError } from '../../../src/shared/errors/ApplicationError.js';
+/* eslint-disable-next-line import/no-extraneous-dependencies */
 import { vi, Mocked } from 'vitest';
 import * as path from 'path';
 import fs from 'fs-extra';
@@ -57,14 +58,14 @@ describe('read_document Command Integration Tests', () => {
       getBranchMemoryPath: vi.fn<(branchName: string) => string>(),
       getLanguage: vi.fn<() => 'en' | 'ja' | 'zh'>()
     };
-    
+
     mockConfigProvider.getConfig.mockReturnValue({
       docsRoot: testEnv.docRoot,
       verbose: false,
       language: 'en',
       isProjectMode: true
     });
-    
+
     const SAFE_TEST_BRANCH = BranchInfo.create(TEST_BRANCH).safeName;
     mockConfigProvider.getGlobalMemoryPath.mockReturnValue(testEnv.globalMemoryPath);
     mockConfigProvider.getBranchMemoryPath.mockReturnValue(path.join(testEnv.branchMemoryPath, SAFE_TEST_BRANCH));
@@ -82,13 +83,14 @@ describe('read_document Command Integration Tests', () => {
 
   /**
    * Helper method to create test documents
+   * @returns {Promise<void>} Promise that resolves when documents are prepared
    */
-  async function prepareTestDocuments() {
+  async function prepareTestDocuments(): Promise<void> {
     // Create a branch document
     const branchDocumentPath = 'test/branch-document.json';
     const branchDocumentContent = {
       schema: "memory_document_v2",
-      documentType: "test",
+      documentType: "test", // documentType はトップレベルに
       metadata: {
         id: "test-branch-document",
         title: "Test Branch Document",
@@ -168,14 +170,14 @@ describe('read_document Command Integration Tests', () => {
       expect(result.data).toBeDefined();
       expect(result.data.path).toBe(documentPath);
       expect(result.data.content).toBeDefined();
-      
+
       // Verify content structure
       const content = result.data.content as any;
       expect(content.schema).toBe("memory_document_v2");
       expect(content.documentType).toBe("test");
       expect(content.metadata.title).toBe("Test Branch Document");
       expect(content.content.message).toBe("This is a test document in branch memory bank");
-      
+
       // Verify tags
       expect(result.data.tags).toEqual(["test", "branch"]);
     });
@@ -197,14 +199,14 @@ describe('read_document Command Integration Tests', () => {
       expect(result.data).toBeDefined();
       expect(result.data.path).toBe(documentPath);
       expect(result.data.content).toBeDefined();
-      
+
       // Verify content structure
       const content = result.data.content as any;
       expect(content.schema).toBe("memory_document_v2");
       expect(content.documentType).toBe("test");
       expect(content.metadata.title).toBe("Test Global Document");
       expect(content.content.message).toBe("This is a test document in global memory bank");
-      
+
       // Verify tags
       expect(result.data.tags).toEqual(["test", "global"]);
     });
@@ -228,7 +230,7 @@ describe('read_document Command Integration Tests', () => {
       expect(result.data).toBeDefined();
       expect(result.data.path).toBe(documentPath);
       expect(result.data.content).toBe(expectedContent);
-      
+
       // Plain text files don't have tags in the standard way
       expect(result.data.tags).toEqual([]);
     });
@@ -244,7 +246,7 @@ describe('read_document Command Integration Tests', () => {
         getCurrentBranchName: vi.fn<() => Promise<string>>()
       };
       freshGitService.getCurrentBranchName.mockResolvedValue(TEST_BRANCH);
-      
+
       const freshConfigProvider = {
         initialize: vi.fn(),
         getConfig: vi.fn<() => WorkspaceConfig>(),
@@ -252,7 +254,7 @@ describe('read_document Command Integration Tests', () => {
         getBranchMemoryPath: vi.fn<(branchName: string) => string>(),
         getLanguage: vi.fn<() => 'en' | 'ja' | 'zh'>()
       };
-      
+
       // Set project mode to true - essential for auto-detection
       freshConfigProvider.getConfig.mockReturnValue({
         docsRoot: testEnv.docRoot,
@@ -260,23 +262,23 @@ describe('read_document Command Integration Tests', () => {
         language: 'en',
         isProjectMode: true
       });
-      
+
       const SAFE_TEST_BRANCH = BranchInfo.create(TEST_BRANCH).safeName;
       freshConfigProvider.getGlobalMemoryPath.mockReturnValue(testEnv.globalMemoryPath);
       freshConfigProvider.getBranchMemoryPath.mockReturnValue(path.join(testEnv.branchMemoryPath, SAFE_TEST_BRANCH));
       freshConfigProvider.getLanguage.mockReturnValue('en');
-      
+
       // Create fresh container with our mocks
       const freshContainer = await setupContainer({ docsRoot: testEnv.docRoot });
       freshContainer.register<IGitService>('gitService', freshGitService);
       freshContainer.register<IConfigProvider>('configProvider', freshConfigProvider);
-      
+
       // Ensure global variable container is set to our fresh container
       // @ts-ignore - We need to directly manipulate the container for this test
       global.container = freshContainer;
-      
+
       console.log("Starting auto-detect branch name test for read_document...");
-      
+
       // Act - Omit branch name
       const result = await read_document({
         scope: 'branch',
@@ -290,7 +292,7 @@ describe('read_document Command Integration Tests', () => {
       expect(result.success).toBe(true);
       expect(result.data).toBeDefined();
       expect(result.data.path).toBe(documentPath);
-      
+
       // Verify GitService was called to auto-detect branch
       console.log(`getCurrentBranchName mock called: ${freshGitService.getCurrentBranchName.mock.calls.length} times`);
       expect(freshGitService.getCurrentBranchName).toHaveBeenCalled();
@@ -315,7 +317,7 @@ describe('read_document Command Integration Tests', () => {
         path: documentPath,
         docs: testEnv.docRoot
       });
-      
+
       // Assert
       expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
@@ -355,10 +357,10 @@ describe('read_document Command Integration Tests', () => {
           path: documentPath,
           docs: testEnv.docRoot
         });
-        
+
         // If we get here, the test should fail
         expect(true).toBe(false); // This will fail the test if no error is thrown
-      } catch (error) {
+      } catch (error: any) {
         // Assert that the error contains the expected message
         expect(error.message).toContain('Invalid scope');
       }
@@ -368,7 +370,7 @@ describe('read_document Command Integration Tests', () => {
       // Arrange - Create a file with invalid JSON
       const documentPath = 'test/invalid-json.json';
       const invalidJson = '{this is not valid JSON';
-      
+
       // Write the invalid JSON directly to the file system
       const SAFE_TEST_BRANCH = BranchInfo.create(TEST_BRANCH).safeName;
       const filePath = path.join(testEnv.branchMemoryPath, SAFE_TEST_BRANCH, documentPath);
@@ -381,7 +383,7 @@ describe('read_document Command Integration Tests', () => {
 
       console.log(`Testing invalid JSON handling with file at ${filePath}`);
       console.log(`File exists: ${await fs.pathExists(filePath)}`);
-      
+
       // Act
       const result = await read_document({
         scope: 'branch',
@@ -392,16 +394,16 @@ describe('read_document Command Integration Tests', () => {
 
       // Assert - The test is expecting success here, even with invalid JSON
       expect(result).toBeDefined();
-      
+
       // For invalid JSON, we should still return success with the raw content
       expect(result.success).toBe(true);
       expect(result.data).toBeDefined();
       expect(result.data.path).toBe(documentPath);
-      
+
       // The content should be the raw string since it couldn't be parsed as JSON
       console.log(`Result content: ${result.data.content}`);
       expect(result.data.content).toBe(invalidJson); // Should contain raw content
-      
+
       // And there should be no tags since it's invalid JSON
       expect(result.data.tags).toEqual([]); // No tags for invalid JSON
     });

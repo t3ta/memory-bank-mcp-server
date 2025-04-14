@@ -12,6 +12,7 @@ import { DocumentController } from '../../../src/interface/controllers/DocumentC
 import { write_document } from '../../../src/interface/tools/document-tools.js';
 import type { WorkspaceConfig } from '../../../src/infrastructure/config/WorkspaceConfig.js';
 import { ApplicationError } from '../../../src/shared/errors/ApplicationError.js';
+/* eslint-disable-next-line import/no-extraneous-dependencies */
 import { vi, Mocked } from 'vitest';
 import * as path from 'path';
 import fs from 'fs-extra';
@@ -57,14 +58,14 @@ describe('write_document Command Integration Tests', () => {
       getBranchMemoryPath: vi.fn<(branchName: string) => string>(),
       getLanguage: vi.fn<() => 'en' | 'ja' | 'zh'>()
     };
-    
+
     mockConfigProvider.getConfig.mockReturnValue({
       docsRoot: testEnv.docRoot,
       verbose: false,
       language: 'en',
       isProjectMode: true
     });
-    
+
     const SAFE_TEST_BRANCH = BranchInfo.create(TEST_BRANCH).safeName;
     mockConfigProvider.getGlobalMemoryPath.mockReturnValue(testEnv.globalMemoryPath);
     mockConfigProvider.getBranchMemoryPath.mockReturnValue(path.join(testEnv.branchMemoryPath, SAFE_TEST_BRANCH));
@@ -83,7 +84,7 @@ describe('write_document Command Integration Tests', () => {
       const documentPath = 'test/branch-document.json';
       const documentContent = {
         schema: "memory_document_v2",
-        documentType: "test",
+        documentType: "test", // documentType はトップレベルに
         metadata: {
           id: "test-branch-document",
           title: "Test Branch Document",
@@ -131,7 +132,7 @@ describe('write_document Command Integration Tests', () => {
       const documentPath = 'core/global-document.json';
       const documentContent = {
         schema: "memory_document_v2",
-        documentType: "test",
+        documentType: "test", // documentType はトップレベルに
         metadata: {
           id: "test-global-document",
           title: "Test Global Document",
@@ -251,7 +252,7 @@ describe('write_document Command Integration Tests', () => {
         getCurrentBranchName: vi.fn<() => Promise<string>>()
       };
       freshGitService.getCurrentBranchName.mockResolvedValue(TEST_BRANCH);
-      
+
       const freshConfigProvider = {
         initialize: vi.fn(),
         getConfig: vi.fn<() => WorkspaceConfig>(),
@@ -259,7 +260,7 @@ describe('write_document Command Integration Tests', () => {
         getBranchMemoryPath: vi.fn<(branchName: string) => string>(),
         getLanguage: vi.fn<() => 'en' | 'ja' | 'zh'>()
       };
-      
+
       // Set project mode to true - essential for auto-detection
       freshConfigProvider.getConfig.mockReturnValue({
         docsRoot: testEnv.docRoot,
@@ -267,29 +268,29 @@ describe('write_document Command Integration Tests', () => {
         language: 'en',
         isProjectMode: true
       });
-      
+
       const SAFE_TEST_BRANCH = BranchInfo.create(TEST_BRANCH).safeName;
       freshConfigProvider.getGlobalMemoryPath.mockReturnValue(testEnv.globalMemoryPath);
       freshConfigProvider.getBranchMemoryPath.mockReturnValue(path.join(testEnv.branchMemoryPath, SAFE_TEST_BRANCH));
       freshConfigProvider.getLanguage.mockReturnValue('en');
-      
+
       // Create fresh container with our mocks
       const freshContainer = await setupContainer({ docsRoot: testEnv.docRoot });
       freshContainer.register<IGitService>('gitService', freshGitService);
       freshContainer.register<IConfigProvider>('configProvider', freshConfigProvider);
-      
+
       // Ensure global variable container is set to our fresh container
       // @ts-ignore - We need to directly manipulate the container for this test
       global.container = freshContainer;
-      
+
       // Ensure directories exist
       const targetDir = path.join(testEnv.branchMemoryPath, SAFE_TEST_BRANCH);
       const filePath = path.join(targetDir, documentPath);
-      
+
       await fs.ensureDir(path.dirname(filePath));
-      
+
       console.log("Starting auto-detect branch name test for write_document...");
-      
+
       // Act - Omit branch name
       const result = await write_document({
         scope: 'branch',
@@ -303,13 +304,13 @@ describe('write_document Command Integration Tests', () => {
       // Assert
       expect(result).toBeDefined();
       expect(result.success).toBe(true);
-      
+
       // Verify file exists
       expect(fs.existsSync(filePath)).toBe(true);
 
       // Check if GitService was called
       console.log(`getCurrentBranchName called ${freshGitService.getCurrentBranchName.mock.calls.length} times`);
-      
+
       // Verify GitService was called to auto-detect branch
       expect(freshGitService.getCurrentBranchName).toHaveBeenCalled();
     });
@@ -333,7 +334,7 @@ describe('write_document Command Integration Tests', () => {
       };
 
       console.log("Setting up test conditions for branch name required test...");
-      
+
       // Important: Set project mode to false in our main mock to trigger branch requirement
       mockConfigProvider.getConfig.mockReturnValue({
         docsRoot: testEnv.docRoot,
@@ -341,36 +342,36 @@ describe('write_document Command Integration Tests', () => {
         language: 'en',
         isProjectMode: false // Critical - This is what triggers the branch name requirement
       });
-      
+
       // Make sure our mock is re-registered with the container
       container.register<IConfigProvider>('configProvider', mockConfigProvider);
-      
+
       // Verify mock is configured correctly
       const config = mockConfigProvider.getConfig();
       console.log(`Test configured with isProjectMode = ${config.isProjectMode}`);
-      
+
       // Before the test, ensure documents directory exists but file doesn't
       try {
         // Create the error-document.json file to make sure it's not an existing file issue
         const SAFE_TEST_BRANCH = BranchInfo.create(TEST_BRANCH).safeName;
         const filePath = path.join(testEnv.branchMemoryPath, SAFE_TEST_BRANCH, documentPath);
-        
+
         // Make sure directory exists
         await fs.ensureDir(path.dirname(filePath));
-        
+
         // Try to catch the error directly
         try {
           console.log("Executing write_document in branch scope without branch name in non-project mode...");
           // This should throw an error because branch is required but not provided
           await write_document({
-            scope: 'branch', 
+            scope: 'branch',
             // intentionally omit branch name
             path: documentPath,
             content: documentContent,
             tags: documentContent.metadata.tags,
             docs: testEnv.docRoot
           });
-          
+
           // If we get here, it didn't throw an error - fail the test
           console.error("Expected an error but none was thrown - test should fail");
           throw new Error("Expected an error but none was thrown");
@@ -410,10 +411,10 @@ describe('write_document Command Integration Tests', () => {
           patches: patches,
           docs: testEnv.docRoot
         });
-        
+
         // If we get here, the test should fail
         expect(true).toBe(false); // This will fail the test if no error is thrown
-      } catch (error) {
+      } catch (error: any) {
         // Assert that the error contains the expected message
         expect(error.message).toContain('Cannot provide both content and patches simultaneously');
       }
@@ -431,10 +432,10 @@ describe('write_document Command Integration Tests', () => {
           path: documentPath,
           docs: testEnv.docRoot
         });
-        
+
         // If we get here, the test should fail
         expect(true).toBe(false); // This will fail the test if no error is thrown
-      } catch (error) {
+      } catch (error: any) {
         // Assert that the error contains the expected message
         expect(error.message).toContain('Either document content or patches must be provided');
       }
@@ -503,7 +504,7 @@ describe('write_document Command Integration Tests', () => {
       expect(result.success).toBe(true);
       expect(result.data).toBeDefined();
       expect(result.data.content).toBeDefined();
-      
+
       // Parse returned content
       const returnedContent = JSON.parse(result.data.content as string);
       expect(returnedContent.content.message).toBe("This content should be returned");

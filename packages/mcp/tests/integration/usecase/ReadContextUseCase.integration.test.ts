@@ -88,7 +88,7 @@ describe('ReadContextUseCase Integration Tests', () => {
       expect(branchContext).toBeDefined();
       expect(typeof branchContext).toBe('object');
       expect((branchContext as any).schema).toBe('memory_document_v2');
-      expect((branchContext as any).documentType).toBe('branch_context');
+      expect((branchContext as any).documentType).toBe('branch_context'); // documentType はトップレベルに移動
     });
 
     it.skip('should get context regardless of language', async () => {
