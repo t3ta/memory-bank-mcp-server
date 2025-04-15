@@ -37,7 +37,7 @@
     "prepublishOnly": "yarn build",
     "check:deps": "depcheck",
     "release": "semantic-release",
-    "inspect": "cd packages/mcp && node dist/server.js --docs ../../docs --project"
+    "inspect": "cd packages/mcp && npx @modelcontextprotocol/inspector node dist/server.js --docs ../../docs --project --language ja"
   },
   "keywords": [
     "mcp",
