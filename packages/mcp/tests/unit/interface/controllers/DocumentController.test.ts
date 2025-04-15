@@ -5,11 +5,8 @@ import { ReadBranchDocumentUseCase } from '../../../../src/application/usecases/
 import { WriteBranchDocumentUseCase } from '../../../../src/application/usecases/branch/WriteBranchDocumentUseCase.js';
 import { ReadGlobalDocumentUseCase } from '../../../../src/application/usecases/global/ReadGlobalDocumentUseCase.js';
 import { WriteGlobalDocumentUseCase } from '../../../../src/application/usecases/global/WriteGlobalDocumentUseCase.js';
-// import { DocumentRepositorySelector } from '../../../../src/application/services/DocumentRepositorySelector.js';
 import { MCPResponsePresenter } from '../../../../src/interface/presenters/MCPResponsePresenter.js';
-import { BranchInfo } from '../../../../src/domain/entities/BranchInfo.js';
 import { ApplicationError } from '../../../../src/shared/errors/ApplicationError.js';
-import { BaseError } from '../../../../src/shared/errors/BaseError.js';
 
 describe('DocumentController', () => {
   // Mock use cases

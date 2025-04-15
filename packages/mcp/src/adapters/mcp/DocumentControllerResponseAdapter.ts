@@ -99,7 +99,15 @@ export function convertErrorToMCPResponse(
  * @returns {MCPToolResponse} MCP protocol formatted response
  */
 export function convertWriteResultToMCPResponse(
-  result: { document: DocumentDTO; version?: number },
+  result: {
+    document: {
+      path: string;
+      content?: string | object;
+      tags?: string[];
+      lastModified: string;
+    };
+    version?: number
+  },
   returnContent?: boolean
 ): MCPToolResponse {
   logger.debug('DocumentControllerResponseAdapter: Converting write result to MCP response', {
