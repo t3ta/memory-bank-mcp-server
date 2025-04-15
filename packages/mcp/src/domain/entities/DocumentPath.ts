@@ -138,6 +138,10 @@ export class DocumentPath {
     return lastDotIndex === -1 ? filename : filename.substring(0, lastDotIndex);
   }
 
+  /**
+   * Infer document type from the file basename
+   * @returns The inferred document type based on the filename patterns
+   */
   public inferDocumentType(): DocumentType {
     const lcBasename = this.basename.toLowerCase();
 

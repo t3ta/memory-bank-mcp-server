@@ -5,34 +5,62 @@ import { DocumentVersionInfo } from './DocumentVersionInfo.js';
 import { DomainError, DomainErrorCodes } from '../../shared/errors/DomainError.js';
 import { IDocumentValidator } from '../validation/IDocumentValidator.js';
 
+/**
+ * Current schema version for JSON documents
+ */
 export const SCHEMA_VERSION = 'memory_document_v2';
 
+/**
+ * Base interface for JSON documents in v2 schema
+ */
 export interface BaseJsonDocumentV2 {
+  /** Schema version identifier */
   schema: string;
+  /** Document metadata containing core properties */
   metadata: DocumentMetadataV2;
+  /** Document content as a flexible record */
   content: Record<string, unknown>;
 }
 
+/**
+ * Metadata interface for JSON documents in v2 schema
+ */
 export interface DocumentMetadataV2 {
+  /** Unique document identifier (UUID) */
   id: string;
+  /** Human-readable document title */
   title: string;
   // documentType: string; // Removed: Moved to top level of BaseJsonDocumentV2
+  /** Document path relative to memory bank root */
   path: string;
+  /** Array of document tags */
   tags: string[];
+  /** Last modification timestamp */
   lastModified: string | Date;
+  /** Document creation timestamp */
   createdAt: string | Date;
+  /** Document version number */
   version: number;
+  /** Additional metadata fields */
   [key: string]: unknown;
 }
 
 /**
  * Type discriminator for document types
+ *
+ * This enumeration defines the supported document types in the system.
+ * Each type has specific schema requirements and behavior.
  */
 export type DocumentType =
+  /** Branch context document containing branch-specific metadata */
   | 'branch_context'
+  /** Active context document containing current work context */
   | 'active_context'
+  /** Progress tracking document */
   | 'progress'
+  /** System patterns document containing architectural patterns */
   | 'system_patterns'
+  /** Generic document type for miscellaneous content */
   | 'generic';
 
 /**

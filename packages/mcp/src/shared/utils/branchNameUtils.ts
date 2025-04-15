@@ -1,5 +1,8 @@
 /**
  * Utility functions for branch name operations
+ *
+ * This module provides helper functions for working with Git branch names,
+ * including validation and conversion to filesystem-safe names.
  */
 
 /**
@@ -14,6 +17,17 @@ export function toSafeBranchName(branchName: string): string {
 
 /**
  * Check if a branch name is valid
+ * @param branchName Branch name to validate
+ * @returns Boolean indicating if the branch name is valid
+ */
+/**
+ * Check if a branch name is valid according to Memory Bank rules
+ *
+ * A valid branch name must:
+ * - Not be empty
+ * - Contain at least one slash (namespace/branch-name format)
+ * - Not have empty parts except potentially at the beginning for absolute paths
+ *
  * @param branchName Branch name to validate
  * @returns Boolean indicating if the branch name is valid
  */

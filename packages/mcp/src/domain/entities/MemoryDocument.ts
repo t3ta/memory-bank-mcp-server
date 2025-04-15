@@ -388,7 +388,16 @@ export class MemoryDocument {
    * Determine the document type based on the path or content
    * @returns document type
    */
-  private determineDocumentType(): JsonDocumentV2['documentType'] { // <<<--- 型修正済み
+  /**
+   * Determine the document type based on the filename
+   *
+   * This method analyzes the filename to infer an appropriate document type
+   * according to the JsonDocumentV2 schema.
+   *
+   * @returns The document type that matches the schema requirements
+   * @private
+   */
+  private determineDocumentType(): JsonDocumentV2['documentType'] {
     const filename = this.props.path.filename.toLowerCase();
 
     if (filename.includes('branchcontext') || filename.includes('branch-context')) {

@@ -73,6 +73,11 @@ export class Tag {
   /**
    * Get tag with leading # character
    */
+  /**
+   * Get tag with leading # character
+   *
+   * @returns Tag formatted as a hashtag (e.g., #tag-name)
+   */
   public toHashtag(): string {
     return `#${this._value}`;
   }

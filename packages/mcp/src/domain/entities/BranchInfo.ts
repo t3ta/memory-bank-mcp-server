@@ -71,6 +71,14 @@ export class BranchInfo {
   /**
    * Get a safe branch name for filesystem usage
    */
+  /**
+   * Get a safe branch name for filesystem usage
+   *
+   * Converts the branch name to a format safe for filesystem operations
+   * by replacing characters that might be problematic in file paths.
+   *
+   * @returns Safe version of the branch name for filesystem usage
+   */
   public get safeName(): string {
     return toSafeBranchName(this._name);
   }

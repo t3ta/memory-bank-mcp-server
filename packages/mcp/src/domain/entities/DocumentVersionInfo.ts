@@ -61,6 +61,18 @@ export class DocumentVersionInfo {
    * @param updateReason Optional update reason
    * @returns New version info
    */
+  /**
+   * Creates a new version info with incremented version
+   *
+   * This method returns a new DocumentVersionInfo instance with:
+   * - Version incremented by 1
+   * - Current timestamp as lastModified
+   * - Same modifiedBy value as current instance
+   * - Optional new updateReason or existing one if not provided
+   *
+   * @param updateReason Optional update reason to record
+   * @returns New DocumentVersionInfo with incremented version
+   */
   public nextVersion(updateReason?: string): DocumentVersionInfo {
     return new DocumentVersionInfo({
       version: this._version + 1,
@@ -73,6 +85,15 @@ export class DocumentVersionInfo {
   /**
    * Converts version info to a plain object
    * @returns Plain object representation
+   */
+  /**
+   * Converts version info to a plain object
+   *
+   * Creates a serializable representation of this version info,
+   * including all properties. The updateReason property is only
+   * included if it exists.
+   *
+   * @returns Plain object representation of this version info
    */
   public toObject(): Record<string, unknown> {
     const result: Record<string, unknown> = {
