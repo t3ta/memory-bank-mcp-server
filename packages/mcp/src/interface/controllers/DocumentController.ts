@@ -81,8 +81,8 @@ export class DocumentController {
               // このロジックは具体的な実装によります - 必要に応じて修正してください
               // 実際のファイルシステムからの読み込みなど
               const fileContent = { document: { path, content: "Invalid JSON content preserved as text", isPlainText: true } };
-              const mcpResponse = {
-                status: 'success',
+              const mcpResponse: { status: "success" | "error" | "pending"; result: any; _meta: any } = {
+                status: "success",
                 result: fileContent,
                 _meta: { documentPath: path }
               };
