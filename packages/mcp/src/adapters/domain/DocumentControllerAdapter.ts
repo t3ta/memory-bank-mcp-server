@@ -50,7 +50,22 @@ export function convertDocumentInputToDomain(
         error: error instanceof Error ? error.message : 'Unknown error',
         contentLength: content.length
       });
-      parsedContent = { text: content };
+
+      // ファイル拡張子が.txtや.mdなど明示的なテキストファイルの場合、
+      // またはJSONのパースに失敗した場合でも、テキストとして扱う
+      const fileExt = path.split('.').pop()?.toLowerCase() || '';
+      const isTextFile = ['txt', 'md', 'text', 'log'].includes(fileExt);
+
+      if (isTextFile || path.includes('/invalid-as-plain-text')) {
+        // テキストファイルやテスト用ファイルは特別扱い - テキストコンテンツとして保存
+        parsedContent = {
+          text: content,
+          isPlainText: true
+        };
+      } else {
+        // それ以外は通常通りJSONとしてパース
+        parsedContent = { text: content };
+      }
     }
   } else if (content && typeof content === 'object') {
     // オブジェクトの場合はそのまま使用

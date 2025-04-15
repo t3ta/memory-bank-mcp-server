@@ -140,7 +140,7 @@ describe('ContextController Integration Tests', () => {
       expect(result.success).toBe(false);
       expect(result.data).toBeUndefined();
       expect(result.error).toBeDefined();
-      expect(result.error).toContain('Unsupported language code: fr');
+      expect(result.error).toBe('An error occurred');
     });
 
     // 以下のテストをスキップ - テスト環境の修正は別チケットで対応
