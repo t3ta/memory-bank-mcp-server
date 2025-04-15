@@ -10746,7 +10746,7 @@ vite-tsconfig-paths@^5.1.4:
 
 vitest@^3.1.1:
   version "3.1.1"
-  resolved "https://registry.npmjs.org/vitest/-/vitest-3.1.1.tgz"
+  resolved "https://registry.yarnpkg.com/vitest/-/vitest-3.1.1.tgz#39fa2356e510513fccdc5d16465a9fc066ef1fc6"
   integrity sha512-kiZc/IYmKICeBAZr9DQ5rT7/6bD9G7uqQEki4fxazi1jdVl2mWGzedtBs5s6llz59yQhVb7FFY2MbHzHCnT79Q==
   dependencies:
     "@vitest/expect" "3.1.1"

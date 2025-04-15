@@ -127,10 +127,14 @@ export interface Logger {
 
 /**
  * Create a console logger
- * @param level Minimum log level to display
+ *
+ * Creates a new logger instance that outputs structured JSON logs to the console.
+ * The logger supports context-based logging and hierarchical log levels.
+ *
+ * @param level Minimum log level to display (default: 'info')
+ * @param initialDefaultContext Optional default context to include in all logs
  * @returns Logger instance
  */
-// Allow passing initial default context
 export function createConsoleLogger(level: LogLevel = 'info', initialDefaultContext?: LogContext): Logger {
   let currentLevel = level;
   let defaultContext: LogContext = initialDefaultContext || {}; // Use initial context if provided

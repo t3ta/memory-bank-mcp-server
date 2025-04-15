@@ -67,7 +67,8 @@ export abstract class BaseError extends Error {
    * Returns true if the error is of the specified class
    * Safer than using instanceof when class definitions might be different
    *
-   * @param errorClass Error class to check against
+   * @param errorClass Error class name to check against
+   * @returns Boolean indicating if this error is an instance of the specified class
    */
   public isInstanceOf(errorClass: string): boolean {
     return this.constructor.name === errorClass || this.name === errorClass;

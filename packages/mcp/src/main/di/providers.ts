@@ -58,6 +58,7 @@ import { CliOptions } from '../../infrastructure/config/WorkspaceConfig.js';
 import { ReadBranchCoreFilesUseCase } from '../../application/usecases/index.js';
 import { GitService } from '../../infrastructure/git/GitService.js';
 import { IGitService } from '../../infrastructure/git/IGitService.js';
+// import { DocumentController as DocumentControllerModified } from '../../interface/controllers/DocumentControllerModified.js';
 
 /**
  * Register infrastructure services
@@ -409,15 +410,13 @@ export async function registerInterfaceServices(container: DIContainer): Promise
   container.register('mcpResponsePresenter', new MCPResponsePresenter());
   container.register('jsonResponsePresenter', new JsonResponsePresenter());
 
-  // Register DocumentController
+  // Register DocumentController (アダプターレイヤー対応版)
   container.registerFactory('documentController', async () => {
     const readBranchDocumentUseCase = await container.get<ReadBranchDocumentUseCase>('readBranchDocumentUseCase');
     const writeBranchDocumentUseCase = await container.get<WriteBranchDocumentUseCase>('writeBranchDocumentUseCase');
     const readGlobalDocumentUseCase = await container.get<ReadGlobalDocumentUseCase>('readGlobalDocumentUseCase');
     const writeGlobalDocumentUseCase = await container.get<WriteGlobalDocumentUseCase>('writeGlobalDocumentUseCase');
-    // const repositorySelector = await container.get<DocumentRepositorySelector>('documentRepositorySelector'); // Not used in the current implementation
     const presenter = await container.get<MCPResponsePresenter>('mcpResponsePresenter');
-
     const configProvider = await container.get<IConfigProvider>('configProvider');
 
     return new DocumentController(
@@ -425,11 +424,12 @@ export async function registerInterfaceServices(container: DIContainer): Promise
       writeBranchDocumentUseCase,
       readGlobalDocumentUseCase,
       writeGlobalDocumentUseCase,
-      // repositorySelector, // Not used in the current implementation
       presenter,
       configProvider
     );
   });
+
+  // DocumentControllerModified はDocumentControllerとして統合されました
 
   container.registerFactory('contextController', async () => {
     const readContextUseCase = await container.get<ReadContextUseCase>('readContextUseCase');
@@ -474,6 +474,8 @@ export async function registerInterfaceServices(container: DIContainer): Promise
     const searchJsonDocumentsUseCase = await container.get<SearchJsonDocumentsUseCase>('searchJsonDocumentsUseCase');
     const updateJsonIndexUseCaseJson = await container.get<UpdateJsonIndexUseCase>('updateJsonIndexUseCase'); // Renamed variable
 
+    logger.warn('DEPRECATED: Using legacy GlobalController. Please switch to DocumentController with scope=global for better adapter layer integration.');
+
     return new GlobalController(
       readGlobalDocumentUseCase,
       writeGlobalDocumentUseCase,
@@ -515,6 +517,8 @@ export async function registerInterfaceServices(container: DIContainer): Promise
       'createBranchCoreFilesUseCase'
     );
     const presenter = await container.get<MCPResponsePresenter>('mcpResponsePresenter');
+
+    logger.warn('DEPRECATED: Using legacy BranchController. Please switch to DocumentController with scope=branch for better adapter layer integration.');
 
     return new BranchController(
       readBranchDocumentUseCase,

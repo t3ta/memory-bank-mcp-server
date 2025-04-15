@@ -15,6 +15,9 @@ import type { MCPResponsePresenter } from "../presenters/types/MCPResponsePresen
 import type { MCPResponse } from "../presenters/types/MCPResponse.js";
 import type { IGlobalController } from "./interfaces/IGlobalController.js";
 import type { IConfigProvider } from "../../infrastructure/config/interfaces/IConfigProvider.js";
+// アダプターレイヤーのインポート
+import { convertAdapterToMCPResponse } from '../../adapters/mcp/MCPProtocolAdapter.js';
+import { convertDomainToAdapter, convertAdapterToDomain, convertJsonDocumentToDomain } from '../../adapters/domain/DomainAdapter.js';
 /**
  * Parameters for the writeDocument method in GlobalController
  */
@@ -30,6 +33,9 @@ interface WriteGlobalDocumentParams {
 /**
  * Controller for global memory bank operations
  * Handles incoming requests related to global memory bank
+ *
+ * @deprecated Use DocumentController with scope=global instead for better adapter layer integration.
+ * This controller will be removed in a future version.
  */
 export class GlobalController implements IGlobalController {
   readonly _type = 'controller' as const;
@@ -86,7 +92,23 @@ export class GlobalController implements IGlobalController {
 
       const result = await this.readGlobalDocumentUseCase.execute({ path });
 
-      return this.presenter.presentSuccess(result.document); // Already correct, no change needed here
+      // ドメインモデルからアダプターレイヤーへの変換
+      const adapterResult = convertDomainToAdapter({
+        documentType: path.split('.').pop() || 'unknown',
+        content: typeof result.document.content === 'string'
+          ? JSON.parse(result.document.content)
+          : result.document.content,
+        metadata: {
+          tags: result.document.tags || [],
+          lastModified: result.document.lastModified,
+          path: result.document.path
+        }
+      });
+
+      // アダプターレイヤーからMCPレスポンスへの変換
+      const mcpResponse = convertAdapterToMCPResponse(adapterResult);
+
+      return this.presenter.presentRawResponse(mcpResponse);
     } catch (error) {
       return this.handleError(error, 'readDocument');
     }
@@ -100,9 +122,9 @@ export class GlobalController implements IGlobalController {
    * @returns Promise resolving to MCP response with the result
    */
   async writeDocument(params: WriteGlobalDocumentParams): Promise<MCPResponse> {
-    const { path: docPath, content, patches, tags: tagStrings } = params; // patches を追加
+    const { path: docPath, content, patches, tags: tagStrings } = params;
     try {
-      this.componentLogger.info(`Writing global document`, { operation: 'writeDocument', docPath, hasContent: !!content, hasPatches: !!patches }); // ログに情報追加
+      this.componentLogger.info(`Writing global document`, { operation: 'writeDocument', docPath, hasContent: !!content, hasPatches: !!patches });
 
       // content と patches の排他チェック (ユースケースでもやるけど、コントローラーでもやるのが親切)
       const hasContent = content !== undefined && content !== null;
@@ -116,43 +138,69 @@ export class GlobalController implements IGlobalController {
       }
 
       // ユースケースに渡す document オブジェクトを構築
-      // ユースケースに渡す document オブジェクトを構築
-      // WriteDocumentDTO には content が必須だが、patches を使う場合は content は不要。
-      // ユースケース側で patches を any キャストで受け取っているので、それに合わせる。
       let documentInput: WriteDocumentDTO | { path: string; tags?: string[]; patches: rfc6902.Operation[] };
 
       if (hasContent) {
-        // content がある場合は WriteDocumentDTO 型
+        // contentがある場合の処理
+        // contentがオブジェクト形式の場合、アダプターレイヤーを使用して適切に変換
+        let normalizedContent: any = content;
+
+        if (typeof content === 'object' && content !== null) {
+          // アダプターレイヤーを使って変換
+          const adapterResult = {
+            content: content as Record<string, unknown>,
+            metadata: {
+              tags: tagStrings || [],
+              lastModified: new Date().toISOString(),
+              path: docPath
+            }
+          };
+
+          // ドメインモデルに変換（documentTypeはパスから推測）
+          const documentType = docPath.split('.').pop() || 'unknown';
+          const domainModel = convertAdapterToDomain(adapterResult, documentType);
+
+          // 変換されたコンテンツを使用
+          normalizedContent = domainModel.content;
+        }
+
         documentInput = {
           path: docPath,
-          content: content, // content は必須なので設定
+          content: normalizedContent,
           tags: tagStrings || [],
         };
       } else if (hasPatches) {
-        // patches がある場合は、content を含まず patches を持つオブジェクトを作成
-        // ユースケース側で any キャストされることを想定
+        // patchesがある場合は、既存の実装を維持
         documentInput = {
           path: docPath,
           tags: tagStrings || [],
-          patches: patches, // patches を設定
+          patches: patches,
         };
       } else {
         // このケースは上のチェックで弾かれるはず
         throw new Error('Invalid state: No content or patches');
       }
 
-
       // Execute the use case and store the result
       const result = await this.writeGlobalDocumentUseCase.execute({
-        // documentInput は WriteDocumentDTO | { ... patches ... } 型だが、
-        // ユースケースの execute は WriteGlobalDocumentInput (document: WriteDocumentDTO) を期待している。
-        // しかし、ユースケース内部で patches を any キャストで扱っているので、このまま渡す。
-        // (より厳密にするならユースケースの型定義を見直すべきだが、既存実装に合わせる)
-        document: documentInput as WriteDocumentDTO, // ユースケースの型定義に合わせるためのキャスト
+        document: documentInput as WriteDocumentDTO,
       });
 
-      // Pass the result from the use case to the presenter
-      return this.presenter.presentSuccess(result);
+      // アダプターレイヤーを使ってレスポンスを変換
+      const adapterResult = convertDomainToAdapter({
+        documentType: docPath.split('.').pop() || 'unknown',
+        content: { success: true, result },
+        metadata: {
+          tags: tagStrings || [],
+          lastModified: new Date().toISOString(),
+          path: docPath
+        }
+      });
+
+      // アダプターレイヤーからMCPレスポンスへの変換
+      const mcpResponse = convertAdapterToMCPResponse(adapterResult);
+
+      return this.presenter.presentRawResponse(mcpResponse);
     } catch (error) {
       return this.handleError(error, 'writeDocument');
     }
@@ -175,34 +223,56 @@ export class GlobalController implements IGlobalController {
         'user-guide.json',
       ];
 
-      const result: Record<string, DocumentDTO> = {};
+      const result: Record<string, any> = {};
 
       for (const documentPath of coreFiles) {
         try {
           const docResult = await this.readGlobalDocumentUseCase.execute({ path: documentPath });
 
           if (docResult && docResult.document) {
-            result[documentPath.replace('.json', '')] = docResult.document;
+            // ドメインモデルからアダプターレイヤーへの変換
+            const adapterResult = convertDomainToAdapter({
+              documentType: documentPath.split('.').pop() || 'unknown',
+              content: typeof docResult.document.content === 'string'
+                ? JSON.parse(docResult.document.content)
+                : docResult.document.content,
+              metadata: {
+                tags: docResult.document.tags || [],
+                lastModified: docResult.document.lastModified,
+                path: docResult.document.path
+              }
+            });
+
+            // キー名からjson拡張子を取り除く
+            result[documentPath.replace('.json', '')] = {
+              content: adapterResult.content,
+              path: documentPath,
+              tags: docResult.document.tags || [],
+              lastModified: docResult.document.lastModified
+            };
           } else {
+            // 空のドキュメントを作成
             result[documentPath.replace('.json', '')] = {
               path: documentPath,
-              content: '',
+              content: {},
               tags: ['global', 'core', documentPath.replace('.json', '')],
               lastModified: new Date().toISOString(),
             };
           }
         } catch (error) {
           this.componentLogger.error(`Error reading global core file`, { operation: 'readCoreFiles', documentPath, error });
+          // エラー時は空のドキュメントを返す
           result[documentPath.replace('.json', '')] = {
             path: documentPath,
-            content: '',
+            content: {},
             tags: ['global', 'core', documentPath.replace('.json', '')],
             lastModified: new Date().toISOString(),
           };
         }
       }
 
-      return this.presenter.presentSuccess(result); // Already correct, no change needed here
+      // アダプターからMCPレスポンスへの変換
+      return this.presenter.presentSuccess(result);
     } catch (error) {
       return this.handleError(error, 'readCoreFiles');
     }
@@ -222,14 +292,38 @@ export class GlobalController implements IGlobalController {
           branchName: undefined, // Global memory bank
           fullRebuild: true,
         });
-        return this.presenter.presentSuccess(result); // Already correct, no change needed here
+
+        // アダプターレイヤーを使ってレスポンスを変換
+        const adapterResult = {
+          content: { success: true, result },
+          metadata: {
+            operation: 'updateTagsIndex',
+            timestamp: new Date().toISOString()
+          }
+        };
+
+        // アダプターからMCPレスポンスへの変換
+        const mcpResponse = convertAdapterToMCPResponse(adapterResult);
+        return this.presenter.presentRawResponse(mcpResponse);
       } else {
         this.componentLogger.info('Using UpdateTagIndexUseCase (V1) for global tag index update', { operation: 'updateTagsIndex' });
         const result = await this.updateTagIndexUseCase.execute({
           branchName: undefined, // Global memory bank
           fullRebuild: true,
         });
-        return this.presenter.presentSuccess(result); // Already correct, no change needed here
+
+        // アダプターレイヤーを使ってレスポンスを変換
+        const adapterResult = {
+          content: { success: true, result },
+          metadata: {
+            operation: 'updateTagsIndex',
+            timestamp: new Date().toISOString()
+          }
+        };
+
+        // アダプターからMCPレスポンスへの変換
+        const mcpResponse = convertAdapterToMCPResponse(adapterResult);
+        return this.presenter.presentRawResponse(mcpResponse);
       }
     } catch (error) {
       return this.handleError(error, 'updateTagsIndex');
@@ -258,13 +352,44 @@ export class GlobalController implements IGlobalController {
         throw new Error("Docs path is missing in configuration or input.");
       }
 
-
       // Pass the correct input structure to the use case
-      // Pass the correct input structure including docs path
       const result = await this.searchDocumentsByTagsUseCase.execute(searchInput);
 
       this.componentLogger.info(`Search completed`, { operation: 'searchDocumentsByTags', count: result.results.length });
-      return this.presenter.presentSuccess(result);
+
+      // 検索結果をアダプターレイヤー形式に変換
+      const adapterResult = {
+        content: {
+          results: result.results.map(doc => {
+            // 基本プロパティを抽出
+            const documentInfo = {
+              path: doc.path,
+              lastModified: doc.lastModified
+            };
+
+            // 型安全な方法でドキュメント情報を返す
+            return {
+              ...documentInfo,
+              documentType: doc.path.split('.').pop() || 'unknown'
+            };
+          }),
+          count: result.results.length,
+          tags: input.tags || []
+        },
+        metadata: {
+          operation: 'searchDocumentsByTags',
+          timestamp: new Date().toISOString(),
+          searchCriteria: {
+            tags: input.tags,
+            match: input.match,
+            scope: searchInput.scope
+          }
+        }
+      };
+
+      // アダプターからMCPレスポンスへの変換
+      const mcpResponse = convertAdapterToMCPResponse(adapterResult);
+      return this.presenter.presentRawResponse(mcpResponse);
     } catch (error) {
       return this.handleError(error, 'searchDocumentsByTags');
     }
@@ -285,26 +410,24 @@ export class GlobalController implements IGlobalController {
       stack: error instanceof Error ? error.stack : undefined
     });
 
-    if (error instanceof BaseError || error instanceof DomainError) {
-      return this.presenter.presentError(error);
-    }
+    // エラー情報をアダプターレイヤー形式に変換
+    const errorAdapter = {
+      content: {
+        message: error instanceof Error ? error.message : 'An unexpected error occurred',
+        code: error instanceof BaseError || error instanceof DomainError ? error.code : 'UNEXPECTED_ERROR',
+        details: error instanceof BaseError || error instanceof DomainError ? error.details : undefined
+      },
+      isError: true, // エラーであることを明示
+      metadata: {
+        operation,
+        timestamp: new Date().toISOString(),
+        errorType: error.constructor.name
+      }
+    };
 
-    if (DomainErrors.unexpectedError) {
-      return this.presenter.presentError(
-        DomainErrors.unexpectedError(
-          error instanceof Error ? error.message : 'An unexpected error occurred',
-          { originalError: error }
-        )
-      );
-    } else {
-      return this.presenter.presentError(
-        new DomainError(
-          'UNEXPECTED_ERROR',
-          error instanceof Error ? error.message : 'An unexpected error occurred',
-          { originalError: error }
-        )
-      );
-    }
+    // アダプターからMCPレスポンスへの変換
+    const mcpResponse = convertAdapterToMCPResponse(errorAdapter);
+    return this.presenter.presentRawResponse(mcpResponse);
   }
 
   /**
@@ -331,7 +454,16 @@ export class GlobalController implements IGlobalController {
         id: options.id,
       });
 
-      return this.presenter.presentSuccess(result.document); // Already correct, no change needed here
+      // JSONドキュメントをドメインモデルに変換
+      const domainModel = convertJsonDocumentToDomain(result.document);
+
+      // ドメインモデルからアダプターレイヤーへの変換
+      const adapterResult = convertDomainToAdapter(domainModel);
+
+      // アダプターからMCPレスポンスへの変換
+      const mcpResponse = convertAdapterToMCPResponse(adapterResult);
+
+      return this.presenter.presentRawResponse(mcpResponse);
     } catch (error) {
       return this.handleError(error, 'readJsonDocument');
     }
@@ -352,6 +484,18 @@ export class GlobalController implements IGlobalController {
         );
       }
 
+      // ドキュメントをドメインモデル形式に変換
+      // 現在この変換結果は直接使用していないが、将来の拡張のために残す
+      // const domainModel = {
+      //   documentType: document.documentType,
+      //   content: document.content || {},
+      //   metadata: {
+      //     title: document.title,
+      //     tags: document.tags || [],
+      //     path: document.path || ''
+      //   }
+      // };
+
       const result = await this.writeJsonDocumentUseCase.execute({
         branchName: undefined, // Global memory bank
         document: {
@@ -363,7 +507,25 @@ export class GlobalController implements IGlobalController {
         },
       });
 
-      return this.presenter.presentSuccess(result); // Already correct, no change needed here
+      // 結果をアダプターレイヤー形式に変換
+      const adapterResult = {
+        content: {
+          success: true,
+          // 結果全体を含める
+          result,
+          path: document.path
+        },
+        metadata: {
+          operation: 'writeJsonDocument',
+          timestamp: new Date().toISOString(),
+          path: document.path
+        }
+      };
+
+      // アダプターからMCPレスポンスへの変換
+      const mcpResponse = convertAdapterToMCPResponse(adapterResult);
+
+      return this.presenter.presentRawResponse(mcpResponse);
     } catch (error) {
       return this.handleError(error, 'writeJsonDocument');
     }
@@ -390,7 +552,24 @@ export class GlobalController implements IGlobalController {
         id: options.id,
       });
 
-      return this.presenter.presentSuccess(result); // Already correct, no change needed here
+      // 結果をアダプターレイヤー形式に変換
+      const adapterResult = {
+        content: {
+          success: true,
+          result, // 結果全体を含める
+          path: options.path,
+          id: options.id
+        },
+        metadata: {
+          operation: 'deleteJsonDocument',
+          timestamp: new Date().toISOString()
+        }
+      };
+
+      // アダプターからMCPレスポンスへの変換
+      const mcpResponse = convertAdapterToMCPResponse(adapterResult);
+
+      return this.presenter.presentRawResponse(mcpResponse);
     } catch (error) {
       return this.handleError(error, 'deleteJsonDocument');
     }
@@ -420,7 +599,26 @@ export class GlobalController implements IGlobalController {
         tags: options?.tags,
       });
 
-      return this.presenter.presentSuccess(result.documents); // Already correct, no change needed here
+      // ドキュメント一覧をアダプターレイヤー形式に変換
+      const adapterResult = {
+        content: {
+          documents: result.documents,
+          count: result.documents.length,
+          filter: {
+            type: options?.type,
+            tags: options?.tags
+          }
+        },
+        metadata: {
+          operation: 'listJsonDocuments',
+          timestamp: new Date().toISOString()
+        }
+      };
+
+      // アダプターからMCPレスポンスへの変換
+      const mcpResponse = convertAdapterToMCPResponse(adapterResult);
+
+      return this.presenter.presentRawResponse(mcpResponse);
     } catch (error) {
       return this.handleError(error, 'listJsonDocuments');
     }
@@ -445,7 +643,23 @@ export class GlobalController implements IGlobalController {
         branchName: undefined, // Global memory bank
       });
 
-      return this.presenter.presentSuccess(result.documents); // Already correct, no change needed here
+      // 検索結果をアダプターレイヤー形式に変換
+      const adapterResult = {
+        content: {
+          documents: result.documents,
+          count: result.documents.length,
+          query
+        },
+        metadata: {
+          operation: 'searchJsonDocuments',
+          timestamp: new Date().toISOString()
+        }
+      };
+
+      // アダプターからMCPレスポンスへの変換
+      const mcpResponse = convertAdapterToMCPResponse(adapterResult);
+
+      return this.presenter.presentRawResponse(mcpResponse);
     } catch (error) {
       return this.handleError(error, 'searchJsonDocuments');
     }
@@ -471,7 +685,23 @@ export class GlobalController implements IGlobalController {
         fullRebuild: options?.force,
       });
 
-      return this.presenter.presentSuccess(result); // Already correct, no change needed here
+      // インデックス更新結果をアダプターレイヤー形式に変換
+      const adapterResult = {
+        content: {
+          success: true,
+          result,
+          force: options?.force || false
+        },
+        metadata: {
+          operation: 'updateJsonIndex',
+          timestamp: new Date().toISOString()
+        }
+      };
+
+      // アダプターからMCPレスポンスへの変換
+      const mcpResponse = convertAdapterToMCPResponse(adapterResult);
+
+      return this.presenter.presentRawResponse(mcpResponse);
     } catch (error) {
       return this.handleError(error, 'updateJsonIndex');
     }

@@ -6,6 +6,8 @@ import { DomainError } from "../../shared/errors/DomainError.js";
 import { InfrastructureError } from "../../shared/errors/InfrastructureError.js";
 import { logger } from "../../shared/utils/logger.js";
 import type { IContextController } from "./interfaces/IContextController.js";
+// アダプターレイヤーのインポート
+import { convertAdapterToMCPResponse } from '../../adapters/mcp/MCPProtocolAdapter.js';
 
 /**
  * Context Controller
@@ -36,15 +38,32 @@ export class ContextController implements IContextController {
   }> {
     try {
       logger.info(`Reading rules for language: ${language}`);
+
+      // ルール情報を取得
       const result = await this.readRulesUseCase.execute(language);
       logger.debug(`Rules retrieved successfully for language: ${language}`);
+
+      // ドメイン結果をアダプターレイヤー形式に変換
+      const adapterResult = {
+        content: result,
+        metadata: {
+          operation: 'readRules',
+          language,
+          timestamp: new Date().toISOString()
+        }
+      };
+
+      // アダプターからMCPレスポンスへの変換
+      const mcpResponse = convertAdapterToMCPResponse(adapterResult);
+
+      // レスポンスを整形して返却
       return {
         success: true,
-        data: result
+        data: mcpResponse.result as unknown as RulesResult
       };
     } catch (error) {
       logger.error(`Failed to read rules for language: ${language}`, error);
-      return this.handleError(error);
+      return this.handleError(error, 'readRules');
     }
   }
 
@@ -93,21 +112,37 @@ export class ContextController implements IContextController {
         throw error; // Re-throw the error instead of silently using fallback content
       }
 
+      // ドメイン結果をアダプターレイヤー形式に変換
+      const adapterResult = {
+        content: contextResult,
+        metadata: {
+          operation: 'readContext',
+          branch: request.branch,
+          language: request.language,
+          timestamp: new Date().toISOString()
+        }
+      };
+
+      // アダプターからMCPレスポンスへの変換
+      const mcpResponse = convertAdapterToMCPResponse(adapterResult);
+
+      // レスポンスを整形して返却
       return {
         success: true,
-        data: contextResult
+        data: mcpResponse.result as unknown as ContextResult
       };
     } catch (error) {
-      return this.handleError(error);
+      return this.handleError(error, 'readContext');
     }
   }
 
   /**
    * Error handling
    * @param error Error object
+   * @param operation Optional operation name for context
    * @returns Response containing error information
    */
-  private handleError(error: any): {
+  private handleError(error: any, operation?: string): {
     success: boolean;
     error: string;
   } {
@@ -115,6 +150,7 @@ export class ContextController implements IContextController {
 
     let errorMessage: string;
     let errorCode: string = 'UNKNOWN_ERROR';
+    let errorDetails: Record<string, unknown> | undefined;
 
     if (error instanceof Error) {
       if (
@@ -124,6 +160,7 @@ export class ContextController implements IContextController {
       ) {
         errorCode = error.code;
         errorMessage = `${errorCode}: ${error.message}`;
+        errorDetails = error.details;
 
         // Use appropriate log level based on error type
         if (error instanceof DomainError) {
@@ -142,9 +179,27 @@ export class ContextController implements IContextController {
       logger.error(`Unknown error type: ${errorMessage}`);
     }
 
+    // エラー情報をアダプターレイヤー形式に変換
+    const errorAdapter = {
+      content: {
+        message: errorMessage,
+        code: errorCode,
+        details: errorDetails
+      },
+      isError: true, // エラーであることを明示
+      metadata: {
+        operation,
+        timestamp: new Date().toISOString(),
+        errorType: error instanceof Error ? error.constructor.name : typeof error
+      }
+    };
+
+    // アダプターからMCPレスポンスへの変換
+    const mcpResponse = convertAdapterToMCPResponse(errorAdapter);
+
     return {
       success: false,
-      error: errorMessage
+      error: typeof mcpResponse.error === 'string' ? mcpResponse.error : errorMessage
     };
   }
 }

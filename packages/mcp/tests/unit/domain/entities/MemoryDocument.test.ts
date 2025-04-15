@@ -212,28 +212,65 @@ describe('MemoryDocument Unit Tests', () => {
   });
 
   describe('toJSON', () => {
-    it('should parse and return the content directly for JSON files', () => {
-      const jsonContent = JSON.stringify(createValidJsonDocV2());
+    it('should parse and return the content directly for JSON files with new format', () => {
+      // 新形式（documentTypeがトップレベル）
+      const jsonDoc = createValidJsonDocV2();
+      const jsonContent = JSON.stringify(jsonDoc);
       const jsonPath = DocumentPath.create('data.json');
       const doc = MemoryDocument.create({ ...docProps, path: jsonPath, content: jsonContent });
       const jsonObj = doc.toJSON();
       expect(jsonObj).toEqual(JSON.parse(jsonContent));
     });
 
-     it('should log an error and return an inferred structure for invalid JSON files', () => {
-       const invalidJsonContent = '{"invalid": json}';
-       const jsonPath = DocumentPath.create('invalid.json');
-       const doc = MemoryDocument.create({ ...docProps, path: jsonPath, content: invalidJsonContent });
-       const jsonObj = doc.toJSON();
+    it('should convert from old format to new format when documentType is in metadata', () => {
+      // 古い形式（documentTypeがmetadata内）のJSONドキュメント
+      const oldFormatDoc = {
+        schema: 'memory_document_v2',
+        metadata: {
+          id: DocumentId.generate().value,
+          title: 'Old Format Document',
+          documentType: 'branch_context', // メタデータ内のdocumentType
+          path: 'old-format.json',
+          tags: ['old', 'format'],
+          lastModified: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          version: 1
+        },
+        content: {
+          purpose: 'Testing old format conversion'
+        }
+      };
 
-       expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining('Failed to parse JSON document'), expect.anything());
-       // Check that the inferred structure is returned (generic type here)
-       expect(jsonObj.schema).toBe('memory_document_v2');
-       expect(jsonObj.documentType).toBe('branch_context'); // Check top-level after removing metadata
-       // Since determineDocumentType returns 'branch_context', adjust expectation
-       // Fallback logic changed to return content as { text: ... }, so adjust expectation
-       expect(jsonObj.content).toEqual({ text: invalidJsonContent });
-     });
+      const jsonPath = DocumentPath.create('old-format.json');
+      const doc = MemoryDocument.create({ ...docProps, path: jsonPath, content: JSON.stringify(oldFormatDoc) });
+      const jsonObj = doc.toJSON();
+
+      // 新形式に変換されていることを確認：
+      // 1. トップレベルにdocumentTypeがある
+      expect(jsonObj.documentType).toBe('branch_context');
+      // 2. メタデータ内のプロパティが保持されている
+      expect(jsonObj.metadata.id).toBe(oldFormatDoc.metadata.id);
+      expect(jsonObj.metadata.title).toBe(oldFormatDoc.metadata.title);
+      // 3. コンテンツが保持されている
+      expect(jsonObj.content).toEqual(oldFormatDoc.content);
+      // 4. ログが出力されている
+      expect(mockLogger.info).toHaveBeenCalledWith(expect.stringContaining('Converting legacy document format to new format'), expect.anything());
+    });
+
+    it('should log an error and return an inferred structure for invalid JSON files', () => {
+      const invalidJsonContent = '{"invalid": json}';
+      const jsonPath = DocumentPath.create('invalid.json');
+      const doc = MemoryDocument.create({ ...docProps, path: jsonPath, content: invalidJsonContent });
+      const jsonObj = doc.toJSON();
+
+      expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining('Failed to parse JSON document'), expect.anything());
+      // Check that the inferred structure is returned (generic type here)
+      expect(jsonObj.schema).toBe('memory_document_v2');
+      expect(jsonObj.documentType).toBe('branch_context'); // Check top-level after removing metadata
+      // Since determineDocumentType returns 'branch_context', adjust expectation
+      // Fallback logic changed to return content as { text: ... }, so adjust expectation
+      expect(jsonObj.content).toEqual({ text: invalidJsonContent });
+    });
 
     it('should infer type from path and convert to JsonDocumentV2 format for non-JSON files (generic)', () => {
       const doc = MemoryDocument.create({ ...docProps, path: DocumentPath.create('notes.txt') });
@@ -252,27 +289,27 @@ describe('MemoryDocument Unit Tests', () => {
       expect(jsonObj.content).toEqual({ text: validContent });
     });
 
-     it('should correctly infer progress type based on path', () => {
-       const doc = MemoryDocument.create({ ...docProps, path: DocumentPath.create('progress.md') });
-       const jsonObj = doc.toJSON();
-       expect(jsonObj.documentType).toBe('progress'); // Check top-level after removing metadata
-       // Also check content structure (simply)
-       // Fallback logic returns content as { text: ... }, so check for 'text' property
-       expect(jsonObj.content).toHaveProperty('text');
-     });
+    it('should correctly infer progress type based on path', () => {
+      const doc = MemoryDocument.create({ ...docProps, path: DocumentPath.create('progress.md') });
+      const jsonObj = doc.toJSON();
+      expect(jsonObj.documentType).toBe('progress'); // Check top-level after removing metadata
+      // Also check content structure (simply)
+      // Fallback logic returns content as { text: ... }, so check for 'text' property
+      expect(jsonObj.content).toHaveProperty('text');
+    });
 
-     // Test other document types (branch_context, active_context, system_patterns) similarly
-     it('should correctly infer branch_context type based on path', () => {
-        const doc = MemoryDocument.create({ ...docProps, path: DocumentPath.create('branchContext.txt') });
-        const jsonObj = doc.toJSON();
-        expect(jsonObj.documentType).toBe('branch_context'); // Check top-level after removing metadata
-        // Fallback logic returns content as { text: ... }, so check for 'text' property
-        expect(jsonObj.content).toHaveProperty('text');
-     });
+    // Test other document types (branch_context, active_context, system_patterns) similarly
+    it('should correctly infer branch_context type based on path', () => {
+      const doc = MemoryDocument.create({ ...docProps, path: DocumentPath.create('branchContext.txt') });
+      const jsonObj = doc.toJSON();
+      expect(jsonObj.documentType).toBe('branch_context'); // Check top-level after removing metadata
+      // Fallback logic returns content as { text: ... }, so check for 'text' property
+      expect(jsonObj.content).toHaveProperty('text');
+    });
   });
 
   describe('fromJSON', () => {
-    it('should create an instance from a valid JsonDocumentV2', () => {
+    it('should create an instance from a valid JsonDocumentV2 with new format', () => {
       const jsonObj = createValidJsonDocV2();
       const doc = MemoryDocument.fromJSON(jsonObj, validPath);
 
@@ -284,13 +321,45 @@ describe('MemoryDocument Unit Tests', () => {
       expect(mockLogger.debug).toHaveBeenCalled(); // Check logger call
     });
 
+    it('should handle and convert from old format when documentType is in metadata', () => {
+      // 古い形式（documentTypeがmetadata内）のJSONドキュメント
+      const oldFormatDoc = {
+        schema: 'memory_document_v2',
+        metadata: {
+          id: DocumentId.generate().value,
+          title: 'Old Format Document',
+          documentType: 'branch_context', // メタデータ内のdocumentType
+          path: 'old-format.json',
+          tags: ['old', 'format'],
+          lastModified: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          version: 1
+        },
+        content: {
+          purpose: 'Testing old format conversion'
+        }
+      };
+
+      const doc = MemoryDocument.fromJSON(oldFormatDoc as any, validPath);
+
+      // 文字列化されたJSONからdocumentTypeの位置を確認
+      const contentObj = JSON.parse(doc.content);
+
+      // 新形式に変換されていることを確認
+      expect(contentObj.documentType).toBe('branch_context');
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        expect.stringContaining('Detected legacy document format with documentType in metadata'),
+        expect.anything()
+      );
+    });
+
     it('should handle cases with no tags correctly', () => {
        const jsonObj = createValidJsonDocV2({ metadata: { tags: undefined } });
        const doc = MemoryDocument.fromJSON(jsonObj, validPath);
        expect(doc.tags).toEqual([]);
     });
 
-     it('should sanitize and create instance when invalid tag formats are included', () => {
+    it('should sanitize and create instance when invalid tag formats are included', () => {
        const invalidTag = 'Invalid Tag';
        const sanitizedTag = 'invalid-tag';
        const jsonObj = createValidJsonDocV2({ metadata: { tags: [validTags[0].value, invalidTag] } });
@@ -300,12 +369,7 @@ describe('MemoryDocument Unit Tests', () => {
        expect(doc.tags).toContainEqual(validTags[0]);
        expect(doc.tags).toContainEqual(Tag.create(sanitizedTag));
        expect(doc.tags.length).toBe(2);
-     });
-
-     // Invalid JsonDocumentV2 (schema violations, etc.) might be the responsibility of the input,
-     // or MemoryDocument.fromJSON should throw an error.
-     // Current implementation might lead to runtime errors for missing required fields.
-     // Focusing on normal cases and tag sanitization here.
+    });
   });
 
   // determineDocumentType は private なので toJSON のテストで間接的に検証済み

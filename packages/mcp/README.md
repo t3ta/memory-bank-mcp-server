@@ -1,4 +1,4 @@
-# @memory-bank/mcp (v3.0.0)
+# @memory-bank/mcp (v2.5.0)
 
 This package provides the core implementation of the Memory-enabled Co-Pilot (MCP) server for managing project documentation and context.
 
@@ -111,8 +111,23 @@ The `@memory-bank/mcp` package follows clean architecture principles:
 
 - **Domain Layer**: Core business logic, entities (e.g., `MemoryDocument`, `BranchInfo`), and interfaces.
 - **Application Layer**: Use cases orchestrating domain logic (e.g., `WriteBranchDocumentUseCase`, `ReadContextUseCase`).
+- **Adapter Layer**: Transforms data between domain models and external formats, ensuring clean separation of concerns.
 - **Interface Layer**: Controllers handling MCP requests and presenters formatting responses.
 - **Infrastructure Layer**: Concrete implementations for external concerns like file system access (`FileSystem*Repository`), configuration, and indexing.
+
+### Adapter Layer
+
+The adapter layer introduced in v2.5.1 provides several benefits:
+
+- **Clear Separation of Responsibilities**: Isolates transformation logic between external protocols and domain models.
+- **Format Compatibility**: Handles conversions between array-based `ToolResponse` format and object-based `JsonDocumentV2` format.
+- **Schema Evolution**: Supports backward compatibility with older document formats, automatically migrating `documentType` field from metadata to top-level.
+- **Error Handling**: Provides consistent error formatting across the application.
+
+Key components:
+- `MCPProtocolAdapter`: Converts between MCP protocol formats and internal formats.
+- `DomainAdapter`: Converts between adapter layer formats and domain models.
+- Flexible content handling with `normalizeContent()` to bridge different content representations.
 
 ## Key Dependencies
 

@@ -232,63 +232,95 @@ export class MemoryDocument {
    * @returns JSON document object
    */
   public toJSON(): JsonDocumentV2 {
-    if (this.isJSON) { // <<<--- if ブロックを復活！
+    if (this.isJSON) {
       try {
         // ファイルの内容をパース
         const parsedContent = JSON.parse(this.props.content);
-        // スキーマ v2 形式であることを確認し、そのまま返す
-        // (ここで Zod などでバリデーションするのがより堅牢)
-        if (parsedContent.schema === 'memory_document_v2' && parsedContent.documentType && parsedContent.metadata && parsedContent.content) {
-           // パースした内容をそのまま返す (ID などもファイルの内容を維持)
-           // 必要であれば、lastModified や tags を props の値で上書きする
-           // parsedContent.metadata.lastModified = this.props.lastModified.toISOString();
-           // parsedContent.metadata.tags = this.props.tags.map(tag => tag.value);
-          return parsedContent as JsonDocumentV2;
+
+        // スキーマ v2 形式であることを確認
+        if (parsedContent.schema === 'memory_document_v2') {
+          // 古い形式から新形式への変換をチェック（documentType が metadata 内にある場合）
+          if (!parsedContent.documentType && parsedContent.metadata?.documentType) {
+            getLogger().info('Converting legacy document format to new format:', {
+              path: this.props.path.value,
+              documentType: parsedContent.metadata.documentType
+            });
+
+            // 新しい形式に変換（documentType をトップレベルに移動）
+            const documentType = parsedContent.metadata.documentType;
+            const newDocument = {
+              ...parsedContent,
+              documentType: documentType, // トップレベルに追加
+              metadata: {
+                ...parsedContent.metadata,
+                // metadata.documentType は削除しない（互換性のため）
+              }
+            };
+
+            return newDocument as JsonDocumentV2;
+          }
+
+          // 新形式のチェック（documentType が既にトップレベルにある）
+          if (parsedContent.documentType && parsedContent.metadata && parsedContent.content) {
+            // 正しい形式なのでそのまま返す
+            return parsedContent as JsonDocumentV2;
+          }
+
+          // スキーマ形式が不明または不完全な場合は警告
+          getLogger().warn('Parsed JSON content has v2 schema but missing required fields, falling back to reconstruction.', {
+            path: this.props.path.value,
+            hasDocumentType: !!parsedContent.documentType,
+            hasMetadataDocumentType: !!parsedContent.metadata?.documentType
+          });
         } else {
-           getLogger().warn('Parsed JSON content does not match expected v2 schema, falling back to reconstruction.', { path: this.props.path.value });
-           // スキーマが不正な場合は、後半の組み立てロジックにフォールバック
+          getLogger().warn('Parsed JSON content does not match expected v2 schema, falling back to reconstruction.', {
+            path: this.props.path.value,
+            schema: parsedContent.schema
+          });
         }
       } catch (error) {
-        getLogger().error('Failed to parse JSON document, falling back to reconstruction:', { error, path: this.props.path.value });
-        // パースエラーの場合も、後半の組み立てロジックにフォールバック
+        getLogger().error('Failed to parse JSON document, will reconstruct document:', {
+          error: (error as Error).message,
+          path: this.props.path.value
+        });
+        // エラーをスローせず、以下の再構築処理に進む
       }
     }
 
-    // --- JSON 形式でない場合、またはパース/バリデーション失敗時のフォールバック ---
-    const documentType = this.determineDocumentType(); // <<<--- 呼び出しはここ
+    // --- JSON 形式でない場合、またはパース/バリデーション失敗時の再構築処理 ---
+    const documentType = this.determineDocumentType();
     const title = this.title || this.props.path.filename;
 
-    // metadata オブジェクトを作成 (documentType を除く)
+    // metadata オブジェクトを作成
     const metadata = {
-      id: crypto.randomUUID(), // 新しいIDを生成 (JSONでない場合はこれで良い)
+      id: crypto.randomUUID(), // 新しいIDを生成
       title: title,
       path: this.props.path.value,
       tags: this.props.tags.map((tag) => tag.value),
       lastModified: this.props.lastModified.toISOString(),
-      createdAt: new Date().toISOString(), // 作成日時は常に現在時刻
+      createdAt: new Date().toISOString(),
       version: 1,
     };
 
-    // content オブジェクトを作成 (JSONでない場合の簡易的な構造)
+    // content オブジェクトを作成（デフォルトは単純なテキスト）
     let content: Record<string, unknown> = {
-        text: this.props.content, // デフォルトは text フィールドに入れる
+      text: this.props.content,
     };
-    // 必要に応じて documentType ごとの特殊な content 構造を定義
-    // (例: branch_context なら purpose に入れるなど、ただし今回は text に統一)
 
-    // スキーマ v2 形式で返す (documentType をトップレベルに)
+    // 新形式の v2 スキーマで返す（documentType はトップレベル）
     return {
       schema: 'memory_document_v2',
-      documentType: documentType, // <<<--- トップレベルに追加！
+      documentType: documentType,
       metadata: metadata,
       content: content,
-    } as JsonDocumentV2; // 型アサーションは維持 (必要に応じて調整)
+    } as JsonDocumentV2;
   }
 
   /**
-   * Convert JSON document to Markdown
+   * JSON ドキュメントから MemoryDocument を作成
+   * v2.5.0 以降の新形式と古い形式の両方をサポート
    * @param jsonDoc JSON document to convert
-   * @returns Markdown formatted string
+   * @returns MemoryDocument instance
    */
   public static fromJSON(jsonDoc: JsonDocumentV2, path: DocumentPath): MemoryDocument {
     getLogger().debug('Creating MemoryDocument from JSON:', {
@@ -296,9 +328,33 @@ export class MemoryDocument {
       schema: jsonDoc.schema
     });
 
-    const lastModified = jsonDoc.metadata.lastModified; // Access via metadata
+    // documentType フィールドの位置を確認（古い形式か新形式か）
+    const hasTopLevelDocumentType = 'documentType' in jsonDoc && typeof jsonDoc.documentType === 'string';
 
-    const sanitizedTags = (jsonDoc.metadata.tags || []).map((tag: string) => { // Access via metadata
+    // 型安全なアクセスのために、`as any`を一時的に使用して型チェックを迂回
+    // これは移行期間中の互換性のためだけの措置
+    const metadata = jsonDoc.metadata as any;
+    const hasMetadataDocumentType = metadata?.documentType && typeof metadata.documentType === 'string';
+
+    if (!hasTopLevelDocumentType && hasMetadataDocumentType) {
+      // 古い形式を検出: documentType が metadata 内にあるケース
+      getLogger().info('Detected legacy document format with documentType in metadata.', {
+        path: path.value,
+        documentType: metadata.documentType
+      });
+
+      // v2.5.0 以降の新形式に変換（トップレベルに documentType を移動）
+      jsonDoc = {
+        ...jsonDoc,
+        documentType: metadata.documentType, // トップレベルに追加
+      } as JsonDocumentV2;
+    }
+
+    // 形式に関わらず metadata から必要な情報を取得
+    const lastModified = jsonDoc.metadata.lastModified;
+
+    // タグの処理（サニタイズを含む）
+    const sanitizedTags = (jsonDoc.metadata.tags || []).map((tag: string) => {
       try {
         const tagObj = Tag.create(tag);
         getLogger().debug('Created tag:', { tag: tagObj.value, source: tag });
@@ -315,6 +371,8 @@ export class MemoryDocument {
       }
     });
 
+    // 常に新形式（v2.5.0以降）として保存するため、
+    // 変換済みの jsonDoc オブジェクトを文字列化
     const doc = MemoryDocument.create({
       path,
       content: JSON.stringify(jsonDoc, null, 2),
@@ -330,7 +388,16 @@ export class MemoryDocument {
    * Determine the document type based on the path or content
    * @returns document type
    */
-  private determineDocumentType(): JsonDocumentV2['documentType'] { // <<<--- 型修正済み
+  /**
+   * Determine the document type based on the filename
+   *
+   * This method analyzes the filename to infer an appropriate document type
+   * according to the JsonDocumentV2 schema.
+   *
+   * @returns The document type that matches the schema requirements
+   * @private
+   */
+  private determineDocumentType(): JsonDocumentV2['documentType'] {
     const filename = this.props.path.filename.toLowerCase();
 
     if (filename.includes('branchcontext') || filename.includes('branch-context')) {

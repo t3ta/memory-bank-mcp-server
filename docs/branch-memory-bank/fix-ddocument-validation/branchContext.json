@@ -1,0 +1,15 @@
+{
+  "schema": "memory_document_v2",
+  "metadata": {
+    "id": "fix-ddocument-validation-context",
+    "title": "Branch Context for fix/ddocument-validation",
+    "documentType": "branch_context",
+    "path": "branchContext.json",
+    "tags": [],
+    "createdAt": "2025-04-14T05:50:02.449Z",
+    "lastModified": "2025-04-14T05:50:02.449Z"
+  },
+  "content": {
+    "description": "Context for branch: fix/ddocument-validation"
+  }
+}
